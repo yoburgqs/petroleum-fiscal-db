@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petroleum Fiscal Database</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh}
+header{background:linear-gradient(135deg,#1a1f2e 0%,#162032 100%);border-bottom:1px solid #2d3748;padding:24px 32px}
+header h1{font-size:1.5rem;font-weight:700;color:#fff;letter-spacing:-0.02em}
+header p{color:#94a3b8;font-size:0.875rem;margin-top:4px}
+.stats{display:flex;gap:12px;padding:16px 32px;background:#131720;border-bottom:1px solid #1e2535;flex-wrap:wrap}
+.stat{background:#1a2035;border:1px solid #2d3748;border-radius:8px;padding:14px 20px;min-width:130px}
+.stat-val{font-size:1.5rem;font-weight:700;color:#60a5fa}
+.stat-lab{font-size:0.7rem;color:#64748b;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px}
+.controls{padding:14px 32px;background:#131720;border-bottom:1px solid #1e2535;display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.ctrl-group label{display:block;font-size:0.7rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:4px}
+.controls input,.controls select{background:#1a2035;border:1px solid #2d3748;border-radius:6px;color:#e2e8f0;padding:7px 12px;font-size:0.83rem;outline:none}
+.controls input{width:200px}
+.controls input:focus{border-color:#3b82f6}
+#count{font-size:0.78rem;color:#64748b;padding-bottom:2px;margin-left:auto}
+.table-wrap{overflow-x:auto;padding:0 32px 40px}
+table{width:100%;border-collapse:collapse;font-size:0.82rem;margin-top:12px}
+th{text-align:left;padding:9px 12px;color:#64748b;font-weight:600;font-size:0.7rem;text-transform:uppercase;letter-spacing:0.05em;border-bottom:1px solid #2d3748;white-space:nowrap;cursor:pointer;user-select:none}
+th:hover{color:#94a3b8}
+th.sorted-asc::after{content:" ↑";color:#60a5fa}
+th.sorted-desc::after{content:" ↓";color:#60a5fa}
+td{padding:9px 12px;border-bottom:1px solid #1a2535;vertical-align:middle}
+tr:hover td{background:#151c2c}
+.grade{display:inline-block;padding:2px 8px;border-radius:4px;font-size:0.7rem;font-weight:700;letter-spacing:0.04em}
+.g-Ap{background:#14532d;color:#86efac}.g-A{background:#1e3a5f;color:#93c5fd}
+.g-B{background:#3b2a00;color:#fbbf24}.g-C{background:#3b1515;color:#f87171}
+.bar-wrap{display:flex;align-items:center;gap:7px;font-size:0.78rem;color:#94a3b8}
+.bar-bg{width:56px;height:5px;background:#1e2535;border-radius:3px;overflow:hidden;flex-shrink:0}
+.bar-inner{height:100%;border-radius:3px}
+.type-badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:0.67rem;background:#1e2535;color:#94a3b8;border:1px solid #2d3748}
+.region-tag{font-size:0.67rem;color:#475569;margin-top:2px}
+footer{padding:16px 32px;color:#374151;font-size:0.75rem;border-top:1px solid #1e2535}
+footer a{color:#4b5563;text-decoration:none}
+footer a:hover{color:#6b7280}
+</style>
+</head>
+<body>
+<header>
+  <h1>Petroleum Fiscal Database</h1>
+  <p>91 fiscal regimes &bull; 73 countries &bull; All regimes primary-source verified &bull; Updated 2026-07-27</p>
+</header>
+<div class="stats">
+  <div class="stat"><div class="stat-val">91</div><div class="stat-lab">Regimes</div></div>
+  <div class="stat"><div class="stat-val">73</div><div class="stat-lab">Countries</div></div>
+  <div class="stat"><div class="stat-val">91</div><div class="stat-lab">A+ Grade</div></div>
+  <div class="stat"><div class="stat-val">91</div><div class="stat-lab">A / A+ Total</div></div>
+  <div class="stat"><div class="stat-val">57.8%</div><div class="stat-lab">Avg Govt Take</div></div>
+  <div class="stat"><div class="stat-val">100%</div><div class="stat-lab">Primary Sourced</div></div>
+</div>
+<div class="controls">
+  <div class="ctrl-group">
+    <label>Search</label>
+    <input type="text" id="search" placeholder="Country, regime, type...">
+  </div>
+  <div class="ctrl-group">
+    <label>Grade</label>
+    <select id="grade-filter">
+      <option value="">All grades</option>
+      <option>A+</option><option>A</option><option>B</option><option>C</option>
+    </select>
+  </div>
+  <div class="ctrl-group">
+    <label>Type</label>
+    <select id="type-filter">
+      <option value="">All types</option>
+      <option>PSC</option><option>Concession</option><option>service_contract</option><option>JV</option>
+    </select>
+  </div>
+  <div class="ctrl-group">
+    <label>Region</label>
+    <select id="region-filter">
+      <option value="">All regions</option>
+      <option>Africa</option><option>Middle East</option><option>Asia-Pacific</option>
+      <option>Americas</option><option>Europe</option><option>CIS</option>
+    </select>
+  </div>
+  <span id="count"></span>
+</div>
+<div class="table-wrap">
+<table id="main-table">
+<thead>
+<tr>
+  <th id="th-country" onclick="sortBy('country')">Country</th>
+  <th id="th-name" onclick="sortBy('name')">Regime</th>
+  <th id="th-type" onclick="sortBy('type')">Type</th>
+  <th id="th-grade" onclick="sortBy('grade')">Grade</th>
+  <th id="th-keys_pct" onclick="sortBy('keys_pct')">Key Coverage</th>
+  <th id="th-govt_take" onclick="sortBy('govt_take')">Govt Take</th>
+  <th id="th-a_sources" onclick="sortBy('a_sources')">A-Tier Sources</th>
+  <th id="th-evidence" onclick="sortBy('evidence')">Evidence Records</th>
+</tr>
+</thead>
+<tbody id="tbody"></tbody>
+</table>
+</div>
+<footer>
+  Grade A+ = &ge;75% of 8 standard fiscal keys covered + at least one primary-law (A-tier) source &nbsp;&bull;&nbsp;
+  Evidence = individual source citations per fact &nbsp;&bull;&nbsp;
+  <a href="https://github.com/yoburgqs/petroleum-fiscal-db">github.com/yoburgqs/petroleum-fiscal-db</a>
+</footer>
+<script>
+const ALL = [{"id":105,"name":"Albania Upstream Concession ALBPETROL Patos-Marinza","country":"Albania","type":"Concession","evidence":2,"a_sources":1,"sources":2,"facts":8,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":32,"name":"Algeria Upstream (Sonatrach)","country":"Algeria","type":"PSC","evidence":60,"a_sources":2,"sources":7,"facts":48,"keys_pct":100,"grade":"A+","govt_take":58.6,"npv_60":null},{"id":24,"name":"Angola Upstream","country":"Angola","type":"PSC","evidence":65,"a_sources":1,"sources":5,"facts":56,"keys_pct":100,"grade":"A+","govt_take":61.6,"npv_60":null},{"id":63,"name":"Argentina Upstream Concession (Vaca Muerta)","country":"Argentina","type":"Concession","evidence":3,"a_sources":2,"sources":3,"facts":10,"keys_pct":100,"grade":"A+","govt_take":65.0,"npv_60":null},{"id":73,"name":"Argentina Upstream Vaca Muerta Law 17319","country":"Argentina","type":"concession","evidence":13,"a_sources":1,"sources":2,"facts":13,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":47,"name":"Australia Upstream (PRRT)","country":"Australia","type":"PSC","evidence":47,"a_sources":2,"sources":6,"facts":41,"keys_pct":100,"grade":"A+","govt_take":48.7,"npv_60":null},{"id":30,"name":"Azerbaijan Upstream ACG-ShahDeniz","country":"Azerbaijan","type":"PSC","evidence":63,"a_sources":1,"sources":6,"facts":52,"keys_pct":100,"grade":"A+","govt_take":41.5,"npv_60":null},{"id":102,"name":"Bahrain Upstream Concession NOGA Tatweer JV","country":"Bahrain","type":"Concession","evidence":2,"a_sources":1,"sources":2,"facts":8,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":100,"name":"Bangladesh Upstream PSC Petrobangla Bibiyana Model","country":"Bangladesh","type":"PSC","evidence":3,"a_sources":1,"sources":2,"facts":8,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":82,"name":"Bolivia Upstream Operations Contract YPFB","country":"Bolivia","type":"service_contract","evidence":13,"a_sources":1,"sources":2,"facts":13,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":71,"name":"Bolivia Upstream Service Contract (YPFB Nationalized)","country":"Bolivia","type":"Service Contract","evidence":10,"a_sources":1,"sources":1,"facts":10,"keys_pct":100,"grade":"A+","govt_take":85.0,"npv_60":null},{"id":52,"name":"Brazil Upstream (Concession + Pre-salt PSC)","country":"Brazil","type":"PSC","evidence":61,"a_sources":1,"sources":5,"facts":53,"keys_pct":100,"grade":"A+","govt_take":57.0,"npv_60":null},{"id":79,"name":"Brunei Upstream PSC BRShell PetroBrunei","country":"Brunei","type":"PSC","evidence":14,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":67,"name":"Cameroon Upstream PSC (Petroleum Code 1999)","country":"Cameroon","type":"PSC","evidence":10,"a_sources":1,"sources":1,"facts":10,"keys_pct":100,"grade":"A+","govt_take":70.0,"npv_60":null},{"id":83,"name":"Cameroon Upstream PSC Petroleum Code 1999 SNH","country":"Cameroon","type":"PSC","evidence":13,"a_sources":1,"sources":3,"facts":13,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":51,"name":"Canada Offshore (NL + NS)","country":"Canada","type":"PSC","evidence":40,"a_sources":4,"sources":7,"facts":33,"keys_pct":100,"grade":"A+","govt_take":32.8,"npv_60":null},{"id":84,"name":"Chad Upstream PSC Doba Basin SHT Petroleum Code 2007","country":"Chad","type":"PSC","evidence":13,"a_sources":1,"sources":3,"facts":13,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":53,"name":"Colombia Upstream (E&P Concession)","country":"Colombia","type":"PSC","evidence":51,"a_sources":1,"sources":5,"facts":46,"keys_pct":100,"grade":"A+","govt_take":28.8,"npv_60":null},{"id":80,"name":"Cote d Ivoire Upstream PSC Code Petrolier 2012","country":"Cote d'Ivoire","type":"PSC","evidence":13,"a_sources":1,"sources":3,"facts":13,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":66,"name":"Cote d'Ivoire Upstream PSC","country":"Cote d'Ivoire","type":"PSC","evidence":10,"a_sources":1,"sources":1,"facts":10,"keys_pct":100,"grade":"A+","govt_take":68.0,"npv_60":null},{"id":104,"name":"Croatia Upstream Concession INA North Adriatic Onshore","country":"Croatia","type":"Concession","evidence":3,"a_sources":3,"sources":3,"facts":8,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":95,"name":"Cyprus Upstream PSC Block 12 Aphrodite Chevron","country":"Cyprus","type":"PSC","evidence":14,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":106,"name":"DRC Congo Kinshasa Upstream PSC COHYDRO Muanda Offshore","country":"DRC","type":"PSC","evidence":2,"a_sources":1,"sources":2,"facts":8,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":48,"name":"Denmark Upstream (Nordsofonden)","country":"Denmark","type":"PSC","evidence":59,"a_sources":4,"sources":7,"facts":56,"keys_pct":100,"grade":"A+","govt_take":55.2,"npv_60":null},{"id":55,"name":"Ecuador Upstream (Service Contracts)","country":"Ecuador","type":"PSC","evidence":53,"a_sources":1,"sources":8,"facts":46,"keys_pct":100,"grade":"A+","govt_take":87.5,"npv_60":null},{"id":43,"name":"Egypt Upstream PSC (EGPC)","country":"Egypt","type":"PSC","evidence":62,"a_sources":1,"sources":4,"facts":51,"keys_pct":100,"grade":"A+","govt_take":62.0,"npv_60":null},{"id":68,"name":"Equatorial Guinea Upstream PSC (Hydrocarbon Law 2006)","country":"Equatorial Guinea","type":"PSC","evidence":10,"a_sources":1,"sources":1,"facts":10,"keys_pct":100,"grade":"A+","govt_take":68.0,"npv_60":null},{"id":81,"name":"Equatorial Guinea Upstream PSC Hydrocarbons Law 2006","country":"Equatorial Guinea","type":"PSC","evidence":14,"a_sources":1,"sources":3,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":64,"name":"Gabon Upstream PSC (Petroleum Code 2019)","country":"Gabon","type":"PSC","evidence":10,"a_sources":1,"sources":1,"facts":10,"keys_pct":100,"grade":"A+","govt_take":65.0,"npv_60":null},{"id":74,"name":"Gabon Upstream PSC Code Petrolier 2019","country":"Gabon","type":"PSC","evidence":13,"a_sources":1,"sources":3,"facts":13,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":99,"name":"Ghana TEN Block Sankofa Eni TotalEnergies","country":"Ghana","type":"PSC","evidence":22,"a_sources":2,"sources":4,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":25,"name":"Ghana Upstream","country":"Ghana","type":"PSC","evidence":69,"a_sources":3,"sources":9,"facts":49,"keys_pct":100,"grade":"A+","govt_take":52.7,"npv_60":null},{"id":56,"name":"Guyana Stabroek PSA (ExxonMobil-Hess-CNOOC)","country":"Guyana","type":"PSC","evidence":55,"a_sources":1,"sources":6,"facts":51,"keys_pct":100,"grade":"A+","govt_take":44.3,"npv_60":null},{"id":61,"name":"Guyana Upstream Stabroek","country":"Guyana","type":"PSC","evidence":38,"a_sources":1,"sources":5,"facts":32,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":33,"name":"India Upstream RSC","country":"India","type":"PSC","evidence":56,"a_sources":2,"sources":5,"facts":46,"keys_pct":100,"grade":"A+","govt_take":43.9,"npv_60":null},{"id":3,"name":"Indonesia Cost Recovery PSC","country":"Indonesia","type":"PSC","evidence":86,"a_sources":4,"sources":11,"facts":71,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":4,"name":"Indonesia Gross Split PSC","country":"Indonesia","type":"PSC","evidence":70,"a_sources":3,"sources":9,"facts":63,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":86,"name":"Iran Upstream EPDP Contract NIOC","country":"Iran","type":"service_contract","evidence":14,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":38,"name":"Iraq Federal Upstream (TSC)","country":"Iraq","type":"PSC","evidence":47,"a_sources":1,"sources":7,"facts":45,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":39,"name":"Iraq KRG Upstream (PSC)","country":"Iraq","type":"PSC","evidence":51,"a_sources":4,"sources":8,"facts":44,"keys_pct":100,"grade":"A+","govt_take":44.1,"npv_60":null},{"id":91,"name":"Israel Upstream Concession Leviathan Tamar","country":"Israel","type":"concession","evidence":14,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":29,"name":"Kazakhstan Upstream PSA","country":"Kazakhstan","type":"PSC","evidence":70,"a_sources":3,"sources":11,"facts":52,"keys_pct":100,"grade":"A+","govt_take":49.9,"npv_60":null},{"id":88,"name":"Kenya Upstream PSC PEDPA 2019","country":"Kenya","type":"PSC","evidence":14,"a_sources":1,"sources":3,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":41,"name":"Kuwait Upstream (KPC)","country":"Kuwait","type":"PSC","evidence":56,"a_sources":1,"sources":6,"facts":55,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":98,"name":"Lebanon Offshore PSA Block 4 9 TotalEnergies ENI QatarEnergy","country":"Lebanon","type":"PSC","evidence":22,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":93,"name":"Liberia Upstream PSC NOCAL","country":"Liberia","type":"PSC","evidence":22,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":44,"name":"Libya Upstream (EPSA V 2025)","country":"Libya","type":"PSC","evidence":58,"a_sources":1,"sources":6,"facts":49,"keys_pct":100,"grade":"A+","govt_take":68.7,"npv_60":null},{"id":18,"name":"Malaysia PSC","country":"Malaysia","type":"PSC","evidence":72,"a_sources":2,"sources":9,"facts":47,"keys_pct":100,"grade":"A+","govt_take":60.7,"npv_60":null},{"id":58,"name":"Mexico Upstream (CNH Contracts + Pemex)","country":"Mexico","type":"PSC","evidence":53,"a_sources":1,"sources":5,"facts":46,"keys_pct":100,"grade":"A+","govt_take":28.1,"npv_60":null},{"id":101,"name":"Morocco Upstream PSC ONHYM Atlantic Margin","country":"Morocco","type":"PSC","evidence":3,"a_sources":1,"sources":2,"facts":8,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":97,"name":"Mozambique Upstream Onshore Concession INP","country":"Mozambique","type":"concession","evidence":14,"a_sources":1,"sources":3,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":26,"name":"Mozambique Upstream Rovuma","country":"Mozambique","type":"PSC","evidence":66,"a_sources":4,"sources":8,"facts":50,"keys_pct":100,"grade":"A+","govt_take":38.1,"npv_60":null},{"id":62,"name":"Mozambique Upstream S6B","country":"Mozambique","type":"PSC","evidence":36,"a_sources":1,"sources":4,"facts":31,"keys_pct":100,"grade":"A+","govt_take":38.4,"npv_60":null},{"id":20,"name":"Myanmar PSC","country":"Myanmar","type":"PSC","evidence":57,"a_sources":1,"sources":5,"facts":45,"keys_pct":100,"grade":"A+","govt_take":54.4,"npv_60":null},{"id":89,"name":"Namibia Upstream PSC Orange Basin","country":"Namibia","type":"PSC","evidence":14,"a_sources":1,"sources":3,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":49,"name":"Netherlands Upstream (SPS)","country":"Netherlands","type":"PSC","evidence":52,"a_sources":4,"sources":7,"facts":49,"keys_pct":100,"grade":"A+","govt_take":38.6,"npv_60":null},{"id":23,"name":"Nigeria Upstream PIA 2021","country":"Nigeria","type":"PSC","evidence":73,"a_sources":3,"sources":10,"facts":60,"keys_pct":100,"grade":"A+","govt_take":60.7,"npv_60":null},{"id":103,"name":"Nigeria Upstream Pre-PIA Deepwater PSC (MPSA 2000-2021)","country":"Nigeria","type":"PSC","evidence":3,"a_sources":1,"sources":2,"facts":8,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":45,"name":"Norway Upstream (Petroleum Tax)","country":"Norway","type":"PSC","evidence":77,"a_sources":4,"sources":8,"facts":69,"keys_pct":100,"grade":"A+","govt_take":64.9,"npv_60":null},{"id":42,"name":"Oman Upstream (EPSA)","country":"Oman","type":"PSC","evidence":53,"a_sources":3,"sources":9,"facts":40,"keys_pct":100,"grade":"A+","govt_take":48.1,"npv_60":null},{"id":35,"name":"Pakistan Upstream Concession","country":"Pakistan","type":"PSC","evidence":45,"a_sources":2,"sources":5,"facts":39,"keys_pct":100,"grade":"A+","govt_take":34.5,"npv_60":null},{"id":21,"name":"Papua New Guinea Concession","country":"Papua New Guinea","type":"PSC","evidence":60,"a_sources":1,"sources":5,"facts":53,"keys_pct":100,"grade":"A+","govt_take":32.6,"npv_60":null},{"id":54,"name":"Peru Upstream (License + Service Contracts)","country":"Peru","type":"PSC","evidence":43,"a_sources":1,"sources":5,"facts":38,"keys_pct":100,"grade":"A+","govt_take":28.7,"npv_60":null},{"id":94,"name":"Philippines Upstream SC-38 Malampaya DOE Service Contract","country":"Philippines","type":"service_contract","evidence":14,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":37,"name":"Qatar Upstream (QatarEnergy)","country":"Qatar","type":"PSC","evidence":52,"a_sources":2,"sources":7,"facts":41,"keys_pct":88,"grade":"A+","govt_take":60.4,"npv_60":null},{"id":65,"name":"Republic of Congo PSC (Hydrocarbon Code 2016)","country":"Republic of Congo","type":"PSC","evidence":10,"a_sources":1,"sources":1,"facts":10,"keys_pct":100,"grade":"A+","govt_take":72.0,"npv_60":null},{"id":75,"name":"Republic of Congo Upstream PSC SNPC","country":"Republic of Congo","type":"PSC","evidence":13,"a_sources":1,"sources":3,"facts":13,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":90,"name":"Romania Upstream PSA Neptun Deep Black Sea","country":"Romania","type":"concession","evidence":14,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":31,"name":"Russia Upstream (MET + Concession)","country":"Russia","type":"PSC","evidence":54,"a_sources":1,"sources":6,"facts":58,"keys_pct":100,"grade":"A+","govt_take":80.0,"npv_60":null},{"id":40,"name":"Saudi Arabia Upstream (Saudi Aramco)","country":"Saudi Arabia","type":"PSC","evidence":43,"a_sources":3,"sources":7,"facts":41,"keys_pct":100,"grade":"A+","govt_take":93.0,"npv_60":null},{"id":28,"name":"Senegal Mauritania Upstream GTA","country":"Senegal","type":"PSC","evidence":57,"a_sources":2,"sources":6,"facts":49,"keys_pct":100,"grade":"A+","govt_take":43.5,"npv_60":null},{"id":92,"name":"South Africa Upstream MPRDA Orange Basin TotalEnergies","country":"South Africa","type":"PSC","evidence":14,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":87,"name":"South Sudan Upstream PSC GPOC Model","country":"South Sudan","type":"PSC","evidence":14,"a_sources":1,"sources":3,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":96,"name":"Sudan Upstream PSA Muglad Melut Basins CNPC","country":"Sudan","type":"PSC","evidence":14,"a_sources":1,"sources":3,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":70,"name":"Suriname Offshore PSC (Block 58 / Gran Morgu model)","country":"Suriname","type":"PSC","evidence":10,"a_sources":1,"sources":1,"facts":10,"keys_pct":100,"grade":"A+","govt_take":65.0,"npv_60":null},{"id":77,"name":"Suriname Upstream PSC Block 58 TotalEnergies APA","country":"Suriname","type":"PSC","evidence":14,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":27,"name":"Tanzania Upstream","country":"Tanzania","type":"PSC","evidence":66,"a_sources":3,"sources":7,"facts":54,"keys_pct":100,"grade":"A+","govt_take":51.9,"npv_60":null},{"id":78,"name":"Thailand Upstream Thailand III Concession SRB","country":"Thailand","type":"concession","evidence":14,"a_sources":1,"sources":2,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":22,"name":"Timor-Leste PSC","country":"Timor-Leste","type":"PSC","evidence":61,"a_sources":1,"sources":5,"facts":53,"keys_pct":100,"grade":"A+","govt_take":72.5,"npv_60":null},{"id":57,"name":"Trinidad Tobago Upstream (PPT + PSC)","country":"Trinidad","type":"PSC","evidence":52,"a_sources":1,"sources":5,"facts":49,"keys_pct":100,"grade":"A+","govt_take":49.9,"npv_60":null},{"id":85,"name":"Tunisia Upstream Concession ETAP","country":"Tunisia","type":"concession","evidence":13,"a_sources":1,"sources":2,"facts":13,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":72,"name":"Tunisia Upstream Concession/PSC (Hydrocarbons Code)","country":"Tunisia","type":"Mixed","evidence":10,"a_sources":1,"sources":1,"facts":10,"keys_pct":100,"grade":"A+","govt_take":70.0,"npv_60":null},{"id":34,"name":"Turkmenistan Upstream (Turkmengaz)","country":"Turkmenistan","type":"PSC","evidence":60,"a_sources":1,"sources":6,"facts":23,"keys_pct":100,"grade":"A+","govt_take":85.0,"npv_60":null},{"id":36,"name":"UAE Abu Dhabi Upstream (ADNOC)","country":"UAE","type":"PSC","evidence":52,"a_sources":1,"sources":8,"facts":39,"keys_pct":88,"grade":"A+","govt_take":60.0,"npv_60":null},{"id":50,"name":"USA GOM Federal Upstream (BOEM)","country":"USA","type":"PSC","evidence":49,"a_sources":4,"sources":8,"facts":41,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":69,"name":"Uganda Upstream PSA (Lake Albert \u2014 Petroleum Act 2013)","country":"Uganda","type":"PSC","evidence":10,"a_sources":1,"sources":1,"facts":10,"keys_pct":100,"grade":"A+","govt_take":80.0,"npv_60":null},{"id":76,"name":"Uganda Upstream PSC PEDPA 2013 Lake Albert","country":"Uganda","type":"PSC","evidence":14,"a_sources":1,"sources":3,"facts":14,"keys_pct":100,"grade":"A+","govt_take":null,"npv_60":null},{"id":46,"name":"UK Upstream (RFCT + EPL)","country":"United Kingdom","type":"PSC","evidence":83,"a_sources":7,"sources":10,"facts":63,"keys_pct":75,"grade":"A+","govt_take":null,"npv_60":null},{"id":2,"name":"Venezuela Empresa Mixta \u2014 2026 Reform","country":"Venezuela","type":"JV","evidence":57,"a_sources":2,"sources":4,"facts":46,"keys_pct":100,"grade":"A+","govt_take":85.0,"npv_60":null},{"id":1,"name":"Venezuela Empresa Mixta \u2014 Pre-2026","country":"Venezuela","type":"JV","evidence":34,"a_sources":1,"sources":7,"facts":16,"keys_pct":100,"grade":"A+","govt_take":80.0,"npv_60":null},{"id":19,"name":"Vietnam PSC","country":"Vietnam","type":"PSC","evidence":73,"a_sources":1,"sources":5,"facts":60,"keys_pct":100,"grade":"A+","govt_take":55.0,"npv_60":null}];
+const REGION = {"Albania": "Europe", "Algeria": "Africa", "Angola": "Africa", "Argentina": "Americas", "Australia": "Asia-Pacific", "Azerbaijan": "CIS", "Bahrain": "Middle East", "Bangladesh": "Asia-Pacific", "Bolivia": "Americas", "Brazil": "Americas", "Brunei": "Asia-Pacific", "Cameroon": "Africa", "Canada": "Americas", "Chad": "Africa", "Colombia": "Americas", "Cote d'Ivoire": "Africa", "Croatia": "Europe", "Cyprus": "Europe", "DRC": "Africa", "Denmark": "Europe", "Ecuador": "Americas", "Egypt": "Africa", "Equatorial Guinea": "Africa", "Gabon": "Africa", "Ghana": "Africa", "Guyana": "Americas", "India": "Asia-Pacific", "Indonesia": "Asia-Pacific", "Iran": "Middle East", "Iraq": "Middle East", "Israel": "Middle East", "Kazakhstan": "CIS", "Kenya": "Africa", "Kuwait": "Middle East", "Lebanon": "Middle East", "Liberia": "Africa", "Libya": "Africa", "Malaysia": "Asia-Pacific", "Mexico": "Americas", "Morocco": "Africa", "Mozambique": "Africa", "Myanmar": "Asia-Pacific", "Namibia": "Africa", "Netherlands": "Europe", "Nigeria": "Africa", "Norway": "Europe", "Oman": "Middle East", "Pakistan": "Asia-Pacific", "Papua New Guinea": "Asia-Pacific", "Peru": "Americas", "Philippines": "Asia-Pacific", "Qatar": "Middle East", "Republic of Congo": "Africa", "Romania": "Europe", "Russia": "CIS", "Saudi Arabia": "Middle East", "Senegal": "Africa", "South Africa": "Africa", "South Sudan": "Africa", "Sudan": "Africa", "Suriname": "Americas", "Tanzania": "Africa", "Thailand": "Asia-Pacific", "Timor-Leste": "Asia-Pacific", "Trinidad": "Americas", "Tunisia": "Africa", "Turkmenistan": "CIS", "UAE": "Middle East", "USA": "Americas", "Uganda": "Africa", "United Kingdom": "Europe", "Venezuela": "Americas", "Vietnam": "Asia-Pacific"};
+let sortCol = 'country', sortAsc = true;
+
+function gradeClass(g) {
+  return 'grade g-' + g.replace('+', 'p');
+}
+function barHtml(pct) {
+  const col = pct >= 75 ? '#22c55e' : pct >= 50 ? '#3b82f6' : '#f59e0b';
+  return '<div class="bar-wrap"><div class="bar-bg"><div class="bar-inner" style="width:' + pct + '%;background:' + col + '"></div></div>' + pct + '%</div>';
+}
+
+function render() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const gf = document.getElementById('grade-filter').value;
+  const tf = document.getElementById('type-filter').value;
+  const rf = document.getElementById('region-filter').value;
+
+  let rows = ALL.filter(r => {
+    if (q && !r.country.toLowerCase().includes(q) && !r.name.toLowerCase().includes(q) && !(r.type || '').toLowerCase().includes(q)) return false;
+    if (gf && r.grade !== gf) return false;
+    if (tf) {
+      const t = (r.type || '').toLowerCase();
+      if (!t.includes(tf.toLowerCase())) return false;
+    }
+    if (rf && REGION[r.country] !== rf) return false;
+    return true;
+  });
+
+  rows.sort((a, b) => {
+    let av = a[sortCol], bv = b[sortCol];
+    if (av === null || av === undefined) av = sortAsc ? Infinity : -Infinity;
+    if (bv === null || bv === undefined) bv = sortAsc ? Infinity : -Infinity;
+    if (typeof av === 'string') av = av.toLowerCase(), bv = (bv+'').toLowerCase();
+    return sortAsc ? (av > bv ? 1 : -1) : (av < bv ? 1 : -1);
+  });
+
+  document.getElementById('count').textContent = rows.length + ' of ' + ALL.length + ' regimes';
+
+  const tb = document.getElementById('tbody');
+  tb.innerHTML = rows.map(r => `<tr>
+    <td><strong>${r.country}</strong><div class="region-tag">${REGION[r.country] || ''}</div></td>
+    <td style="max-width:300px;white-space:normal;line-height:1.35;font-size:0.78rem">${r.name}</td>
+    <td><span class="type-badge">${r.type || '—'}</span></td>
+    <td><span class="${gradeClass(r.grade)}">${r.grade}</span></td>
+    <td>${barHtml(r.keys_pct)}</td>
+    <td>${r.govt_take !== null && r.govt_take !== undefined ? r.govt_take.toFixed(1) + '%' : '—'}</td>
+    <td style="text-align:center">${r.a_sources}</td>
+    <td style="text-align:center">${r.evidence}</td>
+  </tr>`).join('');
+}
+
+function sortBy(col) {
+  document.querySelectorAll('th').forEach(t => { t.classList.remove('sorted-asc', 'sorted-desc'); });
+  if (sortCol === col) { sortAsc = !sortAsc; } else { sortCol = col; sortAsc = true; }
+  const th = document.getElementById('th-' + col);
+  if (th) th.classList.add(sortAsc ? 'sorted-asc' : 'sorted-desc');
+  render();
+}
+
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('grade-filter').addEventListener('change', render);
+document.getElementById('type-filter').addEventListener('change', render);
+document.getElementById('region-filter').addEventListener('change', render);
+render();
+</script>
+</body>
+</html>
