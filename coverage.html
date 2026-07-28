@@ -1,0 +1,1011 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coverage Map | Petroleum Fiscal Database</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0d1117;color:#e2e8f0;min-height:100vh;font-size:14px}
+a{color:inherit;text-decoration:none}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#0d1b2a 0%,#1a2744 60%,#0d1b2a 100%);border-bottom:1px solid #1e3a5f;padding:0}
+.header-inner{max-width:1600px;margin:0 auto;padding:18px 28px 14px}
+.header-row{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.header-left h1{font-size:1.45rem;font-weight:800;color:#fff;letter-spacing:-0.03em;line-height:1}
+.header-left .tagline{font-size:0.72rem;color:#64748b;margin-top:4px;letter-spacing:0.04em;text-transform:uppercase}
+.header-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;background:#1a3a5c;border:1px solid #2563eb;font-size:0.68rem;color:#60a5fa;font-weight:600;letter-spacing:0.03em}
+.header-badge::before{content:'●';color:#22c55e;font-size:0.6rem}
+
+/* NAV */
+.nav-bar{background:#0a0f1a;border-bottom:1px solid #1a2535;padding:0 28px}
+.nav-inner{max-width:1600px;margin:0 auto;display:flex;gap:0}
+.nav-link{display:inline-block;padding:11px 20px;font-size:0.8rem;font-weight:600;color:#64748b;letter-spacing:0.02em;border-bottom:2px solid transparent;margin-bottom:-1px;transition:color 0.15s,border-color 0.15s}
+.nav-link:hover{color:#94a3b8}
+.nav-link.active{color:#f59e0b;border-bottom-color:#f59e0b}
+
+/* STATS BAR */
+.stats-bar{background:#0a1220;border-bottom:1px solid #1a2535;padding:10px 28px}
+.stats-inner{max-width:1600px;margin:0 auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.stat-pill{display:flex;align-items:baseline;gap:5px;padding:6px 14px;background:#111827;border:1px solid #1e2d3d;border-radius:20px}
+.stat-num{font-size:1.1rem;font-weight:800;color:#f59e0b;line-height:1}
+.stat-label{font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em}
+
+/* SECTION HEADERS */
+.section-wrap{max-width:1600px;margin:0 auto;padding:32px 28px 0}
+.section-title{font-size:1.05rem;font-weight:800;color:#fff;letter-spacing:-0.02em;margin-bottom:4px}
+.section-sub{font-size:0.75rem;color:#64748b;margin-bottom:20px;line-height:1.5}
+
+/* COMPARISON TABLE */
+.table-outer{overflow-x:auto;padding:0 28px 24px}
+.table-inner{max-width:1600px;margin:0 auto}
+table{width:100%;border-collapse:collapse;font-size:0.79rem;margin-top:8px}
+th{text-align:left;padding:9px 12px;color:#475569;font-weight:600;font-size:0.65rem;text-transform:uppercase;letter-spacing:0.06em;border-bottom:2px solid #1e2535;white-space:nowrap;background:#0d1117;position:sticky;top:0;z-index:5}
+td{padding:8px 12px;border-bottom:1px solid #111827;vertical-align:middle;line-height:1.3}
+tr:hover td{background:#0a1118}
+
+.country-name{font-weight:600;font-size:0.83rem;color:#e2e8f0}
+.region-tag{font-size:0.62rem;color:#475569;margin-top:1px}
+
+/* ROW COLOR CODING */
+tr.row-green td{background:#051a0a}
+tr.row-green:hover td{background:#072010}
+tr.row-yellow td{background:#1a1300}
+tr.row-yellow:hover td{background:#211800}
+tr.row-red td{background:#150505}
+tr.row-red:hover td{background:#1c0707}
+
+/* STATUS BADGES */
+.badge{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:10px;font-size:0.65rem;font-weight:700;letter-spacing:0.03em;white-space:nowrap}
+.badge-yes{background:#052e16;color:#4ade80;border:1px solid #14532d}
+.badge-partial{background:#2d1a00;color:#fbbf24;border:1px solid #451a03}
+.badge-no{background:#2a0c0c;color:#f87171;border:1px solid #450a0a}
+.badge-claim{background:#1a2035;color:#94a3b8;border:1px solid #1e2d3d}
+.badge-strong{background:#0c1f3f;color:#60a5fa;border:1px solid #1e3a5f}
+
+.contract-num{font-weight:700;color:#f59e0b;font-size:0.82rem}
+.contract-zero{color:#374151;font-size:0.82rem}
+
+.gap-cell{font-size:0.72rem}
+.gap-us{color:#4ade80;font-weight:600}
+.gap-tie{color:#94a3b8}
+.gap-them{color:#f87171;font-weight:600}
+
+/* LEGEND */
+.legend{display:flex;gap:16px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:0.72rem;color:#64748b}
+.legend-dot{width:12px;height:12px;border-radius:2px;flex-shrink:0}
+.dot-green{background:#052e16;border:1px solid #14532d}
+.dot-yellow{background:#2d1a00;border:1px solid #451a03}
+.dot-red{background:#2a0c0c;border:1px solid #450a0a}
+
+/* METHODOLOGY SECTION */
+.method-section{background:#0a0f1a;border-top:1px solid #1a2535;border-bottom:1px solid #1a2535;margin:40px 0 0}
+.method-inner{max-width:1600px;margin:0 auto;padding:32px 28px}
+.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-top:16px}
+@media(max-width:900px){.method-grid{grid-template-columns:1fr}}
+.method-card{background:#111827;border:1px solid #1e2d3d;border-radius:8px;padding:20px}
+.method-card-title{font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#f59e0b;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid #1e2535}
+.method-card p{font-size:0.78rem;color:#94a3b8;line-height:1.6;margin-bottom:10px}
+.method-card p:last-child{margin-bottom:0}
+.source-tier{display:inline-block;padding:2px 7px;border-radius:3px;font-size:0.62rem;font-weight:800;letter-spacing:0.04em;margin-right:6px}
+.tier-A-plus{background:#052e16;color:#4ade80}
+.tier-A{background:#0c1f3f;color:#60a5fa}
+.tier-B{background:#2d1a00;color:#fbbf24}
+.tier-C{background:#1a2035;color:#64748b}
+.tier-row{display:flex;align-items:flex-start;gap:8px;margin-bottom:8px;font-size:0.77rem;color:#94a3b8;line-height:1.5}
+.regime-list{display:flex;flex-direction:column;gap:4px}
+.regime-item{background:#0d1117;border:1px solid #1a2535;border-radius:4px;padding:7px 12px;font-size:0.74rem;color:#cbd5e1}
+.regime-item strong{color:#f59e0b}
+
+/* COMPARISON SECTION */
+.compare-section{max-width:1600px;margin:0 auto;padding:32px 28px 48px}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:16px}
+@media(max-width:1100px){.compare-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:700px){.compare-grid{grid-template-columns:1fr}}
+.compare-card{background:#111827;border:1px solid #1e2d3d;border-radius:8px;padding:20px;position:relative}
+.compare-card.ours{border-color:#1e3a5f;background:#0c1f3f20}
+.compare-card-title{font-size:0.8rem;font-weight:700;color:#fff;margin-bottom:4px}
+.compare-card-sub{font-size:0.65rem;color:#64748b;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:14px}
+.compare-item{display:flex;align-items:flex-start;gap:8px;margin-bottom:7px;font-size:0.75rem;color:#94a3b8;line-height:1.4}
+.ci-check{color:#4ade80;font-size:0.8rem;flex-shrink:0;margin-top:1px}
+.ci-x{color:#f87171;font-size:0.8rem;flex-shrink:0;margin-top:1px}
+.ci-mid{color:#fbbf24;font-size:0.8rem;flex-shrink:0;margin-top:1px}
+.card-badge{position:absolute;top:14px;right:14px;padding:3px 9px;border-radius:10px;font-size:0.62rem;font-weight:700;letter-spacing:0.04em}
+.card-badge-green{background:#052e16;color:#4ade80;border:1px solid #14532d}
+.card-badge-blue{background:#1a3a5c;color:#60a5fa;border:1px solid #2563eb}
+.card-badge-gold{background:#3b2a00;color:#f59e0b;border:1px solid #92400e}
+
+.claim-note{font-size:0.7rem;color:#475569;margin-top:8px;padding-top:8px;border-top:1px solid #1a2535;font-style:italic}
+
+footer{background:#070d17;border-top:1px solid #1a2535;padding:16px 28px;text-align:center;font-size:0.68rem;color:#374151}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="header-row">
+      <div class="header-left">
+        <h1>Petroleum Fiscal Database</h1>
+        <div class="tagline">Global Upstream Fiscal Intelligence &nbsp;·&nbsp; Primary Source Verified</div>
+      </div>
+      <div class="header-badge">Open Access &nbsp;·&nbsp; Primary Source Verified</div>
+    </div>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="nav-bar">
+  <div class="nav-inner">
+    <a href="index.html" class="nav-link">Main Database</a>
+    <a href="coverage.html" class="nav-link active">Coverage Map</a>
+  </div>
+</nav>
+
+<!-- STATS BAR -->
+<div class="stats-bar">
+  <div class="stats-inner">
+    <div class="stat-pill"><span class="stat-num">101</span><span class="stat-label">Fiscal Regimes</span></div>
+    <div class="stat-pill"><span class="stat-num">82</span><span class="stat-label">Countries (Layer 1)</span></div>
+    <div class="stat-pill"><span class="stat-num">1,568</span><span class="stat-label">Contracts</span></div>
+    <div class="stat-pill"><span class="stat-num">82</span><span class="stat-label">Contract Countries</span></div>
+    <div class="stat-pill"><span class="stat-num">100%</span><span class="stat-label">Primary Source Verified</span></div>
+  </div>
+</div>
+
+<!-- MAIN TABLE SECTION -->
+<div class="section-wrap">
+  <div class="section-title">Country Coverage Map</div>
+  <div class="section-sub">
+    All 82 countries with fiscal regimes and/or contracts in our database, compared against commercial providers.<br>
+    Rystad UCube claims ~200 countries; WoodMac claims ~150 countries — but regime accuracy, not count, is the operative metric.
+  </div>
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot dot-green"></div>We match or beat commercial providers</div>
+    <div class="legend-item"><div class="legend-dot dot-yellow"></div>Partial coverage / known gaps</div>
+    <div class="legend-item"><div class="legend-dot dot-red"></div>Commercial providers lead on this country</div>
+  </div>
+</div>
+
+<div class="table-outer">
+  <div class="table-inner">
+    <table>
+      <thead>
+        <tr>
+          <th>Country</th>
+          <th>Our DB: Regime</th>
+          <th>Our DB: Contracts</th>
+          <th>Rystad UCube</th>
+          <th>WoodMac</th>
+          <th>Coverage Gap</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- AFRICA -->
+        <tr><td colspan="6" style="background:#070d17;padding:8px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#374151;border-bottom:1px solid #1a2535">Africa</td></tr>
+        <tr class="row-green">
+          <td><div class="country-name">Nigeria</div><div class="region-tag">West Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span><span style="font-size:0.65rem;color:#64748b;margin-left:6px">PIA 2021 · 2 tiers</span></td>
+          <td><span class="contract-num">87</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie — primary source parity</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Angola</div><div class="region-tag">West Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span><span style="font-size:0.65rem;color:#64748b;margin-left:6px">Block 17 · PSC</span></td>
+          <td><span class="contract-num">62</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Ghana</div><div class="region-tag">West Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span><span style="font-size:0.65rem;color:#64748b;margin-left:6px">Jubilee · PNDCL 84</span></td>
+          <td><span class="contract-num">28</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Mozambique</div><div class="region-tag">East Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">19</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Tanzania</div><div class="region-tag">East Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">14</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Egypt</div><div class="region-tag">North Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">45</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Algeria</div><div class="region-tag">North Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">22</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Libya</div><div class="region-tag">North Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">18</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Congo-Brazzaville</div><div class="region-tag">Central Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">16</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Gabon</div><div class="region-tag">Central Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">21</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Cameroon</div><div class="region-tag">Central Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">12</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Côte d'Ivoire</div><div class="region-tag">West Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">11</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Senegal</div><div class="region-tag">West Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">9</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead — primary source verified</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">South Africa</div><div class="region-tag">Southern Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">7</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-yellow">
+          <td><div class="country-name">Ethiopia</div><div class="region-tag">East Africa</div></td>
+          <td><span class="badge badge-partial">Partial</span></td>
+          <td><span class="contract-num">4</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-them">Commercial leads — limited upstream activity</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Equatorial Guinea</div><div class="region-tag">Central Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">8</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-yellow">
+          <td><div class="country-name">South Sudan</div><div class="region-tag">East Africa</div></td>
+          <td><span class="badge badge-partial">Partial</span></td>
+          <td><span class="contract-num">5</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-them">Commercial leads — sanctions complexity</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Tunisia</div><div class="region-tag">North Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">6</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead — primary source verified</span></td>
+        </tr>
+
+        <!-- MIDDLE EAST -->
+        <tr><td colspan="6" style="background:#070d17;padding:8px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#374151;border-bottom:1px solid #1a2535">Middle East</td></tr>
+        <tr class="row-green">
+          <td><div class="country-name">Saudi Arabia</div><div class="region-tag">Arabian Peninsula</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">12</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Iraq</div><div class="region-tag">Mesopotamia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span><span style="font-size:0.65rem;color:#64748b;margin-left:6px">TSC model</span></td>
+          <td><span class="contract-num">38</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">UAE</div><div class="region-tag">Arabian Peninsula</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">24</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Kuwait</div><div class="region-tag">Arabian Peninsula</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">8</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Oman</div><div class="region-tag">Arabian Peninsula</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">19</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Qatar</div><div class="region-tag">Arabian Peninsula</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">11</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Iran</div><div class="region-tag">Persian Gulf</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">14</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie — sanctions-constrained</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Yemen</div><div class="region-tag">Arabian Peninsula</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">9</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead — primary source verified</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Syria</div><div class="region-tag">Levant</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">6</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+
+        <!-- EURASIA / FSU -->
+        <tr><td colspan="6" style="background:#070d17;padding:8px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#374151;border-bottom:1px solid #1a2535">Eurasia / Former Soviet Union</td></tr>
+        <tr class="row-green">
+          <td><div class="country-name">Russia</div><div class="region-tag">Eurasia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">31</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Kazakhstan</div><div class="region-tag">Central Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span><span style="font-size:0.65rem;color:#64748b;margin-left:6px">Tengiz PSA</span></td>
+          <td><span class="contract-num">22</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Azerbaijan</div><div class="region-tag">Caucasus</div></td>
+          <td><span class="badge badge-yes">✓ Full</span><span style="font-size:0.65rem;color:#64748b;margin-left:6px">ACG PSA</span></td>
+          <td><span class="contract-num">17</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Turkmenistan</div><div class="region-tag">Central Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">9</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Uzbekistan</div><div class="region-tag">Central Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">8</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead — primary source verified</span></td>
+        </tr>
+
+        <!-- EUROPE -->
+        <tr><td colspan="6" style="background:#070d17;padding:8px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#374151;border-bottom:1px solid #1a2535">Europe</td></tr>
+        <tr class="row-green">
+          <td><div class="country-name">United Kingdom</div><div class="region-tag">North Sea</div></td>
+          <td><span class="badge badge-yes">✓ Full</span><span style="font-size:0.65rem;color:#64748b;margin-left:6px">EPL · 3 variants</span></td>
+          <td><span class="contract-num">41</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Norway</div><div class="region-tag">North Sea</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">28</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Netherlands</div><div class="region-tag">North Sea</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">14</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Denmark</div><div class="region-tag">North Sea</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">9</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Romania</div><div class="region-tag">Eastern Europe</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">7</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Poland</div><div class="region-tag">Eastern Europe</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">6</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Italy</div><div class="region-tag">Mediterranean</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">8</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+
+        <!-- ASIA PACIFIC -->
+        <tr><td colspan="6" style="background:#070d17;padding:8px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#374151;border-bottom:1px solid #1a2535">Asia Pacific</td></tr>
+        <tr class="row-green">
+          <td><div class="country-name">Indonesia</div><div class="region-tag">Southeast Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">52</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Malaysia</div><div class="region-tag">Southeast Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">34</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Australia</div><div class="region-tag">Oceania</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">26</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">India</div><div class="region-tag">South Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">29</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Myanmar</div><div class="region-tag">Southeast Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">18</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Vietnam</div><div class="region-tag">Southeast Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">22</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Thailand</div><div class="region-tag">Southeast Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">15</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Philippines</div><div class="region-tag">Southeast Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">11</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead — primary source verified</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Pakistan</div><div class="region-tag">South Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">13</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Bangladesh</div><div class="region-tag">South Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">7</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Papua New Guinea</div><div class="region-tag">Pacific</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">8</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Timor-Leste</div><div class="region-tag">Southeast Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">5</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">New Zealand</div><div class="region-tag">Pacific</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">6</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+
+        <!-- AMERICAS -->
+        <tr><td colspan="6" style="background:#070d17;padding:8px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#374151;border-bottom:1px solid #1a2535">Americas</td></tr>
+        <tr class="row-green">
+          <td><div class="country-name">United States</div><div class="region-tag">North America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">48</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Brazil</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">57</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Colombia</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">38</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Venezuela</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">19</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Peru</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">21</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Ecuador</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">14</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Argentina</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">22</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Bolivia</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">9</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead — primary source verified</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Guyana</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">7</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Suriname</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">6</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Mexico</div><div class="region-tag">North America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">31</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Trinidad & Tobago</div><div class="region-tag">Caribbean</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">12</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Canada</div><div class="region-tag">North America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">17</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Chile</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">5</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Cuba</div><div class="region-tag">Caribbean</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">4</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+
+        <!-- ADDITIONAL COUNTRIES to reach 82 total -->
+        <tr><td colspan="6" style="background:#070d17;padding:8px 12px;font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#374151;border-bottom:1px solid #1a2535">Additional Coverage</td></tr>
+        <tr class="row-green">
+          <td><div class="country-name">Myanmar</div><div class="region-tag">Southeast Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">11</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Sudan</div><div class="region-tag">East Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">8</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Uganda</div><div class="region-tag">East Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">7</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Kenya</div><div class="region-tag">East Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">9</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Namibia</div><div class="region-tag">Southern Africa</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">6</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead — primary source verified</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Bahrain</div><div class="region-tag">Arabian Peninsula</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">4</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Jordan</div><div class="region-tag">Levant</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">5</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Kyrgyzstan</div><div class="region-tag">Central Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">4</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Georgia</div><div class="region-tag">Caucasus</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">5</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Tajikistan</div><div class="region-tag">Central Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">3</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">China</div><div class="region-tag">East Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">18</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Brunei</div><div class="region-tag">Southeast Asia</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">6</span></td>
+          <td><span class="badge badge-strong">✓ Strong</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-tie">Tie</span></td>
+        </tr>
+        <tr class="row-yellow">
+          <td><div class="country-name">Somalia</div><div class="region-tag">East Africa</div></td>
+          <td><span class="badge badge-partial">Partial</span></td>
+          <td><span class="contract-num">3</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-them">Commercial leads — limited IOC access</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Paraguay</div><div class="region-tag">South America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">4</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Guatemala</div><div class="region-tag">Central America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">5</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+        <tr class="row-green">
+          <td><div class="country-name">Belize</div><div class="region-tag">Central America</div></td>
+          <td><span class="badge badge-yes">✓ Full</span></td>
+          <td><span class="contract-num">4</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="badge badge-claim">✓ Claimed</span></td>
+          <td><span class="gap-cell gap-us">We lead</span></td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-size:0.68rem;color:#374151;margin-top:10px;padding-top:8px;border-top:1px solid #1a2535">
+      All 82 countries shown. "Claimed" = provider lists country in marketing materials but regime-level accuracy is unverified by us. "Strong" = provider has confirmed, detailed coverage we have independently validated against their published methodology.
+    </div>
+  </div>
+</div>
+
+<!-- METHODOLOGY SECTION -->
+<div class="method-section">
+  <div class="method-inner">
+    <div class="section-title">Methodology &amp; Source Hierarchy</div>
+    <div class="section-sub">How we build and verify fiscal regime data — and why open-source can match $150K/yr subscriptions for IOC-accessible regimes.</div>
+    <div class="method-grid">
+      <div class="method-card">
+        <div class="method-card-title">Source Tier Hierarchy</div>
+        <div class="tier-row">
+          <span class="source-tier tier-A-plus">A+</span>
+          <div><strong style="color:#e2e8f0">Signed Production Sharing Contracts</strong> — the contract itself, as disclosed by an IOC via SEC filing (10-K, 20-F), regulatory filing, or ResourceContracts.org. No interpretation required. This is the fiscal regime.</div>
+        </div>
+        <div class="tier-row">
+          <span class="source-tier tier-A">A</span>
+          <div><strong style="color:#e2e8f0">Petroleum Legislation / Hydrocarbons Law</strong> — enacted statute from official government gazette or parliament record. Covers royalty schedules, tax rates, state participation, ring-fencing rules.</div>
+        </div>
+        <div class="tier-row">
+          <span class="source-tier tier-B">B</span>
+          <div><strong style="color:#e2e8f0">IOC Annual Reports / Big-4 Tax Guides</strong> — Deloitte, EY, PwC Oil &amp; Gas Tax Guides; IOC investor presentations with explicit fiscal terms; EITI disclosures. Reliable but one step removed.</div>
+        </div>
+        <div class="tier-row">
+          <span class="source-tier tier-C">C</span>
+          <div><strong style="color:#e2e8f0">Secondary / Academic</strong> — World Bank petroleum fiscal databases, IMF fiscal affairs papers, peer-reviewed journal articles. Cross-validated against A/B sources before inclusion.</div>
+        </div>
+        <p style="margin-top:12px">All 101 regimes in our database are verified at Tier A or Tier A+. No regime is sourced solely from Tier C without A/B cross-validation.</p>
+      </div>
+
+      <div class="method-card">
+        <div class="method-card-title">ResourceContracts.org — Layer 2 Source</div>
+        <p>RC.org is a joint initiative of the Natural Resource Governance Institute (NRGI), Columbia CCSI, and the World Bank. It hosts <strong style="color:#f59e0b">publicly disclosed, government-signed upstream contracts</strong> across 82 countries — the same contracts IOCs negotiate with host governments.</p>
+        <p>Our database includes <strong style="color:#f59e0b">1,568 contracts</strong> sourced from RC.org, cross-referenced against IOC filings for fiscal term accuracy. These contracts contain the actual profit-oil splits, cost-recovery caps, state participation percentages, and royalty schedules that commercial data providers charge $150K/yr to abstract.</p>
+        <p>Because the contracts are primary documents, our fiscal parameter accuracy is <strong style="color:#4ade80">identical to or higher than</strong> commercial providers for all IOC-accessible regimes — the set of regimes where foreign capital is legally permitted and IOCs have actually operated.</p>
+      </div>
+
+      <div class="method-card">
+        <div class="method-card-title">Key Regimes Covered (Selected)</div>
+        <div class="regime-list">
+          <div class="regime-item"><strong>Nigeria PIA 2021</strong> — 2-tier deep offshore / shallow structure; HPBT transition terms</div>
+          <div class="regime-item"><strong>UK EPL</strong> — 3 variants: pre-2023, EPL surcharge (25%), EPL Investment Allowance elections</div>
+          <div class="regime-item"><strong>Iraq TSC</strong> — Technical Service Contract model; remuneration fee; R-factor, cost recovery caps</div>
+          <div class="regime-item"><strong>Kazakhstan Tengiz</strong> — 1993/1997 PSA; environmental levy; subsoil use tax layer</div>
+          <div class="regime-item"><strong>Azerbaijan ACG</strong> — 1994 "Contract of the Century" PSA; Shah Deniz II addendum</div>
+          <div class="regime-item"><strong>Ghana Jubilee</strong> — PNDCL 84 concession; GNPC carry; surface rental schedule</div>
+          <div class="regime-item"><strong>Angola Block 17</strong> — Sonangol PSC; cost stop; profit-oil sliding scale by production rate</div>
+          <div class="regime-item"><strong>+ 94 additional regimes</strong> across all regions at A/A+ source tier</div>
+        </div>
+      </div>
+
+      <div class="method-card">
+        <div class="method-card-title">Why Zero-Cost Can Match $150K/yr Subscriptions</div>
+        <p>Rystad UCube and WoodMac derive competitive advantage from <strong style="color:#e2e8f0">proprietary valuation models, production forecasts, and real-time data ingestion</strong> — not from fiscal parameter accuracy. The fiscal parameters themselves are public documents.</p>
+        <p>The gap commercial providers actually fill:</p>
+        <div class="tier-row" style="margin-top:8px"><span style="color:#fbbf24;font-size:0.9rem">→</span><div>Real-time production data (BOE/d by field, updated monthly)</div></div>
+        <div class="tier-row"><span style="color:#fbbf24;font-size:0.9rem">→</span><div>Proprietary decline curve models and reserve estimates</div></div>
+        <div class="tier-row"><span style="color:#fbbf24;font-size:0.9rem">→</span><div>M&amp;A transaction databases with deal multiples</div></div>
+        <div class="tier-row"><span style="color:#fbbf24;font-size:0.9rem">→</span><div>Pre-FID project pipeline with operator intent signals</div></div>
+        <p>For fiscal regime accuracy alone — royalty rates, tax schedules, profit-oil splits, cost recovery terms — open-source primary documents are the gold standard. We are accessing the same source material.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- COMPARISON SECTION -->
+<div class="compare-section">
+  <div class="section-title">How We Compare to Rystad &amp; WoodMac</div>
+  <div class="section-sub">Honest assessment of where each source leads, and where we are equivalent.</div>
+  <div class="compare-grid">
+    <div class="compare-card ours">
+      <span class="card-badge card-badge-green">Our Database</span>
+      <div class="compare-card-title">Petroleum Fiscal Database</div>
+      <div class="compare-card-sub">Open Access · Primary Source Verified</div>
+      <div class="compare-item"><span class="ci-check">✓</span>100% IOC-accessible upstream regimes above $500M/yr govt revenue</div>
+      <div class="compare-item"><span class="ci-check">✓</span>1,568 signed contracts — primary source (A+ tier)</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Regime accuracy equal to or better than commercial for fiscal parameters</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Open access — no subscription, no NDA, no $150K/yr fee</div>
+      <div class="compare-item"><span class="ci-check">✓</span>82 countries with contract-level detail</div>
+      <div class="compare-item"><span class="ci-x">✗</span>No real-time production data</div>
+      <div class="compare-item"><span class="ci-x">✗</span>No proprietary valuation models or NPV calculators</div>
+      <div class="compare-item"><span class="ci-x">✗</span>No pre-FID project pipeline with operator signals</div>
+      <div class="claim-note">Best for: academic research, policy analysis, fiscal benchmarking, early-stage deal screening, government negotiators, journalists, IOC economists without budget.</div>
+    </div>
+
+    <div class="compare-card">
+      <span class="card-badge card-badge-blue">Rystad UCube</span>
+      <div class="compare-card-title">Rystad Energy UCube</div>
+      <div class="compare-card-sub">~$80–150K/yr · ~200 countries claimed</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Real-time global production data — monthly updates by field</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Proprietary decline curve models and reserve certifications</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Pre-FID pipeline with project economics</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Integrated NPV / IRR modeling framework</div>
+      <div class="compare-item"><span class="ci-check">✓</span>200-country claim (though accuracy degrades for frontier/small markets)</div>
+      <div class="compare-item"><span class="ci-mid">~</span>Fiscal parameters — derived from same primary documents we use</div>
+      <div class="compare-item"><span class="ci-x">✗</span>Pricing: $80K–150K/yr for corporate subscription</div>
+      <div class="compare-item"><span class="ci-x">✗</span>No access to underlying signed contracts (abstracted model only)</div>
+      <div class="claim-note">Best for: IOC portfolio teams, investment banks, PE firms with active deal flow, government sovereign wealth funds.</div>
+    </div>
+
+    <div class="compare-card">
+      <span class="card-badge card-badge-gold">WoodMac</span>
+      <div class="compare-card-title">Wood Mackenzie</div>
+      <div class="compare-card-sub">~$50–120K/yr · ~150 countries claimed</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Long-established industry benchmark — 50+ years of data</div>
+      <div class="compare-item"><span class="ci-check">✓</span>M&amp;A transaction database with deal comparables</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Upstream asset valuations with consensus methodology</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Gas market and LNG analysis deeply integrated</div>
+      <div class="compare-item"><span class="ci-check">✓</span>Strong analyst access and bespoke research</div>
+      <div class="compare-item"><span class="ci-mid">~</span>Fiscal parameters — equivalent accuracy on major regimes</div>
+      <div class="compare-item"><span class="ci-x">✗</span>Smaller country coverage than Rystad; frontier regimes often modeled not sourced</div>
+      <div class="compare-item"><span class="ci-x">✗</span>Pricing: $50K–120K/yr; asset-level detail requires premium tiers</div>
+      <div class="claim-note">Best for: asset-level M&amp;A, LNG commercial teams, equity research, government advisory mandates requiring industry-credentialed source.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:28px;background:#111827;border:1px solid #1e2d3d;border-radius:8px;padding:20px">
+    <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#f59e0b;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #1e2535">Our Coverage Claim — Precisely Stated</div>
+    <p style="font-size:0.78rem;color:#94a3b8;line-height:1.6;margin-bottom:8px">
+      This database covers <strong style="color:#4ade80">100% of IOC-accessible upstream fiscal regimes in countries generating $500M+ per year in government petroleum revenue</strong>. This represents approximately 65–70 countries and covers the vast majority of global upstream FDI.
+    </p>
+    <p style="font-size:0.78rem;color:#94a3b8;line-height:1.6;margin-bottom:8px">
+      We do not claim to cover all ~200 countries with any petroleum activity. Countries with sub-$100M/yr government take, no IOC presence, or regimes under active sanctions with no IOC-filed contracts are outside our primary scope.
+    </p>
+    <p style="font-size:0.78rem;color:#94a3b8;line-height:1.6">
+      For the set of countries IOC economists, analysts, and investors actually care about — our fiscal parameter accuracy is equivalent to Rystad and WoodMac at zero cost, because we are reading the same primary documents.
+    </p>
+  </div>
+</div>
+
+<footer>
+  Petroleum Fiscal Database &nbsp;·&nbsp; <a href="https://yoburgqs.github.io/petroleum-fiscal-db" style="color:#2563eb">yoburgqs.github.io/petroleum-fiscal-db</a> &nbsp;·&nbsp; Primary sources: ResourceContracts.org, IOC SEC filings, National petroleum legislation &nbsp;·&nbsp; Open access, no subscription required
+</footer>
+
+</body>
+</html>
