@@ -165,7 +165,7 @@ footer{background:#0a1118;border-top:1px solid #1a2535;padding:20px 28px}
     <span class="stat-div">·</span>
     <div class="stat-pill"><span class="stat-num">58.3%</span><span class="stat-label">Avg Govt Take</span></div>
     <span class="stat-div">·</span>
-    <div class="stat-pill"><span class="stat-num">28</span><span class="stat-label">Production Records</span></div>
+    <div class="stat-pill"><span class="stat-num">33</span><span class="stat-label">Production Records</span></div>
     <span class="updated-tag">Updated 2026-07-28 &bull; <a href="https://github.com/yoburgqs/petroleum-fiscal-db" style="color:#374151">github.com/yoburgqs/petroleum-fiscal-db</a></span>
   </div>
 </div>
@@ -728,7 +728,7 @@ function filterContracts(){
       if(tp==='PSC'&&!ct.includes('psc')&&!ct.includes('psa')&&!ct.includes('production sharing')&&!ct.includes('profit sharing'))return false;
       if(tp==='Concession'&&!ct.includes('concession')&&!ct.includes('epaa'))return false;
       if(tp==='Service'&&!ct.includes('service'))return false;
-      if(tp==='JV'&&!ct.includes('jv')&&!ct.includes('joint venture'))return false;
+      if(tp==='JV'&&!ct.includes('jv')&&!ct.includes('joint venture')&&!ct.includes('joint development'))return false;
       if(tp==='License'&&!ct.includes('license')&&!ct.includes('permit')&&!ct.includes('licence'))return false;
     }
     if(pr==='yes'&&c.oil_production_bbl_day==null&&c.gas_production_mcf_day==null)return false;
@@ -803,8 +803,8 @@ function buildContractDetail(c){
       const num=f.num!=null?`<span class="kv-num">${f.num}${f.unit||''}</span> `:'';
       const txt=f.text?esc(f.text.substring(0,280))+(f.text.length>280?'…':''):null;
       const isNA=!f.text&&f.num==null;
-      const confMap={'high':'HIGH','medium':'MED','low':'LOW'};
-      const confClass={'high':'conf-high','medium':'conf-med','low':'conf-low'};
+      const confMap={'high':'HIGH','medium':'MED','low':'LOW','A':'A','B':'B','C':'C'};
+      const confClass={'high':'conf-high','medium':'conf-med','low':'conf-low','A':'conf-high','B':'conf-med','C':'conf-low'};
       const conf=f.confidence?`<span class="${confClass[f.confidence]||'conf-low'}">[${confMap[f.confidence]||f.confidence}] </span>`:'';
       factsHtml+=`<div class="kv"><div class="kv-label">${esc(f.label||k)}</div><div class="kv-val${isNA?' na':''}">${isNA?'—':conf+num+(txt||'')}</div></div>`;
     });
