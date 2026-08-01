@@ -1,0 +1,2962 @@
+{
+  "generated_at": "2026-08-01",
+  "db_version": "2026-08-01",
+  "total_countries": 211,
+  "total_contracts": 71561,
+  "countries": [
+    {
+      "country": "USA",
+      "contracts": 37222,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.05,
+        "75": 22.07,
+        "100": 23.08,
+        "125": 23.69
+      },
+      "contractor_npv_musd_at_75": 1929.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Norway",
+      "contracts": 7643,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 58.48,
+        "75": 67.43,
+        "100": 71.91,
+        "125": 74.59
+      },
+      "contractor_npv_musd_at_75": 796.1,
+      "contractor_irr_pct_at_75": 76.3,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "United Kingdom",
+      "contracts": 4000,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.48,
+        "75": 27.44,
+        "100": 30.93,
+        "125": 33.02
+      },
+      "contractor_npv_musd_at_75": 3193.3,
+      "contractor_irr_pct_at_75": 344.2,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Russia",
+      "contracts": 1261,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 23.82,
+        "75": 25.75,
+        "100": 26.71,
+        "125": 27.29
+      },
+      "contractor_npv_musd_at_75": 1805.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Australia",
+      "contracts": 1219,
+      "dominant_mechanic": "PRRT",
+      "govt_take_pct": {
+        "50": 28.64,
+        "75": 38.45,
+        "100": 43.34,
+        "125": 46.27
+      },
+      "contractor_npv_musd_at_75": 2285.3,
+      "contractor_irr_pct_at_75": 324.4,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Brazil",
+      "contracts": 1193,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 30.57,
+        "75": 38.06,
+        "100": 41.81,
+        "125": 44.06
+      },
+      "contractor_npv_musd_at_75": 2297.0,
+      "contractor_irr_pct_at_75": 185.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Canada",
+      "contracts": 944,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 32.12,
+        "75": 37.0,
+        "100": 39.44,
+        "125": 40.9
+      },
+      "contractor_npv_musd_at_75": 2360.5,
+      "contractor_irr_pct_at_75": 161.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Nigeria",
+      "contracts": 834,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 36.11,
+        "75": 47.17,
+        "100": 52.69,
+        "125": 56.01
+      },
+      "contractor_npv_musd_at_75": 1511.4,
+      "contractor_irr_pct_at_75": 92.4,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "China",
+      "contracts": 799,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 40.86,
+        "75": 47.78,
+        "100": 51.23,
+        "125": 53.31
+      },
+      "contractor_npv_musd_at_75": 1566.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Indonesia",
+      "contracts": 667,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 48.85,
+        "75": 56.18,
+        "100": 61.16,
+        "125": 63.63
+      },
+      "contractor_npv_musd_at_75": 1113.8,
+      "contractor_irr_pct_at_75": 780.8,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Colombia",
+      "contracts": 666,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 33.01,
+        "75": 36.38,
+        "100": 38.07,
+        "125": 39.08
+      },
+      "contractor_npv_musd_at_75": 1449.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "India",
+      "contracts": 653,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.61,
+        "75": 35.1,
+        "100": 38.34,
+        "125": 40.29
+      },
+      "contractor_npv_musd_at_75": 2531.4,
+      "contractor_irr_pct_at_75": 223.1,
+      "breakeven_price_usd": 43.4
+    },
+    {
+      "country": "Iraq",
+      "contracts": 610,
+      "dominant_mechanic": "TSC",
+      "govt_take_pct": {
+        "50": 73.62,
+        "75": 79.11,
+        "100": 77.61,
+        "125": 78.41
+      },
+      "contractor_npv_musd_at_75": 986.5,
+      "contractor_irr_pct_at_75": 976.5,
+      "breakeven_price_usd": -0.9
+    },
+    {
+      "country": "Iran",
+      "contracts": 547,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 74.97,
+        "75": 69.27,
+        "100": 79.19,
+        "125": 80.03
+      },
+      "contractor_npv_musd_at_75": 3455.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Mexico",
+      "contracts": 537,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 25.08,
+        "75": 28.47,
+        "100": 30.17,
+        "125": 31.18
+      },
+      "contractor_npv_musd_at_75": 2589.0,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Angola",
+      "contracts": 460,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 38.92,
+        "75": 50.69,
+        "100": 56.68,
+        "125": 60.27
+      },
+      "contractor_npv_musd_at_75": 1243.3,
+      "contractor_irr_pct_at_75": 89.8,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Peru",
+      "contracts": 391,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 31.55,
+        "75": 34.39,
+        "100": 35.81,
+        "125": 36.67
+      },
+      "contractor_npv_musd_at_75": 1516.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Argentina",
+      "contracts": 384,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 32.69,
+        "75": 36.06,
+        "100": 37.74,
+        "125": 38.76
+      },
+      "contractor_npv_musd_at_75": 1460.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Saudi Arabia",
+      "contracts": 381,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 52.57,
+        "75": 55.05,
+        "100": 56.29,
+        "125": 57.03
+      },
+      "contractor_npv_musd_at_75": 5826.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Malaysia",
+      "contracts": 365,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 55.85,
+        "75": 64.63,
+        "100": 69.03,
+        "125": 71.68
+      },
+      "contractor_npv_musd_at_75": 645.8,
+      "contractor_irr_pct_at_75": 147.8,
+      "breakeven_price_usd": 29.1
+    },
+    {
+      "country": "Tunisia",
+      "contracts": 343,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 47.57,
+        "75": 50.05,
+        "100": 51.29,
+        "125": 52.03
+      },
+      "contractor_npv_musd_at_75": 6669.0,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Kazakhstan",
+      "contracts": 302,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 53.09,
+        "75": 55.97,
+        "100": 57.41,
+        "125": 58.28
+      },
+      "contractor_npv_musd_at_75": 5694.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Libya",
+      "contracts": 301,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 74.9,
+        "75": 79.22,
+        "100": 81.39,
+        "125": 82.69
+      },
+      "contractor_npv_musd_at_75": 1808.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Venezuela",
+      "contracts": 298,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 51.01,
+        "75": 52.69,
+        "100": 53.54,
+        "125": 54.05
+      },
+      "contractor_npv_musd_at_75": 6216.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Vietnam",
+      "contracts": 241,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 44.61,
+        "75": 51.98,
+        "100": 55.65,
+        "125": 57.86
+      },
+      "contractor_npv_musd_at_75": 1345.0,
+      "contractor_irr_pct_at_75": 1217.8,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Oman",
+      "contracts": 222,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 51.42,
+        "75": 54.15,
+        "100": 55.51,
+        "125": 56.33
+      },
+      "contractor_npv_musd_at_75": 5980.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Egypt",
+      "contracts": 218,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 55.13,
+        "75": 58.32,
+        "100": 59.92,
+        "125": 60.87
+      },
+      "contractor_npv_musd_at_75": 5296.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Thailand",
+      "contracts": 216,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 23.22,
+        "75": 25.48,
+        "100": 26.61,
+        "125": 27.29
+      },
+      "contractor_npv_musd_at_75": 2748.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Philippines",
+      "contracts": 211,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 33.9,
+        "75": 45.33,
+        "100": 51.07,
+        "125": 54.5
+      },
+      "contractor_npv_musd_at_75": 1689.6,
+      "contractor_irr_pct_at_75": 141.2,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "UK",
+      "contracts": 211,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 17.44,
+        "75": 24.96,
+        "100": 28.72,
+        "125": 30.98
+      },
+      "contractor_npv_musd_at_75": 1965.1,
+      "contractor_irr_pct_at_75": 862.3,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Mozambique",
+      "contracts": 198,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.66,
+        "75": 28.04,
+        "100": 30.73,
+        "125": 32.34
+      },
+      "contractor_npv_musd_at_75": 3134.9,
+      "contractor_irr_pct_at_75": 305.8,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Pakistan",
+      "contracts": 194,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 29.5,
+        "75": 32.29,
+        "100": 33.69,
+        "125": 34.52
+      },
+      "contractor_npv_musd_at_75": 1586.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Algeria",
+      "contracts": 177,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 65.23,
+        "75": 68.86,
+        "100": 70.66,
+        "125": 71.76
+      },
+      "contractor_npv_musd_at_75": 3525.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Kuwait",
+      "contracts": 177,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 46.83,
+        "75": 49.55,
+        "100": 50.91,
+        "125": 51.73
+      },
+      "contractor_npv_musd_at_75": 6754.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "UAE",
+      "contracts": 174,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 47.09,
+        "75": 49.83,
+        "100": 51.2,
+        "125": 52.02
+      },
+      "contractor_npv_musd_at_75": 6707.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Ghana",
+      "contracts": 171,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 35.13,
+        "75": 45.48,
+        "100": 50.69,
+        "125": 53.83
+      },
+      "contractor_npv_musd_at_75": 1705.9,
+      "contractor_irr_pct_at_75": 148.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Ecuador",
+      "contracts": 169,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 27.15,
+        "75": 29.56,
+        "100": 30.76,
+        "125": 31.49
+      },
+      "contractor_npv_musd_at_75": 1678.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Azerbaijan",
+      "contracts": 168,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 42.84,
+        "75": 56.66,
+        "100": 63.71,
+        "125": 67.95
+      },
+      "contractor_npv_musd_at_75": 758.4,
+      "contractor_irr_pct_at_75": 61.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Tanzania",
+      "contracts": 167,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 53.21,
+        "75": 61.66,
+        "100": 65.89,
+        "125": 68.42
+      },
+      "contractor_npv_musd_at_75": 816.8,
+      "contractor_irr_pct_at_75": 168.3,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Myanmar",
+      "contracts": 159,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 49.88,
+        "75": 57.76,
+        "100": 61.69,
+        "125": 64.06
+      },
+      "contractor_npv_musd_at_75": 1014.3,
+      "contractor_irr_pct_at_75": 223.4,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Bolivia",
+      "contracts": 152,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 31.28,
+        "75": 33.69,
+        "100": 34.89,
+        "125": 35.61
+      },
+      "contractor_npv_musd_at_75": 1539.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Qatar",
+      "contracts": 146,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 33.37,
+        "75": 35.09,
+        "100": 35.96,
+        "125": 36.48
+      },
+      "contractor_npv_musd_at_75": 9189.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Trinidad and Tobago",
+      "contracts": 144,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 39.3,
+        "75": 44.95,
+        "100": 47.78,
+        "125": 49.47
+      },
+      "contractor_npv_musd_at_75": 1691.9,
+      "contractor_irr_pct_at_75": 578.8,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Guyana",
+      "contracts": 143,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 31.65,
+        "75": 42.19,
+        "100": 47.4,
+        "125": 50.55
+      },
+      "contractor_npv_musd_at_75": 1959.8,
+      "contractor_irr_pct_at_75": 178.1,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Timor-Leste",
+      "contracts": 142,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 46.73,
+        "75": 61.9,
+        "100": 69.48,
+        "125": 74.03
+      },
+      "contractor_npv_musd_at_75": 331.6,
+      "contractor_irr_pct_at_75": 29.8,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Gabon",
+      "contracts": 140,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 44.87,
+        "75": 51.67,
+        "100": 55.07,
+        "125": 57.1
+      },
+      "contractor_npv_musd_at_75": 1340.6,
+      "contractor_irr_pct_at_75": 198.1,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Bangladesh",
+      "contracts": 138,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 57.22,
+        "75": 66.66,
+        "100": 71.39,
+        "125": 74.23
+      },
+      "contractor_npv_musd_at_75": 539.9,
+      "contractor_irr_pct_at_75": 106.2,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Papua New Guinea",
+      "contracts": 138,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.07,
+        "75": 25.61,
+        "100": 27.39,
+        "125": 28.44
+      },
+      "contractor_npv_musd_at_75": 2748.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Netherlands",
+      "contracts": 135,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 23.31,
+        "75": 33.4,
+        "100": 38.44,
+        "125": 41.47
+      },
+      "contractor_npv_musd_at_75": 1518.7,
+      "contractor_irr_pct_at_75": 293.8,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Republic of Congo",
+      "contracts": 129,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 51.1,
+        "75": 59.1,
+        "100": 63.1,
+        "125": 65.5
+      },
+      "contractor_npv_musd_at_75": 942.1,
+      "contractor_irr_pct_at_75": 186.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Kenya",
+      "contracts": 127,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 60.17,
+        "75": 68.07,
+        "100": 72.02,
+        "125": 74.4
+      },
+      "contractor_npv_musd_at_75": 399.7,
+      "contractor_irr_pct_at_75": 180.8,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "New Zealand",
+      "contracts": 127,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.11,
+        "75": 25.27,
+        "100": 26.85,
+        "125": 27.8
+      },
+      "contractor_npv_musd_at_75": 2764.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Equatorial Guinea",
+      "contracts": 125,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 41.14,
+        "75": 53.88,
+        "100": 60.36,
+        "125": 64.24
+      },
+      "contractor_npv_musd_at_75": 964.9,
+      "contractor_irr_pct_at_75": 73.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Namibia",
+      "contracts": 125,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.85,
+        "75": 26.83,
+        "100": 29.82,
+        "125": 31.62
+      },
+      "contractor_npv_musd_at_75": 3241.9,
+      "contractor_irr_pct_at_75": 347.0,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Mauritania",
+      "contracts": 124,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 38.41,
+        "75": 50.42,
+        "100": 56.45,
+        "125": 60.06
+      },
+      "contractor_npv_musd_at_75": 1342.1,
+      "contractor_irr_pct_at_75": 103.7,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Denmark",
+      "contracts": 110,
+      "dominant_mechanic": "PRRT",
+      "govt_take_pct": {
+        "50": 27.16,
+        "75": 38.98,
+        "100": 44.88,
+        "125": 48.41
+      },
+      "contractor_npv_musd_at_75": 1228.1,
+      "contractor_irr_pct_at_75": 1258.0,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Suriname",
+      "contracts": 109,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 36.08,
+        "75": 47.69,
+        "100": 53.52,
+        "125": 57.02
+      },
+      "contractor_npv_musd_at_75": 1496.8,
+      "contractor_irr_pct_at_75": 131.3,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Uzbekistan",
+      "contracts": 108,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 19.22,
+        "75": 20.67,
+        "100": 21.39,
+        "125": 21.83
+      },
+      "contractor_npv_musd_at_75": 1976.0,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cameroon",
+      "contracts": 104,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 43.57,
+        "75": 48.35,
+        "100": 50.74,
+        "125": 52.17
+      },
+      "contractor_npv_musd_at_75": 1087.6,
+      "contractor_irr_pct_at_75": 818.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Turkmenistan",
+      "contracts": 98,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.97,
+        "75": 24.93,
+        "100": 25.91,
+        "125": 26.5
+      },
+      "contractor_npv_musd_at_75": 1840.4,
+      "contractor_irr_pct_at_75": 615.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Ukraine",
+      "contracts": 98,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 36.58,
+        "75": 38.31,
+        "100": 39.18,
+        "125": 39.7
+      },
+      "contractor_npv_musd_at_75": 1382.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Senegal",
+      "contracts": 97,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 30.15,
+        "75": 38.54,
+        "100": 42.74,
+        "125": 45.25
+      },
+      "contractor_npv_musd_at_75": 2579.5,
+      "contractor_irr_pct_at_75": 100.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Uganda",
+      "contracts": 90,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 61.45,
+        "75": 69.67,
+        "100": 73.78,
+        "125": 76.24
+      },
+      "contractor_npv_musd_at_75": 346.3,
+      "contractor_irr_pct_at_75": 134.4,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Sudan",
+      "contracts": 84,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 64.18,
+        "75": 72.87,
+        "100": 77.21,
+        "125": 79.82
+      },
+      "contractor_npv_musd_at_75": 240.0,
+      "contractor_irr_pct_at_75": 89.2,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Greece",
+      "contracts": 83,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 27.72,
+        "75": 30.51,
+        "100": 31.91,
+        "125": 32.75
+      },
+      "contractor_npv_musd_at_75": 1646.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Chad",
+      "contracts": 80,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 56.25,
+        "75": 63.44,
+        "100": 67.03,
+        "125": 69.19
+      },
+      "contractor_npv_musd_at_75": 557.8,
+      "contractor_irr_pct_at_75": 1034.7,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Turkey",
+      "contracts": 79,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 27.15,
+        "75": 29.56,
+        "100": 30.76,
+        "125": 31.49
+      },
+      "contractor_npv_musd_at_75": 1678.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Romania",
+      "contracts": 78,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.72,
+        "75": 24.26,
+        "100": 25.03,
+        "125": 25.49
+      },
+      "contractor_npv_musd_at_75": 1855.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Liberia",
+      "contracts": 75,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 38.01,
+        "75": 49.71,
+        "100": 55.64,
+        "125": 59.21
+      },
+      "contractor_npv_musd_at_75": 1308.2,
+      "contractor_irr_pct_at_75": 115.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Albania",
+      "contracts": 74,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 14.92,
+        "75": 16.36,
+        "100": 17.08,
+        "125": 17.52
+      },
+      "contractor_npv_musd_at_75": 2120.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cote d'Ivoire",
+      "contracts": 73,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 37.8,
+        "75": 49.42,
+        "100": 55.32,
+        "125": 58.85
+      },
+      "contractor_npv_musd_at_75": 1337.8,
+      "contractor_irr_pct_at_75": 97.3,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Brunei",
+      "contracts": 72,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 42.16,
+        "75": 48.42,
+        "100": 51.54,
+        "125": 53.42
+      },
+      "contractor_npv_musd_at_75": 1504.2,
+      "contractor_irr_pct_at_75": 374.4,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cyprus",
+      "contracts": 71,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 13.16,
+        "75": 15.28,
+        "100": 16.33,
+        "125": 16.97
+      },
+      "contractor_npv_musd_at_75": 4237.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Morocco",
+      "contracts": 71,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 34.98,
+        "75": 36.58,
+        "100": 37.38,
+        "125": 37.86
+      },
+      "contractor_npv_musd_at_75": 8955.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Germany",
+      "contracts": 69,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 19.66,
+        "75": 21.18,
+        "100": 21.94,
+        "125": 22.39
+      },
+      "contractor_npv_musd_at_75": 1958.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "United Arab Emirates",
+      "contracts": 67,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 46.83,
+        "75": 49.55,
+        "100": 50.91,
+        "125": 51.73
+      },
+      "contractor_npv_musd_at_75": 6754.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Yemen",
+      "contracts": 62,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 69.83,
+        "75": 73.84,
+        "100": 75.85,
+        "125": 77.05
+      },
+      "contractor_npv_musd_at_75": 2684.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Georgia",
+      "contracts": 60,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 14.07,
+        "75": 15.51,
+        "100": 16.23,
+        "125": 16.67
+      },
+      "contractor_npv_musd_at_75": 2149.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Sao Tome and Principe",
+      "contracts": 60,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 38.43,
+        "75": 51.4,
+        "100": 57.92,
+        "125": 61.84
+      },
+      "contractor_npv_musd_at_75": 1171.1,
+      "contractor_irr_pct_at_75": 84.0,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Somalia",
+      "contracts": 60,
+      "dominant_mechanic": null,
+      "govt_take_pct": {
+        "50": null,
+        "75": null,
+        "100": null,
+        "125": null
+      },
+      "contractor_npv_musd_at_75": null,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": null
+    },
+    {
+      "country": "Italy",
+      "contracts": 59,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 24.67,
+        "75": 26.98,
+        "100": 28.13,
+        "125": 28.83
+      },
+      "contractor_npv_musd_at_75": 1764.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "South Sudan",
+      "contracts": 58,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 56.87,
+        "75": 64.56,
+        "100": 68.41,
+        "125": 70.71
+      },
+      "contractor_npv_musd_at_75": 514.5,
+      "contractor_irr_pct_at_75": 95.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Congo",
+      "contracts": 57,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 49.85,
+        "75": 57.57,
+        "100": 61.43,
+        "125": 63.76
+      },
+      "contractor_npv_musd_at_75": 1023.5,
+      "contractor_irr_pct_at_75": 186.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Croatia",
+      "contracts": 57,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 16.9,
+        "75": 18.63,
+        "100": 19.5,
+        "125": 20.02
+      },
+      "contractor_npv_musd_at_75": 2044.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Madagascar",
+      "contracts": 57,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 54.04,
+        "75": 61.36,
+        "100": 65.02,
+        "125": 67.22
+      },
+      "contractor_npv_musd_at_75": 621.8,
+      "contractor_irr_pct_at_75": 552.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cuba",
+      "contracts": 56,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 53.38,
+        "75": 60.09,
+        "100": 63.46,
+        "125": 65.47
+      },
+      "contractor_npv_musd_at_75": 666.3,
+      "contractor_irr_pct_at_75": 1187.0,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Poland",
+      "contracts": 56,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 18.37,
+        "75": 20.2,
+        "100": 21.12,
+        "125": 21.66
+      },
+      "contractor_npv_musd_at_75": 1992.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "South Africa",
+      "contracts": 56,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 21.08,
+        "75": 25.79,
+        "100": 28.14,
+        "125": 29.55
+      },
+      "contractor_npv_musd_at_75": 3326.9,
+      "contractor_irr_pct_at_75": 364.3,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Chile",
+      "contracts": 55,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.85,
+        "75": 25.45,
+        "100": 26.75,
+        "125": 27.53
+      },
+      "contractor_npv_musd_at_75": 1816.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Ethiopia",
+      "contracts": 55,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 55.55,
+        "75": 63.06,
+        "100": 66.83,
+        "125": 69.08
+      },
+      "contractor_npv_musd_at_75": 567.8,
+      "contractor_irr_pct_at_75": 497.2,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Bahrain",
+      "contracts": 54,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 40.02,
+        "75": 42.34,
+        "100": 43.51,
+        "125": 44.21
+      },
+      "contractor_npv_musd_at_75": 7966.0,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": 0.2
+    },
+    {
+      "country": "Israel",
+      "contracts": 51,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 30.66,
+        "75": 31.9,
+        "100": 32.52,
+        "125": 32.89
+      },
+      "contractor_npv_musd_at_75": 9714.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Faroe Islands",
+      "contracts": 49,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 7.85,
+        "75": 11.23,
+        "100": 12.92,
+        "125": 13.94
+      },
+      "contractor_npv_musd_at_75": 2708.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Ivory Coast",
+      "contracts": 49,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 37.8,
+        "75": 49.42,
+        "100": 55.32,
+        "125": 58.85
+      },
+      "contractor_npv_musd_at_75": 1337.8,
+      "contractor_irr_pct_at_75": 97.3,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Ireland",
+      "contracts": 48,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 5.45,
+        "75": 7.8,
+        "100": 8.97,
+        "125": 9.68
+      },
+      "contractor_npv_musd_at_75": 2894.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Belize",
+      "contracts": 44,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 23.4,
+        "75": 25.81,
+        "100": 27.01,
+        "125": 27.74
+      },
+      "contractor_npv_musd_at_75": 1804.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Sierra Leone",
+      "contracts": 44,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 40.5,
+        "75": 53.24,
+        "100": 59.7,
+        "125": 63.58
+      },
+      "contractor_npv_musd_at_75": 1014.0,
+      "contractor_irr_pct_at_75": 78.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Hungary",
+      "contracts": 43,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 17.32,
+        "75": 18.19,
+        "100": 18.62,
+        "125": 18.88
+      },
+      "contractor_npv_musd_at_75": 2058.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "DRC",
+      "contracts": 41,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 55.54,
+        "75": 61.82,
+        "100": 64.97,
+        "125": 66.85
+      },
+      "contractor_npv_musd_at_75": 687.3,
+      "contractor_irr_pct_at_75": 497.2,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cambodia",
+      "contracts": 37,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 47.48,
+        "75": 55.18,
+        "100": 59.02,
+        "125": 61.33
+      },
+      "contractor_npv_musd_at_75": 1150.3,
+      "contractor_irr_pct_at_75": 277.4,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Guinea",
+      "contracts": 37,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 24.03,
+        "75": 26.85,
+        "100": 28.26,
+        "125": 29.11
+      },
+      "contractor_npv_musd_at_75": 2675.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Jordan",
+      "contracts": 34,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 21.03,
+        "75": 22.02,
+        "100": 22.51,
+        "125": 22.81
+      },
+      "contractor_npv_musd_at_75": 11376.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Lebanon",
+      "contracts": 34,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 18.2,
+        "75": 20.78,
+        "100": 22.07,
+        "125": 22.85
+      },
+      "contractor_npv_musd_at_75": 3010.2,
+      "contractor_irr_pct_at_75": 342.4,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Niger",
+      "contracts": 34,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 56.75,
+        "75": 64.02,
+        "100": 67.66,
+        "125": 69.84
+      },
+      "contractor_npv_musd_at_75": 535.4,
+      "contractor_irr_pct_at_75": 457.1,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Guatemala",
+      "contracts": 32,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 44.02,
+        "75": 49.71,
+        "100": 52.55,
+        "125": 54.26
+      },
+      "contractor_npv_musd_at_75": 1013.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Mongolia",
+      "contracts": 32,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 21.53,
+        "75": 23.94,
+        "100": 25.14,
+        "125": 25.86
+      },
+      "contractor_npv_musd_at_75": 1867.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Syria",
+      "contracts": 32,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 32.84,
+        "75": 34.23,
+        "100": 34.92,
+        "125": 35.34
+      },
+      "contractor_npv_musd_at_75": 9324.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Bulgaria",
+      "contracts": 31,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 14.31,
+        "75": 15.27,
+        "100": 15.76,
+        "125": 16.04
+      },
+      "contractor_npv_musd_at_75": 2156.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Congo, the Democratic Republic of the",
+      "contracts": 31,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 49.03,
+        "75": 55.18,
+        "100": 58.26,
+        "125": 60.1
+      },
+      "contractor_npv_musd_at_75": 829.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Greenland",
+      "contracts": 31,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 7.63,
+        "75": 10.92,
+        "100": 12.56,
+        "125": 13.55
+      },
+      "contractor_npv_musd_at_75": 2725.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Sri Lanka",
+      "contracts": 30,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 52.71,
+        "75": 61.44,
+        "100": 65.81,
+        "125": 68.43
+      },
+      "contractor_npv_musd_at_75": 811.9,
+      "contractor_irr_pct_at_75": 143.0,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Benin",
+      "contracts": 29,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 52.32,
+        "75": 60.86,
+        "100": 65.13,
+        "125": 67.7
+      },
+      "contractor_npv_musd_at_75": 846.7,
+      "contractor_irr_pct_at_75": 171.1,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Eritrea",
+      "contracts": 28,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 31.32,
+        "75": 35.61,
+        "100": 37.76,
+        "125": 39.05
+      },
+      "contractor_npv_musd_at_75": 2199.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Timor - Leste",
+      "contracts": 28,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 51.53,
+        "75": 65.09,
+        "100": 71.87,
+        "125": 75.95
+      },
+      "contractor_npv_musd_at_75": 368.4,
+      "contractor_irr_pct_at_75": 34.4,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Democratic Republic of Congo",
+      "contracts": 27,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 54.0,
+        "75": 60.93,
+        "100": 64.4,
+        "125": 66.48
+      },
+      "contractor_npv_musd_at_75": 639.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Guinea-Bissau",
+      "contracts": 25,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.53,
+        "75": 25.35,
+        "100": 26.76,
+        "125": 27.61
+      },
+      "contractor_npv_musd_at_75": 2758.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Paraguay",
+      "contracts": 25,
+      "dominant_mechanic": null,
+      "govt_take_pct": {
+        "50": null,
+        "75": null,
+        "100": null,
+        "125": null
+      },
+      "contractor_npv_musd_at_75": null,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": null
+    },
+    {
+      "country": "Portugal",
+      "contracts": 24,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 21.77,
+        "75": 24.15,
+        "100": 25.34,
+        "125": 26.05
+      },
+      "contractor_npv_musd_at_75": 2825.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Belarus",
+      "contracts": 23,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 19.36,
+        "75": 21.09,
+        "100": 21.96,
+        "125": 22.48
+      },
+      "contractor_npv_musd_at_75": 1967.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Gambia",
+      "contracts": 23,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 25.15,
+        "75": 28.2,
+        "100": 29.72,
+        "125": 30.64
+      },
+      "contractor_npv_musd_at_75": 2602.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Honduras",
+      "contracts": 23,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 21.53,
+        "75": 23.94,
+        "100": 25.14,
+        "125": 25.86
+      },
+      "contractor_npv_musd_at_75": 1867.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Malawi",
+      "contracts": 23,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.33,
+        "75": 31.22,
+        "100": 32.67,
+        "125": 33.53
+      },
+      "contractor_npv_musd_at_75": 1622.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Republic of the Congo",
+      "contracts": 23,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 52.37,
+        "75": 60.65,
+        "100": 64.79,
+        "125": 67.28
+      },
+      "contractor_npv_musd_at_75": 859.0,
+      "contractor_irr_pct_at_75": 186.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Zambia",
+      "contracts": 23,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 30.74,
+        "75": 34.11,
+        "100": 35.79,
+        "125": 36.81
+      },
+      "contractor_npv_musd_at_75": 1526.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Serbia",
+      "contracts": 22,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 16.62,
+        "75": 18.06,
+        "100": 18.78,
+        "125": 19.22
+      },
+      "contractor_npv_musd_at_75": 2065.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Togo",
+      "contracts": 21,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 48.52,
+        "75": 56.3,
+        "100": 60.18,
+        "125": 62.52
+      },
+      "contractor_npv_musd_at_75": 1092.6,
+      "contractor_irr_pct_at_75": 240.0,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Djibouti",
+      "contracts": 20,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 25.28,
+        "75": 27.69,
+        "100": 28.89,
+        "125": 29.61
+      },
+      "contractor_npv_musd_at_75": 1741.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Kyrgyzstan",
+      "contracts": 20,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 14.31,
+        "75": 15.27,
+        "100": 15.76,
+        "125": 16.04
+      },
+      "contractor_npv_musd_at_75": 2156.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Laos",
+      "contracts": 20,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 54.06,
+        "75": 61.13,
+        "100": 64.66,
+        "125": 66.78
+      },
+      "contractor_npv_musd_at_75": 630.8,
+      "contractor_irr_pct_at_75": 775.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Nicaragua",
+      "contracts": 20,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.33,
+        "75": 31.22,
+        "100": 32.67,
+        "125": 33.53
+      },
+      "contractor_npv_musd_at_75": 1622.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Afghanistan",
+      "contracts": 19,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 23.82,
+        "75": 25.75,
+        "100": 26.71,
+        "125": 27.29
+      },
+      "contractor_npv_musd_at_75": 1805.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Austria",
+      "contracts": 19,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 28.68,
+        "75": 30.89,
+        "100": 32.0,
+        "125": 32.66
+      },
+      "contractor_npv_musd_at_75": 1637.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Jamaica",
+      "contracts": 18,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 32.03,
+        "75": 35.24,
+        "100": 36.85,
+        "125": 37.81
+      },
+      "contractor_npv_musd_at_75": 1488.0,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Uruguay",
+      "contracts": 18,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 52.06,
+        "75": 58.56,
+        "100": 61.81,
+        "125": 63.76
+      },
+      "contractor_npv_musd_at_75": 716.1,
+      "contractor_irr_pct_at_75": 1263.0,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Zimbabwe",
+      "contracts": 18,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 25.28,
+        "75": 27.69,
+        "100": 28.89,
+        "125": 29.61
+      },
+      "contractor_npv_musd_at_75": 1741.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Japan",
+      "contracts": 17,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 25.22,
+        "75": 28.46,
+        "100": 30.07,
+        "125": 31.05
+      },
+      "contractor_npv_musd_at_75": 1716.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Spain",
+      "contracts": 17,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 21.53,
+        "75": 23.94,
+        "100": 25.14,
+        "125": 25.86
+      },
+      "contractor_npv_musd_at_75": 1867.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Bolivia, Plurinational State of",
+      "contracts": 16,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 35.0,
+        "75": 38.08,
+        "100": 39.62,
+        "125": 40.54
+      },
+      "contractor_npv_musd_at_75": 1392.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Tajikistan",
+      "contracts": 16,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 17.72,
+        "75": 19.45,
+        "100": 20.32,
+        "125": 20.84
+      },
+      "contractor_npv_musd_at_75": 2017.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Barbados",
+      "contracts": 14,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 17.19,
+        "75": 17.96,
+        "100": 18.34,
+        "125": 18.58
+      },
+      "contractor_npv_musd_at_75": 2066.0,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Trinidad",
+      "contracts": 14,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 41.81,
+        "75": 46.62,
+        "100": 49.03,
+        "125": 50.47
+      },
+      "contractor_npv_musd_at_75": 1107.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Iraq-Kurdistan",
+      "contracts": 13,
+      "dominant_mechanic": "TSC",
+      "govt_take_pct": {
+        "50": 100.0,
+        "75": 100.0,
+        "100": 100.0,
+        "125": 100.0
+      },
+      "contractor_npv_musd_at_75": null,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": 62.5
+    },
+    {
+      "country": "Lithuania",
+      "contracts": 13,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 17.47,
+        "75": 18.91,
+        "100": 19.63,
+        "125": 20.07
+      },
+      "contractor_npv_musd_at_75": 2035.0,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Solomon Islands",
+      "contracts": 13,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.33,
+        "75": 31.22,
+        "100": 32.67,
+        "125": 33.53
+      },
+      "contractor_npv_musd_at_75": 1622.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Viet Nam",
+      "contracts": 13,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 50.33,
+        "75": 56.69,
+        "100": 59.87,
+        "125": 61.77
+      },
+      "contractor_npv_musd_at_75": 781.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Armenia",
+      "contracts": 12,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 16.9,
+        "75": 18.63,
+        "100": 19.5,
+        "125": 20.02
+      },
+      "contractor_npv_musd_at_75": 2044.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Botswana",
+      "contracts": 12,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 23.44,
+        "75": 25.56,
+        "100": 26.62,
+        "125": 27.26
+      },
+      "contractor_npv_musd_at_75": 1812.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "C\u00f4te d'Ivoire",
+      "contracts": 12,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 52.78,
+        "75": 59.52,
+        "100": 62.89,
+        "125": 64.91
+      },
+      "contractor_npv_musd_at_75": 684.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Dominican Republic",
+      "contracts": 12,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 23.58,
+        "75": 26.18,
+        "100": 27.48,
+        "125": 28.26
+      },
+      "contractor_npv_musd_at_75": 1792.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Slovakia",
+      "contracts": 12,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 29.15,
+        "75": 31.18,
+        "100": 32.19,
+        "125": 32.79
+      },
+      "contractor_npv_musd_at_75": 1623.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Central African Republic",
+      "contracts": 11,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.33,
+        "75": 31.22,
+        "100": 32.67,
+        "125": 33.53
+      },
+      "contractor_npv_musd_at_75": 1622.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Congo Republic",
+      "contracts": 11,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 54.02,
+        "75": 60.72,
+        "100": 64.07,
+        "125": 66.08
+      },
+      "contractor_npv_musd_at_75": 645.8,
+      "contractor_irr_pct_at_75": 791.1,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Montenegro",
+      "contracts": 10,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 10.95,
+        "75": 11.82,
+        "100": 12.25,
+        "125": 12.51
+      },
+      "contractor_npv_musd_at_75": 2272.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Rwanda",
+      "contracts": 10,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 26.93,
+        "75": 29.82,
+        "100": 31.27,
+        "125": 32.13
+      },
+      "contractor_npv_musd_at_75": 1670.0,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "South Korea",
+      "contracts": 10,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 21.53,
+        "75": 23.94,
+        "100": 25.14,
+        "125": 25.86
+      },
+      "contractor_npv_musd_at_75": 1867.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Trinidad & Tobago",
+      "contracts": 10,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 41.81,
+        "75": 46.62,
+        "100": 49.03,
+        "125": 50.47
+      },
+      "contractor_npv_musd_at_75": 1107.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Costa Rica",
+      "contracts": 9,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.33,
+        "75": 31.22,
+        "100": 32.67,
+        "125": 33.53
+      },
+      "contractor_npv_musd_at_75": 1622.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Czech Republic",
+      "contracts": 9,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 21.61,
+        "75": 23.44,
+        "100": 24.36,
+        "125": 24.9
+      },
+      "contractor_npv_musd_at_75": 1883.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Panama",
+      "contracts": 9,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 23.78,
+        "75": 26.19,
+        "100": 27.39,
+        "125": 28.11
+      },
+      "contractor_npv_musd_at_75": 1791.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Tanzania, United Republic of",
+      "contracts": 9,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 61.11,
+        "75": 66.93,
+        "100": 69.84,
+        "125": 71.58
+      },
+      "contractor_npv_musd_at_75": 572.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cote d Ivoire",
+      "contracts": 8,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 52.78,
+        "75": 59.52,
+        "100": 62.89,
+        "125": 64.91
+      },
+      "contractor_npv_musd_at_75": 684.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Falkland Islands",
+      "contracts": 8,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 25.15,
+        "75": 27.65,
+        "100": 28.9,
+        "125": 29.66
+      },
+      "contractor_npv_musd_at_75": 1742.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Malta",
+      "contracts": 8,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 30.09,
+        "75": 33.46,
+        "100": 35.14,
+        "125": 36.16
+      },
+      "contractor_npv_musd_at_75": 1548.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Haiti",
+      "contracts": 7,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 29.73,
+        "75": 32.62,
+        "100": 34.07,
+        "125": 34.93
+      },
+      "contractor_npv_musd_at_75": 1575.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Vanuatu",
+      "contracts": 7,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 5.0,
+        "75": 5.0,
+        "100": 5.0,
+        "125": 5.0
+      },
+      "contractor_npv_musd_at_75": 2500.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Burkina Faso",
+      "contracts": 6,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 26.81,
+        "75": 29.45,
+        "100": 30.78,
+        "125": 31.57
+      },
+      "contractor_npv_musd_at_75": 1682.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cape Verde",
+      "contracts": 6,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 23.78,
+        "75": 26.19,
+        "100": 27.39,
+        "125": 28.11
+      },
+      "contractor_npv_musd_at_75": 1791.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "El Salvador",
+      "contracts": 6,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.33,
+        "75": 31.22,
+        "100": 32.67,
+        "125": 33.53
+      },
+      "contractor_npv_musd_at_75": 1622.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "UAE \u2014 Abu Dhabi",
+      "contracts": 6,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 58.31,
+        "75": 66.21,
+        "100": 70.16,
+        "125": 72.52
+      },
+      "contractor_npv_musd_at_75": 473.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "DR Congo",
+      "contracts": 5,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 54.0,
+        "75": 60.93,
+        "100": 64.4,
+        "125": 66.48
+      },
+      "contractor_npv_musd_at_75": 639.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "East Timor",
+      "contracts": 5,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 68.93,
+        "75": 76.7,
+        "100": 80.59,
+        "125": 82.92
+      },
+      "contractor_npv_musd_at_75": 191.9,
+      "contractor_irr_pct_at_75": 70.5,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "France",
+      "contracts": 5,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 32.78,
+        "75": 35.19,
+        "100": 36.39,
+        "125": 37.11
+      },
+      "contractor_npv_musd_at_75": 1488.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "French Guiana",
+      "contracts": 5,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.52,
+        "75": 25.07,
+        "100": 26.35,
+        "125": 27.11
+      },
+      "contractor_npv_musd_at_75": 1829.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Mali",
+      "contracts": 5,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.33,
+        "75": 31.22,
+        "100": 32.67,
+        "125": 33.53
+      },
+      "contractor_npv_musd_at_75": 1622.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Moldova, Republic of",
+      "contracts": 5,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 12.93,
+        "75": 14.09,
+        "100": 14.67,
+        "125": 15.01
+      },
+      "contractor_npv_musd_at_75": 2196.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Slovenia",
+      "contracts": 5,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 19.99,
+        "75": 21.82,
+        "100": 22.74,
+        "125": 23.28
+      },
+      "contractor_npv_musd_at_75": 1937.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Taiwan",
+      "contracts": 5,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 18.22,
+        "75": 20.15,
+        "100": 21.11,
+        "125": 21.69
+      },
+      "contractor_npv_musd_at_75": 1994.1,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Bahamas",
+      "contracts": 4,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 10.0,
+        "75": 10.0,
+        "100": 10.0,
+        "125": 10.0
+      },
+      "contractor_npv_musd_at_75": 2332.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Burundi",
+      "contracts": 4,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.33,
+        "75": 31.22,
+        "100": 32.67,
+        "125": 33.53
+      },
+      "contractor_npv_musd_at_75": 1622.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cabo Verde",
+      "contracts": 4,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 23.78,
+        "75": 26.19,
+        "100": 27.39,
+        "125": 28.11
+      },
+      "contractor_npv_musd_at_75": 1791.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Fiji",
+      "contracts": 4,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.22,
+        "75": 24.15,
+        "100": 25.11,
+        "125": 25.69
+      },
+      "contractor_npv_musd_at_75": 1859.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Sweden",
+      "contracts": 4,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 14.65,
+        "75": 16.63,
+        "100": 17.62,
+        "125": 18.22
+      },
+      "contractor_npv_musd_at_75": 2112.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Bosnia and Herzegovina",
+      "contracts": 3,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 16.11,
+        "75": 17.07,
+        "100": 17.56,
+        "125": 17.84
+      },
+      "contractor_npv_musd_at_75": 2096.0,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Mayotte",
+      "contracts": 3,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.52,
+        "75": 25.07,
+        "100": 26.35,
+        "125": 27.11
+      },
+      "contractor_npv_musd_at_75": 1829.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Moldova",
+      "contracts": 3,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 12.93,
+        "75": 14.09,
+        "100": 14.67,
+        "125": 15.01
+      },
+      "contractor_npv_musd_at_75": 2196.8,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Reunion",
+      "contracts": 3,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.52,
+        "75": 25.07,
+        "100": 26.35,
+        "125": 27.11
+      },
+      "contractor_npv_musd_at_75": 1829.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "S\u00e3o Tom\u00e9 and Pr\u00edncipe",
+      "contracts": 3,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 55.11,
+        "75": 62.57,
+        "100": 66.31,
+        "125": 68.54
+      },
+      "contractor_npv_musd_at_75": 582.9,
+      "contractor_irr_pct_at_75": 524.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Tonga",
+      "contracts": 3,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.62,
+        "75": 22.55,
+        "100": 23.51,
+        "125": 24.09
+      },
+      "contractor_npv_musd_at_75": 1913.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Belgium",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 17.78,
+        "75": 20.19,
+        "100": 21.39,
+        "125": 22.11
+      },
+      "contractor_npv_musd_at_75": 1993.6,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cook Islands",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.62,
+        "75": 22.55,
+        "100": 23.51,
+        "125": 24.09
+      },
+      "contractor_npv_musd_at_75": 1913.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Cote Ivoire",
+      "contracts": 2,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 51.48,
+        "75": 58.29,
+        "100": 61.7,
+        "125": 63.74
+      },
+      "contractor_npv_musd_at_75": 729.5,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Kiribati",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.62,
+        "75": 22.55,
+        "100": 23.51,
+        "125": 24.09
+      },
+      "contractor_npv_musd_at_75": 1913.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Marshall Islands",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.62,
+        "75": 22.55,
+        "100": 23.51,
+        "125": 24.09
+      },
+      "contractor_npv_musd_at_75": 1913.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Nepal",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 26.78,
+        "75": 29.19,
+        "100": 30.39,
+        "125": 31.11
+      },
+      "contractor_npv_musd_at_75": 1690.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "New Caledonia",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.52,
+        "75": 25.07,
+        "100": 26.35,
+        "125": 27.11
+      },
+      "contractor_npv_musd_at_75": 1829.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Palau",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.62,
+        "75": 22.55,
+        "100": 23.51,
+        "125": 24.09
+      },
+      "contractor_npv_musd_at_75": 1913.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Samoa",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.62,
+        "75": 22.55,
+        "100": 23.51,
+        "125": 24.09
+      },
+      "contractor_npv_musd_at_75": 1913.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Syrian Arab Republic",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.91,
+        "75": 31.61,
+        "100": 32.96,
+        "125": 33.76
+      },
+      "contractor_npv_musd_at_75": 1609.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "UAE \u2014 Dubai",
+      "contracts": 2,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 6.4,
+        "75": 7.27,
+        "100": 7.7,
+        "125": 7.96
+      },
+      "contractor_npv_musd_at_75": 2425.9,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Ascension Island",
+      "contracts": 1,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 26.78,
+        "75": 29.19,
+        "100": 30.39,
+        "125": 31.11
+      },
+      "contractor_npv_musd_at_75": 1690.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Brunei Darussalam",
+      "contracts": 1,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 58.74,
+        "75": 66.42,
+        "100": 70.26,
+        "125": 72.56
+      },
+      "contractor_npv_musd_at_75": 464.2,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "French Polynesia",
+      "contracts": 1,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.52,
+        "75": 25.07,
+        "100": 26.35,
+        "125": 27.11
+      },
+      "contractor_npv_musd_at_75": 1829.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Guadeloupe",
+      "contracts": 1,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 22.52,
+        "75": 25.07,
+        "100": 26.35,
+        "125": 27.11
+      },
+      "contractor_npv_musd_at_75": 1829.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Micronesia",
+      "contracts": 1,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.62,
+        "75": 22.55,
+        "100": 23.51,
+        "125": 24.09
+      },
+      "contractor_npv_musd_at_75": 1913.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Nauru",
+      "contracts": 1,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.62,
+        "75": 22.55,
+        "100": 23.51,
+        "125": 24.09
+      },
+      "contractor_npv_musd_at_75": 1913.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Puerto Rico",
+      "contracts": 1,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 24.81,
+        "75": 26.83,
+        "100": 27.84,
+        "125": 28.45
+      },
+      "contractor_npv_musd_at_75": 1769.4,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Saint Helena",
+      "contracts": 1,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 26.78,
+        "75": 29.19,
+        "100": 30.39,
+        "125": 31.11
+      },
+      "contractor_npv_musd_at_75": 1690.7,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Sao Tome",
+      "contracts": 1,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 55.11,
+        "75": 62.57,
+        "100": 66.31,
+        "125": 68.54
+      },
+      "contractor_npv_musd_at_75": 582.9,
+      "contractor_irr_pct_at_75": 524.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Sao Tome & Principe",
+      "contracts": 1,
+      "dominant_mechanic": "PSC",
+      "govt_take_pct": {
+        "50": 55.11,
+        "75": 62.57,
+        "100": 66.31,
+        "125": 68.54
+      },
+      "contractor_npv_musd_at_75": 582.9,
+      "contractor_irr_pct_at_75": 524.9,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Tuvalu",
+      "contracts": 1,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 20.62,
+        "75": 22.55,
+        "100": 23.51,
+        "125": 24.09
+      },
+      "contractor_npv_musd_at_75": 1913.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    },
+    {
+      "country": "Western Sahara",
+      "contracts": 1,
+      "dominant_mechanic": "Concession",
+      "govt_take_pct": {
+        "50": 28.94,
+        "75": 31.93,
+        "100": 33.42,
+        "125": 34.32
+      },
+      "contractor_npv_musd_at_75": 1599.3,
+      "contractor_irr_pct_at_75": null,
+      "breakeven_price_usd": -1.0
+    }
+  ]
+}

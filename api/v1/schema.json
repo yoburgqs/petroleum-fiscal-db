@@ -1,0 +1,37 @@
+{
+  "version": "1.0",
+  "description": "Petroleum Fiscal Intelligence Platform \u2014 Static JSON API",
+  "base_url": "https://yoburgqs.github.io/petroleum-fiscal-db/api/v1/",
+  "endpoints": {
+    "countries": {
+      "url": "countries.json",
+      "description": "All country summaries with DCF results at 4 price levels"
+    },
+    "mechanics": {
+      "url": "mechanics.json",
+      "description": "Fiscal mechanic summary (Concession, PSC, TSC, PRRT, etc.)"
+    },
+    "country_detail": {
+      "url": "country/{country_name_lowercase}.json",
+      "description": "Full country data: DCF by price, fiscal facts, contract list (up to 500 contracts)"
+    }
+  },
+  "price_scenarios_usd_bbl": [
+    50,
+    75,
+    100,
+    125
+  ],
+  "mechanics_modeled": [
+    "Concession",
+    "PSC",
+    "TSC",
+    "PRRT",
+    "RSC",
+    "Buy-back",
+    "Gross Split"
+  ],
+  "data_sources": "Primary: NRGI Resource Governance Index, SODIR, NSTA open data, EY/KPMG Tax Guides 2025. Secondary: operator disclosures, regulatory filings.",
+  "methodology": "DCF using standardized project profile: 25yr horizon, 50MBD peak, $500M capex, 10% discount rate.",
+  "disclaimer": "For informational and research purposes only. Not investment advice."
+}
