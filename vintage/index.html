@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Petroleum Fiscal Regime Evolution — Interactive Timeline</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --card: #161b22;
+  --border: #30363d;
+  --text: #e6edf3;
+  --muted: #8b949e;
+  --accent: #4da6ff;
+  --green: #3fb950;
+  --orange: #f0883e;
+  --red: #f85149;
+  --purple: #bc8cff;
+  --yellow: #e3b341;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  min-height: 100vh;
+}
+
+/* ── TOP NAV ── */
+.top-nav {
+  background: var(--card);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  height: 48px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.back-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+.back-link:hover { color: var(--text); }
+.back-link::before { content: "←"; }
+.nav-sep { color: var(--border); }
+.nav-title {
+  color: var(--muted);
+  font-size: 13px;
+}
+.nav-badge {
+  margin-left: auto;
+  background: rgba(77, 166, 255, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(77, 166, 255, 0.3);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ── PAGE HEADER ── */
+.page-header {
+  padding: 36px 24px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.page-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.page-sub {
+  color: var(--muted);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+.page-meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+.page-meta span {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* ── DECADE SELECTOR ── */
+.decade-selector {
+  max-width: 1200px;
+  margin: 0 auto 4px;
+  padding: 0 24px;
+}
+.decade-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+.decade-tabs {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.decade-tab {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+}
+.decade-tab:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.decade-tab.active {
+  background: rgba(77, 166, 255, 0.15);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.play-btn {
+  margin-left: auto;
+  background: rgba(63, 185, 80, 0.12);
+  border: 1px solid rgba(63, 185, 80, 0.4);
+  color: var(--green);
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.play-btn:hover {
+  background: rgba(63, 185, 80, 0.22);
+}
+.play-btn.playing {
+  background: rgba(248, 81, 73, 0.12);
+  border-color: rgba(248, 81, 73, 0.4);
+  color: var(--red);
+}
+.play-icon { font-size: 11px; }
+.play-counter {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+/* ── OIL PRICE CONTEXT ── */
+.context-bar {
+  max-width: 1200px;
+  margin: 20px auto;
+  padding: 0 24px;
+}
+.context-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: grid;
+  grid-template-columns: 160px 1fr auto;
+  gap: 20px;
+  align-items: center;
+}
+.price-block {
+  text-align: center;
+  border-right: 1px solid var(--border);
+  padding-right: 20px;
+}
+.price-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.price-value {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--yellow);
+}
+.price-unit {
+  font-size: 12px;
+  color: var(--muted);
+}
+.context-text {
+  color: var(--text);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.context-theme {
+  text-align: right;
+  min-width: 120px;
+}
+.theme-pill {
+  display: inline-block;
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.theme-nationalization { background: rgba(248, 81, 73, 0.15); color: var(--red); border: 1px solid rgba(248, 81, 73, 0.3); }
+.theme-psc { background: rgba(77, 166, 255, 0.15); color: var(--accent); border: 1px solid rgba(77, 166, 255, 0.3); }
+.theme-concession { background: rgba(227, 179, 65, 0.15); color: var(--yellow); border: 1px solid rgba(227, 179, 65, 0.3); }
+.theme-reform { background: rgba(188, 140, 255, 0.15); color: var(--purple); border: 1px solid rgba(188, 140, 255, 0.3); }
+.theme-stable { background: rgba(63, 185, 80, 0.15); color: var(--green); border: 1px solid rgba(63, 185, 80, 0.3); }
+.theme-complexity { background: rgba(240, 136, 62, 0.15); color: var(--orange); border: 1px solid rgba(240, 136, 62, 0.3); }
+
+/* ── SUMMARY STATS ── */
+.stats-bar {
+  max-width: 1200px;
+  margin: 0 auto 16px;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  text-align: center;
+}
+.stat-val {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 3px;
+}
+.stat-label {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+.stat-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 3px;
+}
+
+/* ── CHANGES TABLE ── */
+.table-section {
+  max-width: 1200px;
+  margin: 0 auto 32px;
+  padding: 0 24px;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.section-count {
+  font-size: 12px;
+  color: var(--muted);
+}
+.table-wrap {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+thead th {
+  background: rgba(22, 27, 34, 0.9);
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(77, 166, 255, 0.04); }
+tbody td {
+  padding: 11px 14px;
+  color: var(--text);
+  font-size: 13px;
+  vertical-align: top;
+  line-height: 1.5;
+}
+.td-country { font-weight: 600; white-space: nowrap; }
+.td-year { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.td-context { color: var(--muted); font-size: 12px; }
+.mechanic-pill {
+  display: inline-block;
+  border-radius: 4px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.mp-psc { background: rgba(77, 166, 255, 0.15); color: var(--accent); }
+.mp-prrt { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+.mp-tsc { background: rgba(188, 140, 255, 0.15); color: var(--purple); }
+.mp-concession { background: rgba(227, 179, 65, 0.15); color: var(--yellow); }
+.mp-nat { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+.mp-epsa { background: rgba(240, 136, 62, 0.15); color: var(--orange); }
+.mp-spt { background: rgba(63, 185, 80, 0.15); color: var(--green); }
+.mp-rfd { background: rgba(188, 140, 255, 0.15); color: var(--purple); }
+.mp-gross { background: rgba(248, 81, 73, 0.15); color: var(--orange); }
+.mp-epl { background: rgba(248, 81, 73, 0.15); color: var(--red); }
+.mp-jda { background: rgba(77, 166, 255, 0.15); color: var(--accent); }
+.arrow-right { color: var(--muted); margin: 0 5px; font-size: 12px; }
+
+.empty-state {
+  padding: 48px;
+  text-align: center;
+  color: var(--muted);
+  font-size: 14px;
+}
+.empty-icon { font-size: 32px; margin-bottom: 12px; }
+
+/* ── ANIMATED COUNTER ── */
+.decade-display {
+  font-size: 13px;
+  color: var(--muted);
+  margin-top: 8px;
+  height: 18px;
+}
+.decade-display.playing {
+  color: var(--green);
+}
+
+/* ── FOOTNOTE ── */
+.footnote {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  padding: 0 24px;
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.6;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  .context-card { grid-template-columns: 1fr; gap: 12px; }
+  .price-block { border-right: none; border-bottom: 1px solid var(--border); padding-right: 0; padding-bottom: 12px; text-align: left; }
+  .context-theme { text-align: left; }
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .play-btn { margin-left: 0; }
+  .decade-tabs { gap: 4px; }
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="top-nav">
+  <a href="../" class="back-link">Petroleum Fiscal Intelligence Platform</a>
+  <span class="nav-sep">|</span>
+  <span class="nav-title">Fiscal Regime Evolution Timeline</span>
+  <span class="nav-badge">212 Countries</span>
+</div>
+
+<!-- PAGE HEADER -->
+<div class="page-header">
+  <div class="page-title">Petroleum Fiscal Regime Evolution</div>
+  <div class="page-sub">Interactive timeline of how governments structured petroleum fiscal terms across eight decades of oil price cycles, geopolitical shocks, and industry transformation.</div>
+  <div class="page-meta">Coverage: <span>212 countries</span> · Regimes tracked from <span>1950s</span> through <span>2020s</span> · Source: primary treaty texts, company disclosures, government gazettes</div>
+</div>
+
+<!-- DECADE SELECTOR -->
+<div class="decade-selector">
+  <div class="decade-label">Select Decade</div>
+  <div class="decade-tabs">
+    <button class="decade-tab" onclick="selectDecade('1950s',this)">1950s</button>
+    <button class="decade-tab" onclick="selectDecade('1960s',this)">1960s</button>
+    <button class="decade-tab active" onclick="selectDecade('1970s',this)">1970s</button>
+    <button class="decade-tab" onclick="selectDecade('1980s',this)">1980s</button>
+    <button class="decade-tab" onclick="selectDecade('1990s',this)">1990s</button>
+    <button class="decade-tab" onclick="selectDecade('2000s',this)">2000s</button>
+    <button class="decade-tab" onclick="selectDecade('2010s',this)">2010s</button>
+    <button class="decade-tab" onclick="selectDecade('2020s',this)">2020s</button>
+    <button class="play-btn" id="playBtn" onclick="togglePlay()">
+      <span class="play-icon" id="playIcon">▶</span>
+      <span id="playLabel">Step Through Decades</span>
+      <span class="play-counter" id="playCounter"></span>
+    </button>
+  </div>
+  <div class="decade-display" id="decadeDisplay"></div>
+</div>
+
+<!-- OIL PRICE CONTEXT BAR -->
+<div class="context-bar">
+  <div class="context-card" id="contextCard">
+    <!-- filled by JS -->
+  </div>
+</div>
+
+<!-- SUMMARY STATS -->
+<div class="stats-bar" id="statsBar">
+  <!-- filled by JS -->
+</div>
+
+<!-- CHANGES TABLE -->
+<div class="table-section">
+  <div class="section-header">
+    <div class="section-title" id="tableTitle">Regime Changes</div>
+    <div class="section-count" id="tableCount"></div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Country</th>
+          <th>New Fiscal Regime</th>
+          <th>Previous Regime</th>
+          <th>Year</th>
+          <th>Context</th>
+        </tr>
+      </thead>
+      <tbody id="changesBody">
+      </tbody>
+    </table>
+    <div id="emptyState" class="empty-state" style="display:none">
+      <div class="empty-icon">📋</div>
+      No major regime changes recorded for this decade.
+    </div>
+  </div>
+</div>
+
+<!-- FOOTNOTE -->
+<div class="footnote">
+  Data represents primary fiscal regime introductions and major structural overhauls. Minor rate adjustments and regulatory amendments are excluded. Government take percentages are illustrative averages at reference price ($75/bbl nominal); actual take varies by field size, vintage terms, and cost recovery caps. "Previous regime" denotes the dominant pre-existing framework — many countries operated multiple overlapping frameworks. Sources: primary treaty texts, IOC annual reports, government gazettes, Wood Mackenzie country guides, IHS Markit fiscal database cross-references.
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════════════════════════
+
+const DECADES = ['1950s','1960s','1970s','1980s','1990s','2000s','2010s','2020s'];
+
+// mechanic pill class mapping
+const MP = {
+  'PSC':         'mp-psc',
+  'EPSA':        'mp-epsa',
+  'PRRT':        'mp-prrt',
+  'TSC':         'mp-tsc',
+  'Concession':  'mp-concession',
+  'Nationalized':'mp-nat',
+  'R/T Concession':'mp-concession',
+  'PSA':         'mp-psc',
+  'SPT':         'mp-spt',
+  'Gross Split': 'mp-gross',
+  'EPL':         'mp-epl',
+  'JPDA PSC':    'mp-jda',
+  'JDA':         'mp-jda',
+  'TFT':         'mp-rfd',
+  'None':        '',
+};
+
+function pillClass(m) { return MP[m] || 'mp-concession'; }
+
+// Context data per decade
+const DECADE_CONTEXT = {
+  '1950s': {
+    avgPrice: 2.80,
+    theme: 'Concession Era',
+    themeClass: 'theme-concession',
+    narrative: 'Post-WWII concession model dominated global petroleum. Majors (Seven Sisters) held sweeping exploration rights across the Middle East and Latin America under 50/50 royalty-plus-tax structures introduced in Venezuela (1943) and Saudi Arabia (1950). Host governments had minimal fiscal leverage.',
+    stats: {
+      newRegimes: 3,
+      pscAdoptions: 0,
+      avgTakeBefore: '30–40%',
+      avgTakeAfter: '45–55%',
+      keyTheme: '50/50 Split Era',
+    }
+  },
+  '1960s': {
+    avgPrice: 1.90,
+    theme: 'PSC Invention',
+    themeClass: 'theme-psc',
+    narrative: 'OPEC founded in 1960 (Baghdad); member states began coordinating posted prices. Indonesia invented the Production Sharing Contract (1966) under Ibnu Sutowo at Pertamina — a structural break from concession norms. Libya\'s 1955 concessions began showing cracks as Gaddafi rose to power in 1969.',
+    stats: {
+      newRegimes: 4,
+      pscAdoptions: 1,
+      avgTakeBefore: '45–55%',
+      avgTakeAfter: '55–65%',
+      keyTheme: 'PSC Model Born',
+    }
+  },
+  '1970s': {
+    avgPrice: 11.60,
+    theme: 'Nationalization Wave',
+    themeClass: 'theme-nationalization',
+    narrative: 'OPEC oil shocks (1973, 1979) drove oil from ~$3 to $35/bbl. Nationalization surged: Iraq (1972), Libya EPSA II, Angola (1976), Nigeria PSA (1973). Malaysia and Indonesia refined PSC terms. The PSC became the dominant alternative to full nationalization — governments took resource control while IOCs retained operatorship.',
+    stats: {
+      newRegimes: 8,
+      pscAdoptions: 4,
+      avgTakeBefore: '55–65%',
+      avgTakeAfter: '70–80%',
+      keyTheme: 'Nationalization Peak',
+    }
+  },
+  '1980s': {
+    avgPrice: 27.50,
+    theme: 'PRRT / Tax Reform',
+    themeClass: 'theme-reform',
+    narrative: 'Oil price collapse in 1986 (from $35 to $10) forced governments to attract IOC capital through more investor-friendly fiscal terms. Australia introduced the Petroleum Resource Rent Tax (1987) — a profit-based tax that became a global template. Norway tightened its SPT but maintained stability. UK ring-fence rules codified.',
+    stats: {
+      newRegimes: 5,
+      pscAdoptions: 2,
+      avgTakeBefore: '70–80%',
+      avgTakeAfter: '60–75%',
+      keyTheme: 'Profit-Based Tax Rise',
+    }
+  },
+  '1990s': {
+    avgPrice: 19.20,
+    theme: 'PSA Expansion',
+    themeClass: 'theme-psc',
+    narrative: 'Soviet collapse opened Kazakhstan, Russia, and Azerbaijan to PSA frameworks. Russia\'s 1995 PSA law enabled Sakhalin I & II. Kazakhstan signed landmark PSAs for Tengiz and Kashagan. Guyana\'s first exploration PSCs laid the groundwork for the Stabroek discoveries. Generally stable oil prices kept fiscal terms moderate.',
+    stats: {
+      newRegimes: 6,
+      pscAdoptions: 5,
+      avgTakeBefore: '60–70%',
+      avgTakeAfter: '60–70%',
+      keyTheme: 'Post-Soviet PSA Boom',
+    }
+  },
+  '2000s': {
+    avgPrice: 62.00,
+    theme: 'Resource Nationalism 2.0',
+    themeClass: 'theme-nationalization',
+    narrative: 'Oil price surge to $147/bbl (2008) reignited resource nationalism. Algeria overhauled its TFT (2005), Iraq introduced the TSC model (2007) to protect sovereignty while attracting IOC capital. Timor-Leste\'s JPDA created a novel joint development framework. Venezuela and Bolivia renegotiated contracts aggressively.',
+    stats: {
+      newRegimes: 7,
+      pscAdoptions: 3,
+      avgTakeBefore: '60–70%',
+      avgTakeAfter: '70–85%',
+      keyTheme: 'High-Price Nationalism',
+    }
+  },
+  '2010s': {
+    avgPrice: 72.00,
+    theme: 'Structural Innovation',
+    themeClass: 'theme-complexity',
+    narrative: 'Indonesia overhauled its PSC with a controversial Gross Split model (2017) eliminating cost recovery — a significant structural departure. Senegal issued its first PSCs (2012) ahead of the Sangomar discovery. East Africa PSC frameworks emerged (Tanzania, Mozambique, Kenya). Price crash in 2015–16 forced investor-friendly amendments globally.',
+    stats: {
+      newRegimes: 9,
+      pscAdoptions: 6,
+      avgTakeBefore: '60–75%',
+      avgTakeAfter: '55–70%',
+      keyTheme: 'Gross Split + East Africa',
+    }
+  },
+  '2020s': {
+    avgPrice: 83.00,
+    theme: 'Energy Transition Fiscal',
+    themeClass: 'theme-reform',
+    narrative: 'UK\'s Energy Profits Levy (EPL, 2022) introduced a windfall tax response to post-Ukraine invasion price spikes — 75% combined rate at peak, widely criticized as retroactive fiscal change. Australia expanded PRRT net-down limits. Mozambique LNG PSCs faced force majeure. Energy transition pressure began reshaping fiscal design toward carbon-linked terms.',
+    stats: {
+      newRegimes: 5,
+      pscAdoptions: 2,
+      avgTakeBefore: '55–70%',
+      avgTakeAfter: '60–78%',
+      keyTheme: 'Windfall Tax Era',
+    }
+  },
+};
+
+// Regime change events
+const CHANGES = {
+  '1950s': [
+    { country: 'Saudi Arabia', newM: 'R/T Concession', prevM: 'Concession', year: 1950, context: '50/50 royalty-profit split introduced after Venezuela model; set the template for Middle East concessionary terms' },
+    { country: 'Kuwait', newM: 'R/T Concession', prevM: 'Concession', year: 1951, context: 'Anglo-Persian renegotiation; 50/50 split adopted following Saudi precedent' },
+    { country: 'Iran', newM: 'Consortium', prevM: 'Nationalized', year: 1954, context: 'Post-Mosaddegh AIOC consortium agreement restored IOC access under a novel 50/50 consortium structure — not a classic concession' },
+  ],
+  '1960s': [
+    { country: 'Libya', newM: 'EPSA', prevM: 'Concession', year: 1955, context: 'Libya\'s 1955 Petroleum Law introduced tiered royalties; OPEC membership (1962) accelerated posted-price demands. EPSA framework emerged post-Gaddafi coup (1969)' },
+    { country: 'Indonesia', newM: 'PSC', prevM: 'Concession', year: 1966, context: 'World\'s first Production Sharing Contract — Pertamina/IIAPCO. State retained legal title; contractor recovered costs from production split. Became the global PSC template' },
+    { country: 'Algeria', newM: 'R/T Concession', prevM: 'None', year: 1962, context: 'Post-independence Evian Accords preserved French operator access under renegotiated royalty terms; foundation of later SONATRACH framework' },
+    { country: 'Nigeria', newM: 'R/T Concession', prevM: 'None', year: 1967, context: 'Pre-independence Shell-BP concessions converted to royalty-tax framework post-independence; NNPC precursor established' },
+  ],
+  '1970s': [
+    { country: 'Iraq', newM: 'Nationalized', prevM: 'Concession', year: 1972, context: 'IPC nationalization completed; Iraq Petroleum Company (BP/Shell/Exxon consortium) expropriated. Led to TSC model decades later' },
+    { country: 'Nigeria', newM: 'PSC', prevM: 'R/T Concession', year: 1973, context: 'Nigerian Petroleum Sharing Act introduced PSC alongside NNPC equity stakes in JV blocks — hybrid framework retained royalty-tax for onshore' },
+    { country: 'Malaysia', newM: 'PSC', prevM: 'Concession', year: 1974, context: 'PETRONAS established; inaugural PSC signed with Shell-Esso. Malaysian PSC adopted Indonesian structure but with tiered R-factor provisions' },
+    { country: 'Angola', newM: 'EPSA', prevM: 'Concession', year: 1976, context: 'Post-independence MPLA government introduced EPSA (Exploration and Production Sharing Agreement); Sonangol formed as NOC partner' },
+    { country: 'Libya', newM: 'EPSA', prevM: 'Concession', year: 1974, context: 'EPSA II introduced after OPEC price shocks; government take increased to 85%+ through participation and higher royalties' },
+    { country: 'Venezuela', newM: 'Nationalized', prevM: 'Concession', year: 1976, context: 'Nationalization of oil industry; PDVSA formed from IOC concession holdings. Reversal began in 1990s with Apertura Petrolera operating agreements' },
+    { country: 'Norway', newM: 'SPT', prevM: 'Concession', year: 1975, context: 'Special Petroleum Tax (SPT) introduced at 25% (later raised to 50%); combined with 27.8% corporate tax gives ~78% marginal government take on shelf production' },
+    { country: 'UK', newM: 'PRT', prevM: 'Concession', year: 1975, context: 'Petroleum Revenue Tax introduced at 75% on field profits above a threshold return — first UK North Sea windfall mechanism' },
+  ],
+  '1980s': [
+    { country: 'Australia', newM: 'PRRT', prevM: 'Concession', year: 1987, context: 'Petroleum Resource Rent Tax — landmark profit-based tax with compounding uplift on unrecouped costs. Applied initially to offshore projects; later extended to onshore. Became global template for resource rent taxation' },
+    { country: 'Norway', newM: 'SPT', prevM: 'SPT', year: 1987, context: 'SPT rate increased to 50% (from 35%); combined marginal rate 78%. Investment incentive provisions added to offset deterrent effect on marginal fields' },
+    { country: 'UK', newM: 'PRT', prevM: 'PRT', year: 1983, context: 'Ring-fence corporation tax codified; supplementary charge introduced. PRT rate oscillated 70–75% through decade; eventually abolished for new fields (1993)' },
+    { country: 'Colombia', newM: 'Concession', prevM: 'None', year: 1987, context: 'ANH precursor established; first licensing round opened Colombian frontier acreage to IOCs under a sliding-scale royalty concession framework' },
+    { country: 'China', newM: 'PSC', prevM: 'None', year: 1982, context: 'CNOOC established; first offshore PSC signed with ARCO/Santa Fe. China adopted Indonesian PSC structure with Chinese characteristics — CNOOC retained 51% back-in right' },
+  ],
+  '1990s': [
+    { country: 'Russia', newM: 'PSA', prevM: 'None', year: 1995, context: 'Federal PSA Law (No. 225-FZ) enabled Sakhalin I (Exxon) and Sakhalin II (Shell) — $50B+ combined investment. PSA framework later narrowed under Putin-era resource nationalism' },
+    { country: 'Kazakhstan', newM: 'PSA', prevM: 'None', year: 1993, context: 'Tengizchevroil PSA signed (1993) followed by Kashagan (OKIOC, 1997). Kazakhstan PSAs among largest in history by reserve size — 38+ Bboe Kashagan' },
+    { country: 'Azerbaijan', newM: 'PSA', prevM: 'None', year: 1994, context: '"Contract of the Century" — ACG PSA with BP-led consortium. Multi-layered cost recovery and profit split; established Azerbaijan as post-Soviet PSA model' },
+    { country: 'Guyana', newM: 'PSC', prevM: 'None', year: 1999, context: 'First Stabroek Block PSC signed with Exxon — terms later renegotiated to 2016 Stabroek agreement (2% royalty, 50% cost cap, 50/50 profit oil split)' },
+    { country: 'Myanmar', newM: 'PSC', prevM: 'None', year: 1994, context: 'MOGE PSC framework reopened Myanmar to IOCs post-isolation; Yadana and Yetagun gas fields developed under early PSC terms' },
+    { country: 'Mozambique', newM: 'PSC', prevM: 'None', year: 1997, context: 'First deepwater PSC round; ENH as state partner. Early exploration phase; Area 1 and Area 4 discoveries came in 2010s' },
+  ],
+  '2000s': [
+    { country: 'Timor-Leste', newM: 'JPDA PSC', prevM: 'None', year: 2002, context: 'Joint Petroleum Development Authority (JPDA) established with Australia; Bayu-Undan PSC became first fiscal test. Greater Sunrise fields under contested maritime boundary' },
+    { country: 'Algeria', newM: 'TFT', prevM: 'R/T Concession', year: 2005, context: 'Windfall profits tax (TFT) introduced when oil price exceeded $30/bbl; rate scaled to 50% above $100. Retroactive application deterred IOC re-investment; law partially amended 2006' },
+    { country: 'Iraq', newM: 'TSC', prevM: 'Nationalized', year: 2007, context: 'Technical Service Contract model developed for post-war IOC engagement — contractors paid flat fee per incremental barrel, no equity in reserves. Rumaila, West Qurna-2, Majnoon operated under TSC' },
+    { country: 'Ecuador', newM: 'PSC', prevM: 'Concession', year: 2006, context: 'Windfall profit participation clause (Law 42) inserted into existing concession contracts; contracts migrated to PSC structure under Correa. Oxy expropriation (2006) preceded full reform' },
+    { country: 'Libya', newM: 'EPSA', prevM: 'EPSA', year: 2005, context: 'EPSA IV round — Libya\'s most competitive licensing: profit split as high as 90/10 (state/contractor) in heated bidding. Marathon, ConocoPhillips re-entered' },
+    { country: 'Venezuela', newM: 'PSC', prevM: 'Concession', year: 2006, context: 'Nationalization Round II — Apertura Petrolera operating agreements converted to mixed companies with PDVSA majority; Orinoco heavy oil migrated to joint ventures' },
+    { country: 'Russia', newM: 'R/T Concession', prevM: 'PSA', year: 2003, context: 'Yukos affair triggered creeping PSA rollback; tax code amendments made R/T framework more favorable than PSA for new projects. No new PSAs signed post-2003' },
+  ],
+  '2010s': [
+    { country: 'Indonesia', newM: 'Gross Split', prevM: 'PSC', year: 2017, context: 'Ministerial Regulation 08/2017 introduced Gross Split PSC — contractor bears all costs, receives larger gross split (variable base 43–57%). Controversial: higher risk, potentially lower IRR for complex deepwater' },
+    { country: 'Senegal', newM: 'PSC', prevM: 'None', year: 2012, context: 'First offshore PSC round; Cairn Energy Rufisque/Sangomar exploration. Pre-discovery fiscal terms later renegotiated post-SNE discovery (2014) — source of Woodside/Petrosen dispute' },
+    { country: 'Tanzania', newM: 'PSC', prevM: 'None', year: 2013, context: 'Deepwater PSCs awarded; Rovuma Basin gas discoveries (BG/Ophir) led to LNG development framework. Revised Petroleum Act 2015 increased TPDC back-in right to 25%' },
+    { country: 'Mozambique', newM: 'PSC', prevM: 'PSC', year: 2014, context: 'Revised Model PSC for Area 1 (TotalEnergies) and Area 4 (ENI/ExxonMobil); LNG-specific cost recovery provisions. Onshore insurgency delayed FID; $20B+ projects in limbo 2021–24' },
+    { country: 'Ghana', newM: 'PSC', prevM: 'Concession', year: 2016, context: 'Petroleum Commission Act revamped Ghana\'s fiscal framework; GNPC back-in increased to 15%. Jubilee Phase 2 and TEN field operate under revised PSC terms' },
+    { country: 'Kenya', newM: 'PSC', prevM: 'None', year: 2012, context: 'South Lokichar PSC (Tullow/Africa Oil); East Africa oil discovery race. Amended 2016 to increase government take from 50% to 60% on profit oil above 6× recovery factor' },
+    { country: 'Colombia', newM: 'PSC', prevM: 'Concession', year: 2012, context: 'ANH introduced E&P contract (E&P-C) replacing concession; sliding-scale government take based on production levels. Diversified from Ecopetrol-dominant model' },
+    { country: 'Mexico', newM: 'PSC', prevM: 'Nationalized', year: 2014, context: 'Historic constitutional reform ended 76-year PEMEX monopoly; CNH licensing rounds introduced concessions, PSCs, and profit-sharing contracts. Round 1 launched 2015' },
+    { country: 'Brazil', newM: 'PSC', prevM: 'Concession', year: 2010, context: 'Pre-salt PSC introduced for Libra block and subsequent pre-salt areas; Petrobras as mandatory operator (30% min). Separate from concession regime maintained for non-pre-salt' },
+  ],
+  '2020s': [
+    { country: 'UK', newM: 'EPL', prevM: 'PRT', year: 2022, context: 'Energy Profits Levy at 25% (May 2022) → 35% (Jan 2023); combined marginal rate hit 75%. Investment allowance partially offset; widely regarded as retroactive fiscal change that chilled North Sea investment' },
+    { country: 'Australia', newM: 'PRRT', prevM: 'PRRT', year: 2023, context: 'PRRT net-down cap introduced — deductions limited to 90% of assessable income; targeted at LNG projects (Gorgon, Wheatstone, QCLNG) that had generated near-zero PRRT despite $100B+ revenues' },
+    { country: 'Mozambique', newM: 'PSC', prevM: 'PSC', year: 2022, context: 'Coral South FLNG achieved FID and first LNG (2022); Cabo Delgado insurgency receded partially. TotalEnergies Area 1 suspension continued — fiscal uncertainty linked to security, not terms' },
+    { country: 'Namibia', newM: 'PSC', prevM: 'None', year: 2022, context: 'Orange Basin PSC activity surged post Venus (TotalEnergies) and Graff (Shell) discoveries 2022. NAMCOR back-in provisions; Namibia fast-tracking fiscal framework for first production' },
+    { country: 'Guyana', newM: 'PSC', prevM: 'PSC', year: 2021, context: 'Stabroek 2016 PSC remains in force despite political pressure to renegotiate — 2% royalty widely seen as below market given ~11 Bboe resources. Exxon-led consortium maintained favorable terms through Payara and Yellowtail FIDs' },
+  ],
+};
+
+// ════════════════════════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════════════════════════
+
+let activeDecade = '1970s';
+let playInterval = null;
+let playIndex = DECADES.indexOf('1970s');
+
+// ════════════════════════════════════════════════════════════════════
+// RENDER
+// ════════════════════════════════════════════════════════════════════
+
+function render(decade) {
+  const ctx = DECADE_CONTEXT[decade];
+  const changes = CHANGES[decade] || [];
+
+  // Context card
+  document.getElementById('contextCard').innerHTML = `
+    <div class="price-block">
+      <div class="price-label">Avg Oil Price</div>
+      <div class="price-value">$${ctx.avgPrice.toFixed(2)}</div>
+      <div class="price-unit">/bbl nominal avg</div>
+    </div>
+    <div class="context-text">${ctx.narrative}</div>
+    <div class="context-theme">
+      <span class="theme-pill ${ctx.themeClass}">${ctx.theme}</span>
+    </div>
+  `;
+
+  // Stats bar
+  const s = ctx.stats;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card">
+      <div class="stat-val">${s.newRegimes}</div>
+      <div class="stat-label">Regime Events</div>
+      <div class="stat-sub">in the ${decade}</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${s.pscAdoptions}</div>
+      <div class="stat-label">PSC Adoptions</div>
+      <div class="stat-sub">new PSC frameworks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${s.avgTakeBefore}</div>
+      <div class="stat-label">Govt Take (Start)</div>
+      <div class="stat-sub">typical range entering</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-val">${s.avgTakeAfter}</div>
+      <div class="stat-label">Govt Take (End)</div>
+      <div class="stat-sub">typical range exiting</div>
+    </div>
+  `;
+
+  // Table
+  document.getElementById('tableTitle').textContent = `Major Fiscal Regime Changes — ${decade}`;
+  document.getElementById('tableCount').textContent = `${changes.length} event${changes.length !== 1 ? 's' : ''}`;
+
+  const tbody = document.getElementById('changesBody');
+  const empty = document.getElementById('emptyState');
+
+  if (changes.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = '';
+  } else {
+    empty.style.display = 'none';
+    tbody.innerHTML = changes.map(c => `
+      <tr>
+        <td class="td-country">${c.country}</td>
+        <td>
+          <span class="mechanic-pill ${pillClass(c.newM)}">${c.newM}</span>
+        </td>
+        <td>
+          ${c.prevM === 'None'
+            ? '<span style="color:var(--muted);font-size:12px">— None / First Framework —</span>'
+            : `<span class="mechanic-pill ${pillClass(c.prevM)}">${c.prevM}</span>`
+          }
+        </td>
+        <td class="td-year">${c.year}</td>
+        <td class="td-context">${c.context}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+function selectDecade(decade, el) {
+  activeDecade = decade;
+  playIndex = DECADES.indexOf(decade);
+
+  // Update tab highlight
+  document.querySelectorAll('.decade-tab').forEach(t => t.classList.remove('active'));
+  if (el) el.classList.add('active');
+
+  render(decade);
+}
+
+// ════════════════════════════════════════════════════════════════════
+// PLAY MODE
+// ════════════════════════════════════════════════════════════════════
+
+function togglePlay() {
+  if (playInterval) {
+    stopPlay();
+  } else {
+    startPlay();
+  }
+}
+
+function startPlay() {
+  const btn = document.getElementById('playBtn');
+  const icon = document.getElementById('playIcon');
+  const label = document.getElementById('playLabel');
+  const display = document.getElementById('decadeDisplay');
+
+  btn.classList.add('playing');
+  icon.textContent = '■';
+  label.textContent = 'Stop';
+  display.classList.add('playing');
+
+  // Start from current position
+  playInterval = setInterval(() => {
+    playIndex = (playIndex + 1) % DECADES.length;
+    const d = DECADES[playIndex];
+    activeDecade = d;
+
+    // Update tab UI
+    document.querySelectorAll('.decade-tab').forEach((t, i) => {
+      t.classList.toggle('active', i === playIndex);
+    });
+
+    const counter = document.getElementById('playCounter');
+    counter.textContent = `${playIndex + 1}/${DECADES.length}`;
+    display.textContent = `Now showing: ${d} — ${DECADE_CONTEXT[d].theme}`;
+
+    render(d);
+
+    if (playIndex === DECADES.length - 1) {
+      stopPlay();
+    }
+  }, 2000);
+}
+
+function stopPlay() {
+  clearInterval(playInterval);
+  playInterval = null;
+
+  const btn = document.getElementById('playBtn');
+  const icon = document.getElementById('playIcon');
+  const label = document.getElementById('playLabel');
+  const display = document.getElementById('decadeDisplay');
+  const counter = document.getElementById('playCounter');
+
+  btn.classList.remove('playing');
+  icon.textContent = '▶';
+  label.textContent = 'Step Through Decades';
+  counter.textContent = '';
+  display.classList.remove('playing');
+  display.textContent = '';
+}
+
+// ════════════════════════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════════════════════════
+
+(function init() {
+  // Set active decade tab (1970s is default — index 2)
+  const tabs = document.querySelectorAll('.decade-tab');
+  tabs.forEach((t, i) => {
+    t.classList.toggle('active', DECADES[i] === activeDecade);
+  });
+  render(activeDecade);
+})();
+</script>
+</body>
+</html>
