@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Petroleum Fiscal Database v17</title>
+<title>Petroleum Fiscal Database v18</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -39,6 +39,8 @@ a { color: var(--accent); text-decoration: none; }
 .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 18px; white-space: nowrap; transition: .15s; }
 .tab-btn:hover  { color: var(--text); }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-nav-link { color: #4da6ff; text-decoration: none; padding: 10px 16px; font-size: 13px; border-left: 1px solid var(--border); display: flex; align-items: center; white-space: nowrap; font-weight: 600; transition: .15s; }
+.tab-nav-link:hover { color: var(--text); }
 .tab-pane { display: none; padding: 24px; }
 .tab-pane.active { display: block; }
 
@@ -212,7 +214,7 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
 
 <div class="site-header">
   <h1>Petroleum Fiscal Database</h1>
-  <span class="badge">v17</span>
+  <span class="badge">v18</span>
   <span id="scenario-badge">CUSTOM SCENARIO</span>
   <span class="meta" id="hdr-meta">Loading…</span>
 </div>
@@ -224,7 +226,10 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
   <button class="tab-btn" onclick="switchTab('t4',this)">Vintage Analysis</button>
   <button class="tab-btn" onclick="switchTab('t5',this)">IOC Portfolio</button>
   <button class="tab-btn" onclick="switchTab('t6',this)">Mechanics Guide</button>
-  <a href="scenarios/" class="tab-btn" style="text-decoration:none;display:flex;align-items:center;background:none;border:1px solid #2563eb;color:#4da6ff;margin-left:8px;">&#9654; Scenario Modeler</a>
+  <a href="scenarios/" class="tab-nav-link">Scenario Modeler</a>
+  <a href="countries/" class="tab-nav-link">Country Pages</a>
+  <a href="compare/" class="tab-nav-link">Compare</a>
+  <a href="api/" class="tab-nav-link">API Docs</a>
 </div>
 
 <!-- ═══════════════════════════ TAB 1: GLOBAL EXPLORER ═══════════════════════ -->
@@ -258,6 +263,18 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
       </div>
     </div>
     <div class="scenario-status" id="customStatus">Using pre-computed DB values. Click "Recalculate All" to run live DCF across all 209 countries.</div>
+  </div>
+
+  <!-- Saved Scenarios Panel -->
+  <div class="card" id="saved-scenarios-panel" style="border-color:var(--border);margin-bottom:16px;">
+    <div class="card-title" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <span>Saved Scenarios</span>
+      <div style="display:flex;gap:8px;">
+        <button class="btn btn-sm" onclick="saveCurrentScenario()">Save Scenario</button>
+        <button class="btn btn-outline btn-sm" onclick="copyScenarioURL()">Share URL</button>
+      </div>
+    </div>
+    <div id="saved-scenarios-list"><div class="empty-state" style="padding:12px;font-size:12px;">No saved scenarios. Adjust parameters above and click "Save Scenario".</div></div>
   </div>
 
   <div class="controls-row">
@@ -315,6 +332,7 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
           <th class="num">IRR (%)</th>
           <th class="num">Breakeven</th>
           <th class="num">$50→$125 Swing</th>
+          <th class="num">Sensitivity</th>
           <th>Tier</th>
         </tr>
       </thead>
@@ -1056,6 +1074,7 @@ function renderExplorer() {
       <td class="num">${fmt(irr)}%</td>
       <td class="num">${d.be_75 !== null ? '$' + fmt(d.be_75) : '—'}</td>
       <td class="num" style="color:var(--muted)">${d.swing !== null ? '+' + fmt(d.swing) + 'pp' : '—'}</td>
+      <td class="num">${(()=>{const s125=d.take_125,s50=d.take_50;if(s125==null||s50==null)return '—';const pp=Math.round(s125-s50);const col=pp>30?'var(--red)':pp>15?'var(--orange)':'var(--green)';return `<span style="color:${col};font-weight:700">±${pp}pp</span>`;})()}</td>
       <td><span class="tier ${tc}">${tl}</span></td>
     </tr>`;
   }).join('');
@@ -1540,7 +1559,7 @@ function renderMechanics() {
 
 // ─── init ────────────────────────────────────────────────────────────────────
 document.getElementById('hdr-meta').textContent =
-  `${COUNTRY_DATA.length} countries · ${COUNTRY_DATA.reduce((s,d)=>s+d.n,0).toLocaleString()} contracts · 7 mechanics · Interactive DCF`;
+  `297K+ verified facts | 283K DCF results | 212 countries | 7 fiscal mechanics`;
 
 renderExplorer();
 runScreener();
@@ -1964,10 +1983,147 @@ function exportComparisonPDF() {
   // Footer
   doc.setFontSize(8);
   doc.setTextColor(120, 120, 140);
-  doc.text('Petroleum Fiscal Intelligence Platform v17 | For informational purposes only', 14, 200);
+  doc.text('Petroleum Fiscal Intelligence Platform v18 | For informational purposes only', 14, 200);
 
   doc.save('petroleum-fiscal-comparison.pdf');
 }
+
+// ─── Saved Scenarios (localStorage) ─────────────────────────────────────────
+const SCENARIOS_KEY = 'pfdb_scenarios_v1';
+const MAX_SCENARIOS = 10;
+
+function getSavedScenarios() {
+  try { return JSON.parse(localStorage.getItem(SCENARIOS_KEY)) || []; }
+  catch(e) { return []; }
+}
+
+function putSavedScenarios(arr) {
+  localStorage.setItem(SCENARIOS_KEY, JSON.stringify(arr));
+}
+
+function saveCurrentScenario() {
+  const name = prompt('Name this scenario:');
+  if (!name || !name.trim()) return;
+  const price   = document.getElementById('customPrice').value;
+  const profile = document.getElementById('profileType').value;
+  const discount = document.getElementById('discountRate') ? document.getElementById('discountRate').value : 10;
+  const horizon  = document.getElementById('horizon') ? document.getElementById('horizon').value : 25;
+  // count selected countries (comparison list)
+  const nCountries = compareList ? compareList.length : 0;
+  const scenarios = getSavedScenarios();
+  scenarios.push({
+    name: name.trim(),
+    price: Number(price),
+    profile,
+    discount: Number(discount),
+    horizon: Number(horizon),
+    nCountries,
+    savedAt: new Date().toISOString().slice(0,10)
+  });
+  // FIFO: trim to max 10
+  while (scenarios.length > MAX_SCENARIOS) scenarios.shift();
+  putSavedScenarios(scenarios);
+  renderSavedScenarios();
+}
+
+function loadScenario(idx) {
+  const scenarios = getSavedScenarios();
+  const s = scenarios[idx];
+  if (!s) return;
+  document.getElementById('customPrice').value = s.price;
+  document.getElementById('priceVal').textContent = '$' + s.price + '/bbl';
+  document.getElementById('profileType').value = s.profile;
+  renderSavedScenarios();
+}
+
+function deleteScenario(idx) {
+  const scenarios = getSavedScenarios();
+  scenarios.splice(idx, 1);
+  putSavedScenarios(scenarios);
+  renderSavedScenarios();
+}
+
+function shareScenario(idx) {
+  const scenarios = getSavedScenarios();
+  const s = scenarios[idx];
+  if (!s) return;
+  const hash = `#s=${s.price},${s.profile},${s.discount},${s.horizon}`;
+  const url = location.href.split('#')[0] + hash;
+  navigator.clipboard.writeText(url).then(() => {
+    alert('Scenario URL copied to clipboard:\n' + url);
+  }).catch(() => {
+    prompt('Copy this URL:', url);
+  });
+}
+
+function copyScenarioURL() {
+  const price   = document.getElementById('customPrice').value;
+  const profile = document.getElementById('profileType').value;
+  const discount = document.getElementById('discountRate') ? document.getElementById('discountRate').value : 10;
+  const horizon  = document.getElementById('horizon') ? document.getElementById('horizon').value : 25;
+  const hash = `#s=${price},${profile},${discount},${horizon}`;
+  const url = location.href.split('#')[0] + hash;
+  navigator.clipboard.writeText(url).then(() => {
+    alert('Scenario URL copied to clipboard:\n' + url);
+  }).catch(() => {
+    prompt('Copy this URL:', url);
+  });
+}
+
+function renderSavedScenarios() {
+  const scenarios = getSavedScenarios();
+  const el = document.getElementById('saved-scenarios-list');
+  if (!scenarios.length) {
+    el.innerHTML = '<div class="empty-state" style="padding:12px;font-size:12px;">No saved scenarios. Adjust parameters above and click "Save Scenario".</div>';
+    return;
+  }
+  el.innerHTML = `<table style="width:100%;border-collapse:collapse;font-size:12px;">
+    <thead><tr>
+      <th style="text-align:left;padding:6px 8px;color:var(--muted);font-size:11px;text-transform:uppercase;">Name</th>
+      <th style="text-align:center;padding:6px 8px;color:var(--muted);font-size:11px;text-transform:uppercase;">Price</th>
+      <th style="text-align:center;padding:6px 8px;color:var(--muted);font-size:11px;text-transform:uppercase;">Profile</th>
+      <th style="text-align:center;padding:6px 8px;color:var(--muted);font-size:11px;text-transform:uppercase;">Countries</th>
+      <th style="text-align:center;padding:6px 8px;color:var(--muted);font-size:11px;text-transform:uppercase;">Saved</th>
+      <th style="padding:6px 8px;"></th>
+    </tr></thead>
+    <tbody>${scenarios.map((s,i) => `<tr style="border-top:1px solid var(--border);">
+      <td style="padding:7px 8px;font-weight:600;">${s.name}</td>
+      <td style="text-align:center;padding:7px 8px;color:var(--accent);">$${s.price}/bbl</td>
+      <td style="text-align:center;padding:7px 8px;color:var(--muted);">${s.profile.replace(/_/g,' ')}</td>
+      <td style="text-align:center;padding:7px 8px;color:var(--muted);">${s.nCountries || '—'}</td>
+      <td style="text-align:center;padding:7px 8px;color:var(--muted);">${s.savedAt}</td>
+      <td style="padding:7px 8px;text-align:right;">
+        <button class="btn btn-sm" onclick="loadScenario(${i})" style="margin-right:4px;">Load</button>
+        <button class="btn btn-sm" onclick="shareScenario(${i})" style="margin-right:4px;background:var(--purple);">Share</button>
+        <button class="btn btn-sm btn-outline" onclick="deleteScenario(${i})">Delete</button>
+      </td>
+    </tr>`).join('')}</tbody>
+  </table>`;
+}
+
+// ─── URL hash scenario restore ────────────────────────────────────────────────
+(function restoreFromHash() {
+  const hash = location.hash;
+  if (!hash.startsWith('#s=')) return;
+  const parts = hash.slice(3).split(',');
+  if (parts.length < 2) return;
+  const [price, profile, discount, horizon] = parts;
+  if (price) {
+    document.getElementById('customPrice').value = Number(price);
+    document.getElementById('priceVal').textContent = '$' + price + '/bbl';
+  }
+  if (profile) {
+    const sel = document.getElementById('profileType');
+    if ([...sel.options].some(o => o.value === profile)) sel.value = profile;
+  }
+  if (discount && document.getElementById('discountRate'))
+    document.getElementById('discountRate').value = Number(discount);
+  if (horizon && document.getElementById('horizon'))
+    document.getElementById('horizon').value = Number(horizon);
+})();
+
+// ─── init saved scenarios panel ──────────────────────────────────────────────
+renderSavedScenarios();
 </script>
 
 <!-- Country Drill-Down Modal -->
