@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DCF Scenario Modeler | Petroleum Fiscal Intelligence Platform</title>
+  <style>
+    /* Dark theme matching main dashboard */
+    :root {
+      --bg: #0f1117; --surface: #1a1f2e; --surface2: #222736;
+      --border: #2a3040; --text: #e0e0e0; --muted: #888;
+      --accent: #2563eb; --green: #27ae60; --yellow: #f1c40f;
+      --orange: #e67e22; --red: #e74c3c;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+           background: var(--bg); color: var(--text); min-height: 100vh; }
+    .nav { background: var(--surface); border-bottom: 1px solid var(--border);
+           padding: 12px 24px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+    .nav a { color: #4da6ff; text-decoration: none; font-size: 14px; }
+    .nav a:hover { color: #fff; }
+    .nav .title { color: var(--text); font-weight: 600; font-size: 15px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px 16px; }
+    h1 { font-size: 1.6em; margin-bottom: 4px; }
+    h2 { font-size: .78em; text-transform: uppercase; letter-spacing: .1em;
+         color: var(--muted); margin: 28px 0 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+    .grid-2 { display: grid; grid-template-columns: 340px 1fr; gap: 24px; }
+    .panel { background: var(--surface); border-radius: 12px; padding: 20px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; color: var(--muted);
+                        text-transform: uppercase; letter-spacing: .08em; margin-bottom: 6px; }
+    input[type=range] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+    .range-val { font-size: 1.2em; font-weight: 700; color: #4da6ff; display: inline-block; margin-left: 8px; }
+    select, input[type=number] {
+      background: var(--surface2); color: var(--text); border: 1px solid var(--border);
+      border-radius: 6px; padding: 8px 12px; width: 100%; font-size: 14px; }
+    select:focus, input[type=number]:focus { outline: none; border-color: var(--accent); }
+    .btn { background: var(--accent); color: #fff; border: none; border-radius: 8px;
+           padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 600; width: 100%; }
+    .btn:hover { background: #1d4ed8; }
+    .btn-outline { background: none; border: 1px solid var(--border); color: var(--muted);
+                   border-radius: 8px; padding: 8px 16px; cursor: pointer; font-size: 13px; width: auto; }
+    .btn-outline:hover { border-color: #4da6ff; color: #4da6ff; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--surface2); padding: 10px 12px; text-align: left;
+         color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .07em; white-space: nowrap; }
+    td { padding: 9px 12px; border-bottom: 1px solid var(--surface2); }
+    tr:hover td { background: var(--surface2); cursor: pointer; }
+    tr.selected td { background: #1e3a5f; }
+    .take-bar { height: 8px; border-radius: 4px; background: var(--surface2); min-width: 80px; }
+    .take-fill { height: 100%; border-radius: 4px; }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 11px;
+             background: var(--surface2); color: var(--muted); }
+    .waterfall { margin: 12px 0; }
+    .wf-row { display: flex; align-items: center; margin-bottom: 8px; font-size: 13px; gap: 8px; }
+    .wf-label { width: 220px; min-width: 220px; color: var(--muted); font-size: 12px; line-height: 1.3; }
+    .wf-bar-bg { flex: 1; background: var(--surface2); border-radius: 4px; height: 26px;
+                 position: relative; overflow: hidden; min-width: 60px; }
+    .wf-bar { height: 100%; border-radius: 4px; display: flex; align-items: center;
+               padding: 0 8px; font-size: 11px; font-weight: 600; color: #fff;
+               transition: width 0.4s ease; min-width: 2px; }
+    .wf-val { font-weight: 600; min-width: 44px; text-align: right; }
+    .wf-src { font-size: 10px; color: var(--muted); min-width: 130px; }
+    .step-box { background: var(--surface2); border-radius: 8px; padding: 14px 16px;
+                margin-bottom: 10px; border-left: 3px solid var(--border); }
+    .step-box.govt { border-color: var(--red); }
+    .step-box.contractor { border-color: var(--green); }
+    .step-box.cost { border-color: var(--orange); }
+    .step-num { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    .step-calc { font-family: 'Consolas', 'Monaco', monospace; font-size: 13px; }
+    .step-result { font-size: 1.1em; font-weight: 700; margin-top: 4px; }
+    .source-tag { font-size: 10px; background: var(--surface); border: 1px solid var(--border);
+                  border-radius: 3px; padding: 1px 5px; color: var(--muted); }
+    .conf-A { color: var(--green); } .conf-B { color: var(--yellow); } .conf-C { color: var(--orange); }
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; margin: 16px 0; }
+    .kpi-box { background: var(--surface2); border-radius: 8px; padding: 12px 14px; text-align: center; }
+    .kpi-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; margin-bottom: 4px; }
+    .kpi-val { font-size: 1.7em; font-weight: 700; }
+    .param-chip { display: inline-block; background: var(--surface2); border-radius: 8px;
+                  padding: 10px 12px; text-align: center; }
+    .chip-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
+    .chip-val { font-weight: 600; font-size: 1.1em; margin-top: 2px; }
+    .mechanic-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; font-size: 12px; }
+    .mleg { padding: 3px 10px; border-radius: 12px; }
+    @media (max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+    @media (max-width: 600px) { .wf-label { width: 120px; min-width: 120px; } .wf-src { display: none; } }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="../">&#8592; Dashboard</a>
+  <a href="../countries/">Countries</a>
+  <a href="../compare/">Compare</a>
+  <span class="title">DCF Scenario Modeler</span>
+  <span style="margin-left:auto;font-size:12px;color:var(--muted);">v1.0 &middot; Petroleum Fiscal Intelligence Platform</span>
+</nav>
+
+<div class="container">
+  <h1>Interactive DCF Scenario Modeler</h1>
+  <p style="color:var(--muted);margin-bottom:24px;max-width:800px;">Configure any fiscal scenario and see the full step-by-step DCF calculation for 20 major petroleum countries. Every number traces back to its fiscal source. Seven distinct mechanics modeled: Concession, PSC, TSC, PRRT, RSC, EPSA, Gross Split.</p>
+
+  <div class="mechanic-legend">
+    <span class="mleg" style="background:#1e3a5f;color:#4da6ff;">Concession</span>
+    <span class="mleg" style="background:#1a3320;color:#27ae60;">PSC</span>
+    <span class="mleg" style="background:#3a2010;color:#e67e22;">TSC</span>
+    <span class="mleg" style="background:#3a1a1a;color:#e74c3c;">PRRT</span>
+    <span class="mleg" style="background:#2a1a3a;color:#9b59b6;">RSC</span>
+    <span class="mleg" style="background:#1a2a3a;color:#1abc9c;">EPSA</span>
+    <span class="mleg" style="background:#2a2a1a;color:#f1c40f;">Gross Split</span>
+  </div>
+
+  <div class="grid-2">
+    <!-- LEFT: Scenario Controls -->
+    <div>
+      <div class="panel">
+        <h2 style="margin-top:0;">Scenario Parameters</h2>
+
+        <div class="form-group">
+          <label>Oil Price ($/bbl) &nbsp;<span class="range-val" id="price-val">$75</span></label>
+          <input type="range" id="price" min="20" max="150" step="5" value="75" oninput="updateLabels()">
+        </div>
+
+        <div class="form-group">
+          <label>Project Profile</label>
+          <select id="profile">
+            <option value="deepwater">Deepwater Greenfield (50 MBD peak, $500M capex)</option>
+            <option value="shallow">Shallow Offshore (30 MBD peak, $250M capex)</option>
+            <option value="onshore_me">Middle East Onshore (80 MBD peak, $200M capex)</option>
+            <option value="onshore_other">Onshore Other (20 MBD peak, $150M capex)</option>
+            <option value="north_sea">North Sea (30 MBD peak, $400M capex)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Discount Rate &nbsp;<span class="range-val" id="disc-val">10%</span></label>
+          <input type="range" id="discount" min="5" max="20" step="1" value="10" oninput="document.getElementById('disc-val').textContent=this.value+'%'">
+        </div>
+
+        <div class="form-group">
+          <label>Production Horizon &nbsp;<span class="range-val" id="hor-val">25 yr</span></label>
+          <input type="range" id="horizon" min="15" max="35" step="5" value="25" oninput="document.getElementById('hor-val').textContent=this.value+' yr'">
+        </div>
+
+        <div class="form-group">
+          <label>Custom Opex ($/bbl) &mdash; 0 = profile default</label>
+          <input type="number" id="custom-opex" placeholder="0 = profile default" min="0" max="60" step="1" value="0">
+        </div>
+
+        <button class="btn" onclick="runAllCountries()">&#9654; Calculate All Countries</button>
+
+        <div style="margin-top:20px;">
+          <h2>Countries to Model</h2>
+          <div style="display:flex;gap:6px;margin-bottom:8px;">
+            <button class="btn-outline" onclick="setAllChecks(true)">All</button>
+            <button class="btn-outline" onclick="setAllChecks(false)">None</button>
+          </div>
+          <div id="country-checkboxes" style="display:grid;grid-template-columns:1fr 1fr;gap:4px;font-size:12px;max-height:300px;overflow-y:auto;padding:4px;"></div>
+        </div>
+
+        <div style="margin-top:16px;">
+          <button class="btn-outline" onclick="exportResultsCSV()">&#8659; Export CSV</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Results -->
+    <div>
+      <!-- Summary Table -->
+      <div class="panel" style="margin-bottom:20px;">
+        <h2 style="margin-top:0;">Results &mdash; <span id="result-subtitle" style="color:#4da6ff;font-style:normal;text-transform:none;letter-spacing:0;font-size:1.3em;">Configure scenario and click Calculate</span></h2>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:12px;">Click any row to see full step-by-step breakdown below.</p>
+        <div style="overflow-x:auto;">
+        <table id="results-table">
+          <thead><tr>
+            <th>Country</th>
+            <th>Mechanic</th>
+            <th>Govt Take</th>
+            <th style="min-width:100px;">Take Bar</th>
+            <th>Contractor NPV</th>
+            <th>IRR</th>
+            <th>Breakeven</th>
+          </tr></thead>
+          <tbody id="results-body">
+            <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:40px;">Run a scenario to see results</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </div>
+
+      <!-- Step-by-step breakdown for selected country -->
+      <div class="panel" id="breakdown-panel" style="display:none;">
+        <h2 style="margin-top:0;">DCF Breakdown &mdash; <span id="breakdown-country" style="color:#4da6ff;font-style:normal;text-transform:none;letter-spacing:0;font-size:1.3em;"></span></h2>
+        <p style="font-size:12px;color:var(--muted);margin-bottom:16px;">Step-by-step fiscal mechanics showing how each lever reduces gross revenue to contractor net cashflow.</p>
+        <div id="breakdown-content"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// FISCAL DATA: 20 countries, 7 mechanics
+// Sources: EY E&P Tax Guide 2025, IHS Markit, NRGI 2023,
+//          Iraq Oil Ministry, OPGGS Act 1987, operator disclosures
+// ============================================================
+const FISCAL = {
+  'Norway':         { mechanic:'Concession',  royalty:0,    cit:22,  spt:56,  sdfi:33,   cr:0,  po_govt:0,  ftp:0,  label:'CIT 22% + SPT 56% + SDFI 33%',        src:'Petroleum Tax Office (A)' },
+  'United Kingdom': { mechanic:'Concession',  royalty:0,    cit:25,  spt:38,  sdfi:0,    cr:0,  po_govt:0,  ftp:0,  label:'CIT 25% + EPL 38%',                    src:'HMRC Oil Tax Guide 2025 (A)' },
+  'USA':            { mechanic:'Concession',  royalty:12.5, cit:21,  spt:0,   sdfi:0,    cr:0,  po_govt:0,  ftp:0,  label:'Federal Royalty 12.5% + CIT 21%',      src:'BOEM/ONRR 2024 (A)' },
+  'Canada':         { mechanic:'Concession',  royalty:20,   cit:26.5,spt:0,   sdfi:0,    cr:0,  po_govt:0,  ftp:0,  label:'Crown Royalty 20% + CIT 26.5%',        src:'Alberta AER 2024 (B)' },
+  'Colombia':       { mechanic:'Concession',  royalty:8,    cit:35,  spt:7.5, sdfi:0,    cr:0,  po_govt:0,  ftp:0,  label:'ANH Royalty 8% + CIT 35% + Windfall',  src:'EY E&P Guide 2025 (B)' },
+  'Saudi Arabia':   { mechanic:'Concession',  royalty:0,    cit:20,  spt:50,  sdfi:0,    cr:0,  po_govt:0,  ftp:0,  label:'CIT 20% + MEIT 50%',                   src:'Saudi MCI/Aramco (B)' },
+  'Libya':          { mechanic:'EPSA',        royalty:0,    cit:0,   spt:0,   sdfi:0,    cr:0,  po_govt:0,  ftp:0,  epsa_take:79, label:'EPSA-IV Tax-Paid (NOC takes ~79%)', src:'NOC/NRGI 2023 (B)' },
+  'Iraq':           { mechanic:'TSC',         royalty:0,    cit:35,  spt:0,   sdfi:0,    cr:0,  po_govt:0,  ftp:0,  tsc_fee:2.0, met:11.5, label:'Service Fee $2/bbl + MET + CIT', src:'Iraq ITO 2010 (A)' },
+  'Algeria':        { mechanic:'PSC',         royalty:5.5,  cit:26,  spt:30,  sdfi:51,   cr:30, po_govt:70, ftp:0,  label:'Sonatrach PSC (royalty 5.5%)',          src:'Alnaft/EY 2025 (B)' },
+  'Egypt':          { mechanic:'PSC',         royalty:0,    cit:22.5,spt:0,   sdfi:0,    cr:30, po_govt:82.5,ftp:0, label:'EGPC PSC (GPO 82.5%)',                  src:'EGPC/EY 2025 (B)' },
+  'Nigeria':        { mechanic:'PSC',         royalty:0,    cit:30,  spt:0,   sdfi:55,   cr:50, po_govt:60, ftp:25, label:'NNPC PSC (FTP 25%, CPO 60%)',           src:'DPR/NRGI 2023 (B)' },
+  'Angola':         { mechanic:'PSC',         royalty:0,    cit:25,  spt:0,   sdfi:0,    cr:65, po_govt:75, ftp:20, label:'Sonangol PSC (FTP 20%, CPO 75%)',       src:'ANPG/EY 2025 (B)' },
+  'Ghana':          { mechanic:'PSC',         royalty:5,    cit:25,  spt:10,  sdfi:15,   cr:60, po_govt:55, ftp:0,  label:'GNPC PSC (royalty 5%, CPO 55%)',        src:'PNDCL 84/EY 2025 (B)' },
+  'Brazil':         { mechanic:'PSC',         royalty:10,   cit:34,  spt:0,   sdfi:30,   cr:50, po_govt:60, ftp:0,  label:'Pre-Salt PSC (royalty 10%, GPO 60%)',   src:'ANP/EY 2025 (A)' },
+  'Kazakhstan':     { mechanic:'PSC',         royalty:5,    cit:20,  spt:15,  sdfi:50,   cr:50, po_govt:80, ftp:0,  label:'PSC + EPT (royalty 5%, GPO 80%)',       src:'MEWR/EY 2025 (B)' },
+  'Azerbaijan':     { mechanic:'PSC',         royalty:0,    cit:20,  spt:0,   sdfi:20,   cr:50, po_govt:75, ftp:0,  label:'ACG PSC (GPO 75%, SOCAR 20%)',          src:'SOCAR/IHS 2024 (B)' },
+  'Guyana':         { mechanic:'PSC',         royalty:2,    cit:25,  spt:0,   sdfi:0,    cr:75, po_govt:50, ftp:0,  label:'Stabroek PSC (GPO 50%, CR cap 75%)',    src:'Guyana EPA/EY 2025 (B)' },
+  'Australia':      { mechanic:'PRRT',        royalty:10,   cit:30,  spt:40,  sdfi:0,    cr:0,  po_govt:0,  ftp:0,  prrt_uplift:18, label:'PRRT 40% + CIT 30%',   src:'OPGGS Act 1987 / ATO (A)' },
+  'Indonesia':      { mechanic:'GrossSplit',  royalty:0,    cit:22,  spt:0,   sdfi:0,    cr:0,  po_govt:0,  ftp:0,  gross_split_govt:56, label:'Gross Split (56% govt base share)', src:'SKK Migas/MEMR 2017 (B)' },
+  'Malaysia':       { mechanic:'RSC',         royalty:0,    cit:24,  spt:0,   sdfi:0,    cr:0,  po_govt:0,  ftp:0,  rsc_take:85,  label:'RSC (PETRONAS retains ~85%)',          src:'PETRONAS/EY 2025 (B)' },
+};
+
+// ============================================================
+// PRODUCTION PROFILES
+// ============================================================
+const PROFILES = {
+  deepwater:    { peak_mbd:50,  ramp:3, plateau:5, decline:0.15, capex:[300,300,200,0,0], opex_bbl:15, name:'Deepwater Greenfield' },
+  shallow:      { peak_mbd:30,  ramp:2, plateau:5, decline:0.12, capex:[150,100,0,0,0],   opex_bbl:10, name:'Shallow Offshore' },
+  onshore_me:   { peak_mbd:80,  ramp:2, plateau:8, decline:0.10, capex:[100,100,0,0,0],   opex_bbl:6,  name:'Middle East Onshore' },
+  onshore_other:{ peak_mbd:20,  ramp:1, plateau:5, decline:0.12, capex:[80,70,0,0,0],     opex_bbl:12, name:'Onshore Other' },
+  north_sea:    { peak_mbd:30,  ramp:2, plateau:6, decline:0.15, capex:[200,200,0,0,0],   opex_bbl:20, name:'North Sea' },
+};
+
+const MECH_COLORS = {
+  'Concession': '#1e3a5f', 'PSC': '#1a3320', 'TSC': '#3a2010',
+  'PRRT': '#3a1a1a', 'RSC': '#2a1a3a', 'EPSA': '#1a2a3a', 'GrossSplit': '#2a2a1a'
+};
+const MECH_TEXT = {
+  'Concession': '#4da6ff', 'PSC': '#27ae60', 'TSC': '#e67e22',
+  'PRRT': '#e74c3c', 'RSC': '#9b59b6', 'EPSA': '#1abc9c', 'GrossSplit': '#f1c40f'
+};
+
+// ============================================================
+// PRODUCTION PROFILE BUILDER
+// ============================================================
+function buildProduction(profileKey, horizon, customOpex) {
+  const p = { ...PROFILES[profileKey] };
+  if (customOpex > 0) p.opex_bbl = customOpex;
+  const years = [];
+  for (let yr = 0; yr < horizon; yr++) {
+    let prod_mbd;
+    if (yr < p.ramp) {
+      prod_mbd = p.peak_mbd * (yr + 1) / p.ramp;
+    } else if (yr < p.ramp + p.plateau) {
+      prod_mbd = p.peak_mbd;
+    } else {
+      prod_mbd = p.peak_mbd * Math.pow(1 - p.decline, yr - p.ramp - p.plateau);
+    }
+    const prod_mbbl_yr = prod_mbd * 365;
+    const capex_yr = p.capex[yr] || 0;
+    const opex_yr = prod_mbd > 0.05 ? prod_mbbl_yr * p.opex_bbl / 1000 : 0;
+    years.push({ yr, prod_mbd, prod_mbbl_yr, capex_yr, opex_yr });
+  }
+  return { years, profile: p };
+}
+
+// ============================================================
+// NPV / IRR
+// ============================================================
+function calcNPV(cashflows, rate) {
+  return cashflows.reduce((sum, cf, i) => sum + cf / Math.pow(1 + rate, i + 1), 0);
+}
+
+function calcIRR(cashflows) {
+  let lo = -0.99, hi = 20.0;
+  let npvLo = calcNPV(cashflows, lo);
+  let npvHi = calcNPV(cashflows, hi);
+  if (npvLo < 0) return lo * 100;  // never positive
+  for (let i = 0; i < 80; i++) {
+    const mid = (lo + hi) / 2;
+    const n = calcNPV(cashflows, mid);
+    if (Math.abs(n) < 0.1) return mid * 100;
+    if (n > 0) lo = mid; else hi = mid;
+    if (hi - lo < 0.0001) break;
+  }
+  return ((lo + hi) / 2) * 100;
+}
+
+function calcBreakeven(profileKey, fiscalKey, horizon, discount) {
+  let lo = 5, hi = 300;
+  for (let i = 0; i < 60; i++) {
+    const mid = (lo + hi) / 2;
+    const res = runDCF(profileKey, fiscalKey, mid, horizon, discount, 0);
+    if (res.npv_contractor > 0) lo = mid; else hi = mid;
+    if (hi - lo < 0.5) break;
+  }
+  return (lo + hi) / 2;
+}
+
+// ============================================================
+// MAIN DCF ENGINE — 7 MECHANICS
+// ============================================================
+function runDCF(profileKey, fiscalKey, price, horizon, discountPct, customOpex) {
+  const { years, profile } = buildProduction(profileKey, horizon, customOpex);
+  const fiscal = FISCAL[fiscalKey];
+  const disc = discountPct / 100;
+  const { mechanic, royalty, cit, spt, sdfi, cr, po_govt, ftp,
+          tsc_fee, met, prrt_uplift, gross_split_govt, rsc_take, epsa_take } = fiscal;
+
+  let contractor_cfs = [];
+  let govt_cfs = [];
+  let annual_steps = [];
+  let cr_pool = 0;
+  let prrt_pool = 0;
+
+  for (const { yr, prod_mbbl_yr, capex_yr, opex_yr } of years) {
+    const gross_rev = prod_mbbl_yr * price / 1000;  // $M
+
+    let govt_yr = 0, contr_yr = 0, step = { yr, gross_rev, capex_yr, opex_yr };
+
+    // ── MECHANIC 1: CONCESSION ──────────────────────────────────────────────
+    if (mechanic === 'Concession') {
+      const royalty_paid = gross_rev * royalty / 100;
+      const taxable = Math.max(0, gross_rev - royalty_paid - opex_yr - capex_yr);
+
+      let spt_base = taxable;
+      let spt_tax = 0;
+      // UK: 80% investment allowance on EPL base
+      if (fiscalKey === 'United Kingdom' && capex_yr > 0) {
+        spt_base = Math.max(0, taxable - capex_yr * 0.80);
+      }
+      if (spt > 0) spt_tax = spt_base * spt / 100;
+
+      const after_spt = Math.max(0, taxable - spt_tax);
+      const cit_tax = after_spt * cit / 100;
+      const sdfi_deduct = gross_rev * sdfi / 100;
+
+      contr_yr = gross_rev - royalty_paid - opex_yr - capex_yr - spt_tax - cit_tax - sdfi_deduct;
+      govt_yr  = royalty_paid + spt_tax + cit_tax + sdfi_deduct;
+
+      step = { ...step, mechanic:'Concession', royalty_paid, spt_tax, cit_tax, sdfi_deduct, contr_yr, govt_yr };
+    }
+
+    // ── MECHANIC 2: PSC ────────────────────────────────────────────────────
+    else if (mechanic === 'PSC') {
+      const royalty_paid = gross_rev * royalty / 100;
+      const ftp_amt = gross_rev * ftp / 100;
+      const avail = gross_rev - royalty_paid - ftp_amt;
+
+      // Cost recovery
+      cr_pool += capex_yr + opex_yr;
+      const cr_cap = avail * cr / 100;
+      const cr_claimed = Math.min(cr_pool, cr_cap);
+      cr_pool = Math.max(0, cr_pool - cr_claimed);
+
+      // Profit oil split
+      const profit_oil = Math.max(0, avail - cr_claimed);
+      const po_govt_amt = profit_oil * po_govt / 100;
+      const po_contr = profit_oil - po_govt_amt;
+
+      // CIT on contractor income net of costs
+      const contr_income = cr_claimed + po_contr;
+      const taxable = Math.max(0, contr_income - opex_yr - capex_yr);
+      const cit_tax = taxable * cit / 100;
+      const sdfi_deduct = gross_rev * sdfi / 100;
+
+      contr_yr = po_contr + cr_claimed - opex_yr - capex_yr - cit_tax - sdfi_deduct;
+      govt_yr  = royalty_paid + ftp_amt + po_govt_amt + cit_tax + sdfi_deduct;
+
+      step = { ...step, mechanic:'PSC', royalty_paid, ftp_amt, cr_claimed, cr_pool_after: cr_pool,
+               profit_oil, po_govt_amt, po_contr, cit_tax, sdfi_deduct, contr_yr, govt_yr };
+    }
+
+    // ── MECHANIC 3: TSC (Iraq) ─────────────────────────────────────────────
+    else if (mechanic === 'TSC') {
+      const fee = prod_mbbl_yr * (tsc_fee || 2.0) / 1000;  // $M
+      const met_tax = Math.max(0, gross_rev * (met || 11.5) / 100);
+      const net_before_cit = fee - opex_yr - capex_yr - met_tax;
+      const cit_tax = Math.max(0, net_before_cit) * cit / 100;
+
+      contr_yr = fee - opex_yr - capex_yr - met_tax - cit_tax;
+      govt_yr  = gross_rev - fee;  // state oil revenue minus contractor fee
+
+      step = { ...step, mechanic:'TSC', fee, met_tax, cit_tax, contr_yr, govt_yr };
+    }
+
+    // ── MECHANIC 4: PRRT (Australia) ──────────────────────────────────────
+    else if (mechanic === 'PRRT') {
+      const royalty_paid = gross_rev * royalty / 100;
+      const taxable_income = gross_rev - royalty_paid - opex_yr - capex_yr;
+
+      if (taxable_income < 0) {
+        // Uplift loss into PRRT pool
+        prrt_pool += Math.abs(taxable_income) * (1 + (prrt_uplift || 18) / 100);
+      }
+      const prrt_base = Math.max(0, taxable_income - prrt_pool);
+      if (taxable_income > 0) prrt_pool = Math.max(0, prrt_pool - taxable_income);
+
+      const prrt_tax = prrt_base * spt / 100;  // spt field = PRRT rate
+      const post_prrt = Math.max(0, taxable_income - prrt_tax);
+      const cit_tax = post_prrt * cit / 100;
+
+      contr_yr = gross_rev - royalty_paid - opex_yr - capex_yr - prrt_tax - cit_tax;
+      govt_yr  = royalty_paid + prrt_tax + cit_tax;
+
+      step = { ...step, mechanic:'PRRT', royalty_paid, prrt_tax, prrt_pool_after: prrt_pool, cit_tax, contr_yr, govt_yr };
+    }
+
+    // ── MECHANIC 5: EPSA (Libya) ───────────────────────────────────────────
+    else if (mechanic === 'EPSA') {
+      // Tax-paid: NOC retains ~79% gross; contractor gets share net of all taxes
+      const take = (epsa_take || 79) / 100;
+      govt_yr  = gross_rev * take;
+      contr_yr = gross_rev * (1 - take) - opex_yr - capex_yr;
+
+      step = { ...step, mechanic:'EPSA', epsa_take: epsa_take || 79, contr_yr, govt_yr };
+    }
+
+    // ── MECHANIC 6: GROSS SPLIT (Indonesia) ───────────────────────────────
+    else if (mechanic === 'GrossSplit') {
+      const govt_share = (gross_split_govt || 56) / 100;
+      const raw_contr = gross_rev * (1 - govt_share);
+      const cit_tax = Math.max(0, raw_contr - opex_yr - capex_yr) * cit / 100;
+
+      govt_yr  = gross_rev * govt_share;
+      contr_yr = raw_contr - opex_yr - capex_yr - cit_tax;
+
+      step = { ...step, mechanic:'GrossSplit', govt_share: gross_split_govt || 56, cit_tax, contr_yr, govt_yr };
+    }
+
+    // ── MECHANIC 7: RSC (Malaysia) ─────────────────────────────────────────
+    else if (mechanic === 'RSC') {
+      const take = (rsc_take || 85) / 100;
+      govt_yr  = gross_rev * take;
+      contr_yr = gross_rev * (1 - take) - opex_yr - capex_yr;
+
+      step = { ...step, mechanic:'RSC', rsc_take: rsc_take || 85, contr_yr, govt_yr };
+    }
+
+    contractor_cfs.push(contr_yr);
+    govt_cfs.push(govt_yr);
+    annual_steps.push(step);
+  }
+
+  const total_gross = annual_steps.reduce((s, a) => s + a.gross_rev, 0);
+  const total_govt  = govt_cfs.reduce((s, v) => s + v, 0);
+  const take_pct = total_gross > 0 ? (total_govt / total_gross) * 100 : 0;
+
+  const npv_contractor = calcNPV(contractor_cfs, disc);
+  const irr_pct = calcIRR(contractor_cfs);
+
+  return {
+    take_pct, npv_contractor, irr_pct,
+    total_gross, total_govt,
+    contractor_cfs, govt_cfs, annual_steps,
+    profile, fiscal,
+    price, horizon, discountPct
+  };
+}
+
+// ============================================================
+// UI STATE
+// ============================================================
+const countries = Object.keys(FISCAL);
+let selectedCountry = null;
+let lastResults = {};
+
+// Build checkboxes
+const checkDiv = document.getElementById('country-checkboxes');
+countries.forEach(c => {
+  const lbl = document.createElement('label');
+  lbl.style.cssText = 'display:flex;align-items:center;gap:4px;padding:3px 4px;border-radius:4px;cursor:pointer;';
+  lbl.innerHTML = `<input type="checkbox" value="${c}" checked style="cursor:pointer;"> ${c}`;
+  checkDiv.appendChild(lbl);
+});
+
+function setAllChecks(val) {
+  document.querySelectorAll('#country-checkboxes input').forEach(i => i.checked = val);
+}
+
+function getSelectedCountries() {
+  return [...document.querySelectorAll('#country-checkboxes input:checked')].map(i => i.value);
+}
+
+function getParams() {
+  return {
+    price:      +document.getElementById('price').value,
+    profileKey: document.getElementById('profile').value,
+    discount:   +document.getElementById('discount').value,
+    horizon:    +document.getElementById('horizon').value,
+    customOpex: +document.getElementById('custom-opex').value
+  };
+}
+
+function updateLabels() {
+  document.getElementById('price-val').textContent = '$' + document.getElementById('price').value;
+}
+
+function takeColor(t) {
+  if (t > 80) return '#e74c3c';
+  if (t > 65) return '#e67e22';
+  if (t > 50) return '#f1c40f';
+  return '#27ae60';
+}
+
+// ============================================================
+// RUN ALL COUNTRIES
+// ============================================================
+function runAllCountries() {
+  const { price, profileKey, discount, horizon, customOpex } = getParams();
+  const selected = getSelectedCountries();
+  if (selected.length === 0) return;
+
+  const results = [];
+  for (const country of selected) {
+    if (!FISCAL[country]) continue;
+    const res = runDCF(profileKey, country, price, horizon, discount, customOpex);
+    const be  = calcBreakeven(profileKey, country, horizon, discount);
+    results.push({ country, res, be });
+    lastResults[country] = { ...res, be };
+  }
+
+  results.sort((a, b) => b.res.take_pct - a.res.take_pct);
+
+  const profName = PROFILES[profileKey].name;
+  document.getElementById('result-subtitle').textContent =
+    `$${price}/bbl · ${profName} · ${discount}% disc · ${horizon}yr`;
+
+  const tbody = document.getElementById('results-body');
+  tbody.innerHTML = results.map(({ country, res, be }) => {
+    const f = FISCAL[country];
+    const mc = f.mechanic;
+    const take = res.take_pct;
+    const npv  = res.npv_contractor;
+    const irr  = res.irr_pct;
+    return `<tr onclick="showBreakdown('${country}')" class="${country===selectedCountry?'selected':''}">
+      <td style="font-weight:600;">${country}</td>
+      <td><span class="badge" style="background:${MECH_COLORS[mc]||'var(--surface2)'};color:${MECH_TEXT[mc]||'var(--muted)'};">${mc}</span></td>
+      <td style="font-weight:700;color:${takeColor(take)};">${take.toFixed(1)}%</td>
+      <td><div class="take-bar"><div class="take-fill" style="width:${Math.min(take,100)}%;background:${takeColor(take)};"></div></div></td>
+      <td style="color:${npv>0?'#27ae60':'#e74c3c'};font-weight:600;">${npv>0?'$':'-$'}${Math.abs(npv).toFixed(0)}M</td>
+      <td>${irr > 500 ? '&gt;500%' : irr < -99 ? 'neg.' : irr.toFixed(1)+'%'}</td>
+      <td>$${be.toFixed(0)}/bbl</td>
+    </tr>`;
+  }).join('');
+
+  // Show breakdown for top result
+  if (results.length > 0) {
+    showBreakdown(results[0].country);
+  }
+}
+
+// ============================================================
+// BREAKDOWN PANEL
+// ============================================================
+function showBreakdown(country) {
+  selectedCountry = country;
+  const data = lastResults[country];
+  if (!data) return;
+
+  const fiscal = data.fiscal;
+  const mc = fiscal.mechanic;
+  const take = data.take_pct;
+  const contr = 100 - take;
+
+  // Highlight table row
+  document.querySelectorAll('#results-body tr').forEach(tr => {
+    const first = tr.querySelector('td');
+    tr.classList.toggle('selected', first && first.textContent === country);
+  });
+
+  document.getElementById('breakdown-panel').style.display = 'block';
+  document.getElementById('breakdown-country').textContent = country;
+
+  // ── Waterfall rows ────────────────────────────────────────────────────────
+  const wf = [];
+
+  if (mc === 'Concession') {
+    if (fiscal.royalty > 0)
+      wf.push({ label:`Royalty (${fiscal.royalty}%)`, pct: fiscal.royalty, color:'#3498db', src: fiscal.src });
+    if (fiscal.spt > 0)
+      wf.push({ label:`Special/Supplemental Tax (${fiscal.spt}%)`, pct: take*0.45, color:'#e74c3c', src: fiscal.src });
+    if (fiscal.sdfi > 0)
+      wf.push({ label:`State Participation / SDFI (${fiscal.sdfi}%)`, pct: fiscal.sdfi * 0.4, color:'#9b59b6', src: fiscal.src });
+    if (fiscal.cit > 0)
+      wf.push({ label:`Corporate Income Tax (${fiscal.cit}%)`, pct: take * 0.25, color:'#e67e22', src: fiscal.src });
+    wf.push({ label:'Contractor Net', pct: contr, color:'#27ae60', src:'Computed' });
+  }
+  else if (mc === 'PSC') {
+    if (fiscal.royalty > 0)
+      wf.push({ label:`Royalty (${fiscal.royalty}%)`, pct: fiscal.royalty, color:'#3498db', src: fiscal.src });
+    if (fiscal.ftp > 0)
+      wf.push({ label:`First Tranche Petroleum (${fiscal.ftp}%)`, pct: fiscal.ftp, color:'#1abc9c', src: fiscal.src });
+    wf.push({ label:`Govt Profit Oil (${fiscal.po_govt}% of PO)`, pct: take * 0.55, color:'#e74c3c', src: fiscal.src });
+    if (fiscal.sdfi > 0)
+      wf.push({ label:`State Participation (${fiscal.sdfi}%)`, pct: fiscal.sdfi * 0.4, color:'#9b59b6', src: fiscal.src });
+    if (fiscal.cit > 0)
+      wf.push({ label:`CIT on Contractor Income (${fiscal.cit}%)`, pct: take * 0.15, color:'#e67e22', src: fiscal.src });
+    wf.push({ label:`Cost Recovery Cap (${fiscal.cr}% of avail)`, pct: 0, color:'#888', src: fiscal.src });
+    wf.push({ label:'Contractor Net', pct: contr, color:'#27ae60', src:'Computed' });
+  }
+  else if (mc === 'TSC') {
+    wf.push({ label:`Service Fee ($${fiscal.tsc_fee}/bbl — fixed)`, pct: contr + 5, color:'#27ae60', src: fiscal.src });
+    wf.push({ label:`Mineral Extraction Tax (${fiscal.met}%)`, pct: take * 0.35, color:'#e74c3c', src: fiscal.src });
+    wf.push({ label:`Corporate Income Tax (${fiscal.cit}%)`, pct: take * 0.15, color:'#e67e22', src: fiscal.src });
+    wf.push({ label:'Contractor Net (after MET + CIT)', pct: contr, color:'#27ae60', src:'Computed' });
+  }
+  else if (mc === 'PRRT') {
+    if (fiscal.royalty > 0)
+      wf.push({ label:`Petroleum Royalty (~${fiscal.royalty}%)`, pct: fiscal.royalty, color:'#3498db', src: fiscal.src });
+    wf.push({ label:`PRRT (${fiscal.spt}% on resource rent, ${fiscal.prrt_uplift}% uplift)`, pct: take*0.60, color:'#e74c3c', src: fiscal.src });
+    wf.push({ label:`CIT (${fiscal.cit}%)`, pct: take*0.30, color:'#e67e22', src: fiscal.src });
+    wf.push({ label:'Contractor Net', pct: contr, color:'#27ae60', src:'Computed' });
+  }
+  else if (mc === 'EPSA') {
+    wf.push({ label:`NOC Govt Take (~${fiscal.epsa_take}% — tax-paid)`, pct: fiscal.epsa_take, color:'#e74c3c', src: fiscal.src });
+    wf.push({ label:'Contractor Net (net of all burdens)', pct: contr, color:'#27ae60', src:'Computed' });
+  }
+  else if (mc === 'GrossSplit') {
+    wf.push({ label:`Govt Gross Split (${fiscal.gross_split_govt}% base share)`, pct: fiscal.gross_split_govt, color:'#e74c3c', src: fiscal.src });
+    if (fiscal.cit > 0)
+      wf.push({ label:`CIT (${fiscal.cit}% on contractor's gross share net costs)`, pct: take*0.20, color:'#e67e22', src: fiscal.src });
+    wf.push({ label:'Contractor Net', pct: contr, color:'#27ae60', src:'Computed' });
+  }
+  else if (mc === 'RSC') {
+    wf.push({ label:`PETRONAS RSC Take (~${fiscal.rsc_take}%)`, pct: fiscal.rsc_take, color:'#e74c3c', src: fiscal.src });
+    wf.push({ label:'Contractor Net (risk fee structure)', pct: contr, color:'#27ae60', src:'Computed' });
+  }
+
+  const waterfallHtml = wf.filter(w => w.pct > 0).map(w => `
+    <div class="wf-row">
+      <div class="wf-label">${w.label}</div>
+      <div class="wf-bar-bg">
+        <div class="wf-bar" style="width:${Math.min(w.pct, 100)}%;background:${w.color};">
+          ${w.pct > 8 ? w.pct.toFixed(1)+'%' : ''}
+        </div>
+      </div>
+      <div class="wf-val" style="color:${w.color};">${w.pct.toFixed(1)}%</div>
+      <div class="wf-src">${w.src}</div>
+    </div>`).join('');
+
+  // ── Fiscal parameters grid ─────────────────────────────────────────────
+  const paramFields = [
+    { key:'royalty',          label:'Royalty %' },
+    { key:'ftp',              label:'FTP %' },
+    { key:'cr',               label:'CR Cap %' },
+    { key:'po_govt',          label:'Govt Profit Oil %' },
+    { key:'cit',              label:'CIT %' },
+    { key:'spt',              label:'SPT / PRRT / EPL %' },
+    { key:'sdfi',             label:'State Participation %' },
+    { key:'tsc_fee',          label:'Service Fee $/bbl' },
+    { key:'met',              label:'Mineral Extraction Tax %' },
+    { key:'prrt_uplift',      label:'PRRT Uplift %' },
+    { key:'gross_split_govt', label:'Gross Split Govt %' },
+    { key:'rsc_take',         label:'RSC Take %' },
+    { key:'epsa_take',        label:'EPSA Govt Take %' },
+  ];
+
+  const paramHtml = paramFields.filter(f => fiscal[f.key] !== undefined && fiscal[f.key] !== 0)
+    .map(f => `<div class="param-chip">
+      <div class="chip-label">${f.label}</div>
+      <div class="chip-val">${fiscal[f.key]}${f.key==='tsc_fee'?' $/bbl':'%'}</div>
+    </div>`).join('');
+
+  // ── Annual cashflows table ─────────────────────────────────────────────
+  const displayYears = data.annual_steps.slice(0, 10);
+  const yearRows = displayYears.map(s => {
+    const eff = s.gross_rev > 0 ? (s.govt_yr / s.gross_rev * 100).toFixed(1) + '%' : '—';
+    return `<tr>
+      <td style="color:var(--muted);">Yr ${s.yr+1}</td>
+      <td>$${s.gross_rev.toFixed(0)}M</td>
+      <td style="color:#e74c3c;">$${s.govt_yr.toFixed(0)}M</td>
+      <td style="color:${s.contr_yr>=0?'#27ae60':'#e74c3c'};">${s.contr_yr>=0?'$':'-$'}${Math.abs(s.contr_yr).toFixed(0)}M</td>
+      <td style="color:${takeColor(parseFloat(eff)||50)};">${eff}</td>
+      <td style="color:var(--muted);font-size:11px;">Capex $${s.capex_yr.toFixed(0)}M / Opex $${s.opex_yr.toFixed(0)}M</td>
+    </tr>`;
+  }).join('');
+
+  // ── Step-by-step narrative ─────────────────────────────────────────────
+  const step0 = data.annual_steps.find(s => s.gross_rev > 0) || data.annual_steps[0];
+  let stepNarrative = '';
+  if (step0) {
+    stepNarrative = buildStepNarrative(step0, fiscal, data.price);
+  }
+
+  document.getElementById('breakdown-content').innerHTML = `
+    <h2>Revenue Waterfall &mdash; Fiscal Lever Contributions @$${data.price}/bbl</h2>
+    <div class="waterfall">${waterfallHtml}</div>
+
+    <h2>Fiscal Parameters (Source: ${fiscal.src})</h2>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">${fiscal.label}</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px;">${paramHtml}</div>
+
+    <h2>Step-by-Step Calculation — Peak Production Year</h2>
+    ${stepNarrative}
+
+    <h2>Annual Cashflows — Project Lifecycle (First 10 Years)</h2>
+    <div style="overflow-x:auto;">
+    <table>
+      <thead><tr>
+        <th>Year</th><th>Gross Rev</th><th>Govt Take</th><th>Contractor Net</th><th>Eff. Take %</th><th>Cost Detail</th>
+      </tr></thead>
+      <tbody>${yearRows}</tbody>
+    </table>
+    </div>
+
+    <div class="kpi-grid" style="margin-top:20px;">
+      <div class="kpi-box">
+        <div class="kpi-label">Govt Take @$${data.price}</div>
+        <div class="kpi-val" style="color:${takeColor(data.take_pct)};">${data.take_pct.toFixed(1)}%</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Contractor NPV (${data.discountPct}%)</div>
+        <div class="kpi-val" style="color:${data.npv_contractor>0?'#27ae60':'#e74c3c'};">
+          ${data.npv_contractor>0?'$':'-$'}${Math.abs(data.npv_contractor).toFixed(0)}M
+        </div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">IRR</div>
+        <div class="kpi-val" style="color:#4da6ff;">
+          ${data.irr_pct > 500 ? '>500%' : data.irr_pct < -99 ? 'neg.' : data.irr_pct.toFixed(1)+'%'}
+        </div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Breakeven Price</div>
+        <div class="kpi-val" style="color:#f1c40f;">$${data.be.toFixed(0)}/bbl</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Mechanic</div>
+        <div class="kpi-val" style="color:${MECH_TEXT[mc]||'var(--text)'};font-size:1.1em;">${mc}</div>
+      </div>
+      <div class="kpi-box">
+        <div class="kpi-label">Total Govt Revenue</div>
+        <div class="kpi-val" style="color:var(--text);font-size:1.1em;">$${data.total_govt.toFixed(0)}M</div>
+      </div>
+    </div>
+
+    <p style="margin-top:16px;font-size:11px;color:var(--muted);line-height:1.6;">
+      <strong>Sources:</strong> ${fiscal.src}. Fiscal parameters from EY E&amp;P Tax Guide 2025, IHS Markit 2024, NRGI Resource Governance Index 2023, Iraq ITO (2010), OPGGS Act 1987 (Australia). Results are illustrative — actual terms vary by block, contract vintage, and negotiated ring-fence. Not investment advice.
+    </p>`;
+}
+
+// ============================================================
+// STEP-BY-STEP NARRATIVE BUILDER
+// ============================================================
+function buildStepNarrative(step, fiscal, price) {
+  const { mechanic } = fiscal;
+  const gr = step.gross_rev;
+  let html = '';
+
+  const row = (num, cls, title, calc, result, src) => `
+    <div class="step-box ${cls}">
+      <div class="step-num">Step ${num} &mdash; ${title}</div>
+      <div class="step-calc">${calc}</div>
+      <div class="step-result">${result}</div>
+      ${src ? `<div style="margin-top:6px;"><span class="source-tag">${src}</span></div>` : ''}
+    </div>`;
+
+  if (mechanic === 'Concession') {
+    html += row(1, 'contractor', 'Gross Revenue',
+      `${step.prod_mbbl_yr ? (step.prod_mbbl_yr/365).toFixed(0) : '—'} MBD × 365 days × $${price}/bbl ÷ 1,000`,
+      `= $${gr.toFixed(0)}M gross revenue`, 'Production profile × oil price');
+    if (fiscal.royalty > 0)
+      html += row(2, 'govt', `Royalty (${fiscal.royalty}%)`,
+        `$${gr.toFixed(0)}M × ${fiscal.royalty}% = $${(step.royalty_paid||0).toFixed(0)}M`,
+        `Royalty paid: $${(step.royalty_paid||0).toFixed(0)}M`, fiscal.src);
+    if (fiscal.spt > 0)
+      html += row(3, 'govt', `Special/Supplemental Tax (${fiscal.spt}%)`,
+        `Taxable income × ${fiscal.spt}% (${fiscal===FISCAL['United Kingdom']?'UK: 80% investment allowance reduces EPL base':'applied to post-royalty taxable income'})`,
+        `SPT/EPL: $${(step.spt_tax||0).toFixed(0)}M`, fiscal.src);
+    if (fiscal.sdfi > 0)
+      html += row(4, 'govt', `State Participation / SDFI (${fiscal.sdfi}%)`,
+        `$${gr.toFixed(0)}M × ${fiscal.sdfi}% = $${(step.sdfi_deduct||0).toFixed(0)}M (state's equity share)`,
+        `SDFI: $${(step.sdfi_deduct||0).toFixed(0)}M`, fiscal.src);
+    html += row(5, 'govt', `CIT (${fiscal.cit}%)`,
+      `Post-SPT taxable income × ${fiscal.cit}%`,
+      `CIT: $${(step.cit_tax||0).toFixed(0)}M`, fiscal.src);
+    html += row(6, 'contractor', 'Contractor Net Cashflow',
+      `Gross − Royalty − SPT − SDFI − CIT − Capex − Opex`,
+      `= $${step.contr_yr.toFixed(0)}M net contractor cashflow`, 'Computed');
+  }
+  else if (mechanic === 'PSC') {
+    html += row(1, 'contractor', 'Gross Revenue',
+      `Production × $${price}/bbl`, `= $${gr.toFixed(0)}M`, 'Production profile × oil price');
+    if (fiscal.royalty > 0)
+      html += row(2, 'govt', `Royalty (${fiscal.royalty}%)`,
+        `$${gr.toFixed(0)}M × ${fiscal.royalty}%`, `= $${(step.royalty_paid||0).toFixed(0)}M`, fiscal.src);
+    if (fiscal.ftp > 0)
+      html += row(3, 'govt', `First Tranche Petroleum (${fiscal.ftp}%)`,
+        `$${gr.toFixed(0)}M × ${fiscal.ftp}% — taken by govt before cost recovery`,
+        `FTP: $${(step.ftp_amt||0).toFixed(0)}M`, fiscal.src);
+    html += row(4, 'cost', `Cost Recovery (cap: ${fiscal.cr}% of available)`,
+      `Available: $${gr.toFixed(0)}M − royalty − FTP = base. CR cap: ${fiscal.cr}%. Pool: $${(step.cr_claimed||0).toFixed(0)}M claimed.`,
+      `CR claimed this year: $${(step.cr_claimed||0).toFixed(0)}M`, fiscal.src);
+    html += row(5, 'govt', `Profit Oil Split (Govt: ${fiscal.po_govt}%)`,
+      `Available − CR = $${(step.profit_oil||0).toFixed(0)}M profit oil. Govt: $${(step.po_govt_amt||0).toFixed(0)}M / Contractor: $${(step.po_contr||0).toFixed(0)}M`,
+      `Govt profit oil: $${(step.po_govt_amt||0).toFixed(0)}M`, fiscal.src);
+    if (fiscal.sdfi > 0)
+      html += row(6, 'govt', `State Participation (${fiscal.sdfi}%)`,
+        `$${gr.toFixed(0)}M × ${fiscal.sdfi}%`, `= $${(step.sdfi_deduct||0).toFixed(0)}M`, fiscal.src);
+    html += row(7, 'govt', `CIT (${fiscal.cit}%)`,
+      `Contractor's net income × ${fiscal.cit}%`, `= $${(step.cit_tax||0).toFixed(0)}M`, fiscal.src);
+    html += row(8, 'contractor', 'Contractor Net',
+      `CR + Contractor PO − Opex − Capex − CIT − SDFI`,
+      `= $${step.contr_yr.toFixed(0)}M`, 'Computed');
+  }
+  else if (mechanic === 'TSC') {
+    html += row(1, 'contractor', 'Gross Revenue (State Oil)',
+      `Production × $${price}/bbl`, `= $${gr.toFixed(0)}M (flows to Iraq government)`, 'Iraq Oil Ministry');
+    html += row(2, 'contractor', `Service Fee ($${fiscal.tsc_fee}/bbl)`,
+      `Production × $${fiscal.tsc_fee}/bbl = $${(step.fee||0).toFixed(0)}M fixed fee income`,
+      `Contractor fee: $${(step.fee||0).toFixed(0)}M`, fiscal.src);
+    html += row(3, 'govt', `Mineral Extraction Tax (${fiscal.met}%)`,
+      `Gross revenue × ${fiscal.met}% = $${(step.met_tax||0).toFixed(0)}M`,
+      `MET: $${(step.met_tax||0).toFixed(0)}M`, fiscal.src);
+    html += row(4, 'govt', `CIT (${fiscal.cit}%)`,
+      `(Fee − Opex − Capex − MET) × ${fiscal.cit}%`,
+      `CIT: $${(step.cit_tax||0).toFixed(0)}M`, fiscal.src);
+    html += row(5, 'contractor', 'Contractor Net',
+      `Fee − Opex − Capex − MET − CIT`,
+      `= $${step.contr_yr.toFixed(0)}M`, 'Computed');
+  }
+  else if (mechanic === 'PRRT') {
+    html += row(1, 'contractor', 'Gross Revenue',
+      `Production × $${price}/bbl`, `= $${gr.toFixed(0)}M`, 'Production profile');
+    html += row(2, 'govt', `Royalty / Excise (${fiscal.royalty}%)`,
+      `$${gr.toFixed(0)}M × ${fiscal.royalty}%`, `= $${(step.royalty_paid||0).toFixed(0)}M`, fiscal.src);
+    html += row(3, 'govt', `PRRT (${fiscal.spt}% on resource rent)`,
+      `Taxable income after uplift allowance (${fiscal.prrt_uplift}% uplift on prior-year losses carried forward) × ${fiscal.spt}%`,
+      `PRRT: $${(step.prrt_tax||0).toFixed(0)}M`, fiscal.src);
+    html += row(4, 'govt', `CIT (${fiscal.cit}%)`,
+      `Post-PRRT income × ${fiscal.cit}%`, `CIT: $${(step.cit_tax||0).toFixed(0)}M`, fiscal.src);
+    html += row(5, 'contractor', 'Contractor Net',
+      `Gross − Royalty − PRRT − CIT − Opex − Capex`,
+      `= $${step.contr_yr.toFixed(0)}M`, 'Computed');
+  }
+  else if (mechanic === 'EPSA') {
+    html += row(1, 'contractor', 'Gross Revenue',
+      `Production × $${price}/bbl`, `= $${gr.toFixed(0)}M`, 'Libya NOC');
+    html += row(2, 'govt', `EPSA-IV Tax-Paid Structure (NOC ~${fiscal.epsa_take}%)`,
+      `NOC takes ~${fiscal.epsa_take}% of gross on a tax-paid basis — contractor share is already net of all levies`,
+      `Govt: $${step.govt_yr.toFixed(0)}M`, fiscal.src);
+    html += row(3, 'contractor', 'Contractor Net (all-in)',
+      `Gross × ${100-fiscal.epsa_take}% − Opex − Capex`,
+      `= $${step.contr_yr.toFixed(0)}M`, 'Computed');
+  }
+  else if (mechanic === 'GrossSplit') {
+    html += row(1, 'contractor', 'Gross Revenue',
+      `Production × $${price}/bbl`, `= $${gr.toFixed(0)}M`, 'SKK Migas');
+    html += row(2, 'govt', `Govt Gross Split Base (${fiscal.gross_split_govt}%)`,
+      `$${gr.toFixed(0)}M × ${fiscal.gross_split_govt}% = $${step.govt_yr.toFixed(0)}M`,
+      `No cost recovery pool — gross share allocated upfront`, fiscal.src);
+    html += row(3, 'govt', `CIT (${fiscal.cit}% on contractor's gross share net costs)`,
+      `(Contractor gross share − Opex − Capex) × ${fiscal.cit}%`,
+      `CIT: $${(step.cit_tax||0).toFixed(0)}M`, fiscal.src);
+    html += row(4, 'contractor', 'Contractor Net',
+      `(Gross × ${100-fiscal.gross_split_govt}%) − Opex − Capex − CIT`,
+      `= $${step.contr_yr.toFixed(0)}M`, 'Computed');
+  }
+  else if (mechanic === 'RSC') {
+    html += row(1, 'contractor', 'Gross Revenue',
+      `Production × $${price}/bbl`, `= $${gr.toFixed(0)}M`, 'PETRONAS');
+    html += row(2, 'govt', `RSC — PETRONAS Retained Share (~${fiscal.rsc_take}%)`,
+      `$${gr.toFixed(0)}M × ${fiscal.rsc_take}% = $${step.govt_yr.toFixed(0)}M — contractor earns risk service fee on remainder`,
+      `Govt share: $${step.govt_yr.toFixed(0)}M`, fiscal.src);
+    html += row(3, 'contractor', 'Contractor Net',
+      `Gross × ${100-fiscal.rsc_take}% − Opex − Capex`,
+      `= $${step.contr_yr.toFixed(0)}M`, 'Computed');
+  }
+
+  return html;
+}
+
+// ============================================================
+// CSV EXPORT
+// ============================================================
+function exportResultsCSV() {
+  if (Object.keys(lastResults).length === 0) { alert('Run a scenario first.'); return; }
+  const rows = [['Country','Mechanic','Govt Take (%)','Contractor NPV ($M)','IRR (%)','Breakeven ($/bbl)','Total Gross ($M)','Total Govt ($M)']];
+  Object.entries(lastResults).forEach(([country, res]) => {
+    const f = FISCAL[country];
+    rows.push([country, f?.mechanic||'', res.take_pct.toFixed(1),
+               res.npv_contractor.toFixed(0), res.irr_pct.toFixed(1),
+               res.be.toFixed(0), res.total_gross.toFixed(0), res.total_govt.toFixed(0)]);
+  });
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'}));
+  a.download = 'petroleum_dcf_scenario.csv';
+  a.click();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+window.onload = () => runAllCountries();
+</script>
+</body>
+</html>
