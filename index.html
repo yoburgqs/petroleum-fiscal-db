@@ -3,9 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Petroleum Fiscal Database v14</title>
+<title>Petroleum Fiscal Database v15</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root {
   --bg:      #0a0e1a;
@@ -152,13 +154,57 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
 .page-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
 .page-sub   { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
 .export-row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
+
+/* ── Mobile Responsive (768px breakpoint) ── */
+@media (max-width: 768px) {
+  /* Tab nav: scrollable strip */
+  .tab-nav { padding: 0 8px; }
+  .tab-btn { padding: 10px 12px; font-size: 12px; }
+
+  /* Header: stack vertically */
+  .site-header { flex-wrap: wrap; gap: 8px; padding: 10px 12px; }
+  .site-header .meta { margin-left: 0; width: 100%; }
+
+  /* Tab panes: reduced padding */
+  .tab-pane { padding: 12px; }
+
+  /* Controls: stack vertically */
+  .controls-row { flex-direction: column; align-items: stretch; }
+  .ctrl-group { width: 100%; }
+  .search-input { width: 100%; }
+
+  /* Tables: hide less critical columns on mobile */
+  table thead th:nth-child(n+5) { display: none; }
+  table tbody td:nth-child(n+5) { display: none; }
+
+  /* Slider groups: full width */
+  .slider-group { min-width: 100%; }
+  .slider-row { flex-direction: column; }
+
+  /* Country comparison grid: 2 cols max on mobile */
+  .compare-grid { grid-template-columns: 140px repeat(2, 1fr); overflow-x: auto; }
+  .cmp-hdr:nth-child(n+5), .cmp-row .cmp-cell:nth-child(n+5) { display: none; }
+
+  /* Custom scenario panel: stack */
+  .param-row { flex-direction: column; gap: 8px; }
+
+  /* Cards: full width */
+  .card { padding: 12px; }
+}
+
+@media (max-width: 480px) {
+  .site-header h1 { font-size: 14px; }
+  .tab-btn { padding: 8px 8px; font-size: 11px; }
+  table thead th:nth-child(n+4) { display: none; }
+  table tbody td:nth-child(n+4) { display: none; }
+}
 </style>
 </head>
 <body>
 
 <div class="site-header">
   <h1>Petroleum Fiscal Database</h1>
-  <span class="badge">v14</span>
+  <span class="badge">v15</span>
   <span id="scenario-badge">CUSTOM SCENARIO</span>
   <span class="meta" id="hdr-meta">Loading…</span>
 </div>
@@ -281,6 +327,7 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
       <div id="cmp-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       <button class="btn btn-outline btn-sm" onclick="clearCompare()">Clear</button>
       <button class="btn btn-sm" onclick="exportCompareXLSX()" id="cmp-export-btn" style="display:none;">Export Excel</button>
+      <button class="btn btn-outline btn-sm" onclick="exportComparisonPDF()" id="cmp-pdf-btn" style="display:none;">⬇ Export PDF</button>
     </div>
     <div id="cmp-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;width:260px;z-index:100;margin-top:4px;"></div>
   </div>
@@ -985,7 +1032,7 @@ function renderExplorer() {
     const mechs = d.mechanics.split(',').map(m => `<span class="tag">${m}</span>`).join('');
     const custBadge = isCustom ? '<span class="custom-badge">LIVE</span>' : '';
     const rowClass  = isCustom ? ' class="custom-row"' : '';
-    return `<tr${rowClass}>
+    return `<tr${rowClass} onclick="openDrill('${d.country.replace(/'/,"\\'")}')" style="cursor:pointer;" title="Click to drill down into ${d.country}">
       <td class="num" style="color:var(--muted)">${i+1}</td>
       <td><strong>${d.country}</strong>${custBadge}</td>
       <td style="color:var(--muted)">${d.region}</td>
@@ -1056,16 +1103,19 @@ function renderCompare() {
   ).join('');
 
   const exportBtn = document.getElementById('cmp-export-btn');
+  const pdfBtn = document.getElementById('cmp-pdf-btn');
   const out = document.getElementById('cmp-output');
   if (compareList.length < 2) {
     out.className = 'empty-state';
     out.innerHTML = 'Select 2–4 countries to begin comparison.';
     document.getElementById('cmp-chart-wrap').style.display='none';
     exportBtn.style.display='none';
+    if (pdfBtn) pdfBtn.style.display='none';
     return;
   }
 
   exportBtn.style.display='inline';
+  if (pdfBtn) pdfBtn.style.display='inline';
 
   const rows = [
     {label:'Govt Take ($50/bbl)',   key:(d)=>fmtTake(d.take_50)},
@@ -1483,6 +1533,193 @@ renderExplorer();
 runScreener();
 renderVintage();
 renderMechanics();
+
+// ─── Drill-down modal ─────────────────────────────────────────────────────────
+function openDrill(countryName) {
+  const cd = COUNTRY_DATA.find(d => d.country === countryName);
+  if (!cd) return;
+
+  const modal = document.getElementById('drillModal');
+  const header = document.getElementById('drillHeader');
+  const content = document.getElementById('drillContent');
+
+  const take = cd.take_75 ?? 0;
+  const tierColor = take > 70 ? 'var(--red)' : take > 50 ? 'var(--orange)' : take > 35 ? 'var(--yellow)' : 'var(--green)';
+
+  header.innerHTML = `
+    <h2 style="font-size:22px;margin-bottom:6px;">${countryName}</h2>
+    <div style="display:flex;gap:16px;flex-wrap:wrap;color:var(--muted);font-size:13px;">
+      <span>Mechanic: <strong style="color:var(--text)">${cd.mechanics || 'Mixed'}</strong></span>
+      <span>Contracts: <strong style="color:var(--text)">${cd.n ?? '—'}</strong></span>
+      <span>Take @$75: <strong style="color:${tierColor}">${cd.take_75 != null ? cd.take_75.toFixed(1)+'%' : '—'}</strong></span>
+      <span>NPV @$75: <strong style="color:var(--text)">${cd.npv_75 != null ? '$'+cd.npv_75.toFixed(0)+'M' : '—'}</strong></span>
+      <span>IRR @$75: <strong style="color:var(--text)">${cd.irr_75 != null ? cd.irr_75.toFixed(1)+'%' : '—'}</strong></span>
+    </div>
+  `;
+
+  content.innerHTML = `
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title">Price Sensitivity</div>
+      <table><thead><tr>
+        <th>Price</th><th class="num">Govt Take</th><th class="num">NPV ($M)</th><th class="num">IRR</th><th class="num">Breakeven</th>
+      </tr></thead><tbody>
+        ${[50,75,100,125].map(p => {
+          const t = cd['take_'+p];
+          const n = cd['npv_'+p];
+          const r = cd['irr_'+p];
+          const tc = t > 70 ? 'var(--red)' : t > 50 ? 'var(--orange)' : 'var(--green)';
+          return `<tr>
+            <td>$${p}/bbl</td>
+            <td class="num" style="color:${tc}">${t != null ? t.toFixed(1)+'%' : '—'}</td>
+            <td class="num">${n != null ? '$'+n.toFixed(0)+'M' : '—'}</td>
+            <td class="num">${r != null ? r.toFixed(1)+'%' : '—'}</td>
+            <td class="num">${cd.be_75 != null ? '$'+cd.be_75.toFixed(0)+'/bbl' : '—'}</td>
+          </tr>`;
+        }).join('')}
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-title">Fiscal Regime</div>
+      <p style="color:var(--muted);font-size:13px;line-height:1.6;">${getMechanicDescription(cd.mechanics)}</p>
+    </div>
+  `;
+
+  modal.style.display = 'block';
+  document.body.style.overflow = 'hidden';
+}
+
+function closeDrill() {
+  document.getElementById('drillModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+document.getElementById('drillModal').addEventListener('click', function(e) {
+  if (e.target === this) closeDrill();
+});
+
+// Escape key closes modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeDrill();
+});
+
+function getMechanicDescription(mechanic) {
+  const m = (mechanic || '').split(',')[0].trim();
+  const descs = {
+    'Concession': 'The contractor owns production and pays taxes: royalty on gross revenue + corporate income tax (CIT) on net income. Government take comes from taxes rather than production sharing. Allows contractor to book reserves on balance sheet.',
+    'PSC': 'Production Sharing Contract: the state owns all production. Contractor receives cost oil (to recover CAPEX/OPEX up to the cost recovery cap) and a share of profit oil. Government take includes FTP, government profit oil share, and CIT on contractor income.',
+    'TSC': 'Technical Service Contract (Iraq): government keeps all oil, markets it via SOMO, and pays the contractor a fixed fee per barrel of incremental production above a contractual baseline. Contractor bears all costs but has zero oil price exposure.',
+    'PRRT': 'Petroleum Resource Rent Tax (Australia): a threshold-based rent tax. Government collects no tax until contractor cashflows exceed an uplifted cost pool (costs × 1.115 per year). After threshold: 40% PRRT + 30% CIT. Highly progressive — more take at high prices.',
+    'RSC': 'Risk Service Contract (Malaysia, post-2011): Petronas owns all oil. IOC provides services and receives a service fee as a % of gross revenue. IOC bears all CAPEX/OPEX risk; government take is very high (~85%) because contractor only receives ~15% service fee.',
+    'Buy-back': 'Buy-Back Contract (Iran): government reimburses contractor CAPEX+OPEX over the amortization period plus a guaranteed return on CAPEX. After amortization the contractor earns nothing. Price-insensitive but capital-intensive.',
+    'Gross Split': 'Gross Split PSC (Indonesia, PP 53/2017): direct revenue split with no cost recovery pool. Government receives ~57% of gross oil revenue off the top. Contractor pays all costs from their 43% split. Simpler than standard PSC but contractor bears full cost risk.'
+  };
+  return descs[m] || `${mechanic} regime. Refer to the Mechanics Guide tab for details.`;
+}
+
+// ─── PDF Export (Country Comparison) ─────────────────────────────────────────
+function exportComparisonPDF() {
+  if (compareList.length < 2) {
+    alert('Select 2–4 countries first.');
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('landscape', 'mm', 'a4');
+
+  // Title block
+  doc.setFontSize(16);
+  doc.setTextColor(40, 40, 40);
+  doc.text('Petroleum Fiscal Intelligence Platform', 14, 20);
+  doc.setFontSize(11);
+  doc.text('Country Comparison — Government Take Analysis', 14, 28);
+  doc.setFontSize(9);
+  doc.setTextColor(100, 100, 100);
+  doc.text(`Generated: ${new Date().toLocaleDateString()} | Source: ${COUNTRY_DATA.length} countries · ${COUNTRY_DATA.reduce((s,d)=>s+d.n,0).toLocaleString()} contracts`, 14, 34);
+
+  // Gather selected country objects
+  const selected = compareList.map(name => COUNTRY_DATA.find(d => d.country === name)).filter(Boolean);
+
+  // Draw comparison table
+  let y = 44;
+  const prices = [50, 75, 100, 125];
+  const colW = Math.min(55, 220 / selected.length);
+
+  // Header row
+  doc.setFillColor(18, 24, 43);
+  doc.rect(14, y, 14 + 70 + colW * selected.length - 14, 8, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(8);
+  doc.text('Metric', 16, y + 5.5);
+  selected.forEach((c, i) => {
+    doc.text((c.country || '').slice(0, 18), 86 + i * colW, y + 5.5);
+  });
+  y += 10;
+
+  // Data rows
+  prices.forEach((p, pi) => {
+    const bg = pi % 2 === 0 ? [26,35,64] : [35,44,77];
+    doc.setFillColor(...bg);
+    doc.rect(14, y, 14 + 70 + colW * selected.length - 14, 7, 'F');
+    doc.setTextColor(180, 180, 200);
+    doc.setFontSize(8);
+    doc.text(`Govt Take @ $${p}/bbl`, 16, y + 5);
+    selected.forEach((cd, i) => {
+      const take = cd['take_'+p];
+      if (take != null) {
+        const r = take > 70 ? 239 : take > 50 ? 249 : 34;
+        const g = take > 70 ? 68  : take > 50 ? 115 : 197;
+        const b = take > 70 ? 68  : take > 50 ? 22  : 94;
+        doc.setTextColor(r, g, b);
+        doc.text(`${take.toFixed(1)}%`, 86 + i * colW, y + 5);
+      } else {
+        doc.setTextColor(120, 120, 140);
+        doc.text('N/A', 86 + i * colW, y + 5);
+      }
+    });
+    y += 7;
+  });
+
+  // NPV row
+  y += 4;
+  doc.setTextColor(150, 150, 170);
+  doc.setFontSize(8);
+  doc.text('NPV @$75/bbl ($M)', 16, y);
+  selected.forEach((cd, i) => {
+    doc.setTextColor(200, 200, 220);
+    doc.text(cd.npv_75 != null ? `$${cd.npv_75.toFixed(0)}M` : '—', 86 + i * colW, y);
+  });
+  y += 6;
+  doc.text('IRR @$75/bbl', 16, y);
+  selected.forEach((cd, i) => {
+    doc.text(cd.irr_75 != null ? `${cd.irr_75.toFixed(1)}%` : '—', 86 + i * colW, y);
+  });
+  y += 6;
+  doc.text('Breakeven ($/bbl)', 16, y);
+  selected.forEach((cd, i) => {
+    doc.text(cd.be_75 != null ? `$${cd.be_75.toFixed(0)}` : '—', 86 + i * colW, y);
+  });
+  y += 6;
+  doc.text('Primary Mechanic', 16, y);
+  selected.forEach((cd, i) => {
+    doc.text((cd.mechanics || '—').split(',')[0].trim().slice(0,12), 86 + i * colW, y);
+  });
+
+  // Footer
+  doc.setFontSize(8);
+  doc.setTextColor(120, 120, 140);
+  doc.text('Petroleum Fiscal Intelligence Platform v15 | For informational purposes only', 14, 200);
+
+  doc.save('petroleum-fiscal-comparison.pdf');
+}
 </script>
+
+<!-- Country Drill-Down Modal -->
+<div id="drillModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.75);z-index:1000;overflow-y:auto;">
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;max-width:900px;margin:40px auto;padding:28px;position:relative;">
+    <button onclick="closeDrill()" style="position:absolute;top:12px;right:16px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;">✕</button>
+    <div id="drillHeader" style="margin-bottom:20px;"></div>
+    <div id="drillContent"></div>
+  </div>
+</div>
+
 </body>
 </html>
