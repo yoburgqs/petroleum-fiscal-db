@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Petroleum Fiscal Database v18</title>
+<title>Petroleum Fiscal Database v19</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -144,6 +144,15 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
 .ioc-stat { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 12px 18px; text-align: center; }
 .ioc-stat .sv { font-size: 22px; font-weight: 800; color: var(--accent); }
 .ioc-stat .sk { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; margin-top: 2px; }
+.ioc-compare-wrap { display: flex; gap: 18px; flex-wrap: wrap; margin-top: 18px; }
+.ioc-compare-panel { flex: 1; min-width: 280px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+.ioc-compare-panel h4 { font-size: 15px; font-weight: 800; margin-bottom: 12px; color: var(--accent); }
+.ioc-overlap { margin-top: 18px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; }
+.ioc-overlap h4 { font-size: 15px; font-weight: 800; margin-bottom: 12px; }
+.ioc-detail-section { margin-top: 22px; border-top: 1px solid var(--border); padding-top: 18px; }
+.ioc-detail-section h4 { font-size: 15px; font-weight: 800; margin-bottom: 12px; }
+.ioc-detail-sort { cursor: pointer; user-select: none; }
+.ioc-detail-sort:hover { color: var(--accent); }
 
 /* ── chart container ── */
 .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-top: 16px; max-height: 360px; }
@@ -214,7 +223,7 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
 
 <div class="site-header">
   <h1>Petroleum Fiscal Database</h1>
-  <span class="badge">v18</span>
+  <span class="badge">v19</span>
   <span id="scenario-badge">CUSTOM SCENARIO</span>
   <span class="meta" id="hdr-meta">Loading…</span>
 </div>
@@ -460,15 +469,33 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
   <div class="page-sub">Search any operator to see their full portfolio of fiscal contracts. All metrics at $75/bbl.</div>
 
   <div class="card">
-    <input type="text" class="search-input" id="ioc-search" placeholder="Search operator (e.g. ExxonMobil, Shell, BP, Total, Chevron, Equinor)…" style="width:100%;max-width:500px;" oninput="updateIOCSuggestions()">
-    <div id="ioc-suggestions" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+      <input type="text" class="search-input" id="ioc-search" placeholder="Search operator (e.g. ExxonMobil, Shell, BP, Total, Chevron, Equinor)…" style="flex:1;min-width:220px;max-width:480px;" oninput="updateIOCSuggestions()">
+      <button class="btn btn-outline" id="ioc-compare-btn" onclick="toggleCompareMode()">⚖ Compare Operators</button>
+    </div>
+    <div id="ioc-suggestions" style="margin-top:4px;display:flex;gap:6px;flex-wrap:wrap;"></div>
     <div id="ioc-quick-btns" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
       <span style="color:var(--muted);font-size:12px;margin-right:4px;">Quick:</span>
+    </div>
+    <!-- Compare mode UI (hidden by default) -->
+    <div id="ioc-compare-ui" style="display:none;margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+        <input type="text" class="search-input" id="ioc-op1" placeholder="Operator A…" style="flex:1;min-width:180px;max-width:300px;" oninput="updateIOCCompSuggestions('ioc-op1','ioc-sug1')">
+        <input type="text" class="search-input" id="ioc-op2" placeholder="Operator B…" style="flex:1;min-width:180px;max-width:300px;" oninput="updateIOCCompSuggestions('ioc-op2','ioc-sug2')">
+        <button class="btn" onclick="compareOperators()">Compare</button>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <div id="ioc-sug1" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:200px;"></div>
+        <div id="ioc-sug2" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;min-width:200px;"></div>
+      </div>
+      <a href="#" onclick="toggleCompareMode();return false;" style="font-size:12px;color:var(--muted);text-decoration:underline;margin-top:8px;display:inline-block;">← Back to single search</a>
     </div>
   </div>
 
   <div id="ioc-stats" class="ioc-stats" style="display:none;"></div>
   <div id="ioc-output" class="empty-state">Search for an operator above to view their portfolio.</div>
+  <div id="ioc-detail" style="display:none;"></div>
+  <div id="ioc-compare-output" style="display:none;"></div>
 </div>
 
 <!-- ═══════════════════════════ TAB 6: MECHANICS GUIDE ═══════════════════════ -->
@@ -1471,6 +1498,233 @@ function loadIOC(operator) {
   outDiv.className='';
   outDiv.innerHTML=`<h3 style="font-size:16px;font-weight:800;margin-bottom:14px;">${operator}</h3>${tbl}`;
   document.getElementById('ioc-suggestions').innerHTML='';
+
+  // Contract Detail section
+  iocDetailOperator = operator;
+  iocDetailPage = 0;
+  iocDetailSort = 'take75';
+  iocDetailSortDir = -1;
+  renderIOCDetail();
+}
+
+// ─── IOC Contract Detail (Operator Drill-Down) ──────────────────────────────
+let iocDetailOperator = null;
+let iocDetailPage = 0;
+let iocDetailSort = 'take75';
+let iocDetailSortDir = -1;
+const IOC_DETAIL_PAGE_SIZE = 25;
+
+function getIOCContracts(operator) {
+  const all = [];
+  Object.entries(CONTRACT_DATA).forEach(([country, contracts]) => {
+    contracts.forEach(c => {
+      if ((c.operator || 'Unknown') === operator) {
+        all.push(Object.assign({}, c, {country}));
+      }
+    });
+  });
+  return all;
+}
+
+function renderIOCDetail() {
+  const detailDiv = document.getElementById('ioc-detail');
+  if (!iocDetailOperator) { detailDiv.style.display='none'; return; }
+  const all = getIOCContracts(iocDetailOperator);
+  if (!all.length) { detailDiv.style.display='none'; return; }
+
+  all.sort((a, b) => {
+    let av = a[iocDetailSort], bv = b[iocDetailSort];
+    if (av === null || av === undefined) av = iocDetailSortDir < 0 ? -Infinity : Infinity;
+    if (bv === null || bv === undefined) bv = iocDetailSortDir < 0 ? -Infinity : Infinity;
+    if (typeof av === 'string') return iocDetailSortDir * av.localeCompare(bv);
+    return iocDetailSortDir * (av - bv);
+  });
+
+  const total = all.length;
+  const start = iocDetailPage * IOC_DETAIL_PAGE_SIZE;
+  const page  = all.slice(start, start + IOC_DETAIL_PAGE_SIZE);
+  const maxPage = Math.max(0, Math.ceil(total / IOC_DETAIL_PAGE_SIZE) - 1);
+
+  function sortHdr(field, label) {
+    const active = iocDetailSort === field;
+    const arrow  = active ? (iocDetailSortDir < 0 ? ' \u25bc' : ' \u25b2') : '';
+    return '<th class="num ioc-detail-sort" onclick="iocDetailSortBy(\'' + field + '\')">' + label + arrow + '</th>';
+  }
+
+  const rows = page.map(c => {
+    const nameEsc = (c.block || c.name || '').replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    const takeColor = c.take75 > 65 ? '#e74c3c' : c.take75 > 45 ? '#f39c12' : '#27ae60';
+    const takeHtml = (c.take75 !== null && c.take75 !== undefined)
+      ? '<td class="num" style="color:' + takeColor + '">' + c.take75 + '%</td>'
+      : '<td class="num" style="color:var(--muted)">\u2014</td>';
+    const npvHtml  = (c.npv75  !== null && c.npv75  !== undefined) ? '<td class="num">$' + c.npv75  + 'M</td>' : '<td class="num">\u2014</td>';
+    const irrHtml  = (c.irr75  !== null && c.irr75  !== undefined) ? '<td class="num">' + c.irr75  + '%</td>'  : '<td class="num">\u2014</td>';
+    return '<tr>'
+      + '<td><strong>' + c.country + '</strong></td>'
+      + '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + nameEsc + '">' + (nameEsc || '\u2014') + '</td>'
+      + '<td><span class="tag">' + (c.mechanic || '\u2014') + '</span></td>'
+      + takeHtml + npvHtml + irrHtml
+      + '</tr>';
+  }).join('');
+
+  detailDiv.style.display = 'block';
+  detailDiv.innerHTML =
+    '<div class="ioc-detail-section">'
+    + '<h4>Contract Detail \u2014 ' + iocDetailOperator
+    + ' <span style="font-size:12px;font-weight:400;color:var(--muted);margin-left:8px;">(' + total + ' contracts from top-30 country dataset)</span></h4>'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">'
+    + '<span style="font-size:13px;color:var(--muted);">Showing ' + (start+1) + '\u2013' + Math.min(start+IOC_DETAIL_PAGE_SIZE,total) + ' of ' + total + '</span>'
+    + '<div style="display:flex;gap:6px;">'
+    + '<button onclick="iocDetailNav(-1)" ' + (iocDetailPage===0?'disabled':'') + ' class="btn btn-outline btn-sm">\u2190 Prev</button>'
+    + '<span style="font-size:12px;color:var(--muted);align-self:center;">Page ' + (iocDetailPage+1) + '/' + (maxPage+1) + '</span>'
+    + '<button onclick="iocDetailNav(1)" ' + (iocDetailPage>=maxPage?'disabled':'') + ' class="btn btn-outline btn-sm">Next \u2192</button>'
+    + '</div></div>'
+    + '<div class="tbl-wrap"><table>'
+    + '<thead><tr><th>Country</th><th>Block Name</th><th>Contract Type</th>'
+    + sortHdr('take75','Take @$75') + sortHdr('npv75','NPV ($M)') + sortHdr('irr75','IRR (%)')
+    + '</tr></thead><tbody>' + rows + '</tbody></table></div>'
+    + '</div>';
+}
+
+function iocDetailNav(dir) {
+  const all = getIOCContracts(iocDetailOperator);
+  const maxPage = Math.max(0, Math.ceil(all.length / IOC_DETAIL_PAGE_SIZE) - 1);
+  iocDetailPage = Math.max(0, Math.min(maxPage, iocDetailPage + dir));
+  renderIOCDetail();
+}
+
+function iocDetailSortBy(field) {
+  if (iocDetailSort === field) { iocDetailSortDir *= -1; }
+  else { iocDetailSort = field; iocDetailSortDir = -1; }
+  iocDetailPage = 0;
+  renderIOCDetail();
+}
+
+// ─── IOC Compare Mode ────────────────────────────────────────────────────────
+let iocCompareMode = false;
+
+function toggleCompareMode() {
+  iocCompareMode = !iocCompareMode;
+  const ui  = document.getElementById('ioc-compare-ui');
+  const btn = document.getElementById('ioc-compare-btn');
+  const out = document.getElementById('ioc-compare-output');
+  ui.style.display  = iocCompareMode ? 'block' : 'none';
+  btn.textContent   = iocCompareMode ? '\u2715 Single Search' : '\u2696 Compare Operators';
+  if (!iocCompareMode) { out.style.display='none'; out.innerHTML=''; }
+}
+
+function updateIOCCompSuggestions(inputId, sugId) {
+  const q   = document.getElementById(inputId).value.toLowerCase();
+  const sug = document.getElementById(sugId);
+  if (q.length < 2) { sug.innerHTML=''; return; }
+  const matches = ALL_OPERATORS.filter(o => o.toLowerCase().includes(q)).slice(0,6);
+  sug.innerHTML = matches.map(op => {
+    const safe = op.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    return '<button class="btn btn-outline btn-sm" onclick="document.getElementById(\'' + inputId + '\').value=\'' + safe + '\';document.getElementById(\'' + sugId + '\').innerHTML=\'\';">' + op + '</button>';
+  }).join('');
+}
+
+function compareOperators() {
+  const v1 = document.getElementById('ioc-op1').value.trim();
+  const v2 = document.getElementById('ioc-op2').value.trim();
+  if (!v1 || !v2) { alert('Enter both operator names to compare.'); return; }
+
+  const op1 = ALL_OPERATORS.find(o => o.toLowerCase() === v1.toLowerCase())
+           || ALL_OPERATORS.find(o => o.toLowerCase().includes(v1.toLowerCase()));
+  const op2 = ALL_OPERATORS.find(o => o.toLowerCase() === v2.toLowerCase())
+           || ALL_OPERATORS.find(o => o.toLowerCase().includes(v2.toLowerCase()));
+  if (!op1) { alert('Operator not found: "' + v1 + '"'); return; }
+  if (!op2) { alert('Operator not found: "' + v2 + '"'); return; }
+
+  function opStats(op) {
+    const rows = IOC_DATA.filter(d => d.operator === op);
+    const totalC = rows.reduce((s,r)=>s+r.n,0);
+    const countries = [...new Set(rows.map(r=>r.country))];
+    const mechanics  = [...new Set(rows.map(r=>r.mechanic))];
+    const allTakes   = rows.filter(r=>r.take_75!==null);
+    const wtAvg = allTakes.length
+      ? allTakes.reduce((s,r)=>s+r.take_75*r.n,0) / allTakes.reduce((s,r)=>s+r.n,0)
+      : null;
+    return {op, rows, totalC, countries, mechanics, wtAvg};
+  }
+
+  function panelHtml(s) {
+    const tbl = s.rows.slice().sort((a,b)=>b.n-a.n).map(r =>
+      '<tr>'
+      + '<td><strong>' + r.country + '</strong></td>'
+      + '<td><span class="tag">' + r.mechanic + '</span></td>'
+      + '<td class="num">' + r.n + '</td>'
+      + '<td class="num">' + fmtTake(r.take_75) + '</td>'
+      + '</tr>'
+    ).join('');
+    return '<div class="ioc-compare-panel">'
+      + '<h4>' + s.op + '</h4>'
+      + '<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px;">'
+      + '<div class="ioc-stat" style="padding:8px 14px;"><div class="sv">' + s.totalC + '</div><div class="sk">Contracts</div></div>'
+      + '<div class="ioc-stat" style="padding:8px 14px;"><div class="sv">' + s.countries.length + '</div><div class="sk">Countries</div></div>'
+      + '<div class="ioc-stat" style="padding:8px 14px;"><div class="sv">' + (s.wtAvg!==null?s.wtAvg.toFixed(1)+'%':'\u2014') + '</div><div class="sk">Wtd Avg Take</div></div>'
+      + '</div>'
+      + '<div class="tbl-wrap"><table>'
+      + '<thead><tr><th>Country</th><th>Mechanic</th><th class="num">Contracts</th><th class="num">Govt Take</th></tr></thead>'
+      + '<tbody>' + tbl + '</tbody></table></div>'
+      + '</div>';
+  }
+
+  const s1 = opStats(op1);
+  const s2 = opStats(op2);
+
+  const set1 = new Set(s1.rows.map(r=>r.country));
+  const set2 = new Set(s2.rows.map(r=>r.country));
+  const shared = [...set1].filter(c => set2.has(c)).sort();
+
+  let overlapHtml = '';
+  if (shared.length) {
+    const overlapRows = shared.map(c => {
+      const r1 = s1.rows.filter(r=>r.country===c);
+      const r2 = s2.rows.filter(r=>r.country===c);
+      const t1 = r1.filter(r=>r.take_75!==null);
+      const t2 = r2.filter(r=>r.take_75!==null);
+      const avg1 = t1.length ? t1.reduce((s,r)=>s+r.take_75*r.n,0)/t1.reduce((s,r)=>s+r.n,0) : null;
+      const avg2 = t2.length ? t2.reduce((s,r)=>s+r.take_75*r.n,0)/t2.reduce((s,r)=>s+r.n,0) : null;
+      const n1 = r1.reduce((s,r)=>s+r.n,0);
+      const n2 = r2.reduce((s,r)=>s+r.n,0);
+      let deltaHtml = '<td class="num" style="color:var(--muted)">\u2014</td>';
+      if (avg1 !== null && avg2 !== null) {
+        const d = avg1 - avg2;
+        const col = d > 2 ? '#e74c3c' : d < -2 ? '#27ae60' : 'var(--muted)';
+        deltaHtml = '<td class="num" style="color:' + col + '">' + (d>=0?'+':'') + d.toFixed(1) + '%</td>';
+      }
+      return '<tr>'
+        + '<td><strong>' + c + '</strong></td>'
+        + '<td class="num">' + (avg1!==null?avg1.toFixed(1)+'%':'\u2014') + '</td>'
+        + '<td class="num">' + (avg2!==null?avg2.toFixed(1)+'%':'\u2014') + '</td>'
+        + deltaHtml
+        + '<td class="num">' + n1 + '</td>'
+        + '<td class="num">' + n2 + '</td>'
+        + '</tr>';
+    }).join('');
+    overlapHtml = '<div class="ioc-overlap">'
+      + '<h4>Shared Fiscal Exposure \u2014 ' + shared.length + ' Countr' + (shared.length===1?'y':'ies') + ' in Common</h4>'
+      + '<div class="tbl-wrap"><table>'
+      + '<thead><tr><th>Country</th>'
+      + '<th class="num">' + op1 + ' Take</th>'
+      + '<th class="num">' + op2 + ' Take</th>'
+      + '<th class="num">Delta (A\u2212B)</th>'
+      + '<th class="num">Contracts A</th>'
+      + '<th class="num">Contracts B</th>'
+      + '</tr></thead><tbody>' + overlapRows + '</tbody></table></div></div>';
+  } else {
+    overlapHtml = '<div class="ioc-overlap"><h4>Shared Fiscal Exposure</h4>'
+      + '<p style="color:var(--muted);font-size:13px;">No countries in common between ' + op1 + ' and ' + op2 + ' in this dataset.</p></div>';
+  }
+
+  const out = document.getElementById('ioc-compare-output');
+  out.style.display = 'block';
+  out.innerHTML = '<div style="margin-top:18px;">'
+    + '<h3 style="font-size:16px;font-weight:800;margin-bottom:14px;">Operator Comparison: ' + op1 + ' vs ' + op2 + '</h3>'
+    + '<div class="ioc-compare-wrap">' + panelHtml(s1) + panelHtml(s2) + '</div>'
+    + overlapHtml
+    + '</div>';
 }
 
 // ─── TAB 6: Mechanics Guide ───────────────────────────────────────────────────
@@ -1983,7 +2237,7 @@ function exportComparisonPDF() {
   // Footer
   doc.setFontSize(8);
   doc.setTextColor(120, 120, 140);
-  doc.text('Petroleum Fiscal Intelligence Platform v18 | For informational purposes only', 14, 200);
+  doc.text('Petroleum Fiscal Intelligence Platform v19 | For informational purposes only', 14, 200);
 
   doc.save('petroleum-fiscal-comparison.pdf');
 }
