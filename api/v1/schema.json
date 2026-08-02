@@ -1,117 +1,37 @@
 {
-  "meta": {
-    "generated": "2026-08-02",
-    "version": "v21"
-  },
-  "dcf_profile": {
-    "name": "deepwater",
-    "peak_rate_mbd": 50.0,
-    "capex_usd_mm": {
-      "year_0": 300,
-      "year_1": 300,
-      "year_2": 200,
-      "sustaining_yr3_7": 30
+  "version": "1.0",
+  "description": "Petroleum Fiscal Intelligence Platform \u2014 Static JSON API",
+  "base_url": "https://yoburgqs.github.io/petroleum-fiscal-db/api/v1/",
+  "endpoints": {
+    "countries": {
+      "url": "countries.json",
+      "description": "All country summaries with DCF results at 4 price levels"
     },
-    "opex_base_usd_bbl": 18.0,
-    "discount_rate_pct": 10.0,
-    "project_life_years": 25,
-    "abandonment_usd_mm": 50.0
-  },
-  "mechanics": [
-    {
-      "mechanic": "Concession",
-      "description": "Royalty + Income Tax model. Contractor holds equity. Government take = royalty + CIT + SPT (where applicable)."
+    "mechanics": {
+      "url": "mechanics.json",
+      "description": "Fiscal mechanic summary (Concession, PSC, TSC, PRRT, etc.)"
     },
-    {
-      "mechanic": "PSC",
-      "description": "Production Sharing Contract. Cost recovery first, then profit oil split. Take = royalty + FTP + govt profit oil + CIT on contractor share."
-    },
-    {
-      "mechanic": "TSC",
-      "description": "Technical Service Contract. IOC earns fixed remuneration fee per barrel. All production sold by NOC. Take = (Revenue - Fee) / Revenue."
-    },
-    {
-      "mechanic": "RSC",
-      "description": "Risk Service Contract. Similar to TSC but IOC bears exploration risk. Remuneration is a function of capital employed + profit margin."
-    },
-    {
-      "mechanic": "PRRT",
-      "description": "Profit-Related Resource Rent Tax. Applied on cash flow after uplift allowances. Australia-specific. Very progressive."
-    },
-    {
-      "mechanic": "Gross Split",
-      "description": "Indonesia-specific post-2017 PSC reform. No cost recovery. Gross split of production: base + sliding scales for price, depth, production stage."
-    },
-    {
-      "mechanic": "Buy-back",
-      "description": "Iran-specific. IOC funds capex, recovers via oil sales at ceiling price. No equity. Low upside."
+    "country_detail": {
+      "url": "country/{country_name_lowercase}.json",
+      "description": "Full country data: DCF by price, fiscal facts, contract list (up to 500 contracts)"
     }
-  ],
-  "fact_keys": [
-    {
-      "key": "levy_royalty_rate",
-      "unit": "%",
-      "description": "Royalty rate on gross production"
-    },
-    {
-      "key": "levy_income_tax_rate",
-      "unit": "%",
-      "description": "Corporate income tax rate (CIT)"
-    },
-    {
-      "key": "special_petroleum_tax_rate",
-      "unit": "%",
-      "description": "Special petroleum / windfall tax rate"
-    },
-    {
-      "key": "state_participation_pct",
-      "unit": "%",
-      "description": "NOC equity share (SDFI, state participation)"
-    },
-    {
-      "key": "levy_profit_oil_govt_rate",
-      "unit": "%",
-      "description": "Government profit oil share (PSC)"
-    },
-    {
-      "key": "levy_cost_recovery_rate",
-      "unit": "%",
-      "description": "Cost recovery cap (PSC)"
-    },
-    {
-      "key": "tsc_remuneration_fee_usd_bbl",
-      "unit": "USD/bbl",
-      "description": "TSC remuneration fee per barrel produced"
-    },
-    {
-      "key": "levy_ftp_rate",
-      "unit": "%",
-      "description": "First Tranche Petroleum rate (PSC)"
-    }
-  ],
-  "take_formula": {
-    "description": "Government take = (total government revenues) / gross production revenue",
-    "components": [
-      "Royalty × gross revenue",
-      "SPT × net income after uplift",
-      "CIT × taxable income",
-      "Govt profit oil × profit oil pool",
-      "NOC equity revenue"
-    ],
-    "note": "For PSC: profit oil pool = (gross revenue - royalty - FTP - cost recovery). For TSC: government take = 1 - (remuneration fee / gross revenue per barrel)."
   },
-  "breakeven_semantics": {
-    "field": "breakeven_price_usd",
-    "description": "Interpolated oil price at which contractor NPV = 0. Uses sentinel values.",
-    "sentinels": {
-      "-1.0": "Sub-$20/bbl breakeven — contract is profitable at all modeled prices",
-      "999.0": "Sub-economic — contract never profitable within $20-$125/bbl range"
-    },
-    "categories": {
-      "sub_20": "breakeven_price_usd = -1.0 (most contracts)",
-      "range_20_125": "20 <= breakeven_price_usd <= 125 (real interpolated value)",
-      "sub_economic": "breakeven_price_usd = 999.0"
-    },
-    "api_note": "Use breakeven_category field in countries.json for analytics. Raw value requires sentinel handling."
-  }
+  "price_scenarios_usd_bbl": [
+    50,
+    75,
+    100,
+    125
+  ],
+  "mechanics_modeled": [
+    "Concession",
+    "PSC",
+    "TSC",
+    "PRRT",
+    "RSC",
+    "Buy-back",
+    "Gross Split"
+  ],
+  "data_sources": "Primary: NRGI Resource Governance Index, SODIR, NSTA open data, EY/KPMG Tax Guides 2025. Secondary: operator disclosures, regulatory filings.",
+  "methodology": "DCF using standardized project profile: 25yr horizon, 50MBD peak, $500M capex, 10% discount rate.",
+  "disclaimer": "For informational and research purposes only. Not investment advice."
 }
