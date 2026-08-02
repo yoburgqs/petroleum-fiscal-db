@@ -1,18 +1,18 @@
 country,contracts,dominant_mechanic,region,take_50,take_75,take_100,take_125,npv_75_musd,irr_75_pct,breakeven_usd
 USA,37222,Concession,North America,20.05,22.07,23.08,23.69,1929.6,,-1.0
 Norway,7643,Concession,Europe,58.48,67.43,71.91,74.59,796.1,76.3,-1.0
-United Kingdom,4000,Concession,Europe,20.48,27.44,30.93,33.02,3193.3,344.2,-1.0
+United Kingdom,4000,Concession,Europe,21.69,29.11,32.82,35.05,3053.2,319.7,-1.0
 Russia,1261,Concession,Russia/FSU,23.82,25.75,26.71,27.29,1805.6,,-1.0
 Australia,1219,PRRT,Asia Pacific,28.64,38.45,43.34,46.27,2285.3,324.4,-1.0
 Brazil,1193,Concession,Latin America,30.57,38.06,41.81,44.06,2297.0,185.9,-1.0
 Canada,944,Concession,North America,32.12,37.0,39.44,40.9,2360.5,161.5,-1.0
-Nigeria,834,Concession,Africa,36.11,47.17,52.69,56.01,1511.4,92.4,-1.0
+Nigeria,834,Concession,Africa,33.45,43.37,48.32,51.3,1836.6,139.7,-1.0
 China,799,PSC,Asia Pacific,40.86,47.78,51.23,53.31,1566.9,,-1.0
-Indonesia,667,PSC,Asia Pacific,48.85,56.18,61.16,63.63,1113.8,780.8,-1.0
+Indonesia,667,PSC,Asia Pacific,32.86,43.1,48.32,51.44,1891.5,184.4,0.9
 Colombia,666,Concession,Latin America,33.01,36.38,38.07,39.08,1449.9,,-1.0
 India,653,Concession,Asia Pacific,28.61,35.1,38.34,40.29,2531.4,223.1,43.4
 Iraq,610,TSC,Middle East,73.62,79.11,77.61,78.41,986.5,976.5,-0.9
-Iran,547,PSC,Middle East,74.97,69.27,79.19,80.03,3455.2,,-1.0
+Iran,547,Buy-back,Middle East,52.71,62.84,67.98,71.07,,592.7,-1.0
 Mexico,537,Concession,Latin America,25.08,28.47,30.17,31.18,2589.0,,-1.0
 Angola,460,PSC,Africa,38.92,50.69,56.68,60.27,1243.3,89.8,-1.0
 Peru,391,Concession,Latin America,31.55,34.39,35.81,36.67,1516.1,,-1.0
@@ -20,7 +20,7 @@ Argentina,384,Concession,Latin America,32.69,36.06,37.74,38.76,1460.9,,-1.0
 Saudi Arabia,381,Concession,Middle East,52.57,55.05,56.29,57.03,5826.9,,-1.0
 Malaysia,365,PSC,Asia Pacific,55.85,64.63,69.03,71.68,645.8,147.8,29.1
 Tunisia,343,Concession,Africa,47.57,50.05,51.29,52.03,6669.0,,-1.0
-Kazakhstan,302,PSC,Central Asia,53.09,55.97,57.41,58.28,5694.1,,-1.0
+Kazakhstan,302,PSC,Central Asia,40.58,47.62,51.15,53.27,3591.9,151.2,-1.0
 Libya,301,PSC,Africa,74.9,79.22,81.39,82.69,1808.7,,-1.0
 Venezuela,298,Concession,Latin America,51.01,52.69,53.54,54.05,6216.5,,-1.0
 Vietnam,241,PSC,Asia Pacific,44.61,51.98,55.65,57.86,1345.0,1217.8,-1.0
@@ -78,12 +78,12 @@ United Arab Emirates,67,Concession,Middle East,46.83,49.55,50.91,51.73,6754.5,,-
 Yemen,62,PSC,Middle East,69.83,73.84,75.85,77.05,2684.6,,-1.0
 Georgia,60,Concession,Russia/FSU,14.07,15.51,16.23,16.67,2149.4,,-1.0
 Sao Tome and Principe,60,PSC,Africa,38.43,51.4,57.92,61.84,1171.1,84.0,-1.0
-Somalia,60,Unknown,Africa,,,,,,,
+Somalia,60,Concession,Africa,,8.0,,,4843.2,999.0,
 Italy,59,Concession,Europe,24.67,26.98,28.13,28.83,1764.9,,-1.0
 South Sudan,58,PSC,Africa,56.87,64.56,68.41,70.71,514.5,95.9,-1.0
 Congo,57,PSC,Africa,49.85,57.57,61.43,63.76,1023.5,186.9,-1.0
 Croatia,57,Concession,Europe,16.9,18.63,19.5,20.02,2044.8,,-1.0
-Madagascar,57,PSC,Africa,54.04,61.36,65.02,67.22,621.8,552.5,-1.0
+Madagascar,57,PSC,Africa,54.04,59.67,65.02,67.22,754.4,568.2,-1.0
 Cuba,56,PSC,Latin America,53.38,60.09,63.46,65.47,666.3,1187.0,-1.0
 Poland,56,Concession,Europe,18.37,20.2,21.12,21.66,1992.2,,-1.0
 South Africa,56,Concession,Africa,21.08,25.79,28.14,29.55,3326.9,364.3,-1.0
@@ -97,6 +97,7 @@ Ireland,48,Concession,Europe,5.45,7.8,8.97,9.68,2894.7,,-1.0
 Belize,44,Concession,Latin America,23.4,25.81,27.01,27.74,1804.3,,-1.0
 Sierra Leone,44,PSC,Africa,40.5,53.24,59.7,63.58,1014.0,78.5,-1.0
 Hungary,43,Concession,Europe,17.32,18.19,18.62,18.88,2058.5,,-1.0
+Iraq-Kurdistan,43,Unknown,Other,38.38,45.44,49.42,51.81,,716.7,-1.0
 DRC,41,PSC,Africa,55.54,61.82,64.97,66.85,687.3,497.2,-1.0
 Cambodia,37,PSC,Asia Pacific,47.48,55.18,59.02,61.33,1150.3,277.4,-1.0
 Guinea,37,Concession,Africa,24.03,26.85,28.26,29.11,2675.5,,-1.0
@@ -115,7 +116,7 @@ Eritrea,28,Concession,Africa,31.32,35.61,37.76,39.05,2199.8,,-1.0
 Timor - Leste,28,PSC,Other,51.53,65.09,71.87,75.95,368.4,34.4,-1.0
 Democratic Republic of Congo,27,PSC,Other,54.0,60.93,64.4,66.48,639.1,,-1.0
 Guinea-Bissau,25,Concession,Other,22.53,25.35,26.76,27.61,2758.2,,-1.0
-Paraguay,25,Unknown,Latin America,,,,,,,
+Paraguay,25,Concession,Latin America,,17.44,,,4035.6,878.2,
 Portugal,24,Concession,Europe,21.77,24.15,25.34,26.05,2825.5,,-1.0
 Belarus,23,PSC,Russia/FSU,19.36,21.09,21.96,22.48,1967.9,,-1.0
 Gambia,23,Concession,Other,25.15,28.2,29.72,30.64,2602.3,,-1.0
@@ -140,7 +141,6 @@ Spain,17,Concession,Europe,21.53,23.94,25.14,25.86,1867.4,,-1.0
 Tajikistan,16,Concession,Central Asia,17.72,19.45,20.32,20.84,2017.2,,-1.0
 Barbados,14,Concession,Other,17.19,17.96,18.34,18.58,2066.0,,-1.0
 Trinidad,14,Concession,Other,41.81,46.62,49.03,50.47,1107.7,,-1.0
-Iraq-Kurdistan,13,TSC,Other,100.0,100.0,100.0,100.0,0.0,,62.5
 Lithuania,13,Concession,Europe,17.47,18.91,19.63,20.07,2035.0,,-1.0
 Solomon Islands,13,Concession,Other,28.33,31.22,32.67,33.53,1622.9,,-1.0
 Viet Nam,13,PSC,Other,50.33,56.69,59.87,61.77,781.8,,-1.0
