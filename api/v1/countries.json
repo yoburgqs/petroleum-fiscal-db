@@ -5,7 +5,16 @@
     "n_contracts_total": 71489,
     "n_countries": 177,
     "profile": "deepwater (50 MBD peak, $800M capex, $18/bbl opex, 10% discount rate, 25yr)",
-    "take_definition": "(Royalty + All Taxes + Govt Profit Oil + NOC Equity) / Gross Revenue"
+    "take_definition": "(Royalty + All Taxes + Govt Profit Oil + NOC Equity) / Gross Revenue",
+    "fields_added": [
+      "swing_pp",
+      "stability_score",
+      "take_p10",
+      "take_p50",
+      "take_p90",
+      "breakeven_pct_sub20",
+      "breakeven_pct_range"
+    ]
   },
   "countries": [
     {
@@ -18,7 +27,11 @@
       "npv_10_usd_mm_at_75": 5533.1,
       "irr_pct_at_75": 999.0,
       "mechanics": "Concession",
-      "n_contracts": 60
+      "n_contracts": 60,
+      "breakeven_pct_sub20": 0.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null
     },
     {
       "country": "Vanuatu",
@@ -30,7 +43,13 @@
       "npv_10_usd_mm_at_75": 2500.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 7
+      "n_contracts": 7,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 0.0,
+      "stability_score": 100.0
     },
     {
       "country": "Paraguay",
@@ -42,7 +61,11 @@
       "npv_10_usd_mm_at_75": 4966.9,
       "irr_pct_at_75": 999.0,
       "mechanics": "Concession",
-      "n_contracts": 25
+      "n_contracts": 25,
+      "breakeven_pct_sub20": 0.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null
     },
     {
       "country": "Ireland",
@@ -54,7 +77,13 @@
       "npv_10_usd_mm_at_75": 2894.7,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 48
+      "n_contracts": 48,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.2,
+      "stability_score": 91.6
     },
     {
       "country": "Greenland",
@@ -66,7 +95,13 @@
       "npv_10_usd_mm_at_75": 2725.6,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 31
+      "n_contracts": 31,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 6.0,
+      "stability_score": 88.0
     },
     {
       "country": "Faroe Islands",
@@ -78,7 +113,13 @@
       "npv_10_usd_mm_at_75": 2708.7,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 49
+      "n_contracts": 49,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 6.1,
+      "stability_score": 87.8
     },
     {
       "country": "Montenegro",
@@ -90,7 +131,13 @@
       "npv_10_usd_mm_at_75": 2272.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 10
+      "n_contracts": 10,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 1.6,
+      "stability_score": 96.8
     },
     {
       "country": "Moldova, Republic of",
@@ -102,7 +149,13 @@
       "npv_10_usd_mm_at_75": 2196.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 5
+      "n_contracts": 5,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.1,
+      "stability_score": 95.8
     },
     {
       "country": "Bulgaria",
@@ -114,7 +167,13 @@
       "npv_10_usd_mm_at_75": 2156.6,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 31
+      "n_contracts": 31,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 1.7,
+      "stability_score": 96.6
     },
     {
       "country": "Cyprus",
@@ -126,7 +185,13 @@
       "npv_10_usd_mm_at_75": 4237.8,
       "irr_pct_at_75": null,
       "mechanics": "PSC",
-      "n_contracts": 71
+      "n_contracts": 71,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.8,
+      "stability_score": 92.4
     },
     {
       "country": "Kyrgyzstan",
@@ -138,7 +203,13 @@
       "npv_10_usd_mm_at_75": 2156.6,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 20
+      "n_contracts": 20,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 1.7,
+      "stability_score": 96.6
     },
     {
       "country": "Georgia",
@@ -150,7 +221,13 @@
       "npv_10_usd_mm_at_75": 2149.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 60
+      "n_contracts": 60,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.6,
+      "stability_score": 94.8
     },
     {
       "country": "Albania",
@@ -162,7 +239,13 @@
       "npv_10_usd_mm_at_75": 2120.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 74
+      "n_contracts": 74,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.6,
+      "stability_score": 94.8
     },
     {
       "country": "Barbados",
@@ -174,7 +257,13 @@
       "npv_10_usd_mm_at_75": 2066.0,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 14
+      "n_contracts": 14,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 1.4,
+      "stability_score": 97.2
     },
     {
       "country": "Serbia",
@@ -186,7 +275,13 @@
       "npv_10_usd_mm_at_75": 2065.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession,PSC",
-      "n_contracts": 22
+      "n_contracts": 22,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.6,
+      "stability_score": 94.8
     },
     {
       "country": "Hungary",
@@ -198,7 +293,13 @@
       "npv_10_usd_mm_at_75": 2058.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 43
+      "n_contracts": 43,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 1.6,
+      "stability_score": 96.8
     },
     {
       "country": "Armenia",
@@ -210,7 +311,13 @@
       "npv_10_usd_mm_at_75": 2044.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 12
+      "n_contracts": 12,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.1,
+      "stability_score": 93.8
     },
     {
       "country": "Croatia",
@@ -222,7 +329,13 @@
       "npv_10_usd_mm_at_75": 2044.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 57
+      "n_contracts": 57,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.1,
+      "stability_score": 93.8
     },
     {
       "country": "Lithuania",
@@ -234,7 +347,13 @@
       "npv_10_usd_mm_at_75": 2035.0,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 13
+      "n_contracts": 13,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.6,
+      "stability_score": 94.8
     },
     {
       "country": "Tajikistan",
@@ -246,7 +365,13 @@
       "npv_10_usd_mm_at_75": 2017.2,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 16
+      "n_contracts": 16,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.1,
+      "stability_score": 93.8
     },
     {
       "country": "Taiwan",
@@ -258,7 +383,13 @@
       "npv_10_usd_mm_at_75": 1994.1,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 5
+      "n_contracts": 5,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.5,
+      "stability_score": 93.0
     },
     {
       "country": "Poland",
@@ -270,7 +401,13 @@
       "npv_10_usd_mm_at_75": 1992.2,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 56
+      "n_contracts": 56,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.3,
+      "stability_score": 93.4
     },
     {
       "country": "Uzbekistan",
@@ -282,7 +419,13 @@
       "npv_10_usd_mm_at_75": 1976.0,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 108
+      "n_contracts": 108,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.6,
+      "stability_score": 94.8
     },
     {
       "country": "Lebanon",
@@ -294,7 +437,13 @@
       "npv_10_usd_mm_at_75": 3010.2,
       "irr_pct_at_75": 342.4,
       "mechanics": "PSC,Concession",
-      "n_contracts": 34
+      "n_contracts": 34,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.6,
+      "stability_score": 90.8
     },
     {
       "country": "Belarus",
@@ -306,7 +455,13 @@
       "npv_10_usd_mm_at_75": 1967.9,
       "irr_pct_at_75": null,
       "mechanics": "PSC",
-      "n_contracts": 23
+      "n_contracts": 23,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.1,
+      "stability_score": 93.8
     },
     {
       "country": "Germany",
@@ -318,7 +473,13 @@
       "npv_10_usd_mm_at_75": 1958.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 69
+      "n_contracts": 69,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.7,
+      "stability_score": 94.6
     },
     {
       "country": "Slovenia",
@@ -330,7 +491,13 @@
       "npv_10_usd_mm_at_75": 1937.6,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 5
+      "n_contracts": 5,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.3,
+      "stability_score": 93.4
     },
     {
       "country": "Jordan",
@@ -342,7 +509,13 @@
       "npv_10_usd_mm_at_75": 11376.7,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 34
+      "n_contracts": 34,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 1.8,
+      "stability_score": 96.4
     },
     {
       "country": "USA",
@@ -354,7 +527,16 @@
       "npv_10_usd_mm_at_75": 1929.6,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 37222
+      "n_contracts": 37222,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.7,
+      "stability_score": 92.6,
+      "take_p10": 20.5,
+      "take_p50": 22.1,
+      "take_p90": 22.8
     },
     {
       "country": "Czech Republic",
@@ -366,7 +548,13 @@
       "npv_10_usd_mm_at_75": 1883.1,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 9
+      "n_contracts": 9,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.3,
+      "stability_score": 93.4
     },
     {
       "country": "Honduras",
@@ -378,7 +566,13 @@
       "npv_10_usd_mm_at_75": 1867.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 23
+      "n_contracts": 23,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.4,
+      "stability_score": 91.2
     },
     {
       "country": "Mongolia",
@@ -390,7 +584,13 @@
       "npv_10_usd_mm_at_75": 1867.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 32
+      "n_contracts": 32,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.4,
+      "stability_score": 91.2
     },
     {
       "country": "South Korea",
@@ -402,7 +602,13 @@
       "npv_10_usd_mm_at_75": 1867.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 10
+      "n_contracts": 10,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.4,
+      "stability_score": 91.2
     },
     {
       "country": "Spain",
@@ -414,7 +620,13 @@
       "npv_10_usd_mm_at_75": 1867.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 17
+      "n_contracts": 17,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.4,
+      "stability_score": 91.2
     },
     {
       "country": "Portugal",
@@ -426,7 +638,13 @@
       "npv_10_usd_mm_at_75": 2825.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession,PSC",
-      "n_contracts": 24
+      "n_contracts": 24,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.2,
+      "stability_score": 91.6
     },
     {
       "country": "Romania",
@@ -438,7 +656,13 @@
       "npv_10_usd_mm_at_75": 1855.2,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 78
+      "n_contracts": 78,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.8,
+      "stability_score": 94.4
     },
     {
       "country": "Turkmenistan",
@@ -450,7 +674,13 @@
       "npv_10_usd_mm_at_75": 1840.4,
       "irr_pct_at_75": 615.5,
       "mechanics": "PSC,Concession",
-      "n_contracts": 98
+      "n_contracts": 98,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.5,
+      "stability_score": 93.0
     },
     {
       "country": "UK",
@@ -462,7 +692,13 @@
       "npv_10_usd_mm_at_75": 1965.1,
       "irr_pct_at_75": 862.3,
       "mechanics": "Concession",
-      "n_contracts": 211
+      "n_contracts": 211,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.6,
+      "stability_score": 72.8
     },
     {
       "country": "French Guiana",
@@ -474,7 +710,13 @@
       "npv_10_usd_mm_at_75": 1829.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 5
+      "n_contracts": 5,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.6,
+      "stability_score": 90.8
     },
     {
       "country": "New Zealand",
@@ -486,7 +728,13 @@
       "npv_10_usd_mm_at_75": 2764.1,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 127
+      "n_contracts": 127,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.7,
+      "stability_score": 88.6
     },
     {
       "country": "Chile",
@@ -498,7 +746,13 @@
       "npv_10_usd_mm_at_75": 1816.7,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 55
+      "n_contracts": 55,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.6,
+      "stability_score": 90.8
     },
     {
       "country": "Guinea-Bissau",
@@ -510,7 +764,13 @@
       "npv_10_usd_mm_at_75": 2758.2,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 25
+      "n_contracts": 25,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.1,
+      "stability_score": 89.8
     },
     {
       "country": "Thailand",
@@ -522,7 +782,13 @@
       "npv_10_usd_mm_at_75": 2748.3,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 216
+      "n_contracts": 216,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.1,
+      "stability_score": 91.8
     },
     {
       "country": "Botswana",
@@ -534,7 +800,13 @@
       "npv_10_usd_mm_at_75": 1812.2,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 12
+      "n_contracts": 12,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.9,
+      "stability_score": 92.2
     },
     {
       "country": "Papua New Guinea",
@@ -546,7 +818,13 @@
       "npv_10_usd_mm_at_75": 2748.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 138
+      "n_contracts": 138,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 6.3,
+      "stability_score": 87.4
     },
     {
       "country": "Afghanistan",
@@ -558,7 +836,13 @@
       "npv_10_usd_mm_at_75": 1805.6,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 19
+      "n_contracts": 19,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.5,
+      "stability_score": 93.0
     },
     {
       "country": "Belize",
@@ -570,7 +854,13 @@
       "npv_10_usd_mm_at_75": 1804.3,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 44
+      "n_contracts": 44,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.3,
+      "stability_score": 91.4
     },
     {
       "country": "Russia",
@@ -582,7 +872,16 @@
       "npv_10_usd_mm_at_75": 1805.6,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 1261
+      "n_contracts": 1261,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.5,
+      "stability_score": 93.0,
+      "take_p10": 24.3,
+      "take_p50": 25.8,
+      "take_p90": 26.5
     },
     {
       "country": "South Africa",
@@ -594,7 +893,13 @@
       "npv_10_usd_mm_at_75": 3326.9,
       "irr_pct_at_75": 364.3,
       "mechanics": "Concession",
-      "n_contracts": 56
+      "n_contracts": 56,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 8.5,
+      "stability_score": 83.0
     },
     {
       "country": "Cape Verde",
@@ -606,7 +911,13 @@
       "npv_10_usd_mm_at_75": 1791.7,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 6
+      "n_contracts": 6,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.3,
+      "stability_score": 91.4
     },
     {
       "country": "Dominican Republic",
@@ -618,7 +929,13 @@
       "npv_10_usd_mm_at_75": 1792.1,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 12
+      "n_contracts": 12,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.7,
+      "stability_score": 90.6
     },
     {
       "country": "Panama",
@@ -630,7 +947,13 @@
       "npv_10_usd_mm_at_75": 1791.7,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 9
+      "n_contracts": 9,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.3,
+      "stability_score": 91.4
     },
     {
       "country": "Namibia",
@@ -642,7 +965,13 @@
       "npv_10_usd_mm_at_75": 3241.9,
       "irr_pct_at_75": 347.0,
       "mechanics": "PSC,Concession",
-      "n_contracts": 125
+      "n_contracts": 125,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 10.7,
+      "stability_score": 78.6
     },
     {
       "country": "Guinea",
@@ -654,7 +983,13 @@
       "npv_10_usd_mm_at_75": 2675.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 37
+      "n_contracts": 37,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.1,
+      "stability_score": 89.8
     },
     {
       "country": "Italy",
@@ -666,7 +1001,13 @@
       "npv_10_usd_mm_at_75": 1764.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 59
+      "n_contracts": 59,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.1,
+      "stability_score": 91.8
     },
     {
       "country": "Falkland Islands",
@@ -678,7 +1019,13 @@
       "npv_10_usd_mm_at_75": 1742.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 8
+      "n_contracts": 8,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.6,
+      "stability_score": 90.8
     },
     {
       "country": "Djibouti",
@@ -690,7 +1037,13 @@
       "npv_10_usd_mm_at_75": 1741.2,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 20
+      "n_contracts": 20,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.3,
+      "stability_score": 91.4
     },
     {
       "country": "Zimbabwe",
@@ -702,7 +1055,13 @@
       "npv_10_usd_mm_at_75": 1741.2,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 18
+      "n_contracts": 18,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.3,
+      "stability_score": 91.4
     },
     {
       "country": "Mozambique",
@@ -714,7 +1073,13 @@
       "npv_10_usd_mm_at_75": 3134.9,
       "irr_pct_at_75": 305.8,
       "mechanics": "Concession",
-      "n_contracts": 198
+      "n_contracts": 198,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 9.6,
+      "stability_score": 80.8
     },
     {
       "country": "Gambia",
@@ -726,7 +1091,13 @@
       "npv_10_usd_mm_at_75": 2602.3,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 23
+      "n_contracts": 23,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.5,
+      "stability_score": 89.0
     },
     {
       "country": "Japan",
@@ -738,7 +1109,13 @@
       "npv_10_usd_mm_at_75": 1716.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 17
+      "n_contracts": 17,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.9,
+      "stability_score": 88.2
     },
     {
       "country": "Mexico",
@@ -750,7 +1127,16 @@
       "npv_10_usd_mm_at_75": 2589.0,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 537
+      "n_contracts": 537,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 6.1,
+      "stability_score": 87.8,
+      "take_p10": 25.9,
+      "take_p50": 28.5,
+      "take_p90": 29.8
     },
     {
       "country": "United Kingdom",
@@ -762,7 +1148,16 @@
       "npv_10_usd_mm_at_75": 3053.2,
       "irr_pct_at_75": 319.7,
       "mechanics": "Concession",
-      "n_contracts": 4000
+      "n_contracts": 4000,
+      "breakeven_pct_sub20": 88.1,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.3,
+      "stability_score": 73.4,
+      "take_p10": 23.3,
+      "take_p50": 29.1,
+      "take_p90": 32.0
     },
     {
       "country": "Burkina Faso",
@@ -774,7 +1169,13 @@
       "npv_10_usd_mm_at_75": 1682.1,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 6
+      "n_contracts": 6,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.8,
+      "stability_score": 90.4
     },
     {
       "country": "Ecuador",
@@ -786,7 +1187,13 @@
       "npv_10_usd_mm_at_75": 1678.1,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 169
+      "n_contracts": 169,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.4,
+      "stability_score": 91.2
     },
     {
       "country": "Turkey",
@@ -798,7 +1205,13 @@
       "npv_10_usd_mm_at_75": 1678.1,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 79
+      "n_contracts": 79,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.4,
+      "stability_score": 91.2
     },
     {
       "country": "Rwanda",
@@ -810,7 +1223,13 @@
       "npv_10_usd_mm_at_75": 1670.0,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 10
+      "n_contracts": 10,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.2,
+      "stability_score": 89.6
     },
     {
       "country": "Greece",
@@ -822,7 +1241,13 @@
       "npv_10_usd_mm_at_75": 1646.6,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 83
+      "n_contracts": 83,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.1,
+      "stability_score": 89.8
     },
     {
       "country": "Austria",
@@ -834,7 +1259,13 @@
       "npv_10_usd_mm_at_75": 1637.9,
       "irr_pct_at_75": null,
       "mechanics": "PSC,Concession",
-      "n_contracts": 19
+      "n_contracts": 19,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.0,
+      "stability_score": 92.0
     },
     {
       "country": "Central African Republic",
@@ -846,7 +1277,13 @@
       "npv_10_usd_mm_at_75": 1622.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 11
+      "n_contracts": 11,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.2,
+      "stability_score": 89.6
     },
     {
       "country": "Costa Rica",
@@ -858,7 +1295,13 @@
       "npv_10_usd_mm_at_75": 1622.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 9
+      "n_contracts": 9,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.2,
+      "stability_score": 89.6
     },
     {
       "country": "El Salvador",
@@ -870,7 +1313,13 @@
       "npv_10_usd_mm_at_75": 1622.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 6
+      "n_contracts": 6,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.2,
+      "stability_score": 89.6
     },
     {
       "country": "Malawi",
@@ -882,7 +1331,13 @@
       "npv_10_usd_mm_at_75": 1622.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 23
+      "n_contracts": 23,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.2,
+      "stability_score": 89.6
     },
     {
       "country": "Mali",
@@ -894,7 +1349,13 @@
       "npv_10_usd_mm_at_75": 1622.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 5
+      "n_contracts": 5,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.2,
+      "stability_score": 89.6
     },
     {
       "country": "Nicaragua",
@@ -906,7 +1367,13 @@
       "npv_10_usd_mm_at_75": 1622.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 20
+      "n_contracts": 20,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.2,
+      "stability_score": 89.6
     },
     {
       "country": "Slovakia",
@@ -918,7 +1385,13 @@
       "npv_10_usd_mm_at_75": 1623.2,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 12
+      "n_contracts": 12,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.7,
+      "stability_score": 92.6
     },
     {
       "country": "Solomon Islands",
@@ -930,7 +1403,13 @@
       "npv_10_usd_mm_at_75": 1622.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 13
+      "n_contracts": 13,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.2,
+      "stability_score": 89.6
     },
     {
       "country": "Israel",
@@ -942,7 +1421,13 @@
       "npv_10_usd_mm_at_75": 9714.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 51
+      "n_contracts": 51,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.2,
+      "stability_score": 95.6
     },
     {
       "country": "Pakistan",
@@ -954,7 +1439,13 @@
       "npv_10_usd_mm_at_75": 1586.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 194
+      "n_contracts": 194,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.0,
+      "stability_score": 90.0
     },
     {
       "country": "Haiti",
@@ -966,7 +1457,13 @@
       "npv_10_usd_mm_at_75": 1575.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 7
+      "n_contracts": 7,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.2,
+      "stability_score": 89.6
     },
     {
       "country": "Netherlands",
@@ -978,7 +1475,13 @@
       "npv_10_usd_mm_at_75": 1518.7,
       "irr_pct_at_75": 293.8,
       "mechanics": "Concession,PSC",
-      "n_contracts": 135
+      "n_contracts": 135,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 18.2,
+      "stability_score": 63.6
     },
     {
       "country": "Malta",
@@ -990,7 +1493,13 @@
       "npv_10_usd_mm_at_75": 1548.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 8
+      "n_contracts": 8,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 6.1,
+      "stability_score": 87.8
     },
     {
       "country": "Bolivia",
@@ -1002,7 +1511,13 @@
       "npv_10_usd_mm_at_75": 1539.3,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 152
+      "n_contracts": 152,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.3,
+      "stability_score": 91.4
     },
     {
       "country": "Zambia",
@@ -1014,7 +1529,13 @@
       "npv_10_usd_mm_at_75": 1526.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 23
+      "n_contracts": 23,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 6.1,
+      "stability_score": 87.8
     },
     {
       "country": "Syria",
@@ -1026,7 +1547,13 @@
       "npv_10_usd_mm_at_75": 9324.2,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 32
+      "n_contracts": 32,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.5,
+      "stability_score": 95.0
     },
     {
       "country": "Peru",
@@ -1038,7 +1565,16 @@
       "npv_10_usd_mm_at_75": 1516.1,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 391
+      "n_contracts": 391,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.1,
+      "stability_score": 89.8,
+      "take_p10": 32.2,
+      "take_p50": 34.4,
+      "take_p90": 35.5
     },
     {
       "country": "India",
@@ -1050,7 +1586,16 @@
       "npv_10_usd_mm_at_75": 2531.4,
       "irr_pct_at_75": 223.1,
       "mechanics": "PSC,Concession,RSC",
-      "n_contracts": 653
+      "n_contracts": 653,
+      "breakeven_pct_sub20": 95.6,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 4.4,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 11.7,
+      "stability_score": 76.6,
+      "take_p10": 30.0,
+      "take_p50": 35.1,
+      "take_p90": 37.7
     },
     {
       "country": "Qatar",
@@ -1062,7 +1607,13 @@
       "npv_10_usd_mm_at_75": 9189.6,
       "irr_pct_at_75": null,
       "mechanics": "PSC,Concession",
-      "n_contracts": 146
+      "n_contracts": 146,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.1,
+      "stability_score": 93.8
     },
     {
       "country": "France",
@@ -1074,7 +1625,13 @@
       "npv_10_usd_mm_at_75": 1488.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 5
+      "n_contracts": 5,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.3,
+      "stability_score": 91.4
     },
     {
       "country": "Jamaica",
@@ -1086,7 +1643,13 @@
       "npv_10_usd_mm_at_75": 1488.0,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 18
+      "n_contracts": 18,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.8,
+      "stability_score": 88.4
     },
     {
       "country": "Eritrea",
@@ -1098,7 +1661,13 @@
       "npv_10_usd_mm_at_75": 2199.8,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 28
+      "n_contracts": 28,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 7.7,
+      "stability_score": 84.6
     },
     {
       "country": "Argentina",
@@ -1110,7 +1679,16 @@
       "npv_10_usd_mm_at_75": 1460.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 384
+      "n_contracts": 384,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 6.1,
+      "stability_score": 87.8,
+      "take_p10": 33.4,
+      "take_p50": 36.1,
+      "take_p90": 37.4
     },
     {
       "country": "Colombia",
@@ -1122,7 +1700,16 @@
       "npv_10_usd_mm_at_75": 1449.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 666
+      "n_contracts": 666,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 6.1,
+      "stability_score": 87.8,
+      "take_p10": 33.8,
+      "take_p50": 36.4,
+      "take_p90": 37.7
     },
     {
       "country": "Morocco",
@@ -1134,7 +1721,13 @@
       "npv_10_usd_mm_at_75": 8955.8,
       "irr_pct_at_75": null,
       "mechanics": "PSC,Concession",
-      "n_contracts": 71
+      "n_contracts": 71,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 2.9,
+      "stability_score": 94.2
     },
     {
       "country": "Canada",
@@ -1146,7 +1739,16 @@
       "npv_10_usd_mm_at_75": 2360.5,
       "irr_pct_at_75": 161.5,
       "mechanics": "Concession",
-      "n_contracts": 944
+      "n_contracts": 944,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 8.8,
+      "stability_score": 82.4,
+      "take_p10": 33.2,
+      "take_p50": 37.0,
+      "take_p90": 38.8
     },
     {
       "country": "Bolivia, Plurinational State of",
@@ -1158,7 +1760,13 @@
       "npv_10_usd_mm_at_75": 1392.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 16
+      "n_contracts": 16,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.5,
+      "stability_score": 89.0
     },
     {
       "country": "Brazil",
@@ -1170,7 +1778,16 @@
       "npv_10_usd_mm_at_75": 2297.0,
       "irr_pct_at_75": 185.9,
       "mechanics": "PSC,Concession",
-      "n_contracts": 1193
+      "n_contracts": 1193,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.5,
+      "stability_score": 73.0,
+      "take_p10": 32.3,
+      "take_p50": 37.9,
+      "take_p90": 41.0
     },
     {
       "country": "Ukraine",
@@ -1182,7 +1799,13 @@
       "npv_10_usd_mm_at_75": 1382.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 98
+      "n_contracts": 98,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.1,
+      "stability_score": 93.8
     },
     {
       "country": "Australia",
@@ -1194,7 +1817,16 @@
       "npv_10_usd_mm_at_75": 2285.3,
       "irr_pct_at_75": 324.4,
       "mechanics": "PRRT",
-      "n_contracts": 1219
+      "n_contracts": 1219,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 17.7,
+      "stability_score": 64.6,
+      "take_p10": 30.8,
+      "take_p50": 38.4,
+      "take_p90": 42.3
     },
     {
       "country": "Senegal",
@@ -1206,7 +1838,13 @@
       "npv_10_usd_mm_at_75": 2579.5,
       "irr_pct_at_75": 100.5,
       "mechanics": "PSC",
-      "n_contracts": 97
+      "n_contracts": 97,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 15.2,
+      "stability_score": 69.6
     },
     {
       "country": "Denmark",
@@ -1218,7 +1856,13 @@
       "npv_10_usd_mm_at_75": 1228.1,
       "irr_pct_at_75": 1258.0,
       "mechanics": "PRRT",
-      "n_contracts": 110
+      "n_contracts": 110,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 21.2,
+      "stability_score": 57.6
     },
     {
       "country": "Guyana",
@@ -1230,7 +1874,13 @@
       "npv_10_usd_mm_at_75": 1959.8,
       "irr_pct_at_75": 178.1,
       "mechanics": "PSC",
-      "n_contracts": 143
+      "n_contracts": 143,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 19.0,
+      "stability_score": 62.0
     },
     {
       "country": "Bahrain",
@@ -1242,7 +1892,13 @@
       "npv_10_usd_mm_at_75": 7966.0,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 54
+      "n_contracts": 54,
+      "breakeven_pct_sub20": 98.1,
+      "breakeven_pct_range": 1.9,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": 62.5,
+      "swing_pp": 4.2,
+      "stability_score": 91.6
     },
     {
       "country": "Indonesia",
@@ -1254,7 +1910,16 @@
       "npv_10_usd_mm_at_75": 1891.5,
       "irr_pct_at_75": 184.4,
       "mechanics": "PSC,Gross Split,Concession",
-      "n_contracts": 667
+      "n_contracts": 667,
+      "breakeven_pct_sub20": 97.6,
+      "breakeven_pct_range": 2.4,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": 77.8,
+      "swing_pp": 18.5,
+      "stability_score": 63.0,
+      "take_p10": 35.0,
+      "take_p50": 43.0,
+      "take_p90": 47.1
     },
     {
       "country": "Nigeria",
@@ -1266,7 +1931,16 @@
       "npv_10_usd_mm_at_75": 1836.6,
       "irr_pct_at_75": 139.7,
       "mechanics": "Concession,PSC",
-      "n_contracts": 834
+      "n_contracts": 834,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 17.9,
+      "stability_score": 64.2,
+      "take_p10": 35.7,
+      "take_p50": 43.4,
+      "take_p90": 47.3
     },
     {
       "country": "Trinidad and Tobago",
@@ -1278,7 +1952,13 @@
       "npv_10_usd_mm_at_75": 1691.9,
       "irr_pct_at_75": 578.8,
       "mechanics": "Concession",
-      "n_contracts": 144
+      "n_contracts": 144,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 10.2,
+      "stability_score": 79.6
     },
     {
       "country": "Philippines",
@@ -1290,7 +1970,13 @@
       "npv_10_usd_mm_at_75": 1689.6,
       "irr_pct_at_75": 141.2,
       "mechanics": "PSC,Concession",
-      "n_contracts": 211
+      "n_contracts": 211,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 20.6,
+      "stability_score": 58.8
     },
     {
       "country": "Ghana",
@@ -1302,7 +1988,13 @@
       "npv_10_usd_mm_at_75": 1705.9,
       "irr_pct_at_75": 148.9,
       "mechanics": "Concession,PSC",
-      "n_contracts": 171
+      "n_contracts": 171,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 18.7,
+      "stability_score": 62.6
     },
     {
       "country": "Trinidad",
@@ -1314,7 +2006,13 @@
       "npv_10_usd_mm_at_75": 1107.7,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 14
+      "n_contracts": 14,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 8.7,
+      "stability_score": 82.6
     },
     {
       "country": "Trinidad & Tobago",
@@ -1326,7 +2024,13 @@
       "npv_10_usd_mm_at_75": 1107.7,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 10
+      "n_contracts": 10,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 8.7,
+      "stability_score": 82.6
     },
     {
       "country": "Kazakhstan",
@@ -1338,7 +2042,13 @@
       "npv_10_usd_mm_at_75": 3591.9,
       "irr_pct_at_75": 151.2,
       "mechanics": "Concession,PSC",
-      "n_contracts": 302
+      "n_contracts": 302,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 12.7,
+      "stability_score": 74.6
     },
     {
       "country": "Suriname",
@@ -1350,7 +2060,13 @@
       "npv_10_usd_mm_at_75": 1496.8,
       "irr_pct_at_75": 131.3,
       "mechanics": "PSC,Concession",
-      "n_contracts": 109
+      "n_contracts": 109,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 20.9,
+      "stability_score": 58.2
     },
     {
       "country": "China",
@@ -1362,7 +2078,16 @@
       "npv_10_usd_mm_at_75": 1566.9,
       "irr_pct_at_75": null,
       "mechanics": "PSC,Concession",
-      "n_contracts": 799
+      "n_contracts": 799,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 12.4,
+      "stability_score": 75.2,
+      "take_p10": 42.4,
+      "take_p50": 47.7,
+      "take_p90": 50.6
     },
     {
       "country": "Brunei",
@@ -1374,7 +2099,13 @@
       "npv_10_usd_mm_at_75": 1504.2,
       "irr_pct_at_75": 374.4,
       "mechanics": "PSC,Concession",
-      "n_contracts": 72
+      "n_contracts": 72,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 11.2,
+      "stability_score": 77.6
     },
     {
       "country": "Cameroon",
@@ -1386,7 +2117,13 @@
       "npv_10_usd_mm_at_75": 1087.6,
       "irr_pct_at_75": 818.5,
       "mechanics": "PSC,Concession",
-      "n_contracts": 104
+      "n_contracts": 104,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 8.6,
+      "stability_score": 82.8
     },
     {
       "country": "Cote d'Ivoire",
@@ -1398,7 +2135,13 @@
       "npv_10_usd_mm_at_75": 1337.8,
       "irr_pct_at_75": 97.3,
       "mechanics": "PSC",
-      "n_contracts": 73
+      "n_contracts": 73,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 21.1,
+      "stability_score": 57.8
     },
     {
       "country": "Ivory Coast",
@@ -1410,7 +2153,13 @@
       "npv_10_usd_mm_at_75": 1337.8,
       "irr_pct_at_75": 97.3,
       "mechanics": "PSC",
-      "n_contracts": 49
+      "n_contracts": 49,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 21.1,
+      "stability_score": 57.8
     },
     {
       "country": "United Arab Emirates",
@@ -1422,7 +2171,13 @@
       "npv_10_usd_mm_at_75": 6754.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 67
+      "n_contracts": 67,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.9,
+      "stability_score": 90.2
     },
     {
       "country": "Kuwait",
@@ -1434,7 +2189,13 @@
       "npv_10_usd_mm_at_75": 6754.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 177
+      "n_contracts": 177,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.9,
+      "stability_score": 90.2
     },
     {
       "country": "Guatemala",
@@ -1446,7 +2207,13 @@
       "npv_10_usd_mm_at_75": 1013.4,
       "irr_pct_at_75": null,
       "mechanics": "PSC,Concession",
-      "n_contracts": 32
+      "n_contracts": 32,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 10.3,
+      "stability_score": 79.4
     },
     {
       "country": "Liberia",
@@ -1458,7 +2225,13 @@
       "npv_10_usd_mm_at_75": 1308.2,
       "irr_pct_at_75": 115.5,
       "mechanics": "PSC,Concession",
-      "n_contracts": 75
+      "n_contracts": 75,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 21.2,
+      "stability_score": 57.6
     },
     {
       "country": "UAE",
@@ -1470,7 +2243,13 @@
       "npv_10_usd_mm_at_75": 6707.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 174
+      "n_contracts": 174,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.9,
+      "stability_score": 90.2
     },
     {
       "country": "Tunisia",
@@ -1482,7 +2261,13 @@
       "npv_10_usd_mm_at_75": 6669.0,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 343
+      "n_contracts": 343,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.4,
+      "stability_score": 91.2
     },
     {
       "country": "Mauritania",
@@ -1494,7 +2279,13 @@
       "npv_10_usd_mm_at_75": 1342.1,
       "irr_pct_at_75": 103.7,
       "mechanics": "PSC",
-      "n_contracts": 124
+      "n_contracts": 124,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 21.7,
+      "stability_score": 56.6
     },
     {
       "country": "Angola",
@@ -1506,7 +2297,16 @@
       "npv_10_usd_mm_at_75": 1243.3,
       "irr_pct_at_75": 89.8,
       "mechanics": "Concession,PSC",
-      "n_contracts": 460
+      "n_contracts": 460,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 21.4,
+      "stability_score": 57.2,
+      "take_p10": 41.6,
+      "take_p50": 50.4,
+      "take_p90": 55.3
     },
     {
       "country": "Sao Tome and Principe",
@@ -1518,7 +2318,13 @@
       "npv_10_usd_mm_at_75": 1171.1,
       "irr_pct_at_75": 84.0,
       "mechanics": "PSC",
-      "n_contracts": 60
+      "n_contracts": 60,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 23.4,
+      "stability_score": 53.2
     },
     {
       "country": "Gabon",
@@ -1530,7 +2336,13 @@
       "npv_10_usd_mm_at_75": 1340.6,
       "irr_pct_at_75": 198.1,
       "mechanics": "PSC,Concession",
-      "n_contracts": 140
+      "n_contracts": 140,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 12.2,
+      "stability_score": 75.6
     },
     {
       "country": "Vietnam",
@@ -1542,7 +2354,13 @@
       "npv_10_usd_mm_at_75": 1345.0,
       "irr_pct_at_75": 1217.8,
       "mechanics": "PSC,Concession",
-      "n_contracts": 241
+      "n_contracts": 241,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.3,
+      "stability_score": 73.4
     },
     {
       "country": "Venezuela",
@@ -1554,7 +2372,13 @@
       "npv_10_usd_mm_at_75": 6216.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 298
+      "n_contracts": 298,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 3.0,
+      "stability_score": 94.0
     },
     {
       "country": "Sierra Leone",
@@ -1566,7 +2390,13 @@
       "npv_10_usd_mm_at_75": 1014.0,
       "irr_pct_at_75": 78.5,
       "mechanics": "PSC,Concession",
-      "n_contracts": 44
+      "n_contracts": 44,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 23.1,
+      "stability_score": 53.8
     },
     {
       "country": "Equatorial Guinea",
@@ -1578,7 +2408,13 @@
       "npv_10_usd_mm_at_75": 964.9,
       "irr_pct_at_75": 73.9,
       "mechanics": "PSC,Concession",
-      "n_contracts": 125
+      "n_contracts": 125,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 23.1,
+      "stability_score": 53.8
     },
     {
       "country": "Oman",
@@ -1590,7 +2426,13 @@
       "npv_10_usd_mm_at_75": 5980.4,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 222
+      "n_contracts": 222,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.9,
+      "stability_score": 90.2
     },
     {
       "country": "Saudi Arabia",
@@ -1602,7 +2444,16 @@
       "npv_10_usd_mm_at_75": 5826.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession",
-      "n_contracts": 381
+      "n_contracts": 381,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 4.4,
+      "stability_score": 91.2,
+      "take_p10": 53.1,
+      "take_p50": 55.0,
+      "take_p90": 56.0
     },
     {
       "country": "Cambodia",
@@ -1614,7 +2465,13 @@
       "npv_10_usd_mm_at_75": 1150.3,
       "irr_pct_at_75": 277.4,
       "mechanics": "PSC",
-      "n_contracts": 37
+      "n_contracts": 37,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.8,
+      "stability_score": 72.4
     },
     {
       "country": "Congo, the Democratic Republic of the",
@@ -1626,7 +2483,13 @@
       "npv_10_usd_mm_at_75": 829.5,
       "irr_pct_at_75": null,
       "mechanics": "Concession,PSC",
-      "n_contracts": 31
+      "n_contracts": 31,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 11.1,
+      "stability_score": 77.8
     },
     {
       "country": "Togo",
@@ -1638,7 +2501,13 @@
       "npv_10_usd_mm_at_75": 1092.6,
       "irr_pct_at_75": 240.0,
       "mechanics": "PSC,Concession",
-      "n_contracts": 21
+      "n_contracts": 21,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 14.0,
+      "stability_score": 72.0
     },
     {
       "country": "Azerbaijan",
@@ -1650,7 +2519,13 @@
       "npv_10_usd_mm_at_75": 758.4,
       "irr_pct_at_75": 61.5,
       "mechanics": "PSC,Concession",
-      "n_contracts": 168
+      "n_contracts": 168,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 25.2,
+      "stability_score": 49.6
     },
     {
       "country": "Viet Nam",
@@ -1662,7 +2537,13 @@
       "npv_10_usd_mm_at_75": 781.8,
       "irr_pct_at_75": null,
       "mechanics": "PSC",
-      "n_contracts": 13
+      "n_contracts": 13,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 11.5,
+      "stability_score": 77.0
     },
     {
       "country": "Congo",
@@ -1674,7 +2555,13 @@
       "npv_10_usd_mm_at_75": 1023.5,
       "irr_pct_at_75": 186.9,
       "mechanics": "PSC,Concession",
-      "n_contracts": 57
+      "n_contracts": 57,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.9,
+      "stability_score": 72.2
     },
     {
       "country": "Myanmar",
@@ -1686,7 +2573,13 @@
       "npv_10_usd_mm_at_75": 1014.3,
       "irr_pct_at_75": 223.4,
       "mechanics": "PSC,Concession",
-      "n_contracts": 159
+      "n_contracts": 159,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 14.2,
+      "stability_score": 71.6
     },
     {
       "country": "Egypt",
@@ -1698,7 +2591,13 @@
       "npv_10_usd_mm_at_75": 5296.9,
       "irr_pct_at_75": null,
       "mechanics": "Concession,PSC",
-      "n_contracts": 218
+      "n_contracts": 218,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 5.8,
+      "stability_score": 88.4
     },
     {
       "country": "Uruguay",
@@ -1710,7 +2609,13 @@
       "npv_10_usd_mm_at_75": 716.1,
       "irr_pct_at_75": 1263.0,
       "mechanics": "PSC,Concession",
-      "n_contracts": 18
+      "n_contracts": 18,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 11.7,
+      "stability_score": 76.6
     },
     {
       "country": "Republic of Congo",
@@ -1722,7 +2627,13 @@
       "npv_10_usd_mm_at_75": 942.1,
       "irr_pct_at_75": 186.9,
       "mechanics": "PSC,Concession",
-      "n_contracts": 129
+      "n_contracts": 129,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 14.4,
+      "stability_score": 71.2
     },
     {
       "country": "Cote d Ivoire",
@@ -1734,7 +2645,13 @@
       "npv_10_usd_mm_at_75": 684.8,
       "irr_pct_at_75": null,
       "mechanics": "PSC",
-      "n_contracts": 8
+      "n_contracts": 8,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 12.1,
+      "stability_score": 75.8
     },
     {
       "country": "Côte d'Ivoire",
@@ -1758,7 +2675,13 @@
       "npv_10_usd_mm_at_75": 754.4,
       "irr_pct_at_75": 568.2,
       "mechanics": "PSC,Concession",
-      "n_contracts": 57
+      "n_contracts": 57,
+      "breakeven_pct_sub20": 96.5,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.2,
+      "stability_score": 73.6
     },
     {
       "country": "Cuba",
@@ -1770,7 +2693,13 @@
       "npv_10_usd_mm_at_75": 666.3,
       "irr_pct_at_75": 1187.0,
       "mechanics": "PSC,Concession",
-      "n_contracts": 56
+      "n_contracts": 56,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 12.1,
+      "stability_score": 75.8
     },
     {
       "country": "Republic of the Congo",
@@ -1782,7 +2711,13 @@
       "npv_10_usd_mm_at_75": 859.0,
       "irr_pct_at_75": 186.9,
       "mechanics": "PSC",
-      "n_contracts": 23
+      "n_contracts": 23,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 14.9,
+      "stability_score": 70.2
     },
     {
       "country": "Congo Republic",
@@ -1794,7 +2729,13 @@
       "npv_10_usd_mm_at_75": 645.8,
       "irr_pct_at_75": 791.1,
       "mechanics": "PSC,Concession",
-      "n_contracts": 11
+      "n_contracts": 11,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 12.1,
+      "stability_score": 75.8
     },
     {
       "country": "Benin",
@@ -1806,7 +2747,13 @@
       "npv_10_usd_mm_at_75": 846.7,
       "irr_pct_at_75": 171.1,
       "mechanics": "PSC",
-      "n_contracts": 29
+      "n_contracts": 29,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 15.4,
+      "stability_score": 69.2
     },
     {
       "country": "DR Congo",
@@ -1818,7 +2765,13 @@
       "npv_10_usd_mm_at_75": 639.1,
       "irr_pct_at_75": null,
       "mechanics": "PSC",
-      "n_contracts": 5
+      "n_contracts": 5,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 12.5,
+      "stability_score": 75.0
     },
     {
       "country": "Democratic Republic of Congo",
@@ -1830,7 +2783,13 @@
       "npv_10_usd_mm_at_75": 639.1,
       "irr_pct_at_75": null,
       "mechanics": "PSC",
-      "n_contracts": 27
+      "n_contracts": 27,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 12.5,
+      "stability_score": 75.0
     },
     {
       "country": "Laos",
@@ -1842,7 +2801,13 @@
       "npv_10_usd_mm_at_75": 630.8,
       "irr_pct_at_75": 775.5,
       "mechanics": "PSC",
-      "n_contracts": 20
+      "n_contracts": 20,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 12.7,
+      "stability_score": 74.6
     },
     {
       "country": "Sri Lanka",
@@ -1854,7 +2819,13 @@
       "npv_10_usd_mm_at_75": 811.9,
       "irr_pct_at_75": 143.0,
       "mechanics": "PSC",
-      "n_contracts": 30
+      "n_contracts": 30,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 15.7,
+      "stability_score": 68.6
     },
     {
       "country": "Tanzania",
@@ -1866,7 +2837,13 @@
       "npv_10_usd_mm_at_75": 816.8,
       "irr_pct_at_75": 168.3,
       "mechanics": "PSC",
-      "n_contracts": 167
+      "n_contracts": 167,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 15.2,
+      "stability_score": 69.6
     },
     {
       "country": "DRC",
@@ -1878,7 +2855,13 @@
       "npv_10_usd_mm_at_75": 687.3,
       "irr_pct_at_75": 497.2,
       "mechanics": "PSC,Concession",
-      "n_contracts": 41
+      "n_contracts": 41,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 11.3,
+      "stability_score": 77.4
     },
     {
       "country": "Timor-Leste",
@@ -1890,7 +2873,13 @@
       "npv_10_usd_mm_at_75": 331.6,
       "irr_pct_at_75": 29.8,
       "mechanics": "PSC",
-      "n_contracts": 142
+      "n_contracts": 142,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 27.3,
+      "stability_score": 45.4
     },
     {
       "country": "Iraq-Kurdistan",
@@ -1902,7 +2891,13 @@
       "npv_10_usd_mm_at_75": 713.7,
       "irr_pct_at_75": 65.1,
       "mechanics": "PSC",
-      "n_contracts": 13
+      "n_contracts": 13,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.4,
+      "stability_score": 73.2
     },
     {
       "country": "Iran",
@@ -1914,7 +2909,16 @@
       "npv_10_usd_mm_at_75": 1161.1,
       "irr_pct_at_75": 592.7,
       "mechanics": "Buy-back,PSC,Concession",
-      "n_contracts": 547
+      "n_contracts": 547,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 18.4,
+      "stability_score": 63.2,
+      "take_p10": 55.2,
+      "take_p50": 62.6,
+      "take_p90": 66.8
     },
     {
       "country": "Ethiopia",
@@ -1926,7 +2930,13 @@
       "npv_10_usd_mm_at_75": 567.8,
       "irr_pct_at_75": 497.2,
       "mechanics": "Concession,PSC",
-      "n_contracts": 55
+      "n_contracts": 55,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.6,
+      "stability_score": 72.8
     },
     {
       "country": "Chad",
@@ -1938,7 +2948,13 @@
       "npv_10_usd_mm_at_75": 557.8,
       "irr_pct_at_75": 1034.7,
       "mechanics": "PSC,Concession",
-      "n_contracts": 80
+      "n_contracts": 80,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.0,
+      "stability_score": 74.0
     },
     {
       "country": "Niger",
@@ -1950,7 +2966,13 @@
       "npv_10_usd_mm_at_75": 535.4,
       "irr_pct_at_75": 457.1,
       "mechanics": "PSC",
-      "n_contracts": 34
+      "n_contracts": 34,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.0,
+      "stability_score": 74.0
     },
     {
       "country": "Malaysia",
@@ -1962,7 +2984,16 @@
       "npv_10_usd_mm_at_75": 645.8,
       "irr_pct_at_75": 147.8,
       "mechanics": "PSC,Concession,RSC",
-      "n_contracts": 365
+      "n_contracts": 365,
+      "breakeven_pct_sub20": 97.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 3.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 15.9,
+      "stability_score": 68.2,
+      "take_p10": 58.0,
+      "take_p50": 64.5,
+      "take_p90": 68.1
     },
     {
       "country": "South Sudan",
@@ -1974,7 +3005,13 @@
       "npv_10_usd_mm_at_75": 514.5,
       "irr_pct_at_75": 95.9,
       "mechanics": "PSC,Concession",
-      "n_contracts": 58
+      "n_contracts": 58,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 13.8,
+      "stability_score": 72.4
     },
     {
       "country": "Timor - Leste",
@@ -1986,7 +3023,13 @@
       "npv_10_usd_mm_at_75": 368.4,
       "irr_pct_at_75": 34.4,
       "mechanics": "PSC",
-      "n_contracts": 28
+      "n_contracts": 28,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 24.5,
+      "stability_score": 51.0
     },
     {
       "country": "UAE — Abu Dhabi",
@@ -2010,7 +3053,13 @@
       "npv_10_usd_mm_at_75": 539.9,
       "irr_pct_at_75": 106.2,
       "mechanics": "PSC",
-      "n_contracts": 138
+      "n_contracts": 138,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 17.0,
+      "stability_score": 66.0
     },
     {
       "country": "Tanzania, United Republic of",
@@ -2022,7 +3071,13 @@
       "npv_10_usd_mm_at_75": 572.9,
       "irr_pct_at_75": null,
       "mechanics": "PSC",
-      "n_contracts": 9
+      "n_contracts": 9,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 10.5,
+      "stability_score": 79.0
     },
     {
       "country": "Norway",
@@ -2034,7 +3089,16 @@
       "npv_10_usd_mm_at_75": 796.1,
       "irr_pct_at_75": 76.3,
       "mechanics": "Concession",
-      "n_contracts": 7643
+      "n_contracts": 7643,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 16.1,
+      "stability_score": 67.8,
+      "take_p10": 60.4,
+      "take_p50": 67.5,
+      "take_p90": 70.8
     },
     {
       "country": "Kenya",
@@ -2046,7 +3110,13 @@
       "npv_10_usd_mm_at_75": 399.7,
       "irr_pct_at_75": 180.8,
       "mechanics": "PSC,Concession",
-      "n_contracts": 127
+      "n_contracts": 127,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 14.2,
+      "stability_score": 71.6
     },
     {
       "country": "Algeria",
@@ -2058,7 +3128,13 @@
       "npv_10_usd_mm_at_75": 3525.9,
       "irr_pct_at_75": null,
       "mechanics": "PSC,Concession",
-      "n_contracts": 177
+      "n_contracts": 177,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 6.6,
+      "stability_score": 86.8
     },
     {
       "country": "Uganda",
@@ -2070,7 +3146,13 @@
       "npv_10_usd_mm_at_75": 346.3,
       "irr_pct_at_75": 134.4,
       "mechanics": "PSC,Concession",
-      "n_contracts": 90
+      "n_contracts": 90,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 14.8,
+      "stability_score": 70.4
     },
     {
       "country": "Sudan",
@@ -2082,7 +3164,13 @@
       "npv_10_usd_mm_at_75": 240.0,
       "irr_pct_at_75": 89.2,
       "mechanics": "PSC",
-      "n_contracts": 84
+      "n_contracts": 84,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 15.6,
+      "stability_score": 68.8
     },
     {
       "country": "Yemen",
@@ -2094,7 +3182,13 @@
       "npv_10_usd_mm_at_75": 2684.6,
       "irr_pct_at_75": null,
       "mechanics": "PSC,Concession",
-      "n_contracts": 62
+      "n_contracts": 62,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 7.3,
+      "stability_score": 85.4
     },
     {
       "country": "East Timor",
@@ -2106,7 +3200,13 @@
       "npv_10_usd_mm_at_75": 191.9,
       "irr_pct_at_75": 70.5,
       "mechanics": "PSC",
-      "n_contracts": 5
+      "n_contracts": 5,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 14.0,
+      "stability_score": 72.0
     },
     {
       "country": "Iraq",
@@ -2118,7 +3218,16 @@
       "npv_10_usd_mm_at_75": 986.5,
       "irr_pct_at_75": 976.5,
       "mechanics": "PSC,TSC,Concession",
-      "n_contracts": 610
+      "n_contracts": 610,
+      "breakeven_pct_sub20": 99.8,
+      "breakeven_pct_range": 0.2,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": 62.5,
+      "swing_pp": 4.8,
+      "stability_score": 90.4,
+      "take_p10": 74.8,
+      "take_p50": 77.9,
+      "take_p90": 79.4
     },
     {
       "country": "Libya",
@@ -2130,7 +3239,13 @@
       "npv_10_usd_mm_at_75": 1808.7,
       "irr_pct_at_75": null,
       "mechanics": "PSC,Concession",
-      "n_contracts": 301
+      "n_contracts": 301,
+      "breakeven_pct_sub20": 100.0,
+      "breakeven_pct_range": 0.0,
+      "breakeven_pct_subeconomic": 0.0,
+      "avg_breakeven_usd_where_applicable": null,
+      "swing_pp": 7.8,
+      "stability_score": 84.4
     }
   ]
 }

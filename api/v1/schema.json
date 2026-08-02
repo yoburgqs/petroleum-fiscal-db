@@ -99,5 +99,19 @@
       "NOC equity revenue"
     ],
     "note": "For PSC: profit oil pool = (gross revenue - royalty - FTP - cost recovery). For TSC: government take = 1 - (remuneration fee / gross revenue per barrel)."
+  },
+  "breakeven_semantics": {
+    "field": "breakeven_price_usd",
+    "description": "Interpolated oil price at which contractor NPV = 0. Uses sentinel values.",
+    "sentinels": {
+      "-1.0": "Sub-$20/bbl breakeven — contract is profitable at all modeled prices",
+      "999.0": "Sub-economic — contract never profitable within $20-$125/bbl range"
+    },
+    "categories": {
+      "sub_20": "breakeven_price_usd = -1.0 (most contracts)",
+      "range_20_125": "20 <= breakeven_price_usd <= 125 (real interpolated value)",
+      "sub_economic": "breakeven_price_usd = 999.0"
+    },
+    "api_note": "Use breakeven_category field in countries.json for analytics. Raw value requires sentinel handling."
   }
 }
