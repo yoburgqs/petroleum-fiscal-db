@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Country Directory | Petroleum Fiscal Intelligence Platform</title>
+<style>
+
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#0f1117;color:#e0e0e0;margin:0;padding:0}
+    .container{max-width:1100px;margin:0 auto;padding:24px 16px}
+    .nav{background:#1a1f2e;border-bottom:1px solid #2a2f3e;padding:12px 24px;display:flex;gap:16px;align-items:center}
+    .nav a{color:#4da6ff;text-decoration:none;font-size:14px}
+    .nav a:hover{color:#fff}
+    h1{color:#fff;font-size:2em;margin:0 0 4px}
+    h2{color:#aaa;font-size:1em;text-transform:uppercase;letter-spacing:.1em;margin:28px 0 12px;border-bottom:1px solid #2a2f3e;padding-bottom:8px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin:20px 0}
+    .card{background:#1a1f2e;border-radius:10px;padding:16px;text-align:center}
+    .card .val{font-size:2em;font-weight:700;margin:4px 0}
+    .card .lbl{font-size:12px;color:#888;text-transform:uppercase;letter-spacing:.08em}
+    table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+    th{background:#1a1f2e;padding:10px 12px;text-align:left;color:#aaa;font-size:12px;text-transform:uppercase;letter-spacing:.08em}
+    td{padding:9px 12px;border-bottom:1px solid #1a1f2e}
+    tr:hover td{background:#1a1f2e}
+    .badge{display:inline-block;background:#1a1f2e;border:1px solid #2a2f3e;border-radius:20px;padding:3px 10px;font-size:12px;color:#aaa}
+    .btn{background:#1e40af;color:#fff;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;font-size:13px;text-decoration:none;display:inline-block}
+    .btn:hover{background:#2563eb}
+    .btn-outline{background:none;border:1px solid #2a2f3e;color:#aaa}
+    .btn-outline:hover{border-color:#4da6ff;color:#4da6ff}
+    .fact-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+    .fact-item{background:#1a1f2e;border-radius:8px;padding:10px 14px}
+    .fact-key{font-size:11px;color:#888;margin-bottom:2px}
+    .fact-val{font-weight:600}
+    @media(max-width:700px){.cards{grid-template-columns:1fr 1fr}.fact-grid{grid-template-columns:1fr}}
+    
+.country-card{background:#1a1f2e;border-radius:10px;padding:16px;text-align:center;transition:all .2s;border:1px solid transparent;color:#e0e0e0;}
+.country-card:hover{border-color:#4da6ff;transform:translateY(-2px);}
+.country-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:20px 0;}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="../">&#8592; Dashboard</a>
+  <a href="../compare/">Compare</a>
+</nav>
+<div class="container">
+<h1>Country Directory</h1>
+<p style="color:#888;">Top 50 countries by contract count. Click any country for full fiscal profile, contract list, and DCF analysis.</p>
+<div class="country-grid">
+
+    <a href="usa/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇺🇸</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">USA</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">22.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">37,222 contracts &middot; Concession</div>
+    </a>
+    <a href="norway/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇳🇴</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Norway</div>
+      <div style="font-size:1.4em;font-weight:700;color:#e67e22;">67.4%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">7,643 contracts &middot; Concession</div>
+    </a>
+    <a href="united_kingdom/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇬🇧</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">United Kingdom</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">29.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">4,000 contracts &middot; Concession</div>
+    </a>
+    <a href="russia/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇷🇺</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Russia</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">25.8%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">1,261 contracts &middot; Concession</div>
+    </a>
+    <a href="australia/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇦🇺</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Australia</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">38.5%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">1,219 contracts &middot; PRRT</div>
+    </a>
+    <a href="brazil/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇧🇷</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Brazil</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">38.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">1,193 contracts &middot; Concession</div>
+    </a>
+    <a href="canada/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇨🇦</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Canada</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">37.0%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">944 contracts &middot; Concession</div>
+    </a>
+    <a href="nigeria/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇳🇬</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Nigeria</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">43.4%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">834 contracts &middot; Concession</div>
+    </a>
+    <a href="china/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇨🇳</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">China</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">47.8%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">799 contracts &middot; PSC</div>
+    </a>
+    <a href="indonesia/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇮🇩</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Indonesia</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">43.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">667 contracts &middot; PSC</div>
+    </a>
+    <a href="colombia/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇨🇴</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Colombia</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">36.4%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">666 contracts &middot; Concession</div>
+    </a>
+    <a href="india/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇮🇳</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">India</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">35.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">653 contracts &middot; Concession</div>
+    </a>
+    <a href="iraq/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇮🇶</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Iraq</div>
+      <div style="font-size:1.4em;font-weight:700;color:#e74c3c;">79.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">610 contracts &middot; TSC</div>
+    </a>
+    <a href="iran/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇮🇷</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Iran</div>
+      <div style="font-size:1.4em;font-weight:700;color:#e67e22;">62.8%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">547 contracts &middot; Buy-back</div>
+    </a>
+    <a href="mexico/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇲🇽</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Mexico</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">28.5%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">537 contracts &middot; Concession</div>
+    </a>
+    <a href="angola/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇦🇴</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Angola</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">50.7%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">460 contracts &middot; PSC</div>
+    </a>
+    <a href="peru/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇵🇪</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Peru</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">34.4%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">391 contracts &middot; Concession</div>
+    </a>
+    <a href="argentina/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇦🇷</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Argentina</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">36.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">384 contracts &middot; Concession</div>
+    </a>
+    <a href="saudi_arabia/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇸🇦</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Saudi Arabia</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">55.0%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">381 contracts &middot; Concession</div>
+    </a>
+    <a href="malaysia/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇲🇾</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Malaysia</div>
+      <div style="font-size:1.4em;font-weight:700;color:#e67e22;">64.6%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">365 contracts &middot; PSC</div>
+    </a>
+    <a href="tunisia/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇹🇳</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Tunisia</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">50.0%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">343 contracts &middot; Concession</div>
+    </a>
+    <a href="kazakhstan/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇰🇿</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Kazakhstan</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">47.6%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">302 contracts &middot; PSC</div>
+    </a>
+    <a href="libya/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇱🇾</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Libya</div>
+      <div style="font-size:1.4em;font-weight:700;color:#e74c3c;">79.2%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">301 contracts &middot; PSC</div>
+    </a>
+    <a href="venezuela/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇻🇪</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Venezuela</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">52.7%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">298 contracts &middot; Concession</div>
+    </a>
+    <a href="vietnam/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇻🇳</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Vietnam</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">52.0%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">241 contracts &middot; PSC</div>
+    </a>
+    <a href="oman/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇴🇲</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Oman</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">54.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">222 contracts &middot; Concession</div>
+    </a>
+    <a href="egypt/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇪🇬</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Egypt</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">58.3%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">218 contracts &middot; Concession</div>
+    </a>
+    <a href="thailand/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇹🇭</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Thailand</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">25.5%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">216 contracts &middot; Concession</div>
+    </a>
+    <a href="philippines/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇵🇭</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Philippines</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">45.3%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">211 contracts &middot; PSC</div>
+    </a>
+    <a href="uk/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇬🇧</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">UK</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">25.0%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">211 contracts &middot; Concession</div>
+    </a>
+    <a href="mozambique/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇲🇿</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Mozambique</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">28.0%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">198 contracts &middot; Concession</div>
+    </a>
+    <a href="pakistan/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇵🇰</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Pakistan</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">32.3%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">194 contracts &middot; Concession</div>
+    </a>
+    <a href="algeria/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇩🇿</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Algeria</div>
+      <div style="font-size:1.4em;font-weight:700;color:#e67e22;">68.9%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">177 contracts &middot; PSC</div>
+    </a>
+    <a href="kuwait/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇰🇼</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Kuwait</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">49.6%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">177 contracts &middot; Concession</div>
+    </a>
+    <a href="uae/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇦🇪</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">UAE</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">49.8%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">174 contracts &middot; Concession</div>
+    </a>
+    <a href="ghana/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇬🇭</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Ghana</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">45.5%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">171 contracts &middot; PSC</div>
+    </a>
+    <a href="ecuador/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇪🇨</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Ecuador</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">29.6%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">169 contracts &middot; Concession</div>
+    </a>
+    <a href="azerbaijan/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇦🇿</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Azerbaijan</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">56.7%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">168 contracts &middot; PSC</div>
+    </a>
+    <a href="tanzania/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇹🇿</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Tanzania</div>
+      <div style="font-size:1.4em;font-weight:700;color:#e67e22;">61.7%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">167 contracts &middot; PSC</div>
+    </a>
+    <a href="myanmar/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇲🇲</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Myanmar</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">57.8%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">159 contracts &middot; PSC</div>
+    </a>
+    <a href="bolivia/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇧🇴</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Bolivia</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">33.7%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">152 contracts &middot; Concession</div>
+    </a>
+    <a href="qatar/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇶🇦</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Qatar</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">35.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">146 contracts &middot; Concession</div>
+    </a>
+    <a href="trinidad_and_tobago/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇹🇹</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Trinidad and Tobago</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">45.0%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">144 contracts &middot; Concession</div>
+    </a>
+    <a href="guyana/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇬🇾</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Guyana</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">42.2%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">143 contracts &middot; PSC</div>
+    </a>
+    <a href="timor-leste/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇹🇱</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Timor-Leste</div>
+      <div style="font-size:1.4em;font-weight:700;color:#e67e22;">61.9%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">142 contracts &middot; PSC</div>
+    </a>
+    <a href="gabon/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇬🇦</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Gabon</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">51.7%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">140 contracts &middot; PSC</div>
+    </a>
+    <a href="bangladesh/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇧🇩</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Bangladesh</div>
+      <div style="font-size:1.4em;font-weight:700;color:#e67e22;">66.7%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">138 contracts &middot; PSC</div>
+    </a>
+    <a href="papua_new_guinea/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇵🇬</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Papua New Guinea</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">25.6%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">138 contracts &middot; Concession</div>
+    </a>
+    <a href="netherlands/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🇳🇱</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Netherlands</div>
+      <div style="font-size:1.4em;font-weight:700;color:#27ae60;">33.4%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">135 contracts &middot; PSC</div>
+    </a>
+    <a href="republic_of_congo/" class="country-card" style="text-decoration:none;">
+      <div style="font-size:24px;">🌍</div>
+      <div style="font-weight:600;margin:4px 0;font-size:14px;">Republic of Congo</div>
+      <div style="font-size:1.4em;font-weight:700;color:#f1c40f;">59.1%</div>
+      <div style="font-size:11px;color:#888;margin-top:2px;">129 contracts &middot; PSC</div>
+    </a>
+</div>
+</div>
+<footer style="text-align:center;padding:24px;color:#444;font-size:12px;margin-top:40px;">
+  Petroleum Fiscal Intelligence Platform &nbsp;&middot;&nbsp; Data: 2026-08-01 &nbsp;&middot;&nbsp; <a href="https://yoburgqs.github.io/petroleum-fiscal-db/" style="color:#555;">yoburgqs.github.io/petroleum-fiscal-db</a>
+</footer>
+</body>
+</html>
