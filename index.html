@@ -2339,7 +2339,10 @@ function renderExplorer() {
   const _fourPriceActive = window._fourPriceActive || false;
   const price  = getPriceKey();
   const mech   = document.getElementById('flt-mech').value;
-  const region = document.getElementById('flt-region').value;
+  // Use chip filter for region — chip values ("Americas","Asia Pacific") may not match dropdown options
+  const chipRegion = explorerChipFilters && explorerChipFilters.region && explorerChipFilters.region !== 'all'
+    ? explorerChipFilters.region : '';
+  const region = chipRegion || document.getElementById('flt-region').value;
   const sort   = document.getElementById('flt-sort').value;
   const search = document.getElementById('flt-search').value.toLowerCase();
   const prodBtn = document.getElementById('flt-prod-btn');
