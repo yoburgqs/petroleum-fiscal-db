@@ -7456,6 +7456,8 @@ renderBasket(); // initialize on load
 // Async data loader — externalizes COUNTRY_DATA + REFORM_HISTORY
 // ================================================================
 async function loadPlatformData() {
+  if (window._platformLoaded) return;
+  window._platformLoaded = true;
   const overlay = document.getElementById('loading-overlay');
   try {
     const [cdRes, rhRes] = await Promise.all([
