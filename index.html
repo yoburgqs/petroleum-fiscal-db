@@ -4901,6 +4901,21 @@ function exportExplorer() {
     sel.appendChild(opt);
   });
 })();
+
+// Expose locally-scoped functions to global window for inline HTML event handlers
+// (onchange, oninput, onclick attributes look in global scope, not initPlatform closure)
+window.loadCountryProfile   = loadCountryProfile;
+window.renderSearchResults  = renderSearchResults;
+window.handleSearchKey      = handleSearchKey;
+window.openSearch           = openSearch;
+window.closeSearch          = closeSearch;
+window.updateSearchFocus    = updateSearchFocus;
+window.selectSearchResult   = selectSearchResult;
+window.exportCountryProfile = exportCountryProfile;
+window.exportExplorer       = exportExplorer;
+window.renderMechanics      = renderMechanics;
+window.renderReformTable    = renderReformTable;
+window.MECHANICS_INFO       = MECHANICS_INFO;
 }
 
 function loadAPIJson(country) {
