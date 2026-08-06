@@ -1033,6 +1033,96 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
 <!-- ===== TAB 0: FISCAL COMPARE (v38 centerpiece) ===== -->
 <div id="t0" class="tab-pane active">
+
+  <!-- ── Welcome / Guide Panel ── -->
+  <div id="welcome-panel" style="background:var(--card);border:1px solid rgba(45,212,191,.2);border-radius:10px;padding:20px 24px;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div>
+        <span style="font-size:13px;font-weight:800;color:#2dd4bf;letter-spacing:.08em;text-transform:uppercase;">What This Platform Contains</span>
+      </div>
+      <button onclick="document.getElementById('welcome-body').style.display=document.getElementById('welcome-body').style.display==='none'?'block':'none';this.textContent=this.textContent==='▲ collapse'?'▼ expand':'▲ collapse'" style="background:none;border:1px solid rgba(255,255,255,.15);color:var(--muted);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;">▲ collapse</button>
+    </div>
+    <div id="welcome-body">
+      <!-- DB accomplishments -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:18px;">
+        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">71,601</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Contracts</div>
+        </div>
+        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">185</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Countries with DCF</div>
+        </div>
+        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">330K+</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Sourced fiscal facts</div>
+        </div>
+        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">92.8%</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">A/B confidence facts</div>
+        </div>
+        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">337</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Active sources</div>
+        </div>
+        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">7</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Fiscal mechanics modeled</div>
+        </div>
+      </div>
+
+      <!-- Q&A examples -->
+      <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">What You Can Ask</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
+
+        <div style="background:rgba(255,255,255,.03);border-left:3px solid #2dd4bf;border-radius:0 6px 6px 0;padding:10px 12px;">
+          <div style="font-size:11px;color:#2dd4bf;font-weight:700;margin-bottom:4px;">Q: Which countries take less than 50% for a shallow offshore field at $75?</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Fiscal Compare</strong>: set Profile=Shallow Offshore, Price=$75, Run. Sort by Govt Take ascending. Countries under 50%: USA, Iraq, others at the top.</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.03);border-left:3px solid #f0a830;border-radius:0 6px 6px 0;padding:10px 12px;">
+          <div style="font-size:11px;color:#f0a830;font-weight:700;margin-bottom:4px;">Q: What is Norway's exact royalty rate and what legislation is it from?</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Country Profile</strong>: select Norway. Key Fiscal Parameters shows Royalty: 0% (Petroleumsskatteloven — A-tier, primary legislation).</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.03);border-left:3px solid #a855f7;border-radius:0 6px 6px 0;padding:10px 12px;">
+          <div style="font-size:11px;color:#a855f7;font-weight:700;margin-bottom:4px;">Q: Which PSC countries in Africa have R-factor tiers?</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Regime Explorer</strong>: click PSC chip, click Africa chip, then click ◈ R-factor PSC chip. See filtered country cards.</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.03);border-left:3px solid #ef4444;border-radius:0 6px 6px 0;padding:10px 12px;">
+          <div style="font-size:11px;color:#ef4444;font-weight:700;margin-bottom:4px;">Q: How sensitive is Angola to oil price — what's the govt take swing $50→$125?</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Regime Explorer</strong>: find Angola card. Shows take at 4 price points + Swing column. Click card for full Country Profile with price curve.</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.03);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;padding:10px 12px;">
+          <div style="font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:4px;">Q: What does IRR look like across 185 countries at $75 for a deepwater project?</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Screener</strong> (inside Regime Explorer → Screen tab): set profile=Deepwater, sort by IRR. Presets: "Sweet Spot", "High IRR", "Deepwater".</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.03);border-left:3px solid #22c55e;border-radius:0 6px 6px 0;padding:10px 12px;">
+          <div style="font-size:11px;color:#22c55e;font-weight:700;margin-bottom:4px;">Q: When did Nigeria's fiscal terms last change and what changed?</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Country Profile → Reform Timeline</strong>: shows every major reform with date, instrument, and what changed. Nigeria: PIA 2021 is the most recent.</div>
+        </div>
+
+      </div>
+
+      <!-- Drilldown capabilities -->
+      <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Drilldown Capabilities</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;font-size:11px;color:var(--muted);">
+        <div>📊 <strong style="color:var(--text);">Fiscal Compare</strong> — run any cost profile through all 185 countries simultaneously, rank by take, NPV, IRR, or breakeven</div>
+        <div>🌍 <strong style="color:var(--text);">Country Profile</strong> — per-contract distribution, price sensitivity curve, reform timeline, sourced fiscal facts with confidence badges (A/B/C)</div>
+        <div>🗂 <strong style="color:var(--text);">Regime Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
+        <div>📋 <strong style="color:var(--text);">Screener</strong> — filter by take range, IRR, mechanic, region with sorting. CSV export. Preset scenarios: Sweet Spot / High IRR / Deepwater.</div>
+        <div>📈 <strong style="color:var(--text);">IOC Portfolio</strong> — top operator positions by country, take, and contract count</div>
+        <div>🛠 <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: set royalty, CIT, profit oil split, R-factor tiers. Ctrl+K for search.</div>
+        <div>📡 <strong style="color:var(--text);">API</strong> — machine-readable JSON for every country. Download or pipe into your models.</div>
+        <div>🔍 <strong style="color:var(--text);">Source confidence</strong> — every fiscal fact shows its source and confidence tier. A = primary legislation. B = operator filing. C = secondary. D = default.</div>
+      </div>
+    </div>
+  </div>
+  <!-- ── End Welcome Panel ── -->
+
   <div class="page-title">Fiscal Compare</div>
   <div class="page-sub">Run a production profile through ORCA's DCF engine against all 185 countries simultaneously. Rank by government take.</div>
 
@@ -2229,6 +2319,22 @@ function toggleProdFilter(btn) {
   renderExplorer();
 }
 
+// Helper: match mechanic chip against n_* counts (countries can have multiple mechanics)
+function _mechMatch(d, mechVal) {
+  if (!mechVal || mechVal === 'all') return true;
+  const k = {'Concession':'n_concession','PSC':'n_psc','TSC':'n_tsc','PRRT':'n_prrt',
+              'RSC':'n_rsc','Buy-back':'n_buyback','Revenue Share':'n_rev_share'}[mechVal];
+  return k ? (d[k] || 0) > 0 : d.mechanics.split(',').map(s=>s.trim()).includes(mechVal);
+}
+// Helper: match region chip against DB region strings (chip labels differ from DB values)
+function _regionMatch(dRegion, chipVal) {
+  if (!chipVal || chipVal === 'all') return true;
+  const m = {'Americas':['Latin America','North America'],
+             'Asia Pacific':['Asia','Oceania'],
+             'Other':['Other','CIS/FSU','Unknown']};
+  return (m[chipVal] || [chipVal]).includes(dRegion);
+}
+
 function renderExplorer() {
   const _fourPriceActive = window._fourPriceActive || false;
   const price  = getPriceKey();
@@ -2240,9 +2346,9 @@ function renderExplorer() {
   const prodOnly = prodBtn && prodBtn.dataset.active === '1';
 
   let data = COUNTRY_DATA.filter(d => {
-    if (region && d.region !== region) return false;
+    if (region && !_regionMatch(d.region, region)) return false;
     if (_explorerRFactorOnly) { if (!d.has_r_factor_tiers) return false; }
-    else if (mech && !d.mechanics.split(',').includes(mech)) return false;
+    else if (mech && !_mechMatch(d, mech)) return false;
     if (search && !d.country.toLowerCase().includes(search)) return false;
     if (prodOnly && (!d.prod_coverage_pct || d.prod_coverage_pct <= 5)) return false;
     return true;
@@ -2651,8 +2757,8 @@ async function renderWorldMap() {
   const mechLookup = {};
   const rfactorLookup = {};
   COUNTRY_DATA.forEach(d => {
-    const mOk = activeM === 'all' || d.mechanics.split(',').map(s=>s.trim()).includes(activeM);
-    const rOk = activeR === 'all' || (d.region && d.region.includes(activeR));
+    const mOk = activeM === 'all' || _mechMatch(d, activeM);
+    const rOk = activeR === 'all' || _regionMatch(d.region, activeR);
     if (mOk && rOk) {
       takeLookup[d.country] = d.take_75;
       mechLookup[d.country] = d.mechanics;
@@ -4048,6 +4154,9 @@ function loadCountryProfile(country) {
     ? `<div class="dd-mc-note">&#x2194; P10–P90 uncertainty band: <strong>${p10lo.toFixed(1)}%</strong> – <strong>${p10hi.toFixed(1)}%</strong> &nbsp;·&nbsp; P50 (base): <strong>${mc.p50.toFixed(1)}%</strong> &nbsp;·&nbsp; range reflects \$50–\$125/bbl price scenarios</div>`
     : '';
   const safe = country.replace(/[^a-z0-9]/gi,'_').toLowerCase();
+  // factsSection is referenced in the mainSections template; define it here in loadCountryProfile scope
+  const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+  const factsSection = `<div class="dd-section" id="dd-facts-${ddSlug}"><h3>Key Fiscal Parameters</h3><div id="dd-facts-content-${ddSlug}" style="color:var(--muted);font-size:12px;">Loading from API\u2026</div></div>`;
   const _grank = getGlobalTakeRank(country);
   const _grankHtml = _grank
     ? (function() {
@@ -4858,7 +4967,7 @@ function exportExplorer() {
   const fltRegion = document.getElementById('flt-region').value;
   const fltSearch = document.getElementById('flt-search').value.trim().toLowerCase();
   let data = COUNTRY_DATA.filter(d => {
-    if (fltMech && !d.mechanics.includes(fltMech)) return false;
+    if (fltMech && !_mechMatch(d, fltMech)) return false;
     if (fltRegion && d.region !== fltRegion) return false;
     if (fltSearch && !d.country.toLowerCase().includes(fltSearch)) return false;
     return true;
