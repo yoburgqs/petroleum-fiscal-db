@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>ORCA v50 — Petroleum Fiscal Intelligence</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
@@ -933,6 +934,44 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   @page { size: A4 landscape; margin: 15mm; }
 }
 
+
+/* ── Mobile search overlay fixes ── */
+@media (max-width: 768px) {
+  #search-overlay { padding-top: 20px; }
+  #search-results { max-height: 240px; }
+  #search-modal { max-height: 85vh; overflow-y: auto; }
+}
+
+/* ── Mobile Regime Explorer — hide secondary columns ── */
+@media (max-width: 768px) {
+  /* Hide Breakeven, Swing, Stability headers and cells */
+  #tbl-explorer th[data-sort-key="be"],
+  #tbl-explorer th[data-sort-key="swing"],
+  #tbl-explorer th.num:last-child { display: none; }
+  /* Hide corresponding td cells — 7th, 8th, 9th columns */
+  #tbl-explorer tbody td:nth-child(7),
+  #tbl-explorer tbody td:nth-child(8),
+  #tbl-explorer tbody td:nth-child(9) { display: none; }
+  /* Disable 4-Price button on mobile — it adds 3 more columns */
+  button[onclick="toggleFourPrice(this)"] {
+    display: none !important;
+  }
+  /* Hide the mp-cols if somehow active */
+  .expl-mp-col { display: none !important; }
+}
+
+/* ── Mobile API tab — URL overflow ── */
+@media (max-width: 768px) {
+  #t9 a, #t9 code, #t9 pre { word-break: break-all; overflow-wrap: break-word; }
+}
+
+/* ── Mobile compare grid — horizontal scroll wrapper ── */
+@media (max-width: 600px) {
+  .compare-grid { 
+    grid-template-columns: 100px repeat(2, 1fr) !important;
+    font-size: 10px;
+  }
+}
 </style>
 </head>
 <body>
@@ -1156,7 +1195,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
   <div style="margin-top:24px;background:var(--surface);border-radius:10px;padding:16px;">
     <div style="font-weight:600;color:var(--text);margin-bottom:12px;font-size:13px;">IRR vs Government Take <span style="color:var(--muted);font-weight:400;font-size:11px;">— bubble size = contract count, colored by mechanic</span></div>
-    <canvas id="irr-scatter-canvas" height="220" style="width:100%;display:block;cursor:crosshair;"></canvas>
+    <canvas id="irr-scatter-canvas" style="width:100%;display:block;cursor:crosshair;"></canvas>
     <div id="irr-scatter-tooltip" style="position:fixed;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 10px;font-size:12px;color:#f1f5f9;pointer-events:none;display:none;z-index:9999;"></div>
     <div style="margin-top:8px;font-size:11px;color:var(--muted);">
       <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e8a020;margin-right:4px;"></span>Concession
@@ -1305,10 +1344,10 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="position:absolute;top:8px;right:8px;z-index:10;">
       <button class="btn btn-outline btn-sm" onclick="downloadCmpChart()" title="Download chart as PNG">⬇ PNG</button>
     </div>
-    <canvas id="cmp-chart" height="120"></canvas>
+    <canvas id="cmp-chart"></canvas>
   </div>
   <div id="cmp-npv-chart-wrap" class="chart-wrap" style="display:none;margin-top:8px;">
-    <canvas id="cmp-npv-chart" height="100"></canvas>
+    <canvas id="cmp-npv-chart"></canvas>
   </div>
 </div>
 
@@ -1344,7 +1383,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 
   <div class="chart-wrap" style="margin-top:16px;max-height:400px;">
-    <canvas id="vintage-chart" height="130"></canvas>
+    <canvas id="vintage-chart"></canvas>
   </div>
 
   <!-- Reform History Browser -->
