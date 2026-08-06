@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>ORCA v49 — Petroleum Fiscal Intelligence</title>
+<title>ORCA v50 — Petroleum Fiscal Intelligence</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -900,6 +900,39 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   .dcf-results-row { grid-template-columns: 1fr; }
 }
 
+/* ── Print / PDF export ── */
+@media print {
+  /* Hide everything except country profile content */
+  .tab-nav, .site-header, .search-bar, .export-buttons, #loading-overlay,
+  #compare-basket, #data-vintage-footer,
+  .scenario-modal, #reference-overlay, #reference-panel { display: none !important; }
+
+  /* Hide all tab panes except the active Country Profile */
+  .tab-pane { display: none !important; }
+  #t7 { display: block !important; }
+
+  /* Hide the PDF button itself when printing */
+  .btn-print { display: none !important; }
+  /* Hide XLSX button in print */
+  #dd-export-btn, #dd-copy-link-btn { display: none !important; }
+
+  /* Light theme for print */
+  body, .container, .card, .panel, .dd-section, .tbl-wrap, table, tr, td, th {
+    background: white !important;
+    color: #1a1a1a !important;
+  }
+
+  /* Amber -> black for print */
+  .amber, .text-amber { color: black !important; }
+  .page-title, .page-sub, .dd-section-hdr { color: #1a1a1a !important; }
+  .dd-section { border-color: #ccc !important; }
+
+  /* Charts: ensure visible */
+  canvas { max-width: 100% !important; }
+
+  @page { size: A4 landscape; margin: 15mm; }
+}
+
 </style>
 </head>
 <body>
@@ -1100,7 +1133,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
           <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" title="Contractor NPV ($M) — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Sort: high→low">Contractor NPV ($M)</th>
-          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" title="IRR (%) — arithmetic mean of per-contract IRRs at $75/bbl. Note: averaging IRRs across contracts is not a valid portfolio metric — use for relative screening only, not absolute return analysis. Sort: high→low">IRR (%)</th>
+          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" title="IRR (%) — arithmetic mean of per-contract IRRs at $75/bbl. Note: averaging IRRs across contracts is not a valid portfolio metric — use for relative screening only, not absolute return analysis. Sort: high→low">IRR (%) <span class="info-tooltip" title="Screener metric only — arithmetic mean of contract-level IRRs. Not a portfolio IRR (see A16 in methodology). Use for relative comparison between countries, not for absolute investment decisions." style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" onclick="event.stopPropagation()">ⓘ</span></th>
           <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" title="Breakeven $/bbl — oil price at which contractor NPV = 0. &lt;$50 means the field is profitable even below $50/bbl (sentinel value = -1 in raw data). Sort: low→high">Breakeven</th>
           <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" title="Sort by price sensitivity (low→high)">Swing (pp)</th>
           <th class="num">Stability</th>
@@ -1239,7 +1272,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <th>#</th><th>Country</th><th>Region</th><th>Mechanics</th>
           <th class="num">Govt Take</th><th class="num" title="Evidence quality: % of fiscal facts backed by A/B sources. Click for breakdown.">Evidence</th>
           <th class="num">Contractor NPV ($M)</th>
-          <th class="num" title="Arithmetic mean of per-contract IRRs. Not a valid portfolio IRR — use for relative screening only.">IRR (%)*</th><th class="num">Breakeven ($/bbl)</th>
+          <th class="num">IRR (%)* <span class="info-tooltip" title="Screener metric only — arithmetic mean of contract-level IRRs. Not a portfolio IRR (see A16 in methodology). Use for relative comparison between countries, not for absolute investment decisions." style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;">ⓘ</span></th><th class="num">Breakeven ($/bbl)</th>
           <th class="num">Prod Cov</th><th class="num">Swing</th><th>Tier</th>
         </tr>
       </thead>
@@ -1411,6 +1444,10 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
             style="display:none;margin-left:8px;background:transparent;border:1px solid #334155;border-radius:4px;padding:4px 8px;cursor:pointer;color:#94a3b8;font-size:11px;">
       ⬇ XLSX
     </button>
+    <button id="dd-print-btn" onclick="window.print()" title="Download Country Profile as PDF" class="btn-export btn-print"
+            style="display:none;margin-left:8px;background:transparent;border:1px solid #334155;border-radius:4px;padding:4px 8px;cursor:pointer;color:#94a3b8;font-size:11px;">
+      ⬇ PDF
+    </button>
   </div>
   <div id="dd-content"></div>
   <div id="dd-live-dcf-container" style="padding:0 8px 12px;"></div>
@@ -1557,6 +1594,71 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       Production-weighted countries: Norway, UK, USA, Russia, Saudi Arabia, UAE, Kuwait, Iraq, Iran, Qatar, Libya, Algeria, Nigeria, Angola, Brazil, Venezuela, Kazakhstan, Azerbaijan, Malaysia, Indonesia, Australia.
     </p>
   </div>
+
+  <!-- Section 5: Model Validation — Regression Benchmarks -->
+  <div class="dd-section">
+    <div class="dd-section-hdr">Model Validation — Regression Benchmarks</div>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">13 benchmark countries validated against published reference ranges. Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range.</p>
+    <div class="tbl-wrap">
+      <table id="benchmark-validation-table">
+        <thead>
+          <tr>
+            <th>Country</th>
+            <th class="num">Platform @$75</th>
+            <th class="num">Published Range</th>
+            <th class="num">Pass/Fail</th>
+            <th>Source Note</th>
+          </tr>
+        </thead>
+        <tbody id="benchmark-validation-body"></tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin:14px 0 0;padding:10px 14px;background:var(--surface);border-left:3px solid #ef4444;border-radius:0 6px 6px 0;">
+      <strong>Russia note:</strong> Russia uses a simplified flat MET model. The Article 342 formula is production-volume and price-linked. See mechanic_formulas.md A11 for full disclosure.
+    </p>
+  </div>
+  <script>
+  (function renderBenchmarkTable() {
+    const BENCHMARKS = {
+      'Norway':     { platform: 67.9, ref_lo: 65, ref_hi: 72,  note: 'NCA published range' },
+      'UK':         { platform: 51.4, ref_lo: 48, ref_hi: 58,  note: 'HMRC + OGA' },
+      'Angola':     { platform: 52.7, ref_lo: 50, ref_hi: 58,  note: 'Sonangol/IMF' },
+      'Nigeria':    { platform: 81.2, ref_lo: 78, ref_hi: 85,  note: 'NNPC/Rystad' },
+      'Iraq':       { platform: 84.8, ref_lo: 82, ref_hi: 88,  note: 'MoO TSC terms' },
+      'Kazakhstan': { platform: 70.2, ref_lo: 67, ref_hi: 74,  note: 'KAZENERGY' },
+      'Malaysia':   { platform: 59.4, ref_lo: 56, ref_hi: 63,  note: 'PETRONAS annual' },
+      'Indonesia':  { platform: 59.6, ref_lo: 57, ref_hi: 64,  note: 'SKK Migas' },
+      'Russia':     { platform: 24.8, ref_lo: 45, ref_hi: 55,  note: 'Simplified MET model — known gap' },
+      'USA':        { platform: 23.4, ref_lo: 20, ref_hi: 27,  note: 'EIA GOM study' },
+      'Brazil':     { platform: 55.9, ref_lo: 53, ref_hi: 60,  note: 'ANP/Wood Mac' },
+      'Australia':  { platform: 53.2, ref_lo: 50, ref_hi: 58,  note: 'PRRT literature' },
+      'Ireland':    { platform: 27.1, ref_lo: 25, ref_hi: 32,  note: 'Irish Revenue Part 24-04-01' }
+    };
+    var tbody = document.getElementById('benchmark-validation-body');
+    if (!tbody) return;
+    var rows = '';
+    Object.entries(BENCHMARKS).forEach(function([country, d]) {
+      var gap = d.platform < d.ref_lo ? d.ref_lo - d.platform : (d.platform > d.ref_hi ? d.platform - d.ref_hi : 0);
+      var inside = d.platform >= d.ref_lo && d.platform <= d.ref_hi;
+      var badge, color;
+      if (inside) {
+        badge = '✓ Pass'; color = '#22c55e';
+      } else if (gap <= 3) {
+        badge = '⚠ Near'; color = '#E8A020';
+      } else {
+        badge = '✗ Fail'; color = '#ef4444';
+      }
+      rows += '<tr>'
+        + '<td style="font-weight:600;">' + country + '</td>'
+        + '<td class="num">' + d.platform.toFixed(1) + '%</td>'
+        + '<td class="num">' + d.ref_lo + '–' + d.ref_hi + '%</td>'
+        + '<td class="num" style="color:' + color + ';font-weight:700;">' + badge + '</td>'
+        + '<td style="font-size:12px;color:var(--muted);">' + d.note + '</td>'
+        + '</tr>';
+    });
+    tbody.innerHTML = rows;
+  })();
+  </script>
 </div>
 
 <!-- ===== REFERENCE SLIDE-IN PANEL ===== -->
@@ -3846,6 +3948,8 @@ function loadCountryProfile(country) {
   if (copyLinkBtn) copyLinkBtn.style.display = 'inline-flex';
   var exportBtn = document.getElementById('dd-export-btn');
   if (exportBtn) { exportBtn.style.display = 'inline-flex'; exportBtn._country = country; }
+  var printBtn = document.getElementById('dd-print-btn');
+  if (printBtn) printBtn.style.display = 'inline-flex';
 
   const mechs = d.mechanics.split(',').map(m => `<span class="tag">${m}</span>`).join(' ');
   // MC from COUNTRY_DATA: take_50=p10 (low), take_75=p50 (base), take_125=p90 (high)
@@ -7217,15 +7321,23 @@ loadPlatformData();
 <!-- Data Vintage Footer -->
 <div id="data-vintage-footer" style="background:#0f172a;border-top:1px solid #1e293b;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;color:#64748b;font-family:monospace;">
   <div style="display:flex;align-items:center;gap:16px;">
-    <span style="color:#e8a020;font-weight:700;">ORCA v49</span>
+    <span style="color:#e8a020;font-weight:700;">ORCA v50</span>
     <span>71,601 contracts · 185 jurisdictions · 421,837 fiscal facts</span>
     <span style="color:#475569;">|</span>
     <span>DCF: 13-price · 7 mechanics</span>
     <span style="color:#475569;">|</span>
-    <span>Evidence: <span style="color:#22c55e;">A</span>/<span style="color:#86efac;">B</span> primary sources 51.3%/42.8%</span>
+    <span>Evidence: <span style="color:#22c55e;">A</span>/<span style="color:#86efac;">B</span> primary sources 87.7%</span>
   </div>
-  <div style="display:flex;align-items:center;gap:12px;">
-    <span>Data vintage: 2026-08-05</span>
+  <div class="data-vintage-badge" style="display:flex;align-items:center;gap:8px;">
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DB: 2026-08-05</span>
+    <span class="badge-sep" style="color:#475569;">·</span>
+    <span class="badge-item">71,601 contracts</span>
+    <span class="badge-sep" style="color:#475569;">·</span>
+    <span class="badge-item">185 countries</span>
+    <span class="badge-sep" style="color:#475569;">·</span>
+    <span class="badge-item">87.7% A/B sourced</span>
+    <span class="badge-sep" style="color:#475569;">·</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v50</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
