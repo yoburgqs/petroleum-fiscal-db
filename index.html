@@ -5028,6 +5028,8 @@ window.exportExplorer       = exportExplorer;
 window.renderMechanics      = renderMechanics;
 window.renderReformTable    = renderReformTable;
 window.MECHANICS_INFO       = MECHANICS_INFO;
+// Now that MECHANICS_INFO is available, populate the reference panel list
+if (typeof _renderRefMechanics === 'function') _renderRefMechanics();
 }
 
 function loadAPIJson(country) {
@@ -7324,9 +7326,10 @@ function closeScenarioModal() {
   document.getElementById('scenario-modal').classList.remove('open');
 }
 
-(function v38Init() {
+function _renderRefMechanics() {
+  const list = window.MECHANICS_INFO || [];
   let refHtml = '';
-  MECHANICS_INFO.forEach(m => {
+  list.forEach(m => {
     refHtml += '<div class="ref-mech">';
     refHtml += '<div class="ref-mech-name" style="color:' + m.color + '">' + m.name + '</div>';
     refHtml += '<div class="ref-mech-desc">' + m.how + '</div>';
@@ -7335,6 +7338,11 @@ function closeScenarioModal() {
   });
   const refContainer = document.getElementById('ref-mechanics-list');
   if (refContainer) refContainer.innerHTML = refHtml;
+}
+(function v38Init() {
+  _renderRefMechanics(); // may be empty until initPlatform runs; re-called after
+  const refContainer = document.getElementById('ref-mechanics-list');
+  if (refContainer) { /* populated by _renderRefMechanics */ }
 
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
