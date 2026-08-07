@@ -193,3 +193,16 @@ Scope expansion: [what was added to grader]
   7. Search: Region name search enabled ("middle" → Middle East countries, "africa" → Africa countries)
   8. Version: v51 → v52 in title and footer
 - Grades updated: IA B- → B+, Interaction Design B → B+, Data Presentation B+ → A-, Accessibility B → B+, Search Quality A- → A
+
+---
+## Cycle 2 Log — 2026-08-07 14:04
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 2 complete. Here's what was shipped to the platform:
+
+**8 fixes across 6 categories (v51 â†’ v52):**
+
+- **Tab bar: 12 â†’ 8 tabs** â€” Vintage, Mechanics, Methodology, API moved behind a `Reference â–¾` dropdown. No more horizontal scroll past irrelevant tabs for a first-time viewer.
+- **Fiscal Compare auto-refresh** â€” Profile/Price selects now re-run comparison automatically when changed (if results already exist). No more manual "Run Compare" click after every filter change.
+- **4-Pric
