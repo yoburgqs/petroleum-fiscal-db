@@ -3789,7 +3789,7 @@ document.getElementById('ioc-search').addEventListener('keydown', e => {
   }
 });
 
-function loadIOCAggregated(brandName, operatorList) {
+window.loadIOCAggregated = function(brandName, operatorList) {
   const statsDiv = document.getElementById('ioc-stats');
   const outDiv   = document.getElementById('ioc-output');
   // Collect all rows for all matching operators
@@ -3852,9 +3852,9 @@ function loadIOCAggregated(brandName, operatorList) {
   outDiv.className='';
   outDiv.innerHTML=`${disclosureBanner}<div style="margin-bottom:14px;"><h3 style="font-size:16px;font-weight:800;margin:0;">${brandName} Portfolio</h3><span style="font-size:11px;color:var(--muted);">${operatorList.length} entity name(s) matched</span></div>${tbl}`;
   document.getElementById('ioc-suggestions').innerHTML='';
-}
+};
 
-function loadIOC(operator) {
+window.loadIOC = function(operator) {
   const statsDiv = document.getElementById('ioc-stats');
   const outDiv   = document.getElementById('ioc-output');
   // v41: NOC exclusion — redirect if searching for a state-owned company
@@ -3932,7 +3932,7 @@ function loadIOC(operator) {
   outDiv.className='';
   outDiv.innerHTML=`${disclosureBanner}<div style="display:flex;align-items:center;margin-bottom:14px;"><h3 style="font-size:16px;font-weight:800;margin:0;">${operator}</h3>${compareBtnHtml}</div>${tbl}${nocFootnote}`;
   document.getElementById('ioc-suggestions').innerHTML='';
-}
+};
 
 // ─── TAB 6: Mechanics Guide ───────────────────────────────────────────────────
 const MECHANICS_INFO = [
