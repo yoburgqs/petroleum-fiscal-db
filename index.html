@@ -1146,7 +1146,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v53</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v54</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1504,9 +1504,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div><!-- end browse mode -->
   <div id="explorer-screen-mode" style="display:none">
 
-  <div class="page-title">Investment Screener</div>
+  <div class="page-title">Screener</div>
   <div class="page-sub">Filter countries by fiscal criteria at the selected price point to identify the most attractive regimes.</div>
-  <div style="background:rgba(212,160,23,.08);border-left:3px solid #d4a017;border-radius:0 6px 6px 0;padding:9px 14px;margin-bottom:16px;font-size:12px;color:#f0c060;"><strong style="color:#d4a017;">Investment Screener</strong> — Filter contracts by return threshold, region, and mechanic. Use pre-sets for quick starting points or set sliders manually.</div>
+  <div style="background:rgba(212,160,23,.08);border-left:3px solid #d4a017;border-radius:0 6px 6px 0;padding:9px 14px;margin-bottom:16px;font-size:12px;color:#f0c060;"><strong style="color:#d4a017;">Screener</strong> — Filter contracts by return threshold, region, and mechanic. Use pre-sets for quick starting points or set sliders manually.</div>
 
   <div class="card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
@@ -1891,6 +1891,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v54 (Aug 2026)</strong> — All browser alert() dialogs replaced with styled toast notifications (11 instances); "Investment Screener" renamed to "Screener" for consistency; source comment cleanup (Country Profile terminology); version badge aligned to v54.<br>
       <strong>v53 (Aug 2026)</strong> — Country Profile welcome panel with quick-access country cards (empty states); CDN resilience via onerror fallbacks on all external script/style tags; keyboard accessibility on Reference dropdown; Scenario Builder UX: Run DCF button elevated to top of panel; Regime Explorer streamlined to 3-button mechanic toggle; data coverage transparency: IRR and breakeven null values now display tooltip explanations.<br>
       <strong>v52 (Aug 2026)</strong> — Tab navigation streamlined (8 primary tabs + Reference dropdown), Fiscal Compare auto-refreshes on filter change, NPV formatting unified, region search added, skip-to-content accessibility link.<br>
       <strong>v51 (Aug 2026)</strong> — 118-test Playwright suite passing, ARIA roles, export improvements, error states, naming fixes.<br>
@@ -2944,7 +2945,7 @@ function renderExplorer() {
       ? `<span style="background:rgba(45,212,191,.15);border:1px solid rgba(45,212,191,.3);border-radius:4px;padding:1px 5px;font-size:9px;color:#2dd4bf;font-weight:700;margin-left:4px;vertical-align:middle;" title="${d.prod_coverage_pct.toFixed(1)}% of contracts have verified production data — production chart available">Prod</span>`
       : '';
     const safeExpl = d.country.replace(/'/g,"\\'");
-    return `<tr data-country="${d.country}" style="cursor:pointer;" onclick="openCountryProfileFromFC('${safeExpl}')" title="Click to open ${d.country} profile">
+    return `<tr data-country="${d.country}" style="cursor:pointer;" onclick="openCountryProfileFromFC('${safeExpl}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to open ${d.country} profile">
       <td class="num" style="color:var(--muted)">${i+1}</td>
       <td><button onclick="addToBasket('${d.country.replace(/'/g,"\\'")}');event.stopPropagation();" title="Add to compare basket" style="background:transparent;border:1px solid #334155;color:#64748b;border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;">+</button></td>
       <td><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:9px;color:#2dd4bf;font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''}${prodBadge} ${getDQBadge(d)}</td>
@@ -4328,6 +4329,17 @@ function renderMechanics() {
 // ─── F3: Global Search (Ctrl+K) ──────────────────────────────────────────────
 let _searchFocusIdx = -1;
 
+function _getRecentSearches() {
+  try { return JSON.parse(sessionStorage.getItem('orca-recent-searches') || '[]'); } catch(e) { return []; }
+}
+function _saveRecentSearch(query) {
+  if (!query || query.trim().length < 2) return;
+  var q2 = query.trim().toLowerCase();
+  var recent = _getRecentSearches().filter(s => s !== q2);
+  recent.unshift(q2);
+  try { sessionStorage.setItem('orca-recent-searches', JSON.stringify(recent.slice(0, 5))); } catch(e) {}
+}
+
 function openSearch() {
   document.getElementById('search-overlay').classList.add('open');
   const q = document.getElementById('search-q');
@@ -4353,7 +4365,18 @@ function renderSearchResults() {
   _searchFocusIdx = -1;
 
   if (!q) {
-    container.innerHTML = '<div class="search-empty">Type to search countries and mechanics…</div>';
+    var recent = _getRecentSearches();
+    if (recent.length) {
+      var recentHtml = '<div class="search-section-hdr">Recent Searches</div>';
+      recent.forEach(function(term) {
+        recentHtml += '<div class="search-result" style="gap:8px;" onclick="document.getElementById(\'search-q\').value=\'' + term.replace(/'/g,"\\'") + '\';renderSearchResults();">'
+          + '<span style="color:var(--muted);font-size:13px;">&#x1f55b;</span>'
+          + '<div><div class="sr-name" style="color:var(--muted);">' + term + '</div></div></div>';
+      });
+      container.innerHTML = recentHtml;
+    } else {
+      container.innerHTML = '<div class="search-empty">Type to search countries and mechanics…</div>';
+    }
     return;
   }
 
@@ -4426,6 +4449,7 @@ function updateSearchFocus(results) {
 
 function selectSearchResult(el) {
   const type = el.dataset.type;
+  _saveRecentSearch(document.getElementById('search-q').value);
   if (type === 'country') {
     const country = el.dataset.country;
     closeSearch();
@@ -4453,7 +4477,7 @@ function selectSearchResult(el) {
   }
 }
 
-// ─── TAB 7: Country Deep-Dive ────────────────────────────────────────────────
+// ─── TAB 7: Country Profile ──────────────────────────────────────────────────
 function renderReformTimeline(country) {
   // Fiscal facts from API JSON
   const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -5586,14 +5610,14 @@ renderVintage();
 renderReformTable();
 renderMechanics();
 
-// ─── EXPORT: Country Deep-Dive → Excel ───────────────────────────────────────
+// ─── EXPORT: Country Profile → Excel ─────────────────────────────────────────
 function exportCountryProfile() {
-  if (typeof XLSX === 'undefined') { alert('Excel library not loaded.'); return; }
+  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
   const btn = document.getElementById('dd-export-btn');
   const country = btn ? btn._country : null;
-  if (!country) { alert('No country selected.'); return; }
+  if (!country) { showCopyToast('No country selected — open a Country Profile first.'); return; }
   const d = COUNTRY_DATA.find(x => x.country === country);
-  if (!d) { alert('Country data not found.'); return; }
+  if (!d) { showCopyToast('Country data not found.'); return; }
 
   // Sheet 1: 4-Price Summary
   const summaryRows = [
@@ -5670,7 +5694,7 @@ function exportCountryProfile() {
 
 // ─── EXPORT: Global Explorer → Excel (v28) ───────────────────────────────────
 function exportExplorer() {
-  if (typeof XLSX === 'undefined') { alert('Excel library not loaded. Check internet connection.'); return; }
+  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
   const price = parseInt(document.querySelector('input[name="price"]:checked')?.value || 75);
   const fltMech = document.getElementById('flt-mech').value;
   const fltRegion = document.getElementById('flt-region').value;
@@ -6622,7 +6646,7 @@ function ddAddCompare(country, btn) {
 }
 
 function exportScreenerExcel() {
-  if (typeof XLSX === 'undefined') { alert('Excel library not loaded.'); return; }
+  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
   var data = window._screenerData || [];
   var rows = data.map(function(d,i) {
     return {
@@ -6664,7 +6688,7 @@ function downloadCmpChart() {
 function downloadBubblePng() {
   var canvas = document.getElementById('explorer-bubble-canvas');
   if (!canvas) {
-    alert('No bubble chart found. Make sure Bubble Chart mode is active.');
+    showCopyToast('Switch to Bubble Chart mode first, then download.');
     return;
   }
   var a = document.createElement('a');
@@ -6826,18 +6850,18 @@ function copyExplorerLink() {
   }).catch(function(){ prompt('Copy this link:', url); });
 }
 
-function showCopyToast() {
+function showCopyToast(msg) {
   var toast = document.getElementById('copy-toast');
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'copy-toast';
     toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e293b;border:1px solid #e8a020;color:#f1f5f9;padding:8px 16px;border-radius:4px;font-size:12px;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;';
-    toast.textContent = 'Link copied to clipboard';
     document.body.appendChild(toast);
   }
+  toast.textContent = msg || 'Link copied to clipboard';
   toast.style.opacity = '1';
   clearTimeout(toast._hideTimer);
-  toast._hideTimer = setTimeout(function(){ toast.style.opacity = '0'; }, 2000);
+  toast._hideTimer = setTimeout(function(){ toast.style.opacity = '0'; }, 2500);
 }
 
 function showRoutingHint() {
@@ -7214,7 +7238,7 @@ function runLiveDCF(country, profileKey, price) {
 }
 
 // ================================================================
-// v30 — Live DCF Panel: inject into Country Deep-Dive
+// v30 — Live DCF Panel: inject into Country Profile
 // ================================================================
 
 function renderLiveDCFPanel(country, containerId) {
@@ -7789,9 +7813,9 @@ ${wfHtml}
 }
 
 function saveCustomScenario() {
-  if (!window._lastScenario) { alert('Run a DCF first.'); return; }
+  if (!window._lastScenario) { showCopyToast('Run a DCF first, then save.'); return; }
   const saved = JSON.parse(localStorage.getItem('customScenarios') || '[]');
-  if (saved.length >= 5) { alert('Max 5 saved scenarios. Clear one first.'); return; }
+  if (saved.length >= 5) { showCopyToast('Max 5 saved scenarios — clear one first.'); return; }
   const name = prompt('Scenario name (e.g. "Norway base"):', window._lastScenario.mech + ' @$' + window._lastScenario.price);
   if (!name) return;
   saved.push({ name, ...window._lastScenario, savedAt: new Date().toISOString() });
@@ -8989,9 +9013,9 @@ function renderDrawerWaterfall(canvasId, waterfallData) {
 }
 
 function exportFCResults() {
-  if (typeof XLSX === 'undefined') { alert('Excel library not loaded. Check internet connection.'); return; }
+  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
   const rows = window._fcResults;
-  if (!rows || !rows.length) { alert('Run Fiscal Compare first to generate results.'); return; }
+  if (!rows || !rows.length) { showCopyToast('Run Fiscal Compare first to generate results.'); return; }
   const data = [
     ['Rank', 'Country', 'Region', 'Mechanic', 'R_factor_Tiers', 'Take%', 'GovtTake_50', 'GovtTake_75', 'GovtTake_100', 'GovtTake_125', 'Swing_pp', 'Govt NPV ($M est)', 'Contractor NPV ($M)', 'IRR%', 'Breakeven', 'Tier'],
     ...rows.map(function(r, i) {
@@ -9280,7 +9304,7 @@ function renderBasket() {
 
 function addToBasket(country) {
   if (window.compareBasket.size >= 5) {
-    alert('Max 5 countries in basket. Remove one first.');
+    showCopyToast('Max 5 countries in basket — remove one first.');
     return;
   }
   window.compareBasket.add(country);
@@ -9646,7 +9670,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v53</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v54</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
