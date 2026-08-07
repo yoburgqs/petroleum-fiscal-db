@@ -1055,6 +1055,66 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   .ioc-checkbox-grid { grid-template-columns: 1fr !important; }
 }
 
+/* ── v54: Mobile experience improvements ── */
+
+/* Fix 5: Sticky site header on mobile */
+@media (max-width: 768px) {
+  .site-header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+  }
+}
+
+/* Fix 6: Touch targets — [role="button"] and Explorer mode buttons */
+@media (max-width: 768px) {
+  [role="button"],
+  .expl-mode-btn {
+    min-height: 44px !important;
+    min-width: 44px !important;
+  }
+}
+
+/* Fix 7: Scenario Builder modal — small-screen padding and grid */
+@media (max-width: 768px) {
+  #scenario-modal {
+    padding-top: 20px !important;
+    align-items: flex-start !important;
+  }
+  #scenario-modal-inner {
+    max-height: 85vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px !important;
+  }
+  .scenario-inputs {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Fix 8: IOC Portfolio — table overflow and cramped layout on mobile */
+@media (max-width: 768px) {
+  #ioc-result-area {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  #t6 table,
+  #ioc-exposure-output table {
+    font-size: 0.75rem !important;
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+  #t6 table thead,
+  #t6 table tbody,
+  #t6 table tr,
+  #ioc-exposure-output table thead,
+  #ioc-exposure-output table tbody,
+  #ioc-exposure-output table tr {
+    display: revert !important;
+  }
+}
+
 @media print {
   .tab-nav, .site-header nav, .expl-mode-btn { display: none !important; }
   .tab-panel { display: block !important; page-break-inside: avoid; }
@@ -1177,7 +1237,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       </div>
 
       <!-- Q&A examples -->
-      <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">What You Can Ask</div>
+      <div style="background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.3);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#f0c060;line-height:1.6;"><strong style="color:#d4a017;">New here?</strong> Start with <strong>Fiscal Compare</strong> to benchmark countries &rarr; then explore <strong>Country Profiles</strong> for detail &rarr; use the <strong>Screener</strong> (Regime Explorer &rarr; Screener tab) to filter by return threshold.</div>
+<div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">What You Can Ask</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
 
         <div style="background:rgba(255,255,255,.03);border-left:3px solid #2dd4bf;border-radius:0 6px 6px 0;padding:10px 12px;">
@@ -1294,7 +1355,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-sub">Browse the full database or screen by fiscal criteria.</div>
   <div class="explorer-mode-toggle" role="group" aria-label="Explorer view mode" style="display:flex;gap:0;margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--border);width:fit-content;">
     <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" onclick="switchExplorerMode('browse',this)" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#0B0F1A;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
-    <button id="mode-btn-screen" class="expl-mode-btn" data-mode="screen" onclick="switchExplorerMode('screen',this)" aria-pressed="false" title="Screen and rank countries by fiscal criteria" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;">Screener ⋮</button>
+    <button id="mode-btn-screen" class="expl-mode-btn" data-mode="screen" onclick="switchExplorerMode('screen',this)" aria-pressed="false" title="Screen and rank countries by fiscal criteria" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:2px solid #d4a017;font-size:13px;font-weight:600;cursor:pointer;">Screener ⋮ <span style="font-size:10px;color:#d4a017;vertical-align:middle;">★</span></button>
     <button id="mode-btn-bubble" class="expl-mode-btn" data-mode="bubble" onclick="switchExplorerMode('bubble',this)" aria-pressed="false" title="Scatter plot: Government Take vs Contractor NPV" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;">Bubble ◎</button>
   </div>
   <div id="explorer-browse-mode">
@@ -1445,6 +1506,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
   <div class="page-title">Investment Screener</div>
   <div class="page-sub">Filter countries by fiscal criteria at the selected price point to identify the most attractive regimes.</div>
+  <div style="background:rgba(212,160,23,.08);border-left:3px solid #d4a017;border-radius:0 6px 6px 0;padding:9px 14px;margin-bottom:16px;font-size:12px;color:#f0c060;"><strong style="color:#d4a017;">Investment Screener</strong> — Filter contracts by return threshold, region, and mechanic. Use pre-sets for quick starting points or set sliders manually.</div>
 
   <div class="card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
@@ -1564,6 +1626,12 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
       <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas"></canvas></div>
+      <div style="text-align:right;margin-top:8px;">
+        <button id="download-bubble-png" onclick="downloadBubblePng()"
+          style="padding:6px 14px;background:#1a2332;color:#d4a017;border:1px solid #d4a017;border-radius:4px;cursor:pointer;font-size:0.8rem;">
+          ↓ Download PNG
+        </button>
+      </div>
     </div>
     <div class="mobile-only" style="display:none;text-align:center;color:var(--muted);font-size:12px;margin-top:8px;">
       Tap a bubble to see country details. Showing top 30 regimes. Rotate to landscape for a better view.
@@ -6591,6 +6659,18 @@ function downloadCmpChart() {
   a.click();
 }
 
+function downloadBubblePng() {
+  var canvas = document.getElementById('explorer-bubble-canvas');
+  if (!canvas) {
+    alert('No bubble chart found. Make sure Bubble Chart mode is active.');
+    return;
+  }
+  var a = document.createElement('a');
+  a.download = 'orca-bubble-chart.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
 // ================================================================
 // URL Hash Routing — shareable deep links
 // Routes: #/profile/{slug}, #/compare/{slug+slug+...}, #/explorer, #/ioc
@@ -9139,7 +9219,11 @@ function toggleReferencePanel() {
 }
 
 function openScenarioBuilder() {
-  document.getElementById('scenario-modal').classList.add('open');
+  var modal = document.getElementById('scenario-modal');
+  modal.classList.add('open');
+  // Focus trap: move focus to first focusable element inside modal
+  var focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+  if (focusable.length) focusable[0].focus();
 }
 function closeScenarioModal() {
   document.getElementById('scenario-modal').classList.remove('open');
