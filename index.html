@@ -5892,7 +5892,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Is Southeast Asia cheap or expensive for IOCs vs global norms?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Asia Pacific average sits close to the global average. Indonesia's 58% is typical for a mid-tier PSC regime. The region's extremes are wider than they appear — Philippines TSC contracts near 100% vs some frontier Oceania regimes below 30%.</div>
       ${tbl([{label:'Country / Benchmark'},{label:'Region'},{label:'Govt Take @$75',align:'right'},{label:'Notes'}], asiaRows)}
-      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);const chip=document.querySelector('[data-filter=region][data-value=Asia]');if(chip)setExplorerChip('region','Asia',chip);}})()">Filter Asia in Explorer</button>
+      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);const chip=document.querySelector('[data-filter=region][data-value="Asia Pacific"]');if(chip)setExplorerChip('region','Asia Pacific',chip);}})()">Filter Asia Pacific in Explorer</button>
     </div>`;
 
   asiaGrid.innerHTML = cardA + cardB + cardC;
