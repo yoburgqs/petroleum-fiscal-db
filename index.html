@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>ORCA v50 — Petroleum Fiscal Intelligence</title>
+<title>ORCA v51 — Petroleum Fiscal Intelligence</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
@@ -3160,6 +3160,7 @@ document.addEventListener('click', e => {
 
 function addCompare(country) {
   if (compareList.includes(country) || compareList.length >= 4) return;
+  if (!COUNTRY_DATA || !COUNTRY_DATA.find(function(d){ return d.country === country; })) return;
   compareList.push(country);
   renderCompare();
   _updateCompareHash();
@@ -8138,7 +8139,9 @@ function openFCDrilldown(country) {
   if (row) {
     const newRow = document.createElement('tr');
     newRow.id = 'fc-drawer-row';
-    newRow.innerHTML = '<td colspan="10" style="padding:0;border:none">' + html + '</td>';
+    const _stabCheck = document.getElementById('fc-stability-check');
+    const _drawerColspan = (_stabCheck && _stabCheck.checked) ? 11 : 10;
+    newRow.innerHTML = '<td colspan="' + _drawerColspan + '" style="padding:0;border:none">' + html + '</td>';
     row.after(newRow);
     if (r.waterfall) {
       setTimeout(function() { renderDrawerWaterfall(canvasId, r.waterfall); }, 0);
@@ -9179,7 +9182,7 @@ loadPlatformData();
 <!-- Data Vintage Footer -->
 <div id="data-vintage-footer" style="background:#0f172a;border-top:1px solid #1e293b;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;color:#64748b;font-family:monospace;">
   <div style="display:flex;align-items:center;gap:16px;">
-    <span style="color:#e8a020;font-weight:700;">ORCA v50</span>
+    <span style="color:#e8a020;font-weight:700;">ORCA v51</span>
     <span>71,601 contracts · 185 jurisdictions · 330,329 fiscal facts</span>
     <span style="color:#475569;">|</span>
     <span>DCF: 13-price · 7 mechanics</span>
