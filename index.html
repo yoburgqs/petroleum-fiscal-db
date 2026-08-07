@@ -3426,7 +3426,7 @@ function runScreener() {
   const takeKey = `take_${price}`;
   const npvKey  = `npv_${price}`;
   const irrKey  = `irr_${price}`;
-  const beKey   = `be_${price}`;
+  const beKey   = 'be_75'; // breakeven is only computed at $75 — always use be_75
 
   const maxTake = +document.getElementById('sl-take').value;
   const maxBE   = +document.getElementById('sl-be').value;
