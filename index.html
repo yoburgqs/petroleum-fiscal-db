@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com;">
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2051,6 +2051,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.6;">
       <strong>Benchmark sources:</strong> Government take ranges validated against 13 publicly disclosed reference sets: Wood Mackenzie Fiscal Benchmarks; Rystad Energy UCube Country Profiles; S&amp;P Global Commodity Insights Fiscal Terms Database; IHS Markit Fiscal and Regulatory Updates; Norwegian Offshore Directorate (NCA) published range; HMRC/OGA UK fiscal take reports; EIA Gulf of Mexico fiscal study; ANP (Brazil) fiscal disclosure; KAZENERGY Annual Report; PETRONAS Annual Report; SKK Migas (Indonesia) contractor terms; Sonangol/IMF Angola fiscal review; NNPC/Rystad Nigeria fiscal benchmarks.
     </p>
+    <p class="table-footnote" style="font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.5;">&#8224; Government take calculated at $75/bbl Brent. Source: D&amp;M analysis, Wood Mackenzie reference.</p>
   </div>
 
   <!-- Known Model Limitations subsection -->
@@ -7750,7 +7751,7 @@ function runCustomScenario() {
   }
 
   const irrDisplay = result.irr !== null ? result.irr.toFixed(1) + '%' : 'n/a';
-  const npvDisplay = result.npv !== null ? (Math.abs(result.npv) >= 1000 ? (result.npv/1000).toFixed(1)+'B' : Math.round(result.npv)+'M') : 'n/a';
+  const npvDisplay = result.npv !== null ? fmtNpvShared(result.npv) : 'n/a';
   const takeColor = result.take > 70 ? '#f44336' : result.take > 50 ? '#ff9800' : '#4caf50';
   const irrColor = result.irr === null ? 'var(--muted)' : result.irr < 10 ? '#f44336' : result.irr < 20 ? '#ff9800' : '#4caf50';
   const npvColor = result.npv === null ? 'var(--muted)' : result.npv < 0 ? '#f44336' : '#4caf50';
@@ -7770,7 +7771,7 @@ function runCustomScenario() {
   </div>
   <div class="sb-result-card">
     <div class="sb-result-label">Contractor NPV</div>
-    <div class="sb-result-value" style="color:${npvColor}">$${npvDisplay}</div>
+    <div class="sb-result-value" style="color:${npvColor}">${npvDisplay}</div>
     <div class="sb-result-note">10% disc. rate</div>
   </div>
 </div>
@@ -8637,7 +8638,7 @@ function fetchCountryContracts(country) {
           + '<td style="color:var(--muted);font-size:11px;">' + (c.operator || '—') + '</td>'
           + '<td><span class="tag" style="font-size:10px;">' + (c.mechanic || c.type || '—') + '</span></td>'
           + '<td class="num" style="' + takeCol + ';font-weight:700;">' + (c.take != null ? c.take.toFixed(1) + '%' : '—') + '</td>'
-          + '<td class="num">' + (c.npv != null ? (Math.abs(c.npv) >= 1000 ? (c.npv/1000).toFixed(1)+'B' : Math.round(c.npv).toLocaleString()) : '—') + '</td>'
+          + '<td class="num">' + (c.npv != null ? fmtNpvShared(c.npv) : '—') + '</td>'
           + '<td class="num">' + (c.irr != null ? c.irr.toFixed(1) + '%' : '—') + '</td>'
           + (hasProd ? '<td class="num" style="color:#2dd4bf;">' + (c.prod_mmbbl != null ? c.prod_mmbbl.toFixed(1) : '—') + '</td>' : '')
           + '<td class="num" style="color:var(--muted);font-size:11px;">' + keyRate + '</td>'
