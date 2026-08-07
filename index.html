@@ -1454,7 +1454,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <th class="num expl-mp-col" style="display:none">@$50</th>
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
-          <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" title="Contractor NPV ($M) — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Sort: high→low">Contractor NPV ($M)</th>
+          <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
           <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
           <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
           <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" title="Sort by price sensitivity (low→high)">Swing (pp)</th>
@@ -1607,7 +1607,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <tr>
           <th>#</th><th>Country</th><th>Region</th><th>Mechanics</th>
           <th class="num">Govt Take</th><th class="num" title="Evidence quality: % of fiscal facts backed by A/B sources. Click for breakdown.">Evidence</th>
-          <th class="num">Contractor NPV ($M)</th>
+          <th class="num">Contractor NPV</th>
           <th class="num">IRR (%)* <span class="info-tooltip" title="Screener metric only — arithmetic mean of contract-level IRRs. Not a portfolio IRR (see A16 in methodology). Use for relative comparison between countries, not for absolute investment decisions." style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;">ⓘ</span></th><th class="num">Breakeven ($/bbl)</th>
           <th class="num">Prod Cov</th><th class="num">Swing</th><th>Tier</th>
         </tr>
