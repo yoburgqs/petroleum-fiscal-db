@@ -4418,16 +4418,16 @@ function renderSearchResults() {
       .sort(function(a, b) { return b.score - a.score; })
       .slice(0, 4);
     if (fuzzyMatches.length) {
-      var html = '<div class="search-section-hdr" style="color:#f97316;">Did you mean?</div>';
+      var fuzzyHtml = '<div class="search-section-hdr" style="color:#f97316;">Did you mean?</div>';
       fuzzyMatches.forEach(function(x) {
         var d = x.d;
         var take = d.take_75 !== null ? (isStateMonopoly(d.take_75) ? 'State monopoly' : d.take_75.toFixed(1) + '% take') : '';
         var mechs = d.mechanics.split(',').slice(0,2).join(', ');
-        html += '<div class="search-result" data-type="country" data-country="' + d.country + '" onclick="selectSearchResult(this)">'
+        fuzzyHtml += '<div class="search-result" data-type="country" data-country="' + d.country + '" onclick="selectSearchResult(this)">'
           + '<div><div class="sr-name">' + d.country + '</div><div class="sr-sub">' + d.region + ' · ' + mechs + '</div></div>'
           + '<div class="sr-take">' + (take ? '@$75: ' + take : '') + '</div></div>';
       });
-      container.innerHTML = html;
+      container.innerHTML = fuzzyHtml;
     } else {
       container.innerHTML = '<div class="search-empty">No results found.</div>';
     }
