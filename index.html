@@ -1161,7 +1161,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <button id="tab-btn-t0" class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('t0',this)" title="Compare fiscal terms across up to 5 countries">Fiscal Compare</button>
   <button id="tab-btn-tsamples" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tsamples',this)" title="Pre-built analyses illustrating common fiscal questions">Sample Analyses</button>
   <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t7',this)" title="Deep-dive into a single country's fiscal regime">Country Profile</button>
-  <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('texplorer',this)" title="Browse, screen, and visualize all 71,000+ contracts">Regime Explorer</button>
+  <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('texplorer',this)" title="Browse, screen, and visualize all 71,000+ contracts">Explorer</button>
   <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t5',this)" title="Simulate a portfolio of contracts by IOC operator">IOC Portfolio</button>
   <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t2',this)" title="Compare two countries in parallel">Side-by-Side</button>
   <button id="tab-btn-treformrisk" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('treformrisk',this)" title="Assess fiscal reform risk by country — legislative stability and rate change history">Reform Risk</button>
@@ -3651,7 +3651,7 @@ function renderCompare() {
         scales: {
           x: { ticks: { color: '#8892a8' }, grid: { color: '#2a3555' } },
           y: { ticks: { color: '#8892a8', callback: v => '$' + Math.round(v/1000).toLocaleString() + 'B' }, grid: { color: '#2a3555' },
-               title: { display: true, text: 'Contractor NPV ($M)', color: '#8892a8' } }
+               title: { display: true, text: 'Contractor NPV', color: '#8892a8' } }
         }
       }
     });
