@@ -1613,12 +1613,22 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section">
     <div class="dd-section-hdr">How Government Take is Calculated</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
-      All fiscal metrics are computed on a standardized project basis: <strong>$2B deepwater capex</strong>, <strong>25-year project life</strong> (10-year for buy-back contracts), and a <strong>10% discount rate</strong>. Government take is the undiscounted share of gross revenue captured by the state across all fiscal instruments.
+      All fiscal metrics are computed on a standardized project basis: <strong>$2B deepwater capex</strong>, <strong>25-year project life</strong> (10-year for buy-back contracts), and a <strong>10% discount rate</strong>. Government take is the undiscounted share of gross revenue captured by the state across <em>all</em> fiscal instruments.
     </p>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Formula</p>
+    <div style="background:#1e293b;border:1px solid #334155;border-left:3px solid #e8a020;border-radius:6px;padding:10px 14px;margin-bottom:14px;">
+      <span style="font-size:11px;font-weight:700;color:#e8a020;">Does govt take include income tax for concession regimes?</span>
+      <span style="font-size:12px;color:#94a3b8;margin-left:8px;">Yes. Income tax (CIT, RFCT, ring-fence tax) is explicitly included in the formula below for all mechanics including concessions. Norway's 67.8% includes SPT (56%) + ordinary CIT (22%). UK's 49.2% includes RFCT (40%) + EPL (32%) − RFES. USA's 24% includes federal income tax.</span>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Formula (all mechanics)</p>
     <pre style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 16px;font-size:12px;color:#8892a8;overflow:auto;margin:0 0 18px;">govt_take_pct = (royalties + income_tax + resource_rent_tax + profit_oil_state_share
                + bonuses + state_equity_carry + other_levies)
-               ÷ gross_undiscounted_revenue × 100</pre>
+               ÷ gross_undiscounted_revenue × 100
+
+Concession:   royalties + CIT/RFCT/SPT + resource_rent_tax (if applicable)
+PSC:          profit_oil_state_share + income_tax_on_contractor_profit_oil + FTP (if state gets FTP)
+TSC:          gross_revenue - contractor_fee  (≈ 100% minus fee margin)
+PRRT:         income_tax + PRRT (cash-flow-based RRT after threshold ROR)
+Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     <p style="font-size:13px;color:var(--text);margin:0 0 10px;font-weight:600;">9 Fiscal Mechanics</p>
     <div class="tbl-wrap">
       <table>
@@ -1918,9 +1928,21 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ── Sample Analyses Tab ── -->
 <div id="tsamples" class="tab-pane">
   <div class="page-title">Sample Analyses</div>
-  <div class="page-sub">Six pre-built comparisons drawn live from the database. Click any "Load" button to open the result in the full interactive tool.</div>
-  <div id="samples-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;margin-top:20px;align-items:start;">
-    <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading analyses…</div>
+  <div class="page-sub">Pre-built comparisons drawn live from 71,601 contracts. Click any "Load" button to open the result in the full interactive tool.</div>
+
+  <div style="margin-top:20px;">
+    <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Global Comparisons</div>
+    <div id="samples-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
+      <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading…</div>
+    </div>
+  </div>
+
+  <div style="margin-top:36px;">
+    <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Indonesia &amp; Asia Pacific</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">663 contracts across Indonesia's two PSC regimes, benchmarked against Southeast Asia peers and the global average.</div>
+    <div id="samples-grid-asia" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
+      <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading…</div>
+    </div>
   </div>
 </div>
 
@@ -5203,7 +5225,115 @@ function renderSampleAnalyses() {
       <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);setExplorerChip('mechanic','PSC',document.querySelector('[data-filter=mechanic][data-value=PSC]'));}})()">Filter PSC in Explorer</button>
     </div>`;
 
-  grid.innerHTML = card1 + card2 + card3 + card4 + card5 + card6;
+  // ── Card 7: Reserves vs Take ─────────────────────────────────────────────
+  // Proved reserves (Gb, approx BP Statistical Review 2023 / OPEC 2023)
+  const RESERVES = [
+    {c:'Venezuela',r:303},  {c:'Saudi Arabia',r:266}, {c:'Iran',r:210},
+    {c:'Canada',r:169},     {c:'Iraq',r:145},          {c:'Russia',r:107},
+    {c:'Kuwait',r:102},     {c:'UAE',r:100},            {c:'Libya',r:48},
+    {c:'Nigeria',r:37},     {c:'USA',r:35},             {c:'Kazakhstan',r:30},
+    {c:'Qatar',r:25},       {c:'Brazil',r:15},          {c:'Algeria',r:12},
+    {c:'Angola',r:8},       {c:'Norway',r:8},           {c:'Mexico',r:6},
+    {c:'Indonesia',r:3},    {c:'Malaysia',r:4},
+  ];
+  const resRows = RESERVES.map(({c,r}) => {
+    const d = cd.find(x => x.country === c);
+    const takeStr = d ? `<span style="color:${takeColor(d.take_75)};font-weight:600">${d.take_75.toFixed(1)}%</span>` : '<span style="color:#ef4444;font-size:10px;">state monopoly / no IOC</span>';
+    return [`<span style="color:${c==='Indonesia'?'#e8a020':'var(--text)'}${c==='Indonesia'?';font-weight:700':''}">${c}</span>`,
+            `${r} Gb`,
+            d ? (d.region||'—') : '—',
+            takeStr];
+  });
+  const card7 = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #ef4444;">
+      <div style="font-size:10px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Reserves vs Government Take</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">The biggest reserve holders charge the most. Which are accessible to IOCs?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Proved reserves (BP Statistical Review 2023). State monopolies (Saudi, Kuwait, Iran partially) have no IOC-accessible contracts. Government take = all instruments: royalties + income tax + resource rent tax + profit oil. Sorted by reserves descending.</div>
+      ${tbl([{label:'Country'},{label:'Reserves',align:'right'},{label:'Region'},{label:'Govt Take @$75',align:'right'}], resRows)}
+      <div style="font-size:10px;color:var(--muted);margin-top:8px;">Note: Canada figure includes oil sands (heavy oil — different economics). Indonesia highlighted in amber.</div>
+    </div>`;
+
+  grid.innerHTML = card1 + card2 + card3 + card4 + card5 + card6 + card7;
+
+  // ── Asia Pacific Section ─────────────────────────────────────────────────
+  const asiaGrid = document.getElementById('samples-grid-asia');
+  if (!asiaGrid) return;
+
+  // Card A: Southeast Asia PSC Bloc
+  const seaList = ['Indonesia','Malaysia','Vietnam','Myanmar','Thailand','Philippines','Papua New Guinea','Bangladesh','Pakistan'];
+  const seaRows = seaList.map(c => {
+    const d = cd.find(x => x.country === c);
+    if (!d) return null;
+    const hasGS = c === 'Indonesia'; // Gross Split flag
+    const mech = (d.n_tsc||0) > 0 && (d.n_psc||0) > 0 ? 'PSC+TSC' : (d.n_tsc||0) > 0 ? 'TSC' : (d.n_psc||0) > 0 ? (hasGS ? 'PSC+GS' : 'PSC') : d.mechanics || '—';
+    const isIndo = c === 'Indonesia';
+    const nameStr = isIndo ? `<span style="color:#e8a020;font-weight:700">&#9654; ${c}</span>` : `<span style="color:var(--text)">${c}</span>`;
+    return [nameStr, mech, d.n_contracts||'—',
+            `<span style="color:${takeColor(d.take_50)}">${fmt(d.take_50)}</span>`,
+            `<span style="color:${takeColor(d.take_75)};font-weight:600">${fmt(d.take_75)}</span>`,
+            `<span style="color:${takeColor(d.take_125)}">${fmt(d.take_125)}</span>`];
+  }).filter(Boolean);
+  const seaCmp = seaList.filter(c => cd.find(x=>x.country===c)).slice(0,4);
+  const cardA = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #0ea5e9;">
+      <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Southeast Asia PSC Bloc</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">How does Indonesia compare to its PSC neighbors?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All are PSC-dominant regimes. Indonesia (&#9654;) sits mid-range — Malaysia's Petronas terms are similar; Philippines uses service contracts (TSC) which extract nearly all economics. Bangladesh/Pakistan offer concession-lite terms.</div>
+      ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'}], seaRows)}
+      <button style="${btnStyle}" onclick="(function(){${seaCmp.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Compare Top 4 in Compare</button>
+    </div>`;
+
+  // Card B: Indonesia's Two Regimes (Traditional PSC vs Gross Split)
+  const indoMB = (typeof MECHANIC_BREAKDOWN !== 'undefined' && MECHANIC_BREAKDOWN['Indonesia']) || [];
+  const pscEntry = indoMB.find(x=>x.mechanic==='PSC') || {};
+  const gsEntry  = indoMB.find(x=>x.mechanic==='Gross Split') || {};
+  const indoTakeColor = takeColor;
+  const regimeRows = [
+    [`<span style="color:var(--text);font-weight:600">Traditional PSC</span>`,
+     `${pscEntry.n||644}`,`${pscEntry.pct||97}%`,
+     `<span style="color:${indoTakeColor(pscEntry.take||58.0)};font-weight:600">${(pscEntry.take||58.0).toFixed(1)}%</span>`,
+     `<span style="color:#22c55e">$${(pscEntry.npv||765)}M</span>`,
+     '<span style="color:var(--muted);font-size:10px">Cost recovery + profit split</span>'],
+    [`<span style="color:#f97316;font-weight:600">Gross Split (post-2017)</span>`,
+     `${gsEntry.n||19}`,`${gsEntry.pct||3}%`,
+     `<span style="color:${indoTakeColor(gsEntry.take||65.3)};font-weight:600">${(gsEntry.take||65.3).toFixed(1)}%</span>`,
+     `<span style="color:#ef4444">-$${Math.abs(gsEntry.npv||-216)}M</span>`,
+     '<span style="color:var(--muted);font-size:10px">Gross revenue split, no cost recovery</span>'],
+  ];
+  const cardB = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #e8a020;">
+      <div style="font-size:10px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Indonesia: Two Fiscal Regimes</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">When Indonesia introduced Gross Split PSCs in 2017, did IOCs get better or worse terms?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Gross Split (Permen ESDM No. 08/2017) eliminates cost recovery in exchange for a simpler gross revenue split. Result: government extracts 7.3pp more at $75/bbl and contractor NPV turns negative. IOCs strongly prefer traditional PSC — adoption has been slow.</div>
+      ${tbl([{label:'Regime'},{label:'Contracts',align:'right'},{label:'Share',align:'right'},{label:'Govt Take @$75',align:'right'},{label:'Contractor NPV',align:'right'},{label:'Structure',align:'right'}], regimeRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){const ddSel=document.getElementById('dd-country-select');if(ddSel){ddSel.value='Indonesia';loadCountryProfile('Indonesia');}const cpBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Country Profile'));if(cpBtn)switchTab('t7',cpBtn);})()">Open Indonesia Profile</button>
+    </div>`;
+
+  // Card C: Asia Pacific in Global Context
+  const asiaCountries = cd.filter(d => d.region === 'Asia' || d.region === 'Oceania');
+  const asiaAvg = asiaCountries.length ? asiaCountries.reduce((s,d)=>s+d.take_75,0)/asiaCountries.length : null;
+  const globalAvg = cd.reduce((s,d)=>s+d.take_75,0)/cd.length;
+  const asiaRanked = [...asiaCountries].sort((a,b)=>a.take_75-b.take_75);
+  const asiaRows = [
+    ...asiaRanked.slice(0,4).map(d=>[`<span style="color:#22c55e">${d.country}</span>`,d.region,`<span style="color:#22c55e;font-weight:600">${d.take_75.toFixed(1)}%</span>`,'Lowest in region']),
+    [`<span style="color:#e8a020;font-weight:700">Indonesia</span>`,'Asia',`<span style="color:#eab308;font-weight:600">${(cd.find(x=>x.country==='Indonesia')?.take_75||58).toFixed(1)}%</span>`,'PSC-dominant'],
+    [`<span style="color:var(--muted)">Asia Pacific avg</span>`,'—',`<span style="color:${takeColor(asiaAvg)}">${asiaAvg?asiaAvg.toFixed(1)+'%':'—'}</span>`,'${asiaCountries.length} countries'],
+    [`<span style="color:var(--muted)">Global avg</span>`,'—',`<span style="color:${takeColor(globalAvg)}">${globalAvg.toFixed(1)}%</span>`,'${cd.length} countries'],
+    ...asiaRanked.slice(-3).map(d=>[`<span style="color:#ef4444">${d.country}</span>`,d.region,`<span style="color:#ef4444;font-weight:600">${d.take_75.toFixed(1)}%</span>`,'Highest in region']),
+  ];
+  // fix template literal escapes
+  asiaRows[5][3] = asiaCountries.length + ' countries';
+  asiaRows[6][3] = cd.length + ' countries';
+  const cardC = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #a855f7;">
+      <div style="font-size:10px;font-weight:700;color:#a855f7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Asia Pacific in Global Context</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Is Southeast Asia cheap or expensive for IOCs vs global norms?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Asia Pacific average sits close to the global average. Indonesia's 58% is typical for a mid-tier PSC regime. The region's extremes are wider than they appear — Philippines TSC contracts near 100% vs some frontier Oceania regimes below 30%.</div>
+      ${tbl([{label:'Country / Benchmark'},{label:'Region'},{label:'Govt Take @$75',align:'right'},{label:'Notes'}], asiaRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);const chip=document.querySelector('[data-filter=region][data-value=Asia]');if(chip)setExplorerChip('region','Asia',chip);}})()">Filter Asia in Explorer</button>
+    </div>`;
+
+  asiaGrid.innerHTML = cardA + cardB + cardC;
 }
 window.renderSampleAnalyses = renderSampleAnalyses;
 
