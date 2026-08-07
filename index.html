@@ -603,6 +603,16 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .btn-run { background: var(--accent); color: #0B0F1A; font-weight: 700; padding: 10px 24px; font-size: 14px; border: none; border-radius: var(--radius); cursor: pointer; }
 .btn-run:hover { background: var(--accent-dim); }
 
+/* === v50 FC Sort Buttons === */
+.fc-sort-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.fc-sort-row .fc-sort-label { color: var(--muted); font-size: 12px; font-weight: 600; margin-right: 2px; }
+.fc-sort-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 12px; transition: .15s; }
+.fc-sort-btn:hover { border-color: var(--accent); color: var(--accent); }
+.fc-sort-btn.active { background: rgba(232,160,32,.15); border-color: var(--accent); color: var(--accent); }
+.fc-stability-toggle { display: flex; align-items: center; gap: 5px; margin-left: 16px; }
+.fc-stability-toggle label { color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; }
+.fc-stability-toggle input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
+
 /* === v38 Explorer mode toggle === */
 .mode-toggle { display: flex; gap: 0; margin-bottom: 18px; }
 .mode-toggle button { background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-size: 12px; font-weight: 600; padding: 8px 20px; transition: .15s; }
@@ -1151,6 +1161,19 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <button class="btn-run" onclick="runFiscalCompare()">Run Compare</button>
     <button class="btn btn-sm btn-outline" id="fc-export-btn" style="display:none" onclick="exportFCResults()">Export XLSX</button>
     <span id="fc-status" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Ready</span>
+  </div>
+
+  <div class="fc-sort-row" id="fc-sort-row" style="display:none;">
+    <span class="fc-sort-label">Sort by:</span>
+    <button class="fc-sort-btn active" data-sort="take" onclick="fcSetSort('take')">Govt Take</button>
+    <button class="fc-sort-btn" data-sort="npv" onclick="fcSetSort('npv')">NPV &#9660;</button>
+    <button class="fc-sort-btn" data-sort="irr" onclick="fcSetSort('irr')">IRR &#9660;</button>
+    <button class="fc-sort-btn" data-sort="breakeven" onclick="fcSetSort('breakeven')">Breakeven &#9650;</button>
+    <button class="fc-sort-btn" data-sort="country" onclick="fcSetSort('country')">A&#8211;Z</button>
+    <div class="fc-stability-toggle">
+      <input type="checkbox" id="fc-stability-check" onchange="renderFCResults(window._fcLastResults, window._fcLastPrice)">
+      <label for="fc-stability-check">Show Stability</label>
+    </div>
   </div>
 
   <div id="fc-results" class="empty-state">
@@ -6833,6 +6856,15 @@ const FC_PROFILES = {
   giant:    { name: 'Giant',            peakBblDay: 150000, rampYears: 4, plateauYears: 10, declineRate: 0.10, capexMM: 2000, opexBbl: 10, discountRate: 0.10 },
 };
 
+// Sort control for Fiscal Compare
+window._fcSortState = 'take';
+function fcSetSort(field) {
+  window._fcSortState = field;
+  if (window._fcLastResults && window._fcLastPrice != null) {
+    renderFCResults(window._fcLastResults, window._fcLastPrice);
+  }
+}
+
 function runFiscalCompare() {
   const profileKey = document.getElementById('fc-profile').value;
   const price = parseFloat(document.getElementById('fc-price').value);
@@ -6882,44 +6914,120 @@ function getTierInfo(take) {
 }
 
 function renderFCResults(results, price) {
-  // Pre-compute global rank at $75 for all countries
-  const _fcRankMap = {};
-  const _fcAllSorted = COUNTRY_DATA.filter(c => c.take_75 != null).sort((a,b) => a.take_75 - b.take_75);
-  _fcAllSorted.forEach(function(c, idx) { _fcRankMap[c.country] = idx + 1; });
-  const _fcN = _fcAllSorted.length;
-
+  // Sort state
   if (!window._fcSortState) window._fcSortState = 'take';
-  const _sortByCountry = window._fcSortState === 'country';
-  if (_sortByCountry) results = [...results].sort((a,b) => a.country < b.country ? -1 : a.country > b.country ? 1 : 0);
-  let html = '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
+  var sortField = window._fcSortState;
+
+  // Show sort row now that results exist
+  var sortRow = document.getElementById('fc-sort-row');
+  if (sortRow) sortRow.style.display = '';
+
+  // Update active sort button
+  document.querySelectorAll('.fc-sort-btn').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-sort') === sortField);
+  });
+
+  // Sort results based on current sort field
+  var sorted = [].concat(results);
+  if (sortField === 'country') {
+    sorted.sort(function(a,b) { return a.country < b.country ? -1 : a.country > b.country ? 1 : 0; });
+  } else if (sortField === 'npv') {
+    sorted.sort(function(a,b) {
+      if (a.liveNPV == null && b.liveNPV == null) return 0;
+      if (a.liveNPV == null) return 1;
+      if (b.liveNPV == null) return -1;
+      return b.liveNPV - a.liveNPV;
+    });
+  } else if (sortField === 'irr') {
+    sorted.sort(function(a,b) {
+      var aIRR = (a.liveIRR != null && a.liveIRR <= 200) ? a.liveIRR : null;
+      var bIRR = (b.liveIRR != null && b.liveIRR <= 200) ? b.liveIRR : null;
+      if (aIRR == null && bIRR == null) return 0;
+      if (aIRR == null) return 1;
+      if (bIRR == null) return -1;
+      return bIRR - aIRR;
+    });
+  } else if (sortField === 'breakeven') {
+    sorted.sort(function(a,b) {
+      if (a.be_75 == null && b.be_75 == null) return 0;
+      if (a.be_75 == null) return 1;
+      if (b.be_75 == null) return -1;
+      return a.be_75 - b.be_75;
+    });
+  } else {
+    sorted.sort(function(a,b) { return a.liveTake - b.liveTake; });
+  }
+
+  // Pre-compute global rank for the CURRENT sort dimension
+  var rankMap = {};
+  var rankTotal = 0;
+  sorted.forEach(function(c, idx) {
+    var hasValue = true;
+    if (sortField === 'npv' && c.liveNPV == null) hasValue = false;
+    if (sortField === 'irr' && (c.liveIRR == null || c.liveIRR > 200)) hasValue = false;
+    if (sortField === 'breakeven' && c.be_75 == null) hasValue = false;
+    if (sortField === 'take' && c.liveTake == null) hasValue = false;
+    if (hasValue) rankTotal++;
+    rankMap[c.country] = idx + 1;
+  });
+
+  // Pre-compute stability scores from REFORM_HISTORY
+  var showStability = document.getElementById('fc-stability-check') && document.getElementById('fc-stability-check').checked;
+  var stabilityScores = {};
+  if (showStability) {
+    var rh = (typeof REFORM_HISTORY !== 'undefined') ? REFORM_HISTORY : {};
+    sorted.forEach(function(c) { stabilityScores[c.country] = 5; });
+    Object.keys(rh).forEach(function(c) {
+      var events = Array.isArray(rh[c]) ? rh[c] : [];
+      var n = events.filter(function(e) { return (e.year || 0) >= 2010; }).length;
+      stabilityScores[c] = Math.max(0, 5 - n);
+    });
+  }
+
+  var stabDots = function(score) {
+    var filled = '';
+    var empty = '';
+    for (var si = 0; si < score; si++) filled += '\u25C6';
+    for (var si = 0; si < 5 - score; si++) empty += '\u25C7';
+    var color = score >= 4 ? '#22c55e' : score >= 3 ? '#eab308' : score >= 2 ? '#f97316' : '#ef4444';
+    return '<span style="color:' + color + ';font-size:11px;letter-spacing:1px;">' + filled + '</span><span style="color:#334155;font-size:11px;letter-spacing:1px;">' + empty + '</span>';
+  };
+
+  // Sort dimension labels for rank tooltip
+  var sortDimLabel = sortField === 'npv' ? 'NPV' : sortField === 'irr' ? 'IRR' : sortField === 'breakeven' ? 'breakeven' : 'govt take';
+  var sortDirLabel = (sortField === 'take' || sortField === 'breakeven') ? '1=lowest' : '1=highest';
+
+  var html = '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
   html += '<th class="num" style="width:50px">#</th>';
-  html += '<th style="cursor:pointer;" onclick="window._fcSortState=(window._fcSortState===\'country\'?\'take\':\'country\');renderFCResults(window._fcLastResults,window._fcLastPrice);" title="Click to sort A–Z · Click again for Take rank">Country ' + (_sortByCountry ? '▲' : '') + '</th>';
+  html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th>Mechanic</th>';
-  html += '<th class="num">Take%</th><th class="num" title="Estimated government NPV = contractor NPV × take / (1−take). Avg per contract at selected price/profile.">Govt NPV</th><th class="num">Ctct NPV</th><th class="num">IRR%</th>';
-  html += '<th class="num">Breakeven</th><th class="num">Swing</th><th class="num" title="Global rank by govt take @ $75/bbl (1=lowest take, ' + _fcN + '=highest take)">Rank/#' + _fcN + '</th>';
+  html += '<th class="num">Take%</th><th class="num" title="Estimated government NPV = contractor NPV \u00d7 take / (1\u2212take). Avg per contract at selected price/profile.">Govt NPV</th><th class="num">Ctct NPV</th><th class="num">IRR%</th>';
+  html += '<th class="num">Breakeven</th><th class="num">Swing</th>';
+  if (showStability) {
+    html += '<th class="num" title="Number of fiscal law changes since 2010 in the database. Lower = more stable fiscal regime.">Stability \u24d8</th>';
+  }
   html += '<th class="num" style="width:60px;"></th>';
   html += '</tr></thead><tbody>';
 
-  results.forEach(function(r, i) {
-    const tier = getTierInfo(r.liveTake);
-    const swingCol = r.swing == null ? '' : r.swing < 10 ? 'var(--positive)' : r.swing < 20 ? 'var(--accent)' : 'var(--negative)';
-    const take = r.liveTake; const npv = r.liveNPV;
-    const govtNpv = (npv != null && take != null && take > 0 && take < 100) ? npv * (take/100) / (1 - take/100) : null;
-    const fmtNpv = (v) => v != null ? (Math.abs(v) >= 1000 ? (v/1000).toFixed(1)+'B' : Math.round(v).toLocaleString()+'M') : '\u2014';
-    const govtNpvStr = fmtNpv(govtNpv);
-    const npvStr = fmtNpv(npv);
-    const irrStr = r.liveIRR != null && r.liveIRR <= 200 ? r.liveIRR.toFixed(1) + '%' : '\u2014';
-    const beStr = formatBreakeven(r.be_75);
-    const cEsc = r.country.replace(/'/g, "\\'");
-    const grank = _fcRankMap[r.country];
-    const grankStr = grank ? '#' + grank : '—';
-    const grankColor = grank
-      ? (grank / _fcN <= 0.2 ? 'var(--green)' : grank / _fcN >= 0.8 ? 'var(--red)' : 'var(--muted)')
-      : 'var(--muted)';
+  sorted.forEach(function(r, i) {
+    var tier = getTierInfo(r.liveTake);
+    var swingCol = r.swing == null ? '' : r.swing < 10 ? 'var(--positive)' : r.swing < 20 ? 'var(--accent)' : 'var(--negative)';
+    var take = r.liveTake; var npv = r.liveNPV;
+    var govtNpv = (npv != null && take != null && take > 0 && take < 100) ? npv * (take/100) / (1 - take/100) : null;
+    var fmtNpv = function(v) { return v != null ? (Math.abs(v) >= 1000 ? (v/1000).toFixed(1)+'B' : Math.round(v).toLocaleString()+'M') : '\u2014'; };
+    var govtNpvStr = fmtNpv(govtNpv);
+    var npvStr = fmtNpv(npv);
+    var irrStr = r.liveIRR != null && r.liveIRR <= 200 ? r.liveIRR.toFixed(1) + '%' : '\u2014';
+    var beStr = formatBreakeven(r.be_75);
+    var cEsc = r.country.replace(/'/g, "\\'");
+
+    // Dynamic rank badge for current sort dimension
+    var grank = rankMap[r.country];
+    var rankBadge = (grank && sortField !== 'country') ? ' <span style="font-size:9px;color:#475569;background:#1e293b;border-radius:3px;padding:1px 5px;margin-left:4px;" title="Rank #' + grank + ' of ' + rankTotal + ' by ' + sortDimLabel + ' (' + sortDirLabel + ')">#' + grank + '</span>' : '';
 
     html += '<tr onclick="openFCDrilldown(\'' + cEsc + '\')" data-country="' + r.country + '">';
     html += '<td class="num" style="color:var(--text-muted)">' + (i+1) + '</td>';
-    html += '<td><strong>' + r.country + '</strong> <span style="color:var(--text-muted);font-size:11px">' + r.region + '</span></td>';
+    html += '<td><strong>' + r.country + '</strong>' + rankBadge + ' <span style="color:var(--text-muted);font-size:11px">' + r.region + '</span></td>';
     html += '<td><span class="tag">' + r.mechanic + '</span></td>';
     html += '<td class="num"><span class="take-val ' + takeClass(r.liveTake) + '">' + r.liveTake.toFixed(1) + '%</span></td>';
     html += '<td class="num" style="color:var(--muted);font-size:11px;">' + govtNpvStr + '</td>';
@@ -6927,18 +7035,21 @@ function renderFCResults(results, price) {
     html += '<td class="num">' + irrStr + '</td>';
     html += '<td class="num">' + beStr + '</td>';
     html += '<td class="num">' + (r.swing != null ? '<span style="color:' + swingCol + ';font-weight:600">+' + r.swing.toFixed(1) + 'pp</span>' : '\u2014') + '</td>';
-    html += '<td class="num" style="color:' + grankColor + ';font-size:11px;font-weight:700;" title="Global rank #' + grank + ' of ' + _fcN + ' by govt take @ $75/bbl">' + grankStr + '</td>';
-    html += '<td class="num"><button onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'✓\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Compare tab">+Cmp</button></td>';
+    if (showStability) {
+      var stab = stabilityScores[r.country] != null ? stabilityScores[r.country] : 5;
+      html += '<td class="num">' + stabDots(stab) + '</td>';
+    }
+    html += '<td class="num"><button onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Compare tab">+Cmp</button></td>';
     html += '</tr>';
   });
   html += '</tbody></table></div>';
   document.getElementById('fc-results').innerHTML = html;
-  const exportBtn = document.getElementById('fc-export-btn');
+  var exportBtn = document.getElementById('fc-export-btn');
   if (exportBtn) exportBtn.style.display = '';
 
   // Waterfall: enrich results with component data from COUNTRY_DATA
-  const enriched = results.map(function(r) {
-    const d = COUNTRY_DATA.find(function(x) { return x.country === r.country; }) || {};
+  var enriched = sorted.map(function(r) {
+    var d = COUNTRY_DATA.find(function(x) { return x.country === r.country; }) || {};
     return Object.assign({}, r, {
       royalty: d.royalty, cit: d.cit, spt: d.spt, state_eq: d.state_eq,
       profit_oil_govt: d.profit_oil_govt, cost_recovery: d.cost_recovery,
