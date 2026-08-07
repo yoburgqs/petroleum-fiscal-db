@@ -271,6 +271,7 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
   - Accessibility: A- → A (+1 — aria-live on toast shipped; systematic onclick role="button" pass still needed but main gap closed)
 - **Net result: 1 upgrade. 2 at A+, 9 at A, 2 at A-, 1 at B+. GPA 3.90.**
 - **Version:** v54 → v55
+- **Push status:** BLOCKED — same as Cycle 7. Token missing `workflow` scope due to commit `f6d1b6d` (Playwright workflow file in ancestry). Fix: `gh auth refresh -h github.com -s workflow`. All commits local and safe. Office repo (`yoburgqs/office`) synced successfully.
 
 ---
 
