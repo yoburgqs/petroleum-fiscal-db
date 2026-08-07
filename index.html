@@ -1355,7 +1355,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <input type="text" class="search-input" id="flt-search" placeholder="Search country…" autocomplete="off">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;"></div>
     </div>
-    <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" onclick="toggleFourPrice(this)" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button>
+    <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" onclick="toggleFourPrice(this)" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" onclick="copyExplorerLink()" title="Copy link to current filtered view">🔗 Copy Link</button>
   </div>
 
   <div style="font-size:11px;color:#475569;margin-bottom:8px;letter-spacing:.02em;font-family:'IBM Plex Mono',monospace;padding:4px 0;">
@@ -6646,6 +6646,35 @@ function parseAndNavigate(hash) {
         var rfChip = document.getElementById('chip-rfactor-psc');
         if (rfChip && !_explorerRFactorOnly) setExplorerRFactor(rfChip);
       }, 200);
+    } else {
+      // Restore filter state from query params: #/explorer?mech=PSC&region=Africa&q=nig&price=75
+      var qIdx = hash.indexOf('?');
+      if (qIdx !== -1) {
+        var qStr = hash.slice(qIdx + 1);
+        var qParams = {};
+        qStr.split('&').forEach(function(pair) {
+          var eq = pair.indexOf('=');
+          if (eq !== -1) qParams[decodeURIComponent(pair.slice(0, eq))] = decodeURIComponent(pair.slice(eq + 1));
+        });
+        setTimeout(function() {
+          if (qParams.mech) {
+            var mechChip = document.querySelector('.chip[data-filter="mechanic"][data-value="' + qParams.mech + '"]');
+            if (mechChip) setExplorerChip('mechanic', qParams.mech, mechChip);
+          }
+          if (qParams.region) {
+            var regionChip = document.querySelector('.chip[data-filter="region"][data-value="' + qParams.region + '"]');
+            if (regionChip) setExplorerChip('region', qParams.region, regionChip);
+          }
+          if (qParams.q) {
+            var searchEl = document.getElementById('flt-search');
+            if (searchEl) { searchEl.value = qParams.q; renderExplorer(); }
+          }
+          if (qParams.price) {
+            var priceEl = document.querySelector('input[name="price"][value="' + qParams.price + '"]');
+            if (priceEl) { priceEl.checked = true; renderExplorer(); }
+          }
+        }, 200);
+      }
     }
   } else if (section === 'ioc') {
     var iocBtn = _tabBtnFor('t5');
@@ -6658,6 +6687,28 @@ function copyCurrentLink() {
   var url = window.location.href.split('#')[0] + window.location.hash;
   navigator.clipboard.writeText(url).then(function(){
     showCopyToast();
+  }).catch(function(){ prompt('Copy this link:', url); });
+}
+
+function copyExplorerLink() {
+  // Serialize current Explorer filter state to URL hash params
+  var mech = (explorerChipFilters && explorerChipFilters.mechanic && explorerChipFilters.mechanic !== 'all')
+    ? explorerChipFilters.mechanic : '';
+  var region = (explorerChipFilters && explorerChipFilters.region && explorerChipFilters.region !== 'all')
+    ? explorerChipFilters.region : '';
+  var search = document.getElementById('flt-search') ? document.getElementById('flt-search').value.trim() : '';
+  var price = document.querySelector('input[name="price"]:checked') ? document.querySelector('input[name="price"]:checked').value : '75';
+  var params = [];
+  if (mech) params.push('mech=' + encodeURIComponent(mech));
+  if (region) params.push('region=' + encodeURIComponent(region));
+  if (search) params.push('q=' + encodeURIComponent(search));
+  if (price && price !== '75') params.push('price=' + encodeURIComponent(price));
+  var hash = '#/explorer' + (params.length ? '?' + params.join('&') : '');
+  var url = window.location.origin + window.location.pathname + hash;
+  navigator.clipboard.writeText(url).then(function() {
+    showCopyToast();
+    var btn = document.getElementById('explorer-copy-link');
+    if (btn) { var orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(function(){ btn.textContent = orig; }, 1500); }
   }).catch(function(){ prompt('Copy this link:', url); });
 }
 
@@ -9404,6 +9455,16 @@ async function loadPlatformData() {
   if (window._platformLoaded) return;
   window._platformLoaded = true;
   const overlay = document.getElementById('loading-overlay');
+  var slowLoadTimer = setTimeout(function() {
+    var ov = document.getElementById('loading-overlay');
+    if (ov && ov.style.display !== 'none') {
+      var hint = ov.querySelector('[data-slow-hint]') || document.createElement('div');
+      hint.setAttribute('data-slow-hint', '1');
+      hint.style.cssText = 'color:#64748b;font-size:12px;margin-top:12px;';
+      hint.textContent = 'Taking longer than expected \u2014 check your connection';
+      if (!hint.parentNode) { var inner = ov.querySelector('div'); if (inner) inner.appendChild(hint); }
+    }
+  }, 10000);
   try {
     const [cdRes, rhRes] = await Promise.all([
       _fetchWithTimeout('country_data.json', 10000),
@@ -9413,15 +9474,18 @@ async function loadPlatformData() {
     if (!rhRes.ok) throw new Error('reform_history.json: ' + rhRes.status);
     COUNTRY_DATA = await cdRes.json();
     REFORM_HISTORY = await rhRes.json();
+    clearTimeout(slowLoadTimer);
     if (overlay) overlay.style.display = 'none';
     initPlatform();
   } catch(e) {
+    clearTimeout(slowLoadTimer);
     console.error('Failed to load platform data:', e);
     if (overlay) {
       overlay.innerHTML = '<div style="text-align:center;color:#ef4444;font-family:\'IBM Plex Mono\',monospace;padding:40px">'
         + '<div style="font-size:1.4em;margin-bottom:12px">Load Error</div>'
         + '<div style="font-size:0.9em;color:#fca5a5">' + e.message + '</div>'
         + '<div style="font-size:0.75em;color:#999;margin-top:16px">Open browser console for details</div>'
+        + '<button onclick="location.reload()" style="margin-top:20px;background:#e8a020;border:none;color:#0b0f1a;border-radius:6px;padding:10px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">\u21ba Reload</button>'
         + '</div>';
     }
     // Update tab content areas so users don't see permanent "Loading..." text
