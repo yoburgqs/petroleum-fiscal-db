@@ -3520,6 +3520,9 @@ function runScreener() {
   if (depCat !== 'all') activeCount++;
   if (beCat !== 'all') activeCount++;
   if (!includeIrrNulls) activeCount++;
+  const totalMechBoxes = document.querySelectorAll('#sc-mech-checks input[type=checkbox]').length;
+  if (checkedMechs.length < totalMechBoxes) activeCount++; // some mechanic unchecked = active filter
+  if (minEvid > 0) activeCount++;
   const badgeEl = document.getElementById('screener-active-filters');
   if (activeCount > 0) {
     badgeEl.style.display = 'inline-block';
