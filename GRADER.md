@@ -271,6 +271,7 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
   6. **Explorer country rows keyboard nav** — `tabindex="0"`, `role="row"`, `aria-label`, `onkeydown` Enter/Space handler added to all rendered Explorer rows.
   7. **Recent searches in Ctrl+K** — `_getRecentSearches()` / `_saveRecentSearch()` via sessionStorage; empty-input state now shows last 5 searches; selecting a result saves the query.
   8. ~~Pre-push hook path fix~~ — BLOCKED (protected file, requires manual edit: `node tests/runtime_comprehensive.js`)
+- **Push status:** BLOCKED — prior agent commit `f6d1b6d` added `.github/workflows/playwright.yml` which requires `workflow` OAuth scope. Fix: `gh auth refresh -h github.com -s workflow` in terminal. All 5 pending commits are local and safe. Also fixed test script output order (`C:/tmp/pw_test/runtime_comprehensive.js`) to print `SUMMARY: N PASS / N FAIL` as last line so hook can grep correctly.
 - **Grade changes from Cycle 6:**
   - Naming Consistency: A- → A (+1 — all naming gaps closed)
   - Error & Empty States: A- → A (+1 — all 11 alert() replaced)
