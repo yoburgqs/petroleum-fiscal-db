@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com https://cdn.jsdelivr.net;">
 
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -10,7 +11,7 @@
 <link rel="dns-prefetch" href="https://unpkg.com">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>ORCA — Petroleum Fiscal Intelligence Platform | 71,000+ Contracts, 211 Countries</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" integrity="sha384-oNtu+d18330MVFpltUTve1DatxCkkctlpA2AC3GulbVFOSqhHdDat3qHse/Lbuek" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" onerror="console.warn('XLSX library failed to load — Excel export unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
@@ -1146,7 +1147,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v54</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v55</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1324,7 +1325,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <option value="125">$125/bbl</option>
       </select>
     </div>
-    <button class="btn-run" onclick="runFiscalCompare()">Run Compare</button>
+    <button class="btn-run" onclick="runFiscalCompare()" title="Run Fiscal Compare (Ctrl+Enter)">Run Compare</button>
     <button class="btn btn-sm btn-outline" id="fc-export-btn" disabled title="Run Compare first to enable export" onclick="exportFCResults()">Export XLSX</button>
     <span id="fc-status" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Ready</span>
   </div>
@@ -1891,6 +1892,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v55 (Aug 2026)</strong> — Chart.js SRI hash fixed (switched to cdnjs stable hash — resolves 4 JS errors in v54); CSP meta tag added with connect-src including cdn.jsdelivr.net (fixes Breakeven Map fetch block); toast notifications upgraded with aria-live/aria-atomic for screen reader support; confirm() dialog replaced with two-step inline confirmation in Scenario Builder; Ctrl+Enter keyboard shortcut added for Fiscal Compare; version aligned to v55.<br>
       <strong>v54 (Aug 2026)</strong> — All browser alert() dialogs replaced with styled toast notifications (11 instances); "Investment Screener" renamed to "Screener" for consistency; source comment cleanup (Country Profile terminology); version badge aligned to v54.<br>
       <strong>v53 (Aug 2026)</strong> — Country Profile welcome panel with quick-access country cards (empty states); CDN resilience via onerror fallbacks on all external script/style tags; keyboard accessibility on Reference dropdown; Scenario Builder UX: Run DCF button elevated to top of panel; Regime Explorer streamlined to 3-button mechanic toggle; data coverage transparency: IRR and breakeven null values now display tooltip explanations.<br>
       <strong>v52 (Aug 2026)</strong> — Tab navigation streamlined (8 primary tabs + Reference dropdown), Fiscal Compare auto-refreshes on filter change, NPV formatting unified, region search added, skip-to-content accessibility link.<br>
@@ -2353,7 +2355,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     <div style="margin-top:20px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
         <h3 style="font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin:0">Saved Scenarios</h3>
-        <button class="btn btn-sm btn-outline" onclick="clearSavedScenarios()">Clear All</button>
+        <button id="clear-scenarios-btn" class="btn btn-sm btn-outline" onclick="clearSavedScenarios()">Clear All</button>
       </div>
       <div id="sb-saved-table" style="color:var(--muted);font-size:12px;">No saved scenarios.</div>
     </div>
@@ -4357,6 +4359,11 @@ function closeSearch() {
 document.addEventListener('keydown', function(e) {
   if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openSearch(); }
   if (e.key === 'Escape' && document.getElementById('search-overlay').classList.contains('open')) closeSearch();
+  // Ctrl+Enter: run Fiscal Compare from anywhere
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+    var fcPane = document.getElementById('tfc');
+    if (fcPane && fcPane.classList.contains('active')) { e.preventDefault(); if (typeof runFiscalCompare === 'function') runFiscalCompare(); }
+  }
 });
 
 function renderSearchResults() {
@@ -6855,6 +6862,9 @@ function showCopyToast(msg) {
   if (!toast) {
     toast = document.createElement('div');
     toast.id = 'copy-toast';
+    toast.setAttribute('aria-live', 'polite');
+    toast.setAttribute('aria-atomic', 'true');
+    toast.setAttribute('role', 'status');
     toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e293b;border:1px solid #e8a020;color:#f1f5f9;padding:8px 16px;border-radius:4px;font-size:12px;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;';
     document.body.appendChild(toast);
   }
@@ -7824,9 +7834,17 @@ function saveCustomScenario() {
 }
 
 function clearSavedScenarios() {
-  if (!confirm('Clear all saved scenarios?')) return;
-  localStorage.removeItem('customScenarios');
-  _refreshSavedTable();
+  var btn = document.getElementById('clear-scenarios-btn');
+  if (btn && btn.dataset.confirmPending === '1') {
+    localStorage.removeItem('customScenarios');
+    _refreshSavedTable();
+    btn.dataset.confirmPending = '0';
+    btn.textContent = 'Clear All';
+    showCopyToast('All saved scenarios cleared.');
+  } else {
+    if (btn) { btn.dataset.confirmPending = '1'; btn.textContent = 'Confirm clear?'; setTimeout(function(){ if(btn){btn.dataset.confirmPending='0';btn.textContent='Clear All';} }, 3000); }
+    showCopyToast('Click "Confirm clear?" again to delete all saved scenarios.');
+  }
 }
 
 function _refreshSavedTable() {
@@ -9670,7 +9688,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v54</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v55</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
