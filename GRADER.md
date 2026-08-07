@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
 **Last Updated:** 2026-08-07
-**Grader Version:** 1.0
-**Overall Status:** Post-Cycle-1: All categories B- or above. Target: A across all by end of Cycle 6.
+**Grader Version:** 1.1
+**Overall Status:** Post-Cycle-2: 7 improvements across 6 categories. IA upgraded B- → B+. Interaction upgraded B → B+. Data Presentation upgraded B+ → A-.
 
 ---
 
@@ -35,28 +35,24 @@ Every 30-minute cycle:
 - Footer repeats same stats (71,601 contracts, 185 countries) twice
 **Priority fix:** Standardize remaining icon system. Deduplicate footer stats.
 
-### 2. Information Architecture — B-
-**What's good:** Landing tab (Fiscal Compare) is correct choice, welcome panel Q&A grid is excellent onboarding, URL hash routing enables shareable links, Ctrl+K search improves navigation. `Comparison` tab renamed to `Side-by-Side`. Mobile tab nav fade indicator added. Back to Explorer link added in Country Profile.
+### 2. Information Architecture — B+
+**What's good:** Landing tab (Fiscal Compare) is correct choice, welcome panel Q&A grid is excellent onboarding, URL hash routing enables shareable links, Ctrl+K search improves navigation. `Comparison` tab renamed to `Side-by-Side`. Mobile tab nav fade indicator added. Back to Explorer link added in Country Profile. **Cycle 2:** Vintage, Mechanics, API, Methodology consolidated into `Reference ▾` dropdown — tab bar reduced from 12 to 8 primary tabs + dropdown.
 **What's lacking:**
-- 12 tabs is too many — horizontal scrolling with hidden scrollbar means users miss tabs
-- `Regime Explorer` contains Browse/Screen/Bubble sub-modes = tab-within-a-tab anti-pattern
-- `Vintage`, `Mechanics`, `API`, `Methodology` tabs still exposed rather than consolidated
-**Priority fix:** Consolidate `Vintage`, `Mechanics`, `API`, `Methodology` into `Reference` dropdown.
+- `Regime Explorer` still contains Browse/Screen/Bubble sub-modes = tab-within-a-tab anti-pattern
+- Reform History Browser duplicated between Vintage tab and Vintage Analysis section
+**Priority fix:** Refactor Regime Explorer sub-modes into a cleaner 2-button toggle with clearer labels.
 
-### 3. Data Presentation — B+
-**What's good:** Take sparklines (4-price SVG curves), waterfall breakdown, evidence A/B/C/D tier badges, Monte Carlo uncertainty badge, breakeven color indicators, rank badges (#3 of 185). Duplicate dropdown filters hidden in Explorer Browse mode. IRR column footnote added. Breakeven null explanation note added.
+### 3. Data Presentation — A-
+**What's good:** Take sparklines (4-price SVG curves), waterfall breakdown, evidence A/B/C/D tier badges, Monte Carlo uncertainty badge, breakeven color indicators, rank badges (#3 of 185). Duplicate dropdown filters hidden in Explorer Browse mode. IRR column footnote added. Breakeven null explanation note added. **Cycle 2:** NPV formatting unified via shared `fmtNpvShared()` — Explorer now shows `$1.2B` not `1234.5`, consistent with FC results. Region alignment confirmed correct via `_regionMatch()` mapping.
 **What's lacking:**
-- NPV formatting may be inconsistent between FC results and Explorer
-- Region alignment between chips and dropdowns could be tightened further
-**Priority fix:** Verify NPV formatting consistency. Align region label language across chip and dropdown selects.
+- Country Profile NPV still uses `fmt(d.npv_75)` which shows raw decimal — could benefit from `fmtNpvShared`
+**Priority fix:** Apply `fmtNpvShared` to Country Profile NPV display in the dd-params-grid.
 
-### 4. Interaction Design — B
-**What's good:** Fiscal Compare workflow clean, compare basket well-implemented, keyboard shortcuts (Ctrl+K, Esc, arrow keys), country row drill-down, Scenario Builder mechanic-aware parameter groups. Export XLSX button now always-visible with disabled state. Back to Explorer link added to Country Profile.
+### 4. Interaction Design — B+
+**What's good:** Fiscal Compare workflow clean, compare basket well-implemented, keyboard shortcuts (Ctrl+K, Esc, arrow keys), country row drill-down, Scenario Builder mechanic-aware parameter groups. Export XLSX button now always-visible with disabled state. Back to Explorer link added to Country Profile. **Cycle 2:** Auto-run on filter change implemented (profile/price selects fire `runFiscalCompare()` when results exist). 4-Price View toggle now shows `✓` suffix, accent background, and `aria-pressed` when active. Scenario Builder empty state improved with visual icon and Run DCF shortcut button.
 **What's lacking:**
-- Run Compare button doesn't auto-run on filter change (manual re-click required)
-- 4-Price View toggle has no visual on/off state indicator
-- Scenario Builder Run DCF button not visible until modal is opened (per test)
-**Priority fix:** Add on/off visual indicator to 4-Price View toggle. Auto-run compare on filter change.
+- Scenario Builder Run DCF button still not visible on first open without scrolling (modal panel layout)
+**Priority fix:** Auto-scroll to Run DCF button on Scenario Builder modal open, or float the Run DCF button at the top of the inputs panel.
 
 ### 5. Naming Consistency — B
 **What's good:** Tab buttons have consistent casing. `Country Deep-Dive` → `Country Profile` title fixed throughout. Duplicate `Global Fiscal Explorer` page title removed. Footer deduped. v51 version number corrected.
@@ -93,13 +89,12 @@ Every 30-minute cycle:
 - No full CDN fallback if Chart.js or D3.js fail to load (crossorigin added, not SRI)
 **Priority fix:** Add `onerror` fallback for Chart.js and D3.js CDN script tags.
 
-### 10. Accessibility — B
-**What's good:** Semantic HTML in some areas, `alt` text on some elements. ARIA roles added: `role="tab"`, `role="tablist"`, `role="tabpanel"`, `role="dialog" aria-modal` on scenario modal, `role="search"`, `aria-pressed` on filter chips.
+### 10. Accessibility — B+
+**What's good:** Semantic HTML in some areas, `alt` text on some elements. ARIA roles added: `role="tab"`, `role="tablist"`, `role="tabpanel"`, `role="dialog" aria-modal` on scenario modal, `role="search"`, `aria-pressed` on filter chips. **Cycle 2:** Skip-to-content link added (visible on keyboard focus, links to `#main-content` on tab bar). Reference dropdown has `aria-haspopup`, `aria-expanded`. 4-Price View toggle has `aria-pressed`. Tier system already has symbol+text labels (▲ IF, — MOD, ▼ HI, ◆ NOC).
 **What's lacking:**
-- Color used as sole indicator for tier system (green/yellow/orange/red) — colorblind users still affected
-- No skip-to-content link
-- Keyboard navigation in Fiscal Compare results table not fully implemented
-**Priority fix:** Add text labels or patterns alongside color in tier system. Add skip-to-content link.
+- Keyboard navigation in Fiscal Compare results table not fully implemented (Tab/Enter through rows)
+- Reference dropdown not keyboard-navigable (no arrow key handling in menu)
+**Priority fix:** Add keyboard navigation to the Reference dropdown menu (arrow keys + Enter + Escape).
 
 ### 11. Mobile Experience — B+
 **What's good:** Multiple `@media` breakpoints (768px, 600px, 390px), iOS zoom prevention, touch target sizing (44px minimum), column hiding in Explorer mobile. Mobile tab nav fade indicator added — users now see visual affordance for scrollable tab bar.
@@ -123,13 +118,11 @@ Every 30-minute cycle:
 - No changelog visible to end users
 **Priority fix:** Add pre-push hook that runs `node runtime_comprehensive.js` against local file server.
 
-### 14. Search Quality — A-
-**What's good:** Ctrl+K global search, results for country names AND mechanics, UAE/USA abbreviation support (Bug 10 fixed), keyboard navigation in results.
+### 14. Search Quality — A
+**What's good:** Ctrl+K global search, results for country names AND mechanics, UAE/USA abbreviation support (Bug 10 fixed), keyboard navigation in results, take@$75 shown in results. **Cycle 2:** Region name search enabled — typing "middle" now finds all Middle East countries; "africa" finds all African countries. Results count increased from 5 to 8 for region-based searches.
 **What's lacking:**
-- Search doesn't support partial region names ("middle" doesn't find "Middle East")
 - No search history or recent results
-- Results don't show government take directly (need to click through to profile)
-**Priority fix:** Add take_75 to search result display.
+**Priority fix:** Add recent searches list (last 5 searches) stored in sessionStorage.
 
 ### 15. Export / Shareability — B
 **What's good:** Export XLSX from Fiscal Compare results, copy-link button on Country Profile (hash URL), PDF print styles.
@@ -187,3 +180,16 @@ Scope expansion: [what was added to grader]
 - Test after: 118 PASS / 0 FAIL / 0 JS errors
 - 15 improvements across 9 categories
 - Summary: Emoji removed, naming fixed, duplicate filters hidden, accessibility ARIA added, Russia benchmark moved, error fallbacks added, export button improved, Back to Explorer added
+
+## Cycle 2 Log — 2026-08-07
+- Grade check: lowest = IA at B-, Error States at B-, Interaction at B
+- Fixes implemented:
+  1. IA: Consolidated 4 technical tabs (Vintage, Mechanics, API, Methodology) into `Reference ▾` dropdown — tab bar reduced 12 → 8 primary tabs
+  2. Interaction: Auto-run Fiscal Compare on profile/price filter change (fires only when results already exist)
+  3. Interaction: 4-Price View toggle now shows ✓ suffix + amber background + `aria-pressed` when active
+  4. Interaction: Scenario Builder empty state redesigned — icon, description, and shortcut Run DCF button
+  5. Accessibility: Skip-to-content link added (keyboard focus reveals amber button, targets `#main-content`)
+  6. Data Presentation: NPV formatting unified via `fmtNpvShared()` — Explorer now consistent with FC results ($1.2B not 1234.5)
+  7. Search: Region name search enabled ("middle" → Middle East countries, "africa" → Africa countries)
+  8. Version: v51 → v52 in title and footer
+- Grades updated: IA B- → B+, Interaction Design B → B+, Data Presentation B+ → A-, Accessibility B → B+, Search Quality A- → A

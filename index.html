@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>ORCA v51 — Petroleum Fiscal Intelligence</title>
+<title>ORCA v52 — Petroleum Fiscal Intelligence</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous"></script>
@@ -37,6 +37,10 @@
 body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 14px; min-height: 100vh; }
 a { color: var(--accent); text-decoration: none; }
 
+/* ── Skip to content (accessibility) ── */
+.skip-link { position: absolute; top: -60px; left: 16px; background: var(--accent); color: #0B0F1A; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 0 0 var(--radius) var(--radius); z-index: 10000; text-decoration: none; transition: top .2s; }
+.skip-link:focus { top: 0; }
+
 /* ── header ── */
 .site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
 .site-header h1 { font-size: 18px; font-weight: 700; letter-spacing: .5px; }
@@ -44,13 +48,24 @@ a { color: var(--accent); text-decoration: none; }
 .site-header .meta  { color: var(--muted); font-size: 12px; margin-left: auto; }
 
 /* ── tabs ── */
-.tab-nav { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 2px; padding: 0 24px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.tab-nav { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 2px; padding: 0 24px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; align-items: stretch; }
 .tab-nav::-webkit-scrollbar { display: none; }
 .tab-nav-wrapper { position: relative; }
 .tab-nav-wrapper::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 40px; background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none; }
 .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 18px; white-space: nowrap; transition: .15s; }
 .tab-btn:hover  { color: var(--text); }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── Reference dropdown in tab nav ── */
+.tab-dropdown { position: relative; display: flex; align-items: stretch; }
+.tab-dropdown-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 18px; white-space: nowrap; transition: .15s; display: flex; align-items: center; gap: 4px; }
+.tab-dropdown-btn:hover { color: var(--text); }
+.tab-dropdown-btn.has-active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 0 0 8px 8px; min-width: 180px; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.tab-dropdown-menu.open { display: block; }
+.tab-dropdown-item { display: block; width: 100%; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 10px 18px; text-align: left; transition: .12s; white-space: nowrap; }
+.tab-dropdown-item:hover { background: rgba(232,160,32,.08); color: var(--text); }
+.tab-dropdown-item.active { color: var(--accent); background: rgba(232,160,32,.06); }
 .tab-pane { display: none; padding: 24px; }
 .tab-pane.active { display: block; }
 
@@ -993,6 +1008,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </style>
 </head>
 <body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
 <div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;display:flex;align-items:center;justify-content:center;z-index:9999;">
   <div style="text-align:center;color:#E8A020;font-family:'IBM Plex Mono',monospace">
     <div style="margin-bottom:20px"><span style="font-size:28px;font-weight:900;letter-spacing:.15em;color:var(--accent);">ORCA</span></div>
@@ -1022,21 +1038,29 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 </div>
 
-<!-- ===== v38 TAB NAV ===== -->
+<!-- ===== v52 TAB NAV (8 primary tabs + Reference dropdown) ===== -->
 <div class="tab-nav-wrapper">
-<div class="tab-nav" role="tablist">
+<div class="tab-nav" role="tablist" id="main-content">
   <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('t0',this)">Fiscal Compare</button>
   <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tsamples',this)">Sample Analyses</button>
   <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t7',this)">Country Profile</button>
   <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('texplorer',this)">Regime Explorer</button>
   <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t5',this)">IOC Portfolio</button>
   <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t2',this)">Side-by-Side</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t4',this)">Vintage</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t6',this)">Mechanics</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t9',this)">API</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tmethodology',this)">Methodology</button>
   <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('treformrisk',this)">Reform Risk</button>
   <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tbreakevenmap',this)">Breakeven Map</button>
+  <!-- Reference dropdown: Vintage, Mechanics, API, Methodology -->
+  <div class="tab-dropdown" id="ref-tab-dropdown">
+    <button class="tab-dropdown-btn" id="ref-dropdown-btn" onclick="toggleRefDropdown(event)" aria-haspopup="true" aria-expanded="false">
+      Reference <span style="font-size:9px;opacity:.7;">&#9660;</span>
+    </button>
+    <div class="tab-dropdown-menu" id="ref-dropdown-menu" role="menu">
+      <button class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('t4',this)">Vintage Analysis</button>
+      <button class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('t6',this)">Fiscal Mechanics</button>
+      <button class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('tmethodology',this)">Methodology</button>
+      <button class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('t9',this)">API Explorer</button>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -1163,7 +1187,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="fc-controls">
     <div class="ctrl-group">
       <label>Profile</label>
-      <select id="fc-profile">
+      <select id="fc-profile" onchange="if(window._fcLastResults)runFiscalCompare()">
         <option value="shallow">Shallow Offshore &middot; $400M &middot; 30k bbl/d &middot; $12/bbl opex</option>
         <option value="deepwater">Deepwater &middot; $1.2B &middot; 50k bbl/d &middot; $15/bbl opex</option>
         <option value="onshore">Onshore &middot; $200M &middot; 20k bbl/d &middot; $8/bbl opex</option>
@@ -1174,7 +1198,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </div>
     <div class="ctrl-group">
       <label>Price</label>
-      <select id="fc-price">
+      <select id="fc-price" onchange="if(window._fcLastResults)runFiscalCompare()">
         <option value="50">$50/bbl</option>
         <option value="75" selected>$75/bbl</option>
         <option value="100">$100/bbl</option>
@@ -1289,7 +1313,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <input type="text" class="search-input" id="flt-search" placeholder="Search country…" autocomplete="off">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;"></div>
     </div>
-    <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" onclick="toggleFourPrice(this)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button>
+    <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" onclick="toggleFourPrice(this)" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button>
   </div>
 
   <div class="tbl-wrap">
@@ -2142,8 +2166,13 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
       </div>
 
       <div class="scenario-output-panel" id="sb-output">
-        <div style="color:var(--muted);text-align:center;padding:40px 0;font-size:13px;">
-          Configure fiscal parameters and click <strong>Run DCF</strong> to see results.
+        <div style="color:var(--muted);text-align:center;padding:40px 20px;font-size:13px;line-height:1.7;">
+          <div style="font-size:28px;margin-bottom:12px;opacity:.4;">&#9654;</div>
+          <div style="font-weight:600;color:var(--text);margin-bottom:6px;">No results yet</div>
+          Configure fiscal parameters on the left, then click <strong style="color:var(--accent);">Run DCF</strong> to compute government take, NPV, IRR, and a full 25-year cashflow waterfall.
+          <div style="margin-top:16px;display:flex;justify-content:center;">
+            <button class="btn btn-sm" onclick="runCustomScenario()" style="padding:8px 20px;">&#9654; Run DCF Now</button>
+          </div>
         </div>
       </div>
     </div>
@@ -2280,6 +2309,49 @@ function switchTab(id, btn) {
   }
 }
 
+// ── Reference dropdown helpers (v52) ──────────────────────────────────────────
+function toggleRefDropdown(e) {
+  e.stopPropagation();
+  var menu = document.getElementById('ref-dropdown-menu');
+  var btn  = document.getElementById('ref-dropdown-btn');
+  var open = menu.classList.toggle('open');
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+}
+function switchTabFromDropdown(id, item) {
+  // Close dropdown
+  document.getElementById('ref-dropdown-menu').classList.remove('open');
+  document.getElementById('ref-dropdown-btn').setAttribute('aria-expanded','false');
+  // Clear all tab-btn active states
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected','false'); });
+  // Mark dropdown items
+  document.querySelectorAll('.tab-dropdown-item').forEach(i => i.classList.remove('active'));
+  if (item) item.classList.add('active');
+  // Mark dropdown button as has-active
+  document.getElementById('ref-dropdown-btn').classList.add('has-active');
+  // Activate panel
+  var panel = document.getElementById(id);
+  if (panel) panel.classList.add('active');
+  window._prevTab = window._activeTab;
+  window._activeTab = id;
+}
+// Close dropdown when clicking outside
+document.addEventListener('click', function() {
+  var menu = document.getElementById('ref-dropdown-menu');
+  var btn  = document.getElementById('ref-dropdown-btn');
+  if (menu) menu.classList.remove('open');
+  if (btn)  btn.setAttribute('aria-expanded','false');
+});
+// Override switchTab to clear dropdown has-active state when switching to primary tabs
+var _origSwitchTab = switchTab;
+switchTab = function(id, btn) {
+  // Clear Reference dropdown active state when switching to primary tabs
+  var refBtn = document.getElementById('ref-dropdown-btn');
+  if (refBtn) refBtn.classList.remove('has-active');
+  document.querySelectorAll('.tab-dropdown-item').forEach(i => i.classList.remove('active'));
+  _origSwitchTab(id, btn);
+};
+
 function tierClass(take) {
   if (take === null) return '';
   if (take <= 40) return 'tier-if';
@@ -2305,6 +2377,13 @@ function takeClass(take) {
 function fmt(v, dec=1, suffix='') {
   if (v === null || v === undefined) return '—';
   return Number(v).toFixed(dec) + suffix;
+}
+// Shared NPV formatter — consistent across FC results and Explorer table
+function fmtNpvShared(v) {
+  if (v === null || v === undefined) return '—';
+  const abs = Math.abs(v);
+  if (abs >= 1000) return (v < 0 ? '-' : '') + '$' + (abs / 1000).toFixed(1) + 'B';
+  return (v < 0 ? '-' : '') + '$' + Math.round(abs).toLocaleString() + 'M';
 }
 function isStateMonopoly(v) {
   return v != null && Number(v) >= 99.5;
@@ -2684,7 +2763,7 @@ function renderExplorer() {
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_50)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_100)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_125)}</td>
-      <td class="num">${fmt(npv)}</td>
+      <td class="num">${fmtNpvShared(npv)}</td>
       <td class="num">${fmtIrr(irr)}</td>
       <td class="num" style="${(function(){
         if (!d.be_75 || d.be_75 <= 1 || d.be_75 >= 999) return ''; // <=1 is state-monopoly sentinel
@@ -4082,8 +4161,9 @@ function renderSearchResults() {
   const qExp = _ALIASES[q] || q;
   const countryMatches = COUNTRY_DATA.filter(d =>
     d.country.toLowerCase().includes(qExp) || d.country.toLowerCase().includes(q) ||
-    d.mechanics.toLowerCase().includes(qExp) || d.mechanics.toLowerCase().includes(q)
-  ).slice(0, 5);
+    d.mechanics.toLowerCase().includes(qExp) || d.mechanics.toLowerCase().includes(q) ||
+    (d.region && d.region.toLowerCase().includes(qExp)) || (d.region && d.region.toLowerCase().includes(q))
+  ).slice(0, 8);
 
   if (!countryMatches.length) {
     container.innerHTML = '<div class="search-empty">No results found.</div>';
@@ -7748,8 +7828,11 @@ function toggleFourPrice(btn) {
   btn.dataset.active = active ? '0' : '1';
   window._fourPriceActive = !active;
   btn.style.background = active ? '' : 'var(--accent)';
-  btn.style.color = active ? '' : 'var(--bg)';
-  btn.textContent = active ? '4-Price View' : 'Hide Prices';
+  btn.style.color = active ? '' : '#0B0F1A';
+  btn.style.borderColor = active ? '' : 'var(--accent)';
+  btn.setAttribute('aria-pressed', active ? 'false' : 'true');
+  btn.textContent = active ? '4-Price View' : '4-Price View ✓';
+  btn.title = active ? 'Toggle 4-price columns ($50 / $100 / $125)' : 'Active — click to hide price columns';
   // Also toggle header cells
   const hdrs = document.querySelectorAll('.expl-mp-col, .take-50-col, .take-100-col, .take-125-col');
   hdrs.forEach(el => el.style.display = active ? 'none' : '');
@@ -7949,9 +8032,8 @@ function renderFCResults(results, price) {
     var swingCol = r.swing == null ? '' : r.swing < 10 ? 'var(--positive)' : r.swing < 20 ? 'var(--accent)' : 'var(--negative)';
     var take = r.liveTake; var npv = r.liveNPV;
     var govtNpv = (npv != null && take != null && take > 0 && take < 100) ? npv * (take/100) / (1 - take/100) : null;
-    var fmtNpv = function(v) { return v != null ? (Math.abs(v) >= 1000 ? (v/1000).toFixed(1)+'B' : Math.round(v).toLocaleString()+'M') : '\u2014'; };
-    var govtNpvStr = fmtNpv(govtNpv);
-    var npvStr = fmtNpv(npv);
+    var govtNpvStr = fmtNpvShared(govtNpv);
+    var npvStr = fmtNpvShared(npv);
     var irrStr = r.liveIRR != null && r.liveIRR <= 200 ? r.liveIRR.toFixed(1) + '%' : '\u2014';
     var beStr = formatBreakeven(r.be_75);
     var cEsc = r.country.replace(/'/g, "\\'");
@@ -9235,7 +9317,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v51</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v52</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
