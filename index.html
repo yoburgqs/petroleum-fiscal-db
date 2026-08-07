@@ -1191,6 +1191,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="mode-toggle">
     <button class="active" onclick="switchExplorerMode('browse')">Browse</button>
     <button onclick="switchExplorerMode('screen')">Screen</button>
+    <button onclick="switchExplorerMode('bubble')">Bubble Chart</button>
   </div>
   <div id="explorer-browse-mode">
 
@@ -1320,6 +1321,17 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </div>
   </div>
 
+  <!-- Historical Fiscal Trend by Mechanic -->
+  <div id="explorer-vintage-trend" style="margin-top:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div style="font-size:12px;font-weight:700;color:var(--accent);">Historical Fiscal Trend by Mechanic</div>
+      <button onclick="this.closest('#explorer-vintage-trend').querySelector('#vintage-trend-body').style.display = this.closest('#explorer-vintage-trend').querySelector('#vintage-trend-body').style.display==='none'?'block':'none';this.textContent=this.textContent.includes('Show')?'Hide':'Show';" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer;">Hide</button>
+    </div>
+    <div id="vintage-trend-body">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Average government take by decade and fiscal mechanic, across all contracts in the database. Shows the global trend toward higher capture since 1980.</div>
+      <canvas id="vintage-trend-chart" style="max-height:280px;"></canvas>
+    </div>
+  </div>
   </div><!-- end browse mode -->
   <div id="explorer-screen-mode" style="display:none">
 
@@ -1435,6 +1447,18 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 
   </div><!-- end screen mode -->
+  <!-- Bubble Chart mode -->
+  <div id="explorer-bubble-mode" style="display:none;padding-top:16px;">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">
+      Scatter plot: Government Take (X) vs Contractor NPV (Y). Bubble size = number of contracts.
+      Click any bubble to open the Country Profile. The <strong>lower-left frontier</strong> (low take, high NPV) represents the most IOC-favorable regimes.
+      <strong>Upper-right</strong> (high take, positive NPV) = large-reserve countries where even high take generates value.
+    </div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas"></canvas></div>
+    </div>
+    <div id="explorer-bubble-container"></div>
+  </div>
 </div>
 
 <div id="t2" class="tab-pane">
@@ -8094,8 +8118,152 @@ function exportFCResults() {
   XLSX.writeFile(wb, 'ORCA_fiscal_compare_' + new Date().toISOString().slice(0, 10) + '.xlsx');
 }
 
+
+// ─── Bubble Chart (Take vs NPV) ───────────────────────────────────────────────
+function renderBubbleChart() {
+  var container = document.getElementById('explorer-bubble-container');
+  if (!container) return;
+  if (window._bubbleChartInstance) { window._bubbleChartInstance.destroy(); window._bubbleChartInstance = null; }
+
+  var data = (COUNTRY_DATA || []).filter(function(d) { return d.take_75 != null && d.npv_75 != null; });
+  if (!data.length) { container.innerHTML = '<div style="color:var(--muted);padding:24px;">No data available for bubble chart.</div>'; return; }
+
+  var regionColors = {
+    'Middle East': '#f59e0b', 'Africa': '#22c55e', 'Asia': '#3b82f6',
+    'Europe': '#a855f7', 'North America': '#e8a020', 'Latin America': '#ef4444',
+    'CIS/FSU': '#8b5cf6', 'Oceania': '#06b6d4', 'Other': '#64748b'
+  };
+
+  var regionGroups = {};
+  data.forEach(function(d) {
+    var r = d.region || 'Other';
+    if (!regionGroups[r]) regionGroups[r] = [];
+    regionGroups[r].push(d);
+  });
+
+  var datasets = Object.entries(regionGroups).map(function(entry) {
+    var region = entry[0], countries = entry[1];
+    return {
+      label: region,
+      backgroundColor: (regionColors[region] || '#64748b') + '99',
+      borderColor: regionColors[region] || '#64748b',
+      borderWidth: 1,
+      data: countries.map(function(d) {
+        return {
+          x: d.take_75,
+          y: d.npv_75,
+          r: Math.max(3, Math.min(20, Math.sqrt(d.n_contracts || d.n || 1) * 1.5)),
+          country: d.country,
+          mechanic: d.mechanics || d.mechanic || '\u2014',
+          n: d.n_contracts || d.n || 0
+        };
+      })
+    };
+  });
+
+  var canvas = document.getElementById('explorer-bubble-canvas');
+  if (!canvas) return;
+  var ctx = canvas.getContext('2d');
+
+  window._bubbleChartInstance = new Chart(ctx, {
+    type: 'bubble',
+    data: { datasets: datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 } } },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              var d = ctx.raw;
+              return [d.country, 'Take: ' + ctx.parsed.x.toFixed(1) + '%', 'NPV: $' + Math.round(ctx.parsed.y) + 'M', 'Contracts: ' + d.n, 'Mechanic: ' + d.mechanic];
+            }
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: { display: true, text: 'Government Take @$75/bbl (%)', color: '#94a3b8' },
+          grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' },
+          min: 0, max: 105
+        },
+        y: {
+          title: { display: true, text: 'Contractor NPV @$75 ($M)', color: '#94a3b8' },
+          grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }
+        }
+      },
+      onClick: function(evt, elements) {
+        if (!elements.length) return;
+        var el = elements[0];
+        var d = datasets[el.datasetIndex].data[el.index];
+        if (d && d.country) {
+          var cpBtn = Array.from(document.querySelectorAll('.tab-btn')).find(function(b) { return b.textContent.includes('Country Profile'); });
+          if (cpBtn) switchTab('t7', cpBtn);
+          setTimeout(function() {
+            var sel = document.getElementById('dd-country-select');
+            if (sel) { sel.value = d.country; loadCountryProfile(d.country); }
+          }, 100);
+        }
+      }
+    }
+  });
+}
+
+// ─── Vintage Trend Chart (Historical Fiscal Trend by Mechanic) ────────────────
+function renderVintageTrendChart() {
+  if (window._vintageTrendChart) return; // only render once
+  var canvas = document.getElementById('vintage-trend-chart');
+  if (!canvas || !window.VINTAGE_DATA) return;
+
+  var mechanics = [];
+  var mechanicSet = {};
+  VINTAGE_DATA.forEach(function(d) { if (!mechanicSet[d.mechanic]) { mechanicSet[d.mechanic] = true; mechanics.push(d.mechanic); } });
+  var decadeSet = {};
+  VINTAGE_DATA.forEach(function(d) { decadeSet[d.decade] = true; });
+  var decades = Object.keys(decadeSet).map(Number).sort(function(a,b){return a-b;});
+
+  var mechColors = {
+    'Concession': '#e8a020', 'PSC': '#3b82f6', 'Buy-back': '#ef4444',
+    'TSC': '#a855f7', 'PRRT': '#22c55e', 'RSC': '#f59e0b', 'Gross Split': '#06b6d4'
+  };
+
+  var chartDatasets = mechanics.map(function(m) {
+    return {
+      label: m,
+      data: decades.map(function(d) {
+        var entry = VINTAGE_DATA.find(function(v) { return v.decade === d && v.mechanic === m; });
+        return entry ? entry.avg_take : null;
+      }),
+      borderColor: mechColors[m] || '#64748b',
+      backgroundColor: 'transparent',
+      tension: 0.3,
+      spanGaps: true,
+      pointRadius: 4,
+      borderWidth: 2
+    };
+  });
+
+  window._vintageTrendChart = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: { labels: decades.map(function(d) { return d + 's'; }), datasets: chartDatasets },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+      scales: {
+        x: { grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' } },
+        y: {
+          title: { display: true, text: 'Avg Govt Take (%)', color: '#94a3b8' },
+          grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' },
+          min: 0, max: 105
+        }
+      }
+    }
+  });
+}
+
 function switchExplorerMode(mode) {
-  ['explorer-browse-mode','explorer-screen-mode'].forEach(id => {
+  ['explorer-browse-mode','explorer-screen-mode','explorer-bubble-mode'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
@@ -8103,12 +8271,18 @@ function switchExplorerMode(mode) {
   if (mode === 'browse') {
     const el = document.getElementById('explorer-browse-mode');
     if (el) el.style.display = 'block';
-    document.querySelector('.mode-toggle button:first-child').classList.add('active');
+    document.querySelectorAll('.mode-toggle button').forEach(b => { if (b.textContent.trim() === 'Browse') b.classList.add('active'); });
     renderExplorer();
+    setTimeout(renderVintageTrendChart, 100);
+  } else if (mode === 'bubble') {
+    const el = document.getElementById('explorer-bubble-mode');
+    if (el) el.style.display = 'block';
+    document.querySelectorAll('.mode-toggle button').forEach(b => { if (b.textContent.trim() === 'Bubble Chart') b.classList.add('active'); });
+    renderBubbleChart();
   } else {
     const el = document.getElementById('explorer-screen-mode');
     if (el) el.style.display = 'block';
-    document.querySelector('.mode-toggle button:last-child').classList.add('active');
+    document.querySelectorAll('.mode-toggle button').forEach(b => { if (b.textContent.trim() === 'Screen') b.classList.add('active'); });
   }
   window._explorerMode = mode;
 }
