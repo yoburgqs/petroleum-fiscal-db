@@ -1016,6 +1016,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <button class="tab-btn" onclick="switchTab('t6',this)">Mechanics</button>
   <button class="tab-btn" onclick="switchTab('t9',this)">API</button>
   <button class="tab-btn" onclick="switchTab('tmethodology',this)">Methodology</button>
+  <button class="tab-btn" onclick="switchTab('treformrisk',this)">Reform Risk</button>
 </div>
 
 <!-- ===== SEARCH OVERLAY ===== -->
@@ -1945,6 +1946,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     </div>
   </div>
 </div>
+<!-- ── Reform Risk Tab ── --><div id="treformrisk" class="tab-pane">  <div class="page-title">Reform Risk Intelligence</div>  <div class="page-sub">Track fiscal law changes across 185 jurisdictions. Countries with frequent reforms carry regime risk beyond their headline government take.</div>  <div id="reform-risk-content" style="margin-top:20px;">    <div style="color:var(--muted);font-size:13px;padding:40px 0;text-align:center;">Loading reform history&hellip;</div>  </div></div>
 
 <script>
 let REFORM_HISTORY = {}; // loaded async from reform_history.json
@@ -2022,6 +2024,7 @@ function switchTab(id, btn) {
     switchExplorerMode(window._explorerMode || 'browse');
     setTimeout(renderIRRScatter, 100);
   }
+  if (id === 'treformrisk') renderReformRisk();
   // Update URL hash on tab change (only for primary nav tabs; skip secondary tabs)
   var tabHashMap = { t0: 'compare', t7: 'profile', texplorer: 'explorer', t5: 'ioc' };
   if (tabHashMap[id]) {
@@ -5057,6 +5060,7 @@ window.MECHANICS_INFO       = MECHANICS_INFO;
 // Now that MECHANICS_INFO is available, populate the reference panel list
 if (typeof _renderRefMechanics === 'function') _renderRefMechanics();
 renderSampleAnalyses();
+renderReformRisk();
 }
 
 // ── Sample Analyses ──────────────────────────────────────────────────────────
@@ -5336,6 +5340,192 @@ function renderSampleAnalyses() {
   asiaGrid.innerHTML = cardA + cardB + cardC;
 }
 window.renderSampleAnalyses = renderSampleAnalyses;
+
+// ── Reform Risk Intelligence Tab ─────────────────────────────────────────────
+function renderReformRisk() {
+  const container = document.getElementById('reform-risk-content');
+  if (!container) return;
+
+  const rh = REFORM_HISTORY || {};
+  const countries = Object.keys(rh);
+
+  if (!countries.length) {
+    container.innerHTML = '<div style="color:var(--muted);padding:40px 0;text-align:center;">Reform history data not available.</div>';
+    return;
+  }
+
+  // Build reform counts per country
+  const reformCounts = countries.map(c => {
+    const events = Array.isArray(rh[c]) ? rh[c] : [];
+    const since2010 = events.filter(e => (e.year || 0) >= 2010).length;
+    const total = events.length;
+    const byDecade = {};
+    events.forEach(e => {
+      const yr = e.year;
+      if (yr) {
+        const dec = Math.floor(yr / 10) * 10;
+        byDecade[dec] = (byDecade[dec] || 0) + 1;
+      }
+    });
+    // Count direction from take_change field
+    let tightened = 0, liberalized = 0, neutral = 0;
+    events.forEach(e => {
+      if (e.take_change && e.take_change.startsWith('+')) tightened++;
+      else if (e.take_change && e.take_change.startsWith('-')) liberalized++;
+      else neutral++;
+    });
+    const cd = (COUNTRY_DATA || []).find(d => d.country === c);
+    return { country: c, total, since2010, byDecade, take75: cd ? cd.take_75 : null, events, tightened, liberalized, neutral };
+  }).sort((a,b) => b.total - a.total);
+
+  // Stability score: 100 - (since2010 * 15), min 0
+  const withScore = reformCounts.map(r => ({...r, score: Math.max(0, 100 - r.since2010 * 15)}));
+
+  // Decades for heatmap
+  const decades = [1970,1980,1990,2000,2010,2020];
+  const heatCountries = reformCounts.slice(0, 20);
+
+  const cellColor = n => {
+    if (!n) return '#1e293b';
+    if (n === 1) return '#b45309';
+    if (n === 2) return '#f97316';
+    return '#ef4444';
+  };
+
+  const takeColor = v => {
+    if (v == null) return '#64748b';
+    if (v < 40) return '#22c55e';
+    if (v < 55) return '#86efac';
+    if (v < 70) return '#eab308';
+    if (v < 85) return '#f97316';
+    return '#ef4444';
+  };
+
+  // Aggregate direction totals
+  const totalTightened = withScore.reduce((s,r) => s + r.tightened, 0);
+  const totalLiberalized = withScore.reduce((s,r) => s + r.liberalized, 0);
+  const totalNeutral = withScore.reduce((s,r) => s + r.neutral, 0);
+  const totalEvents = totalTightened + totalLiberalized + totalNeutral;
+
+  // Section 1: Top reformed countries table
+  const topTable = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;">'
+    + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Most Frequently Reformed Regimes</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Countries ranked by total fiscal law change events in the database. High count = active reform environment = regime risk for long-horizon IOC investments.</div>'
+    + '<table style="width:100%;border-collapse:collapse;">'
+    + '<thead><tr>'
+    + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Country</th>'
+    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Total Events</th>'
+    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Since 2010</th>'
+    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Stability Score</th>'
+    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Take @$75</th>'
+    + '</tr></thead>'
+    + '<tbody>'
+    + withScore.slice(0,15).map(function(r) {
+        return '<tr>'
+          + '<td style="padding:5px 8px;font-size:12px;color:var(--text);">' + r.country + '</td>'
+          + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--accent);font-weight:600;">' + r.total + '</td>'
+          + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + (r.since2010>2?'#ef4444':r.since2010>0?'#f97316':'#22c55e') + ';">' + r.since2010 + '</td>'
+          + '<td style="padding:5px 8px;font-size:12px;text-align:right;">'
+          + '<div style="display:inline-flex;align-items:center;gap:6px;">'
+          + '<div style="width:60px;height:6px;background:#1e293b;border-radius:3px;overflow:hidden;">'
+          + '<div style="width:' + r.score + '%;height:100%;background:' + (r.score>70?'#22c55e':r.score>40?'#eab308':'#ef4444') + ';border-radius:3px;"></div>'
+          + '</div>'
+          + '<span style="color:' + (r.score>70?'#22c55e':r.score>40?'#eab308':'#ef4444') + ';font-size:11px;">' + r.score + '</span>'
+          + '</div>'
+          + '</td>'
+          + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + takeColor(r.take75) + ';font-weight:' + (r.take75!=null?'600':'400') + ';">' + (r.take75!=null?r.take75.toFixed(1)+'%':'\u2014') + '</td>'
+          + '</tr>';
+      }).join('')
+    + '</tbody></table></div>';
+
+  // Section 2: Decade heatmap
+  const heatmap = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;overflow-x:auto;">'
+    + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Reform Activity Heatmap \u2014 By Decade</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Top 20 most-reformed countries. Cell color = number of fiscal law changes in that decade. Dark = none, amber = 1, orange = 2, red = 3+.</div>'
+    + '<table style="border-collapse:collapse;min-width:500px;">'
+    + '<thead><tr>'
+    + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);min-width:140px;">Country</th>'
+    + decades.map(function(d) { return '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;padding:6px 10px;border-bottom:1px solid var(--border);">' + d + 's</th>'; }).join('')
+    + '</tr></thead>'
+    + '<tbody>'
+    + heatCountries.map(function(r) {
+        return '<tr>'
+          + '<td style="padding:5px 8px;font-size:11px;color:var(--text);white-space:nowrap;">' + r.country + '</td>'
+          + decades.map(function(d) {
+              var n = r.byDecade[d] || 0;
+              return '<td style="text-align:center;padding:4px 6px;">'
+                + '<div style="width:32px;height:20px;background:' + cellColor(n) + ';border-radius:3px;margin:0 auto;display:flex;align-items:center;justify-content:center;">'
+                + '<span style="font-size:10px;color:' + (n?'#fff':'#475569') + ';">' + (n||'') + '</span>'
+                + '</div></td>';
+            }).join('')
+          + '</tr>';
+      }).join('')
+    + '</tbody></table></div>';
+
+  // Section 3: Stable vs Volatile
+  var stable = withScore.filter(function(r){return r.score>=85;}).slice(0,8);
+  var volatileList = withScore.filter(function(r){return r.score<30;}).slice(0,8);
+
+  var stabVol = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">'
+    + '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid #22c55e;border-radius:10px;padding:16px;">'
+    + '<div style="font-size:11px;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Most Stable Regimes</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">0\u20131 reform events since 2010. Predictable fiscal environment for long-term IOC projects.</div>'
+    + stable.map(function(r) {
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #1e293b;">'
+          + '<span style="font-size:12px;color:var(--text);">' + r.country + '</span>'
+          + '<span style="font-size:12px;color:' + takeColor(r.take75) + ';font-weight:600;">' + (r.take75!=null?r.take75.toFixed(1)+'%':'\u2014') + '</span>'
+          + '</div>';
+      }).join('')
+    + '</div>'
+    + '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid #ef4444;border-radius:10px;padding:16px;">'
+    + '<div style="font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Most Volatile Regimes</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">3+ reform events since 2010. Risk of term renegotiation over a 25-year project life.</div>'
+    + volatileList.map(function(r) {
+        return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #1e293b;">'
+          + '<span style="font-size:12px;color:var(--text);">' + r.country + '</span>'
+          + '<span style="font-size:11px;color:#ef4444;">' + r.since2010 + ' changes \u00b7 <span style="color:' + takeColor(r.take75) + '">' + (r.take75!=null?r.take75.toFixed(1)+'%':'\u2014') + '</span></span>'
+          + '</div>';
+      }).join('')
+    + '</div></div>';
+
+  // Section 4: Reform Type Distribution
+  var pctT = totalEvents ? (totalTightened/totalEvents*100).toFixed(0) : 0;
+  var pctL = totalEvents ? (totalLiberalized/totalEvents*100).toFixed(0) : 0;
+  var pctN = totalEvents ? (totalNeutral/totalEvents*100).toFixed(0) : 0;
+
+  var distrib = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;">'
+    + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Reform Direction Distribution</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Tightening = take_change positive (government captured more). Liberalizing = take_change negative. Neutral/structural = no directional take_change recorded.</div>'
+    + '<div style="display:flex;gap:20px;flex-wrap:wrap;margin-bottom:14px;">'
+    + '<div style="text-align:center;flex:1;min-width:100px;">'
+    + '<div style="font-size:24px;font-weight:800;color:#ef4444;">' + totalTightened + '</div>'
+    + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600;">Tightened</div>'
+    + '<div style="font-size:11px;color:#ef4444;">' + pctT + '%</div>'
+    + '</div>'
+    + '<div style="text-align:center;flex:1;min-width:100px;">'
+    + '<div style="font-size:24px;font-weight:800;color:#22c55e;">' + totalLiberalized + '</div>'
+    + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600;">Liberalized</div>'
+    + '<div style="font-size:11px;color:#22c55e;">' + pctL + '%</div>'
+    + '</div>'
+    + '<div style="text-align:center;flex:1;min-width:100px;">'
+    + '<div style="font-size:24px;font-weight:800;color:var(--muted);">' + totalNeutral + '</div>'
+    + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:600;">Neutral / Structural</div>'
+    + '<div style="font-size:11px;color:var(--muted);">' + pctN + '%</div>'
+    + '</div></div>'
+    + '<div style="height:10px;background:#1e293b;border-radius:5px;overflow:hidden;display:flex;">'
+    + '<div style="width:' + pctT + '%;height:100%;background:#ef4444;"></div>'
+    + '<div style="width:' + pctL + '%;height:100%;background:#22c55e;"></div>'
+    + '<div style="width:' + pctN + '%;height:100%;background:#64748b;"></div>'
+    + '</div>'
+    + '<div style="display:flex;justify-content:space-between;margin-top:6px;">'
+    + '<span style="font-size:10px;color:#ef4444;">Tightened</span>'
+    + '<span style="font-size:10px;color:#22c55e;">Liberalized</span>'
+    + '<span style="font-size:10px;color:#64748b;">Neutral</span>'
+    + '</div></div>';
+
+  container.innerHTML = topTable + heatmap + stabVol + distrib;
+}
+window.renderReformRisk = renderReformRisk;
 
 function loadAPIJson(country) {
   const out = document.getElementById('api-json-output');
