@@ -1027,6 +1027,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <button class="tab-btn" onclick="switchTab('t9',this)">API</button>
   <button class="tab-btn" onclick="switchTab('tmethodology',this)">Methodology</button>
   <button class="tab-btn" onclick="switchTab('treformrisk',this)">Reform Risk</button>
+  <button class="tab-btn" onclick="switchTab('tbreakevenmap',this)">Breakeven Map</button>
 </div>
 
 <!-- ===== SEARCH OVERLAY ===== -->
@@ -1843,6 +1844,44 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   </script>
 </div>
 
+
+<!-- ===== TAB: BREAKEVEN MAP ===== -->
+<div id="tbreakevenmap" class="tab-pane">
+  <div class="page-title">Global Breakeven Price Map</div>
+  <div class="page-sub">Country-level breakeven price — the oil price at which the project achieves zero NPV (undiscounted). Countries above current price are producing at a loss; countries far below are insulated.</div>
+  
+  <div style="display:flex;align-items:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
+    <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);">
+      <span>Current price marker:</span>
+      <input type="range" id="be-price-marker" min="30" max="120" value="70" step="5" style="width:120px;accent-color:var(--accent);">
+      <span id="be-price-label" style="color:var(--accent);font-weight:700;min-width:40px;">$70</span>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;font-size:11px;">
+      <span style="display:inline-block;width:12px;height:12px;background:#22c55e;border-radius:2px;"></span><span style="color:var(--muted);">&lt;$40 (very low)</span>
+      <span style="display:inline-block;width:12px;height:12px;background:#86efac;border-radius:2px;"></span><span style="color:var(--muted);">$40–55</span>
+      <span style="display:inline-block;width:12px;height:12px;background:#eab308;border-radius:2px;"></span><span style="color:var(--muted);">$55–70</span>
+      <span style="display:inline-block;width:12px;height:12px;background:#f97316;border-radius:2px;"></span><span style="color:var(--muted);">$70–85</span>
+      <span style="display:inline-block;width:12px;height:12px;background:#ef4444;border-radius:2px;"></span><span style="color:var(--muted);">&gt;$85</span>
+      <span style="display:inline-block;width:12px;height:12px;background:#475569;border-radius:2px;"></span><span style="color:var(--muted);">No data</span>
+    </div>
+  </div>
+  
+  <div id="breakeven-map-container" style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;position:relative;">
+    <svg id="breakeven-map-svg" style="width:100%;height:500px;display:block;"></svg>
+    <div id="breakeven-map-tooltip" style="position:absolute;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:8px 12px;font-size:12px;pointer-events:none;display:none;z-index:10;"></div>
+  </div>
+  
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="font-size:11px;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Lowest Breakeven (Most Resilient)</div>
+      <div id="be-lowest-list"></div>
+    </div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
+      <div style="font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Highest Breakeven (Most Price-Sensitive)</div>
+      <div id="be-highest-list"></div>
+    </div>
+  </div>
+</div>
 <!-- ===== REFERENCE SLIDE-IN PANEL ===== -->
 <div id="reference-overlay" onclick="toggleReferencePanel()"></div>
 <aside id="reference-panel">
@@ -2080,6 +2119,7 @@ function switchTab(id, btn) {
     setTimeout(renderIRRScatter, 100);
   }
   if (id === 'treformrisk') renderReformRisk();
+  if (id === 'tbreakevenmap') renderBreakevenMap();
   // Update URL hash on tab change (only for primary nav tabs; skip secondary tabs)
   var tabHashMap = { t0: 'compare', t7: 'profile', texplorer: 'explorer', t5: 'ioc' };
   if (tabHashMap[id]) {
@@ -8423,6 +8463,217 @@ renderBasket(); // initialize on load
     initTypeahead();
   }
 })();
+
+// ─── BREAKEVEN MAP TAB ──────────────────────────────────────────────────────
+let _beMapRendered = false;
+
+function beColor(be) {
+  if (be == null) return '#475569';
+  if (be < 40) return '#22c55e';
+  if (be < 55) return '#86efac';
+  if (be < 70) return '#eab308';
+  if (be < 85) return '#f97316';
+  return '#ef4444';
+}
+
+async function renderBreakevenMap() {
+  if (_beMapRendered) return;
+  if (!window.d3) {
+    document.getElementById('breakeven-map-container').innerHTML = '<div style="color:var(--muted);padding:24px;">D3 not loaded</div>';
+    return;
+  }
+  if (!COUNTRY_DATA) {
+    document.getElementById('breakeven-map-container').innerHTML = '<div style="color:var(--muted);padding:24px;">Data not loaded yet</div>';
+    return;
+  }
+
+  const container = document.getElementById('breakeven-map-container');
+  const svgEl = document.getElementById('breakeven-map-svg');
+  const tooltip = document.getElementById('breakeven-map-tooltip');
+
+  const ISO_MAP = {
+    840:'United States', 826:'United Kingdom', 578:'Norway',
+    276:'Germany', 250:'France', 643:'Russia', 156:'China',
+    356:'India', 36:'Australia', 124:'Canada', 484:'Mexico',
+    76:'Brazil', 170:'Colombia', 32:'Argentina',
+    818:'Egypt', 434:'Libya', 788:'Tunisia', 12:'Algeria',
+    566:'Nigeria', 710:'South Africa', 404:'Kenya', 24:'Angola',
+    288:'Ghana', 508:'Mozambique', 716:'Zimbabwe',
+    368:'Iraq', 364:'Iran', 682:'Saudi Arabia', 784:'United Arab Emirates',
+    634:'Qatar', 414:'Kuwait', 48:'Bahrain', 512:'Oman',
+    320:'Guatemala', 340:'Honduras', 600:'Paraguay',
+    360:'Indonesia', 458:'Malaysia', 704:'Vietnam', 764:'Thailand',
+    608:'Philippines', 392:'Japan', 410:'South Korea',
+    144:'Sri Lanka', 50:'Bangladesh', 586:'Pakistan',
+    706:'Somalia', 800:'Uganda', 174:'Comoros',
+    694:'Sierra Leone', 678:'Sao Tome and Principe',
+    408:'North Korea', 626:'Timor-Leste',
+    324:'Guinea', 120:'Cameroon', 266:'Gabon',
+    178:'Republic of the Congo', 180:'Democratic Republic of the Congo',
+    834:'Tanzania', 231:'Ethiopia', 729:'Sudan', 148:'Chad',
+    426:'Lesotho', 516:'Namibia', 894:'Zambia',
+    450:'Madagascar', 226:'Equatorial Guinea', 768:'Togo', 204:'Benin',
+    646:'Rwanda', 108:'Burundi', 454:'Malawi', 72:'Botswana',
+    232:'Eritrea', 262:'Djibouti', 132:'Cape Verde', 624:'Guinea-Bissau',
+    270:'Gambia', 686:'Senegal', 466:'Mali', 562:'Niger', 478:'Mauritania',
+    275:'Palestine', 400:'Jordan', 760:'Syria', 422:'Lebanon', 792:'Turkey',
+    887:'Yemen', 104:'Myanmar', 598:'Papua New Guinea',
+    554:'New Zealand', 96:'Brunei', 116:'Cambodia', 418:'Laos',
+    496:'Mongolia', 398:'Kazakhstan', 795:'Turkmenistan',
+    860:'Uzbekistan', 31:'Azerbaijan', 268:'Georgia', 51:'Armenia',
+    862:'Venezuela', 604:'Peru', 68:'Bolivia', 152:'Chile', 218:'Ecuador',
+    780:'Trinidad and Tobago', 328:'Guyana', 740:'Suriname',
+    858:'Uruguay', 192:'Cuba', 388:'Jamaica', 84:'Belize',
+    188:'Costa Rica', 591:'Panama', 558:'Nicaragua', 222:'El Salvador',
+    332:'Haiti', 214:'Dominican Republic', 528:'Netherlands',
+    208:'Denmark', 380:'Italy', 724:'Spain', 616:'Poland',
+    642:'Romania', 804:'Ukraine', 8:'Albania', 191:'Croatia',
+    300:'Greece', 100:'Bulgaria', 348:'Hungary', 40:'Austria',
+    756:'Switzerland', 56:'Belgium', 372:'Ireland', 620:'Portugal',
+    752:'Sweden', 246:'Finland'
+  };
+
+  const beLookup = {};
+  const takeLookup = {};
+  COUNTRY_DATA.forEach(d => {
+    beLookup[d.country] = d.be_75;
+    takeLookup[d.country] = d.take_75;
+  });
+
+  let world;
+  try {
+    world = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+  } catch(e) {
+    container.innerHTML = '<div style="color:var(--muted);padding:24px;">Map unavailable (network error).</div>';
+    return;
+  }
+
+  svgEl.innerHTML = '';
+
+  const width = container.offsetWidth || 900;
+  const height = 500;
+
+  const svg = d3.select(svgEl)
+    .attr('viewBox', '0 0 ' + width + ' ' + height)
+    .style('background', '#0f172a');
+
+  const projection = d3.geoNaturalEarth1()
+    .scale(width / 6.5)
+    .translate([width / 2, height / 2]);
+
+  const path = d3.geoPath().projection(projection);
+  const countries = topojson.feature(world, world.objects.countries);
+
+  const priceSlider = document.getElementById('be-price-marker');
+  const currentPrice = parseInt(priceSlider?.value || 70);
+
+  svg.selectAll('path')
+    .data(countries.features)
+    .join('path')
+    .attr('d', path)
+    .attr('fill', d => {
+      const name = ISO_MAP[+d.id];
+      const be = name ? beLookup[name] : null;
+      return beColor(be);
+    })
+    .attr('stroke', d => {
+      const name = ISO_MAP[+d.id];
+      const be = name ? beLookup[name] : null;
+      return (be != null && be > currentPrice) ? '#ef4444' : '#0f172a';
+    })
+    .attr('stroke-width', d => {
+      const name = ISO_MAP[+d.id];
+      const be = name ? beLookup[name] : null;
+      return (be != null && be > currentPrice) ? 1.5 : 0.5;
+    })
+    .attr('data-be', d => {
+      const name = ISO_MAP[+d.id];
+      const be = name ? beLookup[name] : null;
+      return be != null ? be : '';
+    })
+    .style('cursor', d => {
+      const name = ISO_MAP[+d.id];
+      return beLookup[name] != null ? 'pointer' : 'default';
+    })
+    .on('mouseover', function(event, d) {
+      const name = ISO_MAP[+d.id];
+      const be = name ? beLookup[name] : null;
+      const take = name ? takeLookup[name] : null;
+      if (!name) return;
+      d3.select(this).attr('stroke', '#e8a020').attr('stroke-width', 2);
+      let html = '<strong style="color:#e8a020">' + name + '</strong><br>';
+      if (be != null) {
+        html += 'Breakeven: <strong>$' + be.toFixed(1) + '/bbl</strong><br>';
+        if (take != null) html += 'Govt take @$75: <strong>' + take.toFixed(1) + '%</strong>';
+      } else {
+        html += '<span style="color:#94a3b8">No breakeven data</span>';
+      }
+      tooltip.innerHTML = html;
+      tooltip.style.display = 'block';
+    })
+    .on('mousemove', function(event) {
+      const rect = container.getBoundingClientRect();
+      let left = event.clientX - rect.left + 12;
+      let top = event.clientY - rect.top - 28;
+      const tw = tooltip.offsetWidth || 160;
+      if (left + tw > rect.width) left = rect.width - tw - 8;
+      if (top < 0) top = 8;
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+    })
+    .on('mouseout', function(event, d) {
+      const name = ISO_MAP[+d.id];
+      const be = name ? beLookup[name] : null;
+      const price = parseInt(priceSlider?.value || 70);
+      d3.select(this)
+        .attr('stroke', (be != null && be > price) ? '#ef4444' : '#0f172a')
+        .attr('stroke-width', (be != null && be > price) ? 1.5 : 0.5);
+      tooltip.style.display = 'none';
+    })
+    .on('click', function(event, d) {
+      const name = ISO_MAP[+d.id];
+      if (name && beLookup[name] != null && typeof openCountryProfileFromFC === 'function') {
+        openCountryProfileFromFC(name);
+      }
+    });
+
+  const mapped = Object.values(beLookup).filter(v => v != null).length;
+  svg.append('text')
+    .attr('x', width - 10).attr('y', height - 10)
+    .attr('fill', '#94a3b8').attr('font-size', 10).attr('text-anchor', 'end')
+    .text(mapped + ' countries with breakeven data');
+
+  const withBE = COUNTRY_DATA.filter(d => d.be_75 != null).sort((a, b) => a.be_75 - b.be_75);
+  const lowest = withBE.slice(0, 10);
+  const highest = withBE.slice(-10).reverse();
+
+  function listHTML(items) {
+    return items.map(d => {
+      const col = beColor(d.be_75);
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;">'
+        + '<span style="color:var(--text);">' + d.country + '</span>'
+        + '<span style="color:' + col + ';font-weight:700;font-variant-numeric:tabular-nums;">$' + d.be_75.toFixed(1) + '</span>'
+        + '</div>';
+    }).join('');
+  }
+  document.getElementById('be-lowest-list').innerHTML = listHTML(lowest);
+  document.getElementById('be-highest-list').innerHTML = listHTML(highest);
+
+  priceSlider?.addEventListener('input', function() {
+    document.getElementById('be-price-label').textContent = '$' + this.value;
+    const price = parseInt(this.value);
+    document.querySelectorAll('#breakeven-map-svg path[data-be]').forEach(p => {
+      const beVal = p.getAttribute('data-be');
+      if (beVal === '') return;
+      const be = parseFloat(beVal);
+      p.style.strokeWidth = be > price ? '1.5' : '0.5';
+      p.style.stroke = be > price ? '#ef4444' : '#0f172a';
+    });
+  });
+
+  _beMapRendered = true;
+}
+
 
 
 // ================================================================
