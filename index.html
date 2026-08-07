@@ -1020,19 +1020,19 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <!-- ===== v38 TAB NAV ===== -->
-<div class="tab-nav">
-  <button class="tab-btn active" onclick="switchTab('t0',this)">Fiscal Compare</button>
-  <button class="tab-btn" onclick="switchTab('tsamples',this)">Sample Analyses</button>
-  <button class="tab-btn" onclick="switchTab('t7',this)">Country Profile</button>
-  <button class="tab-btn" onclick="switchTab('texplorer',this)">Regime Explorer</button>
-  <button class="tab-btn" onclick="switchTab('t5',this)">IOC Portfolio</button>
-  <button class="tab-btn" onclick="switchTab('t2',this)">Comparison</button>
-  <button class="tab-btn" onclick="switchTab('t4',this)">Vintage</button>
-  <button class="tab-btn" onclick="switchTab('t6',this)">Mechanics</button>
-  <button class="tab-btn" onclick="switchTab('t9',this)">API</button>
-  <button class="tab-btn" onclick="switchTab('tmethodology',this)">Methodology</button>
-  <button class="tab-btn" onclick="switchTab('treformrisk',this)">Reform Risk</button>
-  <button class="tab-btn" onclick="switchTab('tbreakevenmap',this)">Breakeven Map</button>
+<div class="tab-nav" role="tablist">
+  <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('t0',this)">Fiscal Compare</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tsamples',this)">Sample Analyses</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t7',this)">Country Profile</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('texplorer',this)">Regime Explorer</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t5',this)">IOC Portfolio</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t2',this)">Comparison</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t4',this)">Vintage</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t6',this)">Mechanics</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t9',this)">API</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tmethodology',this)">Methodology</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('treformrisk',this)">Reform Risk</button>
+  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tbreakevenmap',this)">Breakeven Map</button>
 </div>
 
 <!-- ===== SEARCH OVERLAY ===== -->
@@ -1050,7 +1050,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <!-- ===== TAB 0: FISCAL COMPARE (v38 centerpiece) ===== -->
-<div id="t0" class="tab-pane active">
+<div id="t0" class="tab-pane active" role="tabpanel">
 
   <!-- ── Welcome / Guide Panel ── -->
   <div id="welcome-panel" style="background:var(--card);border:1px solid rgba(45,212,191,.2);border-radius:10px;padding:20px 24px;margin-bottom:20px;">
@@ -1202,7 +1202,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <!-- ===== TAB: REGIME EXPLORER (wraps Browse=t1 + Screen=t3) ===== -->
-<div id="texplorer" class="tab-pane">
+<div id="texplorer" class="tab-pane" role="tabpanel">
   <div class="page-title">Regime Explorer</div>
   <div class="page-sub">Browse the full database or screen by fiscal criteria.</div>
   <div class="mode-toggle">
@@ -1475,7 +1475,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 </div>
 
-<div id="t2" class="tab-pane">
+<div id="t2" class="tab-pane" role="tabpanel">
   <div class="page-title">Country Comparison</div>
   <div class="page-sub">Select 2–4 countries to compare fiscal terms side-by-side.</div>
 
@@ -1507,7 +1507,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 3: INVESTMENT SCREENER ═══════════════════ -->
 
 
-<div id="t4" class="tab-pane">
+<div id="t4" class="tab-pane" role="tabpanel">
   <div class="page-title">Vintage Analysis</div>
   <div class="page-sub">How fiscal terms have evolved across decades. All data at $75/bbl base price.</div>
 
@@ -1585,7 +1585,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 5: IOC PORTFOLIO ═════════════════════════ -->
 
 
-<div id="t5" class="tab-pane">
+<div id="t5" class="tab-pane" role="tabpanel">
   <div class="page-title">IOC Portfolio View</div>
   <div class="page-sub">Search any operator to see their full portfolio of fiscal contracts. All metrics at $75/bbl.</div>
 
@@ -1637,7 +1637,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 6: MECHANICS GUIDE ═══════════════════════ -->
 
 
-<div id="t6" class="tab-pane">
+<div id="t6" class="tab-pane" role="tabpanel">
   <div class="page-title">Fiscal Mechanics Reference Guide</div>
   <div class="page-sub">Comprehensive reference for each petroleum fiscal mechanism in the database.</div>
   <div class="mech-grid" id="mech-grid"></div>
@@ -1646,7 +1646,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 7: COUNTRY DEEP-DIVE ════════════════════ -->
 
 
-<div id="t7" class="tab-pane">
+<div id="t7" class="tab-pane" role="tabpanel">
   <div class="page-title">Country Profile</div>
   <div class="page-sub">Detailed fiscal profile with reform history for any country in the database.</div>
   <div id="dd-select-wrap">
@@ -1686,7 +1686,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 8: API EXPLORER ════════════════════════ -->
 
 
-<div id="t9" class="tab-pane">
+<div id="t9" class="tab-pane" role="tabpanel">
   <div class="page-title">API Explorer</div>
   <div class="page-sub">Browse the live JSON API for any country. Endpoint: <code>api/v1/country/{slug}.json</code> where slug = country name lowercased with hyphens. 185 countries available. Response includes <code>profit_oil_tier_schedule</code> for R-factor PSC countries. Fiscal facts power the Country Deep-Dive panel above.</div>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
@@ -1839,7 +1839,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   <!-- Section 5: Model Validation — Regression Benchmarks -->
   <div class="dd-section" id="meth-validation">
     <div class="dd-section-hdr">Model Validation — Regression Benchmarks</div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">13 benchmark countries validated against published reference ranges. Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">12 benchmark countries validated against published reference ranges. Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range.</p>
     <div class="tbl-wrap">
       <table id="benchmark-validation-table">
         <thead>
@@ -1854,9 +1854,21 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
         <tbody id="benchmark-validation-body"></tbody>
       </table>
     </div>
-    <p style="font-size:12px;color:var(--muted);margin:14px 0 0;padding:10px 14px;background:var(--surface);border-left:3px solid #ef4444;border-radius:0 6px 6px 0;">
-      <strong>Russia note:</strong> Russia uses a simplified flat MET model. The Article 342 formula is production-volume and price-linked. See mechanic_formulas.md A11 for full disclosure.
+  </div>
+
+  <!-- Known Model Limitations subsection -->
+  <div class="dd-section" id="meth-known-limitations" style="margin-top:16px;">
+    <div class="dd-section-hdr" style="color:var(--accent);">Known Model Limitations</div>
+    <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 12px;">
+      The following countries are excluded from the validation table above because our model does not yet fully capture their fiscal structures. They remain in the database for directional use only.
     </p>
+    <div style="padding:12px 16px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;margin-bottom:8px;">
+      <strong style="color:var(--accent);">Russia — Mineral Extraction Tax (MET) model</strong>
+      <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
+        Platform estimate: <strong style="color:var(--text);">24.8%</strong> government take. Published reference range: 45–55%.<br>
+        Russia's fiscal terms are highly opaque and contract-specific. The platform uses a simplified Article 342 MET formula (production-volume and price-linked), which is directionally correct for export-oriented onshore producers operating at reference price. However, it does not capture Russia's additional profit-based export duties (NDPI surcharge) or the excess profit tax (EPT) introduced for large fields post-2019. Together, these can add 20–30 percentage points to effective government take for giant fields. This is a known sourcing gap; enhanced MET + EPT modeling is pending primary source acquisition (Federal Law No. 366-FZ).
+      </p>
+    </div>
   </div>
   <script>
   (function renderBenchmarkTable() {
@@ -1869,7 +1881,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
       'Kazakhstan': { platform: 70.2, ref_lo: 67, ref_hi: 74,  note: 'KAZENERGY' },
       'Malaysia':   { platform: 59.4, ref_lo: 56, ref_hi: 63,  note: 'PETRONAS annual' },
       'Indonesia':  { platform: 59.6, ref_lo: 57, ref_hi: 64,  note: 'SKK Migas' },
-      'Russia':     { platform: 24.8, ref_lo: 45, ref_hi: 55,  note: 'Simplified MET model — known gap' },
+
       'USA':        { platform: 23.4, ref_lo: 20, ref_hi: 27,  note: 'EIA GOM study' },
       'Brazil':     { platform: 55.9, ref_lo: 53, ref_hi: 60,  note: 'ANP/Wood Mac' },
       'Australia':  { platform: 53.2, ref_lo: 50, ref_hi: 58,  note: 'PRRT literature' },
@@ -2236,10 +2248,10 @@ const MECH_COUNTS = {"Concession": 64673, "PSC": 6412, "EPSA": 208, "Buy-back": 
 // ─── utility ─────────────────────────────────────────────────────────────────
 function switchTab(id, btn) {
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
   var panel = document.getElementById(id);
   if (panel) panel.classList.add('active');
-  if (btn) btn.classList.add('active');
+  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
   window._activeTab = id;
   if (id === 'texplorer') {
     switchExplorerMode(window._explorerMode || 'browse');
