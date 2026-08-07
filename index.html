@@ -1793,6 +1793,14 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-title">Methodology</div>
   <div class="page-sub">How government take is calculated, key assumptions, evidence quality, and production weighting approach.</div>
 
+  <!-- Platform Provenance -->
+  <div class="dd-section" id="meth-provenance">
+    <div class="dd-section-hdr">Who Built This</div>
+    <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation.
+    </p>
+  </div>
+
   <!-- Recent Platform Updates / Changelog -->
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
@@ -1954,6 +1962,9 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
         <tbody id="benchmark-validation-body"></tbody>
       </table>
     </div>
+    <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.6;">
+      <strong>Benchmark sources:</strong> Government take ranges validated against 13 publicly disclosed reference sets: Wood Mackenzie Fiscal Benchmarks; Rystad Energy UCube Country Profiles; S&amp;P Global Commodity Insights Fiscal Terms Database; IHS Markit Fiscal and Regulatory Updates; Norwegian Offshore Directorate (NCA) published range; HMRC/OGA UK fiscal take reports; EIA Gulf of Mexico fiscal study; ANP (Brazil) fiscal disclosure; KAZENERGY Annual Report; PETRONAS Annual Report; SKK Migas (Indonesia) contractor terms; Sonangol/IMF Angola fiscal review; NNPC/Rystad Nigeria fiscal benchmarks.
+    </p>
   </div>
 
   <!-- Known Model Limitations subsection -->
@@ -4637,6 +4648,7 @@ function loadCountryProfile(country) {
     ${mcBadge}
     ${dqBadge}
     ${prodDQBadge}
+    <span style="margin-left:10px;font-size:10px;color:var(--muted);white-space:nowrap;" title="Database last verified and deduplicated August 2026">Last verified: Aug 2026</span>
     <span style="margin-left:8px;" title="Fiscal Predictability Score — see methodology note">${renderStabilityBadge(getFiscalPredictabilityScore(d))}</span>
     <button class="btn btn-sm btn-outline" style="margin-left:8px;font-size:11px;" onclick="ddAddCompare('${ddCountryEsc}',this)">+ Compare</button>
     <button class="btn btn-sm btn-outline" style="margin-left:6px;font-size:11px;" onclick="ddOpenScenarioBuilder('${ddCountryEsc}')">&#128295; Scenario</button>
