@@ -1,7 +1,11 @@
 {
   "name": "petroleum-fiscal-db",
+  "version": "1.0.0",
   "scripts": {
-    "test": "node ../tmp/pw_test/runtime_comprehensive.js",
-    "test:local": "TEST_URL=http://localhost:8080 node ../tmp/pw_test/runtime_comprehensive.js"
+    "test": "node tests/runtime_comprehensive.js",
+    "test:local": "TEST_URL=http://localhost:8080 node tests/runtime_comprehensive.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.45.0"
   }
 }
