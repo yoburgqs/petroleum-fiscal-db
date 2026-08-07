@@ -1944,6 +1944,14 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
       <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading…</div>
     </div>
   </div>
+
+  <div style="margin-top:36px;">
+    <div style="font-size:10px;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Strategic Screens</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Pre-built IOC capital allocation screens: OPEC access, frontier deepwater, post-reform terms, R-factor tiers.</div>
+    <div id="samples-grid-strategic" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
+      <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading&hellip;</div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -5334,6 +5342,191 @@ function renderSampleAnalyses() {
     </div>`;
 
   asiaGrid.innerHTML = cardA + cardB + cardC;
+
+  // ── Strategic Screens Section ─────────────────────────────────────────────
+  const strategicGrid = document.getElementById('samples-grid-strategic');
+  if (!strategicGrid) return;
+
+  // ── Card D: OPEC vs Non-OPEC ─────────────────────────────────────────────
+  const opecMembers = ['Saudi Arabia','UAE','Iraq','Iran','Kuwait','Venezuela','Nigeria','Libya','Algeria','Gabon','Republic of Congo','Equatorial Guinea','Ethiopia','Cameroon'];
+  const opecData = cd.filter(d => opecMembers.includes(d.country));
+  const nonOpecData = cd.filter(d => !opecMembers.includes(d.country));
+  const grpStats = (g) => {
+    if (!g.length) return {avg:'\u2014',med:'\u2014',mn:'\u2014',mx:'\u2014',n:0,avgNum:null};
+    const sorted = [...g].sort((a,b) => a.take_75 - b.take_75);
+    const avg = g.reduce((s,d) => s + d.take_75, 0) / g.length;
+    const med = sorted[Math.floor(sorted.length / 2)].take_75;
+    return {
+      avg: '<span style="color:' + takeColor(avg) + ';font-weight:600">' + avg.toFixed(1) + '%</span>',
+      med: '<span style="color:' + takeColor(med) + '">' + med.toFixed(1) + '%</span>',
+      mn: sorted[0].take_75.toFixed(1) + '%',
+      mx: sorted[sorted.length-1].take_75.toFixed(1) + '%',
+      n: g.length,
+      avgNum: avg
+    };
+  };
+  const opecS = grpStats(opecData);
+  const nonOpecS = grpStats(nonOpecData);
+  const opecDiffRows = [
+    ['<span style="color:#ef4444;font-weight:600">OPEC Members</span>', opecS.n, opecS.avg, opecS.med, opecS.mn + ' \u2013 ' + opecS.mx],
+    ['<span style="color:var(--text)">Non-OPEC</span>', nonOpecS.n, nonOpecS.avg, nonOpecS.med, nonOpecS.mn + ' \u2013 ' + nonOpecS.mx],
+  ];
+  const opecDiff = (opecS.avgNum != null && nonOpecS.avgNum != null) ? (opecS.avgNum - nonOpecS.avgNum) : null;
+  const cardD = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #ef4444;">
+      <div style="font-size:10px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">OPEC vs Non-OPEC</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Do OPEC member states extract more from IOCs than non-members?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">14 OPEC members/associates vs rest of world. OPEC average is ${opecDiff != null ? (opecDiff > 0 ? '+' + opecDiff.toFixed(1) : opecDiff.toFixed(1)) + 'pp higher' : 'comparable'}. But ranges overlap \u2014 individual regime design matters more than OPEC membership.</div>
+      ${tbl([{label:'Group'},{label:'Countries',align:'right'},{label:'Avg @$75',align:'right'},{label:'Median',align:'right'},{label:'Range',align:'right'}], opecDiffRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);switchExplorerMode('browse');}})()">Open in Explorer</button>
+    </div>`;
+
+  // ── Card E: Middle East Bloc — IOC Access Reality ─────────────────────────
+  const meList = [
+    {c:'Saudi Arabia',access:false,note:'NOC monopoly (Saudi Aramco)'},
+    {c:'Iran',access:false,note:'Buyback/IPC \u2014 sanctions limit IOC access'},
+    {c:'Kuwait',access:false,note:'NOC monopoly (KPC) \u2014 no IOC equity'},
+    {c:'Iraq',access:true,note:'TSC-dominant \u2014 IOCs active (BP, Eni, Lukoil)'},
+    {c:'UAE',access:true,note:'Concession \u2014 IOCs active (ADNOC partnerships)'},
+    {c:'Qatar',access:true,note:'LNG JVs \u2014 limited upstream equity'},
+    {c:'Oman',access:true,note:'Concession \u2014 IOC-friendly terms'},
+    {c:'Bahrain',access:true,note:'Small producer \u2014 concession terms'},
+    {c:'Yemen',access:false,note:'Conflict \u2014 operations suspended'}
+  ];
+  const meRows = meList.map(({c, access, note}) => {
+    const d = cd.find(x => x.country === c);
+    const takeStr = d ? '<span style="color:' + takeColor(d.take_75) + ';font-weight:600">' + d.take_75.toFixed(1) + '%</span>' : '\u2014';
+    const accessStr = access
+      ? '<span style="color:#22c55e;font-weight:600;">Open</span>'
+      : '<span style="color:#ef4444;font-weight:600;">Limited/No IOC</span>';
+    return ['<span style="color:var(--text)">' + c + '</span>', accessStr, takeStr,
+            '<span style="color:var(--muted);font-size:10px">' + note + '</span>'];
+  });
+  const meAccessible = ['Iraq','UAE','Qatar','Oman','Bahrain'].filter(c => cd.find(x => x.country === c));
+  const cardE = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #f59e0b;">
+      <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Middle East Bloc &mdash; IOC Access Reality</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">OPEC&rsquo;s largest reserve holders: which are actually open to IOCs?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Iraq (TSC) and UAE (concession) are the primary accessible markets. Saudi Arabia, Kuwait, and Iran have minimal IOC equity access &mdash; despite holding ~45% of Middle East reserves.</div>
+      ${tbl([{label:'Country'},{label:'IOC Access'},{label:'Govt Take @$75',align:'right'},{label:'Notes'}], meRows)}
+      <button style="${btnStyle}" onclick="(function(){${meAccessible.map(c => "addCompare('" + c.replace(/'/g,"\\\\'") + "');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Load accessible in Compare</button>
+    </div>`;
+
+  // ── Card F: Post-COVID Fiscal Loosening (2019-2023) ───────────────────────
+  const postCovidList = [
+    {c:'Guyana',year:2016,note:'Stabroek PSC \u2014 50% cost recovery, no windfall tax'},
+    {c:'Suriname',year:2020,note:'Block 58 terms modeled on Guyana'},
+    {c:'Mozambique',year:2019,note:'Area 1/4 LNG \u2014 EPCC contracts awarded'},
+    {c:'Senegal',year:2019,note:'Sangomar FPSO \u2014 new petroleum code 2019'},
+    {c:'Namibia',year:2022,note:'Orange Basin \u2014 Venus/Graff discoveries, new terms'},
+    {c:'Tanzania',year:2022,note:'LNG framework agreement signed'},
+    {c:'Uganda',year:2021,note:'EACOP + Tilenga FID \u2014 production sharing terms'}
+  ];
+  const pcRows = postCovidList.map(({c, year, note}) => {
+    const d = cd.find(x => x.country === c);
+    const takeStr = d ? '<span style="color:' + takeColor(d.take_75) + ';font-weight:600">' + d.take_75.toFixed(1) + '%</span>' : '\u2014';
+    return ['<span style="color:var(--text)">' + c + '</span>', year, takeStr,
+            '<span style="color:var(--muted);font-size:10px">' + note + '</span>'];
+  });
+  const pcCountries = postCovidList.map(x => x.c).filter(c => cd.find(x => x.country === c));
+  const cardF = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #22c55e;">
+      <div style="font-size:10px;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Post-COVID Fiscal Loosening (2019&ndash;2023)</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Which countries cut fiscal terms to attract investment after the 2020 crash?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Frontier nations introduced competitive fiscal frameworks to attract first-mover IOC capital. Guyana set the template &mdash; no windfall tax, generous cost recovery &mdash; and peers followed.</div>
+      ${tbl([{label:'Country'},{label:'Year',align:'right'},{label:'Govt Take @$75',align:'right'},{label:'Framework'}], pcRows)}
+      <button style="${btnStyle}" onclick="(function(){${pcCountries.map(c => "addCompare('" + c.replace(/'/g,"\\\\'") + "');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
+    </div>`;
+
+  // ── Card G: R-Factor PSC Tiers ────────────────────────────────────────────
+  const rfCountries = cd.filter(d => d.has_r_factor_tiers);
+  const rfRows = rfCountries
+    .sort((a,b) => (b.take_75||0) - (a.take_75||0))
+    .map(d => {
+      const dlt = delta(d);
+      return ['<span style="color:var(--text)">' + d.country + '</span>',
+              d.region || '\u2014',
+              '<span style="color:' + takeColor(d.take_50) + '">' + fmt(d.take_50) + '</span>',
+              '<span style="color:' + takeColor(d.take_75) + ';font-weight:600">' + fmt(d.take_75) + '</span>',
+              '<span style="color:' + takeColor(d.take_125) + '">' + fmt(d.take_125) + '</span>',
+              '<span style="color:' + deltaColor(dlt) + '">' + (dlt != null ? '+' + dlt.toFixed(1) + 'pp' : '\u2014') + '</span>'];
+    });
+  const cardG = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #a855f7;">
+      <div style="font-size:10px;font-weight:700;color:#a855f7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">R-Factor PSC Tiers</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">For R-factor PSC countries, when does the state&rsquo;s profit oil share escalate?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">R-factor regimes link the government&rsquo;s profit oil share to project profitability (cumulative revenue / cumulative cost). Higher R = higher state take. The swing column shows how much take increases from $50 to $125/bbl &mdash; a proxy for escalation aggressiveness. ${rfCountries.length} countries with R-factor tiers identified.</div>
+      ${tbl([{label:'Country'},{label:'Region'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], rfRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);setExplorerRFactor(document.getElementById('chip-rfactor-psc'));}})()">Filter R-factor PSC in Explorer</button>
+    </div>`;
+
+  // ── Card H: Deepwater Frontier Screen ─────────────────────────────────────
+  const dwCountries = [...(DEPTH_PROFILE['deepwater']||[]), ...(DEPTH_PROFILE['mixed']||[])];
+  const dwScreen = cd
+    .filter(d => dwCountries.includes(d.country) && d.take_75 < 55 && d.be_75 != null && d.be_75 > 1 && d.be_75 < 65 && d.n_contracts >= 3)
+    .sort((a,b) => a.take_75 - b.take_75);
+  const dwRows = dwScreen.map(d => [
+    '<span style="color:var(--text)">' + d.country + '</span>',
+    d.region || '\u2014',
+    '<span style="color:' + takeColor(d.take_75) + ';font-weight:600">' + d.take_75.toFixed(1) + '%</span>',
+    '<span style="color:#22c55e">$' + d.be_75.toFixed(0) + '/bbl</span>',
+    d.n_contracts || '\u2014'
+  ]);
+  const dwNearMiss = cd
+    .filter(d => dwCountries.includes(d.country) && d.n_contracts >= 3 && d.be_75 != null && d.be_75 > 1
+      && !(d.take_75 < 55 && d.be_75 < 65))
+    .sort((a,b) => a.take_75 - b.take_75)
+    .slice(0, 4);
+  const dwNearRows = dwNearMiss.map(d => [
+    '<span style="color:var(--muted)">' + d.country + '</span>',
+    d.region || '\u2014',
+    '<span style="color:' + takeColor(d.take_75) + '">' + d.take_75.toFixed(1) + '%</span>',
+    '<span style="color:#f59e0b">$' + d.be_75.toFixed(0) + '/bbl</span>',
+    d.n_contracts || '\u2014'
+  ]);
+  const allDwRows = [...dwRows, ...dwNearRows];
+  const dwCmpCountries = dwScreen.slice(0, 5).map(d => d.country);
+  const cardH = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #0ea5e9;">
+      <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Deepwater Frontier Screen</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Where can an IOC find deepwater access at take &lt; 55% and breakeven &lt; $65?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Screened from ${dwCountries.length} deepwater/mixed-depth countries with &ge;3 contracts. ${dwScreen.length} pass both thresholds.${dwNearMiss.length ? ' ' + dwNearMiss.length + ' near-misses shown in muted text.' : ''}</div>
+      ${tbl([{label:'Country'},{label:'Region'},{label:'Govt Take @$75',align:'right'},{label:'Breakeven',align:'right'},{label:'Contracts',align:'right'}], allDwRows)}
+      <button style="${btnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);switchExplorerMode('screen');}})()">Open in Screener</button>
+    </div>`;
+
+  // ── Card I: Reform Trajectory — Most Stable Regimes ───────────────────────
+  const reformCounts = {};
+  if (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) {
+    Object.entries(REFORM_HISTORY).forEach(([country, events]) => {
+      const since2010 = (events || []).filter(e => e.year >= 2010).length;
+      reformCounts[country] = since2010;
+    });
+  }
+  cd.forEach(d => {
+    if (!(d.country in reformCounts)) reformCounts[d.country] = 0;
+  });
+  const reformEntries = Object.entries(reformCounts).map(([c, n]) => ({country: c, reforms: n, d: cd.find(x => x.country === c)})).filter(x => x.d);
+  const stableCountries = reformEntries.filter(x => x.reforms <= 1).sort((a,b) => a.d.take_75 - b.d.take_75).slice(0, 8);
+  const volatileCountries = reformEntries.filter(x => x.reforms >= 3).sort((a,b) => b.reforms - a.reforms).slice(0, 8);
+  const stblTbl = (function(){
+    const th = [{label:'Country'},{label:'Region'},{label:'Govt Take @$75',align:'right'},{label:'Since 2010',align:'right'}]
+      .map(h => '<th style="text-align:' + (h.align||'left') + ';color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;border-bottom:1px solid var(--border);">' + h.label + '</th>').join('');
+    const sRows = stableCountries.map(x => '<tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#22c55e">' + x.country + '</span></td><td style="padding:5px 8px;font-size:12px;">' + (x.d.region||'\u2014') + '</td><td style="padding:5px 8px;font-size:12px;color:' + takeColor(x.d.take_75) + ';font-weight:600">' + x.d.take_75.toFixed(1) + '%</td><td style="padding:5px 8px;font-size:12px;color:#22c55e">' + x.reforms + ' reform' + (x.reforms!==1?'s':'') + '</td></tr>').join('');
+    const divider = '<tr><td colspan="4" style="padding:4px 8px;"><div style="border-top:1px solid var(--border);margin:4px 0;"></div><span style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Most volatile</span></td></tr>';
+    const vRows = volatileCountries.map(x => '<tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#ef4444">' + x.country + '</span></td><td style="padding:5px 8px;font-size:12px;">' + (x.d.region||'\u2014') + '</td><td style="padding:5px 8px;font-size:12px;color:' + takeColor(x.d.take_75) + ';font-weight:600">' + x.d.take_75.toFixed(1) + '%</td><td style="padding:5px 8px;font-size:12px;color:#ef4444;font-weight:600">' + x.reforms + ' reforms</td></tr>').join('');
+    return '<table style="width:100%;border-collapse:collapse;"><thead><tr>' + th + '</tr></thead><tbody>' + sRows + divider + vRows + '</tbody></table>';
+  })();
+  const cardI = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #64748b;">
+      <div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Reform Trajectory &mdash; Regime Stability</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Which regimes have stayed consistent for 10+ years &mdash; and which have changed most?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Reform events since 2010 from the platform&rsquo;s reform history database. Stable regimes (0-1 changes) offer predictability; volatile regimes (3+) demand higher risk premiums. ${stableCountries.length} stable + ${volatileCountries.length} volatile shown.</div>
+      ${stblTbl}
+      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Vintage'));if(btn)switchTab('t4',btn);})()">Open Vintage</button>
+    </div>`;
+
+  strategicGrid.innerHTML = cardD + cardE + cardF + cardG + cardH + cardI;
 }
 window.renderSampleAnalyses = renderSampleAnalyses;
 
