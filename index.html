@@ -1038,7 +1038,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v52</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v53</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1064,10 +1064,10 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       Reference <span style="font-size:9px;opacity:.7;">&#9660;</span>
     </button>
     <div class="tab-dropdown-menu" id="ref-dropdown-menu" role="menu">
-      <button class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('t4',this)">Vintage Analysis</button>
-      <button class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('t6',this)">Fiscal Mechanics</button>
-      <button class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('tmethodology',this)">Methodology</button>
-      <button class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('t9',this)">API Explorer</button>
+      <button id="ref-item-vintage" class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('t4',this)">Vintage Analysis</button>
+      <button id="ref-item-mechanics" class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('t6',this)">Fiscal Mechanics</button>
+      <button id="ref-item-methodology" class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('tmethodology',this)">Methodology</button>
+      <button id="ref-item-api" class="tab-dropdown-item" role="menuitem" onclick="switchTabFromDropdown('t9',this)">API Explorer</button>
     </div>
   </div>
 </div>
@@ -1153,7 +1153,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
         <div style="background:rgba(255,255,255,.03);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;padding:10px 12px;">
           <div style="font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:4px;">Q: What does IRR look like across 185 countries at $75 for a deepwater project?</div>
-          <div style="font-size:11px;color:var(--muted);">→ <strong>Screener</strong> (inside Regime Explorer → Screen &amp; Rank tab): set profile=Deepwater, sort by IRR. Presets: "Sweet Spot", "High IRR", "Deepwater".</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Screener</strong> (inside Regime Explorer → Screener tab): set profile=Deepwater, sort by IRR. Presets: "Sweet Spot", "High IRR", "Deepwater".</div>
         </div>
 
         <div style="background:rgba(255,255,255,.03);border-left:3px solid #22c55e;border-radius:0 6px 6px 0;padding:10px 12px;">
@@ -1553,7 +1553,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 3: INVESTMENT SCREENER ═══════════════════ -->
 
 
-<div id="t4" class="tab-pane" role="tabpanel">
+<div id="t4" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="ref-item-vintage">
   <div class="page-title">Vintage Analysis</div>
   <div class="page-sub">How fiscal terms have evolved across decades. All data at $75/bbl base price.</div>
 
@@ -1683,7 +1683,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 6: MECHANICS GUIDE ═══════════════════════ -->
 
 
-<div id="t6" class="tab-pane" role="tabpanel">
+<div id="t6" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="ref-item-mechanics">
   <div class="page-title">Fiscal Mechanics Reference Guide</div>
   <div class="page-sub">Comprehensive reference for each petroleum fiscal mechanism in the database.</div>
   <div class="mech-grid" id="mech-grid"></div>
@@ -1742,7 +1742,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 8: API EXPLORER ════════════════════════ -->
 
 
-<div id="t9" class="tab-pane" role="tabpanel">
+<div id="t9" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="ref-item-api">
   <div class="page-title">API Explorer</div>
   <div class="page-sub">Browse the live JSON API for any country. Endpoint: <code>api/v1/country/{slug}.json</code> where slug = country name lowercased with hyphens. 185 countries available. Response includes <code>profit_oil_tier_schedule</code> for R-factor PSC countries. Fiscal facts power the Country Profile panel above.</div>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
@@ -1764,6 +1764,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v53 (Aug 2026)</strong> — Reference dropdown consolidation, NPV formatting fixes, empty state improvements, CDN fallback handling, keyboard navigation, Scenario Builder improvements, naming consistency (Screener).<br>
       <strong>v52 (Aug 2026)</strong> — Tab navigation streamlined (8 primary tabs + Reference dropdown), Fiscal Compare auto-refreshes on filter change, NPV formatting unified, region search added, skip-to-content accessibility link.<br>
       <strong>v51 (Aug 2026)</strong> — 118-test Playwright suite passing, ARIA roles, export improvements, error states, naming fixes.<br>
       <strong>v50 (Aug 2026)</strong> — First complete prototype: 71,601 contracts, 7 DCF mechanics, 185 countries, 4-price view.
