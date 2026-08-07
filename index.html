@@ -1045,14 +1045,14 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ===== v52 TAB NAV (8 primary tabs + Reference dropdown) ===== -->
 <div class="tab-nav-wrapper">
 <div class="tab-nav" role="tablist" id="main-content">
-  <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('t0',this)">Fiscal Compare</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tsamples',this)">Sample Analyses</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t7',this)">Country Profile</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('texplorer',this)">Regime Explorer</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t5',this)">IOC Portfolio</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t2',this)">Side-by-Side</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('treformrisk',this)">Reform Risk</button>
-  <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tbreakevenmap',this)">Breakeven Map</button>
+  <button id="tab-btn-t0" class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('t0',this)">Fiscal Compare</button>
+  <button id="tab-btn-tsamples" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tsamples',this)">Sample Analyses</button>
+  <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t7',this)">Country Profile</button>
+  <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('texplorer',this)">Regime Explorer</button>
+  <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t5',this)">IOC Portfolio</button>
+  <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t2',this)">Side-by-Side</button>
+  <button id="tab-btn-treformrisk" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('treformrisk',this)">Reform Risk</button>
+  <button id="tab-btn-tbreakevenmap" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tbreakevenmap',this)">Breakeven Map</button>
   <!-- Reference dropdown: Vintage, Mechanics, API, Methodology -->
   <div class="tab-dropdown" id="ref-tab-dropdown">
     <button class="tab-dropdown-btn" id="ref-dropdown-btn" onclick="toggleRefDropdown(event)" aria-haspopup="true" aria-expanded="false">
@@ -1083,7 +1083,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <!-- ===== TAB 0: FISCAL COMPARE (v38 centerpiece) ===== -->
-<div id="t0" class="tab-pane active" role="tabpanel">
+<div id="t0" class="tab-pane active" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t0">
 
   <!-- ── Welcome / Guide Panel ── -->
   <div id="welcome-panel" style="background:var(--card);border:1px solid rgba(45,212,191,.2);border-radius:10px;padding:20px 24px;margin-bottom:20px;">
@@ -1235,7 +1235,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <!-- ===== TAB: REGIME EXPLORER (wraps Browse=t1 + Screen=t3) ===== -->
-<div id="texplorer" class="tab-pane" role="tabpanel">
+<div id="texplorer" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-texplorer">
   <div class="page-title">Regime Explorer</div>
   <div class="page-sub">Browse the full database or screen by fiscal criteria.</div>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
@@ -1512,7 +1512,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 </div>
 
-<div id="t2" class="tab-pane" role="tabpanel">
+<div id="t2" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t2">
   <div class="page-title">Side-by-Side Country Comparison</div>
   <div class="page-sub">Select 2–4 countries to compare fiscal terms side-by-side.</div>
 
@@ -1622,7 +1622,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 5: IOC PORTFOLIO ═════════════════════════ -->
 
 
-<div id="t5" class="tab-pane" role="tabpanel">
+<div id="t5" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t5">
   <div class="page-title">IOC Portfolio View</div>
   <div class="page-sub">Search any operator to see their full portfolio of fiscal contracts. All metrics at $75/bbl.</div>
 
@@ -1683,7 +1683,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ═══════════════════════════ TAB 7: COUNTRY DEEP-DIVE ════════════════════ -->
 
 
-<div id="t7" class="tab-pane" role="tabpanel">
+<div id="t7" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t7">
   <div class="page-title">Country Profile</div>
   <div class="page-sub">Detailed fiscal profile with reform history for any country in the database.</div>
   <div id="dd-select-wrap">
@@ -1750,6 +1750,16 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <div id="tmethodology" class="tab-pane" role="tabpanel">
   <div class="page-title">Methodology</div>
   <div class="page-sub">How government take is calculated, key assumptions, evidence quality, and production weighting approach.</div>
+
+  <!-- Recent Platform Updates / Changelog -->
+  <div class="dd-section" id="meth-changelog">
+    <div class="dd-section-hdr">Recent Platform Updates</div>
+    <div style="font-size:13px;line-height:1.7;">
+      <strong>v52 (Aug 2026)</strong> — Tab navigation streamlined (8 primary tabs + Reference dropdown), Fiscal Compare auto-refreshes on filter change, NPV formatting unified, region search added, skip-to-content accessibility link.<br>
+      <strong>v51 (Aug 2026)</strong> — 118-test Playwright suite passing, ARIA roles, export improvements, error states, naming fixes.<br>
+      <strong>v50 (Aug 2026)</strong> — First complete prototype: 71,601 contracts, 7 DCF mechanics, 185 countries, 4-price view.
+    </div>
+  </div>
 
   <!-- Quick Navigation -->
   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
@@ -2032,7 +2042,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
 
 
 <!-- ===== TAB: BREAKEVEN MAP ===== -->
-<div id="tbreakevenmap" class="tab-pane" role="tabpanel">
+<div id="tbreakevenmap" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-tbreakevenmap">
   <div class="page-title">Global Breakeven Price Map</div>
   <div class="page-sub">Country-level breakeven price — the oil price at which the project achieves zero NPV (undiscounted). Countries above current price are producing at a loss; countries far below are insulated.</div>
   
@@ -2204,7 +2214,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
 </div>
 
 <!-- ── Sample Analyses Tab ── -->
-<div id="tsamples" class="tab-pane" role="tabpanel">
+<div id="tsamples" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-tsamples">
   <div class="page-title">Sample Analyses</div>
   <div class="page-sub">Pre-built comparisons drawn live from 71,601 contracts. Click any "Load" button to open the result in the full interactive tool.</div>
 
@@ -2231,7 +2241,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     </div>
   </div>
 </div>
-<!-- ── Reform Risk Tab ── --><div id="treformrisk" class="tab-pane" role="tabpanel">  <div class="page-title">Reform Risk Intelligence</div>  <div class="page-sub">Track fiscal law changes across 185 jurisdictions. Countries with frequent reforms carry regime risk beyond their headline government take.</div>  <div id="reform-risk-content" style="margin-top:20px;">    <div style="color:var(--muted);font-size:13px;padding:40px 0;text-align:center;">Loading reform history&hellip;</div>  </div></div>
+<!-- ── Reform Risk Tab ── --><div id="treformrisk" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-treformrisk">  <div class="page-title">Reform Risk Intelligence</div>  <div class="page-sub">Track fiscal law changes across 185 jurisdictions. Countries with frequent reforms carry regime risk beyond their headline government take.</div>  <div id="reform-risk-content" style="margin-top:20px;">    <div style="color:var(--muted);font-size:13px;padding:40px 0;text-align:center;">Loading reform history&hellip;</div>  </div></div>
 
 <script>
 let REFORM_HISTORY = {}; // loaded async from reform_history.json
@@ -2332,6 +2342,10 @@ function toggleRefDropdown(e) {
   var btn  = document.getElementById('ref-dropdown-btn');
   var open = menu.classList.toggle('open');
   btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  if (open) {
+    var firstItem = menu.querySelector('.tab-dropdown-item');
+    if (firstItem) setTimeout(function() { firstItem.focus(); }, 0);
+  }
 }
 function switchTabFromDropdown(id, item) {
   // Close dropdown
@@ -2357,6 +2371,30 @@ document.addEventListener('click', function() {
   var btn  = document.getElementById('ref-dropdown-btn');
   if (menu) menu.classList.remove('open');
   if (btn)  btn.setAttribute('aria-expanded','false');
+});
+// Reference dropdown keyboard navigation (WCAG 2.1 AA — menu button pattern)
+document.addEventListener('DOMContentLoaded', function() {
+  var dropMenu = document.getElementById('ref-dropdown-menu');
+  if (!dropMenu) return;
+  dropMenu.addEventListener('keydown', function(e) {
+    var items = Array.prototype.slice.call(this.querySelectorAll('.tab-dropdown-item'));
+    var idx = items.indexOf(document.activeElement);
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      items[(idx + 1) % items.length].focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      items[(idx - 1 + items.length) % items.length].focus();
+    } else if (e.key === 'Escape') {
+      this.classList.remove('open');
+      var btn = document.getElementById('ref-dropdown-btn');
+      if (btn) { btn.setAttribute('aria-expanded', 'false'); btn.focus(); }
+    } else if (e.key === 'Enter') {
+      if (document.activeElement && items.indexOf(document.activeElement) !== -1) {
+        document.activeElement.click();
+      }
+    }
+  });
 });
 // Override switchTab to clear dropdown has-active state when switching to primary tabs
 var _origSwitchTab = switchTab;
