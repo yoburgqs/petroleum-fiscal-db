@@ -5430,6 +5430,8 @@ if (typeof _renderRefMechanics === 'function') _renderRefMechanics();
 renderSampleAnalyses();
 renderReformRisk();
 initIOCExposureControls();
+// Retry hash navigation now that COUNTRY_DATA is loaded (DOMContentLoaded may have fired first)
+if (window.location.hash) parseAndNavigate(window.location.hash);
 }
 
 // ── IOC Operator Fiscal Exposure Analyzer ──────────────────────────────────────────
@@ -6366,6 +6368,7 @@ function toSlug(name) {
 }
 
 function fromSlug(slug) {
+  if (!COUNTRY_DATA) return null; // guard: called before async data load completes
   var s = slug.toLowerCase();
   var match = COUNTRY_DATA.find(function(d){ return toSlug(d.country) === s; });
   return match ? match.country : null;
