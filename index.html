@@ -4065,6 +4065,29 @@ function renderReformTimeline(country) {
   return html;
 }
 
+// Peer comparison: find N closest countries by |take_75 - current_take_75|
+function getPeerCountries(countryName, n) {
+  var current = COUNTRY_DATA.find(function(d) { return d.country === countryName; });
+  if (!current || current.take_75 == null) return [];
+  return COUNTRY_DATA
+    .filter(function(d) { return d.country !== countryName && d.take_75 != null && d.n >= 3; })
+    .map(function(d) { return Object.assign({}, d, {diff: Math.abs(d.take_75 - current.take_75)}); })
+    .sort(function(a, b) { return a.diff - b.diff; })
+    .slice(0, n);
+}
+
+// Breakeven resilience rank: rank ascending by be_75 (lower = more resilient)
+function getBreakevenRank(countryName) {
+  var current = COUNTRY_DATA.find(function(d) { return d.country === countryName; });
+  if (!current || current.be_75 == null || current.be_75 <= 0) return null;
+  var ranked = COUNTRY_DATA
+    .filter(function(d) { return d.be_75 != null && d.be_75 > 0 && d.be_75 < 500; })
+    .sort(function(a, b) { return a.be_75 - b.be_75; });
+  var idx = ranked.findIndex(function(d) { return d.country === countryName; });
+  if (idx < 0) return null;
+  return { rank: idx + 1, total: ranked.length };
+}
+
 function loadCountryProfile(country) {
   const content = document.getElementById('dd-content');
   const toggleWrap = document.getElementById('dd-mc-toggle-wrap');
@@ -4753,13 +4776,119 @@ function loadCountryProfile(country) {
       </div>`
     : '';
 
+  // -- Enhancement: Breakeven Price Callout --
+  var _beCallout = "";
+  (function() {
+    var bv = d.be_75;
+    if (bv == null || bv <= 0 || bv >= 500) {
+      _beCallout = '<div style="background:#1e293b;border:1px solid #334155;border-left:4px solid #64748b;border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:20px;">'
+        + '<div>'
+        + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Breakeven Price</div>'
+        + '<div style="font-size:28px;font-weight:700;color:#64748b;">\u2014</div>'
+        + '<div style="font-size:11px;color:var(--muted);">Breakeven data not available</div>'
+        + '</div></div>';
+      return;
+    }
+    var beColor = bv < 50 ? "#22c55e" : bv < 70 ? "#eab308" : bv < 85 ? "#f97316" : "#ef4444";
+    var ctxStmt = bv < 50
+      ? "Resilient at $" + bv.toFixed(0) + " \u2014 cushioned against most price scenarios"
+      : bv < 70
+        ? "Moderate breakeven at $" + bv.toFixed(0) + " \u2014 viable above mid-cycle prices"
+        : bv < 85
+          ? "Elevated at $" + bv.toFixed(0) + " \u2014 sensitive to price downturns below current Brent"
+          : "Vulnerable at $" + bv.toFixed(0) + " \u2014 negative NPV at prices below current Brent";
+    var beRank = getBreakevenRank(d.country);
+    var rankStr = beRank
+      ? "Ranked #" + beRank.rank + " of " + beRank.total + " countries by breakeven (lower = more resilient)"
+      : "";
+    _beCallout = '<div style="background:#1e293b;border:1px solid #334155;border-left:4px solid ' + beColor + ';border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;">'
+      + '<div>'
+      + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Breakeven Price</div>'
+      + '<div style="font-size:28px;font-weight:700;color:' + beColor + ';">$' + bv.toFixed(0) + '/bbl</div>'
+      + '<div style="font-size:11px;color:var(--muted);">NPV = 0 at this oil price (undiscounted)</div>'
+      + '</div>'
+      + '<div style="border-left:1px solid #334155;padding-left:20px;">'
+      + '<div style="font-size:12px;color:var(--text);">' + ctxStmt + '</div>'
+      + '<div style="font-size:11px;color:var(--muted);margin-top:4px;">' + rankStr + '</div>'
+      + '</div></div>';
+  })();
+
+  // -- Enhancement: Peer Comparison Mini-Table --
+  var _peerSection = "";
+  (function() {
+    if (d.take_75 == null) return;
+    var peers = getPeerCountries(d.country, 5);
+    if (peers.length === 0) return;
+    var ddSlugPeer = d.country.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    var thS = "text-align:left;padding:7px 10px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap;";
+    var thSR = "text-align:right;padding:7px 10px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap;";
+    function _tc(v) { return v == null ? "var(--muted)" : v <= 40 ? "var(--green)" : v <= 60 ? "var(--yellow)" : v <= 75 ? "var(--orange)" : "var(--red)"; }
+    function _ft(v) { return v != null ? v.toFixed(1) + "%" : "\u2014"; }
+    function _esc(n) { return n.replace(/'/g, "\'"); }
+    function _bpr(r, isSelf) {
+      var bg = isSelf ? "background:rgba(232,160,32,.12);" : "";
+      var fw = isSelf ? "font-weight:800;" : "font-weight:600;";
+      var dStr, dCol;
+      if (isSelf) { dStr = "\u2014"; dCol = "var(--muted)"; }
+      else {
+        var dt = r.take_75 - d.take_75;
+        dStr = (dt >= 0 ? "+" : "") + dt.toFixed(1) + "pp";
+        dCol = Math.abs(dt) < 2 ? "var(--muted)" : dt > 0 ? "var(--red)" : "var(--green)";
+      }
+      var mech = r.mechanics ? r.mechanics.split(",")[0] : "\u2014";
+      var clk = isSelf ? "" : ' onclick="document.getElementById(\'dd-country-select\').value=\'' + _esc(r.country) + '\';loadCountryProfile(\'' + _esc(r.country) + '\')"';
+      var hov = isSelf ? "" : ' onmouseover="this.style.background=\'rgba(232,160,32,.08)\'" onmouseout="this.style.background=\'\'"';
+      var addBtn = isSelf ? "" : '<button class="btn btn-sm btn-outline" style="font-size:9px;padding:2px 6px;margin-left:4px;" onclick="event.stopPropagation();addCompare(\'' + _esc(r.country) + '\')">+</button>';
+      var tr = '<tr style="' + bg + 'cursor:' + (isSelf ? 'default' : 'pointer') + ';"' + clk + hov + '>';
+      tr += '<td style="padding:6px 10px;' + fw + 'color:var(--text);white-space:nowrap;">' + r.country + (isSelf ? ' <span style="font-size:9px;color:var(--accent);">(this)</span>' : '') + addBtn + '</td>';
+      tr += '<td style="padding:6px 10px;text-align:right;font-family:IBM Plex Mono,monospace;font-size:12px;color:' + _tc(r.take_50) + ';">' + _ft(r.take_50) + '</td>';
+      tr += '<td style="padding:6px 10px;text-align:right;font-family:IBM Plex Mono,monospace;font-size:12px;font-weight:700;color:' + _tc(r.take_75) + ';">' + _ft(r.take_75) + '</td>';
+      tr += '<td style="padding:6px 10px;text-align:right;font-family:IBM Plex Mono,monospace;font-size:12px;color:' + _tc(r.take_125) + ';">' + _ft(r.take_125) + '</td>';
+      tr += '<td style="padding:6px 10px;font-size:11px;color:var(--muted);">' + mech + '</td>';
+      tr += '<td style="padding:6px 10px;font-size:11px;color:var(--muted);">' + (r.region || '\u2014') + '</td>';
+      tr += '<td style="padding:6px 10px;text-align:right;font-family:IBM Plex Mono,monospace;font-size:12px;color:' + dCol + ';">' + dStr + '</td>';
+      tr += '</tr>';
+      return tr;
+    }
+    var selfRow = _bpr(d, true);
+    var peerRows = peers.map(function(p) { return _bpr(p, false); }).join("");
+    var eS = d.country.replace(/'/g, "\\'");
+    var laParts = ["addCompare('" + eS + "')"];
+    peers.forEach(function(p) { laParts.push("addCompare('" + p.country.replace(/'/g, "\\'") + "')"); });
+    laParts.push("var cmpBtn=[...document.querySelectorAll('.tab-btn')].find(function(b){return b.textContent.includes('Comparison');});if(cmpBtn)switchTab('t2',cmpBtn);");
+    var laClick = '(function(){' + laParts.join('') + '})()';
+
+    _peerSection = '<div class="dd-section" id="dd-peers-' + ddSlugPeer + '">'
+      + '<div style="font-size:14px;font-weight:700;margin-bottom:4px;">Peer Comparison \u2014 Similar Fiscal Terms</div>'
+      + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Countries with closest government take at $75/bbl. Click any country to load its profile.</div>'
+      + '<div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border);">'
+      + '<table style="width:100%;border-collapse:collapse;">'
+      + '<thead><tr>'
+      + '<th style="' + thS + '">Country</th>'
+      + '<th style="' + thSR + '">@$50</th>'
+      + '<th style="' + thSR + '">@$75</th>'
+      + '<th style="' + thSR + '">@$125</th>'
+      + '<th style="' + thS + '">Mechanic</th>'
+      + '<th style="' + thS + '">Region</th>'
+      + '<th style="' + thSR + '">\u0394 vs ' + d.country + '</th>'
+      + '</tr></thead>'
+      + '<tbody>' + selfRow + peerRows + '</tbody>'
+      + '</table></div>'
+      + '<div style="margin-top:10px;text-align:right;">'
+      + '<button class="btn btn-sm btn-outline" onclick="' + laClick.replace(/"/g, '&quot;') + '">Load All Peers in Compare \u2192</button>'
+      + '</div></div>';
+  })();
+
+  // Prepend breakeven callout + peer comparison to mainSections
+  var _enhancedSections = _beCallout + _peerSection + mainSections;
+
   if (reforms.length > 0) {
     html += dqWarningBanner + `<div class="dd-layout has-sidebar">
-      <div class="dd-main">${mainSections}</div>
+      <div class="dd-main">${_enhancedSections}</div>
       <div class="dd-sidebar">${reformSection}</div>
     </div>`;
   } else {
-    html += dqWarningBanner + `<div class="dd-layout">${mainSections}</div>`;
+    html += dqWarningBanner + `<div class="dd-layout">${_enhancedSections}</div>`;
   }
 
   content.innerHTML = html;
