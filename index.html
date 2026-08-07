@@ -5085,7 +5085,7 @@ function loadCountryProfile(country) {
     var laParts = ["addCompare(decodeURIComponent('" + encodeURIComponent(d.country) + "'))"];
     peers.forEach(function(p) { laParts.push("addCompare(decodeURIComponent('" + encodeURIComponent(p.country) + "'))"); });
     laParts.push("var cmpBtn=[...document.querySelectorAll('.tab-btn')].find(function(b){return b.textContent.includes('Comparison');});if(cmpBtn)switchTab('t2',cmpBtn);");
-    var laClick = '(function(){' + laParts.join('') + '})()';
+    var laClick = '(function(){' + laParts.join(';') + '})()';
 
     _peerSection = '<div class="dd-section" id="dd-peers-' + ddSlugPeer + '">'
       + '<div style="font-size:14px;font-weight:700;margin-bottom:4px;">Peer Comparison \u2014 Similar Fiscal Terms</div>'
