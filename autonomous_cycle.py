@@ -80,21 +80,28 @@ def check_email():
 
 # ─── Step 2: Run Playwright test ──────────────────────────────────────────────
 
+REPORT_FILE = Path("C:/tmp/runtime_test_report.txt")
+
 def run_playwright():
     log("Step 2: Running Playwright test...")
-    out = run(f"node {TEST_FILE}", cwd=REPO, timeout=300)
-    # Parse results
+    run(f"node {TEST_FILE}", cwd=REPO, timeout=300)
+    # Read from the report file (test writes here in structured format)
     pass_count = fail_count = warn_count = js_errors = 0
-    m = re.search(r"PASS:\s*(\d+)", out)
-    if m: pass_count = int(m.group(1))
-    m = re.search(r"FAIL:\s*(\d+)", out)
-    if m: fail_count = int(m.group(1))
-    m = re.search(r"WARN:\s*(\d+)", out)
-    if m: warn_count = int(m.group(1))
-    m = re.search(r"JS errors:\s*(\d+)", out)
-    if m: js_errors = int(m.group(1))
+    raw = ""
+    try:
+        raw = REPORT_FILE.read_text(encoding="utf-8", errors="replace")
+        m = re.search(r"PASS:\s*(\d+)", raw)
+        if m: pass_count = int(m.group(1))
+        m = re.search(r"FAIL:\s*(\d+)", raw)
+        if m: fail_count = int(m.group(1))
+        m = re.search(r"WARN:\s*(\d+)", raw)
+        if m: warn_count = int(m.group(1))
+        m = re.search(r"JS errors:\s*(\d+)", raw)
+        if m: js_errors = int(m.group(1))
+    except Exception as e:
+        log(f"  Could not read report file: {e}")
     log(f"  Test: {pass_count} PASS / {fail_count} FAIL / {warn_count} WARN / {js_errors} JS errors")
-    return {"pass": pass_count, "fail": fail_count, "warn": warn_count, "js_errors": js_errors, "raw": out[-2000:]}
+    return {"pass": pass_count, "fail": fail_count, "warn": warn_count, "js_errors": js_errors, "raw": raw[-2000:]}
 
 # ─── Step 3+4: Claude grader review ──────────────────────────────────────────
 
