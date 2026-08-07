@@ -994,7 +994,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <body>
 <div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;display:flex;align-items:center;justify-content:center;z-index:9999;">
   <div style="text-align:center;color:#E8A020;font-family:'IBM Plex Mono',monospace">
-    <div style="font-size:2.5em;margin-bottom:20px;letter-spacing:4px">&#9632;</div>
+    <div style="margin-bottom:20px"><span style="font-size:28px;font-weight:900;letter-spacing:.15em;color:var(--accent);">ORCA</span></div>
     <div style="font-size:1.1em;font-weight:600;letter-spacing:1px">PETROLEUM FISCAL DATABASE</div>
     <div style="font-size:0.85em;color:#94a3b8;margin-top:8px">Loading 185 countries · 71,601 contracts...</div>
     <div style="margin-top:20px;width:200px;height:2px;background:#1e293b;border-radius:1px;overflow:hidden">
@@ -1017,7 +1017,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
     <button onclick="openScenarioBuilder()">+ Scenario</button>
-    <button onclick="toggleReferencePanel()">? Reference</button>
+    <button onclick="toggleReferencePanel()">Reference Guide</button>
   </div>
 </div>
 
@@ -1143,14 +1143,14 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <!-- Drilldown capabilities -->
       <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Drilldown Capabilities</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;font-size:11px;color:var(--muted);">
-        <div>📊 <strong style="color:var(--text);">Fiscal Compare</strong> — run any cost profile through all 185 countries simultaneously, rank by take, NPV, IRR, or breakeven</div>
-        <div>🌍 <strong style="color:var(--text);">Country Profile</strong> — per-contract distribution, price sensitivity curve, reform timeline, sourced fiscal facts with confidence badges (A/B/C)</div>
-        <div>🗂 <strong style="color:var(--text);">Regime Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
-        <div>📋 <strong style="color:var(--text);">Screener</strong> — filter by take range, IRR, mechanic, region with sorting. CSV export. Preset scenarios: Sweet Spot / High IRR / Deepwater.</div>
-        <div>📈 <strong style="color:var(--text);">IOC Portfolio</strong> — top operator positions by country, take, and contract count</div>
-        <div>🛠 <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: set royalty, CIT, profit oil split, R-factor tiers. Ctrl+K for search.</div>
-        <div>📡 <strong style="color:var(--text);">API</strong> — machine-readable JSON for every country. Download or pipe into your models.</div>
-        <div>🔍 <strong style="color:var(--text);">Source confidence</strong> — every fiscal fact shows its source and confidence tier. A = primary legislation. B = operator filing. C = secondary. D = default.</div>
+        <div>▦ <strong style="color:var(--text);">Fiscal Compare</strong> — run any cost profile through all 185 countries simultaneously, rank by take, NPV, IRR, or breakeven</div>
+        <div>◎ <strong style="color:var(--text);">Country Profile</strong> — per-contract distribution, price sensitivity curve, reform timeline, sourced fiscal facts with confidence badges (A/B/C)</div>
+        <div>≡ <strong style="color:var(--text);">Regime Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
+        <div>☰ <strong style="color:var(--text);">Screener</strong> — filter by take range, IRR, mechanic, region with sorting. CSV export. Preset scenarios: Sweet Spot / High IRR / Deepwater.</div>
+        <div>△ <strong style="color:var(--text);">IOC Portfolio</strong> — top operator positions by country, take, and contract count</div>
+        <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: set royalty, CIT, profit oil split, R-factor tiers. Ctrl+K for search.</div>
+        <div>◉ <strong style="color:var(--text);">API</strong> — machine-readable JSON for every country. Download or pipe into your models.</div>
+        <div>⌕ <strong style="color:var(--text);">Source confidence</strong> — every fiscal fact shows its source and confidence tier. A = primary legislation. B = operator filing. C = secondary. D = default.</div>
       </div>
     </div>
   </div>
@@ -1254,7 +1254,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <input type="radio" name="price" id="p125" value="125"><label for="p125">$125</label>
       </div>
     </div>
-    <div class="ctrl-group">
+    <!-- Mechanic + Region dropdowns hidden: chip rows above are the canonical filter UI (v41).
+         Kept in DOM so setExplorerChip() sync logic continues to work. -->
+    <div class="ctrl-group" style="display:none">
       <label>Mechanic</label>
       <select id="flt-mech">
         <option value="">All Mechanics</option>
@@ -1262,7 +1264,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <option>PRRT</option><option>RSC</option><option>Buy-back</option>
       </select>
     </div>
-    <div class="ctrl-group">
+    <div class="ctrl-group" style="display:none">
       <label>Region</label>
       <select id="flt-region">
         <option value="">All Regions</option>
@@ -2156,7 +2158,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
 </div>
 
 <!-- ── Sample Analyses Tab ── -->
-<div id="tsamples" class="tab-pane">
+<div id="tsamples" class="tab-pane" role="tabpanel">
   <div class="page-title">Sample Analyses</div>
   <div class="page-sub">Pre-built comparisons drawn live from 71,601 contracts. Click any "Load" button to open the result in the full interactive tool.</div>
 
