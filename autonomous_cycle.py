@@ -246,7 +246,7 @@ def main():
     test_before = run_playwright()
 
     # Steps 3-6: Claude does the heavy lifting
-    grader_content = GRADER_FILE.read_text() if GRADER_FILE.exists() else ""
+    grader_content = GRADER_FILE.read_text(encoding="utf-8", errors="replace") if GRADER_FILE.exists() else ""
     claude_summary = run_claude_cycle(grader_content, test_before, email_content)
 
     # Step 7
