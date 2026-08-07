@@ -7030,7 +7030,9 @@ function _buildTornadoChart(country, profileKey, basePrice) {
   const profile = { ...(DCF_PROFILES[profileKey] || DCF_PROFILES.deepwater) };
   const params = getDCFParams(country, mechanic);
   const runType = (mechanic === 'PSC' || mechanic === 'EPSA') ? 'psc' :
-                  (mechanic === 'TSC' || mechanic === 'RSC') ? 'tsc' : 'concession';
+                  (mechanic === 'TSC' || mechanic === 'RSC') ? 'tsc' :
+                  (mechanic === 'PRRT') ? 'prrt' :
+                  (mechanic === 'Buy-back' || mechanic === 'Buyback') ? 'buyback' : 'concession';
 
   function runNPV(overrides) {
     const p = { ...profile, ...overrides.profile };
@@ -7039,6 +7041,8 @@ function _buildTornadoChart(country, profileKey, basePrice) {
     let res;
     if (runType === 'psc') res = dcfPSC(pm, pr, p);
     else if (runType === 'tsc') res = dcfTSC(pm, pr, p);
+    else if (runType === 'prrt') res = dcfPRRT(pm, pr, p);
+    else if (runType === 'buyback') res = dcfBuyback(pm, pr, p);
     else res = dcfConcession(pm, pr, p);
     return res.npv || 0;
   }
@@ -7329,12 +7333,11 @@ function sbGetParams() {
       royalty_rate:+(document.getElementById('sb-prrt-royalty').value || 0) / 100,
       uplift_rate: +(document.getElementById('sb-prrt-uplift').value || 11.5) / 100,
     };
-  } else if (mech === 'PRRT') {
+  } else if (mech === 'TSC') {
     params = {
-      prrt_rate:   +(document.getElementById('sb-prrt-rate').value || 40) / 100,
-      cit_rate:    +(document.getElementById('sb-prrt-cit').value || 30) / 100,
-      royalty_rate:+(document.getElementById('sb-prrt-royalty').value || 0) / 100,
-      uplift_rate: +(document.getElementById('sb-prrt-uplift').value || 11.5) / 100,
+      fee_per_bbl: parseFloat(document.getElementById('sb-fee').value) || 4,
+      cit_rate:    (parseFloat(document.getElementById('sb-tsc-cit').value) || 0) / 100,
+      ept_rate:    (parseFloat(document.getElementById('sb-ept').value) || 0) / 100,
     };
   } else {
     params = {
