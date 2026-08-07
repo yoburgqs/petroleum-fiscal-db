@@ -1212,9 +1212,6 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
   <div id="explorer-browse-mode">
 
-  <div class="page-title">Global Fiscal Explorer</div>
-  <div class="page-sub">Browse government take, NPV, IRR, and breakeven across all countries and price scenarios.</div>
-
   <!-- v41: Mechanic filter chips -->
   <div class="chip-row" id="chip-row-mech">
     <span class="chip-row-label">Mechanic</span>
@@ -1650,7 +1647,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
 
 <div id="t7" class="tab-pane">
-  <div class="page-title">Country Deep-Dive</div>
+  <div class="page-title">Country Profile</div>
   <div class="page-sub">Detailed fiscal profile with reform history for any country in the database.</div>
   <div id="dd-select-wrap">
     <select id="dd-country-select" onchange="loadCountryProfile(this.value)">
@@ -9190,15 +9187,7 @@ loadPlatformData();
 </div>
 
 <!-- Data Vintage Footer -->
-<div id="data-vintage-footer" style="background:#0f172a;border-top:1px solid #1e293b;padding:10px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;font-size:11px;color:#64748b;font-family:monospace;">
-  <div style="display:flex;align-items:center;gap:16px;">
-    <span style="color:#e8a020;font-weight:700;">ORCA v51</span>
-    <span>71,601 contracts · 185 jurisdictions · 330,329 fiscal facts</span>
-    <span style="color:#475569;">|</span>
-    <span>DCF: 13-price · 7 mechanics</span>
-    <span style="color:#475569;">|</span>
-    <span>Evidence: <span style="color:#22c55e;">A</span>/<span style="color:#86efac;">B</span> primary sources 92.8%</span>
-  </div>
+<div id="data-vintage-footer" style="background:#0f172a;border-top:1px solid #1e293b;padding:10px 24px;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;font-size:11px;color:#64748b;font-family:monospace;">
   <div class="data-vintage-badge" style="display:flex;align-items:center;gap:8px;">
     <span class="badge-item" style="color:#e8a020;font-weight:700;">DB: 2026-08-06</span>
     <span class="badge-sep" style="color:#475569;">·</span>
@@ -9208,7 +9197,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v50</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v51</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
