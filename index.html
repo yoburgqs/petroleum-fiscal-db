@@ -2197,7 +2197,7 @@ const IOC_PRESENCE = {
 const DEPTH_PROFILE = {
   'onshore':   ['Iraq','Kazakhstan','USA','Russia','China','Algeria','Libya','Egypt','Oman','UAE','Kuwait','Saudi Arabia','Mexico','Colombia','Argentina','Pakistan'],
   'mixed':     ['Nigeria','Angola','Brazil','Norway','United Kingdom','Australia','Malaysia','Indonesia','Vietnam','India','Ecuador','Trinidad and Tobago','Peru'],
-  'deepwater': ['Guyana','Mozambique','Tanzania','Ghana','Senegal','Cameroon','Gabon','Equatorial Guinea','Republic of Congo','Namibia','Sierra Leone'],
+  'deepwater': ['Guyana','Mozambique','Tanzania','Ghana','Senegal','Cameroon','Gabon','Equatorial Guinea','Republic of the Congo','Namibia','Sierra Leone'],
 };
 
 // ─── embedded data ───────────────────────────────────────────────────────────
@@ -2899,20 +2899,28 @@ function setExplorerChip(filterType, value, btn) {
 
 // ─── v41: Region classification ──────────────────────────────────────────────
 function getRegion(country) {
+  // Primary: look up region from COUNTRY_DATA (authoritative)
+  if (window.COUNTRY_DATA) {
+    const cd = COUNTRY_DATA.find(function(d) { return d.country === country; });
+    if (cd && cd.region && cd.region !== 'Unknown') return cd.region;
+    // UAE sub-entries: check for UAE prefix
+    if (country && country.startsWith('UAE')) return 'Middle East';
+  }
+  // Fallback: hardcoded lists using DB-correct country names
   const AFRICA = ['Nigeria','Angola','Ghana','Mozambique','Libya','Algeria','Egypt','Tunisia',
-    'Cameroon','Gabon','Congo','Democratic Republic of the Congo','Republic of the Congo',
+    'Cameroon','Gabon','Democratic Republic of the Congo','Republic of the Congo',
     'Tanzania','Kenya','Ethiopia','Somalia','South Africa','Uganda','Sudan','Chad',
-    "Côte d'Ivoire",'Senegal','Mali','Niger','Mauritania','Namibia','Zambia','Zimbabwe',
+    "Cote d'Ivoire",'Senegal','Mali','Niger','Mauritania','Namibia','Zambia','Zimbabwe',
     'Madagascar','Equatorial Guinea','Sierra Leone','Liberia','Togo','Benin','Rwanda',
     'Burundi','Malawi','Botswana','Lesotho','Swaziland','Eritrea','Djibouti','Comoros',
     'Sao Tome and Principe','Cape Verde','Guinea','Guinea-Bissau','Gambia'];
-  const MIDDLE_EAST = ['Iraq','Iran','Saudi Arabia','United Arab Emirates','Qatar','Kuwait',
-    'Bahrain','Oman','Yemen','Jordan','Syria','Israel','Lebanon','Turkey'];
+  const MIDDLE_EAST = ['Iraq','Iran','Saudi Arabia','UAE','UAE \u2014 Abu Dhabi','UAE \u2014 Dubai',
+    'Qatar','Kuwait','Bahrain','Oman','Yemen','Jordan','Syria','Israel','Lebanon','Turkey'];
   const ASIA_PAC = ['Indonesia','Malaysia','Vietnam','Thailand','Philippines','Myanmar',
     'Australia','China','India','Pakistan','Bangladesh','Sri Lanka','Japan','South Korea',
     'Papua New Guinea','New Zealand','Timor-Leste','Brunei','Cambodia','Laos','Mongolia',
     'Kazakhstan','Turkmenistan','Uzbekistan','Azerbaijan','Georgia','Armenia'];
-  const AMERICAS = ['United States','Canada','Mexico','Brazil','Colombia','Argentina',
+  const AMERICAS = ['USA','United States','Canada','Mexico','Brazil','Colombia','Argentina',
     'Venezuela','Peru','Bolivia','Chile','Ecuador','Trinidad and Tobago','Guyana',
     'Suriname','Paraguay','Uruguay','Guatemala','Honduras','Cuba','Jamaica',
     'Belize','Costa Rica','Panama','Nicaragua','El Salvador','Haiti','Dominican Republic'];
@@ -5683,7 +5691,7 @@ function renderSampleAnalyses() {
     </div>`;
 
   // ── Card 3: West Africa PSC Bloc ─────────────────────────────────────────
-  const wafrica = ['Angola','Nigeria','Ghana','Gabon','Equatorial Guinea','Cameroon','Republic of Congo'];
+  const wafrica = ['Angola','Nigeria','Ghana','Gabon','Equatorial Guinea','Cameroon','Republic of the Congo'];
   const waRows = wafrica.map(c => {
     const d = cd.find(x => x.country === c);
     if (!d) return null;
@@ -5889,7 +5897,7 @@ function renderSampleAnalyses() {
   if (!strategicGrid) return;
 
   // ── Card D: OPEC vs Non-OPEC ─────────────────────────────────────────────
-  const opecMembers = ['Saudi Arabia','UAE','Iraq','Iran','Kuwait','Venezuela','Nigeria','Libya','Algeria','Gabon','Republic of Congo','Equatorial Guinea','Ethiopia','Cameroon'];
+  const opecMembers = ['Saudi Arabia','UAE','Iraq','Iran','Kuwait','Venezuela','Nigeria','Libya','Algeria','Gabon','Republic of the Congo','Equatorial Guinea','Ethiopia','Cameroon'];
   const opecData = cd.filter(d => opecMembers.includes(d.country));
   const nonOpecData = cd.filter(d => !opecMembers.includes(d.country));
   const grpStats = (g) => {
