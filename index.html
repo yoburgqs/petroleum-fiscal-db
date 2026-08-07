@@ -1506,6 +1506,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
       <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas"></canvas></div>
     </div>
+    <div class="mobile-only" style="display:none;text-align:center;color:var(--muted);font-size:12px;margin-top:8px;">
+      Tap a bubble to see country details. Showing top 30 regimes. Rotate to landscape for a better view.
+    </div>
     <div id="explorer-bubble-container"></div>
   </div>
 </div>
@@ -8799,8 +8802,14 @@ function renderBubbleChart() {
   if (!container) return;
   if (window._bubbleChartInstance) { window._bubbleChartInstance.destroy(); window._bubbleChartInstance = null; }
 
-  var data = (COUNTRY_DATA || []).filter(function(d) { return d.take_75 != null && d.npv_75 != null; });
-  if (!data.length) { container.innerHTML = '<div style="color:var(--muted);padding:24px;">No data available for bubble chart.</div>'; return; }
+  var allData = (COUNTRY_DATA || []).filter(function(d) { return d.take_75 != null && d.npv_75 != null; });
+  if (!allData.length) { container.innerHTML = '<div style="color:var(--muted);padding:24px;">No data available for bubble chart.</div>'; return; }
+
+  // Mobile: limit to top 30 countries by contract count (largest bubbles) to reduce clutter
+  var isMobile = window.innerWidth < 768;
+  var data = isMobile
+    ? allData.slice().sort(function(a, b) { return (b.n || 0) - (a.n || 0); }).slice(0, 30)
+    : allData;
 
   var regionColors = {
     'Middle East': '#f59e0b', 'Africa': '#22c55e', 'Asia': '#3b82f6',
@@ -8823,10 +8832,12 @@ function renderBubbleChart() {
       borderColor: regionColors[region] || '#64748b',
       borderWidth: 1,
       data: countries.map(function(d) {
+        // On mobile, increase bubble radius slightly for easier tapping
+        var baseR = Math.max(3, Math.min(20, Math.sqrt(d.n || 1) * 1.5));
         return {
           x: d.take_75,
           y: d.npv_75,
-          r: Math.max(3, Math.min(20, Math.sqrt(d.n || 1) * 1.5)),
+          r: isMobile ? Math.min(24, baseR * 1.3) : baseR,
           country: d.country,
           mechanic: d.mechanics || d.mechanic || '\u2014',
           n: d.n || 0
@@ -8845,8 +8856,11 @@ function renderBubbleChart() {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      // Add touchstart/touchmove so mobile taps trigger tooltips and onClick
+      events: ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'],
       plugins: {
-        legend: { position: 'right', labels: { color: '#94a3b8', font: { size: 11 } } },
+        legend: { position: isMobile ? 'bottom' : 'right', labels: { color: '#94a3b8', font: { size: isMobile ? 10 : 11 } } },
+        title: isMobile ? { display: true, text: 'Top 30 Regimes by Scale', color: '#94a3b8', font: { size: 13 } } : { display: false },
         tooltip: {
           callbacks: {
             label: function(ctx) {
