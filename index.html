@@ -1012,6 +1012,38 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 @media (max-width: 600px) {
   .mobile-only { display: block !important; }
 }
+
+/* ── Fix 1: Welcome panel Q&A grid — single column on mobile ── */
+@media (max-width: 768px) {
+  #welcome-body > div[style*="grid-template-columns:1fr 1fr"],
+  #welcome-body > div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* ── Fix 2: CP empty state quick-select buttons — wrap on narrow screens ── */
+@media (max-width: 600px) {
+  #cp-empty-state div[style*="display:flex"] {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+  }
+  .cp-quick-btn { min-width: unset !important; }
+}
+
+/* ── Fix 3: Fiscal Compare results table — horizontal scroll on mobile ── */
+@media (max-width: 768px) {
+  #fc-results { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #fc-results table { min-width: 480px; }
+}
+
+/* ── Fix 4: IOC Portfolio exposure grid — single column on mobile ── */
+@media (max-width: 768px) {
+  #ioc-exposure-output > div[style*="grid-template-columns:1fr 1fr"],
+  #ioc-exposure-output > div[style*="grid-template-columns: 1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  .ioc-checkbox-grid { grid-template-columns: 1fr !important; }
+}
 </style>
 </head>
 <body>
@@ -4761,7 +4793,7 @@ function loadCountryProfile(country) {
       <div class="dd-param"><div class="p-key">NPV @ $75</div><div class="p-val" title="${d.prod_coverage_pct > 5 ? 'Based on actual production-weighted DCF ('+d.prod_coverage_pct.toFixed(1)+'% contracts with real data)' : 'Based on standard 50 MBD greenfield profile — fiscal comparison only'}">${fmtNpvShared(d.npv_75)}${d.prod_coverage_pct > 5 ? ' <span style=\'font-size:10px;color:var(--green);\' title=\''+d.prod_coverage_pct.toFixed(1)+'% actual data\'>✓</span>' : ' <span style=\'font-size:10px;color:var(--muted);\' title=\'Standard profile\'>~</span>'}</div></div>
       <div class="dd-param"><div class="p-key">Breakeven</div><div class="p-val">${(function(v){if(!v||v<=0)return'— <span style="font-size:10px;color:var(--muted)" title="Breakeven not computed — requires production profile data">no prod data</span>';if(v>=999)return'>$125/bbl';if(v<50)return'<$50/bbl';return'$'+Number(v).toFixed(0)+'/bbl';})(d.be_75)}</div></div>
       <div class="dd-param"><div class="p-key">Price Swing</div><div class="p-val" title="Government take difference from $50/bbl to $125/bbl scenario">${d.swing !== null ? '+' + fmt(d.swing) + 'pp ($50→$125)' : '—'}${d.has_r_factor_tiers ? ' <span style="font-size:9px;color:#2dd4bf;font-weight:700;" title="R-factor profit oil tiers active — government share of profit oil rises as project R-factor increases (R = cumulative revenue / cumulative cost). Take is price-sensitive by design.">R-factor</span>' : ''}</div></div>
-      <div class="dd-param" title="Country-level IRR is the arithmetic mean of per-contract IRRs and is not a valid portfolio metric. See 4-Price Sensitivity table for per-scenario values."><div class="p-key">IRR @ $75</div><div class="p-val" style="color:var(--muted);font-size:11px;font-style:italic;">Not shown <span style="font-size:10px;">&#9432;</span></div></div>
+      <div class="dd-param"><div class="p-key">IRR @ $75</div><div class="p-val">${(d.irr_75 != null && d.irr_75 <= 200) ? ('<span title="Arithmetic mean of per-contract IRRs \u2014 not a valid portfolio metric. Use for relative comparison only." style="cursor:help;">' + fmtIrr(d.irr_75) + '% &#9432;</span>') : '<span title="IRR requires full revenue waterfall data \u2014 available for 74 of 185 countries" style="color:var(--muted);cursor:help;">IRR: \u2014</span>'}</div></div>
       <div class="dd-param" style="grid-column:1/-1;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;padding-top:8px;"><div class="p-key" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;">Data Completeness</div><div class="p-val" style="font-size:11px;font-family:'IBM Plex Mono',monospace;">\${(function(){const metrics=[{label:'Govt Take',ok:d.take_75!=null},{label:'NPV',ok:d.npv_75!=null},{label:'IRR',ok:d.irr_75!=null&&d.irr_75<=200},{label:'Breakeven',ok:d.be_75!=null&&d.be_75>1&&d.be_75<999},{label:'Swing',ok:d.swing!=null}];return metrics.map(m=>'<span style="margin-right:10px;" title="'+m.label+(m.ok?' — available':' — not yet computed for this regime')+'">'+(m.ok?'<span style="color:#22c55e;">✓</span>':'<span style="color:#475569;">—</span>')+' <span style="color:var(--muted);">'+m.label+'</span></span>').join('');})()\}</div></div>
       <div class="dd-param"><div class="p-key">Predictability</div><div class="p-val">${renderStabilityBadge(getFiscalPredictabilityScore(d))}</div></div>
     </div>
