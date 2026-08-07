@@ -2542,6 +2542,11 @@ const NOC_OPERATORS = new Set([
   'NOC', 'National Oil Corporation'
 ]);
 
+// ─── TAB 5: IOC Portfolio ─────────────────────────────────────────────────────
+// Build unique operator list — v41: NOCs excluded; global so runScreener() can access
+const ALL_OPERATORS = [...new Set(IOC_DATA.map(d=>d.operator))].filter(op => !NOC_OPERATORS.has(op)).sort();
+const TOP_OPERATORS = ['Shell','BP','TotalEnergies','ExxonMobil','Chevron','Equinor','Eni','ConocoPhillips','Repsol','Petronas','CNOOC','Woodside','Santos','Harbour Energy','Tullow Oil','Kosmos Energy'];
+
 // ─── TAB 1: Global Explorer ──────────────────────────────────────────────────
 let explorerSort = {col: 'take', dir: 1}; // dir: 1=asc, -1=desc
 
@@ -3768,11 +3773,6 @@ function renderReformTable() {
     </tr>`;
   }).join('');
 }
-
-// ─── TAB 5: IOC Portfolio ────────────────────────────────────────────────────
-// Build unique operator list — v41: NOCs excluded from IOC Portfolio
-const ALL_OPERATORS = [...new Set(IOC_DATA.map(d=>d.operator))].filter(op => !NOC_OPERATORS.has(op)).sort();
-const TOP_OPERATORS = ['Shell','BP','TotalEnergies','ExxonMobil','Chevron','Equinor','Eni','ConocoPhillips','Repsol','Petronas','CNOOC','Woodside','Santos','Harbour Energy','Tullow Oil','Kosmos Energy'];
 
 // Quick buttons — aggregate all operators matching brand name
 const qb = document.getElementById('ioc-quick-btns');
