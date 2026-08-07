@@ -9280,7 +9280,7 @@ async function loadPlatformData() {
   } catch(e) {
     console.error('Failed to load platform data:', e);
     if (overlay) {
-      overlay.innerHTML = '<div style="text-align:center;color:#ef4444;font-family:'IBM Plex Mono',monospace;padding:40px">'
+      overlay.innerHTML = '<div style="text-align:center;color:#ef4444;font-family:\'IBM Plex Mono\',monospace;padding:40px">'
         + '<div style="font-size:1.4em;margin-bottom:12px">Load Error</div>'
         + '<div style="font-size:0.9em;color:#fca5a5">' + e.message + '</div>'
         + '<div style="font-size:0.75em;color:#999;margin-top:16px">Open browser console for details</div>'
