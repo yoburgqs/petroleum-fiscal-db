@@ -4042,9 +4042,11 @@ function renderSearchResults() {
     return;
   }
 
-  // search COUNTRY_DATA
+  // search COUNTRY_DATA — aliases expand short forms to canonical names
+  const _ALIASES = {'uk':'united kingdom','uae':'united arab emirates','drc':'democratic republic of the congo','usa':'united states','ksa':'saudi arabia','png':'papua new guinea','trinidad':'trinidad and tobago'};
+  const qExp = _ALIASES[q] || q;
   const countryMatches = COUNTRY_DATA.filter(d =>
-    d.country.toLowerCase().includes(q) || d.mechanics.toLowerCase().includes(q)
+    d.country.toLowerCase().includes(qExp) || d.mechanics.toLowerCase().includes(qExp)
   ).slice(0, 5);
 
   if (!countryMatches.length) {
@@ -5047,7 +5049,7 @@ function loadCountryProfile(country) {
     var thSR = "text-align:right;padding:7px 10px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap;";
     function _tc(v) { return v == null ? "var(--muted)" : v <= 40 ? "var(--green)" : v <= 60 ? "var(--yellow)" : v <= 75 ? "var(--orange)" : "var(--red)"; }
     function _ft(v) { return v != null ? v.toFixed(1) + "%" : "\u2014"; }
-    function _esc(n) { return n.replace(/'/g, "\'"); }
+    function _esc(n) { return n.replace(/'/g, "&#39;"); }
     function _bpr(r, isSelf) {
       var bg = isSelf ? "background:rgba(232,160,32,.12);" : "";
       var fw = isSelf ? "font-weight:800;" : "font-weight:600;";
