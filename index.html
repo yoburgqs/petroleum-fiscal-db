@@ -76,7 +76,7 @@ a { color: var(--accent); text-decoration: none; }
 .tab-pane.active { display: block; }
 
 /* ── cards ── */
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2); }
 .card-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
 
 /* ── controls ── */
@@ -105,7 +105,7 @@ button:focus-visible, [role="tab"]:focus-visible, [role="button"]:focus-visible 
 /* ── tables ── */
 .tbl-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
 table { width: 100%; border-collapse: collapse; }
-thead th { background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .5px; padding: 10px 12px; text-align: left; text-transform: uppercase; position: sticky; top: 0; white-space: nowrap; cursor: pointer; user-select: none; }
+thead th { background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.03em; padding: 10px 12px; text-align: left; text-transform: uppercase; position: sticky; top: 0; white-space: nowrap; cursor: pointer; user-select: none; }
 thead th:hover { color: var(--text); }
 thead th.sort-asc::after  { content: ' ▲'; color: var(--accent); }
 thead th.sort-desc::after { content: ' ▼'; color: var(--accent); }
@@ -237,7 +237,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .reform-take.reform-friendly { background: rgba(50,200,50,0.2); color: #5c5; }
 .reform-notes { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
 .dd-empty { color: var(--muted); font-size: 13px; padding: 20px 0; }
-.dd-section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; }
+.dd-section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2); }
 .dd-section h3 { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
 .dd-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; }
 .dd-country-name { font-size: 22px; font-weight: 800; }
@@ -1432,7 +1432,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <input type="text" class="search-input" id="flt-search" placeholder="Search country…" autocomplete="off">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;"></div>
     </div>
-    <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" onclick="toggleFourPrice(this)" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" onclick="copyExplorerLink()" title="Copy link to current filtered view">🔗 Copy Link</button>
+    <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" onclick="toggleFourPrice(this)" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" onclick="copyExplorerLink()" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
   </div>
 
   <div style="font-size:11px;color:#475569;margin-bottom:8px;letter-spacing:.02em;font-family:'IBM Plex Mono',monospace;padding:4px 0;">
@@ -1479,7 +1479,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 
   <div style="margin-top:24px;background:var(--surface);border-radius:10px;padding:16px;">
-    <div style="font-weight:600;color:var(--text);margin-bottom:12px;font-size:13px;">IRR vs Government Take <span style="color:var(--muted);font-weight:400;font-size:11px;">— bubble size = contract count, colored by mechanic</span></div>
+    <div style="font-weight:600;color:var(--text);margin-bottom:12px;font-size:13px;">IRR vs Govt Take <span style="color:var(--muted);font-weight:400;font-size:11px;">— bubble size = contract count, colored by mechanic</span></div>
     <canvas id="irr-scatter-canvas" style="width:100%;display:block;cursor:crosshair;"></canvas>
     <div id="irr-scatter-tooltip" style="position:fixed;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 10px;font-size:12px;color:#f1f5f9;pointer-events:none;display:none;z-index:9999;"></div>
     <div style="margin-top:8px;font-size:11px;color:var(--muted);">
@@ -3090,7 +3090,7 @@ function renderIRRScatter() {
 
   ctx.fillStyle = '#94a3b8'; ctx.font = '11px Inter, sans-serif';
   ctx.textAlign = 'center';
-  ctx.fillText('Government Take (%)', pad.l + plotW/2, CH - 2);
+  ctx.fillText('Govt Take (%)', pad.l + plotW/2, CH - 2);
   ctx.save(); ctx.translate(12, pad.t + plotH/2); ctx.rotate(-Math.PI/2);
   ctx.fillText('IRR (%)', 0, 0); ctx.restore();
 
@@ -3514,7 +3514,7 @@ function renderCompare() {
   const rows = [
     {label:'Global Rank (take @$75)',   key:(d)=>{ const r = _cmpRankMap[d.country]; return r ? `#${r} of ${_cmpN}` : '—'; }, bold:false},
     {label:'Predictability Score',       key:(d)=>renderStabilityBadge(getFiscalPredictabilityScore(d))},
-    {label:'─── Government Take ───', key:()=>'', bold:true, divider:true},
+    {label:'─── Govt Take ───', key:()=>'', bold:true, divider:true},
     {label:'Govt Take ($50/bbl)',   key:(d)=>fmtTake(d.take_50)},
     {label:'Govt Take ($75/bbl)',   key:(d)=>fmtTake(d.take_75)},
     {label:'Govt Take ($100/bbl)',  key:(d)=>fmtTake(d.take_100)},
@@ -4142,7 +4142,7 @@ window.loadIOCAggregated = function(brandName, operatorList) {
   const tbl = `<div class="tbl-wrap"><table>
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
-      <th class="num">Govt Take</th><th class="num">Swing</th><th class="num">NPV ($M)</th>
+      <th class="num">Govt Take</th><th class="num">Swing</th><th class="num">NPV</th>
       <th class="num">IRR (%)</th><th class="num">Breakeven</th>
     </tr></thead>
     <tbody>${rows.sort((a,b)=>b.n-a.n).map(r => {
@@ -4212,7 +4212,7 @@ window.loadIOC = function(operator) {
   const tbl = `<div class="tbl-wrap"><table>
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
-      <th class="num">Govt Take</th><th class="num take-50-col" style="display:none">@$50</th><th class="num take-100-col" style="display:none">@$100</th><th class="num take-125-col" style="display:none">@$125</th><th class="num">Swing</th><th class="num">NPV ($M)</th>
+      <th class="num">Govt Take</th><th class="num take-50-col" style="display:none">@$50</th><th class="num take-100-col" style="display:none">@$100</th><th class="num take-125-col" style="display:none">@$125</th><th class="num">Swing</th><th class="num">NPV</th>
       <th class="num">IRR (%)</th><th class="num">Breakeven</th>
     </tr></thead>
     <tbody>${rows.sort((a,b)=>(b.n-a.n)).map(r => {
@@ -4788,7 +4788,7 @@ function loadCountryProfile(country) {
   const _safeSlugForSimpleAvg = (country||'').replace(/[^a-z0-9]/gi,'_').toLowerCase();
   const _tierBadgeHtml = getTierBadge(d.ab_pct || 0, 'Source quality: ' + (d.ab_pct||0).toFixed(0) + '% of facts from A+B tier sources (primary legislation + verified). See evidence panel below.');
   const mainSections = `<div class="dd-section">
-    <h3>Government Take by Price Scenario ${_isMonopoly ? '' : _grankHtml} ${_tierBadgeHtml}</h3>
+    <h3>Govt Take by Price Scenario ${_isMonopoly ? '' : _grankHtml} ${_tierBadgeHtml}</h3>
     ${_isMonopoly ? '<div style="background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.25);border-radius:8px;padding:12px 16px;margin-bottom:12px;"><span style="color:#f0a830;font-weight:700;">⚠ State Monopoly</span> <span style="color:var(--muted);font-size:13px;">This country is a state monopoly — no foreign contractor access. Fiscal terms are not applicable for investment screening.</span></div>' : ''}
     <div class="dd-take-grid">
       <div class="dd-take-cell"><div class="price-lbl">$50/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_50)}">${_fmtTakeCell(d.take_50)}</div></div>
@@ -6118,7 +6118,7 @@ function renderSampleAnalyses() {
   });
   const card7 = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #ef4444;">
-      <div style="font-size:10px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Reserves vs Government Take</div>
+      <div style="font-size:10px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Reserves vs Govt Take</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">The biggest reserve holders charge the most. Which are accessible to IOCs?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Proved reserves (BP Statistical Review 2023). State monopolies (Saudi, Kuwait, Iran partially) have no IOC-accessible contracts. Government take = all instruments: royalties + income tax + resource rent tax + profit oil. Sorted by reserves descending.</div>
       ${tbl([{label:'Country'},{label:'Reserves',align:'right'},{label:'Region'},{label:'Govt Take @$75',align:'right'}], resRows)}
@@ -7811,7 +7811,7 @@ function _refreshSavedTable() {
   if (!saved.length) { el.innerHTML = '<span style="color:var(--muted);font-size:12px">No saved scenarios.</span>'; return; }
   let html = `<table class="sb-saved-table"><thead><tr>
     <th>Name</th><th>Mechanic</th><th>Profile</th><th>Price</th>
-    <th>Govt Take</th><th>IRR</th><th>NPV ($M)</th>
+    <th>Govt Take</th><th>IRR</th><th>NPV</th>
   </tr></thead><tbody>`;
   for (const s of saved) {
     const r = s.result;
@@ -7822,7 +7822,7 @@ function _refreshSavedTable() {
       <td>$${s.price}</td>
       <td>${r.take.toFixed(1)}%</td>
       <td>${r.irr !== null ? r.irr.toFixed(1)+'%' : 'n/a'}</td>
-      <td>$${r.npv !== null ? Math.round(r.npv).toLocaleString() : 'n/a'}</td>
+      <td>${r.npv !== null ? fmtNpvShared(r.npv) : 'n/a'}</td>
     </tr>`;
   }
   html += '</tbody></table>';
@@ -8621,7 +8621,7 @@ function fetchCountryContracts(country) {
       const hasProd = contracts.some(c => c.prod_mmbbl != null);
       let html = '<div class="tbl-wrap"><table style="font-size:12px;"><thead><tr>'
         + '<th>#</th><th>Block / Contract</th><th>Operator</th><th>Type</th><th class="num">Take%</th>'
-        + '<th class="num">NPV ($M)</th><th class="num">IRR%</th>'
+        + '<th class="num">NPV</th><th class="num">IRR%</th>'
         + (hasProd ? '<th class="num">Prod (MMbbl)</th>' : '')
         + '<th class="num" title="Primary fiscal rate: royalty for Concessions, profit oil for PSCs">Key Rate</th>'
         + '</tr></thead><tbody>';
@@ -9100,7 +9100,7 @@ function renderBubbleChart() {
       },
       scales: {
         x: {
-          title: { display: true, text: 'Government Take @$75/bbl (%)', color: '#94a3b8' },
+          title: { display: true, text: 'Govt Take @$75/bbl (%)', color: '#94a3b8' },
           grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' },
           min: 0, max: 105
         },
