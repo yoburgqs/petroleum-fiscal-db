@@ -1147,7 +1147,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v56</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v57</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1190,7 +1190,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <span class="search-icon-inner">&#x1f50d;</span>
       <input id="search-q" type="text" placeholder="Search countries and mechanics..." aria-label="Search countries and mechanics" autocomplete="off"
         oninput="renderSearchResults()" onkeydown="handleSearchKey(event)">
-      <span style="color:var(--muted);font-size:11px;cursor:pointer;" onclick="closeSearch()">Esc</span>
+      <span role="button" tabindex="0" aria-label="Close search" style="color:var(--muted);font-size:11px;cursor:pointer;" onclick="closeSearch()" onkeydown="if(event.key==='Enter'||event.key===' '){closeSearch();}">Esc</span>
     </div>
     <div id="search-results"></div>
     <div class="search-hint">&uarr;&darr; navigate &middot; Enter select &middot; Esc close</div>
@@ -1239,7 +1239,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       </div>
 
       <!-- Q&A examples -->
-      <div style="background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.3);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#f0c060;line-height:1.6;"><strong style="color:#d4a017;">New here?</strong> Start with <strong>Fiscal Compare</strong> to benchmark countries &rarr; then explore <strong>Country Profiles</strong> for detail &rarr; use the <strong>Screener</strong> (Regime Explorer &rarr; Screener tab) to filter by return threshold.</div>
+      <div style="background:rgba(212,160,23,.08);border:1px solid rgba(212,160,23,.3);border-radius:6px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#f0c060;line-height:1.6;"><strong style="color:#d4a017;">New here?</strong> Start with <strong>Fiscal Compare</strong> to benchmark countries &rarr; then explore <strong>Country Profiles</strong> for detail &rarr; use the <strong>Screener &#9733;</strong> tab to filter by return threshold.</div>
 <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px;">What You Can Ask</div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;">
 
@@ -1265,7 +1265,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
         <div style="background:rgba(255,255,255,.03);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;padding:10px 12px;">
           <div style="font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:4px;">Q: What does IRR look like across 185 countries at $75 for a deepwater project?</div>
-          <div style="font-size:11px;color:var(--muted);">→ <strong>Screener</strong> (inside Regime Explorer → Screener tab): set profile=Deepwater, sort by IRR. Presets: "Sweet Spot", "High IRR", "Deepwater".</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Screener &#9733;</strong> tab: set profile=Deepwater, sort by IRR. Presets: "Sweet Spot", "High IRR", "Deepwater".</div>
         </div>
 
         <div style="background:rgba(255,255,255,.03);border-left:3px solid #22c55e;border-radius:0 6px 6px 0;padding:10px 12px;">
@@ -1446,20 +1446,20 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <tr>
           <th>#</th>
           <th style="width:36px"></th>
-          <th data-sort-key="country" onclick="setExplorerSort('country')" title="Sort A–Z">Country</th>
+          <th data-sort-key="country" onclick="setExplorerSort('country')" onkeydown="if(event.key==='Enter'){setExplorerSort('country');}" tabindex="0" title="Sort A–Z">Country</th>
           <th>Region</th>
           <th class="num">Contracts</th>
           <th>Mechanics</th>
-          <th class="num" data-sort-key="take" onclick="setExplorerSort('take')" title="Sort by Govt Take (low→high)">Govt Take</th>
-          <th class="num" data-sort-key="evidence" onclick="setExplorerSort('evidence')" title="Evidence quality: % of fiscal facts backed by primary (A) or verified (B) sources. Hover any row's take% for full breakdown. Sort: weakest first.">Evidence</th>
+          <th class="num" data-sort-key="take" onclick="setExplorerSort('take')" onkeydown="if(event.key==='Enter'){setExplorerSort('take');}" tabindex="0" title="Sort by Govt Take (low→high)">Govt Take</th>
+          <th class="num" data-sort-key="evidence" onclick="setExplorerSort('evidence')" onkeydown="if(event.key==='Enter'){setExplorerSort('evidence');}" tabindex="0" title="Evidence quality: % of fiscal facts backed by primary (A) or verified (B) sources. Hover any row's take% for full breakdown. Sort: weakest first.">Evidence</th>
           <th class="num">Curve</th>
           <th class="num expl-mp-col" style="display:none">@$50</th>
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
-          <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
-          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
-          <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
-          <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" title="Sort by price sensitivity (low→high)">Swing (pp)</th>
+          <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" onkeydown="if(event.key==='Enter'){setExplorerSort('npv');}" tabindex="0" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
+          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" onkeydown="if(event.key==='Enter'){setExplorerSort('irr');}" tabindex="0" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
+          <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" onkeydown="if(event.key==='Enter'){setExplorerSort('be');}" tabindex="0" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
+          <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" onkeydown="if(event.key==='Enter'){setExplorerSort('swing');}" tabindex="0" title="Sort by price sensitivity (low→high)">Swing (pp)</th>
           <th class="num">Stability</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
           <th>Tier</th>
@@ -1896,6 +1896,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v57 (Aug 2026)</strong> — Screener routing text in welcome panel updated (reflects top-level tab promotion from v56); keyboard navigation on all sortable Explorer column headers (Tab + Enter now triggers sort); fact count updated to 384,259 in Methodology section; basket remove button accessibility (aria-label); Esc close button keyboard support in search modal.<br>
       <strong>v56 (Aug 2026)</strong> — Screener promoted to top-level tab (one-click access, no longer buried under Explorer); IRR scatter chart PNG download added; fuzzy search matching — typos like "Nigera" now return "Nigeria" via Did you mean? suggestions; title tag aligned to 185 Countries (matches DCF interface coverage); pre-push CI hook updated to use repo-local test file (tests/runtime_comprehensive.js).<br>
       <strong>v55 (Aug 2026)</strong> — Chart.js SRI hash fixed (switched to cdnjs stable hash — resolves 4 JS errors in v54); CSP meta tag added with connect-src including cdn.jsdelivr.net (fixes Breakeven Map fetch block); toast notifications upgraded with aria-live/aria-atomic for screen reader support; confirm() dialog replaced with two-step inline confirmation in Scenario Builder; Ctrl+Enter keyboard shortcut added for Fiscal Compare; version aligned to v55.<br>
       <strong>v54 (Aug 2026)</strong> — All browser alert() dialogs replaced with styled toast notifications (11 instances); "Investment Screener" renamed to "Screener" for consistency; source comment cleanup (Country Profile terminology); version badge aligned to v54.<br>
@@ -2168,7 +2169,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   <div class="dd-section" id="meth-sources">
     <div class="dd-section-hdr">Data Sources &amp; Evidence Quality Standards</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
-      The database contains 330,329 fiscal facts across 71,601 contracts, sourced from 337 primary sources (post-deduplication). Facts are graded A through D:
+      The database contains 384,259 fiscal facts across 71,601 contracts, sourced from 337 primary sources (post-deduplication). Facts are graded A through D:
     </p>
     <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
       <thead><tr>
@@ -9359,7 +9360,7 @@ function renderBasket() {
   pillsDiv.innerHTML = items.map(c =>
     `<span style="background:#334155;border-radius:12px;padding:2px 8px;font-size:11px;color:#f1f5f9;display:inline-flex;align-items:center;gap:4px;">
       ${c}
-      <button onclick="removeFromBasket('${c.replace(/'/g,"\\'")}');event.stopPropagation();" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:13px;line-height:1;padding:0;">&#215;</button>
+      <button onclick="removeFromBasket('${c.replace(/'/g,"\\'")}');event.stopPropagation();" aria-label="Remove ${c.replace(/'/g,"\\'")} from basket" style="background:none;border:none;color:#64748b;cursor:pointer;font-size:13px;line-height:1;padding:0;">&#215;</button>
     </span>`
   ).join('');
 }
@@ -9732,7 +9733,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v56</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v57</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
