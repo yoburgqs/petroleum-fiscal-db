@@ -1002,10 +1002,15 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
 /* ── Mobile compare grid — horizontal scroll wrapper ── */
 @media (max-width: 600px) {
-  .compare-grid { 
+  .compare-grid {
     grid-template-columns: 100px repeat(2, 1fr) !important;
     font-size: 10px;
   }
+}
+
+/* ── Mobile bubble chart hint ── */
+@media (max-width: 600px) {
+  .mobile-only { display: block !important; }
 }
 </style>
 </head>
