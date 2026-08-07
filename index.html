@@ -1220,27 +1220,27 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <!-- v41: Mechanic filter chips -->
   <div class="chip-row" id="chip-row-mech">
     <span class="chip-row-label">Mechanic</span>
-    <button class="chip active" data-filter="mechanic" data-value="all" onclick="setExplorerChip('mechanic','all',this)">All</button>
-    <button class="chip" data-filter="mechanic" data-value="Concession" onclick="setExplorerChip('mechanic','Concession',this)">Concession</button>
-    <button class="chip" data-filter="mechanic" data-value="PSC" onclick="setExplorerChip('mechanic','PSC',this)">PSC</button>
-    <button class="chip" data-filter="mechanic" data-value="TSC" onclick="setExplorerChip('mechanic','TSC',this)">TSC</button>
-    <button class="chip" data-filter="mechanic" data-value="PRRT" onclick="setExplorerChip('mechanic','PRRT',this)">PRRT</button>
-    <button class="chip" data-filter="mechanic" data-value="RSC" onclick="setExplorerChip('mechanic','RSC',this)">RSC</button>
-    <button class="chip" data-filter="mechanic" data-value="Buy-back" onclick="setExplorerChip('mechanic','Buy-back',this)">Buy-back</button>
-    <button class="chip" data-filter="mechanic" data-value="Revenue Share" onclick="setExplorerChip('mechanic','Revenue Share',this)">Revenue Share</button>
-    <button class="chip" id="chip-rfactor-psc" data-filter="mechanic" data-value="rfactor" onclick="setExplorerRFactor(this)" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC</button>
+    <button class="chip active" role="button" aria-pressed="true" data-filter="mechanic" data-value="all" onclick="setExplorerChip('mechanic','all',this)">All</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Concession" onclick="setExplorerChip('mechanic','Concession',this)">Concession</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="PSC" onclick="setExplorerChip('mechanic','PSC',this)">PSC</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="TSC" onclick="setExplorerChip('mechanic','TSC',this)">TSC</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="PRRT" onclick="setExplorerChip('mechanic','PRRT',this)">PRRT</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="RSC" onclick="setExplorerChip('mechanic','RSC',this)">RSC</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Buy-back" onclick="setExplorerChip('mechanic','Buy-back',this)">Buy-back</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Revenue Share" onclick="setExplorerChip('mechanic','Revenue Share',this)">Revenue Share</button>
+    <button class="chip" id="chip-rfactor-psc" role="button" aria-pressed="false" data-filter="mechanic" data-value="rfactor" onclick="setExplorerRFactor(this)" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC</button>
     <button class="btn btn-outline btn-sm" id="explorer-map-toggle" onclick="toggleExplorerMap()" style="margin-left:auto;">Map View</button>
   </div>
   <!-- v41: Region filter chips -->
   <div class="chip-row" id="chip-row-region">
     <span class="chip-row-label">Region</span>
-    <button class="chip active" data-filter="region" data-value="all" onclick="setExplorerChip('region','all',this)">All</button>
-    <button class="chip" data-filter="region" data-value="Africa" onclick="setExplorerChip('region','Africa',this)">Africa</button>
-    <button class="chip" data-filter="region" data-value="Middle East" onclick="setExplorerChip('region','Middle East',this)">Middle East</button>
-    <button class="chip" data-filter="region" data-value="Asia Pacific" onclick="setExplorerChip('region','Asia Pacific',this)">Asia Pacific</button>
-    <button class="chip" data-filter="region" data-value="Americas" onclick="setExplorerChip('region','Americas',this)">Americas</button>
-    <button class="chip" data-filter="region" data-value="Europe" onclick="setExplorerChip('region','Europe',this)">Europe</button>
-    <button class="chip" data-filter="region" data-value="Other" onclick="setExplorerChip('region','Other',this)">Other</button>
+    <button class="chip active" role="button" aria-pressed="true" data-filter="region" data-value="all" onclick="setExplorerChip('region','all',this)">All</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Africa" onclick="setExplorerChip('region','Africa',this)">Africa</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Middle East" onclick="setExplorerChip('region','Middle East',this)">Middle East</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Asia Pacific" onclick="setExplorerChip('region','Asia Pacific',this)">Asia Pacific</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Americas" onclick="setExplorerChip('region','Americas',this)">Americas</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Europe" onclick="setExplorerChip('region','Europe',this)">Europe</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Other" onclick="setExplorerChip('region','Other',this)">Other</button>
   </div>
   <!-- v41: World map container (hidden by default) -->
   <div id="world-map-container" style="display:none;position:relative;margin-bottom:16px;"></div>
@@ -2904,8 +2904,9 @@ function setExplorerChip(filterType, value, btn) {
   explorerChipFilters[filterType] = value;
   // Update active state
   const row = filterType === 'mechanic' ? document.getElementById('chip-row-mech') : document.getElementById('chip-row-region');
-  row.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  row.querySelectorAll('.chip').forEach(c => { c.classList.remove('active'); c.setAttribute('aria-pressed', 'false'); });
   btn.classList.add('active');
+  btn.setAttribute('aria-pressed', 'true');
   // Also sync the legacy dropdowns
   if (filterType === 'mechanic') {
     const sel = document.getElementById('flt-mech');
