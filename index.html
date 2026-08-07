@@ -3134,7 +3134,7 @@ cmpSearch.addEventListener('input', () => {
   const matches = COUNTRY_DATA.filter(d => d.country.toLowerCase().includes(q)).slice(0,12);
   if (!matches.length) { cmpDrop.style.display='none'; return; }
   cmpDrop.innerHTML = matches.map(d =>
-    `<div onclick="addCompare('${d.country.replace(/'/,"\\'")}');cmpSearch.value='';cmpDrop.style.display='none';"
+    `<div onclick="addCompare('${d.country.replace(/'/g,"\\'")}');cmpSearch.value='';cmpDrop.style.display='none';"
       style="padding:8px 14px;cursor:pointer;border-bottom:1px solid var(--border);"
       onmouseover="this.style.background='rgba(79,142,247,.1)'" onmouseout="this.style.background=''">${d.country}</div>`
   ).join('');
@@ -3173,7 +3173,7 @@ function renderCompare() {
   const chips = document.getElementById('cmp-chips');
   chips.innerHTML = compareList.map(c =>
     `<span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;display:flex;align-items:center;gap:6px;">
-      ${c} <span onclick="removeCompare('${c.replace(/'/,"\\'")}');event.stopPropagation();" style="cursor:pointer;color:var(--muted);">✕</span>
+      ${c} <span onclick="removeCompare('${c.replace(/'/g,"\\'")}');event.stopPropagation();" style="cursor:pointer;color:var(--muted);">✕</span>
     </span>`
   ).join('');
 
@@ -3743,7 +3743,7 @@ function renderReformTable() {
     const notesTooltip = r.notes ? r.notes.replace(/"/g,"'") : '';
     return `<tr title="${notesTooltip}" style="cursor:default;">
       <td style="font-family:'IBM Plex Mono',monospace;font-weight:700;">${r.year}</td>
-      <td><button onclick="document.getElementById('dd-country-select').value='${r.country.replace(/'/,"\\'")}';loadCountryProfile('${r.country.replace(/'/,"\\'")}');const cpBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Country Profile'));switchTab('t7',cpBtn);" style="background:transparent;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${r.country}</button></td>
+      <td><button onclick="document.getElementById('dd-country-select').value='${r.country.replace(/'/g,"\\'")}';loadCountryProfile('${r.country.replace(/'/g,"\\'")}');const cpBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Country Profile'));switchTab('t7',cpBtn);" style="background:transparent;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${r.country}</button></td>
       <td style="max-width:280px;font-size:12px;">${r.event}</td>
       <td class="num">${tcCell}</td>
       <td><span style="color:${dirCol};font-size:11px;font-weight:700;">${dirLbl}</span></td>
@@ -3776,7 +3776,7 @@ window.updateIOCSuggestions = function() {
   if (q.length < 2) { sug.innerHTML=''; return; }
   const matches = ALL_OPERATORS.filter(o => o.toLowerCase().includes(q)).slice(0,8);
   sug.innerHTML = matches.map(op =>
-    `<button class="btn btn-outline btn-sm" onclick="document.getElementById('ioc-search').value='${op.replace(/'/,"\\'")}';loadIOC('${op.replace(/'/,"\\'")}');document.getElementById('ioc-suggestions').innerHTML='';">${op}</button>`
+    `<button class="btn btn-outline btn-sm" onclick="document.getElementById('ioc-search').value='${op.replace(/'/g,"\\'")}';loadIOC('${op.replace(/'/g,"\\'")}');document.getElementById('ioc-suggestions').innerHTML='';">${op}</button>`
   ).join('');
 };
 
@@ -3927,7 +3927,7 @@ window.loadIOC = function(operator) {
 </div>`;
   const iocCountryList = [...new Set(rows.map(r => r.country))];
   const compareBtnHtml = iocCountryList.length >= 2 && iocCountryList.length <= 4
-    ? `<button class="btn btn-sm btn-outline" style="margin-left:12px;font-size:11px;" onclick="(function(){${iocCountryList.slice(0,4).map(c=>'addCompare(\''+c.replace(/'/,"\\'")+'\');').join('')}const cmpBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Compare'));switchTab('t2',cmpBtn);})()" title="Load all ${iocCountryList.length} countries into Compare tab">Compare All (${iocCountryList.length})</button>`
+    ? `<button class="btn btn-sm btn-outline" style="margin-left:12px;font-size:11px;" onclick="(function(){${iocCountryList.slice(0,4).map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+'\');').join('')}const cmpBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Compare'));switchTab('t2',cmpBtn);})()" title="Load all ${iocCountryList.length} countries into Compare tab">Compare All (${iocCountryList.length})</button>`
     : '';
   outDiv.className='';
   outDiv.innerHTML=`${disclosureBanner}<div style="display:flex;align-items:center;margin-bottom:14px;"><h3 style="font-size:16px;font-weight:800;margin:0;">${operator}</h3>${compareBtnHtml}</div>${tbl}${nocFootnote}`;
@@ -5674,7 +5674,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why does Norway capture 18 percentage points more than the UK?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway's 78% Special Petroleum Tax vs UK's EPL (32%) + RFCT (40%). Same basin, very different terms.</div>
       ${tbl([{label:'Country'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], nsRows)}
-      <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
     </div>`;
 
   // ── Card 3: West Africa PSC Bloc ─────────────────────────────────────────
@@ -5694,7 +5694,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Angola tightened terms in 2023. How does it compare to peers?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All PSC-dominant regimes. Ghana's Jubilee terms (42%) remain the most IOC-friendly in the bloc.</div>
       ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$75',align:'right'}], waRows)}
-      <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
     </div>`;
 
   // ── Card 4: Price Sensitivity Leaders ────────────────────────────────────
@@ -5735,7 +5735,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Where does government take drop below 40% at $75/bbl?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Jurisdictions with take under 40% at the base price. Many are frontier or incentive-grant regimes.</div>
       ${tbl([{label:'Country'},{label:'Region'},{label:'@$75',align:'right'}], sweetRows)}
-      <button style="${btnStyle}" onclick="(function(){${sweetCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Compare Top 5</button>
+      <button style="${btnStyle}" onclick="(function(){${sweetCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Compare Top 5</button>
     </div>`;
 
   // ── Card 6: Concession vs PSC ─────────────────────────────────────────────
@@ -5824,7 +5824,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">How does Indonesia compare to its PSC neighbors?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All are PSC-dominant regimes. Indonesia (&#9654;) sits mid-range — Malaysia's Petronas terms are similar; Philippines uses service contracts (TSC) which extract nearly all economics. Bangladesh/Pakistan offer concession-lite terms.</div>
       ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'}], seaRows)}
-      <button style="${btnStyle}" onclick="(function(){${seaCmp.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Compare Top 4 in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${seaCmp.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Compare Top 4 in Compare</button>
     </div>`;
 
   // Card B: Indonesia's Two Regimes (Traditional PSC vs Gross Split)
@@ -6843,7 +6843,7 @@ function renderLiveDCFPanel(country, containerId) {
   <div class="dcf-controls">
     <div class="dcf-control-group">
       <label>Project Profile</label>
-      <select id="ldcf-profile-${country.replace(/[^a-z0-9]/gi,'_')}" onchange="updateLiveDCF('${country.replace(/'/g,"\'")}')">
+      <select id="ldcf-profile-${country.replace(/[^a-z0-9]/gi,'_')}" onchange="updateLiveDCF('${country.replace(/'/g,"\\'")}')">
         ${Object.entries(DCF_PROFILES).map(([k,v]) =>
           `<option value="${k}"${k===defaultProfile?' selected':''}>${v.name}</option>`
         ).join('')}
@@ -6853,7 +6853,7 @@ function renderLiveDCFPanel(country, containerId) {
       <label>Oil Price: <span id="ldcf-price-lbl-${country.replace(/[^a-z0-9]/gi,'_')}" class="dcf-price-display">$${defaultPrice}/bbl</span></label>
       <input type="range" id="ldcf-price-${country.replace(/[^a-z0-9]/gi,'_')}"
         min="20" max="150" step="5" value="${defaultPrice}"
-        oninput="updateLiveDCFPrice(this,'${country.replace(/'/g,"\'")}')">
+        oninput="updateLiveDCFPrice(this,'${country.replace(/'/g,"\\'")}')">
     </div>
   </div>
   <div class="prod-profile-mini" id="ldcf-prod-mini-${country.replace(/[^a-z0-9]/gi,'_')}">
@@ -7173,7 +7173,7 @@ function renderCashflowTable(country, containerId, profileKey, price) {
 
   let tableHtml = `
 <div class="cashflow-panel" id="cf-panel-${country.replace(/[^a-z0-9]/gi,'_')}">
-  <h3 onclick="toggleCFPanel('${country.replace(/'/g,"\'")}')" title="Click to expand/collapse">
+  <h3 onclick="toggleCFPanel('${country.replace(/'/g,"\\'")}')" title="Click to expand/collapse">
     25-Year Cashflow Breakdown
   </h3>
   <div class="cf-table-wrap">
