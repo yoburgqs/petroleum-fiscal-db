@@ -2,8 +2,14 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://unpkg.com https://cdnjs.cloudflare.com https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com;">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
+<link rel="dns-prefetch" href="https://unpkg.com">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<title>ORCA v53 — Petroleum Fiscal Intelligence</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,000+ Contracts, 211 Countries</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" integrity="sha384-oNtu+d18330MVFpltUTve1DatxCkkctlpA2AC3GulbVFOSqhHdDat3qHse/Lbuek" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
@@ -79,6 +85,9 @@ a { color: var(--accent); text-decoration: none; }
 .ctrl-group label { color: var(--muted); font-size: 12px; font-weight: 600; }
 select, input[type=text], input[type=number], input[type=range] { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 4px 8px; font-size: 13px; outline: none; }
 select:focus, input:focus { border-color: var(--accent); }
+/* === Accessibility: focus-visible enhancement === */
+:focus-visible { outline: 2px solid #d4a017 !important; outline-offset: 2px !important; }
+button:focus-visible, [role="tab"]:focus-visible, [role="button"]:focus-visible { box-shadow: 0 0 0 3px rgba(212,160,23,0.4) !important; }
 .price-radio { display: flex; gap: 4px; }
 .price-radio label { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; padding: 4px 10px; transition: .15s; }
 .price-radio input[type=radio] { display: none; }
@@ -616,6 +625,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 #fc-status { color: var(--text-muted); font-size: 12px; margin-left: 8px; font-family: 'IBM Plex Mono', monospace; }
 #fc-results table tbody tr { cursor: pointer; }
 #fc-results table tbody tr:hover { background: rgba(232,160,32,.06); }
+#fc-results table tbody tr:focus { background: rgba(232,160,32,.1); outline: 2px solid var(--accent); outline-offset: -2px; }
 .fc-drawer { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 8px 0 16px; animation: drawerSlide .2s ease-out; }
 @keyframes drawerSlide { from { opacity: 0; } to { opacity: 1; } }
 .fc-drawer-actions { margin-top: 12px; display: flex; gap: 8px; }
@@ -1044,6 +1054,12 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   }
   .ioc-checkbox-grid { grid-template-columns: 1fr !important; }
 }
+
+@media print {
+  .tab-nav, .site-header nav, .expl-mode-btn { display: none !important; }
+  .tab-panel { display: block !important; page-break-inside: avoid; }
+  body { font-size: 10pt; color: #000; background: #fff; }
+}
 </style>
 </head>
 <body>
@@ -1378,8 +1394,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
           <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" title="Contractor NPV ($M) — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Sort: high→low">Contractor NPV ($M)</th>
-          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. Sort: high→low">IRR @ $75 ⓘ</th>
-          <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven</th>
+          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
+          <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
           <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" title="Sort by price sensitivity (low→high)">Swing (pp)</th>
           <th class="num">Stability</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
@@ -1391,6 +1407,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
   <div id="explorer-count" style="color:var(--muted);font-size:12px;margin-top:10px;"></div>
   <div style="color:var(--muted);font-size:11px;margin-top:8px;line-height:1.6;">
+    <strong>Coverage</strong>: <span title="IRR available for 74 of 185 countries with sufficient cost data (opex/capex). Remaining countries show — in the IRR column." style="cursor:help;">IRR: 74/185 countries</span> &nbsp;|&nbsp; <span title="Breakeven available for 68 of 185 countries. Requires complete royalty and cost data." style="cursor:help;">Breakeven: 68/185 countries</span> &nbsp;|&nbsp; Govt Take + NPV: 185/185 &nbsp;&mdash;&nbsp;
+    <strong>Confidence</strong>: <span title="Source confidence: A = Primary official source (legislation/decree), B = Verified secondary source (operator filing/annual report), C = Estimated or modeled" style="cursor:help;">A/B/C badges — hover any badge for source detail</span><br>
     <strong>Breakeven</strong>: <span style="color:#4caf50">&#9632;</span> &lt;$50 &nbsp; <span style="color:#f5a623">&#9632;</span> $50–75 &nbsp; <span style="color:#e53935">&#9632;</span> &gt;$75 &nbsp;|&nbsp;
     <strong>Swing</strong> = take@$125 − take@$50. &nbsp;
     <span style="color:#4caf50">&#9632;</span> &lt;10pp low &nbsp;
@@ -3966,7 +3984,8 @@ function renderReformTable() {
       const conf = (r.confidence || 'B').toUpperCase();
       const confClass = conf === 'A' ? 'conf-a' : 'conf-b';
       const label = r.source.length > 60 ? r.source.slice(0,60)+'…' : r.source;
-      srcCell = `<a href="${r.source_url}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="font-size:10px;" title="${r.source}">${label} · ${conf} ↗</a>`;
+      const confTierNote = conf === 'A' ? 'Source confidence A = Primary official source (legislation, decree, or concession agreement)' : 'Source confidence B = Verified secondary source (operator filing, annual report, or regulatory filing)';
+      srcCell = `<a href="${r.source_url}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="font-size:10px;" title="${r.source} · ${confTierNote}">${label} · ${conf} ↗</a>`;
     } else if (r.source) {
       srcCell = `<span style="font-size:10px;color:var(--muted);">${r.source.slice(0,60)}</span>`;
     } else {
@@ -4419,15 +4438,16 @@ function renderReformTimeline(country) {
           const srcLabel = conf === 'd'
             ? 'Estimated default'
             : (srcMeta.source ? srcMeta.source : 'Primary Law');
+          const confTierExplain = conf === 'a' ? 'Source confidence A = Primary official source (legislation, decree, or concession agreement)' : conf === 'b' ? 'Source confidence B = Verified secondary source (operator filing, annual report, or regulatory filing)' : 'Source confidence C = Estimated or modeled (aggregator, analyst estimate, or cross-reference)';
           const dTooltip = 'This value is an estimated default — not sourced from primary legal documents. Treat as indicative only.';
           const dIcon = conf === 'd' ? '⚠ ' : '';
           // D-confidence: never link to the circular self-referential URL
           if (conf === 'd') {
             badgeHtml = `<span class="source-badge conf-d" title="${dTooltip}">${dIcon}Estimated default · D</span>`;
           } else if (srcMeta.url) {
-            badgeHtml = `<a href="${srcMeta.url}" target="_blank" rel="noopener" class="source-badge ${confClass}" title="${srcLabel}">${srcLabel} · ${confLabel} ↗</a>`;
+            badgeHtml = `<a href="${srcMeta.url}" target="_blank" rel="noopener" class="source-badge ${confClass}" title="${srcLabel} · ${confTierExplain}">${srcLabel} · ${confLabel} ↗</a>`;
           } else {
-            badgeHtml = `<span class="source-badge ${confClass}" title="${srcLabel}">${srcLabel} · ${confLabel}</span>`;
+            badgeHtml = `<span class="source-badge ${confClass}" title="${srcLabel} · ${confTierExplain}">${srcLabel} · ${confLabel}</span>`;
           }
         } else {
           badgeHtml = '<span class="source-badge conf-db" title="Derived from contract database averages">[API Data]</span>';
@@ -4648,7 +4668,7 @@ function loadCountryProfile(country) {
     ${mcBadge}
     ${dqBadge}
     ${prodDQBadge}
-    <span style="margin-left:10px;font-size:10px;color:var(--muted);white-space:nowrap;" title="Database last verified and deduplicated August 2026">Last verified: Aug 2026</span>
+    <span style="margin-left:10px;font-size:10px;color:var(--muted);white-space:nowrap;" title="Data current as of Q2 2026. Database last verified and deduplicated August 2026. Coverage expands as sourcing progresses.">Data current as of Q2 2026 · verified Aug 2026</span>
     <span style="margin-left:8px;" title="Fiscal Predictability Score — see methodology note">${renderStabilityBadge(getFiscalPredictabilityScore(d))}</span>
     <button class="btn btn-sm btn-outline" style="margin-left:8px;font-size:11px;" onclick="ddAddCompare('${ddCountryEsc}',this)">+ Compare</button>
     <button class="btn btn-sm btn-outline" style="margin-left:6px;font-size:11px;" onclick="ddOpenScenarioBuilder('${ddCountryEsc}')">&#128295; Scenario</button>
@@ -8221,7 +8241,7 @@ function renderFCResults(results, price) {
     var grank = rankMap[r.country];
     var rankBadge = (grank && sortField !== 'country') ? ' <span style="font-size:9px;color:#475569;background:#1e293b;border-radius:3px;padding:1px 5px;margin-left:4px;" title="Rank #' + grank + ' of ' + rankTotal + ' by ' + sortDimLabel + ' (' + sortDirLabel + ')">#' + grank + '</span>' : '';
 
-    html += '<tr onclick="openFCDrilldown(\'' + cEsc + '\')" data-country="' + r.country + '">';
+    html += '<tr onclick="openFCDrilldown(\'' + cEsc + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="' + r.country + ' fiscal compare result" data-country="' + r.country + '">';
     html += '<td class="num" style="color:var(--text-muted)">' + (i+1) + '</td>';
     html += '<td><strong>' + r.country + '</strong>' + rankBadge + ' <span style="color:var(--text-muted);font-size:11px">' + r.region + '</span></td>';
     html += '<td><span class="tag">' + r.mechanic + '</span></td>';
@@ -8240,6 +8260,19 @@ function renderFCResults(results, price) {
   });
   html += '</tbody></table></div>';
   document.getElementById('fc-results').innerHTML = html;
+  // Announce result count to screen readers
+  (function() {
+    var announcer = document.getElementById('sr-announcer');
+    if (!announcer) {
+      announcer = document.createElement('div');
+      announcer.id = 'sr-announcer';
+      announcer.setAttribute('aria-live', 'polite');
+      announcer.setAttribute('aria-atomic', 'true');
+      announcer.style.cssText = 'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)';
+      document.body.appendChild(announcer);
+    }
+    announcer.textContent = sorted.length + ' countries found';
+  })();
   var exportBtn = document.getElementById('fc-export-btn');
   if (exportBtn) { exportBtn.disabled = false; exportBtn.removeAttribute('title'); }
 
