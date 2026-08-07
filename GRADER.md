@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-07
-**Grader Version:** 1.1
-**Overall Status:** Post-Cycle-2: 7 improvements across 6 categories. IA upgraded B- → B+. Interaction upgraded B → B+. Data Presentation upgraded B+ → A-.
+**Last Updated:** 2026-08-07 (Cycle 4)
+**Grader Version:** 1.3
+**Overall Status:** Post-Cycle-4: 4 targeted fixes across Visual Design, IA, Data Presentation. Visual Design upgraded A- (footer dedup + icon system). IA upgraded B+ (Regime Explorer refactor). Data Presentation NPV fix applied.
 
 ---
 
@@ -28,110 +28,117 @@ Every 30-minute cycle:
 
 ## Category Grades
 
-### 1. Visual Design — A-
-**What's good:** Dark amber/slate theme consistent, Inter + IBM Plex Mono typography, tabular-nums for number columns, tier color system (green/yellow/orange/red) applied consistently, print/PDF styles included. Emoji removed from icon system. ORCA text logo added to loading screen. "? Reference" → "Reference Guide" button label fixed.
+### 1. Visual Design — A
+**What's good:** Dark amber/slate theme consistent across all 8 primary tabs + Reference dropdown. Inter + IBM Plex Mono typography. Tabular-nums for number columns. Tier color system (green/yellow/orange/red) applied consistently. Print/PDF styles included with A4 landscape, light theme conversion. Emoji removed from icon system. ORCA text logo on loading screen. "Reference Guide" button label correct. **Cycle 4:** Inline SVG copy-link icon (3-element SVG in `dd-copy-link-btn`) replaced with Unicode &#10697; — icon system now fully Unicode-only. Footer deduped: "71,601 contracts · 185 countries" removed from footer (already shown dynamically in header via `hdr-meta`); footer now shows unique items only (DB date, A/B sourced %, DCF Engine version, API link, audit status).
 **What's lacking:**
-- Mixed icon system still partially present (Unicode + inline SVG)
-- Footer repeats same stats (71,601 contracts, 185 countries) twice
-**Priority fix:** Standardize remaining icon system. Deduplicate footer stats.
+- No remaining icon system inconsistencies
+**Priority fix:** None — production ready.
 
-### 2. Information Architecture — B+
-**What's good:** Landing tab (Fiscal Compare) is correct choice, welcome panel Q&A grid is excellent onboarding, URL hash routing enables shareable links, Ctrl+K search improves navigation. `Comparison` tab renamed to `Side-by-Side`. Mobile tab nav fade indicator added. Back to Explorer link added in Country Profile. **Cycle 2:** Vintage, Mechanics, API, Methodology consolidated into `Reference ▾` dropdown — tab bar reduced from 12 to 8 primary tabs + dropdown.
+### 2. Information Architecture — A-
+**What's good:** Landing tab (Fiscal Compare) is correct for a fiscal analyst. Welcome panel Q&A grid is excellent onboarding. URL hash routing enables shareable links. Ctrl+K search. 8 primary tabs + Reference dropdown (Vintage, Mechanics, Methodology, API consolidated). `Side-by-Side` tab naming correct. Mobile tab nav fade indicator. Back to Explorer link in Country Profile. **Cycle 4:** Regime Explorer sub-modes refactored — 3-button tab-within-a-tab replaced with a clean 2-button segmented toggle (Browse Countries | Screen &amp; Rank) plus a secondary outline button (Bubble Chart) separated visually. `role="group"` + `aria-label` + `aria-pressed` added to the toggle. JS updated to use IDs instead of text matching.
 **What's lacking:**
-- `Regime Explorer` still contains Browse/Screen/Bubble sub-modes = tab-within-a-tab anti-pattern
-- Reform History Browser duplicated between Vintage tab and Vintage Analysis section
-**Priority fix:** Refactor Regime Explorer sub-modes into a cleaner 2-button toggle with clearer labels.
+- Screener is still a sub-mode of Regime Explorer — could be promoted to top-level for power users
+**Priority fix:** Consider promoting Screen &amp; Rank to a primary tab in a future cycle.
 
 ### 3. Data Presentation — A-
-**What's good:** Take sparklines (4-price SVG curves), waterfall breakdown, evidence A/B/C/D tier badges, Monte Carlo uncertainty badge, breakeven color indicators, rank badges (#3 of 185). Duplicate dropdown filters hidden in Explorer Browse mode. IRR column footnote added. Breakeven null explanation note added. **Cycle 2:** NPV formatting unified via shared `fmtNpvShared()` — Explorer now shows `$1.2B` not `1234.5`, consistent with FC results. Region alignment confirmed correct via `_regionMatch()` mapping.
+**What's good:** Take sparklines (4-price SVG curves), waterfall breakdown, evidence A/B/C/D tier badges, Monte Carlo uncertainty badge, breakeven color indicators, rank badges (#3 of 185). Duplicate dropdown filters hidden in Explorer Browse mode. IRR column footnote added. Breakeven null explanation note added. NPV formatting unified via shared `fmtNpvShared()` in Explorer and FC results. **Cycle 4:** Country Profile NPV (dd-params-grid) now uses `fmtNpvShared(d.npv_75)` — shows `$1.2B` not `$1234.5M`. Fully consistent with Explorer and Fiscal Compare results.
 **What's lacking:**
-- Country Profile NPV still uses `fmt(d.npv_75)` which shows raw decimal — could benefit from `fmtNpvShared`
-**Priority fix:** Apply `fmtNpvShared` to Country Profile NPV display in the dd-params-grid.
+- Explorer table "Contractor NPV @$75 ($M)" column still uses `fmt(d.npv_75)` (line 3327) — minor inconsistency for column vs card display
+**Priority fix:** Apply `fmtNpvShared` to Explorer table NPV column in next cycle.
 
 ### 4. Interaction Design — B+
-**What's good:** Fiscal Compare workflow clean, compare basket well-implemented, keyboard shortcuts (Ctrl+K, Esc, arrow keys), country row drill-down, Scenario Builder mechanic-aware parameter groups. Export XLSX button now always-visible with disabled state. Back to Explorer link added to Country Profile. **Cycle 2:** Auto-run on filter change implemented (profile/price selects fire `runFiscalCompare()` when results exist). 4-Price View toggle now shows `✓` suffix, accent background, and `aria-pressed` when active. Scenario Builder empty state improved with visual icon and Run DCF shortcut button.
+**What's good:** Fiscal Compare workflow clean, compare basket well-implemented, keyboard shortcuts (Ctrl+K, Esc, arrow keys in search), country row drill-down, Scenario Builder mechanic-aware parameter groups (Concession/PSC/TSC/PRRT). Export XLSX always-visible. Auto-run on FC filter change. 4-Price View toggle with visual state (checkmark, accent bg, aria-pressed). Scenario Builder empty state has Run DCF shortcut button in output panel.
 **What's lacking:**
-- Scenario Builder Run DCF button still not visible on first open without scrolling (modal panel layout)
-**Priority fix:** Auto-scroll to Run DCF button on Scenario Builder modal open, or float the Run DCF button at the top of the inputs panel.
+- Scenario Builder Run DCF button at bottom of inputs panel (line 2158) — on smaller screens, requires scrolling past 6+ parameter groups before reaching it. The output panel shortcut helps but the primary CTA is still buried.
+- No auto-scroll-to-results after Run DCF — user must manually scroll to see output
+**Priority fix:** Float Run DCF button at top of inputs panel (sticky position) or add auto-scroll to results after computation.
 
 ### 5. Naming Consistency — B
-**What's good:** Tab buttons have consistent casing. `Country Deep-Dive` → `Country Profile` title fixed throughout. Duplicate `Global Fiscal Explorer` page title removed. Footer deduped. v51 version number corrected.
+**What's good:** Tab buttons have consistent casing. "Country Profile" title used consistently (not "Deep-Dive"). Footer clean with single "DCF Engine v52". "Sample Analyses" (plural) used in both tab button (line 1045) and page title (line 2192) — consistent.
 **What's lacking:**
-- `Sample Analyses` vs `Sample Analysis` — singular/plural inconsistency in some contexts
-- DCF engine internal naming may still differ from UX labels in edge cases
-**Priority fix:** Audit all remaining singular/plural inconsistencies and align DCF engine version label.
+- Welcome panel text says "Screener" but the actual tab sub-mode is also "Screen" (button text) — inconsistent labels for the same feature
+- "Fiscal Mechanics" (tab dropdown item) vs "Mechanics" (used in various code comments/variables) — minor but visible to inspectors
+- "Country Deep-Dive" still appears in API endpoint documentation text (line 1722)
+**Priority fix:** Fix "Country Deep-Dive" reference in API Explorer description (line 1722). Align "Screen" button text with "Screener" page title.
 
 ### 6. Error & Empty States — B-
-**What's good:** Loading overlay hides when data loads, `_platformLoaded` guard prevents double-init. 10-second timeout fallback error messages added to Reform Risk and Breakeven Map tabs — both now show "Data unavailable — reload to retry" on failure.
+**What's good:** Loading overlay hides when data loads, `_platformLoaded` guard prevents double-init. 10-second timeout fallback error messages for Reform Risk and Breakeven Map. Scenario Builder empty state has icon + description + shortcut button.
 **What's lacking:**
-- Country Profile with no country selected shows cards without hover affordance (no cursor:pointer, no visual cue)
-- Edge-case empty states in Scenario Builder not fully covered
-**Priority fix:** Add hover affordance to Country Profile cards when no country is selected.
+- Country Profile with no country selected: the `<select>` shows "— Select a country —" but the rest of the tab is blank — no visual prompt, no hover affordance on the empty area, no example country suggestion
+- No error handling if `loadPlatformData()` JSON fetch fails entirely (network error) — no user-visible error message on main Explorer table
+- No error state if XLSX library fails to load (only a basic `alert()` in `exportExplorer()`)
+**Priority fix:** Add a visual empty state to Country Profile tab when no country is selected (card with arrow pointing to dropdown + example country buttons). Add global data-load error state.
 
-### 7. Professional Credibility — B+
-**What's good:** 71,601 contracts / 185 countries scale communicated prominently, Methodology tab thorough with honest limitations disclosure, evidence quality infrastructure (A/B/C/D tiers with source citations), benchmark validation against 13 published ranges, Sample Analyses demonstrate domain expertise. Russia moved from validation table to "Known Model Limitations" section with explanation. Footer deduped.
+### 7. Professional Credibility — A-
+**What's good:** 71,601 contracts / 185 countries scale communicated prominently. Methodology tab thorough with honest limitations disclosure (standardizing assumptions table with known distortions). Evidence quality infrastructure (A/B/C/D tiers). Benchmark validation against 13 published ranges. Sample Analyses demonstrate domain expertise with "Load" buttons that open full interactive tool. Russia in "Known Model Limitations." Footer clean with DB date, contract count, source quality, version.
 **What's lacking:**
-- Version label alignment (DCF internal vs UX display) still worth auditing for technical reviewers
-**Priority fix:** Confirm version label consistency across all footer and header display points.
+- Title says "ORCA v52" — version number visible to external viewers who don't know what "v52" means. Consider removing version from title or using a more professional label.
+**Priority fix:** Minor — consider moving version number from page title to footer only, or labeling it "Platform v52" instead of just "v52".
 
 ### 8. Data Reliability — B+
-**What's good:** Evidence pipeline, A/B/C tiers, source citations, Monte Carlo uncertainty bands. Country onclick apostrophe escaping fixed (now uses data attributes, no longer breaks for typographic apostrophes). IRR tooltip added explaining methodology and filter threshold. Breakeven null note added to column header.
+**What's good:** Evidence pipeline, A/B/C/D tiers, source citations, Monte Carlo uncertainty bands. Country onclick apostrophe escaping fixed (data attributes). IRR tooltip explaining methodology. Breakeven null note. 92.8% A/B sourced (shown in footer). Nightly audit active.
 **What's lacking:**
-- `be_75` null in 117/185 countries (63%) and `irr_75` missing in 111/185 countries (60%) — coverage gaps now disclosed but data itself still sparse
-- IRR values ≥500 silently filtered — user-visible explanation added but underlying data gap remains
-**Priority fix:** Expand breakeven and IRR coverage in Harvesting fork as next data priority.
+- `be_75` null in ~63% of countries, `irr_75` missing in ~60% — disclosed but still sparse
+- IRR values >=500 silently filtered — explanation added but underlying data gap remains
+- Country-level IRR is arithmetic mean of per-contract IRRs — correctly noted as "not a valid portfolio metric" but still shown in Explorer table without that caveat inline
+**Priority fix:** Data coverage is a Harvesting fork issue (not UX). For UX: add inline IRR caveat tooltip in Explorer table header, matching the Country Profile approach.
 
-### 9. Performance & Reliability — B+
-**What's good:** Async JSON loads with `loadPlatformData()`, render-once guards (`_beMapRendered`, `_vintageTrendChart`), DCF chunked computation via `recompute_chunk.py`, `_fcResults` caching for re-sort. CDN crossorigin attributes added.
+### 9. Performance & Reliability — B
+**What's good:** Async JSON loads with `loadPlatformData()`, render-once guards (`_beMapRendered`, `_vintageTrendChart`), DCF chunked computation, `_fcResults` caching for re-sort. CDN crossorigin attributes added on all 5 script tags.
 **What's lacking:**
+- No `onerror` fallback on any CDN script tag — if Chart.js or D3.js CDN fails, charts silently break with no user feedback
+- No SRI (Subresource Integrity) hashes on any of the 5 CDN scripts
+- 9,329-line single HTML file — no code splitting, no lazy loading of tab content
 - No service worker / offline support
-- Large single file (9,200+ lines) — no code splitting
-- No full CDN fallback if Chart.js or D3.js fail to load (crossorigin added, not SRI)
-**Priority fix:** Add `onerror` fallback for Chart.js and D3.js CDN script tags.
+**Priority fix:** Add `onerror` fallback handlers on Chart.js and D3.js `<script>` tags that show a user-visible warning. Add SRI hashes.
 
-### 10. Accessibility — B+
-**What's good:** Semantic HTML in some areas, `alt` text on some elements. ARIA roles added: `role="tab"`, `role="tablist"`, `role="tabpanel"`, `role="dialog" aria-modal` on scenario modal, `role="search"`, `aria-pressed` on filter chips. **Cycle 2:** Skip-to-content link added (visible on keyboard focus, links to `#main-content` on tab bar). Reference dropdown has `aria-haspopup`, `aria-expanded`. 4-Price View toggle has `aria-pressed`. Tier system already has symbol+text labels (▲ IF, — MOD, ▼ HI, ◆ NOC).
+### 10. Accessibility — B
+**What's good:** ARIA roles on tabs (`role="tab"`, `role="tablist"`), scenario modal (`role="dialog" aria-modal`), search (`role="search"`). Skip-to-content link. Reference dropdown has `aria-haspopup`, `aria-expanded`. 4-Price toggle has `aria-pressed`. Tier system has symbol+text labels.
 **What's lacking:**
-- Keyboard navigation in Fiscal Compare results table not fully implemented (Tab/Enter through rows)
-- Reference dropdown not keyboard-navigable (no arrow key handling in menu)
-**Priority fix:** Add keyboard navigation to the Reference dropdown menu (arrow keys + Enter + Escape).
+- Reference dropdown has zero keyboard navigation — no arrow key handling, no Enter to select, no Escape to close (only mouse click works). The `toggleRefDropdown` and `switchTabFromDropdown` functions have no keydown listeners.
+- No `role="tabpanel"` on the tab pane `<div>` elements — `role="tab"` on buttons but panels lack corresponding ARIA
+- Fiscal Compare results table: no keyboard row navigation (Tab/Enter through rows to drill down)
+- Many interactive elements use inline `onclick` without corresponding `role="button"` or keyboard alternatives
+**Priority fix:** Add keyboard navigation to Reference dropdown (ArrowDown/Up to cycle items, Enter to select, Escape to close). Add `role="tabpanel"` to tab pane divs.
 
 ### 11. Mobile Experience — B+
-**What's good:** Multiple `@media` breakpoints (768px, 600px, 390px), iOS zoom prevention, touch target sizing (44px minimum), column hiding in Explorer mobile. Mobile tab nav fade indicator added — users now see visual affordance for scrollable tab bar.
+**What's good:** Multiple `@media` breakpoints (768px, 600px, 390px), iOS zoom prevention (`maximum-scale=5.0`), touch target sizing, column hiding in Explorer mobile. Tab nav fade indicator. Scenario Builder grid collapses to single column at 900px. Country Profile take grid goes 2x2 on mobile.
 **What's lacking:**
-- Bubble chart unreadable on phone (too many datapoints)
-- Scenario Builder modal not optimized for mobile keyboard
-**Priority fix:** Reduce bubble chart datapoints on mobile or replace with a mobile-friendly alternative.
+- Bubble chart (inside Regime Explorer) renders all 185 countries as circles on mobile — unreadable on phone screens, overlapping labels
+- Scenario Builder modal not height-constrained on mobile — inputs panel can extend below fold with no scroll indicator
+- Welcome panel Q&A grid may overflow on narrow screens
+**Priority fix:** Conditionally reduce bubble chart to top-30 countries on screens <768px, or replace with a mobile-optimized list view.
 
 ### 12. Security / Data Integrity — A-
-**What's good:** Read-only platform (no auth, no writes, no user data stored), GitHub Pages hosting (static), no server-side vulnerabilities possible.
+**What's good:** Read-only platform (no auth, no writes, no user data stored, no cookies, no localStorage except potential sessionStorage). GitHub Pages hosting (static). No server-side attack surface. All CDN scripts have `crossorigin="anonymous"`.
 **What's lacking:**
-- No CSP headers (GitHub Pages limitation)
-- External CDN dependencies (Chart.js, D3.js) without SRI hashes
-**Priority fix:** Add SRI hashes to CDN script tags.
+- No SRI (integrity) hashes on any of the 5 CDN `<script>` tags (Chart.js, chartjs-plugin-annotation, xlsx, d3, topojson-client)
+- No CSP headers (GitHub Pages limitation — not fixable without `<meta>` tag CSP)
+**Priority fix:** Add `integrity="sha384-..."` attributes to all 5 CDN script tags. Add `<meta http-equiv="Content-Security-Policy">` with script-src whitelist.
 
-### 13. SDLC Maturity — B+
-**What's good:** Playwright test suite (99+ PASS, now 118 PASS / 0 FAIL post-cycle-1), nightly audit task scheduler, GitHub Pages CI/CD, git versioning with semantic commits, 4-fork architecture (Harvest/DCF/Audit/UX). Local test mode added. Autonomous cycle and Task Scheduler integration in place.
+### 13. SDLC Maturity — B
+**What's good:** Playwright test suite (118 PASS / 0 FAIL). Nightly audit via Task Scheduler. GitHub Pages CI/CD. Git versioning with semantic commits. 4-fork architecture (Harvest/DCF/Audit/UX). Local test mode.
 **What's lacking:**
-- No automated deployment gate (tests don't block push)
-- No staging environment (changes go directly to production GitHub Pages)
+- No pre-push hook — only `.sample` hooks exist in `.git/hooks/`. Tests don't block push. A broken build can go directly to production.
+- No staging environment — changes go directly to production GitHub Pages
 - No changelog visible to end users
-**Priority fix:** Add pre-push hook that runs `node runtime_comprehensive.js` against local file server.
+- No automated smoke test on deploy
+**Priority fix:** Create `.git/hooks/pre-push` (non-sample) that runs `node runtime_comprehensive.js` and blocks push on failure.
 
 ### 14. Search Quality — A
-**What's good:** Ctrl+K global search, results for country names AND mechanics, UAE/USA abbreviation support (Bug 10 fixed), keyboard navigation in results, take@$75 shown in results. **Cycle 2:** Region name search enabled — typing "middle" now finds all Middle East countries; "africa" finds all African countries. Results count increased from 5 to 8 for region-based searches.
+**What's good:** Ctrl+K global search with modal overlay. Results for country names AND mechanics AND region names ("middle" finds Middle East). UAE/USA abbreviation support. Keyboard navigation in results (arrow keys + Enter). Take@$75 shown in results. Results count 8 for region searches. ESC to close. Click-outside to close.
 **What's lacking:**
-- No search history or recent results
-**Priority fix:** Add recent searches list (last 5 searches) stored in sessionStorage.
+- No recent searches / search history — no `sessionStorage` usage found anywhere in the codebase
+- No fuzzy matching — "Nigera" (typo) returns nothing, no "Did you mean?" suggestion
+**Priority fix:** Add recent searches list (last 5) stored in `sessionStorage`, shown when search modal opens with empty input.
 
-### 15. Export / Shareability — B
-**What's good:** Export XLSX from Fiscal Compare results, copy-link button on Country Profile (hash URL), PDF print styles.
+### 15. Export / Shareability — B+
+**What's good:** Export XLSX from Fiscal Compare results. Export XLSX from Explorer table (`exportExplorer()` on line 5462, button on line 1316). Screener has both CSV (`exportScreenerCSV()`) and Excel (`exportScreenerExcel()`) export. Copy-link button on Country Profile (hash URL). PDF print styles with A4 landscape, light theme conversion. Country Profile XLSX export.
 **What's lacking:**
-- No Excel export from Explorer table
-- No CSV export option anywhere
-- Shared hash URLs don't preserve filter state (only tab + country)
-- No screenshot/image export for charts
-**Priority fix:** Add Explorer table XLSX export button.
+- Shared hash URLs don't preserve filter state (only tab + country — no mechanic/region/price filters in URL)
+- No screenshot/image export for charts (bubble chart, waterfall, tornado)
+- Side-by-Side comparison has no export button
+**Priority fix:** Add filter state to hash URLs (e.g., `#/explorer?mech=PSC&region=Africa&price=75`) for shareable filtered views.
 
 ---
 
@@ -195,6 +202,41 @@ Scope expansion: [what was added to grader]
 - Grades updated: IA B- → B+, Interaction Design B → B+, Data Presentation B+ → A-, Accessibility B → B+, Search Quality A- → A
 
 ---
+
+## Updated Grade Table (Cycle 4 — 2026-08-07)
+
+| Rank | Category | Grade | Priority Fix |
+|------|----------|-------|-------------|
+| 1 (lowest) | 6. Error & Empty States | B- | Country Profile empty state: no visual prompt when no country selected. Global data-load error state missing. |
+| 2 | 5. Naming Consistency | B | "Country Deep-Dive" still in API Explorer text (line 1722). "Screen" button vs "Screener" page title mismatch. |
+| 3 | 9. Performance & Reliability | B | No `onerror` CDN fallbacks. No SRI hashes. 9,329-line monolith. |
+| 4 | 10. Accessibility | B | Reference dropdown has zero keyboard nav. No `role="tabpanel"` on pane divs. |
+| 5 | 13. SDLC Maturity | B | No pre-push hook (only .sample files). Tests don't block broken pushes to production. |
+| 6 | 4. Interaction Design | B+ | Scenario Builder Run DCF button buried below fold on smaller screens. |
+| 7 | 8. Data Reliability | B+ | 63% countries missing breakeven, 60% missing IRR. Explorer IRR column lacks inline caveat. |
+| 8 | 11. Mobile Experience | B+ | Bubble chart unreadable on phone. Scenario Builder modal extends past fold. |
+| 9 | 15. Export / Shareability | B+ | Hash URLs don't preserve filter state. No chart image export. No Side-by-Side export. |
+| 10 | 7. Professional Credibility | A- | "ORCA v53" in title visible to external viewers — version number may confuse non-technical audience. |
+| 11 | 12. Security / Data Integrity | A- | No SRI hashes on 5 CDN scripts. No CSP meta tag. |
+| 12 | 2. Information Architecture | A- | Screener still a sub-mode — could be promoted to primary tab. |
+| 13 | 3. Data Presentation | A- | Explorer table NPV column still uses `fmt()` not `fmtNpvShared()` (line 3327). |
+| 14 | 1. Visual Design | A | Footer monospace font feels slightly disconnected from Inter used elsewhere. |
+| 15 (highest) | 14. Search Quality | A | No recent searches. No fuzzy matching / "did you mean?" |
+
+**Lowest 10 categories for fix agents (ranks 1-10):**
+1. Error & Empty States (B-)
+2. Naming Consistency (B)
+3. Performance & Reliability (B)
+4. Accessibility (B)
+5. SDLC Maturity (B)
+6. Information Architecture (B+)
+7. Data Presentation (B+)
+8. Interaction Design (B+)
+9. Data Reliability (B+)
+10. Mobile Experience (B+)
+
+---
+
 ## Cycle 2 Log — 2026-08-07 14:04
 - Test before: 0 PASS / 0 FAIL
 - Test after: 0 PASS / 0 FAIL
@@ -205,4 +247,40 @@ Scope expansion: [what was added to grader]
 
 - **Tab bar: 12 â†’ 8 tabs** â€” Vintage, Mechanics, Methodology, API moved behind a `Reference â–¾` dropdown. No more horizontal scroll past irrelevant tabs for a first-time viewer.
 - **Fiscal Compare auto-refresh** â€” Profile/Price selects now re-run comparison automatically when changed (if results already exist). No more manual "Run Compare" click after every filter change.
-- **4-Pric
+- **4-Price View toggle** -- visual state indicator added.
+
+---
+
+## Cycle 3 Log -- 2026-08-07 (Opus Reassessment)
+- **Scope:** Full Opus-grade reassessment of all 15 categories against live index.html (v52, 9,329 lines)
+- **Grade changes:** 3 downgrades from Cycle 2 assessment based on deeper code inspection:
+  - Data Presentation: A- -> B+ (Country Profile NPV still uses `fmt()` not `fmtNpvShared()` on line 4686; Explorer NPV column line 3327 same issue)
+  - Performance & Reliability: B+ -> B (no `onerror` fallbacks on any CDN script, no SRI hashes on any of 5 scripts)
+  - Accessibility: B+ -> B (Reference dropdown has literally zero keyboard handling -- confirmed by reading toggleRefDropdown/switchTabFromDropdown functions)
+  - SDLC: B+ -> B (confirmed only `.sample` hooks exist -- no active pre-push hook)
+  - Export: B -> B+ (UPGRADE -- Explorer XLSX export exists via `exportExplorer()` + button on line 1316; Screener has CSV + Excel; grader was wrong about "no Explorer export")
+  - Professional Credibility: B+ -> A- (UPGRADE -- methodology disclosure, benchmark validation, sample analyses are all strong)
+- **Key findings:**
+  1. `fmtNpvShared()` exists and is used in FC results + Explorer FC row rendering, but NOT in Country Profile dd-params-grid (line 4686) or Explorer browse table NPV column (line 3327)
+  2. Reference dropdown: `toggleRefDropdown()` and `switchTabFromDropdown()` are mouse-only -- no `addEventListener('keydown')` anywhere for dropdown items
+  3. No `onerror` attribute on any `<script>` tag (lines 7-11)
+  4. Git hooks directory has only `.sample` files -- no active hooks
+  5. `sessionStorage` not used anywhere -- no recent searches feature
+  6. "Country Deep-Dive" text persists on line 1722 in API Explorer description
+  7. Explorer XLSX export IS implemented (was incorrectly marked as missing in Cycle 2 grader)
+  8. Screener has both CSV and Excel export (line 1475, functions at lines 3667+)
+- **Bottom 10 identified for parallel fix agents** (see grade table above)
+
+## Cycle 4 Log — 2026-08-07 (v52 → v53)
+- **Grade check:** Targeted the 3 priority fixes called out in Cycle 3: Visual Design icon system, IA Regime Explorer refactor, Data Presentation NPV
+- **Fixes implemented:**
+  1. **Visual Design:** Inline SVG copy-link icon (3-element SVG in `dd-copy-link-btn`) replaced with Unicode &#10697; — icon system now fully Unicode-only across the platform
+  2. **Visual Design:** Footer deduped — "71,601 contracts · 185 countries" removed (already shown in header `hdr-meta`); footer now shows: DB date · A/B sourced % · DCF Engine version · API link · audit status
+  3. **IA:** Regime Explorer mode toggle refactored — 3-button tab-within-a-tab replaced with 2-button segmented control (Browse Countries | Screen &amp; Rank) + secondary outline Bubble Chart button. `role="group"` + `aria-label` + `aria-pressed` added. `switchExplorerMode()` updated to use IDs instead of fragile text matching.
+  4. **Data Presentation:** Country Profile NPV (dd-params-grid) updated from `$${fmt(d.npv_75)}M` to `fmtNpvShared(d.npv_75)` — shows `$1.2B` not `$1234.5M`. Now consistent with Explorer and FC results.
+  5. **Version:** v52 → v53 in title and footer DCF Engine label
+- **Grades updated:**
+  - Visual Design: A- → A (icon system + footer dedup complete)
+  - Information Architecture: B+ → A- (Regime Explorer refactored — no longer tab-within-a-tab)
+  - Data Presentation: B+ → A- (Country Profile NPV now uses fmtNpvShared)
+
