@@ -8650,10 +8650,10 @@ function renderBubbleChart() {
         return {
           x: d.take_75,
           y: d.npv_75,
-          r: Math.max(3, Math.min(20, Math.sqrt(d.n || d.n || 1) * 1.5)),
+          r: Math.max(3, Math.min(20, Math.sqrt(d.n || 1) * 1.5)),
           country: d.country,
           mechanic: d.mechanics || d.mechanic || '\u2014',
-          n: d.n || d.n || 0
+          n: d.n || 0
         };
       })
     };
