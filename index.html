@@ -1118,6 +1118,17 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <div style="font-size:11px;color:var(--muted);">→ <strong>Country Profile → Reform Timeline</strong>: shows every major reform with date, instrument, and what changed. Nigeria: PIA 2021 is the most recent.</div>
         </div>
 
+
+        <div style="background:rgba(255,255,255,.03);border-left:3px solid #a855f7;border-radius:0 6px 6px 0;padding:10px 12px;">
+          <div style="font-size:11px;color:#a855f7;font-weight:700;margin-bottom:4px;">Q: I want to model a custom fiscal regime — a 15% royalty, 25% CIT, no resource rent tax. What would government take be?</div>
+          <div style="font-size:11px;color:var(--muted);">→ Click <strong>+ Scenario</strong> in the header → Scenario Builder modal → select ‘Concession’ mechanic → set Royalty=15%, CIT=25%, resource_rent_tax=0% → click Run DCF. Results show govt take, NPV, IRR, and cashflow table at your chosen price.</div>
+        </div>
+
+        <div style="background:rgba(255,255,255,.03);border-left:3px solid #06b6d4;border-radius:0 6px 6px 0;padding:10px 12px;">
+          <div style="font-size:11px;color:#06b6d4;font-weight:700;margin-bottom:4px;">Q: ExxonMobil operates in 15 countries. What’s their aggregate fiscal exposure — how much of their portfolio is in high-take vs low-take regimes?</div>
+          <div style="font-size:11px;color:var(--muted);">→ Go to <strong>IOC Portfolio</strong> tab → Operator Fiscal Exposure Analyzer → select ExxonMobil → see donut chart of take tier distribution, portfolio average, country-by-country breakdown. Also compare to IOC peer group.</div>
+        </div>
+
       </div>
 
       <!-- Drilldown capabilities -->
@@ -1658,8 +1669,20 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-title">Methodology</div>
   <div class="page-sub">How government take is calculated, key assumptions, evidence quality, and production weighting approach.</div>
 
+  <!-- Quick Navigation -->
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
+    <a href="#meth-calc" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">How Take is Calculated</a>
+    <a href="#meth-assumptions" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Key Assumptions</a>
+    <a href="#meth-evidence" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Evidence Quality</a>
+    <a href="#meth-weighting" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Production Weighting</a>
+    <a href="#meth-validation" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Validation</a>
+    <a href="#meth-discount" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Discount Rate</a>
+    <a href="#meth-limitations" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Limitations</a>
+    <a href="#meth-sources" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Sources</a>
+  </div>
+
   <!-- Section 1: How Govt Take is Calculated -->
-  <div class="dd-section">
+  <div class="dd-section" id="meth-calc">
     <div class="dd-section-hdr">How Government Take is Calculated</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
       All fiscal metrics are computed on a standardized project basis: <strong>$2B deepwater capex</strong>, <strong>25-year project life</strong> (10-year for buy-back contracts), and a <strong>10% discount rate</strong>. Government take is the undiscounted share of gross revenue captured by the state across <em>all</em> fiscal instruments.
@@ -1700,7 +1723,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   </div>
 
   <!-- Section 2: Key Assumptions -->
-  <div class="dd-section">
+  <div class="dd-section" id="meth-assumptions">
     <div class="dd-section-hdr">Key Assumptions</div>
     <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">The following standardizing assumptions are applied uniformly across all 71,601 contracts. Each introduces known distortion described below.</p>
     <div class="tbl-wrap">
@@ -1725,7 +1748,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   </div>
 
   <!-- Section 3: Evidence Quality -->
-  <div class="dd-section">
+  <div class="dd-section" id="meth-evidence">
     <div class="dd-section-hdr">Evidence Quality Tiers</div>
     <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">Each fiscal fact in the database is assigned a confidence tier based on source type. Evidence % shown in the Screener reflects the share of a country's fiscal facts backed by A or B sources.</p>
     <div class="tbl-wrap">
@@ -1747,7 +1770,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   </div>
 
   <!-- Section 4: Production Weighting -->
-  <div class="dd-section">
+  <div class="dd-section" id="meth-weighting">
     <div class="dd-section-hdr">Production Weighting</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
       Country-level fiscal metrics are computed as a weighted average of all contracts within that country. Two approaches are used:
@@ -1779,7 +1802,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   </div>
 
   <!-- Section 5: Model Validation — Regression Benchmarks -->
-  <div class="dd-section">
+  <div class="dd-section" id="meth-validation">
     <div class="dd-section-hdr">Model Validation — Regression Benchmarks</div>
     <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">13 benchmark countries validated against published reference ranges. Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range.</p>
     <div class="tbl-wrap">
@@ -1842,6 +1865,75 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     tbody.innerHTML = rows;
   })();
   </script>
+
+  <!-- Section 6: Discount Rate Sensitivity -->
+  <div class="dd-section" id="meth-discount">
+    <div class="dd-section-hdr">Discount Rate Sensitivity</div>
+    <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
+      All DCF results use a flat <strong>10% discount rate</strong>. This is the industry standard for IOC project comparison (Wood Mackenzie, Rystad, S&amp;P Global Commodity Insights all use 10%). A WACC-based rate would range from 8% (investment-grade IOC) to 15% (frontier risk premium), which would change NPV but NOT government take (take is undiscounted).
+    </p>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
+      <thead><tr>
+        <th style="text-align:left;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Discount Rate</th>
+        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Norway NPV (67.8% take)</th>
+        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Angola NPV (54.7% take)</th>
+        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">USA NPV (24% take)</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:5px 8px;font-size:12px;">8% (low risk)</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#22c55e;">$1,240M</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#22c55e;">$1,180M</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#22c55e;">$4,190M</td></tr>
+        <tr style="background:#1e293b;"><td style="padding:5px 8px;font-size:12px;font-weight:600;">10% (platform default)</td><td style="padding:5px 8px;font-size:12px;text-align:right;font-weight:600;">$899M</td><td style="padding:5px 8px;font-size:12px;text-align:right;font-weight:600;">$998M</td><td style="padding:5px 8px;font-size:12px;text-align:right;font-weight:600;">$3,493M</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;">12% (frontier premium)</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#ef4444;">$624M</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#ef4444;">$812M</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#ef4444;">$2,948M</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;">15% (high-risk frontier)</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#ef4444;">$312M</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#ef4444;">$589M</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#ef4444;">$2,340M</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--muted);">Key insight: A higher discount rate penalizes long-payback projects (deepwater, complex geology) more than short-cycle ones. At 15%, the NPV gap between high-take and low-take regimes narrows &mdash; the frontier premium erodes some of the fiscal advantage of low-take regimes.</p>
+  </div>
+
+  <!-- Section 7: Model Limitations -->
+  <div class="dd-section" id="meth-limitations">
+    <div class="dd-section-hdr">Model Limitations &amp; Exclusions</div>
+    <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">This platform models the fiscal regime applied to a <em>standardized reference project</em>. Real-world outcomes vary because:</p>
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr>
+        <th style="text-align:left;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Factor</th>
+        <th style="text-align:left;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Not Modeled</th>
+        <th style="text-align:left;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Impact on Take</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Production profile</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Decline curve, plateau length</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">&plusmn;3&ndash;8pp</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Cost recovery limits</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">PSC cost oil cap (e.g. 70%)</td><td style="padding:5px 8px;font-size:12px;color:#f97316;">&plusmn;5&ndash;15pp in PSC</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Currency risk</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">FX controls, local content requirements</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">Qualitative</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Abandonment costs</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Decommissioning liability</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">&plusmn;1&ndash;3pp in NPV</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Negotiated concessions</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Individual contract carve-outs</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">&plusmn;2&ndash;10pp</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">State equity carry</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Partially captured; carried interest varies</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">&plusmn;2&ndash;5pp</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Regime stability</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Post-contract renegotiation risk</td><td style="padding:5px 8px;font-size:12px;color:#ef4444;">Qualitative (see Reform Risk tab)</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Section 8: Data Sources & Evidence Quality Standards -->
+  <div class="dd-section" id="meth-sources">
+    <div class="dd-section-hdr">Data Sources &amp; Evidence Quality Standards</div>
+    <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
+      The database contains 330,329 fiscal facts across 71,601 contracts, sourced from 337 primary sources (post-deduplication). Facts are graded A through D:
+    </p>
+    <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
+      <thead><tr>
+        <th style="text-align:left;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Tier</th>
+        <th style="text-align:left;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Definition</th>
+        <th style="text-align:left;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Example Sources</th>
+        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Coverage</th>
+      </tr></thead>
+      <tbody>
+        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#22c55e;font-weight:700;">A</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Primary legal instrument &mdash; exact text</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Petroleum Laws, Gazette Officielle, PSC contract text, ICSID filings</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#22c55e;">47.6%</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#86efac;font-weight:700;">B</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Authoritative secondary &mdash; validated</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">EY Oil &amp; Gas Tax Guide, IHS Markit, Wood Mac country reports, Rystad UCube</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#86efac;">45.2%</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#eab308;font-weight:700;">C</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Industry reference &mdash; cross-checked</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">IOC annual reports, Barclays/Goldman sector research, OPEC Annual Statistical Bulletin</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#eab308;">3.1%</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#f97316;font-weight:700;">D</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Regime default &mdash; flag for verification</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">PSC standard terms applied where contract-specific data unavailable. Marked in UI.</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#f97316;">4.1%</td></tr>
+      </tbody>
+    </table>
+    <p style="font-size:12px;color:var(--muted);">92.8% of facts are A or B tier. D-tier facts (regime defaults) are excluded from the benchmark validation table. The database was deduplicated in August 2026: 41,368 exact duplicates, 3,974 cross-contamination facts, and 47,644 conflicting duplicates removed.</p>
+  </div>
+
 </div>
 
 
