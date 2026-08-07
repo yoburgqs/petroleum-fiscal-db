@@ -1087,6 +1087,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 </div>
 
+<span id="main-tab-content" tabindex="-1" aria-hidden="true" style="position:absolute;"></span>
 <!-- ===== TAB 0: FISCAL COMPARE (v38 centerpiece) ===== -->
 <div id="t0" class="tab-pane active" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t0">
 
@@ -7911,7 +7912,7 @@ function toggleFourPrice(btn) {
   btn.style.borderColor = active ? '' : 'var(--accent)';
   btn.setAttribute('aria-pressed', active ? 'false' : 'true');
   btn.textContent = active ? '4-Price View' : '4-Price View ✓';
-  btn.title = active ? 'Toggle 4-price columns ($50 / $100 / $125)' : 'Active — click to hide price columns';
+  btn.title = active ? 'Toggle 4-price columns ($50 / $100 / $125)' : 'Showing $50/$100/$125 columns — click to hide';
   // Also toggle header cells
   const hdrs = document.querySelectorAll('.expl-mp-col, .take-50-col, .take-100-col, .take-125-col');
   hdrs.forEach(el => el.style.display = active ? 'none' : '');
