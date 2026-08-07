@@ -1,6 +1,7 @@
 {
   "name": "petroleum-fiscal-db",
-  "version": "1.0.0",
+  "version": "54.0.0",
+  "description": "ORCA Petroleum Fiscal Intelligence Platform",
   "scripts": {
     "test": "node tests/runtime_comprehensive.js",
     "test:local": "TEST_URL=http://localhost:8080 node tests/runtime_comprehensive.js"
