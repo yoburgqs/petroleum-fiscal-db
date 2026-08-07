@@ -1158,14 +1158,14 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ===== v52 TAB NAV (8 primary tabs + Reference dropdown) ===== -->
 <div class="tab-nav-wrapper">
 <div class="tab-nav" role="tablist">
-  <button id="tab-btn-t0" class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('t0',this)">Fiscal Compare</button>
-  <button id="tab-btn-tsamples" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tsamples',this)">Sample Analyses</button>
-  <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t7',this)">Country Profile</button>
-  <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('texplorer',this)">Regime Explorer</button>
-  <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t5',this)">IOC Portfolio</button>
-  <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t2',this)">Side-by-Side</button>
-  <button id="tab-btn-treformrisk" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('treformrisk',this)">Reform Risk</button>
-  <button id="tab-btn-tbreakevenmap" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tbreakevenmap',this)">Breakeven Map</button>
+  <button id="tab-btn-t0" class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('t0',this)" title="Compare fiscal terms across up to 5 countries">Fiscal Compare</button>
+  <button id="tab-btn-tsamples" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tsamples',this)" title="Pre-built analyses illustrating common fiscal questions">Sample Analyses</button>
+  <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t7',this)" title="Deep-dive into a single country's fiscal regime">Country Profile</button>
+  <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('texplorer',this)" title="Browse, screen, and visualize all 71,000+ contracts">Regime Explorer</button>
+  <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t5',this)" title="Simulate a portfolio of contracts by IOC operator">IOC Portfolio</button>
+  <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t2',this)" title="Compare two countries in parallel">Side-by-Side</button>
+  <button id="tab-btn-treformrisk" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('treformrisk',this)" title="Assess fiscal reform risk by country — legislative stability and rate change history">Reform Risk</button>
+  <button id="tab-btn-tbreakevenmap" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tbreakevenmap',this)" title="World map showing breakeven oil price by country">Breakeven Map</button>
   <!-- Reference dropdown: Vintage, Mechanics, API, Methodology -->
   <div class="tab-dropdown" id="ref-tab-dropdown">
     <button class="tab-dropdown-btn" id="ref-dropdown-btn" onclick="toggleRefDropdown(event)" aria-haspopup="true" aria-expanded="false">
