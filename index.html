@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>ORCA v53 — Petroleum Fiscal Intelligence</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" onerror="console.warn('XLSX library failed to load — Excel export unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js" crossorigin="anonymous" onerror="console.warn('D3.js failed to load — bubble chart and world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js" crossorigin="anonymous" onerror="console.warn('TopoJSON failed to load — world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
@@ -1010,6 +1010,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </style>
 </head>
 <body>
+<div id="cdnWarning" style="display:none;background:#ef4444;color:#fff;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;">Some chart libraries failed to load. Charts may not render. Check your network connection and reload.</div>
 <a href="#main-content" class="skip-link">Skip to main content</a>
 <div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;display:flex;align-items:center;justify-content:center;z-index:9999;">
   <div style="text-align:center;color:#E8A020;font-family:'IBM Plex Mono',monospace">
