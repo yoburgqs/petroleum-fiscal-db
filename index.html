@@ -1238,12 +1238,10 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <div id="texplorer" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-texplorer">
   <div class="page-title">Regime Explorer</div>
   <div class="page-sub">Browse the full database or screen by fiscal criteria.</div>
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:18px;">
-    <div class="mode-toggle" style="margin-bottom:0;" role="group" aria-label="Explorer view mode">
-      <button id="mode-btn-browse" class="active" aria-pressed="true" onclick="switchExplorerMode('browse')" title="Browse all countries with filter chips and map view">Browse Countries</button>
-      <button id="mode-btn-screen" aria-pressed="false" onclick="switchExplorerMode('screen')" title="Screen and rank countries by fiscal criteria">Screen &amp; Rank</button>
-    </div>
-    <button id="mode-btn-bubble" onclick="switchExplorerMode('bubble')" title="Scatter plot: Government Take vs Contractor NPV" style="background:none;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);cursor:pointer;font-size:12px;font-weight:600;padding:7px 14px;transition:.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">&#9675; Bubble Chart</button>
+  <div class="explorer-mode-toggle" role="group" aria-label="Explorer view mode" style="display:flex;gap:0;margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--border);width:fit-content;">
+    <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" onclick="switchExplorerMode('browse',this)" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#0B0F1A;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
+    <button id="mode-btn-screen" class="expl-mode-btn" data-mode="screen" onclick="switchExplorerMode('screen',this)" aria-pressed="false" title="Screen and rank countries by fiscal criteria" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;">Screener ⋮</button>
+    <button id="mode-btn-bubble" class="expl-mode-btn" data-mode="bubble" onclick="switchExplorerMode('bubble',this)" aria-pressed="false" title="Scatter plot: Government Take vs Contractor NPV" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;">Bubble ◎</button>
   </div>
   <div id="explorer-browse-mode">
 
@@ -2200,6 +2198,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           <div style="font-size:28px;margin-bottom:12px;opacity:.4;">&#9654;</div>
           <div style="font-weight:600;color:var(--text);margin-bottom:6px;">No results yet</div>
           Configure fiscal parameters on the left, then click <strong style="color:var(--accent);">Run DCF</strong> to compute government take, NPV, IRR, and a full 25-year cashflow waterfall.
+          <div style="margin-top:10px;font-size:11px;color:var(--accent);opacity:.8;">Tip: Select a country in Regime Explorer first to pre-fill the regime type and parameters.</div>
           <div style="margin-top:16px;display:flex;justify-content:center;">
             <button class="btn btn-sm" onclick="runCustomScenario()" style="padding:8px 20px;">&#9654; Run DCF Now</button>
           </div>
@@ -3382,8 +3381,8 @@ function renderCompare() {
     {label:'Price Swing ($50→$125)',key:(d)=>d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'},
     {label:'Weighting Method',      key:(d)=>d.weighting === 'prod_weighted' ? 'Prod-weighted' : d.weighting === 'prod_weighted_blended' ? 'Blended' : 'Equal-weighted'},
     {label:'─── Economics ───', key:()=>'', bold:true, divider:true},
-    {label:'Contractor NPV @$75 ($M)', key:(d)=>fmt(d.npv_75)},
-    {label:'Govt NPV @$75 ($M, est.)', key:(d)=>{ const t=d.take_75,n=d.npv_75; if(t==null||n==null||t<=0||t>=100)return'—'; return '$'+Math.round(n*(t/100)/(1-t/100))+'M'; }, bold:false},
+    {label:'Contractor NPV @$75 (Contractor)', key:(d)=>fmtNpvShared(d.npv_75)},
+    {label:'Govt NPV @$75 (est.)', key:(d)=>{ const t=d.take_75,n=d.npv_75; if(t==null||n==null||t<=0||t>=100)return'—'; return fmtNpvShared(n*(t/100)/(1-t/100)); }, bold:false},
     {label:'IRR @$75 (%)*',         key:(d)=>`<span title="Arithmetic mean of per-contract IRRs — not a valid portfolio metric. Use for relative comparison only." style="cursor:help;">${fmtIrr(d.irr_75)}&thinsp;&#9432;</span>`},
     {label:'Breakeven ($/bbl)',     key:(d)=>formatBreakeven(d.be_75)},
     {label:'─── Structure ───', key:()=>'', bold:true, divider:true},
@@ -8937,36 +8936,38 @@ function renderVintageTrendChart() {
   });
 }
 
-function switchExplorerMode(mode) {
+function switchExplorerMode(mode, btn) {
+  // Hide all sub-panels
   ['explorer-browse-mode','explorer-screen-mode','explorer-bubble-mode'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
-  // Reset primary toggle buttons
-  ['mode-btn-browse','mode-btn-screen'].forEach(id => {
-    const b = document.getElementById(id);
-    if (b) { b.classList.remove('active'); b.setAttribute('aria-pressed','false'); }
+  // Reset all toggle buttons to inactive state
+  document.querySelectorAll('.expl-mode-btn').forEach(b => {
+    b.style.background = 'var(--surface)';
+    b.style.color = 'var(--muted)';
+    b.setAttribute('aria-pressed','false');
   });
-  // Reset bubble button to outline style
-  const bubbleBtn = document.getElementById('mode-btn-bubble');
-  if (bubbleBtn) { bubbleBtn.style.background = 'none'; bubbleBtn.style.borderColor = 'var(--border)'; bubbleBtn.style.color = 'var(--muted)'; }
+  // Activate the clicked button (or find it by mode if called programmatically)
+  const activeBtn = btn || document.getElementById('mode-btn-' + mode);
+  if (activeBtn) {
+    activeBtn.style.background = 'var(--accent)';
+    activeBtn.style.color = '#0B0F1A';
+    activeBtn.setAttribute('aria-pressed','true');
+  }
+  // Show the selected panel and trigger any renders
   if (mode === 'browse') {
     const el = document.getElementById('explorer-browse-mode');
     if (el) el.style.display = 'block';
-    const b = document.getElementById('mode-btn-browse');
-    if (b) { b.classList.add('active'); b.setAttribute('aria-pressed','true'); }
     renderExplorer();
     setTimeout(renderVintageTrendChart, 100);
   } else if (mode === 'bubble') {
     const el = document.getElementById('explorer-bubble-mode');
     if (el) el.style.display = 'block';
-    if (bubbleBtn) { bubbleBtn.style.background = 'var(--accent)'; bubbleBtn.style.borderColor = 'var(--accent)'; bubbleBtn.style.color = '#0B0F1A'; }
     renderBubbleChart();
   } else {
     const el = document.getElementById('explorer-screen-mode');
     if (el) el.style.display = 'block';
-    const b = document.getElementById('mode-btn-screen');
-    if (b) { b.classList.add('active'); b.setAttribute('aria-pressed','true'); }
   }
   window._explorerMode = mode;
 }
