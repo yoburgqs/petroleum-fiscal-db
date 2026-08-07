@@ -1015,6 +1015,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <button class="tab-btn" onclick="switchTab('t6',this)">Mechanics</button>
   <button class="tab-btn" onclick="switchTab('t9',this)">API</button>
   <button class="tab-btn" onclick="switchTab('tmethodology',this)">Methodology</button>
+  <button class="tab-btn" onclick="switchTab('tsamples',this)">Sample Analyses</button>
 </div>
 
 <!-- ===== SEARCH OVERLAY ===== -->
@@ -1917,6 +1918,15 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       </div>
       <div id="sb-saved-table" style="color:var(--muted);font-size:12px;">No saved scenarios.</div>
     </div>
+  </div>
+</div>
+
+<!-- ── Sample Analyses Tab ── -->
+<div id="tsamples" class="tab-pane">
+  <div class="page-title">Sample Analyses</div>
+  <div class="page-sub">Six pre-built comparisons drawn live from the database. Click any "Load" button to open the result in the full interactive tool.</div>
+  <div id="samples-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;margin-top:20px;align-items:start;">
+    <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading analyses…</div>
   </div>
 </div>
 
@@ -5030,7 +5040,178 @@ window.renderReformTable    = renderReformTable;
 window.MECHANICS_INFO       = MECHANICS_INFO;
 // Now that MECHANICS_INFO is available, populate the reference panel list
 if (typeof _renderRefMechanics === 'function') _renderRefMechanics();
+renderSampleAnalyses();
 }
+
+// ── Sample Analyses ──────────────────────────────────────────────────────────
+function renderSampleAnalyses() {
+  const grid = document.getElementById('samples-grid');
+  if (!grid || !COUNTRY_DATA || !COUNTRY_DATA.length) return;
+  const cd = COUNTRY_DATA.filter(d => d.take_75 != null);
+  const fmt = v => v == null ? '—' : v.toFixed(1) + '%';
+  const delta = d => (d.take_125 != null && d.take_50 != null) ? (d.take_125 - d.take_50) : null;
+  const btnStyle = 'background:var(--accent);border:none;color:#0f172a;border-radius:4px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;margin-top:12px;';
+  const outlineBtnStyle = 'background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:4px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;margin-top:12px;';
+  const tbl = (headers, rows, colColors) => {
+    const th = headers.map(h => `<th style="text-align:${h.align||'left'};color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;border-bottom:1px solid var(--border);">${h.label}</th>`).join('');
+    const tr = rows.map(r => '<tr>' + r.map((cell,i) => `<td style="padding:5px 8px;font-size:12px;${colColors&&colColors[i]?'color:'+colColors[i]+';':''}">${cell}</td>`).join('') + '</tr>').join('');
+    return `<table style="width:100%;border-collapse:collapse;"><thead><tr>${th}</tr></thead><tbody>${tr}</tbody></table>`;
+  };
+  const takeColor = v => {
+    if (v == null) return '';
+    if (v < 40) return '#22c55e';
+    if (v < 55) return '#86efac';
+    if (v < 70) return '#eab308';
+    if (v < 85) return '#f97316';
+    return '#ef4444';
+  };
+  const deltaColor = v => v == null ? '' : v > 20 ? '#e8a020' : v > 10 ? '#eab308' : '#94a3b8';
+
+  // ── Card 1: Regional Benchmarks ──────────────────────────────────────────
+  const regionOrder = ['Middle East','Africa','Asia','Latin America','North America','Europe','CIS/FSU','Oceania'];
+  const regionGroups = {};
+  cd.forEach(d => {
+    const r = d.region || 'Other';
+    if (!regionGroups[r]) regionGroups[r] = [];
+    regionGroups[r].push(d);
+  });
+  const regionRows = regionOrder
+    .filter(r => regionGroups[r] && regionGroups[r].length >= 3)
+    .map(r => {
+      const g = regionGroups[r];
+      const avg = g.reduce((s,d) => s + d.take_75, 0) / g.length;
+      const mn = Math.min(...g.map(d => d.take_75));
+      const mx = Math.max(...g.map(d => d.take_75));
+      return [`<span style="color:var(--text)">${r}</span>`, g.length,
+              `<span style="color:${takeColor(avg)};font-weight:600">${avg.toFixed(1)}%</span>`,
+              `${mn.toFixed(1)}% – ${mx.toFixed(1)}%`];
+    });
+  const card1 = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #3b82f6;">
+      <div style="font-size:10px;font-weight:700;color:#3b82f6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Regional Benchmarks</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Where does state capture differ most by geography?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Average government take at $75/bbl across all jurisdictions with DCF coverage.</div>
+      ${tbl([{label:'Region'},{label:'Countries',align:'right'},{label:'Avg @$75',align:'right'},{label:'Range',align:'right'}], regionRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);switchExplorerMode('browse');}})()">Open in Explorer</button>
+    </div>`;
+
+  // ── Card 2: North Sea Neighbors ──────────────────────────────────────────
+  const northSea = ['Norway','United Kingdom','Netherlands','Denmark'];
+  const nsRows = northSea.map(c => {
+    const d = cd.find(x => x.country === c);
+    if (!d) return null;
+    const dlt = delta(d);
+    return [`<span style="color:var(--text)">${c}</span>`,
+            `<span style="color:${takeColor(d.take_50)}">${fmt(d.take_50)}</span>`,
+            `<span style="color:${takeColor(d.take_75)};font-weight:600">${fmt(d.take_75)}</span>`,
+            `<span style="color:${takeColor(d.take_125)}">${fmt(d.take_125)}</span>`,
+            `<span style="color:${deltaColor(dlt)}">${dlt!=null?'+'+dlt.toFixed(1)+'pp':'—'}</span>`];
+  }).filter(Boolean);
+  const nsCountries = northSea.filter(c => cd.find(x => x.country === c));
+  const card2 = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #0ea5e9;">
+      <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">North Sea Neighbors</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why does Norway capture 18 percentage points more than the UK?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway's 78% Special Petroleum Tax vs UK's EPL (32%) + RFCT (40%). Same basin, very different terms.</div>
+      ${tbl([{label:'Country'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], nsRows)}
+      <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);launchCompare();})()">Load in Compare</button>
+    </div>`;
+
+  // ── Card 3: West Africa PSC Bloc ─────────────────────────────────────────
+  const wafrica = ['Angola','Nigeria','Ghana','Gabon','Equatorial Guinea','Cameroon','Republic of Congo'];
+  const waRows = wafrica.map(c => {
+    const d = cd.find(x => x.country === c);
+    if (!d) return null;
+    return [`<span style="color:var(--text)">${c}</span>`,
+            (d.n_concession||0) > 0 ? 'Con+PSC' : 'PSC',
+            d.n_contracts || '—',
+            `<span style="color:${takeColor(d.take_75)};font-weight:600">${fmt(d.take_75)}</span>`];
+  }).filter(Boolean);
+  const waCountries = wafrica.filter(c => cd.find(x => x.country === c));
+  const card3 = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #f59e0b;">
+      <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">West Africa PSC Bloc</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Angola tightened terms in 2023. How does it compare to peers?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All PSC-dominant regimes. Ghana's Jubilee terms (42%) remain the most IOC-friendly in the bloc.</div>
+      ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$75',align:'right'}], waRows)}
+      <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);launchCompare();})()">Load in Compare</button>
+    </div>`;
+
+  // ── Card 4: Price Sensitivity Leaders ────────────────────────────────────
+  const swingData = cd
+    .filter(d => d.take_125 != null && d.take_50 != null && d.n_contracts >= 5)
+    .map(d => ({ country: d.country, take_50: d.take_50, take_125: d.take_125, swing: d.take_125 - d.take_50 }))
+    .sort((a,b) => b.swing - a.swing)
+    .slice(0, 8);
+  const swingRows = swingData.map(d => [
+    `<span style="color:var(--text)">${d.country}</span>`,
+    `<span style="color:${takeColor(d.take_50)}">${d.take_50.toFixed(1)}%</span>`,
+    `<span style="color:${takeColor(d.take_125)}">${d.take_125.toFixed(1)}%</span>`,
+    `<span style="color:#e8a020;font-weight:600">+${d.swing.toFixed(1)}pp</span>`
+  ]);
+  const card4 = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #e8a020;">
+      <div style="font-size:10px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Price Sensitivity Leaders</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Which regimes swing most when oil moves from $50 to $125/bbl?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">High swing = progressive (profits taxed harder at high prices). Low swing = flat/neutral terms.</div>
+      ${tbl([{label:'Country'},{label:'@$50',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], swingRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn)switchTab('texplorer',btn);})()">Open in Explorer</button>
+    </div>`;
+
+  // ── Card 5: IOC Sweet Spots (take < 40%) ─────────────────────────────────
+  const sweet = cd
+    .filter(d => d.take_75 < 40 && d.n_contracts >= 3)
+    .sort((a,b) => a.take_75 - b.take_75)
+    .slice(0, 8);
+  const sweetRows = sweet.map(d => [
+    `<span style="color:var(--text)">${d.country}</span>`,
+    d.region || '—',
+    `<span style="color:#22c55e;font-weight:600">${d.take_75.toFixed(1)}%</span>`
+  ]);
+  const sweetCountries = sweet.slice(0,5).map(d => d.country);
+  const card5 = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #22c55e;">
+      <div style="font-size:10px;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">IOC Sweet Spots</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Where does government take drop below 40% at $75/bbl?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Jurisdictions with take under 40% at the base price. Many are frontier or incentive-grant regimes.</div>
+      ${tbl([{label:'Country'},{label:'Region'},{label:'@$75',align:'right'}], sweetRows)}
+      <button style="${btnStyle}" onclick="(function(){${sweetCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);launchCompare();})()">Compare Top 5</button>
+    </div>`;
+
+  // ── Card 6: Concession vs PSC ─────────────────────────────────────────────
+  const conGroup = cd.filter(d => (d.n_concession||0) > 0 && (d.n_psc||0) === 0 && (d.n_tsc||0) === 0);
+  const pscGroup = cd.filter(d => (d.n_psc||0) > 0 && (d.n_concession||0) === 0 && (d.n_tsc||0) === 0);
+  const mechStat = g => {
+    if (!g.length) return {avg:'—',med:'—',mn:'—',mx:'—',n:0};
+    const sorted = [...g].sort((a,b)=>a.take_75-b.take_75);
+    const avg = g.reduce((s,d)=>s+d.take_75,0)/g.length;
+    const med = sorted[Math.floor(sorted.length/2)].take_75;
+    return {
+      avg: `<span style="color:${takeColor(avg)};font-weight:600">${avg.toFixed(1)}%</span>`,
+      med: `<span style="color:${takeColor(med)}">${med.toFixed(1)}%</span>`,
+      mn: sorted[0].take_75.toFixed(1)+'%',
+      mx: sorted[sorted.length-1].take_75.toFixed(1)+'%',
+      n: g.length
+    };
+  };
+  const conS = mechStat(conGroup);
+  const pscS = mechStat(pscGroup);
+  const mechRows = [
+    ['<span style="color:var(--text)">Concession</span>', conS.n, conS.avg, conS.med, `${conS.mn} – ${conS.mx}`],
+    ['<span style="color:var(--text)">PSC</span>', pscS.n, pscS.avg, pscS.med, `${pscS.mn} – ${pscS.mx}`],
+  ];
+  const card6 = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #a855f7;">
+      <div style="font-size:10px;font-weight:700;color:#a855f7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Concession vs PSC</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Do PSC regimes actually extract more from IOCs than concession regimes?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Pure-play countries only (not mixed). PSC median exceeds concession median by several points — but ranges overlap significantly.</div>
+      ${tbl([{label:'Mechanic'},{label:'Countries',align:'right'},{label:'Avg @$75',align:'right'},{label:'Median',align:'right'},{label:'Range',align:'right'}], mechRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);setExplorerChip('mechanic','PSC',document.querySelector('[data-filter=mechanic][data-value=PSC]'));}})()">Filter PSC in Explorer</button>
+    </div>`;
+
+  grid.innerHTML = card1 + card2 + card3 + card4 + card5 + card6;
+}
+window.renderSampleAnalyses = renderSampleAnalyses;
 
 function loadAPIJson(country) {
   const out = document.getElementById('api-json-output');
