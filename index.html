@@ -1007,6 +1007,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ===== v38 TAB NAV ===== -->
 <div class="tab-nav">
   <button class="tab-btn active" onclick="switchTab('t0',this)">Fiscal Compare</button>
+  <button class="tab-btn" onclick="switchTab('tsamples',this)">Sample Analyses</button>
   <button class="tab-btn" onclick="switchTab('t7',this)">Country Profile</button>
   <button class="tab-btn" onclick="switchTab('texplorer',this)">Regime Explorer</button>
   <button class="tab-btn" onclick="switchTab('t5',this)">IOC Portfolio</button>
@@ -1015,7 +1016,6 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <button class="tab-btn" onclick="switchTab('t6',this)">Mechanics</button>
   <button class="tab-btn" onclick="switchTab('t9',this)">API</button>
   <button class="tab-btn" onclick="switchTab('tmethodology',this)">Methodology</button>
-  <button class="tab-btn" onclick="switchTab('tsamples',this)">Sample Analyses</button>
 </div>
 
 <!-- ===== SEARCH OVERLAY ===== -->
@@ -1153,7 +1153,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span id="fc-status" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Ready</span>
   </div>
 
-  <div id="fc-results" class="empty-state" id="fc-empty-state">
+  <div id="fc-results" class="empty-state">
     <div style="margin-bottom:16px;">Select a profile and price, then click <strong>Run Compare</strong> to rank all 185 countries by government take.</div>
     <div id="fc-quick-stats" style="display:none;"></div>
   </div>
@@ -1590,12 +1590,6 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
 <!-- ═══════════════════════════ TAB 8: API EXPLORER ════════════════════════ -->
 
-
-<div id="t8" class="tab-pane">
-  <div class="page-title">Custom Scenario Builder</div>
-  <div class="page-sub">The scenario builder is now a floating modal. Click the button below or use "+ Scenario" in the header.</div>
-  <button class="btn" onclick="openScenarioBuilder()">Open Scenario Builder</button>
-</div>
 
 <div id="t9" class="tab-pane">
   <div class="page-title">API Explorer</div>
@@ -5114,7 +5108,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why does Norway capture 18 percentage points more than the UK?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway's 78% Special Petroleum Tax vs UK's EPL (32%) + RFCT (40%). Same basin, very different terms.</div>
       ${tbl([{label:'Country'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], nsRows)}
-      <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);launchCompare();})()">Load in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
     </div>`;
 
   // ── Card 3: West Africa PSC Bloc ─────────────────────────────────────────
@@ -5134,7 +5128,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Angola tightened terms in 2023. How does it compare to peers?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All PSC-dominant regimes. Ghana's Jubilee terms (42%) remain the most IOC-friendly in the bloc.</div>
       ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$75',align:'right'}], waRows)}
-      <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);launchCompare();})()">Load in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
     </div>`;
 
   // ── Card 4: Price Sensitivity Leaders ────────────────────────────────────
@@ -5175,7 +5169,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Where does government take drop below 40% at $75/bbl?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Jurisdictions with take under 40% at the base price. Many are frontier or incentive-grant regimes.</div>
       ${tbl([{label:'Country'},{label:'Region'},{label:'@$75',align:'right'}], sweetRows)}
-      <button style="${btnStyle}" onclick="(function(){${sweetCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);launchCompare();})()">Compare Top 5</button>
+      <button style="${btnStyle}" onclick="(function(){${sweetCountries.map(c=>'addCompare(\''+c.replace(/'/,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Comparison'));if(btn)switchTab('t2',btn);})()">Compare Top 5</button>
     </div>`;
 
   // ── Card 6: Concession vs PSC ─────────────────────────────────────────────
