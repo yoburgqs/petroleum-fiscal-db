@@ -1346,8 +1346,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
           <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" title="Contractor NPV ($M) — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Sort: high→low">Contractor NPV ($M)</th>
-          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" title="Arithmetic mean of per-contract IRRs. Not a portfolio IRR — use for screening only, not investment decisions. Sort: high→low">IRR @ $75 ⓘ</th>
-          <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" title="Breakeven $/bbl — oil price at which contractor NPV = 0. &lt;$50 means the field is profitable even below $50/bbl (sentinel value = -1 in raw data). Sort: low→high">Breakeven</th>
+          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. Sort: high→low">IRR @ $75 ⓘ</th>
+          <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven</th>
           <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" title="Sort by price sensitivity (low→high)">Swing (pp)</th>
           <th class="num">Stability</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
