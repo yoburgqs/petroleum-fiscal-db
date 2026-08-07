@@ -5049,7 +5049,6 @@ function loadCountryProfile(country) {
     var thSR = "text-align:right;padding:7px 10px;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap;";
     function _tc(v) { return v == null ? "var(--muted)" : v <= 40 ? "var(--green)" : v <= 60 ? "var(--yellow)" : v <= 75 ? "var(--orange)" : "var(--red)"; }
     function _ft(v) { return v != null ? v.toFixed(1) + "%" : "\u2014"; }
-    function _esc(n) { return n.replace(/'/g, "&#39;"); }
     function _bpr(r, isSelf) {
       var bg = isSelf ? "background:rgba(232,160,32,.12);" : "";
       var fw = isSelf ? "font-weight:800;" : "font-weight:600;";
@@ -5061,9 +5060,10 @@ function loadCountryProfile(country) {
         dCol = Math.abs(dt) < 2 ? "var(--muted)" : dt > 0 ? "var(--red)" : "var(--green)";
       }
       var mech = r.mechanics ? r.mechanics.split(",")[0] : "\u2014";
-      var clk = isSelf ? "" : ' onclick="document.getElementById(\'dd-country-select\').value=\'' + _esc(r.country) + '\';loadCountryProfile(\'' + _esc(r.country) + '\')"';
+      var enc = encodeURIComponent(r.country);
+      var clk = isSelf ? "" : ' onclick="var c=decodeURIComponent(\'' + enc + '\');document.getElementById(\'dd-country-select\').value=c;loadCountryProfile(c)"';
       var hov = isSelf ? "" : ' onmouseover="this.style.background=\'rgba(232,160,32,.08)\'" onmouseout="this.style.background=\'\'"';
-      var addBtn = isSelf ? "" : '<button class="btn btn-sm btn-outline" style="font-size:9px;padding:2px 6px;margin-left:4px;" onclick="event.stopPropagation();addCompare(\'' + _esc(r.country) + '\')">+</button>';
+      var addBtn = isSelf ? "" : '<button class="btn btn-sm btn-outline" style="font-size:9px;padding:2px 6px;margin-left:4px;" onclick="event.stopPropagation();addCompare(decodeURIComponent(\'' + enc + '\'))">+</button>';
       var tr = '<tr style="' + bg + 'cursor:' + (isSelf ? 'default' : 'pointer') + ';"' + clk + hov + '>';
       tr += '<td style="padding:6px 10px;' + fw + 'color:var(--text);white-space:nowrap;">' + r.country + (isSelf ? ' <span style="font-size:9px;color:var(--accent);">(this)</span>' : '') + addBtn + '</td>';
       tr += '<td style="padding:6px 10px;text-align:right;font-family:IBM Plex Mono,monospace;font-size:12px;color:' + _tc(r.take_50) + ';">' + _ft(r.take_50) + '</td>';
@@ -5077,9 +5077,8 @@ function loadCountryProfile(country) {
     }
     var selfRow = _bpr(d, true);
     var peerRows = peers.map(function(p) { return _bpr(p, false); }).join("");
-    var eS = d.country.replace(/'/g, "\\'");
-    var laParts = ["addCompare('" + eS + "')"];
-    peers.forEach(function(p) { laParts.push("addCompare('" + p.country.replace(/'/g, "\\'") + "')"); });
+    var laParts = ["addCompare(decodeURIComponent('" + encodeURIComponent(d.country) + "'))"];
+    peers.forEach(function(p) { laParts.push("addCompare(decodeURIComponent('" + encodeURIComponent(p.country) + "'))"); });
     laParts.push("var cmpBtn=[...document.querySelectorAll('.tab-btn')].find(function(b){return b.textContent.includes('Comparison');});if(cmpBtn)switchTab('t2',cmpBtn);");
     var laClick = '(function(){' + laParts.join('') + '})()';
 
