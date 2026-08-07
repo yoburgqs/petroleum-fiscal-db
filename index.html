@@ -3770,7 +3770,7 @@ TOP_OPERATORS.forEach(op => {
   }
 });
 
-function updateIOCSuggestions() {
+window.updateIOCSuggestions = function() {
   const q = document.getElementById('ioc-search').value.toLowerCase();
   const sug = document.getElementById('ioc-suggestions');
   if (q.length < 2) { sug.innerHTML=''; return; }
@@ -3778,7 +3778,7 @@ function updateIOCSuggestions() {
   sug.innerHTML = matches.map(op =>
     `<button class="btn btn-outline btn-sm" onclick="document.getElementById('ioc-search').value='${op.replace(/'/,"\\'")}';loadIOC('${op.replace(/'/,"\\'")}');document.getElementById('ioc-suggestions').innerHTML='';">${op}</button>`
   ).join('');
-}
+};
 
 document.getElementById('ioc-search').addEventListener('keydown', e => {
   if (e.key === 'Enter') {
