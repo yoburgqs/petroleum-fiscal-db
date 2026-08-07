@@ -4060,7 +4060,8 @@ function renderSearchResults() {
   const _ALIASES = {'uk':'united kingdom','uae':'united arab emirates','drc':'democratic republic of the congo','usa':'united states','ksa':'saudi arabia','png':'papua new guinea','trinidad':'trinidad and tobago'};
   const qExp = _ALIASES[q] || q;
   const countryMatches = COUNTRY_DATA.filter(d =>
-    d.country.toLowerCase().includes(qExp) || d.mechanics.toLowerCase().includes(qExp)
+    d.country.toLowerCase().includes(qExp) || d.country.toLowerCase().includes(q) ||
+    d.mechanics.toLowerCase().includes(qExp) || d.mechanics.toLowerCase().includes(q)
   ).slice(0, 5);
 
   if (!countryMatches.length) {
