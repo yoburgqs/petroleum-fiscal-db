@@ -376,3 +376,20 @@ Scope expansion: [what was added to grader]
   10. **GitHub Actions CI** — .github/workflows/playwright.yml + tests/ directory for automated push gating
 - Grade updates: Performance A- (SRI+onerror), SDLC A- (GitHub Actions), Export B+ → A-, Professional A-→A
 - **No category below B+ entering Cycle 5**
+
+---
+## Cycle 5 Log — 2026-08-07 16:18
+- Test before: 113 PASS / 0 FAIL
+- Test after: 113 PASS / 0 FAIL
+- JS errors: 4
+- Summary: Confirmed â€” second push notification. Already documented. Status:
+
+- **Tests:** 113 PASS / 0 FAIL âœ“ (test output fix also shipped to `C:/tmp/pw_test/runtime_comprehensive.js`)
+- **Push:** Blocked â€” missing `workflow` scope on gh OAuth token
+- **All code changes:** Committed locally in `petroleum-fiscal-db`, synced to `office/projects/oil-gas-expertise/fiscal_db_interface.html`
+
+**One command to unblock:**
+```
+gh auth refresh -h github.com -s workflow
+```
+Then the pending `git push` will go
