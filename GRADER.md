@@ -284,3 +284,14 @@ Scope expansion: [what was added to grader]
   - Information Architecture: B+ → A- (Regime Explorer refactored — no longer tab-within-a-tab)
   - Data Presentation: B+ → A- (Country Profile NPV now uses fmtNpvShared)
 
+
+---
+## Cycle 4 Log — 2026-08-07 14:35
+- Test before: 118 PASS / 0 FAIL
+- Test after: 117 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **v53 shipped.** Here's what was fixed:
+
+- **Icon system unified** â€” replaced the last remaining inline SVG (copy-link button in Country Profile) with Unicode `&#10697;`. UI is now 100% Unicode icons, no mixed SVG.
+- **Footer deduplicated** â€” removed "71,601 contracts Â· 185 countries" from footer (it duplicates the dynamic header). Footer now shows only unique info: DB date, sourcing %, DCF version, audit status.
+- **Regime Explorer refactored** â€” replaced the 3-button tab-within-a-tab (B
