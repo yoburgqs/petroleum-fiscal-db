@@ -9031,9 +9031,13 @@ async function renderBreakevenMap() {
 
   let world;
   try {
-    world = await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+    const _d3Timeout = new Promise(function(_, reject) { setTimeout(function() { reject(new Error('timeout')); }, 10000); });
+    world = await Promise.race([
+      d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json'),
+      _d3Timeout
+    ]);
   } catch(e) {
-    container.innerHTML = '<div style="color:var(--muted);padding:24px;">Map unavailable (network error).</div>';
+    container.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;font-size:14px;">Breakeven map unavailable — reload to retry.</div>';
     return;
   }
 
