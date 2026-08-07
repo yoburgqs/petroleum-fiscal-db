@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>ORCA v53 — Petroleum Fiscal Intelligence</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-e6nUZLBkQ86NJ6TVVKAeSaK8jWa3NhkYWZFomE39AvDbQWeie9PlQqM3pmYW5d1g" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" onerror="console.warn('XLSX library failed to load — Excel export unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js" crossorigin="anonymous" onerror="console.warn('D3.js failed to load — bubble chart and world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js" crossorigin="anonymous" onerror="console.warn('TopoJSON failed to load — world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" integrity="sha384-oNtu+d18330MVFpltUTve1DatxCkkctlpA2AC3GulbVFOSqhHdDat3qHse/Lbuek" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" onerror="console.warn('XLSX library failed to load — Excel export unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js" crossorigin="anonymous" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" onerror="console.warn('D3.js failed to load — bubble chart and world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js" crossorigin="anonymous" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" onerror="console.warn('TopoJSON failed to load — world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
@@ -1016,7 +1016,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </head>
 <body>
 <div id="cdnWarning" style="display:none;background:#ef4444;color:#fff;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;">Some chart libraries failed to load. Charts may not render. Check your network connection and reload.</div>
-<a href="#main-content" class="skip-link">Skip to main content</a>
+<a href="#main-tab-content" class="skip-link">Skip to main content</a>
 <div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;display:flex;align-items:center;justify-content:center;z-index:9999;">
   <div style="text-align:center;color:#E8A020;font-family:'IBM Plex Mono',monospace">
     <div style="margin-bottom:20px"><span style="font-size:28px;font-weight:900;letter-spacing:.15em;color:var(--accent);">ORCA</span></div>
@@ -1049,7 +1049,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
 <!-- ===== v52 TAB NAV (8 primary tabs + Reference dropdown) ===== -->
 <div class="tab-nav-wrapper">
-<div class="tab-nav" role="tablist" id="main-content">
+<div class="tab-nav" role="tablist">
   <button id="tab-btn-t0" class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab('t0',this)">Fiscal Compare</button>
   <button id="tab-btn-tsamples" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('tsamples',this)">Sample Analyses</button>
   <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" onclick="switchTab('t7',this)">Country Profile</button>
@@ -1756,7 +1756,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <!-- ===== TAB: METHODOLOGY ===== -->
-<div id="tmethodology" class="tab-pane" role="tabpanel">
+<div id="tmethodology" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="ref-item-methodology">
   <div class="page-title">Methodology</div>
   <div class="page-sub">How government take is calculated, key assumptions, evidence quality, and production weighting approach.</div>
 
@@ -7584,6 +7584,10 @@ ${wfHtml}
   // Store last result for saving
   window._lastScenario = { mech, profileKey, price, params, result };
   _refreshSavedTable();
+
+  // Scroll results into view
+  var output = document.getElementById('sb-output');
+  if (output) output.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function saveCustomScenario() {
@@ -7996,6 +8000,10 @@ function runFiscalCompare() {
   window._fcLastPrice = price;
   window._fcSortState = 'take'; // reset sort on new run
   renderFCResults(results, price);
+
+  // Scroll results into view
+  var fcResults = document.getElementById('fc-results') || document.getElementById('fc-table-wrap');
+  if (fcResults) fcResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function getTierInfo(take) {
