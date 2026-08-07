@@ -795,11 +795,16 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     grid-template-columns: 1fr !important;
   }
 
-  /* Fix hardcoded canvas/chart widths */
+  /* Fix hardcoded canvas/chart widths — only constrain width, let Chart.js control height */
   canvas {
     max-width: 100% !important;
-    height: auto !important;
   }
+  /* Specific chart containers need explicit height on mobile so Chart.js can read it */
+  .dd-price-chart-wrap { height: 180px !important; }
+  #irr-scatter-canvas { min-height: 120px; }
+  #explorer-bubble-canvas { min-height: 200px; }
+  #vintage-trend-chart { min-height: 180px; }
+  #exposure-donut-chart { min-height: 150px; }
 
   /* Country profile dd-take-grid: already 2-col at 768 via v29 rule */
 
