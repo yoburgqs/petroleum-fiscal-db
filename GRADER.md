@@ -488,3 +488,11 @@ Fix order for this cycle: Chart.js SRI (see note above) → CSP connect-src → 
 - JS errors: 4
 - Summary: v56 is live on GitHub. Push succeeded â€” `64180bb â†’ 4905baa` on `origin/main`. GitHub Pages will pick it up within a minute or two.
 
+
+---
+## Cycle 8 Log — 2026-08-07 18:45
+- Test before: 113 PASS / 0 FAIL
+- Test after: 117 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Background push completed successfully (exit code 0). All changes are live.
+
