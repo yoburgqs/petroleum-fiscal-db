@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>ORCA v51 — Petroleum Fiscal Intelligence</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js" crossorigin="anonymous"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js" crossorigin="anonymous"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
@@ -604,6 +604,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .fc-drawer-actions { margin-top: 12px; display: flex; gap: 8px; }
 .btn-run { background: var(--accent); color: #0B0F1A; font-weight: 700; padding: 10px 24px; font-size: 14px; border: none; border-radius: var(--radius); cursor: pointer; }
 .btn-run:hover { background: var(--accent-dim); }
+#fc-export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
 /* === v50 FC Sort Buttons === */
 .fc-sort-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
@@ -1040,11 +1041,11 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <!-- ===== SEARCH OVERLAY ===== -->
-<div id="search-overlay" onclick="if(event.target===this)closeSearch()">
+<div id="search-overlay" role="search" onclick="if(event.target===this)closeSearch()">
   <div id="search-modal">
     <div id="search-input-wrap">
       <span class="search-icon-inner">&#x1f50d;</span>
-      <input id="search-q" type="text" placeholder="Search countries and mechanics..." autocomplete="off"
+      <input id="search-q" type="text" placeholder="Search countries and mechanics..." aria-label="Search countries and mechanics" autocomplete="off"
         oninput="renderSearchResults()" onkeydown="handleSearchKey(event)">
       <span style="color:var(--muted);font-size:11px;cursor:pointer;" onclick="closeSearch()">Esc</span>
     </div>
@@ -1181,7 +1182,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       </select>
     </div>
     <button class="btn-run" onclick="runFiscalCompare()">Run Compare</button>
-    <button class="btn btn-sm btn-outline" id="fc-export-btn" style="display:none" onclick="exportFCResults()">Export XLSX</button>
+    <button class="btn btn-sm btn-outline" id="fc-export-btn" disabled title="Run Compare first to enable export" onclick="exportFCResults()">Export XLSX</button>
     <span id="fc-status" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Ready</span>
   </div>
 
@@ -2036,10 +2037,10 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
 </aside>
 
 <!-- ===== SCENARIO BUILDER MODAL ===== -->
-<div id="scenario-modal" onclick="if(event.target===this)closeScenarioModal()">
+<div id="scenario-modal" role="dialog" aria-modal="true" aria-labelledby="scenario-modal-title" onclick="if(event.target===this)closeScenarioModal()">
   <div id="scenario-modal-inner">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-      <h2 style="font-size:18px;font-weight:800;margin:0">Custom Scenario Builder</h2>
+      <h2 id="scenario-modal-title" style="font-size:18px;font-weight:800;margin:0">Custom Scenario Builder</h2>
       <button onclick="closeScenarioModal()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button>
     </div>
     <div class="page-sub">Build a custom fiscal scenario and run a live DCF model.</div>
@@ -2185,7 +2186,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     </div>
   </div>
 </div>
-<!-- ── Reform Risk Tab ── --><div id="treformrisk" class="tab-pane">  <div class="page-title">Reform Risk Intelligence</div>  <div class="page-sub">Track fiscal law changes across 185 jurisdictions. Countries with frequent reforms carry regime risk beyond their headline government take.</div>  <div id="reform-risk-content" style="margin-top:20px;">    <div style="color:var(--muted);font-size:13px;padding:40px 0;text-align:center;">Loading reform history&hellip;</div>  </div></div>
+<!-- ── Reform Risk Tab ── --><div id="treformrisk" class="tab-pane" role="tabpanel">  <div class="page-title">Reform Risk Intelligence</div>  <div class="page-sub">Track fiscal law changes across 185 jurisdictions. Countries with frequent reforms carry regime risk beyond their headline government take.</div>  <div id="reform-risk-content" style="margin-top:20px;">    <div style="color:var(--muted);font-size:13px;padding:40px 0;text-align:center;">Loading reform history&hellip;</div>  </div></div>
 
 <script>
 let REFORM_HISTORY = {}; // loaded async from reform_history.json
@@ -2258,6 +2259,7 @@ function switchTab(id, btn) {
   var panel = document.getElementById(id);
   if (panel) panel.classList.add('active');
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
+  window._prevTab = window._activeTab;
   window._activeTab = id;
   if (id === 'texplorer') {
     switchExplorerMode(window._explorerMode || 'browse');
@@ -4438,7 +4440,8 @@ function loadCountryProfile(country) {
     ? `<span title="Pre-production or speculative — DCF based on standard profile, not actual production history" style="color:#f59e0b;font-size:11px;margin-left:6px;cursor:help;">⚠ speculative</span>`
     : '';
   const prodDQBadge = getDQBadge(d);
-  let html = `<div class="dd-header">
+  const backToExplorerBtn = `<div style="margin-bottom:12px;"><button onclick="switchTab('texplorer',document.querySelector('.tab-btn[onclick*=texplorer]'))" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;padding:0;">← Back to Regime Explorer</button></div>`;
+  let html = backToExplorerBtn + `<div class="dd-header">
     <span class="dd-country-name">${d.country}</span>${ddSpecBadge}
     <span class="dd-region">${d.region}</span>
     <span class="tier ${tierClass(d.take_75)}" style="margin-left:8px">${tierLabel(d.take_75)}</span>
@@ -7976,7 +7979,7 @@ function renderFCResults(results, price) {
   html += '</tbody></table></div>';
   document.getElementById('fc-results').innerHTML = html;
   var exportBtn = document.getElementById('fc-export-btn');
-  if (exportBtn) exportBtn.style.display = '';
+  if (exportBtn) { exportBtn.disabled = false; exportBtn.removeAttribute('title'); }
 
   // Waterfall: enrich results with component data from COUNTRY_DATA
   var enriched = sorted.map(function(r) {
@@ -9165,14 +9168,21 @@ async function renderBreakevenMap() {
 // ================================================================
 // Async data loader — externalizes COUNTRY_DATA + REFORM_HISTORY
 // ================================================================
+function _fetchWithTimeout(url, ms) {
+  return new Promise(function(resolve, reject) {
+    var timer = setTimeout(function() { reject(new Error('Timeout fetching ' + url)); }, ms);
+    fetch(url).then(function(r) { clearTimeout(timer); resolve(r); }, function(e) { clearTimeout(timer); reject(e); });
+  });
+}
+
 async function loadPlatformData() {
   if (window._platformLoaded) return;
   window._platformLoaded = true;
   const overlay = document.getElementById('loading-overlay');
   try {
     const [cdRes, rhRes] = await Promise.all([
-      fetch('country_data.json'),
-      fetch('reform_history.json')
+      _fetchWithTimeout('country_data.json', 10000),
+      _fetchWithTimeout('reform_history.json', 10000)
     ]);
     if (!cdRes.ok) throw new Error('country_data.json: ' + cdRes.status);
     if (!rhRes.ok) throw new Error('reform_history.json: ' + rhRes.status);
@@ -9183,12 +9193,17 @@ async function loadPlatformData() {
   } catch(e) {
     console.error('Failed to load platform data:', e);
     if (overlay) {
-      overlay.innerHTML = '<div style="text-align:center;color:#ef4444;font-family:\'IBM Plex Mono\',monospace;padding:40px">'
+      overlay.innerHTML = '<div style="text-align:center;color:#ef4444;font-family:'IBM Plex Mono',monospace;padding:40px">'
         + '<div style="font-size:1.4em;margin-bottom:12px">Load Error</div>'
         + '<div style="font-size:0.9em;color:#fca5a5">' + e.message + '</div>'
         + '<div style="font-size:0.75em;color:#999;margin-top:16px">Open browser console for details</div>'
         + '</div>';
     }
+    // Update tab content areas so users don't see permanent "Loading..." text
+    var rrContent = document.getElementById('reform-risk-content');
+    if (rrContent) rrContent.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;font-size:14px;">Reform history data unavailable — reload to retry.</div>';
+    var beContainer = document.getElementById('breakeven-map-container');
+    if (beContainer) beContainer.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;font-size:14px;">Breakeven map unavailable — reload to retry.</div>';
   }
 }
 

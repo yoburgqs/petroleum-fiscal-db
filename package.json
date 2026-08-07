@@ -1,0 +1,7 @@
+{
+  "name": "petroleum-fiscal-db",
+  "scripts": {
+    "test": "node ../tmp/pw_test/runtime_comprehensive.js",
+    "test:local": "TEST_URL=http://localhost:8080 node ../tmp/pw_test/runtime_comprehensive.js"
+  }
+}
