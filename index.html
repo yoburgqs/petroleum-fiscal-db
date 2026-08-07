@@ -4595,10 +4595,11 @@ function renderReformTimeline(country) {
         const conf = (src.confidence || 'B').toUpperCase();
         const confClass = conf === 'A' ? 'conf-a' : 'conf-b';
         const srcLabel = src.source.length > 80 ? src.source.slice(0,80) + '…' : src.source;
+        const confTierNote2 = conf === 'A' ? 'Source confidence A = Primary official source (legislation, decree, or concession agreement)' : 'Source confidence B = Verified secondary source (operator filing, annual report, or regulatory filing)';
         if (src.source_url) {
-          el.innerHTML = `<a href="${src.source_url}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="font-size:10px;display:inline-block;margin-top:4px;" title="${src.source}">${srcLabel} · ${conf} ↗</a>`;
+          el.innerHTML = `<a href="${src.source_url}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="font-size:10px;display:inline-block;margin-top:4px;" title="${src.source} · ${confTierNote2}">${srcLabel} · ${conf} ↗</a>`;
         } else {
-          el.innerHTML = `<span class="source-badge ${confClass}" style="font-size:10px;display:inline-block;margin-top:4px;" title="${src.source}">${srcLabel} · ${conf}</span>`;
+          el.innerHTML = `<span class="source-badge ${confClass}" style="font-size:10px;display:inline-block;margin-top:4px;" title="${src.source} · ${confTierNote2}">${srcLabel} · ${conf}</span>`;
         }
       });
     })
