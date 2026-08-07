@@ -3710,7 +3710,7 @@ function runScreener() {
       <td>${mechs}</td>
       <td class="num" title="Government take on standardized $2B deepwater project. Production-weighted where coverage data available.">${fmtTake(d[takeKey])}</td>
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}</td>
-      <td class="num">${fmt(d[npvKey])}</td>
+      <td class="num">${fmtNpvShared(d[npvKey])}</td>
       <td class="num" title="Arithmetic mean of per-contract IRRs. Not a valid portfolio IRR — use for relative screening only.">${fmtIrr(d[irrKey])}</td>
       <td class="num">${formatBreakeven(d[beKey])}</td>
       <td class="num" title="Production coverage: % of contracts with verified production data. Higher = take number is more production-weighted." style="color:${(d.prod_coverage_pct||0)>30?'#22c55e':(d.prod_coverage_pct||0)>=10?'#eab308':'#64748b'}">${(d.prod_coverage_pct||0).toFixed(0)}%</td>
@@ -4012,7 +4012,7 @@ window.loadIOCAggregated = function(brandName, operatorList) {
       <td class="num">${r.n}</td>
       <td class="num">${fmtTake(r.take_75)}</td>
       <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'#f44336':r.swing>=10?'#ff9800':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
-      <td class="num">${fmt(r.npv_75)}</td>
+      <td class="num">${fmtNpvShared(r.npv_75)}</td>
       <td class="num">${fmtIrr(r.irr_75)}</td>
       <td class="num">${formatBreakeven(r.be_75)}</td>
       </tr>`;}).join('')}</tbody>
@@ -4085,7 +4085,7 @@ window.loadIOC = function(operator) {
       <td class="num take-100-col" style="display:none">${fmtTake(r.take_100)}</td>
       <td class="num take-125-col" style="display:none">${fmtTake(r.take_125)}</td>
       <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'#f44336':r.swing>=10?'#ff9800':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
-      <td class="num">${fmt(r.npv_75)}</td>
+      <td class="num">${fmtNpvShared(r.npv_75)}</td>
       <td class="num">${fmtIrr(r.irr_75)}</td>
       <td class="num">${formatBreakeven(r.be_75)}</td>
     </tr>`;}).join('')}</tbody>
