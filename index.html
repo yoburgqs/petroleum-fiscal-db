@@ -1149,7 +1149,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v80</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v81</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1336,7 +1336,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <option value="125">$125/bbl</option>
       </select>
     </div>
-    <button class="btn-run" onclick="runFiscalCompare()" title="Run Fiscal Compare (Ctrl+Enter)">Run Compare</button>
+    <button class="btn-run" onclick="runFiscalCompare()" title="Run Fiscal Compare — ranks all 185 countries by govt take for the selected profile and price. Keyboard shortcut: Ctrl+Enter (when on this tab).">Run Compare <span style="font-size:10px;opacity:.65;font-weight:400;">Ctrl+↵</span></button>
     <button class="btn btn-sm btn-outline" id="fc-export-btn" disabled title="Run Compare first to enable export" onclick="exportFCResults()">Export XLSX</button>
     <span id="fc-status" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Ready</span>
   </div>
@@ -1707,6 +1707,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <button onclick="['Norway','Angola'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Norway (Concession, low-take SDFI) vs Angola (PSC, FTP-heavy)">Norway vs Angola</button>
       <button onclick="['United States','Iraq'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>
       <button onclick="['Indonesia','Malaysia'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Indonesia (cost-recovery PSC) vs Malaysia (Petronas PSC)">Indonesia vs Malaysia</button>
+      <button onclick="['Saudi Arabia','UAE'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Saudi Arabia (Aramco concession, ~85% take) vs UAE (concession, ~65% take) — both Middle East Concession regimes with very different IOC access structures">Saudi Arabia vs UAE</button>
     </div>
   </div>
 
@@ -1962,7 +1963,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v79 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v81 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1970,6 +1971,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v81 (Aug 2026)</strong> — 6 UX improvements (Cycle 34): East Africa &amp; Sub-Saharan Frontier section added to Sample Analyses — 2 analysis cards: (1) East Africa Frontier Bloc table — Mozambique, Tanzania, Uganda, Kenya, Namibia, Senegal, Ghana, Sierra Leone with govt take, swing, and project context for each frontier FID/discovery; loads top 4 (Mozambique, Tanzania, Uganda, Namibia) into Side-by-Side for comparison. (2) Africa Fiscal Reform Pressure (2014–2023) card — documents the major reform events in Angola, Nigeria, Mozambique, Tanzania, Ghana, Uganda with year, current take, and reform description; links to Reform Risk tab. Side-by-Side empty state: Saudi Arabia vs UAE added as 4th quickstart comparison — the Middle East Concession pair answers IOC questions about intra-OPEC fiscal variation. Search: Revenue Share and EPSA added to the global mechanics search list — previously typing "revenue" or "epsa" returned no mechanics results. Run Compare button: keyboard shortcut label (Ctrl+↵) added inline to the button text — analysts see the shortcut without reading the sort row hint. Methodology provenance: version corrected from v79 to v81 (was stale after two cycles without update). Version v80→v81.<br>
       <strong>v80 (Aug 2026)</strong> — 4 UX improvements (Cycle 33): Latin America &amp; Atlantic Frontier section added to Sample Analyses — 3 analysis cards covering the Atlantic Basin opportunity set: (1) Atlantic Frontier Bloc table — Brazil, Guyana, Suriname, Trinidad, Venezuela, Colombia, Ecuador, Peru, Bolivia with govt take @$50/$75/$125 and price swing for side-by-side loading; (2) Brazil Pre-salt vs Post-salt structural note explaining Law 12.351 (2010), mandatory Petrobras 30% stake, sliding profit oil tiers, and how pre-salt PSC terms differ from post-salt concession; (3) Andean &amp; Caribbean Block comparison table covering Colombia, Ecuador, Peru, Bolivia, Trinidad, Argentina, Chile. Reform Risk tab: Regional Reform Tilt panel added above the country-level tables — shows net tightening vs liberalizing balance for each region (Africa, Middle East, Asia Pacific, Americas, Europe) as a mixed bar with % breakdown and average stability score — answers "which regions are under net fiscal tightening pressure?" at a glance. IOC Portfolio empty state: upgraded from single placeholder line to an actionable panel with Operator Fiscal Exposure description, 5 one-click operator buttons (ExxonMobil, Shell, TotalEnergies, BP, Equinor), and routing tip — first-visit users now have immediate entry points. Bug fix: IOC Portfolio empty-state quick-launch buttons corrected from non-existent <code>loadIOCPortfolio()</code> to <code>loadIOC()</code>. Version v79→v80.<br>
       <strong>v79 (Aug 2026)</strong> — 10 UX improvements (Cycle 32): All remaining browser <code>prompt()</code> dialogs eliminated — <code>saveCustomScenario()</code> now uses an inline styled modal for scenario naming (no more browser pop-ups); clipboard fallbacks now show toast messages instead of <code>prompt()</code> (4 locations: API copy, Share comparison, Country Profile copy-link, Explorer copy-link). Scenario Builder IRR display: values ≥500% now show styled <code>n/a*</code> with hover tooltip (consistent with Explorer/Screener display — previously showed raw "n/a" with no explanation). Welcome panel "7 fiscal mechanics modeled" stat card clarified to "Full DCF mechanics" with tooltip listing all 7 and explaining 2 additional directional mechanics (Gross Split, EPSA). Scenario Builder: after running DCF, output now shows a "vs 185-Country Database" context panel — displays rank by govt take (#X of 185), difference from global median, and percentile position, giving analysts immediate peer context without leaving the modal. Fiscal Compare empty state: added one-click "Run Deepwater $75" and "Onshore $50" quickstart buttons and a description of recommended starting points for first-time users. Screener "Prod Cov" column header: tooltip fully explains what production coverage means and why high coverage gives more accurate take numbers. Country Profile quick-access: Nigeria added as 8th country (PSC/Concession, PIA 2021 reform — one of the most-watched fiscal events in recent IOC planning). FC results Govt NPV column header: ⓘ symbol added with expanded tooltip clarifying it is derived from contractor NPV via formula (not independently modeled) and cautioning against treating it as independently calibrated. Side-by-Side comparison empty state: added 3 quickstart comparison buttons (Norway vs Angola, USA vs Iraq, Indonesia vs Malaysia) with rationale tooltips. Version v78→v79.<br>
       <strong>v78 (Aug 2026)</strong> — 10 UX improvements (Cycle 31): Loading screen redesigned with platform tagline and contract count. Search modal: added aria-modal, role="dialog", and focus trap (Tab cycles within modal when open) for accessibility. Footer: added "Platform updated" timestamp for credibility. IRR display: fmtIrr() values now show methodology tooltip on hover; ≥500% exclusion tooltip expanded to explain ~60 countries affected. IRR ≥500% display changed from "n/a" to "n/a*" to signal footnote. Screener IRR column header: inline disclosure of ≥500% threshold added. Version v77→v78.<br>
@@ -2526,6 +2528,14 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Latin America &amp; Atlantic Frontier</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Brazil pre-salt to Guyana deepwater: the Atlantic frontier's new fiscal landscape and IOC opportunity set.</div>
     <div id="samples-grid-latam" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
+      <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading&hellip;</div>
+    </div>
+  </div>
+
+  <div style="margin-top:36px;">
+    <div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">East Africa &amp; Sub-Saharan Frontier</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Mozambique, Tanzania, Uganda, Namibia, Senegal — the next wave of frontier production. New fiscal frameworks competing for IOC capital against established basins.</div>
+    <div id="samples-grid-eastafrica" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
       <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading&hellip;</div>
     </div>
   </div>
@@ -4633,7 +4643,7 @@ function renderSearchResults() {
     return;
   }
 
-  const MECH_NAMES = ['Concession','PSC','TSC','PRRT','RSC','Buy-back','Gross Split'];
+  const MECH_NAMES = ['Concession','PSC','TSC','PRRT','RSC','Buy-back','Revenue Share','Gross Split','EPSA'];
   const mechMatches = MECH_NAMES.filter(m => m.toLowerCase().includes(q)).slice(0,3);
 
   let html = '';
@@ -6746,6 +6756,73 @@ function renderSampleAnalyses() {
     </div>`;
 
   latamGrid.innerHTML = cardJ + brazilNote + cardL;
+
+  // ── East Africa & Sub-Saharan Frontier Section ────────────────────────────
+  const eastAfricaGrid = document.getElementById('samples-grid-eastafrica');
+  if (!eastAfricaGrid) return;
+
+  // Card M: East Africa & Sub-Saharan Frontier Bloc
+  const eastAfricaList = [
+    {c:'Mozambique',  note:'Area 1/4 LNG — Eni/TotalEnergies EPCC; gas export focus'},
+    {c:'Tanzania',    note:'LNG framework 2022 — offshore Ruvuma/Tanzanite'},
+    {c:'Uganda',      note:'Tilenga/Kingfisher FID 2021 — EACOP pipeline'},
+    {c:'Kenya',       note:'South Lokichar Basin — Tullow/TotalEnergies'},
+    {c:'Namibia',     note:'Orange Basin Venus/Graff — Shell/TotalEnergies'},
+    {c:'Senegal',     note:'Sangomar FPSO 2024 onstream — Woodside-operated'},
+    {c:'Ghana',       note:'Jubilee + TEN fields — long-term PSC benchmark'},
+    {c:'Sierra Leone',note:'Mercury/Venus blocks — offshore frontier'},
+  ];
+  const eaRows = eastAfricaList.map(({c, note}) => {
+    const d = cd.find(x => x.country === c);
+    if (!d) return null;
+    const dlt = delta(d);
+    return [
+      `<span style="color:var(--text)">${c}</span>`,
+      d.mechanics || '—',
+      `<span style="color:${takeColor(d.take_75)};font-weight:600">${fmt(d.take_75)}</span>`,
+      `<span style="color:${deltaColor(dlt)}">${dlt!=null?'+'+dlt.toFixed(1)+'pp':'—'}</span>`,
+      `<span style="color:var(--muted);font-size:10px;">${note}</span>`
+    ];
+  }).filter(Boolean);
+  const eaCmpCountries = ['Mozambique','Tanzania','Uganda','Namibia','Senegal'].filter(c => cd.find(x => x.country === c)).slice(0,4);
+  const cardM = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #10b981;">
+      <div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">East Africa &amp; Sub-Saharan Frontier</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">The frontier wave: Mozambique LNG to Namibia Orange Basin — fiscal terms for first-mover IOCs.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">East Africa represents the largest concentration of frontier FIDs since 2019. All are PSC or EPCC (service contract variant). Swing measures price exposure — frontier regimes often have lower swing than mature PSC blocs because FTP structures are calibrated at lower price assumptions. Ghana (Jubilee) serves as the established regional benchmark at 42% take.</div>
+      ${tbl([{label:'Country'},{label:'Mechanic'},{label:'Govt Take @$75',align:'right'},{label:'Swing',align:'right'},{label:'Project context'}], eaRows)}
+      <button style="${btnStyle}" onclick="(function(){${eaCmpCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+'\');').join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Compare Frontier 4</button>
+    </div>`;
+
+  // Card N: Africa Reform Pressure — countries where fiscal terms have tightened post-2015
+  const africaReformList = [
+    {c:'Angola',     year:2023, event:'Revised EPCC terms, increased FTP from 20→30% on deepwater'},
+    {c:'Nigeria',    year:2021, event:'PIA 2021 — new royalty tiers, 30% deep-water royalty reduction for frontier'},
+    {c:'Mozambique', year:2014, event:'New Petroleum Law — increased state participation requirement'},
+    {c:'Tanzania',   year:2017, event:'Amended Natural Wealth law — increased state equity to 16%'},
+    {c:'Ghana',      year:2016, event:'GNPC exploration co-carry requirement increased'},
+    {c:'Uganda',     year:2016, event:'East Africa Crude Oil Pipeline ownership terms'},
+  ];
+  const afReformRows = africaReformList.map(({c, year, event}) => {
+    const d = cd.find(x => x.country === c);
+    const takeStr = d ? '<span style="color:' + takeColor(d.take_75) + ';font-weight:600">' + d.take_75.toFixed(1) + '%</span>' : '—';
+    return [
+      '<span style="color:var(--text)">' + c + '</span>',
+      year,
+      takeStr,
+      '<span style="color:var(--muted);font-size:10px;">' + event + '</span>'
+    ];
+  }).filter(r => r);
+  const cardN = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #ef4444;">
+      <div style="font-size:10px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Africa Fiscal Reform Pressure (2014&ndash;2023)</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Most major African producers have tightened fiscal terms since 2014. Which reforms had the most impact on IOC economics?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Nigeria's PIA 2021 is the most significant fiscal reform on the continent in a decade — it restructured royalties, deepwater incentives, and the Host Community Development Trust. Angola's 2023 EPCC revision raises deepwater government take. Tanzania and Mozambique nationalised equity co-carry requirements during the 2014–2017 period of low oil prices. Platform take figures reflect post-reform terms where data is available.</div>
+      ${tbl([{label:'Country'},{label:'Year',align:'right'},{label:'Current Take @$75',align:'right'},{label:'Key reform'}], afReformRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Reform'));if(btn)switchTab('treformrisk',btn);})()">Open Reform Risk Tab</button>
+    </div>`;
+
+  eastAfricaGrid.innerHTML = cardM + cardN;
 }
 window.renderSampleAnalyses = renderSampleAnalyses;
 
@@ -10301,7 +10378,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v80</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v81</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>

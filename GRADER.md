@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 33 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 34 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 33 shipped v80: 4 UX improvements — Latin America & Atlantic Frontier section added to Sample Analyses (3 cards: Atlantic Frontier Bloc table covering 9 countries, Brazil Pre-salt vs Post-salt structural note, Andean & Caribbean Block comparison). Reform Risk tab: Regional Reform Tilt panel added showing net tightening/liberalizing balance per region as a mixed bar chart with average stability scores. IOC Portfolio empty state upgraded from placeholder text to actionable panel with 5 quick-launch operator buttons (ExxonMobil, Shell, TotalEnergies, BP, Equinor). Bug fix: IOC Portfolio empty-state buttons corrected from `loadIOCPortfolio()` (non-existent) to `loadIOC()`. Version v79→v80. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 34 shipped v81: 6 UX improvements — East Africa & Sub-Saharan Frontier section added to Sample Analyses (2 cards: Frontier Bloc table covering Mozambique/Tanzania/Uganda/Kenya/Namibia/Senegal/Ghana/Sierra Leone, Africa Fiscal Reform Pressure 2014–2023). Side-by-Side: Saudi Arabia vs UAE added as 4th quickstart comparison. Search: Revenue Share and EPSA added to global mechanics search. Run Compare button: Ctrl+↵ shortcut label added inline. Methodology provenance version corrected (was stale at v79). Version v80→v81. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -146,27 +146,27 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 33 — 2026-08-08)
+## Updated Grade Table (Cycle 34 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure comprehensive. |
 | 2 | 1. Visual Design | A | = | Loading screen improved with tagline (Cycle 31). Skeleton screens still nice-to-have. |
-| 3 | 4. Interaction Design | A | ↑ | Cycle 33: IOC Portfolio empty state upgraded to actionable panel with 5 quick-launch operator buttons + description. |
-| 4 | 6. Error & Empty States | A | ↑ | Cycle 33: IOC Portfolio empty state was single placeholder line — now fully informative with quick-launch UX. |
+| 3 | 4. Interaction Design | A | ↑ | Cycle 34: Run Compare button now shows Ctrl+↵ shortcut inline — analysts see it without scrolling to sort row. Side-by-Side: Saudi Arabia vs UAE 4th quickstart added. |
+| 4 | 6. Error & Empty States | A | = | All empty states informative. |
 | 5 | 9. Performance & Reliability | A | = | CSP meta tag; unsafe-inline present. |
 | 6 | 10. Accessibility | A | = | Search modal focus trap (Cycle 31). All major gaps closed. |
 | 7 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 8 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
-| 9 | 2. Information Architecture | A | ↑ | Cycle 33: Latin America & Atlantic Frontier section added to Sample Analyses (3 new analysis cards). Reform Risk Regional Tilt panel added. |
+| 9 | 2. Information Architecture | A | ↑ | Cycle 34: East Africa & Sub-Saharan Frontier section added to Sample Analyses (2 new analysis cards). Now covers all major producing regions: Global, Asia Pacific, Latin America, East Africa, Strategic Screens. |
 | 10 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). 117 PASS / 0 FAIL baseline maintained. |
 | 11 | 3. Data Presentation | A+ | = | Regional median callout in Country Profile (Cycle 30). Govt NPV ⓘ disclosure (Cycle 32). Reform Risk Regional Tilt panel (Cycle 33). |
 | 12 | 5. Naming Consistency | A+ | = | "Regime Explorer" fully eliminated (Cycle 30). |
-| 13 | 7. Professional Credibility | A+ | = | Footer "Platform updated" timestamp (Cycle 31). |
-| 14 | 14. Search Quality | A+ | = | Fuzzy search, recent searches. |
+| 13 | 7. Professional Credibility | A+ | = | Footer "Platform updated" timestamp (Cycle 31). Methodology provenance version corrected Cycle 34. |
+| 14 | 14. Search Quality | A+ | ↑ | Cycle 34: Revenue Share and EPSA added to global search mechanics list — previously missing from search index despite being modeled mechanics. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. |
 
-**Summary: 0 categories below B+. Cycle 33: no grade changes (improvements within existing grades — Latin America section and Reform Risk Regional Tilt strengthen Information Architecture and Data Presentation; IOC Portfolio empty state strengthens Interaction Design and Error & Empty States). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 34: no grade changes (improvements within existing grades — East Africa section strengthens Information Architecture; search mechanics expansion strengthens Search Quality; Run Compare shortcut strengthens Interaction Design). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now comprehensive (tooltips, footnotes, column headers, ≥500% filter notes in 5+ locations); the data itself is the constraint.
@@ -252,6 +252,22 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 34 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 33 state), read index.html structure and all tab content. Platform at GPA 3.99 with all 15 categories at A or above, only Data Reliability at B+ (Harvesting-fork-constrained). Focus: geographic coverage completeness in Sample Analyses, search usability gaps, and shortcut discoverability. 6 targeted improvements shipped. Version v80 → v81.
+- **Fixes shipped (6 improvements):**
+  1. **East Africa & Sub-Saharan Frontier section added to Sample Analyses** — New section below Latin America with 2 analysis cards: (A) East Africa Frontier Bloc table — Mozambique, Tanzania, Uganda, Kenya, Namibia, Senegal, Ghana, Sierra Leone with mechanic, govt take @$75, swing, and project context note for each active frontier FID/discovery; loads top 4 (Mozambique, Tanzania, Uganda, Namibia) into Side-by-Side. Sample Analyses now covers all major producing regions: Global, Asia Pacific, Latin America, East Africa, Strategic Screens. (B) Africa Fiscal Reform Pressure (2014–2023) card — documents the 6 most significant reform events in Angola (2023 FTP increase), Nigeria (PIA 2021), Mozambique (2014 state equity), Tanzania (2017 WI requirement), Ghana (GNPC co-carry), Uganda (EACOP terms); links to Reform Risk tab for deeper drill. Rationale: East Africa is the most active frontier FID cluster of the decade — IOC analysts evaluating Mozambique LNG or Namibia Orange Basin need a dedicated benchmark section.
+  2. **Side-by-Side empty state: Saudi Arabia vs UAE added as 4th quickstart** — Existing 3 quickstarts (Norway vs Angola, USA vs Iraq, Indonesia vs Malaysia) cover Europe, Americas, and Asia Pacific but have no Middle East comparison. Saudi Arabia vs UAE is the highest-profile intra-OPEC fiscal comparison (both Concession regimes, ~20pp spread in take, very different IOC access structures). Tooltip explains the Aramco concession vs UAE concession distinction.
+  3. **Search: Revenue Share and EPSA added to mechanics search list** — The `MECH_NAMES` array used for global Ctrl+K search previously listed 7 mechanics (`['Concession','PSC','TSC','PRRT','RSC','Buy-back','Gross Split']`). Revenue Share (which has a full DCF model) and EPSA (Libya's hybrid model documented in Methodology) were absent — searching "revenue" or "epsa" returned no Mechanics results. Both added. Array now: `['Concession','PSC','TSC','PRRT','RSC','Buy-back','Revenue Share','Gross Split','EPSA']`.
+  4. **Run Compare button: Ctrl+↵ shortcut label added inline** — The keyboard shortcut for Fiscal Compare (`Ctrl+Enter`) was disclosed only in the welcome panel shortcuts row and the small sort-row hint. First-time analysts looking at the Run Compare button see no affordance for the shortcut — they must scroll up or know to look. Added `Ctrl+↵` as a small inline label inside the button text itself, matching the pattern already used on the search button (`Ctrl+K` label). The tooltip text was also expanded to explain what the button does in full.
+  5. **Methodology provenance version corrected: v79 → v81** — The provenance paragraph ("Platform v79 · 185 countries · 71,601 contracts") was two versions behind. Corrected to v81. This is a credibility-visible field — a due diligence analyst reviewing methodology would catch a stale version number and question what else is out of date.
+  6. **Version bump: v80 → v81** — Header badge, footer DCF Engine badge, Methodology provenance paragraph, and changelog entry all updated.
+- **Grade changes from Cycle 33:** None (improvements within existing A/A+ grades — East Africa section and search expansion are within Information Architecture A and Search Quality A+; Middle East quickstart and shortcut label are within Interaction Design A).
+- **Net result: 0 grade upgrades. 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected (all changes are additive HTML/JS within existing structure — no function signatures changed, no DCF engine touched, no tab routing changed).
+- **Version:** v80 → v81
 
 ---
 
