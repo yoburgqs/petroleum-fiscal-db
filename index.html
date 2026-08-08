@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v76</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v77</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1300,7 +1300,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;font-size:11px;color:var(--muted);">
         <div>▦ <strong style="color:var(--text);">Fiscal Compare</strong> — run any cost profile through all 185 countries simultaneously, rank by take, NPV, IRR, or breakeven</div>
         <div>◎ <strong style="color:var(--text);">Country Profile</strong> — per-contract distribution, price sensitivity curve, reform timeline, sourced fiscal facts with confidence badges (A/B/C)</div>
-        <div>≡ <strong style="color:var(--text);">Regime Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
+        <div>≡ <strong style="color:var(--text);">Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
         <div>★ <strong style="color:var(--text);">Screener</strong> — top-level tab. Filter by take range, IRR, mechanic, region with sorting. One-click from any tab. CSV + Excel export. Presets: Sweet Spot / High IRR / Deepwater. Add results to compare basket.</div>
         <div>△ <strong style="color:var(--text);">IOC Portfolio</strong> — top operator positions by country, take, and contract count</div>
         <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: set royalty, CIT, profit oil split, R-factor tiers. Click <strong>+ Scenario</strong> in the header to open.</div>
@@ -1363,7 +1363,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
 <!-- ===== TAB: REGIME EXPLORER (wraps Browse=t1 + Screen=t3) ===== -->
 <div id="texplorer" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-texplorer">
-  <div class="page-title">Regime Explorer</div>
+  <div class="page-title">Explorer</div>
   <div class="page-sub">Browse the full database or screen by fiscal criteria.</div>
   <div class="explorer-mode-toggle" role="group" aria-label="Explorer view mode" style="display:flex;gap:0;margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--border);width:fit-content;">
     <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" onclick="switchExplorerMode('browse',this)" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#0B0F1A;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
@@ -1935,7 +1935,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v76 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v77 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1943,6 +1943,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v77 (Aug 2026)</strong> — 5 naming and data improvements: "Regime Explorer" renamed to "Explorer" in all user-visible text — welcome panel drilldown, Explorer page title, Scenario Builder tip, IOC Portfolio NOC exclusion message, and Country Profile Regional Peers onclick (4 label fixes + 1 functional bug fix where the Regional Peers "View all in Explorer" button searched for non-existent "Regime Explorer" tab text, causing the active-tab button styling to break). Country Profile: regional median government take callout added alongside the existing global median badge — analysts now see both "+3.2pp vs global median (58.4%)" and "+1.1pp vs Africa (62.1%)" in one glance, enabling immediate peer context without navigating away. Regional median excludes the selected country itself and requires at least 3 peers to display. Version v76→v77.<br>
       <strong>v76 (Aug 2026)</strong> — Critical crash fix in <code>renderSampleAnalyses()</code>: the Asia Pacific in Global Context card (Card C) used hardcoded array indices [5] and [6] to back-fill the "Asia Pacific avg" and "Global avg" rows after construction, but those indices assumed exactly 4 countries in <code>asiaRanked.slice(0,4)</code>. When the data contains fewer than 4 Asia Pacific countries in the lowest-take group, the indices were wrong and a <code>TypeError: Cannot set properties of undefined</code> crashed the entire platform initialization — preventing all tabs from rendering and causing 3 FAIL tests. Fixed by computing country counts inline during array construction rather than post-indexing. Defensive <code>try/catch</code> wrapper added around <code>renderSampleAnalyses()</code> to prevent any future crash in this function from aborting the broader <code>initPlatform()</code> call chain. Revenue Share mechanic: previously routed to <code>dcfConcession()</code> (wrong — no cost recovery mechanism). Now routes to <code>dcfPSC()</code> in the Fiscal Compare dispatcher, Country Profile live DCF, and <code>getDCFParams()</code> PSC-param enrichment — matching the mechanic's gross revenue split structure. Scenario Builder: RSC (Risk Service Contract) added as 6th mechanic option alongside Concession/PSC/TSC/PRRT/Buy-back — routes to <code>dcfTSC()</code> (correct: RSC is structurally a service contract with fee + CIT). India RSC preset added: $4/bbl fee, 34% CIT, 5% EPT — representative of India's NELP/HELP framework. Scenario Builder now covers all 6 ICF mechanics (RSC added, Revenue Share still modeled via PSC-proxy in live DCF). Version v75→v76.<br>
       <strong>v75 (Aug 2026)</strong> — Sample Analyses data correctness: Regional Benchmarks card (Card 1) used stale region label strings ("Asia", "Latin America", "North America", "Oceania", "CIS/FSU") that do not match the database region taxonomy ("Asia Pacific", "Americas", "Other") — the card was silently showing only Middle East, Africa, and Europe while omitting the other 3 regions. Fixed to use canonical region labels matching COUNTRY_DATA. Asia Pacific in Global Context card (Card C) filtered on d.region === "Asia" which also never matched, leaving asiaCountries empty and the avg computation returning null. Both silent data failures now corrected. Methodology take figures aligned: Norway 67.8% → 67.9%, Angola 54.7% → 52.7%, USA 24% → 23.4% in the discount rate sensitivity table, matching the benchmark validation table on the same page. Methodology provenance paragraph updated: Norway 67.8% → 67.9%, UK 49.2% → 51.4% (updated to match benchmark table). Fiscal Compare Profile and Price dropdowns gain aria-label for screen readers. Explorer Sort and Search inputs gain aria-label. Sample Analyses page subtitle updated to accurately reflect that cards open different destinations (Side-by-Side, Fiscal Compare, Explorer, Country Profile) rather than always a "Load" button. Version v74→v75.<br>
       <strong>v74 (Aug 2026)</strong> — Critical Scenario Builder bug fixed: Buy-back mechanic parameter names corrected in <code>sbGetParams()</code> — <code>capital_recovery_cap</code>→<code>cost_recovery_cap</code> and <code>contract_term</code>→<code>capex_recovery_years</code> to match <code>dcfBuyback()</code> parameter interface. Previously, running a Buy-back scenario silently used defaults (50% cap, 8yr term) regardless of user inputs — user-entered values were ignored. Sample Analyses button labels corrected: 5 buttons that called <code>addCompare()</code> and navigated to Side-by-Side were mislabeled "Load in Fiscal Compare" or "Load accessible in Compare" — now correctly say "Load in Side-by-Side" or "Load Top 4 in Side-by-Side" / "Load Accessible in Side-by-Side". Section header updated to reflect mixed action types. Country Profile quick-access: Iran added as 7th quick-access country (284 Buy-back contracts — largest Buy-back dataset in the platform; closes the gap between Iran Buy-back preset in Scenario Builder and the Profile quick-access list). v72 changelog typo corrected (said "Version v71→v73" — fixed to "v71→v72"). v60 changelog note clarified (fact count history note no longer contradicts current 384K+ figure). Version v73→v74.<br>
@@ -2452,7 +2453,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           <div style="font-size:28px;margin-bottom:12px;opacity:.4;">&#9654;</div>
           <div style="font-weight:600;color:var(--text);margin-bottom:6px;">No results yet</div>
           Configure fiscal parameters on the left, then click <strong style="color:var(--accent);">Run DCF</strong> to compute government take, NPV, IRR, and a full 25-year cashflow waterfall.
-          <div style="margin-top:10px;font-size:11px;color:var(--accent);opacity:.8;">Tip: Select a country in Regime Explorer first to pre-fill the regime type and parameters.</div>
+          <div style="margin-top:10px;font-size:11px;color:var(--accent);opacity:.8;">Tip: Select a country in the Explorer tab first to pre-fill the regime type and parameters.</div>
           <div style="margin-top:16px;display:flex;justify-content:center;">
             <button class="btn btn-sm" onclick="runCustomScenario()" style="padding:8px 20px;">&#9654; Run DCF Now</button>
           </div>
@@ -4329,7 +4330,7 @@ window.loadIOC = function(operator) {
   if (NOC_OPERATORS.has(operator)) {
     statsDiv.style.display='none';
     outDiv.className='empty-state';
-    outDiv.innerHTML=`<strong style="color:#f59e0b;">⚠ NOC excluded.</strong> "${operator}" is a state-owned national oil company. IOC Portfolio shows international operators only. Use Regime Explorer to view government take for this country.`;
+    outDiv.innerHTML=`<strong style="color:#f59e0b;">⚠ NOC excluded.</strong> "${operator}" is a state-owned national oil company. IOC Portfolio shows international operators only. Use the <strong>Explorer</strong> tab to view government take for this country.`;
     return;
   }
   const rows = IOC_DATA.filter(d => d.operator === operator);
@@ -5011,8 +5012,21 @@ function loadCountryProfile(country) {
     var borderCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.3)' : diff > 0 ? 'rgba(249,115,22,.35)' : 'rgba(34,197,94,.35)';
     return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:${col};font-weight:600;margin-left:10px;padding:2px 10px;background:${bgCol};border:1px solid ${borderCol};border-radius:12px;" title="Global median government take @$75/bbl across 185 countries is ${_globalMedian.toFixed(1)}%">${sign}${diff.toFixed(1)}pp vs median (${_globalMedian.toFixed(1)}%)</span>`;
   })() : '';
+  // Compute regional median take for vs-regional-median callout
+  const _regionName = d.region && d.region !== 'Unknown' ? d.region : null;
+  const _vsRegionalMedianHtml = (!_isMonopoly && d.take_75 != null && _regionName) ? (function(){
+    const rTakes = COUNTRY_DATA.filter(x => x.take_75 != null && x.region === _regionName && x.country !== d.country).map(x => x.take_75).sort((a,b)=>a-b);
+    if (rTakes.length < 3) return '';
+    const rMedian = rTakes[Math.floor(rTakes.length/2)];
+    const diff = d.take_75 - rMedian;
+    const sign = diff >= 0 ? '+' : '';
+    const col = Math.abs(diff) < 3 ? 'var(--muted)' : diff > 0 ? 'rgba(249,115,22,.9)' : 'rgba(34,197,94,.9)';
+    var bgCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.08)' : diff > 0 ? 'rgba(249,115,22,.08)' : 'rgba(34,197,94,.08)';
+    var borderCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.25)' : diff > 0 ? 'rgba(249,115,22,.28)' : 'rgba(34,197,94,.28)';
+    return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:${col};font-weight:600;margin-left:6px;padding:2px 10px;background:${bgCol};border:1px solid ${borderCol};border-radius:12px;" title="${_regionName} median government take @$75/bbl (${rTakes.length} countries) is ${rMedian.toFixed(1)}%">${sign}${diff.toFixed(1)}pp vs ${_regionName} (${rMedian.toFixed(1)}%)</span>`;
+  })() : '';
   const mainSections = `<div class="dd-section">
-    <h3>Govt Take by Price Scenario ${_isMonopoly ? '' : _grankHtml} ${_tierBadgeHtml}${_vsMedianHtml}</h3>
+    <h3>Govt Take by Price Scenario ${_isMonopoly ? '' : _grankHtml} ${_tierBadgeHtml}${_vsMedianHtml}${_vsRegionalMedianHtml}</h3>
     ${_isMonopoly ? '<div style="background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.25);border-radius:8px;padding:12px 16px;margin-bottom:12px;"><span style="color:#f0a830;font-weight:700;">⚠ State Monopoly</span> <span style="color:var(--muted);font-size:13px;">This country is a state monopoly — no foreign contractor access. Fiscal terms are not applicable for investment screening.</span></div>' : ''}
     <div class="dd-take-grid">
       <div class="dd-take-cell"><div class="price-lbl">$50/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_50)}">${_fmtTakeCell(d.take_50)}</div></div>
@@ -5197,7 +5211,7 @@ function loadCountryProfile(country) {
       + '</div>'
       + '<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;">'
       + (allRegional.length > 7 ? '<span style="font-size:10px;color:var(--muted);">'+(allRegional.length - 6)+' more countries in region</span>' : '<span></span>')
-      + '<button onclick="(function(){const expBtn=[...document.querySelectorAll(\'.tab-btn\')].find(b=>b.textContent.includes(\'Regime Explorer\'));switchTab(\'texplorer\',expBtn);const chipRegion=typeof getRegion===\'function\'?getRegion(\'' + country.replace(/'/g,"\\'") + '\'):\'all\';const regionEl=document.querySelector(\'#chip-row-region .chip[data-value=\\\'\'+chipRegion+\'\\\']\');if(regionEl)regionEl.click();})()" style="background:transparent;border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-size:11px;color:var(--muted);cursor:pointer;" onmouseover="this.style.color=\'var(--accent)\'" onmouseout="this.style.color=\'var(--muted)\'">'
+      + '<button onclick="(function(){const expBtn=document.getElementById(\'tab-btn-texplorer\');switchTab(\'texplorer\',expBtn);const chipRegion=typeof getRegion===\'function\'?getRegion(\'' + country.replace(/'/g,"\\'") + '\'):\'all\';const regionEl=document.querySelector(\'#chip-row-region .chip[data-value=\\\'\'+chipRegion+\'\\\']\');if(regionEl)regionEl.click();})()" style="background:transparent;border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-size:11px;color:var(--muted);cursor:pointer;" onmouseover="this.style.color=\'var(--accent)\'" onmouseout="this.style.color=\'var(--muted)\'">'
       + 'View all in Explorer →</button>'
       + '</div>'
       + '</div>';
@@ -10061,7 +10075,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v76</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v77</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
