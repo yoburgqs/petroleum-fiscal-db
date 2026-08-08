@@ -734,3 +734,11 @@ Push confirmed â€” `petroleum-fiscal-db` is live on GitHub Pages. No action
 
 Git push to `petroleum-fiscal-db` confirmed successful (exit code 0). Cycle 18 is fully live.
 
+
+---
+## Cycle 17 Log — 2026-08-08 00:48
+- Test before: 117 PASS / 0 FAIL
+- Test after: 117 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All clear. Cycle 19 fully deployed â€” no outstanding tasks.
+
