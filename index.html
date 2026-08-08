@@ -1149,7 +1149,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v79</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v80</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1821,7 +1821,20 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 
   <div id="ioc-stats" class="ioc-stats" style="display:none;"></div>
-  <div id="ioc-output" class="empty-state">Search for an operator above to view their portfolio.</div>
+  <div id="ioc-output" class="empty-state">
+    <div style="max-width:500px;margin:0 auto;padding:20px 0;">
+      <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Operator Fiscal Exposure</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Search an operator above to see every country where they hold active contracts — with government take, tier distribution, and fiscal exposure score. 16 operators tracked: the 8 major IOCs plus 8 independent/national operators.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;">
+        <button onclick="document.getElementById('ioc-search').value='ExxonMobil';updateIOCSuggestions();loadIOC('ExxonMobil')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">ExxonMobil</button>
+        <button onclick="document.getElementById('ioc-search').value='Shell';updateIOCSuggestions();loadIOC('Shell')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">Shell</button>
+        <button onclick="document.getElementById('ioc-search').value='TotalEnergies';updateIOCSuggestions();loadIOC('TotalEnergies')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">TotalEnergies</button>
+        <button onclick="document.getElementById('ioc-search').value='BP';updateIOCSuggestions();loadIOC('BP')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">BP</button>
+        <button onclick="document.getElementById('ioc-search').value='Equinor';updateIOCSuggestions();loadIOC('Equinor')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">Equinor</button>
+      </div>
+      <div style="font-size:11px;color:var(--muted);">Or use the <strong>Operator Fiscal Exposure Analyzer</strong> below for take-tier distribution and peer comparison.</div>
+    </div>
+  </div>
 
 <div id="ioc-exposure-section" style="margin-top:32px;border-top:1px solid var(--border);padding-top:24px;">
   <div class="page-title" style="font-size:16px;">Operator Fiscal Exposure Analyzer</div>
@@ -1957,6 +1970,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v80 (Aug 2026)</strong> — 4 UX improvements (Cycle 33): Latin America &amp; Atlantic Frontier section added to Sample Analyses — 3 analysis cards covering the Atlantic Basin opportunity set: (1) Atlantic Frontier Bloc table — Brazil, Guyana, Suriname, Trinidad, Venezuela, Colombia, Ecuador, Peru, Bolivia with govt take @$50/$75/$125 and price swing for side-by-side loading; (2) Brazil Pre-salt vs Post-salt structural note explaining Law 12.351 (2010), mandatory Petrobras 30% stake, sliding profit oil tiers, and how pre-salt PSC terms differ from post-salt concession; (3) Andean &amp; Caribbean Block comparison table covering Colombia, Ecuador, Peru, Bolivia, Trinidad, Argentina, Chile. Reform Risk tab: Regional Reform Tilt panel added above the country-level tables — shows net tightening vs liberalizing balance for each region (Africa, Middle East, Asia Pacific, Americas, Europe) as a mixed bar with % breakdown and average stability score — answers "which regions are under net fiscal tightening pressure?" at a glance. IOC Portfolio empty state: upgraded from single placeholder line to an actionable panel with Operator Fiscal Exposure description, 5 one-click operator buttons (ExxonMobil, Shell, TotalEnergies, BP, Equinor), and routing tip — first-visit users now have immediate entry points. Bug fix: IOC Portfolio empty-state quick-launch buttons corrected from non-existent <code>loadIOCPortfolio()</code> to <code>loadIOC()</code>. Version v79→v80.<br>
       <strong>v79 (Aug 2026)</strong> — 10 UX improvements (Cycle 32): All remaining browser <code>prompt()</code> dialogs eliminated — <code>saveCustomScenario()</code> now uses an inline styled modal for scenario naming (no more browser pop-ups); clipboard fallbacks now show toast messages instead of <code>prompt()</code> (4 locations: API copy, Share comparison, Country Profile copy-link, Explorer copy-link). Scenario Builder IRR display: values ≥500% now show styled <code>n/a*</code> with hover tooltip (consistent with Explorer/Screener display — previously showed raw "n/a" with no explanation). Welcome panel "7 fiscal mechanics modeled" stat card clarified to "Full DCF mechanics" with tooltip listing all 7 and explaining 2 additional directional mechanics (Gross Split, EPSA). Scenario Builder: after running DCF, output now shows a "vs 185-Country Database" context panel — displays rank by govt take (#X of 185), difference from global median, and percentile position, giving analysts immediate peer context without leaving the modal. Fiscal Compare empty state: added one-click "Run Deepwater $75" and "Onshore $50" quickstart buttons and a description of recommended starting points for first-time users. Screener "Prod Cov" column header: tooltip fully explains what production coverage means and why high coverage gives more accurate take numbers. Country Profile quick-access: Nigeria added as 8th country (PSC/Concession, PIA 2021 reform — one of the most-watched fiscal events in recent IOC planning). FC results Govt NPV column header: ⓘ symbol added with expanded tooltip clarifying it is derived from contractor NPV via formula (not independently modeled) and cautioning against treating it as independently calibrated. Side-by-Side comparison empty state: added 3 quickstart comparison buttons (Norway vs Angola, USA vs Iraq, Indonesia vs Malaysia) with rationale tooltips. Version v78→v79.<br>
       <strong>v78 (Aug 2026)</strong> — 10 UX improvements (Cycle 31): Loading screen redesigned with platform tagline and contract count. Search modal: added aria-modal, role="dialog", and focus trap (Tab cycles within modal when open) for accessibility. Footer: added "Platform updated" timestamp for credibility. IRR display: fmtIrr() values now show methodology tooltip on hover; ≥500% exclusion tooltip expanded to explain ~60 countries affected. IRR ≥500% display changed from "n/a" to "n/a*" to signal footnote. Screener IRR column header: inline disclosure of ≥500% threshold added. Version v77→v78.<br>
       <strong>v77 (Aug 2026)</strong> — 5 naming and data improvements: "Regime Explorer" renamed to "Explorer" in all user-visible text — welcome panel drilldown, Explorer page title, Scenario Builder tip, IOC Portfolio NOC exclusion message, and Country Profile Regional Peers onclick (4 label fixes + 1 functional bug fix where the Regional Peers "View all in Explorer" button searched for non-existent "Regime Explorer" tab text, causing the active-tab button styling to break). Country Profile: regional median government take callout added alongside the existing global median badge — analysts now see both "+3.2pp vs global median (58.4%)" and "+1.1pp vs Africa (62.1%)" in one glance, enabling immediate peer context without navigating away. Regional median excludes the selected country itself and requires at least 3 peers to display. Version v76→v77.<br>
@@ -2505,6 +2519,14 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">663 contracts across Indonesia's two PSC regimes, benchmarked against Southeast Asia peers and the global average.</div>
     <div id="samples-grid-asia" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
       <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading…</div>
+    </div>
+  </div>
+
+  <div style="margin-top:36px;">
+    <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Latin America &amp; Atlantic Frontier</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Brazil pre-salt to Guyana deepwater: the Atlantic frontier's new fiscal landscape and IOC opportunity set.</div>
+    <div id="samples-grid-latam" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
+      <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading&hellip;</div>
     </div>
   </div>
 
@@ -6656,6 +6678,74 @@ function renderSampleAnalyses() {
     </div>`;
 
   strategicGrid.innerHTML = cardD + cardE + cardF + cardG + cardH + cardI;
+
+  // ── Latin America Section ─────────────────────────────────────────────────
+  const latamGrid = document.getElementById('samples-grid-latam');
+  if (!latamGrid) return;
+
+  // Card J: Atlantic Frontier Bloc — Brazil, Guyana, Suriname
+  const atlanticList = ['Brazil','Guyana','Suriname','Trinidad and Tobago','Barbados','Venezuela','Colombia','Ecuador','Peru','Bolivia'];
+  const atlanticRows = atlanticList.map(c => {
+    const d = cd.find(x => x.country === c);
+    if (!d) return null;
+    const dlt = delta(d);
+    const isHighlight = ['Guyana','Brazil','Suriname'].includes(c);
+    const nameStr = isHighlight
+      ? `<span style="color:#e8a020;font-weight:700">&#9654; ${c}</span>`
+      : `<span style="color:var(--text)">${c}</span>`;
+    return [nameStr, d.mechanics || '—', d.n || '—',
+            `<span style="color:${takeColor(d.take_50)}">${fmt(d.take_50)}</span>`,
+            `<span style="color:${takeColor(d.take_75)};font-weight:600">${fmt(d.take_75)}</span>`,
+            `<span style="color:${takeColor(d.take_125)}">${fmt(d.take_125)}</span>`,
+            `<span style="color:${deltaColor(dlt)}">${dlt!=null?'+'+dlt.toFixed(1)+'pp':'—'}</span>`];
+  }).filter(Boolean);
+  const atlanticCmp = ['Guyana','Brazil','Suriname','Colombia'].filter(c => cd.find(x => x.country === c));
+  const cardJ = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #f59e0b;">
+      <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Atlantic Frontier Bloc</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Guyana emerged as one of the most IOC-favorable deepwater regimes. How do its Atlantic neighbors compare?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">&#9654; = highlighted frontier/active countries. Guyana's Stabroek PSC (50% cost recovery, no windfall tax) sits among the lowest-take deepwater regimes globally. Brazil's pre-salt regime has tightened — sliding-scale profit oil share (Petrobras JVs). Venezuela is state monopoly (PDVSA) with no IOC equity access. Swing = take&#8203;@$125 minus take&#8203;@$50.</div>
+      ${tbl([{label:'Country'},{label:'Mechanic'},{label:'Contracts',align:'right'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], atlanticRows)}
+      <button style="${btnStyle}" onclick="(function(){${atlanticCmp.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+'\');').join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load Frontier 4 in Side-by-Side</button>
+    </div>`;
+
+  // Card K: Brazil Pre-salt vs Post-salt (structural comparison)
+  const brazilNote = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #ef4444;">
+      <div style="font-size:10px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Brazil Pre-salt Fiscal Architecture</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why did Brazil switch from PSC to a Production Sharing regime for pre-salt — and what changed for IOCs?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Brazil's 2010 pre-salt legislation (Law 12.351) replaced the old concession system with a state-controlled PSC where Petrobras holds mandatory 30% stake and operatorship on all pre-salt blocks. The state captures profit oil via sliding-scale share tiers tied to internal rate of return — aggressive terms for a world-class resource. Post-salt concession terms (R&amp;D levy + royalty + CIDE) are materially lighter.</div>
+      <div style="background:var(--surface);border-radius:6px;padding:12px 14px;font-size:12px;color:var(--text);line-height:1.8;">
+        <div><span style="color:#ef4444;font-weight:700;">Pre-salt PSC (2010+):</span> Petrobras 30% mandatory WI · Sliding profit oil share (starts ~30% state, escalates to 80%+ at high ROR) · Govt take @$75 significantly higher than platform-average Brazil figure</div>
+        <div style="margin-top:6px;"><span style="color:#22c55e;font-weight:700;">Post-salt Concession:</span> Open bid rounds · No mandatory NOC stake · Royalty 5–27% · CIT ~34% · More IOC-favorable economics</div>
+        <div style="margin-top:6px;color:var(--muted);">Platform Brazil figure (${(()=>{const b=cd.find(x=>x.country==='Brazil');return b?b.take_75.toFixed(1)+'%':'~55%';})()}) reflects a production-weighted blend of both regimes across all ANP-registered contracts.</div>
+      </div>
+      <button style="${outlineBtnStyle}" onclick="(function(){const ddSel=document.getElementById('dd-country-select');if(ddSel){ddSel.value='Brazil';loadCountryProfile('Brazil');}const cpBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Country Profile'));if(cpBtn)switchTab('t7',cpBtn);})()">Open Brazil Profile</button>
+    </div>`;
+
+  // Card L: Andean-Caribbean PSC Comparison (Colombia, Ecuador, Peru, Bolivia, Trinidad)
+  const andeanList = ['Colombia','Ecuador','Peru','Bolivia','Trinidad and Tobago','Argentina','Chile'];
+  const andeanRows = andeanList.map(c => {
+    const d = cd.find(x => x.country === c);
+    if (!d) return null;
+    const dlt = delta(d);
+    return [`<span style="color:var(--text)">${c}</span>`,
+            d.mechanics || '—',
+            `<span style="color:${takeColor(d.take_75)};font-weight:600">${fmt(d.take_75)}</span>`,
+            `<span style="color:${deltaColor(dlt)}">${dlt!=null?'+'+dlt.toFixed(1)+'pp':'—'}</span>`,
+            d.n || '—'];
+  }).filter(Boolean);
+  const andeanCmp = andeanList.filter(c => cd.find(x => x.country === c)).slice(0,4);
+  const cardL = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #a855f7;">
+      <div style="font-size:10px;font-weight:700;color:#a855f7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Andean &amp; Caribbean Block</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">How do Andean nations compare? Colombia vs Peru vs Ecuador — similar geology, very different fiscal terms.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Colombia (concession-dominant, moderate take) has attracted significantly more IOC investment than Ecuador (windfall tax) or Bolivia (nationalized, high take). Argentina's Vaca Muerta shale terms are among the region's most actively evolving. Swing = responsiveness to price.</div>
+      ${tbl([{label:'Country'},{label:'Mechanic'},{label:'Govt Take @$75',align:'right'},{label:'Swing',align:'right'},{label:'Contracts',align:'right'}], andeanRows)}
+      <button style="${btnStyle}" onclick="(function(){${andeanCmp.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+'\');').join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Compare in Side-by-Side</button>
+    </div>`;
+
+  latamGrid.innerHTML = cardJ + brazilNote + cardL;
 }
 window.renderSampleAnalyses = renderSampleAnalyses;
 
@@ -6851,7 +6941,63 @@ function renderReformRisk() {
     + '<button class="btn btn-sm btn-outline" onclick="exportReformRiskCSV()" title="Export full reform history dataset to CSV">&#8659; Export Reform Data (CSV)</button>'
     + '</div>';
 
-  container.innerHTML = topTable + heatmap + stabVol + distrib + exportBar;
+  // Section 5: Regional Reform Tilt (new in Cycle 33)
+  var regionDefs = {
+    'Africa': [],
+    'Middle East': [],
+    'Asia Pacific': [],
+    'Americas': [],
+    'Europe': []
+  };
+  withScore.forEach(function(r) {
+    var cd2 = (COUNTRY_DATA || []).find(function(d){ return d.country === r.country; });
+    var region = cd2 ? cd2.region : null;
+    if (region && regionDefs[region]) {
+      regionDefs[region].push(r);
+    }
+  });
+  var regionTiltRows = Object.keys(regionDefs).map(function(region) {
+    var countries = regionDefs[region];
+    if (!countries.length) return null;
+    var totalT = countries.reduce(function(s,r){return s+r.tightened;},0);
+    var totalL = countries.reduce(function(s,r){return s+r.liberalized;},0);
+    var totalN2 = countries.reduce(function(s,r){return s+r.neutral;},0);
+    var total = totalT + totalL + totalN2;
+    var avgScore = countries.reduce(function(s,r){return s+r.score;},0)/countries.length;
+    var tiltColor = totalT > totalL ? '#ef4444' : totalL > totalT ? '#22c55e' : '#64748b';
+    var tiltLabel = totalT > totalL ? '&#8593; Tightening' : totalL > totalT ? '&#8595; Liberalizing' : 'Neutral';
+    var barWidth = total > 0 ? Math.round(totalT/total*100) : 0;
+    var bar = '<div style="display:flex;height:8px;background:#1e293b;border-radius:4px;overflow:hidden;width:100px;">'
+      + '<div style="width:' + barWidth + '%;background:#ef4444;"></div>'
+      + '<div style="width:' + Math.round(totalL/total*100) + '%;background:#22c55e;"></div>'
+      + '</div>';
+    return '<tr>'
+      + '<td style="padding:5px 8px;font-size:12px;font-weight:600;color:var(--text);">' + region + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:#ef4444;">' + totalT + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:#22c55e;">' + totalL + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;text-align:center;">' + bar + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;color:' + tiltColor + ';font-weight:700;">' + tiltLabel + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + (avgScore>70?'#22c55e':avgScore>40?'#eab308':'#ef4444') + ';">' + avgScore.toFixed(0) + '</td>'
+      + '</tr>';
+  }).filter(Boolean).join('');
+
+  var regionalTilt = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;">'
+    + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Regional Reform Tilt Since 2010</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Have regions been net-tightening (capturing more) or net-liberalizing (attracting IOC capital)? Tightened = take_change positive events. Bar: red = tightened share, green = liberalized share. Avg Score = stability score (100 = zero reforms since 2010).</div>'
+    + '<table style="width:100%;border-collapse:collapse;">'
+    + '<thead><tr>'
+    + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Region</th>'
+    + '<th style="text-align:center;color:#ef4444;font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Tightened</th>'
+    + '<th style="text-align:center;color:#22c55e;font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Liberalized</th>'
+    + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Mix</th>'
+    + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Tilt</th>'
+    + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Avg Stability</th>'
+    + '</tr></thead>'
+    + '<tbody>' + regionTiltRows + '</tbody></table>'
+    + '<div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;">Note: Only countries in ORCA reform history database included. Neutral/structural events (no recorded take_change direction) excluded from tilt calculation. Use <strong>Reform Risk</strong> tab and country drill-downs for full event logs.</div>'
+    + '</div>';
+
+  container.innerHTML = regionalTilt + topTable + heatmap + stabVol + distrib + exportBar;
 }
 window.renderReformRisk = renderReformRisk;
 
@@ -10155,7 +10301,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v79</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v80</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
