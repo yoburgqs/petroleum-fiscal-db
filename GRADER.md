@@ -967,3 +967,12 @@ Background push confirmed â€” petroleum-fiscal-db main is live on GitHub. C
 - JS errors: 3
 - Summary: All clear â€” the background task's push was a no-op (nothing new to push). Repo is stable at `91fbd31`. Cycle 28 fully closed.
 
+
+---
+## Cycle 27 Log — 2026-08-08 08:50
+- Test before: 109 PASS / 3 FAIL
+- Test after: 117 PASS / 0 FAIL
+- JS errors: 0
+- Summary: This background push was redundant â€” v76 is already at `origin/main` (confirmed earlier). The pre-push hook ran local Playwright tests, found the `PAGEERROR: Cannot set properties of null (setting 'innerHTML')` errors, and blocked it. The push had nothing new to add anyway.
+
+The two null-innerHTML errors are from unguarded `document.getElementById(...)` calls (likely `exposure-metrics`, `exposure-peer-comparison`, or `exposure-country-table`) being accessed before those DOM elements exist duri
