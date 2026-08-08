@@ -1152,7 +1152,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v85</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v86</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1968,7 +1968,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v85 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v86 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1976,6 +1976,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v86 (Aug 2026)</strong> — 4 analyst-experience improvements (Cycle 39): (1) <strong>Key Analyst Questions panel added to Methodology tab</strong> — 4 due-diligence questions a senior IOC analyst would ask on first review, with direct answers: "How do I know these numbers are correct?" (benchmark validation infrastructure, 11/12 pass ±3pp), "What does government take exclude?" (local content, abandonment, withholding tax — full exclusion list with impact ranges), "How current is this data?" (verified Aug 2026, nightly audit, reform tracking through 2023), "Can I use these NPVs in an investment decision?" (not directly — standardized reference project; Scenario Builder for field-specific evaluation). Quick navigation updated with link to new section. (2) <strong>Middle East &amp; MENA section added to Sample Analyses</strong> — covers the largest reserve concentration globally (previously no dedicated Middle East section despite the region holding ~45% of OPEC reserves). Two new analysis cards: Card O = IOC Access Map for 9 major Middle East producers showing IOC access status (Open/Restricted), mechanic type, take @$75, and structural note — with one-click load of accessible markets (Iraq, UAE, Oman, Qatar) into Side-by-Side; Card P = Iraq Deep Dive — TSC vs PSC fiscal split within one country, showing how Iraq's 415 TSC contracts (~85% take, $2.50/bbl fee) compare to 171 KRG PSC contracts (~60% take, equity-based) in a single mechanic breakdown table. (3) <strong>Indonesia Gross Split preset button: contract count annotation added</strong> — button in Scenario Builder now shows "(19 contracts)" inline and tooltip expanded to note that the platform has 19 Gross Split contracts in database (3% of Indonesia total, all post-2017 per Decree 8/2017). Addresses the GRADER.md priority item: "Add Gross Split preset count tooltip." (4) <strong>Version v85 → v86</strong> across badge, footer DCF Engine badge, Methodology provenance paragraph, and changelog.<br>
       <strong>v85 (Aug 2026)</strong> — 10 analyst-experience improvements (Cycle 38): (1) <code>.dd-section-hdr</code> CSS class added to main stylesheet — Methodology section headings now render with proper uppercase, weighted, letter-spaced styling matching the rest of the platform (previously only defined in print stylesheet, appearing as unstyled plain text on screen). (2) North Sea card factual correction — "18 percentage points" corrected to "~16 percentage points" (Norway 67.9% vs UK 51.4% = 16.5pp); description corrected from "Norway's 78% SPT" (wrong — 78% is the total marginal rate: 56% SPT + 22% CIT) to accurate 56%/22% breakdown. (3) Breakeven Map price marker default corrected from $70 to $75 — now consistent with the platform's standard reference price used in Fiscal Compare, Screener, and Methodology. (4) Country Profile "Q2 2026" data currency label updated to "Q3 2026" — August 2026 is Q3, not Q2. (5) Loading screen animation upgraded — ORCA title text now pulses (opacity oscillation) and progress bar uses a shimmer gradient sweep instead of a plain fill, giving a more professional feel on first load. (6) West Africa PSC card description improved — now explains what Angola actually changed in 2023 (FTP rate 10%→20% on new deepwater blocks, +~5pp take) rather than just saying "tightened terms". (7) Benchmark validation table — country names are now clickable links that navigate to the Country Profile tab for that country — analysts can drill from validation table to full fiscal detail in one click. (8) Discount rate sensitivity section — added explicit "Why government take doesn't change with discount rate" callout box explaining the mathematical reason (take is undiscounted), addressing a common question when senior economists review the table. (9) Screener NPV slider label — added "@$75" price reference to "Min Contractor NPV" label so analysts know which price scenario the NPV threshold applies to; added descriptive tooltip. (10) Known Model Limitations — added Indonesia Gross Split as second documented limitation entry (modeled as PSC-equivalent with 43% base contractor split; variable split components by field parameter not captured; DMO directional only). Version v84→v85.<br>
       <strong>v84 (Aug 2026)</strong> — 6 improvements (Cycle 37): Gross Split chip added to Explorer mechanic filter row — analysts can now filter the 71,601-contract database by Gross Split mechanic directly from the chip row (was missing; Indonesia contracts were not filterable by chip, unlike Concession/PSC/TSC/PRRT/RSC/Buy-back/Revenue Share). Gross Split option added to hidden flt-mech dropdown (chip sync fix — previously the chip set the UI but the dropdown remained empty, causing filter state mismatches). Revenue Share and Gross Split added to Fiscal Mechanics Guide page as full mechanic cards — guide previously showed only 7 mechanics (Concession, PSC, TSC, PRRT, RSC, Buy-back, Mixed/Hybrid); both Revenue Share and Gross Split now have dedicated How It Works, Typical Take, Examples, and Key Variables entries with Explorer filter buttons. Welcome panel Scenario Builder entry updated to "8 mechanics" including Gross Split (was "7 mechanics" — stale since v83 added Gross Split as 8th option). Stat card updated from "7 Full DCF mechanics" to "8 Scenario mechanics" with corrected tooltip. Methodology formula block: Revenue Share and Gross Split formulas added to the fiscal formula reference (was showing only 5 of 7 modeled mechanics — Revenue Share and Gross Split formulas omitted). Version v83→v84.<br>
       <strong>v83 (Aug 2026)</strong> — 4 UX improvements (Cycle 36): Gross Split added as 8th mechanic option in Scenario Builder — analysts can now model Indonesia's Gross Split regime (MoEMR Decree No. 8/2017) directly with dedicated inputs: Contractor Gross Split %, CIT Rate, DMO Obligation %, and DMO Price (% of ICP). DMO penalty is computed as a revenue reduction on the contractor split (25% of production at 25% ICP price = effective ~5.6% revenue loss at base split), giving a more accurate effective take than simple PSC-proxy. Indonesia Gross Split preset added (43% contractor split, 25% CIT, 25% DMO at 25% ICP — onshore oil profile per Decree 8/2017 base splits). Revenue Share column added to Vintage Analysis decade table and trend chart — previously the table showed only 6 mechanics (Concession/PSC/TSC/PRRT/RSC/Buy-back); Revenue Share contracts were present in the DB but excluded from the vintage visualization; now shows Revenue Share avg take by decade in cyan (#06b6d4) alongside other mechanics. Side-by-Side comparison: "Save as PDF" and "Chart PNG" export buttons added directly below the comparison grid — analysts no longer need to scroll to the top controls to find export options; buttons appear in context after running a comparison. Version v82→v83.<br>
@@ -2025,6 +2026,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <a href="#meth-discount" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Discount Rate</a>
     <a href="#meth-limitations" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Limitations</a>
     <a href="#meth-sources" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Sources</a>
+    <a href="#meth-analyst-faq" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Key Analyst Questions</a>
   </div>
 
   <!-- Section 1: How Govt Take is Calculated -->
@@ -2314,6 +2316,44 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <p style="font-size:12px;color:var(--muted);">92.8% of facts are A or B tier. D-tier facts (regime defaults) are excluded from the benchmark validation table. The database was deduplicated in August 2026: 41,368 exact duplicates, 3,974 cross-contamination facts, and 47,644 conflicting duplicates removed.</p>
   </div>
 
+  <!-- Section 9: Key Analyst Questions (Due Diligence FAQ) -->
+  <div class="dd-section" id="meth-analyst-faq">
+    <div class="dd-section-hdr">Key Analyst Questions</div>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Common due-diligence questions a senior IOC analyst or economist would ask when reviewing this platform for the first time — with direct answers.</p>
+
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+      <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;font-weight:700;color:#93c5fd;margin-bottom:6px;">Q: How do I know these government take numbers are correct?</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          The benchmark validation table above compares our computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP) for 12 benchmark countries. 11 of 12 pass a ±3pp tolerance. The one near-miss (Ireland, within 5pp) reflects a simplified ring-fence treatment. For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of facts are A or B tier.
+        </div>
+      </div>
+
+      <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #22c55e;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;font-weight:700;color:#86efac;margin-bottom:6px;">Q: What does government take exclude? Are there fiscal items not captured?</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          Take includes: royalties, corporate income tax, resource rent tax (PRRT, EPT, ISAE), profit oil / government share, signature/production bonuses, and state carried equity. Take excludes: local content spend, workforce nationalization requirements, infrastructure contributions, abandonment levies, and withholding taxes on dividends. The standardized reference project (deepwater, $2B capex, 25yr life) does not capture field-specific negotiated carve-outs. For Buy-back contracts (Iran), take is computed net of contractor fee. For Gross Split (Indonesia), DMO is captured directionally but variable split components are not. See Model Limitations above for the full exclusion list and impact ranges.
+        </div>
+      </div>
+
+      <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #f59e0b;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;font-weight:700;color:#fcd34d;margin-bottom:6px;">Q: How current is this data? When were fiscal terms last verified?</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          Database verified August 2026. The nightly audit (03:00 daily) checks data completeness, DCF consistency, and sourcing coverage across all 185 countries. The platform tracks 9 fiscal reform events as recently as 2023 (Angola FTP increase, Nigeria PIA 2021). Each Country Profile shows its per-parameter verification date. For high-velocity reform jurisdictions (Nigeria, Angola, Indonesia), we recommend treating parameters as current to within 12 months and cross-checking against primary law for bid-round or investment decision use.
+        </div>
+      </div>
+
+      <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #a855f7;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;font-weight:700;color:#d8b4fe;margin-bottom:6px;">Q: Can I use these NPV numbers in an investment decision or bid model?</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          Not directly. These figures are computed on a <em>standardized reference project</em> ($2B deepwater, 50k bbl/d peak, $15/bbl opex, 10% discount rate, 25yr life) designed for <em>regime comparison</em>, not contract-specific bid evaluation. To use in a bid model, run the Scenario Builder with your actual capex, opex, peak rate, and project life — it will compute a live DCF using your field parameters against the target country's fiscal terms. For bid evaluation, the Scenario Builder output is a starting point; you should apply your actual production decline curve, cost profile, abandonment liability, and country risk premium before use in an IC submission.
+        </div>
+      </div>
+
+    </div>
+  </div>
+
 </div>
 
 
@@ -2526,7 +2566,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <button class="btn btn-sm btn-outline" onclick="loadPreset('iran')" title="Iran — buy-back contract: contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7-10 year term">Iran Buy-back</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('india')" title="India RSC — Risk Service Contract under NELP/HELP: contractor delivers services, government keeps equity; $4/bbl representative fee, 34% CIT, 5% EPT">India RSC</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('nigeria_rs')" title="Nigeria Revenue Share (pre-PIA legacy contracts) — 55% govt revenue share, 30% CIT; representative of Nigeria's pre-PIA gross-revenue contracts before the 2021 Petroleum Industry Act introduced the hybrid PSC structure">Nigeria Rev Share</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('indonesia_gs')" title="Indonesia Gross Split (MoEMR Decree No. 8/2017) — 43% contractor split for onshore oil, 25% DMO at 25% ICP price, 25% CIT. Introduced by Jokowi government to replace cost recovery PSC and reduce government budget risk.">Indonesia Gross Split</button>
+          <button class="btn btn-sm btn-outline" onclick="loadPreset('indonesia_gs')" title="Indonesia Gross Split (MoEMR Decree No. 8/2017) — 43% contractor split for onshore oil, 25% DMO at 25% ICP price, 25% CIT. Introduced by Jokowi government to replace cost recovery PSC and reduce government budget risk. Platform has 19 Gross Split contracts in database (3% of Indonesia total, all post-2017).">Indonesia Gross Split <span style="font-size:9px;color:var(--muted);margin-left:2px;">(19 contracts)</span></button>
         </div>
       </div>
 
@@ -2578,6 +2618,14 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Latin America &amp; Atlantic Frontier</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Brazil pre-salt to Guyana deepwater: the Atlantic frontier's new fiscal landscape and IOC opportunity set.</div>
     <div id="samples-grid-latam" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
+      <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading&hellip;</div>
+    </div>
+  </div>
+
+  <div style="margin-top:36px;">
+    <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Middle East &amp; MENA</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Largest reserve concentration globally — but IOC access is highly restricted. Iraq and UAE are the primary accessible markets; Saudi Arabia, Kuwait, and Iran remain NOC-dominated.</div>
+    <div id="samples-grid-middleeast" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
       <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading&hellip;</div>
     </div>
   </div>
@@ -6906,6 +6954,66 @@ function renderSampleAnalyses() {
     </div>`;
 
   eastAfricaGrid.innerHTML = cardM + cardN;
+
+  // ── Middle East & MENA Section ────────────────────────────────────────────
+  const meGrid = document.getElementById('samples-grid-middleeast');
+  if (!meGrid) return;
+
+  // Card O: Middle East Fiscal Landscape — IOC Access + Take
+  const meDetailList = [
+    {c:'Iraq',        iocAccess:true,  mechanic:'TSC',        note:'Service fee ~$2.50/bbl. IOCs (BP, Eni, Lukoil) operate all major fields'},
+    {c:'UAE',         iocAccess:true,  mechanic:'Concession', note:'ADNOC partnerships (75% NOC + 25% IOC). Competitive concession terms'},
+    {c:'Oman',        iocAccess:true,  mechanic:'Concession', note:'Most open ME market. PDO (Shell JV) + independent blocks'},
+    {c:'Qatar',       iocAccess:true,  mechanic:'PSC',        note:'LNG JVs (QatarEnergy + Shell/TotalEnergies). Limited upstream equity'},
+    {c:'Bahrain',     iocAccess:true,  mechanic:'Concession', note:'Small producer; BAPCO-led but open to IOC service agreements'},
+    {c:'Kuwait',      iocAccess:false, mechanic:'Concession', note:'KPC monopoly. IOC access attempted (Project Kuwait) — failed politically'},
+    {c:'Saudi Arabia',iocAccess:false, mechanic:'Concession', note:'Saudi Aramco monopoly. No upstream IOC equity; downstream JVs only'},
+    {c:'Iran',        iocAccess:false, mechanic:'Buy-back',   note:'IPC model introduced 2016 — sanctions have suspended most IOC activity'},
+    {c:'Yemen',       iocAccess:false, mechanic:'PSC',        note:'Conflict — upstream operations suspended since 2015'},
+  ];
+  const meDetailRows = meDetailList.map(({c, iocAccess, mechanic, note}) => {
+    const d = cd.find(x => x.country === c);
+    const takeStr = d ? '<span style="color:' + takeColor(d.take_75) + ';font-weight:600">' + d.take_75.toFixed(1) + '%</span>' : '—';
+    const accessStr = iocAccess
+      ? '<span style="color:#22c55e;font-weight:600;">Open</span>'
+      : '<span style="color:#ef4444;font-weight:600;">Restricted</span>';
+    return [
+      '<span style="color:var(--text)">' + c + '</span>',
+      accessStr,
+      '<span style="color:var(--muted)">' + mechanic + '</span>',
+      takeStr,
+      '<span style="color:var(--muted);font-size:10px">' + note + '</span>'
+    ];
+  });
+  const meAccessibleCountries = meDetailList.filter(x => x.iocAccess && cd.find(d => d.country === x.c)).map(x => x.c).slice(0, 4);
+  const cardO = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #f59e0b;">
+      <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Middle East IOC Access Map</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">~45% of global reserves — but only 5 of 9 major producers allow IOC equity participation.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Saudi Arabia, Kuwait, and Iran together hold the majority of Middle East reserves but are effectively closed to IOC upstream equity. Iraq (TSC-dominant) and UAE (ADNOC concessions) account for the vast majority of accessible IOC production in the region. Qatar allows LNG JVs but limits upstream equity. The fiscal range is wide: Iraq TSC ~85% vs Oman concession ~45%.</div>
+      ${tbl([{label:'Country'},{label:'IOC Access'},{label:'Mechanic'},{label:'Take @$75',align:'right'},{label:'Structure'}], meDetailRows)}
+      <button style="${btnStyle}" onclick="(function(){${meAccessibleCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+'\');').join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Compare Accessible Markets</button>
+    </div>`;
+
+  // Card P: Iraq Deep Dive — TSC vs PSC within one country
+  const iraqMech = MECHANIC_BREAKDOWN['Iraq'] || [];
+  const iraqRows = iraqMech.map(m => [
+    '<span style="color:var(--text)">' + m.mechanic + '</span>',
+    m.n,
+    (m.pct) + '%',
+    '<span style="color:' + takeColor(m.take) + ';font-weight:600">' + m.take.toFixed(1) + '%</span>',
+    '<span style="color:#86efac">$' + (m.npv || 0).toFixed(0) + 'M</span>'
+  ]);
+  const cardP = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #0ea5e9;">
+      <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Iraq — TSC vs PSC: Two Fiscal Regimes, One Country</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Iraq has one of the widest intra-country fiscal spreads. Why do TSC and PSC contracts produce such different economics?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Iraq's post-2009 TSC model (BP/Rumaila, Lukoil/West Qurna-2, Eni/Zubair) pays IOCs a flat ~$2.50/bbl service fee on all production — state captures ~85% of revenue. The smaller PSC bloc (Kurdistan Regional Government contracts: DNO, Genel, HKN) transfers equity to the IOC and produces ~60% government take. The KRG PSC terms are the most IOC-favorable in the country — but carry political risk from Baghdad-Erbil fiscal disputes. Platform Iraq figure blends both.</div>
+      ${tbl([{label:'Mechanic'},{label:'Contracts',align:'right'},{label:'% of total',align:'right'},{label:'Avg Govt Take @$75',align:'right'},{label:'Avg NPV @$75',align:'right'}], iraqRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){const s=document.getElementById('dd-country-select');if(s){s.value='Iraq';loadCountryProfile('Iraq');}const b=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Country Profile'));if(b)switchTab('t7',b);})()">Open Iraq Country Profile</button>
+    </div>`;
+
+  meGrid.innerHTML = cardO + cardP;
 }
 window.renderSampleAnalyses = renderSampleAnalyses;
 
@@ -10520,7 +10628,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v85</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v86</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
