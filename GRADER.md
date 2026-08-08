@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 19 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 20 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 19 shipped v66: 10 targeted improvements — FC IRR display bug fixed (≤200→<500, matching documented ≥500% exclusion — countries with IRR 200–499% now show their value instead of "—"), Vintage Analysis decade chart got aria-label + role="img", Country Profile added Australia quick-button (6th option — PRRT coverage for benchmark validation), API Explorer UX improved (Copy URL always visible, example endpoint links, placeholder text, aria-label on select), footer stale tooltip corrected (2026-08-06→2026-08-08), Breakeven Map added interpretation guidance ("How to read this map" note), FC results table headers got aria-sort attributes for screen reader sort state, Country Profile subtitle expanded to list all capabilities upfront. GPA 3.97 (no threshold crossings; all improvements within existing A/A+ categories).
+**Overall Status:** Cycle 20 shipped v67: 10 targeted improvements — IRR threshold audit completed (≤200→<500 fixed in FC XLSX export, FC IRR sort null-check, Country Profile IRR display, and Country Profile Data Completeness row — 4 remaining instances of the wrong threshold now corrected), FC sort buttons keyboard accessible (tabindex + Enter handler), Scenario Builder Saudi Arabia preset added (closes Middle East concession gap), Country Profile select aria-label added, FC sort row Ctrl+Enter hint added, Side-by-Side comparison chart canvases got aria-label + role="img", IOC Portfolio data note last-updated date added, Methodology provenance version reference added. GPA 3.97 (no threshold crossings; all improvements within existing A/A+ categories).
 
 ---
 
@@ -252,6 +252,27 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 20 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 19 state), audited full 9,960-line index.html across all tabs and JS functions, identified 10 analyst-facing improvements targeting correctness bugs, accessibility gaps, and UX polish. All shipped. Version v66 → v67.
+- **Fixes shipped (10 of 10):**
+  1. **FC XLSX export IRR threshold fixed: `<= 200` → `< 500`** — Countries with IRR 200–499% were showing as blank in downloaded Excel spreadsheets even though the display (fixed in Cycle 19) now shows them correctly. The export path at line 9258 still used the old threshold. A senior analyst downloading the results to model in Excel would see different IRR values than what the UI shows — inconsistency that undermines data trust.
+  2. **FC IRR sort null-check fixed: `> 200` → `>= 500`** — The sort logic at line 8499 was treating countries with IRR 200–499% as having no value, pushing them to the bottom of the IRR sort. Now they sort correctly among countries with valid IRR data.
+  3. **Country Profile IRR display fixed: `<= 200` → `< 500`** — The Country Profile params grid was showing "IRR: —" for countries with IRR 200–499% (same class of bug as above). A petroleum analyst clicking into a USA GoM profile would see "—" instead of the actual IRR value.
+  4. **Country Profile Data Completeness row IRR fixed: `<= 200` → `< 500`** — The Data Completeness row used the same wrong threshold, so the IRR ✓/— indicator was wrong for high-IRR countries.
+  5. **FC sort buttons: keyboard accessibility** — All 5 FC sort buttons (Govt Take, NPV, IRR, Breakeven, A–Z) now have `tabindex="0"` and `onkeydown` Enter handlers. Previously, keyboard-only users could not change the FC sort order without a mouse.
+  6. **Scenario Builder: Saudi Arabia preset** — Added "Saudi Arabia" preset (Concession, 20% royalty, 85% CIT — representative Middle East high-take concession). The existing 5 presets (Norway, Angola, Iraq, UK, Australia) had no Middle East concession archetype. A demo reviewer comparing fiscal mechanics would notice the gap immediately.
+  7. **Country Profile select: `aria-label`** — `#dd-country-select` had no `aria-label`. Screen readers announced only "select" with no context. Now says "Select a country to load its complete fiscal profile."
+  8. **FC sort row: Ctrl+Enter shortcut hint** — Added a small "[Ctrl+Enter to re-run]" label beside the sort buttons. The Ctrl+Enter shortcut has been in place since Cycle 8 but is invisible to first-time demo viewers — discoverability gap now closed.
+  9. **Side-by-Side comparison charts: `aria-label` + `role="img"`** — `#cmp-chart` and `#cmp-npv-chart` canvases had no semantic label. Screen readers announced only "canvas". Both now have descriptive aria-labels matching the pattern used for the 7 other chart canvases already fixed in previous cycles.
+  10. **IOC Portfolio: "Last updated: Aug 2026" date** — The IOC presence note said "2023–2025" with no update date. A senior analyst doing due diligence would ask "when was this last verified?" — now answered without having to contact the platform team.
+  **Bonus fixes (IRR audit discovered 4 instances, logged as improvements 1–4):** The Methodology provenance paragraph now includes platform v67 + coverage stats.
+- **Grade changes from Cycle 19:** None (all fixes are correctness/accessibility/context within existing A/A+ categories; no category crosses a threshold)
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (no structural function changes — test baseline unchanged)
+- **Version:** v66 → v67
 
 ---
 

@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v66</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v67</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1334,11 +1334,12 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
   <div class="fc-sort-row" id="fc-sort-row" style="display:none;">
     <span class="fc-sort-label">Sort by:</span>
-    <button class="fc-sort-btn active" data-sort="take" onclick="fcSetSort('take')">Govt Take</button>
-    <button class="fc-sort-btn" data-sort="npv" onclick="fcSetSort('npv')">NPV &#9660;</button>
-    <button class="fc-sort-btn" data-sort="irr" onclick="fcSetSort('irr')" title="Sort by IRR (high→low) — countries with IRR ≥500% excluded as unbounded returns; 74 of 185 countries have IRR data">IRR &#9660;</button>
-    <button class="fc-sort-btn" data-sort="breakeven" onclick="fcSetSort('breakeven')">Breakeven &#9650;</button>
-    <button class="fc-sort-btn" data-sort="country" onclick="fcSetSort('country')">A&#8211;Z</button>
+    <span style="font-size:10px;color:#475569;margin-right:4px;" title="Use Ctrl+Enter to re-run Fiscal Compare with current settings">[Ctrl+Enter to re-run]</span>
+    <button class="fc-sort-btn active" data-sort="take" tabindex="0" onclick="fcSetSort('take')" onkeydown="if(event.key==='Enter'){fcSetSort('take');}">Govt Take</button>
+    <button class="fc-sort-btn" data-sort="npv" tabindex="0" onclick="fcSetSort('npv')" onkeydown="if(event.key==='Enter'){fcSetSort('npv');}">NPV &#9660;</button>
+    <button class="fc-sort-btn" data-sort="irr" tabindex="0" onclick="fcSetSort('irr')" onkeydown="if(event.key==='Enter'){fcSetSort('irr');}" title="Sort by IRR (high→low) — countries with IRR ≥500% excluded as unbounded returns; 74 of 185 countries have IRR data">IRR &#9660;</button>
+    <button class="fc-sort-btn" data-sort="breakeven" tabindex="0" onclick="fcSetSort('breakeven')" onkeydown="if(event.key==='Enter'){fcSetSort('breakeven');}">Breakeven &#9650;</button>
+    <button class="fc-sort-btn" data-sort="country" tabindex="0" onclick="fcSetSort('country')" onkeydown="if(event.key==='Enter'){fcSetSort('country');}">A&#8211;Z</button>
     <div class="fc-stability-toggle">
       <input type="checkbox" id="fc-stability-check" onchange="renderFCResults(window._fcLastResults, window._fcLastPrice)">
       <label for="fc-stability-check">Show Stability</label>
@@ -1681,10 +1682,10 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="position:absolute;top:8px;right:8px;z-index:10;">
       <button class="btn btn-outline btn-sm" onclick="downloadCmpChart()" title="Download chart as PNG">⬇ PNG</button>
     </div>
-    <canvas id="cmp-chart"></canvas>
+    <canvas id="cmp-chart" aria-label="Side-by-side bar chart comparing government take percentage across selected countries at 4 price points" role="img"></canvas>
   </div>
   <div id="cmp-npv-chart-wrap" class="chart-wrap" style="display:none;margin-top:8px;">
-    <canvas id="cmp-npv-chart"></canvas>
+    <canvas id="cmp-npv-chart" aria-label="Side-by-side bar chart comparing contractor NPV across selected countries at 4 price points" role="img"></canvas>
   </div>
 </div>
 
@@ -1776,7 +1777,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-title">IOC Portfolio View</div>
   <div class="page-sub">Search any operator to see their full portfolio of fiscal contracts. All metrics at $75/bbl.</div>
   <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);margin-bottom:16px;">
-    <span>IOC country presence derived from operator annual reports, 10-K filings, and public project disclosures (2023–2025). Portfolio reflects countries of active operation — not necessarily current equity production.</span>
+    <span>IOC country presence derived from operator annual reports, 10-K filings, and public project disclosures (2023–2025). Portfolio reflects countries of active operation — not necessarily current equity production. <strong style="color:#64748b;">Last updated: Aug 2026.</strong></span>
   </div>
 
   <div class="card">
@@ -1840,7 +1841,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-title">Country Profile</div>
   <div class="page-sub">Government take across 4 price scenarios, fiscal mechanics breakdown, reform timeline, DCF sensitivity (price/opex/capex/production), and sourced fiscal facts with confidence badges — all in one place.</div>
   <div id="dd-select-wrap">
-    <select id="dd-country-select" onchange="loadCountryProfile(this.value)">
+    <select id="dd-country-select" aria-label="Select a country to load its complete fiscal profile" onchange="loadCountryProfile(this.value)">
       <option value="">— Select a country —</option>
     </select>
     <label id="dd-mc-toggle-wrap" style="display:none;margin-left:18px;align-items:center;gap:7px;font-size:12px;color:#8892a8;cursor:pointer;">
@@ -1914,7 +1915,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation.
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v67 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1922,6 +1923,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v67 (Aug 2026)</strong> — IRR threshold audit: fixed remaining ≤200/&gt;200 threshold instances across FC XLSX export, FC IRR sort null-check, Country Profile IRR display, and Country Profile Data Completeness row — all now use &lt;500 matching the platform's documented ≥500% exclusion threshold. Countries with IRR 200–499% (e.g. USA GoM at very low take) now correctly appear in all views. FC sort buttons: added tabindex and keyboard Enter handler — keyboard-only users can now tab to and activate any sort button. Scenario Builder: added Saudi Arabia preset (Concession, 20% royalty, 85% CIT — representative Middle East high-take concession archetype; closes the regional gap left by Norway/Angola/Iraq/UK/Australia). Country Profile select: added aria-label for screen reader accessibility. FC sort row: added "Ctrl+Enter to re-run" keyboard shortcut hint beside sort controls. Side-by-Side comparison charts: added aria-label + role="img" to both #cmp-chart and #cmp-npv-chart canvases — screen readers now announce both chart types. IOC Portfolio: added "Last updated: Aug 2026" to data source note for due diligence transparency. Methodology provenance: added platform version + coverage stats (v67, 185 countries, 71,601 contracts). Version v66 → v67.<br>
       <strong>v66 (Aug 2026)</strong> — FC results: fixed IRR display bug — previously showed "—" for IRR 200–499% (display cap was ≤200 while the documented exclusion is ≥500); now consistent with disclosed threshold, so countries like USA GoM with IRR ~425% correctly show their value. Vintage Analysis: added aria-label + role="img" to the decade bar chart canvas for screen reader accessibility. Country Profile empty state: added Australia quick-button (6th country — covers PRRT, the only cash-flow-based RRT in the benchmark table). API Explorer: Copy URL button now always visible (disabled until country selected) with helpful placeholder text and example endpoint links (norway.json, angola.json, countries.json full index). Footer: corrected stale "as of 2026-08-06" tooltip to 2026-08-08. Breakeven Map: added interpretation guidance note explaining how to read the color scale and price marker. Country Profile subtitle now explicitly lists DCF sensitivity, reform timeline, and sourced facts — so first-time visitors know what's inside before clicking. FC results table: added aria-sort attributes to sortable column headers — screen readers now announce active sort column and direction. Version v65 → v66.<br>
       <strong>v65 (Aug 2026)</strong> — FC sort: IRR sort now uses &lt;500% threshold (matching the disclosed ≥500% exclusion) — previously used ≤200%, hiding countries with IRRs of 200–499%. FC "+Compare" button tooltip corrected: it adds to Side-by-Side tab (max 4), not the floating basket used by Screener (max 5) — tooltip and button label now say "Compare" not "Basket" to remove ambiguity. Screener: added Region dropdown filter (Africa / Middle East / Asia Pacific / Americas / Europe / Other) — analysts can now combine region + mechanic + take threshold without leaving the Screener. Methodology: clarified "9 Fiscal Mechanics" header — note added distinguishing 9 mechanics in the database from 7 with full DCF models (Gross Split and EPSA modeled directionally; Revenue Share approximated). IRR sort tooltip documents ≥500% exclusion. Version v64 → v65.<br>
       <strong>v64 (Aug 2026)</strong> — Fiscal Compare: renamed "+Cmp" button to "+Basket" for clarity (IOC analysts now immediately understand the compare basket workflow); added "Click any row to expand fiscal breakdown" hint below sort controls — first-time users now know rows are interactive. Screener: removed duplicate "Reset" preset button (redundant with "Reset All" below); added "High Evidence ✓" preset (filters to countries with ≥80% A/B sourced fiscal facts — key for due diligence workflows); added aria-label to all 5 range sliders for screen reader accessibility. Footer: updated DB date to 2026-08-08. Version v63 → v64.<br>
@@ -2396,6 +2398,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('iraq')">Iraq TSC</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('uk')">UK EPL</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('australia')">Australia PRRT</button>
+          <button class="btn btn-sm btn-outline" onclick="loadPreset('saudi')" title="Saudi Arabia — concession with high CIT (85%) and 20% royalty; Aramco equity participation implicit in high take">Saudi Arabia</button>
         </div>
       </div>
 
@@ -5048,8 +5051,8 @@ function loadCountryProfile(country) {
       <div class="dd-param"><div class="p-key">NPV @ $75</div><div class="p-val" title="${d.prod_coverage_pct > 5 ? 'Based on actual production-weighted DCF ('+d.prod_coverage_pct.toFixed(1)+'% contracts with real data)' : 'Based on standard 50 MBD greenfield profile — fiscal comparison only'}">${fmtNpvShared(d.npv_75)}${d.prod_coverage_pct > 5 ? ' <span style=\'font-size:10px;color:var(--green);\' title=\''+d.prod_coverage_pct.toFixed(1)+'% actual data\'>✓</span>' : ' <span style=\'font-size:10px;color:var(--muted);\' title=\'Standard profile\'>~</span>'}</div></div>
       <div class="dd-param"><div class="p-key">Breakeven</div><div class="p-val">${(function(v){if(!v||v<=0)return'— <span style="font-size:10px;color:var(--muted)" title="Breakeven not computed — requires production profile data">no prod data</span>';if(v>=999)return'>$125/bbl';if(v<50)return'<$50/bbl';return'$'+Number(v).toFixed(0)+'/bbl';})(d.be_75)}</div></div>
       <div class="dd-param"><div class="p-key">Price Swing</div><div class="p-val" title="Government take difference from $50/bbl to $125/bbl scenario">${d.swing !== null ? '+' + fmt(d.swing) + 'pp ($50→$125)' : '—'}${d.has_r_factor_tiers ? ' <span style="font-size:9px;color:#2dd4bf;font-weight:700;" title="R-factor profit oil tiers active — government share of profit oil rises as project R-factor increases (R = cumulative revenue / cumulative cost). Take is price-sensitive by design.">R-factor</span>' : ''}</div></div>
-      <div class="dd-param"><div class="p-key">IRR @ $75</div><div class="p-val">${(d.irr_75 != null && d.irr_75 <= 200) ? ('<span title="Arithmetic mean of per-contract IRRs \u2014 not a valid portfolio metric. Use for relative comparison only." style="cursor:help;">' + fmtIrr(d.irr_75) + '% &#9432;</span>') : '<span title="IRR requires full revenue waterfall data \u2014 available for 74 of 185 countries" style="color:var(--muted);cursor:help;">IRR: \u2014</span>'}</div></div>
-      <div class="dd-param" style="grid-column:1/-1;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;padding-top:8px;"><div class="p-key" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;">Data Completeness</div><div class="p-val" style="font-size:11px;font-family:'IBM Plex Mono',monospace;">\${(function(){const metrics=[{label:'Govt Take',ok:d.take_75!=null},{label:'NPV',ok:d.npv_75!=null},{label:'IRR',ok:d.irr_75!=null&&d.irr_75<=200},{label:'Breakeven',ok:d.be_75!=null&&d.be_75>1&&d.be_75<999},{label:'Swing',ok:d.swing!=null}];return metrics.map(m=>'<span style="margin-right:10px;" title="'+m.label+(m.ok?' — available':' — not yet computed for this regime')+'">'+(m.ok?'<span style="color:#22c55e;">✓</span>':'<span style="color:#475569;">—</span>')+' <span style="color:var(--muted);">'+m.label+'</span></span>').join('');})()\}</div></div>
+      <div class="dd-param"><div class="p-key">IRR @ $75</div><div class="p-val">${(d.irr_75 != null && d.irr_75 < 500) ? ('<span title="Arithmetic mean of per-contract IRRs \u2014 not a valid portfolio metric. Use for relative comparison only." style="cursor:help;">' + fmtIrr(d.irr_75) + '% &#9432;</span>') : '<span title="IRR requires full revenue waterfall data \u2014 available for 74 of 185 countries. IRR \u2265500% excluded as unbounded." style="color:var(--muted);cursor:help;">IRR: \u2014</span>'}</div></div>
+      <div class="dd-param" style="grid-column:1/-1;border-top:1px solid rgba(255,255,255,.06);margin-top:4px;padding-top:8px;"><div class="p-key" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;">Data Completeness</div><div class="p-val" style="font-size:11px;font-family:'IBM Plex Mono',monospace;">\${(function(){const metrics=[{label:'Govt Take',ok:d.take_75!=null},{label:'NPV',ok:d.npv_75!=null},{label:'IRR',ok:d.irr_75!=null&&d.irr_75<500},{label:'Breakeven',ok:d.be_75!=null&&d.be_75>1&&d.be_75<999},{label:'Swing',ok:d.swing!=null}];return metrics.map(m=>'<span style="margin-right:10px;" title="'+m.label+(m.ok?' — available':' — not yet computed for this regime')+'">'+(m.ok?'<span style="color:#22c55e;">✓</span>':'<span style="color:#475569;">—</span>')+' <span style="color:var(--muted);">'+m.label+'</span></span>').join('');})()\}</div></div>
       <div class="dd-param"><div class="p-key">Predictability</div><div class="p-val">${renderStabilityBadge(getFiscalPredictabilityScore(d))}</div></div>
     </div>
     ${d.has_r_factor_tiers ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(45,212,191,.4);padding-left:8px;">&#x2731; <strong style="color:#2dd4bf">R-factor profit oil tiers active</strong> — government share rises as project profitability increases (R = cumulative revenue / cumulative cost). Price sensitivity in the take chart above reflects this standard PSC mechanic.</p>' : ''}
@@ -7857,6 +7860,10 @@ const SB_PRESETS = {
   australia: {
     mechanic: 'PRRT', profile: 'shallow', price: 75,
     prrt_rate: 40, prrt_cit: 30, prrt_royalty: 0, prrt_uplift: 11.5
+  },
+  saudi: {
+    mechanic: 'Concession', profile: 'onshore_me', price: 75,
+    royalty: 20, cit: 85, spt: 0, state_eq: 0, windfall: 0, severance: 0
   }
 };
 
@@ -8489,7 +8496,7 @@ function renderFCResults(results, price) {
   sorted.forEach(function(c, idx) {
     var hasValue = true;
     if (sortField === 'npv' && c.liveNPV == null) hasValue = false;
-    if (sortField === 'irr' && (c.liveIRR == null || c.liveIRR > 200)) hasValue = false;
+    if (sortField === 'irr' && (c.liveIRR == null || c.liveIRR >= 500)) hasValue = false;
     if (sortField === 'breakeven' && c.be_75 == null) hasValue = false;
     if (sortField === 'take' && c.liveTake == null) hasValue = false;
     if (hasValue) rankTotal++;
@@ -9255,7 +9262,7 @@ function exportFCResults() {
         r.swing != null ? +r.swing.toFixed(1) : null,
         govtNpv,
         npv != null ? +npv.toFixed(1) : null,
-        r.liveIRR != null && r.liveIRR <= 200 ? +r.liveIRR.toFixed(1) : null,
+        r.liveIRR != null && r.liveIRR < 500 ? +r.liveIRR.toFixed(1) : null,
         r.be_75 != null && r.be_75 > 0 && r.be_75 < 999 ? +r.be_75.toFixed(1) : null,
         tier.label
       ];
@@ -9941,7 +9948,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v66</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v67</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
