@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v68</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v69</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1342,7 +1342,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <button class="fc-sort-btn" data-sort="country" tabindex="0" onclick="fcSetSort('country')" onkeydown="if(event.key==='Enter'){fcSetSort('country');}">A&#8211;Z</button>
     <div class="fc-stability-toggle">
       <input type="checkbox" id="fc-stability-check" onchange="renderFCResults(window._fcLastResults, window._fcLastPrice)">
-      <label for="fc-stability-check">Show Stability</label>
+      <label for="fc-stability-check" title="Adds a Stability column. Score = 5 minus number of fiscal law changes since 2010. ◆◆◆◆◆ (5) = zero changes = most stable. ◇◇◇◇◇ (0) = 5+ changes = most volatile.">Show Stability</label>
     </div>
   </div>
 
@@ -1530,23 +1530,23 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div class="slider-row">
       <div class="slider-group">
         <label>Max Govt Take: <span class="val" id="sv-take">60</span>%</label>
-        <input type="range" id="sl-take" min="30" max="100" value="60" aria-label="Maximum government take percentage (30–100%)" oninput="document.getElementById('sv-take').textContent=this.value;runScreener()">
+        <input type="range" id="sl-take" min="30" max="100" value="60" aria-label="Maximum government take percentage (30–100%)" oninput="document.getElementById('sv-take').textContent=this.value;_activePresetName=null;runScreener()">
       </div>
       <div class="slider-group">
         <label>Max Breakeven: $<span class="val" id="sv-be">70</span>/bbl</label>
-        <input type="range" id="sl-be" min="20" max="120" value="70" aria-label="Maximum breakeven oil price in dollars per barrel (20–120)" oninput="document.getElementById('sv-be').textContent=this.value;runScreener()">
+        <input type="range" id="sl-be" min="20" max="120" value="70" aria-label="Maximum breakeven oil price in dollars per barrel (20–120)" oninput="document.getElementById('sv-be').textContent=this.value;_activePresetName=null;runScreener()">
       </div>
       <div class="slider-group">
         <label>Min Contractor NPV: $<span class="val" id="sv-npv">0</span>M</label>
-        <input type="range" id="sl-npv" min="-500" max="2000" value="0" aria-label="Minimum contractor NPV in millions of dollars (-500 to 2000)" oninput="document.getElementById('sv-npv').textContent=this.value;runScreener()">
+        <input type="range" id="sl-npv" min="-500" max="2000" value="0" aria-label="Minimum contractor NPV in millions of dollars (-500 to 2000)" oninput="document.getElementById('sv-npv').textContent=this.value;_activePresetName=null;runScreener()">
       </div>
       <div class="slider-group">
         <label>Min IRR: <span class="val" id="sv-irr">0</span>%</label>
-        <input type="range" id="sl-irr" min="0" max="50" value="0" aria-label="Minimum contractor IRR percentage (0–50%)" oninput="document.getElementById('sv-irr').textContent=this.value;runScreener()">
+        <input type="range" id="sl-irr" min="0" max="50" value="0" aria-label="Minimum contractor IRR percentage (0–50%)" oninput="document.getElementById('sv-irr').textContent=this.value;_activePresetName=null;runScreener()">
       </div>
       <div class="slider-group">
         <label title="Filter by evidence quality: % of fiscal facts with primary (A) or verified (B) source">Min Evidence A/B: <span class="val" id="sv-evid">0</span>%</label>
-        <input type="range" id="sl-evid" min="0" max="100" value="0" aria-label="Minimum evidence quality percentage — share of fiscal facts with A or B source confidence (0–100%)" oninput="document.getElementById('sv-evid').textContent=this.value;runScreener()">
+        <input type="range" id="sl-evid" min="0" max="100" value="0" aria-label="Minimum evidence quality percentage — share of fiscal facts with A or B source confidence (0–100%)" oninput="document.getElementById('sv-evid').textContent=this.value;_activePresetName=null;runScreener()">
       </div>
     </div>
     <div class="screener-extra">
@@ -1640,9 +1640,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <!-- Bubble Chart mode -->
   <div id="explorer-bubble-mode" style="display:none;padding-top:16px;">
     <div style="font-size:12px;color:var(--muted);margin-bottom:12px;">
-      Scatter plot: Government Take (X) vs Contractor NPV (Y). Bubble size = number of contracts.
-      Click any bubble to open the Country Profile. The <strong>lower-left frontier</strong> (low take, high NPV) represents the most IOC-favorable regimes.
-      <strong>Upper-right</strong> (high take, positive NPV) = large-reserve countries where even high take generates value.
+      Scatter plot: Government Take (X) vs Contractor NPV (Y, standardized $2B deepwater project). Bubble size = number of contracts.
+      Click any bubble to open the Country Profile. The <strong>left frontier</strong> (low take) with <strong>high NPV</strong> (upper position) represents the most IOC-favorable regimes — low government capture and strong contractor returns.
+      <strong>Right side</strong> (high take) with <strong>positive NPV</strong> = large-reserve countries where project scale delivers value even under high fiscal burden. Countries with negative NPV (below the X-axis) are uneconomic at the standardized project size and selected price.
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
       <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Click to open Country Profile." role="img"></canvas></div>
@@ -1895,7 +1895,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <select id="api-country-select" aria-label="Select country to load API JSON response" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:8px 14px;min-width:240px;" onchange="loadAPIJson(this.value)">
       <option value="">— Select a country —</option>
     </select>
-    <button class="btn btn-outline btn-sm" id="api-copy-btn" onclick="copyAPIUrl()" title="Copy direct API URL for this country to clipboard">⎘ Copy API URL</button>
+    <button class="btn btn-outline btn-sm" id="api-copy-btn" onclick="copyAPIUrl()" title="Select a country above to enable this button — then click to copy the direct API URL to clipboard" disabled>⎘ Copy API URL</button>
     <span id="api-url-display" style="font-size:12px;color:var(--muted);font-family:monospace;"></span>
   </div>
   <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
@@ -1915,7 +1915,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v68 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v69 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1923,6 +1923,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v69 (Aug 2026)</strong> — Screener: active preset name now shown in the count bar (e.g. "Sweet Spot · 23 countries match at $75/bbl") — analysts immediately know which preset is driving the results without scrolling back up to the preset row. Bubble chart description: disambiguated "lower-left frontier" language — now explicitly notes that NPV can be negative at high-take regimes, so "lower-left" refers to low take / high NPV, not low take / low value. FC Stability column: tooltip now fully explains the scoring scale (5 = zero reform events since 2010 = most stable; 0 = 5+ reform events = least stable) — previously said only "lower = more stable" which is the opposite of the 5-dot visual. API Explorer: Copy API URL button now starts disabled in HTML markup (not just set via JS) — prevents a flash of enabled state before page JS initializes. Sample Analyses: standardized all "Load in Compare" button labels to "Load in Fiscal Compare" matching the card description text — eliminates the mixed terminology between inline card text and button labels. Version v68 → v69.<br>
       <strong>v68 (Aug 2026)</strong> — Critical IRR display fix: <code>fmtIrr()</code> used <code>v &gt; 200</code> threshold, causing all countries with IRR 201–499% to display "n/a" across Explorer rows, Screener results, IOC Portfolio tables, and Side-by-Side comparison (everywhere <code>fmtIrr()</code> is called). Now correctly uses <code>v &gt;= 500</code> matching the documented exclusion threshold. Live DCF <code>calcIRR()</code> function also used <code>irr &gt; 200</code> sentinel, causing the Country Profile Live DCF panel to return null instead of a real IRR for any project with 201–499% return (common at high price points for low-royalty concessions). Both thresholds now corrected to <code>&gt;= 500</code>. Version v67 → v68.<br>
       <strong>v67 (Aug 2026)</strong> — IRR threshold audit: fixed remaining ≤200/&gt;200 threshold instances across FC XLSX export, FC IRR sort null-check, Country Profile IRR display, and Country Profile Data Completeness row — all now use &lt;500 matching the platform's documented ≥500% exclusion threshold. Countries with IRR 200–499% (e.g. USA GoM at very low take) now correctly appear in all views. FC sort buttons: added tabindex and keyboard Enter handler — keyboard-only users can now tab to and activate any sort button. Scenario Builder: added Saudi Arabia preset (Concession, 20% royalty, 85% CIT — representative Middle East high-take concession archetype; closes the regional gap left by Norway/Angola/Iraq/UK/Australia). Country Profile select: added aria-label for screen reader accessibility. FC sort row: added "Ctrl+Enter to re-run" keyboard shortcut hint beside sort controls. Side-by-Side comparison charts: added aria-label + role="img" to both #cmp-chart and #cmp-npv-chart canvases — screen readers now announce both chart types. IOC Portfolio: added "Last updated: Aug 2026" to data source note for due diligence transparency. Methodology provenance: added platform version + coverage stats (v67, 185 countries, 71,601 contracts). Version v66 → v67.<br>
       <strong>v66 (Aug 2026)</strong> — FC results: fixed IRR display bug — previously showed "—" for IRR 200–499% (display cap was ≤200 while the documented exclusion is ≥500); now consistent with disclosed threshold, so countries like USA GoM with IRR ~425% correctly show their value. Vintage Analysis: added aria-label + role="img" to the decade bar chart canvas for screen reader accessibility. Country Profile empty state: added Australia quick-button (6th country — covers PRRT, the only cash-flow-based RRT in the benchmark table). API Explorer: Copy URL button now always visible (disabled until country selected) with helpful placeholder text and example endpoint links (norway.json, angola.json, countries.json full index). Footer: corrected stale "as of 2026-08-06" tooltip to 2026-08-08. Breakeven Map: added interpretation guidance note explaining how to read the color scale and price marker. Country Profile subtitle now explicitly lists DCF sensitivity, reform timeline, and sourced facts — so first-time visitors know what's inside before clicking. FC results table: added aria-sort attributes to sortable column headers — screen readers now announce active sort column and direction. Version v65 → v66.<br>
@@ -3731,6 +3732,7 @@ function renderCompare() {
 
 // ─── TAB 3: Screener ─────────────────────────────────────────────────────────
 let _screenerRfactorOnly = false;
+let _activePresetName = null; // tracks which preset is currently applied
 
 function applyScreenerPreset(preset) {
   const setSlider = (id, val) => {
@@ -3753,6 +3755,7 @@ function applyScreenerPreset(preset) {
 
   // Reset all to defaults first
   _screenerRfactorOnly = false;
+  _activePresetName = null;
   setSlider('sl-take', 100); setSlider('sl-be', 120); setSlider('sl-npv', -500); setSlider('sl-irr', 0); setSlider('sl-evid', 0);
   setChecks('sc-mech-checks', 'all'); setDepth('all'); setBeCat('all');
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
@@ -3765,35 +3768,42 @@ function applyScreenerPreset(preset) {
     // Low take (≤55%), reasonable breakeven (≤$65), concession + PSC
     setSlider('sl-take', 55); setSlider('sl-be', 65); setSlider('sl-npv', 0);
     setChecks('sc-mech-checks', ['Concession','PSC','PRRT','RSC']);
+    _activePresetName = 'Sweet Spot';
   } else if (preset === 'pscafrica') {
     // PSC in Africa — set both mechanic and region filters
     setSlider('sl-take', 75); setSlider('sl-be', 80);
     setChecks('sc-mech-checks', ['PSC','EPSA']);
     const scRgn2 = document.getElementById('sc-region');
     if (scRgn2) scRgn2.value = 'Africa';
+    _activePresetName = 'PSC Africa';
   } else if (preset === 'deepwater') {
     // Deepwater frontier, PSC or Concession
     setDepth('deepwater');
     setChecks('sc-mech-checks', ['PSC','Concession','EPSA']);
     setSlider('sl-take', 70);
+    _activePresetName = 'Deepwater';
   } else if (preset === 'lowrisk') {
     // Take ≤55% AND low swing (use take proxy) + Concession
     setSlider('sl-take', 55); setSlider('sl-be', 75);
     setChecks('sc-mech-checks', ['Concession','PRRT']);
+    _activePresetName = 'Low-Risk Stable';
   } else if (preset === 'highirr') {
     // Min IRR 15%, positive NPV
     setSlider('sl-irr', 15); setSlider('sl-npv', 100);
     if (nullIrr) nullIrr.checked = false;
+    _activePresetName = 'High IRR';
   } else if (preset === 'rfactor') {
     // PSC countries with R-factor profit oil tiers only
     _screenerRfactorOnly = true;
     setChecks('sc-mech-checks', ['PSC','EPSA']);
     setSlider('sl-take', 90);
+    _activePresetName = 'R-factor PSC';
   } else if (preset === 'highevidence') {
     // Countries with ≥80% A/B sourced fiscal facts — highest data quality for due diligence
     setSlider('sl-evid', 80);
+    _activePresetName = 'High Evidence';
   }
-  // 'reset' case: already reset above
+  // 'reset' case: _activePresetName already null above
   runScreener();
 }
 
@@ -3921,10 +3931,11 @@ function runScreener() {
     badgeEl.innerHTML = '';
   }
 
-  // Results count with active price label
+  // Results count with active price label and preset name
   const priceLabel = `$${price}/bbl`;
   const sortNote = _screenerRfactorOnly ? ' · sorted by price sensitivity (swing ↓)' : '';
-  document.getElementById('screener-count').textContent = `Results: ${data.length} countries match at ${priceLabel}${sortNote}`;
+  const presetPrefix = _activePresetName ? `${_activePresetName} · ` : '';
+  document.getElementById('screener-count').textContent = `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}`;
   document.getElementById('screener-result-count').textContent = `(of ${COUNTRY_DATA.length} total)`;
 
   const tbody = document.getElementById('tbody-screener');
@@ -6162,7 +6173,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why does Norway capture 18 percentage points more than the UK?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway's 78% Special Petroleum Tax vs UK's EPL (32%) + RFCT (40%). Same basin, very different terms.</div>
       ${tbl([{label:'Country'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], nsRows)}
-      <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Fiscal Compare</button>
     </div>`;
 
   // ── Card 3: West Africa PSC Bloc ─────────────────────────────────────────
@@ -6182,7 +6193,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Angola tightened terms in 2023. How does it compare to peers?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All PSC-dominant regimes. Ghana's Jubilee terms (42%) remain the most IOC-friendly in the bloc.</div>
       ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$75',align:'right'}], waRows)}
-      <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Fiscal Compare</button>
     </div>`;
 
   // ── Card 4: Price Sensitivity Leaders ────────────────────────────────────
@@ -6459,7 +6470,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Which countries cut fiscal terms to attract investment after the 2020 crash?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Frontier nations introduced competitive fiscal frameworks to attract first-mover IOC capital. Guyana set the template &mdash; no windfall tax, generous cost recovery &mdash; and peers followed.</div>
       ${tbl([{label:'Country'},{label:'Year',align:'right'},{label:'Govt Take @$75',align:'right'},{label:'Framework'}], pcRows)}
-      <button style="${btnStyle}" onclick="(function(){${pcCountries.map(c => "addCompare('" + c.replace(/'/g,"\\\\'") + "');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${pcCountries.map(c => "addCompare('" + c.replace(/'/g,"\\\\'") + "');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Fiscal Compare</button>
     </div>`;
 
   // ── Card G: R-Factor PSC Tiers ────────────────────────────────────────────
@@ -8556,7 +8567,7 @@ function renderFCResults(results, price) {
   html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as % of gross revenue — royalties + taxes + profit oil (all instruments)">Take%</th><th class="num" title="Estimated government NPV = contractor NPV \u00d7 take / (1\u2212take). Avg per contract at selected price/profile.">Govt NPV</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + '>Ctct NPV</th><th class="num" ' + (sortField==='irr'?'aria-sort="descending"':'') + ' title="Contractor IRR at selected price — IRR \u2265500% excluded as unbounded; shown for countries with verified opex/capex">IRR%</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + '>Breakeven</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price sensitivity: take@$125 \u2212 take@$50 in percentage points. High swing = fiscal regime sensitive to price changes.">Swing</th>';
   if (showStability) {
-    html += '<th class="num" title="Number of fiscal law changes since 2010 in the database. Lower = more stable fiscal regime.">Stability \u24d8</th>';
+    html += '<th class="num" title="Fiscal stability score since 2010. 5 dots = zero regime changes (most stable). 0 dots = 5+ changes (most volatile). Scored as: 5 minus number of reform events in ORCA database from 2010 onward. Covers legislated tax rate changes, new levies, and PSC renegotiations — not operational or political events.">Stability \u24d8</th>';
   }
   html += '<th class="num" style="width:60px;"></th>';
   html += '</tr></thead><tbody>';
@@ -9956,7 +9967,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v68</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v69</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
