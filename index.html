@@ -1149,7 +1149,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v83</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v84</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1234,9 +1234,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <div style="font-size:22px;font-weight:800;color:#2dd4bf;">337</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Active sources</div>
         </div>
-        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;" title="7 mechanics with full DCF models: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share. 2 additional (Gross Split, EPSA) modeled directionally via PSC-equivalent parameters.">
-          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">7</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Full DCF mechanics</div>
+        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;" title="8 mechanics available in Scenario Builder: Concession, PSC, Gross Split, TSC, PRRT, RSC, Buy-back, Revenue Share. 7 with independent full DCF engines; Gross Split modeled via PSC-equivalent. 1 additional (EPSA) modeled directionally.">
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">8</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Scenario mechanics</div>
         </div>
       </div>
 
@@ -1304,7 +1304,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <div>≡ <strong style="color:var(--text);">Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
         <div>★ <strong style="color:var(--text);">Screener</strong> — top-level tab. Filter by take range, IRR, mechanic, region with sorting. One-click from any tab. CSV + Excel export. Presets: Sweet Spot / High IRR / Deepwater. Add results to compare basket.</div>
         <div>△ <strong style="color:var(--text);">IOC Portfolio</strong> — top operator positions by country, take, and contract count</div>
-        <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: 7 mechanics (Concession, PSC, TSC, PRRT, Buy-back, RSC, Revenue Share) with full parameter control. 9 country presets. Click <strong>+ Scenario</strong> in the header to open.</div>
+        <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: 8 mechanics (Concession, PSC, Gross Split, TSC, PRRT, Buy-back, RSC, Revenue Share) with full parameter control. 10 country presets including Indonesia Gross Split. Click <strong>+ Scenario</strong> in the header to open.</div>
         <div>◉ <strong style="color:var(--text);">API</strong> — machine-readable JSON for every country. Download or pipe into your models.</div>
         <div>⌕ <strong style="color:var(--text);">Source confidence</strong> — every fiscal fact shows its source and confidence tier. A = primary legislation. B = operator filing. C = secondary. D = default.</div>
       </div>
@@ -1387,6 +1387,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="RSC" onclick="setExplorerChip('mechanic','RSC',this)">RSC</button>
     <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Buy-back" onclick="setExplorerChip('mechanic','Buy-back',this)">Buy-back</button>
     <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Revenue Share" onclick="setExplorerChip('mechanic','Revenue Share',this)">Revenue Share</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Gross Split" onclick="setExplorerChip('mechanic','Gross Split',this)" title="Indonesia Gross Split — post-2017 PSC reform (MoEMR Decree 8/2017). No cost recovery; contractor receives upfront gross split.">Gross Split</button>
     <button class="chip" id="chip-rfactor-psc" role="button" aria-pressed="false" data-filter="mechanic" data-value="rfactor" onclick="setExplorerRFactor(this)" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC</button>
     <button class="btn btn-outline btn-sm" id="explorer-map-toggle" onclick="toggleExplorerMap()" style="margin-left:auto;">Map View</button>
   </div>
@@ -1421,7 +1422,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <select id="flt-mech">
         <option value="">All Mechanics</option>
         <option>Concession</option><option>PSC</option><option>TSC</option>
-        <option>PRRT</option><option>RSC</option><option>Buy-back</option><option>Revenue Share</option>
+        <option>PRRT</option><option>RSC</option><option>Buy-back</option><option>Revenue Share</option><option>Gross Split</option>
       </select>
     </div>
     <div class="ctrl-group" style="display:none">
@@ -1964,7 +1965,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v83 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v84 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1972,6 +1973,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v84 (Aug 2026)</strong> — 6 improvements (Cycle 37): Gross Split chip added to Explorer mechanic filter row — analysts can now filter the 71,601-contract database by Gross Split mechanic directly from the chip row (was missing; Indonesia contracts were not filterable by chip, unlike Concession/PSC/TSC/PRRT/RSC/Buy-back/Revenue Share). Gross Split option added to hidden flt-mech dropdown (chip sync fix — previously the chip set the UI but the dropdown remained empty, causing filter state mismatches). Revenue Share and Gross Split added to Fiscal Mechanics Guide page as full mechanic cards — guide previously showed only 7 mechanics (Concession, PSC, TSC, PRRT, RSC, Buy-back, Mixed/Hybrid); both Revenue Share and Gross Split now have dedicated How It Works, Typical Take, Examples, and Key Variables entries with Explorer filter buttons. Welcome panel Scenario Builder entry updated to "8 mechanics" including Gross Split (was "7 mechanics" — stale since v83 added Gross Split as 8th option). Stat card updated from "7 Full DCF mechanics" to "8 Scenario mechanics" with corrected tooltip. Methodology formula block: Revenue Share and Gross Split formulas added to the fiscal formula reference (was showing only 5 of 7 modeled mechanics — Revenue Share and Gross Split formulas omitted). Version v83→v84.<br>
       <strong>v83 (Aug 2026)</strong> — 4 UX improvements (Cycle 36): Gross Split added as 8th mechanic option in Scenario Builder — analysts can now model Indonesia's Gross Split regime (MoEMR Decree No. 8/2017) directly with dedicated inputs: Contractor Gross Split %, CIT Rate, DMO Obligation %, and DMO Price (% of ICP). DMO penalty is computed as a revenue reduction on the contractor split (25% of production at 25% ICP price = effective ~5.6% revenue loss at base split), giving a more accurate effective take than simple PSC-proxy. Indonesia Gross Split preset added (43% contractor split, 25% CIT, 25% DMO at 25% ICP — onshore oil profile per Decree 8/2017 base splits). Revenue Share column added to Vintage Analysis decade table and trend chart — previously the table showed only 6 mechanics (Concession/PSC/TSC/PRRT/RSC/Buy-back); Revenue Share contracts were present in the DB but excluded from the vintage visualization; now shows Revenue Share avg take by decade in cyan (#06b6d4) alongside other mechanics. Side-by-Side comparison: "Save as PDF" and "Chart PNG" export buttons added directly below the comparison grid — analysts no longer need to scroll to the top controls to find export options; buttons appear in context after running a comparison. Version v82→v83.<br>
       <strong>v82 (Aug 2026)</strong> — 6 UX improvements (Cycle 35): Revenue Share added as 7th mechanic option in Scenario Builder — analysts can now directly model gross revenue split contracts (no cost recovery) with dedicated Govt Revenue Share %, CIT, and Royalty inputs; routes to dcfPSC with cost_recovery_cap=0 matching the mechanic's structure. Nigeria Revenue Share preset added (55% govt share, 30% CIT, deepwater profile — representative of pre-PIA legacy gross revenue contracts). Explorer mechanic dropdown: Revenue Share option added to the flt-mech filter select (was present in chip row but absent from dropdown). Fuzzy search upgraded from character-overlap scorer to Levenshtein edit distance — produces materially better suggestions for 2+ character typos and longer country names (e.g. "Azerbajan"→"Azerbaijan", "Saudi Arabi"→"Saudi Arabia"); threshold adjusted from 0.6 to 0.55 to match Levenshtein scale. Scenario Builder: opening via Country Profile now correctly routes Revenue Share countries to the Revenue Share panel (previously fell to Concession fallback). Also routes PRRT and Buy-back country mechanic types correctly. Version v81→v82.<br>
       <strong>v81 (Aug 2026)</strong> — 6 UX improvements (Cycle 34): East Africa &amp; Sub-Saharan Frontier section added to Sample Analyses — 2 analysis cards: (1) East Africa Frontier Bloc table — Mozambique, Tanzania, Uganda, Kenya, Namibia, Senegal, Ghana, Sierra Leone with govt take, swing, and project context for each frontier FID/discovery; loads top 4 (Mozambique, Tanzania, Uganda, Namibia) into Side-by-Side for comparison. (2) Africa Fiscal Reform Pressure (2014–2023) card — documents the major reform events in Angola, Nigeria, Mozambique, Tanzania, Ghana, Uganda with year, current take, and reform description; links to Reform Risk tab. Side-by-Side empty state: Saudi Arabia vs UAE added as 4th quickstart comparison — the Middle East Concession pair answers IOC questions about intra-OPEC fiscal variation. Search: Revenue Share and EPSA added to the global mechanics search list — previously typing "revenue" or "epsa" returned no mechanics results. Run Compare button: keyboard shortcut label (Ctrl+↵) added inline to the button text — analysts see the shortcut without reading the sort row hint. Methodology provenance: version corrected from v79 to v81 (was stale after two cycles without update). Version v80→v81.<br>
@@ -2036,13 +2038,15 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
                + bonuses + state_equity_carry + other_levies)
                ÷ gross_undiscounted_revenue × 100
 
-Concession:   royalties + CIT/RFCT/SPT + resource_rent_tax (if applicable)
-PSC:          profit_oil_state_share + income_tax_on_contractor_profit_oil + FTP (if state gets FTP)
-TSC:          gross_revenue - contractor_fee  (≈ 100% minus fee margin)
-PRRT:         income_tax + PRRT (cash-flow-based RRT after threshold ROR)
-Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
+Concession:     royalties + CIT/RFCT/SPT + resource_rent_tax (if applicable)
+PSC:            profit_oil_state_share + income_tax_on_contractor_profit_oil + FTP (if state gets FTP)
+TSC:            gross_revenue - contractor_fee  (≈ 100% minus fee margin)
+PRRT:           income_tax + PRRT (cash-flow-based RRT after threshold ROR)
+Buy-back:       gross_revenue - cost_recovery - contractor_fee
+Revenue Share:  govt_revenue_share_pct × gross_revenue + CIT (no cost recovery)
+Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_penalty</pre>
     <p style="font-size:13px;color:var(--text);margin:0 0 4px;font-weight:600;">9 Fiscal Mechanics in the Database</p>
-    <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">7 mechanics have full DCF models (Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share). Gross Split and EPSA are modeled directionally using PSC-equivalent parameters — flagged in country profiles where applicable.</p>
+    <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">8 mechanics are available in the Scenario Builder (Concession, PSC, Gross Split, TSC, PRRT, RSC, Buy-back, Revenue Share). 7 have independent full DCF engines; Gross Split uses a PSC-equivalent engine with dedicated gross-split and DMO inputs. EPSA (Libya) is modeled directionally as a PSC-equivalent and flagged in country profiles where applicable.</p>
     <div class="tbl-wrap">
       <table>
         <thead>
@@ -4539,6 +4543,22 @@ const MECHANICS_INFO = [
     examples:'Iran (pre-2010, NIOC contracts), Venezuela (early reform era)',
     keyVars:'Buy-back rate, development period, remuneration fee, ceiling cost recovery rate',
     color:'#ef4444'
+  },
+  {
+    name:'Revenue Share', full:'Revenue Share Contract',
+    how:'Government and contractor split gross revenue at the wellhead before any cost deduction. No cost recovery mechanism — contractor bears 100% of costs within their share. Simpler than PSC; government take is highly predictable and price-insensitive. Structurally equivalent to a zero-cost-recovery PSC.',
+    typical:'50-70%',
+    examples:'Nigeria (pre-PIA legacy deepwater contracts), select African and Latin American upstream blocks',
+    keyVars:'Government revenue share %, CIT rate, royalty (if applicable), field classification rules',
+    color:'#06b6d4'
+  },
+  {
+    name:'Gross Split', full:'Gross Split PSC (Indonesia-style)',
+    how:'Indonesia\'s post-2017 replacement for cost-recovery PSC (MoEMR Decree No. 8/2017). Eliminates cost recovery; contractor receives an upfront gross split percentage based on field parameters (water depth, API gravity, field stage, location, domestic market obligation). No cost oil negotiation — split is determined at signing. Domestic Market Obligation (DMO) requires 25% of contractor production at a discounted price.',
+    typical:'50-65%',
+    examples:'Indonesia (all new upstream blocks post-2017), 43% base contractor split for onshore oil',
+    keyVars:'Base contractor gross split %, variable components (water depth, field stage, API), DMO obligation %, DMO price (% of ICP)',
+    color:'#009688'
   },
   {
     name:'Mixed/Hybrid', full:'Mixed or Hybrid Fiscal Regimes',
@@ -10486,7 +10506,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v83</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v84</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
