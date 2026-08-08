@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 35 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 36 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 35 shipped v82: 6 UX improvements — Revenue Share added as 7th mechanic in Scenario Builder (dedicated params panel, Nigeria preset, correct dcfPSC routing with cost_recovery_cap=0). Explorer mechanic dropdown: Revenue Share option added to flt-mech select (was in chip row but not dropdown). Fuzzy search upgraded from character-overlap to Levenshtein edit distance — materially better suggestions for 2+ char typos. Scenario Builder ddOpenScenarioBuilder(): Revenue Share, PRRT, and Buy-back countries now route to correct panels (was falling to Concession fallback). Scenario Builder welcome panel description updated. Version v81→v82. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected.
+**Overall Status:** Cycle 36 shipped v83: 4 UX improvements — (1) Gross Split added as 8th mechanic in Scenario Builder: dedicated params panel (Contractor Split %, CIT, DMO Obligation %, DMO Price % of ICP), DMO penalty correctly computed as effective revenue reduction, Indonesia Gross Split preset (43% contractor split, 25% CIT, 25% DMO at 25% ICP per Decree 8/2017), ddOpenScenarioBuilder() now routes Gross Split countries to the new panel instead of PSC fallback. (2) Revenue Share column added to Vintage Analysis table and chart — was previously missing from the 6-mechanic array; now shows all 7 mechanics including Revenue Share in cyan. (3) Side-by-Side: "Save as PDF" and "Chart PNG" buttons added directly in the comparison result view (below the grid), eliminating the need to scroll to top controls. (4) Version v82→v83 + methodology changelog. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors confirmed.
 
 ---
 
@@ -146,7 +146,7 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 35 — 2026-08-08)
+## Updated Grade Table (Cycle 36 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
@@ -160,13 +160,13 @@ Every 30-minute cycle:
 | 8 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
 | 9 | 2. Information Architecture | A | = | Cycle 34: East Africa & Sub-Saharan Frontier section added to Sample Analyses. Now covers all major producing regions. |
 | 10 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). 117 PASS / 0 FAIL baseline maintained. |
-| 11 | 3. Data Presentation | A+ | = | Regional median callout in Country Profile (Cycle 30). Govt NPV ⓘ disclosure (Cycle 32). Reform Risk Regional Tilt panel (Cycle 33). |
+| 11 | 3. Data Presentation | A+ | = | Regional median callout in Country Profile (Cycle 30). Govt NPV ⓘ disclosure (Cycle 32). Reform Risk Regional Tilt panel (Cycle 33). Cycle 36: Revenue Share column added to Vintage table. |
 | 12 | 5. Naming Consistency | A+ | = | "Regime Explorer" fully eliminated (Cycle 30). |
 | 13 | 7. Professional Credibility | A+ | = | Footer "Platform updated" timestamp (Cycle 31). Methodology provenance version corrected Cycle 34. |
-| 14 | 14. Search Quality | A+ | ↑ | Cycle 35: Levenshtein edit distance replaces character-overlap scorer — materially better fuzzy matches for 2+ char typos and longer country names. Threshold 0.6→0.55 tuned to Levenshtein scale. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. |
+| 14 | 14. Search Quality | A+ | = | Cycle 35: Levenshtein edit distance replaces character-overlap scorer. Cycle 36: no changes. |
+| 15 (highest) | 15. Export / Shareability | A+ | ↑ | Cycle 36: Side-by-Side "Save as PDF" and "Chart PNG" buttons added directly in comparison result view — no longer requires scrolling to top controls. Analysts can export in context. |
 
-**Summary: 0 categories below B+. Cycle 35: no grade changes (Revenue Share Scenario Builder and Levenshtein fuzzy search are improvements within existing A/A+ grades). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected.**
+**Summary: 0 categories below B+. Cycle 36: no grade changes (Gross Split Scenario Builder, Revenue Share Vintage column, and Side-by-Side export improvements are within existing A/A+ grades). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors confirmed.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now comprehensive (tooltips, footnotes, column headers, ≥500% filter notes in 5+ locations); the data itself is the constraint.
@@ -175,8 +175,8 @@ Every 30-minute cycle:
 1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
 2. Continue onclick→event listener migration: Explorer chip filters, Reform Risk filter selects (Security → tighter CSP)
 3. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
-4. Add Gross Split as explicit Scenario Builder option (currently PSC-proxy)
-5. Side-by-Side: add a "Download comparison as PDF" option directly from the comparison result view
+4. Gross Split mechanic: add to Explorer chip filters and Screener mechanic checkboxes for completeness
+5. Scenario Builder: add a "Compare to database" context box for Gross Split results (currently shows for PSC/Concession/RSC but not all mechanics)
 
 ---
 
