@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 23 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 24 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 23 shipped v70: 10 targeted analyst-experience improvements — Bubble Chart gets a 4-price selector (analysts can now shift the frontier at $50/$75/$100/$125 — the most-requested UX enhancement for the chart); Screener zero-results now shows a clear "No countries match" empty state with a Reset All Filters button; Screener preset tooltips now expose explicit criteria (e.g. "Take ≤55% · Breakeven ≤$65/bbl"); Welcome panel gains a keyboard shortcuts summary row; Header "+ Scenario" and "Reference Guide" buttons gain full aria-label + title; Search modal gains a "Clear" button in the recent searches list; Side-by-Side Clear and Export PDF buttons gain aria-label; Fiscal Component Breakdown header now shows active price (@$75/bbl); footer IRR/BE coverage stats are now clickable links to Explorer; FC profile banner now shows project life alongside other run parameters. GPA 3.97 (no threshold crossings). 10 targeted analyst-experience improvements — Screener count bar now shows active preset name (e.g. "Sweet Spot · 23 countries match at $75/bbl") with auto-clear on manual slider adjustment; slider `oninput` handlers all set `_activePresetName=null` to prevent stale label. FC Stability column tooltip fully explains 5-dot scoring (5=zero changes=most stable, 0=5+ changes=most volatile). Stability checkbox label gains descriptive tooltip. Bubble chart description disambiguated: NPV Y-axis language now explicit that negative NPV countries appear below X-axis. API Copy URL button now starts `disabled` in HTML markup (prevents flash-of-enabled before JS). Sample Analyses "Load in Compare" buttons standardized to "Load in Fiscal Compare" (3 instances). Changelog entry v69 added. Version badge, DCF Engine footer, and Methodology provenance all updated v68→v69. GPA 3.97 (no threshold crossings).
+**Overall Status:** Cycle 24 shipped v71: 10 targeted accuracy and usability fixes — Explorer legend stability description corrected (was the wrong "100−(Swing×2)" formula; now correctly describes the 5-dot reform-event scoring); Welcome panel "Regime Explorer" stale references corrected to "Explorer" tab (2 instances); Welcome panel Screener tip corrected ("set profile=Deepwater" → "set Water Depth=Deepwater"); Welcome Drilldown Scenario Builder tip corrected ("Ctrl+K for search" → "click + Scenario in the header"); Methodology Known Limitations Russia estimate corrected (24.8%→23.4% matching benchmark table); Reform Risk Most Frequently Reformed table: each country gains a "Profile →" button navigating to Country Profile; Reform Risk Most Stable / Most Volatile panels: country names are now clickable links to Country Profile; Screener subtitle and tip now explicitly state "$75/bbl" price basis for all filters; IOC Portfolio subtitle now shows "16 major operators tracked" for first-visit context; version v70→v71 across badge, footer, and methodology. GPA 3.97 (no threshold crossings). Playwright: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -146,27 +146,27 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 23 — 2026-08-08)
+## Updated Grade Table (Cycle 24 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure now includes ≥500% exclusion note in 3 locations. |
 | 2 | 1. Visual Design | A | = | Skeleton screens would improve perceived load. Loading screen has credentials tagline. |
 | 3 | 4. Interaction Design | A | = | Bubble chart price selector shipped (Cycle 23). FC profile banner now shows project life. |
-| 4 | 5. Naming Consistency | A | = | All naming gaps closed. |
+| 4 | 5. Naming Consistency | A | = | All naming gaps closed. Welcome panel stale "Regime Explorer" refs fixed (Cycle 24). |
 | 5 | 6. Error & Empty States | A | = | Screener zero-results empty state with Reset button shipped (Cycle 23). |
 | 6 | 9. Performance & Reliability | A | = | CSP meta tag added; unsafe-inline still present (gradual refactor). |
-| 7 | 10. Accessibility | A | = | Header buttons aria-label, Side-by-Side buttons aria-label (Cycle 23). |
+| 7 | 10. Accessibility | A | = | Reform Risk table now has Profile → buttons and clickable country names (Cycle 24). |
 | 8 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 9 | 12. Security / Data Integrity | A | = | CSP added; SRI hashes all valid. |
-| 10 | 2. Information Architecture | A | = | Welcome panel keyboard shortcuts summary added (Cycle 23). |
-| 11 | 13. SDLC Maturity | A | = | CI pre-push hook uses repo-local test file. |
-| 12 | 3. Data Presentation | A+ | = | Waterfall header now shows active price (@$75/bbl). |
-| 13 | 7. Professional Credibility | A+ | = | Near-perfect. IRR ≥500% exclusion now disclosed in 3 locations. |
-| 14 | 14. Search Quality | A+ | = | Search recent history now has a Clear button (Cycle 23). |
-| 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. Footer IRR/BE stats now navigate to Explorer. |
+| 10 | 2. Information Architecture | A | = | Welcome panel routing fixed: Screener water depth filter correctly described. Drilldown Scenario Builder tip fixed. (Cycle 24) |
+| 11 | 13. SDLC Maturity | A | = | CI pre-push hook uses repo-local test file. 117 PASS / 0 FAIL. |
+| 12 | 3. Data Presentation | A+ | = | Waterfall header shows active price. Screener now explicitly labels $75/bbl price basis (Cycle 24). |
+| 13 | 7. Professional Credibility | A+ | = | Russia estimate corrected 24.8%→23.4% to match benchmark table (Cycle 24). Methodology internally consistent. |
+| 14 | 14. Search Quality | A+ | = | Search recent history has Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. Footer IRR/BE stats navigate to Explorer. |
 
-**Summary: 0 categories below B+. Cycle 23: 0 grade upgrades (all fixes close analyst-experience gaps — bubble chart price selector, screener empty state, preset tooltip clarity, keyboard shortcuts, accessibility labels, search clear, price context in waterfall, navigable coverage stats; no category crosses a threshold). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 24: 0 grade upgrades (all 10 fixes target accuracy and usability gaps — stale routing text, wrong stability formula, Russia benchmark discrepancy, Reform Risk drillability, Screener price clarity, IOC Portfolio context). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
