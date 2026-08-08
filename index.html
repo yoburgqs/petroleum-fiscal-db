@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v62</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v63</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1604,7 +1604,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <span id="screener-count" style="color:var(--muted);font-size:13px;"></span>
       <span id="screener-result-count" style="color:var(--muted);font-size:12px;margin-left:4px;"></span>
       <span id="screener-active-filters" style="display:none;"></span>
-      <button class="btn btn-sm btn-outline" style="margin-left:auto;" onclick="exportScreenerCSV()">&#8659; CSV</button>&nbsp;<button class="btn btn-sm" onclick="exportScreenerExcel()">&#8659; Excel</button>
+      <button class="btn btn-sm btn-outline" style="margin-left:auto;" onclick="resetScreenerAll()" title="Reset all filters to default state">Reset All</button>&nbsp;<button class="btn btn-sm btn-outline" onclick="exportScreenerCSV()">&#8659; CSV</button>&nbsp;<button class="btn btn-sm" onclick="exportScreenerExcel()">&#8659; Excel</button>
     </div>
   </div>
 
@@ -1684,7 +1684,10 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-sub">How fiscal terms have evolved across decades. All data at $75/bbl base price.</div>
 
   <div class="card">
-    <div class="card-title">Average Govt Take by Decade & Mechanic</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+      <div class="card-title" style="margin-bottom:0;">Average Govt Take by Decade &amp; Mechanic</div>
+      <button class="btn btn-sm btn-outline" onclick="exportVintageCSV()" title="Export decade-by-mechanic take averages to CSV">&#8659; Export CSV</button>
+    </div>
     <div class="tbl-wrap" style="margin-bottom:20px;">
       <table id="tbl-vintage">
         <thead>
@@ -1901,6 +1904,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v63 (Aug 2026)</strong> — Country Profile: added global median callout (+Xpp vs global median 58.4%) beside govt take heading — analysts immediately see where a country sits vs the 185-country field; added "Fiscal Compare" quick-nav button alongside "Explorer" in the back-navigation row. Vintage Analysis: added CSV export button — decade-by-mechanic take data now downloadable. Fiscal Mechanics Guide: each mechanic card now has a "Filter Explorer → [Mechanic]" button — one click to see all countries of that type. Screener: added "Reset All" button that fully resets sliders and mechanic checkboxes in one click. Footer: audit badge now shows last run date. Ctrl+Enter shortcut for Fiscal Compare: fixed bug where the tab ID check was wrong (was checking for nonexistent 'tfc', now correctly checks 't0'). Version v62 → v63.<br>
       <strong>v62 (Aug 2026)</strong> — Breakeven Map: added coverage note (68/185 countries) prominently on the tab; added Export Breakeven Data (CSV) button. Reform Risk: added Export Reform History (CSV) button — full sourced reform event dataset downloadable. Fiscal Component Breakdown: fixed typographic spacing bug (missing space before separator). Benchmark validation: clarified 12-of-185 country scope (6.5% coverage) in table header. IOC Portfolio: added data source note for IOC country positions. Version v61 → v62.<br>
       <strong>v61 (Aug 2026)</strong> — IRR scatter chart: added 74/185 coverage note and ≥500% exclusion disclosure to legend. Fiscal Compare: added profile context banner showing run parameters (profile, price, peak rate, capex, opex, discount rate) above results — analysts always see what was run even when scrolled. Explorer IRR column tooltip updated to explain ≥500% exclusion threshold. Screener IRR null checkbox now shows "(111 countries)" count. Loading screen: added sourcing credentials tagline. Methodology: added point estimate disclosure note under Known Model Limitations.<br>
       <strong>v60 (Aug 2026)</strong> — Fact count corrected to 330K+ (verifiable from shipped country_data.json; 384K was unverifiable). CDN version pins: d3@7 pinned to d3@7.9.0, topojson-client@3 pinned to topojson-client@3.1.0 (prevents SRI hash breakage when new patch releases).<br>
@@ -3754,6 +3758,13 @@ function applyScreenerPreset(preset) {
   runScreener();
 }
 
+function resetScreenerAll() {
+  // Hard reset: all sliders to maximum range, all checkboxes checked, no IOC filter
+  applyScreenerPreset('reset');
+  showCopyToast('All filters reset');
+}
+window.resetScreenerAll = resetScreenerAll;
+
 function runScreener() {
   // Bug 4 fix: use active price point, not hardcoded $75
   const price   = getPriceKey();   // '50' | '75' | '100' | '125'
@@ -4353,6 +4364,9 @@ function renderMechanics() {
       <div class="mech-row"><div class="mech-key">Examples</div><div class="mech-val" style="color:var(--muted);font-size:12px;">${m.examples}</div></div>
       <div class="mech-row"><div class="mech-key">Key Variables</div><div class="mech-val" style="color:var(--muted);font-size:12px;">${m.keyVars}</div></div>
       ${cnt ? `<div class="mech-cnt">DB records at $75/bbl: <span>${cnt.toLocaleString()}</span></div>` : ''}
+      <div style="margin-top:10px;">
+        <button onclick="(function(mname){var explorerBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.trim()==='Explorer');switchTab('texplorer',explorerBtn||document.getElementById('tab-btn-texplorer'));setTimeout(function(){var chip=document.querySelector('#chip-row-mech .chip[data-value=\''+mname+'\']');if(chip&&!chip.classList.contains('active'))chip.click();},200);})(${JSON.stringify(m.name)})" style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);border-radius:5px;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600;padding:4px 10px;transition:.15s;" onmouseover="this.style.background='rgba(232,160,32,.18)'" onmouseout="this.style.background='rgba(232,160,32,.08)'">Filter Explorer → ${m.name}</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -4390,7 +4404,7 @@ document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape' && document.getElementById('search-overlay').classList.contains('open')) closeSearch();
   // Ctrl+Enter: run Fiscal Compare from anywhere
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-    var fcPane = document.getElementById('tfc');
+    var fcPane = document.getElementById('t0');
     if (fcPane && fcPane.classList.contains('active')) { e.preventDefault(); if (typeof runFiscalCompare === 'function') runFiscalCompare(); }
   }
 });
@@ -4816,7 +4830,7 @@ function loadCountryProfile(country) {
     ? `<span title="Pre-production or speculative — DCF based on standard profile, not actual production history" style="color:#f59e0b;font-size:11px;margin-left:6px;cursor:help;">⚠ speculative</span>`
     : '';
   const prodDQBadge = getDQBadge(d);
-  const backToExplorerBtn = `<div style="margin-bottom:12px;"><button onclick="switchTab('texplorer',document.querySelector('.tab-btn[onclick*=texplorer]'))" style="background:none;border:none;color:var(--accent);font-size:12px;cursor:pointer;padding:0;">← Back to Regime Explorer</button></div>`;
+  const backToExplorerBtn = `<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;"><button onclick="switchTab('texplorer',document.getElementById('tab-btn-texplorer'))" style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(232,160,32,.18)'" onmouseout="this.style.background='rgba(232,160,32,.08)'">← Explorer</button><button onclick="switchTab('t0',document.getElementById('tab-btn-t0'))" style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(232,160,32,.18)'" onmouseout="this.style.background='rgba(232,160,32,.08)'">Fiscal Compare</button></div>`;
   let html = backToExplorerBtn + `<div class="dd-header">
     <span class="dd-country-name">${d.country}</span>${ddSpecBadge}
     <span class="dd-region">${d.region}</span>
@@ -4875,8 +4889,18 @@ function loadCountryProfile(country) {
   // Feature 2: placeholder for simple_avg note — filled asynchronously after API fetch
   const _safeSlugForSimpleAvg = (country||'').replace(/[^a-z0-9]/gi,'_').toLowerCase();
   const _tierBadgeHtml = getTierBadge(d.ab_pct || 0, 'Source quality: ' + (d.ab_pct||0).toFixed(0) + '% of facts from A+B tier sources (primary legislation + verified). See evidence panel below.');
+  // Compute global median take for vs-median callout
+  const _globalTakes = COUNTRY_DATA.filter(x => x.take_75 != null).map(x => x.take_75).sort((a,b)=>a-b);
+  const _globalMedian = _globalTakes.length ? _globalTakes[Math.floor(_globalTakes.length/2)] : null;
+  const _vsMedianHtml = (!_isMonopoly && d.take_75 != null && _globalMedian != null) ? (function(){
+    const diff = d.take_75 - _globalMedian;
+    const sign = diff >= 0 ? '+' : '';
+    const col = Math.abs(diff) < 3 ? 'var(--muted)' : diff > 0 ? 'var(--orange)' : 'var(--green)';
+    const lbl = Math.abs(diff) < 3 ? 'at global median' : diff > 0 ? 'above global median' : 'below global median';
+    return `<span style="font-size:11px;color:${col};font-weight:400;margin-left:10px;" title="Global median government take @$75/bbl across 185 countries is ${_globalMedian.toFixed(1)}%">${sign}${diff.toFixed(1)}pp vs global median (${_globalMedian.toFixed(1)}%)</span>`;
+  })() : '';
   const mainSections = `<div class="dd-section">
-    <h3>Govt Take by Price Scenario ${_isMonopoly ? '' : _grankHtml} ${_tierBadgeHtml}</h3>
+    <h3>Govt Take by Price Scenario ${_isMonopoly ? '' : _grankHtml} ${_tierBadgeHtml}${_vsMedianHtml}</h3>
     ${_isMonopoly ? '<div style="background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.25);border-radius:8px;padding:12px 16px;margin-bottom:12px;"><span style="color:#f0a830;font-weight:700;">⚠ State Monopoly</span> <span style="color:var(--muted);font-size:13px;">This country is a state monopoly — no foreign contractor access. Fiscal terms are not applicable for investment screening.</span></div>' : ''}
     <div class="dd-take-grid">
       <div class="dd-take-cell"><div class="price-lbl">$50/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_50)}">${_fmtTakeCell(d.take_50)}</div></div>
@@ -9772,6 +9796,34 @@ function exportBreakevenCSV() {
 }
 window.exportBreakevenCSV = exportBreakevenCSV;
 
+function exportVintageCSV() {
+  if (!window.VINTAGE_DATA || !VINTAGE_DATA.length) { showCopyToast('Vintage data not loaded yet.'); return; }
+  const mechs = ['Concession','PSC','TSC','PRRT','RSC','Buy-back'];
+  const decades = [...new Set(VINTAGE_DATA.map(d=>d.decade))].sort();
+  const pivot = {};
+  VINTAGE_DATA.forEach(function(d) {
+    if (!pivot[d.decade]) pivot[d.decade] = {n:0};
+    pivot[d.decade][d.mechanic] = d.avg_take;
+    pivot[d.decade].n = (pivot[d.decade].n||0) + d.n;
+  });
+  var rows = ['Decade,' + mechs.join(',') + ',Total Contracts'];
+  decades.forEach(function(dec) {
+    var p = pivot[dec] || {};
+    var cols = mechs.map(function(m){ return p[m] != null ? p[m].toFixed(1) : ''; });
+    rows.push(dec + 's,' + cols.join(',') + ',' + (p.n||0));
+  });
+  rows.push('');
+  rows.push('Source: ORCA Petroleum Fiscal Intelligence Platform — Vintage Analysis');
+  rows.push('Export date: ' + new Date().toISOString().slice(0,10));
+  var blob = new Blob([rows.join('\n')], {type:'text/csv'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'orca_vintage_analysis.csv';
+  a.click();
+  showCopyToast('Vintage CSV exported');
+}
+window.exportVintageCSV = exportVintageCSV;
+
 // ================================================================
 // Async data loader — externalizes COUNTRY_DATA + REFORM_HISTORY
 // ================================================================
@@ -9846,11 +9898,11 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v62</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v63</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
-    <span style="color:#334155;">Nightly audit: active</span>
+    <span style="color:#334155;" title="Nightly audit runs at 03:00 daily via Task Scheduler — checks data completeness, DCF consistency, and sourcing coverage across all 185 countries">Nightly audit: active · last run 2026-08-08</span>
     <span style="color:#475569;">|</span>
     <span style="color:#334155;" title="Coverage as of 2026-08-06 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price).">IRR: 74/185 countries · Breakeven: 68/185 · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
   </div>
