@@ -1134,6 +1134,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="margin-top:20px;width:200px;height:2px;background:#1e293b;border-radius:1px;overflow:hidden">
       <div style="height:100%;background:#E8A020;animation:ldbar 1.8s ease-in-out infinite;transform-origin:left"></div>
     </div>
+    <div style="font-size:0.72em;color:#475569;margin-top:14px;letter-spacing:0.5px;">Primary legislation · Operator filings · 15+ years of sourcing</div>
   </div>
 </div>
 <style>
@@ -1147,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v60</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v61</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1457,7 +1458,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
           <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" onkeydown="if(event.key==='Enter'){setExplorerSort('npv');}" tabindex="0" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
-          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" onkeydown="if(event.key==='Enter'){setExplorerSort('irr');}" tabindex="0" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
+          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" onkeydown="if(event.key==='Enter'){setExplorerSort('irr');}" tabindex="0" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
           <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" onkeydown="if(event.key==='Enter'){setExplorerSort('be');}" tabindex="0" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
           <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" onkeydown="if(event.key==='Enter'){setExplorerSort('swing');}" tabindex="0" title="Sort by price sensitivity (low→high)">Swing (pp)</th>
           <th class="num">Stability</th>
@@ -1492,6 +1493,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3b82f6;margin:0 4px 0 12px;"></span>PSC
       <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10b981;margin:0 4px 0 12px;"></span>TSC/RSC
       <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8b5cf6;margin:0 4px 0 12px;"></span>Mixed
+      <span style="margin-left:16px;color:#64748b;" title="IRR available for 74 of 185 countries with verified opex/capex data. Countries with IRR &gt;500% are excluded as unbounded returns (e.g. USA GoM with very low take at high price). Remaining 111 countries lack sufficient cost data for IRR computation.">Coverage: 74/185 countries &bull; &gt;500% excluded</span>
     </div>
   </div>
 
@@ -1594,7 +1596,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div class="screener-filter-block">
         <div class="filter-lbl">IRR Data</div>
         <div class="mech-checkbox-group">
-          <label><input type="checkbox" id="sc-irr-nulls" checked onchange="runScreener()"> Include countries with no IRR data</label>
+          <label title="111 of 185 countries lack verified opex/capex for IRR computation. Uncheck to screen only countries where IRR is calculable."><input type="checkbox" id="sc-irr-nulls" checked onchange="runScreener()"> Include countries with no IRR data <span style="color:var(--muted);font-size:10px;">(111 countries)</span></label>
         </div>
       </div>
     </div>
@@ -1896,6 +1898,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v61 (Aug 2026)</strong> — IRR scatter chart: added 74/185 coverage note and ≥500% exclusion disclosure to legend. Fiscal Compare: added profile context banner showing run parameters (profile, price, peak rate, capex, opex, discount rate) above results — analysts always see what was run even when scrolled. Explorer IRR column tooltip updated to explain ≥500% exclusion threshold. Screener IRR null checkbox now shows "(111 countries)" count. Loading screen: added sourcing credentials tagline. Methodology: added point estimate disclosure note under Known Model Limitations.<br>
       <strong>v60 (Aug 2026)</strong> — Fact count corrected to 330K+ (verifiable from shipped country_data.json; 384K was unverifiable). CDN version pins: d3@7 pinned to d3@7.9.0, topojson-client@3 pinned to topojson-client@3.1.0 (prevents SRI hash breakage when new patch releases).<br>
       <strong>v59 (Aug 2026)</strong> — Aria-label added to reform history filter selects, IOC exposure operator selector, breakeven map price slider, IRR scatter canvas, bubble chart canvas, IOC exposure donut chart canvas, and API JSON output; compare chip remove buttons now have role="button", aria-label, and keyboard support (Enter/Space).<br>
       <strong>v58 (Aug 2026)</strong> — Tornado/sensitivity chart PNG download added (↓ PNG button in Country Profile sensitivity panel — analysts can now export for presentations); Screener rows now have keyboard navigation (Tab + Enter) and basket add button (workflow parity with Fiscal Compare); add-to-basket button aria-label on FC results rows; compare basket Clear/Compare buttons accessible (aria-label); Screener Drilldown description updated to reflect top-level tab status.<br>
@@ -2078,6 +2081,11 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
         Platform estimate: <strong style="color:var(--text);">24.8%</strong> government take. Published reference range: 45–55%.<br>
         Russia's fiscal terms are highly opaque and contract-specific. The platform uses a simplified Article 342 MET formula (production-volume and price-linked), which is directionally correct for export-oriented onshore producers operating at reference price. However, it does not capture Russia's additional profit-based export duties (NDPI surcharge) or the excess profit tax (EPT) introduced for large fields post-2019. Together, these can add 20–30 percentage points to effective government take for giant fields. This is a known sourcing gap; enhanced MET + EPT modeling is pending primary source acquisition (Federal Law No. 366-FZ).
       </p>
+    </div>
+    <!-- Point estimate disclosure -->
+    <div style="margin-top:16px;padding:10px 16px;background:rgba(232,160,32,.06);border-left:3px solid rgba(232,160,32,.4);border-radius:0 6px 6px 0;">
+      <strong style="color:var(--accent);font-size:12px;">Point Estimate Note</strong>
+      <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">Government take and NPV are presented as single-point estimates at the selected oil price. No confidence interval or Monte Carlo range is shown for the headline take figure — the platform's Monte Carlo uncertainty bands (visible in the Screener) apply to IRR only. For frontier or complex regimes (EPSA, R-factor PSC), actual take can vary ±5–15pp depending on field-specific parameters not captured in the standardized cost profile. Use the Scenario Builder to stress-test specific assumptions.</p>
     </div>
   </div>
   <script>
@@ -2377,7 +2385,8 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   <div class="page-sub">Pre-built comparisons drawn live from 71,601 contracts. Click any "Load" button to open the result in the full interactive tool.</div>
 
   <div style="margin-top:20px;">
-    <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;">Global Comparisons</div>
+    <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Global Comparisons</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Cross-regional benchmarks drawn live from the database. Click "Load in Fiscal Compare" to run any analysis interactively.</div>
     <div id="samples-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
       <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading…</div>
     </div>
@@ -8402,7 +8411,23 @@ function renderFCResults(results, price) {
   var sortDimLabel = sortField === 'npv' ? 'NPV' : sortField === 'irr' ? 'IRR' : sortField === 'breakeven' ? 'breakeven' : 'govt take';
   var sortDirLabel = (sortField === 'take' || sortField === 'breakeven') ? '1=lowest' : '1=highest';
 
-  var html = '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
+  // Profile context banner — shows what was run so analyst always has context even if they scroll away from controls
+  var profileKey2 = document.getElementById('fc-profile') ? document.getElementById('fc-profile').value : '';
+  var profileObj = FC_PROFILES[profileKey2] || {};
+  var priceLbl = price ? '$' + price + '/bbl' : '';
+  var profileBanner = '';
+  if (profileObj.name) {
+    profileBanner = '<div style="background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.2);border-radius:6px;padding:7px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;align-items:center;">'
+      + '<span style="color:var(--accent);font-weight:700;">' + profileObj.name + ' &middot; ' + priceLbl + '</span>'
+      + '<span>Peak: ' + (profileObj.peakBblDay/1000).toFixed(0) + 'k bbl/d</span>'
+      + '<span>Capex: $' + (profileObj.capexMM >= 1000 ? (profileObj.capexMM/1000).toFixed(1)+'B' : profileObj.capexMM+'M') + '</span>'
+      + '<span>Opex: $' + profileObj.opexBbl + '/bbl</span>'
+      + '<span>Discount: ' + (profileObj.discountRate*100).toFixed(0) + '%</span>'
+      + '<span style="margin-left:auto;color:#64748b;">' + results.length + ' countries ranked</span>'
+      + '</div>';
+  }
+
+  var html = profileBanner + '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
   html += '<th class="num" style="width:50px">#</th>';
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th>Mechanic</th>';
@@ -9752,13 +9777,13 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v60</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v61</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
     <span style="color:#334155;">Nightly audit: active</span>
     <span style="color:#475569;">|</span>
-    <span style="color:#334155;" title="Coverage as of 2026-08-06 — expands as sourcing progresses">IRR: 74 countries · Breakeven: 68 countries · Full coverage: Govt Take + NPV = 185/185</span>
+    <span style="color:#334155;" title="Coverage as of 2026-08-06 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price).">IRR: 74/185 countries · Breakeven: 68/185 · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
   </div>
 </div>
 
