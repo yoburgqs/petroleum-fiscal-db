@@ -1149,7 +1149,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v78</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v79</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1234,9 +1234,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <div style="font-size:22px;font-weight:800;color:#2dd4bf;">337</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Active sources</div>
         </div>
-        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
+        <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;" title="7 mechanics with full DCF models: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share. 2 additional (Gross Split, EPSA) modeled directionally via PSC-equivalent parameters.">
           <div style="font-size:22px;font-weight:800;color:#2dd4bf;">7</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Fiscal mechanics modeled</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:2px;">Full DCF mechanics</div>
         </div>
       </div>
 
@@ -1356,7 +1356,10 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 
   <div id="fc-results" class="empty-state">
-    <div style="margin-bottom:16px;">Select a profile and price, then click <strong>Run Compare</strong> to rank all 185 countries by government take.</div>
+    <div style="margin-bottom:10px;">Select a profile and price, then click <strong>Run Compare</strong> to rank all 185 countries by government take.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Suggested starting points: <strong>Deepwater $75/bbl</strong> — the platform's standard benchmarking basis used in Methodology. <strong>Onshore $50/bbl</strong> — screens low-breakeven regimes for unconventional plays. <strong>Giant $100/bbl</strong> — identifies high-take regimes sustainable only at elevated prices.</div>
+    <button onclick="document.getElementById('fc-profile').value='deepwater';document.getElementById('fc-price').value='75';runFiscalCompare();" style="background:#e8a020;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;padding:8px 18px;cursor:pointer;margin-right:8px;">⚡ Run Deepwater $75</button>
+    <button onclick="document.getElementById('fc-profile').value='onshore';document.getElementById('fc-price').value='50';runFiscalCompare();" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 16px;cursor:pointer;">Onshore $50</button>
     <div id="fc-quick-stats" style="display:none;"></div>
   </div>
   <div id="fiscal-waterfall-container" style="display:none;"></div>
@@ -1639,7 +1642,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <th class="num">Govt Take</th><th class="num" title="Evidence quality: % of fiscal facts backed by A/B sources. Click for breakdown.">Evidence</th>
           <th class="num">Contractor NPV</th>
           <th class="num">IRR (%)* <span class="info-tooltip" title="Screener metric only — arithmetic mean of contract-level IRRs. Not a portfolio IRR (see A16 in methodology). Use for relative comparison between countries, not for absolute investment decisions. Values ≥500% excluded as unbounded returns (~60 countries affected)." style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;">ⓘ</span></th><th class="num">Breakeven ($/bbl)</th>
-          <th class="num">Prod Cov</th><th class="num">Swing</th><th>Tier</th>
+          <th class="num" title="Production Coverage — percentage of a country's contracts that have verified field-level production data. High Prod Cov (≥30%, green) means government take is production-weighted by actual output. Low coverage means equal-weighting across contracts, which can over-represent small or inactive blocks. Click 'Prod Data Only' in Explorer to filter to high-coverage countries only.">Prod Cov <span style="font-size:10px;cursor:help;">ⓘ</span></th><th class="num">Swing</th><th>Tier</th>
         </tr>
       </thead>
       <tbody id="tbody-screener"></tbody>
@@ -1697,7 +1700,15 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div id="cmp-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;width:260px;z-index:100;margin-top:4px;"></div>
   </div>
 
-  <div id="cmp-output" class="empty-state">Select countries above to begin comparison.</div>
+  <div id="cmp-output" class="empty-state">
+    <div style="margin-bottom:10px;">Select countries above to begin comparison.</div>
+    <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Suggested comparisons: <strong>Norway vs Angola</strong> — PSC vs Concession at comparable scale. <strong>USA vs Iraq</strong> — Low-take Concession vs TSC. <strong>Indonesia vs Malaysia</strong> — Asia Pacific PSC peer group.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
+      <button onclick="['Norway','Angola'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Norway (Concession, low-take SDFI) vs Angola (PSC, FTP-heavy)">Norway vs Angola</button>
+      <button onclick="['United States','Iraq'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>
+      <button onclick="['Indonesia','Malaysia'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Indonesia (cost-recovery PSC) vs Malaysia (Petronas PSC)">Indonesia vs Malaysia</button>
+    </div>
+  </div>
 
   <div id="cmp-chart-wrap" class="chart-wrap" style="display:none;margin-top:16px;position:relative;">
     <div style="position:absolute;top:8px;right:8px;z-index:10;">
@@ -1895,6 +1906,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United Arab Emirates';loadCountryProfile('United Arab Emirates')" aria-label="Load United Arab Emirates fiscal profile — Concession regime, Middle East benchmark">UAE</button>
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Australia';loadCountryProfile('Australia')" title="Australia — PRRT regime (Petroleum Resource Rent Tax), the primary cash-flow-based RRT used offshore" aria-label="Load Australia fiscal profile — PRRT regime, cash-flow-based RRT offshore">Australia</button>
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Iran';loadCountryProfile('Iran')" title="Iran — Buy-back contract regime: largest Buy-back dataset in the platform (284 contracts). Contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7–10 year term." aria-label="Load Iran fiscal profile — Buy-back contract regime, largest Buy-back dataset in platform">Iran</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Nigeria';loadCountryProfile('Nigeria')" title="Nigeria — PSC/Concession regime significantly reformed by the Petroleum Industry Act (PIA) 2021: new royalty tiers, deep offshore incentives, NNPC commercialization. One of the most-watched reform events in recent IOC planning." aria-label="Load Nigeria fiscal profile — PSC and Concession regimes, PIA 2021 reform">Nigeria</button>
       </div>
     </div>
   </div>
@@ -1937,7 +1949,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v78 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v79 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1945,6 +1957,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v79 (Aug 2026)</strong> — 10 UX improvements (Cycle 32): All remaining browser <code>prompt()</code> dialogs eliminated — <code>saveCustomScenario()</code> now uses an inline styled modal for scenario naming (no more browser pop-ups); clipboard fallbacks now show toast messages instead of <code>prompt()</code> (4 locations: API copy, Share comparison, Country Profile copy-link, Explorer copy-link). Scenario Builder IRR display: values ≥500% now show styled <code>n/a*</code> with hover tooltip (consistent with Explorer/Screener display — previously showed raw "n/a" with no explanation). Welcome panel "7 fiscal mechanics modeled" stat card clarified to "Full DCF mechanics" with tooltip listing all 7 and explaining 2 additional directional mechanics (Gross Split, EPSA). Scenario Builder: after running DCF, output now shows a "vs 185-Country Database" context panel — displays rank by govt take (#X of 185), difference from global median, and percentile position, giving analysts immediate peer context without leaving the modal. Fiscal Compare empty state: added one-click "Run Deepwater $75" and "Onshore $50" quickstart buttons and a description of recommended starting points for first-time users. Screener "Prod Cov" column header: tooltip fully explains what production coverage means and why high coverage gives more accurate take numbers. Country Profile quick-access: Nigeria added as 8th country (PSC/Concession, PIA 2021 reform — one of the most-watched fiscal events in recent IOC planning). FC results Govt NPV column header: ⓘ symbol added with expanded tooltip clarifying it is derived from contractor NPV via formula (not independently modeled) and cautioning against treating it as independently calibrated. Side-by-Side comparison empty state: added 3 quickstart comparison buttons (Norway vs Angola, USA vs Iraq, Indonesia vs Malaysia) with rationale tooltips. Version v78→v79.<br>
       <strong>v78 (Aug 2026)</strong> — 10 UX improvements (Cycle 31): Loading screen redesigned with platform tagline and contract count. Search modal: added aria-modal, role="dialog", and focus trap (Tab cycles within modal when open) for accessibility. Footer: added "Platform updated" timestamp for credibility. IRR display: fmtIrr() values now show methodology tooltip on hover; ≥500% exclusion tooltip expanded to explain ~60 countries affected. IRR ≥500% display changed from "n/a" to "n/a*" to signal footnote. Screener IRR column header: inline disclosure of ≥500% threshold added. Version v77→v78.<br>
       <strong>v77 (Aug 2026)</strong> — 5 naming and data improvements: "Regime Explorer" renamed to "Explorer" in all user-visible text — welcome panel drilldown, Explorer page title, Scenario Builder tip, IOC Portfolio NOC exclusion message, and Country Profile Regional Peers onclick (4 label fixes + 1 functional bug fix where the Regional Peers "View all in Explorer" button searched for non-existent "Regime Explorer" tab text, causing the active-tab button styling to break). Country Profile: regional median government take callout added alongside the existing global median badge — analysts now see both "+3.2pp vs global median (58.4%)" and "+1.1pp vs Africa (62.1%)" in one glance, enabling immediate peer context without navigating away. Regional median excludes the selected country itself and requires at least 3 peers to display. Version v76→v77.<br>
       <strong>v76 (Aug 2026)</strong> — Critical crash fix in <code>renderSampleAnalyses()</code>: the Asia Pacific in Global Context card (Card C) used hardcoded array indices [5] and [6] to back-fill the "Asia Pacific avg" and "Global avg" rows after construction, but those indices assumed exactly 4 countries in <code>asiaRanked.slice(0,4)</code>. When the data contains fewer than 4 Asia Pacific countries in the lowest-take group, the indices were wrong and a <code>TypeError: Cannot set properties of undefined</code> crashed the entire platform initialization — preventing all tabs from rendering and causing 3 FAIL tests. Fixed by computing country counts inline during array construction rather than post-indexing. Defensive <code>try/catch</code> wrapper added around <code>renderSampleAnalyses()</code> to prevent any future crash in this function from aborting the broader <code>initPlatform()</code> call chain. Revenue Share mechanic: previously routed to <code>dcfConcession()</code> (wrong — no cost recovery mechanism). Now routes to <code>dcfPSC()</code> in the Fiscal Compare dispatcher, Country Profile live DCF, and <code>getDCFParams()</code> PSC-param enrichment — matching the mechanic's gross revenue split structure. Scenario Builder: RSC (Risk Service Contract) added as 6th mechanic option alongside Concession/PSC/TSC/PRRT/Buy-back — routes to <code>dcfTSC()</code> (correct: RSC is structurally a service contract with fee + CIT). India RSC preset added: $4/bbl fee, 34% CIT, 5% EPT — representative of India's NELP/HELP framework. Scenario Builder now covers all 6 ICF mechanics (RSC added, Revenue Share still modeled via PSC-proxy in live DCF). Version v75→v76.<br>
@@ -6896,7 +6909,7 @@ function copyAPIUrl() {
   const base = window.location.href.replace(/\/[^/]*$/, '/');
   navigator.clipboard.writeText(base + url)
     .then(() => { btn.textContent = '✓ Copied'; setTimeout(() => btn.textContent = '⎘ Copy API URL', 1500); })
-    .catch(() => { prompt('API URL:', base + url); });
+    .catch(() => { showCopyToast('Copy failed — URL: ' + (base + url).slice(0, 60) + '…'); });
 }
 
 function ddAddCompare(country, btn) {
@@ -6940,7 +6953,7 @@ function shareComparison() {
     var btn = document.querySelector('[onclick="shareComparison()"]');
     if (btn) { var o=btn.textContent; btn.textContent='\u2713 Copied!'; setTimeout(function(){btn.textContent=o;},2000); }
     showCopyToast();
-  }).catch(function(){ prompt('Share URL:', url); });
+  }).catch(function(){ showCopyToast('Copy failed — open console or use Ctrl+C on the page URL.'); });
 }
 
 function downloadCmpChart() {
@@ -7117,7 +7130,7 @@ function copyCurrentLink() {
   var url = window.location.href.split('#')[0] + window.location.hash;
   navigator.clipboard.writeText(url).then(function(){
     showCopyToast();
-  }).catch(function(){ prompt('Copy this link:', url); });
+  }).catch(function(){ showCopyToast('Clipboard unavailable — copy from address bar.'); });
 }
 
 function copyExplorerLink() {
@@ -7139,7 +7152,7 @@ function copyExplorerLink() {
     showCopyToast();
     var btn = document.getElementById('explorer-copy-link');
     if (btn) { var orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(function(){ btn.textContent = orig; }, 1500); }
-  }).catch(function(){ prompt('Copy this link:', url); });
+  }).catch(function(){ showCopyToast('Clipboard unavailable — copy from address bar.'); });
 }
 
 function showCopyToast(msg) {
@@ -8098,10 +8111,14 @@ function runCustomScenario() {
     </div>`;
   }
 
-  const irrDisplay = result.irr !== null ? result.irr.toFixed(1) + '%' : 'n/a';
+  // Use fmtIrr for consistent display (handles ≥500% exclusion with tooltip)
+  const irrHtml = result.irr !== null ? (result.irr >= 500
+    ? '<span style="color:var(--green);font-size:11px" title="IRR ≥500% — unbounded return excluded per platform methodology. Common at low-royalty concession regimes with high price. Use government take for comparison instead.">n/a*</span>'
+    : result.irr.toFixed(1) + '%') : 'n/a';
+  const irrDisplay = result.irr !== null && result.irr < 500 ? result.irr.toFixed(1) + '%' : (result.irr !== null ? 'n/a*' : 'n/a');
   const npvDisplay = result.npv !== null ? fmtNpvShared(result.npv) : 'n/a';
   const takeColor = result.take > 70 ? '#f44336' : result.take > 50 ? '#ff9800' : '#4caf50';
-  const irrColor = result.irr === null ? 'var(--muted)' : result.irr < 10 ? '#f44336' : result.irr < 20 ? '#ff9800' : '#4caf50';
+  const irrColor = result.irr === null || result.irr >= 500 ? 'var(--muted)' : result.irr < 10 ? '#f44336' : result.irr < 20 ? '#ff9800' : '#4caf50';
   const npvColor = result.npv === null ? 'var(--muted)' : result.npv < 0 ? '#f44336' : '#4caf50';
 
   document.getElementById('sb-output').innerHTML = `
@@ -8114,7 +8131,7 @@ function runCustomScenario() {
   </div>
   <div class="sb-result-card">
     <div class="sb-result-label">Contractor IRR</div>
-    <div class="sb-result-value" style="color:${irrColor}">${irrDisplay}</div>
+    <div class="sb-result-value" style="color:${irrColor}">${irrHtml}</div>
     <div class="sb-result-note">25yr project</div>
   </div>
   <div class="sb-result-card">
@@ -8125,6 +8142,27 @@ function runCustomScenario() {
 </div>
 <div class="dcf-waterfall-title">Fiscal Breakdown (% of Revenue)</div>
 ${wfHtml}
+${(function() {
+  // Database context: show where custom take sits vs 185-country distribution
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || COUNTRY_DATA.length < 5) return '';
+  var customTake = result.take;
+  var takes = COUNTRY_DATA.map(function(c){ return c.take_75; }).filter(function(v){ return v != null; });
+  if (!takes.length) return '';
+  takes.sort(function(a,b){ return a-b; });
+  var below = takes.filter(function(v){ return v < customTake; }).length;
+  var pctRank = Math.round((below / takes.length) * 100);
+  var med = takes[Math.floor(takes.length/2)];
+  var diffFromMed = (customTake - med).toFixed(1);
+  var diffSign = diffFromMed >= 0 ? '+' : '';
+  var rankColor = pctRank <= 30 ? '#22c55e' : pctRank <= 60 ? '#eab308' : '#ef4444';
+  return '<div style="margin-top:14px;padding:10px 14px;background:rgba(255,255,255,.03);border:1px solid #334155;border-radius:6px;font-size:11px;color:var(--muted);">'
+    + '<span style="font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;font-size:10px;">vs 185-Country Database</span>'
+    + '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:14px;">'
+    + '<span>Ranked <strong style="color:' + rankColor + ';">#' + (takes.length - below) + ' of ' + takes.length + '</strong> by govt take (1=lowest)</span>'
+    + '<span>Median: <strong style="color:#94a3b8;">' + med.toFixed(1) + '%</strong> &nbsp; This regime: <strong style="color:' + rankColor + ';">' + diffSign + diffFromMed + 'pp</strong> vs median</span>'
+    + '<span>' + pctRank + '% of countries have <em>lower</em> take at $75/bbl</span>'
+    + '</div></div>';
+})()}
 `;
 
   // Store last result for saving
@@ -8140,11 +8178,37 @@ function saveCustomScenario() {
   if (!window._lastScenario) { showCopyToast('Run a DCF first, then save.'); return; }
   const saved = JSON.parse(localStorage.getItem('customScenarios') || '[]');
   if (saved.length >= 5) { showCopyToast('Max 5 saved scenarios — clear one first.'); return; }
-  const name = prompt('Scenario name (e.g. "Norway base"):', window._lastScenario.mech + ' @$' + window._lastScenario.price);
-  if (!name) return;
-  saved.push({ name, ...window._lastScenario, savedAt: new Date().toISOString() });
-  localStorage.setItem('customScenarios', JSON.stringify(saved));
-  _refreshSavedTable();
+  // Replace browser prompt() with inline name modal
+  var defaultName = window._lastScenario.mech + ' @$' + window._lastScenario.price;
+  var existing = document.getElementById('sb-save-modal');
+  if (existing) existing.remove();
+  var modal = document.createElement('div');
+  modal.id = 'sb-save-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;display:flex;align-items:center;justify-content:center;';
+  modal.innerHTML = '<div style="background:#1e293b;border:1px solid #475569;border-radius:10px;padding:24px;min-width:300px;max-width:420px;width:90%;">'
+    + '<div style="font-size:13px;font-weight:700;color:#e8a020;margin-bottom:12px;">Save Scenario</div>'
+    + '<input id="sb-save-name" type="text" value="' + defaultName.replace(/"/g,'&quot;') + '" placeholder="Scenario name…" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#f1f5f9;padding:8px 12px;font-size:13px;margin-bottom:14px;box-sizing:border-box;" maxlength="60">'
+    + '<div style="display:flex;gap:10px;justify-content:flex-end;">'
+    + '<button onclick="document.getElementById(\'sb-save-modal\').remove();" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;padding:7px 16px;font-size:12px;cursor:pointer;">Cancel</button>'
+    + '<button id="sb-save-confirm-btn" style="background:#e8a020;border:none;border-radius:6px;color:#fff;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">Save</button>'
+    + '</div></div>';
+  document.body.appendChild(modal);
+  var inp = document.getElementById('sb-save-name');
+  inp.focus();
+  inp.select();
+  var doSave = function() {
+    var name = inp.value.trim();
+    if (!name) { inp.focus(); return; }
+    modal.remove();
+    var saved2 = JSON.parse(localStorage.getItem('customScenarios') || '[]');
+    saved2.push({ name: name, ...window._lastScenario, savedAt: new Date().toISOString() });
+    localStorage.setItem('customScenarios', JSON.stringify(saved2));
+    _refreshSavedTable();
+    showCopyToast('Scenario "' + name + '" saved.');
+  };
+  document.getElementById('sb-save-confirm-btn').addEventListener('click', doSave);
+  inp.addEventListener('keydown', function(e){ if(e.key==='Enter') doSave(); if(e.key==='Escape') modal.remove(); });
+  modal.addEventListener('click', function(e){ if(e.target===modal) modal.remove(); });
 }
 
 function clearSavedScenarios() {
@@ -8675,7 +8739,7 @@ function renderFCResults(results, price) {
   html += '<th class="num" style="width:50px">#</th>';
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th>Mechanic</th>';
-  html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as % of gross revenue — royalties + taxes + profit oil (all instruments)">Take%</th><th class="num" title="Estimated government NPV = contractor NPV \u00d7 take / (1\u2212take). Avg per contract at selected price/profile.">Govt NPV</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + '>Ctct NPV</th><th class="num" ' + (sortField==='irr'?'aria-sort="descending"':'') + ' title="Contractor IRR at selected price — IRR \u2265500% excluded as unbounded; shown for countries with verified opex/capex">IRR%</th>';
+  html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as % of gross revenue — royalties + taxes + profit oil (all instruments)">Take%</th><th class="num" title="Estimated government NPV derived from contractor NPV using the formula: Govt NPV = Ctct NPV × take / (1 − take). Not independently modeled — use as indicative order-of-magnitude only. Actual govt NPV depends on timing of fiscal receipts and discount rates applied by the state.">Govt NPV \u24d8</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="Contractor net present value at selected price and profile. Discounted at 10%. Reflects cost recovery, profit oil/royalty, and tax deductions as applicable to the primary mechanic.">Ctct NPV</th><th class="num" ' + (sortField==='irr'?'aria-sort="descending"':'') + ' title="Contractor IRR at selected price — IRR \u2265500% excluded as unbounded; shown for countries with verified opex/capex">IRR%</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + '>Breakeven</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price sensitivity: take@$125 \u2212 take@$50 in percentage points. High swing = fiscal regime sensitive to price changes.">Swing</th>';
   if (showStability) {
     html += '<th class="num" title="Fiscal stability score since 2010. 5 dots = zero regime changes (most stable). 0 dots = 5+ changes (most volatile). Scored as: 5 minus number of reform events in ORCA database from 2010 onward. Covers legislated tax rate changes, new levies, and PSC renegotiations — not operational or political events.">Stability \u24d8</th>';
@@ -10091,7 +10155,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v78</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v79</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
