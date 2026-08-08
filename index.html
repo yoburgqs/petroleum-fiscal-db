@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v73</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v74</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1892,6 +1892,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United States';loadCountryProfile('United States')" aria-label="Load United States fiscal profile — Concession regime, Gulf of Mexico benchmark">USA</button>
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United Arab Emirates';loadCountryProfile('United Arab Emirates')" aria-label="Load United Arab Emirates fiscal profile — Concession regime, Middle East benchmark">UAE</button>
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Australia';loadCountryProfile('Australia')" title="Australia — PRRT regime (Petroleum Resource Rent Tax), the primary cash-flow-based RRT used offshore" aria-label="Load Australia fiscal profile — PRRT regime, cash-flow-based RRT offshore">Australia</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Iran';loadCountryProfile('Iran')" title="Iran — Buy-back contract regime: largest Buy-back dataset in the platform (284 contracts). Contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7–10 year term." aria-label="Load Iran fiscal profile — Buy-back contract regime, largest Buy-back dataset in platform">Iran</button>
       </div>
     </div>
   </div>
@@ -1934,7 +1935,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v73 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v74 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1942,8 +1943,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v74 (Aug 2026)</strong> — Critical Scenario Builder bug fixed: Buy-back mechanic parameter names corrected in <code>sbGetParams()</code> — <code>capital_recovery_cap</code>→<code>cost_recovery_cap</code> and <code>contract_term</code>→<code>capex_recovery_years</code> to match <code>dcfBuyback()</code> parameter interface. Previously, running a Buy-back scenario silently used defaults (50% cap, 8yr term) regardless of user inputs — user-entered values were ignored. Sample Analyses button labels corrected: 5 buttons that called <code>addCompare()</code> and navigated to Side-by-Side were mislabeled "Load in Fiscal Compare" or "Load accessible in Compare" — now correctly say "Load in Side-by-Side" or "Load Top 4 in Side-by-Side" / "Load Accessible in Side-by-Side". Section header updated to reflect mixed action types. Country Profile quick-access: Iran added as 7th quick-access country (284 Buy-back contracts — largest Buy-back dataset in the platform; closes the gap between Iran Buy-back preset in Scenario Builder and the Profile quick-access list). v72 changelog typo corrected (said "Version v71→v73" — fixed to "v71→v72"). v60 changelog note clarified (fact count history note no longer contradicts current 384K+ figure). Version v73→v74.<br>
       <strong>v73 (Aug 2026)</strong> — Welcome panel fact count corrected 330K+→384K+ (matches Methodology section and verified DB state of 384,259 facts). Scenario Builder: Buy-back mechanic added as 5th option (was limited to Concession/PSC/TSC/PRRT despite Buy-back having a full DCF model in the platform engine). New Buy-back parameter panel with Contractor Fee, Capital Recovery Cap, Contract Term, and CIT Rate controls. Iran Buy-back preset added to Scenario Builder country archetypes — analysts can now model Iran's dominant fiscal structure (NIOC buy-back with $3.50/bbl fee, 50% cap, 10yr term) alongside the existing Norway/Angola/Iraq/UK/Australia/Saudi Arabia presets. Screener: Mechanic Filter now includes Revenue Share checkbox (was missing despite Revenue Share having a full DCF model). Explorer hidden region dropdown values corrected (Asia→Asia Pacific, Latin America→Americas) for chip sync consistency. Version v72→v73.<br>
-      <strong>v72 (Aug 2026)</strong> — 10 improvements: GitHub Actions CI workflow created (`.github/workflows/playwright.yml` — runs Playwright tests on push/PR to main, Ubuntu + Node 20 + Chromium). Compare basket buttons refactored from inline onclick to event listeners (clearBasket, launchCompare) — first step toward removing CSP `unsafe-inline`. Country Profile vs-global-median callout upgraded from inline text to styled badge with background + border — analysts see the +/- median delta at a glance. Methodology Data Sources fact count updated 330,329→384,259 (matches verified DB state). Reform Risk heatmap: top-20 country names now clickable — click opens Country Profile. Screener CSV + Excel export buttons: aria-label added for screen readers. Explorer "Prod Data Only" toggle: aria-label added. Country Profile empty state quick-access buttons: aria-label with country name added. Breakeven Map CSV export: aria-label added. Version v71→v73 across badge, footer, methodology.<br>
+      <strong>v72 (Aug 2026)</strong> — 10 improvements: GitHub Actions CI workflow created (`.github/workflows/playwright.yml` — runs Playwright tests on push/PR to main, Ubuntu + Node 20 + Chromium). Compare basket buttons refactored from inline onclick to event listeners (clearBasket, launchCompare) — first step toward removing CSP `unsafe-inline`. Country Profile vs-global-median callout upgraded from inline text to styled badge with background + border — analysts see the +/- median delta at a glance. Methodology Data Sources fact count updated 330,329→384,259 (matches verified DB state). Reform Risk heatmap: top-20 country names now clickable — click opens Country Profile. Screener CSV + Excel export buttons: aria-label added for screen readers. Explorer "Prod Data Only" toggle: aria-label added. Country Profile empty state quick-access buttons: aria-label with country name added. Breakeven Map CSV export: aria-label added. Version v71→v72 across badge, footer, methodology.<br>
       <strong>v71 (Aug 2026)</strong> — 10 analyst-experience improvements: Explorer legend: Stability description corrected — now accurately says "5-dot score, 5=zero reform events since 2010 (most stable)" rather than the wrong "100−(Swing×2)" formula (Swing and stability are independent measures). Welcome panel: fixed stale routing text — "Regime Explorer" references updated to "Explorer" tab, and Screener water depth filter correctly described (was "set profile=Deepwater", now "set Water Depth=Deepwater"). Welcome panel Drilldown section: Scenario Builder description corrected — previously said "Ctrl+K for search" (wrong: Ctrl+K opens global search, not Scenario Builder). Methodology Known Limitations: Russia platform estimate corrected 24.8%→23.4% to match the benchmark validation table. Reform Risk tab — Most Frequently Reformed Regimes table: each country now has a "Profile →" button linking directly to its Country Profile — analysts can drill from reform risk to fiscal detail in one click. Reform Risk tab — Most Stable / Most Volatile panels: country names are now clickable links to their Country Profile. Screener: subtitle and tip now explicitly state "All take and IRR thresholds apply at $75/bbl" — removes ambiguity about which price scenario drives the filter. IOC Portfolio: subtitle now shows "16 major operators tracked" alongside 185 countries for first-visit context. Version v70 → v71.<br>
       <strong>v70 (Aug 2026)</strong> — Bubble Chart: 4-price selector added (analysts can now shift the frontier at $50/$75/$100/$125 — axis labels update dynamically to reflect selected price). Screener: empty-state now shows "No countries match" with a "Reset All Filters" button instead of a blank table. Screener presets: all 6 preset buttons now have explicit criteria in their tooltips (e.g. "Sweet Spot: Take ≤55% · Breakeven ≤$65/bbl · Positive NPV") — analysts see the filter logic on hover. Welcome panel: keyboard shortcut summary added (Ctrl+K, Ctrl+Enter, Esc, Click any row) — first-time visitors see shortcuts without reading documentation. Header buttons: "aria-label" and descriptive "title" added to "+ Scenario" and "Reference Guide" — screen readers and sighted users on hover now get full context. Search: "Clear" button added to recent searches list — previously had no way to clear history from the UI. Side-by-Side "Clear" and "Export PDF" buttons: aria-label added for screen reader clarity. Fiscal Component Breakdown header: now shows the active price (e.g. "Fiscal Component Breakdown @$75/bbl") — analysts always know which price scenario the breakdown reflects. Footer coverage stats: IRR (74/185) and Breakeven (68/185) stats are now clickable links that navigate to the Explorer tab. FC profile context banner: project life added to the displayed parameters (e.g. "Life: 25yr") alongside peak rate, capex, opex, and discount rate. Version v69 → v70.<br>
       <strong>v69 (Aug 2026)</strong> — Screener: active preset name now shown in the count bar (e.g. "Sweet Spot · 23 countries match at $75/bbl") — analysts immediately know which preset is driving the results without scrolling back up to the preset row. Bubble chart description: disambiguated "lower-left frontier" language — now explicitly notes that NPV can be negative at high-take regimes, so "lower-left" refers to low take / high NPV, not low take / low value. FC Stability column: tooltip now fully explains the scoring scale (5 = zero reform events since 2010 = most stable; 0 = 5+ reform events = least stable) — previously said only "lower = more stable" which is the opposite of the 5-dot visual. API Explorer: Copy API URL button now starts disabled in HTML markup (not just set via JS) — prevents a flash of enabled state before page JS initializes. Sample Analyses: standardized all "Load in Compare" button labels to "Load in Fiscal Compare" matching the card description text — eliminates the mixed terminology between inline card text and button labels. Version v68 → v69.<br>
@@ -1955,7 +1957,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <strong>v63 (Aug 2026)</strong> — Country Profile: added global median callout (+Xpp vs global median 58.4%) beside govt take heading — analysts immediately see where a country sits vs the 185-country field; added "Fiscal Compare" quick-nav button alongside "Explorer" in the back-navigation row. Vintage Analysis: added CSV export button — decade-by-mechanic take data now downloadable. Fiscal Mechanics Guide: each mechanic card now has a "Filter Explorer → [Mechanic]" button — one click to see all countries of that type. Screener: added "Reset All" button that fully resets sliders and mechanic checkboxes in one click. Footer: audit badge now shows last run date. Ctrl+Enter shortcut for Fiscal Compare: fixed bug where the tab ID check was wrong (was checking for nonexistent 'tfc', now correctly checks 't0'). Version v62 → v63.<br>
       <strong>v62 (Aug 2026)</strong> — Breakeven Map: added coverage note (68/185 countries) prominently on the tab; added Export Breakeven Data (CSV) button. Reform Risk: added Export Reform History (CSV) button — full sourced reform event dataset downloadable. Fiscal Component Breakdown: fixed typographic spacing bug (missing space before separator). Benchmark validation: clarified 12-of-185 country scope (6.5% coverage) in table header. IOC Portfolio: added data source note for IOC country positions. Version v61 → v62.<br>
       <strong>v61 (Aug 2026)</strong> — IRR scatter chart: added 74/185 coverage note and ≥500% exclusion disclosure to legend. Fiscal Compare: added profile context banner showing run parameters (profile, price, peak rate, capex, opex, discount rate) above results — analysts always see what was run even when scrolled. Explorer IRR column tooltip updated to explain ≥500% exclusion threshold. Screener IRR null checkbox now shows "(111 countries)" count. Loading screen: added sourcing credentials tagline. Methodology: added point estimate disclosure note under Known Model Limitations.<br>
-      <strong>v60 (Aug 2026)</strong> — Fact count corrected to 330K+ (verifiable from shipped country_data.json; 384K was unverifiable). CDN version pins: d3@7 pinned to d3@7.9.0, topojson-client@3 pinned to topojson-client@3.1.0 (prevents SRI hash breakage when new patch releases).<br>
+      <strong>v60 (Aug 2026)</strong> — CDN version pins: d3@7 pinned to d3@7.9.0, topojson-client@3 pinned to topojson-client@3.1.0 (prevents SRI hash breakage when new patch releases). Note: fact count shown as 330K+ at v60 — later corrected to 384K+ in v73 after Harvesting fork confirmed 384,259 verified facts in the DB.<br>
       <strong>v59 (Aug 2026)</strong> — Aria-label added to reform history filter selects, IOC exposure operator selector, breakeven map price slider, IRR scatter canvas, bubble chart canvas, IOC exposure donut chart canvas, and API JSON output; compare chip remove buttons now have role="button", aria-label, and keyboard support (Enter/Space).<br>
       <strong>v58 (Aug 2026)</strong> — Tornado/sensitivity chart PNG download added (↓ PNG button in Country Profile sensitivity panel — analysts can now export for presentations); Screener rows now have keyboard navigation (Tab + Enter) and basket add button (workflow parity with Fiscal Compare); add-to-basket button aria-label on FC results rows; compare basket Clear/Compare buttons accessible (aria-label); Screener Drilldown description updated to reflect top-level tab status.<br>
       <strong>v57 (Aug 2026)</strong> — Screener routing text in welcome panel updated (reflects top-level tab promotion from v56); keyboard navigation on all sortable Explorer column headers (Tab + Enter now triggers sort); fact count updated in Methodology section; basket remove button accessibility (aria-label); Esc close button keyboard support in search modal.<br>
@@ -2471,7 +2473,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
 
   <div style="margin-top:20px;">
     <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Global Comparisons</div>
-    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Cross-regional benchmarks drawn live from the database. Click "Load in Fiscal Compare" to run any analysis interactively.</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Cross-regional benchmarks drawn live from the database. Click any action button to run the analysis interactively (opens Fiscal Compare, Side-by-Side, or Explorer depending on the card).</div>
     <div id="samples-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
       <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading…</div>
     </div>
@@ -6220,7 +6222,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why does Norway capture 18 percentage points more than the UK?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway's 78% Special Petroleum Tax vs UK's EPL (32%) + RFCT (40%). Same basin, very different terms.</div>
       ${tbl([{label:'Country'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], nsRows)}
-      <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Fiscal Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Side-by-Side</button>
     </div>`;
 
   // ── Card 3: West Africa PSC Bloc ─────────────────────────────────────────
@@ -6240,7 +6242,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Angola tightened terms in 2023. How does it compare to peers?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All PSC-dominant regimes. Ghana's Jubilee terms (42%) remain the most IOC-friendly in the bloc.</div>
       ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$75',align:'right'}], waRows)}
-      <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Fiscal Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Side-by-Side</button>
     </div>`;
 
   // ── Card 4: Price Sensitivity Leaders ────────────────────────────────────
@@ -6370,7 +6372,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">How does Indonesia compare to its PSC neighbors?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All are PSC-dominant regimes. Indonesia (&#9654;) sits mid-range — Malaysia's Petronas terms are similar; Philippines uses service contracts (TSC) which extract nearly all economics. Bangladesh/Pakistan offer concession-lite terms.</div>
       ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'}], seaRows)}
-      <button style="${btnStyle}" onclick="(function(){${seaCmp.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Compare Top 4 in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${seaCmp.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load Top 4 in Side-by-Side</button>
     </div>`;
 
   // Card B: Indonesia's Two Regimes (Traditional PSC vs Gross Split)
@@ -6491,7 +6493,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">OPEC&rsquo;s largest reserve holders: which are actually open to IOCs?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Iraq (TSC) and UAE (concession) are the primary accessible markets. Saudi Arabia, Kuwait, and Iran have minimal IOC equity access &mdash; despite holding ~45% of Middle East reserves.</div>
       ${tbl([{label:'Country'},{label:'IOC Access'},{label:'Govt Take @$75',align:'right'},{label:'Notes'}], meRows)}
-      <button style="${btnStyle}" onclick="(function(){${meAccessible.map(c => "addCompare('" + c.replace(/'/g,"\\\\'") + "');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load accessible in Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${meAccessible.map(c => "addCompare('" + c.replace(/'/g,"\\\\'") + "');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load Accessible in Side-by-Side</button>
     </div>`;
 
   // ── Card F: Post-COVID Fiscal Loosening (2019-2023) ───────────────────────
@@ -6517,7 +6519,7 @@ function renderSampleAnalyses() {
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Which countries cut fiscal terms to attract investment after the 2020 crash?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Frontier nations introduced competitive fiscal frameworks to attract first-mover IOC capital. Guyana set the template &mdash; no windfall tax, generous cost recovery &mdash; and peers followed.</div>
       ${tbl([{label:'Country'},{label:'Year',align:'right'},{label:'Govt Take @$75',align:'right'},{label:'Framework'}], pcRows)}
-      <button style="${btnStyle}" onclick="(function(){${pcCountries.map(c => "addCompare('" + c.replace(/'/g,"\\\\'") + "');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Fiscal Compare</button>
+      <button style="${btnStyle}" onclick="(function(){${pcCountries.map(c => "addCompare('" + c.replace(/'/g,"\\\\'") + "');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Side-by-Side</button>
     </div>`;
 
   // ── Card G: R-Factor PSC Tiers ────────────────────────────────────────────
@@ -8022,10 +8024,10 @@ function sbGetParams() {
     };
   } else if (mech === 'Buy-back') {
     params = {
-      fee_per_bbl:        parseFloat(document.getElementById('sb-bb-fee').value) || 3.5,
-      capital_recovery_cap:(parseFloat(document.getElementById('sb-bb-cap').value) || 50) / 100,
-      contract_term:      parseInt(document.getElementById('sb-bb-term').value) || 10,
-      cit_rate:           (parseFloat(document.getElementById('sb-bb-cit').value) || 25) / 100,
+      fee_per_bbl:          parseFloat(document.getElementById('sb-bb-fee').value) || 3.5,
+      cost_recovery_cap:    (parseFloat(document.getElementById('sb-bb-cap').value) || 50) / 100,
+      capex_recovery_years: parseInt(document.getElementById('sb-bb-term').value) || 10,
+      cit_rate:             (parseFloat(document.getElementById('sb-bb-cit').value) || 25) / 100,
     };
   } else {
     params = {
@@ -10028,7 +10030,7 @@ async function loadPlatformData() {
 
 loadPlatformData();
 
-// v73: Event listeners replacing inline onclick for compare basket buttons
+// v73/v74: Event listeners replacing inline onclick for compare basket buttons
 document.addEventListener('DOMContentLoaded', function() {
   var clearBtn = document.getElementById('basket-clear-btn');
   if (clearBtn) clearBtn.addEventListener('click', function() { clearBasket(); });
@@ -10053,7 +10055,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v73</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v74</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
