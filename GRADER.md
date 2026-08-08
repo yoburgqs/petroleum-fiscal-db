@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 18 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 19 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 18 shipped v65: 8 targeted improvements — IRR sort threshold corrected (200→499), FC "+Compare" button label/tooltip fixed (was misleadingly called "+Basket"), Screener Region dropdown added (Africa/Middle East/Asia Pacific/Americas/Europe/Other), Methodology "9 Fiscal Mechanics" header clarified with DCF coverage column (✓ vs ~), IRR sort tooltip documents ≥500% exclusion, Country Profile empty state globe emoji accessibility, IOC Portfolio quick-buttons get aria-label + tooltip with entity count, Breakeven Map export button moved to top (near coverage note) for discoverability. GPA 3.97 (no threshold crossings; all improvements within existing A/A+ categories). Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 19 shipped v66: 10 targeted improvements — FC IRR display bug fixed (≤200→<500, matching documented ≥500% exclusion — countries with IRR 200–499% now show their value instead of "—"), Vintage Analysis decade chart got aria-label + role="img", Country Profile added Australia quick-button (6th option — PRRT coverage for benchmark validation), API Explorer UX improved (Copy URL always visible, example endpoint links, placeholder text, aria-label on select), footer stale tooltip corrected (2026-08-06→2026-08-08), Breakeven Map added interpretation guidance ("How to read this map" note), FC results table headers got aria-sort attributes for screen reader sort state, Country Profile subtitle expanded to list all capabilities upfront. GPA 3.97 (no threshold crossings; all improvements within existing A/A+ categories).
 
 ---
 
@@ -252,6 +252,26 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 19 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 18 state), audited full 9,945-line index.html across all tabs and JS functions, identified 10 analyst-facing improvements targeting correctness bugs, accessibility gaps, and UX context. All shipped. Version v65 → v66.
+- **Fixes shipped (10 of 10):**
+  1. **FC IRR display bug fixed: `<= 200` → `< 500`** — The FC results table was showing "—" for any country with IRR between 200–499%. The IRR sort was already fixed in Cycle 18 to use `< 500`, but the display logic at line 8551 was never updated. Countries like USA GoM (IRR ~425%) were showing "—" in results — inconsistent with the disclosed ≥500% exclusion threshold and with what Explorer shows. Fixed to `< 500` matching all other IRR handling in the platform.
+  2. **Vintage Analysis `vintage-chart` canvas: `aria-label` + `role="img"`** — The decade bar chart in the Vintage Analysis tab had no semantic label for screen readers. Added descriptive aria-label and role="img" to match the other 5 chart canvases fixed in previous cycles.
+  3. **Country Profile empty state: Australia quick-button** — The 5 quick-access country buttons (Norway, Iraq, Angola, USA, UAE) covered Concession, PSC, and TSC mechanics but not PRRT. Australia is the only PRRT country in the 12-benchmark validation table and represents a distinct fiscal architecture (cash-flow-based resource rent tax). Added as a 6th button with a descriptive title attribute.
+  4. **API Explorer: Copy URL button always visible** — Previously hidden with `display:none` until a country was selected (poor affordance — users couldn't discover the button existed). Now always visible but disabled until a country is selected. Added `aria-label` to the country select element.
+  5. **API Explorer: example endpoint links** — Added example API URLs (norway.json, angola.json, countries.json index) as clickable links above the JSON output area. Analysts who want to pipe the API into a model now have immediate example patterns without having to construct the URL format themselves.
+  6. **API Explorer: placeholder text in JSON output area** — Previously blank when no country selected. Now shows "Select a country above to view its JSON API response." — makes the panel's function obvious before interaction.
+  7. **Footer stale tooltip corrected** — The coverage tooltip said "as of 2026-08-06" while the DB date badge above it said 2026-08-08. Updated to 2026-08-08 for consistency.
+  8. **Breakeven Map: interpretation guidance note** — Added a "How to read this map" note above the legend explaining what the color scale means (breakeven oil price) and the purpose of the price marker. A senior analyst opening the map for the first time now immediately understands the color-to-price mapping without hovering individual countries.
+  9. **FC results table: `aria-sort` on sortable column headers** — Added `aria-sort="ascending"` or `aria-sort="descending"` to the Take%, Ctct NPV, IRR%, Breakeven, and Swing column headers based on the current sort field. Screen readers now announce which column is active and its sort direction. Also added descriptive `title` attributes to Take% (explains what's included) and Swing columns.
+  10. **Country Profile tab subtitle expanded** — Previous: "Detailed fiscal profile with reform history for any country in the database." New: "Government take across 4 price scenarios, fiscal mechanics breakdown, reform timeline, DCF sensitivity (price/opex/capex/production), and sourced fiscal facts with confidence badges — all in one place." First-time visitors now know the full scope of the tab before clicking in.
+- **Grade changes from Cycle 18:** None (all fixes are correctness/accessibility/context within existing A/A+ categories; the B+ Data Reliability category remains Harvesting-fork-constrained)
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** Pre-push hook (117 PASS / 0 FAIL / 19 WARN / 0 JS errors baseline — no structural function changes)
+- **Version:** v65 → v66
 
 ---
 
