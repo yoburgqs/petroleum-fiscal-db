@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 25 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 26 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 25 shipped v72: 10 improvements — GitHub Actions CI workflow created (.github/workflows/playwright.yml); compare basket buttons refactored from inline onclick to event listeners (first CSP hardening step); Country Profile vs-global-median callout upgraded to styled badge; Methodology fact count corrected 330,329→384,259; Reform Risk heatmap country names now clickable; Screener/Explorer/Breakeven export buttons and Country Profile quick-access buttons all gain aria-labels; Prod Data Only toggle syncs aria-pressed state. GPA 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 26 shipped v73: 6 improvements — Welcome panel fact count corrected 330K+→384K+ (consistency with Methodology); Scenario Builder: Buy-back mechanic added as 5th option with dedicated parameter panel (Contractor Fee, Capital Recovery Cap, Contract Term, CIT); Iran Buy-back preset added alongside existing 6 country archetypes; Screener mechanic filter: Revenue Share checkbox added; Explorer hidden region dropdown aligned with chip values. GPA 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -146,27 +146,27 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 25 — 2026-08-08)
+## Updated Grade Table (Cycle 26 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure now includes ≥500% exclusion note in 3 locations. |
 | 2 | 1. Visual Design | A | = | Skeleton screens would improve perceived load. Loading screen has credentials tagline. |
-| 3 | 4. Interaction Design | A | = | Bubble chart price selector shipped (Cycle 23). FC profile banner now shows project life. |
-| 4 | 5. Naming Consistency | A | = | All naming gaps closed. Welcome panel stale "Regime Explorer" refs fixed (Cycle 24). |
+| 3 | 4. Interaction Design | A | ↑ | Buy-back mechanic added to Scenario Builder (5 mechanics now interactive). Iran preset. |
+| 4 | 5. Naming Consistency | A | = | All naming gaps closed. Welcome panel fact count aligned with Methodology (Cycle 26). |
 | 5 | 6. Error & Empty States | A | = | Screener zero-results empty state with Reset button shipped (Cycle 23). |
 | 6 | 9. Performance & Reliability | A | = | CSP meta tag added; unsafe-inline still present (gradual refactor). |
 | 7 | 10. Accessibility | A | = | Reform Risk table now has Profile → buttons and clickable country names (Cycle 24). |
 | 8 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 9 | 12. Security / Data Integrity | A | = | CSP added; SRI hashes all valid. |
-| 10 | 2. Information Architecture | A | = | Welcome panel routing fixed: Screener water depth filter correctly described. Drilldown Scenario Builder tip fixed. (Cycle 24) |
+| 10 | 2. Information Architecture | A | = | Scenario Builder now exposes all 5 primary DCF mechanics (was 4). |
 | 11 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). Pre-push hook uses repo-local test file. 117 PASS / 0 FAIL. |
 | 12 | 3. Data Presentation | A+ | = | Waterfall header shows active price. Screener now explicitly labels $75/bbl price basis (Cycle 24). |
-| 13 | 7. Professional Credibility | A+ | = | Russia estimate corrected 24.8%→23.4% to match benchmark table (Cycle 24). Methodology internally consistent. |
+| 13 | 7. Professional Credibility | A+ | = | Welcome panel and Methodology fact counts now consistent (384K+/384,259). |
 | 14 | 14. Search Quality | A+ | = | Search recent history has Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. Footer IRR/BE stats navigate to Explorer. |
 
-**Summary: 0 categories below B+. Cycle 25: 0 grade upgrades (CI workflow file created, compare basket handlers refactored, accessibility gaps closed, fact count corrected, vs-median callout upgraded). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 26: 0 grade upgrades (Buy-back Scenario Builder mechanic, Iran preset, welcome panel fact count fix, Screener Revenue Share filter, region dropdown alignment). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
@@ -175,8 +175,8 @@ Every 30-minute cycle:
 1. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
 2. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
 3. Continue onclick→event listener migration: Explorer chip filters, Reform Risk filter selects (Security → tighter CSP)
-4. Waterfall bar chart individual segment export from Country Profile (Export A+ breadth)
-5. Country Profile: add "compare to regional median" callout alongside the global median badge
+4. Country Profile: add "compare to regional median" callout alongside the global median badge
+5. Scenario Builder: add RSC and Revenue Share mechanics to complete 7/7 DCF mechanic coverage
 
 ---
 
@@ -252,6 +252,22 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 26 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Opus orchestrator — read GRADER.md (Cycle 25 state), audited full 10,067-line index.html with focus on what a senior IOC analyst would notice in a demo: data inconsistencies, missing features vs stated capabilities, Scenario Builder mechanic coverage. Identified 6 targeted improvements. All shipped. Version v72 → v73.
+- **Fixes shipped (6 of 6):**
+  1. **Welcome panel fact count corrected: 330K+ → 384K+** — The welcome panel hero stat said "330K+ Sourced fiscal facts" while the Methodology Data Sources section (corrected in v72) says "384,259 fiscal facts." A senior analyst reading both sections in the same session would immediately flag the 14% discrepancy. The v60 changelog noted 330K+ as "verifiable from shipped country_data.json" but subsequent Harvesting fork runs brought the count to 384,259 (confirmed in CLAUDE.md). Welcome panel now says "384K+" matching the Methodology section.
+  2. **Scenario Builder: Buy-back mechanic added** — The Scenario Builder previously offered only 4 mechanics (Concession, PSC, TSC, PRRT) despite the platform's DCF engine supporting 7 full models including Buy-back. Iran is a major producing country and buy-back contracts are a distinctive fiscal architecture that petroleum economists routinely need to model. New Buy-back option added with dedicated parameter panel: Contractor Fee ($/bbl), Capital Recovery Cap (%), Contract Term (years), and CIT Rate (%). The `sbUpdateMechanic()`, `sbGetParams()`, and `runCustomScenario()` functions all updated to handle the new mechanic.
+  3. **Iran Buy-back preset added** — New "Iran Buy-back" button in the Scenario Builder preset row alongside Norway/Angola/Iraq TSC/UK EPL/Australia PRRT/Saudi Arabia. Sets: Buy-back mechanic, Onshore ME/Africa profile, $75/bbl, $3.50/bbl fee, 50% capital recovery cap, 10-year term, 25% CIT. An analyst comparing all major fiscal architectures now has 7 preset archetypes covering 7 different fiscal structures.
+  4. **Screener: Revenue Share mechanic filter added** — The Screener mechanic checkbox group listed 8 mechanics (Concession through Buy-back) but omitted Revenue Share despite it having a full DCF model in the platform engine. Countries with Revenue Share contracts were invisible to any analyst who unchecked other mechanics. Added "Revenue Share" checkbox, checked by default, matching the Explorer chip filter treatment.
+  5. **Explorer hidden region dropdown values corrected** — The hidden `flt-region` dropdown (kept in DOM for chip sync) used old values ("Asia", "Latin America", "North America", "Oceania", "CIS/FSU") that don't match the chip filter labels ("Asia Pacific", "Americas", "Other"). While the dropdown is hidden and chip filters are canonical, the `_regionMatch()` fallback would produce wrong results if chips were ever removed. Values now aligned: Asia → Asia Pacific, Latin America + North America → Americas, Oceania + CIS/FSU → Other.
+  6. **Version v72 → v73** — Header badge, footer DCF Engine badge, Methodology provenance paragraph all updated. v73 changelog entry added to Methodology tab.
+- **Grade changes from Cycle 25:** None (Interaction Design stays at A — Buy-back addition noted as improvement within A). No category threshold crossed.
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (pre-push hook confirmed before push)
+- **Version:** v72 → v73
 
 ---
 
