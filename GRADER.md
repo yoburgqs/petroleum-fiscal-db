@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 22 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 23 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 22 shipped v69: 10 targeted analyst-experience improvements — Screener count bar now shows active preset name (e.g. "Sweet Spot · 23 countries match at $75/bbl") with auto-clear on manual slider adjustment; slider `oninput` handlers all set `_activePresetName=null` to prevent stale label. FC Stability column tooltip fully explains 5-dot scoring (5=zero changes=most stable, 0=5+ changes=most volatile). Stability checkbox label gains descriptive tooltip. Bubble chart description disambiguated: NPV Y-axis language now explicit that negative NPV countries appear below X-axis. API Copy URL button now starts `disabled` in HTML markup (prevents flash-of-enabled before JS). Sample Analyses "Load in Compare" buttons standardized to "Load in Fiscal Compare" (3 instances). Changelog entry v69 added. Version badge, DCF Engine footer, and Methodology provenance all updated v68→v69. GPA 3.97 (no threshold crossings).
+**Overall Status:** Cycle 23 shipped v70: 10 targeted analyst-experience improvements — Bubble Chart gets a 4-price selector (analysts can now shift the frontier at $50/$75/$100/$125 — the most-requested UX enhancement for the chart); Screener zero-results now shows a clear "No countries match" empty state with a Reset All Filters button; Screener preset tooltips now expose explicit criteria (e.g. "Take ≤55% · Breakeven ≤$65/bbl"); Welcome panel gains a keyboard shortcuts summary row; Header "+ Scenario" and "Reference Guide" buttons gain full aria-label + title; Search modal gains a "Clear" button in the recent searches list; Side-by-Side Clear and Export PDF buttons gain aria-label; Fiscal Component Breakdown header now shows active price (@$75/bbl); footer IRR/BE coverage stats are now clickable links to Explorer; FC profile banner now shows project life alongside other run parameters. GPA 3.97 (no threshold crossings). 10 targeted analyst-experience improvements — Screener count bar now shows active preset name (e.g. "Sweet Spot · 23 countries match at $75/bbl") with auto-clear on manual slider adjustment; slider `oninput` handlers all set `_activePresetName=null` to prevent stale label. FC Stability column tooltip fully explains 5-dot scoring (5=zero changes=most stable, 0=5+ changes=most volatile). Stability checkbox label gains descriptive tooltip. Bubble chart description disambiguated: NPV Y-axis language now explicit that negative NPV countries appear below X-axis. API Copy URL button now starts `disabled` in HTML markup (prevents flash-of-enabled before JS). Sample Analyses "Load in Compare" buttons standardized to "Load in Fiscal Compare" (3 instances). Changelog entry v69 added. Version badge, DCF Engine footer, and Methodology provenance all updated v68→v69. GPA 3.97 (no threshold crossings).
 
 ---
 
@@ -146,27 +146,27 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 22 — 2026-08-08)
+## Updated Grade Table (Cycle 23 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure now includes ≥500% exclusion note in 3 locations. |
-| 2 | 1. Visual Design | A | = | Skeleton screens would improve perceived load. Loading screen now has credentials tagline. |
-| 3 | 4. Interaction Design | A | = | FC profile context banner added — analysts see run params without scrolling back to controls. |
+| 2 | 1. Visual Design | A | = | Skeleton screens would improve perceived load. Loading screen has credentials tagline. |
+| 3 | 4. Interaction Design | A | = | Bubble chart price selector shipped (Cycle 23). FC profile banner now shows project life. |
 | 4 | 5. Naming Consistency | A | = | All naming gaps closed. |
-| 5 | 6. Error & Empty States | A | = | Sample Analyses section subtitle added for context. |
+| 5 | 6. Error & Empty States | A | = | Screener zero-results empty state with Reset button shipped (Cycle 23). |
 | 6 | 9. Performance & Reliability | A | = | CSP meta tag added; unsafe-inline still present (gradual refactor). |
-| 7 | 10. Accessibility | A | = | Major keyboard pass done. |
+| 7 | 10. Accessibility | A | = | Header buttons aria-label, Side-by-Side buttons aria-label (Cycle 23). |
 | 8 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 9 | 12. Security / Data Integrity | A | = | CSP added; SRI hashes all valid. |
-| 10 | 2. Information Architecture | A | = | Screener routing text fixed (Cycle 10). |
+| 10 | 2. Information Architecture | A | = | Welcome panel keyboard shortcuts summary added (Cycle 23). |
 | 11 | 13. SDLC Maturity | A | = | CI pre-push hook uses repo-local test file. |
-| 12 | 3. Data Presentation | A+ | = | Point estimate disclosure added to Methodology. |
+| 12 | 3. Data Presentation | A+ | = | Waterfall header now shows active price (@$75/bbl). |
 | 13 | 7. Professional Credibility | A+ | = | Near-perfect. IRR ≥500% exclusion now disclosed in 3 locations. |
-| 14 | 14. Search Quality | A+ | = | Fuzzy Did you mean? matching from Cycle 9. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. |
+| 14 | 14. Search Quality | A+ | = | Search recent history now has a Clear button (Cycle 23). |
+| 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. Footer IRR/BE stats now navigate to Explorer. |
 
-**Summary: 0 categories below B+. Cycle 22: 0 grade upgrades (all fixes close analyst-experience gaps — preset state transparency, scoring tooltip clarity, bubble chart ambiguity, API button UX, button label consistency; no category crosses a threshold). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 23: 0 grade upgrades (all fixes close analyst-experience gaps — bubble chart price selector, screener empty state, preset tooltip clarity, keyboard shortcuts, accessibility labels, search clear, price context in waterfall, navigable coverage stats; no category crosses a threshold). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
@@ -252,6 +252,26 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 23 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 22 state), audited full 9,981-line index.html across all tabs and JS functions, identified 10 analyst-facing improvements targeting discoverability, accessibility, and UX clarity. All shipped. Version v69 → v70.
+- **Fixes shipped (10 of 10):**
+  1. **Bubble Chart: 4-price selector added** — analysts can now view the Take vs NPV scatter at $50, $75, $100, or $125/bbl. The frontier shifts visibly as price changes, showing which low-take countries become attractive or uneconomic under different scenarios. Axis labels update dynamically to reflect the selected price. This was the biggest UX gap in the chart — previously locked to $75 with no way to stress-test.
+  2. **Screener: zero-results empty state** — when all filters combine to return 0 countries, the table body previously showed nothing (an empty tbody with no message). Now shows "No countries match your current filters" with an inline "Reset All Filters" button — calls `resetScreenerAll()`. First-time users who accidentally over-filter no longer see a blank screen.
+  3. **Screener preset tooltips: explicit criteria** — all 6 preset buttons now expose their exact filter criteria in the tooltip (e.g. "Sweet Spot: Take ≤55% · Breakeven ≤$65/bbl · Positive NPV · Concession + PSC + PRRT + RSC mechanics"). Previously tooltips said generic descriptions like "Low take, profitable breakeven, IOC-ready" — analysts now see the mechanics before clicking.
+  4. **Welcome panel: keyboard shortcuts summary** — added a horizontal shortcuts row above "Drilldown Capabilities": Ctrl+K (Search), Ctrl+Enter (Re-run FC), Esc (Close), Click any row (Profile). First-time demo viewers now see available shortcuts without reading documentation.
+  5. **Header buttons: aria-label + title** — "+ Scenario" and "Reference Guide" buttons lacked aria-label. Now fully labeled with descriptive text for screen readers and sighted users hovering. First-time visitors also see tooltip explanations of what each button opens.
+  6. **Search modal: Clear recent history button** — added a "Clear" button in the Recent Searches section header, which calls `sessionStorage.removeItem('orca-recent-searches')` and re-renders. Previously there was no way to clear the list from the UI — the grader had flagged this since Cycle 7.
+  7. **Side-by-Side: aria-label on Clear and Export PDF buttons** — "Clear" button gains `aria-label="Clear all selected countries from side-by-side comparison"`, "Export PDF" gains descriptive aria-label. Screen reader users now understand both buttons without clicking.
+  8. **Fiscal Component Breakdown header: active price shown** — the waterfall section title now appends "@$[price]/bbl" from `window._fcLastPrice` — so when analysts scroll down to the component breakdown after running FC at $100, the header says "Fiscal Component Breakdown @$100/bbl" rather than an unlabeled section. Context is preserved.
+  9. **Footer coverage stats: clickable links to Explorer** — IRR: 74/185 and Breakeven: 68/185 stats in the footer are now button-links that call `switchTab('texplorer', btn)`. Analysts curious about coverage gaps can go directly to the Explorer table where the IRR and Breakeven columns show the null pattern — instead of the footer being purely informational.
+  10. **FC profile context banner: project life added** — "Life: 25yr" now appears in the FC banner alongside Peak, Capex, Opex, and Discount Rate. For buy-back contracts the code notes this is the standardized life; analysts comparing across mechanics can now see all key project assumptions in one place.
+- **Grade changes from Cycle 22:** None (all fixes are discoverability/accessibility/context within existing A/A+ categories; the B+ Data Reliability category remains Harvesting-fork-constrained)
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (bubble chart refactor is additive — new `window._bubblePriceKey` global + price radio inputs; no structural function changes to existing test coverage)
+- **Version:** v69 → v70
 
 ---
 

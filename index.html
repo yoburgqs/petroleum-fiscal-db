@@ -1148,12 +1148,12 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v69</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v70</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
-    <button onclick="openScenarioBuilder()">+ Scenario</button>
-    <button onclick="toggleReferencePanel()">Reference Guide</button>
+    <button onclick="openScenarioBuilder()" aria-label="Open Scenario Builder — model a custom fiscal regime and run DCF" title="Build a custom fiscal regime: set royalty, CIT, profit oil split, R-factor tiers, then run DCF">+ Scenario</button>
+    <button onclick="toggleReferencePanel()" aria-label="Open Reference Guide — fiscal mechanics, methodology, and sourcing" title="Open fiscal mechanics reference guide: concession, PSC, TSC, PRRT, RSC, Buy-back">Reference Guide</button>
   </div>
 </div>
 
@@ -1287,6 +1287,14 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
       </div>
 
+      <!-- Keyboard shortcuts summary -->
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;padding:8px 12px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;align-items:center;">
+        <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:4px;">Shortcuts:</span>
+        <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Ctrl+K</kbd> Search</span>
+        <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Ctrl+Enter</kbd> Re-run Fiscal Compare</span>
+        <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Esc</kbd> Close search / overlay</span>
+        <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Click any row</kbd> Open Country Profile</span>
+      </div>
       <!-- Drilldown capabilities -->
       <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;margin-bottom:8px;">Drilldown Capabilities</div>
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;font-size:11px;color:var(--muted);">
@@ -1519,12 +1527,12 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
       <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;">Pre-sets:</span>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('sweetspot')" title="Low take, profitable breakeven, IOC-ready">Sweet Spot</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('pscafrica')" title="PSC contracts in Africa">PSC Africa</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('deepwater')" title="Deepwater frontier regimes">Deepwater</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('lowrisk')" title="Low take AND low swing — predictable regimes">Low-Risk Stable</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highirr')" title="High-return opportunities">High IRR</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highevidence')" title="Countries with ≥80% of fiscal facts sourced from primary legislation (A) or verified filings (B) — highest data quality for due diligence">High Evidence ✓</button>
+      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('sweetspot')" title="Sweet Spot: Take ≤55% · Breakeven ≤$65/bbl · Positive NPV · Concession + PSC + PRRT + RSC mechanics">Sweet Spot</button>
+      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('pscafrica')" title="PSC Africa: Production Sharing Contracts in Africa only · Take ≤75% · Breakeven ≤$80/bbl">PSC Africa</button>
+      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('deepwater')" title="Deepwater: Deepwater + mixed depth countries · PSC + Concession · Take ≤70%">Deepwater</button>
+      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('lowrisk')" title="Low-Risk Stable: Take ≤55% · Breakeven ≤$75/bbl · Concession + PRRT mechanics — predictable, low-swing regimes">Low-Risk Stable</button>
+      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highirr')" title="High IRR: Contractor IRR ≥15% · Contractor NPV ≥$100M · Excludes countries with no IRR data">High IRR</button>
+      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highevidence')" title="High Evidence: ≥80% of fiscal facts sourced from primary legislation (A) or verified filings (B) — highest data quality for due diligence">High Evidence ✓</button>
       <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('rfactor')" title="PSC countries with R-factor profit oil tiers — government take is price-sensitive by contract design" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC <span id="rfactor-preset-count" style="font-size:9px;opacity:.7;"></span></button>
     </div>
     <div class="slider-row">
@@ -1644,6 +1652,16 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       Click any bubble to open the Country Profile. The <strong>left frontier</strong> (low take) with <strong>high NPV</strong> (upper position) represents the most IOC-favorable regimes — low government capture and strong contractor returns.
       <strong>Right side</strong> (high take) with <strong>positive NPV</strong> = large-reserve countries where project scale delivers value even under high fiscal burden. Countries with negative NPV (below the X-axis) are uneconomic at the standardized project size and selected price.
     </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+      <span style="font-size:12px;color:var(--muted);font-weight:600;">Price scenario:</span>
+      <div class="price-radio">
+        <input type="radio" name="bubble-price" id="bp50" value="50" onchange="window._bubblePriceKey='50';if(window._bubbleChartInstance){window._bubbleChartInstance.destroy();window._bubbleChartInstance=null;}renderBubbleChart();"><label for="bp50">$50</label>
+        <input type="radio" name="bubble-price" id="bp75" value="75" checked onchange="window._bubblePriceKey='75';if(window._bubbleChartInstance){window._bubbleChartInstance.destroy();window._bubbleChartInstance=null;}renderBubbleChart();"><label for="bp75">$75</label>
+        <input type="radio" name="bubble-price" id="bp100" value="100" onchange="window._bubblePriceKey='100';if(window._bubbleChartInstance){window._bubbleChartInstance.destroy();window._bubbleChartInstance=null;}renderBubbleChart();"><label for="bp100">$100</label>
+        <input type="radio" name="bubble-price" id="bp125" value="125" onchange="window._bubblePriceKey='125';if(window._bubbleChartInstance){window._bubbleChartInstance.destroy();window._bubbleChartInstance=null;}renderBubbleChart();"><label for="bp125">$125</label>
+      </div>
+      <span style="font-size:11px;color:#475569;margin-left:8px;">Shift the frontier to see which countries become viable at different oil prices</span>
+    </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
       <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Click to open Country Profile." role="img"></canvas></div>
       <div style="text-align:right;margin-top:8px;">
@@ -1669,8 +1687,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
       <input type="text" class="search-input" id="cmp-search" placeholder="Type to search countries…" aria-label="Search countries to compare side-by-side" autocomplete="off" style="width:260px;">
       <div id="cmp-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-      <button class="btn btn-outline btn-sm" onclick="clearCompare()">Clear</button>
-      <button class="btn btn-outline btn-sm" onclick="window.print()" title="Print/export comparison as PDF">⬇ Export PDF</button>
+      <button class="btn btn-outline btn-sm" onclick="clearCompare()" aria-label="Clear all selected countries from side-by-side comparison">Clear</button>
+      <button class="btn btn-outline btn-sm" onclick="window.print()" title="Print/export comparison as PDF" aria-label="Export comparison as PDF via browser print">⬇ Export PDF</button>
       <button class="btn btn-outline btn-sm" onclick="shareComparison()" title="Copy shareable link to this comparison">⎘ Share Link</button>
     </div>
     <div id="cmp-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;width:260px;z-index:100;margin-top:4px;"></div>
@@ -1915,7 +1933,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v69 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v70 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1923,6 +1941,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v70 (Aug 2026)</strong> — Bubble Chart: 4-price selector added (analysts can now shift the frontier at $50/$75/$100/$125 — axis labels update dynamically to reflect selected price). Screener: empty-state now shows "No countries match" with a "Reset All Filters" button instead of a blank table. Screener presets: all 6 preset buttons now have explicit criteria in their tooltips (e.g. "Sweet Spot: Take ≤55% · Breakeven ≤$65/bbl · Positive NPV") — analysts see the filter logic on hover. Welcome panel: keyboard shortcut summary added (Ctrl+K, Ctrl+Enter, Esc, Click any row) — first-time visitors see shortcuts without reading documentation. Header buttons: "aria-label" and descriptive "title" added to "+ Scenario" and "Reference Guide" — screen readers and sighted users on hover now get full context. Search: "Clear" button added to recent searches list — previously had no way to clear history from the UI. Side-by-Side "Clear" and "Export PDF" buttons: aria-label added for screen reader clarity. Fiscal Component Breakdown header: now shows the active price (e.g. "Fiscal Component Breakdown @$75/bbl") — analysts always know which price scenario the breakdown reflects. Footer coverage stats: IRR (74/185) and Breakeven (68/185) stats are now clickable links that navigate to the Explorer tab. FC profile context banner: project life added to the displayed parameters (e.g. "Life: 25yr") alongside peak rate, capex, opex, and discount rate. Version v69 → v70.<br>
       <strong>v69 (Aug 2026)</strong> — Screener: active preset name now shown in the count bar (e.g. "Sweet Spot · 23 countries match at $75/bbl") — analysts immediately know which preset is driving the results without scrolling back up to the preset row. Bubble chart description: disambiguated "lower-left frontier" language — now explicitly notes that NPV can be negative at high-take regimes, so "lower-left" refers to low take / high NPV, not low take / low value. FC Stability column: tooltip now fully explains the scoring scale (5 = zero reform events since 2010 = most stable; 0 = 5+ reform events = least stable) — previously said only "lower = more stable" which is the opposite of the 5-dot visual. API Explorer: Copy API URL button now starts disabled in HTML markup (not just set via JS) — prevents a flash of enabled state before page JS initializes. Sample Analyses: standardized all "Load in Compare" button labels to "Load in Fiscal Compare" matching the card description text — eliminates the mixed terminology between inline card text and button labels. Version v68 → v69.<br>
       <strong>v68 (Aug 2026)</strong> — Critical IRR display fix: <code>fmtIrr()</code> used <code>v &gt; 200</code> threshold, causing all countries with IRR 201–499% to display "n/a" across Explorer rows, Screener results, IOC Portfolio tables, and Side-by-Side comparison (everywhere <code>fmtIrr()</code> is called). Now correctly uses <code>v &gt;= 500</code> matching the documented exclusion threshold. Live DCF <code>calcIRR()</code> function also used <code>irr &gt; 200</code> sentinel, causing the Country Profile Live DCF panel to return null instead of a real IRR for any project with 201–499% return (common at high price points for low-royalty concessions). Both thresholds now corrected to <code>&gt;= 500</code>. Version v67 → v68.<br>
       <strong>v67 (Aug 2026)</strong> — IRR threshold audit: fixed remaining ≤200/&gt;200 threshold instances across FC XLSX export, FC IRR sort null-check, Country Profile IRR display, and Country Profile Data Completeness row — all now use &lt;500 matching the platform's documented ≥500% exclusion threshold. Countries with IRR 200–499% (e.g. USA GoM at very low take) now correctly appear in all views. FC sort buttons: added tabindex and keyboard Enter handler — keyboard-only users can now tab to and activate any sort button. Scenario Builder: added Saudi Arabia preset (Concession, 20% royalty, 85% CIT — representative Middle East high-take concession archetype; closes the regional gap left by Norway/Angola/Iraq/UK/Australia). Country Profile select: added aria-label for screen reader accessibility. FC sort row: added "Ctrl+Enter to re-run" keyboard shortcut hint beside sort controls. Side-by-Side comparison charts: added aria-label + role="img" to both #cmp-chart and #cmp-npv-chart canvases — screen readers now announce both chart types. IOC Portfolio: added "Last updated: Aug 2026" to data source note for due diligence transparency. Methodology provenance: added platform version + coverage stats (v67, 185 countries, 71,601 contracts). Version v66 → v67.<br>
@@ -3939,6 +3958,13 @@ function runScreener() {
   document.getElementById('screener-result-count').textContent = `(of ${COUNTRY_DATA.length} total)`;
 
   const tbody = document.getElementById('tbody-screener');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="12" style="padding:32px;text-align:center;color:var(--muted);font-size:13px;">'
+      + 'No countries match your current filters. '
+      + '<button onclick="resetScreenerAll()" style="background:rgba(232,160,32,.15);border:1px solid rgba(232,160,32,.4);color:var(--accent);border-radius:4px;padding:4px 12px;font-size:12px;font-weight:600;cursor:pointer;margin-left:8px;">Reset All Filters</button>'
+      + '</td></tr>';
+    return;
+  }
   tbody.innerHTML = data.map((d,i) => {
     const mechs = d.mechanics.split(',').map(m => `<span class="tag">${m}</span>`).join('');
     const tc = tierClass(d[takeKey]);
@@ -4476,7 +4502,7 @@ function renderSearchResults() {
   if (!q) {
     var recent = _getRecentSearches();
     if (recent.length) {
-      var recentHtml = '<div class="search-section-hdr">Recent Searches</div>';
+      var recentHtml = '<div class="search-section-hdr" style="display:flex;align-items:center;justify-content:space-between;padding-right:18px;">Recent Searches <button onclick="(function(){try{sessionStorage.removeItem(\'orca-recent-searches\');}catch(e){}renderSearchResults();})()" style="background:none;border:none;color:var(--muted);font-size:11px;cursor:pointer;padding:0;text-decoration:underline;" aria-label="Clear recent search history">Clear</button></div>';
       recent.forEach(function(term) {
         recentHtml += '<div class="search-result" style="gap:8px;" onclick="document.getElementById(\'search-q\').value=\'' + term.replace(/'/g,"\\'") + '\';renderSearchResults();">'
           + '<span style="color:var(--muted);font-size:13px;">&#x1f55b;</span>'
@@ -8549,11 +8575,13 @@ function renderFCResults(results, price) {
   var priceLbl = price ? '$' + price + '/bbl' : '';
   var profileBanner = '';
   if (profileObj.name) {
+    var projLifeYrs = (profileKey2 === 'marginal') ? '15yr' : (profileKey2 === 'lng') ? '30yr' : '25yr';
     profileBanner = '<div style="background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.2);border-radius:6px;padding:7px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;align-items:center;">'
       + '<span style="color:var(--accent);font-weight:700;">' + profileObj.name + ' &middot; ' + priceLbl + '</span>'
       + '<span>Peak: ' + (profileObj.peakBblDay/1000).toFixed(0) + 'k bbl/d</span>'
       + '<span>Capex: $' + (profileObj.capexMM >= 1000 ? (profileObj.capexMM/1000).toFixed(1)+'B' : profileObj.capexMM+'M') + '</span>'
       + '<span>Opex: $' + profileObj.opexBbl + '/bbl</span>'
+      + '<span>Life: ' + projLifeYrs + '</span>'
       + '<span>Discount: ' + (profileObj.discountRate*100).toFixed(0) + '%</span>'
       + '<span style="margin-left:auto;color:#64748b;">' + results.length + ' countries ranked</span>'
       + '</div>';
@@ -8652,9 +8680,10 @@ function renderFiscalWaterfall(countries) {
   if (!hasData) { container.style.display = 'none'; return; }
   container.style.display = 'block';
 
+  var wfPriceLabel = window._fcLastPrice ? ' @$' + window._fcLastPrice + '/bbl' : '';
   var html = '<div style="margin-top:24px;border-top:1px solid #334155;padding-top:20px;">' +
     '<h3 style="font-size:13px;font-weight:600;color:#94a3b8;text-transform:uppercase;' +
-    'letter-spacing:0.05em;margin-bottom:16px;">Fiscal Component Breakdown</h3>' +
+    'letter-spacing:0.05em;margin-bottom:4px;">Fiscal Component Breakdown<span style="font-weight:400;color:#64748b;text-transform:none;font-size:12px;letter-spacing:0;">' + wfPriceLabel + '</span></h3>' +
     '<div style="font-size:11px;color:#64748b;margin-bottom:16px;">' +
     'Nominal rates from verified A/B-confidence contracts \u00b7 Effective contribution varies by project economics' +
     '</div>';
@@ -9295,12 +9324,16 @@ function exportFCResults() {
 
 
 // ─── Bubble Chart (Take vs NPV) ───────────────────────────────────────────────
+window._bubblePriceKey = window._bubblePriceKey || '75';
 function renderBubbleChart() {
   var container = document.getElementById('explorer-bubble-container');
   if (!container) return;
   if (window._bubbleChartInstance) { window._bubbleChartInstance.destroy(); window._bubbleChartInstance = null; }
 
-  var allData = (COUNTRY_DATA || []).filter(function(d) { return d.take_75 != null && d.npv_75 != null; });
+  var bprice = window._bubblePriceKey || '75';
+  var takeKey_b = 'take_' + bprice;
+  var npvKey_b  = 'npv_'  + bprice;
+  var allData = (COUNTRY_DATA || []).filter(function(d) { return d[takeKey_b] != null && d[npvKey_b] != null; });
   if (!allData.length) { container.innerHTML = '<div style="color:var(--muted);padding:24px;">No data available for bubble chart.</div>'; return; }
 
   // Mobile: limit to top 30 countries by contract count (largest bubbles) to reduce clutter
@@ -9333,8 +9366,8 @@ function renderBubbleChart() {
         // On mobile, increase bubble radius slightly for easier tapping
         var baseR = Math.max(3, Math.min(20, Math.sqrt(d.n || 1) * 1.5));
         return {
-          x: d.take_75,
-          y: d.npv_75,
+          x: d[takeKey_b],
+          y: d[npvKey_b],
           r: isMobile ? Math.min(24, baseR * 1.3) : baseR,
           country: d.country,
           mechanic: d.mechanics || d.mechanic || '\u2014',
@@ -9370,12 +9403,12 @@ function renderBubbleChart() {
       },
       scales: {
         x: {
-          title: { display: true, text: 'Govt Take @$75/bbl (%)', color: '#94a3b8' },
+          title: { display: true, text: 'Govt Take @$' + bprice + '/bbl (%)', color: '#94a3b8' },
           grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' },
           min: 0, max: 105
         },
         y: {
-          title: { display: true, text: 'Contractor NPV @$75 ($M)', color: '#94a3b8' },
+          title: { display: true, text: 'Contractor NPV @$' + bprice + ' ($M)', color: '#94a3b8' },
           grid: { color: '#1e293b' }, ticks: { color: '#94a3b8' }
         }
       },
@@ -9967,13 +10000,13 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v69</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v70</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
     <span style="color:#334155;" title="Nightly audit runs at 03:00 daily via Task Scheduler — checks data completeness, DCF consistency, and sourcing coverage across all 185 countries">Nightly audit: active · last run 2026-08-08</span>
     <span style="color:#475569;">|</span>
-    <span style="color:#334155;" title="Coverage as of 2026-08-08 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price).">IRR: 74/185 countries · Breakeven: 68/185 · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
+    <span style="color:#334155;" title="Coverage as of 2026-08-08 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price)."><button onclick="var b=document.querySelector('[id=\'tab-btn-texplorer\']');if(b){switchTab('texplorer',b);}" style="background:none;border:none;color:#334155;cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — IRR column shows 74/185 countries with data">IRR: 74/185 countries</button> · <button onclick="var b=document.querySelector('[id=\'tab-btn-texplorer\']');if(b){switchTab('texplorer',b);}" style="background:none;border:none;color:#334155;cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — Breakeven column shows 68/185 countries with data">Breakeven: 68/185</button> · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
   </div>
 </div>
 
