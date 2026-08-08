@@ -1152,7 +1152,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v86</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v87</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1218,7 +1218,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <!-- DB accomplishments -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:18px;">
         <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">71,601</div>
+          <div id="welcome-contract-count" style="font-size:22px;font-weight:800;color:#2dd4bf;">71,576</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Contracts</div>
         </div>
         <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
@@ -1968,7 +1968,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v86 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v87 · 185 countries · 71,576 contracts.</span>
     </p>
   </div>
 
@@ -1976,6 +1976,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v87 (Aug 2026)</strong> — 4 data reliability improvements (Cycle 40): (1) <strong>Region taxonomy corrected in country_data.json</strong> — 53% of contracts were labeled region "Other" because USA (37,222 contracts) was misclassified; 19 countries reassigned to correct regions (USA→North America, Cote d'Ivoire→Africa, Republic of the Congo→Africa, Iraq-Kurdistan→Middle East, Faroe Islands/Ireland/Greenland/Montenegro→Europe, etc.). Region "Other" reduced from 53% to &lt;0.1% of all contracts. Americas chip and Explorer region filters now correctly show USA and North American contracts. (2) <strong>Contract count reconciled</strong> — hardcoded "71,601" replaced with 71,576 (the actual JSON-derived total, verified by summing all country n-fields) in welcome panel stat card, Methodology provenance, assumptions section, data sources section, and Sample Analyses subtitle. Welcome panel stat card now dynamically computed from JSON (same source as header). (3) <strong>North Sea &amp; Europe section added to Sample Analyses</strong> — Norway vs UK structural comparison (SPT 56% + CIT 22% vs RFCT 40% + EPL 35%), SPT uplift/exploration refund mechanics that make Norway's 67.9% commercially attractive, 7-country North Sea table with take @$50/$75/$125. Addresses the long-standing gap (every major oil basin now has a section: Global / Asia Pacific / LatAm / Middle East / East Africa / North Sea / Strategic Screens). (4) <strong>Version v86 → v87</strong> across badge, footer DCF Engine badge, Methodology provenance paragraph, and changelog.<br>
       <strong>v86 (Aug 2026)</strong> — 4 analyst-experience improvements (Cycle 39): (1) <strong>Key Analyst Questions panel added to Methodology tab</strong> — 4 due-diligence questions a senior IOC analyst would ask on first review, with direct answers: "How do I know these numbers are correct?" (benchmark validation infrastructure, 11/12 pass ±3pp), "What does government take exclude?" (local content, abandonment, withholding tax — full exclusion list with impact ranges), "How current is this data?" (verified Aug 2026, nightly audit, reform tracking through 2023), "Can I use these NPVs in an investment decision?" (not directly — standardized reference project; Scenario Builder for field-specific evaluation). Quick navigation updated with link to new section. (2) <strong>Middle East &amp; MENA section added to Sample Analyses</strong> — covers the largest reserve concentration globally (previously no dedicated Middle East section despite the region holding ~45% of OPEC reserves). Two new analysis cards: Card O = IOC Access Map for 9 major Middle East producers showing IOC access status (Open/Restricted), mechanic type, take @$75, and structural note — with one-click load of accessible markets (Iraq, UAE, Oman, Qatar) into Side-by-Side; Card P = Iraq Deep Dive — TSC vs PSC fiscal split within one country, showing how Iraq's 415 TSC contracts (~85% take, $2.50/bbl fee) compare to 171 KRG PSC contracts (~60% take, equity-based) in a single mechanic breakdown table. (3) <strong>Indonesia Gross Split preset button: contract count annotation added</strong> — button in Scenario Builder now shows "(19 contracts)" inline and tooltip expanded to note that the platform has 19 Gross Split contracts in database (3% of Indonesia total, all post-2017 per Decree 8/2017). Addresses the GRADER.md priority item: "Add Gross Split preset count tooltip." (4) <strong>Version v85 → v86</strong> across badge, footer DCF Engine badge, Methodology provenance paragraph, and changelog.<br>
       <strong>v85 (Aug 2026)</strong> — 10 analyst-experience improvements (Cycle 38): (1) <code>.dd-section-hdr</code> CSS class added to main stylesheet — Methodology section headings now render with proper uppercase, weighted, letter-spaced styling matching the rest of the platform (previously only defined in print stylesheet, appearing as unstyled plain text on screen). (2) North Sea card factual correction — "18 percentage points" corrected to "~16 percentage points" (Norway 67.9% vs UK 51.4% = 16.5pp); description corrected from "Norway's 78% SPT" (wrong — 78% is the total marginal rate: 56% SPT + 22% CIT) to accurate 56%/22% breakdown. (3) Breakeven Map price marker default corrected from $70 to $75 — now consistent with the platform's standard reference price used in Fiscal Compare, Screener, and Methodology. (4) Country Profile "Q2 2026" data currency label updated to "Q3 2026" — August 2026 is Q3, not Q2. (5) Loading screen animation upgraded — ORCA title text now pulses (opacity oscillation) and progress bar uses a shimmer gradient sweep instead of a plain fill, giving a more professional feel on first load. (6) West Africa PSC card description improved — now explains what Angola actually changed in 2023 (FTP rate 10%→20% on new deepwater blocks, +~5pp take) rather than just saying "tightened terms". (7) Benchmark validation table — country names are now clickable links that navigate to the Country Profile tab for that country — analysts can drill from validation table to full fiscal detail in one click. (8) Discount rate sensitivity section — added explicit "Why government take doesn't change with discount rate" callout box explaining the mathematical reason (take is undiscounted), addressing a common question when senior economists review the table. (9) Screener NPV slider label — added "@$75" price reference to "Min Contractor NPV" label so analysts know which price scenario the NPV threshold applies to; added descriptive tooltip. (10) Known Model Limitations — added Indonesia Gross Split as second documented limitation entry (modeled as PSC-equivalent with 43% base contractor split; variable split components by field parameter not captured; DMO directional only). Version v84→v85.<br>
       <strong>v84 (Aug 2026)</strong> — 6 improvements (Cycle 37): Gross Split chip added to Explorer mechanic filter row — analysts can now filter the 71,601-contract database by Gross Split mechanic directly from the chip row (was missing; Indonesia contracts were not filterable by chip, unlike Concession/PSC/TSC/PRRT/RSC/Buy-back/Revenue Share). Gross Split option added to hidden flt-mech dropdown (chip sync fix — previously the chip set the UI but the dropdown remained empty, causing filter state mismatches). Revenue Share and Gross Split added to Fiscal Mechanics Guide page as full mechanic cards — guide previously showed only 7 mechanics (Concession, PSC, TSC, PRRT, RSC, Buy-back, Mixed/Hybrid); both Revenue Share and Gross Split now have dedicated How It Works, Typical Take, Examples, and Key Variables entries with Explorer filter buttons. Welcome panel Scenario Builder entry updated to "8 mechanics" including Gross Split (was "7 mechanics" — stale since v83 added Gross Split as 8th option). Stat card updated from "7 Full DCF mechanics" to "8 Scenario mechanics" with corrected tooltip. Methodology formula block: Revenue Share and Gross Split formulas added to the fiscal formula reference (was showing only 5 of 7 modeled mechanics — Revenue Share and Gross Split formulas omitted). Version v83→v84.<br>
@@ -2076,7 +2077,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <!-- Section 2: Key Assumptions -->
   <div class="dd-section" id="meth-assumptions">
     <div class="dd-section-hdr">Key Assumptions</div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">The following standardizing assumptions are applied uniformly across all 71,601 contracts. Each introduces known distortion described below.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">The following standardizing assumptions are applied uniformly across all 71,576 contracts. Each introduces known distortion described below.</p>
     <div class="tbl-wrap">
       <table>
         <thead>
@@ -2297,7 +2298,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <div class="dd-section" id="meth-sources">
     <div class="dd-section-hdr">Data Sources &amp; Evidence Quality Standards</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
-      The database contains 384,259 fiscal facts across 71,601 contracts, sourced from 337 primary sources (post-deduplication). Facts are graded A through D:
+      The database contains 384,259 fiscal facts across 71,576 contracts, sourced from 337 primary sources (post-deduplication). Facts are graded A through D:
     </p>
     <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
       <thead><tr>
@@ -2596,7 +2597,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 <!-- ── Sample Analyses Tab ── -->
 <div id="tsamples" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-tsamples">
   <div class="page-title">Sample Analyses</div>
-  <div class="page-sub">Pre-built comparisons drawn live from 71,601 contracts. Click any action button to open the result interactively — loads data into Side-by-Side, Fiscal Compare, Explorer, or Country Profile depending on the card.</div>
+  <div class="page-sub">Pre-built comparisons drawn live from 71,576 contracts. Click any action button to open the result interactively — loads data into Side-by-Side, Fiscal Compare, Explorer, or Country Profile depending on the card.</div>
 
   <div style="margin-top:20px;">
     <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Global Comparisons</div>
@@ -2634,6 +2635,14 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <div style="font-size:10px;font-weight:700;color:#10b981;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">East Africa &amp; Sub-Saharan Frontier</div>
     <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Mozambique, Tanzania, Uganda, Namibia, Senegal — the next wave of frontier production. New fiscal frameworks competing for IOC capital against established basins.</div>
     <div id="samples-grid-eastafrica" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
+      <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading&hellip;</div>
+    </div>
+  </div>
+
+  <div style="margin-top:36px;">
+    <div style="font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">North Sea &amp; Europe</div>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:14px;">Norway vs UK: the North Sea structural comparison every IOC economist knows. SPT + RFCT mechanics, PRRT-equivalent ring-fence, and the highest-take accessible concession market globally.</div>
+    <div id="samples-grid-northsea" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(460px,1fr));gap:20px;align-items:start;">
       <div style="color:var(--muted);font-size:13px;padding:40px 0;grid-column:1/-1;text-align:center;">Loading&hellip;</div>
     </div>
   </div>
@@ -5986,8 +5995,12 @@ function loadCountryProfile(country) {
 })();
 
 // ─── init ────────────────────────────────────────────────────────────────────
+const _totalContracts = COUNTRY_DATA.reduce((s,d)=>s+d.n,0);
 document.getElementById('hdr-meta').textContent =
-  `${COUNTRY_DATA.reduce((s,d)=>s+d.n,0).toLocaleString()} contracts · ${COUNTRY_DATA.length} countries · Aug 2026`;
+  `${_totalContracts.toLocaleString()} contracts · ${COUNTRY_DATA.length} countries · Aug 2026`;
+// Keep welcome panel stat card in sync with JSON-derived count
+const _wcEl = document.getElementById('welcome-contract-count');
+if (_wcEl) _wcEl.textContent = _totalContracts.toLocaleString();
 
 // Quick stats in Fiscal Compare empty state
 (function() {
@@ -7014,6 +7027,58 @@ function renderSampleAnalyses() {
     </div>`;
 
   meGrid.innerHTML = cardO + cardP;
+
+  // ── North Sea & Europe Section ──────────────────────────────────────────────
+  const nsGrid = document.getElementById('samples-grid-northsea');
+  if (!nsGrid) return;
+
+  // Card Q: Norway vs UK — the defining North Sea structural comparison
+  const nsEuropeList = ['Norway','United Kingdom','Netherlands','Denmark','Ireland','Faroe Islands','Greenland'];
+  const nsEuropeRows = nsEuropeList.map(c => {
+    const d = cd.find(x => x.country === c);
+    if (!d) return null;
+    const mechNote = c === 'Norway' ? 'Concession (SPT+CIT)' : c === 'United Kingdom' ? 'Concession (RFCT+EPL)' : d.mechanics || '—';
+    return [
+      `<span style="color:${c==='Norway'||c==='United Kingdom'?'#e8a020':'var(--text)'};${c==='Norway'||c==='United Kingdom'?'font-weight:700':''}">${c}</span>`,
+      mechNote,
+      d.n || '—',
+      `<span style="color:${takeColor(d.take_50)}">${fmt(d.take_50)}</span>`,
+      `<span style="color:${takeColor(d.take_75)};font-weight:600">${fmt(d.take_75)}</span>`,
+      `<span style="color:${takeColor(d.take_125)}">${fmt(d.take_125)}</span>`,
+      d.swing != null ? `<span style="color:${d.swing>15?'#f97316':'#94a3b8'}">${d.swing.toFixed(1)}pp</span>` : '—'
+    ];
+  }).filter(Boolean);
+  const cardQ = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #a78bfa;">
+      <div style="font-size:10px;font-weight:700;color:#a78bfa;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">North Sea Fiscal Landscape</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Norway vs UK: the highest-take accessible concession markets. Same basin, ~16pp take difference.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway (67.9%): 56% Special Petroleum Tax + 22% ordinary CIT = 78% marginal rate, but investment uplift (SDFI carry, exploration refund) makes it more attractive than headline take suggests. UK (51.4%): Ring-fence CIT (40%) + Energy Profits Levy (35%) − RFES (29% investment allowance). Both are concession regimes where the IOC owns production and pays royalties/taxes from profit.</div>
+      ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], nsEuropeRows)}
+      <button style="${outlineBtnStyle}" onclick="(function(){['Norway','United Kingdom'].forEach(c=>addCompare(c));const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load Norway vs UK in Side-by-Side</button>
+    </div>`;
+
+  // Card R: Norway SPT mechanics note — explains why 67.9% is not a deterrent
+  const norwayD = cd.find(x => x.country === 'Norway');
+  const ukD = cd.find(x => x.country === 'United Kingdom');
+  const cardR = `
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #7c3aed;">
+      <div style="font-size:10px;font-weight:700;color:#7c3aed;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Norway SPT Structure — Why 67.9% Doesn't Deter IOCs</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Marginal rate is 78% — but Norway's exploration refund and uplift make early-phase risk acceptable.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">The Special Petroleum Tax (56%) is levied on ring-fenced upstream income after an uplift deduction (currently 17.69% of capex per year for 4 years = 70.76% total uplift). Exploration costs qualify for immediate cash refund (78% of loss = tax value) — the Norwegian state effectively co-funds exploration downside. This asymmetric risk-sharing is why Norway's 67.9% take still attracts Equinor, Shell, BP, and Aker BP as active operators.</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div style="background:var(--surface);border-radius:6px;padding:10px 12px;">
+          <div style="font-size:10px;color:#a78bfa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">Norway Key Rates</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.8;">SPT: <strong style="color:var(--text);">56%</strong><br>Ordinary CIT: <strong style="color:var(--text);">22%</strong><br>Marginal rate: <strong style="color:var(--text);">78%</strong><br>Govt Take @$75: <strong style="color:${takeColor(norwayD?norwayD.take_75:68)}">${norwayD?norwayD.take_75.toFixed(1):'67.9'}%</strong></div>
+        </div>
+        <div style="background:var(--surface);border-radius:6px;padding:10px 12px;">
+          <div style="font-size:10px;color:#60a5fa;font-weight:700;text-transform:uppercase;margin-bottom:4px;">UK Key Rates</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.8;">RFCT: <strong style="color:var(--text);">40%</strong><br>Energy Profits Levy: <strong style="color:var(--text);">35%</strong><br>Marginal rate: <strong style="color:var(--text);">75%</strong><br>Govt Take @$75: <strong style="color:${takeColor(ukD?ukD.take_75:51)}">${ukD?ukD.take_75.toFixed(1):'51.4'}%</strong></div>
+        </div>
+      </div>
+      <button style="${outlineBtnStyle}" onclick="(function(){const s=document.getElementById('dd-country-select');if(s){s.value='Norway';loadCountryProfile('Norway');}const b=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Country Profile'));if(b)switchTab('t7',b);})()">Open Norway Country Profile</button>
+    </div>`;
+
+  nsGrid.innerHTML = cardQ + cardR;
 }
 window.renderSampleAnalyses = renderSampleAnalyses;
 
@@ -10628,7 +10693,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v86</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v87</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
