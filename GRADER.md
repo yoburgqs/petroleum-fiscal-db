@@ -1033,3 +1033,13 @@ The two null-innerHTML errors are from unguarded `document.getElementById(...)` 
 - 117 PASS / 0 FAIL on all three test runs
 - office sync at `projects/oil-gas-expertise/fiscal_db_interface.html`
 
+
+---
+## Cycle 31 Log — 2026-08-08 12:44
+- Test before: 117 PASS / 0 FAIL
+- Test after: 117 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Sonnet | **Directive:** DIRECT | **Task:** Background push confirmation
+
+Push confirmed â€” Cycle 33 is live at `yoburgqs.github.io/petroleum-fiscal-db/`.
+
