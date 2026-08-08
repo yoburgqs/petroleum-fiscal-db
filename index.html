@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v65</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v66</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1723,7 +1723,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 
   <div class="chart-wrap" style="margin-top:16px;max-height:400px;">
-    <canvas id="vintage-chart"></canvas>
+    <canvas id="vintage-chart" aria-label="Bar chart of average government take by decade across all fiscal mechanics — shows the global trend toward higher state capture since the 1950s" role="img"></canvas>
   </div>
 
   <!-- Reform History Browser -->
@@ -1838,7 +1838,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
 <div id="t7" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t7">
   <div class="page-title">Country Profile</div>
-  <div class="page-sub">Detailed fiscal profile with reform history for any country in the database.</div>
+  <div class="page-sub">Government take across 4 price scenarios, fiscal mechanics breakdown, reform timeline, DCF sensitivity (price/opex/capex/production), and sourced fiscal facts with confidence badges — all in one place.</div>
   <div id="dd-select-wrap">
     <select id="dd-country-select" onchange="loadCountryProfile(this.value)">
       <option value="">— Select a country —</option>
@@ -1871,6 +1871,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Angola';loadCountryProfile('Angola')">Angola</button>
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United States';loadCountryProfile('United States')">USA</button>
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United Arab Emirates';loadCountryProfile('United Arab Emirates')">UAE</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Australia';loadCountryProfile('Australia')" title="Australia — PRRT regime (Petroleum Resource Rent Tax), the primary cash-flow-based RRT used offshore">Australia</button>
       </div>
     </div>
   </div>
@@ -1890,13 +1891,18 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-title">API Explorer</div>
   <div class="page-sub">Browse the live JSON API for any country. Endpoint: <code>api/v1/country/{slug}.json</code> where slug = country name lowercased with hyphens. 185 countries available. Response includes <code>profit_oil_tier_schedule</code> for R-factor PSC countries. Fiscal facts power the Country Profile panel above.</div>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-    <select id="api-country-select" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:8px 14px;min-width:240px;" onchange="loadAPIJson(this.value)">
+    <select id="api-country-select" aria-label="Select country to load API JSON response" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:8px 14px;min-width:240px;" onchange="loadAPIJson(this.value)">
       <option value="">— Select a country —</option>
     </select>
-    <button class="btn btn-outline btn-sm" id="api-copy-btn" onclick="copyAPIUrl()" style="display:none;">⎘ Copy API URL</button>
+    <button class="btn btn-outline btn-sm" id="api-copy-btn" onclick="copyAPIUrl()" title="Copy direct API URL for this country to clipboard">⎘ Copy API URL</button>
     <span id="api-url-display" style="font-size:12px;color:var(--muted);font-family:monospace;"></span>
   </div>
-  <pre id="api-json-output" aria-label="API JSON response for selected country" aria-live="polite" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;overflow:auto;max-height:600px;font-size:12px;color:#8892a8;white-space:pre-wrap;"></pre>
+  <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
+    Examples: <a href="api/v1/country/norway.json" target="_blank" style="color:var(--accent);font-family:monospace;">api/v1/country/norway.json</a> &nbsp;&middot;&nbsp;
+    <a href="api/v1/country/angola.json" target="_blank" style="color:var(--accent);font-family:monospace;">api/v1/country/angola.json</a> &nbsp;&middot;&nbsp;
+    <a href="api/v1/countries.json" target="_blank" style="color:var(--accent);font-family:monospace;">api/v1/countries.json</a> (full index)
+  </div>
+  <pre id="api-json-output" aria-label="API JSON response for selected country" aria-live="polite" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;overflow:auto;max-height:600px;font-size:12px;color:#8892a8;white-space:pre-wrap;">Select a country above to view its JSON API response.</pre>
 </div>
 
 <!-- ===== TAB: METHODOLOGY ===== -->
@@ -1916,6 +1922,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v66 (Aug 2026)</strong> — FC results: fixed IRR display bug — previously showed "—" for IRR 200–499% (display cap was ≤200 while the documented exclusion is ≥500); now consistent with disclosed threshold, so countries like USA GoM with IRR ~425% correctly show their value. Vintage Analysis: added aria-label + role="img" to the decade bar chart canvas for screen reader accessibility. Country Profile empty state: added Australia quick-button (6th country — covers PRRT, the only cash-flow-based RRT in the benchmark table). API Explorer: Copy URL button now always visible (disabled until country selected) with helpful placeholder text and example endpoint links (norway.json, angola.json, countries.json full index). Footer: corrected stale "as of 2026-08-06" tooltip to 2026-08-08. Breakeven Map: added interpretation guidance note explaining how to read the color scale and price marker. Country Profile subtitle now explicitly lists DCF sensitivity, reform timeline, and sourced facts — so first-time visitors know what's inside before clicking. FC results table: added aria-sort attributes to sortable column headers — screen readers now announce active sort column and direction. Version v65 → v66.<br>
       <strong>v65 (Aug 2026)</strong> — FC sort: IRR sort now uses &lt;500% threshold (matching the disclosed ≥500% exclusion) — previously used ≤200%, hiding countries with IRRs of 200–499%. FC "+Compare" button tooltip corrected: it adds to Side-by-Side tab (max 4), not the floating basket used by Screener (max 5) — tooltip and button label now say "Compare" not "Basket" to remove ambiguity. Screener: added Region dropdown filter (Africa / Middle East / Asia Pacific / Americas / Europe / Other) — analysts can now combine region + mechanic + take threshold without leaving the Screener. Methodology: clarified "9 Fiscal Mechanics" header — note added distinguishing 9 mechanics in the database from 7 with full DCF models (Gross Split and EPSA modeled directionally; Revenue Share approximated). IRR sort tooltip documents ≥500% exclusion. Version v64 → v65.<br>
       <strong>v64 (Aug 2026)</strong> — Fiscal Compare: renamed "+Cmp" button to "+Basket" for clarity (IOC analysts now immediately understand the compare basket workflow); added "Click any row to expand fiscal breakdown" hint below sort controls — first-time users now know rows are interactive. Screener: removed duplicate "Reset" preset button (redundant with "Reset All" below); added "High Evidence ✓" preset (filters to countries with ≥80% A/B sourced fiscal facts — key for due diligence workflows); added aria-label to all 5 range sliders for screen reader accessibility. Footer: updated DB date to 2026-08-08. Version v63 → v64.<br>
       <strong>v63 (Aug 2026)</strong> — Country Profile: added global median callout (+Xpp vs global median 58.4%) beside govt take heading — analysts immediately see where a country sits vs the 185-country field; added "Fiscal Compare" quick-nav button alongside "Explorer" in the back-navigation row. Vintage Analysis: added CSV export button — decade-by-mechanic take data now downloadable. Fiscal Mechanics Guide: each mechanic card now has a "Filter Explorer → [Mechanic]" button — one click to see all countries of that type. Screener: added "Reset All" button that fully resets sliders and mechanic checkboxes in one click. Footer: audit badge now shows last run date. Ctrl+Enter shortcut for Fiscal Compare: fixed bug where the tab ID check was wrong (was checking for nonexistent 'tfc', now correctly checks 't0'). Version v62 → v63.<br>
@@ -2237,6 +2244,9 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     <button class="btn btn-sm btn-outline" onclick="exportBreakevenCSV()" title="Export all 68 countries with breakeven data to CSV">&#8659; Export CSV</button>
   </div>
   
+  <div style="font-size:11px;color:var(--muted);background:rgba(232,160,32,.05);border:1px solid rgba(232,160,32,.15);border-radius:5px;padding:6px 12px;margin-bottom:8px;">
+    <strong style="color:var(--accent);">How to read this map:</strong> Each country is colored by its breakeven price — the oil price at which the project achieves NPV=0. Countries colored <span style="color:#22c55e;font-weight:700;">green</span> break even below $40/bbl (highly resilient). Countries colored <span style="color:#ef4444;font-weight:700;">red</span> need >$85/bbl to be profitable. Set the price marker below to see which countries are above or below a target price.
+  </div>
   <div style="display:flex;align-items:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);">
       <span>Current price marker:</span>
@@ -6762,11 +6772,11 @@ function loadAPIJson(country) {
   const out = document.getElementById('api-json-output');
   const urlDisplay = document.getElementById('api-url-display');
   const copyBtn = document.getElementById('api-copy-btn');
-  if (!country) { out.textContent = ''; urlDisplay.textContent = ''; copyBtn.style.display='none'; return; }
+  if (!country) { out.textContent = 'Select a country above to view its JSON API response.'; urlDisplay.textContent = ''; copyBtn.disabled = true; return; }
   const slug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   const url = `api/v1/country/${slug}.json`;
   urlDisplay.textContent = url;
-  copyBtn.style.display = 'inline-flex';
+  copyBtn.disabled = false;
   copyBtn.dataset.url = url;
   out.textContent = 'Loading…';
   fetch(url)
@@ -8533,8 +8543,8 @@ function renderFCResults(results, price) {
   html += '<th class="num" style="width:50px">#</th>';
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th>Mechanic</th>';
-  html += '<th class="num">Take%</th><th class="num" title="Estimated government NPV = contractor NPV \u00d7 take / (1\u2212take). Avg per contract at selected price/profile.">Govt NPV</th><th class="num">Ctct NPV</th><th class="num">IRR%</th>';
-  html += '<th class="num">Breakeven</th><th class="num">Swing</th>';
+  html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as % of gross revenue — royalties + taxes + profit oil (all instruments)">Take%</th><th class="num" title="Estimated government NPV = contractor NPV \u00d7 take / (1\u2212take). Avg per contract at selected price/profile.">Govt NPV</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + '>Ctct NPV</th><th class="num" ' + (sortField==='irr'?'aria-sort="descending"':'') + ' title="Contractor IRR at selected price — IRR \u2265500% excluded as unbounded; shown for countries with verified opex/capex">IRR%</th>';
+  html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + '>Breakeven</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price sensitivity: take@$125 \u2212 take@$50 in percentage points. High swing = fiscal regime sensitive to price changes.">Swing</th>';
   if (showStability) {
     html += '<th class="num" title="Number of fiscal law changes since 2010 in the database. Lower = more stable fiscal regime.">Stability \u24d8</th>';
   }
@@ -8548,7 +8558,7 @@ function renderFCResults(results, price) {
     var govtNpv = (npv != null && take != null && take > 0 && take < 100) ? npv * (take/100) / (1 - take/100) : null;
     var govtNpvStr = fmtNpvShared(govtNpv);
     var npvStr = fmtNpvShared(npv);
-    var irrStr = r.liveIRR != null && r.liveIRR <= 200 ? r.liveIRR.toFixed(1) + '%' : '\u2014';
+    var irrStr = r.liveIRR != null && r.liveIRR < 500 ? r.liveIRR.toFixed(1) + '%' : '\u2014';
     var beStr = formatBreakeven(r.be_75);
     var cEsc = r.country.replace(/'/g, "\\'");
 
@@ -9931,13 +9941,13 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v65</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v66</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
     <span style="color:#334155;" title="Nightly audit runs at 03:00 daily via Task Scheduler — checks data completeness, DCF consistency, and sourcing coverage across all 185 countries">Nightly audit: active · last run 2026-08-08</span>
     <span style="color:#475569;">|</span>
-    <span style="color:#334155;" title="Coverage as of 2026-08-06 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price).">IRR: 74/185 countries · Breakeven: 68/185 · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
+    <span style="color:#334155;" title="Coverage as of 2026-08-08 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price).">IRR: 74/185 countries · Breakeven: 68/185 · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
   </div>
 </div>
 
