@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v74</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v75</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1317,7 +1317,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="fc-controls">
     <div class="ctrl-group">
       <label>Profile</label>
-      <select id="fc-profile" onchange="if(window._fcLastResults)runFiscalCompare()">
+      <select id="fc-profile" aria-label="Select project production profile for Fiscal Compare" onchange="if(window._fcLastResults)runFiscalCompare()">
         <option value="shallow">Shallow Offshore &middot; $400M &middot; 30k bbl/d &middot; $12/bbl opex</option>
         <option value="deepwater">Deepwater &middot; $1.2B &middot; 50k bbl/d &middot; $15/bbl opex</option>
         <option value="onshore">Onshore &middot; $200M &middot; 20k bbl/d &middot; $8/bbl opex</option>
@@ -1328,7 +1328,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </div>
     <div class="ctrl-group">
       <label>Price</label>
-      <select id="fc-price" onchange="if(window._fcLastResults)runFiscalCompare()">
+      <select id="fc-price" aria-label="Select oil price scenario for Fiscal Compare" onchange="if(window._fcLastResults)runFiscalCompare()">
         <option value="50">$50/bbl</option>
         <option value="75" selected>$75/bbl</option>
         <option value="100">$100/bbl</option>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </div>
     <div class="ctrl-group">
       <label>Sort</label>
-      <select id="flt-sort">
+      <select id="flt-sort" aria-label="Sort Explorer table by selected metric">
         <option value="take">Govt Take</option>
         <option value="irr">IRR</option>
         <option value="npv">NPV</option>
@@ -1441,7 +1441,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       </select>
     </div>
     <div style="position:relative;display:inline-block;">
-      <input type="text" class="search-input" id="flt-search" placeholder="Search country…" autocomplete="off">
+      <input type="text" class="search-input" id="flt-search" placeholder="Search country…" aria-label="Search countries in Explorer table" autocomplete="off">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;"></div>
     </div>
     <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" onclick="toggleFourPrice(this)" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)" aria-label="Toggle production data filter — show only countries with verified production data" aria-pressed="false">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" onclick="copyExplorerLink()" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
@@ -1935,7 +1935,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v74 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v75 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1943,6 +1943,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v75 (Aug 2026)</strong> — Sample Analyses data correctness: Regional Benchmarks card (Card 1) used stale region label strings ("Asia", "Latin America", "North America", "Oceania", "CIS/FSU") that do not match the database region taxonomy ("Asia Pacific", "Americas", "Other") — the card was silently showing only Middle East, Africa, and Europe while omitting the other 3 regions. Fixed to use canonical region labels matching COUNTRY_DATA. Asia Pacific in Global Context card (Card C) filtered on d.region === "Asia" which also never matched, leaving asiaCountries empty and the avg computation returning null. Both silent data failures now corrected. Methodology take figures aligned: Norway 67.8% → 67.9%, Angola 54.7% → 52.7%, USA 24% → 23.4% in the discount rate sensitivity table, matching the benchmark validation table on the same page. Methodology provenance paragraph updated: Norway 67.8% → 67.9%, UK 49.2% → 51.4% (updated to match benchmark table). Fiscal Compare Profile and Price dropdowns gain aria-label for screen readers. Explorer Sort and Search inputs gain aria-label. Sample Analyses page subtitle updated to accurately reflect that cards open different destinations (Side-by-Side, Fiscal Compare, Explorer, Country Profile) rather than always a "Load" button. Version v74→v75.<br>
       <strong>v74 (Aug 2026)</strong> — Critical Scenario Builder bug fixed: Buy-back mechanic parameter names corrected in <code>sbGetParams()</code> — <code>capital_recovery_cap</code>→<code>cost_recovery_cap</code> and <code>contract_term</code>→<code>capex_recovery_years</code> to match <code>dcfBuyback()</code> parameter interface. Previously, running a Buy-back scenario silently used defaults (50% cap, 8yr term) regardless of user inputs — user-entered values were ignored. Sample Analyses button labels corrected: 5 buttons that called <code>addCompare()</code> and navigated to Side-by-Side were mislabeled "Load in Fiscal Compare" or "Load accessible in Compare" — now correctly say "Load in Side-by-Side" or "Load Top 4 in Side-by-Side" / "Load Accessible in Side-by-Side". Section header updated to reflect mixed action types. Country Profile quick-access: Iran added as 7th quick-access country (284 Buy-back contracts — largest Buy-back dataset in the platform; closes the gap between Iran Buy-back preset in Scenario Builder and the Profile quick-access list). v72 changelog typo corrected (said "Version v71→v73" — fixed to "v71→v72"). v60 changelog note clarified (fact count history note no longer contradicts current 384K+ figure). Version v73→v74.<br>
       <strong>v73 (Aug 2026)</strong> — Welcome panel fact count corrected 330K+→384K+ (matches Methodology section and verified DB state of 384,259 facts). Scenario Builder: Buy-back mechanic added as 5th option (was limited to Concession/PSC/TSC/PRRT despite Buy-back having a full DCF model in the platform engine). New Buy-back parameter panel with Contractor Fee, Capital Recovery Cap, Contract Term, and CIT Rate controls. Iran Buy-back preset added to Scenario Builder country archetypes — analysts can now model Iran's dominant fiscal structure (NIOC buy-back with $3.50/bbl fee, 50% cap, 10yr term) alongside the existing Norway/Angola/Iraq/UK/Australia/Saudi Arabia presets. Screener: Mechanic Filter now includes Revenue Share checkbox (was missing despite Revenue Share having a full DCF model). Explorer hidden region dropdown values corrected (Asia→Asia Pacific, Latin America→Americas) for chip sync consistency. Version v72→v73.<br>
       <strong>v72 (Aug 2026)</strong> — 10 improvements: GitHub Actions CI workflow created (`.github/workflows/playwright.yml` — runs Playwright tests on push/PR to main, Ubuntu + Node 20 + Chromium). Compare basket buttons refactored from inline onclick to event listeners (clearBasket, launchCompare) — first step toward removing CSP `unsafe-inline`. Country Profile vs-global-median callout upgraded from inline text to styled badge with background + border — analysts see the +/- median delta at a glance. Methodology Data Sources fact count updated 330,329→384,259 (matches verified DB state). Reform Risk heatmap: top-20 country names now clickable — click opens Country Profile. Screener CSV + Excel export buttons: aria-label added for screen readers. Explorer "Prod Data Only" toggle: aria-label added. Country Profile empty state quick-access buttons: aria-label with country name added. Breakeven Map CSV export: aria-label added. Version v71→v72 across badge, footer, methodology.<br>
@@ -1991,7 +1992,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </p>
     <div style="background:#1e293b;border:1px solid #334155;border-left:3px solid #e8a020;border-radius:6px;padding:10px 14px;margin-bottom:14px;">
       <span style="font-size:11px;font-weight:700;color:#e8a020;">Does govt take include income tax for concession regimes?</span>
-      <span style="font-size:12px;color:#94a3b8;margin-left:8px;">Yes. Income tax (CIT, RFCT, ring-fence tax) is explicitly included in the formula below for all mechanics including concessions. Norway's 67.8% includes SPT (56%) + ordinary CIT (22%). UK's 49.2% includes RFCT (40%) + EPL (32%) − RFES. USA's 24% includes federal income tax.</span>
+      <span style="font-size:12px;color:#94a3b8;margin-left:8px;">Yes. Income tax (CIT, RFCT, ring-fence tax) is explicitly included in the formula below for all mechanics including concessions. Norway's 67.9% includes SPT (56%) + ordinary CIT (22%). UK's 51.4% includes RFCT (40%) + EPL (32%) − RFES. USA's 23.4% includes federal income tax.</span>
     </div>
     <p style="font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Formula (all mechanics)</p>
     <pre style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 16px;font-size:12px;color:#8892a8;overflow:auto;margin:0 0 18px;">govt_take_pct = (royalties + income_tax + resource_rent_tax + profit_oil_state_share
@@ -2199,9 +2200,9 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
       <thead><tr>
         <th style="text-align:left;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Discount Rate</th>
-        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Norway NPV (67.8% take)</th>
-        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Angola NPV (54.7% take)</th>
-        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">USA NPV (24% take)</th>
+        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Norway NPV (67.9% take)</th>
+        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Angola NPV (52.7% take)</th>
+        <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">USA NPV (23.4% take)</th>
       </tr></thead>
       <tbody>
         <tr><td style="padding:5px 8px;font-size:12px;">8% (low risk)</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#22c55e;">$1,240M</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#22c55e;">$1,180M</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#22c55e;">$4,190M</td></tr>
@@ -2469,7 +2470,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
 <!-- ── Sample Analyses Tab ── -->
 <div id="tsamples" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-tsamples">
   <div class="page-title">Sample Analyses</div>
-  <div class="page-sub">Pre-built comparisons drawn live from 71,601 contracts. Click any "Load" button to open the result in the full interactive tool.</div>
+  <div class="page-sub">Pre-built comparisons drawn live from 71,601 contracts. Click any action button to open the result interactively — loads data into Side-by-Side, Fiscal Compare, Explorer, or Country Profile depending on the card.</div>
 
   <div style="margin-top:20px;">
     <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Global Comparisons</div>
@@ -6176,7 +6177,7 @@ function renderSampleAnalyses() {
   const deltaColor = v => v == null ? '' : v > 20 ? '#e8a020' : v > 10 ? '#eab308' : '#94a3b8';
 
   // ── Card 1: Regional Benchmarks ──────────────────────────────────────────
-  const regionOrder = ['Middle East','Africa','Asia','Latin America','North America','Europe','CIS/FSU','Oceania'];
+  const regionOrder = ['Middle East','Africa','Asia Pacific','Americas','Europe','Other'];
   const regionGroups = {};
   cd.forEach(d => {
     const r = d.region || 'Other';
@@ -6402,7 +6403,7 @@ function renderSampleAnalyses() {
     </div>`;
 
   // Card C: Asia Pacific in Global Context
-  const asiaCountries = cd.filter(d => d.region === 'Asia' || d.region === 'Oceania');
+  const asiaCountries = cd.filter(d => d.region === 'Asia Pacific');
   const asiaAvg = asiaCountries.length ? asiaCountries.reduce((s,d)=>s+d.take_75,0)/asiaCountries.length : null;
   const globalAvg = cd.reduce((s,d)=>s+d.take_75,0)/cd.length;
   const asiaRanked = [...asiaCountries].sort((a,b)=>a.take_75-b.take_75);
@@ -10055,7 +10056,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v74</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v75</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
