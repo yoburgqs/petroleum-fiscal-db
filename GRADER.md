@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 15 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 16 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 15 shipped v62: 6 targeted analyst-facing improvements — Breakeven Map coverage disclosure (68/185 on tab), Breakeven CSV export button, Reform Risk CSV export button, Fiscal Component Breakdown typographic bug fixed, benchmark validation 6.5%-of-185 coverage disclosure, IOC Portfolio data source note. GPA 3.97 (no threshold crossings — all A categories maintained; Data Reliability B+ unchanged as it is a Harvesting fork issue). Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 16 shipped v63: 6 targeted analyst-facing improvements — Country Profile global median callout (+Xpp vs global median), Vintage Analysis CSV export, Fiscal Mechanics "Filter Explorer" buttons, Screener "Reset All" button, footer audit date, Ctrl+Enter FC shortcut bug fix. GPA 3.97 (no threshold crossings — all A categories maintained; Data Reliability B+ unchanged as Harvesting fork issue). Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -252,6 +252,24 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 16 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 15 state), audited full 9,860-line index.html across all tabs, identified 6 targeted improvements targeting analyst usability, navigation clarity, data export parity, and a confirmed JS bug. All shipped. Version v62 → v63.
+- **Fixes shipped (6 of 6):**
+  1. **Country Profile global median callout** — Added "+Xpp vs global median (58.4%)" beside the "Govt Take by Price Scenario" heading. Computed live from COUNTRY_DATA at render time. A senior analyst looking at, say, Ireland (27.1%) immediately sees "−31.3pp vs global median" without having to run Fiscal Compare. Closes NEXT.md item: "Country Profile drill-down: add 'compare to global median' callout for take figures."
+  2. **Country Profile navigation buttons restyled** — "Back to Explorer" was a bare `background:none;border:none` text link — invisible against the dark background in a demo. Replaced with two styled amber-outlined nav buttons: "← Explorer" and "Fiscal Compare", matching the platform's button vocabulary.
+  3. **Vintage Analysis CSV export** — Added "Export CSV" button in the card header alongside the title. New `exportVintageCSV()` function exports decade × mechanic take averages with source attribution. Analysts studying historical fiscal trends (e.g. did PSC take rise in the 2010s?) can now extract the data for their own charts.
+  4. **Fiscal Mechanics Guide: Filter Explorer button per card** — Each mechanic card now has a "Filter Explorer → [Mechanic]" amber button. One click: navigates to Explorer tab and activates the mechanic chip filter for that type. Analysts reading about PSCs can immediately see all 185 PSC countries without manually hunting for the chip.
+  5. **Screener: "Reset All" button** — Added between the count display and CSV/Excel exports. Calls `applyScreenerPreset('reset')` — resets all sliders to maximum range, all mechanic checkboxes to checked, IOC filters cleared. Analysts who have narrowed a complex filter can recover the full view in one click without reloading.
+  6. **Ctrl+Enter Fiscal Compare shortcut bug fix** — The keyboard shortcut handler was checking for `document.getElementById('tfc')` which does not exist (the Fiscal Compare pane is `id="t0"`). The shortcut has never fired since it was added in Cycle 8. Fixed to check `t0`. A keyboard-workflow analyst can now Ctrl+Enter to run Fiscal Compare.
+  7. **Footer: audit date** — "Nightly audit: active" now reads "Nightly audit: active · last run 2026-08-08" with a tooltip explaining the audit scope. A client asking "when was this last checked?" has an immediate answer.
+- **Grade changes from Cycle 15:** None (all fixes improve workflow and analytical utility within existing A categories; no category threshold crossed)
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (pre-push hook verified)
+- **Version:** v62 → v63
+- **Push:** Success — `39fb284 → 982c243` on `origin/main`. GitHub Pages live.
 
 ---
 
