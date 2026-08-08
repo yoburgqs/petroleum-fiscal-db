@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com https://cdn.jsdelivr.net;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com https://cdn.jsdelivr.net; report-uri /csp-report;">
 
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -1130,7 +1130,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div style="text-align:center;color:#E8A020;font-family:'IBM Plex Mono',monospace">
     <div style="margin-bottom:20px"><span style="font-size:28px;font-weight:900;letter-spacing:.15em;color:var(--accent);">ORCA</span></div>
     <div style="font-size:1.1em;font-weight:600;letter-spacing:1px">PETROLEUM FISCAL DATABASE</div>
-    <div style="font-size:0.85em;color:#94a3b8;margin-top:8px">Loading 185 countries · 71,601 contracts...</div>
+    <div style="font-size:0.85em;color:#94a3b8;margin-top:8px">Petroleum Fiscal Intelligence Platform</div>
+    <div style="font-size:0.75em;color:#64748b;margin-top:4px">71,000+ contracts across 185 countries</div>
     <div style="margin-top:20px;width:200px;height:2px;background:#1e293b;border-radius:1px;overflow:hidden">
       <div style="height:100%;background:#E8A020;animation:ldbar 1.8s ease-in-out infinite;transform-origin:left"></div>
     </div>
@@ -1148,7 +1149,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v77</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v78</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1185,8 +1186,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <!-- ===== SEARCH OVERLAY ===== -->
-<div id="search-overlay" role="search" onclick="if(event.target===this)closeSearch()">
-  <div id="search-modal">
+<div id="search-overlay" role="search" aria-modal="true" onclick="if(event.target===this)closeSearch()">
+  <div id="search-modal" role="dialog" aria-label="Search countries and mechanics">
     <div id="search-input-wrap">
       <span class="search-icon-inner">&#x1f50d;</span>
       <input id="search-q" type="text" placeholder="Search countries and mechanics..." aria-label="Search countries and mechanics" autocomplete="off"
@@ -1637,12 +1638,13 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <th>#</th><th>Country</th><th>Region</th><th>Mechanics</th>
           <th class="num">Govt Take</th><th class="num" title="Evidence quality: % of fiscal facts backed by A/B sources. Click for breakdown.">Evidence</th>
           <th class="num">Contractor NPV</th>
-          <th class="num">IRR (%)* <span class="info-tooltip" title="Screener metric only — arithmetic mean of contract-level IRRs. Not a portfolio IRR (see A16 in methodology). Use for relative comparison between countries, not for absolute investment decisions." style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;">ⓘ</span></th><th class="num">Breakeven ($/bbl)</th>
+          <th class="num">IRR (%)* <span class="info-tooltip" title="Screener metric only — arithmetic mean of contract-level IRRs. Not a portfolio IRR (see A16 in methodology). Use for relative comparison between countries, not for absolute investment decisions. Values ≥500% excluded as unbounded returns (~60 countries affected)." style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;">ⓘ</span></th><th class="num">Breakeven ($/bbl)</th>
           <th class="num">Prod Cov</th><th class="num">Swing</th><th>Tier</th>
         </tr>
       </thead>
       <tbody id="tbody-screener"></tbody>
     </table>
+    <div style="font-size:10px;color:#475569;margin-top:6px;padding:0 4px;line-height:1.5;">* IRR is arithmetic mean of contract-level IRRs — use for relative comparison only. <strong>n/a*</strong> = IRR ≥500% excluded as unbounded returns at extreme leverage (~60 countries affected). <strong>—</strong> = insufficient cost data for IRR computation (111 of 185 countries).</div>
   </div>
 
   </div><!-- end screen mode -->
@@ -1935,7 +1937,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v77 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v78 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1943,6 +1945,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v78 (Aug 2026)</strong> — 10 UX improvements (Cycle 31): Loading screen redesigned with platform tagline and contract count. CSP meta tag: added report-uri directive for violation reporting. Search modal: added aria-modal, role="dialog", and focus trap (Tab cycles within modal when open) for accessibility. Footer: added "Platform updated" timestamp for credibility. IRR display: fmtIrr() values now show methodology tooltip on hover; ≥500% exclusion tooltip expanded to explain ~60 countries affected. IRR ≥500% display changed from "n/a" to "n/a*" to signal footnote. Screener IRR column header: inline disclosure of ≥500% threshold added. Version v77→v78.<br>
       <strong>v77 (Aug 2026)</strong> — 5 naming and data improvements: "Regime Explorer" renamed to "Explorer" in all user-visible text — welcome panel drilldown, Explorer page title, Scenario Builder tip, IOC Portfolio NOC exclusion message, and Country Profile Regional Peers onclick (4 label fixes + 1 functional bug fix where the Regional Peers "View all in Explorer" button searched for non-existent "Regime Explorer" tab text, causing the active-tab button styling to break). Country Profile: regional median government take callout added alongside the existing global median badge — analysts now see both "+3.2pp vs global median (58.4%)" and "+1.1pp vs Africa (62.1%)" in one glance, enabling immediate peer context without navigating away. Regional median excludes the selected country itself and requires at least 3 peers to display. Version v76→v77.<br>
       <strong>v76 (Aug 2026)</strong> — Critical crash fix in <code>renderSampleAnalyses()</code>: the Asia Pacific in Global Context card (Card C) used hardcoded array indices [5] and [6] to back-fill the "Asia Pacific avg" and "Global avg" rows after construction, but those indices assumed exactly 4 countries in <code>asiaRanked.slice(0,4)</code>. When the data contains fewer than 4 Asia Pacific countries in the lowest-take group, the indices were wrong and a <code>TypeError: Cannot set properties of undefined</code> crashed the entire platform initialization — preventing all tabs from rendering and causing 3 FAIL tests. Fixed by computing country counts inline during array construction rather than post-indexing. Defensive <code>try/catch</code> wrapper added around <code>renderSampleAnalyses()</code> to prevent any future crash in this function from aborting the broader <code>initPlatform()</code> call chain. Revenue Share mechanic: previously routed to <code>dcfConcession()</code> (wrong — no cost recovery mechanism). Now routes to <code>dcfPSC()</code> in the Fiscal Compare dispatcher, Country Profile live DCF, and <code>getDCFParams()</code> PSC-param enrichment — matching the mechanic's gross revenue split structure. Scenario Builder: RSC (Risk Service Contract) added as 6th mechanic option alongside Concession/PSC/TSC/PRRT/Buy-back — routes to <code>dcfTSC()</code> (correct: RSC is structurally a service contract with fee + CIT). India RSC preset added: $4/bbl fee, 34% CIT, 5% EPT — representative of India's NELP/HELP framework. Scenario Builder now covers all 6 ICF mechanics (RSC added, Revenue Share still modeled via PSC-proxy in live DCF). Version v75→v76.<br>
       <strong>v75 (Aug 2026)</strong> — Sample Analyses data correctness: Regional Benchmarks card (Card 1) used stale region label strings ("Asia", "Latin America", "North America", "Oceania", "CIS/FSU") that do not match the database region taxonomy ("Asia Pacific", "Americas", "Other") — the card was silently showing only Middle East, Africa, and Europe while omitting the other 3 regions. Fixed to use canonical region labels matching COUNTRY_DATA. Asia Pacific in Global Context card (Card C) filtered on d.region === "Asia" which also never matched, leaving asiaCountries empty and the avg computation returning null. Both silent data failures now corrected. Methodology take figures aligned: Norway 67.8% → 67.9%, Angola 54.7% → 52.7%, USA 24% → 23.4% in the discount rate sensitivity table, matching the benchmark validation table on the same page. Methodology provenance paragraph updated: Norway 67.8% → 67.9%, UK 49.2% → 51.4% (updated to match benchmark table). Fiscal Compare Profile and Price dropdowns gain aria-label for screen readers. Explorer Sort and Search inputs gain aria-label. Sample Analyses page subtitle updated to accurately reflect that cards open different destinations (Side-by-Side, Fiscal Compare, Explorer, Country Profile) rather than always a "Load" button. Version v74→v75.<br>
@@ -2708,8 +2711,8 @@ function fmtTake(v) {
 }
 function fmtIrr(v) {
   if (v === null || v === undefined) return '<span style="color:var(--muted);font-size:11px" title="IRR calculation requires complete revenue/cost data — not available for all fiscal regimes">—</span>';
-  if (v >= 500) return '<span style="color:var(--green);font-size:11px" title="IRR ≥500% — unbounded return excluded per platform methodology">n/a</span>';
-  return `${Number(v).toFixed(1)}%`;
+  if (v >= 500) return '<span style="color:var(--green);font-size:11px" title="IRR ≥500% — unbounded return excluded per platform methodology. ~60 countries affected at extreme leverage. Threshold ensures meaningful fiscal comparison.">n/a*</span>';
+  return `<span title="Contractor IRR at reference project parameters. Values ≥500% excluded as unreliable at extreme leverage.">${Number(v).toFixed(1)}%</span>`;
 }
 // ─── Evidence Quality System ─────────────────────────────────────────────────
 // Returns colored confidence dot + mini bar for use anywhere in the UX.
@@ -4503,9 +4506,22 @@ function openSearch() {
   q.focus();
   _searchFocusIdx = -1;
   renderSearchResults();
+  // Focus trap: keep Tab within search modal
+  var modal = document.getElementById('search-modal');
+  modal._focusTrap = function(e) {
+    if (e.key !== 'Tab') return;
+    var focusable = modal.querySelectorAll('input, button, [tabindex]:not([tabindex="-1"]), a[href], [role="button"]');
+    if (!focusable.length) return;
+    var first = focusable[0], last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+    else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+  };
+  modal.addEventListener('keydown', modal._focusTrap);
 }
 
 function closeSearch() {
+  var modal = document.getElementById('search-modal');
+  if (modal._focusTrap) { modal.removeEventListener('keydown', modal._focusTrap); modal._focusTrap = null; }
   document.getElementById('search-overlay').classList.remove('open');
   _searchFocusIdx = -1;
 }
@@ -10075,7 +10091,9 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v77</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v78</span>
+    <span class="badge-sep" style="color:#475569;">·</span>
+    <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
