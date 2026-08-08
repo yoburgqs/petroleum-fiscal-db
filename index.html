@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v71</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v72</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1444,7 +1444,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <input type="text" class="search-input" id="flt-search" placeholder="Search country…" autocomplete="off">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;"></div>
     </div>
-    <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" onclick="toggleFourPrice(this)" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" onclick="copyExplorerLink()" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
+    <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" onclick="toggleFourPrice(this)" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)" aria-label="Toggle production data filter — show only countries with verified production data" aria-pressed="false">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" onclick="copyExplorerLink()" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
   </div>
 
   <div style="font-size:11px;color:#475569;margin-bottom:8px;letter-spacing:.02em;font-family:'IBM Plex Mono',monospace;padding:4px 0;">
@@ -1625,7 +1625,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <span id="screener-count" style="color:var(--muted);font-size:13px;"></span>
       <span id="screener-result-count" style="color:var(--muted);font-size:12px;margin-left:4px;"></span>
       <span id="screener-active-filters" style="display:none;"></span>
-      <button class="btn btn-sm btn-outline" style="margin-left:auto;" onclick="resetScreenerAll()" title="Reset all filters to default state">Reset All</button>&nbsp;<button class="btn btn-sm btn-outline" onclick="exportScreenerCSV()">&#8659; CSV</button>&nbsp;<button class="btn btn-sm" onclick="exportScreenerExcel()">&#8659; Excel</button>
+      <button class="btn btn-sm btn-outline" style="margin-left:auto;" onclick="resetScreenerAll()" title="Reset all filters to default state">Reset All</button>&nbsp;<button class="btn btn-sm btn-outline" onclick="exportScreenerCSV()" aria-label="Export screener results as CSV file">&#8659; CSV</button>&nbsp;<button class="btn btn-sm" onclick="exportScreenerExcel()" aria-label="Export screener results as Excel file">&#8659; Excel</button>
     </div>
   </div>
 
@@ -1885,12 +1885,12 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">Select a country to view its complete fiscal profile</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6;">Government take, fiscal mechanics, contract history, DCF sensitivity, and source confidence — all in one place.</div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Norway';loadCountryProfile('Norway')">Norway</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Iraq';loadCountryProfile('Iraq')">Iraq</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Angola';loadCountryProfile('Angola')">Angola</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United States';loadCountryProfile('United States')">USA</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United Arab Emirates';loadCountryProfile('United Arab Emirates')">UAE</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Australia';loadCountryProfile('Australia')" title="Australia — PRRT regime (Petroleum Resource Rent Tax), the primary cash-flow-based RRT used offshore">Australia</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Norway';loadCountryProfile('Norway')" aria-label="Load Norway fiscal profile — Concession regime, North Sea benchmark">Norway</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Iraq';loadCountryProfile('Iraq')" aria-label="Load Iraq fiscal profile — Technical Service Contract regime">Iraq</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Angola';loadCountryProfile('Angola')" aria-label="Load Angola fiscal profile — PSC regime, West Africa benchmark">Angola</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United States';loadCountryProfile('United States')" aria-label="Load United States fiscal profile — Concession regime, Gulf of Mexico benchmark">USA</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United Arab Emirates';loadCountryProfile('United Arab Emirates')" aria-label="Load United Arab Emirates fiscal profile — Concession regime, Middle East benchmark">UAE</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Australia';loadCountryProfile('Australia')" title="Australia — PRRT regime (Petroleum Resource Rent Tax), the primary cash-flow-based RRT used offshore" aria-label="Load Australia fiscal profile — PRRT regime, cash-flow-based RRT offshore">Australia</button>
       </div>
     </div>
   </div>
@@ -1933,7 +1933,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v71 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v72 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1941,6 +1941,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v72 (Aug 2026)</strong> — 10 improvements: GitHub Actions CI workflow created (`.github/workflows/playwright.yml` — runs Playwright tests on push/PR to main, Ubuntu + Node 20 + Chromium). Compare basket buttons refactored from inline onclick to event listeners (clearBasket, launchCompare) — first step toward removing CSP `unsafe-inline`. Country Profile vs-global-median callout upgraded from inline text to styled badge with background + border — analysts see the +/- median delta at a glance. Methodology Data Sources fact count updated 330,329→384,259 (matches verified DB state). Reform Risk heatmap: top-20 country names now clickable — click opens Country Profile. Screener CSV + Excel export buttons: aria-label added for screen readers. Explorer "Prod Data Only" toggle: aria-label added. Country Profile empty state quick-access buttons: aria-label with country name added. Breakeven Map CSV export: aria-label added. Version v71→v72 across badge, footer, methodology.<br>
       <strong>v71 (Aug 2026)</strong> — 10 analyst-experience improvements: Explorer legend: Stability description corrected — now accurately says "5-dot score, 5=zero reform events since 2010 (most stable)" rather than the wrong "100−(Swing×2)" formula (Swing and stability are independent measures). Welcome panel: fixed stale routing text — "Regime Explorer" references updated to "Explorer" tab, and Screener water depth filter correctly described (was "set profile=Deepwater", now "set Water Depth=Deepwater"). Welcome panel Drilldown section: Scenario Builder description corrected — previously said "Ctrl+K for search" (wrong: Ctrl+K opens global search, not Scenario Builder). Methodology Known Limitations: Russia platform estimate corrected 24.8%→23.4% to match the benchmark validation table. Reform Risk tab — Most Frequently Reformed Regimes table: each country now has a "Profile →" button linking directly to its Country Profile — analysts can drill from reform risk to fiscal detail in one click. Reform Risk tab — Most Stable / Most Volatile panels: country names are now clickable links to their Country Profile. Screener: subtitle and tip now explicitly state "All take and IRR thresholds apply at $75/bbl" — removes ambiguity about which price scenario drives the filter. IOC Portfolio: subtitle now shows "16 major operators tracked" alongside 185 countries for first-visit context. Version v70 → v71.<br>
       <strong>v70 (Aug 2026)</strong> — Bubble Chart: 4-price selector added (analysts can now shift the frontier at $50/$75/$100/$125 — axis labels update dynamically to reflect selected price). Screener: empty-state now shows "No countries match" with a "Reset All Filters" button instead of a blank table. Screener presets: all 6 preset buttons now have explicit criteria in their tooltips (e.g. "Sweet Spot: Take ≤55% · Breakeven ≤$65/bbl · Positive NPV") — analysts see the filter logic on hover. Welcome panel: keyboard shortcut summary added (Ctrl+K, Ctrl+Enter, Esc, Click any row) — first-time visitors see shortcuts without reading documentation. Header buttons: "aria-label" and descriptive "title" added to "+ Scenario" and "Reference Guide" — screen readers and sighted users on hover now get full context. Search: "Clear" button added to recent searches list — previously had no way to clear history from the UI. Side-by-Side "Clear" and "Export PDF" buttons: aria-label added for screen reader clarity. Fiscal Component Breakdown header: now shows the active price (e.g. "Fiscal Component Breakdown @$75/bbl") — analysts always know which price scenario the breakdown reflects. Footer coverage stats: IRR (74/185) and Breakeven (68/185) stats are now clickable links that navigate to the Explorer tab. FC profile context banner: project life added to the displayed parameters (e.g. "Life: 25yr") alongside peak rate, capex, opex, and discount rate. Version v69 → v70.<br>
       <strong>v69 (Aug 2026)</strong> — Screener: active preset name now shown in the count bar (e.g. "Sweet Spot · 23 countries match at $75/bbl") — analysts immediately know which preset is driving the results without scrolling back up to the preset row. Bubble chart description: disambiguated "lower-left frontier" language — now explicitly notes that NPV can be negative at high-take regimes, so "lower-left" refers to low take / high NPV, not low take / low value. FC Stability column: tooltip now fully explains the scoring scale (5 = zero reform events since 2010 = most stable; 0 = 5+ reform events = least stable) — previously said only "lower = more stable" which is the opposite of the 5-dot visual. API Explorer: Copy API URL button now starts disabled in HTML markup (not just set via JS) — prevents a flash of enabled state before page JS initializes. Sample Analyses: standardized all "Load in Compare" button labels to "Load in Fiscal Compare" matching the card description text — eliminates the mixed terminology between inline card text and button labels. Version v68 → v69.<br>
@@ -2234,7 +2235,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   <div class="dd-section" id="meth-sources">
     <div class="dd-section-hdr">Data Sources &amp; Evidence Quality Standards</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
-      The database contains 330,329 fiscal facts across 71,601 contracts, sourced from 337 primary sources (post-deduplication). Facts are graded A through D:
+      The database contains 384,259 fiscal facts across 71,601 contracts, sourced from 337 primary sources (post-deduplication). Facts are graded A through D:
     </p>
     <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
       <thead><tr>
@@ -2265,7 +2266,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
       <span style="color:var(--accent);font-weight:700;">Coverage: 68 of 185 countries</span>
       <span>· Requires complete royalty + cost data · Remaining 117 countries shown as grey on map</span>
     </div>
-    <button class="btn btn-sm btn-outline" onclick="exportBreakevenCSV()" title="Export all 68 countries with breakeven data to CSV">&#8659; Export CSV</button>
+    <button class="btn btn-sm btn-outline" onclick="exportBreakevenCSV()" title="Export all 68 countries with breakeven data to CSV" aria-label="Export breakeven price data for 68 countries as CSV file">&#8659; Export CSV</button>
   </div>
   
   <div style="font-size:11px;color:var(--muted);background:rgba(232,160,32,.05);border:1px solid rgba(232,160,32,.15);border-radius:5px;padding:6px 12px;margin-bottom:8px;">
@@ -2958,6 +2959,7 @@ function makeTakeSparkline(d, activePrice) {
 function toggleProdFilter(btn) {
   const active = btn.dataset.active === '1';
   btn.dataset.active = active ? '0' : '1';
+  btn.setAttribute('aria-pressed', active ? 'false' : 'true');
   btn.style.background = active ? '' : 'rgba(45,212,191,.15)';
   btn.style.fontWeight = active ? '' : '700';
   renderExplorer();
@@ -4983,7 +4985,9 @@ function loadCountryProfile(country) {
     const sign = diff >= 0 ? '+' : '';
     const col = Math.abs(diff) < 3 ? 'var(--muted)' : diff > 0 ? 'var(--orange)' : 'var(--green)';
     const lbl = Math.abs(diff) < 3 ? 'at global median' : diff > 0 ? 'above global median' : 'below global median';
-    return `<span style="font-size:11px;color:${col};font-weight:400;margin-left:10px;" title="Global median government take @$75/bbl across 185 countries is ${_globalMedian.toFixed(1)}%">${sign}${diff.toFixed(1)}pp vs global median (${_globalMedian.toFixed(1)}%)</span>`;
+    var bgCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.1)' : diff > 0 ? 'rgba(249,115,22,.1)' : 'rgba(34,197,94,.1)';
+    var borderCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.3)' : diff > 0 ? 'rgba(249,115,22,.35)' : 'rgba(34,197,94,.35)';
+    return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:${col};font-weight:600;margin-left:10px;padding:2px 10px;background:${bgCol};border:1px solid ${borderCol};border-radius:12px;" title="Global median government take @$75/bbl across 185 countries is ${_globalMedian.toFixed(1)}%">${sign}${diff.toFixed(1)}pp vs median (${_globalMedian.toFixed(1)}%)</span>`;
   })() : '';
   const mainSections = `<div class="dd-section">
     <h3>Govt Take by Price Scenario ${_isMonopoly ? '' : _grankHtml} ${_tierBadgeHtml}${_vsMedianHtml}</h3>
@@ -6705,7 +6709,7 @@ function renderReformRisk() {
     + '<tbody>'
     + heatCountries.map(function(r) {
         return '<tr>'
-          + '<td style="padding:5px 8px;font-size:11px;color:var(--text);white-space:nowrap;">' + r.country + '</td>'
+          + '<td style="padding:5px 8px;font-size:11px;color:var(--text);white-space:nowrap;"><a href="#" style="color:var(--text);text-decoration:underline dotted;text-underline-offset:2px;" title="Open Country Profile for ' + r.country + '" onclick="event.preventDefault();document.getElementById(\'dd-country-select\').value=\'' + r.country.replace(/'/g,"\\'") + '\';loadCountryProfile(\'' + r.country.replace(/'/g,"\\'") + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));">' + r.country + '</a></td>'
           + decades.map(function(d) {
               var n = r.byDecade[d] || 0;
               return '<td style="text-align:center;padding:4px 6px;">'
@@ -9990,14 +9994,22 @@ async function loadPlatformData() {
 
 loadPlatformData();
 
+// v72: Event listeners replacing inline onclick for compare basket buttons
+document.addEventListener('DOMContentLoaded', function() {
+  var clearBtn = document.getElementById('basket-clear-btn');
+  if (clearBtn) clearBtn.addEventListener('click', function() { clearBasket(); });
+  var cmpBtn = document.getElementById('basket-compare-btn');
+  if (cmpBtn) cmpBtn.addEventListener('click', function() { launchCompare(); });
+});
+
 </script>
 
 <!-- Floating Comparison Basket -->
 <div id="compare-basket" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;background:#1e293b;border-top:1px solid #334155;padding:10px 20px;align-items:center;gap:10px;flex-wrap:wrap;">
   <span style="color:#94a3b8;font-size:12px;font-weight:600;white-space:nowrap;">Compare basket:</span>
   <div id="basket-pills" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;"></div>
-  <button onclick="clearBasket()" aria-label="Clear all countries from compare basket" style="background:transparent;border:1px solid #475569;color:#94a3b8;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">Clear</button>
-  <button onclick="launchCompare()" aria-label="Launch side-by-side comparison of selected countries" title="Open Side-by-Side Compare tab with all basket countries loaded" style="background:#e8a020;border:none;color:#0f172a;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Compare &#8594;</button>
+  <button id="basket-clear-btn" aria-label="Clear all countries from compare basket" style="background:transparent;border:1px solid #475569;color:#94a3b8;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">Clear</button>
+  <button id="basket-compare-btn" aria-label="Launch side-by-side comparison of selected countries" title="Open Side-by-Side Compare tab with all basket countries loaded" style="background:#e8a020;border:none;color:#0f172a;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Compare &#8594;</button>
 </div>
 
 <!-- Data Vintage Footer -->
@@ -10007,7 +10019,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v71</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v72</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>

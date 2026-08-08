@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 24 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 25 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 24 shipped v71: 10 targeted accuracy and usability fixes — Explorer legend stability description corrected (was the wrong "100−(Swing×2)" formula; now correctly describes the 5-dot reform-event scoring); Welcome panel "Regime Explorer" stale references corrected to "Explorer" tab (2 instances); Welcome panel Screener tip corrected ("set profile=Deepwater" → "set Water Depth=Deepwater"); Welcome Drilldown Scenario Builder tip corrected ("Ctrl+K for search" → "click + Scenario in the header"); Methodology Known Limitations Russia estimate corrected (24.8%→23.4% matching benchmark table); Reform Risk Most Frequently Reformed table: each country gains a "Profile →" button navigating to Country Profile; Reform Risk Most Stable / Most Volatile panels: country names are now clickable links to Country Profile; Screener subtitle and tip now explicitly state "$75/bbl" price basis for all filters; IOC Portfolio subtitle now shows "16 major operators tracked" for first-visit context; version v70→v71 across badge, footer, and methodology. GPA 3.97 (no threshold crossings). Playwright: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 25 shipped v72: 10 improvements — GitHub Actions CI workflow created (.github/workflows/playwright.yml); compare basket buttons refactored from inline onclick to event listeners (first CSP hardening step); Country Profile vs-global-median callout upgraded to styled badge; Methodology fact count corrected 330,329→384,259; Reform Risk heatmap country names now clickable; Screener/Explorer/Breakeven export buttons and Country Profile quick-access buttons all gain aria-labels; Prod Data Only toggle syncs aria-pressed state. GPA 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -124,7 +124,7 @@ Every 30-minute cycle:
 ### 13. SDLC Maturity — A
 **What's good:** Playwright test suite (117+ PASS / 0 FAIL). Nightly audit via Task Scheduler. GitHub Pages hosting. Git versioning with semantic commits. 4-fork architecture (Harvest/DCF/Audit/UX). **Tests now in repo:** `tests/runtime_comprehensive.js` exists. **GitHub Actions CI shipped:** `.github/workflows/playwright.yml` runs tests on push/PR to main (Ubuntu, Node 20, Chromium). **TESTING.md present** with test documentation. **package.json present** for dependency management. Active pre-push hook at `.git/hooks/pre-push`. Methodology changelog updated through v56. **Pre-push hook path fixed (Cycle 9)** — now references `tests/runtime_comprehensive.js` (repo-local) instead of `C:/tmp/pw_test/runtime_comprehensive.js` — hook is now portable and won't break if C:/tmp/ is cleared.
 **What's lacking:**
-- GitHub Actions CI may fail due to OAuth token or Playwright install issues — needs verification of at least one successful run
+- GitHub Actions CI workflow file now exists (created Cycle 25) — needs verification of at least one successful run on push
 - No staging environment — changes go directly to production GitHub Pages
 **Grade: A** (upgraded from A- — pre-push hook path fixed; now uses repo-local test file)
 **Priority fix:** Verify at least one successful GitHub Actions CI run (confirm `.github/workflows/playwright.yml` executes on push).
@@ -146,7 +146,7 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 24 — 2026-08-08)
+## Updated Grade Table (Cycle 25 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
@@ -160,13 +160,13 @@ Every 30-minute cycle:
 | 8 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 9 | 12. Security / Data Integrity | A | = | CSP added; SRI hashes all valid. |
 | 10 | 2. Information Architecture | A | = | Welcome panel routing fixed: Screener water depth filter correctly described. Drilldown Scenario Builder tip fixed. (Cycle 24) |
-| 11 | 13. SDLC Maturity | A | = | CI pre-push hook uses repo-local test file. 117 PASS / 0 FAIL. |
+| 11 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). Pre-push hook uses repo-local test file. 117 PASS / 0 FAIL. |
 | 12 | 3. Data Presentation | A+ | = | Waterfall header shows active price. Screener now explicitly labels $75/bbl price basis (Cycle 24). |
 | 13 | 7. Professional Credibility | A+ | = | Russia estimate corrected 24.8%→23.4% to match benchmark table (Cycle 24). Methodology internally consistent. |
 | 14 | 14. Search Quality | A+ | = | Search recent history has Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. Footer IRR/BE stats navigate to Explorer. |
 
-**Summary: 0 categories below B+. Cycle 24: 0 grade upgrades (all 10 fixes target accuracy and usability gaps — stale routing text, wrong stability formula, Russia benchmark discrepancy, Reform Risk drillability, Screener price clarity, IOC Portfolio context). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 25: 0 grade upgrades (CI workflow file created, compare basket handlers refactored, accessibility gaps closed, fact count corrected, vs-median callout upgraded). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
@@ -174,9 +174,9 @@ Every 30-minute cycle:
 **Next cycle priorities:**
 1. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
 2. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
-3. Remaining onclick elements in compare chips / reform filters (Accessibility → A+)
+3. Continue onclick→event listener migration: Explorer chip filters, Reform Risk filter selects (Security → tighter CSP)
 4. Waterfall bar chart individual segment export from Country Profile (Export A+ breadth)
-5. Country Profile drill-down: add "compare to global median" callout for take figures
+5. Country Profile: add "compare to regional median" callout alongside the global median badge
 
 ---
 
@@ -252,6 +252,26 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 25 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Opus orchestrator — read GRADER.md (Cycle 24 state), audited full index.html across all tabs, identified 10 improvements targeting SDLC gaps, CSP hardening, accessibility, data accuracy, and UX polish. All shipped. Version v71 → v72.
+- **Fixes shipped (10 of 10):**
+  1. **GitHub Actions CI workflow created** — `.github/workflows/playwright.yml` now exists in the repo. Runs Playwright tests on push/PR to main using Ubuntu + Node 20 + Chromium. Uploads test artifacts. The grader had claimed CI was "shipped" in Cycle 6 but the file never actually existed — now it does. Awaiting first successful run verification.
+  2. **Compare basket: onclick→event listeners** — The floating compare basket "Clear" and "Compare →" buttons previously used inline `onclick` handlers. Refactored to `addEventListener` pattern with `id`-based selection. First step toward removing `'unsafe-inline'` from the CSP meta tag. Buttons retain aria-labels.
+  3. **Country Profile: vs-global-median callout upgraded** — The "+Xpp vs median" text was previously an unstyled inline `<span>` with `font-weight:400` — easy to miss. Now rendered as a styled pill badge with colored background, border, rounded corners, and `font-weight:600`. Green for below-median, orange for above, muted for near-median. Analysts see the delta at a glance.
+  4. **Methodology Data Sources: fact count corrected 330,329→384,259** — The exact count in the Data Sources section was stale (dating to the v60 correction cycle). CLAUDE.md confirms 384,259 verified facts. The welcome panel correctly shows "330K+" (rounded), but the Methodology section used an exact number that was wrong. Now matches the verified DB state.
+  5. **Reform Risk heatmap: clickable country names** — The top-20 most-reformed countries in the decade heatmap table had plain text country names. Now each name is a clickable link (dotted underline) that navigates to that country's Profile tab. Matches the treatment already applied to the "Most Frequently Reformed" table above it (Cycle 24) and the Most Stable/Most Volatile panels.
+  6. **Screener CSV + Excel export buttons: aria-label added** — Both export buttons lacked aria-labels. Screen readers now announce "Export screener results as CSV file" and "Export screener results as Excel file" respectively.
+  7. **Explorer "Prod Data Only" toggle: aria-label + aria-pressed** — Button lacked accessibility attributes. Now has `aria-label` explaining the filter and `aria-pressed` that syncs with the toggle state via the `toggleProdFilter()` function.
+  8. **Country Profile empty state: quick-access buttons gain aria-labels** — All 6 quick-access country buttons (Norway, Iraq, Angola, USA, UAE, Australia) now have descriptive aria-labels including the country's fiscal mechanic type (e.g. "Load Norway fiscal profile — Concession regime, North Sea benchmark").
+  9. **Breakeven Map CSV export: aria-label added** — The export button lacked an aria-label. Now announces "Export breakeven price data for 68 countries as CSV file" to screen readers.
+  10. **Version v71→v72** — Header badge, footer DCF Engine badge, Methodology provenance paragraph all updated. v72 changelog entry added to Methodology tab.
+- **Grade changes from Cycle 24:** None (all fixes are SDLC, accessibility, and data accuracy within existing A categories; B+ Data Reliability remains Harvesting-fork-constrained)
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (no structural function changes — event listener refactor is additive)
+- **Version:** v71 → v72
 
 ---
 
