@@ -865,3 +865,13 @@ Background push confirmed â€” petroleum-fiscal-db main is live on GitHub. C
 - JS errors: 0
 - Summary: GRADER.md commit confirmed. Cycle 23 fully committed and pushed â€” v71 live.
 
+
+---
+## Cycle 23 Log — 2026-08-08 04:46
+- Test before: 117 PASS / 0 FAIL
+- Test after: 117 PASS / 0 FAIL
+- JS errors: 0
+- Summary: v72 is live. Push succeeded (`1f7b28c..33b22ec`). Tests clean: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+
+**GitHub Actions CI** (`playwright.yml`) is still committed locally but not on remote. To add it: upgrade your OAuth token to include `workflow` scope at github.com â†’ Settings â†’ Developer settings â†’ Personal access tokens, then `git push origin main` from `petroleum-fiscal-db`.
+
