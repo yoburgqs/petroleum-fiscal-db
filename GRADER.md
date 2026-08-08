@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 29 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 30 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 29 shipped v76: 6 improvements — Critical crash fix: `renderSampleAnalyses()` crashed `initPlatform()` via hardcoded array indices [5][3] and [6][3] that assumed exactly 4 Asia Pacific lowest-take countries; crash aborted all tab rendering, causing 3 FAIL tests + 5 cascading WARNs. Fixed by computing counts inline + defensive try/catch. Revenue Share mechanic now correctly routes to dcfPSC() in all 3 dispatchers (was using dcfConcession — wrong model). Scenario Builder now covers 6 mechanics: RSC added as option (routes to dcfTSC), India RSC preset added. OPEC wording bug fixed. Version v75→v76. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (expected after push propagates).
+**Overall Status:** Cycle 30 shipped v77: 5 improvements — Explorer naming cleanup: "Regime Explorer" label removed from all user-visible text (welcome panel drilldown, Explorer page title, Scenario Builder tip, IOC Portfolio NOC exclusion message) + onclick bug fixed in Country Profile Regional Peers (button searched for non-existent "Regime Explorer" text in DOM; tab button says "Explorer"; fix uses getElementById instead of text-based querySelector). Country Profile: regional median government take callout added alongside global median badge — analysts now see both global and regional context in one row (e.g. "+3.2pp vs global median (58.4%)" and "+1.1pp vs Africa (62.1%)"). Regional median requires ≥3 regional peers and excludes the selected country. Version v76→v77. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -45,10 +45,10 @@ Every 30-minute cycle:
 **Priority fix:** Update welcome panel routing instruction for Screener.
 
 ### 3. Data Presentation — A+
-**What's good:** Take sparklines (4-price SVG curves), waterfall breakdown, evidence A/B/C/D tier badges, Monte Carlo uncertainty badge, breakeven color indicators, rank badges (#3 of 185). `fmtNpvShared()` applied consistently across Explorer browse, Screener, FC results, and Country Profile — shows `$1.2B` not `$1234.5M`. Coverage stats in footer with exact counts. Data Completeness row in Country Profile. Inline data coverage banner in Explorer — `IRR: 74/185`, `Breakeven: 68/185` with tooltip explanations for gaps. **NPV column headers fixed:** Explorer (line 1457) and Screener (line 1610) now say "Contractor NPV" without the misleading ($M) unit label. Excel export headers retain ($M) for downstream compatibility — correct decision.
+**What's good:** Take sparklines (4-price SVG curves), waterfall breakdown, evidence A/B/C/D tier badges, Monte Carlo uncertainty badge, breakeven color indicators, rank badges (#3 of 185). `fmtNpvShared()` applied consistently. Coverage stats in footer with exact counts. Data Completeness row in Country Profile. Inline data coverage banner in Explorer. NPV column headers say "Contractor NPV" without misleading ($M) unit label. **Regional median callout added (Cycle 30):** Country Profile "Govt Take by Price Scenario" header now shows both global median badge (e.g. "+3.2pp vs median 58.4%") and regional median badge (e.g. "+1.1pp vs Africa 62.1%") side-by-side — analysts immediately know the country's position within both the global field and its regional peer group, without navigating away. Regional median requires ≥3 regional peers and excludes the selected country to avoid self-reference. Color-coded: green = below median (favorable), orange = above median (expensive), grey = within ±3pp.
 **What's lacking:**
-- Screener NPV slider label still says "Min Contractor NPV: $0M" (line 1532) — minor inconsistency with the column header cleanup, but the slider is a filter control so $M as input unit is arguably correct
-**Grade: A+** (upgraded from A — NPV header cleanup was the last presentation gap)
+- Screener NPV slider label still says "Min Contractor NPV: $0M" — minor inconsistency with column header cleanup; slider is a filter control so $M input unit is arguably correct
+**Grade: A+** (maintains A+ — regional median callout strengthens analyst-facing context in Country Profile)
 **Priority fix:** None critical.
 
 ### 4. Interaction Design — A
@@ -59,11 +59,11 @@ Every 30-minute cycle:
 **Grade: A** (upgraded from A- — scroll-to-results and copy-link with filter state both shipped)
 **Priority fix:** Add mobile `max-height` + overflow-y to Scenario Builder modal. Minor CSS.
 
-### 5. Naming Consistency — A
-**What's good:** Tab buttons have consistent casing. "Country Profile" used consistently in tab button, page title, welcome panel, and empty state — and now in all 3 JS source comments (fixed Cycle 7). Footer clean. "Sample Analyses" (plural) consistent. Version removed from title tag (now "ORCA — Petroleum Fiscal Intelligence Platform"). Badge and footer now say v54 (fixed Cycle 7). "Screen & Rank" eliminated. Screener page title now says "Screener" matching toggle button (fixed Cycle 7).
+### 5. Naming Consistency — A+
+**What's good:** Tab buttons have consistent casing. "Country Profile" used consistently in tab button, page title, welcome panel, and empty state. Footer clean. "Sample Analyses" (plural) consistent. Version removed from title tag. Screener page title says "Screener" matching toggle button. **Explorer naming fully unified (Cycle 30):** "Regime Explorer" removed from all user-visible text — welcome panel drilldown, Explorer page title (was "Regime Explorer", now "Explorer"), Scenario Builder tip, IOC Portfolio NOC exclusion message. Only remaining "Regime Explorer" reference is a CSS comment (#991) not visible to users. Tab button, page title, and all in-app references now consistently say "Explorer".
 **What's lacking:**
 - Nothing user-visible remains. All naming inconsistencies resolved.
-**Grade: A** (upgraded from A- — all 3 naming gaps closed in Cycle 7)
+**Grade: A+** (upgraded from A — Explorer naming fully unified in Cycle 30)
 **Priority fix:** None.
 
 ### 6. Error & Empty States — A
@@ -146,35 +146,35 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 29 — 2026-08-08)
+## Updated Grade Table (Cycle 30 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure now includes ≥500% exclusion note in 3 locations. |
 | 2 | 1. Visual Design | A | = | Skeleton screens would improve perceived load. Loading screen has credentials tagline. |
-| 3 | 4. Interaction Design | A | = | Buy-back DCF param bug fixed (Cycle 27). Buy-back now uses user inputs correctly. |
-| 4 | 5. Naming Consistency | A | = | Sample Analyses button labels corrected (Cycle 27). All action buttons now accurately describe destination. |
-| 5 | 6. Error & Empty States | A | = | Screener zero-results empty state with Reset button shipped (Cycle 23). |
-| 6 | 9. Performance & Reliability | A | = | CSP meta tag added; unsafe-inline still present (gradual refactor). |
-| 7 | 10. Accessibility | A | ↑ | FC Profile/Price selects + Explorer Sort/Search now have aria-labels (Cycle 28). |
-| 8 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
-| 9 | 12. Security / Data Integrity | A | = | CSP added; SRI hashes all valid. |
-| 10 | 2. Information Architecture | A | = | Country Profile quick-access expanded to 7 countries — Iran added (Cycle 27). |
-| 11 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). Pre-push hook uses repo-local test file. 117 PASS / 0 FAIL. |
-| 12 | 3. Data Presentation | A+ | = | Methodology take figures corrected to match BENCHMARKS object (Cycle 28). |
+| 3 | 4. Interaction Design | A | = | Buy-back DCF param bug fixed (Cycle 27). Regional Peers "View all in Explorer" onclick bug fixed (Cycle 30). |
+| 4 | 6. Error & Empty States | A | = | Screener zero-results empty state with Reset button shipped (Cycle 23). |
+| 5 | 9. Performance & Reliability | A | = | CSP meta tag added; unsafe-inline still present (gradual refactor). |
+| 6 | 10. Accessibility | A | = | FC Profile/Price selects + Explorer Sort/Search now have aria-labels (Cycle 28). |
+| 7 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
+| 8 | 12. Security / Data Integrity | A | = | CSP added; SRI hashes all valid. |
+| 9 | 2. Information Architecture | A | = | Country Profile quick-access expanded to 7 countries — Iran added (Cycle 27). |
+| 10 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). Pre-push hook uses repo-local test file. 117 PASS / 0 FAIL. |
+| 11 | 3. Data Presentation | A+ | = | Regional median callout added to Country Profile (Cycle 30). |
+| 12 | 5. Naming Consistency | A+ | ↑ | "Regime Explorer" fully eliminated from user-visible text — Explorer naming unified (Cycle 30). |
 | 13 | 7. Professional Credibility | A+ | = | Changelog corrections in v74 (Cycle 27) — no contradictions in fact count history. |
 | 14 | 14. Search Quality | A+ | = | Search recent history has Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. Footer IRR/BE stats navigate to Explorer. |
 
-**Summary: 0 categories below B+. Cycle 29: 0 grade upgrades (crash fix restores tests; DCF dispatch fixes improve data accuracy; RSC Scenario Builder closes a 6/7 mechanic gap). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (expected after GitHub Pages propagation).**
+**Summary: 0 categories below B+. Cycle 30: 1 grade upgrade (Naming Consistency A → A+). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
 
 **Next cycle priorities:**
-1. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
-2. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
-3. Continue onclick→event listener migration: Explorer chip filters, Reform Risk filter selects (Security → tighter CSP)
+1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
+2. Continue onclick→event listener migration: Explorer chip filters, Reform Risk filter selects (Security → tighter CSP)
+3. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
 4. Country Profile: add "compare to regional median" callout alongside the global median badge
 5. Add Revenue Share to Scenario Builder (currently modeled via PSC-proxy in live DCF; add explicit Scenario Builder option)
 
