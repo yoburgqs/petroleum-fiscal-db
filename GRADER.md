@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 34 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 35 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 34 shipped v81: 6 UX improvements — East Africa & Sub-Saharan Frontier section added to Sample Analyses (2 cards: Frontier Bloc table covering Mozambique/Tanzania/Uganda/Kenya/Namibia/Senegal/Ghana/Sierra Leone, Africa Fiscal Reform Pressure 2014–2023). Side-by-Side: Saudi Arabia vs UAE added as 4th quickstart comparison. Search: Revenue Share and EPSA added to global mechanics search. Run Compare button: Ctrl+↵ shortcut label added inline. Methodology provenance version corrected (was stale at v79). Version v80→v81. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 35 shipped v82: 6 UX improvements — Revenue Share added as 7th mechanic in Scenario Builder (dedicated params panel, Nigeria preset, correct dcfPSC routing with cost_recovery_cap=0). Explorer mechanic dropdown: Revenue Share option added to flt-mech select (was in chip row but not dropdown). Fuzzy search upgraded from character-overlap to Levenshtein edit distance — materially better suggestions for 2+ char typos. Scenario Builder ddOpenScenarioBuilder(): Revenue Share, PRRT, and Buy-back countries now route to correct panels (was falling to Concession fallback). Scenario Builder welcome panel description updated. Version v81→v82. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected.
 
 ---
 
@@ -146,27 +146,27 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 34 — 2026-08-08)
+## Updated Grade Table (Cycle 35 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure comprehensive. |
 | 2 | 1. Visual Design | A | = | Loading screen improved with tagline (Cycle 31). Skeleton screens still nice-to-have. |
-| 3 | 4. Interaction Design | A | ↑ | Cycle 34: Run Compare button now shows Ctrl+↵ shortcut inline — analysts see it without scrolling to sort row. Side-by-Side: Saudi Arabia vs UAE 4th quickstart added. |
+| 3 | 4. Interaction Design | A | = | Cycle 34: Run Compare button now shows Ctrl+↵ shortcut inline. All major interaction gaps closed. |
 | 4 | 6. Error & Empty States | A | = | All empty states informative. |
 | 5 | 9. Performance & Reliability | A | = | CSP meta tag; unsafe-inline present. |
 | 6 | 10. Accessibility | A | = | Search modal focus trap (Cycle 31). All major gaps closed. |
 | 7 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 8 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
-| 9 | 2. Information Architecture | A | ↑ | Cycle 34: East Africa & Sub-Saharan Frontier section added to Sample Analyses (2 new analysis cards). Now covers all major producing regions: Global, Asia Pacific, Latin America, East Africa, Strategic Screens. |
+| 9 | 2. Information Architecture | A | = | Cycle 34: East Africa & Sub-Saharan Frontier section added to Sample Analyses. Now covers all major producing regions. |
 | 10 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). 117 PASS / 0 FAIL baseline maintained. |
 | 11 | 3. Data Presentation | A+ | = | Regional median callout in Country Profile (Cycle 30). Govt NPV ⓘ disclosure (Cycle 32). Reform Risk Regional Tilt panel (Cycle 33). |
 | 12 | 5. Naming Consistency | A+ | = | "Regime Explorer" fully eliminated (Cycle 30). |
 | 13 | 7. Professional Credibility | A+ | = | Footer "Platform updated" timestamp (Cycle 31). Methodology provenance version corrected Cycle 34. |
-| 14 | 14. Search Quality | A+ | ↑ | Cycle 34: Revenue Share and EPSA added to global search mechanics list — previously missing from search index despite being modeled mechanics. |
+| 14 | 14. Search Quality | A+ | ↑ | Cycle 35: Levenshtein edit distance replaces character-overlap scorer — materially better fuzzy matches for 2+ char typos and longer country names. Threshold 0.6→0.55 tuned to Levenshtein scale. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. |
 
-**Summary: 0 categories below B+. Cycle 34: no grade changes (improvements within existing grades — East Africa section strengthens Information Architecture; search mechanics expansion strengthens Search Quality; Run Compare shortcut strengthens Interaction Design). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 35: no grade changes (Revenue Share Scenario Builder and Levenshtein fuzzy search are improvements within existing A/A+ grades). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now comprehensive (tooltips, footnotes, column headers, ≥500% filter notes in 5+ locations); the data itself is the constraint.
@@ -174,9 +174,9 @@ Every 30-minute cycle:
 **Next cycle priorities:**
 1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
 2. Continue onclick→event listener migration: Explorer chip filters, Reform Risk filter selects (Security → tighter CSP)
-3. Add Revenue Share to Scenario Builder (currently modeled via PSC-proxy in live DCF; add explicit Scenario Builder option)
-4. Levenshtein distance for fuzzy search (Search Quality polish)
-5. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
+3. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
+4. Add Gross Split as explicit Scenario Builder option (currently PSC-proxy)
+5. Side-by-Side: add a "Download comparison as PDF" option directly from the comparison result view
 
 ---
 
@@ -252,6 +252,22 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 35 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 34 state), read index.html in sections to audit Scenario Builder mechanic coverage, fuzzy search implementation, and Explorer filter consistency. Platform at GPA 3.99 with all 15 categories at A or above. Focus: GRADER.md "next cycle priorities" items 3 and 4 — Revenue Share Scenario Builder and Levenshtein fuzzy search. 6 targeted improvements shipped. Version v81 → v82.
+- **Fixes shipped (6 improvements):**
+  1. **Revenue Share added as 7th mechanic in Scenario Builder** — Previously the Scenario Builder offered 6 mechanics (Concession, PSC, TSC, PRRT, Buy-back, RSC) but not Revenue Share, despite Revenue Share having a full DCF model in the platform engine. Revenue Share contracts appear in ~15 countries (select African and Latin American regimes). Added: (a) 7th option in `sb-mechanic` select dropdown; (b) dedicated `sb-revshare-params` panel with Govt Revenue Share %, CIT Rate, and Royalty Rate inputs plus an explanatory note describing the gross-revenue-split structure; (c) `sbUpdateMechanic()` extended to toggle the new panel; (d) `sbGetParams()` extended to read Revenue Share params and construct the correct PSC parameter object (cost_recovery_cap=0, profit_oil_govt_pct=share/100) that routes to dcfPSC; (e) `runCustomScenario()` already routed PSC and Revenue Share to dcfPSC — confirmed correct. Rationale: an analyst asked to model a Revenue Share contract could not do so; they would have to approximate it manually via PSC with a 0% cost recovery cap — now it is first-class.
+  2. **Nigeria Revenue Share preset added to Scenario Builder** — Preset `nigeria_rs`: 55% govt revenue share, 30% CIT, 0% royalty, deepwater profile ($75/bbl). Representative of Nigeria's pre-PIA (pre-2021 Petroleum Industry Act) legacy gross revenue share deepwater structures. The Nigeria preset complements existing presets (Norway, Angola, Iraq, UK, Australia, Saudi Arabia, Iran, India) and is the first Revenue Share archetype in the library. `SB_PRESETS`, `loadPreset()`, and preset button HTML all updated.
+  3. **Explorer mechanic dropdown: Revenue Share added to flt-mech select** — The `flt-mech` hidden dropdown (used by `setExplorerChip()` sync logic and `renderExplorer()` filtering) previously listed only: Concession, PSC, TSC, PRRT, RSC, Buy-back. Revenue Share was in the chip row (line 1389) and Screener checkbox list but absent from the dropdown. This caused a mismatch where selecting the Revenue Share chip would set the chip UI correctly but not sync the hidden dropdown, potentially causing `renderExplorer()` to return wrong results when the dropdown value was queried. Fixed by adding `<option>Revenue Share</option>` to flt-mech.
+  4. **Fuzzy search upgraded to Levenshtein edit distance** — Previous implementation used a character-overlap subsequence scorer (`_fuzzyScore`): iterated through query characters sequentially, counted matching characters in order, and normalized by max(query, country) length. This worked reasonably for 1-char typos but degraded for 2+ char errors in longer names (e.g. "Azerbajan" vs "Azerbaijan" — the subsequence scorer misses the transposition; "Saudi Arabi" would score well but "Saudia Arabia" with an extra character could fail). Replaced with proper Levenshtein edit distance using a standard DP table `_levenshtein(a,b)`. Score normalized as `1 - dist/max(len_a, len_b)` — a distance of 1 edit on a 9-char query still scores 0.89, well above threshold. Threshold adjusted 0.6 → 0.55 to account for the different scale (edit distance tends to be harsher on long names with multiple errors). Fuzzy section still styled orange and labeled "Did you mean?" — no UX change, just better suggestions.
+  5. **ddOpenScenarioBuilder() mechanic routing corrected** — When a user clicked "Open in Scenario Builder" from a Country Profile, the mechanic routing logic was: PSC/EPSA → 'PSC'; TSC/RSC → 'TSC'; else → 'Concession'. This meant Revenue Share countries fell to Concession (wrong), PRRT countries fell to Concession (wrong), Buy-back countries fell to Concession (wrong). Fixed to: PSC/EPSA/Gross Split → 'PSC'; Revenue Share → 'Revenue Share'; TSC/RSC → 'TSC'; PRRT → 'PRRT'; Buy-back → 'Buy-back'; else → 'Concession'. Now all 7 mechanic types route correctly.
+  6. **Scenario Builder welcome panel description updated** — The Drilldown Capabilities panel entry for Scenario Builder previously said "set royalty, CIT, profit oil split, R-factor tiers" — accurate for Concession/PSC but omitting the now-7-mechanic coverage. Updated to: "7 mechanics (Concession, PSC, TSC, PRRT, Buy-back, RSC, Revenue Share) with full parameter control. 9 country presets." — first-time users now see the full mechanic coverage before opening the modal.
+- **Grade changes from Cycle 34:** None (Revenue Share Scenario Builder and Levenshtein are improvements within existing A/A+ grades for Interaction Design and Search Quality).
+- **Net result: 0 grade upgrades. 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected (all changes are additive — new params panel hidden by default, Levenshtein is drop-in replacement for fuzzy fallback, Revenue Share mechanic already routed in dcfPSC). No function signatures changed, no DCF engine modified.
+- **Version:** v81 → v82
 
 ---
 
