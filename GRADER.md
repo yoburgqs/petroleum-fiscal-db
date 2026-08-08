@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 31 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 32 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 31 shipped v78: 10 UX improvements — Loading screen redesigned with platform tagline ("Petroleum Fiscal Intelligence Platform — 71,000+ contracts across 185 countries"). CSP meta tag: report-uri directive added. Search modal: aria-modal="true", role="dialog", and focus trap (Tab cycles within modal) for accessibility. Footer: "Platform updated: 2026-08-08" timestamp added for credibility. IRR display: fmtIrr() values now show methodology tooltip on hover; ≥500% exclusion tooltip expanded; "n/a" changed to "n/a*" with footnote. Screener IRR column header: inline disclosure of ≥500% threshold. Screener: IRR footnote legend added below results table explaining n/a* and dash symbols. Version v77→v78. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 32 shipped v79: 10 UX improvements — All remaining browser `prompt()` dialogs eliminated (saveCustomScenario now uses an inline styled modal; clipboard fallbacks now show toast messages in 4 locations). Scenario Builder IRR: values ≥500% now show styled n/a* with tooltip (consistent with Explorer/Screener). Welcome panel "7 fiscal mechanics" card clarified to "Full DCF mechanics" with expanded tooltip. Scenario Builder: after Run DCF, output panel now shows "vs 185-Country Database" context (rank by take, diff from median, percentile position). Fiscal Compare empty state: quickstart buttons added (Run Deepwater $75, Onshore $50) with profile rationale. Screener Prod Cov column header: full tooltip explaining production-weighted vs equal-weighted distinction. Country Profile quick-access: Nigeria added (8th country, PIA 2021 reform). FC results Govt NPV column: ⓘ disclosure added clarifying formula-derived nature. Side-by-Side empty state: 3 quickstart comparison buttons (Norway vs Angola, USA vs Iraq, Indonesia vs Malaysia). Version v78→v79. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -146,27 +146,27 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 31 — 2026-08-08)
+## Updated Grade Table (Cycle 32 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure now includes ≥500% exclusion note in 5+ locations (Cycle 31: tooltips + footnote). |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure comprehensive. |
 | 2 | 1. Visual Design | A | = | Loading screen improved with tagline (Cycle 31). Skeleton screens still nice-to-have. |
-| 3 | 4. Interaction Design | A | = | Buy-back DCF param bug fixed (Cycle 27). Regional Peers onclick fixed (Cycle 30). |
-| 4 | 6. Error & Empty States | A | = | clearSavedScenarios inline confirmation already shipped. No confirm() dialogs remain. |
-| 5 | 9. Performance & Reliability | A | = | CSP meta tag added; unsafe-inline still present (gradual refactor). |
-| 6 | 10. Accessibility | A | = | Search modal focus trap + aria-modal added (Cycle 31). |
+| 3 | 4. Interaction Design | A | ↑ | Cycle 32: FC empty state quickstart buttons, Side-by-Side quickstart comparisons, Scenario Builder DB context panel all reduce friction for first-time users. |
+| 4 | 6. Error & Empty States | A | ↑ | Cycle 32: all prompt() dialogs eliminated — saveCustomScenario now uses inline modal. No browser dialogs remain at all. |
+| 5 | 9. Performance & Reliability | A | = | CSP meta tag; unsafe-inline present. |
+| 6 | 10. Accessibility | A | = | Search modal focus trap (Cycle 31). All major gaps closed. |
 | 7 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 8 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
-| 9 | 2. Information Architecture | A | = | Welcome panel Screener routing correct. Iran quick-access added (Cycle 27). |
-| 10 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). Pre-push hook uses repo-local test file. 117 PASS / 0 FAIL. |
-| 11 | 3. Data Presentation | A+ | = | Regional median callout added to Country Profile (Cycle 30). |
-| 12 | 5. Naming Consistency | A+ | = | "Regime Explorer" fully eliminated from user-visible text (Cycle 30). |
-| 13 | 7. Professional Credibility | A+ | = | Footer "Platform updated" timestamp added (Cycle 31). |
-| 14 | 14. Search Quality | A+ | = | Search recent history Clear button present. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. Footer IRR/BE stats navigate to Explorer. |
+| 9 | 2. Information Architecture | A | ↑ | Cycle 32: Nigeria added to Country Profile quick-access (8th country, PIA 2021 reform). Welcome panel stat card clarified. |
+| 10 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). 117 PASS / 0 FAIL baseline maintained. |
+| 11 | 3. Data Presentation | A+ | = | Regional median callout in Country Profile (Cycle 30). Govt NPV ⓘ disclosure added (Cycle 32). |
+| 12 | 5. Naming Consistency | A+ | = | "Regime Explorer" fully eliminated (Cycle 30). |
+| 13 | 7. Professional Credibility | A+ | = | Footer "Platform updated" timestamp (Cycle 31). |
+| 14 | 14. Search Quality | A+ | = | Fuzzy search, recent searches. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. |
 
-**Summary: 0 categories below B+. Cycle 31: no grade changes (improvements within existing grades). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 32: no grade changes (improvements within existing grades — Interaction Design and Error & Empty States both strengthened, Information Architecture improved). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now comprehensive (tooltips, footnotes, column headers, ≥500% filter notes in 5+ locations); the data itself is the constraint.
@@ -174,9 +174,9 @@ Every 30-minute cycle:
 **Next cycle priorities:**
 1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
 2. Continue onclick→event listener migration: Explorer chip filters, Reform Risk filter selects (Security → tighter CSP)
-3. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
-4. Add Revenue Share to Scenario Builder (currently modeled via PSC-proxy in live DCF; add explicit Scenario Builder option)
-5. Levenshtein distance for fuzzy search (Search Quality polish)
+3. Add Revenue Share to Scenario Builder (currently modeled via PSC-proxy in live DCF; add explicit Scenario Builder option)
+4. Levenshtein distance for fuzzy search (Search Quality polish)
+5. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
 
 ---
 
@@ -252,6 +252,26 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 32 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 31 state), audited index.html for remaining browser dialog calls, analyst workflow friction points, and data disclosure gaps. Platform is at GPA 3.99 with all 15 categories at A or above (only Data Reliability at B+ which is a Harvesting fork issue). Focus shifted to polish: eliminating last browser dialogs, improving analyst onboarding, and adding peer context to Scenario Builder. All 10 improvements shipped. Version v78 → v79.
+- **Fixes shipped (10 of 10):**
+  1. **saveCustomScenario() prompt() replaced with inline modal** — Previously called `prompt('Scenario name...')` which is a browser dialog inconsistent with the rest of the UX. Now creates a styled inline modal (dark theme, amber header, name input, Save/Cancel buttons, Esc to close, Enter to save, click-outside to close). Toast confirms save with scenario name.
+  2. **Clipboard fallback prompt() calls replaced with showCopyToast()** — 4 locations (API copy URL, Share comparison, Country Profile copy-link, Explorer copy-link) previously called `prompt()` on clipboard write failure. All replaced with informative toast messages. Zero browser dialogs remain in the entire platform.
+  3. **Scenario Builder IRR: ≥500% now shows styled n/a* with tooltip** — `runCustomScenario()` computed `irrDisplay` but didn't handle the ≥500% threshold case — showed "n/a" without styling or explanation. Now uses `irrHtml` which shows styled green n/a* with tooltip matching the Explorer/Screener display. `irrColor` also updated to treat ≥500% as muted rather than colored.
+  4. **Welcome panel stat card clarified** — "7 fiscal mechanics modeled" label changed to "Full DCF mechanics" with a hover tooltip listing all 7 (Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share) and noting 2 additional directional mechanics (Gross Split, EPSA). Removes ambiguity between "modeled" and "fully modeled with DCF".
+  5. **Scenario Builder: "vs 185-Country Database" context panel added** — After running DCF, a context band appears below the waterfall showing: rank by govt take (#X of 185, 1=lowest), difference from global median (+/-Xpp), and percentile (X% of countries have lower take). Colored by tier (green/yellow/red). Gives analysts immediate peer benchmarking without navigating to Fiscal Compare.
+  6. **Fiscal Compare empty state: quickstart buttons added** — "Run Deepwater $75" (amber primary button) and "Onshore $50" (outline) added below the empty state description. Description updated with rationale for each starting point (Deepwater $75 = platform benchmark basis; Onshore $50 = low-breakeven screen; Giant $100 = high-take resilience). First-time users can load results in one click.
+  7. **Screener "Prod Cov" column header: full tooltip added** — Previously bare "Prod Cov" with no explanation. Now has ⓘ and a 40-word tooltip explaining what production coverage means, why high coverage gives more accurate take numbers (production-weighted vs equal-weighted), and directing users to the "Prod Data Only" filter in Explorer for high-coverage screens.
+  8. **Country Profile quick-access: Nigeria added as 8th country** — Nigeria covers PSC and Concession mechanics, has the PIA 2021 as one of the most-watched recent fiscal reform events in IOC planning, and adds an Africa PSC perspective to complement Angola. Quick-access title explains the PIA 2021 significance.
+  9. **FC results Govt NPV column: ⓘ disclosure added** — Column header "Govt NPV" changed to "Govt NPV ⓘ" with tooltip explaining it is derived via formula (Govt NPV = Ctct NPV × take / (1−take)), is not independently modeled, and should be treated as indicative order-of-magnitude only. Also adds note that actual govt NPV depends on timing of fiscal receipts. Ctct NPV column also gains a tooltip describing the 10% discount rate.
+  10. **Side-by-Side comparison empty state: quickstart comparison buttons** — Empty state previously said only "Select countries above to begin comparison." Now includes 3 quickstart buttons (Norway vs Angola, USA vs Iraq, Indonesia vs Malaysia) each with a tooltip explaining the analytic rationale. Buttons call `addCompare()` for each country pair — fully functional one-click loading.
+- **Grade changes from Cycle 31:** None (all improvements within existing A grades — platform is at theoretical ceiling for UX given the data coverage constraint in Data Reliability).
+- **Net result: 0 grade upgrades. 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (pre-push hook confirmed).
+- **Version:** v78 → v79
 
 ---
 
