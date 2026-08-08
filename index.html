@@ -1147,7 +1147,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v58</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v59</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1221,7 +1221,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Countries with DCF</div>
         </div>
         <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">330K+</div>
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">384K+</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Sourced fiscal facts</div>
         </div>
         <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
@@ -1485,7 +1485,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div style="font-weight:600;color:var(--text);font-size:13px;">IRR vs Govt Take <span style="color:var(--muted);font-weight:400;font-size:11px;">— bubble size = contract count, colored by mechanic</span></div>
       <button onclick="downloadIRRScatterPng()" style="padding:5px 12px;background:#1a2332;color:#d4a017;border:1px solid #d4a017;border-radius:4px;cursor:pointer;font-size:11px;white-space:nowrap;" title="Download IRR scatter chart as PNG">↓ PNG</button>
     </div>
-    <canvas id="irr-scatter-canvas" style="width:100%;display:block;cursor:crosshair;"></canvas>
+    <canvas id="irr-scatter-canvas" aria-label="IRR vs Government Take scatter chart — hover over dots to see country details" role="img" style="width:100%;display:block;cursor:crosshair;"></canvas>
     <div id="irr-scatter-tooltip" style="position:fixed;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 10px;font-size:12px;color:#f1f5f9;pointer-events:none;display:none;z-index:9999;"></div>
     <div style="margin-top:8px;font-size:11px;color:var(--muted);">
       <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e8a020;margin-right:4px;"></span>Concession
@@ -1503,7 +1503,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </div>
     <div id="vintage-trend-body">
       <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Average government take by decade and fiscal mechanic, across all contracts in the database. Shows the global trend toward higher capture since 1980.</div>
-      <canvas id="vintage-trend-chart" style="max-height:280px;"></canvas>
+      <canvas id="vintage-trend-chart" aria-label="Line chart of average government take by decade and fiscal mechanic (Concession, PSC, TSC) since 1960" role="img" style="max-height:280px;"></canvas>
     </div>
   </div>
   </div><!-- end browse mode -->
@@ -1630,7 +1630,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <strong>Upper-right</strong> (high take, positive NPV) = large-reserve countries where even high take generates value.
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
-      <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas"></canvas></div>
+      <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Click to open Country Profile." role="img"></canvas></div>
       <div style="text-align:right;margin-top:8px;">
         <button id="download-bubble-png" onclick="downloadBubblePng()"
           style="padding:6px 14px;background:#1a2332;color:#d4a017;border:1px solid #d4a017;border-radius:4px;cursor:pointer;font-size:0.8rem;">
@@ -1652,7 +1652,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="card">
     <div class="card-title">Select Countries (max 4)</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-      <input type="text" class="search-input" id="cmp-search" placeholder="Type to search countries…" style="width:260px;">
+      <input type="text" class="search-input" id="cmp-search" placeholder="Type to search countries…" aria-label="Search countries to compare side-by-side" autocomplete="off" style="width:260px;">
       <div id="cmp-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       <button class="btn btn-outline btn-sm" onclick="clearCompare()">Clear</button>
       <button class="btn btn-outline btn-sm" onclick="window.print()" title="Print/export comparison as PDF">⬇ Export PDF</button>
@@ -1713,16 +1713,16 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="card" style="margin-top:24px;">
     <div class="card-title">Fiscal Reform History — Sourced Event Log</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center;">
-      <select id="reform-filter-country" onchange="renderReformTable()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
+      <select id="reform-filter-country" aria-label="Filter by country" onchange="renderReformTable()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
         <option value="">All Countries</option>
       </select>
-      <select id="reform-filter-dir" onchange="renderReformTable()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
+      <select id="reform-filter-dir" aria-label="Filter by reform direction" onchange="renderReformTable()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
         <option value="">All Directions</option>
         <option value="hostile">Hostile (↑ take)</option>
         <option value="friendly">Friendly (↓ take)</option>
         <option value="neutral">Neutral</option>
       </select>
-      <select id="reform-filter-decade" onchange="renderReformTable()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
+      <select id="reform-filter-decade" aria-label="Filter by decade" onchange="renderReformTable()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
         <option value="">All Decades</option>
         <option value="1960">1960s</option>
         <option value="1970">1970s</option>
@@ -1760,7 +1760,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-sub">Search any operator to see their full portfolio of fiscal contracts. All metrics at $75/bbl.</div>
 
   <div class="card">
-    <input type="text" class="search-input" id="ioc-search" placeholder="Search operator (e.g. ExxonMobil, Shell, BP, Total, Chevron, Equinor)…" style="width:100%;max-width:500px;" oninput="updateIOCSuggestions()">
+    <input type="text" class="search-input" id="ioc-search" placeholder="Search operator (e.g. ExxonMobil, Shell, BP, Total, Chevron, Equinor)…" aria-label="Search IOC operator" autocomplete="off" style="width:100%;max-width:500px;" oninput="updateIOCSuggestions()">
     <div id="ioc-suggestions" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;"></div>
     <div id="ioc-quick-btns" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
       <span style="color:var(--muted);font-size:12px;margin-right:4px;">Quick:</span>
@@ -1775,7 +1775,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-sub">Select an operator to see what percentage of their global contract portfolio sits in each take tier — and how their aggregate exposure compares to the IOC peer group.</div>
 
   <div style="display:flex;gap:12px;align-items:center;margin:16px 0;flex-wrap:wrap;">
-    <select id="exposure-ioc-select" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;font-size:13px;" onchange="renderIOCExposure(this.value)">
+    <select id="exposure-ioc-select" aria-label="Select IOC operator for fiscal exposure analysis" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;font-size:13px;" onchange="renderIOCExposure(this.value)">
       <option value="">Select Operator…</option>
     </select>
     <div id="exposure-ioc-quick" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
@@ -1785,7 +1785,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Portfolio Take Distribution</div>
-        <canvas id="exposure-donut-chart" style="max-height:200px;"></canvas>
+        <canvas id="exposure-donut-chart" aria-label="Donut chart showing portfolio distribution of government take tiers for the selected IOC operator" role="img" style="max-height:200px;"></canvas>
       </div>
       <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Key Metrics</div>
@@ -1876,7 +1876,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <button class="btn btn-outline btn-sm" id="api-copy-btn" onclick="copyAPIUrl()" style="display:none;">⎘ Copy API URL</button>
     <span id="api-url-display" style="font-size:12px;color:var(--muted);font-family:monospace;"></span>
   </div>
-  <pre id="api-json-output" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;overflow:auto;max-height:600px;font-size:12px;color:#8892a8;white-space:pre-wrap;"></pre>
+  <pre id="api-json-output" aria-label="API JSON response for selected country" aria-live="polite" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;overflow:auto;max-height:600px;font-size:12px;color:#8892a8;white-space:pre-wrap;"></pre>
 </div>
 
 <!-- ===== TAB: METHODOLOGY ===== -->
@@ -1896,6 +1896,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v59 (Aug 2026)</strong> — Welcome panel fact count corrected to 384K+ (consistent with Methodology section); aria-label added to reform history filter selects, IOC exposure operator selector, breakeven map price slider, IRR scatter canvas, bubble chart canvas, IOC exposure donut chart canvas, and API JSON output; compare chip remove buttons now have role="button", aria-label, and keyboard support (Enter/Space).<br>
       <strong>v58 (Aug 2026)</strong> — Tornado/sensitivity chart PNG download added (↓ PNG button in Country Profile sensitivity panel — analysts can now export for presentations); Screener rows now have keyboard navigation (Tab + Enter) and basket add button (workflow parity with Fiscal Compare); add-to-basket button aria-label on FC results rows; compare basket Clear/Compare buttons accessible (aria-label); Screener Drilldown description updated to reflect top-level tab status.<br>
       <strong>v57 (Aug 2026)</strong> — Screener routing text in welcome panel updated (reflects top-level tab promotion from v56); keyboard navigation on all sortable Explorer column headers (Tab + Enter now triggers sort); fact count updated to 384,259 in Methodology section; basket remove button accessibility (aria-label); Esc close button keyboard support in search modal.<br>
       <strong>v56 (Aug 2026)</strong> — Screener promoted to top-level tab (one-click access, no longer buried under Explorer); IRR scatter chart PNG download added; fuzzy search matching — typos like "Nigera" now return "Nigeria" via Did you mean? suggestions; title tag aligned to 185 Countries (matches DCF interface coverage); pre-push CI hook updated to use repo-local test file (tests/runtime_comprehensive.js).<br>
@@ -2200,7 +2201,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   <div style="display:flex;align-items:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);">
       <span>Current price marker:</span>
-      <input type="range" id="be-price-marker" min="30" max="120" value="70" step="5" style="width:120px;accent-color:var(--accent);">
+      <input type="range" id="be-price-marker" min="30" max="120" value="70" step="5" aria-label="Current oil price marker for breakeven map ($/bbl)" style="width:120px;accent-color:var(--accent);">
       <span id="be-price-label" style="color:var(--accent);font-weight:700;min-width:40px;">$70</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;font-size:11px;">
@@ -3499,7 +3500,7 @@ function renderCompare() {
   const chips = document.getElementById('cmp-chips');
   chips.innerHTML = compareList.map(c =>
     `<span style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:4px 12px;font-size:12px;display:flex;align-items:center;gap:6px;">
-      ${c} <span onclick="removeCompare('${c.replace(/'/g,"\\'")}');event.stopPropagation();" style="cursor:pointer;color:var(--muted);">✕</span>
+      ${c} <span role="button" tabindex="0" aria-label="Remove ${c.replace(/'/g,"\\'").replace(/"/g,'&quot;')} from comparison" onclick="removeCompare('${c.replace(/'/g,"\\'")}');event.stopPropagation();" onkeydown="if(event.key==='Enter'||event.key===' '){removeCompare('${c.replace(/'/g,"\\'")}');event.stopPropagation();}" style="cursor:pointer;color:var(--muted);">✕</span>
     </span>`
   ).join('');
 
@@ -9750,7 +9751,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v58</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v59</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
