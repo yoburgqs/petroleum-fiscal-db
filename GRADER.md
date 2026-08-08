@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 37 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 38 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 37 shipped v84: 6 improvements — (1) Gross Split chip added to Explorer mechanic filter row — analysts can now filter the DB by Gross Split mechanic from the chip bar (was the only modeled mechanic missing from the chip row). (2) Gross Split added to hidden flt-mech dropdown for chip sync consistency. (3) Revenue Share and Gross Split added as full mechanic cards to the Fiscal Mechanics Guide page — guide previously showed only 7 cards; both mechanics now have complete How/Typical/Examples/KeyVars entries plus Explorer filter buttons. (4) Welcome panel Scenario Builder description updated to 8 mechanics. (5) Stat card corrected from "7 Full DCF mechanics" to "8 Scenario mechanics" with updated tooltip. (6) Methodology formula block expanded with Revenue Share and Gross Split formulas — was showing only 5 of the 7+ modeled mechanics. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected (all additive changes).
+**Overall Status:** Cycle 38 shipped v85: 10 improvements — (1) dd-section-hdr CSS added to main stylesheet — Methodology headings now styled correctly on screen. (2) North Sea card factual fix: "18pp" → "~16pp", "78% SPT" → correct 56% SPT + 22% CIT breakdown. (3) Breakeven Map price marker default $70→$75. (4) Country Profile "Q2 2026" → "Q3 2026". (5) Loading animation upgraded: ORCA title pulse + shimmer bar. (6) West Africa PSC card: Angola 2023 reform explained with concrete detail (FTP 10%→20%). (7) Benchmark table countries now clickable → Country Profile. (8) Discount rate section: callout explaining govt take invariance. (9) Screener NPV slider: @$75 price reference added. (10) Known Model Limitations: Indonesia Gross Split limitation documented. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected.
 
 ---
 
@@ -146,27 +146,27 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 37 — 2026-08-08)
+## Updated Grade Table (Cycle 38 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure comprehensive. |
-| 2 | 1. Visual Design | A | = | Loading screen improved with tagline (Cycle 31). Skeleton screens still nice-to-have. |
-| 3 | 4. Interaction Design | A | = | Cycle 34: Run Compare button now shows Ctrl+↵ shortcut inline. All major interaction gaps closed. |
+| 2 | 1. Visual Design | A | ↑ | Cycle 38: loading animation upgraded (pulse + shimmer). Skeleton screens still nice-to-have. |
+| 3 | 4. Interaction Design | A | = | Cycle 34: Run Compare button shows Ctrl+↵. Cycle 38: benchmark table country links + NPV slider reference. All major gaps closed. |
 | 4 | 6. Error & Empty States | A | = | All empty states informative. |
 | 5 | 9. Performance & Reliability | A | = | CSP meta tag; unsafe-inline present. |
 | 6 | 10. Accessibility | A | = | Search modal focus trap (Cycle 31). All major gaps closed. |
 | 7 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 8 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
-| 9 | 2. Information Architecture | A | = | Cycle 34: East Africa & Sub-Saharan Frontier section added to Sample Analyses. Cycle 37: Fiscal Mechanics Guide now includes Revenue Share and Gross Split cards — guide coverage complete. |
+| 9 | 2. Information Architecture | A | = | Cycle 34: East Africa section in Sample Analyses. Cycle 37: Mechanics Guide complete. Cycle 38: Angola 2023 reform detail in West Africa card. |
 | 10 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). 117 PASS / 0 FAIL baseline maintained. |
-| 11 | 3. Data Presentation | A+ | = | Regional median callout in Country Profile (Cycle 30). Govt NPV ⓘ disclosure (Cycle 32). Reform Risk Regional Tilt panel (Cycle 33). Cycle 36: Revenue Share column added to Vintage table. |
-| 12 | 5. Naming Consistency | A+ | = | "Regime Explorer" fully eliminated (Cycle 30). Cycle 37: Gross Split and Revenue Share mechanic cards added to Mechanics Guide — no new naming inconsistencies. |
-| 13 | 7. Professional Credibility | A+ | = | Footer "Platform updated" timestamp (Cycle 31). Cycle 37: methodology formula block now shows all 7+ modeled mechanics. Provenance updated to v84. |
-| 14 | 14. Search Quality | A+ | = | Cycle 35: Levenshtein edit distance replaces character-overlap scorer. Cycle 37: no changes. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | Cycle 36: Side-by-Side export buttons in context. Cycle 37: no changes. |
+| 11 | 3. Data Presentation | A+ | = | Regional median callout (Cycle 30). Cycle 38: discount rate invariance callout added. |
+| 12 | 5. Naming Consistency | A+ | = | "Regime Explorer" fully eliminated (Cycle 30). Cycle 38: no new inconsistencies. |
+| 13 | 7. Professional Credibility | A+ | = | Cycle 38: Indonesia Gross Split limitation documented in Known Model Limitations. Benchmark table now links to Country Profile. North Sea card factual error corrected. Provenance updated to v85. |
+| 14 | 14. Search Quality | A+ | = | Cycle 35: Levenshtein edit distance. Cycle 38: no changes. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | Cycle 36: Side-by-Side export buttons. Cycle 38: no changes. |
 
-**Summary: 0 categories below B+. Cycle 37: no grade changes (Gross Split Explorer chip, Mechanics Guide cards, and formula completeness are improvements within existing A/A+ grades). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected.**
+**Summary: 0 categories below B+. Cycle 38: no grade changes (10 improvements within existing A/A+ grades — factual corrections, CSS fix, animation polish, analytical depth improvements). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now comprehensive (tooltips, footnotes, column headers, ≥500% filter notes in 5+ locations); the data itself is the constraint.
@@ -176,7 +176,7 @@ Every 30-minute cycle:
 2. Continue onclick→event listener migration: Explorer chip filters, Reform Risk filter selects (Security → tighter CSP)
 3. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
 4. Add Gross Split preset count tooltip to the Indonesia Gross Split preset button in Scenario Builder
-5. Screener: add Gross Split to the "Filter Explorer →" button logic for any Mechanics Guide mechanic cards that link to Explorer sub-modes
+5. Add a "Key Analyst Questions" panel to the Methodology tab — 3-4 common questions a due-diligence analyst would ask with direct answers (e.g. "How do I know these numbers are right?", "What does government take exclude?", "How current is this data?")
 
 ---
 
@@ -252,6 +252,26 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 38 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 37 state), read index.html comprehensively to audit all 15 graded categories. Platform at GPA 3.99 with all categories at A or above except Data Reliability (B+ — Harvesting-constrained). Focus: factual accuracy issues, missing CSS styling, analytical depth gaps, and UX polish that a senior IOC analyst would notice on a first-time demo. 10 improvements shipped. Version v84 → v85.
+- **Fixes shipped (10 improvements):**
+  1. **dd-section-hdr CSS added to main stylesheet** — The `.dd-section-hdr` class was only defined in the `@media print` block (`color: #1a1a1a !important`), not in the main stylesheet. On screen, all Methodology section headings (Who Built This, Recent Platform Updates, How Govt Take is Calculated, Key Assumptions, Evidence Quality Tiers, etc.) rendered as unstyled default text with no visual hierarchy — identical to body text. Added main-stylesheet rule: `font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px;` — matching `.dd-section h3` style. Methodology tab now has proper section heading visual hierarchy.
+  2. **North Sea card factual corrections (2 errors)** — (a) "Why does Norway capture 18 percentage points more than the UK?" — incorrect. Norway: 67.9%, UK: 51.4%, actual gap = 16.5pp. Corrected to "~16 percentage points". (b) "Norway's 78% Special Petroleum Tax" — incorrect. Norway's SPT rate is 56%, not 78%. 78% is Norway's combined marginal rate (56% SPT + 22% CIT). Corrected description to accurately explain the 56%/22% breakdown.
+  3. **Breakeven Map price marker default $70 → $75** — The map's "current price marker" slider defaulted to $70/bbl, inconsistent with every other part of the platform that uses $75/bbl as the standard reference (Fiscal Compare default, Screener take thresholds, Methodology benchmarks). Fixed to $75 for internal consistency.
+  4. **Country Profile "Q2 2026" → "Q3 2026"** — The data currency badge on every Country Profile said "Data current as of Q2 2026 · verified Aug 2026". August 2026 is Q3 (July–September), not Q2. Corrected to Q3 2026.
+  5. **Loading animation upgraded** — (a) The ORCA title text now uses a subtle pulse animation (`ld-pulse`: opacity 1→0.65→1 on 2s cycle) giving the loading screen a more professional, alive feel. (b) The progress bar was replaced: instead of a plain amber fill widening from left to right, now shows a 60%-wide shimmer band that sweeps left-to-right using a linear gradient (`#b87a10 → #E8A020 → #f0c060 → #E8A020 → #b87a10`) on a 1.6s animation. Bar height increased from 2px to 3px for visibility.
+  6. **West Africa PSC card: Angola 2023 reform explained** — The card said "Angola tightened terms in 2023" with no explanation of what actually changed. An analyst reading this would want to know the mechanism. Updated to: "Angola's 2023 Sonangol reform increased First Tranche Petroleum (FTP) from 10% to 20% on new deepwater blocks, raising effective take ~5pp." Also added reference to Nigeria PIA 2021 restructuring royalty tiers and deepwater incentives.
+  7. **Benchmark validation table: country names clickable → Country Profile** — The 12 benchmark countries (Norway, UK, Angola, Nigeria, Iraq, Kazakhstan, Malaysia, Indonesia, USA, Brazil, Australia, Ireland) were displayed as static `<td>` text. Analysts reading the validation table who want to drill into a country's full fiscal profile had no in-table affordance. Made each country name a button that navigates to the Country Profile tab with that country loaded — consistent with how Reform Risk and other tables expose drill-down.
+  8. **Discount rate sensitivity: "govt take invariant" callout added** — A senior economist reviewing the discount rate sensitivity table would immediately ask "why doesn't government take change with discount rate?" The answer is correct (take is undiscounted) but wasn't stated anywhere near the table. Added a teal callout box directly below the sensitivity table explaining the mathematical reason, referencing the undiscounted basis of the take computation.
+  9. **Screener NPV slider: @$75 price reference added** — The "Min Contractor NPV" slider label gave no indication of which oil price scenario the NPV threshold applies to. An analyst using $50/bbl NPV intuitions to set a filter at "$500M" would be applying a different benchmark than the platform's NPV (computed at $75/bbl). Added "@$75" as a secondary label and expanded the tooltip to explain: "0 = NPV-positive only. Negative = allow negative-NPV (loss-making at $75). All values in $M."
+  10. **Indonesia Gross Split: Known Model Limitations entry added** — The Known Model Limitations section previously had only one entry (Russia MET). Indonesia's Gross Split contracts are the second most notable modeling approximation: the platform uses a PSC-equivalent with 43% base contractor split, but the true Gross Split adds variable components (API gravity, field location, water depth, CO₂ content, H₂S content, local content) that can shift the contractor split ±10pp. DMO is directional only. This limitation now documented in the same section as Russia, visible to any analyst doing due diligence on the Methodology page.
+- **Grade changes from Cycle 37:** None (all improvements within existing A/A+ grade ranges — CSS fix and factual corrections are Professional Credibility polish; animation is Visual Design polish; analytical callouts are Data Presentation polish within existing A+).
+- **Net result: 0 grade upgrades. 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors expected (all changes are: CSS addition, text corrections, slider default value change, new animation keyframes, benchmark table JS row template change — no DCF engine, no data loading, no tab routing modified).
+- **Version:** v84 → v85
 
 ---
 
