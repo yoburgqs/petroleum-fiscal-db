@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v64</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v65</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1336,7 +1336,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="fc-sort-label">Sort by:</span>
     <button class="fc-sort-btn active" data-sort="take" onclick="fcSetSort('take')">Govt Take</button>
     <button class="fc-sort-btn" data-sort="npv" onclick="fcSetSort('npv')">NPV &#9660;</button>
-    <button class="fc-sort-btn" data-sort="irr" onclick="fcSetSort('irr')">IRR &#9660;</button>
+    <button class="fc-sort-btn" data-sort="irr" onclick="fcSetSort('irr')" title="Sort by IRR (high→low) — countries with IRR ≥500% excluded as unbounded returns; 74 of 185 countries have IRR data">IRR &#9660;</button>
     <button class="fc-sort-btn" data-sort="breakeven" onclick="fcSetSort('breakeven')">Breakeven &#9650;</button>
     <button class="fc-sort-btn" data-sort="country" onclick="fcSetSort('country')">A&#8211;Z</button>
     <div class="fc-stability-toggle">
@@ -1592,6 +1592,18 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <input type="radio" id="dep-shallow" name="dep-cat" value="shallow" onchange="runScreener()"><label for="dep-shallow">Shallow (&lt;500m)</label>
           <input type="radio" id="dep-deep" name="dep-cat" value="deepwater" onchange="runScreener()"><label for="dep-deep">Deepwater (&gt;500m)</label>
         </div>
+      </div>
+      <div class="screener-filter-block">
+        <div class="filter-lbl">Region</div>
+        <select id="sc-region" aria-label="Filter by region" onchange="runScreener()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
+          <option value="">All Regions</option>
+          <option value="Africa">Africa</option>
+          <option value="Middle East">Middle East</option>
+          <option value="Asia Pacific">Asia Pacific</option>
+          <option value="Americas">Americas</option>
+          <option value="Europe">Europe</option>
+          <option value="Other">Other</option>
+        </select>
       </div>
       <div class="screener-filter-block">
         <div class="filter-lbl">IRR Data</div>
@@ -1850,7 +1862,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
   <div id="cp-empty-state">
     <div style="text-align:center;padding:56px 24px 40px;max-width:560px;margin:0 auto;">
-      <div style="font-size:36px;margin-bottom:16px;opacity:.45;">🌍</div>
+      <div style="font-size:36px;margin-bottom:16px;opacity:.45;" role="img" aria-label="Globe icon">🌍</div>
       <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">Select a country to view its complete fiscal profile</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6;">Government take, fiscal mechanics, contract history, DCF sensitivity, and source confidence — all in one place.</div>
       <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
@@ -1904,6 +1916,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v65 (Aug 2026)</strong> — FC sort: IRR sort now uses &lt;500% threshold (matching the disclosed ≥500% exclusion) — previously used ≤200%, hiding countries with IRRs of 200–499%. FC "+Compare" button tooltip corrected: it adds to Side-by-Side tab (max 4), not the floating basket used by Screener (max 5) — tooltip and button label now say "Compare" not "Basket" to remove ambiguity. Screener: added Region dropdown filter (Africa / Middle East / Asia Pacific / Americas / Europe / Other) — analysts can now combine region + mechanic + take threshold without leaving the Screener. Methodology: clarified "9 Fiscal Mechanics" header — note added distinguishing 9 mechanics in the database from 7 with full DCF models (Gross Split and EPSA modeled directionally; Revenue Share approximated). IRR sort tooltip documents ≥500% exclusion. Version v64 → v65.<br>
       <strong>v64 (Aug 2026)</strong> — Fiscal Compare: renamed "+Cmp" button to "+Basket" for clarity (IOC analysts now immediately understand the compare basket workflow); added "Click any row to expand fiscal breakdown" hint below sort controls — first-time users now know rows are interactive. Screener: removed duplicate "Reset" preset button (redundant with "Reset All" below); added "High Evidence ✓" preset (filters to countries with ≥80% A/B sourced fiscal facts — key for due diligence workflows); added aria-label to all 5 range sliders for screen reader accessibility. Footer: updated DB date to 2026-08-08. Version v63 → v64.<br>
       <strong>v63 (Aug 2026)</strong> — Country Profile: added global median callout (+Xpp vs global median 58.4%) beside govt take heading — analysts immediately see where a country sits vs the 185-country field; added "Fiscal Compare" quick-nav button alongside "Explorer" in the back-navigation row. Vintage Analysis: added CSV export button — decade-by-mechanic take data now downloadable. Fiscal Mechanics Guide: each mechanic card now has a "Filter Explorer → [Mechanic]" button — one click to see all countries of that type. Screener: added "Reset All" button that fully resets sliders and mechanic checkboxes in one click. Footer: audit badge now shows last run date. Ctrl+Enter shortcut for Fiscal Compare: fixed bug where the tab ID check was wrong (was checking for nonexistent 'tfc', now correctly checks 't0'). Version v62 → v63.<br>
       <strong>v62 (Aug 2026)</strong> — Breakeven Map: added coverage note (68/185 countries) prominently on the tab; added Export Breakeven Data (CSV) button. Reform Risk: added Export Reform History (CSV) button — full sourced reform event dataset downloadable. Fiscal Component Breakdown: fixed typographic spacing bug (missing space before separator). Benchmark validation: clarified 12-of-185 country scope (6.5% coverage) in table header. IOC Portfolio: added data source note for IOC country positions. Version v61 → v62.<br>
@@ -1954,22 +1967,23 @@ PSC:          profit_oil_state_share + income_tax_on_contractor_profit_oil + FTP
 TSC:          gross_revenue - contractor_fee  (≈ 100% minus fee margin)
 PRRT:         income_tax + PRRT (cash-flow-based RRT after threshold ROR)
 Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
-    <p style="font-size:13px;color:var(--text);margin:0 0 10px;font-weight:600;">9 Fiscal Mechanics</p>
+    <p style="font-size:13px;color:var(--text);margin:0 0 4px;font-weight:600;">9 Fiscal Mechanics in the Database</p>
+    <p style="font-size:11px;color:var(--muted);margin:0 0 10px;">7 mechanics have full DCF models (Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share). Gross Split and EPSA are modeled directionally using PSC-equivalent parameters — flagged in country profiles where applicable.</p>
     <div class="tbl-wrap">
       <table>
         <thead>
-          <tr><th>Mechanic</th><th>Description</th></tr>
+          <tr><th>Mechanic</th><th>DCF</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td><span class="tag">Concession</span></td><td style="font-size:12px;">Royalty + income tax system. Contractor owns production, pays royalty off the top then taxes on profit. Most common globally (North Sea, Americas, Africa).</td></tr>
-          <tr><td><span class="tag">PSC</span></td><td style="font-size:12px;">Production Sharing Contract. Cost oil recovers capex/opex; remaining profit oil split between state and contractor per contract schedule. Dominant in SE Asia, West Africa.</td></tr>
-          <tr><td><span class="tag">TSC</span></td><td style="font-size:12px;">Technical Service Contract. Contractor paid a per-barrel fee; state owns all production. Iraq's dominant model post-2009.</td></tr>
-          <tr><td><span class="tag">PRRT</span></td><td style="font-size:12px;">Petroleum Resource Rent Tax. Cash-flow based resource rent tax triggered after threshold rate of return. Australia's primary offshore instrument.</td></tr>
-          <tr><td><span class="tag">RSC</span></td><td style="font-size:12px;">Risk Service Contract. Contractor recovers costs plus a margin; state retains equity. India's current model (Bid Parameter = Revenue Share).</td></tr>
-          <tr><td><span class="tag">Gross Split</span></td><td style="font-size:12px;">Indonesia's post-2017 PSC reform. Eliminates cost recovery; split determined upfront by field parameters (water depth, API, location). No cost oil mechanism.</td></tr>
-          <tr><td><span class="tag">EPSA</span></td><td style="font-size:12px;">Exploration &amp; Production Sharing Agreement. Libya's hybrid model combining equity participation with production sharing. Four EPSA generations (I–IV).</td></tr>
-          <tr><td><span class="tag">Buy-back</span></td><td style="font-size:12px;">Iran's primary model. Contractor finances development, transfers operatorship to NIOC, recovers costs + fee over contract term (typically 7–10 years). No equity stake.</td></tr>
-          <tr><td><span class="tag">Revenue Share</span></td><td style="font-size:12px;">Direct revenue share without cost recovery mechanism. Used in select African and Latin American contracts.</td></tr>
+          <tr><td><span class="tag">Concession</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Royalty + income tax system. Contractor owns production, pays royalty off the top then taxes on profit. Most common globally (North Sea, Americas, Africa).</td></tr>
+          <tr><td><span class="tag">PSC</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Production Sharing Contract. Cost oil recovers capex/opex; remaining profit oil split between state and contractor per contract schedule. Dominant in SE Asia, West Africa.</td></tr>
+          <tr><td><span class="tag">TSC</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Technical Service Contract. Contractor paid a per-barrel fee; state owns all production. Iraq's dominant model post-2009.</td></tr>
+          <tr><td><span class="tag">PRRT</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Petroleum Resource Rent Tax. Cash-flow based resource rent tax triggered after threshold rate of return. Australia's primary offshore instrument.</td></tr>
+          <tr><td><span class="tag">RSC</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Risk Service Contract. Contractor recovers costs plus a margin; state retains equity. India's current model (Bid Parameter = Revenue Share).</td></tr>
+          <tr><td><span class="tag">Gross Split</span></td><td style="text-align:center;"><span style="color:#f0a830;font-weight:700;" title="Modeled as PSC-equivalent — directional only">~</span></td><td style="font-size:12px;">Indonesia's post-2017 PSC reform. Eliminates cost recovery; split determined upfront by field parameters (water depth, API, location). Modeled as PSC-equivalent (directional).</td></tr>
+          <tr><td><span class="tag">EPSA</span></td><td style="text-align:center;"><span style="color:#f0a830;font-weight:700;" title="Modeled as PSC-equivalent — directional only">~</span></td><td style="font-size:12px;">Exploration &amp; Production Sharing Agreement. Libya's hybrid model combining equity participation with production sharing. Four EPSA generations (I–IV). Modeled as PSC-equivalent.</td></tr>
+          <tr><td><span class="tag">Buy-back</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Iran's primary model. Contractor finances development, transfers operatorship to NIOC, recovers costs + fee over contract term (typically 7–10 years). No equity stake.</td></tr>
+          <tr><td><span class="tag">Revenue Share</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Direct revenue share without cost recovery mechanism. Used in select African and Latin American contracts.</td></tr>
         </tbody>
       </table>
     </div>
@@ -2215,9 +2229,12 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
 <div id="tbreakevenmap" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-tbreakevenmap">
   <div class="page-title">Global Breakeven Price Map</div>
   <div class="page-sub">Country-level breakeven price — the oil price at which the project achieves zero NPV (undiscounted). Countries above current price are producing at a loss; countries far below are insulated.</div>
-  <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);margin-bottom:4px;">
-    <span style="color:var(--accent);font-weight:700;">Coverage: 68 of 185 countries</span>
-    <span>· Requires complete royalty + cost data · Remaining 117 countries shown as grey on map</span>
+  <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px;">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);">
+      <span style="color:var(--accent);font-weight:700;">Coverage: 68 of 185 countries</span>
+      <span>· Requires complete royalty + cost data · Remaining 117 countries shown as grey on map</span>
+    </div>
+    <button class="btn btn-sm btn-outline" onclick="exportBreakevenCSV()" title="Export all 68 countries with breakeven data to CSV">&#8659; Export CSV</button>
   </div>
   
   <div style="display:flex;align-items:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
@@ -3727,15 +3744,19 @@ function applyScreenerPreset(preset) {
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
   const nullIrr = document.getElementById('sc-irr-nulls');
   if (nullIrr) nullIrr.checked = true;
+  const scRgn = document.getElementById('sc-region');
+  if (scRgn) scRgn.value = '';
 
   if (preset === 'sweetspot') {
     // Low take (≤55%), reasonable breakeven (≤$65), concession + PSC
     setSlider('sl-take', 55); setSlider('sl-be', 65); setSlider('sl-npv', 0);
     setChecks('sc-mech-checks', ['Concession','PSC','PRRT','RSC']);
   } else if (preset === 'pscafrica') {
-    // PSC only
+    // PSC in Africa — set both mechanic and region filters
     setSlider('sl-take', 75); setSlider('sl-be', 80);
     setChecks('sc-mech-checks', ['PSC','EPSA']);
+    const scRgn2 = document.getElementById('sc-region');
+    if (scRgn2) scRgn2.value = 'Africa';
   } else if (preset === 'deepwater') {
     // Deepwater frontier, PSC or Concession
     setDepth('deepwater');
@@ -3860,14 +3881,19 @@ function runScreener() {
       const depKey2 = depCat === 'shallow' ? 'mixed' : depCat;
       if (!(DEPTH_PROFILE[depKey2] || []).includes(d.country)) return false;
     }
+    // region filter
+    const scRegion = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
+    if (scRegion && d.region !== scRegion) return false;
     return true;
   }).sort((a,b) => _screenerRfactorOnly ? ((b.swing||0) - (a.swing||0)) : ((b[npvKey]||0) - (a[npvKey]||0)));
 
   // active filters count badge
+  const scRegionActive = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
   let activeCount = 0;
   if (checkedIOCs.length > 0) activeCount++;
   if (depCat !== 'all') activeCount++;
   if (beCat !== 'all') activeCount++;
+  if (scRegionActive) activeCount++;
   if (!includeIrrNulls) activeCount++;
   const totalMechBoxes = document.querySelectorAll('#sc-mech-checks input[type=checkbox]').length;
   if (checkedMechs.length < totalMechBoxes) activeCount++; // some mechanic unchecked = active filter
@@ -4127,6 +4153,8 @@ TOP_OPERATORS.forEach(op => {
     const btn = document.createElement('button');
     btn.className = 'btn btn-outline btn-sm';
     btn.textContent = op;
+    btn.setAttribute('aria-label', 'Load ' + op + ' portfolio');
+    btn.title = 'View ' + op + ' fiscal portfolio — ' + matches.length + ' operator entit' + (matches.length === 1 ? 'y' : 'ies');
     btn.onclick = () => { document.getElementById('ioc-search').value = op; loadIOCAggregated(op, matches); };
     qb.appendChild(btn);
   }
@@ -8427,8 +8455,8 @@ function renderFCResults(results, price) {
     });
   } else if (sortField === 'irr') {
     sorted.sort(function(a,b) {
-      var aIRR = (a.liveIRR != null && a.liveIRR <= 200) ? a.liveIRR : null;
-      var bIRR = (b.liveIRR != null && b.liveIRR <= 200) ? b.liveIRR : null;
+      var aIRR = (a.liveIRR != null && a.liveIRR < 500) ? a.liveIRR : null;
+      var bIRR = (b.liveIRR != null && b.liveIRR < 500) ? b.liveIRR : null;
       if (aIRR == null && bIRR == null) return 0;
       if (aIRR == null) return 1;
       if (bIRR == null) return -1;
@@ -8542,7 +8570,7 @@ function renderFCResults(results, price) {
       var stab = stabilityScores[r.country] != null ? stabilityScores[r.country] : 5;
       html += '<td class="num">' + stabDots(stab) + '</td>';
     }
-    html += '<td class="num"><button onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Side-by-Side compare basket (max 5 countries)">+Basket</button></td>';
+    html += '<td class="num"><button onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Side-by-Side compare tab (max 4 countries). Tip: use the Screener ★ + basket for larger sets.">+Compare</button></td>';
     html += '</tr>';
   });
   html += '</tbody></table></div>';
@@ -9893,7 +9921,7 @@ loadPlatformData();
   <span style="color:#94a3b8;font-size:12px;font-weight:600;white-space:nowrap;">Compare basket:</span>
   <div id="basket-pills" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;"></div>
   <button onclick="clearBasket()" aria-label="Clear all countries from compare basket" style="background:transparent;border:1px solid #475569;color:#94a3b8;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">Clear</button>
-  <button onclick="launchCompare()" aria-label="Launch side-by-side comparison of selected countries" style="background:#e8a020;border:none;color:#0f172a;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Compare &#8594;</button>
+  <button onclick="launchCompare()" aria-label="Launch side-by-side comparison of selected countries" title="Open Side-by-Side Compare tab with all basket countries loaded" style="background:#e8a020;border:none;color:#0f172a;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Compare &#8594;</button>
 </div>
 
 <!-- Data Vintage Footer -->
@@ -9903,7 +9931,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v64</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v65</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>

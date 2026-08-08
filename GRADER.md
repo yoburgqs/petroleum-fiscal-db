@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 17 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 18 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 17 shipped v64: 6 targeted analyst-facing improvements — FC "+Basket" label clarity, row-click discoverability hint, Screener "High Evidence ✓" preset, duplicate Reset button removal, slider aria-labels, footer DB date update. GPA 3.97 (no threshold crossings — all A categories maintained; Data Reliability B+ unchanged as Harvesting fork issue). Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 18 shipped v65: 8 targeted improvements — IRR sort threshold corrected (200→499), FC "+Compare" button label/tooltip fixed (was misleadingly called "+Basket"), Screener Region dropdown added (Africa/Middle East/Asia Pacific/Americas/Europe/Other), Methodology "9 Fiscal Mechanics" header clarified with DCF coverage column (✓ vs ~), IRR sort tooltip documents ≥500% exclusion, Country Profile empty state globe emoji accessibility, IOC Portfolio quick-buttons get aria-label + tooltip with entity count, Breakeven Map export button moved to top (near coverage note) for discoverability. GPA 3.97 (no threshold crossings; all improvements within existing A/A+ categories). Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -166,7 +166,7 @@ Every 30-minute cycle:
 | 14 | 14. Search Quality | A+ | = | Fuzzy Did you mean? matching from Cycle 9. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. |
 
-**Summary: 0 categories below B+. Cycle 15: 0 grade upgrades (all fixes close disclosure/export gaps within existing A/A+ categories; no category crosses a threshold). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 18: 0 grade upgrades (all fixes close correctness, labeling, and workflow gaps within existing A/A+ categories; no category crosses a threshold). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
@@ -252,6 +252,24 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 18 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 17 state), audited full 9,917-line index.html across all tabs and JS functions, identified 8 analyst-facing improvements targeting correctness gaps and workflow clarity. All shipped. Version v64 → v65.
+- **Fixes shipped (8 of 8):**
+  1. **FC IRR sort threshold corrected: ≤200 → <500** — The FC results IRR sort was silently filtering out countries with IRRs between 200–499% (sorting them as null) while the platform's stated exclusion threshold is ≥500%. An analyst sorting by IRR could be missing high-IRR frontier countries. Fixed to use `< 500` matching the documented exclusion everywhere else.
+  2. **FC "+Compare" button label/tooltip corrected** — The button in FC results was labeled "+Basket" with a tooltip referencing "basket (max 5 countries)" — but it calls `addCompare()` which adds to the Side-by-Side tab (max 4 countries), not the floating basket used by the Screener (max 5). The misleading label would cause a first-time demo user to expect the button to add to the floating basket. Renamed to "+Compare" with corrected tooltip distinguishing the two workflows.
+  3. **Screener Region dropdown added** — The Screener had mechanic, IRR, take, breakeven, IOC, and depth filters but no region filter. An analyst wanting "Africa PSC, take <65%" had to use the IOC filter as a proxy. Added a Region dropdown (All / Africa / Middle East / Asia Pacific / Americas / Europe / Other) as a new filter block. PSC Africa preset now also sets the Region dropdown to Africa for complete filter state. Region resets properly in `applyScreenerPreset('reset')`.
+  4. **Methodology: "9 Fiscal Mechanics" header with DCF coverage column** — The methodology table header said "9 Fiscal Mechanics" with no distinction between full DCF models vs. approximations. A petroleum economist reviewing the methodology would ask "which 7 are actually modeled?" Added clarifying sub-note (7 full DCF, Gross Split/EPSA directional) and a DCF column to the mechanics table (✓ = full model, ~ = PSC-equivalent approximation).
+  5. **IRR sort button tooltip documents ≥500% exclusion** — The sort buttons had no tooltips. The IRR sort button now explains that countries with IRR ≥500% are excluded (matching the disclosed threshold), and that 74 of 185 countries have IRR data — giving a senior analyst immediate context when sort results look sparse.
+  6. **Country Profile empty state globe emoji: `role="img" aria-label`** — The 🌍 emoji had no semantic label for screen readers. Added `role="img" aria-label="Globe icon"`.
+  7. **IOC Portfolio quick-buttons: `aria-label` + informative tooltip** — The quick-load operator buttons (ExxonMobil, Shell, BP, etc.) had no aria-label and no tooltip. Added `aria-label="Load [operator] portfolio"` and a tooltip showing how many operator entities are included ("View ExxonMobil fiscal portfolio — 3 operator entities"). Useful when the operator name maps to multiple legal entities in the database.
+  8. **Breakeven Map: Export CSV button moved to top** — The export button was at the very bottom of the page, after the high/low breakeven lists. An analyst opening the Breakeven Map tab and wanting the data would have to scroll past the entire map and two ranked lists before finding the export. Added a second Export CSV button immediately next to the coverage note (top of the tab), where it is visible without scrolling.
+- **Grade changes from Cycle 17:** None (all fixes are correctness/workflow within existing A/A+ categories; no category threshold crossed)
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (pre-push hook)
+- **Version:** v64 → v65
 
 ---
 
