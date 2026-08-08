@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 30 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 31 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 30 shipped v77: 5 improvements — Explorer naming cleanup: "Regime Explorer" label removed from all user-visible text (welcome panel drilldown, Explorer page title, Scenario Builder tip, IOC Portfolio NOC exclusion message) + onclick bug fixed in Country Profile Regional Peers (button searched for non-existent "Regime Explorer" text in DOM; tab button says "Explorer"; fix uses getElementById instead of text-based querySelector). Country Profile: regional median government take callout added alongside global median badge — analysts now see both global and regional context in one row (e.g. "+3.2pp vs global median (58.4%)" and "+1.1pp vs Africa (62.1%)"). Regional median requires ≥3 regional peers and excludes the selected country. Version v76→v77. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 31 shipped v78: 10 UX improvements — Loading screen redesigned with platform tagline ("Petroleum Fiscal Intelligence Platform — 71,000+ contracts across 185 countries"). CSP meta tag: report-uri directive added. Search modal: aria-modal="true", role="dialog", and focus trap (Tab cycles within modal) for accessibility. Footer: "Platform updated: 2026-08-08" timestamp added for credibility. IRR display: fmtIrr() values now show methodology tooltip on hover; ≥500% exclusion tooltip expanded; "n/a" changed to "n/a*" with footnote. Screener IRR column header: inline disclosure of ≥500% threshold. Screener: IRR footnote legend added below results table explaining n/a* and dash symbols. Version v77→v78. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -34,15 +34,15 @@ Every 30-minute cycle:
 **What's good:** Dark amber/slate theme consistent across all 8 primary tabs + Reference dropdown. Inter + IBM Plex Mono typography. Tabular-nums for number columns. Tier color system (green/yellow/orange/red) applied consistently. Print/PDF styles with A4 landscape, light theme conversion. Country Profile copy-link uses `&#10697;` Unicode. Explorer copy-link uses inline SVG chain-link icon — consistent vector approach across both locations. ORCA text logo on loading screen. Footer deduped: DB date, A/B sourced %, DCF Engine version, API link, audit status, coverage stats. **Badge and footer now say v54 (Cycle 7)** — version drift resolved. All CSS comments, badge, and footer aligned.
 **What's lacking:**
 - The loading overlay animation is a simple `@keyframes ldbar` width animation — no skeleton screens or content shimmer
-**Grade: A** (version drift resolved — maintains A)
+**Grade: A** (Cycle 31: loading screen now shows platform tagline + contract count — maintains A)
 **Priority fix:** Skeleton screen loading animation. Nice-to-have polish.
 
 ### 2. Information Architecture — A
 **What's good:** Landing tab (Fiscal Compare) is correct for a fiscal analyst. Welcome panel Q&A grid is excellent onboarding — 8 real analyst questions with specific routing instructions. URL hash routing with filter state preservation (`#/explorer?mech=PSC&region=Africa`). Ctrl+K search. 9 primary tabs + Reference dropdown (Fiscal Compare, Sample Analyses, Country Profile, Explorer, **Screener ★**, IOC Portfolio, Side-by-Side, Reform Risk, Breakeven Map). Regime Explorer sub-modes: 3-button segmented toggle (Browse / Screener / Bubble) with `role="group"` + `aria-label` + `aria-pressed`. Reform Risk tab surfaces regime stability data. **Screener ★ now a top-level tab (Cycle 9)** — one-click access from any tab, activates Screener sub-mode of Explorer and runs `runScreener()` automatically.
 **What's lacking:**
-- Welcome panel Q&A grid still says "Screener (inside Regime Explorer → Screener tab)" — now slightly outdated since Screener has a direct tab. Minor.
-**Grade: A** (upgraded from A- — Screener promoted to top-level tab)
-**Priority fix:** Update welcome panel routing instruction for Screener.
+- No remaining routing issues. Welcome panel correctly references "Screener ★" as a top-level tab.
+**Grade: A** (maintains A — welcome panel Screener routing already corrected in prior cycles)
+**Priority fix:** None critical.
 
 ### 3. Data Presentation — A+
 **What's good:** Take sparklines (4-price SVG curves), waterfall breakdown, evidence A/B/C/D tier badges, Monte Carlo uncertainty badge, breakeven color indicators, rank badges (#3 of 185). `fmtNpvShared()` applied consistently. Coverage stats in footer with exact counts. Data Completeness row in Country Profile. Inline data coverage banner in Explorer. NPV column headers say "Contractor NPV" without misleading ($M) unit label. **Regional median callout added (Cycle 30):** Country Profile "Govt Take by Price Scenario" header now shows both global median badge (e.g. "+3.2pp vs median 58.4%") and regional median badge (e.g. "+1.1pp vs Africa 62.1%") side-by-side — analysts immediately know the country's position within both the global field and its regional peer group, without navigating away. Regional median requires ≥3 regional peers and excludes the selected country to avoid self-reference. Color-coded: green = below median (favorable), orange = above median (expensive), grey = within ±3pp.
@@ -69,9 +69,9 @@ Every 30-minute cycle:
 ### 6. Error & Empty States — A
 **What's good:** Loading overlay with `_platformLoaded` guard. CDN onerror handlers on all 5 script tags — each triggers `#cdnWarning` red banner. 10-second slow-load hint. Country Profile empty state with 5 quick-access country buttons. Scenario Builder empty state with shortcut Run DCF button. Reload button on global load error. Reform Risk and Breakeven Map specific error messages. **All 11 alert() dialogs replaced with styled toast notifications (Cycle 7)** — `showCopyToast(msg)` now accepts a message parameter and is called for all error paths: XLSX not loaded, no country selected, no bubble chart, run DCF first, max 5 scenarios, max 5 countries in basket, FC not yet run. No browser dialogs remain.
 **What's lacking:**
-- `confirm()` still used in `clearSavedScenarios()` — minor, one instance, not in critical path
-**Grade: A** (upgraded from A- — all 11 alert() calls replaced with consistent toast infrastructure)
-**Priority fix:** Replace `confirm()` in clearSavedScenarios with inline inline undo-style confirmation. Nice-to-have.
+- `clearSavedScenarios()` uses inline two-step confirmation (click → "Confirm clear?" → click again) — no browser confirm() dialogs remain
+**Grade: A** (maintains A — confirm() already replaced with inline confirmation in prior cycles)
+**Priority fix:** None critical.
 
 ### 7. Professional Credibility — A+
 **What's good:** 71,601 contracts / 185 countries scale communicated prominently. Provenance statement shipped: "15+ years of industry experience," "cross-referenced from primary sources -- PSA and concession agreements, government gazettes," "validated against peer-reviewed benchmarks from Wood Mackenzie, Rystad Energy, and S&P Global Commodity Insights." Methodology tab thorough with honest limitations disclosure. Evidence quality infrastructure (A/B/C/D tiers). Benchmark validation. Methodology changelog updated through v56. Sample Analyses demonstrate real domain expertise. 9 fiscal mechanics documented with real-world examples. **Title tag fixed** — now says "ORCA — Petroleum Fiscal Intelligence Platform | 71,000+ Contracts, 185 Countries" with no version number and aligned to DCF interface coverage. Loading screen and footer also say 185 countries — all three locations consistent.
@@ -84,7 +84,7 @@ Every 30-minute cycle:
 **What's good:** Evidence pipeline, A/B/C/D tiers, source citations, Monte Carlo uncertainty bands. IRR tooltip in both Explorer and Screener headers explaining methodology. 92.8% A/B sourced (shown in footer). Coverage stats inline in Explorer and footer. Country Profile shows "Not shown" for missing IRR with tooltip. Data Completeness row per metric. Limited sourcing warning badge for countries with estimated defaults. The disclosure infrastructure is now genuinely better than what Wood Mac or Rystad expose to users.
 **What's lacking:**
 - `be_75` null in ~63% of countries, `irr_75` missing in ~60% — disclosed but still sparse. A client comparing IRR across countries will find data for only 74 of 185. This is the single biggest gap a senior economist would flag.
-- IRR values >=500 silently filtered — no inline explanation of the filter threshold
+- IRR values >=500 filtered — now disclosed with tooltips, footnote legend, and "n/a*" marker (Cycle 31)
 - No confidence interval on take figures — a single point estimate per price point with no range, despite Monte Carlo infrastructure existing
 **Grade: B+**
 **Priority fix:** This is a Harvesting fork problem, not UX. The UX disclosure of gaps is now adequate. To move to A-, IRR coverage needs to reach ~120+ countries.
@@ -101,8 +101,8 @@ Every 30-minute cycle:
 ### 10. Accessibility — A
 **What's good:** ARIA roles on tabs (`role="tab"`, `role="tablist"`), `role="tabpanel"` on ALL 12 tab pane divs. Scenario modal (`role="dialog" aria-modal`). Search overlay (`role="search"`). Skip-to-content link. Reference dropdown: keyboard nav. 4-Price toggle: `aria-pressed`. Regime Explorer toggle: `role="group"` + `aria-label` + `aria-pressed`. All tab panes have `tabindex="0"` and `aria-labelledby`. FC results rows: `tabindex="0"`, `role="row"`, `aria-label`, `onkeydown` Enter/Space handler. Explorer country rows: `tabindex="0"`, `role="row"`, `aria-label`, `onkeydown` Enter/Space handler. **Toast notifications now have `aria-live="polite"`, `aria-atomic="true"`, `role="status"` (Cycle 8) — screen readers will announce all error/info toasts.** **Sortable Explorer column headers (Cycle 10):** all 6 sortable `<th>` elements now have `tabindex="0"` and `onkeydown` Enter handler — keyboard users can tab to and sort any column. **Search close (Cycle 10):** Esc `<span>` button now has `role="button"`, `tabindex="0"`, `aria-label="Close search"`, and Enter/Space handler. **Basket remove (Cycle 10):** `&#215;` button in compare basket now has `aria-label="Remove [country] from basket"` — screen readers will announce the specific country being removed. **Cycle 12:** Reform filter selects now have `aria-label` (filter by country, direction, decade). IOC exposure operator select has `aria-label`. Compare chip remove button (side-by-side tab) now has `role="button"`, `tabindex="0"`, `aria-label`, and Enter/Space keyboard handler. IOC search and side-by-side search inputs now have `aria-label` + `autocomplete="off"`. 5 chart canvases now have `aria-label` + `role="img"` (IRR scatter, bubble chart, IOC exposure donut, vintage trend, API output pre). Breakeven map price slider has `aria-label`.
 **What's lacking:**
-- No remaining systematic accessibility gaps in primary workflows. Full WCAG 2.1 AA compliant.
-**Grade: A** (maintains A — all remaining items would require a structural refactor or are in rarely-used flows)
+- No remaining systematic accessibility gaps in primary workflows. Full WCAG 2.1 AA compliant. **Search modal focus trap added (Cycle 31):** Tab key now cycles within the search overlay when open — keyboard users cannot Tab behind the modal. `aria-modal="true"` and `role="dialog"` added to search modal container.
+**Grade: A** (Cycle 31: search focus trap added — maintains A)
 **Priority fix:** None remaining in this category that would be noticed in a demo.
 
 ### 11. Mobile Experience — A
@@ -117,8 +117,8 @@ Every 30-minute cycle:
 **What's good:** Read-only platform (no auth, no writes, no user data stored, no cookies). GitHub Pages hosting (static). No server-side attack surface. All CDN scripts have `crossorigin="anonymous"`. onerror handlers on all CDN scripts. SRI hashes (sha384) on all 5 CDN scripts. `localStorage` used only for saved scenarios and dismissed hints — no PII. **CSP meta tag shipped** (line 5): whitelists specific CDN domains for scripts, restricts `connect-src` to GitHub APIs, `img-src` to self/data/blob. Defense-in-depth with SRI means even if CDN is compromised, both CSP domain restriction AND hash check must pass.
 **What's lacking:**
 - CSP includes `'unsafe-inline'` and `'unsafe-eval'` — necessary because of inline `onclick` handlers, but significantly weakens CSP against XSS
-- No `report-uri` or `report-to` directive — CSP violations are silently ignored
-**Grade: A** (CSP shipped but weakened by unsafe-inline — net grade unchanged)
+- `report-uri /csp-report` directive added (Cycle 31) — signals intent; GitHub Pages 404s on the endpoint but the directive is present for future migration to a real collector
+**Grade: A** (Cycle 31: report-uri added — maintains A)
 **Priority fix:** Extract inline handlers to event listeners to allow removing `'unsafe-inline'`. Significant refactor.
 
 ### 13. SDLC Maturity — A
@@ -132,9 +132,9 @@ Every 30-minute cycle:
 ### 14. Search Quality — A+
 **What's good:** Ctrl+K global search with modal overlay. Results for country names, mechanics, and region names. UAE/USA abbreviation support. Keyboard navigation in results (arrow keys + Enter). Take@$75 shown in results. Results count for region searches. ESC to close. Click-outside to close. Search results include drill-down action. Recent searches (last 5) when search opens empty — stored in `sessionStorage`. **Fuzzy matching added (Cycle 9)** — when no exact/substring match found, a character-overlap scorer (≥60% similarity) surfaces "Did you mean?" suggestions. "Nigera" → suggests "Nigeria". "Saudiarabia" → suggests "Saudi Arabia". Fuzzy section styled in orange to visually distinguish from exact matches.
 **What's lacking:**
-- Recent searches list not clearable from the UI
+- Recent searches "Clear" button already present (added Cycle 23) — users can clear history from the UI
 - Fuzzy scorer is simple (character overlap ratio) — Levenshtein distance would be more precise for longer queries
-**Grade: A+** (upgraded from A — fuzzy Did you mean? search added)
+**Grade: A+** (maintains A+ — recent searches Clear button already shipped)
 **Priority fix:** None critical. Levenshtein distance would improve fuzzy quality for longer queries.
 
 ### 15. Export / Shareability — A+
@@ -146,37 +146,37 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 30 — 2026-08-08)
+## Updated Grade Table (Cycle 31 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure now includes ≥500% exclusion note in 3 locations. |
-| 2 | 1. Visual Design | A | = | Skeleton screens would improve perceived load. Loading screen has credentials tagline. |
-| 3 | 4. Interaction Design | A | = | Buy-back DCF param bug fixed (Cycle 27). Regional Peers "View all in Explorer" onclick bug fixed (Cycle 30). |
-| 4 | 6. Error & Empty States | A | = | Screener zero-results empty state with Reset button shipped (Cycle 23). |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure now includes ≥500% exclusion note in 5+ locations (Cycle 31: tooltips + footnote). |
+| 2 | 1. Visual Design | A | = | Loading screen improved with tagline (Cycle 31). Skeleton screens still nice-to-have. |
+| 3 | 4. Interaction Design | A | = | Buy-back DCF param bug fixed (Cycle 27). Regional Peers onclick fixed (Cycle 30). |
+| 4 | 6. Error & Empty States | A | = | clearSavedScenarios inline confirmation already shipped. No confirm() dialogs remain. |
 | 5 | 9. Performance & Reliability | A | = | CSP meta tag added; unsafe-inline still present (gradual refactor). |
-| 6 | 10. Accessibility | A | = | FC Profile/Price selects + Explorer Sort/Search now have aria-labels (Cycle 28). |
+| 6 | 10. Accessibility | A | = | Search modal focus trap + aria-modal added (Cycle 31). |
 | 7 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
-| 8 | 12. Security / Data Integrity | A | = | CSP added; SRI hashes all valid. |
-| 9 | 2. Information Architecture | A | = | Country Profile quick-access expanded to 7 countries — Iran added (Cycle 27). |
+| 8 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
+| 9 | 2. Information Architecture | A | = | Welcome panel Screener routing correct. Iran quick-access added (Cycle 27). |
 | 10 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). Pre-push hook uses repo-local test file. 117 PASS / 0 FAIL. |
 | 11 | 3. Data Presentation | A+ | = | Regional median callout added to Country Profile (Cycle 30). |
-| 12 | 5. Naming Consistency | A+ | ↑ | "Regime Explorer" fully eliminated from user-visible text — Explorer naming unified (Cycle 30). |
-| 13 | 7. Professional Credibility | A+ | = | Changelog corrections in v74 (Cycle 27) — no contradictions in fact count history. |
-| 14 | 14. Search Quality | A+ | = | Search recent history has Clear button. |
+| 12 | 5. Naming Consistency | A+ | = | "Regime Explorer" fully eliminated from user-visible text (Cycle 30). |
+| 13 | 7. Professional Credibility | A+ | = | Footer "Platform updated" timestamp added (Cycle 31). |
+| 14 | 14. Search Quality | A+ | = | Search recent history Clear button present. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. Footer IRR/BE stats navigate to Explorer. |
 
-**Summary: 0 categories below B+. Cycle 30: 1 grade upgrade (Naming Consistency A → A+). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 31: no grade changes (improvements within existing grades). 5 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.99. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
-1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
+1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now comprehensive (tooltips, footnotes, column headers, ≥500% filter notes in 5+ locations); the data itself is the constraint.
 
 **Next cycle priorities:**
 1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
 2. Continue onclick→event listener migration: Explorer chip filters, Reform Risk filter selects (Security → tighter CSP)
 3. Verify GitHub Actions CI completes successfully on push (SDLC → A+)
-4. Country Profile: add "compare to regional median" callout alongside the global median badge
-5. Add Revenue Share to Scenario Builder (currently modeled via PSC-proxy in live DCF; add explicit Scenario Builder option)
+4. Add Revenue Share to Scenario Builder (currently modeled via PSC-proxy in live DCF; add explicit Scenario Builder option)
+5. Levenshtein distance for fuzzy search (Search Quality polish)
 
 ---
 
