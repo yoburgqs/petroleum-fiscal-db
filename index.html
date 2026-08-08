@@ -1149,7 +1149,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v82</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v83</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1745,6 +1745,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
             <th class="num">PRRT Avg Take</th>
             <th class="num">RSC Avg Take</th>
             <th class="num">Buy-back Avg Take</th>
+            <th class="num" title="Revenue Share — gross revenue split with no cost recovery mechanism. Used in select African and Latin American contracts.">Rev Share Avg Take</th>
             <th class="num">Total Contracts</th>
           </tr>
         </thead>
@@ -1963,7 +1964,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v82 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v83 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1971,6 +1972,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v83 (Aug 2026)</strong> — 4 UX improvements (Cycle 36): Gross Split added as 8th mechanic option in Scenario Builder — analysts can now model Indonesia's Gross Split regime (MoEMR Decree No. 8/2017) directly with dedicated inputs: Contractor Gross Split %, CIT Rate, DMO Obligation %, and DMO Price (% of ICP). DMO penalty is computed as a revenue reduction on the contractor split (25% of production at 25% ICP price = effective ~5.6% revenue loss at base split), giving a more accurate effective take than simple PSC-proxy. Indonesia Gross Split preset added (43% contractor split, 25% CIT, 25% DMO at 25% ICP — onshore oil profile per Decree 8/2017 base splits). Revenue Share column added to Vintage Analysis decade table and trend chart — previously the table showed only 6 mechanics (Concession/PSC/TSC/PRRT/RSC/Buy-back); Revenue Share contracts were present in the DB but excluded from the vintage visualization; now shows Revenue Share avg take by decade in cyan (#06b6d4) alongside other mechanics. Side-by-Side comparison: "Save as PDF" and "Chart PNG" export buttons added directly below the comparison grid — analysts no longer need to scroll to the top controls to find export options; buttons appear in context after running a comparison. Version v82→v83.<br>
       <strong>v82 (Aug 2026)</strong> — 6 UX improvements (Cycle 35): Revenue Share added as 7th mechanic option in Scenario Builder — analysts can now directly model gross revenue split contracts (no cost recovery) with dedicated Govt Revenue Share %, CIT, and Royalty inputs; routes to dcfPSC with cost_recovery_cap=0 matching the mechanic's structure. Nigeria Revenue Share preset added (55% govt share, 30% CIT, deepwater profile — representative of pre-PIA legacy gross revenue contracts). Explorer mechanic dropdown: Revenue Share option added to the flt-mech filter select (was present in chip row but absent from dropdown). Fuzzy search upgraded from character-overlap scorer to Levenshtein edit distance — produces materially better suggestions for 2+ character typos and longer country names (e.g. "Azerbajan"→"Azerbaijan", "Saudi Arabi"→"Saudi Arabia"); threshold adjusted from 0.6 to 0.55 to match Levenshtein scale. Scenario Builder: opening via Country Profile now correctly routes Revenue Share countries to the Revenue Share panel (previously fell to Concession fallback). Also routes PRRT and Buy-back country mechanic types correctly. Version v81→v82.<br>
       <strong>v81 (Aug 2026)</strong> — 6 UX improvements (Cycle 34): East Africa &amp; Sub-Saharan Frontier section added to Sample Analyses — 2 analysis cards: (1) East Africa Frontier Bloc table — Mozambique, Tanzania, Uganda, Kenya, Namibia, Senegal, Ghana, Sierra Leone with govt take, swing, and project context for each frontier FID/discovery; loads top 4 (Mozambique, Tanzania, Uganda, Namibia) into Side-by-Side for comparison. (2) Africa Fiscal Reform Pressure (2014–2023) card — documents the major reform events in Angola, Nigeria, Mozambique, Tanzania, Ghana, Uganda with year, current take, and reform description; links to Reform Risk tab. Side-by-Side empty state: Saudi Arabia vs UAE added as 4th quickstart comparison — the Middle East Concession pair answers IOC questions about intra-OPEC fiscal variation. Search: Revenue Share and EPSA added to the global mechanics search list — previously typing "revenue" or "epsa" returned no mechanics results. Run Compare button: keyboard shortcut label (Ctrl+↵) added inline to the button text — analysts see the shortcut without reading the sort row hint. Methodology provenance: version corrected from v79 to v81 (was stale after two cycles without update). Version v80→v81.<br>
       <strong>v80 (Aug 2026)</strong> — 4 UX improvements (Cycle 33): Latin America &amp; Atlantic Frontier section added to Sample Analyses — 3 analysis cards covering the Atlantic Basin opportunity set: (1) Atlantic Frontier Bloc table — Brazil, Guyana, Suriname, Trinidad, Venezuela, Colombia, Ecuador, Peru, Bolivia with govt take @$50/$75/$125 and price swing for side-by-side loading; (2) Brazil Pre-salt vs Post-salt structural note explaining Law 12.351 (2010), mandatory Petrobras 30% stake, sliding profit oil tiers, and how pre-salt PSC terms differ from post-salt concession; (3) Andean &amp; Caribbean Block comparison table covering Colombia, Ecuador, Peru, Bolivia, Trinidad, Argentina, Chile. Reform Risk tab: Regional Reform Tilt panel added above the country-level tables — shows net tightening vs liberalizing balance for each region (Africa, Middle East, Asia Pacific, Americas, Europe) as a mixed bar with % breakdown and average stability score — answers "which regions are under net fiscal tightening pressure?" at a glance. IOC Portfolio empty state: upgraded from single placeholder line to an actionable panel with Operator Fiscal Exposure description, 5 one-click operator buttons (ExxonMobil, Shell, TotalEnergies, BP, Equinor), and routing tip — first-visit users now have immediate entry points. Bug fix: IOC Portfolio empty-state quick-launch buttons corrected from non-existent <code>loadIOCPortfolio()</code> to <code>loadIOC()</code>. Version v79→v80.<br>
@@ -2377,6 +2379,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           <select id="sb-mechanic" onchange="sbUpdateMechanic()">
             <option value="Concession">Concession</option>
             <option value="PSC">Production Sharing Contract (PSC)</option>
+            <option value="Gross Split">Gross Split (Indonesia-style)</option>
             <option value="TSC">Technical Service Contract (TSC)</option>
             <option value="PRRT">PRRT (Australia-style)</option>
             <option value="Buy-back">Buy-back (Iran-style)</option>
@@ -2480,6 +2483,19 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           </div>
         </div>
 
+        <div id="sb-grosssplit-params" style="display:none">
+          <div class="sb-section-hdr">Gross Split Parameters (Indonesia MoEMR Decree 8/2017)</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5;">Indonesia's Gross Split replaces the cost recovery PSC. The contractor receives a base split plus variable components (field stage, field depth, domestic market obligation, etc.). No cost recovery — contractor bears all costs within their gross split. Modeled via PSC-equivalent with 0% cost recovery and configurable split percentages.</div>
+          <div class="sb-row2">
+            <div class="sb-control-group"><label>Contractor Gross Split (%)</label><input type="number" id="sb-gs-cont" value="43" min="15" max="70" step="1" title="Contractor's base gross split plus variable components (typical range: 40–55% for conventional onshore; 48–64% for deepwater). Indonesia Decree 8/2017 base: Onshore Oil=43%, Offshore Oil=48%, Gas=48%."></div>
+            <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-gs-cit" value="25" min="0" max="60" step="1" title="Indonesia corporate income tax rate: 25% (standard). Gross split contractors may also face branch profit tax of 20% on after-tax income."></div>
+          </div>
+          <div class="sb-row2">
+            <div class="sb-control-group"><label>DMO Obligation (%)</label><input type="number" id="sb-gs-dmo" value="25" min="0" max="30" step="1" title="Domestic Market Obligation: contractor must supply 25% of production to domestic market at 25% of ICP (Indonesian Crude Price). Reduces effective contractor revenue."></div>
+            <div class="sb-control-group"><label>DMO Price (% of ICP)</label><input type="number" id="sb-gs-dmo-price" value="25" min="0" max="100" step="5" title="Price at which DMO volumes are sold as % of Indonesian Crude Price. Default 25% per Decree 8/2017 Month 1-60; escalates over contract life."></div>
+          </div>
+        </div>
+
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
           <button class="btn" onclick="runCustomScenario()">&#9654; Run DCF</button>
           <button class="btn btn-outline" onclick="saveCustomScenario()">Save Scenario</button>
@@ -2492,6 +2508,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('iran')" title="Iran — buy-back contract: contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7-10 year term">Iran Buy-back</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('india')" title="India RSC — Risk Service Contract under NELP/HELP: contractor delivers services, government keeps equity; $4/bbl representative fee, 34% CIT, 5% EPT">India RSC</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('nigeria_rs')" title="Nigeria Revenue Share (pre-PIA legacy contracts) — 55% govt revenue share, 30% CIT; representative of Nigeria's pre-PIA gross-revenue contracts before the 2021 Petroleum Industry Act introduced the hybrid PSC structure">Nigeria Rev Share</button>
+          <button class="btn btn-sm btn-outline" onclick="loadPreset('indonesia_gs')" title="Indonesia Gross Split (MoEMR Decree No. 8/2017) — 43% contractor split for onshore oil, 25% DMO at 25% ICP price, 25% CIT. Introduced by Jokowi government to replace cost recovery PSC and reduce government budget risk.">Indonesia Gross Split</button>
         </div>
       </div>
 
@@ -3741,6 +3758,13 @@ function renderCompare() {
     html += `</div>`;
   });
   html += `</div>`;
+  // Add export/share actions directly below the comparison grid
+  html += `<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+    <button onclick="window.print()" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Print or Save as PDF via browser print dialog — comparison table and chart included">⬇ Save as PDF</button>
+    <button onclick="downloadCmpChart()" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Download chart as PNG image">⬇ Chart PNG</button>
+    <button onclick="shareComparison()" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Copy shareable link to this comparison">⎘ Share Link</button>
+    <span style="font-size:10px;color:#475569;margin-left:4px;">Tip: Ctrl+P to print, select "Save as PDF" as printer for best results</span>
+  </div>`;
   out.className = '';
   out.innerHTML = html;
 
@@ -4093,7 +4117,7 @@ function exportScreenerCSV() {
 function renderVintage() {
   // pivot by decade
   const decades = [...new Set(VINTAGE_DATA.map(d=>d.decade))].sort();
-  const mechs   = ['Concession','PSC','TSC','PRRT','RSC','Buy-back'];
+  const mechs   = ['Concession','PSC','TSC','PRRT','RSC','Buy-back','Revenue Share'];
 
   // build pivot
   const pivot = {};
@@ -4140,7 +4164,7 @@ function renderVintage() {
   const ctx = document.getElementById('vintage-chart').getContext('2d');
   const colors = {
     'Concession':'#4f8ef7','PSC':'#22c55e','TSC':'#eab308',
-    'PRRT':'#f97316','RSC':'#a855f7','Buy-back':'#ef4444'
+    'PRRT':'#f97316','RSC':'#a855f7','Buy-back':'#ef4444','Revenue Share':'#06b6d4'
   };
   new Chart(ctx, {
     type:'line',
@@ -8240,6 +8264,14 @@ const SB_PRESETS = {
     // 55% govt revenue share, 30% CIT, 0% royalty; representative of pre-PIA deepwater RSA structures
     mechanic: 'Revenue Share', profile: 'deepwater', price: 75,
     rs_govt: 55, rs_cit: 30, rs_royalty: 0
+  },
+  indonesia_gs: {
+    // Indonesia Gross Split — MoEMR Decree No. 8/2017 (effective January 2017)
+    // Base contractor split: 43% onshore oil. Variable components (field stage, depth, location, infrastructure)
+    // add 2–18pp to base split. 25% DMO at 25% ICP (years 1–5), escalating to 100% ICP thereafter.
+    // Replaces traditional cost recovery PSC; contractor bears all cost risk within gross split.
+    mechanic: 'Gross Split', profile: 'onshore_me', price: 75,
+    gs_cont: 43, gs_cit: 25, gs_dmo: 25, gs_dmo_price: 25
   }
 };
 
@@ -8281,6 +8313,11 @@ function loadPreset(name) {
     document.getElementById('sb-rs-govt').value = p.rs_govt ?? 60;
     document.getElementById('sb-rs-cit').value = p.rs_cit ?? 30;
     document.getElementById('sb-rs-royalty').value = p.rs_royalty ?? 0;
+  } else if (p.mechanic === 'Gross Split') {
+    document.getElementById('sb-gs-cont').value = p.gs_cont ?? 43;
+    document.getElementById('sb-gs-cit').value = p.gs_cit ?? 25;
+    document.getElementById('sb-gs-dmo').value = p.gs_dmo ?? 25;
+    document.getElementById('sb-gs-dmo-price').value = p.gs_dmo_price ?? 25;
   }
 }
 
@@ -8292,6 +8329,7 @@ function sbUpdateMechanic() {
   document.getElementById('sb-prrt-params').style.display = mech === 'PRRT' ? '' : 'none';
   document.getElementById('sb-buyback-params').style.display = mech === 'Buy-back' ? '' : 'none';
   document.getElementById('sb-revshare-params').style.display = mech === 'Revenue Share' ? '' : 'none';
+  document.getElementById('sb-grosssplit-params').style.display = mech === 'Gross Split' ? '' : 'none';
 }
 
 function sbGetParams() {
@@ -8346,6 +8384,27 @@ function sbGetParams() {
       cit_rate:            (parseFloat(document.getElementById('sb-rs-cit').value) || 30) / 100,
       royalty_rate:        (parseFloat(document.getElementById('sb-rs-royalty').value) || 0) / 100,
     };
+  } else if (mech === 'Gross Split') {
+    // Indonesia Gross Split (MoEMR Decree 8/2017): contractual split of gross revenue, no cost recovery.
+    // Contractor split = base + variable components. DMO obligation reduces effective contractor revenue.
+    // Modeled via dcfPSC with cost_recovery_cap=0; govt split = 1 - contractor split.
+    // DMO penalty: 25% of production sold at 25% ICP price — applied as revenue reduction within contractor split.
+    const contSplit = (parseFloat(document.getElementById('sb-gs-cont').value) || 43) / 100;
+    const dmoPct    = (parseFloat(document.getElementById('sb-gs-dmo').value) || 25) / 100;
+    const dmoPrice  = (parseFloat(document.getElementById('sb-gs-dmo-price').value) || 25) / 100;
+    // Effective contractor split after DMO discount: contSplit - dmoPct*(1-dmoPrice)*contSplit
+    const dmoDiscount = dmoPct * (1 - dmoPrice); // fraction of contractor revenue lost to DMO pricing
+    const effectiveContSplit = contSplit * (1 - dmoDiscount);
+    params = {
+      cost_recovery_cap:   0,
+      ftp_rate:            0,
+      profit_oil_govt_pct: 1 - effectiveContSplit,  // govt share after DMO adjustment
+      cit_rate:            (parseFloat(document.getElementById('sb-gs-cit').value) || 25) / 100,
+      royalty_rate:        0,
+      _gs_cont_pct:        contSplit,    // stored for display in results header
+      _gs_dmo_pct:         dmoPct,
+      _gs_dmo_price_pct:   dmoPrice,
+    };
   } else {
     params = {
       fee_per_bbl: parseFloat(document.getElementById('sb-fee').value) || 4,
@@ -8359,7 +8418,7 @@ function sbGetParams() {
 function runCustomScenario() {
   const { mech, profileKey, price, profile, params } = sbGetParams();
   let result;
-  if (mech === 'PSC' || mech === 'Revenue Share') result = dcfPSC(params, price, profile);
+  if (mech === 'PSC' || mech === 'Revenue Share' || mech === 'Gross Split') result = dcfPSC(params, price, profile);
   else if (mech === 'TSC' || mech === 'RSC') result = dcfTSC(params, price, profile);
   else if (mech === 'PRRT') result = dcfPRRT(params, price, profile);
   else if (mech === 'Buy-back' || mech === 'Buyback') result = dcfBuyback(params, price, profile);
@@ -8595,7 +8654,8 @@ function ddOpenScenarioBuilder(country) {
   // Set mechanic
   const mechEl = document.getElementById('sb-mechanic');
   if (mechEl) {
-    if (mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split') mechEl.value = 'PSC';
+    if (mechanic === 'Gross Split') mechEl.value = 'Gross Split';
+    else if (mechanic === 'PSC' || mechanic === 'EPSA') mechEl.value = 'PSC';
     else if (mechanic === 'Revenue Share') mechEl.value = 'Revenue Share';
     else if (mechanic === 'TSC' || mechanic === 'RSC') mechEl.value = 'TSC';
     else if (mechanic === 'PRRT') mechEl.value = 'PRRT';
@@ -10426,7 +10486,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v82</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v83</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
