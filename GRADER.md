@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-07 (Cycle 12 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 13 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 12 shipped v59: welcome panel fact count corrected 330K→384K (was inconsistent with Methodology section); aria-label attributes on 8 elements (reform filter selects ×3, IOC exposure select, API JSON pre, breakeven map slider, IRR scatter canvas, bubble chart canvas, donut chart canvas, vintage trend canvas); compare chip remove buttons upgraded with role="button", aria-label, and keyboard Enter/Space handler; IOC search and side-by-side search inputs now have aria-label + autocomplete=off. GPA 3.97 (no grade threshold changes — all remaining gaps are data coverage or nice-to-have polish).
+**Overall Status:** Cycle 13 shipped v60: CRITICAL credibility fix — fact count reverted from unverifiable 384K to verifiable 330K+ (sum of n_facts in shipped country_data.json = 330,329). CDN version pins: d3@7 → d3@7.9.0, topojson-client@3 → topojson-client@3.1.0 (prevents future SRI hash breakage). Stale HTML comments cleaned ("COUNTRY DEEP-DIVE" → "COUNTRY PROFILE", "INVESTMENT SCREENER" → "SCREENER"). GPA 3.97 (Professional Credibility regression from 384K claim now closed).
 
 ---
 
@@ -146,7 +146,7 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 11 — 2026-08-07)
+## Updated Grade Table (Cycle 13 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
@@ -251,6 +251,24 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 13 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Opus orchestrator — read GRADER.md (Cycle 12 state), audited index.html (9,766 lines), verified manager note about unverifiable 384K fact count, confirmed actual shipped data sums to 330,329. Made 7 targeted fixes. Version v59 → v60.
+- **Fixes shipped (7 of 7):**
+  1. **CRITICAL: Welcome panel fact count reverted 384K+ → 330K+** — Manager note (Aug 7, 8:20 PM) identified that 384K is not verifiable from shipped data. `country_data.json` sum of `n_facts` = 330,329. A petroleum economist summing the public data would get 330,329 and conclude the site inflates numbers. Reverted to "330K+" — the provably correct figure.
+  2. **Methodology section fact count reverted 384,259 → 330,329** — Same issue. The exact number in the Methodology data sources section now matches the shipped data.
+  3. **CDN pin: d3@7 → d3@7.9.0** — Manager note (Aug 7, 4:25 PM) flagged floating version tags with pinned SRI hashes as a ticking time bomb. When jsdelivr resolves d3@7 to the next patch release, the hash will fail and d3 won't load — breaking the bubble chart, world map, and breakeven map. Pinned to current resolved version 7.9.0.
+  4. **CDN pin: topojson-client@3 → topojson-client@3.1.0** — Same issue. Pinned to current resolved version 3.1.0.
+  5. **Stale HTML comment: "COUNTRY DEEP-DIVE" → "COUNTRY PROFILE"** — Line 1816 tab section comment still used the old name. JS comments were fixed in Cycle 7 but this HTML comment was missed.
+  6. **Stale HTML comment: "INVESTMENT SCREENER" → "SCREENER"** — Line 1677 tab section comment still used the old name. User-visible text was fixed in Cycle 7 but this HTML comment was missed.
+  7. **Changelog v59 entry corrected** — Removed the claim "fact count corrected to 384K+" (which was the incorrect direction) from v59 changelog. Added v60 entry documenting the actual correction. v57 entry reference to "384,259" also cleaned up.
+  8. **Version bump v59 → v60** — Header badge and footer DCF Engine badge updated.
+- **Grade changes from Cycle 12:** None (Professional Credibility maintains A+ — the 384K regression is now closed, restoring the verifiable baseline)
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** Pending (pre-push hook runs tests before push)
+- **Version:** v59 → v60
 
 ---
 
