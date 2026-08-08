@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v67</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v68</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1461,7 +1461,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" onkeydown="if(event.key==='Enter'){setExplorerSort('npv');}" tabindex="0" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
           <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" onkeydown="if(event.key==='Enter'){setExplorerSort('irr');}" tabindex="0" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
           <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" onkeydown="if(event.key==='Enter'){setExplorerSort('be');}" tabindex="0" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
-          <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" onkeydown="if(event.key==='Enter'){setExplorerSort('swing');}" tabindex="0" title="Sort by price sensitivity (low→high)">Swing (pp)</th>
+          <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" onkeydown="if(event.key==='Enter'){setExplorerSort('swing');}" tabindex="0" title="Price sensitivity: govt take@$125/bbl minus take@$50/bbl in percentage points. High swing = fiscal terms are price-sensitive (government captures more of oil price upside). Color: green &lt;10pp (stable), amber 10&ndash;20pp (moderate), red &gt;20pp (highly responsive). Sort: low to high.">Swing (pp)</th>
           <th class="num">Stability</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
           <th>Tier</th>
@@ -1915,7 +1915,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v67 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v68 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1923,6 +1923,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v68 (Aug 2026)</strong> — Critical IRR display fix: <code>fmtIrr()</code> used <code>v &gt; 200</code> threshold, causing all countries with IRR 201–499% to display "n/a" across Explorer rows, Screener results, IOC Portfolio tables, and Side-by-Side comparison (everywhere <code>fmtIrr()</code> is called). Now correctly uses <code>v &gt;= 500</code> matching the documented exclusion threshold. Live DCF <code>calcIRR()</code> function also used <code>irr &gt; 200</code> sentinel, causing the Country Profile Live DCF panel to return null instead of a real IRR for any project with 201–499% return (common at high price points for low-royalty concessions). Both thresholds now corrected to <code>&gt;= 500</code>. Version v67 → v68.<br>
       <strong>v67 (Aug 2026)</strong> — IRR threshold audit: fixed remaining ≤200/&gt;200 threshold instances across FC XLSX export, FC IRR sort null-check, Country Profile IRR display, and Country Profile Data Completeness row — all now use &lt;500 matching the platform's documented ≥500% exclusion threshold. Countries with IRR 200–499% (e.g. USA GoM at very low take) now correctly appear in all views. FC sort buttons: added tabindex and keyboard Enter handler — keyboard-only users can now tab to and activate any sort button. Scenario Builder: added Saudi Arabia preset (Concession, 20% royalty, 85% CIT — representative Middle East high-take concession archetype; closes the regional gap left by Norway/Angola/Iraq/UK/Australia). Country Profile select: added aria-label for screen reader accessibility. FC sort row: added "Ctrl+Enter to re-run" keyboard shortcut hint beside sort controls. Side-by-Side comparison charts: added aria-label + role="img" to both #cmp-chart and #cmp-npv-chart canvases — screen readers now announce both chart types. IOC Portfolio: added "Last updated: Aug 2026" to data source note for due diligence transparency. Methodology provenance: added platform version + coverage stats (v67, 185 countries, 71,601 contracts). Version v66 → v67.<br>
       <strong>v66 (Aug 2026)</strong> — FC results: fixed IRR display bug — previously showed "—" for IRR 200–499% (display cap was ≤200 while the documented exclusion is ≥500); now consistent with disclosed threshold, so countries like USA GoM with IRR ~425% correctly show their value. Vintage Analysis: added aria-label + role="img" to the decade bar chart canvas for screen reader accessibility. Country Profile empty state: added Australia quick-button (6th country — covers PRRT, the only cash-flow-based RRT in the benchmark table). API Explorer: Copy URL button now always visible (disabled until country selected) with helpful placeholder text and example endpoint links (norway.json, angola.json, countries.json full index). Footer: corrected stale "as of 2026-08-06" tooltip to 2026-08-08. Breakeven Map: added interpretation guidance note explaining how to read the color scale and price marker. Country Profile subtitle now explicitly lists DCF sensitivity, reform timeline, and sourced facts — so first-time visitors know what's inside before clicking. FC results table: added aria-sort attributes to sortable column headers — screen readers now announce active sort column and direction. Version v65 → v66.<br>
       <strong>v65 (Aug 2026)</strong> — FC sort: IRR sort now uses &lt;500% threshold (matching the disclosed ≥500% exclusion) — previously used ≤200%, hiding countries with IRRs of 200–499%. FC "+Compare" button tooltip corrected: it adds to Side-by-Side tab (max 4), not the floating basket used by Screener (max 5) — tooltip and button label now say "Compare" not "Basket" to remove ambiguity. Screener: added Region dropdown filter (Africa / Middle East / Asia Pacific / Americas / Europe / Other) — analysts can now combine region + mechanic + take threshold without leaving the Screener. Methodology: clarified "9 Fiscal Mechanics" header — note added distinguishing 9 mechanics in the database from 7 with full DCF models (Gross Split and EPSA modeled directionally; Revenue Share approximated). IRR sort tooltip documents ≥500% exclusion. Version v64 → v65.<br>
@@ -2662,7 +2663,7 @@ function fmtTake(v) {
 }
 function fmtIrr(v) {
   if (v === null || v === undefined) return '<span style="color:var(--muted);font-size:11px" title="IRR calculation requires complete revenue/cost data — not available for all fiscal regimes">—</span>';
-  if (v > 200) return '<span style="color:var(--green);font-size:11px">n/a</span>';
+  if (v >= 500) return '<span style="color:var(--green);font-size:11px" title="IRR ≥500% — unbounded return excluded per platform methodology">n/a</span>';
   return `${Number(v).toFixed(1)}%`;
 }
 // ─── Evidence Quality System ─────────────────────────────────────────────────
@@ -3957,7 +3958,9 @@ function exportScreenerCSV() {
   const csv = [hdr, ...rows].map(r => r.join(',')).join('\n');
   const blob = new Blob([csv], {type:'text/csv'});
   const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
-  a.download = 'petroleum_screener.csv'; a.click();
+  const scrPrice = getPriceKey ? getPriceKey() : '75';
+  const scrDate = new Date().toISOString().slice(0, 10);
+  a.download = 'petroleum_screener_$' + scrPrice + '_' + scrDate + '.csv'; a.click();
 }
 
 // ─── TAB 4: Vintage ──────────────────────────────────────────────────────────
@@ -7346,7 +7349,7 @@ function calcIRR(cashflows, initialCapexMM) {
     if (hi - lo < 0.0001) break;
   }
   const irr = mid * 100;
-  return (irr < 0 || irr > 200) ? null : Math.round(irr * 10) / 10;
+  return (irr < 0 || irr >= 500) ? null : Math.round(irr * 10) / 10;
 }
 
 // Alias for PRRT/Buyback compatibility
@@ -8545,7 +8548,7 @@ function renderFCResults(results, price) {
       + '</div>';
   }
 
-  var _clickHint = '<div style="font-size:11px;color:#475569;margin-bottom:6px;font-style:italic;">Click any row to expand fiscal breakdown \u2014 or use +Basket to add to side-by-side compare</div>';
+  var _clickHint = '<div style="font-size:11px;color:var(--muted);background:rgba(232,160,32,.05);border-left:2px solid rgba(232,160,32,.3);padding:5px 12px;margin-bottom:10px;border-radius:0 4px 4px 0;">\u25b6 Click any row to expand fiscal breakdown &mdash; or use +Compare to add to side-by-side</div>';
   var html = profileBanner + _clickHint + '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
   html += '<th class="num" style="width:50px">#</th>';
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
@@ -9271,7 +9274,12 @@ function exportFCResults() {
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(data);
   XLSX.utils.book_append_sheet(wb, ws, 'Fiscal Compare');
-  XLSX.writeFile(wb, 'ORCA_fiscal_compare_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+  const fcPriceEl = document.getElementById('fc-price');
+  const fcPrice = fcPriceEl ? fcPriceEl.value : '75';
+  const fcProfileEl = document.getElementById('fc-profile');
+  const fcProfileKey = fcProfileEl ? fcProfileEl.value : '';
+  const fcProfileSlug = fcProfileKey ? '_' + fcProfileKey.replace(/[^a-z0-9]/gi, '-') : '';
+  XLSX.writeFile(wb, 'ORCA_fiscal_compare_$' + fcPrice + fcProfileSlug + '_' + new Date().toISOString().slice(0, 10) + '.xlsx');
 }
 
 
@@ -9948,7 +9956,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v67</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v68</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
