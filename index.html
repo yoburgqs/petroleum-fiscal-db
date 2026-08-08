@@ -1149,7 +1149,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v81</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v82</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1304,7 +1304,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <div>≡ <strong style="color:var(--text);">Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
         <div>★ <strong style="color:var(--text);">Screener</strong> — top-level tab. Filter by take range, IRR, mechanic, region with sorting. One-click from any tab. CSV + Excel export. Presets: Sweet Spot / High IRR / Deepwater. Add results to compare basket.</div>
         <div>△ <strong style="color:var(--text);">IOC Portfolio</strong> — top operator positions by country, take, and contract count</div>
-        <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: set royalty, CIT, profit oil split, R-factor tiers. Click <strong>+ Scenario</strong> in the header to open.</div>
+        <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: 7 mechanics (Concession, PSC, TSC, PRRT, Buy-back, RSC, Revenue Share) with full parameter control. 9 country presets. Click <strong>+ Scenario</strong> in the header to open.</div>
         <div>◉ <strong style="color:var(--text);">API</strong> — machine-readable JSON for every country. Download or pipe into your models.</div>
         <div>⌕ <strong style="color:var(--text);">Source confidence</strong> — every fiscal fact shows its source and confidence tier. A = primary legislation. B = operator filing. C = secondary. D = default.</div>
       </div>
@@ -1421,7 +1421,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <select id="flt-mech">
         <option value="">All Mechanics</option>
         <option>Concession</option><option>PSC</option><option>TSC</option>
-        <option>PRRT</option><option>RSC</option><option>Buy-back</option>
+        <option>PRRT</option><option>RSC</option><option>Buy-back</option><option>Revenue Share</option>
       </select>
     </div>
     <div class="ctrl-group" style="display:none">
@@ -1963,7 +1963,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v81 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v82 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1971,6 +1971,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v82 (Aug 2026)</strong> — 6 UX improvements (Cycle 35): Revenue Share added as 7th mechanic option in Scenario Builder — analysts can now directly model gross revenue split contracts (no cost recovery) with dedicated Govt Revenue Share %, CIT, and Royalty inputs; routes to dcfPSC with cost_recovery_cap=0 matching the mechanic's structure. Nigeria Revenue Share preset added (55% govt share, 30% CIT, deepwater profile — representative of pre-PIA legacy gross revenue contracts). Explorer mechanic dropdown: Revenue Share option added to the flt-mech filter select (was present in chip row but absent from dropdown). Fuzzy search upgraded from character-overlap scorer to Levenshtein edit distance — produces materially better suggestions for 2+ character typos and longer country names (e.g. "Azerbajan"→"Azerbaijan", "Saudi Arabi"→"Saudi Arabia"); threshold adjusted from 0.6 to 0.55 to match Levenshtein scale. Scenario Builder: opening via Country Profile now correctly routes Revenue Share countries to the Revenue Share panel (previously fell to Concession fallback). Also routes PRRT and Buy-back country mechanic types correctly. Version v81→v82.<br>
       <strong>v81 (Aug 2026)</strong> — 6 UX improvements (Cycle 34): East Africa &amp; Sub-Saharan Frontier section added to Sample Analyses — 2 analysis cards: (1) East Africa Frontier Bloc table — Mozambique, Tanzania, Uganda, Kenya, Namibia, Senegal, Ghana, Sierra Leone with govt take, swing, and project context for each frontier FID/discovery; loads top 4 (Mozambique, Tanzania, Uganda, Namibia) into Side-by-Side for comparison. (2) Africa Fiscal Reform Pressure (2014–2023) card — documents the major reform events in Angola, Nigeria, Mozambique, Tanzania, Ghana, Uganda with year, current take, and reform description; links to Reform Risk tab. Side-by-Side empty state: Saudi Arabia vs UAE added as 4th quickstart comparison — the Middle East Concession pair answers IOC questions about intra-OPEC fiscal variation. Search: Revenue Share and EPSA added to the global mechanics search list — previously typing "revenue" or "epsa" returned no mechanics results. Run Compare button: keyboard shortcut label (Ctrl+↵) added inline to the button text — analysts see the shortcut without reading the sort row hint. Methodology provenance: version corrected from v79 to v81 (was stale after two cycles without update). Version v80→v81.<br>
       <strong>v80 (Aug 2026)</strong> — 4 UX improvements (Cycle 33): Latin America &amp; Atlantic Frontier section added to Sample Analyses — 3 analysis cards covering the Atlantic Basin opportunity set: (1) Atlantic Frontier Bloc table — Brazil, Guyana, Suriname, Trinidad, Venezuela, Colombia, Ecuador, Peru, Bolivia with govt take @$50/$75/$125 and price swing for side-by-side loading; (2) Brazil Pre-salt vs Post-salt structural note explaining Law 12.351 (2010), mandatory Petrobras 30% stake, sliding profit oil tiers, and how pre-salt PSC terms differ from post-salt concession; (3) Andean &amp; Caribbean Block comparison table covering Colombia, Ecuador, Peru, Bolivia, Trinidad, Argentina, Chile. Reform Risk tab: Regional Reform Tilt panel added above the country-level tables — shows net tightening vs liberalizing balance for each region (Africa, Middle East, Asia Pacific, Americas, Europe) as a mixed bar with % breakdown and average stability score — answers "which regions are under net fiscal tightening pressure?" at a glance. IOC Portfolio empty state: upgraded from single placeholder line to an actionable panel with Operator Fiscal Exposure description, 5 one-click operator buttons (ExxonMobil, Shell, TotalEnergies, BP, Equinor), and routing tip — first-visit users now have immediate entry points. Bug fix: IOC Portfolio empty-state quick-launch buttons corrected from non-existent <code>loadIOCPortfolio()</code> to <code>loadIOC()</code>. Version v79→v80.<br>
       <strong>v79 (Aug 2026)</strong> — 10 UX improvements (Cycle 32): All remaining browser <code>prompt()</code> dialogs eliminated — <code>saveCustomScenario()</code> now uses an inline styled modal for scenario naming (no more browser pop-ups); clipboard fallbacks now show toast messages instead of <code>prompt()</code> (4 locations: API copy, Share comparison, Country Profile copy-link, Explorer copy-link). Scenario Builder IRR display: values ≥500% now show styled <code>n/a*</code> with hover tooltip (consistent with Explorer/Screener display — previously showed raw "n/a" with no explanation). Welcome panel "7 fiscal mechanics modeled" stat card clarified to "Full DCF mechanics" with tooltip listing all 7 and explaining 2 additional directional mechanics (Gross Split, EPSA). Scenario Builder: after running DCF, output now shows a "vs 185-Country Database" context panel — displays rank by govt take (#X of 185), difference from global median, and percentile position, giving analysts immediate peer context without leaving the modal. Fiscal Compare empty state: added one-click "Run Deepwater $75" and "Onshore $50" quickstart buttons and a description of recommended starting points for first-time users. Screener "Prod Cov" column header: tooltip fully explains what production coverage means and why high coverage gives more accurate take numbers. Country Profile quick-access: Nigeria added as 8th country (PSC/Concession, PIA 2021 reform — one of the most-watched fiscal events in recent IOC planning). FC results Govt NPV column header: ⓘ symbol added with expanded tooltip clarifying it is derived from contractor NPV via formula (not independently modeled) and cautioning against treating it as independently calibrated. Side-by-Side comparison empty state: added 3 quickstart comparison buttons (Norway vs Angola, USA vs Iraq, Indonesia vs Malaysia) with rationale tooltips. Version v78→v79.<br>
@@ -2380,6 +2381,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
             <option value="PRRT">PRRT (Australia-style)</option>
             <option value="Buy-back">Buy-back (Iran-style)</option>
             <option value="RSC">Risk Service Contract (RSC)</option>
+            <option value="Revenue Share">Revenue Share</option>
           </select>
         </div>
 
@@ -2466,6 +2468,18 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           </div>
         </div>
 
+        <div id="sb-revshare-params" style="display:none">
+          <div class="sb-section-hdr">Revenue Share Parameters</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.5;">Gross revenue split — no cost recovery mechanism. State takes a fixed share of production revenue before any deductions. Used in select African and Latin American contracts. Modeled via PSC-equivalent with 0% cost recovery cap.</div>
+          <div class="sb-row2">
+            <div class="sb-control-group"><label>Govt Revenue Share (%)</label><input type="number" id="sb-rs-govt" value="60" min="10" max="90" step="5" title="Percentage of gross revenue taken by government before contractor cost recovery"></div>
+            <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-rs-cit" value="30" min="0" max="60" step="1"></div>
+          </div>
+          <div class="sb-row2">
+            <div class="sb-control-group"><label>Royalty Rate (%)</label><input type="number" id="sb-rs-royalty" value="0" min="0" max="20" step="1"></div>
+          </div>
+        </div>
+
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
           <button class="btn" onclick="runCustomScenario()">&#9654; Run DCF</button>
           <button class="btn btn-outline" onclick="saveCustomScenario()">Save Scenario</button>
@@ -2477,6 +2491,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('saudi')" title="Saudi Arabia — concession with high CIT (85%) and 20% royalty; Aramco equity participation implicit in high take">Saudi Arabia</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('iran')" title="Iran — buy-back contract: contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7-10 year term">Iran Buy-back</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('india')" title="India RSC — Risk Service Contract under NELP/HELP: contractor delivers services, government keeps equity; $4/bbl representative fee, 34% CIT, 5% EPT">India RSC</button>
+          <button class="btn btn-sm btn-outline" onclick="loadPreset('nigeria_rs')" title="Nigeria Revenue Share (pre-PIA legacy contracts) — 55% govt revenue share, 30% CIT; representative of Nigeria's pre-PIA gross-revenue contracts before the 2021 Petroleum Industry Act introduced the hybrid PSC structure">Nigeria Rev Share</button>
         </div>
       </div>
 
@@ -4612,18 +4627,28 @@ function renderSearchResults() {
   ).slice(0, 8);
 
   if (!countryMatches.length) {
-    // Fuzzy fallback: find closest country name by character overlap (handles 1-2 char typos)
-    function _fuzzyScore(a, b) {
-      // Count matching characters in order (not necessarily contiguous)
-      var ai = 0, bi = 0, matched = 0;
-      while (ai < a.length && bi < b.length) {
-        if (a[ai] === b[bi]) { matched++; ai++; bi++; } else { bi++; }
+    // Fuzzy fallback: Levenshtein edit distance — handles transpositions, insertions, deletions
+    function _levenshtein(a, b) {
+      var m = a.length, n = b.length;
+      var dp = [];
+      for (var i = 0; i <= m; i++) { dp[i] = [i]; }
+      for (var j = 0; j <= n; j++) { dp[0][j] = j; }
+      for (var i = 1; i <= m; i++) {
+        for (var j = 1; j <= n; j++) {
+          if (a[i-1] === b[j-1]) dp[i][j] = dp[i-1][j-1];
+          else dp[i][j] = 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+        }
       }
-      return matched / Math.max(a.length, b.length);
+      return dp[m][n];
+    }
+    function _fuzzyScore(a, b) {
+      // Normalize: shorter distance vs longer string = higher score
+      var dist = _levenshtein(a, b);
+      return 1 - dist / Math.max(a.length, b.length);
     }
     var fuzzyMatches = COUNTRY_DATA.map(function(d) {
       return { d: d, score: _fuzzyScore(q, d.country.toLowerCase()) };
-    }).filter(function(x) { return x.score >= 0.6; })
+    }).filter(function(x) { return x.score >= 0.55; })
       .sort(function(a, b) { return b.score - a.score; })
       .slice(0, 4);
     if (fuzzyMatches.length) {
@@ -8209,6 +8234,12 @@ const SB_PRESETS = {
   india: {
     mechanic: 'RSC', profile: 'shallow', price: 75,
     fee: 4.0, tsc_cit: 34, ept: 5
+  },
+  nigeria_rs: {
+    // Nigeria Revenue Share — pre-PIA legacy gross revenue contracts (pre-2021 Petroleum Industry Act)
+    // 55% govt revenue share, 30% CIT, 0% royalty; representative of pre-PIA deepwater RSA structures
+    mechanic: 'Revenue Share', profile: 'deepwater', price: 75,
+    rs_govt: 55, rs_cit: 30, rs_royalty: 0
   }
 };
 
@@ -8246,6 +8277,10 @@ function loadPreset(name) {
     document.getElementById('sb-bb-cap').value = p.bb_cap ?? 50;
     document.getElementById('sb-bb-term').value = p.bb_term ?? 10;
     document.getElementById('sb-bb-cit').value = p.bb_cit ?? 25;
+  } else if (p.mechanic === 'Revenue Share') {
+    document.getElementById('sb-rs-govt').value = p.rs_govt ?? 60;
+    document.getElementById('sb-rs-cit').value = p.rs_cit ?? 30;
+    document.getElementById('sb-rs-royalty').value = p.rs_royalty ?? 0;
   }
 }
 
@@ -8256,6 +8291,7 @@ function sbUpdateMechanic() {
   document.getElementById('sb-tsc-params').style.display = (mech === 'TSC' || mech === 'RSC') ? '' : 'none';
   document.getElementById('sb-prrt-params').style.display = mech === 'PRRT' ? '' : 'none';
   document.getElementById('sb-buyback-params').style.display = mech === 'Buy-back' ? '' : 'none';
+  document.getElementById('sb-revshare-params').style.display = mech === 'Revenue Share' ? '' : 'none';
 }
 
 function sbGetParams() {
@@ -8301,6 +8337,15 @@ function sbGetParams() {
       capex_recovery_years: parseInt(document.getElementById('sb-bb-term').value) || 10,
       cit_rate:             (parseFloat(document.getElementById('sb-bb-cit').value) || 25) / 100,
     };
+  } else if (mech === 'Revenue Share') {
+    // Revenue Share: gross revenue split, no cost recovery. Modeled via dcfPSC with cost_recovery_cap=0
+    params = {
+      cost_recovery_cap:   0,           // no cost recovery
+      ftp_rate:            0,           // no FTP
+      profit_oil_govt_pct: (parseFloat(document.getElementById('sb-rs-govt').value) || 60) / 100,
+      cit_rate:            (parseFloat(document.getElementById('sb-rs-cit').value) || 30) / 100,
+      royalty_rate:        (parseFloat(document.getElementById('sb-rs-royalty').value) || 0) / 100,
+    };
   } else {
     params = {
       fee_per_bbl: parseFloat(document.getElementById('sb-fee').value) || 4,
@@ -8314,7 +8359,7 @@ function sbGetParams() {
 function runCustomScenario() {
   const { mech, profileKey, price, profile, params } = sbGetParams();
   let result;
-  if (mech === 'PSC') result = dcfPSC(params, price, profile);
+  if (mech === 'PSC' || mech === 'Revenue Share') result = dcfPSC(params, price, profile);
   else if (mech === 'TSC' || mech === 'RSC') result = dcfTSC(params, price, profile);
   else if (mech === 'PRRT') result = dcfPRRT(params, price, profile);
   else if (mech === 'Buy-back' || mech === 'Buyback') result = dcfBuyback(params, price, profile);
@@ -8550,8 +8595,11 @@ function ddOpenScenarioBuilder(country) {
   // Set mechanic
   const mechEl = document.getElementById('sb-mechanic');
   if (mechEl) {
-    if (mechanic === 'PSC' || mechanic === 'EPSA') mechEl.value = 'PSC';
+    if (mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split') mechEl.value = 'PSC';
+    else if (mechanic === 'Revenue Share') mechEl.value = 'Revenue Share';
     else if (mechanic === 'TSC' || mechanic === 'RSC') mechEl.value = 'TSC';
+    else if (mechanic === 'PRRT') mechEl.value = 'PRRT';
+    else if (mechanic === 'Buy-back') mechEl.value = 'Buy-back';
     else mechEl.value = 'Concession';
     sbUpdateMechanic();
   }
@@ -10378,7 +10426,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v81</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v82</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
