@@ -1186,3 +1186,12 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+## Cycle 35 Log — 2026-08-08 17:40
+- Test before: 117 PASS / 0 FAIL
+- Test after: 117 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All three background tasks resolved cleanly. v86 is live.
+Warning: no stdin data received in 3s, proceeding without it. If piping from a slow command, redirect stdin explicitly: < /dev/null to skip, or wait longer.
+
