@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 14 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 15 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 14 shipped v61: 6 targeted analyst-facing improvements — IRR scatter coverage disclosure, Fiscal Compare profile context banner, ≥500% IRR exclusion explanations in 3 locations, Screener IRR null count label, loading screen credentials tagline, point estimate disclosure in Methodology, footer coverage detail, Sample Analyses subtitle. GPA 3.97 (no threshold crossings — all A categories maintained; Data Reliability B+ unchanged as it is a Harvesting fork issue).
+**Overall Status:** Cycle 15 shipped v62: 6 targeted analyst-facing improvements — Breakeven Map coverage disclosure (68/185 on tab), Breakeven CSV export button, Reform Risk CSV export button, Fiscal Component Breakdown typographic bug fixed, benchmark validation 6.5%-of-185 coverage disclosure, IOC Portfolio data source note. GPA 3.97 (no threshold crossings — all A categories maintained; Data Reliability B+ unchanged as it is a Harvesting fork issue). Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -146,7 +146,7 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 14 — 2026-08-08)
+## Updated Grade Table (Cycle 15 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
@@ -166,7 +166,7 @@ Every 30-minute cycle:
 | 14 | 14. Search Quality | A+ | = | Fuzzy Did you mean? matching from Cycle 9. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. |
 
-**Summary: 0 categories below B+. Cycle 14: 0 grade upgrades (all fixes close disclosure gaps within existing A/A+ categories; no category crosses a threshold). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 15: 0 grade upgrades (all fixes close disclosure/export gaps within existing A/A+ categories; no category crosses a threshold). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
@@ -176,6 +176,7 @@ Every 30-minute cycle:
 2. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
 3. Remaining onclick elements in compare chips / reform filters (Accessibility → A+)
 4. Waterfall bar chart individual segment export from Country Profile (Export A+ breadth)
+5. Country Profile drill-down: add "compare to global median" callout for take figures
 
 ---
 
@@ -251,6 +252,23 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 15 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 14 state), audited full 9,791-line index.html, identified 6 targeted improvements across export capability, data transparency, and typographic correctness. All shipped. Version v61 → v62.
+- **Fixes shipped (6 of 6):**
+  1. **Breakeven Map coverage disclosure** — Added amber-bordered coverage note "Coverage: 68 of 185 countries · Requires complete royalty + cost data · Remaining 117 countries shown as grey on map" prominently above the Breakeven Map legend. Previously, coverage was only in the footer — a first-time viewer clicking the Breakeven Map tab had no immediate context for why most of the world map is grey.
+  2. **Breakeven Map CSV export** — Added "Export Breakeven Data (CSV)" button below the lowest/highest breakeven lists. New `exportBreakevenCSV()` function exports all 68 countries with their breakeven, take, and IRR values. An analyst who wants to load breakeven data into their own model or deck now has a direct path.
+  3. **Reform Risk CSV export** — Added "Export Reform Data (CSV)" button at the bottom of the Reform Risk tab content. New `exportReformRiskCSV()` function exports the full sourced reform event log (all countries, all events, year/mechanic/take_change/direction/source/notes). Analysts presenting reform risk often want to build their own slides with this data.
+  4. **Fiscal Component Breakdown typographic fix** — Fixed missing space before `·` separator in the waterfall subtitle string. The character was directly concatenated against the preceding word with no space, resulting in "contracts·Effective" in rendered text. Now reads "contracts · Effective" correctly.
+  5. **Benchmark validation scope disclosure** — Expanded validation table description from "12 benchmark countries validated" to "12 benchmark countries validated — representing 6.5% of the 185-country database (the subset where independently published fiscal ranges are publicly available)." Sets honest expectations about validation breadth without undermining the quality of the validated set.
+  6. **IOC Portfolio data source note** — Added source disclosure banner below the IOC Portfolio page subtitle: "IOC country presence derived from operator annual reports, 10-K filings, and public project disclosures (2023–2025). Portfolio reflects countries of active operation — not necessarily current equity production." A senior analyst wondering where IOC country lists come from now has an immediate answer.
+- **Grade changes from Cycle 14:** None (all fixes are transparency/export within existing A/A+ categories; no category threshold crossed)
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (pre-push hook verified)
+- **Version:** v61 → v62
+- **Push:** Success — `edc582d → 40933ee` on `origin/main`. GitHub Pages live.
 
 ---
 
