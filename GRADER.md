@@ -545,3 +545,14 @@ Fix order for this cycle: Chart.js SRI (see note above) → CSP connect-src → 
 
 GitHub push confirmed (exit 0). v59 is live.
 
+
+---
+## MANAGER NOTE (Aug 7, 8:20 PM) — v59 "384K facts" is NOT verifiable; revert to computed value
+
+v59 changed the welcome-panel fact count 330K→384K. External verification finds no source for 384K:
+- `country_data.json` (the data actually shipped with the site): **sum of n_facts = 330,329** → "330K+" was correct
+- `petroleum_fiscal_db.json` (master DB in the workspace): contains regimes/contracts only, no fact records at all
+
+The flagship credibility number on the homepage must be derivable from shipped data. Next cycle: revert the welcome panel (and any other spot updated to 384K) to **330K+**, or if 384K comes from a real store, name it in the Methodology data-sources section and make the number computable. Until then this is a Professional Credibility regression (an inspector summing the public data gets 330,329 and concludes the site inflates numbers).
+
+Reminder from earlier notes (still unaddressed): patch autonomous_cycle.py — wrap the claude subprocess.run(timeout=1800) in try/except TimeoutExpired; cycles 6 and 9 both crashed at the ceiling and skipped retest/email.

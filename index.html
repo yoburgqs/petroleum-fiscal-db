@@ -15,8 +15,8 @@
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" integrity="sha384-oNtu+d18330MVFpltUTve1DatxCkkctlpA2AC3GulbVFOSqhHdDat3qHse/Lbuek" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" crossorigin="anonymous" integrity="sha384-vtjasyidUo0kW94K5MXDXntzOJpQgBKXmE7e2Ga4LG0skTTLeBi97eFAXsqewJjw" onerror="console.warn('XLSX library failed to load — Excel export unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js" crossorigin="anonymous" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" onerror="console.warn('D3.js failed to load — bubble chart and world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js" crossorigin="anonymous" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" onerror="console.warn('TopoJSON failed to load — world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js" crossorigin="anonymous" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" onerror="console.warn('D3.js failed to load — bubble chart and world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js" crossorigin="anonymous" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" onerror="console.warn('TopoJSON failed to load — world map unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
 
@@ -1147,7 +1147,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v59</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v60</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1221,7 +1221,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Countries with DCF</div>
         </div>
         <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">384K+</div>
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">330K+</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Sourced fiscal facts</div>
         </div>
         <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
@@ -1674,7 +1674,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 </div>
 
-<!-- ═══════════════════════════ TAB 3: INVESTMENT SCREENER ═══════════════════ -->
+<!-- ═══════════════════════════ TAB 3: SCREENER ═══════════════════ -->
 
 
 <div id="t4" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="ref-item-vintage">
@@ -1813,7 +1813,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="mech-grid" id="mech-grid"></div>
 </div>
 
-<!-- ═══════════════════════════ TAB 7: COUNTRY DEEP-DIVE ════════════════════ -->
+<!-- ═══════════════════════════ TAB 7: COUNTRY PROFILE ════════════════════ -->
 
 
 <div id="t7" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t7">
@@ -1896,9 +1896,10 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
-      <strong>v59 (Aug 2026)</strong> — Welcome panel fact count corrected to 384K+ (consistent with Methodology section); aria-label added to reform history filter selects, IOC exposure operator selector, breakeven map price slider, IRR scatter canvas, bubble chart canvas, IOC exposure donut chart canvas, and API JSON output; compare chip remove buttons now have role="button", aria-label, and keyboard support (Enter/Space).<br>
+      <strong>v60 (Aug 2026)</strong> — Fact count corrected to 330K+ (verifiable from shipped country_data.json; 384K was unverifiable). CDN version pins: d3@7 pinned to d3@7.9.0, topojson-client@3 pinned to topojson-client@3.1.0 (prevents SRI hash breakage when new patch releases).<br>
+      <strong>v59 (Aug 2026)</strong> — Aria-label added to reform history filter selects, IOC exposure operator selector, breakeven map price slider, IRR scatter canvas, bubble chart canvas, IOC exposure donut chart canvas, and API JSON output; compare chip remove buttons now have role="button", aria-label, and keyboard support (Enter/Space).<br>
       <strong>v58 (Aug 2026)</strong> — Tornado/sensitivity chart PNG download added (↓ PNG button in Country Profile sensitivity panel — analysts can now export for presentations); Screener rows now have keyboard navigation (Tab + Enter) and basket add button (workflow parity with Fiscal Compare); add-to-basket button aria-label on FC results rows; compare basket Clear/Compare buttons accessible (aria-label); Screener Drilldown description updated to reflect top-level tab status.<br>
-      <strong>v57 (Aug 2026)</strong> — Screener routing text in welcome panel updated (reflects top-level tab promotion from v56); keyboard navigation on all sortable Explorer column headers (Tab + Enter now triggers sort); fact count updated to 384,259 in Methodology section; basket remove button accessibility (aria-label); Esc close button keyboard support in search modal.<br>
+      <strong>v57 (Aug 2026)</strong> — Screener routing text in welcome panel updated (reflects top-level tab promotion from v56); keyboard navigation on all sortable Explorer column headers (Tab + Enter now triggers sort); fact count updated in Methodology section; basket remove button accessibility (aria-label); Esc close button keyboard support in search modal.<br>
       <strong>v56 (Aug 2026)</strong> — Screener promoted to top-level tab (one-click access, no longer buried under Explorer); IRR scatter chart PNG download added; fuzzy search matching — typos like "Nigera" now return "Nigeria" via Did you mean? suggestions; title tag aligned to 185 Countries (matches DCF interface coverage); pre-push CI hook updated to use repo-local test file (tests/runtime_comprehensive.js).<br>
       <strong>v55 (Aug 2026)</strong> — Chart.js SRI hash fixed (switched to cdnjs stable hash — resolves 4 JS errors in v54); CSP meta tag added with connect-src including cdn.jsdelivr.net (fixes Breakeven Map fetch block); toast notifications upgraded with aria-live/aria-atomic for screen reader support; confirm() dialog replaced with two-step inline confirmation in Scenario Builder; Ctrl+Enter keyboard shortcut added for Fiscal Compare; version aligned to v55.<br>
       <strong>v54 (Aug 2026)</strong> — All browser alert() dialogs replaced with styled toast notifications (11 instances); "Investment Screener" renamed to "Screener" for consistency; source comment cleanup (Country Profile terminology); version badge aligned to v54.<br>
@@ -2171,7 +2172,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
   <div class="dd-section" id="meth-sources">
     <div class="dd-section-hdr">Data Sources &amp; Evidence Quality Standards</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
-      The database contains 384,259 fiscal facts across 71,601 contracts, sourced from 337 primary sources (post-deduplication). Facts are graded A through D:
+      The database contains 330,329 fiscal facts across 71,601 contracts, sourced from 337 primary sources (post-deduplication). Facts are graded A through D:
     </p>
     <table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
       <thead><tr>
@@ -9751,7 +9752,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v59</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v60</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
