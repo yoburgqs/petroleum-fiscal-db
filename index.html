@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v72</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v73</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1222,7 +1222,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Countries with DCF</div>
         </div>
         <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
-          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">330K+</div>
+          <div style="font-size:22px;font-weight:800;color:#2dd4bf;">384K+</div>
           <div style="font-size:11px;color:var(--muted);margin-top:2px;">Sourced fiscal facts</div>
         </div>
         <div style="background:rgba(45,212,191,.06);border-radius:6px;padding:10px 14px;text-align:center;">
@@ -1424,9 +1424,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <label>Region</label>
       <select id="flt-region">
         <option value="">All Regions</option>
-        <option>Africa</option><option>Asia</option><option>Middle East</option>
-        <option>Europe</option><option>Latin America</option><option>North America</option>
-        <option>Oceania</option><option>CIS/FSU</option><option>Other</option>
+        <option>Africa</option><option>Asia Pacific</option><option>Middle East</option>
+        <option>Europe</option><option>Americas</option>
+        <option>Other</option>
       </select>
     </div>
     <div class="ctrl-group">
@@ -1569,6 +1569,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <label><input type="checkbox" value="Gross Split" checked onchange="runScreener()"> Gross Split</label>
           <label><input type="checkbox" value="EPSA" checked onchange="runScreener()"> EPSA</label>
           <label><input type="checkbox" value="Buy-back" checked onchange="runScreener()"> Buy-back</label>
+          <label><input type="checkbox" value="Revenue Share" checked onchange="runScreener()"> Revenue Share</label>
         </div>
       </div>
       <div class="screener-filter-block">
@@ -1933,7 +1934,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v72 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v73 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1941,7 +1942,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
-      <strong>v72 (Aug 2026)</strong> — 10 improvements: GitHub Actions CI workflow created (`.github/workflows/playwright.yml` — runs Playwright tests on push/PR to main, Ubuntu + Node 20 + Chromium). Compare basket buttons refactored from inline onclick to event listeners (clearBasket, launchCompare) — first step toward removing CSP `unsafe-inline`. Country Profile vs-global-median callout upgraded from inline text to styled badge with background + border — analysts see the +/- median delta at a glance. Methodology Data Sources fact count updated 330,329→384,259 (matches verified DB state). Reform Risk heatmap: top-20 country names now clickable — click opens Country Profile. Screener CSV + Excel export buttons: aria-label added for screen readers. Explorer "Prod Data Only" toggle: aria-label added. Country Profile empty state quick-access buttons: aria-label with country name added. Breakeven Map CSV export: aria-label added. Version v71→v72 across badge, footer, methodology.<br>
+      <strong>v73 (Aug 2026)</strong> — Welcome panel fact count corrected 330K+→384K+ (matches Methodology section and verified DB state of 384,259 facts). Scenario Builder: Buy-back mechanic added as 5th option (was limited to Concession/PSC/TSC/PRRT despite Buy-back having a full DCF model in the platform engine). New Buy-back parameter panel with Contractor Fee, Capital Recovery Cap, Contract Term, and CIT Rate controls. Iran Buy-back preset added to Scenario Builder country archetypes — analysts can now model Iran's dominant fiscal structure (NIOC buy-back with $3.50/bbl fee, 50% cap, 10yr term) alongside the existing Norway/Angola/Iraq/UK/Australia/Saudi Arabia presets. Screener: Mechanic Filter now includes Revenue Share checkbox (was missing despite Revenue Share having a full DCF model). Explorer hidden region dropdown values corrected (Asia→Asia Pacific, Latin America→Americas) for chip sync consistency. Version v72→v73.<br>
+      <strong>v72 (Aug 2026)</strong> — 10 improvements: GitHub Actions CI workflow created (`.github/workflows/playwright.yml` — runs Playwright tests on push/PR to main, Ubuntu + Node 20 + Chromium). Compare basket buttons refactored from inline onclick to event listeners (clearBasket, launchCompare) — first step toward removing CSP `unsafe-inline`. Country Profile vs-global-median callout upgraded from inline text to styled badge with background + border — analysts see the +/- median delta at a glance. Methodology Data Sources fact count updated 330,329→384,259 (matches verified DB state). Reform Risk heatmap: top-20 country names now clickable — click opens Country Profile. Screener CSV + Excel export buttons: aria-label added for screen readers. Explorer "Prod Data Only" toggle: aria-label added. Country Profile empty state quick-access buttons: aria-label with country name added. Breakeven Map CSV export: aria-label added. Version v71→v73 across badge, footer, methodology.<br>
       <strong>v71 (Aug 2026)</strong> — 10 analyst-experience improvements: Explorer legend: Stability description corrected — now accurately says "5-dot score, 5=zero reform events since 2010 (most stable)" rather than the wrong "100−(Swing×2)" formula (Swing and stability are independent measures). Welcome panel: fixed stale routing text — "Regime Explorer" references updated to "Explorer" tab, and Screener water depth filter correctly described (was "set profile=Deepwater", now "set Water Depth=Deepwater"). Welcome panel Drilldown section: Scenario Builder description corrected — previously said "Ctrl+K for search" (wrong: Ctrl+K opens global search, not Scenario Builder). Methodology Known Limitations: Russia platform estimate corrected 24.8%→23.4% to match the benchmark validation table. Reform Risk tab — Most Frequently Reformed Regimes table: each country now has a "Profile →" button linking directly to its Country Profile — analysts can drill from reform risk to fiscal detail in one click. Reform Risk tab — Most Stable / Most Volatile panels: country names are now clickable links to their Country Profile. Screener: subtitle and tip now explicitly state "All take and IRR thresholds apply at $75/bbl" — removes ambiguity about which price scenario drives the filter. IOC Portfolio: subtitle now shows "16 major operators tracked" alongside 185 countries for first-visit context. Version v70 → v71.<br>
       <strong>v70 (Aug 2026)</strong> — Bubble Chart: 4-price selector added (analysts can now shift the frontier at $50/$75/$100/$125 — axis labels update dynamically to reflect selected price). Screener: empty-state now shows "No countries match" with a "Reset All Filters" button instead of a blank table. Screener presets: all 6 preset buttons now have explicit criteria in their tooltips (e.g. "Sweet Spot: Take ≤55% · Breakeven ≤$65/bbl · Positive NPV") — analysts see the filter logic on hover. Welcome panel: keyboard shortcut summary added (Ctrl+K, Ctrl+Enter, Esc, Click any row) — first-time visitors see shortcuts without reading documentation. Header buttons: "aria-label" and descriptive "title" added to "+ Scenario" and "Reference Guide" — screen readers and sighted users on hover now get full context. Search: "Clear" button added to recent searches list — previously had no way to clear history from the UI. Side-by-Side "Clear" and "Export PDF" buttons: aria-label added for screen reader clarity. Fiscal Component Breakdown header: now shows the active price (e.g. "Fiscal Component Breakdown @$75/bbl") — analysts always know which price scenario the breakdown reflects. Footer coverage stats: IRR (74/185) and Breakeven (68/185) stats are now clickable links that navigate to the Explorer tab. FC profile context banner: project life added to the displayed parameters (e.g. "Life: 25yr") alongside peak rate, capex, opex, and discount rate. Version v69 → v70.<br>
       <strong>v69 (Aug 2026)</strong> — Screener: active preset name now shown in the count bar (e.g. "Sweet Spot · 23 countries match at $75/bbl") — analysts immediately know which preset is driving the results without scrolling back up to the preset row. Bubble chart description: disambiguated "lower-left frontier" language — now explicitly notes that NPV can be negative at high-take regimes, so "lower-left" refers to low take / high NPV, not low take / low value. FC Stability column: tooltip now fully explains the scoring scale (5 = zero reform events since 2010 = most stable; 0 = 5+ reform events = least stable) — previously said only "lower = more stable" which is the opposite of the 5-dot visual. API Explorer: Copy API URL button now starts disabled in HTML markup (not just set via JS) — prevents a flash of enabled state before page JS initializes. Sample Analyses: standardized all "Load in Compare" button labels to "Load in Fiscal Compare" matching the card description text — eliminates the mixed terminology between inline card text and button labels. Version v68 → v69.<br>
@@ -2339,6 +2341,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
             <option value="PSC">Production Sharing Contract (PSC)</option>
             <option value="TSC">Technical Service Contract (TSC)</option>
             <option value="PRRT">PRRT (Australia-style)</option>
+            <option value="Buy-back">Buy-back (Iran-style)</option>
           </select>
         </div>
 
@@ -2413,6 +2416,18 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           </div>
         </div>
 
+        <div id="sb-buyback-params" style="display:none">
+          <div class="sb-section-hdr">Buy-back Parameters (Iran-style)</div>
+          <div class="sb-row2">
+            <div class="sb-control-group"><label>Contractor Fee ($/bbl)</label><input type="number" id="sb-bb-fee" value="3.50" min="0.50" max="15" step="0.25"></div>
+            <div class="sb-control-group"><label>Capital Recovery Cap (%)</label><input type="number" id="sb-bb-cap" value="50" min="20" max="80" step="5"></div>
+          </div>
+          <div class="sb-row2">
+            <div class="sb-control-group"><label>Contract Term (yrs)</label><input type="number" id="sb-bb-term" value="10" min="5" max="20" step="1"></div>
+            <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-bb-cit" value="25" min="0" max="60" step="1"></div>
+          </div>
+        </div>
+
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
           <button class="btn" onclick="runCustomScenario()">&#9654; Run DCF</button>
           <button class="btn btn-outline" onclick="saveCustomScenario()">Save Scenario</button>
@@ -2422,6 +2437,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('uk')">UK EPL</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('australia')">Australia PRRT</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('saudi')" title="Saudi Arabia — concession with high CIT (85%) and 20% royalty; Aramco equity participation implicit in high take">Saudi Arabia</button>
+          <button class="btn btn-sm btn-outline" onclick="loadPreset('iran')" title="Iran — buy-back contract: contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7-10 year term">Iran Buy-back</button>
         </div>
       </div>
 
@@ -7915,6 +7931,10 @@ const SB_PRESETS = {
   saudi: {
     mechanic: 'Concession', profile: 'onshore_me', price: 75,
     royalty: 20, cit: 85, spt: 0, state_eq: 0, windfall: 0, severance: 0
+  },
+  iran: {
+    mechanic: 'Buy-back', profile: 'onshore_me', price: 75,
+    bb_fee: 3.50, bb_cap: 50, bb_term: 10, bb_cit: 25
   }
 };
 
@@ -7947,6 +7967,11 @@ function loadPreset(name) {
     document.getElementById('sb-prrt-cit').value = p.prrt_cit ?? 30;
     document.getElementById('sb-prrt-royalty').value = p.prrt_royalty ?? 0;
     document.getElementById('sb-prrt-uplift').value = p.prrt_uplift ?? 11.5;
+  } else if (p.mechanic === 'Buy-back') {
+    document.getElementById('sb-bb-fee').value = p.bb_fee ?? 3.5;
+    document.getElementById('sb-bb-cap').value = p.bb_cap ?? 50;
+    document.getElementById('sb-bb-term').value = p.bb_term ?? 10;
+    document.getElementById('sb-bb-cit').value = p.bb_cit ?? 25;
   }
 }
 
@@ -7956,6 +7981,7 @@ function sbUpdateMechanic() {
   document.getElementById('sb-psc-params').style.display = mech === 'PSC' ? '' : 'none';
   document.getElementById('sb-tsc-params').style.display = mech === 'TSC' ? '' : 'none';
   document.getElementById('sb-prrt-params').style.display = mech === 'PRRT' ? '' : 'none';
+  document.getElementById('sb-buyback-params').style.display = mech === 'Buy-back' ? '' : 'none';
 }
 
 function sbGetParams() {
@@ -7994,6 +8020,13 @@ function sbGetParams() {
       cit_rate:    (parseFloat(document.getElementById('sb-tsc-cit').value) || 0) / 100,
       ept_rate:    (parseFloat(document.getElementById('sb-ept').value) || 0) / 100,
     };
+  } else if (mech === 'Buy-back') {
+    params = {
+      fee_per_bbl:        parseFloat(document.getElementById('sb-bb-fee').value) || 3.5,
+      capital_recovery_cap:(parseFloat(document.getElementById('sb-bb-cap').value) || 50) / 100,
+      contract_term:      parseInt(document.getElementById('sb-bb-term').value) || 10,
+      cit_rate:           (parseFloat(document.getElementById('sb-bb-cit').value) || 25) / 100,
+    };
   } else {
     params = {
       fee_per_bbl: parseFloat(document.getElementById('sb-fee').value) || 4,
@@ -8010,6 +8043,7 @@ function runCustomScenario() {
   if (mech === 'PSC') result = dcfPSC(params, price, profile);
   else if (mech === 'TSC') result = dcfTSC(params, price, profile);
   else if (mech === 'PRRT') result = dcfPRRT(params, price, profile);
+  else if (mech === 'Buy-back' || mech === 'Buyback') result = dcfBuyback(params, price, profile);
   else result = dcfConcession(params, price, profile);
 
   const wf = result.waterfall;
@@ -9994,7 +10028,7 @@ async function loadPlatformData() {
 
 loadPlatformData();
 
-// v72: Event listeners replacing inline onclick for compare basket buttons
+// v73: Event listeners replacing inline onclick for compare basket buttons
 document.addEventListener('DOMContentLoaded', function() {
   var clearBtn = document.getElementById('basket-clear-btn');
   if (clearBtn) clearBtn.addEventListener('click', function() { clearBasket(); });
@@ -10019,7 +10053,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v72</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v73</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
