@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v63</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v64</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1523,29 +1523,29 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('deepwater')" title="Deepwater frontier regimes">Deepwater</button>
       <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('lowrisk')" title="Low take AND low swing — predictable regimes">Low-Risk Stable</button>
       <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highirr')" title="High-return opportunities">High IRR</button>
+      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highevidence')" title="Countries with ≥80% of fiscal facts sourced from primary legislation (A) or verified filings (B) — highest data quality for due diligence">High Evidence ✓</button>
       <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('rfactor')" title="PSC countries with R-factor profit oil tiers — government take is price-sensitive by contract design" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC <span id="rfactor-preset-count" style="font-size:9px;opacity:.7;"></span></button>
-      <button class="btn btn-sm btn-outline" style="color:var(--muted);" onclick="applyScreenerPreset('reset')">Reset</button>
     </div>
     <div class="slider-row">
       <div class="slider-group">
         <label>Max Govt Take: <span class="val" id="sv-take">60</span>%</label>
-        <input type="range" id="sl-take" min="30" max="100" value="60" oninput="document.getElementById('sv-take').textContent=this.value;runScreener()">
+        <input type="range" id="sl-take" min="30" max="100" value="60" aria-label="Maximum government take percentage (30–100%)" oninput="document.getElementById('sv-take').textContent=this.value;runScreener()">
       </div>
       <div class="slider-group">
         <label>Max Breakeven: $<span class="val" id="sv-be">70</span>/bbl</label>
-        <input type="range" id="sl-be" min="20" max="120" value="70" oninput="document.getElementById('sv-be').textContent=this.value;runScreener()">
+        <input type="range" id="sl-be" min="20" max="120" value="70" aria-label="Maximum breakeven oil price in dollars per barrel (20–120)" oninput="document.getElementById('sv-be').textContent=this.value;runScreener()">
       </div>
       <div class="slider-group">
         <label>Min Contractor NPV: $<span class="val" id="sv-npv">0</span>M</label>
-        <input type="range" id="sl-npv" min="-500" max="2000" value="0" oninput="document.getElementById('sv-npv').textContent=this.value;runScreener()">
+        <input type="range" id="sl-npv" min="-500" max="2000" value="0" aria-label="Minimum contractor NPV in millions of dollars (-500 to 2000)" oninput="document.getElementById('sv-npv').textContent=this.value;runScreener()">
       </div>
       <div class="slider-group">
         <label>Min IRR: <span class="val" id="sv-irr">0</span>%</label>
-        <input type="range" id="sl-irr" min="0" max="50" value="0" oninput="document.getElementById('sv-irr').textContent=this.value;runScreener()">
+        <input type="range" id="sl-irr" min="0" max="50" value="0" aria-label="Minimum contractor IRR percentage (0–50%)" oninput="document.getElementById('sv-irr').textContent=this.value;runScreener()">
       </div>
       <div class="slider-group">
         <label title="Filter by evidence quality: % of fiscal facts with primary (A) or verified (B) source">Min Evidence A/B: <span class="val" id="sv-evid">0</span>%</label>
-        <input type="range" id="sl-evid" min="0" max="100" value="0" oninput="document.getElementById('sv-evid').textContent=this.value;runScreener()">
+        <input type="range" id="sl-evid" min="0" max="100" value="0" aria-label="Minimum evidence quality percentage — share of fiscal facts with A or B source confidence (0–100%)" oninput="document.getElementById('sv-evid').textContent=this.value;runScreener()">
       </div>
     </div>
     <div class="screener-extra">
@@ -1904,6 +1904,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v64 (Aug 2026)</strong> — Fiscal Compare: renamed "+Cmp" button to "+Basket" for clarity (IOC analysts now immediately understand the compare basket workflow); added "Click any row to expand fiscal breakdown" hint below sort controls — first-time users now know rows are interactive. Screener: removed duplicate "Reset" preset button (redundant with "Reset All" below); added "High Evidence ✓" preset (filters to countries with ≥80% A/B sourced fiscal facts — key for due diligence workflows); added aria-label to all 5 range sliders for screen reader accessibility. Footer: updated DB date to 2026-08-08. Version v63 → v64.<br>
       <strong>v63 (Aug 2026)</strong> — Country Profile: added global median callout (+Xpp vs global median 58.4%) beside govt take heading — analysts immediately see where a country sits vs the 185-country field; added "Fiscal Compare" quick-nav button alongside "Explorer" in the back-navigation row. Vintage Analysis: added CSV export button — decade-by-mechanic take data now downloadable. Fiscal Mechanics Guide: each mechanic card now has a "Filter Explorer → [Mechanic]" button — one click to see all countries of that type. Screener: added "Reset All" button that fully resets sliders and mechanic checkboxes in one click. Footer: audit badge now shows last run date. Ctrl+Enter shortcut for Fiscal Compare: fixed bug where the tab ID check was wrong (was checking for nonexistent 'tfc', now correctly checks 't0'). Version v62 → v63.<br>
       <strong>v62 (Aug 2026)</strong> — Breakeven Map: added coverage note (68/185 countries) prominently on the tab; added Export Breakeven Data (CSV) button. Reform Risk: added Export Reform History (CSV) button — full sourced reform event dataset downloadable. Fiscal Component Breakdown: fixed typographic spacing bug (missing space before separator). Benchmark validation: clarified 12-of-185 country scope (6.5% coverage) in table header. IOC Portfolio: added data source note for IOC country positions. Version v61 → v62.<br>
       <strong>v61 (Aug 2026)</strong> — IRR scatter chart: added 74/185 coverage note and ≥500% exclusion disclosure to legend. Fiscal Compare: added profile context banner showing run parameters (profile, price, peak rate, capex, opex, discount rate) above results — analysts always see what was run even when scrolled. Explorer IRR column tooltip updated to explain ≥500% exclusion threshold. Screener IRR null checkbox now shows "(111 countries)" count. Loading screen: added sourcing credentials tagline. Methodology: added point estimate disclosure note under Known Model Limitations.<br>
@@ -3753,6 +3754,9 @@ function applyScreenerPreset(preset) {
     _screenerRfactorOnly = true;
     setChecks('sc-mech-checks', ['PSC','EPSA']);
     setSlider('sl-take', 90);
+  } else if (preset === 'highevidence') {
+    // Countries with ≥80% A/B sourced fiscal facts — highest data quality for due diligence
+    setSlider('sl-evid', 80);
   }
   // 'reset' case: already reset above
   runScreener();
@@ -8496,7 +8500,8 @@ function renderFCResults(results, price) {
       + '</div>';
   }
 
-  var html = profileBanner + '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
+  var _clickHint = '<div style="font-size:11px;color:#475569;margin-bottom:6px;font-style:italic;">Click any row to expand fiscal breakdown \u2014 or use +Basket to add to side-by-side compare</div>';
+  var html = profileBanner + _clickHint + '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
   html += '<th class="num" style="width:50px">#</th>';
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th>Mechanic</th>';
@@ -8537,7 +8542,7 @@ function renderFCResults(results, price) {
       var stab = stabilityScores[r.country] != null ? stabilityScores[r.country] : 5;
       html += '<td class="num">' + stabDots(stab) + '</td>';
     }
-    html += '<td class="num"><button onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Compare tab">+Cmp</button></td>';
+    html += '<td class="num"><button onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Side-by-Side compare basket (max 5 countries)">+Basket</button></td>';
     html += '</tr>';
   });
   html += '</tbody></table></div>';
@@ -9894,11 +9899,11 @@ loadPlatformData();
 <!-- Data Vintage Footer -->
 <div id="data-vintage-footer" style="background:#0f172a;border-top:1px solid #1e293b;padding:10px 24px;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;font-size:11px;color:#64748b;font-family:monospace;">
   <div class="data-vintage-badge" style="display:flex;align-items:center;gap:8px;">
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DB: 2026-08-06</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DB: 2026-08-08</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v63</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v64</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
