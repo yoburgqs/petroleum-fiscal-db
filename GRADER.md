@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 21 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 22 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 21 shipped v68: 10 targeted improvements — Critical IRR display fix: fmtIrr() used `v > 200` threshold causing all 201–499% IRR countries to display "n/a" everywhere fmtIrr() is called (Explorer, Screener, IOC, Side-by-Side); calcIRR() bisection solver used `irr > 200` causing live DCF panel to return null instead of real IRR for any project with 201–499% return — both corrected to ≥500. Screener CSV export now includes active price in filename. FC XLSX export filename now includes active price+profile. FC results click-hint redesigned with amber left-border for discoverability. Explorer Swing column tooltip now explains the metric, color thresholds, and sort direction. GPA 3.97 (no threshold crossings).
+**Overall Status:** Cycle 22 shipped v69: 10 targeted analyst-experience improvements — Screener count bar now shows active preset name (e.g. "Sweet Spot · 23 countries match at $75/bbl") with auto-clear on manual slider adjustment; slider `oninput` handlers all set `_activePresetName=null` to prevent stale label. FC Stability column tooltip fully explains 5-dot scoring (5=zero changes=most stable, 0=5+ changes=most volatile). Stability checkbox label gains descriptive tooltip. Bubble chart description disambiguated: NPV Y-axis language now explicit that negative NPV countries appear below X-axis. API Copy URL button now starts `disabled` in HTML markup (prevents flash-of-enabled before JS). Sample Analyses "Load in Compare" buttons standardized to "Load in Fiscal Compare" (3 instances). Changelog entry v69 added. Version badge, DCF Engine footer, and Methodology provenance all updated v68→v69. GPA 3.97 (no threshold crossings).
 
 ---
 
@@ -146,7 +146,7 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 17 — 2026-08-08)
+## Updated Grade Table (Cycle 22 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
@@ -166,7 +166,7 @@ Every 30-minute cycle:
 | 14 | 14. Search Quality | A+ | = | Fuzzy Did you mean? matching from Cycle 9. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. |
 
-**Summary: 0 categories below B+. Cycle 18: 0 grade upgrades (all fixes close correctness, labeling, and workflow gaps within existing A/A+ categories; no category crosses a threshold). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 22: 0 grade upgrades (all fixes close analyst-experience gaps — preset state transparency, scoring tooltip clarity, bubble chart ambiguity, API button UX, button label consistency; no category crosses a threshold). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
