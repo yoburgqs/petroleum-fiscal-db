@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v70</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v71</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1256,17 +1256,17 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
         <div style="background:rgba(255,255,255,.03);border-left:3px solid #a855f7;border-radius:0 6px 6px 0;padding:10px 12px;">
           <div style="font-size:11px;color:#a855f7;font-weight:700;margin-bottom:4px;">Q: Which PSC countries in Africa have R-factor tiers?</div>
-          <div style="font-size:11px;color:var(--muted);">→ <strong>Regime Explorer</strong>: click PSC chip, click Africa chip, then click ◈ R-factor PSC chip. See filtered country cards.</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Explorer</strong> tab: click PSC chip, click Africa chip, then click ◈ R-factor PSC chip. See filtered country cards.</div>
         </div>
 
         <div style="background:rgba(255,255,255,.03);border-left:3px solid #ef4444;border-radius:0 6px 6px 0;padding:10px 12px;">
           <div style="font-size:11px;color:#ef4444;font-weight:700;margin-bottom:4px;">Q: How sensitive is Angola to oil price — what's the govt take swing $50→$125?</div>
-          <div style="font-size:11px;color:var(--muted);">→ <strong>Regime Explorer</strong>: find Angola card. Shows take at 4 price points + Swing column. Click card for full Country Profile with price curve.</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Explorer</strong> tab: find Angola in the table. Shows take at 4 price points + Swing column. Click row to open Country Profile with full price curve.</div>
         </div>
 
         <div style="background:rgba(255,255,255,.03);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;padding:10px 12px;">
           <div style="font-size:11px;color:#3b82f6;font-weight:700;margin-bottom:4px;">Q: What does IRR look like across 185 countries at $75 for a deepwater project?</div>
-          <div style="font-size:11px;color:var(--muted);">→ <strong>Screener &#9733;</strong> tab: set profile=Deepwater, sort by IRR. Presets: "Sweet Spot", "High IRR", "Deepwater".</div>
+          <div style="font-size:11px;color:var(--muted);">→ <strong>Screener &#9733;</strong> tab: set Water Depth=Deepwater, sort by IRR. Presets: "Deepwater", "High IRR", "Sweet Spot".</div>
         </div>
 
         <div style="background:rgba(255,255,255,.03);border-left:3px solid #22c55e;border-radius:0 6px 6px 0;padding:10px 12px;">
@@ -1303,7 +1303,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <div>≡ <strong style="color:var(--text);">Regime Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
         <div>★ <strong style="color:var(--text);">Screener</strong> — top-level tab. Filter by take range, IRR, mechanic, region with sorting. One-click from any tab. CSV + Excel export. Presets: Sweet Spot / High IRR / Deepwater. Add results to compare basket.</div>
         <div>△ <strong style="color:var(--text);">IOC Portfolio</strong> — top operator positions by country, take, and contract count</div>
-        <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: set royalty, CIT, profit oil split, R-factor tiers. Ctrl+K for search.</div>
+        <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: set royalty, CIT, profit oil split, R-factor tiers. Click <strong>+ Scenario</strong> in the header to open.</div>
         <div>◉ <strong style="color:var(--text);">API</strong> — machine-readable JSON for every country. Download or pipe into your models.</div>
         <div>⌕ <strong style="color:var(--text);">Source confidence</strong> — every fiscal fact shows its source and confidence tier. A = primary legislation. B = operator filing. C = secondary. D = default.</div>
       </div>
@@ -1487,7 +1487,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span style="color:#4caf50">&#9632;</span> &lt;10pp low &nbsp;
     <span style="color:#f5a623">&#9632;</span> 10–20pp moderate &nbsp;
     <span style="color:#e53935">&#9632;</span> &gt;20pp high &nbsp;|&nbsp;
-    <strong>Stability</strong> = 100 − (Swing × 2), capped [0, 100].
+    <strong>Stability</strong> = 5-dot score: 5 = zero reform events since 2010 (most stable) → 0 = 5+ reform events (most volatile). Sourced from ORCA reform history database.
   </div>
 
   <div style="margin-top:24px;background:var(--surface);border-radius:10px;padding:16px;">
@@ -1521,8 +1521,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div id="explorer-screen-mode" style="display:none">
 
   <div class="page-title">Screener</div>
-  <div class="page-sub">Filter countries by fiscal criteria at the selected price point to identify the most attractive regimes.</div>
-  <div style="background:rgba(212,160,23,.08);border-left:3px solid #d4a017;border-radius:0 6px 6px 0;padding:9px 14px;margin-bottom:16px;font-size:12px;color:#f0c060;"><strong style="color:#d4a017;">Screener</strong> — Filter contracts by return threshold, region, and mechanic. Use pre-sets for quick starting points or set sliders manually.</div>
+  <div class="page-sub">Filter countries by fiscal criteria to identify the most attractive regimes. <strong>All take and IRR thresholds apply at $75/bbl</strong> (the platform base case).</div>
+  <div style="background:rgba(212,160,23,.08);border-left:3px solid #d4a017;border-radius:0 6px 6px 0;padding:9px 14px;margin-bottom:16px;font-size:12px;color:#f0c060;"><strong style="color:#d4a017;">Screener</strong> — Filter contracts by return threshold, region, and mechanic. Use pre-sets for quick starting points or set sliders manually. <strong style="color:#d4a017;">Metrics are at $75/bbl</strong> unless noted.</div>
 
   <div class="card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
@@ -1793,7 +1793,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
 <div id="t5" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t5">
   <div class="page-title">IOC Portfolio View</div>
-  <div class="page-sub">Search any operator to see their full portfolio of fiscal contracts. All metrics at $75/bbl.</div>
+  <div class="page-sub">Search any operator to see their full portfolio of fiscal contracts across 185 countries. All metrics at $75/bbl. 16 major operators tracked.</div>
   <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(148,163,184,.06);border:1px solid rgba(148,163,184,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);margin-bottom:16px;">
     <span>IOC country presence derived from operator annual reports, 10-K filings, and public project disclosures (2023–2025). Portfolio reflects countries of active operation — not necessarily current equity production. <strong style="color:#64748b;">Last updated: Aug 2026.</strong></span>
   </div>
@@ -1933,7 +1933,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v70 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v71 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1941,6 +1941,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v71 (Aug 2026)</strong> — 10 analyst-experience improvements: Explorer legend: Stability description corrected — now accurately says "5-dot score, 5=zero reform events since 2010 (most stable)" rather than the wrong "100−(Swing×2)" formula (Swing and stability are independent measures). Welcome panel: fixed stale routing text — "Regime Explorer" references updated to "Explorer" tab, and Screener water depth filter correctly described (was "set profile=Deepwater", now "set Water Depth=Deepwater"). Welcome panel Drilldown section: Scenario Builder description corrected — previously said "Ctrl+K for search" (wrong: Ctrl+K opens global search, not Scenario Builder). Methodology Known Limitations: Russia platform estimate corrected 24.8%→23.4% to match the benchmark validation table. Reform Risk tab — Most Frequently Reformed Regimes table: each country now has a "Profile →" button linking directly to its Country Profile — analysts can drill from reform risk to fiscal detail in one click. Reform Risk tab — Most Stable / Most Volatile panels: country names are now clickable links to their Country Profile. Screener: subtitle and tip now explicitly state "All take and IRR thresholds apply at $75/bbl" — removes ambiguity about which price scenario drives the filter. IOC Portfolio: subtitle now shows "16 major operators tracked" alongside 185 countries for first-visit context. Version v70 → v71.<br>
       <strong>v70 (Aug 2026)</strong> — Bubble Chart: 4-price selector added (analysts can now shift the frontier at $50/$75/$100/$125 — axis labels update dynamically to reflect selected price). Screener: empty-state now shows "No countries match" with a "Reset All Filters" button instead of a blank table. Screener presets: all 6 preset buttons now have explicit criteria in their tooltips (e.g. "Sweet Spot: Take ≤55% · Breakeven ≤$65/bbl · Positive NPV") — analysts see the filter logic on hover. Welcome panel: keyboard shortcut summary added (Ctrl+K, Ctrl+Enter, Esc, Click any row) — first-time visitors see shortcuts without reading documentation. Header buttons: "aria-label" and descriptive "title" added to "+ Scenario" and "Reference Guide" — screen readers and sighted users on hover now get full context. Search: "Clear" button added to recent searches list — previously had no way to clear history from the UI. Side-by-Side "Clear" and "Export PDF" buttons: aria-label added for screen reader clarity. Fiscal Component Breakdown header: now shows the active price (e.g. "Fiscal Component Breakdown @$75/bbl") — analysts always know which price scenario the breakdown reflects. Footer coverage stats: IRR (74/185) and Breakeven (68/185) stats are now clickable links that navigate to the Explorer tab. FC profile context banner: project life added to the displayed parameters (e.g. "Life: 25yr") alongside peak rate, capex, opex, and discount rate. Version v69 → v70.<br>
       <strong>v69 (Aug 2026)</strong> — Screener: active preset name now shown in the count bar (e.g. "Sweet Spot · 23 countries match at $75/bbl") — analysts immediately know which preset is driving the results without scrolling back up to the preset row. Bubble chart description: disambiguated "lower-left frontier" language — now explicitly notes that NPV can be negative at high-take regimes, so "lower-left" refers to low take / high NPV, not low take / low value. FC Stability column: tooltip now fully explains the scoring scale (5 = zero reform events since 2010 = most stable; 0 = 5+ reform events = least stable) — previously said only "lower = more stable" which is the opposite of the 5-dot visual. API Explorer: Copy API URL button now starts disabled in HTML markup (not just set via JS) — prevents a flash of enabled state before page JS initializes. Sample Analyses: standardized all "Load in Compare" button labels to "Load in Fiscal Compare" matching the card description text — eliminates the mixed terminology between inline card text and button labels. Version v68 → v69.<br>
       <strong>v68 (Aug 2026)</strong> — Critical IRR display fix: <code>fmtIrr()</code> used <code>v &gt; 200</code> threshold, causing all countries with IRR 201–499% to display "n/a" across Explorer rows, Screener results, IOC Portfolio tables, and Side-by-Side comparison (everywhere <code>fmtIrr()</code> is called). Now correctly uses <code>v &gt;= 500</code> matching the documented exclusion threshold. Live DCF <code>calcIRR()</code> function also used <code>irr &gt; 200</code> sentinel, causing the Country Profile Live DCF panel to return null instead of a real IRR for any project with 201–499% return (common at high price points for low-royalty concessions). Both thresholds now corrected to <code>&gt;= 500</code>. Version v67 → v68.<br>
@@ -2131,7 +2132,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
     <div style="padding:12px 16px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;margin-bottom:8px;">
       <strong style="color:var(--accent);">Russia — Mineral Extraction Tax (MET) model</strong>
       <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
-        Platform estimate: <strong style="color:var(--text);">24.8%</strong> government take. Published reference range: 45–55%.<br>
+        Platform estimate: <strong style="color:var(--text);">23.4%</strong> government take. Published reference range: 45–55%.<br>
         Russia's fiscal terms are highly opaque and contract-specific. The platform uses a simplified Article 342 MET formula (production-volume and price-linked), which is directionally correct for export-oriented onshore producers operating at reference price. However, it does not capture Russia's additional profit-based export duties (NDPI surcharge) or the excess profit tax (EPT) introduced for large fields post-2019. Together, these can add 20–30 percentage points to effective government take for giant fields. This is a known sourcing gap; enhanced MET + EPT modeling is pending primary source acquisition (Federal Law No. 366-FZ).
       </p>
     </div>
@@ -6671,8 +6672,12 @@ function renderReformRisk() {
     + '</tr></thead>'
     + '<tbody>'
     + withScore.slice(0,15).map(function(r) {
+        var escapedC = r.country.replace(/'/g,"\\'");
         return '<tr>'
-          + '<td style="padding:5px 8px;font-size:12px;color:var(--text);">' + r.country + '</td>'
+          + '<td style="padding:5px 8px;font-size:12px;color:var(--text);">'
+          + r.country
+          + ' <button onclick="document.getElementById(\'dd-country-select\').value=\'' + escapedC + '\';loadCountryProfile(\'' + escapedC + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:1px 6px;font-size:10px;color:var(--accent);cursor:pointer;margin-left:6px;" title="Open Country Profile for ' + r.country + '">Profile →</button>'
+          + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--accent);font-weight:600;">' + r.total + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + (r.since2010>2?'#ef4444':r.since2010>0?'#f97316':'#22c55e') + ';">' + r.since2010 + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;">'
@@ -6721,8 +6726,9 @@ function renderReformRisk() {
     + '<div style="font-size:11px;font-weight:700;color:#22c55e;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Most Stable Regimes</div>'
     + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">0\u20131 reform events since 2010. Predictable fiscal environment for long-term IOC projects.</div>'
     + stable.map(function(r) {
+        var ec = r.country.replace(/'/g,"\\'");
         return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #1e293b;">'
-          + '<span style="font-size:12px;color:var(--text);">' + r.country + '</span>'
+          + '<button onclick="document.getElementById(\'dd-country-select\').value=\'' + ec + '\';loadCountryProfile(\'' + ec + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" style="background:none;border:none;color:var(--text);font-size:12px;cursor:pointer;padding:0;text-align:left;" title="Open Country Profile">' + r.country + ' ›</button>'
           + '<span style="font-size:12px;color:' + takeColor(r.take75) + ';font-weight:600;">' + (r.take75!=null?r.take75.toFixed(1)+'%':'\u2014') + '</span>'
           + '</div>';
       }).join('')
@@ -6731,8 +6737,9 @@ function renderReformRisk() {
     + '<div style="font-size:11px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Most Volatile Regimes</div>'
     + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">3+ reform events since 2010. Risk of term renegotiation over a 25-year project life.</div>'
     + volatileList.map(function(r) {
+        var ec = r.country.replace(/'/g,"\\'");
         return '<div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid #1e293b;">'
-          + '<span style="font-size:12px;color:var(--text);">' + r.country + '</span>'
+          + '<button onclick="document.getElementById(\'dd-country-select\').value=\'' + ec + '\';loadCountryProfile(\'' + ec + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" style="background:none;border:none;color:var(--text);font-size:12px;cursor:pointer;padding:0;text-align:left;" title="Open Country Profile">' + r.country + ' ›</button>'
           + '<span style="font-size:11px;color:#ef4444;">' + r.since2010 + ' changes \u00b7 <span style="color:' + takeColor(r.take75) + '">' + (r.take75!=null?r.take75.toFixed(1)+'%':'\u2014') + '</span></span>'
           + '</div>';
       }).join('')
@@ -10000,7 +10007,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v70</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v71</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
