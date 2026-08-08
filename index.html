@@ -240,6 +240,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .dd-empty { color: var(--muted); font-size: 13px; padding: 20px 0; }
 .dd-section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2); }
 .dd-section h3 { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
+.dd-section-hdr { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
 .dd-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; }
 .dd-country-name { font-size: 22px; font-weight: 800; }
 .dd-region { color: var(--muted); font-size: 14px; }
@@ -1128,18 +1129,20 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <a href="#main-tab-content" class="skip-link">Skip to main content</a>
 <div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;display:flex;align-items:center;justify-content:center;z-index:9999;">
   <div style="text-align:center;color:#E8A020;font-family:'IBM Plex Mono',monospace">
-    <div style="margin-bottom:20px"><span style="font-size:28px;font-weight:900;letter-spacing:.15em;color:var(--accent);">ORCA</span></div>
+    <div style="margin-bottom:20px"><span style="font-size:28px;font-weight:900;letter-spacing:.15em;color:var(--accent);animation:ld-pulse 2s ease-in-out infinite;">ORCA</span></div>
     <div style="font-size:1.1em;font-weight:600;letter-spacing:1px">PETROLEUM FISCAL DATABASE</div>
     <div style="font-size:0.85em;color:#94a3b8;margin-top:8px">Petroleum Fiscal Intelligence Platform</div>
     <div style="font-size:0.75em;color:#64748b;margin-top:4px">71,000+ contracts across 185 countries</div>
-    <div style="margin-top:20px;width:200px;height:2px;background:#1e293b;border-radius:1px;overflow:hidden">
-      <div style="height:100%;background:#E8A020;animation:ldbar 1.8s ease-in-out infinite;transform-origin:left"></div>
+    <div style="margin-top:20px;width:200px;height:3px;background:#1e293b;border-radius:2px;overflow:hidden;position:relative;">
+      <div style="height:100%;background:linear-gradient(90deg,#b87a10,#E8A020,#f0c060,#E8A020,#b87a10);background-size:200% 100%;animation:ld-shimmer 1.6s ease-in-out infinite;position:absolute;width:60%;border-radius:2px;"></div>
     </div>
     <div style="font-size:0.72em;color:#475569;margin-top:14px;letter-spacing:0.5px;">Primary legislation · Operator filings · 15+ years of sourcing</div>
   </div>
 </div>
 <style>
 @keyframes ldbar { 0%{width:0%} 60%{width:100%} 100%{width:100%;opacity:0} }
+@keyframes ld-shimmer { 0%{left:-60%;} 100%{left:100%;} }
+@keyframes ld-pulse { 0%,100%{opacity:1;} 50%{opacity:.65;} }
 </style>
 
 
@@ -1149,7 +1152,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v84</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v85</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1550,8 +1553,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <input type="range" id="sl-be" min="20" max="120" value="70" aria-label="Maximum breakeven oil price in dollars per barrel (20–120)" oninput="document.getElementById('sv-be').textContent=this.value;_activePresetName=null;runScreener()">
       </div>
       <div class="slider-group">
-        <label>Min Contractor NPV: $<span class="val" id="sv-npv">0</span>M</label>
-        <input type="range" id="sl-npv" min="-500" max="2000" value="0" aria-label="Minimum contractor NPV in millions of dollars (-500 to 2000)" oninput="document.getElementById('sv-npv').textContent=this.value;_activePresetName=null;runScreener()">
+        <label title="Filter by minimum contractor NPV at $75/bbl. 0 = NPV-positive only. Negative = allow negative-NPV (loss-making at $75). All values in $M.">Min Contractor NPV: $<span class="val" id="sv-npv">0</span>M <span style="font-size:10px;color:var(--muted);">@$75</span></label>
+        <input type="range" id="sl-npv" min="-500" max="2000" value="0" aria-label="Minimum contractor NPV in millions of dollars at $75/bbl (-500 to 2000)" oninput="document.getElementById('sv-npv').textContent=this.value;_activePresetName=null;runScreener()">
       </div>
       <div class="slider-group">
         <label>Min IRR: <span class="val" id="sv-irr">0</span>%</label>
@@ -1965,7 +1968,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v84 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v85 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1973,6 +1976,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v85 (Aug 2026)</strong> — 10 analyst-experience improvements (Cycle 38): (1) <code>.dd-section-hdr</code> CSS class added to main stylesheet — Methodology section headings now render with proper uppercase, weighted, letter-spaced styling matching the rest of the platform (previously only defined in print stylesheet, appearing as unstyled plain text on screen). (2) North Sea card factual correction — "18 percentage points" corrected to "~16 percentage points" (Norway 67.9% vs UK 51.4% = 16.5pp); description corrected from "Norway's 78% SPT" (wrong — 78% is the total marginal rate: 56% SPT + 22% CIT) to accurate 56%/22% breakdown. (3) Breakeven Map price marker default corrected from $70 to $75 — now consistent with the platform's standard reference price used in Fiscal Compare, Screener, and Methodology. (4) Country Profile "Q2 2026" data currency label updated to "Q3 2026" — August 2026 is Q3, not Q2. (5) Loading screen animation upgraded — ORCA title text now pulses (opacity oscillation) and progress bar uses a shimmer gradient sweep instead of a plain fill, giving a more professional feel on first load. (6) West Africa PSC card description improved — now explains what Angola actually changed in 2023 (FTP rate 10%→20% on new deepwater blocks, +~5pp take) rather than just saying "tightened terms". (7) Benchmark validation table — country names are now clickable links that navigate to the Country Profile tab for that country — analysts can drill from validation table to full fiscal detail in one click. (8) Discount rate sensitivity section — added explicit "Why government take doesn't change with discount rate" callout box explaining the mathematical reason (take is undiscounted), addressing a common question when senior economists review the table. (9) Screener NPV slider label — added "@$75" price reference to "Min Contractor NPV" label so analysts know which price scenario the NPV threshold applies to; added descriptive tooltip. (10) Known Model Limitations — added Indonesia Gross Split as second documented limitation entry (modeled as PSC-equivalent with 43% base contractor split; variable split components by field parameter not captured; DMO directional only). Version v84→v85.<br>
       <strong>v84 (Aug 2026)</strong> — 6 improvements (Cycle 37): Gross Split chip added to Explorer mechanic filter row — analysts can now filter the 71,601-contract database by Gross Split mechanic directly from the chip row (was missing; Indonesia contracts were not filterable by chip, unlike Concession/PSC/TSC/PRRT/RSC/Buy-back/Revenue Share). Gross Split option added to hidden flt-mech dropdown (chip sync fix — previously the chip set the UI but the dropdown remained empty, causing filter state mismatches). Revenue Share and Gross Split added to Fiscal Mechanics Guide page as full mechanic cards — guide previously showed only 7 mechanics (Concession, PSC, TSC, PRRT, RSC, Buy-back, Mixed/Hybrid); both Revenue Share and Gross Split now have dedicated How It Works, Typical Take, Examples, and Key Variables entries with Explorer filter buttons. Welcome panel Scenario Builder entry updated to "8 mechanics" including Gross Split (was "7 mechanics" — stale since v83 added Gross Split as 8th option). Stat card updated from "7 Full DCF mechanics" to "8 Scenario mechanics" with corrected tooltip. Methodology formula block: Revenue Share and Gross Split formulas added to the fiscal formula reference (was showing only 5 of 7 modeled mechanics — Revenue Share and Gross Split formulas omitted). Version v83→v84.<br>
       <strong>v83 (Aug 2026)</strong> — 4 UX improvements (Cycle 36): Gross Split added as 8th mechanic option in Scenario Builder — analysts can now model Indonesia's Gross Split regime (MoEMR Decree No. 8/2017) directly with dedicated inputs: Contractor Gross Split %, CIT Rate, DMO Obligation %, and DMO Price (% of ICP). DMO penalty is computed as a revenue reduction on the contractor split (25% of production at 25% ICP price = effective ~5.6% revenue loss at base split), giving a more accurate effective take than simple PSC-proxy. Indonesia Gross Split preset added (43% contractor split, 25% CIT, 25% DMO at 25% ICP — onshore oil profile per Decree 8/2017 base splits). Revenue Share column added to Vintage Analysis decade table and trend chart — previously the table showed only 6 mechanics (Concession/PSC/TSC/PRRT/RSC/Buy-back); Revenue Share contracts were present in the DB but excluded from the vintage visualization; now shows Revenue Share avg take by decade in cyan (#06b6d4) alongside other mechanics. Side-by-Side comparison: "Save as PDF" and "Chart PNG" export buttons added directly below the comparison grid — analysts no longer need to scroll to the top controls to find export options; buttons appear in context after running a comparison. Version v82→v83.<br>
       <strong>v82 (Aug 2026)</strong> — 6 UX improvements (Cycle 35): Revenue Share added as 7th mechanic option in Scenario Builder — analysts can now directly model gross revenue split contracts (no cost recovery) with dedicated Govt Revenue Share %, CIT, and Royalty inputs; routes to dcfPSC with cost_recovery_cap=0 matching the mechanic's structure. Nigeria Revenue Share preset added (55% govt share, 30% CIT, deepwater profile — representative of pre-PIA legacy gross revenue contracts). Explorer mechanic dropdown: Revenue Share option added to the flt-mech filter select (was present in chip row but absent from dropdown). Fuzzy search upgraded from character-overlap scorer to Levenshtein edit distance — produces materially better suggestions for 2+ character typos and longer country names (e.g. "Azerbajan"→"Azerbaijan", "Saudi Arabi"→"Saudi Arabia"); threshold adjusted from 0.6 to 0.55 to match Levenshtein scale. Scenario Builder: opening via Country Profile now correctly routes Revenue Share countries to the Revenue Share panel (previously fell to Concession fallback). Also routes PRRT and Buy-back country mechanic types correctly. Version v81→v82.<br>
@@ -2183,6 +2187,12 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         Russia's fiscal terms are highly opaque and contract-specific. The platform uses a simplified Article 342 MET formula (production-volume and price-linked), which is directionally correct for export-oriented onshore producers operating at reference price. However, it does not capture Russia's additional profit-based export duties (NDPI surcharge) or the excess profit tax (EPT) introduced for large fields post-2019. Together, these can add 20–30 percentage points to effective government take for giant fields. This is a known sourcing gap; enhanced MET + EPT modeling is pending primary source acquisition (Federal Law No. 366-FZ).
       </p>
     </div>
+    <div style="padding:12px 16px;background:var(--surface);border-left:3px solid rgba(232,160,32,.5);border-radius:0 6px 6px 0;margin-bottom:8px;">
+      <strong style="color:#f0a830;">Indonesia — Gross Split modeled as PSC-equivalent</strong>
+      <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
+        Platform estimate: <strong style="color:var(--text);">59.6%</strong> government take (within SKK Migas range 57–64%). Within the platform, Indonesia's Gross Split contracts (MoEMR Decree No. 8/2017 — all new blocks post-2017) are modeled as a PSC with zero cost recovery and a 43% base contractor split. The true Gross Split mechanic adds variable split components (based on API gravity, field location, water depth, CO₂ content, H₂S content, and local content) that can shift the contractor split by ±10pp from the base. DMO obligation (25% of production at 25% ICP price for first 60 months) is captured directionally. Field-specific variable components are not modeled. Use the Gross Split Scenario Builder to stress-test the variable components for specific field conditions.
+      </p>
+    </div>
     <!-- Point estimate disclosure -->
     <div style="margin-top:16px;padding:10px 16px;background:rgba(232,160,32,.06);border-left:3px solid rgba(232,160,32,.4);border-radius:0 6px 6px 0;">
       <strong style="color:var(--accent);font-size:12px;">Point Estimate Note</strong>
@@ -2220,8 +2230,9 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       } else {
         badge = '✗ Fail'; color = '#ef4444';
       }
+      var cEsc = country.replace(/'/g,"\\'");
       rows += '<tr>'
-        + '<td style="font-weight:600;">' + country + '</td>'
+        + '<td style="font-weight:600;"><button onclick="var s=document.getElementById(\'dd-country-select\');if(s){s.value=\'' + cEsc + '\';loadCountryProfile(\'' + cEsc + '\');var btn=[...document.querySelectorAll(\'.tab-btn\')].find(b=>b.textContent.includes(\'Country Profile\'));if(btn)switchTab(\'t7\',btn);}" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:13px;font-weight:600;padding:0;text-decoration:underline dotted;" title="Open ' + country + ' Country Profile">' + country + '</button></td>'
         + '<td class="num">' + d.platform.toFixed(1) + '%</td>'
         + '<td class="num">' + d.ref_lo + '–' + d.ref_hi + '%</td>'
         + '<td class="num" style="color:' + color + ';font-weight:700;">' + badge + '</td>'
@@ -2253,6 +2264,9 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </tbody>
     </table>
     <p style="font-size:12px;color:var(--muted);">Key insight: A higher discount rate penalizes long-payback projects (deepwater, complex geology) more than short-cycle ones. At 15%, the NPV gap between high-take and low-take regimes narrows &mdash; the frontier premium erodes some of the fiscal advantage of low-take regimes.</p>
+    <div style="margin-top:10px;padding:8px 14px;background:rgba(45,212,191,.06);border-left:3px solid #2dd4bf;border-radius:0 6px 6px 0;font-size:12px;color:#94a3b8;line-height:1.6;">
+      <strong style="color:#2dd4bf;">Why government take doesn't change with discount rate:</strong> Take is computed on undiscounted gross revenue (royalties + income tax + profit oil share), so it is mathematically invariant to the chosen discount rate. The discount rate affects only NPV — how the time value of money compresses future cash flows. This means all country comparisons on a take basis are discount-rate-neutral.
+    </div>
   </div>
 
   <!-- Section 7: Model Limitations -->
@@ -2321,8 +2335,8 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <div style="display:flex;align-items:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);">
       <span>Current price marker:</span>
-      <input type="range" id="be-price-marker" min="30" max="120" value="70" step="5" aria-label="Current oil price marker for breakeven map ($/bbl)" style="width:120px;accent-color:var(--accent);">
-      <span id="be-price-label" style="color:var(--accent);font-weight:700;min-width:40px;">$70</span>
+      <input type="range" id="be-price-marker" min="30" max="120" value="75" step="5" aria-label="Current oil price marker for breakeven map ($/bbl)" style="width:120px;accent-color:var(--accent);">
+      <span id="be-price-label" style="color:var(--accent);font-weight:700;min-width:40px;">$75</span>
     </div>
     <div style="display:flex;gap:8px;align-items:center;font-size:11px;">
       <span style="display:inline-block;width:12px;height:12px;background:#22c55e;border-radius:2px;"></span><span style="color:var(--muted);">&lt;$40 (very low)</span>
@@ -5080,7 +5094,7 @@ function loadCountryProfile(country) {
     ${mcBadge}
     ${dqBadge}
     ${prodDQBadge}
-    <span style="margin-left:10px;font-size:10px;color:var(--muted);white-space:nowrap;" title="Data current as of Q2 2026. Database last verified and deduplicated August 2026. Coverage expands as sourcing progresses.">Data current as of Q2 2026 · verified Aug 2026</span>
+    <span style="margin-left:10px;font-size:10px;color:var(--muted);white-space:nowrap;" title="Data current as of Q3 2026. Database last verified and deduplicated August 2026. Coverage expands as sourcing progresses.">Data current as of Q3 2026 · verified Aug 2026</span>
     <span style="margin-left:8px;" title="Fiscal Predictability Score — see methodology note">${renderStabilityBadge(getFiscalPredictabilityScore(d))}</span>
     <button class="btn btn-sm btn-outline" style="margin-left:8px;font-size:11px;" onclick="ddAddCompare('${ddCountryEsc}',this)">+ Compare</button>
     <button class="btn btn-sm btn-outline" style="margin-left:6px;font-size:11px;" onclick="ddOpenScenarioBuilder('${ddCountryEsc}')">&#128295; Scenario</button>
@@ -6367,8 +6381,8 @@ function renderSampleAnalyses() {
   const card2 = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #0ea5e9;">
       <div style="font-size:10px;font-weight:700;color:#0ea5e9;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">North Sea Neighbors</div>
-      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why does Norway capture 18 percentage points more than the UK?</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway's 78% Special Petroleum Tax vs UK's EPL (32%) + RFCT (40%). Same basin, very different terms.</div>
+      <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Why does Norway capture ~16 percentage points more than the UK?</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Norway: 56% Special Petroleum Tax + 22% ordinary CIT = 78% headline marginal rate, 67.9% effective take. UK: EPL (35%) + RFCT (40%) − RFES relief = 51.4% effective take. Same basin, very different fiscal architecture.</div>
       ${tbl([{label:'Country'},{label:'@$50',align:'right'},{label:'@$75',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], nsRows)}
       <button style="${btnStyle}" onclick="(function(){${nsCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Side-by-Side</button>
     </div>`;
@@ -6388,7 +6402,7 @@ function renderSampleAnalyses() {
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #f59e0b;">
       <div style="font-size:10px;font-weight:700;color:#f59e0b;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">West Africa PSC Bloc</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Angola tightened terms in 2023. How does it compare to peers?</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">All PSC-dominant regimes. Ghana's Jubilee terms (42%) remain the most IOC-friendly in the bloc.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Angola's 2023 Sonangol reform increased First Tranche Petroleum (FTP) from 10% to 20% on new deepwater blocks, raising effective take ~5pp. Ghana's Jubilee terms (42%) remain the most IOC-friendly in the bloc. Nigeria PIA 2021 restructured royalty tiers and deepwater incentives.</div>
       ${tbl([{label:'Country'},{label:'Structure'},{label:'Contracts',align:'right'},{label:'@$75',align:'right'}], waRows)}
       <button style="${btnStyle}" onclick="(function(){${waCountries.map(c=>'addCompare(\''+c.replace(/'/g,"\\'")+"');").join('')}const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Side-by-Side'));if(btn)switchTab('t2',btn);})()">Load in Side-by-Side</button>
     </div>`;
@@ -10506,7 +10520,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v84</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v85</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
