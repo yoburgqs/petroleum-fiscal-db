@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 26 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 27 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 26 shipped v73: 6 improvements — Welcome panel fact count corrected 330K+→384K+ (consistency with Methodology); Scenario Builder: Buy-back mechanic added as 5th option with dedicated parameter panel (Contractor Fee, Capital Recovery Cap, Contract Term, CIT); Iran Buy-back preset added alongside existing 6 country archetypes; Screener mechanic filter: Revenue Share checkbox added; Explorer hidden region dropdown aligned with chip values. GPA 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 27 shipped v74: 8 improvements — Critical Scenario Builder Buy-back parameter name bug fixed (sbGetParams passed wrong keys, dcfBuyback silently used defaults); 5 Sample Analyses button labels corrected from "Load in Fiscal Compare" to correct "Load in Side-by-Side" variants; Iran added to Country Profile quick-access (7th button — aligns with Iran Buy-back Scenario Builder preset); v72 changelog typo fixed ("v71→v73" → "v71→v72"); v60 changelog clarified (no longer contradicts 384K fact count). GPA 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
 
 ---
 
@@ -146,27 +146,27 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 26 — 2026-08-08)
+## Updated Grade Table (Cycle 27 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. UX disclosure now includes ≥500% exclusion note in 3 locations. |
 | 2 | 1. Visual Design | A | = | Skeleton screens would improve perceived load. Loading screen has credentials tagline. |
-| 3 | 4. Interaction Design | A | ↑ | Buy-back mechanic added to Scenario Builder (5 mechanics now interactive). Iran preset. |
-| 4 | 5. Naming Consistency | A | = | All naming gaps closed. Welcome panel fact count aligned with Methodology (Cycle 26). |
+| 3 | 4. Interaction Design | A | = | Buy-back DCF param bug fixed (Cycle 27). Buy-back now uses user inputs correctly. |
+| 4 | 5. Naming Consistency | A | = | Sample Analyses button labels corrected (Cycle 27). All action buttons now accurately describe destination. |
 | 5 | 6. Error & Empty States | A | = | Screener zero-results empty state with Reset button shipped (Cycle 23). |
 | 6 | 9. Performance & Reliability | A | = | CSP meta tag added; unsafe-inline still present (gradual refactor). |
-| 7 | 10. Accessibility | A | = | Reform Risk table now has Profile → buttons and clickable country names (Cycle 24). |
+| 7 | 10. Accessibility | A | = | Iran quick-access button has descriptive aria-label (Cycle 27). |
 | 8 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 9 | 12. Security / Data Integrity | A | = | CSP added; SRI hashes all valid. |
-| 10 | 2. Information Architecture | A | = | Scenario Builder now exposes all 5 primary DCF mechanics (was 4). |
+| 10 | 2. Information Architecture | A | = | Country Profile quick-access expanded to 7 countries — Iran added (Cycle 27). |
 | 11 | 13. SDLC Maturity | A | = | CI workflow file created (Cycle 25). Pre-push hook uses repo-local test file. 117 PASS / 0 FAIL. |
 | 12 | 3. Data Presentation | A+ | = | Waterfall header shows active price. Screener now explicitly labels $75/bbl price basis (Cycle 24). |
-| 13 | 7. Professional Credibility | A+ | = | Welcome panel and Methodology fact counts now consistent (384K+/384,259). |
+| 13 | 7. Professional Credibility | A+ | = | Changelog corrections in v74 (Cycle 27) — no contradictions in fact count history. |
 | 14 | 14. Search Quality | A+ | = | Search recent history has Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | IRR scatter + tornado PNG downloads. Footer IRR/BE stats navigate to Explorer. |
 
-**Summary: 0 categories below B+. Cycle 26: 0 grade upgrades (Buy-back Scenario Builder mechanic, Iran preset, welcome panel fact count fix, Screener Revenue Share filter, region dropdown alignment). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
+**Summary: 0 categories below B+. Cycle 27: 0 grade upgrades (Buy-back DCF fix, 5 button label corrections, Iran quick-access, changelog corrections). 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.**
 
 **Remaining B+ category (1):**
 1. **Data Reliability (B+)** — The ONLY path to A- is expanding IRR/breakeven data coverage via the Harvesting fork. UX disclosure of IRR exclusion logic now excellent (3 locations); the data itself is the constraint.
@@ -252,6 +252,24 @@ Add `tabindex="0"` and `onkeydown="if(event.key==='Enter')this.click()"` to FC r
 8. Is the breakeven map accessible on a 1080p screen?
 9. Are the IOC operator results plausible (cross-checked against Wood Mac / Rystad)?
 10. Does the Vintage Trend chart correctly show year-over-year changes?
+
+---
+
+## Cycle 27 Log — 2026-08-08 (Autonomous Improvement Cycle)
+- **Scope:** Sonnet orchestrator — read GRADER.md (Cycle 26 state), audited full 10,067-line index.html focused on correctness bugs and labeling issues that a first-time senior analyst would notice. Identified 8 targeted improvements including one critical silent DCF bug. All shipped. Version v73 → v74.
+- **Fixes shipped (8 of 8):**
+  1. **CRITICAL: Scenario Builder Buy-back parameter name mismatch fixed** — `sbGetParams()` passed `capital_recovery_cap` and `contract_term` but `dcfBuyback()` reads `cost_recovery_cap` and `capex_recovery_years`. Any Buy-back scenario ran silently with defaults (50% cap, 8yr term) regardless of user inputs — user-set values were ignored without error. Fixed: param keys in `sbGetParams()` now match `dcfBuyback()` interface exactly. Iran preset was also affected (preset data was correct but sbGetParams() discarded it).
+  2. **Sample Analyses Card 2 (North Sea Neighbors) button label corrected** — Button said "Load in Fiscal Compare" but navigated to Side-by-Side tab. Now says "Load in Side-by-Side".
+  3. **Sample Analyses Card 3 (West Africa PSC Bloc) button label corrected** — Same mislabeling. Now says "Load in Side-by-Side".
+  4. **Sample Analyses Card (Southeast Asia PSC Bloc) button label corrected** — Said "Compare Top 4 in Compare" — ambiguous and incorrect. Now says "Load Top 4 in Side-by-Side".
+  5. **Sample Analyses Card E (Middle East Bloc) button label corrected** — Said "Load accessible in Compare". Now says "Load Accessible in Side-by-Side".
+  6. **Sample Analyses Card G (Post-Reform Capture) button label corrected** — Said "Load in Fiscal Compare" but navigated to Side-by-Side. Now says "Load in Side-by-Side".
+  7. **Country Profile quick-access: Iran added as 7th button** — Iran has 284 Buy-back contracts (the largest Buy-back dataset in the platform) and is the only major OPEC producer with a Buy-back-dominant structure. The Iran Buy-back preset exists in Scenario Builder but Iran was absent from the Country Profile quick-access list. Added with descriptive aria-label and tooltip explaining the contract structure.
+  8. **Changelog corrections** — v72 entry had typo "Version v71→v73" (fixed to "v71→v72"). v60 entry said "384K was unverifiable" — now clarified to explain the fact count history without contradicting the current 384K+ platform figure. Section header in Sample Analyses updated from "Click Load in Fiscal Compare" to neutral "click any action button" text.
+- **Grade changes from Cycle 26:** None (all fixes are correctness/labeling within existing A categories; the Buy-back bug fix improves Interaction Design but doesn't change the A grade since Buy-back was already there functionally).
+- **Net result: 0 grade upgrades. 4 at A+. 9 at A. 0 at A-. 1 at B+. GPA: 3.97.**
+- **Test result:** 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (pre-push hook confirmed before push)
+- **Version:** v73 → v74
 
 ---
 
