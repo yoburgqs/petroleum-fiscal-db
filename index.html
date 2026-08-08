@@ -1147,7 +1147,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v57</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v58</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1292,7 +1292,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <div>▦ <strong style="color:var(--text);">Fiscal Compare</strong> — run any cost profile through all 185 countries simultaneously, rank by take, NPV, IRR, or breakeven</div>
         <div>◎ <strong style="color:var(--text);">Country Profile</strong> — per-contract distribution, price sensitivity curve, reform timeline, sourced fiscal facts with confidence badges (A/B/C)</div>
         <div>≡ <strong style="color:var(--text);">Regime Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
-        <div>☰ <strong style="color:var(--text);">Screener</strong> — filter by take range, IRR, mechanic, region with sorting. CSV export. Preset scenarios: Sweet Spot / High IRR / Deepwater.</div>
+        <div>★ <strong style="color:var(--text);">Screener</strong> — top-level tab. Filter by take range, IRR, mechanic, region with sorting. One-click from any tab. CSV + Excel export. Presets: Sweet Spot / High IRR / Deepwater. Add results to compare basket.</div>
         <div>△ <strong style="color:var(--text);">IOC Portfolio</strong> — top operator positions by country, take, and contract count</div>
         <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: set royalty, CIT, profit oil split, R-factor tiers. Ctrl+K for search.</div>
         <div>◉ <strong style="color:var(--text);">API</strong> — machine-readable JSON for every country. Download or pipe into your models.</div>
@@ -1896,6 +1896,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v58 (Aug 2026)</strong> — Tornado/sensitivity chart PNG download added (↓ PNG button in Country Profile sensitivity panel — analysts can now export for presentations); Screener rows now have keyboard navigation (Tab + Enter) and basket add button (workflow parity with Fiscal Compare); add-to-basket button aria-label on FC results rows; compare basket Clear/Compare buttons accessible (aria-label); Screener Drilldown description updated to reflect top-level tab status.<br>
       <strong>v57 (Aug 2026)</strong> — Screener routing text in welcome panel updated (reflects top-level tab promotion from v56); keyboard navigation on all sortable Explorer column headers (Tab + Enter now triggers sort); fact count updated to 384,259 in Methodology section; basket remove button accessibility (aria-label); Esc close button keyboard support in search modal.<br>
       <strong>v56 (Aug 2026)</strong> — Screener promoted to top-level tab (one-click access, no longer buried under Explorer); IRR scatter chart PNG download added; fuzzy search matching — typos like "Nigera" now return "Nigeria" via Did you mean? suggestions; title tag aligned to 185 Countries (matches DCF interface coverage); pre-push CI hook updated to use repo-local test file (tests/runtime_comprehensive.js).<br>
       <strong>v55 (Aug 2026)</strong> — Chart.js SRI hash fixed (switched to cdnjs stable hash — resolves 4 JS errors in v54); CSP meta tag added with connect-src including cdn.jsdelivr.net (fixes Breakeven Map fetch block); toast notifications upgraded with aria-live/aria-atomic for screen reader support; confirm() dialog replaced with two-step inline confirmation in Scenario Builder; Ctrl+Enter keyboard shortcut added for Fiscal Compare; version aligned to v55.<br>
@@ -2955,7 +2956,7 @@ function renderExplorer() {
     const safeExpl = d.country.replace(/'/g,"\\'");
     return `<tr data-country="${d.country}" style="cursor:pointer;" onclick="openCountryProfileFromFC('${safeExpl}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to open ${d.country} profile">
       <td class="num" style="color:var(--muted)">${i+1}</td>
-      <td><button onclick="addToBasket('${d.country.replace(/'/g,"\\'")}');event.stopPropagation();" title="Add to compare basket" style="background:transparent;border:1px solid #334155;color:#64748b;border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;">+</button></td>
+      <td><button onclick="addToBasket('${d.country.replace(/'/g,"\\'")}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid #334155;color:#64748b;border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;">+</button></td>
       <td><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:9px;color:#2dd4bf;font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''}${prodBadge} ${getDQBadge(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
       <td class="num" style="cursor:pointer;color:var(--accent);" onclick="event.stopPropagation();openContractDrilldown('${d.country.replace(/'/g,"\\'")}')" title="Click to open Country Profile with contract details">${(function(){
@@ -3855,9 +3856,9 @@ function runScreener() {
     const tc = tierClass(d[takeKey]);
     // Bug 3 fix: click row to navigate to country profile
     const safeName = d.country.replace(/'/g, "\\'");
-    return `<tr style="cursor:pointer" onclick="openCountryProfileFromFC('${safeName}')" title="Click to open ${d.country} profile">
+    return `<tr style="cursor:pointer" onclick="openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to open ${d.country} profile">
       <td class="num" style="color:var(--muted)">${i+1}</td>
-      <td><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:9px;color:#2dd4bf;font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}</td>
+      <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid #334155;color:#64748b;border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:9px;color:#2dd4bf;font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
       <td>${mechs}</td>
       <td class="num" title="Government take on standardized $2B deepwater project. Production-weighted where coverage data available.">${fmtTake(d[takeKey])}</td>
@@ -6749,6 +6750,19 @@ function downloadIRRScatterPng() {
   a.click();
 }
 
+function downloadTornadoPng(country) {
+  var slug = (country || '').replace(/[^a-z0-9]/gi, '_');
+  var canvas = document.getElementById('tornado-canvas-' + slug);
+  if (!canvas) {
+    showCopyToast('Sensitivity chart not rendered yet — open a Country Profile first.');
+    return;
+  }
+  var a = document.createElement('a');
+  a.download = 'orca-sensitivity-' + slug + '.png';
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
 // ================================================================
 // URL Hash Routing — shareable deep links
 // Routes: #/profile/{slug}, #/compare/{slug+slug+...}, #/explorer, #/ioc
@@ -7471,7 +7485,10 @@ function renderTornadoPanel(country, containerId, profileKey, price) {
   if (!container) return;
   container.innerHTML = `
 <div class="tornado-panel">
-  <h3>&#8679; Sensitivity Analysis — NPV at ±25%</h3>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+    <h3 style="margin:0;">&#8679; Sensitivity Analysis — NPV at ±25%</h3>
+    <button onclick="downloadTornadoPng('${country.replace(/'/g,"\\'")}')" style="padding:4px 10px;background:#1a2332;color:#d4a017;border:1px solid #d4a017;border-radius:4px;cursor:pointer;font-size:11px;white-space:nowrap;" title="Download sensitivity chart as PNG">&#8595; PNG</button>
+  </div>
   <div class="tornado-chart-wrap"><canvas id="tornado-canvas-${country.replace(/[^a-z0-9]/gi,'_')}"></canvas></div>
 </div>`;
   _buildTornadoChart(country, profileKey || 'deepwater', price || 75);
@@ -9722,8 +9739,8 @@ loadPlatformData();
 <div id="compare-basket" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;background:#1e293b;border-top:1px solid #334155;padding:10px 20px;align-items:center;gap:10px;flex-wrap:wrap;">
   <span style="color:#94a3b8;font-size:12px;font-weight:600;white-space:nowrap;">Compare basket:</span>
   <div id="basket-pills" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;"></div>
-  <button onclick="clearBasket()" style="background:transparent;border:1px solid #475569;color:#94a3b8;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">Clear</button>
-  <button onclick="launchCompare()" style="background:#e8a020;border:none;color:#0f172a;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Compare &#8594;</button>
+  <button onclick="clearBasket()" aria-label="Clear all countries from compare basket" style="background:transparent;border:1px solid #475569;color:#94a3b8;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">Clear</button>
+  <button onclick="launchCompare()" aria-label="Launch side-by-side comparison of selected countries" style="background:#e8a020;border:none;color:#0f172a;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Compare &#8594;</button>
 </div>
 
 <!-- Data Vintage Footer -->
@@ -9733,7 +9750,7 @@ loadPlatformData();
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v57</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v58</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
