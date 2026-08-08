@@ -1132,7 +1132,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="margin-bottom:20px"><span style="font-size:28px;font-weight:900;letter-spacing:.15em;color:var(--accent);animation:ld-pulse 2s ease-in-out infinite;">ORCA</span></div>
     <div style="font-size:1.1em;font-weight:600;letter-spacing:1px">PETROLEUM FISCAL DATABASE</div>
     <div style="font-size:0.85em;color:#94a3b8;margin-top:8px">Petroleum Fiscal Intelligence Platform</div>
-    <div style="font-size:0.75em;color:#64748b;margin-top:4px">71,000+ contracts across 185 countries</div>
+    <div style="font-size:0.75em;color:#64748b;margin-top:4px">71,576 contracts across 185 countries</div>
     <div style="margin-top:20px;width:200px;height:3px;background:#1e293b;border-radius:2px;overflow:hidden;position:relative;">
       <div style="height:100%;background:linear-gradient(90deg,#b87a10,#E8A020,#f0c060,#E8A020,#b87a10);background-size:200% 100%;animation:ld-shimmer 1.6s ease-in-out infinite;position:absolute;width:60%;border-radius:2px;"></div>
     </div>
@@ -1212,7 +1212,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div>
         <span style="font-size:13px;font-weight:800;color:#2dd4bf;letter-spacing:.08em;text-transform:uppercase;">What This Platform Contains</span>
       </div>
-      <button onclick="document.getElementById('welcome-body').style.display=document.getElementById('welcome-body').style.display==='none'?'block':'none';this.textContent=this.textContent==='▲ collapse'?'▼ expand':'▲ collapse'" style="background:none;border:1px solid rgba(255,255,255,.15);color:var(--muted);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;">▲ collapse</button>
+      <button aria-label="Toggle platform overview panel" onclick="var b=document.getElementById('welcome-body');var shown=b.style.display!=='none';b.style.display=shown?'none':'block';this.textContent=shown?'▼ expand':'▲ collapse';this.setAttribute('aria-expanded',shown?'false':'true');" aria-expanded="true" style="background:none;border:1px solid rgba(255,255,255,.15);color:var(--muted);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;">▲ collapse</button>
     </div>
     <div id="welcome-body">
       <!-- DB accomplishments -->
@@ -2174,7 +2174,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.6;">
       <strong>Benchmark sources:</strong> Government take ranges validated against 13 publicly disclosed reference sets: Wood Mackenzie Fiscal Benchmarks; Rystad Energy UCube Country Profiles; S&amp;P Global Commodity Insights Fiscal Terms Database; IHS Markit Fiscal and Regulatory Updates; Norwegian Offshore Directorate (NCA) published range; HMRC/OGA UK fiscal take reports; EIA Gulf of Mexico fiscal study; ANP (Brazil) fiscal disclosure; KAZENERGY Annual Report; PETRONAS Annual Report; SKK Migas (Indonesia) contractor terms; Sonangol/IMF Angola fiscal review; NNPC/Rystad Nigeria fiscal benchmarks.
     </p>
-    <p class="table-footnote" style="font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.5;">&#8224; Government take calculated at $75/bbl Brent. Source: D&amp;M analysis, Wood Mackenzie reference.</p>
+    <p class="table-footnote" style="font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.5;">&#8224; Government take calculated at $75/bbl Brent. Source: independent petroleum economics analysis; benchmark ranges from Wood Mackenzie, Rystad Energy, HMRC, NCA, and national regulator publications.</p>
   </div>
 
   <!-- Known Model Limitations subsection -->
