@@ -1148,7 +1148,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v75</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v76</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1935,7 +1935,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v75 · 185 countries · 71,601 contracts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against peer-reviewed benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v76 · 185 countries · 71,601 contracts.</span>
     </p>
   </div>
 
@@ -1943,6 +1943,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v76 (Aug 2026)</strong> — Critical crash fix in <code>renderSampleAnalyses()</code>: the Asia Pacific in Global Context card (Card C) used hardcoded array indices [5] and [6] to back-fill the "Asia Pacific avg" and "Global avg" rows after construction, but those indices assumed exactly 4 countries in <code>asiaRanked.slice(0,4)</code>. When the data contains fewer than 4 Asia Pacific countries in the lowest-take group, the indices were wrong and a <code>TypeError: Cannot set properties of undefined</code> crashed the entire platform initialization — preventing all tabs from rendering and causing 3 FAIL tests. Fixed by computing country counts inline during array construction rather than post-indexing. Defensive <code>try/catch</code> wrapper added around <code>renderSampleAnalyses()</code> to prevent any future crash in this function from aborting the broader <code>initPlatform()</code> call chain. Revenue Share mechanic: previously routed to <code>dcfConcession()</code> (wrong — no cost recovery mechanism). Now routes to <code>dcfPSC()</code> in the Fiscal Compare dispatcher, Country Profile live DCF, and <code>getDCFParams()</code> PSC-param enrichment — matching the mechanic's gross revenue split structure. Scenario Builder: RSC (Risk Service Contract) added as 6th mechanic option alongside Concession/PSC/TSC/PRRT/Buy-back — routes to <code>dcfTSC()</code> (correct: RSC is structurally a service contract with fee + CIT). India RSC preset added: $4/bbl fee, 34% CIT, 5% EPT — representative of India's NELP/HELP framework. Scenario Builder now covers all 6 ICF mechanics (RSC added, Revenue Share still modeled via PSC-proxy in live DCF). Version v75→v76.<br>
       <strong>v75 (Aug 2026)</strong> — Sample Analyses data correctness: Regional Benchmarks card (Card 1) used stale region label strings ("Asia", "Latin America", "North America", "Oceania", "CIS/FSU") that do not match the database region taxonomy ("Asia Pacific", "Americas", "Other") — the card was silently showing only Middle East, Africa, and Europe while omitting the other 3 regions. Fixed to use canonical region labels matching COUNTRY_DATA. Asia Pacific in Global Context card (Card C) filtered on d.region === "Asia" which also never matched, leaving asiaCountries empty and the avg computation returning null. Both silent data failures now corrected. Methodology take figures aligned: Norway 67.8% → 67.9%, Angola 54.7% → 52.7%, USA 24% → 23.4% in the discount rate sensitivity table, matching the benchmark validation table on the same page. Methodology provenance paragraph updated: Norway 67.8% → 67.9%, UK 49.2% → 51.4% (updated to match benchmark table). Fiscal Compare Profile and Price dropdowns gain aria-label for screen readers. Explorer Sort and Search inputs gain aria-label. Sample Analyses page subtitle updated to accurately reflect that cards open different destinations (Side-by-Side, Fiscal Compare, Explorer, Country Profile) rather than always a "Load" button. Version v74→v75.<br>
       <strong>v74 (Aug 2026)</strong> — Critical Scenario Builder bug fixed: Buy-back mechanic parameter names corrected in <code>sbGetParams()</code> — <code>capital_recovery_cap</code>→<code>cost_recovery_cap</code> and <code>contract_term</code>→<code>capex_recovery_years</code> to match <code>dcfBuyback()</code> parameter interface. Previously, running a Buy-back scenario silently used defaults (50% cap, 8yr term) regardless of user inputs — user-entered values were ignored. Sample Analyses button labels corrected: 5 buttons that called <code>addCompare()</code> and navigated to Side-by-Side were mislabeled "Load in Fiscal Compare" or "Load accessible in Compare" — now correctly say "Load in Side-by-Side" or "Load Top 4 in Side-by-Side" / "Load Accessible in Side-by-Side". Section header updated to reflect mixed action types. Country Profile quick-access: Iran added as 7th quick-access country (284 Buy-back contracts — largest Buy-back dataset in the platform; closes the gap between Iran Buy-back preset in Scenario Builder and the Profile quick-access list). v72 changelog typo corrected (said "Version v71→v73" — fixed to "v71→v72"). v60 changelog note clarified (fact count history note no longer contradicts current 384K+ figure). Version v73→v74.<br>
       <strong>v73 (Aug 2026)</strong> — Welcome panel fact count corrected 330K+→384K+ (matches Methodology section and verified DB state of 384,259 facts). Scenario Builder: Buy-back mechanic added as 5th option (was limited to Concession/PSC/TSC/PRRT despite Buy-back having a full DCF model in the platform engine). New Buy-back parameter panel with Contractor Fee, Capital Recovery Cap, Contract Term, and CIT Rate controls. Iran Buy-back preset added to Scenario Builder country archetypes — analysts can now model Iran's dominant fiscal structure (NIOC buy-back with $3.50/bbl fee, 50% cap, 10yr term) alongside the existing Norway/Angola/Iraq/UK/Australia/Saudi Arabia presets. Screener: Mechanic Filter now includes Revenue Share checkbox (was missing despite Revenue Share having a full DCF model). Explorer hidden region dropdown values corrected (Asia→Asia Pacific, Latin America→Americas) for chip sync consistency. Version v72→v73.<br>
@@ -2345,6 +2346,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
             <option value="TSC">Technical Service Contract (TSC)</option>
             <option value="PRRT">PRRT (Australia-style)</option>
             <option value="Buy-back">Buy-back (Iran-style)</option>
+            <option value="RSC">Risk Service Contract (RSC)</option>
           </select>
         </div>
 
@@ -2397,7 +2399,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
         </div>
 
         <div id="sb-tsc-params" style="display:none">
-          <div class="sb-section-hdr">TSC / Service Contract Parameters</div>
+          <div class="sb-section-hdr">TSC / RSC Service Contract Parameters</div>
           <div class="sb-row2">
             <div class="sb-control-group"><label>Contractor Fee ($/bbl)</label><input type="number" id="sb-fee" value="4.00" min="0.50" max="20" step="0.25"></div>
             <div class="sb-control-group"><label>CIT Rate (%)</label><input type="number" id="sb-tsc-cit" value="35" min="0" max="60" step="1"></div>
@@ -2441,6 +2443,7 @@ Buy-back:     gross_revenue - cost_recovery - contractor_fee</pre>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('australia')">Australia PRRT</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('saudi')" title="Saudi Arabia — concession with high CIT (85%) and 20% royalty; Aramco equity participation implicit in high take">Saudi Arabia</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('iran')" title="Iran — buy-back contract: contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7-10 year term">Iran Buy-back</button>
+          <button class="btn btn-sm btn-outline" onclick="loadPreset('india')" title="India RSC — Risk Service Contract under NELP/HELP: contractor delivers services, government keeps equity; $4/bbl representative fee, 34% CIT, 5% EPT">India RSC</button>
         </div>
       </div>
 
@@ -5956,7 +5959,7 @@ window.renderReformTable    = renderReformTable;
 window.MECHANICS_INFO       = MECHANICS_INFO;
 // Now that MECHANICS_INFO is available, populate the reference panel list
 if (typeof _renderRefMechanics === 'function') _renderRefMechanics();
-renderSampleAnalyses();
+try { renderSampleAnalyses(); } catch(e) { console.error('renderSampleAnalyses failed:', e); }
 renderReformRisk();
 initIOCExposureControls();
 // Retry hash navigation now that COUNTRY_DATA is loaded (DOMContentLoaded may have fired first)
@@ -6407,16 +6410,14 @@ function renderSampleAnalyses() {
   const asiaAvg = asiaCountries.length ? asiaCountries.reduce((s,d)=>s+d.take_75,0)/asiaCountries.length : null;
   const globalAvg = cd.reduce((s,d)=>s+d.take_75,0)/cd.length;
   const asiaRanked = [...asiaCountries].sort((a,b)=>a.take_75-b.take_75);
+  const asiaTopN = asiaRanked.slice(0,4);
   const asiaRows = [
-    ...asiaRanked.slice(0,4).map(d=>[`<span style="color:#22c55e">${d.country}</span>`,d.region,`<span style="color:#22c55e;font-weight:600">${d.take_75.toFixed(1)}%</span>`,'Lowest in region']),
-    [`<span style="color:#e8a020;font-weight:700">Indonesia</span>`,'Asia',`<span style="color:#eab308;font-weight:600">${(cd.find(x=>x.country==='Indonesia')?.take_75||58).toFixed(1)}%</span>`,'PSC-dominant'],
-    [`<span style="color:var(--muted)">Asia Pacific avg</span>`,'—',`<span style="color:${takeColor(asiaAvg)}">${asiaAvg?asiaAvg.toFixed(1)+'%':'—'}</span>`,'${asiaCountries.length} countries'],
-    [`<span style="color:var(--muted)">Global avg</span>`,'—',`<span style="color:${takeColor(globalAvg)}">${globalAvg.toFixed(1)}%</span>`,'${cd.length} countries'],
+    ...asiaTopN.map(d=>[`<span style="color:#22c55e">${d.country}</span>`,d.region,`<span style="color:#22c55e;font-weight:600">${d.take_75.toFixed(1)}%</span>`,'Lowest in region']),
+    [`<span style="color:#e8a020;font-weight:700">Indonesia</span>`,'Asia Pacific',`<span style="color:#eab308;font-weight:600">${(cd.find(x=>x.country==='Indonesia')?.take_75||58).toFixed(1)}%</span>`,'PSC-dominant'],
+    [`<span style="color:var(--muted)">Asia Pacific avg</span>`,'—',`<span style="color:${takeColor(asiaAvg)}">${asiaAvg?asiaAvg.toFixed(1)+'%':'—'}</span>`,asiaCountries.length + ' countries'],
+    [`<span style="color:var(--muted)">Global avg</span>`,'—',`<span style="color:${takeColor(globalAvg)}">${globalAvg.toFixed(1)}%</span>`,cd.length + ' countries'],
     ...asiaRanked.slice(-3).map(d=>[`<span style="color:#ef4444">${d.country}</span>`,d.region,`<span style="color:#ef4444;font-weight:600">${d.take_75.toFixed(1)}%</span>`,'Highest in region']),
   ];
-  // fix template literal escapes
-  asiaRows[5][3] = asiaCountries.length + ' countries';
-  asiaRows[6][3] = cd.length + ' countries';
   const cardC = `
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #a855f7;">
       <div style="font-size:10px;font-weight:700;color:#a855f7;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Asia Pacific in Global Context</div>
@@ -6461,7 +6462,7 @@ function renderSampleAnalyses() {
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #ef4444;">
       <div style="font-size:10px;font-weight:700;color:#ef4444;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">OPEC vs Non-OPEC</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Do OPEC member states extract more from IOCs than non-members?</div>
-      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">14 OPEC members/associates vs rest of world. OPEC average is ${opecDiff != null ? (opecDiff > 0 ? '+' + opecDiff.toFixed(1) : opecDiff.toFixed(1)) + 'pp higher' : 'comparable'}. But ranges overlap \u2014 individual regime design matters more than OPEC membership.</div>
+      <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">14 OPEC members/associates vs rest of world. OPEC average is ${opecDiff != null ? (opecDiff > 0 ? '+' + opecDiff.toFixed(1) + 'pp higher than non-OPEC' : opecDiff.toFixed(1) + 'pp lower than non-OPEC') : 'comparable to non-OPEC'}. But ranges overlap \u2014 individual regime design matters more than OPEC membership.</div>
       ${tbl([{label:'Group'},{label:'Countries',align:'right'},{label:'Avg @$75',align:'right'},{label:'Median',align:'right'},{label:'Range',align:'right'}], opecDiffRows)}
       <button style="${outlineBtnStyle}" onclick="(function(){const btn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Explorer'));if(btn){switchTab('texplorer',btn);switchExplorerMode('browse');}})()">Open in Explorer</button>
     </div>`;
@@ -7455,7 +7456,7 @@ function getDCFParams(country, mechanic) {
 
   // For PSC mechanic: enrich from COUNTRY_DATA when DB fields are available
   // This makes the live DCF consistent with the underlying database averages
-  if ((mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split') && !countryOverrides[country]) {
+  if ((mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split' || mechanic === 'Revenue Share') && !countryOverrides[country]) {
     const cd = COUNTRY_DATA && COUNTRY_DATA.find(x => x.country === country);
     if (cd) {
       if (cd.ftp != null)          params.ftp_rate           = cd.ftp / 100;
@@ -7483,7 +7484,7 @@ function runLiveDCF(country, profileKey, price) {
   if (params._mechanic) mechanic = params._mechanic;
 
   let result;
-  if (mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split') {
+  if (mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split' || mechanic === 'Revenue Share') {
     result = dcfPSC(params, price, profile);
   } else if (mechanic === 'TSC' || mechanic === 'RSC') {
     result = dcfTSC(params, price, profile);
@@ -7938,6 +7939,10 @@ const SB_PRESETS = {
   iran: {
     mechanic: 'Buy-back', profile: 'onshore_me', price: 75,
     bb_fee: 3.50, bb_cap: 50, bb_term: 10, bb_cit: 25
+  },
+  india: {
+    mechanic: 'RSC', profile: 'shallow', price: 75,
+    fee: 4.0, tsc_cit: 34, ept: 5
   }
 };
 
@@ -7961,7 +7966,7 @@ function loadPreset(name) {
     document.getElementById('sb-po-govt').value = p.po_govt ?? 60;
     document.getElementById('sb-psc-cit').value = p.psc_cit ?? 25;
     document.getElementById('sb-psc-royalty').value = p.psc_royalty ?? 0;
-  } else if (p.mechanic === 'TSC') {
+  } else if (p.mechanic === 'TSC' || p.mechanic === 'RSC') {
     document.getElementById('sb-fee').value = p.fee ?? 4;
     document.getElementById('sb-tsc-cit').value = p.tsc_cit ?? 35;
     document.getElementById('sb-ept').value = p.ept ?? 0;
@@ -7982,7 +7987,7 @@ function sbUpdateMechanic() {
   const mech = document.getElementById('sb-mechanic').value;
   document.getElementById('sb-concession-params').style.display = mech === 'Concession' ? '' : 'none';
   document.getElementById('sb-psc-params').style.display = mech === 'PSC' ? '' : 'none';
-  document.getElementById('sb-tsc-params').style.display = mech === 'TSC' ? '' : 'none';
+  document.getElementById('sb-tsc-params').style.display = (mech === 'TSC' || mech === 'RSC') ? '' : 'none';
   document.getElementById('sb-prrt-params').style.display = mech === 'PRRT' ? '' : 'none';
   document.getElementById('sb-buyback-params').style.display = mech === 'Buy-back' ? '' : 'none';
 }
@@ -8017,7 +8022,7 @@ function sbGetParams() {
       royalty_rate:+(document.getElementById('sb-prrt-royalty').value || 0) / 100,
       uplift_rate: +(document.getElementById('sb-prrt-uplift').value || 11.5) / 100,
     };
-  } else if (mech === 'TSC') {
+  } else if (mech === 'TSC' || mech === 'RSC') {
     params = {
       fee_per_bbl: parseFloat(document.getElementById('sb-fee').value) || 4,
       cit_rate:    (parseFloat(document.getElementById('sb-tsc-cit').value) || 0) / 100,
@@ -8044,7 +8049,7 @@ function runCustomScenario() {
   const { mech, profileKey, price, profile, params } = sbGetParams();
   let result;
   if (mech === 'PSC') result = dcfPSC(params, price, profile);
-  else if (mech === 'TSC') result = dcfTSC(params, price, profile);
+  else if (mech === 'TSC' || mech === 'RSC') result = dcfTSC(params, price, profile);
   else if (mech === 'PRRT') result = dcfPRRT(params, price, profile);
   else if (mech === 'Buy-back' || mech === 'Buyback') result = dcfBuyback(params, price, profile);
   else result = dcfConcession(params, price, profile);
@@ -8495,7 +8500,7 @@ function runFiscalCompare() {
     const params = getDCFParams(c.country, mechanic);
     let res;
     try {
-      if (mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split') res = dcfPSC(params, price, profile);
+      if (mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split' || mechanic === 'Revenue Share') res = dcfPSC(params, price, profile);
       else if (mechanic === 'TSC' || mechanic === 'RSC') res = dcfTSC(params, price, profile);
       else if (mechanic === 'PRRT') res = dcfPRRT(params, price, profile);
       else if (mechanic === 'Buy-back' || mechanic === 'Buyback') res = dcfBuyback(params, price, profile);
@@ -10056,7 +10061,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v75</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v76</span>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank">API</a>
     <span style="color:#475569;">|</span>
