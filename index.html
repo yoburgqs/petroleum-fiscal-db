@@ -1183,7 +1183,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v97</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v98</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1199,7 +1199,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <button id="tab-btn-tsamples" class="tab-btn" role="tab" aria-selected="false" aria-controls="tsamples" title="Pre-built analyses illustrating common fiscal questions">Sample Analyses</button>
   <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" aria-controls="t7" title="Deep-dive into a single country's fiscal regime">Country Profile</button>
   <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" title="Browse, screen, and visualize all 71,000+ contracts">Explorer</button>
-  <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="(function(btn){document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>{b.classList.remove('active');b.setAttribute('aria-selected','false');});var panel=document.getElementById('texplorer');if(panel)panel.classList.add('active');btn.classList.add('active');btn.setAttribute('aria-selected','true');window._activeTab='texplorer';switchExplorerMode('screen',document.getElementById('mode-btn-screen'));if(typeof runScreener==='function')runScreener();})(this)" title="Screen and rank 185 countries by fiscal threshold — filter by take, IRR, mechanic, region">Screener ★</button>
+  <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" title="Screen and rank 185 countries by fiscal threshold — filter by take, IRR, mechanic, region">Screener ★</button>
   <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" aria-controls="t5" title="Simulate a portfolio of contracts by IOC operator">IOC Portfolio</button>
   <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" aria-controls="t2" title="Compare two countries in parallel">Side-by-Side</button>
   <button id="tab-btn-treformrisk" class="tab-btn" role="tab" aria-selected="false" aria-controls="treformrisk" title="Assess fiscal reform risk by country — legislative stability and rate change history">Reform Risk</button>
@@ -2010,7 +2010,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v97 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v98 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2018,6 +2018,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v98 (Aug 2026)</strong> — Bug fix: hash routing and Country Profile tab navigation restored. <code>_tabBtnFor()</code> now uses <code>getElementById('tab-btn-{id}')</code> — the v97 onclick→addEventListener migration removed the onclick attributes that _tabBtnFor relied on, breaking <code>#/profile/</code>, <code>#/compare/</code>, <code>#/explorer/</code> deep links and CountryProfile tab activation. Screener tab duplicate onclick handler removed (DOMContentLoaded handler alone is sufficient). Test suite <code>switchTab()</code> updated to use id-based lookup, restoring full 117-test coverage.<br>
       <strong>v97 (Aug 2026)</strong> — onclick→addEventListener migration: 20+ inline event handlers removed from HTML and replaced with DOMContentLoaded listeners (tab nav, header actions, Run Compare, sort buttons, reference dropdown). Ctrl+Enter extended to Screener mode. aria-controls added to all 9 tab buttons. 10th Key Analyst FAQ added: data currency and update schedule.<br>
       <strong>v96 (Aug 2026)</strong> — 10 analyst-experience and platform-quality improvements (Cycle 49): (1) <strong>Favicon added</strong> — SVG oil-droplet icon in ORCA amber (#E8A020) on dark background; browser tabs now show a professional icon instead of the browser default. (2) <strong>Social meta tags completed</strong> — <code>og:url</code>, <code>twitter:card</code>, <code>twitter:title</code>, <code>twitter:description</code>, and <code>&lt;link rel="canonical"&gt;</code> added. Link previews now render correctly across Slack, LinkedIn, X/Twitter, and email. (3) <strong>Norway take discrepancy fixed</strong> — BENCHMARKS validation table showed 67.9% for Norway; canonical <code>country_data.json</code> computes 68.0%. All three locations updated (validation table, discount rate sensitivity header, DCF formula explanation) to match the authoritative JSON value. Consistency now confirmed: Norway 68.0% appears identically in Explorer, Country Profile, validation table, and sensitivity analysis. (4) <strong>Ctrl+Enter extended to Scenario Builder</strong> — keyboard shortcut now triggers <code>runCustomScenario()</code> when the Scenario Builder modal is open (previously only triggered <code>runFiscalCompare()</code> when on the Fiscal Compare tab). Welcome panel keyboard shortcut note updated. (5) <strong>9th Key Analyst FAQ added</strong> — "How are countries with multiple fiscal regimes weighted? Iraq shows 84.8% take — but it has both TSC and PSC contracts." — explains production-weighted blending, the mechanic-count split in Country Profile, the IQR as the within-country variation signal, and how to use the Scenario Builder for block-specific DCF when the blend masks regime-level detail. (6) <strong>"How to Cite" section added to Methodology</strong> — recommended citation format for IC memos and internal reports using the platform as a fiscal data source (modeled on commercial database citation conventions). (7) Version v95→v96 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br>
       <strong>v95 (Aug 2026)</strong> — 5 platform quality and analyst-content improvements (Cycle 48): (1) <strong>JS console error fixed</strong> — <code>frame-ancestors 'none'</code> removed from the CSP <code>&lt;meta&gt;</code> tag; browsers correctly reject this directive in meta-delivered CSP (it is only enforceable via HTTP headers), causing a console error on every page load. Removing it eliminates the browser warning without changing the platform's security posture. (2) <strong>Meta description and Open Graph tags added</strong> — <code>&lt;meta name="description"&gt;</code> added with a professional description for search engines and link previews; OG title and description added for sharing in Slack, LinkedIn, and email. <code>&lt;meta name="robots"&gt;</code> added. These were missing from all prior versions. (3) <strong>8th Key Analyst FAQ added</strong> — "Does the platform model ring-fencing? How do I interpret country-level blended take vs. a specific field?" — explains ring-fence treatment by regime type (universal per-block vs. non-ring-fenced corporate base), the production-weighted country-level aggregate, and the correct two-step workflow: Explorer/Screener for regime screening, Scenario Builder for field-isolated DCF evaluation. Directly addresses a common IOC due-diligence question that was previously unanswered. (4) <strong>Atlantic Frontier Quartet quickstart added to Side-by-Side</strong> — new quickstart button loads Guyana, Angola, Brazil, and Nigeria into Side-by-Side in one click; matches the Atlantic frontier comparison described in FAQ Q6 (deepwater IOC entry terms). The four countries span a 30pp take range (~52–65%) across structurally different PSC regimes in the same basin — the benchmark comparison for IOC Atlantic capital allocation. (5) Version v94→v95 across header badge, footer DCF Engine badge, Methodology provenance, and changelog.<br>
@@ -2473,7 +2474,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v97, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v98, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -7673,6 +7674,10 @@ function fromSlug(slug) {
 
 function _tabBtnFor(tabId) {
   // Returns the .tab-btn element that switches to tabId
+  // Use id-based lookup — primary tab buttons use id="tab-btn-{tabId}" (v97+: no onclick attr)
+  var byId = document.getElementById('tab-btn-' + tabId);
+  if (byId) return byId;
+  // Fallback: scan for onclick (covers any remaining inline-handler tabs)
   return Array.from(document.querySelectorAll('.tab-btn')).find(function(b){
     return b.getAttribute('onclick') && b.getAttribute('onclick').indexOf("'" + tabId + "'") !== -1;
   }) || null;
@@ -10973,7 +10978,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v97</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v98</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>

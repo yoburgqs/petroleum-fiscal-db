@@ -77,7 +77,9 @@ async function load(page) {
 
 async function switchTab(page, tabId) {
   await page.evaluate(id => {
-    const btn = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'"));
+    // Primary tabs use id="tab-btn-{id}" (v97+: onclick migrated to addEventListener)
+    const btn = document.getElementById('tab-btn-' + id) ||
+      [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick') && b.getAttribute('onclick').includes("'" + id + "'"));
     if (btn) btn.click();
   }, tabId);
   await page.waitForTimeout(300);
@@ -250,18 +252,22 @@ async function testCountryProfile(page) {
       await page.waitForTimeout(600);
 
       const heading = await page.evaluate(() => {
-        const h = document.querySelector('#dd-profile-head strong, #dd-profile-head h2, .country-profile-header');
-        return h ? h.textContent.trim() : '';
+        // Profile renders .dd-country-name inside #dd-content (v76+)
+        const h = document.querySelector('#dd-content .dd-country-name, #dd-content .dd-header .dd-country-name');
+        if (h) return h.textContent.trim();
+        // Fallback for older selectors
+        const h2 = document.querySelector('#dd-profile-head strong, #dd-profile-head h2, .country-profile-header');
+        return h2 ? h2.textContent.trim() : '';
       });
       if (heading.includes(country) || heading.length > 0)
         p(S, `profile-${country}`, `Profile rendered (heading: "${heading.slice(0,40)}")`);
       else
         w(S, `profile-${country}`, 'No heading found in profile');
 
-      // Check breakeven callout rendered
+      // Check breakeven callout rendered (profile output is in #dd-content)
       const beCallout = await page.evaluate(() => {
-        const el = document.getElementById('dd-profile-head') || document.getElementById('dd-output');
-        return el ? el.innerHTML.includes('bbl') || el.innerHTML.includes('Breakeven') : false;
+        const el = document.getElementById('dd-content');
+        return el ? el.innerHTML.includes('bbl') || el.innerHTML.includes('Breakeven') || el.innerHTML.includes('breakeven') : false;
       });
       if (beCallout) p(S, `be-callout-${country}`, 'Breakeven callout present');
       else w(S, `be-callout-${country}`, 'No breakeven callout found');
