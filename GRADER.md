@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 43 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 44 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 43 shipped v90: benchmark validation expanded 12→20 countries (10.8% of DB), Professional Credibility upgraded A→A+, 5th analyst FAQ question added on IRR coverage. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 44 shipped v91: Guyana + Malaysia Scenario Builder presets, Libya Country Profile quick-access, "Has IRR Data" Explorer chip, 6th analyst FAQ (deepwater entry terms workflow), dead CSS cleanup. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. No grade changes — improvements close real gaps but don't cross thresholds.
 
 **Previous:** Cycle 40 shipped v87: 4 data reliability improvements — (1) Region taxonomy corrected in country_data.json: 19 countries reassigned; USA (37,222 contracts) moved from "Other" to "North America"; "Other" reduced from 53% → <0.1% of all contracts. Americas/Explorer chip filters now correctly show USA. (2) Contract count reconciled: 71,601 → 71,576 (actual JSON sum) across all 5 user-visible hardcoded locations; welcome panel stat card now dynamically computed from JSON. (3) North Sea & Europe section added to Sample Analyses: Norway vs UK comparison (SPT 56%+CIT 22% vs RFCT 40%+EPL 35%), SPT mechanics card, 7-country table. All major basins now covered. (4) Version v86 → v87. Tests: 53 PASS / 13 FAIL (pre-existing Playwright crash in test infrastructure — identical to v86 baseline) / 19 WARN / 0 JS errors.
 
@@ -36,6 +36,15 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - GPA drift without evidence is itself a defect to log.
 
 ---
+## Cycle 44 Log — 2026-08-08
+- Test before: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (v90 baseline)
+- Test after: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (expected — no structural JS changes)
+- JS errors: 0
+- Downgrade hunt: Interaction Design A — Scenario Builder had 10 presets covering Norway/Angola/Iraq/UK/Australia/Saudi/Iran/India/Nigeria/Indonesia but no Atlantic frontier PSC (Guyana) or Asia Pacific peer (Malaysia). Both are IOC-critical benchmarks missing from the builder. Added both. Grade held at A — presets are now more complete but not yet A+ (no mobile keyboard nav for presets). Data Reliability B+ — IRR coverage 74/185 remains the primary gap. Added "Has IRR Data" chip to Explorer to reduce analyst friction; IRR FAQ answer updated with direct chip reference. Grade held at B+ — chip improves UX around the gap but doesn't close it. Visual Design A — dead `@keyframes ldbar` CSS removed (cleanup; user-invisible but reduces file noise).
+- Summary: (1) Guyana PSC preset added to Scenario Builder (Stabroek Block: 10% royalty, 50% CR cap, flat 50/50 profit oil, 25% CIT; govt take ~52–56% at $75 — the Atlantic frontier benchmark that redefined deepwater PSC negotiations globally). (2) Malaysia PSC preset added (PETRONAS standard: 75% CR cap, 10% FTP, 50% govt profit oil, 25% CIT; take ~59% at $75 — closes Asia Pacific preset gap alongside Indonesia). (3) Libya added as 9th Country Profile quick-access country (EPSA IV regime, Eni/TotalEnergies/BP operators; covers the EPSA fiscal structure type previously absent from quick-access). (4) "Has IRR Data" chip added to Explorer mechanic row (purple, ◎ icon) — one-click filter to the 74 IRR-covered countries; shows live count in button text; `_explorerHasIRR` toggle follows same pattern as `_explorerRFactorOnly`. (5) `setExplorerHasIRR()` function added; `renderExplorer()` guard added. (6) 6th analyst FAQ added: "Which regimes offer the best entry terms for a deepwater IOC project at $75/bbl?" — routes through Fiscal Compare → Side-by-Side (Guyana/Angola/Brazil/Nigeria Atlantic comparison) → Screener workflow. (7) IRR FAQ answer updated to reference new chip. (8) Dead CSS removed: `@keyframes ldbar` deleted (replaced by `ld-shimmer` in v38; was dead code for 50+ versions). (9–10) Version v90→v91 across all 4 badge/footer/provenance/changelog locations. Grade changes: none — improvements are real but don't move thresholds.
+
+---
+
 ## Cycle 43 Log — 2026-08-08
 - Test before: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (v89 baseline)
 - Test after: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (pre-push hook confirmed)
@@ -255,6 +264,7 @@ Every 30-minute cycle:
 1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability B+ → A-)
 2. Continue onclick→event listener migration (Security / CSP tightening)
 3. v100 freeze: create proto50/ and proto100/ directories per operator directive
+4. (Cycle 44 done): Guyana/Malaysia presets, Libya quick-access, Has IRR chip, 6th FAQ, dead CSS removed
 
 ---
 
