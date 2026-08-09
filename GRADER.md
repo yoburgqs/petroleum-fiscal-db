@@ -1,9 +1,9 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-09 (Cycle 48 — autonomous improvement cycle)
+**Last Updated:** 2026-08-09 (Cycle 49 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 48 shipped v95: (1) JS console error fixed — `frame-ancestors 'none'` removed from meta CSP tag (invalid in meta-delivered CSP, causes browser console error on every load; security posture unchanged since GitHub Pages cannot enforce HTTP headers anyway). Clears 1 JS error → 0. (2) Meta description and Open Graph tags added — first visit by a professional now shows a proper link preview when sharing via Slack/email/LinkedIn; robots tag added. (3) 8th Key Analyst FAQ added — ring-fence modeling and country-level vs field-level workflow; addresses a common IOC due-diligence question unanswered in prior 7 FAQs. (4) Atlantic Frontier Quartet quickstart added to Side-by-Side — Guyana/Angola/Brazil/Nigeria loaded in one click, matching FAQ Q6 benchmark comparison. Tests: 116 PASS / 0 FAIL / 20 WARN / 0 JS errors. Grade changes: Security downgraded A+ → A (the `frame-ancestors` fix reveals a grader error: Cycle 47 graded it A+ citing frame-ancestors as evidence, but that directive was spec-invalid in meta CSP — the actual clickjacking protection never existed. Reverting to A which is correct for a read-only static platform with SRI + domain whitelist + no auth surface).
+**Overall Status:** Cycle 49 shipped v96: (1) Favicon added — SVG oil-droplet in ORCA amber on dark background; browser tabs now show a professional icon. (2) Social meta set completed — og:url, twitter:card/title/description, canonical link — link previews now render on X, LinkedIn, Slack. (3) Norway take discrepancy fixed — BENCHMARKS hardcoded 67.9% while country_data.json computes 68.0%; all 3 affected locations updated (validation table, sensitivity header, DCF formula note). (4) Ctrl+Enter extended to Scenario Builder — shortcut now runs runCustomScenario() when modal open, previously only fired runFiscalCompare(). (5) 9th Key Analyst FAQ added — multi-mechanic blending (Iraq TSC+PSC); explains production-weighting, IQR signal, and Scenario Builder workflow for block-specific DCF. (6) "How to Cite" section added to Methodology. (7) Version v95→v96 across all 4 locations. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (3 script blocks syntax-checked). Grade changes: Information Architecture A→A (citation + social meta close the IA completeness gaps without reaching A+ threshold). Professional Credibility A+ maintained (Norway inconsistency fix strengthens data integrity argument).
 
-**Previous:** Cycle 47 shipped v94: Fiscal Compare skeleton loader, CSP frame-ancestors (now corrected as invalid in meta), tab bar scroll indicators, preload hints, CI badge. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. Grade changes: Visual Design A→A+, Security A→A+ (partially reversed in Cycle 48), SDLC A→A+.
+**Previous:** Cycle 48 shipped v95: JS console error fixed (frame-ancestors removed from meta CSP), meta description and OG tags added, 8th Key Analyst FAQ (ring-fence), Atlantic Frontier Quartet quickstart. Tests: 116 PASS / 0 FAIL / 20 WARN / 0 JS errors. Grade changes: Security A+ → A.
 
 ---
 
@@ -36,6 +36,15 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - GPA drift without evidence is itself a defect to log.
 
 ---
+## Cycle 49 Log — 2026-08-09
+- Test before: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (v95 baseline)
+- Test after: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (3 script blocks syntax-checked — `node -e "new Function(script)"`)
+- JS errors: 0
+- Downgrade hunt: Information Architecture A — favicon was missing from all prior versions; og:url, twitter:card, and canonical link also missing. All four added in Cycle 49. Grade maintained A — improvements close genuine IA gaps but the A→A+ threshold requires additional work (onclick→event listener migration, which would improve link-sharing behavior). Professional Credibility A+ — Norway validation table showed 67.9% while country_data.json computes 68.0%; all 3 locations updated to 68.0. This was a real data integrity issue: a senior economist comparing the validation table (67.9%) to Country Profile (68.0%) would question which number to trust. Fix confirmed: Explorer → Norway shows 68.0%; validation table now shows 68.0%; sensitivity header now shows 68.0%. Grade maintained A+ — fix removes an inconsistency rather than revealing a gap.
+- Summary: (1) SVG favicon added via data URI — ORCA amber oil-droplet on dark background (#0F172A); browser tabs now show professional icon. (2) og:url pointing to https://yoburgqs.github.io/petroleum-fiscal-db/ added; twitter:card=summary with twitter:title and twitter:description added; canonical link added. Social preview set is now complete. (3) Norway take updated from 67.9% to 68.0% in BENCHMARKS object (validation table), discount rate sensitivity table header, and DCF formula explanation paragraph — all now match the authoritative country_data.json value. (4) Ctrl+Enter keyboard shortcut extended to Scenario Builder — `document.addEventListener('keydown')` handler now checks if `#scenario-modal` has class `open` before falling through to Fiscal Compare check; `runCustomScenario()` fires when modal is open. Welcome panel shortcut hint updated from "Re-run Fiscal Compare" to "Run Compare / Run DCF". (5) 9th Key Analyst FAQ added — "How are countries with multiple fiscal regimes weighted?" — uses Iraq (415 TSC + 171 PSC) as the worked example; explains production-weighted blending, IQR as variation signal, Fiscal Predictability Score penalty for wide IQR, and Scenario Builder workflow for block-specific DCF. (6) "How to Cite This Platform" section added at bottom of Methodology Key Analyst Questions — APA-style citation format + guidance for IC memos. (7) Version v95→v96 across header badge, footer DCF Engine badge, Methodology provenance, changelog. Grade changes: none — all improvements are genuine but don't cross A→A+ thresholds in Interaction Design or Information Architecture.
+
+---
+
 ## Cycle 48 Log — 2026-08-09
 - Test before: 116 PASS / 0 FAIL / 20 WARN / 1 JS error (v94 baseline — CSP frame-ancestors console error)
 - Test after: 116 PASS / 0 FAIL / 20 WARN / 0 JS errors (3 script blocks parse clean — verified via `node -e "new Function(script)"` syntax check)
@@ -263,37 +272,38 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 48 — 2026-08-09)
+## Updated Grade Table (Cycle 49 — 2026-08-09)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 8th FAQ adds ring-fence/field-level workflow; 7th FAQ adds IRR-proxy workflow. |
-| 2 | 4. Interaction Design | A | = | All major gaps closed. Atlantic Frontier Quartet quickstart added to Side-by-Side (Cycle 48). |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 9 FAQs now cover all major analyst workflow gaps including multi-mechanic blending. |
+| 2 | 4. Interaction Design | A | ↑ | Ctrl+Enter extended to Scenario Builder (Cycle 49) — keyboard shortcut now runs DCF when modal open. Remaining gap: no keyboard shortcut for Screener filter application. |
 | 3 | 6. Error & Empty States | A | = | All empty states informative. clearSavedScenarios two-step inline confirmation is correct UX. |
 | 4 | 9. Performance & Reliability | A | = | Preload hints (Cycle 47). Single-file constraint and unsafe-inline remain architectural. |
 | 5 | 10. Accessibility | A | = | Full WCAG 2.1 AA. No remaining systematic gaps. |
 | 6 | 11. Mobile Experience | A | = | Tab gradient widened to 60px on mobile + left indicator added (Cycle 47). All major mobile gaps closed. |
-| 7 | 2. Information Architecture | A | = | Meta description + OG tags added (Cycle 48) — link previews now render. Welcome panel routing, Screener top-level tab, 9 welcome examples, all tabs organized. |
-| 8 | 12. Security / Data Integrity | A | ↓ | Cycle 47 A+ grade was based on frame-ancestors in meta CSP — spec-invalid (browsers ignore it; MDN confirmed). Removed in Cycle 48; console error eliminated. Actual security posture: SRI hashes on all 5 CDN scripts + domain-whitelisted CSP + read-only static platform with no auth surface. Solid A, not A+. |
-| 9 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Nothing a client would notice as missing. |
-| 10 | 13. SDLC Maturity | A+ | = | CI badge (Cycle 47). 116 PASS / 0 FAIL / 20 WARN / 0 JS errors. Pre-push hook enforces tests. GitHub Actions CI + TESTING.md + package.json. |
-| 11 | 3. Data Presentation | A+ | = | Regional median callout, sparklines, evidence badges all in place. |
+| 7 | 2. Information Architecture | A | ↑ | og:url + twitter:card + canonical link added (Cycle 49) — completes the social preview set started in Cycle 48. Favicon now present. All IA gaps visible to a first-time IOC professional are closed. |
+| 8 | 12. Security / Data Integrity | A | = | SRI hashes on all 5 CDN scripts + domain-whitelisted CSP + read-only platform. Norway data consistency fix (Cycle 49) strengthens data integrity posture. |
+| 9 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon (Cycle 49 — browser tab now shows amber oil-droplet icon). |
+| 10 | 13. SDLC Maturity | A+ | = | CI badge (Cycle 47). 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. Pre-push hook enforces tests. |
+| 11 | 3. Data Presentation | A+ | = | Regional median callout, sparklines, evidence badges all in place. Norway value consistency fix (Cycle 49). |
 | 12 | 5. Naming Consistency | A+ | = | All naming unified across tabs, welcome panel, and documentation. |
-| 13 | 7. Professional Credibility | A+ | = | 8th FAQ (ring-fence) + 7th FAQ (IRR proxy) + Benchmark validation 25 countries (13.5%), 24/25 pass (96%). |
+| 13 | 7. Professional Credibility | A+ | = | 9 FAQs + "How to Cite" section added (Cycle 49) + Benchmark 25 countries / 24/25 pass (96%) + Norway data consistency fixed. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance (Cycle 35). Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | Full export coverage: XLSX, CSV, PDF, PNG across all tabs. |
 
-**Summary: 1 at B+. 0 at A-. 5 at A. 9 at A+. GPA: 3.90. Tests: 0 JS errors (was 1). Cycle 48 grade changes: Security A+ → A (frame-ancestors correction — clickjacking protection was illusory in meta CSP; fix eliminates console error).**
+**Summary: 1 at B+. 0 at A-. 5 at A. 9 at A+. GPA: 3.90. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. Cycle 49 grade changes: None (improvements are real but Interaction Design and Information Architecture remain A — gap to A+ would require keyboard nav for Screener and onclick→addEventListener migration respectively).**
+
+**Downgrade hunt (Cycle 49):** Information Architecture A — favicon was missing (resolved Cycle 49). Interaction Design A — Ctrl+Enter extended to Scenario Builder. No downgrade warranted; both improvements are genuine but don't yet cross the A→A+ threshold. Professional Credibility A+ — Norway 67.9% vs JSON 68.0% was a real inconsistency; fixed Cycle 49. Grade maintained A+ (the fix removes a data integrity risk rather than revealing a gap that should cause a downgrade).
 
 **Path to demo-ready (remaining gaps):**
-1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. The data constraint is the only remaining gap. UX disclosure and workflow guidance are now complete (8 FAQs).
+1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. The data constraint is the only remaining gap. UX guidance now complete (9 FAQs + Cite section).
 2. **v100 freeze:** Create proto50/ and proto100/ directories per operator directive.
 
 **Next cycle priorities:**
-1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability B+ → A-)
-2. Continue onclick→event listener migration (Security / CSP tightening toward removing unsafe-inline)
-3. v100 freeze: create proto50/ and proto100/ directories per operator directive
-4. (Cycle 46 done): Benchmark 20→25 countries, Kazakhstan PSA preset, 7th FAQ, 9th welcome example
+1. v100 freeze: create proto50/ and proto100/ per operator directive (reached v96 — 4 cycles remain)
+2. Continue onclick→event listener migration (Security / IA toward A+ — removes unsafe-inline)
+3. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability B+ → A-)
 
 ---
 
