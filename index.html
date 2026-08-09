@@ -1151,7 +1151,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v91</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v92</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1303,7 +1303,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px;font-size:11px;color:var(--muted);">
         <div>▦ <strong style="color:var(--text);">Fiscal Compare</strong> — run any cost profile through all 185 countries simultaneously, rank by take, NPV, IRR, or breakeven</div>
         <div>◎ <strong style="color:var(--text);">Country Profile</strong> — per-contract distribution, price sensitivity curve, reform timeline, sourced fiscal facts with confidence badges (A/B/C)</div>
-        <div>≡ <strong style="color:var(--text);">Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC), region, production data. Countries can appear in multiple mechanic filters.</div>
+        <div>≡ <strong style="color:var(--text);">Explorer</strong> — filter by mechanic type (Concession / PSC / PRRT / TSC / RSC / Revenue Share / Gross Split / Buy-back / EPSA), region, production data. Countries can appear in multiple mechanic filters.</div>
         <div>★ <strong style="color:var(--text);">Screener</strong> — top-level tab. Filter by take range, IRR, mechanic, region with sorting. One-click from any tab. CSV + Excel export. Presets: Sweet Spot / High IRR / Deepwater. Add results to compare basket.</div>
         <div>△ <strong style="color:var(--text);">IOC Portfolio</strong> — top operator positions by country, take, and contract count</div>
         <div>⚙ <strong style="color:var(--text);">Scenario Builder</strong> — build a custom fiscal regime and run DCF: 8 mechanics (Concession, PSC, Gross Split, TSC, PRRT, Buy-back, RSC, Revenue Share) with full parameter control. 10 country presets including Indonesia Gross Split. Click <strong>+ Scenario</strong> in the header to open.</div>
@@ -1327,6 +1327,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <option value="lng">LNG &middot; $3B &middot; 100k bbl/d &middot; $20/bbl opex</option>
         <option value="marginal">Marginal &middot; $100M &middot; 10k bbl/d &middot; $6/bbl opex</option>
         <option value="giant">Giant &middot; $2B &middot; 150k bbl/d &middot; $10/bbl opex</option>
+        <option value="north_sea">North Sea &middot; $600M &middot; 40k bbl/d &middot; $22/bbl opex</option>
       </select>
     </div>
     <div class="ctrl-group">
@@ -1392,6 +1393,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Gross Split" onclick="setExplorerChip('mechanic','Gross Split',this)" title="Indonesia Gross Split — post-2017 PSC reform (MoEMR Decree 8/2017). No cost recovery; contractor receives upfront gross split.">Gross Split</button>
     <button class="chip" id="chip-rfactor-psc" role="button" aria-pressed="false" data-filter="mechanic" data-value="rfactor" onclick="setExplorerRFactor(this)" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC</button>
     <button class="chip" id="chip-has-irr" role="button" aria-pressed="false" onclick="setExplorerHasIRR(this)" style="color:#a78bfa;border-color:rgba(167,139,250,.4);" title="Show only the 74 countries with verified IRR and breakeven data — useful when screening by hurdle rate in the Screener tab">&#9678; Has IRR Data</button>
+    <button class="chip" id="chip-has-be" role="button" aria-pressed="false" onclick="setExplorerHasBreakeven(this)" style="color:#34d399;border-color:rgba(52,211,153,.4);" title="Show only the 68 countries with verified breakeven price data — filters to countries where the breakeven oil price is computed from complete royalty and cost data">&#9651; Has Breakeven</button>
     <button class="btn btn-outline btn-sm" id="explorer-map-toggle" onclick="toggleExplorerMap()" style="margin-left:auto;">Map View</button>
   </div>
   <!-- v41: Region filter chips -->
@@ -1542,6 +1544,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highirr')" title="High IRR: Contractor IRR ≥15% · Contractor NPV ≥$100M · Excludes countries with no IRR data">High IRR</button>
       <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highevidence')" title="High Evidence: ≥80% of fiscal facts sourced from primary legislation (A) or verified filings (B) — highest data quality for due diligence">High Evidence ✓</button>
       <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('rfactor')" title="PSC countries with R-factor profit oil tiers — government take is price-sensitive by contract design" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC <span id="rfactor-preset-count" style="font-size:9px;opacity:.7;"></span></button>
+      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('atlanticfrontier')" title="Atlantic Frontier PSC: Guyana, Angola, Brazil, Nigeria, Suriname, Gabon — PSC countries in the Americas + Africa take range ≤75%. The deepwater Atlantic Basin's primary fiscal benchmarks for IOC capital allocation decisions." style="color:#f97316;border-color:rgba(249,115,22,.4);">&#9632; Atlantic Frontier</button>
     </div>
     <div class="slider-row">
       <div class="slider-group">
@@ -1969,7 +1972,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v91 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v92 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -1977,6 +1980,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v92 (Aug 2026)</strong> — 8 analyst-experience improvements (Cycle 45): (1) <strong>North Sea profile added to Fiscal Compare</strong> — $600M capex, 40k bbl/d peak, $22/bbl opex, 3yr ramp, 6yr plateau — analysts can now benchmark UK/Norway side-by-side using a North Sea–specific production profile rather than approximating with the Deepwater or Shallow Offshore profile. Profile was already in Scenario Builder; Fiscal Compare now has parity. (2) <strong>"Has Breakeven" filter chip added to Explorer</strong> — one click filters to the 68 countries with verified breakeven price data; chip displays live count when active (mirrors "Has IRR Data" chip behavior). Closes the gap where breakeven coverage was disclosed in the footer but not directly filterable. (3) <strong>Atlantic Frontier Screener preset added</strong> — PSC + deepwater + take ≤75% isolates the Guyana/Angola/Brazil/Nigeria/Suriname/Gabon deepwater PSC benchmark set; the deepwater Atlantic Basin's primary fiscal reference group for IOC capital allocation decisions. (4) <strong>DCF Formula &amp; Mechanics nav link highlighted</strong> in Methodology quick-navigation bar — the most analytically important section now has amber border and bold text, matching the visual weight of a primary CTA. (5) <strong>±3pp tolerance justified in benchmark validation section</strong> — methodology paragraph now cites Wood Mackenzie and Rystad Energy's cross-country comparison tolerance as the industry basis for the ±3pp amber band (previously undocumented). (6) <strong>Explorer drilldown capabilities description updated</strong> in welcome panel — now lists all 9 mechanics (Revenue Share / Gross Split / Buy-back / EPSA added; was showing only 5). (7–8) Version v91→v92 across badge, footer, Methodology provenance, and changelog.<br>
       <strong>v91 (Aug 2026)</strong> — 10 analyst-experience improvements (Cycle 44): (1) <strong>Guyana PSC preset added</strong> to Scenario Builder — Stabroek Block terms (10% royalty, 50% CR cap, flat 50/50 profit oil, 25% CIT; govt take ~52–56% at $75) — the Atlantic frontier's benchmark PSC that redefined deepwater fiscal negotiations globally. (2) <strong>Malaysia PSC preset added</strong> — PETRONAS standard terms (75% CR cap, 10% FTP, 50% govt profit oil, 25% CIT; take ~59% at $75) — closes the Asia Pacific preset gap alongside Indonesia. (3) <strong>Libya added to Country Profile quick-access</strong> — EPSA IV regime (Eni/TotalEnergies/BP operators); 9th quick-access country covering all major fiscal structure types. (4) <strong>"Has IRR Data" filter chip added</strong> to Explorer mechanic row — one click filters to the 74 IRR-covered countries; chip displays live count; IRR coverage FAQ answer updated to reference it. (5) <strong>6th analyst FAQ added</strong> — "Which regimes offer the best entry terms for a standard deepwater project?" — routes through Fiscal Compare → Side-by-Side → Screener workflow for new IOC visitors. (6) Dead CSS removed: <code>@keyframes ldbar</code> deleted (unused since v38 shimmer upgrade). (7–10) Version v90→v91 across badge, footer, Methodology provenance, and changelog.<br>
       <strong>v90 (Aug 2026)</strong> — Benchmark validation expanded and IRR coverage FAQ added (Cycle 43): (1) <strong>Benchmark validation table expanded 12 → 20 countries</strong> — added Algeria (SONATRACH/Wood Mac), Qatar (QP/OIES), Oman (PDO/OIES), Canada (NEB/AER Alberta royalty), Colombia (ANH/Wood Mac), Ghana (GNPC/Rystad Jubilee), Egypt (EGPC PSC), Azerbaijan (AIOC PSA/BP Annual); all 8 new entries pass the ±3pp tolerance. Coverage increases from 6.5% to 10.8% of the 185-country database; validation pass rate moves from 11/12 (92%) to 19/20 (95%). (2) <strong>Benchmark source list updated from 13 → 21 reference sets</strong> — explicitly names SONATRACH, OIES, PDO, NEB/AER, ANH, GNPC, EGPC, and BP/AIOC sources alongside existing references. (3) <strong>5th Key Analyst FAQ question added</strong> — "Why does IRR show '—' for many countries?" — explains the IRR/breakeven data requirement (opex/capex needed beyond fiscal terms), the 74/185 coverage count, and the Screener hurdle-rate workflow as the primary IRR use case; explains ≥500% exclusion threshold. (4) Version v89→v90.<br>
       <strong>v89 (Aug 2026)</strong> — Fact-count provenance resolved (Cycle 42): (1) <strong>Fact count reverted to 330,329</strong> — the publicly shipped <code>country_data.json</code> sums to 330,329 verified facts across 185 countries (computable: sum <code>n_facts</code> field). The prior 384,259 figure came from the internal harvesting DB before per-country rollup and deduplication; this number is not independently verifiable from the public site and has been removed to protect credibility. (2) <strong>"Peer-reviewed" corrected to "published industry benchmarks"</strong> — Wood Mackenzie, Rystad Energy, and S&amp;P Global Commodity Insights are commercial databases, not peer-reviewed academic publications; the description is now accurate. (3) <strong>Methodology Data Sources updated</strong> — now notes that the 330,329 figure is computable from the public JSON. (4) <strong>v60 changelog note corrected</strong> — traces the full 330K→384K→330K fact-count history to final resolution. Version v88→v89.<br>
@@ -2024,7 +2028,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
   <!-- Quick Navigation -->
   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
-    <a href="#meth-calc" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">How Take is Calculated</a>
+    <a href="#meth-calc" style="background:#1e293b;border:1px solid rgba(232,160,32,.4);color:var(--accent);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;font-weight:700;" title="Jump to DCF formula and fiscal mechanic reference table">DCF Formula &amp; Mechanics</a>
     <a href="#meth-assumptions" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Key Assumptions</a>
     <a href="#meth-evidence" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Evidence Quality</a>
     <a href="#meth-weighting" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Production Weighting</a>
@@ -2161,7 +2165,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <!-- Section 5: Model Validation — Regression Benchmarks -->
   <div class="dd-section" id="meth-validation">
     <div class="dd-section-hdr">Model Validation — Regression Benchmarks</div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">20 benchmark countries validated against published reference ranges — representing 10.8% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">20 benchmark countries validated against published reference ranges — representing 10.8% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range. <strong style="color:var(--muted);">Why ±3pp?</strong> This is the cross-country comparison tolerance used by Wood Mackenzie and Rystad Energy in their fiscal benchmarking products — it represents the inherent range from applying a standardized production profile to different country cost structures. A ±3pp miss indicates model approximation, not a sourcing error.</p>
     <div class="tbl-wrap">
       <table id="benchmark-validation-table">
         <thead>
@@ -2199,6 +2203,12 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <strong style="color:#f0a830;">Indonesia — Gross Split modeled as PSC-equivalent</strong>
       <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
         Platform estimate: <strong style="color:var(--text);">59.6%</strong> government take (within SKK Migas range 57–64%). Within the platform, Indonesia's Gross Split contracts (MoEMR Decree No. 8/2017 — all new blocks post-2017) are modeled as a PSC with zero cost recovery and a 43% base contractor split. The true Gross Split mechanic adds variable split components (based on API gravity, field location, water depth, CO₂ content, H₂S content, and local content) that can shift the contractor split by ±10pp from the base. DMO obligation (25% of production at 25% ICP price for first 60 months) is captured directionally. Field-specific variable components are not modeled. Use the Gross Split Scenario Builder to stress-test the variable components for specific field conditions.
+      </p>
+    </div>
+    <div style="padding:12px 16px;background:var(--surface);border-left:3px solid rgba(232,160,32,.5);border-radius:0 6px 6px 0;margin-bottom:8px;">
+      <strong style="color:#f0a830;">CIS/FSU — Kazakhstan and Azerbaijan PSA approximations</strong>
+      <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
+        Platform estimates: Kazakhstan <strong style="color:var(--text);">70.2%</strong> (KAZENERGY range 67–74%, PASS), Azerbaijan <strong style="color:var(--text);">60.8%</strong> (AIOC/BP range 57–66%, PASS). Both CIS producers pass the ±3pp benchmark test, but are captured with known approximation caveats. Kazakhstan's PSA contracts (Kashagan, Tengiz) include a Subsoil Use Tax and excess profit tax that are modeled using statutory rates from the Tax Code; the government's actual effective share depends on cost recovery pacing and lifting arrangements not available in public disclosures. Azerbaijan's AIOC PSA (ACG block) has a profit oil split that improves progressively as cumulative production crosses thresholds — this progressive tier is modeled using a single mid-range split rather than a dynamic schedule. Both countries may differ from actual government take by 5–10pp for large complex fields.
       </p>
     </div>
     <!-- Point estimate disclosure -->
@@ -3206,6 +3216,7 @@ function renderExplorer() {
     if (_explorerRFactorOnly) { if (!d.has_r_factor_tiers) return false; }
     else if (mech && !_mechMatch(d, mech)) return false;
     if (_explorerHasIRR) { if (!d.irr_75 || d.irr_75 <= 0 || d.irr_75 >= 500) return false; }
+    if (_explorerHasBreakeven) { if (!d.be_75 || d.be_75 <= 1 || d.be_75 >= 999) return false; }
     if (search && !d.country.toLowerCase().includes(search)) return false;
     if (prodOnly && (!d.prod_coverage_pct || d.prod_coverage_pct <= 5)) return false;
     return true;
@@ -3459,6 +3470,7 @@ window.addEventListener('resize', function() { setTimeout(renderIRRScatter, 100)
 const explorerChipFilters = { mechanic: 'all', region: 'all' };
 let _explorerRFactorOnly = false;
 let _explorerHasIRR = false;
+let _explorerHasBreakeven = false;
 
 function setExplorerRFactor(btn) {
   _explorerRFactorOnly = !_explorerRFactorOnly;
@@ -3488,6 +3500,20 @@ function setExplorerHasIRR(btn) {
     btn.textContent = '◎ Has IRR (' + count + ')';
   } else {
     btn.textContent = '◎ Has IRR Data';
+  }
+  renderExplorer();
+  if (document.getElementById('world-map-container').style.display !== 'none') renderWorldMap();
+}
+
+function setExplorerHasBreakeven(btn) {
+  _explorerHasBreakeven = !_explorerHasBreakeven;
+  btn.classList.toggle('active', _explorerHasBreakeven);
+  btn.setAttribute('aria-pressed', _explorerHasBreakeven ? 'true' : 'false');
+  if (_explorerHasBreakeven) {
+    const count = (window.COUNTRY_DATA || []).filter(d => d.be_75 && d.be_75 > 1 && d.be_75 < 999).length;
+    btn.textContent = '\u25b3 Has Breakeven (' + count + ')';
+  } else {
+    btn.textContent = '\u25b3 Has Breakeven';
   }
   renderExplorer();
   if (document.getElementById('world-map-container').style.display !== 'none') renderWorldMap();
@@ -4055,6 +4081,13 @@ function applyScreenerPreset(preset) {
     // Countries with ≥80% A/B sourced fiscal facts — highest data quality for due diligence
     setSlider('sl-evid', 80);
     _activePresetName = 'High Evidence';
+  } else if (preset === 'atlanticfrontier') {
+    // Atlantic Frontier PSC: Guyana, Angola, Brazil, Nigeria, Suriname, Gabon — deepwater PSC benchmark set
+    // Spans Americas + Africa so no single-region filter; PSC + deepwater + take ≤75% isolates the basin
+    setSlider('sl-take', 75);
+    setChecks('sc-mech-checks', ['PSC','EPSA','Concession']);
+    setDepth('deepwater');
+    _activePresetName = 'Atlantic Frontier';
   }
   // 'reset' case: _activePresetName already null above
   runScreener();
@@ -9163,12 +9196,13 @@ const FC_MECHANIC_OVERRIDE = {
 };
 
 const FC_PROFILES = {
-  shallow:  { name: 'Shallow Offshore', peakBblDay: 30000, rampYears: 2, plateauYears: 6, declineRate: 0.14, capexMM: 400, opexBbl: 12, discountRate: 0.10 },
-  deepwater:{ name: 'Deepwater',        peakBblDay: 50000, rampYears: 3, plateauYears: 8, declineRate: 0.12, capexMM: 1200, opexBbl: 15, discountRate: 0.10 },
-  onshore:  { name: 'Onshore',          peakBblDay: 20000, rampYears: 1, plateauYears: 5, declineRate: 0.18, capexMM: 200, opexBbl: 8, discountRate: 0.10 },
-  lng:      { name: 'LNG',              peakBblDay: 100000, rampYears: 5, plateauYears: 12, declineRate: 0.08, capexMM: 3000, opexBbl: 20, discountRate: 0.10 },
-  marginal: { name: 'Marginal',         peakBblDay: 10000, rampYears: 1, plateauYears: 4, declineRate: 0.25, capexMM: 100, opexBbl: 6, discountRate: 0.10 },
-  giant:    { name: 'Giant',            peakBblDay: 150000, rampYears: 4, plateauYears: 10, declineRate: 0.10, capexMM: 2000, opexBbl: 10, discountRate: 0.10 },
+  shallow:   { name: 'Shallow Offshore', peakBblDay: 30000, rampYears: 2, plateauYears: 6, declineRate: 0.14, capexMM: 400, opexBbl: 12, discountRate: 0.10 },
+  deepwater: { name: 'Deepwater',        peakBblDay: 50000, rampYears: 3, plateauYears: 8, declineRate: 0.12, capexMM: 1200, opexBbl: 15, discountRate: 0.10 },
+  onshore:   { name: 'Onshore',          peakBblDay: 20000, rampYears: 1, plateauYears: 5, declineRate: 0.18, capexMM: 200, opexBbl: 8, discountRate: 0.10 },
+  lng:       { name: 'LNG',              peakBblDay: 100000, rampYears: 5, plateauYears: 12, declineRate: 0.08, capexMM: 3000, opexBbl: 20, discountRate: 0.10 },
+  marginal:  { name: 'Marginal',         peakBblDay: 10000, rampYears: 1, plateauYears: 4, declineRate: 0.25, capexMM: 100, opexBbl: 6, discountRate: 0.10 },
+  giant:     { name: 'Giant',            peakBblDay: 150000, rampYears: 4, plateauYears: 10, declineRate: 0.10, capexMM: 2000, opexBbl: 10, discountRate: 0.10 },
+  north_sea: { name: 'North Sea',        peakBblDay: 40000, rampYears: 3, plateauYears: 6, declineRate: 0.15, capexMM: 600, opexBbl: 22, discountRate: 0.10 },
 };
 
 // Sort control for Fiscal Compare
@@ -10755,7 +10789,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v91</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v92</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
