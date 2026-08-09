@@ -1195,7 +1195,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v106</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v107</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1522,20 +1522,20 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <tr>
           <th>#</th>
           <th style="width:36px"></th>
-          <th data-sort-key="country" onclick="setExplorerSort('country')" onkeydown="if(event.key==='Enter'){setExplorerSort('country');}" tabindex="0" title="Sort A–Z">Country</th>
+          <th data-sort-key="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z">Country</th>
           <th>Region</th>
           <th class="num">Contracts</th>
           <th>Mechanics</th>
-          <th class="num" data-sort-key="take" onclick="setExplorerSort('take')" onkeydown="if(event.key==='Enter'){setExplorerSort('take');}" tabindex="0" title="Sort by Govt Take (low→high)">Govt Take</th>
-          <th class="num" data-sort-key="evidence" onclick="setExplorerSort('evidence')" onkeydown="if(event.key==='Enter'){setExplorerSort('evidence');}" tabindex="0" title="Evidence quality: % of fiscal facts backed by primary (A) or verified (B) sources. Hover any row's take% for full breakdown. Sort: weakest first.">Evidence</th>
+          <th class="num" data-sort-key="take" tabindex="0" role="columnheader" aria-sort="none" title="Sort by Govt Take (low→high)">Govt Take</th>
+          <th class="num" data-sort-key="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence quality: % of fiscal facts backed by primary (A) or verified (B) sources. Hover any row's take% for full breakdown. Sort: weakest first.">Evidence</th>
           <th class="num">Curve</th>
           <th class="num expl-mp-col" style="display:none">@$50</th>
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
-          <th class="num" data-sort-key="npv" onclick="setExplorerSort('npv')" onkeydown="if(event.key==='Enter'){setExplorerSort('npv');}" tabindex="0" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
-          <th class="num" data-sort-key="irr" onclick="setExplorerSort('irr')" onkeydown="if(event.key==='Enter'){setExplorerSort('irr');}" tabindex="0" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
-          <th class="num" data-sort-key="be" onclick="setExplorerSort('be')" onkeydown="if(event.key==='Enter'){setExplorerSort('be');}" tabindex="0" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
-          <th class="num" data-sort-key="swing" onclick="setExplorerSort('swing')" onkeydown="if(event.key==='Enter'){setExplorerSort('swing');}" tabindex="0" title="Price sensitivity: govt take@$125/bbl minus take@$50/bbl in percentage points. High swing = fiscal terms are price-sensitive (government captures more of oil price upside). Color: green &lt;10pp (stable), amber 10&ndash;20pp (moderate), red &gt;20pp (highly responsive). Sort: low to high.">Swing (pp)</th>
+          <th class="num" data-sort-key="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
+          <th class="num" data-sort-key="irr" tabindex="0" role="columnheader" aria-sort="none" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
+          <th class="num" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
+          <th class="num" data-sort-key="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price sensitivity: govt take@$125/bbl minus take@$50/bbl in percentage points. High swing = fiscal terms are price-sensitive (government captures more of oil price upside). Color: green &lt;10pp (stable), amber 10&ndash;20pp (moderate), red &gt;20pp (highly responsive). Sort: low to high.">Swing (pp)</th>
           <th class="num">Stability</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
           <th>Tier</th>
@@ -1778,7 +1778,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
   <div id="cmp-chart-wrap" class="chart-wrap" style="display:none;margin-top:16px;position:relative;">
     <div style="position:absolute;top:8px;right:8px;z-index:10;">
-      <button class="btn btn-outline btn-sm" onclick="downloadCmpChart()" title="Download chart as PNG">⬇ PNG</button>
+      <button class="btn btn-outline btn-sm" id="cmp-chart-png-btn" aria-label="Download Side-by-Side comparison chart as PNG image" title="Download chart as PNG">⬇ PNG</button>
     </div>
     <canvas id="cmp-chart" aria-label="Side-by-side bar chart comparing government take percentage across selected countries at 4 price points" role="img"></canvas>
   </div>
@@ -1797,7 +1797,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div class="card-title" style="margin-bottom:0;">Average Govt Take by Decade &amp; Mechanic</div>
-      <button class="btn btn-sm btn-outline" onclick="exportVintageCSV()" title="Export decade-by-mechanic take averages to CSV">&#8659; Export CSV</button>
+      <button class="btn btn-sm btn-outline" id="vintage-csv-btn" aria-label="Export decade-by-mechanic take averages to CSV" title="Export decade-by-mechanic take averages to CSV">&#8659; Export CSV</button>
     </div>
     <div class="tbl-wrap" style="margin-bottom:20px;">
       <table id="tbl-vintage">
@@ -1893,11 +1893,11 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Operator Fiscal Exposure</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Search an operator above to see every country where they hold active contracts — with government take, tier distribution, and fiscal exposure score. 16 operators tracked: the 8 major IOCs plus 8 independent/national operators.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;">
-        <button onclick="document.getElementById('ioc-search').value='ExxonMobil';updateIOCSuggestions();loadIOC('ExxonMobil')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">ExxonMobil</button>
-        <button onclick="document.getElementById('ioc-search').value='Shell';updateIOCSuggestions();loadIOC('Shell')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">Shell</button>
-        <button onclick="document.getElementById('ioc-search').value='TotalEnergies';updateIOCSuggestions();loadIOC('TotalEnergies')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">TotalEnergies</button>
-        <button onclick="document.getElementById('ioc-search').value='BP';updateIOCSuggestions();loadIOC('BP')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">BP</button>
-        <button onclick="document.getElementById('ioc-search').value='Equinor';updateIOCSuggestions();loadIOC('Equinor')" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;">Equinor</button>
+        <button class="ioc-quick-btn" data-ioc-op="ExxonMobil" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load ExxonMobil fiscal exposure profile">ExxonMobil</button>
+        <button class="ioc-quick-btn" data-ioc-op="Shell" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Shell fiscal exposure profile">Shell</button>
+        <button class="ioc-quick-btn" data-ioc-op="TotalEnergies" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load TotalEnergies fiscal exposure profile">TotalEnergies</button>
+        <button class="ioc-quick-btn" data-ioc-op="BP" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load BP fiscal exposure profile">BP</button>
+        <button class="ioc-quick-btn" data-ioc-op="Equinor" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Equinor fiscal exposure profile">Equinor</button>
       </div>
       <div style="font-size:11px;color:var(--muted);">Or use the <strong>Operator Fiscal Exposure Analyzer</strong> below for take-tier distribution and peer comparison.</div>
     </div>
@@ -1960,15 +1960,15 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <input type="checkbox" id="dd-mc-toggle" checked aria-label="Toggle Monte Carlo uncertainty bands on country profile charts">
       Show MC uncertainty
     </label>
-    <button id="dd-copy-link-btn" onclick="copyCurrentLink()" title="Copy shareable link to this country profile"
+    <button id="dd-copy-link-btn" title="Copy shareable link to this country profile" aria-label="Copy shareable link to this country profile"
             style="display:none;margin-left:14px;background:transparent;border:1px solid #334155;border-radius:4px;padding:4px 8px;cursor:pointer;color:#94a3b8;font-size:11px;align-items:center;gap:4px;">
       <span style="font-size:12px;vertical-align:middle;">&#10697;</span> Copy link
     </button>
-    <button id="dd-export-btn" onclick="exportCountryProfile()" title="Export this country profile to Excel"
+    <button id="dd-export-btn" title="Export this country profile to Excel" aria-label="Export country profile to Excel XLSX"
             style="display:none;margin-left:8px;background:transparent;border:1px solid #334155;border-radius:4px;padding:4px 8px;cursor:pointer;color:#94a3b8;font-size:11px;">
       ⬇ XLSX
     </button>
-    <button id="dd-print-btn" onclick="window.print()" title="Download Country Profile as PDF" class="btn-export btn-print"
+    <button id="dd-print-btn" title="Download Country Profile as PDF" aria-label="Download country profile as PDF" class="btn-export btn-print"
             style="display:none;margin-left:8px;background:transparent;border:1px solid #334155;border-radius:4px;padding:4px 8px;cursor:pointer;color:#94a3b8;font-size:11px;">
       ⬇ PDF
     </button>
@@ -2010,7 +2010,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <select id="api-country-select" aria-label="Select country to load API JSON response" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:8px 14px;min-width:240px;">
       <option value="">— Select a country —</option>
     </select>
-    <button class="btn btn-outline btn-sm" id="api-copy-btn" onclick="copyAPIUrl()" title="Select a country above to enable this button — then click to copy the direct API URL to clipboard" disabled>⎘ Copy API URL</button>
+    <button class="btn btn-outline btn-sm" id="api-copy-btn" aria-label="Copy API URL for selected country to clipboard" title="Select a country above to enable this button — then click to copy the direct API URL to clipboard" disabled>⎘ Copy API URL</button>
     <span id="api-url-display" style="font-size:12px;color:var(--muted);font-family:monospace;"></span>
   </div>
   <div style="font-size:11px;color:var(--muted);margin-bottom:8px;">
@@ -2030,7 +2030,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v106 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v107 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2038,6 +2038,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v107 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 60): (1) <strong>Security / Inline Handler Migration</strong> — 5 IOC Portfolio quick-launch buttons migrated from inline <code>onclick</code> to <code>class="ioc-quick-btn" data-ioc-op="..."</code> event delegation (ExxonMobil, Shell, TotalEnergies, BP, Equinor). <code>aria-label</code> added to all 5. Country Profile action buttons (<code>#dd-copy-link-btn</code>, <code>#dd-export-btn</code>, <code>#dd-print-btn</code>) — inline <code>onclick</code> removed, now handled via DOMContentLoaded event listeners; <code>aria-label</code> added to all 3. Side-by-Side PNG download button (<code>#cmp-chart-png-btn</code>), Vintage Analysis Export CSV (<code>#vintage-csv-btn</code>), Breakeven Map Export CSV (<code>#be-export-csv-btn</code>), API Copy URL button — all now use event listeners with <code>aria-label</code>. Reference panel overlay and close button (<code>#ref-panel-close-btn</code>) migrated. Scenario modal backdrop click-to-close, close button (<code>#scenario-modal-close-btn</code>), all Run DCF buttons (<code>#sb-run-dcf-top-btn</code>, <code>#sb-run-dcf-bottom-btn</code>, <code>#sb-run-dcf-empty-btn</code>), Save Scenario, Clear All Scenarios — all migrated. Scenario Builder preset buttons (13 presets: Norway, Angola, Iraq, UK, Australia, Saudi, Iran, India, Nigeria Rev Share, Indonesia Gross Split, Guyana, Malaysia, Kazakhstan) migrated from inline <code>onclick</code> to <code>class="sb-preset-btn" data-sb-preset="..."</code> event delegation. <code>sb-mechanic</code> select <code>onchange</code> migrated. (2) <strong>Accessibility</strong> — FAQ items A12–A15 converted to accessible accordions: <code>role="button"</code>, <code>tabindex="0"</code>, <code>aria-expanded</code>, <code>aria-controls</code> added; answers have matching <code>id</code> attributes; toggle respects both click and Enter/Space keydown. Reference panel <code>aria-label</code> added to <code>&lt;aside&gt;</code>. (3) <strong>Version</strong> — v106→v107 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v106 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 59): (1) <strong>Reliability / Bug Fix</strong> — <code>runFiscalCompare()</code> null guard added: function now returns immediately with "Data loading — please wait…" status message if <code>COUNTRY_DATA</code> is null or empty, preventing a crash when the function is called before async data fetch completes (e.g. from keyboard shortcut or quickstart button during initial load). (2) <strong>Accessibility</strong> — <code>aria-live="polite" aria-atomic="true"</code> added to <code>#fc-status</code> span — screen readers now announce Fiscal Compare status updates ("Running 185 countries…", "185 results · 0.2s") without requiring keyboard focus on the element. (3) <strong>Security / Data Integrity</strong> — 2 remaining inline <code>onclick</code> handlers in the footer coverage stats (IRR and Breakeven coverage links) migrated to DOMContentLoaded event listeners. Both buttons now use <code>id="footer-irr-link"</code> and <code>id="footer-be-link"</code> with <code>addEventListener('click', ...)</code>. Static HTML inline handler count at new historic minimum. (4) <strong>Data Reliability / Professional Credibility</strong> — A15 Key Analyst FAQ added: "I have two candidate countries with similar government take — how do I differentiate using IRR and Breakeven?" — explains the Take → Swing → IRR/Breakeven → Scenario Builder DCF progression; gives explicit rule of thumb for analyst decision workflow. Benchmark validation expanded 25 → 27 countries (Senegal SNH/Wood Mac Sangomar PSC; Mozambique ENH/Rystad LNG PSA literature) — coverage increases from 13.5% → 14.6%; pass rate 26/27 (96%); source list updated with SNH and ENH. All 3 FAQ references updated (count, source list, pass rate). (5) <strong>Naming / Version</strong> — v105→v106 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog. Version v105→v106.<br><br>
       <strong>v105 (Aug 2026)</strong> — 10 targeted improvements across 7 categories (Cycle 58): (1) <strong>Security</strong> — Bubble chart price radio <code>onchange</code> handlers migrated to DOMContentLoaded event listeners (4 handlers: bp50/bp75/bp100/bp125). Bubble PNG download <code>onclick</code> migrated. Side-by-Side Clear/Print/Share button <code>onclick</code> handlers migrated to named IDs + event listeners. Side-by-Side quickstart buttons refactored from inline <code>onclick</code> to <code>class="cmp-quickstart-btn" data-countries="..."</code> + event delegation (5 buttons). Breakeven Map CSV export <code>onclick</code> migrated. Search close button <code>onclick</code>/<code>onkeydown</code> migrated. (2) <strong>Interaction Design / Accessibility</strong> — Bubble chart price radio group wrapped with <code>role="group" aria-labelledby="bubble-price-label"</code> — screen readers now announce "Price scenario: $50/$75/$100/$125" as a grouped control. Bubble PNG button gains <code>aria-label</code>. (3) <strong>Mobile / Visual Design</strong> — Right tab fade gradient widened from 40px to 72px on desktop — more visible overflow indicator when the tab bar has additional tabs out of view on narrow viewports. (4) <strong>Performance</strong> — <code>will-change: transform</code> added to both shimmer animations (loading bar + FC skeleton <code>.fc-skel-bar::after</code>) — promotes elements to GPU compositing layer, reducing main-thread paint cost during loading animations. (5) <strong>Data Reliability / Professional Credibility</strong> — A14 Key Analyst FAQ added: "How do I access fiscal data programmatically for integration with our internal models?" — documents all three API endpoints (<code>countries.json</code>, <code>country/{slug}.json</code>, <code>mechanics.json</code>), recommended integration pattern (countries.json for portfolio screening → individual slugs for finalists), no-auth static CDN delivery, and XLSX alternative workflow. (6) <strong>Error &amp; Empty States</strong> — Reform Risk "no reform events" empty state upgraded from bare <code>&lt;p&gt;</code> text to icon + bolded headline + contextual explanation (stable regime vs. limited sourcing coverage guidance). Version v104→v105 across all 4 locations.<br><br>
       <strong>v104 (Aug 2026)</strong> — 10 targeted improvements across 7 lowest-graded categories (Cycle 57): (1) <strong>Accessibility</strong> — <code>aria-label</code> added to <code>#flt-mech</code> (Explorer mechanic filter select) and <code>#flt-region</code> (both were missing, WCAG 1.3.5 violation). <code>aria-label</code> added to Scenario Builder <code>#sb-mechanic</code> and <code>#sb-profile</code> selects. <code>aria-label</code> added to header Search button (<code>#hdr-search-btn</code>). <code>aria-label</code> added to <code>#dd-mc-toggle</code> checkbox. (2) <strong>Information Architecture</strong> — <code>&lt;nav aria-label="Platform sections"&gt;</code> landmark wraps the tab navigation — screen readers can now skip directly to the nav landmark. <code>&lt;main id="tab-content-main" aria-label="Platform content — fiscal data tabs"&gt;</code> landmark wraps all tab pane content — completes the landmark map required for WCAG 2.4.1. (3) <strong>Security / Data Integrity</strong> — 4 additional <code>onchange</code> handlers migrated to DOMContentLoaded event listeners: <code>#dd-country-select</code>, <code>#dd-mc-toggle</code>, <code>#exposure-ioc-select</code>, <code>#api-country-select</code>. This reduces the HTML's inline event handler count by a further 4. (4) <strong>Performance</strong> — <code>&lt;link rel="preconnect"&gt;</code> added for <code>unpkg.com</code> (previously only had dns-prefetch — preconnect establishes the TCP+TLS handshake proactively). (5) <strong>Mobile</strong> — <code>touch-action: manipulation</code> added to <code>.tab-btn</code> CSS rule — removes iOS Safari's 300ms double-tap delay on all tab navigation buttons. (6) <strong>Data Reliability</strong> — A13 Key Analyst FAQ added: "How do I independently verify a government take figure? What primary sources should I check?" — three-tier verification workflow: Evidence badge tier inspection (A/B/C/D), benchmark validation table cross-check (25 countries, 96% pass rate), and API source_note field with evidence_tier per parameter for frontier countries. Version v103→v104 across all 4 locations.<br>
@@ -2529,10 +2530,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </details>
 
     <div class="meth-faq-item" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
-      <div class="meth-faq-q" style="font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+      <div class="meth-faq-q" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a12-body" style="font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;">
         A12. My capital allocation team needs IRR for every candidate country. How do I handle the 111 countries without IRR data?
       </div>
-      <div class="meth-faq-a" style="color:var(--muted);font-size:13px;line-height:1.7;">
+      <div class="meth-faq-a" id="faq-a12-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
         <strong style="color:var(--text);">Four-step proxy workflow for IRR-incomplete countries:</strong>
         <ol style="margin:8px 0 8px 16px;padding:0;">
           <li style="margin-bottom:4px;"><strong>Stage 1 — Government Take screen:</strong> Filter all 185 countries by take ≤ your hurdle threshold. IRR and take are highly correlated at fixed project economics — regimes with take &lt;50% almost universally deliver IRR &gt;15%. Use the Screener's take slider as a fast filter.</li>
@@ -2545,10 +2546,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
 
     <div class="meth-faq-item" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
-      <div class="meth-faq-q" style="font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+      <div class="meth-faq-q" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a13-body" style="font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;">
         A13. How do I independently verify a government take figure? What primary sources should I check?
       </div>
-      <div class="meth-faq-a" style="color:var(--muted);font-size:13px;line-height:1.7;">
+      <div class="meth-faq-a" id="faq-a13-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
         <strong style="color:var(--text);">Three-tier verification workflow:</strong>
         <ol style="margin:8px 0 8px 16px;padding:0;">
           <li style="margin-bottom:6px;"><strong>Check the Evidence badge first.</strong> Every country in Explorer and Country Profile shows an A/B/C/D confidence tier. Tier A (teal) = parameter sourced directly from primary legislation or signed PSA text. Tier B (green) = sourced from operator annual report or government filing. Tier C (yellow) = cross-referenced secondary (Wood Mac, Rystad). Tier D (grey) = modeled default. For investment-grade due diligence, verify any Tier C or D country against a primary source before use in an IC submission.</li>
@@ -2560,10 +2561,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
 
     <div class="meth-faq-item" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
-      <div class="meth-faq-q" style="font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+      <div class="meth-faq-q" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a14-body" style="font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;">
         A14. How do I access fiscal data programmatically for integration with our internal models?
       </div>
-      <div class="meth-faq-a" style="color:var(--muted);font-size:13px;line-height:1.7;">
+      <div class="meth-faq-a" id="faq-a14-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
         <strong style="color:var(--text);">The platform exposes a static JSON API at three endpoints:</strong>
         <ul style="margin:8px 0 8px 16px;padding:0;">
           <li style="margin-bottom:6px;"><code style="background:var(--surface2);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px;">api/v1/countries.json</code> — full summary for all 185 countries (govt take @4 prices, NPV, IRR, mechanic, region, evidence tier, contract count). Use this for portfolio-wide screening or feeding a country comparison model.</li>
@@ -2576,10 +2577,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
 
     <div class="meth-faq-item" style="padding:12px 0;border-top:1px solid rgba(71,85,105,.2);">
-      <div class="meth-faq-q" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;line-height:1.4;">
+      <div class="meth-faq-q" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a15-body" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;line-height:1.4;">
         A15. I have two candidate countries with similar government take — how do I differentiate using IRR and Breakeven?
       </div>
-      <div class="meth-faq-a" style="color:var(--muted);font-size:13px;line-height:1.7;">
+      <div class="meth-faq-a" id="faq-a15-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
         Govt Take is a revenue-share metric; it tells you what fraction of gross revenue the government captures, but not the economics of your specific project. Two countries at 55% take can have very different IRRs if their cost structures, royalty bases, or profit-sharing tiers differ. Use this three-step workflow:<br><br>
         <strong style="color:var(--text);">Step 1 — Screen by Take (Explorer/Screener).</strong> Identify the tier of each country: IF (&lt;45%), Moderate (45–60%), High-Take (60–72%), or State-Dominated (&gt;72%). Two countries at 55% are both Moderate — take alone does not differentiate.<br><br>
         <strong style="color:var(--text);">Step 2 — Compare Price Swing.</strong> The Swing column (Govt Take @$125 − Take @$50, in pp) tells you how price-responsive the fiscal regime is. A low-swing country (green, &lt;10pp) offers predictable terms at any oil price. A high-swing country (red, &gt;20pp) captures most of your upside in a high-price scenario — important for a project that depends on high-price economics to clear your hurdle rate.<br><br>
@@ -2590,7 +2591,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v106, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v107, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -2645,37 +2646,37 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
   </div>
   <div style="margin-top:14px;text-align:right;">
-    <button class="btn btn-sm btn-outline" onclick="exportBreakevenCSV()" title="Export all breakeven data to CSV">&#8659; Export Breakeven Data (CSV)</button>
+    <button class="btn btn-sm btn-outline" id="be-export-csv-btn" aria-label="Export all breakeven data to CSV" title="Export all breakeven data to CSV">&#8659; Export Breakeven Data (CSV)</button>
   </div>
 </div>
 <!-- ===== REFERENCE SLIDE-IN PANEL ===== -->
-<div id="reference-overlay" onclick="toggleReferencePanel()"></div>
-<aside id="reference-panel">
-  <button class="ref-close" onclick="toggleReferencePanel()">&times;</button>
+<div id="reference-overlay"></div>
+<aside id="reference-panel" aria-label="Fiscal Mechanics Reference panel">
+  <button class="ref-close" id="ref-panel-close-btn" aria-label="Close Fiscal Mechanics Reference panel">&times;</button>
   <h2>Fiscal Mechanics Reference</h2>
   <div id="ref-mechanics-list"></div>
 </aside>
 
 <!-- ===== SCENARIO BUILDER MODAL ===== -->
-<div id="scenario-modal" role="dialog" aria-modal="true" aria-labelledby="scenario-modal-title" onclick="if(event.target===this)closeScenarioModal()">
+<div id="scenario-modal" role="dialog" aria-modal="true" aria-labelledby="scenario-modal-title">
   <div id="scenario-modal-inner">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
       <h2 id="scenario-modal-title" style="font-size:18px;font-weight:800;margin:0">Custom Scenario Builder</h2>
-      <button onclick="closeScenarioModal()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button>
+      <button id="scenario-modal-close-btn" aria-label="Close Scenario Builder" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer">&times;</button>
     </div>
     <div class="page-sub">Build a custom fiscal scenario and run a live DCF model.</div>
 
     <div class="scenario-builder-grid">
       <div class="scenario-inputs-panel">
         <div style="margin-bottom:14px;">
-          <button class="btn" onclick="runCustomScenario()" style="width:100%;font-size:14px;padding:10px;letter-spacing:.03em;">&#9654; Run DCF</button>
+          <button class="btn" id="sb-run-dcf-top-btn" aria-label="Run DCF calculation" style="width:100%;font-size:14px;padding:10px;letter-spacing:.03em;">&#9654; Run DCF</button>
         </div>
 
         <h3 style="font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin:0 0 14px">Fiscal Parameters</h3>
 
         <div class="sb-control-group">
           <label>Mechanic</label>
-          <select id="sb-mechanic" aria-label="Select fiscal mechanic for Scenario Builder DCF" onchange="sbUpdateMechanic()">
+          <select id="sb-mechanic" aria-label="Select fiscal mechanic for Scenario Builder DCF">
             <option value="Concession">Concession</option>
             <option value="PSC">Production Sharing Contract (PSC)</option>
             <option value="Gross Split">Gross Split (Indonesia-style)</option>
@@ -2796,21 +2797,21 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         </div>
 
         <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap;">
-          <button class="btn" onclick="runCustomScenario()">&#9654; Run DCF</button>
-          <button class="btn btn-outline" onclick="saveCustomScenario()">Save Scenario</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('norway')">Norway</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('angola')">Angola</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('iraq')">Iraq TSC</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('uk')">UK EPL</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('australia')">Australia PRRT</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('saudi')" title="Saudi Arabia — concession with high CIT (85%) and 20% royalty; Aramco equity participation implicit in high take">Saudi Arabia</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('iran')" title="Iran — buy-back contract: contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7-10 year term">Iran Buy-back</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('india')" title="India RSC — Risk Service Contract under NELP/HELP: contractor delivers services, government keeps equity; $4/bbl representative fee, 34% CIT, 5% EPT">India RSC</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('nigeria_rs')" title="Nigeria Revenue Share (pre-PIA legacy contracts) — 55% govt revenue share, 30% CIT; representative of Nigeria's pre-PIA gross-revenue contracts before the 2021 Petroleum Industry Act introduced the hybrid PSC structure">Nigeria Rev Share</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('indonesia_gs')" title="Indonesia Gross Split (MoEMR Decree No. 8/2017) — 43% contractor split for onshore oil, 25% DMO at 25% ICP price, 25% CIT. Introduced by Jokowi government to replace cost recovery PSC and reduce government budget risk. Platform has 19 Gross Split contracts in database (3% of Indonesia total, all post-2017).">Indonesia Gross Split <span style="font-size:9px;color:var(--muted);margin-left:2px;">(19 contracts)</span></button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('guyana')" title="Guyana — Stabroek Block PSC (ExxonMobil/Hess/CNOOC, 2016): 10% royalty, 50% cost recovery cap, flat 50/50 profit oil split, 25% CIT. The Liza discovery (2015) triggered one of the largest deepwater developments in history and benchmarks all Atlantic frontier PSC negotiations. Govt take ~52–56% at $75/bbl.">Guyana PSC</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('malaysia')" title="Malaysia — PETRONAS PSC: 75% cost recovery cap, 10% FTP (First Tranche Petroleum), 50% government profit oil, 25% CIT. Standard terms governing Shell, ExxonMobil, TotalEnergies, and Murphy upstream operations. Govt take ~59% at $75/bbl — mid-range Asia Pacific benchmark.">Malaysia PSC</button>
-          <button class="btn btn-sm btn-outline" onclick="loadPreset('kazakhstan')" title="Kazakhstan — PSA model (Kashagan/Tengiz): 80% cost recovery cap, 50% govt profit oil, 20% CIT + Subsoil Use Tax, 5% royalty. One of the most complex PSA structures globally — renegotiated 6× for Kashagan. Govt take ~70% at $75/bbl (KAZENERGY range 67–74%).">Kazakhstan PSA</button>
+          <button class="btn" id="sb-run-dcf-bottom-btn" aria-label="Run DCF calculation">&#9654; Run DCF</button>
+          <button class="btn btn-outline" id="sb-save-scenario-btn" aria-label="Save current scenario configuration">Save Scenario</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="norway" aria-label="Load Norway Concession preset into Scenario Builder">Norway</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="angola" aria-label="Load Angola PSC preset into Scenario Builder">Angola</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="iraq" aria-label="Load Iraq TSC preset into Scenario Builder">Iraq TSC</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="uk" aria-label="Load UK EPL (Energy Profits Levy) preset into Scenario Builder">UK EPL</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="australia" aria-label="Load Australia PRRT preset into Scenario Builder">Australia PRRT</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="saudi" title="Saudi Arabia — concession with high CIT (85%) and 20% royalty; Aramco equity participation implicit in high take" aria-label="Load Saudi Arabia Concession preset into Scenario Builder">Saudi Arabia</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="iran" title="Iran — buy-back contract: contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7-10 year term" aria-label="Load Iran Buy-back contract preset into Scenario Builder">Iran Buy-back</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="india" title="India RSC — Risk Service Contract under NELP/HELP: contractor delivers services, government keeps equity; $4/bbl representative fee, 34% CIT, 5% EPT" aria-label="Load India RSC preset into Scenario Builder">India RSC</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="nigeria_rs" title="Nigeria Revenue Share (pre-PIA legacy contracts) — 55% govt revenue share, 30% CIT; representative of Nigeria's pre-PIA gross-revenue contracts before the 2021 Petroleum Industry Act introduced the hybrid PSC structure" aria-label="Load Nigeria Revenue Share preset into Scenario Builder">Nigeria Rev Share</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="indonesia_gs" title="Indonesia Gross Split (MoEMR Decree No. 8/2017) — 43% contractor split for onshore oil, 25% DMO at 25% ICP price, 25% CIT. Introduced by Jokowi government to replace cost recovery PSC and reduce government budget risk. Platform has 19 Gross Split contracts in database (3% of Indonesia total, all post-2017)." aria-label="Load Indonesia Gross Split preset into Scenario Builder">Indonesia Gross Split <span style="font-size:9px;color:var(--muted);margin-left:2px;">(19 contracts)</span></button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="guyana" title="Guyana — Stabroek Block PSC (ExxonMobil/Hess/CNOOC, 2016): 10% royalty, 50% cost recovery cap, flat 50/50 profit oil split, 25% CIT. The Liza discovery (2015) triggered one of the largest deepwater developments in history and benchmarks all Atlantic frontier PSC negotiations. Govt take ~52–56% at $75/bbl." aria-label="Load Guyana PSC (Stabroek Block) preset into Scenario Builder">Guyana PSC</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="malaysia" title="Malaysia — PETRONAS PSC: 75% cost recovery cap, 10% FTP (First Tranche Petroleum), 50% government profit oil, 25% CIT. Standard terms governing Shell, ExxonMobil, TotalEnergies, and Murphy upstream operations. Govt take ~59% at $75/bbl — mid-range Asia Pacific benchmark." aria-label="Load Malaysia PSC (PETRONAS) preset into Scenario Builder">Malaysia PSC</button>
+          <button class="btn btn-sm btn-outline sb-preset-btn" data-sb-preset="kazakhstan" title="Kazakhstan — PSA model (Kashagan/Tengiz): 80% cost recovery cap, 50% govt profit oil, 20% CIT + Subsoil Use Tax, 5% royalty. One of the most complex PSA structures globally — renegotiated 6× for Kashagan. Govt take ~70% at $75/bbl (KAZENERGY range 67–74%)." aria-label="Load Kazakhstan PSA (Kashagan/Tengiz model) preset into Scenario Builder">Kazakhstan PSA</button>
         </div>
       </div>
 
@@ -2821,7 +2822,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           Configure fiscal parameters on the left, then click <strong style="color:var(--accent);">Run DCF</strong> to compute government take, NPV, IRR, and a full 25-year cashflow waterfall.
           <div style="margin-top:10px;font-size:11px;color:var(--accent);opacity:.8;">Tip: Select a country in the Explorer tab first to pre-fill the regime type and parameters.</div>
           <div style="margin-top:16px;display:flex;justify-content:center;">
-            <button class="btn btn-sm" onclick="runCustomScenario()" style="padding:8px 20px;">&#9654; Run DCF Now</button>
+            <button class="btn btn-sm" id="sb-run-dcf-empty-btn" aria-label="Run DCF calculation" style="padding:8px 20px;">&#9654; Run DCF Now</button>
           </div>
         </div>
       </div>
@@ -2830,7 +2831,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <div style="margin-top:20px;">
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
         <h3 style="font-size:13px;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;margin:0">Saved Scenarios</h3>
-        <button id="clear-scenarios-btn" class="btn btn-sm btn-outline" onclick="clearSavedScenarios()">Clear All</button>
+        <button id="clear-scenarios-btn" class="btn btn-sm btn-outline" aria-label="Clear all saved scenarios">Clear All</button>
       </div>
       <div id="sb-saved-table" style="color:var(--muted);font-size:12px;">No saved scenarios.</div>
     </div>
@@ -11138,6 +11139,121 @@ document.addEventListener('DOMContentLoaded', function() {
   if (cmpBtn) cmpBtn.addEventListener('click', function() { launchCompare(); });
 });
 
+// v107: Explorer table column header sort — event delegation (replaces per-th onclick/onkeydown)
+document.addEventListener('DOMContentLoaded', function() {
+  var thead = document.querySelector('#tbl-explorer thead');
+  if (thead) {
+    thead.addEventListener('click', function(e) {
+      var th = e.target.closest('th[data-sort-key]');
+      if (!th) return;
+      var key = th.getAttribute('data-sort-key');
+      if (key && typeof setExplorerSort === 'function') setExplorerSort(key);
+    });
+    thead.addEventListener('keydown', function(e) {
+      if (e.key !== 'Enter') return;
+      var th = e.target.closest('th[data-sort-key]');
+      if (!th) return;
+      var key = th.getAttribute('data-sort-key');
+      if (key && typeof setExplorerSort === 'function') setExplorerSort(key);
+    });
+  }
+});
+
+// v107: IOC Portfolio quick-launch buttons — event delegation via data-ioc-op
+document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.ioc-quick-btn');
+    if (!btn) return;
+    var op = btn.getAttribute('data-ioc-op');
+    if (!op) return;
+    var search = document.getElementById('ioc-search');
+    if (search) search.value = op;
+    if (typeof updateIOCSuggestions === 'function') updateIOCSuggestions();
+    if (typeof loadIOC === 'function') loadIOC(op);
+  });
+});
+
+// v107: Country Profile action buttons
+document.addEventListener('DOMContentLoaded', function() {
+  var copyLinkBtn = document.getElementById('dd-copy-link-btn');
+  if (copyLinkBtn) copyLinkBtn.addEventListener('click', function() { if (typeof copyCurrentLink === 'function') copyCurrentLink(); });
+  var exportBtn = document.getElementById('dd-export-btn');
+  if (exportBtn) exportBtn.addEventListener('click', function() { if (typeof exportCountryProfile === 'function') exportCountryProfile(); });
+  var printBtn = document.getElementById('dd-print-btn');
+  if (printBtn) printBtn.addEventListener('click', function() { window.print(); });
+});
+
+// v107: Misc action buttons (vintage, cmp PNG, breakeven, api)
+document.addEventListener('DOMContentLoaded', function() {
+  var vintageCsv = document.getElementById('vintage-csv-btn');
+  if (vintageCsv) vintageCsv.addEventListener('click', function() { if (typeof exportVintageCSV === 'function') exportVintageCSV(); });
+  var cmpPng = document.getElementById('cmp-chart-png-btn');
+  if (cmpPng) cmpPng.addEventListener('click', function() { if (typeof downloadCmpChart === 'function') downloadCmpChart(); });
+  var beExport = document.getElementById('be-export-csv-btn');
+  if (beExport) beExport.addEventListener('click', function() { if (typeof exportBreakevenCSV === 'function') exportBreakevenCSV(); });
+  var apiCopy = document.getElementById('api-copy-btn');
+  if (apiCopy) apiCopy.addEventListener('click', function() { if (typeof copyAPIUrl === 'function') copyAPIUrl(); });
+});
+
+// v107: Reference panel overlay and close button
+document.addEventListener('DOMContentLoaded', function() {
+  var refOverlay = document.getElementById('reference-overlay');
+  if (refOverlay) refOverlay.addEventListener('click', function() { if (typeof toggleReferencePanel === 'function') toggleReferencePanel(); });
+  var refClose = document.getElementById('ref-panel-close-btn');
+  if (refClose) {
+    refClose.addEventListener('click', function() { if (typeof toggleReferencePanel === 'function') toggleReferencePanel(); });
+    refClose.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (typeof toggleReferencePanel === 'function') toggleReferencePanel(); } });
+  }
+});
+
+// v107: Scenario modal — backdrop, close, Run DCF buttons, Save, Clear, sb-mechanic, preset delegation
+document.addEventListener('DOMContentLoaded', function() {
+  // Modal backdrop click-to-close
+  var modal = document.getElementById('scenario-modal');
+  if (modal) modal.addEventListener('click', function(e) { if (e.target === this && typeof closeScenarioModal === 'function') closeScenarioModal(); });
+  // Close button
+  var sbClose = document.getElementById('scenario-modal-close-btn');
+  if (sbClose) sbClose.addEventListener('click', function() { if (typeof closeScenarioModal === 'function') closeScenarioModal(); });
+  // Run DCF buttons (top panel, bottom panel, empty state)
+  ['sb-run-dcf-top-btn','sb-run-dcf-bottom-btn','sb-run-dcf-empty-btn'].forEach(function(id) {
+    var btn = document.getElementById(id);
+    if (btn) btn.addEventListener('click', function() { if (typeof runCustomScenario === 'function') runCustomScenario(); });
+  });
+  // Save Scenario
+  var saveBtn = document.getElementById('sb-save-scenario-btn');
+  if (saveBtn) saveBtn.addEventListener('click', function() { if (typeof saveCustomScenario === 'function') saveCustomScenario(); });
+  // Clear All Scenarios
+  var clearBtn = document.getElementById('clear-scenarios-btn');
+  if (clearBtn) clearBtn.addEventListener('click', function() { if (typeof clearSavedScenarios === 'function') clearSavedScenarios(); });
+  // sb-mechanic onchange
+  var sbMech = document.getElementById('sb-mechanic');
+  if (sbMech) sbMech.addEventListener('change', function() { if (typeof sbUpdateMechanic === 'function') sbUpdateMechanic(); });
+  // Scenario Builder preset buttons — event delegation via data-sb-preset
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.sb-preset-btn');
+    if (!btn) return;
+    var preset = btn.getAttribute('data-sb-preset');
+    if (preset && typeof loadPreset === 'function') loadPreset(preset);
+  });
+});
+
+// v107: FAQ accordion — accessible toggle for A12–A15 (role=button, aria-expanded, keyboard support)
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.meth-faq-q[aria-expanded]').forEach(function(q) {
+    function toggleFaq(q) {
+      var body = document.getElementById(q.getAttribute('aria-controls'));
+      if (!body) return;
+      var expanded = q.getAttribute('aria-expanded') === 'true';
+      q.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+      body.style.display = expanded ? 'none' : 'block';
+    }
+    q.addEventListener('click', function() { toggleFaq(this); });
+    q.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFaq(this); }
+    });
+  });
+});
+
 // v106: Footer coverage links — migrate inline onclick to event listeners
 document.addEventListener('DOMContentLoaded', function() {
   var irrLink = document.getElementById('footer-irr-link');
@@ -11313,7 +11429,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v106</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v107</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
