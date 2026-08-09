@@ -1,0 +1,103 @@
+{
+  "meta": {
+    "generated": "2026-08-02",
+    "version": "v21"
+  },
+  "dcf_profile": {
+    "name": "deepwater",
+    "peak_rate_mbd": 50.0,
+    "capex_usd_mm": {
+      "year_0": 300,
+      "year_1": 300,
+      "year_2": 200,
+      "sustaining_yr3_7": 30
+    },
+    "opex_base_usd_bbl": 18.0,
+    "discount_rate_pct": 10.0,
+    "project_life_years": 25,
+    "abandonment_usd_mm": 50.0
+  },
+  "mechanics": [
+    {
+      "mechanic": "Concession",
+      "description": "Royalty + Income Tax model. Contractor holds equity. Government take = royalty + CIT + SPT (where applicable)."
+    },
+    {
+      "mechanic": "PSC",
+      "description": "Production Sharing Contract. Cost recovery first, then profit oil split. Take = royalty + FTP + govt profit oil + CIT on contractor share."
+    },
+    {
+      "mechanic": "TSC",
+      "description": "Technical Service Contract. IOC earns fixed remuneration fee per barrel. All production sold by NOC. Take = (Revenue - Fee) / Revenue."
+    },
+    {
+      "mechanic": "RSC",
+      "description": "Risk Service Contract. Similar to TSC but IOC bears exploration risk. Remuneration is a function of capital employed + profit margin."
+    },
+    {
+      "mechanic": "PRRT",
+      "description": "Profit-Related Resource Rent Tax. Applied on cash flow after uplift allowances. Australia-specific. Very progressive."
+    },
+    {
+      "mechanic": "Gross Split",
+      "description": "Indonesia-specific post-2017 PSC reform. No cost recovery. Gross split of production: base + sliding scales for price, depth, production stage."
+    },
+    {
+      "mechanic": "Buy-back",
+      "description": "Iran-specific. IOC funds capex, recovers via oil sales at ceiling price. No equity. Low upside."
+    }
+  ],
+  "fact_keys": [
+    {
+      "key": "levy_royalty_rate",
+      "unit": "%",
+      "description": "Royalty rate on gross production"
+    },
+    {
+      "key": "levy_income_tax_rate",
+      "unit": "%",
+      "description": "Corporate income tax rate (CIT)"
+    },
+    {
+      "key": "special_petroleum_tax_rate",
+      "unit": "%",
+      "description": "Special petroleum / windfall tax rate"
+    },
+    {
+      "key": "state_participation_pct",
+      "unit": "%",
+      "description": "NOC equity share (SDFI, state participation)"
+    },
+    {
+      "key": "levy_profit_oil_govt_rate",
+      "unit": "%",
+      "description": "Government profit oil share (PSC)"
+    },
+    {
+      "key": "levy_cost_recovery_rate",
+      "unit": "%",
+      "description": "Cost recovery cap (PSC)"
+    },
+    {
+      "key": "tsc_remuneration_fee_usd_bbl",
+      "unit": "USD/bbl",
+      "description": "TSC remuneration fee per barrel produced"
+    },
+    {
+      "key": "levy_ftp_rate",
+      "unit": "%",
+      "description": "First Tranche Petroleum rate (PSC)"
+    }
+  ],
+  "take_formula": {
+    "description": "Government take = (total government revenues) / gross production revenue",
+    "components": [
+      "Royalty × gross revenue",
+      "SPT × net income after uplift",
+      "CIT × taxable income",
+      "Govt profit oil × profit oil pool",
+      "NOC equity revenue"
+    ],
+    "note": "For PSC: profit oil pool = (gross revenue - royalty - FTP - cost recovery). For TSC: government take = 1 - (remuneration fee / gross revenue per barrel)."
+  }
+}

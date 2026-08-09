@@ -1,0 +1,46 @@
+{
+  "mechanics": [
+    {
+      "mechanic": "Concession",
+      "countries": 177,
+      "contracts": 62042,
+      "avg_govt_take_pct_at_75": 30.6
+    },
+    {
+      "mechanic": "PSC",
+      "countries": 81,
+      "contracts": 7628,
+      "avg_govt_take_pct_at_75": 54.7
+    },
+    {
+      "mechanic": "PRRT",
+      "countries": 2,
+      "contracts": 1329,
+      "avg_govt_take_pct_at_75": 38.5
+    },
+    {
+      "mechanic": "TSC",
+      "countries": 1,
+      "contracts": 415,
+      "avg_govt_take_pct_at_75": 98.5
+    },
+    {
+      "mechanic": "Buy-back",
+      "countries": 1,
+      "contracts": 238,
+      "avg_govt_take_pct_at_75": 83.6
+    },
+    {
+      "mechanic": "RSC",
+      "countries": 2,
+      "contracts": 40,
+      "avg_govt_take_pct_at_75": 85.0
+    },
+    {
+      "mechanic": "Gross Split",
+      "countries": 1,
+      "contracts": 16,
+      "avg_govt_take_pct_at_75": 65.3
+    }
+  ]
+}
