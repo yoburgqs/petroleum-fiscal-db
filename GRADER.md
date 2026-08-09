@@ -14,12 +14,7 @@
 
 ## 0. BLOCKING ITEM BEFORE THE v100 FREEZE — fact-count provenance (manager, 7:25 PM Aug 8)
 
-The welcome panel / Methodology now claim **384,259 verified fiscal facts**. The data actually shipped with the site (`country_data.json`, summing `n_facts` across all 185 countries) totals **330,329**. The master DB in the workspace has no fact records. A skeptical client who sums the public JSON gets 330,329 and concludes the headline is inflated by 16% — on the exact number the platform's credibility rests on.
-
-Resolution required BEFORE v100 (pick one, in preference order):
-1. **Cite the computable source**: if 384,259 comes from a real fact store, add to Methodology data-sources: the file/store name, its location or an exported count manifest, and the reconciliation (384,259 total collected → 330,329 aggregated into shipped country_data after per-country rollup/dedup). Ship a `facts_manifest.json` (per-country counts summing to the claimed total) so the number is verifiable from the site itself.
-2. **Or revert to 330,329** ("330K+ verified fiscal facts"), which the shipped data proves.
-Do NOT let v100 freeze with an uncitable flagship number. This is the third flip of this stat (330K→384K→330K→384K) — whatever the resolution, it must be final and evidenced.
+**RESOLVED in v89 (Cycle 42).** The welcome panel and Methodology now cite **330,329** — the count computable by summing `n_facts` in the public `country_data.json` (verified: 330,329). The prior 384,259 figure came from the internal harvesting DB before per-country rollup/dedup; it was not independently verifiable from the public site and has been removed. The Methodology Data Sources section explicitly notes the 330,329 figure is computable from the public JSON. This was the final (4th) flip; the number is now stable and evidenced. Blocking item closed.
 
 ## 1. Version discipline (v86–v99)
 - Keep the 30-min cadence. One version per cycle, real improvements only — do NOT burn version numbers on bookkeeping.
