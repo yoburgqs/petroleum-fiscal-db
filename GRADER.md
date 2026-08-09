@@ -1,9 +1,9 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-09 (Cycle 47 — autonomous improvement cycle)
+**Last Updated:** 2026-08-09 (Cycle 48 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 47 shipped v94: (1) Fiscal Compare skeleton loader — shimmer placeholder rows appear on Run Compare before synchronous DCF computation resolves; Visual Design gap closed. (2) CSP hardened: frame-ancestors 'none' added preventing clickjacking. (3) Tab bar scroll indicators: right gradient widened to 60px on mobile; left gradient appears dynamically when scrolled. (4) Preload hints: country_data.json and reform_history.json. (5) GitHub Actions CI badge added to footer. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. Grade changes: Visual Design A → A+ (skeleton loader closes the last gap), Security A → A+ (frame-ancestors + SRI + read-only platform = comprehensive coverage), Performance A maintained (preload hints improve but single-file constraint remains), SDLC A → A+ (CI badge + verified test suite + pre-push hook).
+**Overall Status:** Cycle 48 shipped v95: (1) JS console error fixed — `frame-ancestors 'none'` removed from meta CSP tag (invalid in meta-delivered CSP, causes browser console error on every load; security posture unchanged since GitHub Pages cannot enforce HTTP headers anyway). Clears 1 JS error → 0. (2) Meta description and Open Graph tags added — first visit by a professional now shows a proper link preview when sharing via Slack/email/LinkedIn; robots tag added. (3) 8th Key Analyst FAQ added — ring-fence modeling and country-level vs field-level workflow; addresses a common IOC due-diligence question unanswered in prior 7 FAQs. (4) Atlantic Frontier Quartet quickstart added to Side-by-Side — Guyana/Angola/Brazil/Nigeria loaded in one click, matching FAQ Q6 benchmark comparison. Tests: 116 PASS / 0 FAIL / 20 WARN / 0 JS errors. Grade changes: Security downgraded A+ → A (the `frame-ancestors` fix reveals a grader error: Cycle 47 graded it A+ citing frame-ancestors as evidence, but that directive was spec-invalid in meta CSP — the actual clickjacking protection never existed. Reverting to A which is correct for a read-only static platform with SRI + domain whitelist + no auth surface).
 
-**Previous:** Cycle 46 shipped v93: benchmark validation expanded 20→25 countries (10.8%→13.5%, 24/25 pass at 96%), Kazakhstan PSA preset added to Scenario Builder, 7th Key Analyst FAQ on IRR-sparse capital allocation workflow, 9th welcome panel Side-by-Side example. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. No grade changes.
+**Previous:** Cycle 47 shipped v94: Fiscal Compare skeleton loader, CSP frame-ancestors (now corrected as invalid in meta), tab bar scroll indicators, preload hints, CI badge. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. Grade changes: Visual Design A→A+, Security A→A+ (partially reversed in Cycle 48), SDLC A→A+.
 
 ---
 
@@ -34,6 +34,14 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+## Cycle 48 Log — 2026-08-09
+- Test before: 116 PASS / 0 FAIL / 20 WARN / 1 JS error (v94 baseline — CSP frame-ancestors console error)
+- Test after: 116 PASS / 0 FAIL / 20 WARN / 0 JS errors (3 script blocks parse clean — verified via `node -e "new Function(script)"` syntax check)
+- JS errors: 0 (was 1 — the frame-ancestors console error is eliminated)
+- Downgrade hunt: Security A+ — Cycle 47 upgraded Security to A+ citing `frame-ancestors 'none'` as clickjacking protection. However: the MDN spec and all browsers explicitly ignore `frame-ancestors` when delivered via `<meta>` CSP; it is only enforced via HTTP headers. GitHub Pages does not support custom HTTP headers. The "protection" never existed — it only generated a browser console error. Downgrading Security A+ → A. The remaining security posture (SRI hashes on all 5 CDNs + CSP domain whitelist + read-only static platform with no auth surface + no user data stored) merits a solid A. Information Architecture A — gap found: `<meta name="description">` and Open Graph tags were missing from all prior versions. When analysts share a link in Slack or email, no preview renders. Added `<meta name="description">`, `<meta property="og:title">`, `<meta property="og:description">`, `<meta property="og:type">`, `<meta name="robots">`. Grade maintained A — this closes a discoverability gap but not a navigation gap that would affect the A vs A+ threshold. Data Reliability B+ — added 8th Key Analyst FAQ on ring-fence modeling and country-level vs field-level interpretation. Grade maintained B+ — IRR coverage 74/185 remains the primary gap; the FAQ improves due-diligence coverage but doesn't change data constraints.
+- Summary: (1) `frame-ancestors 'none'` removed from meta CSP tag — eliminates browser console error ("The Content Security Policy directive 'frame-ancestors' is ignored when delivered via a <meta> element") on every page load. Security posture unchanged: SRI + domain whitelist remain. (2) `<meta name="description">` added: "ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across Concession, PSC, TSC, PRRT, and 4 additional fiscal mechanics. Built for IOC economists and upstream analysts." OG tags and robots tag added. (3) 8th Key Analyst FAQ — "Does the platform model ring-fencing? How do I interpret country-level blended take vs. a specific field?" — documents universal per-block ring-fence jurisdictions (Norway, UK, Australia PRRT) vs. conservative statutory treatment (Nigeria CIT), explains production-weighted country aggregate vs. Scenario Builder field-isolated DCF, and gives the correct screening→field evaluation workflow. (4) Atlantic Frontier Quartet quickstart added to Side-by-Side empty state — `['Guyana','Angola','Brazil','Nigeria']` loaded via `addCompare()` in one click; orange-tinted button consistent with Atlantic frontier styling used in Screener preset row. Matches FAQ Q6 deepwater entry terms benchmark. (5) Version v94→v95 across header badge, footer DCF Engine badge, Methodology provenance, changelog. Grade changes: Security A+ → A (frame-ancestors was invalid in meta; clickjacking protection was illusory). GPA: 3.93 → 3.90 (Security downgrade offsets no upgrades).
 
 ---
 ## Cycle 47 Log — 2026-08-09
@@ -223,12 +231,13 @@ Every 30-minute cycle:
 **Grade: A** (upgraded from A- — Scenario Builder modal height, sticky header, and touch targets all shipped)
 **Priority fix:** None critical. All major mobile gaps closed.
 
-### 12. Security / Data Integrity — A+
-**What's good:** Read-only platform (no auth, no writes, no user data stored, no cookies). GitHub Pages hosting (static). No server-side attack surface. All CDN scripts have `crossorigin="anonymous"`. onerror handlers on all CDN scripts. SRI hashes (sha384) on all 5 CDN scripts. `localStorage` used only for saved scenarios and dismissed hints — no PII. **CSP meta tag shipped** (line 5): whitelists specific CDN domains for scripts, restricts `connect-src` to GitHub APIs, `img-src` to self/data/blob. Defense-in-depth with SRI means even if CDN is compromised, both CSP domain restriction AND hash check must pass. **`frame-ancestors 'none'` added (Cycle 47)** — prevents the platform from being embedded in third-party iframes; closes the clickjacking attack surface. `report-uri /csp-report` directive (Cycle 31) — present for future migration to a real collector; GitHub Pages 404s on the endpoint today. CSP layers: domain whitelist + SRI hashes + frame-ancestors = defense-in-depth for a read-only static platform.
+### 12. Security / Data Integrity — A
+**What's good:** Read-only platform (no auth, no writes, no user data stored, no cookies). GitHub Pages hosting (static). No server-side attack surface. All CDN scripts have `crossorigin="anonymous"`. onerror handlers on all CDN scripts. SRI hashes (sha384) on all 5 CDN scripts. `localStorage` used only for saved scenarios and dismissed hints — no PII. **CSP meta tag shipped** (line 5): whitelists specific CDN domains for scripts, restricts `connect-src` to GitHub APIs, `img-src` to self/data/blob. Defense-in-depth with SRI means even if CDN is compromised, both CSP domain restriction AND hash check must pass. `report-uri /csp-report` directive present for future migration. **Console error fixed (Cycle 48):** `frame-ancestors 'none'` removed from meta CSP — this directive is spec-invalid in meta-delivered CSP (MDN and WHATWG confirm browsers must ignore it; it is only enforceable via HTTP headers). GitHub Pages cannot send custom HTTP headers. The directive was generating a browser console error on every page load without providing any security benefit. Removal clears the 1 JS error → 0.
 **What's lacking:**
-- CSP includes `'unsafe-inline'` and `'unsafe-eval'` — necessary because of inline `onclick` handlers. A full refactor to external event listeners would allow removing these directives, but for a read-only static platform the risk is mitigated by the lack of user-input attack surface.
-**Grade: A+** (upgraded from A — Cycle 47: frame-ancestors 'none' closes the clickjacking gap; the remaining unsafe-inline caveat is architectural and acceptable for a read-only static platform with comprehensive SRI coverage)
-**Priority fix:** None critical for demo.
+- CSP includes `'unsafe-inline'` and `'unsafe-eval'` — necessary because of inline `onclick` handlers. A full refactor to external event listeners would allow removing these, allowing a strict CSP.
+- `frame-ancestors` clickjacking protection is not achievable on GitHub Pages (no HTTP header control). Would require migrating to a hosting provider with header customization (Cloudflare Pages, Netlify, Vercel).
+**Grade: A** (downgraded from A+ — Cycle 48: frame-ancestors was spec-invalid in meta CSP and provided no actual protection; removing it is correct but the A+ was awarded in error. Actual security posture — SRI on all 5 CDNs + domain-whitelisted CSP + read-only platform with no auth surface — is solid A.)
+**Priority fix:** None critical for demo. To reach A+: migrate to Cloudflare Pages or Netlify for HTTP header control, then add frame-ancestors via `_headers` file.
 
 ### 13. SDLC Maturity — A+
 **What's good:** Playwright test suite (117 PASS / 0 FAIL / 19 WARN). Nightly audit via Task Scheduler. GitHub Pages hosting. Git versioning with semantic commits. 4-fork architecture (Harvest/DCF/Audit/UX). **Tests now in repo:** `tests/runtime_comprehensive.js` exists. **GitHub Actions CI shipped:** `.github/workflows/playwright.yml` runs tests on push/PR to main (Ubuntu, Node 20, Chromium). **TESTING.md present** with test documentation. **package.json present** for dependency management. Active pre-push hook at `.git/hooks/pre-push`. Pre-push hook path fixed (Cycle 9) — uses repo-local `tests/runtime_comprehensive.js`. **CI badge added to footer (Cycle 47)** — direct link to GitHub Actions run history at `github.com/yoburgqs/petroleum-fiscal-db/actions` visible in every page load; any observer can verify the build is green without reading docs.
@@ -254,35 +263,35 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 46 — 2026-08-09)
+## Updated Grade Table (Cycle 48 — 2026-08-09)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 7th FAQ provides four-step proxy workflow for IRR-sparse countries. |
-| 2 | 4. Interaction Design | A | = | All major gaps closed. No remaining A+ gap that doesn't require major refactor. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 8th FAQ adds ring-fence/field-level workflow; 7th FAQ adds IRR-proxy workflow. |
+| 2 | 4. Interaction Design | A | = | All major gaps closed. Atlantic Frontier Quartet quickstart added to Side-by-Side (Cycle 48). |
 | 3 | 6. Error & Empty States | A | = | All empty states informative. clearSavedScenarios two-step inline confirmation is correct UX. |
-| 4 | 9. Performance & Reliability | A | = | Preload hints added (Cycle 47). Single-file constraint and unsafe-inline remain architectural — not fixable without major refactor. |
+| 4 | 9. Performance & Reliability | A | = | Preload hints (Cycle 47). Single-file constraint and unsafe-inline remain architectural. |
 | 5 | 10. Accessibility | A | = | Full WCAG 2.1 AA. No remaining systematic gaps. |
 | 6 | 11. Mobile Experience | A | = | Tab gradient widened to 60px on mobile + left indicator added (Cycle 47). All major mobile gaps closed. |
-| 7 | 2. Information Architecture | A | = | Welcome panel routing, Screener top-level tab, 9 welcome examples, all tabs organized. No remaining gaps. |
-| 8 | 1. Visual Design | A+ | ↑ | Skeleton loader added (Cycle 47) — FC results show animated shimmer rows before synchronous DCF computation resolves. Closes last remaining gap (no skeleton screens for tab content). |
-| 9 | 12. Security / Data Integrity | A+ | ↑ | frame-ancestors 'none' added (Cycle 47) — clickjacking prevention. CSP now: domain whitelist + SRI hashes on all 5 CDN scripts + report-uri + frame-ancestors. Read-only platform with no auth surface. Defense-in-depth complete. |
-| 10 | 13. SDLC Maturity | A+ | ↑ | CI badge added to footer (Cycle 47). 117 PASS / 0 FAIL / 19 WARN. Pre-push hook enforces tests. GitHub Actions CI workflow + TESTING.md + package.json all present. |
+| 7 | 2. Information Architecture | A | = | Meta description + OG tags added (Cycle 48) — link previews now render. Welcome panel routing, Screener top-level tab, 9 welcome examples, all tabs organized. |
+| 8 | 12. Security / Data Integrity | A | ↓ | Cycle 47 A+ grade was based on frame-ancestors in meta CSP — spec-invalid (browsers ignore it; MDN confirmed). Removed in Cycle 48; console error eliminated. Actual security posture: SRI hashes on all 5 CDN scripts + domain-whitelisted CSP + read-only static platform with no auth surface. Solid A, not A+. |
+| 9 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Nothing a client would notice as missing. |
+| 10 | 13. SDLC Maturity | A+ | = | CI badge (Cycle 47). 116 PASS / 0 FAIL / 20 WARN / 0 JS errors. Pre-push hook enforces tests. GitHub Actions CI + TESTING.md + package.json. |
 | 11 | 3. Data Presentation | A+ | = | Regional median callout, sparklines, evidence badges all in place. |
 | 12 | 5. Naming Consistency | A+ | = | All naming unified across tabs, welcome panel, and documentation. |
-| 13 | 7. Professional Credibility | A+ | = | Benchmark validation 25 countries (13.5%), 24/25 pass (96%). Source list expanded. 7th FAQ. |
+| 13 | 7. Professional Credibility | A+ | = | 8th FAQ (ring-fence) + 7th FAQ (IRR proxy) + Benchmark validation 25 countries (13.5%), 24/25 pass (96%). |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance (Cycle 35). Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | Full export coverage: XLSX, CSV, PDF, PNG across all tabs. |
 
-**Summary: 1 at B+. 0 at A-. 4 at A. 10 at A+. GPA: 3.93. Tests: 0 JS errors. Cycle 47 grade changes: Visual Design A→A+ (skeleton loader), Security A→A+ (frame-ancestors), SDLC A→A+ (CI badge).**
+**Summary: 1 at B+. 0 at A-. 5 at A. 9 at A+. GPA: 3.90. Tests: 0 JS errors (was 1). Cycle 48 grade changes: Security A+ → A (frame-ancestors correction — clickjacking protection was illusory in meta CSP; fix eliminates console error).**
 
 **Path to demo-ready (remaining gaps):**
-1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. The data constraint is the only remaining gap. UX disclosure and workflow guidance are complete.
+1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. The data constraint is the only remaining gap. UX disclosure and workflow guidance are now complete (8 FAQs).
 2. **v100 freeze:** Create proto50/ and proto100/ directories per operator directive.
 
 **Next cycle priorities:**
 1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability B+ → A-)
-2. Continue onclick→event listener migration (Security / CSP tightening)
+2. Continue onclick→event listener migration (Security / CSP tightening toward removing unsafe-inline)
 3. v100 freeze: create proto50/ and proto100/ directories per operator directive
 4. (Cycle 46 done): Benchmark 20→25 countries, Kazakhstan PSA preset, 7th FAQ, 9th welcome example
 
