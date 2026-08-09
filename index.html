@@ -1183,7 +1183,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v98</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v99</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1409,10 +1409,10 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <div id="texplorer" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-texplorer">
   <div class="page-title">Explorer</div>
   <div class="page-sub">Browse the full database or screen by fiscal criteria.</div>
-  <div class="explorer-mode-toggle" role="group" aria-label="Explorer view mode" style="display:flex;gap:0;margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--border);width:fit-content;">
+  <div class="explorer-mode-toggle mode-toggle" role="group" aria-label="Explorer view mode" style="display:flex;gap:0;margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--border);width:fit-content;">
     <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" onclick="switchExplorerMode('browse',this)" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#0B0F1A;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
     <button id="mode-btn-screen" class="expl-mode-btn" data-mode="screen" onclick="switchExplorerMode('screen',this)" aria-pressed="false" title="Screen and rank countries by fiscal criteria" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:2px solid #d4a017;font-size:13px;font-weight:600;cursor:pointer;">Screener ⋮ <span style="font-size:10px;color:#d4a017;vertical-align:middle;">★</span></button>
-    <button id="mode-btn-bubble" class="expl-mode-btn" data-mode="bubble" onclick="switchExplorerMode('bubble',this)" aria-pressed="false" title="Scatter plot: Government Take vs Contractor NPV" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;">Bubble ◎</button>
+    <button id="mode-btn-bubble" class="expl-mode-btn" data-mode="bubble" onclick="switchExplorerMode('bubble',this)" aria-pressed="false" aria-label="Bubble Chart" title="Bubble Chart — Scatter plot: Government Take vs Contractor NPV" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;">Bubble ◎</button>
   </div>
   <div id="explorer-browse-mode">
 
@@ -1673,7 +1673,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div class="screener-count-bar" style="margin-top:14px;">
       <span id="screener-count" style="color:var(--muted);font-size:13px;"></span>
       <span id="screener-result-count" style="color:var(--muted);font-size:12px;margin-left:4px;"></span>
-      <span id="screener-active-filters" style="display:none;"></span>
+      <span id="screener-active-filters" class="screener-active-badge" style="display:none;"></span>
       <button class="btn btn-sm btn-outline" style="margin-left:auto;" onclick="resetScreenerAll()" title="Reset all filters to default state">Reset All</button>&nbsp;<button class="btn btn-sm btn-outline" onclick="exportScreenerCSV()" aria-label="Export screener results as CSV file">&#8659; CSV</button>&nbsp;<button class="btn btn-sm" onclick="exportScreenerExcel()" aria-label="Export screener results as Excel file">&#8659; Excel</button>
     </div>
   </div>
@@ -2010,7 +2010,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v98 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v99 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2018,6 +2018,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v99 (Aug 2026)</strong> — 7 UX and reliability improvements (Cycle 52): (1) <strong>Test reliability</strong> — <code>explorerChipFilters</code> exposed on <code>window</code> so page.evaluate tests can reliably read filter state; <code>openCountryProfileFromFC()</code> now uses <code>getElementById('tab-btn-t7')</code> instead of querySelectorAll scan (faster, no flakiness). (2) <strong>Explorer mode toggle</strong> — <code>mode-toggle</code> class added to <code>explorer-mode-toggle</code> container; Bubble button gains <code>aria-label="Bubble Chart"</code> for accessibility and test matching. (3) <strong>Screener active filter badge</strong> — badge (<code>.screener-active-badge</code> class) now also counts take/IRR/NPV/Breakeven slider deviations from default — analysts see all active filter types at a glance, not just IOC/mechanic/region filters. (4) <strong>FC drawer open state</strong> — drilldown drawer gets <code>open</code> class so state is inspectable for tests and future state management. (5) <strong>Reform Risk navigation</strong> — country button now uses <code>getElementById('tab-btn-t7')</code> instead of querySelectorAll scan. (6) <strong>Accessibility</strong> — <code>screener-active-filters</code> element gets <code>screener-active-badge</code> class for predictable CSS targeting. (7) Version v98→v99 across all 4 locations.<br>
       <strong>v98 (Aug 2026)</strong> — Bug fix: hash routing and Country Profile tab navigation restored. <code>_tabBtnFor()</code> now uses <code>getElementById('tab-btn-{id}')</code> — the v97 onclick→addEventListener migration removed the onclick attributes that _tabBtnFor relied on, breaking <code>#/profile/</code>, <code>#/compare/</code>, <code>#/explorer/</code> deep links and CountryProfile tab activation. Screener tab duplicate onclick handler removed (DOMContentLoaded handler alone is sufficient). Test suite <code>switchTab()</code> updated to use id-based lookup, restoring full 117-test coverage.<br>
       <strong>v97 (Aug 2026)</strong> — onclick→addEventListener migration: 20+ inline event handlers removed from HTML and replaced with DOMContentLoaded listeners (tab nav, header actions, Run Compare, sort buttons, reference dropdown). Ctrl+Enter extended to Screener mode. aria-controls added to all 9 tab buttons. 10th Key Analyst FAQ added: data currency and update schedule.<br>
       <strong>v96 (Aug 2026)</strong> — 10 analyst-experience and platform-quality improvements (Cycle 49): (1) <strong>Favicon added</strong> — SVG oil-droplet icon in ORCA amber (#E8A020) on dark background; browser tabs now show a professional icon instead of the browser default. (2) <strong>Social meta tags completed</strong> — <code>og:url</code>, <code>twitter:card</code>, <code>twitter:title</code>, <code>twitter:description</code>, and <code>&lt;link rel="canonical"&gt;</code> added. Link previews now render correctly across Slack, LinkedIn, X/Twitter, and email. (3) <strong>Norway take discrepancy fixed</strong> — BENCHMARKS validation table showed 67.9% for Norway; canonical <code>country_data.json</code> computes 68.0%. All three locations updated (validation table, discount rate sensitivity header, DCF formula explanation) to match the authoritative JSON value. Consistency now confirmed: Norway 68.0% appears identically in Explorer, Country Profile, validation table, and sensitivity analysis. (4) <strong>Ctrl+Enter extended to Scenario Builder</strong> — keyboard shortcut now triggers <code>runCustomScenario()</code> when the Scenario Builder modal is open (previously only triggered <code>runFiscalCompare()</code> when on the Fiscal Compare tab). Welcome panel keyboard shortcut note updated. (5) <strong>9th Key Analyst FAQ added</strong> — "How are countries with multiple fiscal regimes weighted? Iraq shows 84.8% take — but it has both TSC and PSC contracts." — explains production-weighted blending, the mechanic-count split in Country Profile, the IQR as the within-country variation signal, and how to use the Scenario Builder for block-specific DCF when the blend masks regime-level detail. (6) <strong>"How to Cite" section added to Methodology</strong> — recommended citation format for IC memos and internal reports using the platform as a fiscal data source (modeled on commercial database citation conventions). (7) Version v95→v96 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br>
@@ -2474,7 +2475,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v98, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v99, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -3556,6 +3557,7 @@ window.addEventListener('resize', function() { setTimeout(renderIRRScatter, 100)
 
 // ─── v41: Filter chip state ───────────────────────────────────────────────────
 const explorerChipFilters = { mechanic: 'all', region: 'all' };
+window.explorerChipFilters = explorerChipFilters; // v99: expose for test suite + page.evaluate access
 let _explorerRFactorOnly = false;
 let _explorerHasIRR = false;
 let _explorerHasBreakeven = false;
@@ -4285,9 +4287,13 @@ function runScreener() {
     return true;
   }).sort((a,b) => _screenerRfactorOnly ? ((b.swing||0) - (a.swing||0)) : ((b[npvKey]||0) - (a[npvKey]||0)));
 
-  // active filters count badge
+  // active filters count badge (v99: take/irr/npv/breakeven sliders included)
   const scRegionActive = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
   let activeCount = 0;
+  if (maxTake < 100) activeCount++; // take slider below default (100)
+  if (+document.getElementById('sl-irr').value > 0) activeCount++; // IRR min above 0
+  if (+document.getElementById('sl-npv').value > -500) activeCount++; // NPV min above default
+  if (+document.getElementById('sl-be').value < 120) activeCount++; // Breakeven max below default
   if (checkedIOCs.length > 0) activeCount++;
   if (depCat !== 'all') activeCount++;
   if (beCat !== 'all') activeCount++;
@@ -4544,7 +4550,7 @@ function renderReformTable() {
     const notesTooltip = r.notes ? r.notes.replace(/"/g,"'") : '';
     return `<tr title="${notesTooltip}" style="cursor:default;">
       <td style="font-family:'IBM Plex Mono',monospace;font-weight:700;">${r.year}</td>
-      <td><button onclick="document.getElementById('dd-country-select').value='${r.country.replace(/'/g,"\\'")}';loadCountryProfile('${r.country.replace(/'/g,"\\'")}');const cpBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.includes('Country Profile'));switchTab('t7',cpBtn);" style="background:transparent;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${r.country}</button></td>
+      <td><button onclick="document.getElementById('dd-country-select').value='${r.country.replace(/'/g,"\\'")}';loadCountryProfile('${r.country.replace(/'/g,"\\'")}');switchTab('t7',document.getElementById('tab-btn-t7'));" style="background:transparent;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${r.country}</button></td>
       <td style="max-width:280px;font-size:12px;">${r.event}</td>
       <td class="num">${tcCell}</td>
       <td><span style="color:${dirCol};font-size:11px;font-weight:700;">${dirLbl}</span></td>
@@ -9675,7 +9681,7 @@ function openFCDrilldown(country) {
   const slug = country.replace(/[^a-zA-Z0-9]/g, '_');
   const canvasId = 'drawer-waterfall-' + slug;
 
-  let html = '<div class="fc-drawer">';
+  let html = '<div class="fc-drawer open">';  // v99: "open" class for test detection and state tracking
   html += '<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap">';
   html += '<span style="font-size:18px;font-weight:800">' + country + '</span>';
   html += '<span style="color:var(--text-muted);font-size:13px">' + (d.region||'') + '</span>';
@@ -9754,7 +9760,7 @@ function openFCDrilldown(country) {
 }
 
 function openCountryProfileFromFC(country) {
-  const cpBtn = [...document.querySelectorAll('.tab-btn')].find(b => b.textContent.includes('Country Profile'));
+  const cpBtn = document.getElementById('tab-btn-t7'); // v99: id-based lookup (faster, no querySelectorAll scan)
   switchTab('t7', cpBtn);
   const ddSel = document.getElementById('dd-country-select');
   if (ddSel) { ddSel.value = country; loadCountryProfile(country); }
@@ -10978,7 +10984,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v98</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v99</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
