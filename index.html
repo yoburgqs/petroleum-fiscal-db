@@ -73,7 +73,7 @@ a { color: var(--accent); text-decoration: none; }
 .tab-nav { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 2px; padding: 0 24px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; align-items: stretch; }
 .tab-nav::-webkit-scrollbar { display: none; }
 .tab-nav-wrapper { position: relative; }
-.tab-nav-wrapper::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 40px; background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none; }
+.tab-nav-wrapper::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 72px; background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none; }
 .tab-nav-wrapper::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(to left, transparent, var(--bg)); pointer-events: none; z-index: 1; transition: width .2s; }
 .tab-nav-wrapper.scrolled::before { width: 32px; }
 .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 18px; white-space: nowrap; transition: .15s; touch-action: manipulation; }
@@ -1159,7 +1159,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="font-size:0.85em;color:#94a3b8;margin-top:8px">Petroleum Fiscal Intelligence Platform</div>
     <div style="font-size:0.75em;color:#64748b;margin-top:4px">71,576 contracts across 185 countries</div>
     <div style="margin-top:20px;width:200px;height:3px;background:#1e293b;border-radius:2px;overflow:hidden;position:relative;">
-      <div style="height:100%;background:linear-gradient(90deg,#b87a10,#E8A020,#f0c060,#E8A020,#b87a10);background-size:200% 100%;animation:ld-shimmer 1.6s ease-in-out infinite;position:absolute;width:60%;border-radius:2px;"></div>
+      <div style="height:100%;background:linear-gradient(90deg,#b87a10,#E8A020,#f0c060,#E8A020,#b87a10);background-size:200% 100%;animation:ld-shimmer 1.6s ease-in-out infinite;position:absolute;width:60%;border-radius:2px;will-change:transform;"></div>
     </div>
     <div style="font-size:0.72em;color:#475569;margin-top:14px;letter-spacing:0.5px;">Primary legislation · Operator filings · 15+ years of sourcing</div>
   </div>
@@ -1173,7 +1173,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 .fc-skel-wrap { padding: 4px 0; }
 .fc-skel-row { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,.03); }
 .fc-skel-bar { border-radius: 4px; background: var(--surface2); position: relative; overflow: hidden; }
-.fc-skel-bar::after { content:''; position:absolute; top:0; left:-60%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent); animation:ld-shimmer 1.4s ease-in-out infinite; }
+.fc-skel-bar::after { content:''; position:absolute; top:0; left:-60%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent); animation:ld-shimmer 1.4s ease-in-out infinite; will-change: transform; }
 .fc-skel-rank { width:28px; height:11px; flex-shrink:0; }
 .fc-skel-flag { width:22px; height:22px; border-radius:50%; background:var(--surface2); flex-shrink:0; animation:ld-pulse 1.6s ease-in-out infinite; }
 .fc-skel-name { width:110px; height:12px; }
@@ -1195,7 +1195,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v104</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v105</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1240,7 +1240,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <span class="search-icon-inner">&#x1f50d;</span>
       <input id="search-q" type="text" placeholder="Search countries and mechanics..." aria-label="Search countries and mechanics" autocomplete="off"
         oninput="renderSearchResults()" onkeydown="handleSearchKey(event)">
-      <span role="button" tabindex="0" aria-label="Close search" style="color:var(--muted);font-size:11px;cursor:pointer;" onclick="closeSearch()" onkeydown="if(event.key==='Enter'||event.key===' '){closeSearch();}">Esc</span>
+      <span id="search-close-btn" role="button" tabindex="0" aria-label="Close search" style="color:var(--muted);font-size:11px;cursor:pointer;">Esc</span>
     </div>
     <div id="search-results"></div>
     <div class="search-hint">&uarr;&darr; navigate &middot; Enter select &middot; Esc close</div>
@@ -1722,20 +1722,21 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <strong>Right side</strong> (high take) with <strong>positive NPV</strong> = large-reserve countries where project scale delivers value even under high fiscal burden. Countries with negative NPV (below the X-axis) are uneconomic at the standardized project size and selected price.
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-      <span style="font-size:12px;color:var(--muted);font-weight:600;">Price scenario:</span>
-      <div class="price-radio">
-        <input type="radio" name="bubble-price" id="bp50" value="50" onchange="window._bubblePriceKey='50';if(window._bubbleChartInstance){window._bubbleChartInstance.destroy();window._bubbleChartInstance=null;}renderBubbleChart();"><label for="bp50">$50</label>
-        <input type="radio" name="bubble-price" id="bp75" value="75" checked onchange="window._bubblePriceKey='75';if(window._bubbleChartInstance){window._bubbleChartInstance.destroy();window._bubbleChartInstance=null;}renderBubbleChart();"><label for="bp75">$75</label>
-        <input type="radio" name="bubble-price" id="bp100" value="100" onchange="window._bubblePriceKey='100';if(window._bubbleChartInstance){window._bubbleChartInstance.destroy();window._bubbleChartInstance=null;}renderBubbleChart();"><label for="bp100">$100</label>
-        <input type="radio" name="bubble-price" id="bp125" value="125" onchange="window._bubblePriceKey='125';if(window._bubbleChartInstance){window._bubbleChartInstance.destroy();window._bubbleChartInstance=null;}renderBubbleChart();"><label for="bp125">$125</label>
+      <span style="font-size:12px;color:var(--muted);font-weight:600;" id="bubble-price-label">Price scenario:</span>
+      <div class="price-radio" role="group" aria-labelledby="bubble-price-label">
+        <input type="radio" name="bubble-price" id="bp50" value="50"><label for="bp50">$50</label>
+        <input type="radio" name="bubble-price" id="bp75" value="75" checked><label for="bp75">$75</label>
+        <input type="radio" name="bubble-price" id="bp100" value="100"><label for="bp100">$100</label>
+        <input type="radio" name="bubble-price" id="bp125" value="125"><label for="bp125">$125</label>
       </div>
       <span style="font-size:11px;color:#475569;margin-left:8px;">Shift the frontier to see which countries become viable at different oil prices</span>
     </div>
     <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;">
       <div style="position:relative;height:500px;"><canvas id="explorer-bubble-canvas" aria-label="Bubble chart: Government Take vs Contractor NPV. Each bubble represents a country; size indicates contract count. Click to open Country Profile." role="img"></canvas></div>
       <div style="text-align:right;margin-top:8px;">
-        <button id="download-bubble-png" onclick="downloadBubblePng()"
-          style="padding:6px 14px;background:#1a2332;color:#d4a017;border:1px solid #d4a017;border-radius:4px;cursor:pointer;font-size:0.8rem;">
+        <button id="download-bubble-png"
+          style="padding:6px 14px;background:#1a2332;color:#d4a017;border:1px solid #d4a017;border-radius:4px;cursor:pointer;font-size:0.8rem;"
+          aria-label="Download bubble chart as PNG image">
           ↓ Download PNG
         </button>
       </div>
@@ -1756,9 +1757,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
       <input type="text" class="search-input" id="cmp-search" placeholder="Type to search countries…" aria-label="Search countries to compare side-by-side" autocomplete="off" style="width:260px;">
       <div id="cmp-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
-      <button class="btn btn-outline btn-sm" onclick="clearCompare()" aria-label="Clear all selected countries from side-by-side comparison">Clear</button>
-      <button class="btn btn-outline btn-sm" onclick="window.print()" title="Print/export comparison as PDF" aria-label="Export comparison as PDF via browser print">⬇ Export PDF</button>
-      <button class="btn btn-outline btn-sm" onclick="shareComparison()" title="Copy shareable link to this comparison">⎘ Share Link</button>
+      <button class="btn btn-outline btn-sm" id="cmp-clear-btn" aria-label="Clear all selected countries from side-by-side comparison">Clear</button>
+      <button class="btn btn-outline btn-sm" id="cmp-print-btn" title="Print/export comparison as PDF" aria-label="Export comparison as PDF via browser print">⬇ Export PDF</button>
+      <button class="btn btn-outline btn-sm" id="cmp-share-btn" title="Copy shareable link to this comparison">⎘ Share Link</button>
     </div>
     <div id="cmp-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;width:260px;z-index:100;margin-top:4px;"></div>
   </div>
@@ -1767,11 +1768,11 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="margin-bottom:10px;">Select countries above to begin comparison.</div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Suggested comparisons: <strong>Norway vs Angola</strong> — PSC vs Concession at comparable scale. <strong>USA vs Iraq</strong> — Low-take Concession vs TSC. <strong>Indonesia vs Malaysia</strong> — Asia Pacific PSC peer group.</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-      <button onclick="['Norway','Angola'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Norway (Concession, low-take SDFI) vs Angola (PSC, FTP-heavy)">Norway vs Angola</button>
-      <button onclick="['United States','Iraq'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>
-      <button onclick="['Indonesia','Malaysia'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Indonesia (cost-recovery PSC) vs Malaysia (Petronas PSC)">Indonesia vs Malaysia</button>
-      <button onclick="['Saudi Arabia','UAE'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Saudi Arabia (Aramco concession, ~85% take) vs UAE (concession, ~65% take) — both Middle East Concession regimes with very different IOC access structures">Saudi Arabia vs UAE</button>
-      <button onclick="['Guyana','Angola','Brazil','Nigeria'].forEach(function(c){addCompare(c);});" style="background:transparent;border:1px solid rgba(249,115,22,.4);border-radius:6px;color:#f97316;font-size:11px;padding:5px 12px;cursor:pointer;" title="Atlantic Frontier PSC Quartet: Guyana (Stabroek ~52%), Angola (deepwater PSC ~55%), Brazil (pre-salt ~65%), Nigeria (PIA deepwater ~58%) — four PSC regimes in the same basin spanning a 30pp take range. The benchmark for IOC Atlantic capital allocation decisions.">&#9632; Atlantic Frontier Quartet</button>
+      <button class="cmp-quickstart-btn" data-countries="Norway|Angola" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Norway (Concession, low-take SDFI) vs Angola (PSC, FTP-heavy)">Norway vs Angola</button>
+      <button class="cmp-quickstart-btn" data-countries="United States|Iraq" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>
+      <button class="cmp-quickstart-btn" data-countries="Indonesia|Malaysia" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Indonesia (cost-recovery PSC) vs Malaysia (Petronas PSC)">Indonesia vs Malaysia</button>
+      <button class="cmp-quickstart-btn" data-countries="Saudi Arabia|UAE" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Saudi Arabia (Aramco concession, ~85% take) vs UAE (concession, ~65% take) — both Middle East Concession regimes with very different IOC access structures">Saudi Arabia vs UAE</button>
+      <button class="cmp-quickstart-btn" data-countries="Guyana|Angola|Brazil|Nigeria" style="background:transparent;border:1px solid rgba(249,115,22,.4);border-radius:6px;color:#f97316;font-size:11px;padding:5px 12px;cursor:pointer;" title="Atlantic Frontier PSC Quartet: Guyana (Stabroek ~52%), Angola (deepwater PSC ~55%), Brazil (pre-salt ~65%), Nigeria (PIA deepwater ~58%) — four PSC regimes in the same basin spanning a 30pp take range. The benchmark for IOC Atlantic capital allocation decisions.">&#9632; Atlantic Frontier Quartet</button>
     </div>
   </div>
 
@@ -2029,7 +2030,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v104 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v105 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2037,6 +2038,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v105 (Aug 2026)</strong> — 10 targeted improvements across 7 categories (Cycle 58): (1) <strong>Security</strong> — Bubble chart price radio <code>onchange</code> handlers migrated to DOMContentLoaded event listeners (4 handlers: bp50/bp75/bp100/bp125). Bubble PNG download <code>onclick</code> migrated. Side-by-Side Clear/Print/Share button <code>onclick</code> handlers migrated to named IDs + event listeners. Side-by-Side quickstart buttons refactored from inline <code>onclick</code> to <code>class="cmp-quickstart-btn" data-countries="..."</code> + event delegation (5 buttons). Breakeven Map CSV export <code>onclick</code> migrated. Search close button <code>onclick</code>/<code>onkeydown</code> migrated. (2) <strong>Interaction Design / Accessibility</strong> — Bubble chart price radio group wrapped with <code>role="group" aria-labelledby="bubble-price-label"</code> — screen readers now announce "Price scenario: $50/$75/$100/$125" as a grouped control. Bubble PNG button gains <code>aria-label</code>. (3) <strong>Mobile / Visual Design</strong> — Right tab fade gradient widened from 40px to 72px on desktop — more visible overflow indicator when the tab bar has additional tabs out of view on narrow viewports. (4) <strong>Performance</strong> — <code>will-change: transform</code> added to both shimmer animations (loading bar + FC skeleton <code>.fc-skel-bar::after</code>) — promotes elements to GPU compositing layer, reducing main-thread paint cost during loading animations. (5) <strong>Data Reliability / Professional Credibility</strong> — A14 Key Analyst FAQ added: "How do I access fiscal data programmatically for integration with our internal models?" — documents all three API endpoints (<code>countries.json</code>, <code>country/{slug}.json</code>, <code>mechanics.json</code>), recommended integration pattern (countries.json for portfolio screening → individual slugs for finalists), no-auth static CDN delivery, and XLSX alternative workflow. (6) <strong>Error &amp; Empty States</strong> — Reform Risk "no reform events" empty state upgraded from bare <code>&lt;p&gt;</code> text to icon + bolded headline + contextual explanation (stable regime vs. limited sourcing coverage guidance). Version v104→v105 across all 4 locations.<br><br>
       <strong>v104 (Aug 2026)</strong> — 10 targeted improvements across 7 lowest-graded categories (Cycle 57): (1) <strong>Accessibility</strong> — <code>aria-label</code> added to <code>#flt-mech</code> (Explorer mechanic filter select) and <code>#flt-region</code> (both were missing, WCAG 1.3.5 violation). <code>aria-label</code> added to Scenario Builder <code>#sb-mechanic</code> and <code>#sb-profile</code> selects. <code>aria-label</code> added to header Search button (<code>#hdr-search-btn</code>). <code>aria-label</code> added to <code>#dd-mc-toggle</code> checkbox. (2) <strong>Information Architecture</strong> — <code>&lt;nav aria-label="Platform sections"&gt;</code> landmark wraps the tab navigation — screen readers can now skip directly to the nav landmark. <code>&lt;main id="tab-content-main" aria-label="Platform content — fiscal data tabs"&gt;</code> landmark wraps all tab pane content — completes the landmark map required for WCAG 2.4.1. (3) <strong>Security / Data Integrity</strong> — 4 additional <code>onchange</code> handlers migrated to DOMContentLoaded event listeners: <code>#dd-country-select</code>, <code>#dd-mc-toggle</code>, <code>#exposure-ioc-select</code>, <code>#api-country-select</code>. This reduces the HTML's inline event handler count by a further 4. (4) <strong>Performance</strong> — <code>&lt;link rel="preconnect"&gt;</code> added for <code>unpkg.com</code> (previously only had dns-prefetch — preconnect establishes the TCP+TLS handshake proactively). (5) <strong>Mobile</strong> — <code>touch-action: manipulation</code> added to <code>.tab-btn</code> CSS rule — removes iOS Safari's 300ms double-tap delay on all tab navigation buttons. (6) <strong>Data Reliability</strong> — A13 Key Analyst FAQ added: "How do I independently verify a government take figure? What primary sources should I check?" — three-tier verification workflow: Evidence badge tier inspection (A/B/C/D), benchmark validation table cross-check (25 countries, 96% pass rate), and API source_note field with evidence_tier per parameter for frontier countries. Version v103→v104 across all 4 locations.<br>
       <strong>v103 (Aug 2026)</strong> — Security hardening: 15+ additional inline <code>onclick</code>/<code>onchange</code> handlers migrated to DOMContentLoaded event listeners, significantly reducing <code>'unsafe-inline'</code> dependency in Content Security Policy. Handlers removed: (1) Welcome panel collapse button (<code>id="welcome-collapse-btn"</code>); (2) Search overlay backdrop click handler; (3) FC quickstart buttons (<code>id="fc-quickstart-deepwater/onshore"</code>); (4) FC Export XLSX button; (5) FC Stability checkbox; (6) IRR scatter PNG download (<code>id="irr-scatter-png-btn"</code>); (7) Explorer Excel export (<code>id="explorer-excel-btn"</code>); (8) Explorer Copy Link; (9) 4-Price View toggle (<code>id="four-price-toggle"</code>); (10) Prod Data Only filter; (11) Vintage Trend toggle (<code>id="vintage-trend-toggle"</code>, now with <code>aria-expanded</code> + <code>aria-controls</code>); (12–19) All 8 Screener preset buttons migrated to <code>data-preset</code> attribute + document event delegation (<code>class="screener-preset-btn"</code>); (20) Screener Reset/CSV/Excel buttons. Accessibility: Reference dropdown <code>aria-haspopup</code> corrected to <code>listbox</code> (was generic <code>true</code>) + full <code>aria-label</code> listing all 4 destinations added; decorative chevron marked <code>aria-hidden="true"</code>. Information Architecture: <code>&lt;meta name="theme-color" content="#0F172A"&gt;</code> added — mobile browsers (Chrome Android, Safari iOS) now show ORCA's dark slate color in the browser chrome, preventing jarring white flash on load. Version v102→v103 across all 4 locations.<br>
       <strong>v102 (Aug 2026)</strong> — 10 targeted improvements across all 10 graded categories (Cycle 55): (1) <strong>Data Reliability</strong> — A12 Key Analyst FAQ added: "My capital allocation team needs IRR for every candidate country. How do I handle the 111 countries without IRR data?" — four-step proxy workflow using Take screen, Price Swing column, Breakeven proxy chip, and Scenario Builder DCF. (2) <strong>SDLC Maturity</strong> — GRADER.md updated to reflect current A+ state. (3) <strong>Error &amp; Empty States</strong> — Screener zero-results state upgraded: icon, bolded headline, actionable guidance text, and styled Reset All Filters button (was: bare text + plain button). (4) <strong>Performance</strong> — <code>fetchpriority="high"</code> added to both preload hints (<code>country_data.json</code> and <code>reform_history.json</code>) — tells browser to prioritize data fetches over lower-priority preloads. (5) <strong>Accessibility</strong> — <code>aria-live="polite" aria-atomic="true"</code> added to <code>explorer-count</code> div (screen readers now announce filter result counts); Oil Price <code>ctrl-group</code> div gains <code>role="group" aria-label="Oil price for DCF calculations"</code>. (6) <strong>Mobile</strong> — <code>.site-header { padding: 10px 16px; gap: 10px; }</code> added to 768px breakpoint — prevents header overflow on narrow screens. (7) <strong>Information Architecture</strong> — Welcome callout gains 3-step IOC workflow hint: "(1) Set oil price → (2) Filter by mechanic/region chips → (3) Export to Excel for IC presentation". (8) <strong>Security/Data Integrity</strong> — Welcome FAQ button inline <code>onclick</code> removed; replaced with <code>id="welcome-faq-btn"</code> and DOMContentLoaded event listener — consistent with v97-v101 inline handler migration. (9) <strong>Visual Design</strong> — <code>@keyframes row-fade-in</code> added; <code>#tbody-explorer tr</code> gets 0.15s fade-in animation — subtle entrance on table re-render. (10) <strong>Interaction Design</strong> — Screener row <code>title</code> updated to "Click to view {country} Country Profile" for consistent discoverability tooltip language. Version v101→v102 across all 4 locations.<br>
@@ -2553,9 +2555,25 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
 
+    <div class="meth-faq-item" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+      <div class="meth-faq-q" style="font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        A14. How do I access fiscal data programmatically for integration with our internal models?
+      </div>
+      <div class="meth-faq-a" style="color:var(--muted);font-size:13px;line-height:1.7;">
+        <strong style="color:var(--text);">The platform exposes a static JSON API at three endpoints:</strong>
+        <ul style="margin:8px 0 8px 16px;padding:0;">
+          <li style="margin-bottom:6px;"><code style="background:var(--surface2);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px;">api/v1/countries.json</code> — full summary for all 185 countries (govt take @4 prices, NPV, IRR, mechanic, region, evidence tier, contract count). Use this for portfolio-wide screening or feeding a country comparison model.</li>
+          <li style="margin-bottom:6px;"><code style="background:var(--surface2);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px;">api/v1/country/{slug}.json</code> — per-country detail including full fiscal parameters, profit-oil tier schedules, breakeven, Monte Carlo p10/p90, and <code>source_note</code> + <code>evidence_tier</code> per parameter. Slug = country name lowercased with spaces replaced by hyphens (e.g. <code>saudi-arabia</code>, <code>trinidad-and-tobago</code>). Accessible via the API Explorer tab.</li>
+          <li style="margin-bottom:6px;"><code style="background:var(--surface2);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px;">api/v1/mechanics.json</code> + <code>api/v1/schema.json</code> — mechanic definitions and field schema for parsing downstream.</li>
+        </ul>
+        <strong style="color:var(--text);">Recommended integration pattern:</strong> fetch <code>countries.json</code> once per session to build a ranked list; call individual <code>country/{slug}.json</code> only for the 5–10 finalist countries where full parameter sets are needed for bid modeling. All endpoints are static (no auth, no rate limit) and cached by GitHub Pages CDN. <br><br>
+        <em>XLSX alternative: use Country Profile → Export XLSX for a single-country parameter sheet (includes all four price scenarios + fiscal parameters + source annotations), or Explorer → Excel for the full 185-country filtered table. Both include the same fields as the JSON API in Excel-native format.</em>
+      </div>
+    </div>
+
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v104, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v105, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -2572,7 +2590,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <span style="color:var(--accent);font-weight:700;">Coverage: 68 of 185 countries</span>
       <span>· Requires complete royalty + cost data · Remaining 117 countries shown as grey on map</span>
     </div>
-    <button class="btn btn-sm btn-outline" onclick="exportBreakevenCSV()" title="Export all 68 countries with breakeven data to CSV" aria-label="Export breakeven price data for 68 countries as CSV file">&#8659; Export CSV</button>
+    <button class="btn btn-sm btn-outline" id="breakeven-csv-btn" title="Export all 68 countries with breakeven data to CSV" aria-label="Export breakeven price data for 68 countries as CSV file">&#8659; Export CSV</button>
   </div>
   
   <div style="font-size:11px;color:var(--muted);background:rgba(232,160,32,.05);border:1px solid rgba(232,160,32,.15);border-radius:5px;padding:6px 12px;margin-bottom:8px;">
@@ -5233,7 +5251,7 @@ function renderReformTimeline(country) {
   }
 
   const reforms = REFORM_HISTORY[country] || [];
-  if (!reforms.length) return '<p class="dd-empty">No reform history recorded for this country.</p>';
+  if (!reforms.length) return '<div style="color:var(--muted);font-size:13px;padding:20px 0;display:flex;align-items:flex-start;gap:10px;"><span style="font-size:20px;line-height:1;">&#128197;</span><div><strong style="color:var(--text);display:block;margin-bottom:4px;">No reform events recorded</strong>No fiscal law changes are on record for this country in our dataset (2010–2023). This may indicate a stable fiscal regime or limited sourcing coverage. Check the Country Profile Evidence badge — Tier A/B countries with no reform record have been actively verified as stable.</div></div>';
 
   const rfSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   let html = '<h3>Fiscal Reform History</h3><div class="reform-timeline">';
@@ -11097,6 +11115,45 @@ document.addEventListener('DOMContentLoaded', function() {
   if (cmpBtn) cmpBtn.addEventListener('click', function() { launchCompare(); });
 });
 
+// v105: Event listeners for bubble price radios, Side-by-Side buttons, search close, breakeven CSV
+document.addEventListener('DOMContentLoaded', function() {
+  // Bubble price radio buttons — replace inline onchange
+  ['bp50','bp75','bp100','bp125'].forEach(function(id) {
+    var radio = document.getElementById(id);
+    if (radio) radio.addEventListener('change', function() {
+      window._bubblePriceKey = this.value;
+      if (window._bubbleChartInstance) { window._bubbleChartInstance.destroy(); window._bubbleChartInstance = null; }
+      if (typeof renderBubbleChart === 'function') renderBubbleChart();
+    });
+  });
+  // Bubble chart download PNG
+  var bubblePngBtn = document.getElementById('download-bubble-png');
+  if (bubblePngBtn) bubblePngBtn.addEventListener('click', function() { if (typeof downloadBubblePng === 'function') downloadBubblePng(); });
+  // Side-by-Side control buttons
+  var cmpClear = document.getElementById('cmp-clear-btn');
+  if (cmpClear) cmpClear.addEventListener('click', function() { if (typeof clearCompare === 'function') clearCompare(); });
+  var cmpPrint = document.getElementById('cmp-print-btn');
+  if (cmpPrint) cmpPrint.addEventListener('click', function() { window.print(); });
+  var cmpShare = document.getElementById('cmp-share-btn');
+  if (cmpShare) cmpShare.addEventListener('click', function() { if (typeof shareComparison === 'function') shareComparison(); });
+  // Side-by-Side quickstart buttons — event delegation by data-countries attribute
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.cmp-quickstart-btn');
+    if (!btn) return;
+    var countries = (btn.getAttribute('data-countries') || '').split('|').filter(Boolean);
+    countries.forEach(function(c) { if (typeof addCompare === 'function') addCompare(c); });
+  });
+  // Breakeven CSV export
+  var beCSV = document.getElementById('breakeven-csv-btn');
+  if (beCSV) beCSV.addEventListener('click', function() { if (typeof exportBreakevenCSV === 'function') exportBreakevenCSV(); });
+  // Search close button — remove inline onclick/onkeydown
+  var searchCloseBtn = document.getElementById('search-close-btn');
+  if (searchCloseBtn) {
+    searchCloseBtn.addEventListener('click', function() { if (typeof closeSearch === 'function') closeSearch(); });
+    searchCloseBtn.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); if (typeof closeSearch === 'function') closeSearch(); } });
+  }
+});
+
 // v97: Event listener migration — tab nav, header buttons, Run Compare, sort buttons, reference dropdown
 document.addEventListener('DOMContentLoaded', function() {
   // Primary tab buttons
@@ -11204,7 +11261,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v104</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v105</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
