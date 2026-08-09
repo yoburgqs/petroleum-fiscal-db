@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com https://cdn.jsdelivr.net;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com https://cdn.jsdelivr.net; frame-ancestors 'none';">
 
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 <link rel="dns-prefetch" href="https://unpkg.com">
+<link rel="preload" href="country_data.json" as="fetch" crossorigin="anonymous">
+<link rel="preload" href="reform_history.json" as="fetch" crossorigin="anonymous">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
 <title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
@@ -59,6 +61,8 @@ a { color: var(--accent); text-decoration: none; }
 .tab-nav::-webkit-scrollbar { display: none; }
 .tab-nav-wrapper { position: relative; }
 .tab-nav-wrapper::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 40px; background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none; }
+.tab-nav-wrapper::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(to left, transparent, var(--bg)); pointer-events: none; z-index: 1; transition: width .2s; }
+.tab-nav-wrapper.scrolled::before { width: 32px; }
 .tab-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 18px; white-space: nowrap; transition: .15s; }
 .tab-btn:hover  { color: var(--text); }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
@@ -1143,6 +1147,23 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 @keyframes ld-shimmer { 0%{left:-60%;} 100%{left:100%;} }
 @keyframes ld-pulse { 0%,100%{opacity:1;} 50%{opacity:.65;} }
 </style>
+<style>
+/* ── FC Skeleton Loader ── */
+.fc-skel-wrap { padding: 4px 0; }
+.fc-skel-row { display: flex; align-items: center; gap: 10px; padding: 11px 14px; border-bottom: 1px solid rgba(255,255,255,.03); }
+.fc-skel-bar { border-radius: 4px; background: var(--surface2); position: relative; overflow: hidden; }
+.fc-skel-bar::after { content:''; position:absolute; top:0; left:-60%; width:60%; height:100%; background:linear-gradient(90deg,transparent,rgba(255,255,255,.06),transparent); animation:ld-shimmer 1.4s ease-in-out infinite; }
+.fc-skel-rank { width:28px; height:11px; flex-shrink:0; }
+.fc-skel-flag { width:22px; height:22px; border-radius:50%; background:var(--surface2); flex-shrink:0; animation:ld-pulse 1.6s ease-in-out infinite; }
+.fc-skel-name { width:110px; height:12px; }
+.fc-skel-take { width:72px; height:12px; }
+.fc-skel-bar-wide { width:150px; height:10px; }
+.fc-skel-mini { width:52px; height:11px; }
+/* Mobile gradient override */
+@media (max-width: 768px) {
+  .tab-nav-wrapper::after { width: 60px; }
+}
+</style>
 
 
 <!-- ===== v38 HEADER ===== -->
@@ -1151,7 +1172,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v93</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v94</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1977,7 +1998,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v93 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v94 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -1985,6 +2006,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v94 (Aug 2026)</strong> — 5 platform quality improvements (Cycle 47): (1) <strong>Fiscal Compare skeleton loader added</strong> — clicking Run Compare now shows animated shimmer placeholder rows before results render, eliminating the jarring blank-then-results transition. Uses a 1-frame setTimeout so the DOM repaints with skeleton before the synchronous DCF computation runs across 185 countries. (2) <strong>CSP hardened with frame-ancestors 'none'</strong> — Content Security Policy now includes <code>frame-ancestors 'none'</code> preventing the platform from being embedded in iframes by third-party sites (clickjacking protection). (3) <strong>Tab bar scroll indicators improved</strong> — right fade gradient widened to 60px on mobile; left fade gradient now appears dynamically when the tab bar has been scrolled right, giving users a clear visual cue that more tabs exist in both directions. (4) <strong>Preload hints added for JSON data files</strong> — <code>&lt;link rel="preload"&gt;</code> hints added for <code>country_data.json</code> and <code>reform_history.json</code> so browsers begin fetching data while still parsing scripts — reduces perceived load time on fast connections. (5) <strong>GitHub Actions CI badge added to footer</strong> — direct link to CI workflow run history added alongside API and audit status links. Version v93→v94 across badge, footer DCF Engine badge, Methodology provenance, and changelog.<br>
       <strong>v93 (Aug 2026)</strong> — 5 data quality and analyst-workflow improvements (Cycle 46): (1) <strong>Benchmark validation expanded 20 → 25 countries</strong> — added Mexico (CNH/Wood Mac 2022), Libya (EPSA IV/NOC literature), Trinidad and Tobago (MEEI/Rystad), Namibia (MoM Block 2912B/NAMCOR), and Suriname (DSO PSC/Staatsolie); all 5 new entries pass the ±3pp tolerance. Coverage increases from 10.8% → 13.5% of the 185-country database; validation pass rate moves to 24/25 (96%). Source list expanded to include CNH, NOC/Libya, MEEI, NAMCOR, and Staatsolie. (2) <strong>Kazakhstan PSA preset added to Scenario Builder</strong> — representative Kashagan/Tengiz model (80% CR cap, 50% govt profit oil, 20% CIT + 5% royalty + Subsoil Use Tax); closes the gap between Kazakhstan appearing in the benchmark validation table and Known Model Limitations but having no direct Scenario Builder entry. (3) <strong>7th Key Analyst FAQ added</strong> — "My priority countries don't all have IRR data. How do I rank them for a capital allocation recommendation?" — four-step proxy workflow: Govt Take → Price Swing → Breakeven proxy → field-specific Scenario Builder IRR. Directly addresses the Data Reliability B+ gap with actionable analyst guidance. (4) <strong>9th welcome panel workflow example added</strong> — Side-by-Side workflow for multi-country comparison using basket or direct country search, with North Sea/Atlantic frontier example. (5) <strong>Drilldown capabilities panel updated</strong> — Scenario Builder now correctly shows "11 country presets" (was 10, Kazakhstan added). Version v92→v93 across all 4 locations.<br>
       <strong>v92 (Aug 2026)</strong> — 8 analyst-experience improvements (Cycle 45): (1) <strong>North Sea profile added to Fiscal Compare</strong> — $600M capex, 40k bbl/d peak, $22/bbl opex, 3yr ramp, 6yr plateau — analysts can now benchmark UK/Norway side-by-side using a North Sea–specific production profile rather than approximating with the Deepwater or Shallow Offshore profile. Profile was already in Scenario Builder; Fiscal Compare now has parity. (2) <strong>"Has Breakeven" filter chip added to Explorer</strong> — one click filters to the 68 countries with verified breakeven price data; chip displays live count when active (mirrors "Has IRR Data" chip behavior). Closes the gap where breakeven coverage was disclosed in the footer but not directly filterable. (3) <strong>Atlantic Frontier Screener preset added</strong> — PSC + deepwater + take ≤75% isolates the Guyana/Angola/Brazil/Nigeria/Suriname/Gabon deepwater PSC benchmark set; the deepwater Atlantic Basin's primary fiscal reference group for IOC capital allocation decisions. (4) <strong>DCF Formula &amp; Mechanics nav link highlighted</strong> in Methodology quick-navigation bar — the most analytically important section now has amber border and bold text, matching the visual weight of a primary CTA. (5) <strong>±3pp tolerance justified in benchmark validation section</strong> — methodology paragraph now cites Wood Mackenzie and Rystad Energy's cross-country comparison tolerance as the industry basis for the ±3pp amber band (previously undocumented). (6) <strong>Explorer drilldown capabilities description updated</strong> in welcome panel — now lists all 9 mechanics (Revenue Share / Gross Split / Buy-back / EPSA added; was showing only 5). (7–8) Version v91→v92 across badge, footer, Methodology provenance, and changelog.<br>
       <strong>v91 (Aug 2026)</strong> — 10 analyst-experience improvements (Cycle 44): (1) <strong>Guyana PSC preset added</strong> to Scenario Builder — Stabroek Block terms (10% royalty, 50% CR cap, flat 50/50 profit oil, 25% CIT; govt take ~52–56% at $75) — the Atlantic frontier's benchmark PSC that redefined deepwater fiscal negotiations globally. (2) <strong>Malaysia PSC preset added</strong> — PETRONAS standard terms (75% CR cap, 10% FTP, 50% govt profit oil, 25% CIT; take ~59% at $75) — closes the Asia Pacific preset gap alongside Indonesia. (3) <strong>Libya added to Country Profile quick-access</strong> — EPSA IV regime (Eni/TotalEnergies/BP operators); 9th quick-access country covering all major fiscal structure types. (4) <strong>"Has IRR Data" filter chip added</strong> to Explorer mechanic row — one click filters to the 74 IRR-covered countries; chip displays live count; IRR coverage FAQ answer updated to reference it. (5) <strong>6th analyst FAQ added</strong> — "Which regimes offer the best entry terms for a standard deepwater project?" — routes through Fiscal Compare → Side-by-Side → Screener workflow for new IOC visitors. (6) Dead CSS removed: <code>@keyframes ldbar</code> deleted (unused since v38 shimmer upgrade). (7–10) Version v90→v91 across badge, footer, Methodology provenance, and changelog.<br>
@@ -9244,6 +9266,21 @@ function fcSetSort(field) {
   }
 }
 
+function _fcSkelHTML() {
+  var rows = '';
+  for (var i = 0; i < 10; i++) {
+    rows += '<div class="fc-skel-row">' +
+      '<div class="fc-skel-bar fc-skel-rank"></div>' +
+      '<div class="fc-skel-flag"></div>' +
+      '<div class="fc-skel-bar fc-skel-name" style="width:' + (80 + (i % 5) * 18) + 'px"></div>' +
+      '<div class="fc-skel-bar fc-skel-take"></div>' +
+      '<div class="fc-skel-bar fc-skel-bar-wide"></div>' +
+      '<div class="fc-skel-bar fc-skel-mini"></div>' +
+      '</div>';
+  }
+  return '<div class="fc-skel-wrap">' + rows + '</div>';
+}
+
 function runFiscalCompare() {
   const profileKey = document.getElementById('fc-profile').value;
   const price = parseFloat(document.getElementById('fc-price').value);
@@ -9251,41 +9288,45 @@ function runFiscalCompare() {
   if (!profile) return;
   const status = document.getElementById('fc-status');
   status.textContent = 'Running ' + COUNTRY_DATA.length + ' countries...';
-  const t0 = performance.now();
 
-  const results = COUNTRY_DATA.map(function(c) {
-    const mechanic = FC_MECHANIC_OVERRIDE[c.country] || (c.mechanics || 'Concession').split(',')[0].trim();
-    const params = getDCFParams(c.country, mechanic);
-    let res;
-    try {
-      if (mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split' || mechanic === 'Revenue Share') res = dcfPSC(params, price, profile);
-      else if (mechanic === 'TSC' || mechanic === 'RSC') res = dcfTSC(params, price, profile);
-      else if (mechanic === 'PRRT') res = dcfPRRT(params, price, profile);
-      else if (mechanic === 'Buy-back' || mechanic === 'Buyback') res = dcfBuyback(params, price, profile);
-      else res = dcfConcession(params, price, profile);
-    } catch(e) {
-      res = { take: c.take_75 || 0, npv: 0, irr: null };
-    }
-    return {
-      country: c.country, region: c.region, n: c.n, mechanic: mechanic,
-      mechanics: c.mechanics, liveTake: res.take, liveNPV: res.npv, liveIRR: res.irr,
-      swing: c.swing, take_50: c.take_50, take_75: c.take_75, take_100: c.take_100, take_125: c.take_125,
-      be_75: c.be_75, waterfall: res.waterfall, has_r_factor_tiers: c.has_r_factor_tiers
-    };
-  });
+  // Show skeleton loader — deferred 1 frame so DOM repaints before synchronous DCF computation
+  var fcDiv = document.getElementById('fc-results');
+  if (fcDiv) fcDiv.innerHTML = _fcSkelHTML();
 
-  results.sort(function(a,b) { return a.liveTake - b.liveTake; });
-  const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
-  status.textContent = results.length + ' results \u00b7 ' + elapsed + 's';
-  window._fcResults = results;
-  window._fcLastResults = results;
-  window._fcLastPrice = price;
-  window._fcSortState = 'take'; // reset sort on new run
-  renderFCResults(results, price);
-
-  // Scroll results into view
-  var fcResults = document.getElementById('fc-results') || document.getElementById('fc-table-wrap');
-  if (fcResults) fcResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  setTimeout(function() {
+    const t0 = performance.now();
+    const results = COUNTRY_DATA.map(function(c) {
+      const mechanic = FC_MECHANIC_OVERRIDE[c.country] || (c.mechanics || 'Concession').split(',')[0].trim();
+      const params = getDCFParams(c.country, mechanic);
+      let res;
+      try {
+        if (mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split' || mechanic === 'Revenue Share') res = dcfPSC(params, price, profile);
+        else if (mechanic === 'TSC' || mechanic === 'RSC') res = dcfTSC(params, price, profile);
+        else if (mechanic === 'PRRT') res = dcfPRRT(params, price, profile);
+        else if (mechanic === 'Buy-back' || mechanic === 'Buyback') res = dcfBuyback(params, price, profile);
+        else res = dcfConcession(params, price, profile);
+      } catch(e) {
+        res = { take: c.take_75 || 0, npv: 0, irr: null };
+      }
+      return {
+        country: c.country, region: c.region, n: c.n, mechanic: mechanic,
+        mechanics: c.mechanics, liveTake: res.take, liveNPV: res.npv, liveIRR: res.irr,
+        swing: c.swing, take_50: c.take_50, take_75: c.take_75, take_100: c.take_100, take_125: c.take_125,
+        be_75: c.be_75, waterfall: res.waterfall, has_r_factor_tiers: c.has_r_factor_tiers
+      };
+    });
+    results.sort(function(a,b) { return a.liveTake - b.liveTake; });
+    const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
+    status.textContent = results.length + ' results · ' + elapsed + 's';
+    window._fcResults = results;
+    window._fcLastResults = results;
+    window._fcLastPrice = price;
+    window._fcSortState = 'take'; // reset sort on new run
+    renderFCResults(results, price);
+    // Scroll results into view
+    var fcResults = document.getElementById('fc-results') || document.getElementById('fc-table-wrap');
+    if (fcResults) fcResults.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 16); // 1-frame delay allows skeleton repaint before synchronous DCF computation
 }
 
 function getTierInfo(take) {
@@ -10794,6 +10835,17 @@ async function loadPlatformData() {
 
 loadPlatformData();
 
+// Tab nav left-gradient scroll indicator
+(function() {
+  var nav = document.querySelector('.tab-nav');
+  var wrapper = document.querySelector('.tab-nav-wrapper');
+  if (nav && wrapper) {
+    nav.addEventListener('scroll', function() {
+      wrapper.classList.toggle('scrolled', nav.scrollLeft > 8);
+    }, { passive: true });
+  }
+})();
+
 // v73/v74: Event listeners replacing inline onclick for compare basket buttons
 document.addEventListener('DOMContentLoaded', function() {
   var clearBtn = document.getElementById('basket-clear-btn');
@@ -10819,9 +10871,11 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v93</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v94</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
+    <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
+    <span style="color:#475569;">|</span>
+    <a href="https://github.com/yoburgqs/petroleum-fiscal-db/actions" target="_blank" style="color:#64748b;text-decoration:none;" title="GitHub Actions CI — test suite runs on every push">CI &#x2197;</a>
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank" title="Open raw JSON API — country-level fiscal metrics for all 185 countries (govt take, NPV, IRR, mechanic, region). Also: api/v1/mechanics.json and api/v1/schema.json">API &#x2197;</a>
     <span style="color:#475569;">|</span>
