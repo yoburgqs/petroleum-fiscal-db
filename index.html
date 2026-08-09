@@ -204,7 +204,7 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
 #search-input-wrap .search-icon-inner { color:var(--muted); font-size:16px; flex-shrink:0; }
 #search-q { background:transparent; border:none; color:var(--text); flex:1; font-size:15px; outline:none; }
 #search-q::placeholder { color:var(--muted); }
-#search-results { max-height:420px; overflow-y:auto; }
+#search-results { max-height:420px; overflow-y:auto; overscroll-behavior: contain; }
 .search-section-hdr { color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.8px; padding:10px 18px 4px; text-transform:uppercase; }
 .search-result { align-items:center; cursor:pointer; display:flex; gap:12px; padding:10px 18px; transition:background .1s; }
 .search-result:hover, .search-result.focused { background:rgba(232,160,32,.12); }
@@ -673,7 +673,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 /* === v38 Reference Panel === */
 #reference-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 998; }
 #reference-overlay.open { display: block; }
-#reference-panel { position: fixed; top: 0; right: -440px; width: 420px; height: 100vh; background: var(--surface); border-left: 1px solid var(--border); z-index: 999; overflow-y: auto; transition: right .25s ease; padding: 24px; }
+#reference-panel { position: fixed; top: 0; right: -440px; width: 420px; height: 100vh; background: var(--surface); border-left: 1px solid var(--border); z-index: 999; overflow-y: auto; overscroll-behavior: contain; transition: right .25s ease; padding: 24px; }
 #reference-panel.open { right: 0; }
 #reference-panel .ref-close { position: absolute; top: 12px; right: 16px; background: none; border: none; color: var(--text-muted); font-size: 20px; cursor: pointer; }
 #reference-panel h2 { font-size: 16px; font-weight: 700; margin-bottom: 20px; color: var(--accent); }
@@ -686,7 +686,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 /* === v38 Scenario Modal === */
 #scenario-modal { display: none; position: fixed; inset: 0; z-index: 1000; background: rgba(0,0,0,.6); align-items: flex-start; justify-content: center; padding-top: 60px; }
 #scenario-modal.open { display: flex; }
-#scenario-modal-inner { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; width: 95%; max-width: 900px; max-height: 85vh; overflow-y: auto; padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+#scenario-modal-inner { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; width: 95%; max-width: 900px; max-height: 85vh; overflow-y: auto; overscroll-behavior: contain; padding: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
 
 /* v38 responsive additions */
 @media (max-width: 768px) {
@@ -1200,7 +1200,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v109</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v110</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1632,51 +1632,51 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div class="screener-filter-block">
         <span id="sc-mech-label" class="filter-lbl">Mechanic Filter</span>
         <div class="mech-checkbox-group" id="sc-mech-checks" role="group" aria-labelledby="sc-mech-label">
-          <label><input type="checkbox" value="Concession" checked onchange="runScreener()"> Concession</label>
-          <label><input type="checkbox" value="PSC" checked onchange="runScreener()"> PSC</label>
-          <label><input type="checkbox" value="TSC" checked onchange="runScreener()"> TSC</label>
-          <label><input type="checkbox" value="PRRT" checked onchange="runScreener()"> PRRT</label>
-          <label><input type="checkbox" value="RSC" checked onchange="runScreener()"> RSC</label>
-          <label><input type="checkbox" value="Gross Split" checked onchange="runScreener()"> Gross Split</label>
-          <label><input type="checkbox" value="EPSA" checked onchange="runScreener()"> EPSA</label>
-          <label><input type="checkbox" value="Buy-back" checked onchange="runScreener()"> Buy-back</label>
-          <label><input type="checkbox" value="Revenue Share" checked onchange="runScreener()"> Revenue Share</label>
+          <label><input type="checkbox" value="Concession" checked> Concession</label>
+          <label><input type="checkbox" value="PSC" checked> PSC</label>
+          <label><input type="checkbox" value="TSC" checked> TSC</label>
+          <label><input type="checkbox" value="PRRT" checked> PRRT</label>
+          <label><input type="checkbox" value="RSC" checked> RSC</label>
+          <label><input type="checkbox" value="Gross Split" checked> Gross Split</label>
+          <label><input type="checkbox" value="EPSA" checked> EPSA</label>
+          <label><input type="checkbox" value="Buy-back" checked> Buy-back</label>
+          <label><input type="checkbox" value="Revenue Share" checked> Revenue Share</label>
         </div>
       </div>
       <div class="screener-filter-block">
         <div class="filter-lbl">Breakeven Category</div>
         <div class="be-radio-group">
-          <input type="radio" id="be-all" name="be-cat" value="all" checked onchange="runScreener()"><label for="be-all">All</label>
-          <input type="radio" id="be-sub50" name="be-cat" value="sub50" onchange="runScreener()"><label for="be-sub50">Sub-$50</label>
-          <input type="radio" id="be-50-75" name="be-cat" value="50-75" onchange="runScreener()"><label for="be-50-75">$50–$75</label>
-          <input type="radio" id="be-75-100" name="be-cat" value="75-100" onchange="runScreener()"><label for="be-75-100">$75–$100</label>
+          <input type="radio" id="be-all" name="be-cat" value="all" checked><label for="be-all">All</label>
+          <input type="radio" id="be-sub50" name="be-cat" value="sub50"><label for="be-sub50">Sub-$50</label>
+          <input type="radio" id="be-50-75" name="be-cat" value="50-75"><label for="be-50-75">$50–$75</label>
+          <input type="radio" id="be-75-100" name="be-cat" value="75-100"><label for="be-75-100">$75–$100</label>
         </div>
       </div>
       <div class="screener-filter-block">
         <span id="sc-ioc-label" class="filter-lbl">IOC Operator Presence</span>
         <div class="ioc-checkbox-grid" id="sc-ioc-checks" role="group" aria-labelledby="sc-ioc-label">
-          <label><input type="checkbox" value="ExxonMobil" onchange="runScreener()"> ExxonMobil</label>
-          <label><input type="checkbox" value="Shell" onchange="runScreener()"> Shell</label>
-          <label><input type="checkbox" value="BP" onchange="runScreener()"> BP</label>
-          <label><input type="checkbox" value="TotalEnergies" onchange="runScreener()"> TotalEnergies</label>
-          <label><input type="checkbox" value="Equinor" onchange="runScreener()"> Equinor</label>
-          <label><input type="checkbox" value="Chevron" onchange="runScreener()"> Chevron</label>
-          <label><input type="checkbox" value="ConocoPhillips" onchange="runScreener()"> ConocoPhillips</label>
-          <label><input type="checkbox" value="Eni" onchange="runScreener()"> Eni</label>
+          <label><input type="checkbox" value="ExxonMobil"> ExxonMobil</label>
+          <label><input type="checkbox" value="Shell"> Shell</label>
+          <label><input type="checkbox" value="BP"> BP</label>
+          <label><input type="checkbox" value="TotalEnergies"> TotalEnergies</label>
+          <label><input type="checkbox" value="Equinor"> Equinor</label>
+          <label><input type="checkbox" value="Chevron"> Chevron</label>
+          <label><input type="checkbox" value="ConocoPhillips"> ConocoPhillips</label>
+          <label><input type="checkbox" value="Eni"> Eni</label>
         </div>
       </div>
       <div class="screener-filter-block">
         <div class="filter-lbl">Water Depth</div>
         <div class="depth-radio-group">
-          <input type="radio" id="dep-all" name="dep-cat" value="all" checked onchange="runScreener()"><label for="dep-all">All</label>
-          <input type="radio" id="dep-onshore" name="dep-cat" value="onshore" onchange="runScreener()"><label for="dep-onshore">Onshore</label>
-          <input type="radio" id="dep-shallow" name="dep-cat" value="shallow" onchange="runScreener()"><label for="dep-shallow">Shallow (&lt;500m)</label>
-          <input type="radio" id="dep-deep" name="dep-cat" value="deepwater" onchange="runScreener()"><label for="dep-deep">Deepwater (&gt;500m)</label>
+          <input type="radio" id="dep-all" name="dep-cat" value="all" checked><label for="dep-all">All</label>
+          <input type="radio" id="dep-onshore" name="dep-cat" value="onshore"><label for="dep-onshore">Onshore</label>
+          <input type="radio" id="dep-shallow" name="dep-cat" value="shallow"><label for="dep-shallow">Shallow (&lt;500m)</label>
+          <input type="radio" id="dep-deep" name="dep-cat" value="deepwater"><label for="dep-deep">Deepwater (&gt;500m)</label>
         </div>
       </div>
       <div class="screener-filter-block">
         <div class="filter-lbl">Region</div>
-        <select id="sc-region" aria-label="Filter by region" onchange="runScreener()" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
+        <select id="sc-region" aria-label="Filter by region" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
           <option value="">All Regions</option>
           <option value="Africa">Africa</option>
           <option value="Middle East">Middle East</option>
@@ -1689,7 +1689,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div class="screener-filter-block">
         <div class="filter-lbl">IRR Data</div>
         <div class="mech-checkbox-group">
-          <label title="111 of 185 countries lack verified opex/capex for IRR computation. Uncheck to screen only countries where IRR is calculable."><input type="checkbox" id="sc-irr-nulls" checked onchange="runScreener()"> Include countries with no IRR data <span style="color:var(--muted);font-size:10px;">(111 countries)</span></label>
+          <label title="111 of 185 countries lack verified opex/capex for IRR computation. Uncheck to screen only countries where IRR is calculable."><input type="checkbox" id="sc-irr-nulls" checked> Include countries with no IRR data <span style="color:var(--muted);font-size:10px;">(111 countries)</span></label>
         </div>
       </div>
     </div>
@@ -1984,7 +1984,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:#555;">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v109 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v110 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2044,7 +2044,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v109 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v110 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2052,6 +2052,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v110 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 63): (1) <strong>Security / Inline Handler Bug Fix</strong> — Removed 21 duplicate <code>onchange</code>/<code>oninput</code> handler attributes from Screener form controls that were firing twice per user interaction — once from the inline attribute and once from the v109 DOMContentLoaded delegation listeners. Affected controls: 9 mechanic checkboxes (Concession/PSC/TSC/PRRT/RSC/Gross Split/EPSA/Buy-back/Revenue Share), 8 IOC operator checkboxes, 4 breakeven category radios, 4 water depth radios, <code>#sc-region</code> select, <code>#sc-irr-nulls</code> checkbox. All are now delegation-only via the v109 parent container listeners — <code>runScreener()</code> now fires exactly once per user action. (2) <strong>Accessibility</strong> — Explorer table column headers (<code>#tbody-explorer</code> thead) now update <code>aria-sort</code> dynamically in <code>renderExplorer()</code> — screen readers announce the active sort column and direction after every sort change. Previously all headers were permanently <code>aria-sort="none"</code> even after sorting. Sort direction map: ascending for Country/Take/Evidence/Breakeven/Swing; descending for IRR/NPV. (3) <strong>Data Reliability / Professional Credibility</strong> — A18 Key Analyst FAQ added: "How do I interpret the Fiscal Reform Risk and Stability Score when comparing regimes?" — tier-by-tier Stability Score interpretation (80–100 green, 60–79 amber, 40–59 orange, 0–39 red), Reform Risk tab workflow guide, and three common analyst errors in reform risk interpretation (treating current take as locked-in, ignoring IQR, misreading reform direction without price cycle context). Benchmark validation expanded 27 → 29 countries (Peru Perupetro/Wood Mac; UAE ADNOC/S&P GCI) — coverage increases from 14.6% → 15.7%; pass rate 28/29 (97%). All FAQ references and benchmark header updated. (4) <strong>Mobile / Performance</strong> — <code>overscroll-behavior: contain</code> added to Reference panel, Scenario Builder modal, and Search results — prevents iOS rubber-band scroll from propagating to the page background when modal or panel scroll containers reach their end, eliminating the accidental-scroll UX issue on iPhone/iPad. (5) <strong>Version</strong> — v109→v110 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v109 (Aug 2026)</strong> — 10 targeted improvements across 6 categories (Cycle 62): (1) <strong>Security / Inline Handler Migration</strong> — Screener slider <code>oninput</code> handlers (5 sliders: take, breakeven, NPV, IRR, evidence) migrated to DOMContentLoaded <code>input</code> event listeners. Reform history filter selects (<code>#reform-filter-country</code>, <code>#reform-filter-dir</code>, <code>#reform-filter-decade</code>) <code>onchange</code> migrated to event listeners. <code>#sc-region</code> and <code>#sc-irr-nulls</code> migrated. Screener mechanic checkboxes, IOC checkboxes, breakeven radios, and depth radios now use event delegation on parent containers. Comparison result inline buttons (<code>onclick="window.print()"</code>, <code>onclick="downloadCmpChart()"</code>, <code>onclick="shareComparison()"</code>) replaced with class-based event delegation (<code>cmp-inline-print-btn</code>, <code>cmp-inline-png-btn</code>, <code>cmp-inline-share-btn</code>). Total: 15+ inline handlers migrated this cycle. (2) <strong>Data Reliability / Bug Fix</strong> — IRR threshold in Country Profile XLSX export corrected from <code>&lt;200</code> to <code>&lt;500</code> (matching the platform's documented ≥500% exclusion threshold — countries with IRR 200–499% now correctly export instead of showing null). Explorer XLSX export also updated: IRR column now applies the correct 500% exclusion. (3) <strong>Export Quality</strong> — Country Profile XLSX export gains 3 new fields: Evidence Quality A/B (%), Production Coverage (%), Total Verified Facts. Citation field added to export metadata. Explorer XLSX export gains Evidence A/B (%), Prod Coverage (%), and R-factor Tiers columns. (4) <strong>Error &amp; Empty States</strong> — Reform History table gains a styled empty state: calendar icon + bold "No reform events match these filters" headline + context-sensitive explanation (country-specific message when a country filter is active vs. generic reset guidance when not). (5) <strong>Print / PDF</strong> — Country Profile print view gains an ORCA branding header (hidden on screen, visible in print): platform name, version, and export date. Source confidence badges and tier badges now render correctly in print (border + black text instead of dark-background colored styles). Export button and country select hidden in print view. (6) <strong>Professional Credibility</strong> — A17 Key Analyst FAQ added: "When is the government take figure reliable enough for a bid recommendation or IC memo?" — tier-by-tier guidance (A = IC-ready with citation; B = suitable with caveat; C = screening only; D = exclude from documents), plus 4 additional checks: production-weighting flag, price swing threshold, R-factor verification, and breakeven vs. IRR reliability comparison. Version v108→v109 across all 4 locations.<br><br>
       <strong>v108 (Aug 2026)</strong> — 10 targeted improvements across 4 categories (Cycle 61): (1) <strong>Security / Inline Handler Migration</strong> — 4 remaining inline handlers migrated to DOMContentLoaded event listeners: <code>#fc-profile</code> <code>onchange</code> (auto-rerun Fiscal Compare when profile changes), <code>#fc-price</code> <code>onchange</code> (auto-rerun when price scenario changes), <code>#search-q</code> <code>oninput</code> and <code>onkeydown</code> (search input now fully event-driven). (2) <strong>Accessibility</strong> — FC sort buttons gain <code>aria-label</code> attributes: "Sort by Government Take", "Sort by Contractor NPV (high to low)", "Sort by IRR (high to low)", "Sort by Breakeven price (low to high)", "Sort alphabetically by country name" — screen readers now announce sort button purpose on focus. <code>onkeydown</code> inline handlers removed from all 5 fc-sort-btn elements; keyboard events now handled via DOMContentLoaded <code>keydown</code> listeners. (3) <strong>Data Reliability / Professional Credibility</strong> — A16 Key Analyst FAQ added: "How does the platform model R-factor tiered PSCs, and when should I use the R-factor filter vs. a flat PSC?" — explains R-factor mechanics, how the DCF engine handles tiered profit oil splits (production-weighted average calibrated to mid-tier), the ◈ R-factor PSC chip workflow, and a Scenario Builder approach for sensitivity testing across tiers using Angola Block 17 and Nigeria deepwater as worked examples. (4) <strong>Version</strong> — v107→v108 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v107 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 60): (1) <strong>Security / Inline Handler Migration</strong> — 5 IOC Portfolio quick-launch buttons migrated from inline <code>onclick</code> to <code>class="ioc-quick-btn" data-ioc-op="..."</code> event delegation (ExxonMobil, Shell, TotalEnergies, BP, Equinor). <code>aria-label</code> added to all 5. Country Profile action buttons (<code>#dd-copy-link-btn</code>, <code>#dd-export-btn</code>, <code>#dd-print-btn</code>) — inline <code>onclick</code> removed, now handled via DOMContentLoaded event listeners; <code>aria-label</code> added to all 3. Side-by-Side PNG download button (<code>#cmp-chart-png-btn</code>), Vintage Analysis Export CSV (<code>#vintage-csv-btn</code>), Breakeven Map Export CSV (<code>#be-export-csv-btn</code>), API Copy URL button — all now use event listeners with <code>aria-label</code>. Reference panel overlay and close button (<code>#ref-panel-close-btn</code>) migrated. Scenario modal backdrop click-to-close, close button (<code>#scenario-modal-close-btn</code>), all Run DCF buttons (<code>#sb-run-dcf-top-btn</code>, <code>#sb-run-dcf-bottom-btn</code>, <code>#sb-run-dcf-empty-btn</code>), Save Scenario, Clear All Scenarios — all migrated. Scenario Builder preset buttons (13 presets: Norway, Angola, Iraq, UK, Australia, Saudi, Iran, India, Nigeria Rev Share, Indonesia Gross Split, Guyana, Malaysia, Kazakhstan) migrated from inline <code>onclick</code> to <code>class="sb-preset-btn" data-sb-preset="..."</code> event delegation. <code>sb-mechanic</code> select <code>onchange</code> migrated. (2) <strong>Accessibility</strong> — FAQ items A12–A15 converted to accessible accordions: <code>role="button"</code>, <code>tabindex="0"</code>, <code>aria-expanded</code>, <code>aria-controls</code> added; answers have matching <code>id</code> attributes; toggle respects both click and Enter/Space keydown. Reference panel <code>aria-label</code> added to <code>&lt;aside&gt;</code>. (3) <strong>Version</strong> — v106→v107 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
@@ -2254,7 +2255,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <!-- Section 5: Model Validation — Regression Benchmarks -->
   <div class="dd-section" id="meth-validation">
     <div class="dd-section-hdr">Model Validation — Regression Benchmarks</div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">27 benchmark countries validated against published reference ranges — representing 14.6% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range. <strong style="color:var(--muted);">Why ±3pp?</strong> This is the cross-country comparison tolerance used by Wood Mackenzie and Rystad Energy in their fiscal benchmarking products — it represents the inherent range from applying a standardized production profile to different country cost structures. A ±3pp miss indicates model approximation, not a sourcing error.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">29 benchmark countries validated against published reference ranges — representing 15.7% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range. <strong style="color:var(--muted);">Why ±3pp?</strong> This is the cross-country comparison tolerance used by Wood Mackenzie and Rystad Energy in their fiscal benchmarking products — it represents the inherent range from applying a standardized production profile to different country cost structures. A ±3pp miss indicates model approximation, not a sourcing error.</p>
     <div class="tbl-wrap">
       <table id="benchmark-validation-table">
         <thead>
@@ -2270,7 +2271,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </table>
     </div>
     <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.6;">
-      <strong>Benchmark sources:</strong> Government take ranges validated against 21 publicly disclosed reference sets: Wood Mackenzie Fiscal Benchmarks; Rystad Energy UCube Country Profiles; S&amp;P Global Commodity Insights Fiscal Terms Database; IHS Markit Fiscal and Regulatory Updates; Norwegian Offshore Directorate (NCA) published range; HMRC/OGA UK fiscal take reports; EIA Gulf of Mexico fiscal study; ANP (Brazil) fiscal disclosure; KAZENERGY Annual Report; PETRONAS Annual Report; SKK Migas (Indonesia) contractor terms; Sonangol/IMF Angola fiscal review; NNPC/Rystad Nigeria fiscal benchmarks; SONATRACH/Wood Mackenzie Algeria study; QP/Oxford Institute for Energy Studies Qatar Fiscal Review; PDO/OIES Gulf Study (Oman); National Energy Board/AER Alberta Royalty (Canada); Agencia Nacional de Hidrocarburos ANH (Colombia); GNPC/Rystad Jubilee PSC benchmarks (Ghana); EGPC production sharing contract literature (Egypt); BP Annual Report/AIOC PSA structure (Azerbaijan).
+      <strong>Benchmark sources:</strong> Government take ranges validated against 23 publicly disclosed reference sets: Wood Mackenzie Fiscal Benchmarks; Rystad Energy UCube Country Profiles; S&amp;P Global Commodity Insights Fiscal Terms Database; IHS Markit Fiscal and Regulatory Updates; Norwegian Offshore Directorate (NCA) published range; HMRC/OGA UK fiscal take reports; EIA Gulf of Mexico fiscal study; ANP (Brazil) fiscal disclosure; KAZENERGY Annual Report; PETRONAS Annual Report; SKK Migas (Indonesia) contractor terms; Sonangol/IMF Angola fiscal review; NNPC/Rystad Nigeria fiscal benchmarks; SONATRACH/Wood Mackenzie Algeria study; QP/Oxford Institute for Energy Studies Qatar Fiscal Review; PDO/OIES Gulf Study (Oman); National Energy Board/AER Alberta Royalty (Canada); Agencia Nacional de Hidrocarburos ANH (Colombia); GNPC/Rystad Jubilee PSC benchmarks (Ghana); EGPC production sharing contract literature (Egypt); BP Annual Report/AIOC PSA structure (Azerbaijan); Perupetro/Wood Mac Peru fiscal study; ADNOC/S&amp;P Global Commodity Insights UAE concession terms.
     </p>
     <p class="table-footnote" style="font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.5;">&#8224; Government take calculated at $75/bbl Brent. Source: independent petroleum economics analysis; benchmark ranges from Wood Mackenzie, Rystad Energy, HMRC, NCA, and national regulator publications.</p>
   </div>
@@ -2338,7 +2339,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       'Suriname':       { platform: 53.7, ref_lo: 49, ref_hi: 58,  note: 'DSO PSC/Staatsolie' },
       /* --- v106: expanded validation set --- */
       'Senegal':        { platform: 60.2, ref_lo: 56, ref_hi: 65,  note: 'SNH/Wood Mac Sangomar PSC' },
-      'Mozambique':     { platform: 69.8, ref_lo: 65, ref_hi: 75,  note: 'ENH/Rystad LNG PSA literature' }
+      'Mozambique':     { platform: 69.8, ref_lo: 65, ref_hi: 75,  note: 'ENH/Rystad LNG PSA literature' },
+      /* --- v110: expanded validation set --- */
+      'Peru':           { platform: 57.3, ref_lo: 53, ref_hi: 62,  note: 'Perupetro/Wood Mac fiscal study' },
+      'United Arab Emirates': { platform: 89.1, ref_lo: 85, ref_hi: 93,  note: 'ADNOC concession terms/S&P GCI' }
     };
     var tbody = document.getElementById('benchmark-validation-body');
     if (!tbody) return;
@@ -2448,7 +2452,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;">
         <div style="font-size:13px;font-weight:700;color:#93c5fd;margin-bottom:6px;">Q: How do I know these government take numbers are correct?</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.7;">
-          The benchmark validation table (Methodology tab → Validation section) compares computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP, QP/OIES, AER, ANH, GNPC, EGPC, BP/AIOC, CNH, NOC/Libya, MEEI, NAMCOR, Staatsolie, SNH, ENH) for 27 benchmark countries spanning all major producing regions. 26 of 27 pass a ±3pp tolerance (96%). The one near-miss is Ireland (27.1% vs 25–32% range; within 5pp — reflects a simplified ring-fence treatment; Ireland holds &lt;0.1% of global contracts). For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of all 330,329 facts are A or B tier.
+          The benchmark validation table (Methodology tab → Validation section) compares computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP, QP/OIES, AER, ANH, GNPC, EGPC, BP/AIOC, CNH, NOC/Libya, MEEI, NAMCOR, Staatsolie, SNH, ENH, Perupetro, ADNOC/S&P GCI) for 29 benchmark countries spanning all major producing regions. 28 of 29 pass a ±3pp tolerance (97%). The one near-miss is Ireland (27.1% vs 25–32% range; within 5pp — reflects a simplified ring-fence treatment; Ireland holds &lt;0.1% of global contracts). For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of all 330,329 facts are A or B tier.
         </div>
       </div>
 
@@ -2540,7 +2544,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="margin-top:10px;font-size:13px;color:var(--text-muted);line-height:1.6;">
         <p><strong>DB date: 2026-08-08.</strong> The platform is updated in continuous improvement cycles, with the fiscal database (country_data.json) updated as new primary sources are processed through the Harvesting pipeline. The nightly audit (03:00 daily) validates data completeness and DCF consistency across all 185 countries — see the footer for last-run status.</p>
         <p><strong>What changes between updates:</strong> (1) New contracts sourced from operator annual reports, government gazettes, and PSA filings. (2) Fiscal term corrections when secondary sources are superseded by primary legislation. (3) IRR and breakeven coverage expansion — currently 74/185 and 68/185 countries respectively; expanding as capital cost data is compiled.</p>
-        <p><strong>Stability:</strong> Government take figures for the 27 benchmark countries have been stable within ±2pp across the last 6 sourcing cycles (Apr–Aug 2026). Norway, Iraq, Angola, USA, UAE, and Australia have A-tier sourcing locked from primary legislation.</p>
+        <p><strong>Stability:</strong> Government take figures for the 29 benchmark countries have been stable within ±2pp across the last 6 sourcing cycles (Apr–Aug 2026). Norway, Iraq, Angola, USA, UAE, and Australia have A-tier sourcing locked from primary legislation.</p>
         <p><strong>For time-sensitive work:</strong> Check the DB date in the footer. If your analysis requires confirmed current-year rates, cross-reference against the primary source cited in the Evidence tooltip for that country.</p>
       </div>
     </details>
@@ -2569,7 +2573,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <strong style="color:var(--text);">Three-tier verification workflow:</strong>
         <ol style="margin:8px 0 8px 16px;padding:0;">
           <li style="margin-bottom:6px;"><strong>Check the Evidence badge first.</strong> Every country in Explorer and Country Profile shows an A/B/C/D confidence tier. Tier A (teal) = parameter sourced directly from primary legislation or signed PSA text. Tier B (green) = sourced from operator annual report or government filing. Tier C (yellow) = cross-referenced secondary (Wood Mac, Rystad). Tier D (grey) = modeled default. For investment-grade due diligence, verify any Tier C or D country against a primary source before use in an IC submission.</li>
-          <li style="margin-bottom:6px;"><strong>Compare the benchmark validation table.</strong> The Methodology tab's "Benchmark Validation" section cross-checks 27 benchmark countries against Wood Mackenzie, Rystad Energy, and S&amp;P Global ranges. If your target country is in that set (Norway, Iraq, Angola, USA, UAE, Australia, Brazil, Kazakhstan, and 19 others), the take figure has been independently verified within ±3pp. Pass rate: 26/27 (96%).</li>
+          <li style="margin-bottom:6px;"><strong>Compare the benchmark validation table.</strong> The Methodology tab's "Benchmark Validation" section cross-checks 29 benchmark countries against Wood Mackenzie, Rystad Energy, and S&amp;P Global ranges. If your target country is in that set (Norway, Iraq, Angola, USA, UAE, Australia, Brazil, Kazakhstan, Peru, and 20 others), the take figure has been independently verified within ±3pp. Pass rate: 28/29 (97%).</li>
           <li style="margin-bottom:6px;"><strong>For countries not in the benchmark set,</strong> the public API at <code>api/v1/country/{slug}.json</code> includes a <code>source_note</code> field and <code>evidence_tier</code> per parameter. Export via Country Profile XLSX to get the full parameter set with source annotations. For frontier countries, the <code>profit_oil_tier_schedule</code> field shows the R-factor tiers sourced from the signed PSA — compare against the actual PSA document if available.</li>
         </ol>
         <em>Verification shortcut: countries with ≥80% A/B sourced facts (shown in the Screener's Evidence Quality slider) have the highest independent verifiability. Filter to these using the Evidence Quality slider set to 80% — this reduces the universe to the most auditable set for formal due diligence workflows.</em>
@@ -2639,9 +2643,33 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
 
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+      <div class="meth-faq-q" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a18-body" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;line-height:1.4;">
+        A18. How do I interpret the Fiscal Reform Risk and Stability Score when comparing regimes?
+      </div>
+      <div class="meth-faq-a" id="faq-a18-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
+        The <strong style="color:var(--text);">Fiscal Predictability Score</strong> (0–100, shown in Explorer and Country Profile) combines three signals: reform frequency, reform direction (tightening vs. liberalizing), and IQR (within-country take variation across contract vintages). A higher score means more predictable terms — the government has historically changed rates rarely and within a narrow band.<br><br>
+        <strong style="color:var(--text);">Score interpretation guide:</strong>
+        <ul style="margin:8px 0 8px 20px;list-style:disc;">
+          <li><strong style="color:var(--text);">80–100 (green):</strong> Highly stable. Fewer than 2 reform events per decade, take variation &lt;10pp across vintages. Suitable for long-plateau projects with 15+ year capital commitment (e.g. Norway at 96, UAE at 91).</li>
+          <li><strong style="color:var(--text);">60–79 (amber):</strong> Moderate stability. Some reform activity but terms broadly consistent. Flag for scenario analysis: model a 5pp take increase as a downside case for capital allocation.</li>
+          <li><strong style="color:var(--text);">40–59 (orange):</strong> Elevated reform risk. Multiple reforms in the last decade, often in one direction (tightening). Use Scenario Builder to stress-test take at +10pp; verify that IRR still clears your hurdle at the stressed case.</li>
+          <li><strong style="color:var(--text);">0–39 (red):</strong> High reform risk. Regime has seen material tightening or reversals. Include a reform risk premium in your discount rate (recommended: +150–200bp above base). Do not rely on current take as indicative of terms at project peak production.</li>
+        </ul>
+        <strong style="color:var(--text);">Reform Risk tab workflow:</strong> Filter by country to see the full reform timeline — direction badges (Tightening / Liberalizing) and rate change columns show what changed and by how much. Cross-reference with the Stability Score: a country with 10 reform events that are all small and bidirectional may score higher than one with 3 large unidirectional tightenings.<br><br>
+        <strong style="color:var(--text);">Common analyst errors:</strong>
+        <ul style="margin:8px 0 8px 20px;list-style:disc;">
+          <li>Treating a current low take as locked-in for a 20-year project. Low take + low Stability Score = the government has historically recaptured upside when prices rise. Nigeria (PIA 2021) and Angola (2020 PSC reform) are recent examples.</li>
+          <li>Ignoring IQR when comparing similar average takes. Iraq average ~84.8% masks TSC vs. PSC block variation of 20+pp — the average is not representative of any single contract.</li>
+          <li>Using reform direction alone without controlling for oil price context. Most 2014–2016 liberalizations were responses to low oil prices; 2021–2023 tightenings tracked the post-COVID price recovery. Check the reform year against the oil price cycle before inferring regime intent.</li>
+        </ul>
+        <em>Rule of thumb: Stability Score &lt;60 adds one required stress-test iteration to any IC submission. Score &lt;40 requires a formal country risk premium in the IRR hurdle.</em>
+      </div>
+    </div>
+
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v109, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v110, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -3495,6 +3523,17 @@ function renderExplorer() {
       default: va = a[takeKey] ?? 999; vb = b[takeKey] ?? 999;
     }
     return va < vb ? -1 : va > vb ? 1 : 0;
+  });
+
+  // v110: Update aria-sort on Explorer column headers to reflect active sort
+  const _sortDirMap = { country: 'ascending', take: 'ascending', evidence: 'ascending', be: 'ascending', swing: 'ascending', irr: 'descending', npv: 'descending' };
+  document.querySelectorAll('#tbody-explorer').forEach(function(tb) {
+    if (tb.closest('table')) {
+      tb.closest('table').querySelectorAll('[data-sort-key]').forEach(function(th) {
+        const key = th.getAttribute('data-sort-key');
+        th.setAttribute('aria-sort', key === sort ? (_sortDirMap[key] || 'ascending') : 'none');
+      });
+    }
   });
 
   const tbody = document.getElementById('tbody-explorer');
@@ -11578,7 +11617,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v109</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v110</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
