@@ -167,7 +167,7 @@ async function testFiscalCompare(page) {
     // Run fiscal compare
     await page.selectOption('#fc-profile', 'deepwater');
     await page.selectOption('#fc-price', '75');
-    await page.evaluate(() => { const b = document.querySelector('button[onclick*="runFiscalCompare"]'); if(b) b.click(); });
+    await page.evaluate(() => { const b = document.getElementById('fc-run-btn'); if(b) b.click(); });
     await page.waitForTimeout(2000);
 
     const resultCount = await page.evaluate(() => {
@@ -208,7 +208,7 @@ async function testFiscalCompare(page) {
     // Run at different profile
     await page.selectOption('#fc-profile', 'onshore').catch(() => {});
     await page.selectOption('#fc-price', '100').catch(() => {});
-    await page.evaluate(() => { const b = document.querySelector('button[onclick*="runFiscalCompare"]'); if(b) b.click(); });
+    await page.evaluate(() => { const b = document.getElementById('fc-run-btn'); if(b) b.click(); });
     await page.waitForTimeout(1500);
     const r2 = await page.evaluate(() => window._fcResults ? window._fcResults.length : 0);
     if (r2 > 0) p(S, 'run onshore $100', `${r2} results`);
@@ -610,7 +610,7 @@ async function testDCF(page) {
     await page.waitForTimeout(200);
     await page.selectOption('#fc-profile', 'deepwater').catch(() => {});
     await page.selectOption('#fc-price', '75').catch(() => {});
-    await page.evaluate(() => { const b = document.querySelector('button[onclick*="runFiscalCompare"]'); if(b) b.click(); });
+    await page.evaluate(() => { const b = document.getElementById('fc-run-btn'); if(b) b.click(); });
     await page.waitForTimeout(2000);
 
     const fcCount = await page.evaluate(() => window._fcResults ? window._fcResults.length : 0);
