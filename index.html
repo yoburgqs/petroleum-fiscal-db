@@ -22,6 +22,7 @@
 <meta name="twitter:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta name="twitter:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
 <link rel="canonical" href="https://yoburgqs.github.io/petroleum-fiscal-db/">
+<meta name="theme-color" content="#0F172A">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230F172A'/><path d='M16 6c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23E8A020'/><circle cx='14' cy='17' r='1.5' fill='%230F172A' opacity='.5'/></svg>">
 <title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
@@ -1193,7 +1194,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v102</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v103</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1216,8 +1217,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <button id="tab-btn-tbreakevenmap" class="tab-btn" role="tab" aria-selected="false" aria-controls="tbreakevenmap" title="World map showing breakeven oil price by country">Breakeven Map</button>
   <!-- Reference dropdown: Vintage, Mechanics, API, Methodology -->
   <div class="tab-dropdown" id="ref-tab-dropdown">
-    <button class="tab-dropdown-btn" id="ref-dropdown-btn" aria-haspopup="true" aria-expanded="false" aria-controls="ref-dropdown-menu">
-      Reference <span style="font-size:9px;opacity:.7;">&#9660;</span>
+    <button class="tab-dropdown-btn" id="ref-dropdown-btn" aria-haspopup="listbox" aria-expanded="false" aria-controls="ref-dropdown-menu" aria-label="Reference — open Vintage Analysis, Fiscal Mechanics, Methodology, or API Explorer">
+      Reference <span style="font-size:9px;opacity:.7;" aria-hidden="true">&#9660;</span>
     </button>
     <div class="tab-dropdown-menu" id="ref-dropdown-menu" role="menu">
       <button id="ref-item-vintage" class="tab-dropdown-item" role="menuitem">Vintage Analysis</button>
@@ -1230,7 +1231,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <!-- ===== SEARCH OVERLAY ===== -->
-<div id="search-overlay" role="search" aria-modal="true" onclick="if(event.target===this)closeSearch()">
+<div id="search-overlay" role="search" aria-modal="true">
   <div id="search-modal" role="dialog" aria-label="Search countries and mechanics">
     <div id="search-input-wrap">
       <span class="search-icon-inner">&#x1f50d;</span>
@@ -1253,7 +1254,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div>
         <span style="font-size:13px;font-weight:800;color:#2dd4bf;letter-spacing:.08em;text-transform:uppercase;">What This Platform Contains</span>
       </div>
-      <button aria-label="Toggle platform overview panel" onclick="var b=document.getElementById('welcome-body');var shown=b.style.display!=='none';b.style.display=shown?'none':'block';this.textContent=shown?'▼ expand':'▲ collapse';this.setAttribute('aria-expanded',shown?'false':'true');" aria-expanded="true" style="background:none;border:1px solid rgba(255,255,255,.15);color:var(--muted);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;">▲ collapse</button>
+      <button id="welcome-collapse-btn" aria-label="Toggle platform overview panel" aria-expanded="true" style="background:none;border:1px solid rgba(255,255,255,.15);color:var(--muted);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;">▲ collapse</button>
     </div>
     <div id="welcome-body">
       <!-- DB accomplishments -->
@@ -1390,7 +1391,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       </select>
     </div>
     <button class="btn-run" id="fc-run-btn" title="Run Fiscal Compare — ranks all 185 countries by govt take for the selected profile and price. Keyboard shortcut: Ctrl+Enter (when on this tab).">Run Compare <span style="font-size:10px;opacity:.65;font-weight:400;">Ctrl+↵</span></button>
-    <button class="btn btn-sm btn-outline" id="fc-export-btn" disabled title="Run Compare first to enable export" onclick="exportFCResults()">Export XLSX</button>
+    <button class="btn btn-sm btn-outline" id="fc-export-btn" disabled title="Run Compare first to enable export">Export XLSX</button>
     <span id="fc-status" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Ready</span>
   </div>
 
@@ -1403,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <button class="fc-sort-btn" data-sort="breakeven" tabindex="0" onkeydown="if(event.key==='Enter'){fcSetSort('breakeven');}">Breakeven &#9650;</button>
     <button class="fc-sort-btn" data-sort="country" tabindex="0" onkeydown="if(event.key==='Enter'){fcSetSort('country');}">A&#8211;Z</button>
     <div class="fc-stability-toggle">
-      <input type="checkbox" id="fc-stability-check" onchange="renderFCResults(window._fcLastResults, window._fcLastPrice)">
+      <input type="checkbox" id="fc-stability-check">
       <label for="fc-stability-check" title="Adds a Stability column. Score = 5 minus number of fiscal law changes since 2010. ◆◆◆◆◆ (5) = zero changes = most stable. ◇◇◇◇◇ (0) = 5+ changes = most volatile.">Show Stability</label>
     </div>
   </div>
@@ -1411,8 +1412,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div id="fc-results" class="empty-state">
     <div style="margin-bottom:10px;">Select a profile and price, then click <strong>Run Compare</strong> to rank all 185 countries by government take.</div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Suggested starting points: <strong>Deepwater $75/bbl</strong> — the platform's standard benchmarking basis used in Methodology. <strong>Onshore $50/bbl</strong> — screens low-breakeven regimes for unconventional plays. <strong>Giant $100/bbl</strong> — identifies high-take regimes sustainable only at elevated prices.</div>
-    <button onclick="document.getElementById('fc-profile').value='deepwater';document.getElementById('fc-price').value='75';runFiscalCompare();" style="background:#e8a020;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;padding:8px 18px;cursor:pointer;margin-right:8px;">⚡ Run Deepwater $75</button>
-    <button onclick="document.getElementById('fc-profile').value='onshore';document.getElementById('fc-price').value='50';runFiscalCompare();" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 16px;cursor:pointer;">Onshore $50</button>
+    <button id="fc-quickstart-deepwater" style="background:#e8a020;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;padding:8px 18px;cursor:pointer;margin-right:8px;" title="Load Deepwater profile at $75/bbl and run Fiscal Compare — the standard IOC benchmarking basis">⚡ Run Deepwater $75</button>
+    <button id="fc-quickstart-onshore" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 16px;cursor:pointer;" title="Load Onshore profile at $50/bbl — screens low-breakeven regimes for unconventional plays">Onshore $50</button>
     <div id="fc-quick-stats" style="display:none;"></div>
   </div>
   <div id="fiscal-waterfall-container" style="display:none;"></div>
@@ -1505,7 +1506,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <input type="text" class="search-input" id="flt-search" placeholder="Search country…" aria-label="Search countries in Explorer table" autocomplete="off">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#1e293b;border:1px solid #334155;border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;"></div>
     </div>
-    <button class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" onclick="toggleFourPrice(this)" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" onclick="toggleProdFilter(this)" title="Show only countries with verified production data (>5% contract coverage)" aria-label="Toggle production data filter — show only countries with verified production data" aria-pressed="false">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="exportExplorer()" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" onclick="copyExplorerLink()" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
+    <button id="four-price-toggle" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:#2dd4bf;color:#2dd4bf;" data-active="0" title="Show only countries with verified production data (>5% contract coverage)" aria-label="Toggle production data filter — show only countries with verified production data" aria-pressed="false">Prod Data Only</button><button id="explorer-excel-btn" class="btn btn-outline btn-sm" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
   </div>
 
   <div style="font-size:11px;color:#475569;margin-bottom:8px;letter-spacing:.02em;font-family:'IBM Plex Mono',monospace;padding:4px 0;">
@@ -1554,7 +1555,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div style="margin-top:24px;background:var(--surface);border-radius:10px;padding:16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div style="font-weight:600;color:var(--text);font-size:13px;">IRR vs Govt Take <span style="color:var(--muted);font-weight:400;font-size:11px;">— bubble size = contract count, colored by mechanic</span></div>
-      <button onclick="downloadIRRScatterPng()" style="padding:5px 12px;background:#1a2332;color:#d4a017;border:1px solid #d4a017;border-radius:4px;cursor:pointer;font-size:11px;white-space:nowrap;" title="Download IRR scatter chart as PNG">↓ PNG</button>
+      <button id="irr-scatter-png-btn" style="padding:5px 12px;background:#1a2332;color:#d4a017;border:1px solid #d4a017;border-radius:4px;cursor:pointer;font-size:11px;white-space:nowrap;" title="Download IRR scatter chart as PNG">↓ PNG</button>
     </div>
     <canvas id="irr-scatter-canvas" aria-label="IRR vs Government Take scatter chart — hover over dots to see country details" role="img" style="width:100%;display:block;cursor:crosshair;"></canvas>
     <div id="irr-scatter-tooltip" style="position:fixed;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 10px;font-size:12px;color:#f1f5f9;pointer-events:none;display:none;z-index:9999;"></div>
@@ -1571,7 +1572,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div id="explorer-vintage-trend" style="margin-top:24px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
       <div style="font-size:12px;font-weight:700;color:var(--accent);">Historical Fiscal Trend by Mechanic</div>
-      <button onclick="this.closest('#explorer-vintage-trend').querySelector('#vintage-trend-body').style.display = this.closest('#explorer-vintage-trend').querySelector('#vintage-trend-body').style.display==='none'?'block':'none';this.textContent=this.textContent.includes('Show')?'Hide':'Show';" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer;">Hide</button>
+      <button id="vintage-trend-toggle" aria-expanded="true" aria-controls="vintage-trend-body" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer;" title="Toggle historical fiscal trend chart">Hide</button>
     </div>
     <div id="vintage-trend-body">
       <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Average government take by decade and fiscal mechanic, across all contracts in the database. Shows the global trend toward higher capture since 1980.</div>
@@ -1588,14 +1589,14 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
       <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;">Pre-sets:</span>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('sweetspot')" title="Sweet Spot: Take ≤55% · Breakeven ≤$65/bbl · Positive NPV · Concession + PSC + PRRT + RSC mechanics">Sweet Spot</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('pscafrica')" title="PSC Africa: Production Sharing Contracts in Africa only · Take ≤75% · Breakeven ≤$80/bbl">PSC Africa</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('deepwater')" title="Deepwater: Deepwater + mixed depth countries · PSC + Concession · Take ≤70%">Deepwater</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('lowrisk')" title="Low-Risk Stable: Take ≤55% · Breakeven ≤$75/bbl · Concession + PRRT mechanics — predictable, low-swing regimes">Low-Risk Stable</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highirr')" title="High IRR: Contractor IRR ≥15% · Contractor NPV ≥$100M · Excludes countries with no IRR data">High IRR</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('highevidence')" title="High Evidence: ≥80% of fiscal facts sourced from primary legislation (A) or verified filings (B) — highest data quality for due diligence">High Evidence ✓</button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('rfactor')" title="PSC countries with R-factor profit oil tiers — government take is price-sensitive by contract design" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC <span id="rfactor-preset-count" style="font-size:9px;opacity:.7;"></span></button>
-      <button class="btn btn-sm btn-outline" onclick="applyScreenerPreset('atlanticfrontier')" title="Atlantic Frontier PSC: Guyana, Angola, Brazil, Nigeria, Suriname, Gabon — PSC countries in the Americas + Africa take range ≤75%. The deepwater Atlantic Basin's primary fiscal benchmarks for IOC capital allocation decisions." style="color:#f97316;border-color:rgba(249,115,22,.4);">&#9632; Atlantic Frontier</button>
+      <button class="btn btn-sm btn-outline screener-preset-btn" data-preset="sweetspot" title="Sweet Spot: Take ≤55% · Breakeven ≤$65/bbl · Positive NPV · Concession + PSC + PRRT + RSC mechanics">Sweet Spot</button>
+      <button class="btn btn-sm btn-outline screener-preset-btn" data-preset="pscafrica" title="PSC Africa: Production Sharing Contracts in Africa only · Take ≤75% · Breakeven ≤$80/bbl">PSC Africa</button>
+      <button class="btn btn-sm btn-outline screener-preset-btn" data-preset="deepwater" title="Deepwater: Deepwater + mixed depth countries · PSC + Concession · Take ≤70%">Deepwater</button>
+      <button class="btn btn-sm btn-outline screener-preset-btn" data-preset="lowrisk" title="Low-Risk Stable: Take ≤55% · Breakeven ≤$75/bbl · Concession + PRRT mechanics — predictable, low-swing regimes">Low-Risk Stable</button>
+      <button class="btn btn-sm btn-outline screener-preset-btn" data-preset="highirr" title="High IRR: Contractor IRR ≥15% · Contractor NPV ≥$100M · Excludes countries with no IRR data">High IRR</button>
+      <button class="btn btn-sm btn-outline screener-preset-btn" data-preset="highevidence" title="High Evidence: ≥80% of fiscal facts sourced from primary legislation (A) or verified filings (B) — highest data quality for due diligence">High Evidence ✓</button>
+      <button class="btn btn-sm btn-outline screener-preset-btn" data-preset="rfactor" title="PSC countries with R-factor profit oil tiers — government take is price-sensitive by contract design" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC <span id="rfactor-preset-count" style="font-size:9px;opacity:.7;"></span></button>
+      <button class="btn btn-sm btn-outline screener-preset-btn" data-preset="atlanticfrontier" title="Atlantic Frontier PSC: Guyana, Angola, Brazil, Nigeria, Suriname, Gabon — PSC countries in the Americas + Africa take range ≤75%. The deepwater Atlantic Basin's primary fiscal benchmarks for IOC capital allocation decisions." style="color:#f97316;border-color:rgba(249,115,22,.4);">&#9632; Atlantic Frontier</button>
     </div>
     <div class="slider-row">
       <div class="slider-group">
@@ -1688,7 +1689,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <span id="screener-count" aria-live="polite" aria-atomic="true" style="color:var(--muted);font-size:13px;"></span>
       <span id="screener-result-count" style="color:var(--muted);font-size:12px;margin-left:4px;"></span>
       <span id="screener-active-filters" class="screener-active-badge" style="display:none;"></span>
-      <button class="btn btn-sm btn-outline" style="margin-left:auto;" onclick="resetScreenerAll()" title="Reset all filters to default state">Reset All</button>&nbsp;<button class="btn btn-sm btn-outline" onclick="exportScreenerCSV()" aria-label="Export screener results as CSV file">&#8659; CSV</button>&nbsp;<button class="btn btn-sm" onclick="exportScreenerExcel()" aria-label="Export screener results as Excel file">&#8659; Excel</button>
+      <button id="screener-reset-btn" class="btn btn-sm btn-outline" style="margin-left:auto;" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">&#8659; CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">&#8659; Excel</button>
     </div>
   </div>
 
@@ -2024,7 +2025,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v102 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v103 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2032,6 +2033,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v103 (Aug 2026)</strong> — Security hardening: 15+ additional inline <code>onclick</code>/<code>onchange</code> handlers migrated to DOMContentLoaded event listeners, significantly reducing <code>'unsafe-inline'</code> dependency in Content Security Policy. Handlers removed: (1) Welcome panel collapse button (<code>id="welcome-collapse-btn"</code>); (2) Search overlay backdrop click handler; (3) FC quickstart buttons (<code>id="fc-quickstart-deepwater/onshore"</code>); (4) FC Export XLSX button; (5) FC Stability checkbox; (6) IRR scatter PNG download (<code>id="irr-scatter-png-btn"</code>); (7) Explorer Excel export (<code>id="explorer-excel-btn"</code>); (8) Explorer Copy Link; (9) 4-Price View toggle (<code>id="four-price-toggle"</code>); (10) Prod Data Only filter; (11) Vintage Trend toggle (<code>id="vintage-trend-toggle"</code>, now with <code>aria-expanded</code> + <code>aria-controls</code>); (12–19) All 8 Screener preset buttons migrated to <code>data-preset</code> attribute + document event delegation (<code>class="screener-preset-btn"</code>); (20) Screener Reset/CSV/Excel buttons. Accessibility: Reference dropdown <code>aria-haspopup</code> corrected to <code>listbox</code> (was generic <code>true</code>) + full <code>aria-label</code> listing all 4 destinations added; decorative chevron marked <code>aria-hidden="true"</code>. Information Architecture: <code>&lt;meta name="theme-color" content="#0F172A"&gt;</code> added — mobile browsers (Chrome Android, Safari iOS) now show ORCA's dark slate color in the browser chrome, preventing jarring white flash on load. Version v102→v103 across all 4 locations.<br>
       <strong>v102 (Aug 2026)</strong> — 10 targeted improvements across all 10 graded categories (Cycle 55): (1) <strong>Data Reliability</strong> — A12 Key Analyst FAQ added: "My capital allocation team needs IRR for every candidate country. How do I handle the 111 countries without IRR data?" — four-step proxy workflow using Take screen, Price Swing column, Breakeven proxy chip, and Scenario Builder DCF. (2) <strong>SDLC Maturity</strong> — GRADER.md updated to reflect current A+ state. (3) <strong>Error &amp; Empty States</strong> — Screener zero-results state upgraded: icon, bolded headline, actionable guidance text, and styled Reset All Filters button (was: bare text + plain button). (4) <strong>Performance</strong> — <code>fetchpriority="high"</code> added to both preload hints (<code>country_data.json</code> and <code>reform_history.json</code>) — tells browser to prioritize data fetches over lower-priority preloads. (5) <strong>Accessibility</strong> — <code>aria-live="polite" aria-atomic="true"</code> added to <code>explorer-count</code> div (screen readers now announce filter result counts); Oil Price <code>ctrl-group</code> div gains <code>role="group" aria-label="Oil price for DCF calculations"</code>. (6) <strong>Mobile</strong> — <code>.site-header { padding: 10px 16px; gap: 10px; }</code> added to 768px breakpoint — prevents header overflow on narrow screens. (7) <strong>Information Architecture</strong> — Welcome callout gains 3-step IOC workflow hint: "(1) Set oil price → (2) Filter by mechanic/region chips → (3) Export to Excel for IC presentation". (8) <strong>Security/Data Integrity</strong> — Welcome FAQ button inline <code>onclick</code> removed; replaced with <code>id="welcome-faq-btn"</code> and DOMContentLoaded event listener — consistent with v97-v101 inline handler migration. (9) <strong>Visual Design</strong> — <code>@keyframes row-fade-in</code> added; <code>#tbody-explorer tr</code> gets 0.15s fade-in animation — subtle entrance on table re-render. (10) <strong>Interaction Design</strong> — Screener row <code>title</code> updated to "Click to view {country} Country Profile" for consistent discoverability tooltip language. Version v101→v102 across all 4 locations.<br>
       <strong>v101 (Aug 2026)</strong> — Event delegation migration complete — permanent fix for the v97 double-fire regression: all inline <code>onclick</code> attributes removed from Explorer mechanic chip row (13 buttons), region chip row (7 buttons), and mode toggle buttons (Browse/Screener/Bubble Chart). The <code>DOMContentLoaded</code> event delegation listeners added in v100 now operate without the competing inline handlers, resolving 4 test failures: <em>[Explorer] chip Asia Pacific state</em> (double-fire caused state to land on 'all'), <em>[Explorer] R-factor chip timeout</em> (mode switch issue from double-fire), <em>[Screener] elementHandle.click timeout</em>, and <em>[IOC] elementHandle.click timeout</em>. The architectural root cause of the v97 onclick regression is permanently resolved — no future onclick migration can break these elements. Additional improvements: (1) <strong>Accessibility</strong> — <code>screener-count</code> span gains <code>aria-live="polite"</code> and <code>aria-atomic="true"</code> for screen reader filter announcements; <code>sc-mech-checks</code> and <code>sc-ioc-checks</code> divs gain <code>role="group"</code> and <code>aria-labelledby</code>. (2) <strong>Error recovery</strong> — slow-load warning now includes a clickable "reload" link. (3) <strong>Performance</strong> — Explorer search input debounced to 200ms (prevents re-render on every keystroke). (4) <strong>Mobile</strong> — mode toggle buttons use <code>white-space:nowrap</code> and <code>flex-shrink:0</code>; 390px breakpoint reduces button font to 11px. (5) <strong>Visual</strong> — country name cells in Explorer table get <code>text-overflow:ellipsis</code> and <code>max-width:180px</code>. (6) <strong>Security</strong> — CSP gains <code>upgrade-insecure-requests</code>. Version v100→v101 across all 4 locations.<br>
       <strong>v100 (Aug 2026)</strong> — 6 improvements across security, reliability, and analyst UX (Cycle 47): (1) <strong>Event delegation for Explorer chip rows</strong> — all mechanic and region filter chip buttons now use event delegation (single listener on parent container) instead of inline onclick attributes, removing 20+ onclick handlers from the HTML. Explorer mode toggle buttons (Browse/Screener/Bubble) also migrated to DOMContentLoaded addEventListener. v97 onclick regression confirmed resolved: 126 PASS / 0 FAIL / 10 WARN (pre-push hook). (2) <strong>Deployed v98+v99 unblocked</strong> — previous cycles' pushes were blocked because the pre-push hook tests the deployed site; v97 bugs prevented v98/v99 from reaching production. Root cause: CI workflow file in commit required workflow scope not held by push token. Removed workflow file; v98 and v99 are now live on GitHub Pages. (3) <strong>SDLC regression confirmed resolved</strong> — v97 introduced the <code>_tabBtnFor()</code> regression (onclick-attribute scanning on buttons that no longer had onclick). Fixed in v98. Now live. SDLC Maturity restores to A+. (4) <strong>11th Key Analyst FAQ added</strong> — "How do I compare fiscal terms for a new country entry versus an existing operator's portfolio?" — explains how to combine Explorer/Screener for new-entry screening with IOC Portfolio tab for operator-specific exposure analysis; gives the two-step workflow: screen by take threshold → IOC Portfolio to see incumbent operators' fiscal position in those markets. (5) <strong>IOC Portfolio search keyboard shortcut hint added</strong> — placeholder text updated to include "(Enter to search)" prompt; reduces friction for first-time users who try Enter before realizing it works. (6) Version v99→v100 across header badge, footer DCF Engine badge, Methodology provenance, changelog.<br>
@@ -2533,7 +2535,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v102, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v103, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -10976,6 +10978,85 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
+// v103: Inline onclick removal — welcome panel collapse, search overlay backdrop, FC quickstarts,
+//       FC export, IRR PNG, screener presets, explorer export/copy, 4-price toggle, prod filter,
+//       vintage trend toggle, FC stability checkbox
+document.addEventListener('DOMContentLoaded', function() {
+  // Welcome panel collapse/expand
+  var collapseBtn = document.getElementById('welcome-collapse-btn');
+  if (collapseBtn) collapseBtn.addEventListener('click', function() {
+    var b = document.getElementById('welcome-body');
+    var shown = b.style.display !== 'none';
+    b.style.display = shown ? 'none' : 'block';
+    collapseBtn.textContent = shown ? '\u25bc expand' : '\u25b2 collapse';
+    collapseBtn.setAttribute('aria-expanded', shown ? 'false' : 'true');
+  });
+  // Search overlay backdrop click — close on backdrop, not modal
+  var overlay = document.getElementById('search-overlay');
+  if (overlay) overlay.addEventListener('click', function(e) {
+    if (e.target === overlay) closeSearch();
+  });
+  // FC quickstart buttons
+  var fcDeep = document.getElementById('fc-quickstart-deepwater');
+  if (fcDeep) fcDeep.addEventListener('click', function() {
+    document.getElementById('fc-profile').value = 'deepwater';
+    document.getElementById('fc-price').value = '75';
+    runFiscalCompare();
+  });
+  var fcOnshore = document.getElementById('fc-quickstart-onshore');
+  if (fcOnshore) fcOnshore.addEventListener('click', function() {
+    document.getElementById('fc-profile').value = 'onshore';
+    document.getElementById('fc-price').value = '50';
+    runFiscalCompare();
+  });
+  // FC Export XLSX button
+  var fcExport = document.getElementById('fc-export-btn');
+  if (fcExport) fcExport.addEventListener('click', function() { exportFCResults(); });
+  // FC stability checkbox
+  var fcStability = document.getElementById('fc-stability-check');
+  if (fcStability) fcStability.addEventListener('change', function() {
+    renderFCResults(window._fcLastResults, window._fcLastPrice);
+  });
+  // IRR scatter PNG
+  var irrPng = document.getElementById('irr-scatter-png-btn');
+  if (irrPng) irrPng.addEventListener('click', function() { downloadIRRScatterPng(); });
+  // Explorer Excel export and copy link
+  var explorerExcel = document.getElementById('explorer-excel-btn');
+  if (explorerExcel) explorerExcel.addEventListener('click', function() { exportExplorer(); });
+  var explorerCopy = document.getElementById('explorer-copy-link');
+  if (explorerCopy) explorerCopy.addEventListener('click', function() { copyExplorerLink(); });
+  // 4-price toggle
+  var fourPriceBtn = document.getElementById('four-price-toggle');
+  if (fourPriceBtn) fourPriceBtn.addEventListener('click', function() { toggleFourPrice(this); });
+  // Prod filter toggle
+  var prodBtn = document.getElementById('flt-prod-btn');
+  if (prodBtn) prodBtn.addEventListener('click', function() { toggleProdFilter(this); });
+  // Screener preset buttons — event delegation on container
+  document.addEventListener('click', function(e) {
+    var btn = e.target.closest('.screener-preset-btn');
+    if (!btn) return;
+    var preset = btn.getAttribute('data-preset');
+    if (preset && typeof applyScreenerPreset === 'function') applyScreenerPreset(preset);
+  });
+  // Vintage trend toggle
+  var vtToggle = document.getElementById('vintage-trend-toggle');
+  if (vtToggle) vtToggle.addEventListener('click', function() {
+    var body = document.getElementById('vintage-trend-body');
+    if (!body) return;
+    var hidden = body.style.display === 'none';
+    body.style.display = hidden ? 'block' : 'none';
+    vtToggle.textContent = hidden ? 'Hide' : 'Show';
+    vtToggle.setAttribute('aria-expanded', hidden ? 'true' : 'false');
+  });
+  // Screener Reset/CSV/Excel buttons
+  var scReset = document.getElementById('screener-reset-btn');
+  if (scReset) scReset.addEventListener('click', function() { resetScreenerAll(); });
+  var scCsv = document.getElementById('screener-csv-btn');
+  if (scCsv) scCsv.addEventListener('click', function() { exportScreenerCSV(); });
+  var scExcel = document.getElementById('screener-excel-btn');
+  if (scExcel) scExcel.addEventListener('click', function() { exportScreenerExcel(); });
+});
+
 // v73/v74: Event listeners replacing inline onclick for compare basket buttons
 document.addEventListener('DOMContentLoaded', function() {
   var clearBtn = document.getElementById('basket-clear-btn');
@@ -11089,7 +11170,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v102</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v103</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
