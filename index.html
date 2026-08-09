@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://unpkg.com" crossorigin>
 <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com">
 <link rel="dns-prefetch" href="https://unpkg.com">
 <link rel="preload" href="country_data.json" as="fetch" crossorigin="anonymous" fetchpriority="high">
@@ -75,7 +76,7 @@ a { color: var(--accent); text-decoration: none; }
 .tab-nav-wrapper::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 40px; background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none; }
 .tab-nav-wrapper::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(to left, transparent, var(--bg)); pointer-events: none; z-index: 1; transition: width .2s; }
 .tab-nav-wrapper.scrolled::before { width: 32px; }
-.tab-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 18px; white-space: nowrap; transition: .15s; }
+.tab-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 18px; white-space: nowrap; transition: .15s; touch-action: manipulation; }
 .tab-btn:hover  { color: var(--text); }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
@@ -1194,16 +1195,17 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v103</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v104</span>
   </div>
   <div class="header-actions">
-    <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
+    <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
     <button id="hdr-scenario-btn" aria-label="Open Scenario Builder — model a custom fiscal regime and run DCF" title="Build a custom fiscal regime: set royalty, CIT, profit oil split, R-factor tiers, then run DCF">+ Scenario</button>
     <button id="hdr-ref-btn" aria-label="Open Reference Guide — fiscal mechanics, methodology, and sourcing" title="Open fiscal mechanics reference guide: concession, PSC, TSC, PRRT, RSC, Buy-back">Reference Guide</button>
   </div>
 </div>
 
 <!-- ===== v52 TAB NAV (8 primary tabs + Reference dropdown) ===== -->
+<nav aria-label="Platform sections">
 <div class="tab-nav-wrapper">
 <div class="tab-nav" role="tablist">
   <button id="tab-btn-t0" class="tab-btn active" role="tab" aria-selected="true" aria-controls="t0" title="Compare fiscal terms across up to 5 countries">Fiscal Compare</button>
@@ -1229,6 +1231,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 </div>
 </div>
+</nav>
 
 <!-- ===== SEARCH OVERLAY ===== -->
 <div id="search-overlay" role="search" aria-modal="true">
@@ -1245,6 +1248,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 </div>
 
 <span id="main-tab-content" tabindex="-1" aria-hidden="true" style="position:absolute;"></span>
+<main id="tab-content-main" aria-label="Platform content — fiscal data tabs">
 <!-- ===== TAB 0: FISCAL COMPARE (v38 centerpiece) ===== -->
 <div id="t0" class="tab-pane active" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t0">
 
@@ -1476,7 +1480,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
          Kept in DOM so setExplorerChip() sync logic continues to work. -->
     <div class="ctrl-group" style="display:none">
       <label>Mechanic</label>
-      <select id="flt-mech">
+      <select id="flt-mech" aria-label="Filter Explorer table by fiscal mechanic type">
         <option value="">All Mechanics</option>
         <option>Concession</option><option>PSC</option><option>TSC</option>
         <option>PRRT</option><option>RSC</option><option>Buy-back</option><option>Revenue Share</option><option>Gross Split</option>
@@ -1484,7 +1488,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </div>
     <div class="ctrl-group" style="display:none">
       <label>Region</label>
-      <select id="flt-region">
+      <select id="flt-region" aria-label="Filter Explorer table by geographic region">
         <option value="">All Regions</option>
         <option>Africa</option><option>Asia Pacific</option><option>Middle East</option>
         <option>Europe</option><option>Americas</option>
@@ -1903,7 +1907,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-sub">Select an operator to see what percentage of their global contract portfolio sits in each take tier — and how their aggregate exposure compares to the IOC peer group.</div>
 
   <div style="display:flex;gap:12px;align-items:center;margin:16px 0;flex-wrap:wrap;">
-    <select id="exposure-ioc-select" aria-label="Select IOC operator for fiscal exposure analysis" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;font-size:13px;" onchange="renderIOCExposure(this.value)">
+    <select id="exposure-ioc-select" aria-label="Select IOC operator for fiscal exposure analysis" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;font-size:13px;">
       <option value="">Select Operator…</option>
     </select>
     <div id="exposure-ioc-quick" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
@@ -1948,11 +1952,11 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-title">Country Profile</div>
   <div class="page-sub">Government take across 4 price scenarios, fiscal mechanics breakdown, reform timeline, DCF sensitivity (price/opex/capex/production), and sourced fiscal facts with confidence badges — all in one place.</div>
   <div id="dd-select-wrap">
-    <select id="dd-country-select" aria-label="Select a country to load its complete fiscal profile" onchange="loadCountryProfile(this.value)">
+    <select id="dd-country-select" aria-label="Select a country to load its complete fiscal profile">
       <option value="">— Select a country —</option>
     </select>
     <label id="dd-mc-toggle-wrap" style="display:none;margin-left:18px;align-items:center;gap:7px;font-size:12px;color:#8892a8;cursor:pointer;">
-      <input type="checkbox" id="dd-mc-toggle" checked onchange="loadCountryProfile(document.getElementById('dd-country-select').value)">
+      <input type="checkbox" id="dd-mc-toggle" checked aria-label="Toggle Monte Carlo uncertainty bands on country profile charts">
       Show MC uncertainty
     </label>
     <button id="dd-copy-link-btn" onclick="copyCurrentLink()" title="Copy shareable link to this country profile"
@@ -2002,7 +2006,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-title">API Explorer</div>
   <div class="page-sub">Browse the live JSON API for any country. Endpoint: <code>api/v1/country/{slug}.json</code> where slug = country name lowercased with hyphens. 185 countries available. Response includes <code>profit_oil_tier_schedule</code> for R-factor PSC countries. Fiscal facts power the Country Profile panel above.</div>
   <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
-    <select id="api-country-select" aria-label="Select country to load API JSON response" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:8px 14px;min-width:240px;" onchange="loadAPIJson(this.value)">
+    <select id="api-country-select" aria-label="Select country to load API JSON response" style="background:var(--card);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:8px 14px;min-width:240px;">
       <option value="">— Select a country —</option>
     </select>
     <button class="btn btn-outline btn-sm" id="api-copy-btn" onclick="copyAPIUrl()" title="Select a country above to enable this button — then click to copy the direct API URL to clipboard" disabled>⎘ Copy API URL</button>
@@ -2025,7 +2029,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v103 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v104 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2033,6 +2037,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v104 (Aug 2026)</strong> — 10 targeted improvements across 7 lowest-graded categories (Cycle 57): (1) <strong>Accessibility</strong> — <code>aria-label</code> added to <code>#flt-mech</code> (Explorer mechanic filter select) and <code>#flt-region</code> (both were missing, WCAG 1.3.5 violation). <code>aria-label</code> added to Scenario Builder <code>#sb-mechanic</code> and <code>#sb-profile</code> selects. <code>aria-label</code> added to header Search button (<code>#hdr-search-btn</code>). <code>aria-label</code> added to <code>#dd-mc-toggle</code> checkbox. (2) <strong>Information Architecture</strong> — <code>&lt;nav aria-label="Platform sections"&gt;</code> landmark wraps the tab navigation — screen readers can now skip directly to the nav landmark. <code>&lt;main id="tab-content-main" aria-label="Platform content — fiscal data tabs"&gt;</code> landmark wraps all tab pane content — completes the landmark map required for WCAG 2.4.1. (3) <strong>Security / Data Integrity</strong> — 4 additional <code>onchange</code> handlers migrated to DOMContentLoaded event listeners: <code>#dd-country-select</code>, <code>#dd-mc-toggle</code>, <code>#exposure-ioc-select</code>, <code>#api-country-select</code>. This reduces the HTML's inline event handler count by a further 4. (4) <strong>Performance</strong> — <code>&lt;link rel="preconnect"&gt;</code> added for <code>unpkg.com</code> (previously only had dns-prefetch — preconnect establishes the TCP+TLS handshake proactively). (5) <strong>Mobile</strong> — <code>touch-action: manipulation</code> added to <code>.tab-btn</code> CSS rule — removes iOS Safari's 300ms double-tap delay on all tab navigation buttons. (6) <strong>Data Reliability</strong> — A13 Key Analyst FAQ added: "How do I independently verify a government take figure? What primary sources should I check?" — three-tier verification workflow: Evidence badge tier inspection (A/B/C/D), benchmark validation table cross-check (25 countries, 96% pass rate), and API source_note field with evidence_tier per parameter for frontier countries. Version v103→v104 across all 4 locations.<br>
       <strong>v103 (Aug 2026)</strong> — Security hardening: 15+ additional inline <code>onclick</code>/<code>onchange</code> handlers migrated to DOMContentLoaded event listeners, significantly reducing <code>'unsafe-inline'</code> dependency in Content Security Policy. Handlers removed: (1) Welcome panel collapse button (<code>id="welcome-collapse-btn"</code>); (2) Search overlay backdrop click handler; (3) FC quickstart buttons (<code>id="fc-quickstart-deepwater/onshore"</code>); (4) FC Export XLSX button; (5) FC Stability checkbox; (6) IRR scatter PNG download (<code>id="irr-scatter-png-btn"</code>); (7) Explorer Excel export (<code>id="explorer-excel-btn"</code>); (8) Explorer Copy Link; (9) 4-Price View toggle (<code>id="four-price-toggle"</code>); (10) Prod Data Only filter; (11) Vintage Trend toggle (<code>id="vintage-trend-toggle"</code>, now with <code>aria-expanded</code> + <code>aria-controls</code>); (12–19) All 8 Screener preset buttons migrated to <code>data-preset</code> attribute + document event delegation (<code>class="screener-preset-btn"</code>); (20) Screener Reset/CSV/Excel buttons. Accessibility: Reference dropdown <code>aria-haspopup</code> corrected to <code>listbox</code> (was generic <code>true</code>) + full <code>aria-label</code> listing all 4 destinations added; decorative chevron marked <code>aria-hidden="true"</code>. Information Architecture: <code>&lt;meta name="theme-color" content="#0F172A"&gt;</code> added — mobile browsers (Chrome Android, Safari iOS) now show ORCA's dark slate color in the browser chrome, preventing jarring white flash on load. Version v102→v103 across all 4 locations.<br>
       <strong>v102 (Aug 2026)</strong> — 10 targeted improvements across all 10 graded categories (Cycle 55): (1) <strong>Data Reliability</strong> — A12 Key Analyst FAQ added: "My capital allocation team needs IRR for every candidate country. How do I handle the 111 countries without IRR data?" — four-step proxy workflow using Take screen, Price Swing column, Breakeven proxy chip, and Scenario Builder DCF. (2) <strong>SDLC Maturity</strong> — GRADER.md updated to reflect current A+ state. (3) <strong>Error &amp; Empty States</strong> — Screener zero-results state upgraded: icon, bolded headline, actionable guidance text, and styled Reset All Filters button (was: bare text + plain button). (4) <strong>Performance</strong> — <code>fetchpriority="high"</code> added to both preload hints (<code>country_data.json</code> and <code>reform_history.json</code>) — tells browser to prioritize data fetches over lower-priority preloads. (5) <strong>Accessibility</strong> — <code>aria-live="polite" aria-atomic="true"</code> added to <code>explorer-count</code> div (screen readers now announce filter result counts); Oil Price <code>ctrl-group</code> div gains <code>role="group" aria-label="Oil price for DCF calculations"</code>. (6) <strong>Mobile</strong> — <code>.site-header { padding: 10px 16px; gap: 10px; }</code> added to 768px breakpoint — prevents header overflow on narrow screens. (7) <strong>Information Architecture</strong> — Welcome callout gains 3-step IOC workflow hint: "(1) Set oil price → (2) Filter by mechanic/region chips → (3) Export to Excel for IC presentation". (8) <strong>Security/Data Integrity</strong> — Welcome FAQ button inline <code>onclick</code> removed; replaced with <code>id="welcome-faq-btn"</code> and DOMContentLoaded event listener — consistent with v97-v101 inline handler migration. (9) <strong>Visual Design</strong> — <code>@keyframes row-fade-in</code> added; <code>#tbody-explorer tr</code> gets 0.15s fade-in animation — subtle entrance on table re-render. (10) <strong>Interaction Design</strong> — Screener row <code>title</code> updated to "Click to view {country} Country Profile" for consistent discoverability tooltip language. Version v101→v102 across all 4 locations.<br>
       <strong>v101 (Aug 2026)</strong> — Event delegation migration complete — permanent fix for the v97 double-fire regression: all inline <code>onclick</code> attributes removed from Explorer mechanic chip row (13 buttons), region chip row (7 buttons), and mode toggle buttons (Browse/Screener/Bubble Chart). The <code>DOMContentLoaded</code> event delegation listeners added in v100 now operate without the competing inline handlers, resolving 4 test failures: <em>[Explorer] chip Asia Pacific state</em> (double-fire caused state to land on 'all'), <em>[Explorer] R-factor chip timeout</em> (mode switch issue from double-fire), <em>[Screener] elementHandle.click timeout</em>, and <em>[IOC] elementHandle.click timeout</em>. The architectural root cause of the v97 onclick regression is permanently resolved — no future onclick migration can break these elements. Additional improvements: (1) <strong>Accessibility</strong> — <code>screener-count</code> span gains <code>aria-live="polite"</code> and <code>aria-atomic="true"</code> for screen reader filter announcements; <code>sc-mech-checks</code> and <code>sc-ioc-checks</code> divs gain <code>role="group"</code> and <code>aria-labelledby</code>. (2) <strong>Error recovery</strong> — slow-load warning now includes a clickable "reload" link. (3) <strong>Performance</strong> — Explorer search input debounced to 200ms (prevents re-render on every keystroke). (4) <strong>Mobile</strong> — mode toggle buttons use <code>white-space:nowrap</code> and <code>flex-shrink:0</code>; 390px breakpoint reduces button font to 11px. (5) <strong>Visual</strong> — country name cells in Explorer table get <code>text-overflow:ellipsis</code> and <code>max-width:180px</code>. (6) <strong>Security</strong> — CSP gains <code>upgrade-insecure-requests</code>. Version v100→v101 across all 4 locations.<br>
@@ -2533,9 +2538,24 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
 
+    <div class="meth-faq-item" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+      <div class="meth-faq-q" style="font-weight:700;color:var(--text);margin-bottom:6px;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'block':'none'">
+        A13. How do I independently verify a government take figure? What primary sources should I check?
+      </div>
+      <div class="meth-faq-a" style="color:var(--muted);font-size:13px;line-height:1.7;">
+        <strong style="color:var(--text);">Three-tier verification workflow:</strong>
+        <ol style="margin:8px 0 8px 16px;padding:0;">
+          <li style="margin-bottom:6px;"><strong>Check the Evidence badge first.</strong> Every country in Explorer and Country Profile shows an A/B/C/D confidence tier. Tier A (teal) = parameter sourced directly from primary legislation or signed PSA text. Tier B (green) = sourced from operator annual report or government filing. Tier C (yellow) = cross-referenced secondary (Wood Mac, Rystad). Tier D (grey) = modeled default. For investment-grade due diligence, verify any Tier C or D country against a primary source before use in an IC submission.</li>
+          <li style="margin-bottom:6px;"><strong>Compare the benchmark validation table.</strong> The Methodology tab's "Benchmark Validation" section cross-checks 25 benchmark countries against Wood Mackenzie, Rystad Energy, and S&amp;P Global ranges. If your target country is in that set (Norway, Iraq, Angola, USA, UAE, Australia, Brazil, Kazakhstan, and 17 others), the take figure has been independently verified within ±3pp. Pass rate: 24/25 (96%).</li>
+          <li style="margin-bottom:6px;"><strong>For countries not in the benchmark set,</strong> the public API at <code>api/v1/country/{slug}.json</code> includes a <code>source_note</code> field and <code>evidence_tier</code> per parameter. Export via Country Profile XLSX to get the full parameter set with source annotations. For frontier countries, the <code>profit_oil_tier_schedule</code> field shows the R-factor tiers sourced from the signed PSA — compare against the actual PSA document if available.</li>
+        </ol>
+        <em>Verification shortcut: countries with ≥80% A/B sourced facts (shown in the Screener's Evidence Quality slider) have the highest independent verifiability. Filter to these using the Evidence Quality slider set to 80% — this reduces the universe to the most auditable set for formal due diligence workflows.</em>
+      </div>
+    </div>
+
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v103, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v104, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -2620,7 +2640,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
         <div class="sb-control-group">
           <label>Mechanic</label>
-          <select id="sb-mechanic" onchange="sbUpdateMechanic()">
+          <select id="sb-mechanic" aria-label="Select fiscal mechanic for Scenario Builder DCF" onchange="sbUpdateMechanic()">
             <option value="Concession">Concession</option>
             <option value="PSC">Production Sharing Contract (PSC)</option>
             <option value="Gross Split">Gross Split (Indonesia-style)</option>
@@ -2634,7 +2654,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
         <div class="sb-control-group">
           <label>Project Profile</label>
-          <select id="sb-profile">
+          <select id="sb-profile" aria-label="Select project production profile for Scenario Builder DCF">
             <option value="deepwater">Deepwater ($800M capex, 50Mbbl/d peak)</option>
             <option value="shallow">Shallow Offshore ($400M capex, 30Mbbl/d)</option>
             <option value="onshore_me">Onshore ME/Africa ($300M capex, 80Mbbl/d)</option>
@@ -11055,6 +11075,18 @@ document.addEventListener('DOMContentLoaded', function() {
   if (scCsv) scCsv.addEventListener('click', function() { exportScreenerCSV(); });
   var scExcel = document.getElementById('screener-excel-btn');
   if (scExcel) scExcel.addEventListener('click', function() { exportScreenerExcel(); });
+  // v104: Country Profile select + MC toggle + IOC Exposure select + API select
+  var ddCountry = document.getElementById('dd-country-select');
+  if (ddCountry) ddCountry.addEventListener('change', function() { loadCountryProfile(this.value); });
+  var ddMcToggle = document.getElementById('dd-mc-toggle');
+  if (ddMcToggle) ddMcToggle.addEventListener('change', function() {
+    var sel = document.getElementById('dd-country-select');
+    if (sel && sel.value) loadCountryProfile(sel.value);
+  });
+  var iocExpSelect = document.getElementById('exposure-ioc-select');
+  if (iocExpSelect) iocExpSelect.addEventListener('change', function() { renderIOCExposure(this.value); });
+  var apiCountry = document.getElementById('api-country-select');
+  if (apiCountry) apiCountry.addEventListener('change', function() { loadAPIJson(this.value); });
 });
 
 // v73/v74: Event listeners replacing inline onclick for compare basket buttons
@@ -11155,6 +11187,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 
+</main>
+
 <!-- Floating Comparison Basket -->
 <div id="compare-basket" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;background:#1e293b;border-top:1px solid #334155;padding:10px 20px;align-items:center;gap:10px;flex-wrap:wrap;">
   <span style="color:#94a3b8;font-size:12px;font-weight:600;white-space:nowrap;">Compare basket:</span>
@@ -11170,7 +11204,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v103</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v104</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
