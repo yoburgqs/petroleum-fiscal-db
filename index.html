@@ -977,10 +977,13 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   .tab-pane { display: none !important; }
   #t7 { display: block !important; }
 
+  /* Show print-only header with ORCA branding */
+  .print-header { display: block !important; }
+
   /* Hide the PDF button itself when printing */
   .btn-print { display: none !important; }
   /* Hide XLSX button in print */
-  #dd-export-btn, #dd-copy-link-btn { display: none !important; }
+  #dd-export-btn, #dd-copy-link-btn, #dd-select-wrap { display: none !important; }
 
   /* Light theme for print */
   body, .container, .card, .panel, .dd-section, .tbl-wrap, table, tr, td, th {
@@ -992,6 +995,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   .amber, .text-amber { color: black !important; }
   .page-title, .page-sub, .dd-section-hdr { color: #1a1a1a !important; }
   .dd-section { border-color: #ccc !important; }
+  .source-badge { border: 1px solid #999 !important; color: #333 !important; background: transparent !important; }
+  .tier-badge, .dq-badge { color: #000 !important; background: #eee !important; border: 1px solid #999 !important; }
 
   /* Charts: ensure visible */
   canvas { max-width: 100% !important; }
@@ -1195,7 +1200,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v108</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v109</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1604,23 +1609,23 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div class="slider-row">
       <div class="slider-group">
         <label>Max Govt Take: <span class="val" id="sv-take">60</span>%</label>
-        <input type="range" id="sl-take" min="30" max="100" value="60" aria-label="Maximum government take percentage (30–100%)" oninput="document.getElementById('sv-take').textContent=this.value;_activePresetName=null;runScreener()">
+        <input type="range" id="sl-take" min="30" max="100" value="60" aria-label="Maximum government take percentage (30–100%)">
       </div>
       <div class="slider-group">
         <label>Max Breakeven: $<span class="val" id="sv-be">70</span>/bbl</label>
-        <input type="range" id="sl-be" min="20" max="120" value="70" aria-label="Maximum breakeven oil price in dollars per barrel (20–120)" oninput="document.getElementById('sv-be').textContent=this.value;_activePresetName=null;runScreener()">
+        <input type="range" id="sl-be" min="20" max="120" value="70" aria-label="Maximum breakeven oil price in dollars per barrel (20–120)">
       </div>
       <div class="slider-group">
         <label title="Filter by minimum contractor NPV at $75/bbl. 0 = NPV-positive only. Negative = allow negative-NPV (loss-making at $75). All values in $M.">Min Contractor NPV: $<span class="val" id="sv-npv">0</span>M <span style="font-size:10px;color:var(--muted);">@$75</span></label>
-        <input type="range" id="sl-npv" min="-500" max="2000" value="0" aria-label="Minimum contractor NPV in millions of dollars at $75/bbl (-500 to 2000)" oninput="document.getElementById('sv-npv').textContent=this.value;_activePresetName=null;runScreener()">
+        <input type="range" id="sl-npv" min="-500" max="2000" value="0" aria-label="Minimum contractor NPV in millions of dollars at $75/bbl (-500 to 2000)">
       </div>
       <div class="slider-group">
         <label>Min IRR: <span class="val" id="sv-irr">0</span>%</label>
-        <input type="range" id="sl-irr" min="0" max="50" value="0" aria-label="Minimum contractor IRR percentage (0–50%)" oninput="document.getElementById('sv-irr').textContent=this.value;_activePresetName=null;runScreener()">
+        <input type="range" id="sl-irr" min="0" max="50" value="0" aria-label="Minimum contractor IRR percentage (0–50%)">
       </div>
       <div class="slider-group">
         <label title="Filter by evidence quality: % of fiscal facts with primary (A) or verified (B) source">Min Evidence A/B: <span class="val" id="sv-evid">0</span>%</label>
-        <input type="range" id="sl-evid" min="0" max="100" value="0" aria-label="Minimum evidence quality percentage — share of fiscal facts with A or B source confidence (0–100%)" oninput="document.getElementById('sv-evid').textContent=this.value;_activePresetName=null;runScreener()">
+        <input type="range" id="sl-evid" min="0" max="100" value="0" aria-label="Minimum evidence quality percentage — share of fiscal facts with A or B source confidence (0–100%)">
       </div>
     </div>
     <div class="screener-extra">
@@ -1972,6 +1977,16 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       ⬇ PDF
     </button>
   </div>
+  <!-- Print-only branding header — hidden on screen, visible when printing -->
+  <div class="print-header" style="display:none;border-bottom:2px solid #333;padding-bottom:8px;margin-bottom:16px;">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;">
+      <div>
+        <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
+        <span style="font-size:13px;margin-left:10px;color:#555;">Petroleum Fiscal Intelligence Platform</span>
+      </div>
+      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v109 · Exported <span id="print-export-date"></span></div>
+    </div>
+  </div>
   <div id="cp-empty-state">
     <div style="text-align:center;padding:56px 24px 40px;max-width:560px;margin:0 auto;">
       <div style="font-size:36px;margin-bottom:16px;opacity:.45;" role="img" aria-label="Globe icon">🌍</div>
@@ -2029,7 +2044,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v108 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v109 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2037,6 +2052,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v109 (Aug 2026)</strong> — 10 targeted improvements across 6 categories (Cycle 62): (1) <strong>Security / Inline Handler Migration</strong> — Screener slider <code>oninput</code> handlers (5 sliders: take, breakeven, NPV, IRR, evidence) migrated to DOMContentLoaded <code>input</code> event listeners. Reform history filter selects (<code>#reform-filter-country</code>, <code>#reform-filter-dir</code>, <code>#reform-filter-decade</code>) <code>onchange</code> migrated to event listeners. <code>#sc-region</code> and <code>#sc-irr-nulls</code> migrated. Screener mechanic checkboxes, IOC checkboxes, breakeven radios, and depth radios now use event delegation on parent containers. Comparison result inline buttons (<code>onclick="window.print()"</code>, <code>onclick="downloadCmpChart()"</code>, <code>onclick="shareComparison()"</code>) replaced with class-based event delegation (<code>cmp-inline-print-btn</code>, <code>cmp-inline-png-btn</code>, <code>cmp-inline-share-btn</code>). Total: 15+ inline handlers migrated this cycle. (2) <strong>Data Reliability / Bug Fix</strong> — IRR threshold in Country Profile XLSX export corrected from <code>&lt;200</code> to <code>&lt;500</code> (matching the platform's documented ≥500% exclusion threshold — countries with IRR 200–499% now correctly export instead of showing null). Explorer XLSX export also updated: IRR column now applies the correct 500% exclusion. (3) <strong>Export Quality</strong> — Country Profile XLSX export gains 3 new fields: Evidence Quality A/B (%), Production Coverage (%), Total Verified Facts. Citation field added to export metadata. Explorer XLSX export gains Evidence A/B (%), Prod Coverage (%), and R-factor Tiers columns. (4) <strong>Error &amp; Empty States</strong> — Reform History table gains a styled empty state: calendar icon + bold "No reform events match these filters" headline + context-sensitive explanation (country-specific message when a country filter is active vs. generic reset guidance when not). (5) <strong>Print / PDF</strong> — Country Profile print view gains an ORCA branding header (hidden on screen, visible in print): platform name, version, and export date. Source confidence badges and tier badges now render correctly in print (border + black text instead of dark-background colored styles). Export button and country select hidden in print view. (6) <strong>Professional Credibility</strong> — A17 Key Analyst FAQ added: "When is the government take figure reliable enough for a bid recommendation or IC memo?" — tier-by-tier guidance (A = IC-ready with citation; B = suitable with caveat; C = screening only; D = exclude from documents), plus 4 additional checks: production-weighting flag, price swing threshold, R-factor verification, and breakeven vs. IRR reliability comparison. Version v108→v109 across all 4 locations.<br><br>
       <strong>v108 (Aug 2026)</strong> — 10 targeted improvements across 4 categories (Cycle 61): (1) <strong>Security / Inline Handler Migration</strong> — 4 remaining inline handlers migrated to DOMContentLoaded event listeners: <code>#fc-profile</code> <code>onchange</code> (auto-rerun Fiscal Compare when profile changes), <code>#fc-price</code> <code>onchange</code> (auto-rerun when price scenario changes), <code>#search-q</code> <code>oninput</code> and <code>onkeydown</code> (search input now fully event-driven). (2) <strong>Accessibility</strong> — FC sort buttons gain <code>aria-label</code> attributes: "Sort by Government Take", "Sort by Contractor NPV (high to low)", "Sort by IRR (high to low)", "Sort by Breakeven price (low to high)", "Sort alphabetically by country name" — screen readers now announce sort button purpose on focus. <code>onkeydown</code> inline handlers removed from all 5 fc-sort-btn elements; keyboard events now handled via DOMContentLoaded <code>keydown</code> listeners. (3) <strong>Data Reliability / Professional Credibility</strong> — A16 Key Analyst FAQ added: "How does the platform model R-factor tiered PSCs, and when should I use the R-factor filter vs. a flat PSC?" — explains R-factor mechanics, how the DCF engine handles tiered profit oil splits (production-weighted average calibrated to mid-tier), the ◈ R-factor PSC chip workflow, and a Scenario Builder approach for sensitivity testing across tiers using Angola Block 17 and Nigeria deepwater as worked examples. (4) <strong>Version</strong> — v107→v108 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v107 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 60): (1) <strong>Security / Inline Handler Migration</strong> — 5 IOC Portfolio quick-launch buttons migrated from inline <code>onclick</code> to <code>class="ioc-quick-btn" data-ioc-op="..."</code> event delegation (ExxonMobil, Shell, TotalEnergies, BP, Equinor). <code>aria-label</code> added to all 5. Country Profile action buttons (<code>#dd-copy-link-btn</code>, <code>#dd-export-btn</code>, <code>#dd-print-btn</code>) — inline <code>onclick</code> removed, now handled via DOMContentLoaded event listeners; <code>aria-label</code> added to all 3. Side-by-Side PNG download button (<code>#cmp-chart-png-btn</code>), Vintage Analysis Export CSV (<code>#vintage-csv-btn</code>), Breakeven Map Export CSV (<code>#be-export-csv-btn</code>), API Copy URL button — all now use event listeners with <code>aria-label</code>. Reference panel overlay and close button (<code>#ref-panel-close-btn</code>) migrated. Scenario modal backdrop click-to-close, close button (<code>#scenario-modal-close-btn</code>), all Run DCF buttons (<code>#sb-run-dcf-top-btn</code>, <code>#sb-run-dcf-bottom-btn</code>, <code>#sb-run-dcf-empty-btn</code>), Save Scenario, Clear All Scenarios — all migrated. Scenario Builder preset buttons (13 presets: Norway, Angola, Iraq, UK, Australia, Saudi, Iran, India, Nigeria Rev Share, Indonesia Gross Split, Guyana, Malaysia, Kazakhstan) migrated from inline <code>onclick</code> to <code>class="sb-preset-btn" data-sb-preset="..."</code> event delegation. <code>sb-mechanic</code> select <code>onchange</code> migrated. (2) <strong>Accessibility</strong> — FAQ items A12–A15 converted to accessible accordions: <code>role="button"</code>, <code>tabindex="0"</code>, <code>aria-expanded</code>, <code>aria-controls</code> added; answers have matching <code>id</code> attributes; toggle respects both click and Enter/Space keydown. Reference panel <code>aria-label</code> added to <code>&lt;aside&gt;</code>. (3) <strong>Version</strong> — v106→v107 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v106 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 59): (1) <strong>Reliability / Bug Fix</strong> — <code>runFiscalCompare()</code> null guard added: function now returns immediately with "Data loading — please wait…" status message if <code>COUNTRY_DATA</code> is null or empty, preventing a crash when the function is called before async data fetch completes (e.g. from keyboard shortcut or quickstart button during initial load). (2) <strong>Accessibility</strong> — <code>aria-live="polite" aria-atomic="true"</code> added to <code>#fc-status</code> span — screen readers now announce Fiscal Compare status updates ("Running 185 countries…", "185 results · 0.2s") without requiring keyboard focus on the element. (3) <strong>Security / Data Integrity</strong> — 2 remaining inline <code>onclick</code> handlers in the footer coverage stats (IRR and Breakeven coverage links) migrated to DOMContentLoaded event listeners. Both buttons now use <code>id="footer-irr-link"</code> and <code>id="footer-be-link"</code> with <code>addEventListener('click', ...)</code>. Static HTML inline handler count at new historic minimum. (4) <strong>Data Reliability / Professional Credibility</strong> — A15 Key Analyst FAQ added: "I have two candidate countries with similar government take — how do I differentiate using IRR and Breakeven?" — explains the Take → Swing → IRR/Breakeven → Scenario Builder DCF progression; gives explicit rule of thumb for analyst decision workflow. Benchmark validation expanded 25 → 27 countries (Senegal SNH/Wood Mac Sangomar PSC; Mozambique ENH/Rystad LNG PSA literature) — coverage increases from 13.5% → 14.6%; pass rate 26/27 (96%); source list updated with SNH and ENH. All 3 FAQ references updated (count, source list, pass rate). (5) <strong>Naming / Version</strong> — v105→v106 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog. Version v105→v106.<br><br>
@@ -2602,9 +2618,30 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
 
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+      <div class="meth-faq-q" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a17-body" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;line-height:1.4;">
+        A17. When is the government take figure reliable enough to include in a bid recommendation or IC memo?
+      </div>
+      <div class="meth-faq-a" id="faq-a17-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
+        Use the <strong style="color:var(--text);">Evidence badge tier</strong> (visible in Country Profile → Fiscal Parameters) as the primary reliability signal. The threshold for a bid recommendation depends on what the take figure will be used for:<br><br>
+        <strong style="color:var(--text);">Evidence tier A (primary legislation / fiscal code):</strong> Use directly in IC memo — cite the specific legislation (e.g. "Petroleum Tax Act §10, Norwegian Offshore Tax — Petroleumsskatteloven"). Treat the figure as authoritative for screening and ranking. Uncertainty is limited to implementation risk, not data quality.<br><br>
+        <strong style="color:var(--text);">Evidence tier B (operator filing / annual report):</strong> Suitable for preliminary IC memo with a one-line caveat ("Sourced from [Operator] 10-K/Annual Report — verify against signed contract before final bid"). Figures are typically accurate but reflect a single operator's interpretation of the regime, not the full contract spectrum.<br><br>
+        <strong style="color:var(--text);">Evidence tier C (estimated / secondary source):</strong> Use for screening only — not for a bid recommendation without independent verification. Flag explicitly: "Take figure is estimated; primary legislation review recommended before advancing to bid stage." Cross-check against the Country Profile price sensitivity curve — if the curve looks anomalous (flat when it should be progressive, or implausibly low), the C-tier source may be stale or wrong.<br><br>
+        <strong style="color:var(--text);">Evidence tier D (default / no sourcing):</strong> Do not include in any recommendation document. This country is in the database for structural completeness but the take figure is a modeled default. Exclude from any ranked shortlist.<br><br>
+        <strong style="color:var(--text);">Additional checks before a bid recommendation:</strong>
+        <ul style="margin:8px 0 8px 20px;list-style:disc;">
+          <li>Confirm the production-weighting flag (Country Profile → Weighting Method). "Equal-weighted" means take is averaged across contracts regardless of output — a single inactive block at atypical terms can distort the figure. Production-weighted figures are more representative of current operating conditions.</li>
+          <li>Check the Price Swing column. A swing &gt;20pp means the regime is highly price-sensitive — small oil price movements produce large government take shifts. This is due diligence risk at the IC level, even if the A/B evidence tier is high.</li>
+          <li>For PSC countries: check if R-factor tiers apply (◈ chip visible in Explorer). If yes, use Scenario Builder to bound the take uncertainty before finalizing your bid economics.</li>
+          <li>For countries with IRR data: the breakeven price is more reliable than the IRR for screening, because breakeven is a direct output of cost structure rather than an annualized return calculation. Compare the breakeven to your project's cost estimate — if they diverge materially, your cost assumptions differ from the platform's reference project.</li>
+        </ul>
+        <em>Rule of thumb: A/B tier take figures are IC-ready with citation. C-tier figures require a verification step. D-tier figures should not appear in external documents.</em>
+      </div>
+    </div>
+
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v108, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v109, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -4128,9 +4165,9 @@ function renderCompare() {
   html += `</div>`;
   // Add export/share actions directly below the comparison grid
   html += `<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-    <button onclick="window.print()" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Print or Save as PDF via browser print dialog — comparison table and chart included">⬇ Save as PDF</button>
-    <button onclick="downloadCmpChart()" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Download chart as PNG image">⬇ Chart PNG</button>
-    <button onclick="shareComparison()" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Copy shareable link to this comparison">⎘ Share Link</button>
+    <button class="cmp-inline-print-btn" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Print or Save as PDF via browser print dialog — comparison table and chart included">⬇ Save as PDF</button>
+    <button class="cmp-inline-png-btn" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Download chart as PNG image">⬇ Chart PNG</button>
+    <button class="cmp-inline-share-btn" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Copy shareable link to this comparison">⎘ Share Link</button>
     <span style="font-size:10px;color:#475569;margin-left:4px;">Tip: Ctrl+P to print, select "Save as PDF" as printer for best results</span>
   </div>`;
   out.className = '';
@@ -4658,6 +4695,18 @@ function renderReformTable() {
 
   const tbody = document.getElementById('tbody-reforms');
   if (!tbody) return;
+
+  if (data.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:32px 16px;text-align:center;border:none;">
+      <div style="font-size:22px;margin-bottom:8px;opacity:.4;" role="img" aria-label="Calendar icon">📅</div>
+      <div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">No reform events match these filters</div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.6;max-width:400px;margin:0 auto;">
+        ${filterCountry ? `<strong>${filterCountry}</strong> may have a stable fiscal regime with no recorded changes in this period, or sourcing for this country's reform history is still in progress.` : 'Try broadening the filters — remove the country, direction, or decade filter to see all recorded events.'}
+        ${filterCountry ? `<br>To check overall fiscal stability, see the Country Profile → Stability Score, or view the Predictability Score in Fiscal Compare.` : ''}
+      </div>
+    </td></tr>`;
+    return;
+  }
 
   const dirColors = {hostile:'#ef4444', friendly:'#22c55e', neutral:'#94a3b8'};
   const dirLabels = {hostile:'↑ Hostile', friendly:'↓ Friendly', neutral:'→ Neutral'};
@@ -6368,10 +6417,10 @@ function exportCountryProfile() {
     { Metric: 'Contractor NPV @$75 ($M)', Value: d.npv_75 != null ? +d.npv_75.toFixed(1) : null },
     { Metric: 'Contractor NPV @$100 ($M)', Value: d.npv_100 != null ? +d.npv_100.toFixed(1) : null },
     { Metric: 'Contractor NPV @$125 ($M)', Value: d.npv_125 != null ? +d.npv_125.toFixed(1) : null },
-    { Metric: 'IRR @$50 (%)', Value: (d.irr_50 != null && d.irr_50 < 200) ? +d.irr_50.toFixed(1) : null },
-    { Metric: 'IRR @$75 (%)', Value: (d.irr_75 != null && d.irr_75 < 200) ? +d.irr_75.toFixed(1) : null },
-    { Metric: 'IRR @$100 (%)', Value: (d.irr_100 != null && d.irr_100 < 200) ? +d.irr_100.toFixed(1) : null },
-    { Metric: 'IRR @$125 (%)', Value: (d.irr_125 != null && d.irr_125 < 200) ? +d.irr_125.toFixed(1) : null },
+    { Metric: 'IRR @$50 (%)', Value: (d.irr_50 != null && d.irr_50 < 500) ? +d.irr_50.toFixed(1) : null },
+    { Metric: 'IRR @$75 (%)', Value: (d.irr_75 != null && d.irr_75 < 500) ? +d.irr_75.toFixed(1) : null },
+    { Metric: 'IRR @$100 (%)', Value: (d.irr_100 != null && d.irr_100 < 500) ? +d.irr_100.toFixed(1) : null },
+    { Metric: 'IRR @$125 (%)', Value: (d.irr_125 != null && d.irr_125 < 500) ? +d.irr_125.toFixed(1) : null },
     { Metric: 'Avg Breakeven @$75 ($/bbl)', Value: d.be_75 != null && d.be_75 > 0 && d.be_75 < 999 ? +d.be_75.toFixed(0) : null },
     { Metric: '', Value: '' },
     { Metric: 'Royalty Rate (%)', Value: d.royalty != null ? +d.royalty.toFixed(1) : null },
@@ -6384,9 +6433,14 @@ function exportCountryProfile() {
     { Metric: 'Rev Share Min (%)', Value: d.rev_share_min != null ? +d.rev_share_min.toFixed(1) : null },
     { Metric: 'Rev Share Max (%)', Value: d.rev_share_max != null ? +d.rev_share_max.toFixed(1) : null },
     { Metric: '', Value: '' },
+    { Metric: 'Evidence Quality A/B (%)', Value: d.ab_pct != null ? +d.ab_pct.toFixed(1) : null },
+    { Metric: 'Production Coverage (%)', Value: d.prod_coverage_pct != null ? +d.prod_coverage_pct.toFixed(1) : null },
+    { Metric: 'Total Verified Facts', Value: d.n_facts != null ? d.n_facts : null },
+    { Metric: '', Value: '' },
     { Metric: 'Source', Value: 'ORCA Petroleum Fiscal Intelligence Platform' },
     { Metric: 'Export Date', Value: new Date().toISOString().slice(0,10) },
-    { Metric: 'Note', Value: 'Govt take = production-weighted where prod data exists, equal-weighted otherwise.' },
+    { Metric: 'Citation', Value: 'ORCA Petroleum Fiscal Intelligence Platform (2026). v109, Aug 2026. https://yoburgqs.github.io/petroleum-fiscal-db/' },
+    { Metric: 'Note', Value: 'Govt take = production-weighted where prod data exists, equal-weighted otherwise. IRR ≥500% excluded as unbounded returns.' },
   ];
 
   // Sheet 2: Regional peers
@@ -6446,10 +6500,13 @@ function exportExplorer() {
     'Govt Take @$100': d.take_100 !== null ? +d.take_100.toFixed(1) : null,
     'Govt Take @$125': d.take_125 !== null ? +d.take_125.toFixed(1) : null,
     'Contractor NPV $75 ($M)': d.npv_75 !== null ? +d.npv_75.toFixed(1) : null,
-    'IRR @$75 (%)': d.irr_75 !== null ? +d.irr_75.toFixed(1) : null,
+    'IRR @$75 (%)': d.irr_75 !== null && d.irr_75 < 500 ? +d.irr_75.toFixed(1) : null,
     'Breakeven ($/bbl)': d.be_75,
     'Swing (pp)': d.swing !== null ? +d.swing.toFixed(1) : null,
     'Stability Score': d.swing !== null ? Math.max(0, Math.min(100, Math.round(100 - d.swing * 3))) : null,
+    'Evidence A/B (%)': d.ab_pct != null ? +d.ab_pct.toFixed(1) : null,
+    'Prod Coverage (%)': d.prod_coverage_pct != null ? +d.prod_coverage_pct.toFixed(1) : null,
+    'R-factor Tiers': d.has_r_factor_tiers ? 'Yes' : 'No',
   }));
   const ws = XLSX.utils.json_to_sheet(rows);
   const wb = XLSX.utils.book_new();
@@ -11250,7 +11307,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// v107/v108: FAQ accordion — accessible toggle for A12–A16 (role=button, aria-expanded, keyboard support)
+// v107/v108/v109: FAQ accordion — accessible toggle for A12–A17 (role=button, aria-expanded, keyboard support)
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.meth-faq-q[aria-expanded]').forEach(function(q) {
     function toggleFaq(q) {
@@ -11264,6 +11321,71 @@ document.addEventListener('DOMContentLoaded', function() {
     q.addEventListener('keydown', function(e) {
       if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleFaq(this); }
     });
+  });
+});
+
+// v109: Screener sliders — migrate oninput to input event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  var sliderDefs = [
+    { id: 'sl-take',  displayId: 'sv-take' },
+    { id: 'sl-be',    displayId: 'sv-be' },
+    { id: 'sl-npv',   displayId: 'sv-npv' },
+    { id: 'sl-irr',   displayId: 'sv-irr' },
+    { id: 'sl-evid',  displayId: 'sv-evid' },
+  ];
+  sliderDefs.forEach(function(def) {
+    var slider = document.getElementById(def.id);
+    var display = document.getElementById(def.displayId);
+    if (slider && display) {
+      slider.addEventListener('input', function() {
+        display.textContent = this.value;
+        window._activePresetName = null;
+        if (typeof runScreener === 'function') runScreener();
+      });
+    }
+  });
+});
+
+// v109: Reform history filter selects — migrate onchange to event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  ['reform-filter-country', 'reform-filter-dir', 'reform-filter-decade'].forEach(function(id) {
+    var sel = document.getElementById(id);
+    if (sel) sel.addEventListener('change', function() { if (typeof renderReformTable === 'function') renderReformTable(); });
+  });
+  // sc-region select in Screener
+  var scRegion = document.getElementById('sc-region');
+  if (scRegion) scRegion.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  // sc-irr-nulls checkbox
+  var scIrrNulls = document.getElementById('sc-irr-nulls');
+  if (scIrrNulls) scIrrNulls.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+});
+
+// v109: Screener mechanic checkboxes + breakeven/depth radios + IOC checkboxes — event delegation
+document.addEventListener('DOMContentLoaded', function() {
+  var mechChecks = document.getElementById('sc-mech-checks');
+  if (mechChecks) mechChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  var iocChecks = document.getElementById('sc-ioc-checks');
+  if (iocChecks) iocChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  // Breakeven category radios — delegate on parent
+  var beCatParent = document.querySelector('.be-radio-group');
+  if (beCatParent) beCatParent.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  // Depth radios — delegate on parent
+  var depParent = document.querySelector('.depth-radio-group');
+  if (depParent) depParent.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+});
+
+// v109: Populate print header export date
+document.addEventListener('DOMContentLoaded', function() {
+  var printDate = document.getElementById('print-export-date');
+  if (printDate) printDate.textContent = new Date().toISOString().slice(0, 10);
+});
+
+// v109: Inline comparison buttons — event delegation (replaces onclick in dynamically-rendered HTML)
+document.addEventListener('DOMContentLoaded', function() {
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('cmp-inline-print-btn')) { window.print(); }
+    else if (e.target.classList.contains('cmp-inline-png-btn')) { if (typeof downloadCmpChart === 'function') downloadCmpChart(); }
+    else if (e.target.classList.contains('cmp-inline-share-btn')) { if (typeof shareComparison === 'function') shareComparison(); }
   });
 });
 
@@ -11456,7 +11578,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v108</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v109</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
