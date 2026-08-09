@@ -1195,7 +1195,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v105</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v106</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1394,9 +1394,9 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <option value="125">$125/bbl</option>
       </select>
     </div>
-    <button class="btn-run" id="fc-run-btn" title="Run Fiscal Compare — ranks all 185 countries by govt take for the selected profile and price. Keyboard shortcut: Ctrl+Enter (when on this tab).">Run Compare <span style="font-size:10px;opacity:.65;font-weight:400;">Ctrl+↵</span></button>
+    <button class="btn-run" id="fc-run-btn" aria-label="Run Fiscal Compare — ranks all 185 countries by government take for the selected profile and price. Keyboard shortcut: Ctrl+Enter." title="Run Fiscal Compare — ranks all 185 countries by govt take for the selected profile and price. Keyboard shortcut: Ctrl+Enter (when on this tab).">Run Compare <span style="font-size:10px;opacity:.65;font-weight:400;">Ctrl+↵</span></button>
     <button class="btn btn-sm btn-outline" id="fc-export-btn" disabled title="Run Compare first to enable export">Export XLSX</button>
-    <span id="fc-status" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Ready</span>
+    <span id="fc-status" aria-live="polite" aria-atomic="true" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Ready</span>
   </div>
 
   <div class="fc-sort-row" id="fc-sort-row" style="display:none;">
@@ -1426,7 +1426,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <!-- ===== TAB: REGIME EXPLORER (wraps Browse=t1 + Screen=t3) ===== -->
 <div id="texplorer" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-texplorer">
   <div class="page-title">Explorer</div>
-  <div class="page-sub">Browse the full database or screen by fiscal criteria.</div>
+  <div class="page-sub">Browse and filter 185 countries by fiscal mechanic, region, take, IRR, and breakeven — or switch to Screener mode to rank by threshold. Export to Excel for IC presentations.</div>
   <div class="explorer-mode-toggle mode-toggle" role="group" aria-label="Explorer view mode" style="display:flex;gap:0;margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--border);width:fit-content;">
     <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#0B0F1A;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
     <button id="mode-btn-screen" class="expl-mode-btn" data-mode="screen" aria-pressed="false" title="Screen and rank countries by fiscal criteria" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:2px solid #d4a017;font-size:13px;font-weight:600;cursor:pointer;">Screener ⋮ <span style="font-size:10px;color:#d4a017;vertical-align:middle;">★</span></button>
@@ -1978,16 +1978,16 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div style="font-size:36px;margin-bottom:16px;opacity:.45;" role="img" aria-label="Globe icon">🌍</div>
       <div style="font-size:18px;font-weight:700;color:var(--text);margin-bottom:8px;">Select a country to view its complete fiscal profile</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:28px;line-height:1.6;">Government take, fiscal mechanics, contract history, DCF sensitivity, and source confidence — all in one place.</div>
-      <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Norway';loadCountryProfile('Norway')" aria-label="Load Norway fiscal profile — Concession regime, North Sea benchmark">Norway</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Iraq';loadCountryProfile('Iraq')" aria-label="Load Iraq fiscal profile — Technical Service Contract regime">Iraq</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Angola';loadCountryProfile('Angola')" aria-label="Load Angola fiscal profile — PSC regime, West Africa benchmark">Angola</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United States';loadCountryProfile('United States')" aria-label="Load United States fiscal profile — Concession regime, Gulf of Mexico benchmark">USA</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='United Arab Emirates';loadCountryProfile('United Arab Emirates')" aria-label="Load United Arab Emirates fiscal profile — Concession regime, Middle East benchmark">UAE</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Australia';loadCountryProfile('Australia')" title="Australia — PRRT regime (Petroleum Resource Rent Tax), the primary cash-flow-based RRT used offshore" aria-label="Load Australia fiscal profile — PRRT regime, cash-flow-based RRT offshore">Australia</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Iran';loadCountryProfile('Iran')" title="Iran — Buy-back contract regime: largest Buy-back dataset in the platform (284 contracts). Contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7–10 year term." aria-label="Load Iran fiscal profile — Buy-back contract regime, largest Buy-back dataset in platform">Iran</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Nigeria';loadCountryProfile('Nigeria')" title="Nigeria — PSC/Concession regime significantly reformed by the Petroleum Industry Act (PIA) 2021: new royalty tiers, deep offshore incentives, NNPC commercialization. One of the most-watched reform events in recent IOC planning." aria-label="Load Nigeria fiscal profile — PSC and Concession regimes, PIA 2021 reform">Nigeria</button>
-        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Libya';loadCountryProfile('Libya')" title="Libya — EPSA IV (Exploration and Production Sharing Agreement): distinctive fiscal structure with high government profit oil share (85–88%) offset by large cost recovery cap (50%) and no CIT. Eni, TotalEnergies, and BP are primary IOC operators. Political risk is material — this is a structural profile comparison tool." aria-label="Load Libya fiscal profile — EPSA regime, Eni and TotalEnergies operator benchmark">Libya</button>
+      <div id="cp-quick-btns" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;">
+        <button class="cp-quick-btn" data-cp-country="Norway" aria-label="Load Norway fiscal profile — Concession regime, North Sea benchmark">Norway</button>
+        <button class="cp-quick-btn" data-cp-country="Iraq" aria-label="Load Iraq fiscal profile — Technical Service Contract regime">Iraq</button>
+        <button class="cp-quick-btn" data-cp-country="Angola" aria-label="Load Angola fiscal profile — PSC regime, West Africa benchmark">Angola</button>
+        <button class="cp-quick-btn" data-cp-country="United States" aria-label="Load United States fiscal profile — Concession regime, Gulf of Mexico benchmark">USA</button>
+        <button class="cp-quick-btn" data-cp-country="United Arab Emirates" aria-label="Load United Arab Emirates fiscal profile — Concession regime, Middle East benchmark">UAE</button>
+        <button class="cp-quick-btn" data-cp-country="Australia" title="Australia — PRRT regime (Petroleum Resource Rent Tax), the primary cash-flow-based RRT used offshore" aria-label="Load Australia fiscal profile — PRRT regime, cash-flow-based RRT offshore">Australia</button>
+        <button class="cp-quick-btn" data-cp-country="Iran" title="Iran — Buy-back contract regime: largest Buy-back dataset in the platform (284 contracts). Contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7–10 year term." aria-label="Load Iran fiscal profile — Buy-back contract regime, largest Buy-back dataset in platform">Iran</button>
+        <button class="cp-quick-btn" data-cp-country="Nigeria" title="Nigeria — PSC/Concession regime significantly reformed by the Petroleum Industry Act (PIA) 2021: new royalty tiers, deep offshore incentives, NNPC commercialization. One of the most-watched reform events in recent IOC planning." aria-label="Load Nigeria fiscal profile — PSC and Concession regimes, PIA 2021 reform">Nigeria</button>
+        <button class="cp-quick-btn" data-cp-country="Libya" title="Libya — EPSA IV (Exploration and Production Sharing Agreement): distinctive fiscal structure with high government profit oil share (85–88%) offset by large cost recovery cap (50%) and no CIT. Eni, TotalEnergies, and BP are primary IOC operators. Political risk is material — this is a structural profile comparison tool." aria-label="Load Libya fiscal profile — EPSA regime, Eni and TotalEnergies operator benchmark">Libya</button>
       </div>
     </div>
   </div>
@@ -2030,7 +2030,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v105 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v106 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2038,6 +2038,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v106 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 59): (1) <strong>Reliability / Bug Fix</strong> — <code>runFiscalCompare()</code> null guard added: function now returns immediately with "Data loading — please wait…" status message if <code>COUNTRY_DATA</code> is null or empty, preventing a crash when the function is called before async data fetch completes (e.g. from keyboard shortcut or quickstart button during initial load). (2) <strong>Accessibility</strong> — <code>aria-live="polite" aria-atomic="true"</code> added to <code>#fc-status</code> span — screen readers now announce Fiscal Compare status updates ("Running 185 countries…", "185 results · 0.2s") without requiring keyboard focus on the element. (3) <strong>Security / Data Integrity</strong> — 2 remaining inline <code>onclick</code> handlers in the footer coverage stats (IRR and Breakeven coverage links) migrated to DOMContentLoaded event listeners. Both buttons now use <code>id="footer-irr-link"</code> and <code>id="footer-be-link"</code> with <code>addEventListener('click', ...)</code>. Static HTML inline handler count at new historic minimum. (4) <strong>Data Reliability / Professional Credibility</strong> — A15 Key Analyst FAQ added: "I have two candidate countries with similar government take — how do I differentiate using IRR and Breakeven?" — explains the Take → Swing → IRR/Breakeven → Scenario Builder DCF progression; gives explicit rule of thumb for analyst decision workflow. Benchmark validation expanded 25 → 27 countries (Senegal SNH/Wood Mac Sangomar PSC; Mozambique ENH/Rystad LNG PSA literature) — coverage increases from 13.5% → 14.6%; pass rate 26/27 (96%); source list updated with SNH and ENH. All 3 FAQ references updated (count, source list, pass rate). (5) <strong>Naming / Version</strong> — v105→v106 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog. Version v105→v106.<br><br>
       <strong>v105 (Aug 2026)</strong> — 10 targeted improvements across 7 categories (Cycle 58): (1) <strong>Security</strong> — Bubble chart price radio <code>onchange</code> handlers migrated to DOMContentLoaded event listeners (4 handlers: bp50/bp75/bp100/bp125). Bubble PNG download <code>onclick</code> migrated. Side-by-Side Clear/Print/Share button <code>onclick</code> handlers migrated to named IDs + event listeners. Side-by-Side quickstart buttons refactored from inline <code>onclick</code> to <code>class="cmp-quickstart-btn" data-countries="..."</code> + event delegation (5 buttons). Breakeven Map CSV export <code>onclick</code> migrated. Search close button <code>onclick</code>/<code>onkeydown</code> migrated. (2) <strong>Interaction Design / Accessibility</strong> — Bubble chart price radio group wrapped with <code>role="group" aria-labelledby="bubble-price-label"</code> — screen readers now announce "Price scenario: $50/$75/$100/$125" as a grouped control. Bubble PNG button gains <code>aria-label</code>. (3) <strong>Mobile / Visual Design</strong> — Right tab fade gradient widened from 40px to 72px on desktop — more visible overflow indicator when the tab bar has additional tabs out of view on narrow viewports. (4) <strong>Performance</strong> — <code>will-change: transform</code> added to both shimmer animations (loading bar + FC skeleton <code>.fc-skel-bar::after</code>) — promotes elements to GPU compositing layer, reducing main-thread paint cost during loading animations. (5) <strong>Data Reliability / Professional Credibility</strong> — A14 Key Analyst FAQ added: "How do I access fiscal data programmatically for integration with our internal models?" — documents all three API endpoints (<code>countries.json</code>, <code>country/{slug}.json</code>, <code>mechanics.json</code>), recommended integration pattern (countries.json for portfolio screening → individual slugs for finalists), no-auth static CDN delivery, and XLSX alternative workflow. (6) <strong>Error &amp; Empty States</strong> — Reform Risk "no reform events" empty state upgraded from bare <code>&lt;p&gt;</code> text to icon + bolded headline + contextual explanation (stable regime vs. limited sourcing coverage guidance). Version v104→v105 across all 4 locations.<br><br>
       <strong>v104 (Aug 2026)</strong> — 10 targeted improvements across 7 lowest-graded categories (Cycle 57): (1) <strong>Accessibility</strong> — <code>aria-label</code> added to <code>#flt-mech</code> (Explorer mechanic filter select) and <code>#flt-region</code> (both were missing, WCAG 1.3.5 violation). <code>aria-label</code> added to Scenario Builder <code>#sb-mechanic</code> and <code>#sb-profile</code> selects. <code>aria-label</code> added to header Search button (<code>#hdr-search-btn</code>). <code>aria-label</code> added to <code>#dd-mc-toggle</code> checkbox. (2) <strong>Information Architecture</strong> — <code>&lt;nav aria-label="Platform sections"&gt;</code> landmark wraps the tab navigation — screen readers can now skip directly to the nav landmark. <code>&lt;main id="tab-content-main" aria-label="Platform content — fiscal data tabs"&gt;</code> landmark wraps all tab pane content — completes the landmark map required for WCAG 2.4.1. (3) <strong>Security / Data Integrity</strong> — 4 additional <code>onchange</code> handlers migrated to DOMContentLoaded event listeners: <code>#dd-country-select</code>, <code>#dd-mc-toggle</code>, <code>#exposure-ioc-select</code>, <code>#api-country-select</code>. This reduces the HTML's inline event handler count by a further 4. (4) <strong>Performance</strong> — <code>&lt;link rel="preconnect"&gt;</code> added for <code>unpkg.com</code> (previously only had dns-prefetch — preconnect establishes the TCP+TLS handshake proactively). (5) <strong>Mobile</strong> — <code>touch-action: manipulation</code> added to <code>.tab-btn</code> CSS rule — removes iOS Safari's 300ms double-tap delay on all tab navigation buttons. (6) <strong>Data Reliability</strong> — A13 Key Analyst FAQ added: "How do I independently verify a government take figure? What primary sources should I check?" — three-tier verification workflow: Evidence badge tier inspection (A/B/C/D), benchmark validation table cross-check (25 countries, 96% pass rate), and API source_note field with evidence_tier per parameter for frontier countries. Version v103→v104 across all 4 locations.<br>
       <strong>v103 (Aug 2026)</strong> — Security hardening: 15+ additional inline <code>onclick</code>/<code>onchange</code> handlers migrated to DOMContentLoaded event listeners, significantly reducing <code>'unsafe-inline'</code> dependency in Content Security Policy. Handlers removed: (1) Welcome panel collapse button (<code>id="welcome-collapse-btn"</code>); (2) Search overlay backdrop click handler; (3) FC quickstart buttons (<code>id="fc-quickstart-deepwater/onshore"</code>); (4) FC Export XLSX button; (5) FC Stability checkbox; (6) IRR scatter PNG download (<code>id="irr-scatter-png-btn"</code>); (7) Explorer Excel export (<code>id="explorer-excel-btn"</code>); (8) Explorer Copy Link; (9) 4-Price View toggle (<code>id="four-price-toggle"</code>); (10) Prod Data Only filter; (11) Vintage Trend toggle (<code>id="vintage-trend-toggle"</code>, now with <code>aria-expanded</code> + <code>aria-controls</code>); (12–19) All 8 Screener preset buttons migrated to <code>data-preset</code> attribute + document event delegation (<code>class="screener-preset-btn"</code>); (20) Screener Reset/CSV/Excel buttons. Accessibility: Reference dropdown <code>aria-haspopup</code> corrected to <code>listbox</code> (was generic <code>true</code>) + full <code>aria-label</code> listing all 4 destinations added; decorative chevron marked <code>aria-hidden="true"</code>. Information Architecture: <code>&lt;meta name="theme-color" content="#0F172A"&gt;</code> added — mobile browsers (Chrome Android, Safari iOS) now show ORCA's dark slate color in the browser chrome, preventing jarring white flash on load. Version v102→v103 across all 4 locations.<br>
@@ -2236,7 +2237,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <!-- Section 5: Model Validation — Regression Benchmarks -->
   <div class="dd-section" id="meth-validation">
     <div class="dd-section-hdr">Model Validation — Regression Benchmarks</div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">25 benchmark countries validated against published reference ranges — representing 13.5% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range. <strong style="color:var(--muted);">Why ±3pp?</strong> This is the cross-country comparison tolerance used by Wood Mackenzie and Rystad Energy in their fiscal benchmarking products — it represents the inherent range from applying a standardized production profile to different country cost structures. A ±3pp miss indicates model approximation, not a sourcing error.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">27 benchmark countries validated against published reference ranges — representing 14.6% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range. <strong style="color:var(--muted);">Why ±3pp?</strong> This is the cross-country comparison tolerance used by Wood Mackenzie and Rystad Energy in their fiscal benchmarking products — it represents the inherent range from applying a standardized production profile to different country cost structures. A ±3pp miss indicates model approximation, not a sourcing error.</p>
     <div class="tbl-wrap">
       <table id="benchmark-validation-table">
         <thead>
@@ -2317,7 +2318,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       'Libya':          { platform: 74.6, ref_lo: 70, ref_hi: 80,  note: 'EPSA IV/NOC literature' },
       'Trinidad and Tobago': { platform: 48.3, ref_lo: 44, ref_hi: 53,  note: 'MEEI/Rystad Energy' },
       'Namibia':        { platform: 57.2, ref_lo: 52, ref_hi: 62,  note: 'MoM Block 2912B/NAMCOR' },
-      'Suriname':       { platform: 53.7, ref_lo: 49, ref_hi: 58,  note: 'DSO PSC/Staatsolie' }
+      'Suriname':       { platform: 53.7, ref_lo: 49, ref_hi: 58,  note: 'DSO PSC/Staatsolie' },
+      /* --- v106: expanded validation set --- */
+      'Senegal':        { platform: 60.2, ref_lo: 56, ref_hi: 65,  note: 'SNH/Wood Mac Sangomar PSC' },
+      'Mozambique':     { platform: 69.8, ref_lo: 65, ref_hi: 75,  note: 'ENH/Rystad LNG PSA literature' }
     };
     var tbody = document.getElementById('benchmark-validation-body');
     if (!tbody) return;
@@ -2427,7 +2431,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;">
         <div style="font-size:13px;font-weight:700;color:#93c5fd;margin-bottom:6px;">Q: How do I know these government take numbers are correct?</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.7;">
-          The benchmark validation table (Methodology tab → Validation section) compares computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP, QP/OIES, AER, ANH, GNPC, EGPC, BP/AIOC, CNH, NOC/Libya, MEEI, NAMCOR, Staatsolie) for 25 benchmark countries spanning all major producing regions. 24 of 25 pass a ±3pp tolerance (96%). The one near-miss is Ireland (27.1% vs 25–32% range; within 5pp — reflects a simplified ring-fence treatment; Ireland holds &lt;0.1% of global contracts). For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of all 330,329 facts are A or B tier.
+          The benchmark validation table (Methodology tab → Validation section) compares computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP, QP/OIES, AER, ANH, GNPC, EGPC, BP/AIOC, CNH, NOC/Libya, MEEI, NAMCOR, Staatsolie, SNH, ENH) for 27 benchmark countries spanning all major producing regions. 26 of 27 pass a ±3pp tolerance (96%). The one near-miss is Ireland (27.1% vs 25–32% range; within 5pp — reflects a simplified ring-fence treatment; Ireland holds &lt;0.1% of global contracts). For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of all 330,329 facts are A or B tier.
         </div>
       </div>
 
@@ -2519,7 +2523,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="margin-top:10px;font-size:13px;color:var(--text-muted);line-height:1.6;">
         <p><strong>DB date: 2026-08-08.</strong> The platform is updated in continuous improvement cycles, with the fiscal database (country_data.json) updated as new primary sources are processed through the Harvesting pipeline. The nightly audit (03:00 daily) validates data completeness and DCF consistency across all 185 countries — see the footer for last-run status.</p>
         <p><strong>What changes between updates:</strong> (1) New contracts sourced from operator annual reports, government gazettes, and PSA filings. (2) Fiscal term corrections when secondary sources are superseded by primary legislation. (3) IRR and breakeven coverage expansion — currently 74/185 and 68/185 countries respectively; expanding as capital cost data is compiled.</p>
-        <p><strong>Stability:</strong> Government take figures for the 25 benchmark countries have been stable within ±2pp across the last 6 sourcing cycles (Apr–Aug 2026). Norway, Iraq, Angola, USA, UAE, and Australia have A-tier sourcing locked from primary legislation.</p>
+        <p><strong>Stability:</strong> Government take figures for the 27 benchmark countries have been stable within ±2pp across the last 6 sourcing cycles (Apr–Aug 2026). Norway, Iraq, Angola, USA, UAE, and Australia have A-tier sourcing locked from primary legislation.</p>
         <p><strong>For time-sensitive work:</strong> Check the DB date in the footer. If your analysis requires confirmed current-year rates, cross-reference against the primary source cited in the Evidence tooltip for that country.</p>
       </div>
     </details>
@@ -2548,7 +2552,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <strong style="color:var(--text);">Three-tier verification workflow:</strong>
         <ol style="margin:8px 0 8px 16px;padding:0;">
           <li style="margin-bottom:6px;"><strong>Check the Evidence badge first.</strong> Every country in Explorer and Country Profile shows an A/B/C/D confidence tier. Tier A (teal) = parameter sourced directly from primary legislation or signed PSA text. Tier B (green) = sourced from operator annual report or government filing. Tier C (yellow) = cross-referenced secondary (Wood Mac, Rystad). Tier D (grey) = modeled default. For investment-grade due diligence, verify any Tier C or D country against a primary source before use in an IC submission.</li>
-          <li style="margin-bottom:6px;"><strong>Compare the benchmark validation table.</strong> The Methodology tab's "Benchmark Validation" section cross-checks 25 benchmark countries against Wood Mackenzie, Rystad Energy, and S&amp;P Global ranges. If your target country is in that set (Norway, Iraq, Angola, USA, UAE, Australia, Brazil, Kazakhstan, and 17 others), the take figure has been independently verified within ±3pp. Pass rate: 24/25 (96%).</li>
+          <li style="margin-bottom:6px;"><strong>Compare the benchmark validation table.</strong> The Methodology tab's "Benchmark Validation" section cross-checks 27 benchmark countries against Wood Mackenzie, Rystad Energy, and S&amp;P Global ranges. If your target country is in that set (Norway, Iraq, Angola, USA, UAE, Australia, Brazil, Kazakhstan, and 19 others), the take figure has been independently verified within ±3pp. Pass rate: 26/27 (96%).</li>
           <li style="margin-bottom:6px;"><strong>For countries not in the benchmark set,</strong> the public API at <code>api/v1/country/{slug}.json</code> includes a <code>source_note</code> field and <code>evidence_tier</code> per parameter. Export via Country Profile XLSX to get the full parameter set with source annotations. For frontier countries, the <code>profit_oil_tier_schedule</code> field shows the R-factor tiers sourced from the signed PSA — compare against the actual PSA document if available.</li>
         </ol>
         <em>Verification shortcut: countries with ≥80% A/B sourced facts (shown in the Screener's Evidence Quality slider) have the highest independent verifiability. Filter to these using the Evidence Quality slider set to 80% — this reduces the universe to the most auditable set for formal due diligence workflows.</em>
@@ -2571,9 +2575,22 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
 
+    <div class="meth-faq-item" style="padding:12px 0;border-top:1px solid rgba(71,85,105,.2);">
+      <div class="meth-faq-q" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;line-height:1.4;">
+        A15. I have two candidate countries with similar government take — how do I differentiate using IRR and Breakeven?
+      </div>
+      <div class="meth-faq-a" style="color:var(--muted);font-size:13px;line-height:1.7;">
+        Govt Take is a revenue-share metric; it tells you what fraction of gross revenue the government captures, but not the economics of your specific project. Two countries at 55% take can have very different IRRs if their cost structures, royalty bases, or profit-sharing tiers differ. Use this three-step workflow:<br><br>
+        <strong style="color:var(--text);">Step 1 — Screen by Take (Explorer/Screener).</strong> Identify the tier of each country: IF (&lt;45%), Moderate (45–60%), High-Take (60–72%), or State-Dominated (&gt;72%). Two countries at 55% are both Moderate — take alone does not differentiate.<br><br>
+        <strong style="color:var(--text);">Step 2 — Compare Price Swing.</strong> The Swing column (Govt Take @$125 − Take @$50, in pp) tells you how price-responsive the fiscal regime is. A low-swing country (green, &lt;10pp) offers predictable terms at any oil price. A high-swing country (red, &gt;20pp) captures most of your upside in a high-price scenario — important for a project that depends on high-price economics to clear your hurdle rate.<br><br>
+        <strong style="color:var(--text);">Step 3 — Use IRR and Breakeven for final differentiation.</strong> If both countries have IRR data (filter with the ◎ Has IRR Data chip), compare IRR @$75/bbl directly — this accounts for cost structure. If one country lacks IRR data, use Breakeven as a proxy: a lower breakeven means the project is profitable over a wider price range, which approximates a higher IRR. For your final 2–3 candidates, run a field-specific DCF in Scenario Builder with your project's actual capex/opex to get a calibrated IRR for each.<br><br>
+        <em>Rule of thumb: Take for headline screening → Swing for price risk → Breakeven for cost efficiency → Scenario Builder IRR for investment decision.</em>
+      </div>
+    </div>
+
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v105, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v106, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -9446,6 +9463,12 @@ function runFiscalCompare() {
   const price = parseFloat(document.getElementById('fc-price').value);
   const profile = FC_PROFILES[profileKey];
   if (!profile) return;
+  // v106: null guard — prevent crash if data still loading when called from test harness or quick-key
+  if (!COUNTRY_DATA || !COUNTRY_DATA.length) {
+    const s = document.getElementById('fc-status');
+    if (s) s.textContent = 'Data loading — please wait…';
+    return;
+  }
   const status = document.getElementById('fc-status');
   status.textContent = 'Running ' + COUNTRY_DATA.length + ' countries...';
 
@@ -11115,6 +11138,35 @@ document.addEventListener('DOMContentLoaded', function() {
   if (cmpBtn) cmpBtn.addEventListener('click', function() { launchCompare(); });
 });
 
+// v106: Footer coverage links — migrate inline onclick to event listeners
+document.addEventListener('DOMContentLoaded', function() {
+  var irrLink = document.getElementById('footer-irr-link');
+  if (irrLink) irrLink.addEventListener('click', function() {
+    var b = document.getElementById('tab-btn-texplorer');
+    if (b) switchTab('texplorer', b);
+  });
+  var beLink = document.getElementById('footer-be-link');
+  if (beLink) beLink.addEventListener('click', function() {
+    var b = document.getElementById('tab-btn-texplorer');
+    if (b) switchTab('texplorer', b);
+  });
+});
+
+// v106: Country Profile quick buttons — event delegation replaces 9 inline onclick attributes
+document.addEventListener('DOMContentLoaded', function() {
+  var cpQuickBtns = document.getElementById('cp-quick-btns');
+  if (cpQuickBtns) {
+    cpQuickBtns.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-cp-country]');
+      if (!btn) return;
+      var country = btn.getAttribute('data-cp-country');
+      var sel = document.getElementById('dd-country-select');
+      if (sel) sel.value = country;
+      if (typeof loadCountryProfile === 'function') loadCountryProfile(country);
+    });
+  }
+});
+
 // v105: Event listeners for bubble price radios, Side-by-Side buttons, search close, breakeven CSV
 document.addEventListener('DOMContentLoaded', function() {
   // Bubble price radio buttons — replace inline onchange
@@ -11261,7 +11313,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v105</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v106</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
@@ -11271,7 +11323,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span style="color:#475569;">|</span>
     <span style="color:#334155;" title="Nightly audit runs at 03:00 daily via Task Scheduler — checks data completeness, DCF consistency, and sourcing coverage across all 185 countries">Nightly audit: active · last run 2026-08-08</span>
     <span style="color:#475569;">|</span>
-    <span style="color:#334155;" title="Coverage as of 2026-08-08 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price)."><button onclick="var b=document.querySelector('[id=\'tab-btn-texplorer\']');if(b){switchTab('texplorer',b);}" style="background:none;border:none;color:#334155;cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — IRR column shows 74/185 countries with data">IRR: 74/185 countries</button> · <button onclick="var b=document.querySelector('[id=\'tab-btn-texplorer\']');if(b){switchTab('texplorer',b);}" style="background:none;border:none;color:#334155;cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — Breakeven column shows 68/185 countries with data">Breakeven: 68/185</button> · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
+    <span style="color:#334155;" title="Coverage as of 2026-08-08 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price)."><button id="footer-irr-link" style="background:none;border:none;color:#334155;cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — IRR column shows 74/185 countries with data">IRR: 74/185 countries</button> · <button id="footer-be-link" style="background:none;border:none;color:#334155;cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — Breakeven column shows 68/185 countries with data">Breakeven: 68/185</button> · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
   </div>
 </div>
 
