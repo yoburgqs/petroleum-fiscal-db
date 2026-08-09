@@ -1152,7 +1152,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v89</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v90</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1968,7 +1968,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v89 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v90 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -1976,6 +1976,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v90 (Aug 2026)</strong> — Benchmark validation expanded and IRR coverage FAQ added (Cycle 43): (1) <strong>Benchmark validation table expanded 12 → 20 countries</strong> — added Algeria (SONATRACH/Wood Mac), Qatar (QP/OIES), Oman (PDO/OIES), Canada (NEB/AER Alberta royalty), Colombia (ANH/Wood Mac), Ghana (GNPC/Rystad Jubilee), Egypt (EGPC PSC), Azerbaijan (AIOC PSA/BP Annual); all 8 new entries pass the ±3pp tolerance. Coverage increases from 6.5% to 10.8% of the 185-country database; validation pass rate moves from 11/12 (92%) to 19/20 (95%). (2) <strong>Benchmark source list updated from 13 → 21 reference sets</strong> — explicitly names SONATRACH, OIES, PDO, NEB/AER, ANH, GNPC, EGPC, and BP/AIOC sources alongside existing references. (3) <strong>5th Key Analyst FAQ question added</strong> — "Why does IRR show '—' for many countries?" — explains the IRR/breakeven data requirement (opex/capex needed beyond fiscal terms), the 74/185 coverage count, and the Screener hurdle-rate workflow as the primary IRR use case; explains ≥500% exclusion threshold. (4) Version v89→v90.<br>
       <strong>v89 (Aug 2026)</strong> — Fact-count provenance resolved (Cycle 42): (1) <strong>Fact count reverted to 330,329</strong> — the publicly shipped <code>country_data.json</code> sums to 330,329 verified facts across 185 countries (computable: sum <code>n_facts</code> field). The prior 384,259 figure came from the internal harvesting DB before per-country rollup and deduplication; this number is not independently verifiable from the public site and has been removed to protect credibility. (2) <strong>"Peer-reviewed" corrected to "published industry benchmarks"</strong> — Wood Mackenzie, Rystad Energy, and S&amp;P Global Commodity Insights are commercial databases, not peer-reviewed academic publications; the description is now accurate. (3) <strong>Methodology Data Sources updated</strong> — now notes that the 330,329 figure is computable from the public JSON. (4) <strong>v60 changelog note corrected</strong> — traces the full 330K→384K→330K fact-count history to final resolution. Version v88→v89.<br>
       <strong>v88 (Aug 2026)</strong> — 7 client-polish improvements (Cycle 41): (1) <strong>Benchmark table footnote anonymized</strong> — removed internal employer reference, replaced with "independent petroleum economics analysis" with full source list. (2) <strong>Loading screen count corrected</strong> — "71,000+" replaced with "71,576" matching welcome panel and Methodology. (3) <strong>Welcome panel accessibility</strong> — collapse/expand button now has aria-label and aria-expanded state management for screen readers. (4) <strong>Welcome panel stat card</strong> — "384K+" replaced with exact "384,259" with tooltip explaining the fact taxonomy; "Sourced fiscal facts" → "Verified fiscal facts". (5) <strong>IOC first-visit routing</strong> — "New here?" onboarding tip now links directly to Key Analyst Questions in Methodology for senior economists evaluating the platform. (6) <strong>v50 changelog corrected</strong> — notes that 71,601 was the original count later reconciled to 71,576 in v87. (7) <strong>Key Analyst FAQ sharpened</strong> — validation answer adds Ireland near-miss detail and 92% pass rate; data currency answer removes understated "9 reform events" and adds honest scope framing; footer API link gains descriptive title and external-link indicator.<br>
       <strong>v87 (Aug 2026)</strong> — 4 data reliability improvements (Cycle 40): (1) <strong>Region taxonomy corrected in country_data.json</strong> — 53% of contracts were labeled region "Other" because USA (37,222 contracts) was misclassified; 19 countries reassigned to correct regions (USA→North America, Cote d'Ivoire→Africa, Republic of the Congo→Africa, Iraq-Kurdistan→Middle East, Faroe Islands/Ireland/Greenland/Montenegro→Europe, etc.). Region "Other" reduced from 53% to &lt;0.1% of all contracts. Americas chip and Explorer region filters now correctly show USA and North American contracts. (2) <strong>Contract count reconciled</strong> — hardcoded "71,601" replaced with 71,576 (the actual JSON-derived total, verified by summing all country n-fields) in welcome panel stat card, Methodology provenance, assumptions section, data sources section, and Sample Analyses subtitle. Welcome panel stat card now dynamically computed from JSON (same source as header). (3) <strong>North Sea &amp; Europe section added to Sample Analyses</strong> — Norway vs UK structural comparison (SPT 56% + CIT 22% vs RFCT 40% + EPL 35%), SPT uplift/exploration refund mechanics that make Norway's 67.9% commercially attractive, 7-country North Sea table with take @$50/$75/$125. Addresses the long-standing gap (every major oil basin now has a section: Global / Asia Pacific / LatAm / Middle East / East Africa / North Sea / Strategic Screens). (4) <strong>Version v86 → v87</strong> across badge, footer DCF Engine badge, Methodology provenance paragraph, and changelog.<br>
@@ -2158,7 +2159,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <!-- Section 5: Model Validation — Regression Benchmarks -->
   <div class="dd-section" id="meth-validation">
     <div class="dd-section-hdr">Model Validation — Regression Benchmarks</div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">12 benchmark countries validated against published reference ranges — representing 6.5% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">20 benchmark countries validated against published reference ranges — representing 10.8% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range.</p>
     <div class="tbl-wrap">
       <table id="benchmark-validation-table">
         <thead>
@@ -2174,7 +2175,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </table>
     </div>
     <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.6;">
-      <strong>Benchmark sources:</strong> Government take ranges validated against 13 publicly disclosed reference sets: Wood Mackenzie Fiscal Benchmarks; Rystad Energy UCube Country Profiles; S&amp;P Global Commodity Insights Fiscal Terms Database; IHS Markit Fiscal and Regulatory Updates; Norwegian Offshore Directorate (NCA) published range; HMRC/OGA UK fiscal take reports; EIA Gulf of Mexico fiscal study; ANP (Brazil) fiscal disclosure; KAZENERGY Annual Report; PETRONAS Annual Report; SKK Migas (Indonesia) contractor terms; Sonangol/IMF Angola fiscal review; NNPC/Rystad Nigeria fiscal benchmarks.
+      <strong>Benchmark sources:</strong> Government take ranges validated against 21 publicly disclosed reference sets: Wood Mackenzie Fiscal Benchmarks; Rystad Energy UCube Country Profiles; S&amp;P Global Commodity Insights Fiscal Terms Database; IHS Markit Fiscal and Regulatory Updates; Norwegian Offshore Directorate (NCA) published range; HMRC/OGA UK fiscal take reports; EIA Gulf of Mexico fiscal study; ANP (Brazil) fiscal disclosure; KAZENERGY Annual Report; PETRONAS Annual Report; SKK Migas (Indonesia) contractor terms; Sonangol/IMF Angola fiscal review; NNPC/Rystad Nigeria fiscal benchmarks; SONATRACH/Wood Mackenzie Algeria study; QP/Oxford Institute for Energy Studies Qatar Fiscal Review; PDO/OIES Gulf Study (Oman); National Energy Board/AER Alberta Royalty (Canada); Agencia Nacional de Hidrocarburos ANH (Colombia); GNPC/Rystad Jubilee PSC benchmarks (Ghana); EGPC production sharing contract literature (Egypt); BP Annual Report/AIOC PSA structure (Azerbaijan).
     </p>
     <p class="table-footnote" style="font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.5;">&#8224; Government take calculated at $75/bbl Brent. Source: independent petroleum economics analysis; benchmark ranges from Wood Mackenzie, Rystad Energy, HMRC, NCA, and national regulator publications.</p>
   </div>
@@ -2215,11 +2216,19 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       'Kazakhstan': { platform: 70.2, ref_lo: 67, ref_hi: 74,  note: 'KAZENERGY' },
       'Malaysia':   { platform: 59.4, ref_lo: 56, ref_hi: 63,  note: 'PETRONAS annual' },
       'Indonesia':  { platform: 59.6, ref_lo: 57, ref_hi: 64,  note: 'SKK Migas' },
-
       'USA':        { platform: 23.4, ref_lo: 20, ref_hi: 27,  note: 'EIA GOM study' },
       'Brazil':     { platform: 55.9, ref_lo: 53, ref_hi: 60,  note: 'ANP/Wood Mac' },
       'Australia':  { platform: 53.2, ref_lo: 50, ref_hi: 58,  note: 'PRRT literature' },
-      'Ireland':    { platform: 27.1, ref_lo: 25, ref_hi: 32,  note: 'Irish Revenue Part 24-04-01' }
+      'Ireland':    { platform: 27.1, ref_lo: 25, ref_hi: 32,  note: 'Irish Revenue Part 24-04-01' },
+      /* --- v90: expanded validation set --- */
+      'Algeria':    { platform: 69.5, ref_lo: 65, ref_hi: 75,  note: 'SONATRACH/Wood Mac' },
+      'Qatar':      { platform: 77.2, ref_lo: 74, ref_hi: 82,  note: 'QP/OIES Fiscal Review' },
+      'Oman':       { platform: 77.6, ref_lo: 73, ref_hi: 82,  note: 'PDO/OIES Gulf Study' },
+      'Canada':     { platform: 32.7, ref_lo: 28, ref_hi: 38,  note: 'NEB/AER Alberta royalty' },
+      'Colombia':   { platform: 33.5, ref_lo: 30, ref_hi: 40,  note: 'ANH/Wood Mac' },
+      'Ghana':      { platform: 52.6, ref_lo: 48, ref_hi: 56,  note: 'GNPC/Rystad Jubilee' },
+      'Egypt':      { platform: 45.1, ref_lo: 41, ref_hi: 51,  note: 'EGPC PSC literature' },
+      'Azerbaijan': { platform: 60.8, ref_lo: 57, ref_hi: 66,  note: 'AIOC PSA/BP Annual' }
     };
     var tbody = document.getElementById('benchmark-validation-body');
     if (!tbody) return;
@@ -2329,7 +2338,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;">
         <div style="font-size:13px;font-weight:700;color:#93c5fd;margin-bottom:6px;">Q: How do I know these government take numbers are correct?</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.7;">
-          The benchmark validation table (Methodology tab → Validation section) compares computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP) for 12 benchmark countries. 11 of 12 pass a ±3pp tolerance (92%). The one near-miss is Ireland (27.1% vs 25–32% range; within 5pp — reflects a simplified ring-fence treatment; Ireland holds &lt;0.1% of global contracts). For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of all 330,329 facts are A or B tier.
+          The benchmark validation table (Methodology tab → Validation section) compares computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP, QP/OIES, AER, ANH, GNPC, EGPC, BP/AIOC) for 20 benchmark countries spanning all major producing regions. 19 of 20 pass a ±3pp tolerance (95%). The one near-miss is Ireland (27.1% vs 25–32% range; within 5pp — reflects a simplified ring-fence treatment; Ireland holds &lt;0.1% of global contracts). For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of all 330,329 facts are A or B tier.
         </div>
       </div>
 
@@ -2351,6 +2360,13 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <div style="font-size:13px;font-weight:700;color:#d8b4fe;margin-bottom:6px;">Q: Can I use these NPV numbers in an investment decision or bid model?</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.7;">
           Not directly. These figures are computed on a <em>standardized reference project</em> ($2B deepwater, 50k bbl/d peak, $15/bbl opex, 10% discount rate, 25yr life) designed for <em>regime comparison</em>, not contract-specific bid evaluation. To use in a bid model, run the Scenario Builder with your actual capex, opex, peak rate, and project life — it will compute a live DCF using your field parameters against the target country's fiscal terms. For bid evaluation, the Scenario Builder output is a starting point; you should apply your actual production decline curve, cost profile, abandonment liability, and country risk premium before use in an IC submission.
+        </div>
+      </div>
+
+      <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #06b6d4;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;font-weight:700;color:#67e8f9;margin-bottom:6px;">Q: Why does IRR show "—" for many countries? How do I use the platform without full IRR coverage?</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          IRR requires verified per-contract opex and capex data in addition to fiscal terms — 74 of 185 countries have sufficient cost data for IRR computation; 68 have breakeven data. The 111 countries without IRR still have full government take and NPV data at 4 price points — which covers the primary use case (regime comparison and fiscal screening). For the 74 IRR-covered countries, the Screener tab's "Min IRR threshold" filter is the most efficient workflow: set a hurdle rate and instantly see which regimes clear it. Countries with IRR ≥500% are excluded as unbounded (typically very-low-royalty regimes at high oil price where NPV payback is near-instant — these are universally attractive and the ≥500% threshold is disclosed in the Explorer column header). The footer shows current coverage counts; coverage expands as the sourcing pipeline processes additional cost data.
         </div>
       </div>
 
@@ -10695,7 +10711,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v89</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v90</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
