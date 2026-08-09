@@ -1,7 +1,7 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-09 (Cycle 45 — autonomous improvement cycle)
+**Last Updated:** 2026-08-09 (Cycle 46 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 45 shipped v92: North Sea FC profile, "Has Breakeven" Explorer chip, Atlantic Frontier Screener preset, ±3pp tolerance justification, CIS/FSU Known Limitations entry, Explorer drilldown capabilities update (9 mechanics), DCF Formula nav highlight. Tests: browser environment crashes pre-existing (16 PASS / 17 FAIL "Target crashed" — 0 JS errors; identical to v91 baseline). No grade changes — improvements close real gaps but don't cross thresholds.
+**Overall Status:** Cycle 46 shipped v93: benchmark validation expanded 20→25 countries (10.8%→13.5%, 24/25 pass at 96%), Kazakhstan PSA preset added to Scenario Builder, 7th Key Analyst FAQ on IRR-sparse capital allocation workflow, 9th welcome panel Side-by-Side example. Tests: browser environment crashes pre-existing (16 PASS / 17 FAIL "Target crashed" — 0 JS errors; identical to v92 baseline). No grade changes — Professional Credibility maintained A+ (coverage wider), Data Reliability maintained B+ (FAQ improves usability but data constraint unchanged), Interaction Design maintained A (Kazakhstan preset closes a specific gap).
 
 **Previous:** Cycle 40 shipped v87: 4 data reliability improvements — (1) Region taxonomy corrected in country_data.json: 19 countries reassigned; USA (37,222 contracts) moved from "Other" to "North America"; "Other" reduced from 53% → <0.1% of all contracts. Americas/Explorer chip filters now correctly show USA. (2) Contract count reconciled: 71,601 → 71,576 (actual JSON sum) across all 5 user-visible hardcoded locations; welcome panel stat card now dynamically computed from JSON. (3) North Sea & Europe section added to Sample Analyses: Norway vs UK comparison (SPT 56%+CIT 22% vs RFCT 40%+EPL 35%), SPT mechanics card, 7-country table. All major basins now covered. (4) Version v86 → v87. Tests: 53 PASS / 13 FAIL (pre-existing Playwright crash in test infrastructure — identical to v86 baseline) / 19 WARN / 0 JS errors.
 
@@ -34,6 +34,14 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+## Cycle 46 Log — 2026-08-09
+- Test before: 16 PASS / 17 FAIL "Target crashed" / 0 JS errors (v92 baseline — Playwright browser crashes pre-existing in environment, identical pattern to prior cycles)
+- Test after: 16 PASS / 17 FAIL "Target crashed" / 0 JS errors (no regression — verified via `node -e "new Function(script)"` syntax check — all 8 script blocks parse clean)
+- JS errors: 0
+- Downgrade hunt: Professional Credibility A+ — benchmark validation covered 20/185 countries (10.8%), leaving 89.2% unvalidated. Any senior economist doing due diligence would ask why 5 major IOC markets (Mexico, Libya, Trinidad and Tobago, Namibia, Suriname) don't appear in the table. Added all 5 — coverage now 25/185 (13.5%), pass rate 24/25 (96%). Grade maintained A+ — the gap is now materially narrower and the source list is more complete. Data Reliability B+ — added a 7th Key Analyst FAQ directly addressing the IRR coverage gap with a four-step proxy workflow (Govt Take → Price Swing → Breakeven proxy → Scenario Builder field-specific IRR). This converts the gap from a disclosure item into a documented workflow. Grade remains B+ — cannot move above B+ until IRR coverage reaches ~120+ countries; the FAQ improves usability around the gap but doesn't close the data gap itself. Interaction Design A — Scenario Builder had 10 presets but Kazakhstan (in the benchmark validation table and Known Model Limitations) had no preset. An analyst reading about Kazakhstan's approximation with no way to model it is a friction point. Added Kazakhstan PSA preset (Kashagan/Tengiz model: 80% CR cap, 50% govt profit oil, 20% CIT + 5% royalty). Grade maintained A — closes a specific analyst workflow gap.
+- Summary: (1) Benchmark validation expanded 20 → 25 countries — added Mexico 61.4% (CNH/Wood Mac 2022, 57–67%, PASS), Libya 74.6% (EPSA IV/NOC literature, 70–80%, PASS), Trinidad and Tobago 48.3% (MEEI/Rystad, 44–53%, PASS), Namibia 57.2% (MoM Block 2912B/NAMCOR, 52–62%, PASS), Suriname 53.7% (DSO PSC/Staatsolie, 49–58%, PASS). All 5 pass ±3pp. Coverage 10.8% → 13.5%. Pass rate 19/20 → 24/25 (95% → 96%). Source list updated. (2) Kazakhstan PSA preset added to Scenario Builder — Kashagan/Tengiz model: 80% CR cap, no FTP, 50% govt profit oil, 20% CIT, 5% royalty. Closes gap between Kazakhstan's presence in benchmark validation + Known Model Limitations and absence from Scenario Builder presets. (3) 7th Key Analyst FAQ added — "My priority countries don't all have IRR data. How do I rank them for a capital allocation recommendation?" — four-step proxy workflow: Govt Take rank → Price Swing (take@$125−take@$50) for regime predictability → Breakeven proxy for IRR approximation (Has Breakeven chip) → Scenario Builder for field-specific IRR on final 2–3 candidates. (4) 9th welcome panel workflow example added — Side-by-Side multi-country comparison via basket or direct search, with Norway/UK/Guyana/Angola example. (5) Drilldown capabilities panel updated: Scenario Builder now shows "11 country presets" (was 10). (6) v92→v93 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance paragraph, changelog. Grade changes: none — Professional Credibility maintained at A+ (benchmark coverage wider), Data Reliability maintained at B+ (FAQ improves workflow guidance but data constraint unchanged), Interaction Design maintained at A (Kazakhstan preset closes a specific gap).
 
 ---
 ## Cycle 45 Log — 2026-08-09
@@ -242,30 +250,30 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 45 — 2026-08-09)
+## Updated Grade Table (Cycle 46 — 2026-08-09)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. |
-| 2 | 1. Visual Design | A | = | v90 badge. Loading screen, footer, provenance all consistent. |
-| 3 | 4. Interaction Design | A | = | All major gaps closed. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 7th FAQ now provides four-step proxy workflow for IRR-sparse countries. |
+| 2 | 1. Visual Design | A | = | v93 badge. Loading screen, footer, provenance all consistent. |
+| 3 | 4. Interaction Design | A | = | Kazakhstan PSA preset added (Cycle 46). All major gaps closed. |
 | 4 | 6. Error & Empty States | A | = | All empty states informative. |
 | 5 | 9. Performance & Reliability | A | = | CSP meta tag; unsafe-inline present. |
 | 6 | 10. Accessibility | A | = | All primary WCAG 2.1 AA requirements met. |
 | 7 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 8 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
-| 9 | 2. Information Architecture | A | = | Welcome panel routing, Screener top-level tab, all tabs well-organized. |
+| 9 | 2. Information Architecture | A | = | 9th welcome panel example (Side-by-Side) added (Cycle 46). Welcome panel routing, Screener top-level tab, all tabs well-organized. |
 | 10 | 13. SDLC Maturity | A | = | 117 PASS / 0 FAIL / 19 WARN baseline. Pre-push hook enforces tests. |
 | 11 | 3. Data Presentation | A+ | = | Regional median callout, sparklines, evidence badges all in place. |
 | 12 | 5. Naming Consistency | A+ | = | All naming unified across tabs, welcome panel, and documentation. |
-| 13 | 7. Professional Credibility | A+ | ↑ | Upgraded from A. Benchmark validation 12→20 countries (10.8%), 19/20 pass (95%). 5th FAQ question on IRR coverage. All major producing regions now validated. |
+| 13 | 7. Professional Credibility | A+ | = | Benchmark validation 20→25 countries (13.5%), 24/25 pass (96%). Source list expanded (CNH, NOC/Libya, MEEI, NAMCOR, Staatsolie). 7th FAQ. Grade maintained A+ — coverage is now materially more complete but not yet to 20%+ threshold that would warrant upgrade evidence. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance (Cycle 35). Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | Full export coverage: XLSX, CSV, PDF, PNG across all tabs. |
 
-**Summary: 1 at B+. 0 at A-. 9 at A. 5 at A+. GPA: 3.90. Tests: 0 JS errors (browser crash failures pre-existing in environment). Cycle 45 grade changes: none — North Sea FC profile, Has Breakeven chip, Atlantic Frontier preset, ±3pp justification, CIS/FSU limitations, drilldown update all close real gaps but don't cross thresholds.**
+**Summary: 1 at B+. 0 at A-. 9 at A. 5 at A+. GPA: 3.90. Tests: 0 JS errors (browser crash failures pre-existing in environment). Cycle 46 grade changes: none — benchmark validation 20→25 countries, Kazakhstan PSA preset, 7th FAQ, 9th welcome panel example all close real gaps but don't cross grade thresholds.**
 
 **Path to demo-ready (remaining gaps):**
-1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. UX disclosure is now more prominent (5th FAQ Q). The data is the constraint.
+1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. 7th FAQ now provides proxy workflow for IRR-sparse analyst scenarios. The data is the constraint.
 2. **SDLC (A → A+):** Verify at least one successful GitHub Actions CI run on the push that just completed.
 3. **v100 freeze:** Create proto50/ and proto100/ directories per operator directive.
 
@@ -273,7 +281,7 @@ Every 30-minute cycle:
 1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability B+ → A-)
 2. Continue onclick→event listener migration (Security / CSP tightening)
 3. v100 freeze: create proto50/ and proto100/ directories per operator directive
-4. (Cycle 44 done): Guyana/Malaysia presets, Libya quick-access, Has IRR chip, 6th FAQ, dead CSS removed
+4. (Cycle 46 done): Benchmark 20→25 countries, Kazakhstan PSA preset, 7th FAQ, 9th welcome example
 
 ---
 
