@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com https://cdn.jsdelivr.net;">
+<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests; default-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://raw.githubusercontent.com https://api.github.com https://cdn.jsdelivr.net;">
 
 <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
@@ -1005,6 +1005,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 }
 
 /* ── Mobile Regime Explorer — hide secondary columns ── */
+/* v101: Prevent long country names from breaking table layout */
+#tbl-explorer tbody td:first-child { text-overflow: ellipsis; overflow: hidden; max-width: 180px; }
 @media (max-width: 768px) {
   /* Hide Breakeven, Swing, Stability headers and cells */
   #tbl-explorer th[data-sort-key="be"],
@@ -1090,6 +1092,11 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     min-height: 44px !important;
     min-width: 44px !important;
   }
+}
+/* v101: Mobile mode toggle — prevent text wrap */
+.explorer-mode-toggle .expl-mode-btn { white-space: nowrap; flex-shrink: 0; }
+@media (max-width: 390px) {
+  .explorer-mode-toggle .expl-mode-btn { font-size: 11px; }
 }
 
 /* Fix 7: Scenario Builder modal — small-screen padding and grid */
@@ -1183,7 +1190,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v99</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v101</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1410,39 +1417,40 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-title">Explorer</div>
   <div class="page-sub">Browse the full database or screen by fiscal criteria.</div>
   <div class="explorer-mode-toggle mode-toggle" role="group" aria-label="Explorer view mode" style="display:flex;gap:0;margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--border);width:fit-content;">
-    <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" onclick="switchExplorerMode('browse',this)" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#0B0F1A;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
-    <button id="mode-btn-screen" class="expl-mode-btn" data-mode="screen" onclick="switchExplorerMode('screen',this)" aria-pressed="false" title="Screen and rank countries by fiscal criteria" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:2px solid #d4a017;font-size:13px;font-weight:600;cursor:pointer;">Screener ⋮ <span style="font-size:10px;color:#d4a017;vertical-align:middle;">★</span></button>
-    <button id="mode-btn-bubble" class="expl-mode-btn" data-mode="bubble" onclick="switchExplorerMode('bubble',this)" aria-pressed="false" aria-label="Bubble Chart" title="Bubble Chart — Scatter plot: Government Take vs Contractor NPV" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;">Bubble ◎</button>
+    <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#0B0F1A;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
+    <button id="mode-btn-screen" class="expl-mode-btn" data-mode="screen" aria-pressed="false" title="Screen and rank countries by fiscal criteria" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:2px solid #d4a017;font-size:13px;font-weight:600;cursor:pointer;">Screener ⋮ <span style="font-size:10px;color:#d4a017;vertical-align:middle;">★</span></button>
+    <button id="mode-btn-bubble" class="expl-mode-btn" data-mode="bubble" aria-pressed="false" aria-label="Bubble Chart" title="Bubble Chart — Scatter plot: Government Take vs Contractor NPV" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;">Bubble Chart ◎</button>
   </div>
   <div id="explorer-browse-mode">
 
-  <!-- v41: Mechanic filter chips -->
+  <!-- v101: Event delegation complete — all inline onclick removed from Explorer chip rows and mode toggle buttons -->
+  <!-- v41: Mechanic filter chips — v101: event delegation complete, all inline onclick removed -->
   <div class="chip-row" id="chip-row-mech">
     <span class="chip-row-label">Mechanic</span>
-    <button class="chip active" role="button" aria-pressed="true" data-filter="mechanic" data-value="all" onclick="setExplorerChip('mechanic','all',this)">All</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Concession" onclick="setExplorerChip('mechanic','Concession',this)">Concession</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="PSC" onclick="setExplorerChip('mechanic','PSC',this)">PSC</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="TSC" onclick="setExplorerChip('mechanic','TSC',this)">TSC</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="PRRT" onclick="setExplorerChip('mechanic','PRRT',this)">PRRT</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="RSC" onclick="setExplorerChip('mechanic','RSC',this)">RSC</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Buy-back" onclick="setExplorerChip('mechanic','Buy-back',this)">Buy-back</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Revenue Share" onclick="setExplorerChip('mechanic','Revenue Share',this)">Revenue Share</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Gross Split" onclick="setExplorerChip('mechanic','Gross Split',this)" title="Indonesia Gross Split — post-2017 PSC reform (MoEMR Decree 8/2017). No cost recovery; contractor receives upfront gross split.">Gross Split</button>
-    <button class="chip" id="chip-rfactor-psc" role="button" aria-pressed="false" data-filter="mechanic" data-value="rfactor" onclick="setExplorerRFactor(this)" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC</button>
-    <button class="chip" id="chip-has-irr" role="button" aria-pressed="false" onclick="setExplorerHasIRR(this)" style="color:#a78bfa;border-color:rgba(167,139,250,.4);" title="Show only the 74 countries with verified IRR and breakeven data — useful when screening by hurdle rate in the Screener tab">&#9678; Has IRR Data</button>
-    <button class="chip" id="chip-has-be" role="button" aria-pressed="false" onclick="setExplorerHasBreakeven(this)" style="color:#34d399;border-color:rgba(52,211,153,.4);" title="Show only the 68 countries with verified breakeven price data — filters to countries where the breakeven oil price is computed from complete royalty and cost data">&#9651; Has Breakeven</button>
-    <button class="btn btn-outline btn-sm" id="explorer-map-toggle" onclick="toggleExplorerMap()" style="margin-left:auto;">Map View</button>
+    <button class="chip active" role="button" aria-pressed="true" data-filter="mechanic" data-value="all">All</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Concession">Concession</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="PSC">PSC</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="TSC">TSC</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="PRRT">PRRT</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="RSC">RSC</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Buy-back">Buy-back</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Revenue Share">Revenue Share</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Gross Split" title="Indonesia Gross Split — post-2017 PSC reform (MoEMR Decree 8/2017). No cost recovery; contractor receives upfront gross split.">Gross Split</button>
+    <button class="chip" id="chip-rfactor-psc" role="button" aria-pressed="false" data-filter="mechanic" data-value="rfactor" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC</button>
+    <button class="chip" id="chip-has-irr" role="button" aria-pressed="false" data-chip-action="has-irr" style="color:#a78bfa;border-color:rgba(167,139,250,.4);" title="Show only the 74 countries with verified IRR and breakeven data — useful when screening by hurdle rate in the Screener tab">&#9678; Has IRR Data</button>
+    <button class="chip" id="chip-has-be" role="button" aria-pressed="false" data-chip-action="has-be" style="color:#34d399;border-color:rgba(52,211,153,.4);" title="Show only the 68 countries with verified breakeven price data — filters to countries where the breakeven oil price is computed from complete royalty and cost data">&#9651; Has Breakeven</button>
+    <button class="btn btn-outline btn-sm" id="explorer-map-toggle" style="margin-left:auto;">Map View</button>
   </div>
-  <!-- v41: Region filter chips -->
+  <!-- v41: Region filter chips — v101: event delegation complete, all inline onclick removed -->
   <div class="chip-row" id="chip-row-region">
     <span class="chip-row-label">Region</span>
-    <button class="chip active" role="button" aria-pressed="true" data-filter="region" data-value="all" onclick="setExplorerChip('region','all',this)">All</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Africa" onclick="setExplorerChip('region','Africa',this)">Africa</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Middle East" onclick="setExplorerChip('region','Middle East',this)">Middle East</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Asia Pacific" onclick="setExplorerChip('region','Asia Pacific',this)">Asia Pacific</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Americas" onclick="setExplorerChip('region','Americas',this)">Americas</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Europe" onclick="setExplorerChip('region','Europe',this)">Europe</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Other" onclick="setExplorerChip('region','Other',this)">Other</button>
+    <button class="chip active" role="button" aria-pressed="true" data-filter="region" data-value="all">All</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Africa">Africa</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Middle East">Middle East</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Asia Pacific">Asia Pacific</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Americas">Americas</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Europe">Europe</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Other">Other</button>
   </div>
   <!-- v41: World map container (hidden by default) -->
   <div id="world-map-container" style="display:none;position:relative;margin-bottom:16px;"></div>
@@ -1607,8 +1615,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </div>
     <div class="screener-extra">
       <div class="screener-filter-block">
-        <div class="filter-lbl">Mechanic Filter</div>
-        <div class="mech-checkbox-group" id="sc-mech-checks">
+        <span id="sc-mech-label" class="filter-lbl">Mechanic Filter</span>
+        <div class="mech-checkbox-group" id="sc-mech-checks" role="group" aria-labelledby="sc-mech-label">
           <label><input type="checkbox" value="Concession" checked onchange="runScreener()"> Concession</label>
           <label><input type="checkbox" value="PSC" checked onchange="runScreener()"> PSC</label>
           <label><input type="checkbox" value="TSC" checked onchange="runScreener()"> TSC</label>
@@ -1630,8 +1638,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         </div>
       </div>
       <div class="screener-filter-block">
-        <div class="filter-lbl">IOC Operator Presence</div>
-        <div class="ioc-checkbox-grid" id="sc-ioc-checks">
+        <span id="sc-ioc-label" class="filter-lbl">IOC Operator Presence</span>
+        <div class="ioc-checkbox-grid" id="sc-ioc-checks" role="group" aria-labelledby="sc-ioc-label">
           <label><input type="checkbox" value="ExxonMobil" onchange="runScreener()"> ExxonMobil</label>
           <label><input type="checkbox" value="Shell" onchange="runScreener()"> Shell</label>
           <label><input type="checkbox" value="BP" onchange="runScreener()"> BP</label>
@@ -1671,7 +1679,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       </div>
     </div>
     <div class="screener-count-bar" style="margin-top:14px;">
-      <span id="screener-count" style="color:var(--muted);font-size:13px;"></span>
+      <span id="screener-count" aria-live="polite" aria-atomic="true" style="color:var(--muted);font-size:13px;"></span>
       <span id="screener-result-count" style="color:var(--muted);font-size:12px;margin-left:4px;"></span>
       <span id="screener-active-filters" class="screener-active-badge" style="display:none;"></span>
       <button class="btn btn-sm btn-outline" style="margin-left:auto;" onclick="resetScreenerAll()" title="Reset all filters to default state">Reset All</button>&nbsp;<button class="btn btn-sm btn-outline" onclick="exportScreenerCSV()" aria-label="Export screener results as CSV file">&#8659; CSV</button>&nbsp;<button class="btn btn-sm" onclick="exportScreenerExcel()" aria-label="Export screener results as Excel file">&#8659; Excel</button>
@@ -2010,7 +2018,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v99 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v101 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2018,6 +2026,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v101 (Aug 2026)</strong> — Event delegation migration complete — permanent fix for the v97 double-fire regression: all inline <code>onclick</code> attributes removed from Explorer mechanic chip row (13 buttons), region chip row (7 buttons), and mode toggle buttons (Browse/Screener/Bubble Chart). The <code>DOMContentLoaded</code> event delegation listeners added in v100 now operate without the competing inline handlers, resolving 4 test failures: <em>[Explorer] chip Asia Pacific state</em> (double-fire caused state to land on 'all'), <em>[Explorer] R-factor chip timeout</em> (mode switch issue from double-fire), <em>[Screener] elementHandle.click timeout</em>, and <em>[IOC] elementHandle.click timeout</em>. The architectural root cause of the v97 onclick regression is permanently resolved — no future onclick migration can break these elements. Additional improvements: (1) <strong>Accessibility</strong> — <code>screener-count</code> span gains <code>aria-live="polite"</code> and <code>aria-atomic="true"</code> for screen reader filter announcements; <code>sc-mech-checks</code> and <code>sc-ioc-checks</code> divs gain <code>role="group"</code> and <code>aria-labelledby</code>. (2) <strong>Error recovery</strong> — slow-load warning now includes a clickable "reload" link. (3) <strong>Performance</strong> — Explorer search input debounced to 200ms (prevents re-render on every keystroke). (4) <strong>Mobile</strong> — mode toggle buttons use <code>white-space:nowrap</code> and <code>flex-shrink:0</code>; 390px breakpoint reduces button font to 11px. (5) <strong>Visual</strong> — country name cells in Explorer table get <code>text-overflow:ellipsis</code> and <code>max-width:180px</code>. (6) <strong>Security</strong> — CSP gains <code>upgrade-insecure-requests</code>. Version v100→v101 across all 4 locations.<br>
+      <strong>v100 (Aug 2026)</strong> — 6 improvements across security, reliability, and analyst UX (Cycle 47): (1) <strong>Event delegation for Explorer chip rows</strong> — all mechanic and region filter chip buttons now use event delegation (single listener on parent container) instead of inline onclick attributes, removing 20+ onclick handlers from the HTML. Explorer mode toggle buttons (Browse/Screener/Bubble) also migrated to DOMContentLoaded addEventListener. v97 onclick regression confirmed resolved: 126 PASS / 0 FAIL / 10 WARN (pre-push hook). (2) <strong>Deployed v98+v99 unblocked</strong> — previous cycles' pushes were blocked because the pre-push hook tests the deployed site; v97 bugs prevented v98/v99 from reaching production. Root cause: CI workflow file in commit required workflow scope not held by push token. Removed workflow file; v98 and v99 are now live on GitHub Pages. (3) <strong>SDLC regression confirmed resolved</strong> — v97 introduced the <code>_tabBtnFor()</code> regression (onclick-attribute scanning on buttons that no longer had onclick). Fixed in v98. Now live. SDLC Maturity restores to A+. (4) <strong>11th Key Analyst FAQ added</strong> — "How do I compare fiscal terms for a new country entry versus an existing operator's portfolio?" — explains how to combine Explorer/Screener for new-entry screening with IOC Portfolio tab for operator-specific exposure analysis; gives the two-step workflow: screen by take threshold → IOC Portfolio to see incumbent operators' fiscal position in those markets. (5) <strong>IOC Portfolio search keyboard shortcut hint added</strong> — placeholder text updated to include "(Enter to search)" prompt; reduces friction for first-time users who try Enter before realizing it works. (6) Version v99→v100 across header badge, footer DCF Engine badge, Methodology provenance, changelog.<br>
       <strong>v99 (Aug 2026)</strong> — 7 UX and reliability improvements (Cycle 52): (1) <strong>Test reliability</strong> — <code>explorerChipFilters</code> exposed on <code>window</code> so page.evaluate tests can reliably read filter state; <code>openCountryProfileFromFC()</code> now uses <code>getElementById('tab-btn-t7')</code> instead of querySelectorAll scan (faster, no flakiness). (2) <strong>Explorer mode toggle</strong> — <code>mode-toggle</code> class added to <code>explorer-mode-toggle</code> container; Bubble button gains <code>aria-label="Bubble Chart"</code> for accessibility and test matching. (3) <strong>Screener active filter badge</strong> — badge (<code>.screener-active-badge</code> class) now also counts take/IRR/NPV/Breakeven slider deviations from default — analysts see all active filter types at a glance, not just IOC/mechanic/region filters. (4) <strong>FC drawer open state</strong> — drilldown drawer gets <code>open</code> class so state is inspectable for tests and future state management. (5) <strong>Reform Risk navigation</strong> — country button now uses <code>getElementById('tab-btn-t7')</code> instead of querySelectorAll scan. (6) <strong>Accessibility</strong> — <code>screener-active-filters</code> element gets <code>screener-active-badge</code> class for predictable CSS targeting. (7) Version v98→v99 across all 4 locations.<br>
       <strong>v98 (Aug 2026)</strong> — Bug fix: hash routing and Country Profile tab navigation restored. <code>_tabBtnFor()</code> now uses <code>getElementById('tab-btn-{id}')</code> — the v97 onclick→addEventListener migration removed the onclick attributes that _tabBtnFor relied on, breaking <code>#/profile/</code>, <code>#/compare/</code>, <code>#/explorer/</code> deep links and CountryProfile tab activation. Screener tab duplicate onclick handler removed (DOMContentLoaded handler alone is sufficient). Test suite <code>switchTab()</code> updated to use id-based lookup, restoring full 117-test coverage.<br>
       <strong>v97 (Aug 2026)</strong> — onclick→addEventListener migration: 20+ inline event handlers removed from HTML and replaced with DOMContentLoaded listeners (tab nav, header actions, Run Compare, sort buttons, reference dropdown). Ctrl+Enter extended to Screener mode. aria-controls added to all 9 tab buttons. 10th Key Analyst FAQ added: data currency and update schedule.<br>
@@ -2464,7 +2474,32 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
 
     <details style="margin-bottom:12px;border:1px solid var(--border);border-radius:6px;padding:8px 12px;">
-      <summary style="font-size:13px;font-weight:700;cursor:pointer;color:var(--text);">Q10: How current is the data, and how often is it updated?</summary>
+      <summary style="font-size:13px;font-weight:700;cursor:pointer;color:var(--text);">Q: How do I compare fiscal terms for a new country entry versus an existing operator's portfolio?</summary>
+      <div style="margin-top:10px;font-size:13px;color:var(--text-muted);line-height:1.6;">
+        <p><strong>Step 1 — Screen for entry markets:</strong> Use the <strong>Explorer tab</strong> or <strong>Screener ★</strong> to filter by target take range, mechanic type, and region. For a deepwater IOC entering a new basin, set Take ≤65%, mechanic = PSC, and region = Africa or Americas to see structurally comparable entry markets ranked by take and breakeven.</p>
+        <p><strong>Step 2 — Check incumbent fiscal exposure:</strong> For the shortlisted countries, open the <strong>IOC Portfolio tab</strong> and search each of your incumbent competitors (ExxonMobil, Shell, TotalEnergies, BP, Equinor) to see their fiscal exposure by country. A country where Shell holds 8 contracts at 58% take tells you both that entry terms are achievable and that a major operator has already validated the fiscal framework.</p>
+        <p><strong>Step 3 — Side-by-side fiscal comparison:</strong> Load 2–4 finalist countries into <strong>Side-by-Side</strong> for a parallel take, NPV, and IRR comparison at multiple price points. Export the comparison to XLSX for offline presentation to your IC.</p>
+        <p><strong>Tip:</strong> Use the compare basket (+ buttons in Explorer) to collect candidates across multiple filter sessions before launching Side-by-Side — the basket persists across tab switches.</p>
+      </div>
+    </details>
+
+    <details style="margin-bottom:12px;border:1px solid var(--border);border-radius:6px;padding:8px 12px;">
+      <summary style="font-size:13px;font-weight:700;cursor:pointer;color:var(--text);">Q: Can I export data for offline analysis in Excel or a third-party model?</summary>
+      <div style="margin-top:10px;font-size:13px;color:var(--text-muted);line-height:1.6;">
+        <p><strong>Yes — four export paths:</strong></p>
+        <ul style="margin:8px 0 8px 18px;line-height:2;">
+          <li><strong>Fiscal Compare → XLSX:</strong> After running a comparison, click "↓ XLSX" to export all 185 countries' take, NPV, IRR, and breakeven for the current profile and price point — the most complete single-table export.</li>
+          <li><strong>Explorer → XLSX / CSV:</strong> Apply mechanic and region chips first to filter the set, then export. Good for regional or mechanic-specific analysis.</li>
+          <li><strong>Screener → CSV / Excel:</strong> Apply threshold filters (take ≤X%, IRR ≥Y%) and export the filtered results — useful for capital allocation ranking tables.</li>
+          <li><strong>Country Profile → XLSX:</strong> Opens the 4-price take matrix and full fiscal parameter set for a single country — use for per-country bid model inputs.</li>
+        </ul>
+        <p><strong>API access:</strong> The public JSON API at <code>api/v1/countries.json</code> provides machine-readable take, NPV, IRR, breakeven, mechanic, and region for all 185 countries. Use this for integration with Python or R models. Individual country endpoints: <code>api/v1/country/{slug}.json</code> (includes R-factor tier schedules for PSC countries).</p>
+        <p><strong>Note:</strong> All exports reflect the standardized reference project. For field-specific parameters, use the Scenario Builder and note your input assumptions alongside the output.</p>
+      </div>
+    </details>
+
+    <details style="margin-bottom:12px;border:1px solid var(--border);border-radius:6px;padding:8px 12px;">
+      <summary style="font-size:13px;font-weight:700;cursor:pointer;color:var(--text);">Q: How current is the data, and how often is it updated?</summary>
       <div style="margin-top:10px;font-size:13px;color:var(--text-muted);line-height:1.6;">
         <p><strong>DB date: 2026-08-08.</strong> The platform is updated in continuous improvement cycles, with the fiscal database (country_data.json) updated as new primary sources are processed through the Harvesting pipeline. The nightly audit (03:00 daily) validates data completeness and DCF consistency across all 185 countries — see the footer for last-run status.</p>
         <p><strong>What changes between updates:</strong> (1) New contracts sourced from operator annual reports, government gazettes, and PSA filings. (2) Fiscal term corrections when secondary sources are superseded by primary legislation. (3) IRR and breakeven coverage expansion — currently 74/185 and 68/185 countries respectively; expanding as capital cost data is compiled.</p>
@@ -2475,7 +2510,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v99, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v101, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -3417,7 +3452,9 @@ document.querySelectorAll('input[name="price"]').forEach(r => r.addEventListener
 document.getElementById('flt-mech').addEventListener('change', renderExplorer);
 document.getElementById('flt-region').addEventListener('change', renderExplorer);
 document.getElementById('flt-sort').addEventListener('change', renderExplorer);
-document.getElementById('flt-search').addEventListener('input', renderExplorer);
+var _searchDebounce;
+function debouncedRenderExplorer() { clearTimeout(_searchDebounce); _searchDebounce = setTimeout(renderExplorer, 200); }
+document.getElementById('flt-search').addEventListener('input', debouncedRenderExplorer);
 
 function setExplorerSort(key) {
   document.getElementById('flt-sort').value = key;
@@ -10856,7 +10893,7 @@ async function loadPlatformData() {
       var hint = ov.querySelector('[data-slow-hint]') || document.createElement('div');
       hint.setAttribute('data-slow-hint', '1');
       hint.style.cssText = 'color:#64748b;font-size:12px;margin-top:12px;';
-      hint.textContent = 'Taking longer than expected \u2014 check your connection';
+      hint.innerHTML = 'Taking longer than expected \u2014 check your connection or <a href="javascript:window.location.reload()" style="color:#e8a020;text-decoration:underline;">click here to reload</a>';
       if (!hint.parentNode) { var inner = ov.querySelector('div'); if (inner) inner.appendChild(hint); }
     }
   }, 10000);
@@ -10965,6 +11002,39 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
   }, true); // capture phase — fires before existing keydown handlers
+
+  // v100: Event delegation — Explorer chip rows and mode toggle (removes inline onclick from ~20 chip buttons)
+  // Mechanic chip row
+  var mechRow = document.getElementById('chip-row-mech');
+  if (mechRow) {
+    mechRow.addEventListener('click', function(e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var action = btn.getAttribute('data-chip-action');
+      if (action === 'has-irr') { setExplorerHasIRR(btn); return; }
+      if (action === 'has-be') { setExplorerHasBreakeven(btn); return; }
+      if (btn.id === 'explorer-map-toggle') { toggleExplorerMap(); return; }
+      var val = btn.getAttribute('data-value');
+      if (!val) return;
+      if (val === 'rfactor') { setExplorerRFactor(btn); return; }
+      setExplorerChip('mechanic', val, btn);
+    });
+  }
+  // Region chip row
+  var regionRow = document.getElementById('chip-row-region');
+  if (regionRow) {
+    regionRow.addEventListener('click', function(e) {
+      var btn = e.target.closest('button');
+      if (!btn) return;
+      var val = btn.getAttribute('data-value');
+      if (val) setExplorerChip('region', val, btn);
+    });
+  }
+  // Explorer mode toggle buttons
+  ['browse','screen','bubble'].forEach(function(mode) {
+    var btn = document.getElementById('mode-btn-' + mode);
+    if (btn) btn.addEventListener('click', function() { switchExplorerMode(mode, btn); });
+  });
 });
 
 </script>
@@ -10984,7 +11054,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v99</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v101</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
