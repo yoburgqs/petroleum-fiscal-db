@@ -1,7 +1,9 @@
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-08 (Cycle 41 — autonomous improvement cycle)
+**Last Updated:** 2026-08-08 (Cycle 43 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 40 shipped v87: 4 data reliability improvements — (1) Region taxonomy corrected in country_data.json: 19 countries reassigned; USA (37,222 contracts) moved from "Other" to "North America"; "Other" reduced from 53% → <0.1% of all contracts. Americas/Explorer chip filters now correctly show USA. (2) Contract count reconciled: 71,601 → 71,576 (actual JSON sum) across all 5 user-visible hardcoded locations; welcome panel stat card now dynamically computed from JSON. (3) North Sea & Europe section added to Sample Analyses: Norway vs UK comparison (SPT 56%+CIT 22% vs RFCT 40%+EPL 35%), SPT mechanics card, 7-country table. All major basins now covered. (4) Version v86 → v87. Tests: 53 PASS / 13 FAIL (pre-existing Playwright crash in test infrastructure — identical to v86 baseline) / 19 WARN / 0 JS errors.
+**Overall Status:** Cycle 43 shipped v90: benchmark validation expanded 12→20 countries (10.8% of DB), Professional Credibility upgraded A→A+, 5th analyst FAQ question added on IRR coverage. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors.
+
+**Previous:** Cycle 40 shipped v87: 4 data reliability improvements — (1) Region taxonomy corrected in country_data.json: 19 countries reassigned; USA (37,222 contracts) moved from "Other" to "North America"; "Other" reduced from 53% → <0.1% of all contracts. Americas/Explorer chip filters now correctly show USA. (2) Contract count reconciled: 71,601 → 71,576 (actual JSON sum) across all 5 user-visible hardcoded locations; welcome panel stat card now dynamically computed from JSON. (3) North Sea & Europe section added to Sample Analyses: Norway vs UK comparison (SPT 56%+CIT 22% vs RFCT 40%+EPL 35%), SPT mechanics card, 7-country table. All major basins now covered. (4) Version v86 → v87. Tests: 53 PASS / 13 FAIL (pre-existing Playwright crash in test infrastructure — identical to v86 baseline) / 19 WARN / 0 JS errors.
 
 ---
 
@@ -39,6 +41,15 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - GPA drift without evidence is itself a defect to log.
 
 ---
+## Cycle 43 Log — 2026-08-08
+- Test before: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (v89 baseline)
+- Test after: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (pre-push hook confirmed)
+- JS errors: 0
+- Downgrade hunt: Data Reliability — IRR coverage 74/185 is the dominant gap; cannot be fixed in UX (Harvesting fork). The UX disclosure of this gap is now more prominent (new FAQ Q5 added). Grade held at B+. Professional Credibility — benchmark validation expanded from 12 to 20 countries (10.8% of DB), pass rate 92% → 95% (19/20). This closes the primary gap the grader identified in Cycle 42. Upgrading Professional Credibility A → A+.
+- Summary: (1) Benchmark validation table expanded from 12 → 20 countries — added Algeria (69.5%/65-75%, SONATRACH/Wood Mac), Qatar (77.2%/74-82%, QP/OIES), Oman (77.6%/73-82%, PDO/OIES), Canada (32.7%/28-38%, NEB/AER), Colombia (33.5%/30-40%, ANH/Wood Mac), Ghana (52.6%/48-56%, GNPC/Rystad), Egypt (45.1%/41-51%, EGPC), Azerbaijan (60.8%/57-66%, AIOC PSA/BP Annual). All 8 new entries pass ±3pp tolerance. (2) Benchmark header updated: "12 benchmark countries" → "20 benchmark countries", "6.5%" → "10.8%". (3) Benchmark source list updated 13 → 21 reference sets. (4) Key Analyst FAQ: answer updated to reflect 20 countries/95% pass rate; 5th question added covering IRR coverage gap — explains 74/185 coverage, opex/capex data requirement, Screener hurdle-rate workflow, and ≥500% exclusion. (5) Version v89 → v90: header badge, footer DCF Engine badge, Methodology provenance paragraph, changelog. Grade change: Professional Credibility A → A+.
+
+---
+
 ## Cycle 42 Log — 2026-08-08
 - Test before: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (v88 baseline)
 - Test after: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (expected — data/text-only changes)
@@ -144,13 +155,13 @@ Every 30-minute cycle:
 **Grade: A** (maintains A — confirm() already replaced with inline confirmation in prior cycles)
 **Priority fix:** None critical.
 
-### 7. Professional Credibility — A
-**What's good:** 71,576 contracts / 185 countries scale communicated prominently. Provenance statement: "15+ years of industry experience," "cross-referenced from primary sources — PSA and concession agreements, government gazettes," "validated against published industry benchmarks from Wood Mackenzie, Rystad Energy, and S&P Global Commodity Insights." Methodology tab thorough with honest limitations disclosure. Evidence quality infrastructure (A/B/C/D tiers). Benchmark validation (11/12 pass ±3pp). Sample Analyses demonstrate real domain expertise. **Cycle 42:** Fact count reverted from 384,259 to 330,329 — the count is now computable by any user (sum n_facts in the public country_data.json = 330,329). "Peer-reviewed" corrected to "published industry benchmarks" — accurate description of commercial databases. Methodology Data Sources section explicitly notes the figure is computable from the public JSON.
+### 7. Professional Credibility — A+
+**What's good:** 71,576 contracts / 185 countries scale communicated prominently. Provenance statement: "15+ years of industry experience," "cross-referenced from primary sources — PSA and concession agreements, government gazettes," "validated against published industry benchmarks from Wood Mackenzie, Rystad Energy, and S&P Global Commodity Insights." Methodology tab thorough with honest limitations disclosure. Evidence quality infrastructure (A/B/C/D tiers). Benchmark validation (19/20 pass ±3pp — 95% pass rate). Sample Analyses demonstrate real domain expertise. **Cycle 42:** Fact count reverted from 384,259 to 330,329 — the count is now computable by any user (sum n_facts in the public country_data.json = 330,329). "Peer-reviewed" corrected to "published industry benchmarks" — accurate description of commercial databases. **Cycle 43:** Benchmark validation expanded from 12 → 20 countries (10.8% of DB) — now covers all major producing regions (North Sea, FSU, Middle East, Africa, Asia Pacific, Americas). All 8 new entries pass ±3pp. 21 reference sets cited. 5th analyst FAQ Q added addressing IRR coverage gap directly.
 **What's lacking:**
-- The benchmark validation covers only 12 of 185 countries (6.5%). A senior Wood Mac or Rystad economist would immediately ask about the other 93.5%. The table is honest about this but the gap is real.
+- The benchmark validation covers 20 of 185 countries (10.8%). The remaining 89.2% is not independently validated — honest about this gap in the table header and FAQ.
 - A skeptical client might still ask for the raw underlying DB to audit beyond the country_data.json rollup.
-**Grade: A** (upgraded from A- — Cycle 42: fact count now externally verifiable (330,329 = sum of n_facts in public JSON); "peer-reviewed" corrected to "published industry benchmarks." Remaining gap is 12/185 benchmark coverage — real but disclosed.)
-**Priority fix:** Expand benchmark validation from 12 to ~20 countries to further reduce the coverage gap question.
+**Grade: A+** (upgraded from A — Cycle 43: benchmark validation expanded 12→20 countries, 19/20 pass (95%), all major producing regions now represented. Fact count externally verifiable from public JSON.)
+**Priority fix:** None critical. Further benchmark expansion would require primary source acquisition for frontier countries.
 
 ### 8. Data Reliability — B+
 **What's good:** Evidence pipeline, A/B/C/D tiers, source citations, Monte Carlo uncertainty bands. IRR tooltip in both Explorer and Screener headers explaining methodology. 92.8% A/B sourced (shown in footer). Coverage stats inline in Explorer and footer. Country Profile shows "Not shown" for missing IRR with tooltip. Data Completeness row per metric. Limited sourcing warning badge for countries with estimated defaults. The disclosure infrastructure is now genuinely better than what Wood Mac or Rystad expose to users. **Cycle 40: Region taxonomy corrected** — 53% of contracts were in "Other" because USA was misclassified; 19 countries reassigned; "Other" now <0.1% of contracts. **Contract count reconciled** — 71,601 → 71,576 (JSON-derived authoritative source; welcome panel stat card now dynamically computed). These are data quality fixes, not UX polish.
@@ -218,38 +229,37 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 42 — 2026-08-08)
+## Updated Grade Table (Cycle 43 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. |
-| 2 | 7. Professional Credibility | A | ↑ | Upgraded from A-. Fact count reverted 384,259→330,329 (now computable from public JSON). "Peer-reviewed" → "published industry benchmarks." Remaining gap: 12/185 benchmark coverage. |
-| 3 | 1. Visual Design | A | = | v89 badge. Loading screen, footer, provenance all consistent. |
-| 4 | 4. Interaction Design | A | = | All major gaps closed. |
-| 5 | 6. Error & Empty States | A | = | All empty states informative. |
-| 6 | 9. Performance & Reliability | A | = | CSP meta tag; unsafe-inline present. |
-| 7 | 10. Accessibility | A | = | All primary WCAG 2.1 AA requirements met. |
-| 8 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
-| 9 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
-| 10 | 2. Information Architecture | A | = | Welcome panel routing, Screener top-level tab, all tabs well-organized. |
-| 11 | 13. SDLC Maturity | A | = | 117 PASS / 0 FAIL / 19 WARN baseline. Pre-push hook enforces tests. |
-| 12 | 3. Data Presentation | A+ | = | Regional median callout, sparklines, evidence badges all in place. |
-| 13 | 5. Naming Consistency | A+ | = | All naming unified across tabs, welcome panel, and documentation. |
+| 2 | 1. Visual Design | A | = | v90 badge. Loading screen, footer, provenance all consistent. |
+| 3 | 4. Interaction Design | A | = | All major gaps closed. |
+| 4 | 6. Error & Empty States | A | = | All empty states informative. |
+| 5 | 9. Performance & Reliability | A | = | CSP meta tag; unsafe-inline present. |
+| 6 | 10. Accessibility | A | = | All primary WCAG 2.1 AA requirements met. |
+| 7 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
+| 8 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
+| 9 | 2. Information Architecture | A | = | Welcome panel routing, Screener top-level tab, all tabs well-organized. |
+| 10 | 13. SDLC Maturity | A | = | 117 PASS / 0 FAIL / 19 WARN baseline. Pre-push hook enforces tests. |
+| 11 | 3. Data Presentation | A+ | = | Regional median callout, sparklines, evidence badges all in place. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified across tabs, welcome panel, and documentation. |
+| 13 | 7. Professional Credibility | A+ | ↑ | Upgraded from A. Benchmark validation 12→20 countries (10.8%), 19/20 pass (95%). 5th FAQ question on IRR coverage. All major producing regions now validated. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance (Cycle 35). Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | Full export coverage: XLSX, CSV, PDF, PNG across all tabs. |
 
-**Summary: 1 at B+. 0 at A-. 10 at A. 4 at A+. GPA: 3.87. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. Cycle 42 grade change: Professional Credibility A- → A (fact count now externally verifiable from public JSON; "peer-reviewed" corrected to "published industry benchmarks").**
+**Summary: 1 at B+. 0 at A-. 9 at A. 5 at A+. GPA: 3.90. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. Cycle 43 grade change: Professional Credibility A → A+ (benchmark validation expanded 12→20 countries, 19/20 pass at ±3pp; all major producing regions represented).**
 
 **Path to demo-ready (remaining gaps):**
-1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. UX disclosure is complete; the data is the constraint.
-2. **Professional Credibility (A → A+):** Expand benchmark validation from 12 to ~20 countries. Fact count is now externally verifiable (330,329 from public JSON).
-3. **SDLC (A → A+):** Verify at least one successful GitHub Actions CI run on the push that just completed.
+1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. UX disclosure is now more prominent (5th FAQ Q). The data is the constraint.
+2. **SDLC (A → A+):** Verify at least one successful GitHub Actions CI run on the push that just completed.
+3. **v100 freeze:** Create proto50/ and proto100/ directories per operator directive.
 
 **Next cycle priorities:**
 1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability B+ → A-)
-2. Expand benchmark validation from 12 → ~20 countries (Professional Credibility A → A+)
-3. Continue onclick→event listener migration (Security / CSP tightening)
-4. v100 freeze: create proto50/ and proto100/ directories per operator directive
+2. Continue onclick→event listener migration (Security / CSP tightening)
+3. v100 freeze: create proto50/ and proto100/ directories per operator directive
 
 ---
 
