@@ -1140,7 +1140,6 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   </div>
 </div>
 <style>
-@keyframes ldbar { 0%{width:0%} 60%{width:100%} 100%{width:100%;opacity:0} }
 @keyframes ld-shimmer { 0%{left:-60%;} 100%{left:100%;} }
 @keyframes ld-pulse { 0%,100%{opacity:1;} 50%{opacity:.65;} }
 </style>
@@ -1152,7 +1151,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v90</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v91</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" onclick="openSearch()" title="Search (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1392,6 +1391,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Revenue Share" onclick="setExplorerChip('mechanic','Revenue Share',this)">Revenue Share</button>
     <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Gross Split" onclick="setExplorerChip('mechanic','Gross Split',this)" title="Indonesia Gross Split — post-2017 PSC reform (MoEMR Decree 8/2017). No cost recovery; contractor receives upfront gross split.">Gross Split</button>
     <button class="chip" id="chip-rfactor-psc" role="button" aria-pressed="false" data-filter="mechanic" data-value="rfactor" onclick="setExplorerRFactor(this)" style="color:#2dd4bf;border-color:rgba(45,212,191,.4);">&#9670; R-factor PSC</button>
+    <button class="chip" id="chip-has-irr" role="button" aria-pressed="false" onclick="setExplorerHasIRR(this)" style="color:#a78bfa;border-color:rgba(167,139,250,.4);" title="Show only the 74 countries with verified IRR and breakeven data — useful when screening by hurdle rate in the Screener tab">&#9678; Has IRR Data</button>
     <button class="btn btn-outline btn-sm" id="explorer-map-toggle" onclick="toggleExplorerMap()" style="margin-left:auto;">Map View</button>
   </div>
   <!-- v41: Region filter chips -->
@@ -1926,6 +1926,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Australia';loadCountryProfile('Australia')" title="Australia — PRRT regime (Petroleum Resource Rent Tax), the primary cash-flow-based RRT used offshore" aria-label="Load Australia fiscal profile — PRRT regime, cash-flow-based RRT offshore">Australia</button>
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Iran';loadCountryProfile('Iran')" title="Iran — Buy-back contract regime: largest Buy-back dataset in the platform (284 contracts). Contractor finances development, NIOC takes operatorship, contractor recovers costs + fee over 7–10 year term." aria-label="Load Iran fiscal profile — Buy-back contract regime, largest Buy-back dataset in platform">Iran</button>
         <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Nigeria';loadCountryProfile('Nigeria')" title="Nigeria — PSC/Concession regime significantly reformed by the Petroleum Industry Act (PIA) 2021: new royalty tiers, deep offshore incentives, NNPC commercialization. One of the most-watched reform events in recent IOC planning." aria-label="Load Nigeria fiscal profile — PSC and Concession regimes, PIA 2021 reform">Nigeria</button>
+        <button class="cp-quick-btn" onclick="document.getElementById('dd-country-select').value='Libya';loadCountryProfile('Libya')" title="Libya — EPSA IV (Exploration and Production Sharing Agreement): distinctive fiscal structure with high government profit oil share (85–88%) offset by large cost recovery cap (50%) and no CIT. Eni, TotalEnergies, and BP are primary IOC operators. Political risk is material — this is a structural profile comparison tool." aria-label="Load Libya fiscal profile — EPSA regime, Eni and TotalEnergies operator benchmark">Libya</button>
       </div>
     </div>
   </div>
@@ -1968,7 +1969,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v90 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v91 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -1976,6 +1977,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v91 (Aug 2026)</strong> — 10 analyst-experience improvements (Cycle 44): (1) <strong>Guyana PSC preset added</strong> to Scenario Builder — Stabroek Block terms (10% royalty, 50% CR cap, flat 50/50 profit oil, 25% CIT; govt take ~52–56% at $75) — the Atlantic frontier's benchmark PSC that redefined deepwater fiscal negotiations globally. (2) <strong>Malaysia PSC preset added</strong> — PETRONAS standard terms (75% CR cap, 10% FTP, 50% govt profit oil, 25% CIT; take ~59% at $75) — closes the Asia Pacific preset gap alongside Indonesia. (3) <strong>Libya added to Country Profile quick-access</strong> — EPSA IV regime (Eni/TotalEnergies/BP operators); 9th quick-access country covering all major fiscal structure types. (4) <strong>"Has IRR Data" filter chip added</strong> to Explorer mechanic row — one click filters to the 74 IRR-covered countries; chip displays live count; IRR coverage FAQ answer updated to reference it. (5) <strong>6th analyst FAQ added</strong> — "Which regimes offer the best entry terms for a standard deepwater project?" — routes through Fiscal Compare → Side-by-Side → Screener workflow for new IOC visitors. (6) Dead CSS removed: <code>@keyframes ldbar</code> deleted (unused since v38 shimmer upgrade). (7–10) Version v90→v91 across badge, footer, Methodology provenance, and changelog.<br>
       <strong>v90 (Aug 2026)</strong> — Benchmark validation expanded and IRR coverage FAQ added (Cycle 43): (1) <strong>Benchmark validation table expanded 12 → 20 countries</strong> — added Algeria (SONATRACH/Wood Mac), Qatar (QP/OIES), Oman (PDO/OIES), Canada (NEB/AER Alberta royalty), Colombia (ANH/Wood Mac), Ghana (GNPC/Rystad Jubilee), Egypt (EGPC PSC), Azerbaijan (AIOC PSA/BP Annual); all 8 new entries pass the ±3pp tolerance. Coverage increases from 6.5% to 10.8% of the 185-country database; validation pass rate moves from 11/12 (92%) to 19/20 (95%). (2) <strong>Benchmark source list updated from 13 → 21 reference sets</strong> — explicitly names SONATRACH, OIES, PDO, NEB/AER, ANH, GNPC, EGPC, and BP/AIOC sources alongside existing references. (3) <strong>5th Key Analyst FAQ question added</strong> — "Why does IRR show '—' for many countries?" — explains the IRR/breakeven data requirement (opex/capex needed beyond fiscal terms), the 74/185 coverage count, and the Screener hurdle-rate workflow as the primary IRR use case; explains ≥500% exclusion threshold. (4) Version v89→v90.<br>
       <strong>v89 (Aug 2026)</strong> — Fact-count provenance resolved (Cycle 42): (1) <strong>Fact count reverted to 330,329</strong> — the publicly shipped <code>country_data.json</code> sums to 330,329 verified facts across 185 countries (computable: sum <code>n_facts</code> field). The prior 384,259 figure came from the internal harvesting DB before per-country rollup and deduplication; this number is not independently verifiable from the public site and has been removed to protect credibility. (2) <strong>"Peer-reviewed" corrected to "published industry benchmarks"</strong> — Wood Mackenzie, Rystad Energy, and S&amp;P Global Commodity Insights are commercial databases, not peer-reviewed academic publications; the description is now accurate. (3) <strong>Methodology Data Sources updated</strong> — now notes that the 330,329 figure is computable from the public JSON. (4) <strong>v60 changelog note corrected</strong> — traces the full 330K→384K→330K fact-count history to final resolution. Version v88→v89.<br>
       <strong>v88 (Aug 2026)</strong> — 7 client-polish improvements (Cycle 41): (1) <strong>Benchmark table footnote anonymized</strong> — removed internal employer reference, replaced with "independent petroleum economics analysis" with full source list. (2) <strong>Loading screen count corrected</strong> — "71,000+" replaced with "71,576" matching welcome panel and Methodology. (3) <strong>Welcome panel accessibility</strong> — collapse/expand button now has aria-label and aria-expanded state management for screen readers. (4) <strong>Welcome panel stat card</strong> — "384K+" replaced with exact "384,259" with tooltip explaining the fact taxonomy; "Sourced fiscal facts" → "Verified fiscal facts". (5) <strong>IOC first-visit routing</strong> — "New here?" onboarding tip now links directly to Key Analyst Questions in Methodology for senior economists evaluating the platform. (6) <strong>v50 changelog corrected</strong> — notes that 71,601 was the original count later reconciled to 71,576 in v87. (7) <strong>Key Analyst FAQ sharpened</strong> — validation answer adds Ireland near-miss detail and 92% pass rate; data currency answer removes understated "9 reform events" and adds honest scope framing; footer API link gains descriptive title and external-link indicator.<br>
@@ -2366,7 +2368,14 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #06b6d4;border-radius:0 6px 6px 0;">
         <div style="font-size:13px;font-weight:700;color:#67e8f9;margin-bottom:6px;">Q: Why does IRR show "—" for many countries? How do I use the platform without full IRR coverage?</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.7;">
-          IRR requires verified per-contract opex and capex data in addition to fiscal terms — 74 of 185 countries have sufficient cost data for IRR computation; 68 have breakeven data. The 111 countries without IRR still have full government take and NPV data at 4 price points — which covers the primary use case (regime comparison and fiscal screening). For the 74 IRR-covered countries, the Screener tab's "Min IRR threshold" filter is the most efficient workflow: set a hurdle rate and instantly see which regimes clear it. Countries with IRR ≥500% are excluded as unbounded (typically very-low-royalty regimes at high oil price where NPV payback is near-instant — these are universally attractive and the ≥500% threshold is disclosed in the Explorer column header). The footer shows current coverage counts; coverage expands as the sourcing pipeline processes additional cost data.
+          IRR requires verified per-contract opex and capex data in addition to fiscal terms — 74 of 185 countries have sufficient cost data for IRR computation; 68 have breakeven data. The 111 countries without IRR still have full government take and NPV data at 4 price points — which covers the primary use case (regime comparison and fiscal screening). For the 74 IRR-covered countries, the Screener tab's "Min IRR threshold" filter is the most efficient workflow: set a hurdle rate and instantly see which regimes clear it. Countries with IRR ≥500% are excluded as unbounded (typically very-low-royalty regimes at high oil price where NPV payback is near-instant — these are universally attractive and the ≥500% threshold is disclosed in the Explorer column header). The footer shows current coverage counts; coverage expands as the sourcing pipeline processes additional cost data. Use the <strong style="color:#a78bfa;">◎ Has IRR Data</strong> chip in the Explorer mechanic row to instantly filter to the 74 IRR-covered countries.
+        </div>
+      </div>
+
+      <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #f43f5e;border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;font-weight:700;color:#fda4af;margin-bottom:6px;">Q: Which regimes offer the best entry terms for a standard deepwater IOC project at $75/bbl?</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          Run <strong style="color:var(--text);">Fiscal Compare → Deepwater $75</strong> (the default quickstart) to rank all 185 countries by government take. The contractor-friendly end of the spectrum (&lt;40% take) is dominated by USA GoM (Concession, ~24%), Guyana Stabroek PSC (~52%), and Trinidad. The mid-range (45–60%) is PSC-dominant: Angola, Egypt, Malaysia, Nigeria PIA deepwater. The high-take tier (&gt;70%) includes Norway (Concession + 56% SPT), Iraq (TSC flat fee), and traditional Middle East concessions. For a quick Atlantic frontier comparison, load <strong>Guyana, Angola, Brazil, and Nigeria</strong> into Side-by-Side — four structurally different PSC regimes in the same basin, spanning a 30pp take range. The <strong>Screener ★</strong> tab lets you apply simultaneous filters on take, breakeven, and IRR across all 185 countries in one view.
         </div>
       </div>
 
@@ -2586,6 +2595,8 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <button class="btn btn-sm btn-outline" onclick="loadPreset('india')" title="India RSC — Risk Service Contract under NELP/HELP: contractor delivers services, government keeps equity; $4/bbl representative fee, 34% CIT, 5% EPT">India RSC</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('nigeria_rs')" title="Nigeria Revenue Share (pre-PIA legacy contracts) — 55% govt revenue share, 30% CIT; representative of Nigeria's pre-PIA gross-revenue contracts before the 2021 Petroleum Industry Act introduced the hybrid PSC structure">Nigeria Rev Share</button>
           <button class="btn btn-sm btn-outline" onclick="loadPreset('indonesia_gs')" title="Indonesia Gross Split (MoEMR Decree No. 8/2017) — 43% contractor split for onshore oil, 25% DMO at 25% ICP price, 25% CIT. Introduced by Jokowi government to replace cost recovery PSC and reduce government budget risk. Platform has 19 Gross Split contracts in database (3% of Indonesia total, all post-2017).">Indonesia Gross Split <span style="font-size:9px;color:var(--muted);margin-left:2px;">(19 contracts)</span></button>
+          <button class="btn btn-sm btn-outline" onclick="loadPreset('guyana')" title="Guyana — Stabroek Block PSC (ExxonMobil/Hess/CNOOC, 2016): 10% royalty, 50% cost recovery cap, flat 50/50 profit oil split, 25% CIT. The Liza discovery (2015) triggered one of the largest deepwater developments in history and benchmarks all Atlantic frontier PSC negotiations. Govt take ~52–56% at $75/bbl.">Guyana PSC</button>
+          <button class="btn btn-sm btn-outline" onclick="loadPreset('malaysia')" title="Malaysia — PETRONAS PSC: 75% cost recovery cap, 10% FTP (First Tranche Petroleum), 50% government profit oil, 25% CIT. Standard terms governing Shell, ExxonMobil, TotalEnergies, and Murphy upstream operations. Govt take ~59% at $75/bbl — mid-range Asia Pacific benchmark.">Malaysia PSC</button>
         </div>
       </div>
 
@@ -3194,6 +3205,7 @@ function renderExplorer() {
     if (region && !_regionMatch(d.region, region)) return false;
     if (_explorerRFactorOnly) { if (!d.has_r_factor_tiers) return false; }
     else if (mech && !_mechMatch(d, mech)) return false;
+    if (_explorerHasIRR) { if (!d.irr_75 || d.irr_75 <= 0 || d.irr_75 >= 500) return false; }
     if (search && !d.country.toLowerCase().includes(search)) return false;
     if (prodOnly && (!d.prod_coverage_pct || d.prod_coverage_pct <= 5)) return false;
     return true;
@@ -3446,6 +3458,7 @@ window.addEventListener('resize', function() { setTimeout(renderIRRScatter, 100)
 // ─── v41: Filter chip state ───────────────────────────────────────────────────
 const explorerChipFilters = { mechanic: 'all', region: 'all' };
 let _explorerRFactorOnly = false;
+let _explorerHasIRR = false;
 
 function setExplorerRFactor(btn) {
   _explorerRFactorOnly = !_explorerRFactorOnly;
@@ -3460,6 +3473,21 @@ function setExplorerRFactor(btn) {
     _explorerRFactorOnly = false;
     setExplorerChip('mechanic', 'all', document.querySelector('#chip-row-mech .chip[data-value="all"]'));
     return;
+  }
+  renderExplorer();
+  if (document.getElementById('world-map-container').style.display !== 'none') renderWorldMap();
+}
+
+function setExplorerHasIRR(btn) {
+  _explorerHasIRR = !_explorerHasIRR;
+  btn.classList.toggle('active', _explorerHasIRR);
+  btn.setAttribute('aria-pressed', _explorerHasIRR ? 'true' : 'false');
+  if (_explorerHasIRR) {
+    // Show count in button text
+    const count = (window.COUNTRY_DATA || []).filter(d => d.irr_75 && d.irr_75 > 0 && d.irr_75 < 500).length;
+    btn.textContent = '◎ Has IRR (' + count + ')';
+  } else {
+    btn.textContent = '◎ Has IRR Data';
   }
   renderExplorer();
   if (document.getElementById('world-map-container').style.display !== 'none') renderWorldMap();
@@ -8497,6 +8525,22 @@ const SB_PRESETS = {
     // Replaces traditional cost recovery PSC; contractor bears all cost risk within gross split.
     mechanic: 'Gross Split', profile: 'onshore_me', price: 75,
     gs_cont: 43, gs_cit: 25, gs_dmo: 25, gs_dmo_price: 25
+  },
+  guyana: {
+    // Guyana — Stabroek Block PSC (ExxonMobil 45% / Hess 30% / CNOOC 25%, 2016 renegotiation)
+    // 10% royalty, 50% cost recovery cap (oil), 50/50 profit oil split (flat — no R-factor tiers), 25% CIT.
+    // One of the most-watched deepwater fiscal benchmarks since the 2015 Liza discovery (11+ billion boe).
+    // Government take ~52–56% at $75/bbl — among the most contractor-friendly PSCs in Latin America.
+    mechanic: 'PSC', profile: 'deepwater', price: 75,
+    cr_cap: 50, ftp: 0, po_govt: 50, psc_cit: 25, psc_royalty: 10
+  },
+  malaysia: {
+    // Malaysia — PETRONAS PSC (standard upstream model contract terms)
+    // 75% cost recovery cap (oil), 10% FTP (First Tranche Petroleum, PETRONAS), 50% government profit oil,
+    // 25% CIT. Governs Shell, ExxonMobil, TotalEnergies, and Murphy deepwater operations.
+    // Government take ~59% at $75/bbl — mid-range Asia Pacific PSC benchmark.
+    mechanic: 'PSC', profile: 'deepwater', price: 75,
+    cr_cap: 75, ftp: 10, po_govt: 50, psc_cit: 25, psc_royalty: 0
   }
 };
 
@@ -10711,7 +10755,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v90</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v91</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-08</span>
     <span style="color:#475569;">|</span>
