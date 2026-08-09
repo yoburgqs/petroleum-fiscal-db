@@ -10,6 +10,15 @@
 
 **Mission: reach v100, then freeze two client prototypes. Deadline: within 24 hours (by ~5 PM Aug 9).**
 
+## 0. BLOCKING ITEM BEFORE THE v100 FREEZE — fact-count provenance (manager, 7:25 PM Aug 8)
+
+The welcome panel / Methodology now claim **384,259 verified fiscal facts**. The data actually shipped with the site (`country_data.json`, summing `n_facts` across all 185 countries) totals **330,329**. The master DB in the workspace has no fact records. A skeptical client who sums the public JSON gets 330,329 and concludes the headline is inflated by 16% — on the exact number the platform's credibility rests on.
+
+Resolution required BEFORE v100 (pick one, in preference order):
+1. **Cite the computable source**: if 384,259 comes from a real fact store, add to Methodology data-sources: the file/store name, its location or an exported count manifest, and the reconciliation (384,259 total collected → 330,329 aggregated into shipped country_data after per-country rollup/dedup). Ship a `facts_manifest.json` (per-country counts summing to the claimed total) so the number is verifiable from the site itself.
+2. **Or revert to 330,329** ("330K+ verified fiscal facts"), which the shipped data proves.
+Do NOT let v100 freeze with an uncitable flagship number. This is the third flip of this stat (330K→384K→330K→384K) — whatever the resolution, it must be final and evidenced.
+
 ## 1. Version discipline (v86–v99)
 - Keep the 30-min cadence. One version per cycle, real improvements only — do NOT burn version numbers on bookkeeping.
 - Priority order for remaining cycles: **(a) Data Reliability items** (they are why that grade is B+): region taxonomy at the DATA layer (53% of contracts sit in region "Other" in country_data.json — reassign from country names), IRR coverage note/expansion (74/185), reconcile header 71,576 vs welcome 71,601 (one number, one source); **(b)** any open bug; **(c)** final client polish (consistency sweep, dead-link check, export sanity).
@@ -30,6 +39,15 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - GPA drift without evidence is itself a defect to log.
 
 ---
+## Cycle 42 Log — 2026-08-08
+- Test before: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (v88 baseline)
+- Test after: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (expected — data/text-only changes)
+- JS errors: 0
+- Downgrade hunt: Professional Credibility — the blocking item from operator directive resolved. "384,259 verified fiscal facts" reverted to 330,329 (the computable count from country_data.json, verified by summing n_facts across all 185 countries = 330,329). The "peer-reviewed benchmarks" language corrected to "published industry benchmarks." Both defects that held Professional Credibility at A- are now addressed. Upgrading A- → A.
+- Summary: (1) Fact count 384,259 → 330,329 in 3 locations: welcome panel stat card, Methodology Data Sources section, Key Analyst FAQ. Tooltip updated with verifiable provenance note. (2) Methodology Data Sources: added note that 330,329 is computable from public country_data.json. (3) "peer-reviewed" → "published industry benchmarks" in Who Built This paragraph. (4) v60 changelog note updated to document full 330K→384K→330K history with final resolution. (5) v89 changelog entry added to Recent Platform Updates. (6) Version v88 → v89: header badge, footer DCF Engine badge, Who Built This provenance paragraph (now also cites 330,329 fact count). Version v88→v89. Grade change: Professional Credibility A- → A.
+
+---
+
 ## Cycle 41 Log — 2026-08-08
 - Test before: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (v87 baseline)
 - Test after: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors (pre-push hook confirmed)
@@ -126,14 +144,13 @@ Every 30-minute cycle:
 **Grade: A** (maintains A — confirm() already replaced with inline confirmation in prior cycles)
 **Priority fix:** None critical.
 
-### 7. Professional Credibility — A-
-**What's good:** 71,576 contracts / 185 countries scale communicated prominently. Provenance statement: "15+ years of industry experience," "cross-referenced from primary sources — PSA and concession agreements, government gazettes," "validated against peer-reviewed benchmarks from Wood Mackenzie, Rystad Energy, and S&P Global Commodity Insights." Methodology tab thorough with honest limitations disclosure. Evidence quality infrastructure (A/B/C/D tiers). Benchmark validation (11/12 pass ±3pp). Sample Analyses demonstrate real domain expertise. Title tag now says "71,576 Contracts, 185 Countries" with no version. Loading screen, welcome panel, footer, title, and Methodology all say 71,576 — fully consistent. **Cycle 41:** Benchmark table footnote anonymized — removed internal employer reference ("D&M analysis"), replaced with "independent petroleum economics analysis" with full named source list. Welcome panel fact count changed from "384K+" to "384,259" with tooltip. Key Analyst FAQ sharpened — validation answer adds 92% pass rate and Ireland near-miss detail; data currency answer removes understated "9 reform events" count and adds honest scope statement.
+### 7. Professional Credibility — A
+**What's good:** 71,576 contracts / 185 countries scale communicated prominently. Provenance statement: "15+ years of industry experience," "cross-referenced from primary sources — PSA and concession agreements, government gazettes," "validated against published industry benchmarks from Wood Mackenzie, Rystad Energy, and S&P Global Commodity Insights." Methodology tab thorough with honest limitations disclosure. Evidence quality infrastructure (A/B/C/D tiers). Benchmark validation (11/12 pass ±3pp). Sample Analyses demonstrate real domain expertise. **Cycle 42:** Fact count reverted from 384,259 to 330,329 — the count is now computable by any user (sum n_facts in the public country_data.json = 330,329). "Peer-reviewed" corrected to "published industry benchmarks" — accurate description of commercial databases. Methodology Data Sources section explicitly notes the figure is computable from the public JSON.
 **What's lacking:**
-- **Downgrade hunt (Cycle 41):** The "384,259 verified fiscal facts" claim is still unverifiable from the UI — users cannot count facts themselves and there is no external citation for this number. It is internally consistent (matches Methodology and Data Sources sections) but not externally verifiable. This is why A+ cannot be sustained.
 - The benchmark validation covers only 12 of 185 countries (6.5%). A senior Wood Mac or Rystad economist would immediately ask about the other 93.5%. The table is honest about this but the gap is real.
-- "Peer-reviewed benchmarks from Wood Mackenzie, Rystad Energy, and S&P Global Commodity Insights" — these are commercial databases, not peer-reviewed in the academic sense. The word choice could be questioned.
-**Grade: A-** (downgraded from A+ — Cycle 41 downgrade hunt confirmed: 384K fact count is unverifiable from the UI; "peer-reviewed" is imprecise; 12/185 validation coverage is a real gap a skeptical client would probe. Grade is A- not B because the disclosure infrastructure is genuinely excellent and the benchmark numbers that ARE validated pass cleanly.)
-**Priority fix:** Either add a footnote that "384,259" is the internal DB count (computed as sum of all contract facts, queryable via API) or provide a cross-check. Change "peer-reviewed" to "published industry benchmarks."
+- A skeptical client might still ask for the raw underlying DB to audit beyond the country_data.json rollup.
+**Grade: A** (upgraded from A- — Cycle 42: fact count now externally verifiable (330,329 = sum of n_facts in public JSON); "peer-reviewed" corrected to "published industry benchmarks." Remaining gap is 12/185 benchmark coverage — real but disclosed.)
+**Priority fix:** Expand benchmark validation from 12 to ~20 countries to further reduce the coverage gap question.
 
 ### 8. Data Reliability — B+
 **What's good:** Evidence pipeline, A/B/C/D tiers, source citations, Monte Carlo uncertainty bands. IRR tooltip in both Explorer and Screener headers explaining methodology. 92.8% A/B sourced (shown in footer). Coverage stats inline in Explorer and footer. Country Profile shows "Not shown" for missing IRR with tooltip. Data Completeness row per metric. Limited sourcing warning badge for countries with estimated defaults. The disclosure infrastructure is now genuinely better than what Wood Mac or Rystad expose to users. **Cycle 40: Region taxonomy corrected** — 53% of contracts were in "Other" because USA was misclassified; 19 countries reassigned; "Other" now <0.1% of contracts. **Contract count reconciled** — 71,601 → 71,576 (JSON-derived authoritative source; welcome panel stat card now dynamically computed). These are data quality fixes, not UX polish.
@@ -201,38 +218,38 @@ Every 30-minute cycle:
 
 ---
 
-## Updated Grade Table (Cycle 41 — 2026-08-08)
+## Updated Grade Table (Cycle 42 — 2026-08-08)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
 | 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. |
-| 2 | 7. Professional Credibility | A- | ↓ | Downgraded from A+. "384,259 facts" unverifiable from UI; benchmark covers 12/185 (6.5%); "peer-reviewed" imprecise. Cycle 41: footnote anonymized, stat card exact count, FAQ sharpened. |
-| 3 | 1. Visual Design | A | = | Cycle 41: loading screen count corrected 71,000+→71,576. Stale GRADER prose about "v54" removed. |
+| 2 | 7. Professional Credibility | A | ↑ | Upgraded from A-. Fact count reverted 384,259→330,329 (now computable from public JSON). "Peer-reviewed" → "published industry benchmarks." Remaining gap: 12/185 benchmark coverage. |
+| 3 | 1. Visual Design | A | = | v89 badge. Loading screen, footer, provenance all consistent. |
 | 4 | 4. Interaction Design | A | = | All major gaps closed. |
 | 5 | 6. Error & Empty States | A | = | All empty states informative. |
 | 6 | 9. Performance & Reliability | A | = | CSP meta tag; unsafe-inline present. |
-| 7 | 10. Accessibility | A | = | Cycle 41: welcome panel collapse button gains aria-label + aria-expanded. |
+| 7 | 10. Accessibility | A | = | All primary WCAG 2.1 AA requirements met. |
 | 8 | 11. Mobile Experience | A | = | All major mobile gaps closed. |
 | 9 | 12. Security / Data Integrity | A | = | CSP report-uri added (Cycle 31). SRI hashes all valid. |
-| 10 | 2. Information Architecture | A | = | Cycle 41: Sample Analyses tab — removed duplicate paragraph, added price-reference framing. |
-| 11 | 13. SDLC Maturity | A | = | 117 PASS / 0 FAIL / 19 WARN (Cycle 41 baseline — pre-push hook confirmed). |
+| 10 | 2. Information Architecture | A | = | Welcome panel routing, Screener top-level tab, all tabs well-organized. |
+| 11 | 13. SDLC Maturity | A | = | 117 PASS / 0 FAIL / 19 WARN baseline. Pre-push hook enforces tests. |
 | 12 | 3. Data Presentation | A+ | = | Regional median callout, sparklines, evidence badges all in place. |
-| 13 | 5. Naming Consistency | A+ | = | All naming unified. Cycle 41: stale "v54 (Cycle 7)" prose removed from GRADER. |
+| 13 | 5. Naming Consistency | A+ | = | All naming unified across tabs, welcome panel, and documentation. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance (Cycle 35). Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | Full export coverage: XLSX, CSV, PDF, PNG across all tabs. |
 
-**Summary: 1 at B+. 1 at A-. 9 at A. 4 at A+. 0 at A. GPA: 3.80. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. Cycle 41 grade change: Professional Credibility A+ → A- (honest downgrade — 384K claim unverifiable from UI, 6.5% benchmark coverage, "peer-reviewed" imprecise).**
+**Summary: 1 at B+. 0 at A-. 10 at A. 4 at A+. GPA: 3.87. Tests: 117 PASS / 0 FAIL / 19 WARN / 0 JS errors. Cycle 42 grade change: Professional Credibility A- → A (fact count now externally verifiable from public JSON; "peer-reviewed" corrected to "published industry benchmarks").**
 
 **Path to demo-ready (remaining gaps):**
 1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. UX disclosure is complete; the data is the constraint.
-2. **Professional Credibility (A- → A):** Either add API endpoint that returns fact count (making 384,259 externally verifiable) OR change "peer-reviewed" to "published industry benchmarks."
+2. **Professional Credibility (A → A+):** Expand benchmark validation from 12 to ~20 countries. Fact count is now externally verifiable (330,329 from public JSON).
 3. **SDLC (A → A+):** Verify at least one successful GitHub Actions CI run on the push that just completed.
 
 **Next cycle priorities:**
-1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability → A-)
-2. Add footnote/link making the 384,259 fact count verifiable (Professional Credibility → A)
-3. Change "peer-reviewed" → "published industry benchmarks" in Methodology
-4. Continue onclick→event listener migration (Security / CSP tightening)
+1. Expand IRR/breakeven coverage via Harvesting fork (Data Reliability B+ → A-)
+2. Expand benchmark validation from 12 → ~20 countries (Professional Credibility A → A+)
+3. Continue onclick→event listener migration (Security / CSP tightening)
+4. v100 freeze: create proto50/ and proto100/ directories per operator directive
 
 ---
 
