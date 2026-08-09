@@ -1195,7 +1195,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v107</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v108</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1238,8 +1238,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div id="search-modal" role="dialog" aria-label="Search countries and mechanics">
     <div id="search-input-wrap">
       <span class="search-icon-inner">&#x1f50d;</span>
-      <input id="search-q" type="text" placeholder="Search countries and mechanics..." aria-label="Search countries and mechanics" autocomplete="off"
-        oninput="renderSearchResults()" onkeydown="handleSearchKey(event)">
+      <input id="search-q" type="text" placeholder="Search countries and mechanics..." aria-label="Search countries and mechanics" autocomplete="off">
       <span id="search-close-btn" role="button" tabindex="0" aria-label="Close search" style="color:var(--muted);font-size:11px;cursor:pointer;">Esc</span>
     </div>
     <div id="search-results"></div>
@@ -1375,7 +1374,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="fc-controls">
     <div class="ctrl-group">
       <label>Profile</label>
-      <select id="fc-profile" aria-label="Select project production profile for Fiscal Compare" onchange="if(window._fcLastResults)runFiscalCompare()">
+      <select id="fc-profile" aria-label="Select project production profile for Fiscal Compare">
         <option value="shallow">Shallow Offshore &middot; $400M &middot; 30k bbl/d &middot; $12/bbl opex</option>
         <option value="deepwater">Deepwater &middot; $1.2B &middot; 50k bbl/d &middot; $15/bbl opex</option>
         <option value="onshore">Onshore &middot; $200M &middot; 20k bbl/d &middot; $8/bbl opex</option>
@@ -1387,7 +1386,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     </div>
     <div class="ctrl-group">
       <label>Price</label>
-      <select id="fc-price" aria-label="Select oil price scenario for Fiscal Compare" onchange="if(window._fcLastResults)runFiscalCompare()">
+      <select id="fc-price" aria-label="Select oil price scenario for Fiscal Compare">
         <option value="50">$50/bbl</option>
         <option value="75" selected>$75/bbl</option>
         <option value="100">$100/bbl</option>
@@ -1402,11 +1401,11 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="fc-sort-row" id="fc-sort-row" style="display:none;">
     <span class="fc-sort-label">Sort by:</span>
     <span style="font-size:10px;color:#475569;margin-right:4px;" title="Use Ctrl+Enter to re-run Fiscal Compare with current settings">[Ctrl+Enter to re-run]</span>
-    <button class="fc-sort-btn active" data-sort="take" tabindex="0" onkeydown="if(event.key==='Enter'){fcSetSort('take');}">Govt Take</button>
-    <button class="fc-sort-btn" data-sort="npv" tabindex="0" onkeydown="if(event.key==='Enter'){fcSetSort('npv');}">NPV &#9660;</button>
-    <button class="fc-sort-btn" data-sort="irr" tabindex="0" onkeydown="if(event.key==='Enter'){fcSetSort('irr');}" title="Sort by IRR (high→low) — countries with IRR ≥500% excluded as unbounded returns; 74 of 185 countries have IRR data">IRR &#9660;</button>
-    <button class="fc-sort-btn" data-sort="breakeven" tabindex="0" onkeydown="if(event.key==='Enter'){fcSetSort('breakeven');}">Breakeven &#9650;</button>
-    <button class="fc-sort-btn" data-sort="country" tabindex="0" onkeydown="if(event.key==='Enter'){fcSetSort('country');}">A&#8211;Z</button>
+    <button class="fc-sort-btn active" data-sort="take" tabindex="0" aria-label="Sort by Government Take">Govt Take</button>
+    <button class="fc-sort-btn" data-sort="npv" tabindex="0" aria-label="Sort by Contractor NPV (high to low)">NPV &#9660;</button>
+    <button class="fc-sort-btn" data-sort="irr" tabindex="0" aria-label="Sort by IRR (high to low)" title="Sort by IRR (high→low) — countries with IRR ≥500% excluded as unbounded returns; 74 of 185 countries have IRR data">IRR &#9660;</button>
+    <button class="fc-sort-btn" data-sort="breakeven" tabindex="0" aria-label="Sort by Breakeven price (low to high)">Breakeven &#9650;</button>
+    <button class="fc-sort-btn" data-sort="country" tabindex="0" aria-label="Sort alphabetically by country name">A&#8211;Z</button>
     <div class="fc-stability-toggle">
       <input type="checkbox" id="fc-stability-check">
       <label for="fc-stability-check" title="Adds a Stability column. Score = 5 minus number of fiscal law changes since 2010. ◆◆◆◆◆ (5) = zero changes = most stable. ◇◇◇◇◇ (0) = 5+ changes = most volatile.">Show Stability</label>
@@ -2030,7 +2029,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v107 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v108 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2038,6 +2037,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v108 (Aug 2026)</strong> — 10 targeted improvements across 4 categories (Cycle 61): (1) <strong>Security / Inline Handler Migration</strong> — 4 remaining inline handlers migrated to DOMContentLoaded event listeners: <code>#fc-profile</code> <code>onchange</code> (auto-rerun Fiscal Compare when profile changes), <code>#fc-price</code> <code>onchange</code> (auto-rerun when price scenario changes), <code>#search-q</code> <code>oninput</code> and <code>onkeydown</code> (search input now fully event-driven). (2) <strong>Accessibility</strong> — FC sort buttons gain <code>aria-label</code> attributes: "Sort by Government Take", "Sort by Contractor NPV (high to low)", "Sort by IRR (high to low)", "Sort by Breakeven price (low to high)", "Sort alphabetically by country name" — screen readers now announce sort button purpose on focus. <code>onkeydown</code> inline handlers removed from all 5 fc-sort-btn elements; keyboard events now handled via DOMContentLoaded <code>keydown</code> listeners. (3) <strong>Data Reliability / Professional Credibility</strong> — A16 Key Analyst FAQ added: "How does the platform model R-factor tiered PSCs, and when should I use the R-factor filter vs. a flat PSC?" — explains R-factor mechanics, how the DCF engine handles tiered profit oil splits (production-weighted average calibrated to mid-tier), the ◈ R-factor PSC chip workflow, and a Scenario Builder approach for sensitivity testing across tiers using Angola Block 17 and Nigeria deepwater as worked examples. (4) <strong>Version</strong> — v107→v108 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v107 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 60): (1) <strong>Security / Inline Handler Migration</strong> — 5 IOC Portfolio quick-launch buttons migrated from inline <code>onclick</code> to <code>class="ioc-quick-btn" data-ioc-op="..."</code> event delegation (ExxonMobil, Shell, TotalEnergies, BP, Equinor). <code>aria-label</code> added to all 5. Country Profile action buttons (<code>#dd-copy-link-btn</code>, <code>#dd-export-btn</code>, <code>#dd-print-btn</code>) — inline <code>onclick</code> removed, now handled via DOMContentLoaded event listeners; <code>aria-label</code> added to all 3. Side-by-Side PNG download button (<code>#cmp-chart-png-btn</code>), Vintage Analysis Export CSV (<code>#vintage-csv-btn</code>), Breakeven Map Export CSV (<code>#be-export-csv-btn</code>), API Copy URL button — all now use event listeners with <code>aria-label</code>. Reference panel overlay and close button (<code>#ref-panel-close-btn</code>) migrated. Scenario modal backdrop click-to-close, close button (<code>#scenario-modal-close-btn</code>), all Run DCF buttons (<code>#sb-run-dcf-top-btn</code>, <code>#sb-run-dcf-bottom-btn</code>, <code>#sb-run-dcf-empty-btn</code>), Save Scenario, Clear All Scenarios — all migrated. Scenario Builder preset buttons (13 presets: Norway, Angola, Iraq, UK, Australia, Saudi, Iran, India, Nigeria Rev Share, Indonesia Gross Split, Guyana, Malaysia, Kazakhstan) migrated from inline <code>onclick</code> to <code>class="sb-preset-btn" data-sb-preset="..."</code> event delegation. <code>sb-mechanic</code> select <code>onchange</code> migrated. (2) <strong>Accessibility</strong> — FAQ items A12–A15 converted to accessible accordions: <code>role="button"</code>, <code>tabindex="0"</code>, <code>aria-expanded</code>, <code>aria-controls</code> added; answers have matching <code>id</code> attributes; toggle respects both click and Enter/Space keydown. Reference panel <code>aria-label</code> added to <code>&lt;aside&gt;</code>. (3) <strong>Version</strong> — v106→v107 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v106 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 59): (1) <strong>Reliability / Bug Fix</strong> — <code>runFiscalCompare()</code> null guard added: function now returns immediately with "Data loading — please wait…" status message if <code>COUNTRY_DATA</code> is null or empty, preventing a crash when the function is called before async data fetch completes (e.g. from keyboard shortcut or quickstart button during initial load). (2) <strong>Accessibility</strong> — <code>aria-live="polite" aria-atomic="true"</code> added to <code>#fc-status</code> span — screen readers now announce Fiscal Compare status updates ("Running 185 countries…", "185 results · 0.2s") without requiring keyboard focus on the element. (3) <strong>Security / Data Integrity</strong> — 2 remaining inline <code>onclick</code> handlers in the footer coverage stats (IRR and Breakeven coverage links) migrated to DOMContentLoaded event listeners. Both buttons now use <code>id="footer-irr-link"</code> and <code>id="footer-be-link"</code> with <code>addEventListener('click', ...)</code>. Static HTML inline handler count at new historic minimum. (4) <strong>Data Reliability / Professional Credibility</strong> — A15 Key Analyst FAQ added: "I have two candidate countries with similar government take — how do I differentiate using IRR and Breakeven?" — explains the Take → Swing → IRR/Breakeven → Scenario Builder DCF progression; gives explicit rule of thumb for analyst decision workflow. Benchmark validation expanded 25 → 27 countries (Senegal SNH/Wood Mac Sangomar PSC; Mozambique ENH/Rystad LNG PSA literature) — coverage increases from 13.5% → 14.6%; pass rate 26/27 (96%); source list updated with SNH and ENH. All 3 FAQ references updated (count, source list, pass rate). (5) <strong>Naming / Version</strong> — v105→v106 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog. Version v105→v106.<br><br>
       <strong>v105 (Aug 2026)</strong> — 10 targeted improvements across 7 categories (Cycle 58): (1) <strong>Security</strong> — Bubble chart price radio <code>onchange</code> handlers migrated to DOMContentLoaded event listeners (4 handlers: bp50/bp75/bp100/bp125). Bubble PNG download <code>onclick</code> migrated. Side-by-Side Clear/Print/Share button <code>onclick</code> handlers migrated to named IDs + event listeners. Side-by-Side quickstart buttons refactored from inline <code>onclick</code> to <code>class="cmp-quickstart-btn" data-countries="..."</code> + event delegation (5 buttons). Breakeven Map CSV export <code>onclick</code> migrated. Search close button <code>onclick</code>/<code>onkeydown</code> migrated. (2) <strong>Interaction Design / Accessibility</strong> — Bubble chart price radio group wrapped with <code>role="group" aria-labelledby="bubble-price-label"</code> — screen readers now announce "Price scenario: $50/$75/$100/$125" as a grouped control. Bubble PNG button gains <code>aria-label</code>. (3) <strong>Mobile / Visual Design</strong> — Right tab fade gradient widened from 40px to 72px on desktop — more visible overflow indicator when the tab bar has additional tabs out of view on narrow viewports. (4) <strong>Performance</strong> — <code>will-change: transform</code> added to both shimmer animations (loading bar + FC skeleton <code>.fc-skel-bar::after</code>) — promotes elements to GPU compositing layer, reducing main-thread paint cost during loading animations. (5) <strong>Data Reliability / Professional Credibility</strong> — A14 Key Analyst FAQ added: "How do I access fiscal data programmatically for integration with our internal models?" — documents all three API endpoints (<code>countries.json</code>, <code>country/{slug}.json</code>, <code>mechanics.json</code>), recommended integration pattern (countries.json for portfolio screening → individual slugs for finalists), no-auth static CDN delivery, and XLSX alternative workflow. (6) <strong>Error &amp; Empty States</strong> — Reform Risk "no reform events" empty state upgraded from bare <code>&lt;p&gt;</code> text to icon + bolded headline + contextual explanation (stable regime vs. limited sourcing coverage guidance). Version v104→v105 across all 4 locations.<br><br>
@@ -2589,9 +2589,22 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
 
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+      <div class="meth-faq-q" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a16-body" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;line-height:1.4;">
+        A16. How does the platform model R-factor tiered PSCs, and when should I use the R-factor filter vs. a flat PSC?
+      </div>
+      <div class="meth-faq-a" id="faq-a16-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
+        An R-factor (recovery factor) is a ratio that triggers progressive profit oil splits as the contractor recoups its investment — typically R = cumulative revenue ÷ cumulative cost. At R&lt;1 the contractor has not recouped capex; at R&gt;1 the government captures an increasing share of profit oil. This is the dominant PSC structure in Africa and the Middle East (Angola, Nigeria, Oman, Algeria, Tunisia, Egypt).<br><br>
+        <strong style="color:var(--text);">How the platform models R-factor PSCs.</strong> The DCF engine uses a production-weighted average profit oil split across the contract's modeled life, calibrated to the mid-tier split (the tier where production is weighted most heavily for the reference project). The platform's IRR column header tooltip notes this limitation explicitly ("arithmetic mean of contract-level IRRs"). The advantage is that it allows direct comparison across 185 countries; the disadvantage is that a project clearing R=1 early generates a different IRR than the model implies.<br><br>
+        <strong style="color:var(--text);">Use the ◈ R-factor PSC chip in Explorer</strong> to filter to the ~23 countries where the platform has verified R-factor tiered contracts. These countries have a more complex fiscal profile than the flat-split figure implies — treat the take figure as a reference band, not a precise estimate.<br><br>
+        <strong style="color:var(--text);">For investment decisions on R-factor regimes:</strong> load the country in Scenario Builder, manually set profit oil split to the mid-tier value (shown in Country Profile parameters), then check sensitivity by re-running with the high tier (R&gt;2 split). The spread between these two runs approximates the take uncertainty from R-factor tiering. Angola Block 17 typically spans 4–8pp across tiers; Nigeria deepwater spans 6–12pp.<br><br>
+        <em>Rule of thumb: Use Explorer for screening (the blended take is directionally correct). Use Scenario Builder with explicit tier inputs for any country where R-factor tiering would materially affect your hurdle rate comparison.</em>
+      </div>
+    </div>
+
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v107, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v108, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -11237,7 +11250,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-// v107: FAQ accordion — accessible toggle for A12–A15 (role=button, aria-expanded, keyboard support)
+// v107/v108: FAQ accordion — accessible toggle for A12–A16 (role=button, aria-expanded, keyboard support)
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.meth-faq-q[aria-expanded]').forEach(function(q) {
     function toggleFaq(q) {
@@ -11353,11 +11366,25 @@ document.addEventListener('DOMContentLoaded', function() {
   // Run Compare button
   var runBtn = document.getElementById('fc-run-btn');
   if (runBtn) runBtn.addEventListener('click', function() { runFiscalCompare(); });
-  // Sort buttons
+  // Sort buttons — click and keyboard (Enter) via event delegation
   ['take','npv','irr','breakeven','country'].forEach(function(sort) {
     var sortBtn = document.querySelector('.fc-sort-btn[data-sort="' + sort + '"]');
-    if (sortBtn) sortBtn.addEventListener('click', function() { fcSetSort(sort); });
+    if (sortBtn) {
+      sortBtn.addEventListener('click', function() { fcSetSort(sort); });
+      sortBtn.addEventListener('keydown', function(e) { if (e.key === 'Enter') fcSetSort(sort); });
+    }
   });
+  // v108: FC profile/price selects — onchange migrated to event listeners
+  var fcProfile = document.getElementById('fc-profile');
+  if (fcProfile) fcProfile.addEventListener('change', function() { if (window._fcLastResults) runFiscalCompare(); });
+  var fcPrice = document.getElementById('fc-price');
+  if (fcPrice) fcPrice.addEventListener('change', function() { if (window._fcLastResults) runFiscalCompare(); });
+  // v108: Search input — oninput/onkeydown migrated to event listeners
+  var searchQ = document.getElementById('search-q');
+  if (searchQ) {
+    searchQ.addEventListener('input', function() { if (typeof renderSearchResults === 'function') renderSearchResults(); });
+    searchQ.addEventListener('keydown', function(e) { if (typeof handleSearchKey === 'function') handleSearchKey(e); });
+  }
   // Reference dropdown and items
   var refDropBtn = document.getElementById('ref-dropdown-btn');
   if (refDropBtn) refDropBtn.addEventListener('click', function(e) { toggleRefDropdown(e); });
@@ -11429,7 +11456,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v107</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v108</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
     <span style="color:#475569;">|</span>
