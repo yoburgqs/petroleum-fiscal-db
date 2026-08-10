@@ -498,6 +498,10 @@ async function testComparison(page) {
     await page.waitForTimeout(500);
 
     const rowCount = await page.evaluate(() => {
+      // v83+: renderCompare() uses CSS grid (.compare-grid .cmp-row), not <table>
+      const grid = document.querySelector('#cmp-output .compare-grid');
+      if (grid) return grid.querySelectorAll('.cmp-row').length;
+      // Fallback: legacy table structure
       const tbody = document.querySelector('#cmp-output table tbody');
       return tbody ? tbody.querySelectorAll('tr').length : 0;
     });
@@ -698,8 +702,8 @@ async function testScreener(page) {
       p(S, 'reset button', 'Screener reset clicked');
     } else w(S, 'reset button', 'No reset button found');
 
-    // Preset buttons
-    const presets = await page.$$('button[onclick*="applyScreenerPreset"]');
+    // Preset buttons — v103+: use class="screener-preset-btn" data-action="applyScreenerPreset" (no onclick)
+    const presets = await page.$$('button[data-action="applyScreenerPreset"], button[onclick*="applyScreenerPreset"]');
     if (presets.length >= 3) {
       await presets[0].click();
       await page.waitForTimeout(300);
@@ -900,7 +904,8 @@ async function testScenarioBuilder(page) {
     for (const mech of ['Concession', 'PSC', 'TSC', 'PRRT']) {
       await page.selectOption('#sb-mechanic', mech).catch(() => {});
       await page.waitForTimeout(200);
-      const runBtn = await page.$('button[onclick*="runCustomScenario"]');
+      // v107+: Run DCF buttons use event listeners (no onclick attr); use data-action attribute
+      const runBtn = await page.$('button[data-action="runCustomScenario"], button[onclick*="runCustomScenario"]');
       if (runBtn) {
         await runBtn.click({ force: true });
         await page.waitForTimeout(400);
