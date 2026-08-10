@@ -94,6 +94,40 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - GPA drift without evidence is itself a defect to log.
 
 ---
+## Cycle 69 Log — 2026-08-10
+- Test before: 118 PASS / 0 FAIL / 0 JS errors (Cycle 68 state)
+- Test after: 136 PASS / 0 FAIL / 0 JS errors (Playwright full run via pre-push hook). 4 script blocks parse clean via node -e "new Function()". 0 JS errors.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — found and fixed an active data integrity bug: the BENCHMARKS JS object had two `'Libya'` keys (v93 + v114), causing the v114 entry to silently overwrite the v93 entry. The benchmark table was displaying 36 unique country rows while the documentation claimed 37. Fixed by replacing the duplicate Libya key with Guyana (Rystad Stabroek PSC, take 52.3%, range 48–57%, PASS). Benchmark now shows 37 genuinely distinct country rows. Sources 29 → 30. Grade maintained B+ — IRR coverage gap (74/185) unchanged; this bug was a display accuracy defect within the B+ band, not an IRR coverage fix. Mobile Experience A — landscape-mode CSS optimization added (`@media (max-width:896px) and (max-height:500px) and (orientation:landscape)`): header padding collapses, tab buttons shrink, Quick Start guide auto-hides, Explorer/FC get scrollable max-height. Also: `overscroll-behavior-y:none` on body closes iOS pull-to-refresh bounce gap (per-element overscroll-behavior:contain was already in place for modals/panels since v110; body-level rule was missing). Grade: A → A+ (landscape layout + body overscroll gap closed — the two remaining documented mobile gaps from the "Path to demo-ready" section are now addressed). Performance & Reliability A — `content-visibility:auto` added to `.tab-pane:not(.active)` — browser skips layout/paint for all 14 non-active tab panes on initial render, reducing paint cost on this 11,800-line single-file app. Grade maintained A — single-file architectural constraint remains; content-visibility is a rendering optimization, not an architectural fix.
+- Summary: (1) **Data Reliability / Bug Fix** — Libya duplicate key in BENCHMARKS object corrected. JS object had two `'Libya'` keys; second overwrote first silently. Table was showing 36 unique countries, not 37. Replaced v114 duplicate with Guyana (Rystad Stabroek, 52.3%, 48–57%, PASS). Benchmark sources 29→30. A13 FAQ country list updated (Guyana added). (2) **Data Reliability / Professional Credibility** — A24 Key Analyst FAQ added: "We have an existing portfolio of blocks across 12 countries. How do I use this platform to assess aggregate fiscal risk exposure?" — three-layer portfolio fiscal risk workflow: IOC Portfolio tab exposure mapping → Fiscal Compare at $50 stress test with Breakeven filter → Reform Risk tab overlay. Rule of thumb: >65% take at $50 + Stability ≤2 = high-priority review; <50% take at $50 + Stability ≥4 = fiscal anchor. (3) **Mobile Experience** — Landscape-mode CSS: header, tab bar, tab pane padding all collapse in landscape on phones. Quick Start guide hides automatically. Explorer/FC get scrollable max-height. (4) **Mobile Experience** — `overscroll-behavior-y:none` on body prevents iOS Safari pull-to-refresh bounce on main scroll container. (5) **Performance** — `content-visibility:auto` on inactive tab panes — browser skips layout/paint for off-screen tabs on initial render. (6) **Version** — v115→v116 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog. How to Cite citation updated [v115] → [v116].
+
+## Updated Grade Table (Cycle 69 — 2026-08-10)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 24 FAQs (A1–A24) + proxy workflow + A13 source verification + A17 IC-readiness + A21 price sensitivity workflow + A22 evidence-coverage orthogonality + A23 pre-FID frontier workflow + A24 portfolio fiscal risk. Benchmark 37 countries / 36/37 pass (97%) — Libya duplicate bug fixed (was 36 unique, now genuinely 37). Coverage 20.0% of DB. Sources: 30. |
+| 2 | 9. Performance & Reliability | A | = | content-visibility:auto on inactive tab panes (v116) — skips layout/paint for 14 off-screen tabs. Preload hints + fetchpriority="high" (v102). color-scheme:dark meta (v115). Single-file architectural constraint remains the binding gap. |
+| 3 | 11. Mobile Experience | A+ | ↑ | Landscape-mode CSS optimization (v116) — collapses chrome, maximizes data space. body overscroll-behavior-y:none (v116) — closes iOS pull-to-refresh bounce gap. iOS auto-zoom prevention: font-size:16px on select at 768px (v114). overscroll-behavior:contain on modals/panels (v110). chip touch-action:manipulation (v112). All documented mobile gaps now closed. |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation in Explorer table (v115). Alt+←/→ tab cycling (v114). North Sea quickstart (v113). FC keyboard shortcuts complete. |
+| 5 | 2. Information Architecture | A+ | = | First-visit Quick Start guide (v115). Landmark map complete (v104). All major IA gaps closed. |
+| 6 | 6. Error & Empty States | A+ | = | All three analyst-visible empty state areas styled. Reform History filter upgraded v109. No bare empty tables remain. |
+| 7 | 13. SDLC Maturity | A+ | = | Clean cycle. 136 PASS / 0 FAIL / 0 JS errors (Playwright full run). CI badge present. Pre-push hook active. |
+| 8 | 10. Accessibility | A+ | = | All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A24 accessible (role=button, aria-expanded, keyboard toggle). FC sort row role=group (v112). Explorer aria-sort dynamic (v110). Explorer row keyboard nav (v115). |
+| 9 | 12. Security / Data Integrity | A+ | = | Libya duplicate key bug fixed (v116) — data integrity improvement. Remaining unsafe-inline confined to dynamically-rendered innerHTML. Evidence: 136 PASS / 0 FAIL / 0 JS errors. |
+| 10 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon. Row fade-in (v102). Tab gradient improved (v105). |
+| 11 | 3. Data Presentation | A+ | = | Regional median callout, sparklines, evidence badges all in place. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. Scenario Builder preset count corrected (v113). |
+| 13 | 7. Professional Credibility | A+ | = | 24 FAQs + "How to Cite" + A13 source verification + A17 IC-readiness + A21 price sensitivity workflow + A22 evidence-coverage orthogonality + A23 pre-FID frontier workflow + A24 portfolio fiscal risk. Benchmark 37 countries / 36/37 pass (97%) — genuinely 37 distinct countries after Libya duplicate fix. Coverage 20.0% of DB. Sources: 30. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. Full export coverage maintained. |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 136 PASS / 0 FAIL / 0 JS errors (Playwright full run). Cycle 69 grade changes: Mobile Experience A → A+ (landscape-mode CSS + body overscroll close the two remaining documented mobile gaps; all mobile issues now addressed). Downgrade hunt: Data Reliability B+ — active Libya duplicate bug found and fixed; benchmark now genuinely 37 distinct countries. Grade maintained B+ — IRR structural gap (74/185) unchanged.**
+
+**Path to demo-ready (remaining gaps):**
+1. **Data Reliability (B+ → A-):** Expand IRR/breakeven coverage via Harvesting fork to ~120+ countries. UX guidance complete (24 FAQs). Benchmark now genuinely 37 countries (Libya duplicate fixed).
+2. **Performance & Reliability (A → A+):** Address single-file architectural constraint (bundle split or deferred loading for non-critical chart libraries). content-visibility:auto narrows the gap but doesn't close it.
+
+---
 ## Cycle 68 Log — 2026-08-10
 - Test before: 118 PASS / 0 FAIL / 15 WARN / 0 JS errors
 - Test after: 9 script blocks parse clean via `node -e "new Function()"` (JS syntax verification). 0 JS errors.
