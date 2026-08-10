@@ -5926,13 +5926,13 @@ function loadCountryProfile(country) {
     : '';
   const prodDQBadge = getDQBadge(d);
   const backToExplorerBtn = `<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;"><button onclick="switchTab('texplorer',document.getElementById('tab-btn-texplorer'))" style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(232,160,32,.18)'" onmouseout="this.style.background='rgba(232,160,32,.08)'">← Explorer</button><button onclick="switchTab('t0',document.getElementById('tab-btn-t0'))" style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(232,160,32,.18)'" onmouseout="this.style.background='rgba(232,160,32,.08)'">Fiscal Compare</button></div>`;
-  const _beCallout = (d.be_75 != null && d.be_75 < 500) ? `<span style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${d.be_75.toFixed(0)} $/bbl</strong></span>` : `<span style="font-size:10px;color:var(--muted);margin-left:10px;" title="Breakeven requires complete capital cost data — not yet computed for this country">Breakeven: pending $/bbl data</span>`;
+  const _hdrBeCallout = (d.be_75 != null && d.be_75 < 500) ? `<span style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${d.be_75.toFixed(0)} $/bbl</strong></span>` : `<span style="font-size:10px;color:var(--muted);margin-left:10px;" title="Breakeven requires complete capital cost data — not yet computed for this country">Breakeven: pending $/bbl data</span>`;
   let html = backToExplorerBtn + `<div id="dd-profile-head" class="dd-header">
     <strong class="dd-country-name">${d.country}</strong>${ddSpecBadge}
     <span class="dd-region">${d.region}</span>
     <span class="tier ${tierClass(d.take_75)}" style="margin-left:8px">${tierLabel(d.take_75)}</span>
     <span class="count-badge" style="margin-left:8px">${d.n} contracts</span>
-    ${_beCallout}
+    ${_hdrBeCallout}
     ${mcBadge}
     ${dqBadge}
     ${prodDQBadge}
