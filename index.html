@@ -2650,7 +2650,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <details style="margin-bottom:12px;border:1px solid var(--border);border-radius:6px;padding:8px 12px;">
       <summary style="font-size:13px;font-weight:700;cursor:pointer;color:var(--text);">Q: How current is the data, and how often is it updated?</summary>
       <div style="margin-top:10px;font-size:13px;color:var(--text-muted);line-height:1.6;">
-        <p><strong>DB date: 2026-08-08.</strong> The platform is updated in continuous improvement cycles, with the fiscal database (country_data.json) updated as new primary sources are processed through the Harvesting pipeline. The nightly audit (03:00 daily) validates data completeness and DCF consistency across all 185 countries — see the footer for last-run status.</p>
+        <p><strong>DB date: 2026-08-10.</strong> The platform is updated in continuous improvement cycles, with the fiscal database (country_data.json) updated as new primary sources are processed through the Harvesting pipeline. The nightly audit (03:00 daily) validates data completeness and DCF consistency across all 185 countries — see the footer for last-run status.</p>
         <p><strong>What changes between updates:</strong> (1) New contracts sourced from operator annual reports, government gazettes, and PSA filings. (2) Fiscal term corrections when secondary sources are superseded by primary legislation. (3) IRR and breakeven coverage expansion — currently 74/185 and 68/185 countries respectively; expanding as capital cost data is compiled.</p>
         <p><strong>Stability:</strong> Government take figures for the 41 benchmark countries have been stable within ±2pp across the last 6 sourcing cycles (Apr–Aug 2026). Norway, Iraq, Angola, USA, UAE, and Australia have A-tier sourcing locked from primary legislation.</p>
         <p><strong>For time-sensitive work:</strong> Check the DB date in the footer. If your analysis requires confirmed current-year rates, cross-reference against the primary source cited in the Evidence tooltip for that country.</p>
@@ -11899,7 +11899,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Data Vintage Footer -->
 <div id="data-vintage-footer" style="background:#0f172a;border-top:1px solid #1e293b;padding:10px 24px;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;font-size:11px;color:#64748b;font-family:monospace;">
   <div class="data-vintage-badge" style="display:flex;align-items:center;gap:8px;">
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DB: 2026-08-08</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DB: 2026-08-10</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
@@ -11911,7 +11911,7 @@ document.addEventListener('DOMContentLoaded', function() {
     <span style="color:#475569;">|</span>
     <a href="api/v1/countries.json" style="color:#64748b;text-decoration:none;" target="_blank" title="Open raw JSON API — country-level fiscal metrics for all 185 countries (govt take, NPV, IRR, mechanic, region). Also: api/v1/mechanics.json and api/v1/schema.json">API &#x2197;</a>
     <span style="color:#475569;">|</span>
-    <span style="color:#334155;" title="Nightly audit runs at 03:00 daily via Task Scheduler — checks data completeness, DCF consistency, and sourcing coverage across all 185 countries">Nightly audit: active · last run 2026-08-08</span>
+    <span style="color:#334155;" title="Nightly audit runs at 03:00 daily via Task Scheduler — checks data completeness, DCF consistency, and sourcing coverage across all 185 countries">Nightly audit: active · last run 2026-08-10</span>
     <span style="color:#475569;">|</span>
     <span style="color:#334155;" title="Coverage as of 2026-08-08 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price)."><button id="footer-irr-link" style="background:none;border:none;color:#334155;cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — IRR column shows 74/185 countries with data">IRR: 74/185 countries</button> · <button id="footer-be-link" style="background:none;border:none;color:#334155;cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — Breakeven column shows 68/185 countries with data">Breakeven: 68/185</button> · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
   </div>
