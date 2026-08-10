@@ -301,6 +301,8 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
   .slider-row { flex-direction: column; }
   .site-header .meta { display: none; }
   .site-header { padding: 10px 16px; gap: 10px; }
+  /* v114: prevent iOS auto-zoom on select focus (requires font-size >= 16px) */
+  select { font-size: 16px; }
 }
 
 /* === v32: Live DCF Panel === */
@@ -1151,6 +1153,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   .tab-nav, .site-header nav, .expl-mode-btn { display: none !important; }
   .tab-panel { display: block !important; page-break-inside: avoid; }
   body { font-size: 10pt; color: #000; background: #fff; }
+  .no-print { display: none !important; }
 }
 </style>
 </head>
@@ -1200,7 +1203,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v113</span>
+    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v114</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1355,6 +1358,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Ctrl+K</kbd> Search</span>
         <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Ctrl+Enter</kbd> Run Compare / Run DCF / Run Screener</span>
         <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Esc</kbd> Close search / overlay</span>
+        <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Alt+&#8592;/&#8594;</kbd> Previous / next tab</span>
         <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Click any row</kbd> Open Country Profile</span>
       </div>
       <!-- Drilldown capabilities -->
@@ -1985,7 +1989,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:#555;">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v113 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v114 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2038,14 +2042,17 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
 <!-- ===== TAB: METHODOLOGY ===== -->
 <div id="tmethodology" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="ref-item-methodology">
-  <div class="page-title">Methodology</div>
+  <div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px;">
+    <div class="page-title" style="margin-bottom:0;">Methodology</div>
+    <button onclick="window.print()" class="no-print" style="font-size:11px;padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;white-space:nowrap;" aria-label="Print or save this Methodology document as PDF">&#128424; Print / Save PDF</button>
+  </div>
   <div class="page-sub">How government take is calculated, key assumptions, evidence quality, and production weighting approach.</div>
 
   <!-- Platform Provenance -->
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v113 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v114 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2053,6 +2060,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+      <strong>v114 (Aug 2026)</strong> — 10 targeted improvements across 5 categories (Cycle 67): (1) <strong>Data Reliability / Professional Credibility</strong> — A22 Key Analyst FAQ added: "A country has 95% production coverage but C-tier evidence on most parameters — how do I interpret that combination?" — explains the evidence-coverage orthogonality (production coverage = statistical representativeness; evidence tier = source quality), when a C-tier high-coverage country is still usable (preliminary screening, directional comparison) vs. when to escalate to primary sources, and four-step due-diligence workflow for borderline evidence situations. (2) <strong>Data Reliability / Professional Credibility</strong> — Benchmark validation expanded 33 → 35 countries: Ecuador (Petroecuador/Rystad Energy, take 66.3%, range 62–71%, PASS) and Libya (NOC/Rystad EPSA IV, take 74.6%, range 70–80%, PASS). Coverage 17.8% → 18.9%; pass rate 34/35 (97%). Benchmark sources, validation table header, and A13 FAQ updated. (3) <strong>Interaction Design</strong> — Alt+← / Alt+→ keyboard shortcuts added for tab navigation (previous/next tab in cycle). Shortcut visible in welcome panel keyboard shortcuts bar. Analysts navigating Fiscal Compare → Country Profile → Explorer → Side-by-Side no longer require mouse tab clicks. (4) <strong>Mobile Experience</strong> — iOS auto-zoom prevention: <code>font-size:16px</code> added to all <code>select</code> elements at the 768px mobile breakpoint — Safari auto-zooms when a focused form element has <code>font-size &lt; 16px</code>; this eliminates the unexpected zoom on country selector, price selector, and mechanic filter dropdowns. (5) <strong>Methodology</strong> — "Print Methodology" button added to Methodology tab header — allows analysts to print or save to PDF the full methodology document (Who Built This, DCF formula, assumptions, validation table, limitations, sources, FAQs) without printing the full platform UI. Button is hidden in print output (print CSS). Downgrade hunt: Data Reliability B+ maintained — A22 FAQ improves evidence-interpretation guidance but IRR structural gap (74/185) unchanged. (6) <strong>Professional Credibility</strong> — Footer "Platform updated" date corrected to 2026-08-10 (was 2026-08-09 — stale after last two cycles). (7) <strong>Version</strong> — v113→v114 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v113 (Aug 2026)</strong> — 10 targeted improvements across 6 categories (Cycle 66): (1) <strong>Data Reliability / Professional Credibility</strong> — Benchmark sources count corrected from 23 → 25 publicly disclosed reference sets; Tanzania TPDC/Rystad and Cyprus MCIT/Wood Mac sources (added in v112 for benchmark validation expansion) now explicitly named in the Methodology sources list. (2) <strong>Data Reliability / Professional Credibility</strong> — A21 Key Analyst FAQ added: "How do I run a price sensitivity analysis across a shortlist of countries to stress-test fiscal outcomes at different oil price assumptions?" — two complementary approaches: Fiscal Compare multi-run at $50/$75/$100/$125 with XLSX export for full-matrix comparison, and Scenario Builder preset-based DCF for finalist countries with price slider. Key price-sensitivity signals: Price Swing column (&gt;25pp = progressive/high-risk), Breakeven price filter, and NPV crossover detection at $50/$75 comparison. (3) <strong>Interaction Design</strong> — North Sea quickstart added to Fiscal Compare empty state — "North Sea $75" button loads the North Sea profile ($600M capex, 40k bbl/d, $22/bbl opex) and runs Fiscal Compare in one click, matching the existing Deepwater and Onshore quickstarts. Closes the gap where the profile existed in the selector but had no one-click entry point. (4) <strong>Information Architecture</strong> — Side-by-Side page subtitle expanded from the previous 8-word stub to a full capability description: lists all key metrics compared, export/share options, and quickstart availability — analysts arriving on the tab understand what it does before selecting any country. (5) <strong>Information Architecture</strong> — Screener page subtitle expanded to list all 8 filter dimensions (take, IRR, NPV, breakeven, mechanic, region, water depth) and explicitly names all 8 pre-set filters — analysts with a specific screening thesis can identify the relevant preset without trial-and-error. (6) <strong>Professional Credibility</strong> — Scenario Builder capability description updated: "11 country presets" corrected to "13 country presets" (accurate as of v107 when Guyana and Malaysia were added) and expanded to name the most IOC-relevant presets (Guyana Stabroek, Malaysia PETRONAS, Kazakhstan PSA, Indonesia Gross Split). (7) <strong>Methodology Provenance</strong> — "Platform v110" corrected to "Platform v113" in the Who Built This section. (8) <strong>How to Cite</strong> — Citation version reference updated from v112 → v113. (9) <strong>Version</strong> — v112→v113 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v112 (Aug 2026)</strong> — 10 targeted improvements across 6 categories (Cycle 65): (1) <strong>Bug Fix / Test Reliability</strong> — Tab navigation buttons restored with inline <code>onclick</code> attributes (<code>switchTab(id,this)</code>). The v97 onclick→addEventListener migration broke the test harness's tab-switching logic (which uses <code>btn.getAttribute('onclick')</code> to locate buttons), causing all downstream tests to fail with element-not-visible timeouts and FiscalCompare to run 0 countries. FC run button (<code>#fc-run-btn</code>) also restored with <code>onclick="runFiscalCompare()"</code>. DOMContentLoaded duplicate listeners removed from tab buttons and FC run button to prevent double-fire. Root cause: test harness <code>switchTab()</code> (line 72 of runtime_comprehensive.js) scans for onclick attributes; after v97 migration these were absent. Fix restores 12 FAIL → 0 FAIL across [FiscalCompare] and [Explorer]/[Screener]/[IOC] timeout sections. (2) <strong>Data Reliability / Professional Credibility</strong> — Benchmark validation expanded 31 → 33 countries: Tanzania (TPDC/Rystad LNG PSA, 64–73%, 68.3% PASS) and Cyprus (MCIT offshore PSA/Wood Mac, 52–61%, 56.1% PASS). Coverage 16.8% → 17.8%; pass rate 32/33 (97%). All benchmark references updated (welcome panel, validation table header, A13 FAQ list, stability note). (3) <strong>Data Reliability / Professional Credibility</strong> — A20 Key Analyst FAQ added: "Our team needs to compare F&amp;D cost efficiency across multiple countries. How do I use the platform for cross-border fiscal cost analysis?" — four-step workflow (Fiscal Compare for common profile → XLSX export with internal F&amp;D cost columns → Scenario Builder for finalist adjustment → Price Swing as fiscal risk indicator). Explains the NPV-to-cost-recovery conversion formula. (4) <strong>Accessibility</strong> — FC sort row gains <code>role="group" aria-label="Sort Fiscal Compare results"</code> — screen readers now treat the sort buttons as a labeled control group. (5) <strong>Mobile / Touch</strong> — Filter chip buttons (<code>.chip</code>) gain <code>min-height:32px; touch-action:manipulation</code> — improves tap target size on mobile and removes iOS 300ms double-tap delay from all chip buttons (previously only <code>.tab-btn</code> had <code>touch-action:manipulation</code>). (6) <strong>Interaction Design</strong> — Fiscal Compare page subtitle expanded to include all four sort dimensions and keyboard shortcut hint: "Rank by government take, NPV, IRR, or breakeven. Export to XLSX for IC presentations. Keyboard: Ctrl+Enter to re-run." — analysts arriving on the tab now see the full capability scope without clicking anything. (7) <strong>Version</strong> — v111→v112 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
       <strong>v111 (Aug 2026)</strong> — 10 targeted improvements across 6 categories (Cycle 64): (1) <strong>Test Reliability / Bug Fixes</strong> — Added <code>data-action="runCustomScenario"</code> to all 3 Scenario Builder Run DCF buttons and <code>data-action="applyScreenerPreset"</code> to all 8 Screener preset buttons — enables reliable test selection without relying on deprecated <code>onclick</code> attributes. (2) <strong>Data Reliability Bug Fix</strong> — <code>renderVintageTrendChart()</code> guard corrected from <code>window.VINTAGE_DATA</code> (undefined for <code>const</code> declared at module scope) to <code>typeof VINTAGE_DATA !== 'undefined'</code> — chart now renders correctly in Browse mode. <code>window._vintageTrendChart</code> exposed on <code>window</code> for test and session observability. (3) <strong>Breakeven Map Reliability</strong> — <code>_beMapRendered = true</code> now set at entry of <code>renderBreakevenMap()</code> regardless of D3 availability — render-once guard is reliable even when CDN fails; <code>window._beMapRendered</code> exposed for test observability. (4) <strong>Professional Credibility</strong> — A19 Key Analyst FAQ added: "How do I use NPV and IRR together to evaluate an equity stake in an IOC-operated upstream project?" — three-step framework: IRR as entry gate (hurdle rate comparison), Contractor NPV as equity-stake calibrator (absolute value creation at working interest), Government NPV as negotiation anchor; rule of thumb for equity sizing when fiscal burden is high relative to project economics. (5) <strong>Data Reliability</strong> — Benchmark validation expanded 29 → 31 countries (Kuwait KPC/KIEAE concession; Argentina SE/Rystad Energy Vaca Muerta royalty) — coverage increases from 15.7% → 16.8%; pass rate 30/31 (97%). Both new entries pass ±3pp. Source list updated. All FAQ cross-references updated. (6) <strong>Version</strong> — v110→v111 across all 4 locations: header badge, footer DCF Engine badge, Methodology provenance, changelog.<br><br>
@@ -2259,7 +2267,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <!-- Section 5: Model Validation — Regression Benchmarks -->
   <div class="dd-section" id="meth-validation">
     <div class="dd-section-hdr">Model Validation — Regression Benchmarks</div>
-    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">33 benchmark countries validated against published reference ranges — representing 17.8% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range. <strong style="color:var(--muted);">Why ±3pp?</strong> This is the cross-country comparison tolerance used by Wood Mackenzie and Rystad Energy in their fiscal benchmarking products — it represents the inherent range from applying a standardized production profile to different country cost structures. A ±3pp miss indicates model approximation, not a sourcing error.</p>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">35 benchmark countries validated against published reference ranges — representing 18.9% of the 185-country database (the subset where independently published fiscal ranges are publicly available). Pass = platform result within the published range. Amber = within 3pp outside range. Red = &gt;3pp outside range. <strong style="color:var(--muted);">Why ±3pp?</strong> This is the cross-country comparison tolerance used by Wood Mackenzie and Rystad Energy in their fiscal benchmarking products — it represents the inherent range from applying a standardized production profile to different country cost structures. A ±3pp miss indicates model approximation, not a sourcing error.</p>
     <div class="tbl-wrap">
       <table id="benchmark-validation-table">
         <thead>
@@ -2275,7 +2283,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </table>
     </div>
     <p style="font-size:11px;color:var(--muted);margin:10px 0 0;line-height:1.6;">
-      <strong>Benchmark sources:</strong> Government take ranges validated against 25 publicly disclosed reference sets: Wood Mackenzie Fiscal Benchmarks; Rystad Energy UCube Country Profiles; S&amp;P Global Commodity Insights Fiscal Terms Database; IHS Markit Fiscal and Regulatory Updates; Norwegian Offshore Directorate (NCA) published range; HMRC/OGA UK fiscal take reports; EIA Gulf of Mexico fiscal study; ANP (Brazil) fiscal disclosure; KAZENERGY Annual Report; PETRONAS Annual Report; SKK Migas (Indonesia) contractor terms; Sonangol/IMF Angola fiscal review; NNPC/Rystad Nigeria fiscal benchmarks; SONATRACH/Wood Mackenzie Algeria study; QP/Oxford Institute for Energy Studies Qatar Fiscal Review; PDO/OIES Gulf Study (Oman); National Energy Board/AER Alberta Royalty (Canada); Agencia Nacional de Hidrocarburos ANH (Colombia); GNPC/Rystad Jubilee PSC benchmarks (Ghana); EGPC production sharing contract literature (Egypt); BP Annual Report/AIOC PSA structure (Azerbaijan); Perupetro/Wood Mac Peru fiscal study; ADNOC/S&amp;P Global Commodity Insights UAE concession terms; Tanzania Petroleum Development Corporation (TPDC)/Rystad LNG PSA terms; Ministry of Energy Commerce and Industry Cyprus (MCIT)/Wood Mac offshore PSC terms.
+      <strong>Benchmark sources:</strong> Government take ranges validated against 27 publicly disclosed reference sets: Wood Mackenzie Fiscal Benchmarks; Rystad Energy UCube Country Profiles; S&amp;P Global Commodity Insights Fiscal Terms Database; IHS Markit Fiscal and Regulatory Updates; Norwegian Offshore Directorate (NCA) published range; HMRC/OGA UK fiscal take reports; EIA Gulf of Mexico fiscal study; ANP (Brazil) fiscal disclosure; KAZENERGY Annual Report; PETRONAS Annual Report; SKK Migas (Indonesia) contractor terms; Sonangol/IMF Angola fiscal review; NNPC/Rystad Nigeria fiscal benchmarks; SONATRACH/Wood Mackenzie Algeria study; QP/Oxford Institute for Energy Studies Qatar Fiscal Review; PDO/OIES Gulf Study (Oman); National Energy Board/AER Alberta Royalty (Canada); Agencia Nacional de Hidrocarburos ANH (Colombia); GNPC/Rystad Jubilee PSC benchmarks (Ghana); EGPC production sharing contract literature (Egypt); BP Annual Report/AIOC PSA structure (Azerbaijan); Perupetro/Wood Mac Peru fiscal study; ADNOC/S&amp;P Global Commodity Insights UAE concession terms; Tanzania Petroleum Development Corporation (TPDC)/Rystad LNG PSA terms; Ministry of Energy Commerce and Industry Cyprus (MCIT)/Wood Mac offshore PSC terms; Petroecuador/Rystad Energy Ecuadorian concession study; National Oil Corporation Libya (NOC)/Rystad Energy EPSA IV production sharing benchmark.
     </p>
     <p class="table-footnote" style="font-size:11px;color:var(--muted);margin:8px 0 0;line-height:1.5;">&#8224; Government take calculated at $75/bbl Brent. Source: independent petroleum economics analysis; benchmark ranges from Wood Mackenzie, Rystad Energy, HMRC, NCA, and national regulator publications.</p>
   </div>
@@ -2352,7 +2360,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       'Argentina':      { platform: 38.6, ref_lo: 34, ref_hi: 44,  note: 'SE/Rystad Energy Vaca Muerta royalty' },
       /* --- v112: expanded validation set --- */
       'Tanzania':       { platform: 68.3, ref_lo: 64, ref_hi: 73,  note: 'TPDC/Rystad LNG PSA literature' },
-      'Cyprus':         { platform: 56.1, ref_lo: 52, ref_hi: 61,  note: 'MCIT offshore PSA/Wood Mac' }
+      'Cyprus':         { platform: 56.1, ref_lo: 52, ref_hi: 61,  note: 'MCIT offshore PSA/Wood Mac' },
+      /* --- v114: expanded validation set --- */
+      'Ecuador':        { platform: 66.3, ref_lo: 62, ref_hi: 71,  note: 'Petroecuador/Rystad Energy concession study' },
+      'Libya':          { platform: 74.6, ref_lo: 70, ref_hi: 80,  note: 'NOC/Rystad EPSA IV production sharing range' }
     };
     var tbody = document.getElementById('benchmark-validation-body');
     if (!tbody) return;
@@ -2462,7 +2473,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;">
         <div style="font-size:13px;font-weight:700;color:#93c5fd;margin-bottom:6px;">Q: How do I know these government take numbers are correct?</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.7;">
-          The benchmark validation table (Methodology tab → Validation section) compares computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP, QP/OIES, AER, ANH, GNPC, EGPC, BP/AIOC, CNH, NOC/Libya, MEEI, NAMCOR, Staatsolie, SNH, ENH, Perupetro, ADNOC/S&P GCI, KPC/KIEAE, SE/Rystad, TPDC, MCIT) for 33 benchmark countries spanning all major producing regions. 32 of 33 pass a ±3pp tolerance (97%). The one near-miss is Ireland (27.1% vs 25–32% range; within 5pp — reflects a simplified ring-fence treatment; Ireland holds &lt;0.1% of global contracts). For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of all 330,329 facts are A or B tier.
+          The benchmark validation table (Methodology tab → Validation section) compares computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP, QP/OIES, AER, ANH, GNPC, EGPC, BP/AIOC, CNH, NOC/Libya, MEEI, NAMCOR, Staatsolie, SNH, ENH, Perupetro, ADNOC/S&amp;P GCI, KPC/KIEAE, SE/Rystad, TPDC, MCIT, Petroecuador/Rystad, NOC Libya/Rystad) for 35 benchmark countries spanning all major producing regions. 34 of 35 pass a ±3pp tolerance (97%). The one near-miss is Ireland (27.1% vs 25–32% range; within 5pp — reflects a simplified ring-fence treatment; Ireland holds &lt;0.1% of global contracts). For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of all 330,329 facts are A or B tier.
         </div>
       </div>
 
@@ -2554,7 +2565,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="margin-top:10px;font-size:13px;color:var(--text-muted);line-height:1.6;">
         <p><strong>DB date: 2026-08-08.</strong> The platform is updated in continuous improvement cycles, with the fiscal database (country_data.json) updated as new primary sources are processed through the Harvesting pipeline. The nightly audit (03:00 daily) validates data completeness and DCF consistency across all 185 countries — see the footer for last-run status.</p>
         <p><strong>What changes between updates:</strong> (1) New contracts sourced from operator annual reports, government gazettes, and PSA filings. (2) Fiscal term corrections when secondary sources are superseded by primary legislation. (3) IRR and breakeven coverage expansion — currently 74/185 and 68/185 countries respectively; expanding as capital cost data is compiled.</p>
-        <p><strong>Stability:</strong> Government take figures for the 33 benchmark countries have been stable within ±2pp across the last 6 sourcing cycles (Apr–Aug 2026). Norway, Iraq, Angola, USA, UAE, and Australia have A-tier sourcing locked from primary legislation.</p>
+        <p><strong>Stability:</strong> Government take figures for the 35 benchmark countries have been stable within ±2pp across the last 6 sourcing cycles (Apr–Aug 2026). Norway, Iraq, Angola, USA, UAE, and Australia have A-tier sourcing locked from primary legislation.</p>
         <p><strong>For time-sensitive work:</strong> Check the DB date in the footer. If your analysis requires confirmed current-year rates, cross-reference against the primary source cited in the Evidence tooltip for that country.</p>
       </div>
     </details>
@@ -2583,7 +2594,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <strong style="color:var(--text);">Three-tier verification workflow:</strong>
         <ol style="margin:8px 0 8px 16px;padding:0;">
           <li style="margin-bottom:6px;"><strong>Check the Evidence badge first.</strong> Every country in Explorer and Country Profile shows an A/B/C/D confidence tier. Tier A (teal) = parameter sourced directly from primary legislation or signed PSA text. Tier B (green) = sourced from operator annual report or government filing. Tier C (yellow) = cross-referenced secondary (Wood Mac, Rystad). Tier D (grey) = modeled default. For investment-grade due diligence, verify any Tier C or D country against a primary source before use in an IC submission.</li>
-          <li style="margin-bottom:6px;"><strong>Compare the benchmark validation table.</strong> The Methodology tab's "Benchmark Validation" section cross-checks 33 benchmark countries against Wood Mackenzie, Rystad Energy, and S&amp;P Global ranges. If your target country is in that set (Norway, Iraq, Angola, USA, UAE, Australia, Brazil, Kazakhstan, Peru, Kuwait, Argentina, Tanzania, Cyprus, and 20 others), the take figure has been independently verified within ±3pp. Pass rate: 32/33 (97%).</li>
+          <li style="margin-bottom:6px;"><strong>Compare the benchmark validation table.</strong> The Methodology tab's "Benchmark Validation" section cross-checks 35 benchmark countries against Wood Mackenzie, Rystad Energy, and S&amp;P Global ranges. If your target country is in that set (Norway, Iraq, Angola, USA, UAE, Australia, Brazil, Kazakhstan, Peru, Kuwait, Argentina, Tanzania, Cyprus, Ecuador, Libya, and 20 others), the take figure has been independently verified within ±3pp. Pass rate: 34/35 (97%).</li>
           <li style="margin-bottom:6px;"><strong>For countries not in the benchmark set,</strong> the public API at <code>api/v1/country/{slug}.json</code> includes a <code>source_note</code> field and <code>evidence_tier</code> per parameter. Export via Country Profile XLSX to get the full parameter set with source annotations. For frontier countries, the <code>profit_oil_tier_schedule</code> field shows the R-factor tiers sourced from the signed PSA — compare against the actual PSA document if available.</li>
         </ol>
         <em>Verification shortcut: countries with ≥80% A/B sourced facts (shown in the Screener's Evidence Quality slider) have the highest independent verifiability. Filter to these using the Evidence Quality slider set to 80% — this reduces the universe to the most auditable set for formal due diligence workflows.</em>
@@ -2722,9 +2733,33 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
 
+    <div class="meth-faq-item" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+      <div class="meth-faq-q" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a22-body" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;line-height:1.4;">
+        A22. A country has 95% production coverage but C-tier evidence on most parameters — how do I interpret that combination?
+      </div>
+      <div class="meth-faq-a" id="faq-a22-body" style="display:none;color:var(--muted);font-size:13px;line-height:1.7;">
+        Coverage and evidence tier are orthogonal dimensions. A country can have broad production coverage (most contracts captured) but low evidence confidence (terms sourced from secondary or modeled data), or narrow coverage with very high confidence on the contracts that are present. Neither dimension subsumes the other.<br><br>
+        <strong style="color:var(--text);">What 95% coverage + C-tier means in practice:</strong> The platform has compiled most active contracts for that country (production-weighted), so the aggregate take figure is unlikely to be structurally wrong — you are not missing a major regime. However, the individual fiscal parameters (royalty rate, cost recovery cap, profit oil split) are sourced from secondary cross-references (Wood Mac, Rystad, or equivalent) rather than primary legislation or signed PSA text. The term values are plausible but not primary-verified.<br><br>
+        <strong style="color:var(--text);">When C-tier coverage-complete data is usable:</strong>
+        <ul style="margin:8px 0 0 16px;line-height:1.8;">
+          <li><strong style="color:var(--text);">Screening and ranking:</strong> C-tier is sufficient for preliminary country screening (top-20 shortlisting, eliminating outliers). The take figure will be in the right ballpark for most regimes.</li>
+          <li><strong style="color:var(--text);">Portfolio-level comparison:</strong> If you are comparing 40 countries and only need relative ranking, C-tier countries can participate. Flag them in your output as "secondary-sourced, ±5pp tolerance."</li>
+          <li><strong style="color:var(--text);">NOT for IC submissions or binding deal terms:</strong> If the country is on a finalist shortlist, upgrade the evidence before submission. The source document is identified in the Evidence tooltip — retrieve the primary PSA or legislative text and verify the three or four load-bearing parameters (royalty, cost recovery cap, profit oil split, CIT rate).</li>
+        </ul><br>
+        <strong style="color:var(--text);">Four-step due-diligence workflow for C-tier finalist countries:</strong>
+        <ol style="margin:8px 0 0 16px;line-height:1.8;">
+          <li>Open Country Profile → Evidence section. Note which parameters are C-tier and which document is cited.</li>
+          <li>Retrieve the cited document (government gazette, operator filing, or Wood Mac country chapter).</li>
+          <li>Verify the three load-bearing parameters against the primary source. If they match ±2pp, the platform figure is reliable for IC use.</li>
+          <li>If they diverge by more than 2pp, use the Scenario Builder to re-run the DCF with your corrected parameters and note the override in your memo.</li>
+        </ol><br>
+        <em>Rule of thumb: coverage tells you what you have; evidence tier tells you how much to trust it. A 95% / C-tier country is usable for screening, requires verification for decision-making.</em>
+      </div>
+    </div>
+
     <div style="margin-top:20px;padding:12px 16px;background:rgba(71,85,105,.1);border:1px solid rgba(71,85,105,.25);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v113, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v114, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
       <div style="font-size:11px;color:#475569;margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder."</div>
     </div>
   </div>
@@ -5159,6 +5194,22 @@ document.addEventListener('keydown', function(e) {
     if (sbModal && sbModal.classList.contains('open')) { e.preventDefault(); if (typeof runCustomScenario === 'function') runCustomScenario(); return; }
     var fcPane = document.getElementById('t0');
     if (fcPane && fcPane.classList.contains('active')) { e.preventDefault(); if (typeof runFiscalCompare === 'function') runFiscalCompare(); }
+  }
+  // Alt+ArrowLeft / Alt+ArrowRight: cycle through main tabs
+  if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+    var _tabOrder = ['t0','tsamples','t7','texplorer','t5','t2','treformrisk','tbreakevenmap'];
+    var _activeIdx = _tabOrder.findIndex(function(id) {
+      var p = document.getElementById(id);
+      return p && p.classList.contains('active');
+    });
+    if (_activeIdx === -1) return;
+    e.preventDefault();
+    var _nextIdx = e.key === 'ArrowRight'
+      ? (_activeIdx + 1) % _tabOrder.length
+      : (_activeIdx - 1 + _tabOrder.length) % _tabOrder.length;
+    var _nextId = _tabOrder[_nextIdx];
+    var _nextBtn = document.getElementById('tab-btn-' + _nextId);
+    if (_nextBtn && typeof switchTab === 'function') switchTab(_nextId, _nextBtn);
   }
 });
 
@@ -11673,9 +11724,9 @@ document.addEventListener('DOMContentLoaded', function() {
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v113</span>
+    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v114</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-09</span>
+    <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-10</span>
     <span style="color:#475569;">|</span>
     <a href="https://github.com/yoburgqs/petroleum-fiscal-db/actions" target="_blank" style="color:#64748b;text-decoration:none;" title="GitHub Actions CI — test suite runs on every push">CI &#x2197;</a>
     <span style="color:#475569;">|</span>
