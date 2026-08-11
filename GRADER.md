@@ -1119,3 +1119,11 @@ Background Playwright suite confirmed: **136 PASS / 0 FAIL / 0 WARN / 0 JS error
 - JS errors: 0
 - Summary: v164 shipped. Added FAQ A70 (R-factor PSC mechanics — definition, 3-tier example, ORCA mid-tier approximation ±3pp band, price sensitivity 5–8pp take shift at $100 vs $75, IC memo template) and FAQ A71 (IOC Portfolio tab 4-step pre-screening workflow, peer comparison chart interpretation, IOC_DATA source limitations, portfolio narrative framing). Version v163→v164 across 8 UI locations. Grade changes: none — Data Reliability B+ maintained (IRR 74/185 unchanged), Performance & Reliability A maintained.
 
+
+---
+## Cycle 114 Log — 2026-08-11 08:54
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Also already handled â€” that's the completed push notification. Both repos are live on `main`. Cycle 116 done.
+
