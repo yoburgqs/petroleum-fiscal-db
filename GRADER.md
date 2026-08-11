@@ -961,3 +961,13 @@ Here's what was fixed:
 - **Stale FAQ fixed** â€” A13 "How do I verify a government take figure?" showed an outdated 125/125 pass rate. Corrected to 134/134 with the expanded country list.
 
 - **New FAQ added (A61)** â€” Production profile shape impa
+
+---
+## Cycle 105 Log — 2026-08-11 01:42
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Sonnet | **Directive:** PETROLEUM PLATFORM | **Task:** Background task cleanup
+
+The killed task is a stale background process â€” the Cycle 105 agent already completed the push successfully (136 PASS / 0 FAIL, v155 pushed to both repos). No action needed.
+
