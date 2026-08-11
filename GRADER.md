@@ -797,3 +797,16 @@ Only `CYCLE_STATE.json` and `cycle_log.txt` have uncommitted local changes (mino
 - JS errors: 0
 - Summary: All background tasks confirmed complete. Cycle 97 fully landed.
 
+
+---
+## Cycle 96 Log — 2026-08-10 19:16
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed successfully. The remote was already at our commit â€” the initial "rejected" error was a timing artifact, not a real conflict. 
+
+**Cycle 98 (v146) â€” fully landed:**
+- 136 PASS / 0 FAIL / 0 JS errors confirmed
+- Commit `ec09a60` on `yoburgqs/petroleum-fiscal-db` main
+- Iran, Belarus, Eritrea added; FAQ A54 on reform risk; coverage 59.5% â†’ 61.1%
+
