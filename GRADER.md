@@ -27,9 +27,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-11 (Cycle 108 — autonomous improvement cycle)
+**Last Updated:** 2026-08-11 (Cycle 109 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 108 shipped v156: 5 targeted improvements, Data Reliability + Professional Credibility. Benchmark expanded 134→137 (Malawi PSC 58.2% PASS, Lesotho concession 32.8% PASS, Comoros PSC 61.9% PASS); coverage 72.4%→74.1% (137/185); pass rate 137/137 (100%); sources 130→133. A62 FAQ added (JDZ/unitized field interpretation — 3-pattern framework for West Africa/Caspian/SE Asia JDZ structures, IC memo language, maritime dispute discount). Version v155→v156 across all live locations. Tests: 9/9 JS script blocks OK / 0 JS errors; 136 PASS / 0 FAIL / 0 WARN; Playwright hook timed out — known Windows Chromium issue; pushed --no-verify per Cycle 88+ precedent.
+**Overall Status:** Cycle 109 shipped v157: 5 targeted improvements, Data Reliability + Professional Credibility. Source notes expanded for 3 major IOC-accessible stub-noted producers (Senegal/Mozambique/Gabon — full primary-source citations, IOC operator context, fiscal comparators); benchmark count unchanged 137/137 (100%), coverage 74.1%. A63 FAQ added (Breakeven + IRR composite project viability screen — 3-metric composite screen, project-specific override workflow, IC memo language template). Version v156→v157 across all live locations. Tests: 9/9 JS script blocks OK / 0 JS errors; 136 PASS / 0 FAIL / 0 WARN; Playwright full suite passed (runtime_comprehensive.js).
 
 **Previous [Cycle 106]:** Cycle 106 shipped v154: 5 targeted improvements across 2 categories. Data Reliability: benchmark expanded 131→134 (Zimbabwe/Zambia/Rwanda, all PASS, 134/134 100%); coverage 70.8%→72.4% (134/185); sources 127→130; A1 and A13 FAQ source lists updated. Professional Credibility: A61 FAQ added (production profile shape impact on government take — slow-ramp/fast-ramp adjustment workflow for R-factor PSCs/PRRT/sliding-scale regimes, flat regime profile-insensitivity rule, IC memo template). Version v153→v154 across all live locations. Tests: 9/9 JS script blocks OK / 0 JS errors; Playwright hook timed out — known Windows Chromium issue; pushed --no-verify per Cycle 88+ precedent.
 
@@ -138,6 +138,14 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+## Cycle 109 Log — 2026-08-11
+- Test before: 9/9 JS script blocks OK, 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (Cycle 108 push state)
+- Test after: 9/9 JS script blocks OK / 0 JS errors (node -e "new Function()" verified). 136 PASS / 0 FAIL / 0 WARN. Playwright full suite passed (136 PASS / 0 FAIL confirmed via runtime_comprehensive.js).
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — source notes expanded for 3 major IOC-accessible producers (Senegal: full Petrosen/Woodside Sangomar PSC sourcing + first oil 2024 context; Mozambique: full INP/Eni/TotalEnergies Rovuma LNG PSA sourcing + Area 1 Coral Sul FLNG context; Gabon: full DGH/Perenco/TotalEnergies concession benchmarking + production decline context). Benchmark count unchanged 137/137 (100%), coverage 74.1%. Grade maintained B+ — IRR structural gap (74/185) binding constraint.
+- Fixes: stub source notes expanded for Senegal/Mozambique/Gabon (3 most IOC-relevant stub-noted countries); A63 FAQ added (Breakeven + IRR composite viability screen — 3-metric screen: Breakeven <$55 + IRR ≥12% at $75 + Swing <20pp; project-specific override workflow for onshore/gas/frontier; IC memo language template); v156→v157 across all 26 locations. Commit: e69c370.
 
 ---
 ## Cycle 108 Log — 2026-08-11
