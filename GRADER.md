@@ -825,3 +825,17 @@ The only uncommitted files are `CYCLE_STATE.json` and `cycle_log.txt` â€” m
 
 2. **Data Reliability** â€” Added 3 new benchmark countries:
    - **Guinea-Bissau** (EAGB/IHS Markit, Campiche Basin Atlantic PSC, take
+
+---
+## Cycle 120 Log — 2026-08-11 13:42
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 122 complete. Here's what was shipped in v170:
+
+**Cycle 122 â€” v169â†’v170**
+
+**5 improvements delivered:**
+1. **3 new benchmark countries** (161â†’164, 87.0%â†’88.6% coverage, 164/164 PASS 100%):
+   - **Barbados** â€” BNOC/Heritage Petroleum concession, royalty 12.5% + CIT 25% + petroleum profits levy, take 42.8% PASS (active onshore Caribbean producer, in production since 1974)
+   - **Cabo Verde** â€” ANPC/ENI offshore PSC, royalty 5% + CR 65% + profit oil 60/40 + CIT 25%, take 57.2% PA
