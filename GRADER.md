@@ -797,3 +797,21 @@ The only uncommitted files are `CYCLE_STATE.json` and `cycle_log.txt` â€” m
 - JS errors: 0
 - Summary: Push confirmed complete (exit code 0). v167 is live.
 
+
+---
+## Cycle 119 Log — 2026-08-11 12:46
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 121 complete. Here's what was shipped:
+
+---
+
+**Cycle 121 â€” v169 â€” 2026-08-11**
+
+**5 improvements across 2 categories:**
+
+1. **Data Reliability bug fix** â€” Removed duplicate `'United Arab Emirates'` entry from BENCHMARKS (same country as `'UAE'` added in v167; rendered as 2 separate table rows). True unique count corrected 159â†’158 before additions.
+
+2. **Data Reliability** â€” Added 3 new benchmark countries:
+   - **Guinea-Bissau** (EAGB/IHS Markit, Campiche Basin Atlantic PSC, take
