@@ -936,3 +936,18 @@ Cycle 100 complete.
 - JS errors: 0
 - Summary: GRADER commit pushed successfully. All repos fully in sync â€” v153 is live.
 
+
+---
+## Cycle 104 Log — 2026-08-11 01:07
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 106 complete â€” v154 shipped.**
+
+Here's what was fixed:
+
+- **3 new countries added** (Zimbabwe, Zambia, Rwanda) â€” benchmark coverage expands from 131 â†’ 134 countries (70.8% â†’ 72.4% of 185 covered). All 3 pass the Â±5pp audit gate. Sources count: 127 â†’ 130.
+
+- **Stale FAQ fixed** â€” A13 "How do I verify a government take figure?" showed an outdated 125/125 pass rate. Corrected to 134/134 with the expanded country list.
+
+- **New FAQ added (A61)** â€” Production profile shape impa
