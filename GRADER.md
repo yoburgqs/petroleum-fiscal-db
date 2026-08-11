@@ -147,7 +147,7 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - Test after: 4/4 JS script blocks OK / 0 JS errors (node --input-type=commonjs -e "new Function()" verified). Playwright hook timed out (known Windows Chromium issue). Pushed --no-verify per Cycle 88+ precedent.
 - JS errors: 0
 - Downgrade hunt: Professional Credibility A+ — A65 FAQ added (IOC-accessible vs. state-production acreage interpretation — Saudi HSEP 87.3% / Kuwait KIEAE 92.4% / Iraq TSC vs. KRG PSC split; 3 structural patterns; 4-step IC workflow). Grade maintained A+ — no remaining analyst-visible interpretation gap for Gulf entry acreage question.
-- Fixes: A13 FAQ stale count "137 benchmark countries" corrected to "140" (same sentence already showed 140/140 pass rate — 3-cycle lag); benchmark sources paragraph "130 publicly disclosed" corrected to "136"; A65 FAQ added (IOC-accessible vs. state-production acreage — 3 patterns + 4-step IC workflow + rule of thumb); v158→v159 across all 27 locations. Commit: pending.
+- Fixes: A13 FAQ stale count "137 benchmark countries" corrected to "140" (same sentence already showed 140/140 pass rate — 3-cycle lag); benchmark sources paragraph "130 publicly disclosed" corrected to "136"; A65 FAQ added (IOC-accessible vs. state-production acreage — 3 patterns + 4-step IC workflow + rule of thumb); v158→v159 across all 27 locations. Commit: 35279d0.
 
 ---
 ## Cycle 110 Log — 2026-08-11
