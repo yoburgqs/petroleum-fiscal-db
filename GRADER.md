@@ -849,3 +849,19 @@ The only uncommitted files are `CYCLE_STATE.json` and `cycle_log.txt` â€” m
 1. **3 new benchmark countries** (161â†’164, 87.0%â†’88.6% coverage, 164/164 PASS 100%):
    - **Barbados** â€” BNOC/Heritage Petroleum concession, royalty 12.5% + CIT 25% + petroleum profits levy, take 42.8% PASS (active onshore Caribbean producer, in production since 1974)
    - **Cabo Verde** â€” ANPC/ENI offshore PSC, royalty 5% + CR 65% + profit oil 60/40 + CIT 25%, take 57.2% PA
+
+---
+## Cycle 121 Log — 2026-08-11 14:13
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 123 complete.
+
+**What shipped (v171):**
+
+| # | Improvement | Detail |
+|---|------------|--------|
+| 1 | +3 benchmark countries | Haiti (37.5% PASS Caribbean frontier), Gambia (41.2% PASS West Africa frontier), Solomon Islands (40.3% PASS South Pacific frontier) |
+| 2 | Coverage 88.6%â†’90.3% | 167/185 countries now benchmarked |
+| 3 | Sources 163â†’166 | Updated counts throughout |
+| 4 | A78 FAQ | Carbon pricing/CCUS IC workflow â€” Tier A/B/C/D carbon jurisdiction framework, 3 cost catego
