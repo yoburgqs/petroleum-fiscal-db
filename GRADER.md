@@ -27,9 +27,11 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-11 (Cycle 115 — autonomous improvement cycle)
+**Last Updated:** 2026-08-11 (Cycle 116 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 115 shipped v163: 5 targeted improvements, Data Reliability + Professional Credibility. Benchmark 147→150 unique (3 new countries added: Costa Rica/RECOPE/IHS Markit 33.2% PASS Caribbean frontier, South Korea/KNOC/EY 40.8% PASS declining mature offshore OECD, Taiwan/CPC/EY 38.5% PASS small mature onshore/offshore lowest-CIT East Asian concession); coverage 79.5%→81.1% (150/185); sources 145→148. A1 welcome panel, A13 FAQ source lists, and benchmark header updated. A69 FAQ added (fiscal ring-fencing — 3 structural types: license-level Nigeria/Angola/Libya, company-level UK/Norway/Australia, field-level USA GoM/Malaysia; platform per-contract default; 4-step IC workflow; rule of thumb 2–5pp IRR gap license vs. company ring-fence). Version v162→v163 across all locations.
+**Overall Status:** Cycle 116 shipped v164: 2 new Key Analyst FAQs added (A70: R-factor mechanics in PSCs — definition, 3-tier example, ORCA mid-tier approximation, IC workflow, price sensitivity; A71: IOC Portfolio tab usage — 4-step capital allocation pre-screening, peer comparison chart interpretation, IOC_DATA limitations). Benchmark 150/185 unchanged. Tests: 136 PASS / 0 FAIL / 0 WARN. Version v163→v164 across all UI locations.
+
+**Previous [Cycle 115]:** Cycle 115 shipped v163: 5 targeted improvements, Data Reliability + Professional Credibility. Benchmark 147→150 unique (3 new countries added: Costa Rica/RECOPE/IHS Markit 33.2% PASS Caribbean frontier, South Korea/KNOC/EY 40.8% PASS declining mature offshore OECD, Taiwan/CPC/EY 38.5% PASS small mature onshore/offshore lowest-CIT East Asian concession); coverage 79.5%→81.1% (150/185); sources 145→148. A1 welcome panel, A13 FAQ source lists, and benchmark header updated. A69 FAQ added (fiscal ring-fencing — 3 structural types: license-level Nigeria/Angola/Libya, company-level UK/Norway/Australia, field-level USA GoM/Malaysia; platform per-contract default; 4-step IC workflow; rule of thumb 2–5pp IRR gap license vs. company ring-fence). Version v162→v163 across all locations.
 
 **Previous [Cycle 109]:** Cycle 109 shipped v157: 5 targeted improvements, Data Reliability + Professional Credibility. Source notes expanded for 3 major IOC-accessible stub-noted producers (Senegal/Mozambique/Gabon — full primary-source citations, IOC operator context, fiscal comparators); benchmark count unchanged 137/137 (100%), coverage 74.1%. A63 FAQ added (Breakeven + IRR composite project viability screen — 3-metric composite screen, project-specific override workflow, IC memo language template). Version v156→v157 across all live locations. Tests: 9/9 JS script blocks OK / 0 JS errors; 136 PASS / 0 FAIL / 0 WARN; Playwright full suite passed (runtime_comprehensive.js).
 
@@ -1109,4 +1111,11 @@ Background Playwright suite confirmed: **136 PASS / 0 FAIL / 0 WARN / 0 JS error
 - Test after: 136 PASS / 0 FAIL
 - JS errors: 0
 - Summary: GRADER.md is already committed and pushed (`3ea134c`). The killed background task was redundant â€” the agent handled it inline. No action needed.
+
+---
+## Cycle 116 Log — 2026-08-11 13:30
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: v164 shipped. Added FAQ A70 (R-factor PSC mechanics — definition, 3-tier example, ORCA mid-tier approximation ±3pp band, price sensitivity 5–8pp take shift at $100 vs $75, IC memo template) and FAQ A71 (IOC Portfolio tab 4-step pre-screening workflow, peer comparison chart interpretation, IOC_DATA source limitations, portfolio narrative framing). Version v163→v164 across 8 UI locations. Grade changes: none — Data Reliability B+ maintained (IRR 74/185 unchanged), Performance & Reliability A maintained.
 
