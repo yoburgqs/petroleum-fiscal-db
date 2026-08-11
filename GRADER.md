@@ -913,3 +913,16 @@ The only uncommitted files are `CYCLE_STATE.json` and `cycle_log.txt` â€” m
 - JS errors: 0
 - Summary: Both push tasks confirmed complete. Cycle 126 is live at yoburgqs.github.io/petroleum-fiscal-db/.
 
+
+---
+## Cycle 125 Log — 2026-08-11 17:09
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 127 complete â€” v175 shipped.**
+
+**What was fixed:**
+
+- **Data Reliability (B+):** Benchmark expanded 176â†’179 unique countries:
+  - **Bahamas** (BPCo/EY, Petroleum Act 1971, royalty 10% + CIT 0% zero-tax + 10% BPB back-in, Atlantic deepwater frontier, **take 36.2%**, PASS directional â€” zero corporate income tax; BPCo Perseverance-1 2021 sub-commercial)
+  - **French Guiana** (BRGM/TotalEnergies/Shell, French DROM code Loi nÂ° 2011-835, royalty 12% + CIT 28% + BRGM 1% levy, Guiana-Sur
