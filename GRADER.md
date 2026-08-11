@@ -37,9 +37,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-11 (Cycle 128 — autonomous improvement cycle)
+**Last Updated:** 2026-08-11 (Cycle 129 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 128 shipped v176: 5 targeted improvements across 2 categories. Data Reliability: benchmark expanded 179→182 (Samoa MCIL/SPC-SOPAC/IHS Markit concession 38.2% PASS directional South Pacific frontier; Tonga MLNRE/SPC-SOPAC/IHS Markit concession 35.8% PASS directional South Pacific frontier; Kiribati MELAD/IMF Pacific/IHS Markit PSC 36.5% PASS directional Central Pacific frontier); coverage 96.8%→98.4% (182/185); sources 178→181; A13 FAQ and benchmark header updated. Professional Credibility: A83 FAQ added (farm-in/farm-out fiscal modeling IC workflow — WI-invariant government take; 4 adjustment factors: sunk vs. forward costs, carry provisions, WI vs. NRI, ring-fencing; 4-step IC workflow; regime-type rules of thumb; IC memo language template); FAQ count 82→83. Version v175→v176 across all locations. Tests: 4/4 JS script blocks OK / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 129 shipped v177: 5 targeted improvements across 2 categories. Data Reliability: benchmark expanded 182→185 — MILESTONE: 185/185 (100%) coverage achieved. United Kingdom (HMRC/Wood Mac UKCS concession RFCT 30%+SC 10%+EPL 35%/25%, North Sea, take 49.2%, PASS); Iraq-Kurdistan (KRG MNR/Rystad PSC royalty 10%+CIT 15%+profit oil 60% base, take 43.5%, PASS); Republic of the Congo (SNPC/Wood Mac PSC royalty 15%+CR 60%+profit oil 70/30+CIT 35%, Moho-Bilondo, take 60.2%, PASS). Coverage 98.4%→100% (185/185). Stale counts corrected: benchmark header 176→185, sources paragraph 156/156→185/185, stability paragraph 95→185. Professional Credibility: A84 FAQ added (gas-weighted country adjustment — 3 gas linkage structures: LNG netback/hub-linked/DMO; 4-step Scenario Builder workflow; IC memo template; rule of thumb by gas regime type); FAQ count 83→84. Version v176→v177 across all locations. Tests: 4/4 JS script blocks OK / 136 PASS / 0 FAIL / 0 JS errors.
 
 **Previous [Cycle 122]:** Cycle 122 shipped v170: 5 targeted improvements across 2 categories. Data Reliability: benchmark expanded 161→164 (Barbados BNOC/Heritage/EY royalty 12.5%+CIT 25%+PPL, 42.8% PASS active Caribbean onshore producer; Cabo Verde ANPC/ENI/Rystad PSC 57.2% PASS directional Atlantic frontier; Fiji FMRD/IHS Markit concession 37.5% PASS directional South Pacific frontier); coverage 87.0%→88.6% (164/185); sources count corrected 157→163 (stale sources text from v169 bug fixed); A13 FAQ and benchmark header updated. Professional Credibility: A77 FAQ added (local content requirements IC workflow — LCR excluded from statutory take; 3 cost channels: local goods/services premium 8–15% opex uplift, training levies 0.3–0.8pp IRR, CDF as royalty equivalent; 4-step IC adjustment workflow; LCR tier rule of thumb Nigeria/Angola/Brazil/Indonesia vs. OECD); FAQ count 76→77. Version v169→v170 across all locations. Tests: 4/4 JS script blocks OK / 0 FAIL / 0 JS errors.
 
@@ -160,6 +160,14 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+## Cycle 129 Log — 2026-08-11
+- Test before: 4/4 JS script blocks OK, 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (Cycle 128 push state)
+- Test after: 4/4 JS script blocks OK / 0 JS errors (BENCHMARKS 185 entries verified; braces 186/186 balanced). Playwright 136 PASS / 0 FAIL / 0 WARN (full suite passed). Pushed with hook.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — MILESTONE: benchmark expanded 182→185 (100% coverage). United Kingdom HMRC/Wood Mac UKCS concession RFCT 30%+SC 10%+EPL 35%/25% take 49.2% PASS; Iraq-Kurdistan KRG MNR/Rystad PSC take 43.5% PASS primary IOC-accessible Iraq acreage; Republic of the Congo SNPC/Wood Mac PSC take 60.2% PASS West Africa producer. Coverage 98.4%→100% (185/185). Sources 181→184. Stale benchmark header (176→185), stale sources paragraph (156/156→185/185), stale stability count (95→185) corrected. Grade maintained B+ — IRR structural gap (74/185) remains binding constraint.
+- Fixes: benchmark 182→185 (UK/Iraq-Kurdistan/Republic of the Congo); 185/185 100% coverage milestone; stale count corrections (benchmark header, sources paragraph, stability paragraph); A84 FAQ added (gas-weighted country adjustment — LNG netback/hub-linked/DMO; 4-step workflow; IC memo template); FAQ count 83→84; v176→v177 across all locations.
 
 ---
 ## Cycle 128 Log — 2026-08-11
@@ -364,18 +372,18 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - Downgrade hunt: Data Reliability B+ — benchmark expanded 107→110 (Italy: ENI/EY Oil & Gas Tax Guide concession, D.Lgs. 625/1996, royalty 7% onshore/4–20% offshore + CIT 27.9% + Robin Hood Tax 10.5%, Val d'Agri/Adriatic offshore, take 46.1%, range 42–51%, PASS; Spain: CNE/Repsol/EY concession, Hydrocarbons Act 34/1998, royalty 2–12% + CIT 25% + hydrocarbon tax, Casablanca offshore Mediterranean, take 44.8%, range 40–50%, PASS; Portugal: ANRM/Galp/EY concession, Decree Law 109/94, royalty 5–10% + CIT 21% + GALP state participation, Alentejo Basin onshore and Atlantic margin Block 6, take 38.7%, range 34–43%, PASS). Coverage 57.8%→59.5% (110/185). Pass rate 110/110 (100%). Sources 103→106. Grade maintained B+ — IRR structural gap (74/185) binding constraint.
 - Fixes: benchmark 107→110 (Italy/Spain/Portugal), coverage 57.8%→59.5%, sources 103→106, A53 FAQ farm-out/WI fiscal mechanics (CGT exposure, WI-invariant take, carried interest uplift, 4-step workflow), version v144→v145. Commit: a46c16d.
 
-## Updated Grade Table (Cycle 127 — 2026-08-11)
+## Updated Grade Table (Cycle 129 — 2026-08-11)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 83 FAQs (A1–A83) + proxy workflow + A13 source verification + A17 IC-readiness + A49–A83 advanced IC workflows (A83 adds farm-in/farm-out fiscal modeling IC workflow). Benchmark 182 countries (all unique) / 182/182 pass (100%) — coverage 98.4% of DB. Sources: 181. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 84 FAQs (A1–A84) + proxy workflow + A13 source verification + A17 IC-readiness + A49–A84 advanced IC workflows (A84 adds gas-weighted country adjustment workflow). Benchmark 185 countries (all unique) / 185/185 pass (100%) — MILESTONE: 100% DB coverage. Sources: 184. |
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Single-file architectural constraint remains binding gap. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 83-FAQ section (v176). First-visit Quick Start guide (v115). Landmark map complete (v104). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 84-FAQ section (v177). First-visit Quick Start guide (v115). Landmark map complete (v104). |
 | 6 | 6. Error & Empty States | A+ | = | All three analyst-visible empty state areas styled. Reform History filter upgraded v109. No bare empty tables remain. |
 | 7 | 13. SDLC Maturity | A+ | = | Clean cycle. 4/4 script blocks OK / 136 PASS / 0 FAIL / 0 JS errors. CI badge present. |
-| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A82 accessible (querySelectorAll delegation picks up new FAQs automatically). FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A84 accessible (querySelectorAll delegation picks up new FAQs automatically). FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. Evidence: 4/4 script blocks clean / 0 JS errors. |
 | 10 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon. Row fade-in (v102). Tab gradient improved (v105). |
 | 11 | 3. Data Presentation | A+ | = | Stability column tooltip fully descriptive (v120). Regional median callout, sparklines, evidence badges all in place. |
