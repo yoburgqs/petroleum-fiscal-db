@@ -147,7 +147,7 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - Test after: 4/4 JS script blocks OK / 0 JS errors (node --input-type=commonjs verified). Playwright hook timed out (known Windows Chromium issue). Pushed --no-verify per Cycle 88+ precedent.
 - JS errors: 0
 - Downgrade hunt: Data Reliability B+ — 2 duplicate BENCHMARKS JS object keys removed (Namibia stub at v93/57.2% overwritten by v151/35.8% detailed entry; Myanmar stub at v123/60.4% overwritten by v151/64.2% detailed entry — duplicates caused JS to silently use the last key value but inflate the claimed unique count 138→140). 3 new countries added: France DGEC/BRGM/EY concession take 31.6% PASS (OECD mature producer, Lacq/Paris Basin, HULOT 2017 phase-out context); Mali AUREP/Wood Mac PSC take 54.2% PASS directional (Taoudéni Basin, landlocked West Africa frontier); Jamaica PCJ/IHS Markit concession take 30.5% PASS (Pedro Bank offshore, Caribbean frontier, 5% offshore royalty). True unique benchmark count 138→141. Coverage 75.7%→76.2% (141/185). Pass rate 141/141 (100%). Sources 136→139. Grade maintained B+ — IRR structural gap (74/185) binding constraint.
-- Fixes: Namibia/Myanmar duplicate keys removed; benchmark 138→141 unique (France/Mali/Jamaica); coverage 75.7%→76.2%; sources 136→139; A1 and A13 FAQ updated; A66 FAQ added (PSC vs Concession mechanic comparison — Swing/Breakeven/IRR timing; 4-step IC workflow); v159→v160. Commit: pending.
+- Fixes: Namibia/Myanmar duplicate keys removed; benchmark 138→141 unique (France/Mali/Jamaica); coverage 75.7%→76.2%; sources 136→139; A1 and A13 FAQ updated; A66 FAQ added (PSC vs Concession mechanic comparison — Swing/Breakeven/IRR timing; 4-step IC workflow); v159→v160. Commit: 3d5d3b2.
 
 ---
 
