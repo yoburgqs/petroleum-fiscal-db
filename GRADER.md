@@ -392,7 +392,7 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ## Cycle 150 Log — 2026-08-13
 - Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors
-- Test after: pending syntax gate (pre-push)
+- Test after: 4/4 JS syntax gate PASS / 0 JS errors — pushed clean
 - JS errors: 0
 - Summary: **Cycle 150 — v199 shipped.** A106 FAQ added: decommissioning/abandonment obligation — 6-regime breakdown (UK RFCT+DRU / Norway PTA §22+78% refund / Australia PRRT / US GoM BSEE bond / West Africa PSC WI split / Indonesia Gross Split), 4-step IC workflow, net obligation rule of thumb by basin, IC memo disclosure template. Version sweep v198→v199 (81 locations). FAQ count 105→106.
 
