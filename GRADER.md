@@ -576,3 +576,11 @@ GRADER.md commit confirmed. Cycle 137 fully closed â€” v186 live, grades up
 2. **Professional Credibility** — A94 FAQ added: sliding-scale royalty tier calibration IC workflow — where tiered royalties appear (USA GoM RSV, Canada Alberta, Malaysia R-factor, Australia PRRT); production-weighted average royalty calculation; 4-step IC workflow; rule of thumb by project scale (<10k: 5–10pp delta; 10–35k: 2–5pp; >35k: top tier applies); IC memo language template with tier basis disclosure
 3. **Version** — v186→v187 across all standard locations (title, meta, badge, XLSX metadata, Fiscal Compare export note, DCF footer, How to Cite citation)
 4. **GRADER.md** — cycle 137 grades updated; file trimmed toward 120KB limit
+
+---
+## Cycle 138 Log — 2026-08-13 01:43
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Background Playwright task confirmed complete (exit code 0) â€” matches the 136 PASS / 0 FAIL already reported. Cycle 138 is fully closed.
+
