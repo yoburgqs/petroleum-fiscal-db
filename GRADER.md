@@ -1048,3 +1048,16 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 - **CDN atlas â†’ self-hosted** â€” The 2 JS errors were caused by `countries-110m.json` loading from jsdelivr CDN (404 in test env). Downloaded the 108KB TopoJSON into the repo; both map renderers (`renderWorldMap` + `renderBreakevenMap`) now load locally. Expected: 0 JS errors next cycle.
 
 - **FAQ A117 added** â€” "Portfolio asset review triage: how to use ORCA's fiscal data to identify hold vs. divest candidates across a 12-country upstream port
+
+---
+## Cycle 162 Log — 2026-08-13 16:41
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 162 complete. Shipped v211.**
+
+**What was fixed:**
+
+1. **Professional Credibility â€” FAQ A118 added**: "Our target block produces a medium-sour crude (30Â° API, 2.0% sulfur). Does ORCA's Scenario Builder input price correspond to Brent or the national marker crude â€” and how does the crude quality differential affect effective government take and IRR?"
+   - Explains ORCA's Brent-equivalent, quality-neutral model basis
+   - Covers the critical distinction: administered-price regimes (IC
