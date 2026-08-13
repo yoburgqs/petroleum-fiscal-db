@@ -924,3 +924,22 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 - JS errors: 0
 - Summary: Playwright task already completed and results were captured â€” 136 PASS / 0 FAIL / 0 JS errors, which is what the cycle report reflects. No action needed.
 
+
+---
+## Cycle 156 Log — 2026-08-13 13:38
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 156 complete.** Here's what shipped:
+
+---
+
+**v205 live at yoburgqs.github.io/petroleum-fiscal-db/**
+
+**Tests:** 136 PASS / 0 FAIL / 0 JS errors | Syntax gate: 4/4 PASS | Push: confirmed (2 commits)
+
+**What was fixed:**
+
+1. **FAQ A112 â€” PSC cost oil pool definition** *(Professional Credibility)*
+   - Fills the gap between "how much can you recover" (A42) and "what happens when you can't" (A111) with "what actually goes in the pool"
+   - Four exclusion categories: (1) financing costs/int
