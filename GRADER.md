@@ -967,3 +967,23 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 - JS errors: 0
 - Summary: Push confirmed. Cycle 157 fully landed â€” both commits live on GitHub Pages.
 
+
+---
+## Cycle 158 Log — 2026-08-13 14:36
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 158 complete.
+
+---
+
+**Cycle 158 â€” v207 shipped**
+
+**Tests:** 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors
+
+**What shipped:**
+
+1. **Professional Credibility** â€” FAQ A114 added: *Crude oil Domestic Market Obligation (DMO)*
+   - Indonesia legacy PSC: 25% contractor entitlement at $0.20/bbl for months 0â€“60 â†’ ~$85â€“110M PV10 drag = **2.5â€“4.5pp IRR penalty** on the reference project
+   - Gross Split (post-2017): market-price DMO from Year 1 â€” no penalty
+   - Nigeria PIA
