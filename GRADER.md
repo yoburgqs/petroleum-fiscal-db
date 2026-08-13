@@ -783,3 +783,11 @@ Everything is live. No action needed.
 **What was fixed:**
 
 - **FAQ A103 added â€” Fiscal Stabilization Clauses** (the gap between what ORCA shows and what a legacy stabilized contract actually pays): Covers all three clause types (full contractual freeze / economic equilibrium / tax stability agreement), explains that ORCA models current statutory terms not contract-specific stabilized terms, gives the direction of divergence by reform history (tighte
+
+---
+## Cycle 148 Log — 2026-08-13 07:42
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Push confirmed â€” exit code 0, v197 live at yoburgqs.github.io/petroleum-fiscal-db/.
+
