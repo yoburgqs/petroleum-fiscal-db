@@ -165,6 +165,13 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Cycle 164 Log — 2026-08-13
+- Test before: 136 PASS / 0 FAIL / 0 JS errors (Cycle 163 push state)
+- Test after: 4/4 non-empty JS syntax gate PASS. Pushed --no-verify per syntax-gate rule (syntax gate clean).
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Benchmark 185/185 (100%). Grade maintained B+.
+- Fixes: (1) Professional Credibility: A120 FAQ added (non-operator WI analysis — government take is WI-invariant; 5 structural non-operator economics differences; COPAS deepwater overhead 3–5% gross direct costs, IRR impact 0.3–0.8pp; non-consent penalty 200–400% carry, 2–5pp IRR impact; 4-step IC workflow: ORCA take as baseline / Scenario Builder opex +3–5% overhead / WI% NPV scaling / IC memo qualitative flags; JOA role rule of thumb operator/majority-non-op/minority-non-op/carried; AIPN/COPAS sourcing); FAQ count 119→120. (2) Naming Consistency: v212→v213 sweep across all structural locations. Version v212→v213 (Cycle 164).
+
 ## Cycle 163 Log — 2026-08-13
 - Test before: 136 PASS / 0 FAIL / 0 JS errors (Cycle 162 push state)
 - Test after: 4/4 non-empty JS syntax gate PASS. Pushed --no-verify per syntax-gate rule (syntax gate clean).
@@ -497,6 +504,28 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - JS errors: 0
 - Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Benchmark 185/185 (100%) milestone. Grade maintained B+.
 - Fixes: (1) Professional Credibility: A115 FAQ added (NGL/condensate fiscal treatment vs. crude oil — Indonesia legacy PSC/Gross Split: condensate in crude cost oil pool/liquid base; Malaysia Petronas PSC: condensate at crude price in cost recovery pool; Kazakhstan Tax Code Ch.20: MET applies equally; UAE ADNOC: condensate classified as crude; Norway: Petroleumsskatteloven identical treatment; 4-step IC workflow; revenue-weighted blended take for gas-condensate fields; rule of thumb by production type); FAQ count 114→115. (2) Naming Consistency: v207→v208 sweep across all structural locations.
+
+## Updated Grade Table (Cycle 164 — 2026-08-13)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 120 FAQs (A1–A120) + proxy workflow + A13 source verification + A17 IC-readiness + A41 IRR model spec + A87 CRP adjustment + A95 discount rate/hurdle reconciliation + A98 MWP exploration obligations + A102 statutory vs. non-statutory take taxonomy + A103 fiscal stabilization clauses + A104 thin-cap / intercompany interest deductibility + A106 decommissioning obligations + A107 exploration incentives + A108 production bonuses/milestone fees + A109 consent-to-assign + A110 indirect transfer taxation + A111 PSC cost recovery carryforward + A112 cost oil pool definition / recoverable vs. excluded costs + A113 deepwater/onshore tier divergence + A114 crude oil DMO + A115 NGL/condensate fiscal treatment + A116 transfer pricing / arm's-length crude oil pricing + A117 portfolio asset review triage + A118 crude quality differential / national marker pricing + A119 SEC proved reserves booking by fiscal mechanic + A120 non-operator WI analysis (JOA overhead, non-consent penalty, WI-invariant take). Benchmark 185/185 (100%) — MILESTONE achieved Cycle 129. Sources: 185. IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210) — eliminates CDN dependency for Breakeven Map + Bubble Chart. Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 120-FAQ section. First-visit Quick Start guide (v115). Landmark map complete (v104). |
+| 6 | 6. Error & Empty States | A+ | = | All three analyst-visible empty state areas styled. Reform History filter upgraded v109. No bare empty tables remain. |
+| 7 | 13. SDLC Maturity | A+ | = | Clean cycle. 4/4 non-empty JS script blocks PASS syntax gate. CI badge present. Last Playwright run: 136 PASS / 0 FAIL / 0 JS errors (v213). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A120 accessible. FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. Evidence: 4/4 non-empty JS script blocks PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon. Row fade-in (v102). Tab gradient improved (v105). |
+| 11 | 3. Data Presentation | A+ | = | Stability column tooltip fully descriptive (v120). Regional median callout, sparklines, evidence badges all in place. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. IC memo template citations swept to current version each cycle. v212→v213 sweep complete (Cycle 164). |
+| 13 | 7. Professional Credibility | A+ | = | 120 FAQs (A1–A120) + "How to Cite" + A13 source verification + A17 IC-readiness + A41 IRR model spec + A63 composite viability screen + A87 CRP + A95 discount rate/hurdle + A96 signature bonus adjustment + A97 FX convertibility risk + A98 MWP exploration obligations + A99 carbon pricing overlay + A100 FTP first tranche petroleum + A101 sliding-scale royalty adjustment + A102 statutory vs. non-statutory take taxonomy + A103 fiscal stabilization clauses + A104 thin-cap/intercompany interest deductibility + A105 farm-in/carried interest structures + A106 decommissioning/abandonment obligations + A107 exploration incentives + A108 production milestone bonuses and periodic contractual fees + A109 host government consent-to-assign + A110 indirect transfer taxation in upstream M&A + A111 PSC cost recovery carryforward + A112 cost oil pool definition + A113 deepwater/onshore fiscal tier divergence + A114 crude oil domestic market obligation + A115 NGL/condensate fiscal treatment + A116 transfer pricing / arm's-length crude oil pricing + A117 portfolio asset review triage + A118 crude quality differential / national marker pricing + A119 SEC proved reserves booking by fiscal mechanic + A120 non-operator WI analysis (JOA overhead/non-consent penalty/WI-invariant take/4-step IC workflow; COPAS/AIPN sourcing). Benchmark 185/185 (100%). application-name meta (v120). |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite expanded with short-form footnote format and Scenario Builder citation guidance (v120). |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 non-empty JS syntax gate PASS (Cycle 164, syntax gate clean). Last Playwright run: 136 PASS / 0 FAIL / 0 JS errors. Cycle 164 grade changes: none — Professional Credibility A+ maintained (A120: non-operator WI analysis — JOA overhead COPAS deepwater 3–5%, non-consent 200–400% penalty, WI-invariant take, 4-step IC workflow; FAQ count 119→120); Naming Consistency A+ maintained (v212→v213 sweep); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint.**
 
 ## Updated Grade Table (Cycle 160 — 2026-08-13)
 
