@@ -1072,3 +1072,19 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 1. **Professional Credibility â€” FAQ A118 added**: "Our target block produces a medium-sour crude (30Â° API, 2.0% sulfur). Does ORCA's Scenario Builder input price correspond to Brent or the national marker crude â€” and how does the crude quality differential affect effective government take and IRR?"
    - Explains ORCA's Brent-equivalent, quality-neutral model basis
    - Covers the critical distinction: administered-price regimes (IC
+
+---
+## Cycle 163 Log — 2026-08-13 17:06
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 163 complete. v212 shipped.**
+
+---
+
+**What was fixed:**
+
+1. **FAQ A119 â€” SEC Proved Reserves Booking by Fiscal Mechanic** *(Professional Credibility)*
+   - Answers the IC committee question of whether ORCA's mechanic classification affects reserves bookability under SEC Rule 4-10(a)/ASC 932
+   - **Concession (WI):** Book WI% Ã— gross reserves â€” take percentage does not reduce bookable volume
+   - **PSC:** Book entitlement barrels only (cost oil + contractor profit oil); typically 20â
