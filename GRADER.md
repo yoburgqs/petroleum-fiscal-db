@@ -1132,3 +1132,16 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 - JS errors: 0
 - Summary: Background push completed (exit code 0) â€” office repo updated with the fiscal_db_interface.html copy from Cycle 164.
 
+
+---
+## Cycle 165 Log — 2026-08-13 18:24
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All clear. Final state:
+
+- **petroleum-fiscal-db** at `476007d` (v214, FAQ A121, GRADER updated)
+- **office repo** synced with `fiscal_db_interface.html` v214
+- **136 PASS / 0 FAIL / 0 WARN** confirmed on both pushes
+- Pre-push hook ran cleanly both times â€” no `--no-verify` used
+
