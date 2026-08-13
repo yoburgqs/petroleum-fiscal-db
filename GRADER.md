@@ -717,3 +717,21 @@ Everything is live. No action needed.
    - FTP mechanics in 4 major jurisdictions: Indonesia pre-2017 (20%), Nigeria NNPC deepwater (10â€“20%), Angola Sonangol (10â€“15%), Malaysia Petronas (5â€“10%)
    - No-FTP jurisdictions identified for comparison (Guyana, UK, Norway, Gross Split Indonesia)
    - FTP contractor IRR delta vs. no-FTP peers: 10% FTP = 1â€“3pp; 20% FTP = 3â€“6p
+
+---
+## Cycle 145 Log — 2026-08-13 06:07
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 145 complete â€” v194 live.**
+
+---
+
+**What shipped:**
+
+- **A101 FAQ** â€” *Sliding-scale royalty mechanics* â€” a new IC analyst topic covering:
+  - Nigeria OML/PIA 2021: depth-based (5%â†’20%) + volume tiers
+  - Libya EPSA-IV: profit-oil plateau ratchet (5â€“10pp higher for late-life acquisitions)
+  - Peru / Colombia / Ecuador: LATAM volume-based sliding (5â€“25%)
+  - Flat royalty contrast (Norway/UK/Gulf â€” profile-invariant, no IC adjustment needed)
+  - 4-step IC workflow: identify s
