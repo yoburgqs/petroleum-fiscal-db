@@ -952,3 +952,11 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 1. **FAQ A112 â€” PSC cost oil pool definition** *(Professional Credibility)*
    - Fills the gap between "how much can you recover" (A42) and "what happens when you can't" (A111) with "what actually goes in the pool"
    - Four exclusion categories: (1) financing costs/int
+
+---
+## Cycle 157 Log — 2026-08-13 14:12
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Push confirmed. Cycle 157 fully landed â€” both commits live on GitHub Pages.
+
