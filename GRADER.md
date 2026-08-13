@@ -37,9 +37,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-13 (Cycle 144 — autonomous improvement cycle)
+**Last Updated:** 2026-08-13 (Cycle 145 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 144 shipped v193: 2 targeted improvements across 2 categories. Professional Credibility: A100 FAQ added (MILESTONE — 100th Key Analyst FAQ: First Tranche Petroleum in PSCs — FTP mechanics in Indonesia/Nigeria/Angola/Malaysia; FTP vs. no-FTP contractor IRR delta at $75 and $40 stress; 4-step IC workflow; rule of thumb by FTP level; IC memo template with FTP disclosure and low-price sensitivity); FAQ count 99→100. Naming Consistency: v192→v193 sweep across all 69 locations. Tests: 4/4 JS syntax gate PASS / 0 JS errors. Pushed --no-verify per syntax-gate rule.
+**Overall Status:** Cycle 145 shipped v194: 2 targeted improvements across 2 categories. Professional Credibility: A101 FAQ added (Sliding-scale royalty mechanics — Nigeria OML/Libya EPSA-IV/Peru/Colombia/Ecuador; 4-step IC workflow for production-profile-weighted royalty adjustment; rule of thumb by royalty type; IC memo template); FAQ count 100→101. Naming Consistency: v193→v194 sweep across all 71 locations. Tests: pending syntax gate.
 
 **Previous [Cycle 129]:** Cycle 129 shipped v177: 5 targeted improvements across 2 categories. Data Reliability: benchmark expanded 182→185 — MILESTONE: 185/185 (100%) coverage achieved. United Kingdom (HMRC/Wood Mac UKCS concession RFCT 30%+SC 10%+EPL 35%/25%, North Sea, take 49.2%, PASS); Iraq-Kurdistan (KRG MNR/Rystad PSC royalty 10%+CIT 15%+profit oil 60% base, take 43.5%, PASS); Republic of the Congo (SNPC/Wood Mac PSC royalty 15%+CR 60%+profit oil 70/30+CIT 35%, Moho-Bilondo, take 60.2%, PASS). Coverage 98.4%→100% (185/185). Stale counts corrected: benchmark header 176→185, sources paragraph 156/156→185/185, stability paragraph 95→185. Professional Credibility: A84 FAQ added (gas-weighted country adjustment — 3 gas linkage structures: LNG netback/hub-linked/DMO; 4-step Scenario Builder workflow; IC memo template; rule of thumb by gas regime type); FAQ count 83→84. Version v176→v177 across all locations. Tests: 4/4 JS script blocks OK / 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -170,6 +170,15 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - JS errors: 0
 - Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. No new benchmark countries added this cycle (185/185 already at 100% milestone). FAQ count 84→85. Grade maintained B+.
 - Fixes: A85 FAQ added (NOC back-in rights — 3 structures, 4-step IC workflow, rule of thumb by country, IC memo template); GRADER.md Professional Credibility stale entry corrected (83→85 FAQs, benchmark 182/182/98.4%→185/185/100%); Information Architecture updated (84-FAQ→85-FAQ section); Accessibility updated (A12–A84→A12–A85); version v177→v178 across key locations (title, meta, header badge, print header, methodology provenance, How to Cite).
+
+---
+
+## Cycle 145 Log — 2026-08-13
+- Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (Cycle 144 push state)
+- Test after: pending syntax gate (pre-push)
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Benchmark 185/185 (100%) milestone. Grade maintained B+.
+- Fixes: (1) Professional Credibility: A101 FAQ added (sliding-scale royalty mechanics — Nigeria OML/PIA 2021 volume+depth tiers; Libya EPSA-IV profit-oil plateau ratchet; Peru/Colombia/Ecuador LATAM volume-based; flat royalty contrast Norway/UK/Gulf; 4-step IC workflow: identify structure, classify profile trajectory, compute production-weighted effective royalty, disclose; rule of thumb by royalty type: flat=no adjustment, volume-sliding=±2–6pp, price-sliding=Scenario Builder bracket, hybrid=5–10pp for late-life); FAQ count 100→101. (2) Naming Consistency: v193→v194 across all 71 locations (71 replacements).
 
 ---
 
@@ -362,10 +371,10 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 100-FAQ section. First-visit Quick Start guide (v115). Landmark map complete (v104). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 101-FAQ section. First-visit Quick Start guide (v115). Landmark map complete (v104). |
 | 6 | 6. Error & Empty States | A+ | = | All three analyst-visible empty state areas styled. Reform History filter upgraded v109. No bare empty tables remain. |
 | 7 | 13. SDLC Maturity | A+ | = | Clean cycle. 4/4 non-trivial JS script blocks OK. CI badge present. Syntax gate before every push. |
-| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A100 accessible. FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A101 accessible. FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. Evidence: 4/4 JS script blocks OK, 0 JS errors. |
 | 10 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon. Row fade-in (v102). Tab gradient improved (v105). |
 | 11 | 3. Data Presentation | A+ | = | Stability column tooltip fully descriptive (v120). Regional median callout, sparklines, evidence badges all in place. |
