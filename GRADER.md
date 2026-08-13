@@ -1100,3 +1100,11 @@ GRADER.md commit/push also complete. Both commits landed â€” v177 fully dep
    - 4 mechanics where scale is material: sliding-scale royalties (3â€“8pp lower for small fields), PSC cost recovery timing, volumetric levies, R-factor threshold acceleration
    - 3 mechanics with near-zero scale effect: flat royalty concessions, revenue share contracts, CIT-only regimes
    - 4-step Scenari
+
+---
+## Cycle 135 Log — 2026-08-12 23:16
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Push confirmed â€” `yoburgqs/petroleum-fiscal-db` main is live at v184.
+
