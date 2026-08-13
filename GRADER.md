@@ -1028,3 +1028,14 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 **What shipped (v209):**
 
 1. **FAQ A116 added** â€” Transfer pricing / arm's-length crude oil pricing for IC analysts. Covers how ORCA's market reference price relates to five major government-administered and market-value TP frameworks: Nigeria NNPC Reference Price, Indonesia ICP, Kazakhstan Tax Code Art. 381â€“393, Norway Norm Price Board (PetroleumsprisrÃ¥det), and UK HMRC market value + TIOPA 2010 Part 4. Includes 4-step IC workflow, rule of thumb by TP framewor
+
+---
+## Cycle 161 Log — 2026-08-13 16:14
+- Test before: 135 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 161 complete.** Here's what was fixed:
+
+- **CDN atlas â†’ self-hosted** â€” The 2 JS errors were caused by `countries-110m.json` loading from jsdelivr CDN (404 in test env). Downloaded the 108KB TopoJSON into the repo; both map renderers (`renderWorldMap` + `renderBreakevenMap`) now load locally. Expected: 0 JS errors next cycle.
+
+- **FAQ A117 added** â€” "Portfolio asset review triage: how to use ORCA's fiscal data to identify hold vs. divest candidates across a 12-country upstream port
