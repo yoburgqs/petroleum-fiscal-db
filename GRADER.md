@@ -39,7 +39,7 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 # ORCA Petroleum Platform — UX & SDLC Grader
 **Last Updated:** 2026-08-13 (Cycle 145 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 146 shipped v195: 2 targeted improvements across 2 categories. Professional Credibility: A102 FAQ added (Statutory vs. non-statutory take taxonomy — IC dual-track reporting: what ORCA includes vs. excludes; 4-step IC workflow; rule of thumb by item type; IC memo template distinguishing statutory take and all-in fiscal burden); FAQ count 101→102. Naming Consistency: v194→v195 sweep across all 74 locations. Tests: pending syntax gate.
+**Overall Status:** Cycle 146 shipped v195: 2 targeted improvements across 2 categories. Professional Credibility: A102 FAQ added (Statutory vs. non-statutory take taxonomy — IC dual-track reporting: what ORCA includes vs. excludes; 4-step IC workflow; rule of thumb by item type; IC memo template distinguishing statutory take and all-in fiscal burden); FAQ count 101→102. Naming Consistency: v194→v195 sweep across all 74 locations. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
 **Previous [Cycle 129]:** Cycle 129 shipped v177: 5 targeted improvements across 2 categories. Data Reliability: benchmark expanded 182→185 — MILESTONE: 185/185 (100%) coverage achieved. United Kingdom (HMRC/Wood Mac UKCS concession RFCT 30%+SC 10%+EPL 35%/25%, North Sea, take 49.2%, PASS); Iraq-Kurdistan (KRG MNR/Rystad PSC royalty 10%+CIT 15%+profit oil 60% base, take 43.5%, PASS); Republic of the Congo (SNPC/Wood Mac PSC royalty 15%+CR 60%+profit oil 70/30+CIT 35%, Moho-Bilondo, take 60.2%, PASS). Coverage 98.4%→100% (185/185). Stale counts corrected: benchmark header 176→185, sources paragraph 156/156→185/185, stability paragraph 95→185. Professional Credibility: A84 FAQ added (gas-weighted country adjustment — 3 gas linkage structures: LNG netback/hub-linked/DMO; 4-step Scenario Builder workflow; IC memo template; rule of thumb by gas regime type); FAQ count 83→84. Version v176→v177 across all locations. Tests: 4/4 JS script blocks OK / 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -175,7 +175,7 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ## Cycle 146 Log — 2026-08-13
 - Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (Cycle 145 push state)
-- Test after: pending syntax gate (pre-push)
+- Test after: 4/4 JS syntax gate PASS / 0 JS errors. Playwright 136 PASS / 0 FAIL / 0 WARN (hook passed — pushed without --no-verify).
 - JS errors: 0
 - Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Benchmark 185/185 (100%) milestone. Grade maintained B+.
 - Fixes: (1) Professional Credibility: A102 FAQ added (statutory vs. non-statutory take taxonomy; 4-step IC dual-track reporting workflow; rule of thumb by item; IC memo template); FAQ count 101→102. (2) Naming Consistency: v194→v195 across all 74 locations.
