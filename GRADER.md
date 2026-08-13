@@ -37,9 +37,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-13 (Cycle 148 — autonomous improvement cycle)
+**Last Updated:** 2026-08-13 (Cycle 149 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 148 shipped v197: 2 targeted improvements across 2 categories. Professional Credibility: A104 FAQ added (thin capitalization rules and intercompany interest deductibility — 3 thin-cap rule structures: fixed D/E cap, OECD BEPS EBITDA-based cap, PSC ring-fence exclusion; 4-step IC adjustment workflow; jurisdiction rule of thumb Norway/UK/Nigeria-Angola-Indonesia/Gulf states/PSC ring-fence; IC memo disclosure language); FAQ count 103→104. Naming Consistency: v196→v197 sweep across all 75 locations. Tests: 9/9 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 149 shipped v198: 2 targeted improvements across 2 categories. Professional Credibility: A105 FAQ added (farm-in and carried interest structures — three carry types: gross carry non-recoverable from PSC cost pool / net profits earn-in with payout trigger / cash+partial carry hybrid; 4-step IC workflow: confirm WI+carry obligation, model carry as upfront capex, check PSC ring-fence eligibility, IC memo disclosure with carry-adjusted IRR; tax on farm-out proceeds UK/Norway/Australia PRRT; rule of thumb by block type frontier deepwater 5–10pp IRR drag / near-field 1–3pp / producing asset no carry; PSC ring-fence excludes carry premium from cost oil in all major PSC jurisdictions); FAQ count 104→105. Naming Consistency: v197→v198 sweep across all 79 locations. Tests: 9/9 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
 **Previous [Cycle 129]:** Cycle 129 shipped v177: 5 targeted improvements across 2 categories. Data Reliability: benchmark expanded 182→185 — MILESTONE: 185/185 (100%) coverage achieved. United Kingdom (HMRC/Wood Mac UKCS concession RFCT 30%+SC 10%+EPL 35%/25%, North Sea, take 49.2%, PASS); Iraq-Kurdistan (KRG MNR/Rystad PSC royalty 10%+CIT 15%+profit oil 60% base, take 43.5%, PASS); Republic of the Congo (SNPC/Wood Mac PSC royalty 15%+CR 60%+profit oil 70/30+CIT 35%, Moho-Bilondo, take 60.2%, PASS). Coverage 98.4%→100% (185/185). Stale counts corrected: benchmark header 176→185, sources paragraph 156/156→185/185, stability paragraph 95→185. Professional Credibility: A84 FAQ added (gas-weighted country adjustment — 3 gas linkage structures: LNG netback/hub-linked/DMO; 4-step Scenario Builder workflow; IC memo template; rule of thumb by gas regime type); FAQ count 83→84. Version v176→v177 across all locations. Tests: 4/4 JS script blocks OK / 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -405,12 +405,12 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. Evidence: 9/9 JS script blocks PASS, 0 JS errors. |
 | 10 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon. Row fade-in (v102). Tab gradient improved (v105). |
 | 11 | 3. Data Presentation | A+ | = | Stability column tooltip fully descriptive (v120). Regional median callout, sparklines, evidence badges all in place. |
-| 12 | 5. Naming Consistency | A+ | = | All naming unified. IC memo template citations swept to current version each cycle. v197 sweep complete (Cycle 148 — 75 stale cites corrected). |
-| 13 | 7. Professional Credibility | A+ | = | 104 FAQs (A1–A104) + "How to Cite" + A13 source verification + A17 IC-readiness + A41 IRR model spec + A63 composite viability screen + A87 CRP + A95 discount rate/hurdle + A96 signature bonus adjustment + A97 FX convertibility risk + A98 MWP exploration obligations + A99 carbon pricing overlay + A100 FTP first tranche petroleum + A101 sliding-scale royalty adjustment + A102 statutory vs. non-statutory take taxonomy + A103 fiscal stabilization clauses + A104 thin-cap/intercompany interest deductibility. Benchmark 185/185 (100%). application-name meta (v120). |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. IC memo template citations swept to current version each cycle. v198 sweep complete (Cycle 149 — 79 stale cites corrected). |
+| 13 | 7. Professional Credibility | A+ | = | 105 FAQs (A1–A105) + "How to Cite" + A13 source verification + A17 IC-readiness + A41 IRR model spec + A63 composite viability screen + A87 CRP + A95 discount rate/hurdle + A96 signature bonus adjustment + A97 FX convertibility risk + A98 MWP exploration obligations + A99 carbon pricing overlay + A100 FTP first tranche petroleum + A101 sliding-scale royalty adjustment + A102 statutory vs. non-statutory take taxonomy + A103 fiscal stabilization clauses + A104 thin-cap/intercompany interest deductibility + A105 farm-in/carried interest structures. Benchmark 185/185 (100%). application-name meta (v120). |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite expanded with short-form footnote format and Scenario Builder citation guidance (v120). |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 9/9 JS syntax gate PASS, 0 JS errors (2026-08-13). Cycle 148 grade changes: none — Professional Credibility A+ maintained (A104: thin capitalization rules and intercompany interest deductibility — 3 thin-cap structures: fixed D/E cap/OECD BEPS EBITDA cap/PSC ring-fence; 4-step IC workflow; jurisdiction rule of thumb; IC memo template; FAQ count 103→104); Naming Consistency A+ maintained (75 stale v196 cites swept to v197); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 9/9 JS syntax gate PASS, 0 JS errors (2026-08-13). Cycle 149 grade changes: none — Professional Credibility A+ maintained (A105: farm-in and carried interest structures — 3 carry types, 4-step IC workflow, PSC ring-fence exclusion of carry premium, tax on farm-out proceeds, rule of thumb by block type; FAQ count 104→105); Naming Consistency A+ maintained (79 stale v197 cites swept to v198); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint.**
 
 
 *[Cycle logs 77–90 grade tables archived — see GRADER_ARCHIVE.md]*
@@ -791,3 +791,22 @@ Everything is live. No action needed.
 - JS errors: 0
 - Summary: Push confirmed â€” exit code 0, v197 live at yoburgqs.github.io/petroleum-fiscal-db/.
 
+
+---
+## Cycle 149 Log — 2026-08-13
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 149 complete — v198 live at yoburgqs.github.io/petroleum-fiscal-db/**
+
+**What shipped:**
+
+1. **FAQ A105 — Farm-in and carried interest structures** *(Professional Credibility)*
+   - Three carry types: gross carry (non-recoverable from PSC cost pool), net profits earn-in, cash+partial carry hybrid
+   - 4-step IC workflow: confirm WI+carry obligation → model carry as upfront capex → check PSC ring-fence eligibility → IC memo disclosure with carry-adjusted IRR
+   - Tax on farm-out proceeds: UK ring-fence CT, Norway 78% rate, Australia PRRT starting base
+   - Rule of thumb: frontier deepwater carry 5–10pp IRR drag / near-field 1–3pp / producing asset no carry
+   - FAQ count: 104→105
+
+2. **Version sweep v197→v198** *(Naming Consistency)*
+   - 79 stale v197 citations corrected to v198 across FAQ bodies A1–A104 and structural locations
