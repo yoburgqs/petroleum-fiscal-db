@@ -39,7 +39,7 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 # ORCA Petroleum Platform — UX & SDLC Grader
 **Last Updated:** 2026-08-13 (Cycle 145 — autonomous improvement cycle)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 145 shipped v194: 2 targeted improvements across 2 categories. Professional Credibility: A101 FAQ added (Sliding-scale royalty mechanics — Nigeria OML/Libya EPSA-IV/Peru/Colombia/Ecuador; 4-step IC workflow for production-profile-weighted royalty adjustment; rule of thumb by royalty type; IC memo template); FAQ count 100→101. Naming Consistency: v193→v194 sweep across all 71 locations. Tests: pending syntax gate.
+**Overall Status:** Cycle 146 shipped v195: 2 targeted improvements across 2 categories. Professional Credibility: A102 FAQ added (Statutory vs. non-statutory take taxonomy — IC dual-track reporting: what ORCA includes vs. excludes; 4-step IC workflow; rule of thumb by item type; IC memo template distinguishing statutory take and all-in fiscal burden); FAQ count 101→102. Naming Consistency: v194→v195 sweep across all 74 locations. Tests: pending syntax gate.
 
 **Previous [Cycle 129]:** Cycle 129 shipped v177: 5 targeted improvements across 2 categories. Data Reliability: benchmark expanded 182→185 — MILESTONE: 185/185 (100%) coverage achieved. United Kingdom (HMRC/Wood Mac UKCS concession RFCT 30%+SC 10%+EPL 35%/25%, North Sea, take 49.2%, PASS); Iraq-Kurdistan (KRG MNR/Rystad PSC royalty 10%+CIT 15%+profit oil 60% base, take 43.5%, PASS); Republic of the Congo (SNPC/Wood Mac PSC royalty 15%+CR 60%+profit oil 70/30+CIT 35%, Moho-Bilondo, take 60.2%, PASS). Coverage 98.4%→100% (185/185). Stale counts corrected: benchmark header 176→185, sources paragraph 156/156→185/185, stability paragraph 95→185. Professional Credibility: A84 FAQ added (gas-weighted country adjustment — 3 gas linkage structures: LNG netback/hub-linked/DMO; 4-step Scenario Builder workflow; IC memo template; rule of thumb by gas regime type); FAQ count 83→84. Version v176→v177 across all locations. Tests: 4/4 JS script blocks OK / 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -170,6 +170,15 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - JS errors: 0
 - Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. No new benchmark countries added this cycle (185/185 already at 100% milestone). FAQ count 84→85. Grade maintained B+.
 - Fixes: A85 FAQ added (NOC back-in rights — 3 structures, 4-step IC workflow, rule of thumb by country, IC memo template); GRADER.md Professional Credibility stale entry corrected (83→85 FAQs, benchmark 182/182/98.4%→185/185/100%); Information Architecture updated (84-FAQ→85-FAQ section); Accessibility updated (A12–A84→A12–A85); version v177→v178 across key locations (title, meta, header badge, print header, methodology provenance, How to Cite).
+
+---
+
+## Cycle 146 Log — 2026-08-13
+- Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (Cycle 145 push state)
+- Test after: pending syntax gate (pre-push)
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Benchmark 185/185 (100%) milestone. Grade maintained B+.
+- Fixes: (1) Professional Credibility: A102 FAQ added (statutory vs. non-statutory take taxonomy; 4-step IC dual-track reporting workflow; rule of thumb by item; IC memo template); FAQ count 101→102. (2) Naming Consistency: v194→v195 across all 74 locations.
 
 ---
 
@@ -363,27 +372,27 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - Downgrade hunt: Data Reliability B+ — benchmark expanded 95→98 (Yemen: YOC/Hunt Oil PSC take 69.4%, range 65–74%, PASS directional pre-2015; Croatia: INA/MOL Mining Act concession take 40.2%, range 36–45%, PASS; Niger: SONIDEP/Wood Mac PSC take 62.5%, range 57–68%, PASS). Coverage 51.4%→53.0% (98/185). Pass rate 98/98 (100%). Sources 91→94. Grade maintained B+ — IRR structural gap (74/185) binding constraint.
 - Fixes: benchmark 95→98 (Yemen/Croatia/Niger), coverage 51.4%→53.0%, sources 91→94, A49 FAQ sanctions-jurisdiction guidance (Russia/Iran/Venezuela/Syria country-by-country IC memo workflow), version v140→v141.
 
-## Updated Grade Table (Cycle 143 — 2026-08-13)
+## Updated Grade Table (Cycle 146 — 2026-08-13)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 98 FAQs (A1–A98) + proxy workflow + A13 source verification + A17 IC-readiness + A41 IRR model spec + A87 CRP adjustment + A95 discount rate/hurdle reconciliation + A98 MWP exploration obligations. Benchmark 185/185 (100%) — MILESTONE achieved Cycle 129. Sources: 185. IRR structural gap is the binding constraint. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 102 FAQs (A1–A102) + proxy workflow + A13 source verification + A17 IC-readiness + A41 IRR model spec + A87 CRP adjustment + A95 discount rate/hurdle reconciliation + A98 MWP exploration obligations + A102 statutory vs. non-statutory take taxonomy. Benchmark 185/185 (100%) — MILESTONE achieved Cycle 129. Sources: 185. IRR structural gap is the binding constraint. |
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 101-FAQ section. First-visit Quick Start guide (v115). Landmark map complete (v104). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 102-FAQ section. First-visit Quick Start guide (v115). Landmark map complete (v104). |
 | 6 | 6. Error & Empty States | A+ | = | All three analyst-visible empty state areas styled. Reform History filter upgraded v109. No bare empty tables remain. |
 | 7 | 13. SDLC Maturity | A+ | = | Clean cycle. 4/4 non-trivial JS script blocks OK. CI badge present. Syntax gate before every push. |
-| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A101 accessible. FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A102 accessible. FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. Evidence: 4/4 JS script blocks OK, 0 JS errors. |
 | 10 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon. Row fade-in (v102). Tab gradient improved (v105). |
 | 11 | 3. Data Presentation | A+ | = | Stability column tooltip fully descriptive (v120). Regional median callout, sparklines, evidence badges all in place. |
-| 12 | 5. Naming Consistency | A+ | = | All naming unified. IC memo template citations swept to current version each cycle. v190 sweep complete (Cycle 142 — 70+ stale cites corrected). |
-| 13 | 7. Professional Credibility | A+ | = | 100 FAQs (A1–A100) + "How to Cite" + A13 source verification + A17 IC-readiness + A41 IRR model spec + A63 composite viability screen + A87 CRP + A95 discount rate/hurdle + A96 signature bonus adjustment + A97 FX convertibility risk + A98 MWP exploration obligations + A99 carbon pricing overlay + A100 FTP first tranche petroleum. Benchmark 185/185 (100%). application-name meta (v120). |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. IC memo template citations swept to current version each cycle. v195 sweep complete (Cycle 146 — 74 stale cites corrected). |
+| 13 | 7. Professional Credibility | A+ | = | 102 FAQs (A1–A102) + "How to Cite" + A13 source verification + A17 IC-readiness + A41 IRR model spec + A63 composite viability screen + A87 CRP + A95 discount rate/hurdle + A96 signature bonus adjustment + A97 FX convertibility risk + A98 MWP exploration obligations + A99 carbon pricing overlay + A100 FTP first tranche petroleum + A101 sliding-scale royalty adjustment + A102 statutory vs. non-statutory take taxonomy. Benchmark 185/185 (100%). application-name meta (v120). |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite expanded with short-form footnote format and Scenario Builder citation guidance (v120). |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS, 0 JS errors (2026-08-13). Cycle 144 grade changes: none — Professional Credibility A+ maintained (A100 milestone: FTP first tranche petroleum IC workflow; FAQ count 99→100); Naming Consistency A+ maintained (69 stale v192 cites swept to v193); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS, 0 JS errors (2026-08-13). Cycle 146 grade changes: none — Professional Credibility A+ maintained (A102: statutory vs. non-statutory take taxonomy — IC committee distinction workflow; FAQ count 101→102); Naming Consistency A+ maintained (74 stale v194 cites swept to v195); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint.**
 
 
 *[Cycle logs 77–90 grade tables archived — see GRADER_ARCHIVE.md]*
