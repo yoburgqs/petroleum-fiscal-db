@@ -1117,3 +1117,11 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
    - Answers the IC committee question of whether ORCA's mechanic classification affects reserves bookability under SEC Rule 4-10(a)/ASC 932
    - **Concession (WI):** Book WI% Ã— gross reserves â€” take percentage does not reduce bookable volume
    - **PSC:** Book entitlement barrels only (cost oil + contractor profit oil); typically 20â
+
+---
+## Cycle 164 Log — 2026-08-13 17:42
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Background push completed (exit code 0) â€” office repo updated with the fiscal_db_interface.html copy from Cycle 164.
+
