@@ -1004,3 +1004,16 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 - JS errors: 0
 - Summary: Already captured â€” 136 PASS / 0 FAIL / 0 JS errors. Cycle 159 is fully closed.
 
+
+---
+## Cycle 160 Log — 2026-08-13 15:38
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 160 complete.**
+
+---
+
+**What shipped (v209):**
+
+1. **FAQ A116 added** â€” Transfer pricing / arm's-length crude oil pricing for IC analysts. Covers how ORCA's market reference price relates to five major government-administered and market-value TP frameworks: Nigeria NNPC Reference Price, Indonesia ICP, Kazakhstan Tax Code Art. 381â€“393, Norway Norm Price Board (PetroleumsprisrÃ¥det), and UK HMRC market value + TIOPA 2010 Part 4. Includes 4-step IC workflow, rule of thumb by TP framewor
