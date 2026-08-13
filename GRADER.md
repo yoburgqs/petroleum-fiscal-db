@@ -382,27 +382,35 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - Downgrade hunt: Data Reliability B+ — benchmark expanded 107→110 (Italy: ENI/EY Oil & Gas Tax Guide concession, D.Lgs. 625/1996, royalty 7% onshore/4–20% offshore + CIT 27.9% + Robin Hood Tax 10.5%, Val d'Agri/Adriatic offshore, take 46.1%, range 42–51%, PASS; Spain: CNE/Repsol/EY concession, Hydrocarbons Act 34/1998, royalty 2–12% + CIT 25% + hydrocarbon tax, Casablanca offshore Mediterranean, take 44.8%, range 40–50%, PASS; Portugal: ANRM/Galp/EY concession, Decree Law 109/94, royalty 5–10% + CIT 21% + GALP state participation, Alentejo Basin onshore and Atlantic margin Block 6, take 38.7%, range 34–43%, PASS). Coverage 57.8%→59.5% (110/185). Pass rate 110/110 (100%). Sources 103→106. Grade maintained B+ — IRR structural gap (74/185) binding constraint.
 - Fixes: benchmark 107→110 (Italy/Spain/Portugal), coverage 57.8%→59.5%, sources 103→106, A53 FAQ farm-out/WI fiscal mechanics (CGT exposure, WI-invariant take, carried interest uplift, 4-step workflow), version v144→v145. Commit: a46c16d.
 
-## Updated Grade Table (Cycle 135 — 2026-08-12)
+## Updated Grade Table (Cycle 136 — 2026-08-12)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 90 FAQs (A1–A90) + proxy workflow + A13 source verification + A17 IC-readiness + A49–A90 advanced IC workflows (A90 adds project scale adjustment — 4 scale-sensitive mechanics, rule of thumb by regime type, 4-step Scenario Builder calibration workflow). Benchmark 185 countries (all unique) / 185/185 pass (100%) — MILESTONE: 100% DB coverage. Sources: 184. Documentation bug fixed: methodology table correctly says "Straight-line 7yr" matching actual DCF engine. |
-| 2 | 9. Performance & Reliability | A | = | Google Fonts now non-blocking link (v183). requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Single-file architectural constraint remains binding gap for A+. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 91 FAQs (A1–A91) + proxy workflow + A13 source verification + A17 IC-readiness + A49–A91 advanced IC workflows (A91 adds portfolio blended take — production-weighted average, 3-step workflow, IC disclosure conventions). Benchmark 185 countries (all unique) / 185/185 pass (100%) — MILESTONE: 100% DB coverage. Sources: 184. Documentation bug fixed: methodology table correctly says "Straight-line 7yr" matching actual DCF engine. |
+| 2 | 9. Performance & Reliability | A | = | Google Fonts now non-blocking link (v184). requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 90-FAQ section (v183). First-visit Quick Start guide (v115). Landmark map complete (v104). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 91-FAQ section (v184). First-visit Quick Start guide (v115). Landmark map complete (v104). |
 | 6 | 6. Error & Empty States | A+ | = | All three analyst-visible empty state areas styled. Reform History filter upgraded v109. No bare empty tables remain. |
 | 7 | 13. SDLC Maturity | A+ | = | Clean cycle. 4/4 script blocks OK / 136 PASS / 0 FAIL / 0 JS errors. CI badge present. |
-| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A90 accessible (querySelectorAll delegation picks up new FAQs automatically). FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A91 accessible (querySelectorAll delegation picks up new FAQs automatically). FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. Evidence: 4/4 script blocks clean / 0 JS errors. |
 | 10 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon. Row fade-in (v102). Tab gradient improved (v105). |
 | 11 | 3. Data Presentation | A+ | = | Stability column tooltip fully descriptive (v120). Regional median callout, sparklines, evidence badges all in place. |
-| 12 | 5. Naming Consistency | A+ | = | All naming unified. v182→v183 across all locations (Cycle 135). 26 stale v177 IC memo template citations corrected to v179 across FAQ bodies A59–A85 and How to Cite (v179). |
-| 13 | 7. Professional Credibility | A+ | = | 90 FAQs (A1–A90) + "How to Cite" + A13 source verification + A17 IC-readiness + A49–A90 advanced IC workflows (A90 adds project scale adjustment — 4 scale-sensitive fiscal mechanics, 4-step calibration workflow, rule of thumb by mechanic type). Benchmark 185 countries (all unique) / 185/185 pass (100%). Sources: 184. application-name meta (v120). |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. v183→v184 across all locations (Cycle 136). 26 stale v177 IC memo template citations corrected to v179 across FAQ bodies A59–A85 and How to Cite (v179). |
+| 13 | 7. Professional Credibility | A+ | = | 91 FAQs (A1–A91) + "How to Cite" + A13 source verification + A17 IC-readiness + A49–A91 advanced IC workflows (A91 adds portfolio blended take — production-weighted average take, 3-step workflow, 3-metric IC block, disclosure conventions). Benchmark 185 countries (all unique) / 185/185 pass (100%). Sources: 184. application-name meta (v120). |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite expanded with short-form footnote format and Scenario Builder citation guidance (v175). XLSX Citation metadata updated to v183. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite expanded with short-form footnote format and Scenario Builder citation guidance (v175). XLSX Citation metadata updated to v184. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS script blocks OK / 136 PASS / 0 FAIL / 0 JS errors. Cycle 135 grade changes: Professional Credibility A+ maintained — 90 FAQs (A90 project scale adjustment). Naming Consistency A+ maintained — v183 version bump complete. Data Reliability B+ maintained — IRR structural gap (74/185) binding constraint unchanged.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS script blocks OK / 136 PASS / 0 FAIL / 0 JS errors. Cycle 136 grade changes: Professional Credibility A+ maintained — 91 FAQs (A91 portfolio blended take: production-weighted average, 3-step workflow, IC disclosure conventions). Naming Consistency A+ maintained — v184 version bump complete. Data Reliability B+ maintained — IRR structural gap (74/185) binding constraint unchanged.**
+
+---
+## Cycle 136 Log — 2026-08-12
+- Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (Cycle 135 push state)
+- Test after: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- JS errors: 0
+- Downgrade hunt: Performance & Reliability A — binding gap confirmed: single-file architectural constraint (all JS/CSS inline in index.html). No quick wins available. Grade maintained A.
+- Fixes: A91 FAQ added (portfolio blended take — production-weighted average take, 3-step workflow, 3-metric IC block, disclosure conventions); FAQ count 90→91; v183→v184 across all locations.
 
 ---
 ## Cycle 135 Log — 2026-08-12
