@@ -663,3 +663,23 @@ GRADER.md commit confirmed. Cycle 137 fully closed â€” v186 live, grades up
 
 Everything is live. No action needed.
 
+
+---
+## Cycle 143 Log — 2026-08-13 05:05
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos live. Here's the cycle summary:
+
+---
+
+**Cycle 143 â€” v192 shipped**
+
+**Test before:** 136 PASS / 0 FAIL / 0 WARN / 0 JS errors  
+**Test after:** 4/4 JS syntax gate PASS / 0 JS errors â€” pushed clean
+
+**What shipped:**
+
+1. **FAQ A99 â€” Carbon pricing / emissions levies IC workflow** *(Professional Credibility)*  
+   Covers the four active carbon pricing mechanisms for upstream E&P that ORCA doesn't model in statutory take:
+   - Norway COâ‚‚ tax (~$195/tonne, 2026) â†’ net 2â€“4pp in
