@@ -1076,3 +1076,19 @@ GRADER.md commit/push also complete. Both commits landed â€” v177 fully dep
 - JS errors: 0
 - Summary: Same race condition as before â€” the push hook ran Playwright, passed (136/0/0), then tried to push but the remote ref had already advanced. The GRADER.md is confirmed live at `1ff5bd1` on origin/main. No action needed.
 
+
+---
+## Cycle 134 Log — 2026-08-12 22:35
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 135 complete. v183 live.**
+
+---
+
+**What shipped:**
+
+1. **FAQ A90** â€” "My project is 25k bbl/d / $600M capex â€” half the reference. How do I calibrate ORCA's take figure?" Covers:
+   - 4 mechanics where scale is material: sliding-scale royalties (3â€“8pp lower for small fields), PSC cost recovery timing, volumetric levies, R-factor threshold acceleration
+   - 3 mechanics with near-zero scale effect: flat royalty concessions, revenue share contracts, CIT-only regimes
+   - 4-step Scenari
