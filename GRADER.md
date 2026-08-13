@@ -692,3 +692,19 @@ Everything is live. No action needed.
 1. **FAQ A99 â€” Carbon pricing / emissions levies IC workflow** *(Professional Credibility)*  
    Covers the four active carbon pricing mechanisms for upstream E&P that ORCA doesn't model in statutory take:
    - Norway COâ‚‚ tax (~$195/tonne, 2026) â†’ net 2â€“4pp in
+
+---
+## Cycle 144 Log — 2026-08-13 05:38
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 144 complete â€” v193 shipped.**
+
+---
+
+**What shipped:**
+
+1. **FAQ A100 â€” MILESTONE (100th Key Analyst FAQ): First Tranche Petroleum (FTP) in PSCs**
+   - FTP mechanics in 4 major jurisdictions: Indonesia pre-2017 (20%), Nigeria NNPC deepwater (10â€“20%), Angola Sonangol (10â€“15%), Malaysia Petronas (5â€“10%)
+   - No-FTP jurisdictions identified for comparison (Guyana, UK, Norway, Gross Split Indonesia)
+   - FTP contractor IRR delta vs. no-FTP peers: 10% FTP = 1â€“3pp; 20% FTP = 3â€“6p
