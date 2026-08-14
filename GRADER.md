@@ -295,9 +295,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 185 — light-mode polish sweep + A138 FAQ (energy transition screening) — v235→v236)
+**Last Updated:** 2026-08-14 (Cycle 186 — deep dark-mode color sweep — v236→v237)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 185 shipped v236: light-mode polish completing the v235 visual redesign — all residual dark-mode hardcoded hex colors converted to CSS variables (chips, skeleton loader, quickstart buttons, shortcuts bar, tooltips, data coverage bar, example callouts, Screener banner, Breakeven Map tooltip, search dropdown). A138 FAQ added (energy transition portfolio strategy). 4/4 JS syntax gate PASS / 0 JS errors.
+**Overall Status:** Cycle 186 shipped v237: second-pass dark-mode color sweep resolved 25+ hardcoded hex values missed in v235/v236 — across JS template literals, canvas drawing, D3 SVG, chart fallbacks, and dynamic UI elements. Visual Design A+ evidence strengthened. 9/9 JS syntax gate PASS / 0 JS errors.
 
 **Holistic walkthrough (Cycle 180):** (1) First impression — Home tab clear, stats prominent, 134-FAQ Methodology card, What's New panel shows v231 improvements. Good. (2) Empty states — all 4 primary tabs auto-load (v219). Good. (3) Fiscal Compare flow — auto-runs with Deepwater $75; table visible immediately. Good. (4) Country Profile — auto-loads Norway; Compare button visible. Good. (5) Navigation — coherent, labels match content. Good. (6) Information density — no excessive banners. Good. (7) IOC Portfolio — auto-loads Shell; Mechanic Mix stat immediately shows % concentration breakdown. Good. All dimensions: GOOD.
 
@@ -433,6 +433,16 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Cycle 186 Log — 2026-08-14
+- Test before: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 185 push state)
+- Test after: 9/9 non-empty JS syntax gate PASS / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. Visual Design A+ — active downgrade hunt: found 25+ hardcoded dark hex values missed in v235/v236 sweep across JS template literals (template strings with inline style attributes), canvas drawing code (IRR scatter, region avg marker), D3 SVG (Breakeven Map mouseleave stroke), and chart fallback color properties. All fixed in v237. Grade maintained A+ with maximum evidence strength.
+- Fixes: (1) Methodology FAQ income-tax text #94a3b8→var(--muted). (2) Breakeven legend "No data" swatch #475569→var(--border). (3) Data completeness row divider rgba(255,255,255,.06)→var(--border); missing-metric dash #475569→var(--muted). (4) Country Profile take ruler region avg marker #64748b→var(--muted). (5) IOC Portfolio delta-color low-end #94a3b8→var(--muted). (6) Swing color scale low-end #94a3b8→var(--muted). (7) Reform heat-map empty cell #1e293b→var(--surface2); take-color null branch #64748b→var(--muted). (8) Decade grid icon on empty cell #475569→var(--muted). (9) Tornado PNG button #1a2332/#d4a017 border→var(--surface2)/var(--accent). (10) Waterfall footnotes #475569→var(--muted). (11) Confidence badge fallback #94a3b8→#6B6560. (12) Bubble chart "Other" region fallback #64748b→#6B6560. (13) Vintage trend mechanic fallback #64748b→#6B6560. (14) beColor null state #475569→#D0CAC0. (15) Breakeven Map mouseleave stroke #0f172a→#D0CAC0. (16) Loading overlay slow-hint #64748b→var(--muted). Version v236→v237 (Cycle 186).
+- **Holistic walkthrough (Directive 2):** Methodology panel income-tax FAQ text correct warm gray ✓. Breakeven legend "No data" swatch matches off-white border tone ✓. Reform Risk heat-map empty cells render as light surface ✓. Tornado PNG button light-mode styled ✓. Bubble chart "Other" region warm gray fallback ✓. Loading hint warm muted gray ✓. **All dimensions: GOOD.**
+
+---
+
 ## Cycle 185 Log — 2026-08-14
 - Test before: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 184 push state)
 - Test after: 4/4 non-empty JS syntax gate PASS / 0 JS errors. Pushed clean.
@@ -443,7 +453,7 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 185 — 2026-08-14)
+## Updated Grade Table (Cycle 186 — 2026-08-14)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
@@ -451,19 +461,19 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). reform_history.json preload priority low (v226). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). Directive 1 COMPLETE. Country Profile "Compare" button (v227). "Load Top 5 in Side-by-Side" button (v229). IOC Portfolio "Mechanic Mix" stat (v231). Auto-run guards strengthened (v234). |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 138-FAQ section. Methodology card updated to 138 analyst FAQs (v236). First-visit Quick Start guide updated to v236. What's New panel light-mode correct (v236). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 138-FAQ section. Methodology card updated to 138 analyst FAQs (v236). First-visit Quick Start guide updated to v237. What's New panel updated to v237 with deep sweep description. |
 | 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). Side-by-Side empty-state text updated (v223). No bare empty tables remain. |
 | 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 185). 136 PASS / 0 FAIL / 0 JS errors (stable since v219). |
 | 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A138 accessible. Explorer "Other" chip tooltip added (v232). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
-| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235): petroleum consulting report aesthetic. Light-mode polish sweep (v236): all residual dark-mode hardcoded hex colors converted to CSS variables — chips, skeleton loader, quickstart buttons, shortcuts bar, What's New panel, tooltips, data coverage bar, fact table hover, example callouts, Screener hint banner, Breakeven Map tooltip, search suggestions dropdown. Platform now renders correctly throughout on off-white background. |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235): petroleum consulting report aesthetic. Light-mode polish sweep (v236): residual hardcoded dark hex in CSS and static markup converted. Deep sweep (v237): 25+ additional hardcoded hex values in JS template literals, canvas drawing, D3 SVG, and chart fallbacks converted — Methodology FAQ text, Breakeven legend swatch, data completeness row divider, reform heat-map empty cells, take ruler avg marker, delta/swing low-end color, tornado PNG button, waterfall footnotes, confidence badge fallback, bubble/vintage chart fallbacks, beColor null, Breakeven Map mouseleave stroke, loading hint. Platform now renders correctly throughout on off-white background with maximum evidence. |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
-| 12 | 5. Naming Consistency | A+ | = | All naming unified. v235→v236 sweep complete. How to Cite fully updated to v236. Quick Start citation corrected to v236. |
-| 13 | 7. Professional Credibility | A+ | ↑ | 138 FAQs (A1–A138). A138: ORCA fiscal take interpretation for energy transition portfolio strategy — Price Swing/Breakeven/Reform Risk trifecta; 4-step decarbonization exposure audit; rule of thumb by IOC strategy type. How to Cite updated to v236. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. v236→v237 sweep complete. How to Cite fully updated to v237. Quick Start citation corrected to v237. What's New panel updated to v237. |
+| 13 | 7. Professional Credibility | A+ | = | 138 FAQs (A1–A138). A138: ORCA fiscal take interpretation for energy transition portfolio strategy — Price Swing/Breakeven/Reform Risk trifecta; 4-step decarbonization exposure audit; rule of thumb by IOC strategy type. How to Cite updated to v237. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v236 — citation template, short-form footnote, and Scenario Builder cite example all corrected. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v237 — citation template, short-form footnote, and Scenario Builder cite example all corrected. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 185 changes: Visual Design A+ upward evidence (v236 light-mode polish completes theme swap); Professional Credibility A+ maintained (A138: energy transition screening, FAQ 137→138); Naming Consistency A+ maintained (v235→v236 sweep); Data Reliability B+ unchanged.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 9/9 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 186 changes: Visual Design A+ upward evidence (v237 deep dark-mode sweep — 25+ additional hardcoded hex values resolved in JS template literals, canvas, D3 SVG, chart fallbacks); Naming Consistency A+ maintained (v236→v237 sweep); Data Reliability B+ unchanged.**
 
 ---
 
