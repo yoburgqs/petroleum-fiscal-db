@@ -455,7 +455,17 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v244. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 194: complete off-palette color sweep — 171 replacements across 40+ rendering sites, 0 active off-palette hex remaining. Visual Design maintained A+ with strongest evidence yet.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 195: 10 UX and data currency improvements — v246 version sweep, dates to 2026-08-14, data currency signal in home hero, A/B confidence tooltip, IOC Portfolio title clarification, Sample Analyses 11px headers. Cycle 194: complete off-palette color sweep — 171 replacements across 40+ rendering sites, 0 active off-palette hex remaining.**
+
+---
+
+## Cycle 195 Log — 2026-08-14
+- Test before: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (Cycle 194 push state)
+- Test after: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) unchanged, binding constraint. Grade maintained B+. All other categories A+ — no regressions from UX-only changes. Version naming, dates, and prose improvements do not affect structural scoring.
+- Fixes: (1) v245→v246 version sweep — 8 structural locations: page title, meta description, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation, How to Cite short-form. (2) Footer dates updated: DB date 2026-08-13→2026-08-14, Platform updated 2026-08-13→2026-08-14, Nightly audit last run 2026-08-13→2026-08-14. (3) Methodology data currency FAQ: DB date 2026-08-13→2026-08-14. (4) Home hero subtitle: added "Current to Q3 2026." for data currency signal on first impression. (5) Home 92.8% A/B confidence stat: added title tooltip explaining A-tier (primary legislation/PSA text/government gazette) and B-tier (operator annual reports/10-K filings) with remaining 7.2% C/D-tier context — first-time visitors understand the credibility signal without reading Methodology. (6) IOC Portfolio page title: "IOC Portfolio View" → "IOC Portfolio — Fiscal Exposure" — clearer for first-time users and matches the actual content (exposure analysis, not just portfolio listing); page-sub updated to explicitly name output dimensions. (7) Sample Analyses section headers: 10px → 11px across all 7 regional section labels (Global, Asia Pacific, LatAm, Middle East, East Africa, North Sea, Strategic) — 10px was below platform minimum readable text size. (8) What's New panel: heading updated to v246, v246 entry prepended describing all 10 improvements. (9) Changelog: v246/Cycle 195 entry prepended with full improvement list. (10) CYCLE_STATE.json and cycle_log.txt updated for Cycle 195.
+- **Holistic walkthrough (Cycle 195):** Home tab — "Current to Q3 2026." visible in hero subtitle ✓. 92.8% stat shows tooltip on hover describing A/B tier definition ✓. v246 badge in header ✓. What's New shows v246 as first entry (green border) ✓. Fiscal Compare — auto-loads, no regressions ✓. IOC Portfolio — page title reads "IOC Portfolio — Fiscal Exposure" ✓. Sample Analyses — section headers readable at 11px ✓. Footer — DB date 2026-08-14 ✓. Methodology — v246 in provenance, DB date 2026-08-14 in data currency FAQ ✓. **All dimensions: GOOD.**
 
 ---
 
