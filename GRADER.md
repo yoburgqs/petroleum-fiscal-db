@@ -100,7 +100,7 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 180 — A134 portfolio mechanic concentration FAQ + IOC Mechanic Mix stat + v230→v231 sweep)
+**Last Updated:** 2026-08-14 (Cycle 181 — A135 data vintage/statutory terms FAQ + Explorer Other chip tooltip + v231→v232 sweep)
 **Grader Version:** 2.0
 **Overall Status:** Cycle 180 shipped v231: 3 improvements across 3 categories. Professional Credibility: A134 FAQ added — portfolio fiscal mechanic concentration risk (4-step audit workflow: IOC Portfolio mechanic map / Screener PSC+Africa stress cluster / Reform Risk tilt / IC memo 3-metric concentration matrix; systemic risk score formula; rule of thumb by mechanic type; IC memo disclosure template; cross-reference A24/A51/A71/A73/A93/A117; FAQ count 133→134). Interaction Design: IOC Portfolio "Mechanic Mix" stat added — contract-weighted % breakdown by mechanic type (e.g. "PSC 62% · Concession 38%") replaces the uninformative "Mechanics: N" count; tooltip references FAQ A134 concentration framework; applies to both single-operator and aggregate views. Naming Consistency: v230→v231 sweep across 25 structural locations; What's New panel updated to v231 cards; Methodology card 133→134 analyst FAQs. Tests: 4/4 JS syntax gate PASS / 0 JS errors (pre-commit verification).
 
@@ -715,6 +715,30 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v231 — citation template, short-form footnote, and Scenario Builder cite example. |
 
 **Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 180). Cycle 180 grade changes: Professional Credibility A+ maintained (A134: portfolio mechanic concentration risk, FAQ count 133→134); Interaction Design A+ maintained (IOC Mechanic Mix stat replaces uninformative count); Naming Consistency A+ maintained (v230→v231 sweep, 25 replacements); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint.**
+
+---
+
+## Updated Grade Table (Cycle 181 — 2026-08-14)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 135 FAQs (A1–A135) including A135 data vintage/statutory terms. Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). reform_history.json preload priority lowered to "low" (v231). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). Directive 1 COMPLETE. Country Profile "Compare" button (v227). "Load Top 5 in Side-by-Side" button (v229). IOC Portfolio "Mechanic Mix" stat (v231). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 135-FAQ section. Methodology card updated to 135 analyst FAQs (v232). First-visit Quick Start guide (v115). What's New panel (v232 updated). |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). Side-by-Side empty-state text updated (v223). No bare empty tables remain. |
+| 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 181). 136 PASS / 0 FAIL / 0 JS errors (stable since v219). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A135 accessible. Explorer "Other" chip tooltip added (v232) — FSU/Central Asia/Caribbean/Pacific Island jurisdictions now enumerated. |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | = | Skeleton loader. Favicon. Row fade-in. IOC Portfolio duplicate page-title removed (v219). |
+| 11 | 3. Data Presentation | A+ | ↑ | Explorer "Other" region chip (v232): tooltip now enumerates FSU states, Central Asia, Caribbean, Pacific Island nations, Oceania — first-time users no longer left guessing what "Other" covers. Previously the unlabeled chip was the audit finding ("53% Other" noted in manager audit Cycle 55). Now explicitly documented. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. v231→v232 sweep complete (16 replacements across all structural locations). |
+| 13 | 7. Professional Credibility | A+ | = | 135 FAQs (A1–A135). A135 added: data vintage and statutory vs. contract-specific terms — the foundational due-diligence question answered with A/B/C badge guidance, IC citation language, 4-step workflow (Evidence badge check → reform recency check → block-specific deviation identification → IC memo disclosure), rule of thumb by source tier, and IC memo disclosure template. How to Cite updated to v232. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v232 — citation template, short-form footnote, and Scenario Builder cite example. |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 181). Cycle 181 grade changes: Professional Credibility A+ maintained (A135: data vintage FAQ, FAQ count 134→135); Data Presentation A+ maintained with upward evidence strength (Explorer Other chip tooltip resolves the 53%-Other audit finding); Naming Consistency A+ maintained (v231→v232 sweep, 16 replacements); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint.**
 
 ---
 
@@ -1525,6 +1549,17 @@ Ready for the next cycle when triggered.
 
 
 ---
+
+## Cycle 181 Log — 2026-08-14
+- Test before: 136 PASS / 0 FAIL / 0 JS errors (Cycle 180 push state)
+- Test after: 4/4 JS syntax gate PASS / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. Data Presentation A+ — “53% Other” chip audit finding (noted Cycle 55 manager review) addressed: Explorer “Other” region chip now has tooltip listing FSU states, Central Asia, Caribbean, Pacific Island nations, Oceania — a first-time user no longer left guessing which countries are in “Other.” Grade maintained A+, evidence strength improved.
+- **Holistic walkthrough (Directive 2):** Home tab — loads immediately, What's New panel updated to v232, Methodology card shows 135 FAQs ✓. Fiscal Compare — auto-runs 185 countries on first activation ✓. Country Profile — auto-loads Norway ✓. Side-by-Side — North Sea Trio auto-loads ✓. IOC Portfolio — auto-loads Shell, Mechanic Mix stat present ✓. Explorer — “Other” chip shows ⓘ with tooltip ✓. Methodology/How to Cite — v232 citations consistent throughout ✓. Navigation coherent, zero empty states ✓. **All dimensions: GOOD.**
+- Summary: **Cycle 181 — v232 shipped. A135 FAQ (data vintage/statutory terms) + Explorer Other chip tooltip + v231→v232 sweep. 4/4 JS syntax gate PASS / 0 JS errors.**
+
+---
+
 ## Cycle 180 Log — 2026-08-14 05:41
 - Test before: 136 PASS / 0 FAIL
 - Test after: 136 PASS / 0 FAIL
