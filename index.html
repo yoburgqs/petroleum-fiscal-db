@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" crossorigin>
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v237.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v238.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -32,7 +32,7 @@
 <meta name="color-scheme" content="light">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v237</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v238</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" integrity="sha384-oNtu+d18330MVFpltUTve1DatxCkkctlpA2AC3GulbVFOSqhHdDat3qHse/Lbuek" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
@@ -438,8 +438,8 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
   padding-top: 8px;
   border-top: 1px solid var(--border);
 }
-.dcf-vs-db .delta-pos { color: #4caf50; }
-.dcf-vs-db .delta-neg { color: #f44336; }
+.dcf-vs-db .delta-pos { color: var(--green); }
+.dcf-vs-db .delta-neg { color: var(--red); }
 
 /* === v31: Tornado Chart + Cashflow Table === */
 .tornado-panel {
@@ -512,8 +512,8 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 }
 .cf-table td:first-child { text-align: left; color: var(--muted); }
 .cf-table tr:hover td { background: var(--surface); }
-.cf-positive { color: #4caf50 !important; }
-.cf-negative { color: #f44336 !important; }
+.cf-positive { color: var(--green) !important; }
+.cf-negative { color: var(--red) !important; }
 
 /* === v32: Custom Scenario Builder === */
 .scenario-builder-grid {
@@ -719,8 +719,8 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 /* v38: tier badges with symbol */
 .tier { display: inline-flex; align-items: center; gap: 3px; }
 
-/* v38: zebra rows */
-tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
+/* v38: zebra rows — light mode warm stripe */
+tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
 /* v38: mono numbers in tables */
 .num { font-family: 'IBM Plex Mono', monospace; }
@@ -1241,7 +1241,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v237</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v238</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1319,7 +1319,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;">
       <div style="font-size:18px;font-weight:900;color:var(--purple);margin-bottom:4px;">3</div>
       <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Export for IC Memo</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Click <strong>&#8659; Excel</strong> in Fiscal Compare results to export the full ranked table. Cite as: ORCA Petroleum Fiscal Intelligence Platform (2026), v237 — yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Click <strong>&#8659; Excel</strong> in Fiscal Compare results to export the full ranked table. Cite as: ORCA Petroleum Fiscal Intelligence Platform (2026), v238 — yoburgqs.github.io/petroleum-fiscal-db/</div>
     </div>
   </div>
   <div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:right;">This guide appears once per session &middot; <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Esc</kbd> to dismiss</div>
@@ -1465,7 +1465,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <!-- v232: What's New panel — compact recent-update summary for first-time visitors and returning colleagues -->
   <details style="margin-top:8px;margin-bottom:4px;">
     <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Expand to see the 3 most recent platform improvements">
-      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v237
+      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v238
       <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">Aug 2026</span>
     </summary>
     <div style="padding:10px 12px 6px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface2);">
@@ -1475,7 +1475,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
           <div style="font-size:11px;color:var(--muted);line-height:1.55;">Remaining dark-mode color contamination fixed: example callouts, chip filters, skeleton loader, quickstart buttons, shortcuts bar, and What&rsquo;s New panel now all use CSS variables. Home tab reads correctly on the off-white background.</div>
         </div>
         <div style="padding:8px 10px;background:rgba(21,128,61,.05);border:1px solid rgba(21,128,61,.2);border-radius:5px;">
-          <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:3px;">Deep Color Sweep (v237)</div>
+          <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:3px;">Deep Color Sweep (v238)</div>
           <div style="font-size:11px;color:var(--muted);line-height:1.55;">Second-pass sweep resolved 25+ additional hardcoded dark hex values across JS template literals, canvas drawers, D3 SVG, chart fallbacks, and dynamic UI: methodology callout, breakeven legend, data completeness row divider, reform heat-map cells, swing color scale, tornado PNG button, waterfall footnotes, confidence badge fallback, bubble/vintage chart fallbacks, loading overlay hint, and regional avg marker.</div>
         </div>
         <div style="padding:8px 10px;background:rgba(124,58,237,.05);border:1px solid rgba(124,58,237,.2);border-radius:5px;">
@@ -1675,11 +1675,11 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div style="color:var(--muted);font-size:11px;margin-top:8px;line-height:1.6;">
     <strong>Coverage</strong>: <span title="IRR available for 74 of 185 countries where complete cost data (capex + opex) is independently verifiable from primary sources — operator filings, national oil company disclosures, and S&amp;P/Rystad/Wood Mac cost databases. Coverage expands as the Harvesting fork adds cost sourcing. Countries without IRR data show — in this column and are sorted by take in the IRR sort view." style="cursor:help;">IRR: 74/185 countries</span> &nbsp;|&nbsp; <span title="Breakeven available for 68 of 185 countries. Requires complete royalty and cost data." style="cursor:help;">Breakeven: 68/185 countries</span> &nbsp;|&nbsp; Govt Take + NPV: 185/185 &nbsp;&mdash;&nbsp;
     <strong>Confidence</strong>: <span title="Source confidence: A = Primary official source (legislation/decree), B = Verified secondary source (operator filing/annual report), C = Estimated or modeled" style="cursor:help;">A/B/C badges — hover any badge for source detail</span><br>
-    <strong>Breakeven</strong>: <span style="color:#4caf50">&#9632;</span> &lt;$50 &nbsp; <span style="color:#f5a623">&#9632;</span> $50–75 &nbsp; <span style="color:#e53935">&#9632;</span> &gt;$75 &nbsp;|&nbsp;
+    <strong>Breakeven</strong>: <span style="color:var(--green)">&#9632;</span> &lt;$50 &nbsp; <span style="color:var(--yellow)">&#9632;</span> $50–75 &nbsp; <span style="color:var(--red)">&#9632;</span> &gt;$75 &nbsp;|&nbsp;
     <strong>Swing</strong> = take@$125 − take@$50. &nbsp;
-    <span style="color:#4caf50">&#9632;</span> &lt;10pp low &nbsp;
-    <span style="color:#f5a623">&#9632;</span> 10–20pp moderate &nbsp;
-    <span style="color:#e53935">&#9632;</span> &gt;20pp high &nbsp;|&nbsp;
+    <span style="color:var(--green)">&#9632;</span> &lt;10pp low &nbsp;
+    <span style="color:var(--yellow)">&#9632;</span> 10–20pp moderate &nbsp;
+    <span style="color:var(--red)">&#9632;</span> &gt;20pp high &nbsp;|&nbsp;
     <strong>Stability</strong> = 5-dot score: 5 = zero reform events since 2010 (most stable) → 0 = 5+ reform events (most volatile). Sourced from ORCA reform history database.
   </div>
 
@@ -2112,7 +2112,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:#555;">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v237 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v238 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2175,7 +2175,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v237 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v238 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2183,7 +2183,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
-            <strong>v237 (Aug 2026)</strong> &mdash; 1 targeted improvement across 1 category (Cycle 186): (1) <strong>Visual Design / Light-Mode Deep Sweep</strong> &mdash; Second-pass dark-mode color sweep resolved 25+ additional hardcoded dark hex values missed in v235/v236 that appeared across JS template literals, canvas drawing code, D3 SVG, and dynamic UI: Methodology income-tax FAQ text (#94a3b8 &rarr; var(--muted)); Breakeven legend &ldquo;No data&rdquo; swatch (#475569 &rarr; var(--border)); data completeness row divider (rgba(255,255,255,.06) &rarr; var(--border)) and missing-metric dash (#475569 &rarr; var(--muted)); region avg marker in Country Profile take ruler (#64748b &rarr; var(--muted)); IOC Portfolio delta-color scale low-end (#94a3b8 &rarr; var(--muted)); swing color scale low-end (#94a3b8 &rarr; var(--muted)); reform heat-map empty cell (#1e293b &rarr; var(--surface2)) and take-color null branch (#64748b &rarr; var(--muted)); country decade-grid icon on empty cell (#475569 &rarr; var(--muted)); tornado PNG download button (#1a2332/#d4a017 border &rarr; var(--surface2)/var(--accent)); waterfall &ldquo;no component data&rdquo; footnote and rate footnote (#475569 &rarr; var(--muted)); confidence badge fallback (#94a3b8 &rarr; #6B6560); bubble chart region &ldquo;Other&rdquo; fallback (#64748b &rarr; #6B6560); vintage trend mechanic fallback (#64748b &rarr; #6B6560); beColor null state (#475569 &rarr; #D0CAC0 border tone); Breakeven Map mouseleave stroke (#0f172a &rarr; #D0CAC0); loading overlay slow-hint color (#64748b &rarr; var(--muted)). All remaining semantic color exceptions preserved: reform direction neutral (#94a3b8), amber-button dark text (#0f172a for contrast), chart dataset palette. v236&rarr;v237 sweep across all structural locations. Version v236&rarr;v237 (Cycle 186).<br><br>
+            <strong>v238 (Aug 2026)</strong> &mdash; 1 targeted improvement across 1 category (Cycle 186): (1) <strong>Visual Design / Light-Mode Deep Sweep</strong> &mdash; Second-pass dark-mode color sweep resolved 25+ additional hardcoded dark hex values missed in v235/v236 that appeared across JS template literals, canvas drawing code, D3 SVG, and dynamic UI: Methodology income-tax FAQ text (#94a3b8 &rarr; var(--muted)); Breakeven legend &ldquo;No data&rdquo; swatch (#475569 &rarr; var(--border)); data completeness row divider (rgba(255,255,255,.06) &rarr; var(--border)) and missing-metric dash (#475569 &rarr; var(--muted)); region avg marker in Country Profile take ruler (#64748b &rarr; var(--muted)); IOC Portfolio delta-color scale low-end (#94a3b8 &rarr; var(--muted)); swing color scale low-end (#94a3b8 &rarr; var(--muted)); reform heat-map empty cell (#1e293b &rarr; var(--surface2)) and take-color null branch (#64748b &rarr; var(--muted)); country decade-grid icon on empty cell (#475569 &rarr; var(--muted)); tornado PNG download button (#1a2332/#d4a017 border &rarr; var(--surface2)/var(--accent)); waterfall &ldquo;no component data&rdquo; footnote and rate footnote (#475569 &rarr; var(--muted)); confidence badge fallback (#94a3b8 &rarr; #6B6560); bubble chart region &ldquo;Other&rdquo; fallback (#64748b &rarr; #6B6560); vintage trend mechanic fallback (#64748b &rarr; #6B6560); beColor null state (#475569 &rarr; #D0CAC0 border tone); Breakeven Map mouseleave stroke (#0f172a &rarr; #D0CAC0); loading overlay slow-hint color (#64748b &rarr; var(--muted)). All remaining semantic color exceptions preserved: reform direction neutral (#94a3b8), amber-button dark text (#0f172a for contrast), chart dataset palette. v236&rarr;v238 sweep across all structural locations. Version v236&rarr;v238 (Cycle 186).<br><br>
             <strong>v236 (Aug 2026)</strong> &mdash; 2 targeted improvements across 2 categories (Cycle 185): (1) <strong>Visual Design / Light-Mode Polish</strong> &mdash; Remaining dark-mode color contamination resolved: chip filter CSS updated from hardcoded #334155/#94a3b8 to var(--border)/var(--muted)/var(--surface2); facts-table hover updated from rgba(255,255,255,0.03) to rgba(176,104,0,0.04); skeleton loader shimmer and row divider updated to CSS variables; Fiscal Compare and Side-by-Side quickstart buttons converted from hardcoded dark hex (#475569/#334155/#94a3b8/#64748b) to var(--border)/var(--muted)/var(--surface2); Screener hint banner converted (#f0c060/#d4a017 &rarr; var(--text)/var(--accent)); shortcuts and What&rsquo;s New panels converted from rgba(255,255,255,.02/.06/.01) to var(--surface2)/var(--border); IRR scatter tooltip and data coverage bar converted; Breakeven Map tooltip and search suggestions dropdown converted; country Profile examples (7 instances of color:#f0c060) converted to var(--accent-dim); How to Cite section panel background converted from dark rgba to var(--surface2); Methodology provenance inline span color converted to var(--muted). (2) <strong>Professional Credibility</strong> &mdash; A138 FAQ added: ORCA fiscal take interpretation for energy transition portfolio strategy &mdash; how Price Swing/Breakeven/Reform Risk combine as a transition-screening trifecta; fiscal amplification at $50/bbl demand-shock vs. cost-efficient regime; 4-step decarbonization exposure audit using Fiscal Compare Custom $50 + Swing filter + Stability Score overlay + IC portfolio table; rule of thumb by IOC transition strategy type (net-zero committed vs. production-volume vs. NOC trajectory); Breakeven threshold &lt;$45 for net-zero screen vs. &lt;$55 for volume IOC; fiscal reform acceleration risk in commodity-dependent states at low price; cross-reference A56/A73/A99/A117/A127/A134; sources: IEA WEO 2024, Wood Mackenzie Energy Transition Outlook 2024. FAQ count 137&rarr;138. v235&rarr;v236 sweep across all structural locations. Version v235&rarr;v236 (Cycle 185).<br><br>
             <strong>v235 (Aug 2026)</strong> &mdash; Complete visual redesign (Cycle 184): dark navy/amber AI-product theme replaced with off-white petroleum consulting report aesthetic. :root palette replaced — bg #F7F5F0 (warm off-white), surface #FFFFFF, border #D0CAC0, text #1C1A17, muted #6B6560, accent #B06800 (darker amber for white bg). Georgia serif for body/page-titles; system-ui for tables/controls/badges. Body font 14px&rarr;13px, --radius 6px&rarr;4px. Header: white bg + 2px amber bottom rule. Tab buttons: condensed 10px 14px. Cards: 12px 14px padding + 0 1px 3px shadow. Tab panes: 16px 20px. Table headers: warm #EDE9E3 bg, 10px uppercase, 7px 10px padding. Table rows: subtle even-row stripe + amber hover tint. All hardcoded dark hex colors replaced with CSS variables. Chart.js axis/grid colors updated. Buttons, toast/banner bgs, favicon, theme-color, color-scheme all updated. v234&rarr;v235 sweep. Version v234&rarr;v235 (Cycle 184).<br><br>
             <strong>v234 (Aug 2026)</strong> &mdash; 4 targeted improvements across 4 categories (Cycle 182): (1) <strong>Professional Credibility</strong> &mdash; A137 FAQ added: WACC and discount rate selection for upstream petroleum IC models &mdash; when ORCA&rsquo;s 10% standardized discount rate applies and how to adjust for a project-specific WACC; Tier 1 IOC WACC benchmark 8&ndash;10% nominal vs. independent E&amp;P 12&ndash;15%; country risk premium overlay by Stability Score tier (+1&ndash;2pp for volatile regimes); how IRR is discount-rate-independent and how to evaluate project IRR vs. WACC without recalculating NPV; directional NPV scaling rule (~4&ndash;8% per 1pp discount rate change for a 15-year project, duration-dependent); 4-step IC workflow (establish firm WACC / compare ORCA IRR to WACC / apply country risk overlay / IC memo language); rule of thumb by project type (deepwater most sensitive to discount rate due to long payback; onshore marginal least sensitive; LNG most sensitive at 20&ndash;25 year project life); cross-reference A41/A63/A117/A133. FAQ count 136&rarr;137. (2) <strong>Reliability / Auto-run Guards</strong> &mdash; IOC Portfolio auto-run now checks <code>IOC_DATA</code> is populated before calling <code>loadIOC(&lsquo;Shell&rsquo;)</code> &mdash; prevents silent failure on slow loads where the tab is switched before platform data arrives (previously the guard checked only DOM elements, not data readiness). Country Profile auto-run now checks both <code>COUNTRY_DATA</code> availability and <code>dd-profile-content</code> emptiness before calling <code>loadCountryProfile(&lsquo;Norway&rsquo;)</code> &mdash; aligns with directive spec and prevents double-fire if the user has already loaded a country before the guard fires. (3) <strong>Naming Consistency</strong> &mdash; Home page IOC Portfolio card description corrected: &ldquo;Fiscal Exposure Analyzer shows take-tier distribution&rdquo; updated to &ldquo;Take Distribution &amp; Peer Comparison shows take-tier distribution&rdquo; &mdash; stale reference to the section heading that was renamed in v219; v233&rarr;v234 sweep across all structural locations (header badge, page title, meta description, print header, Methodology provenance, How to Cite citation and short-form footnote); Methodology card on Home tab updated from &ldquo;136 analyst FAQs&rdquo; to &ldquo;137 analyst FAQs&rdquo;. Version v233&rarr;v234 (Cycle 182).<br><br>
@@ -6494,7 +6494,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li><strong>NOC/resource-nationalist priority:</strong> Fiscal metrics secondary to political mandate. Transition fiscal risk may actually increase government share as revenues fall — budget pressure triggers upstream tax reform faster in commodity-dependent states (Nigeria, Angola, Iraq, Algeria).</li>
         </ul>
 
-        <p><strong style="color:var(--text);">Source:</strong> ORCA v237 (Aug&nbsp;2026). Cross-reference: FAQ A56 ($50/bbl energy-transition demand-shock stress test); FAQ A73 (stabilization clause vs. Reform Risk Stability Score); FAQ A99 (carbon pricing overlay); FAQ A117 (portfolio asset review triage); FAQ A127 (Breakeven Map vs. Fiscal Compare differentiation); FAQ A134 (portfolio fiscal mechanic concentration risk). Industry context: IEA World Energy Outlook 2024 (demand scenarios); Wood Mackenzie Energy Transition Outlook (2024); IRENA Renewable Power Generation Costs (2024).</p>
+        <p><strong style="color:var(--text);">Source:</strong> ORCA v238 (Aug&nbsp;2026). Cross-reference: FAQ A56 ($50/bbl energy-transition demand-shock stress test); FAQ A73 (stabilization clause vs. Reform Risk Stability Score); FAQ A99 (carbon pricing overlay); FAQ A117 (portfolio asset review triage); FAQ A127 (Breakeven Map vs. Fiscal Compare differentiation); FAQ A134 (portfolio fiscal mechanic concentration risk). Industry context: IEA World Energy Outlook 2024 (demand scenarios); Wood Mackenzie Energy Transition Outlook (2024); IRENA Renewable Power Generation Costs (2024).</p>
       </div>
     </details>
 
@@ -6504,13 +6504,13 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v237, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v237." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v238, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v238." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
         <strong style="color:var(--text);">Short-form citation for footnotes:</strong><br>
-        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v237 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
-        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v237, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
-        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v237."
+        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v238 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
+        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v238, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
+        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v238."
       </div>
     </div>
   </div>
@@ -7455,14 +7455,14 @@ function renderExplorer() {
       <td class="num">${fmtIrr(irr)}</td>
       <td class="num" style="${(function(){
         if (!d.be_75 || d.be_75 <= 1 || d.be_75 >= 999) return ''; // <=1 is state-monopoly sentinel
-        if (d.be_75 < 50) return 'border-left:3px solid #4caf50;padding-left:5px;';
-        if (d.be_75 <= 75) return 'border-left:3px solid #f5a623;padding-left:5px;';
-        return 'border-left:3px solid #e53935;padding-left:5px;';
+        if (d.be_75 < 50) return 'border-left:3px solid #15803D;padding-left:5px;';
+        if (d.be_75 <= 75) return 'border-left:3px solid #A16207;padding-left:5px;';
+        return 'border-left:3px solid #B91C1C;padding-left:5px;';
       })()}">${formatBreakeven(d.be_75)}</td>
       <td class="num">${(function(){
         if (d.swing === null) return '—';
         const s = d.swing;
-        const col = s < 10 ? '#4caf50' : s < 20 ? '#f5a623' : '#e53935';
+        const col = s < 10 ? '#15803D' : s < 20 ? '#A16207' : '#B91C1C';
         return `<span style="color:${col};font-weight:600">+${fmt(s)}pp</span>`;
       })()}</td>
       <td class="num">${(function(){
@@ -8437,7 +8437,7 @@ function runScreener() {
       <td class="num" title="Arithmetic mean of per-contract IRRs. Not a valid portfolio IRR — use for relative screening only.">${fmtIrr(d[irrKey])}</td>
       <td class="num">${formatBreakeven(d[beKey])}</td>
       <td class="num" title="Production coverage: % of contracts with verified production data. Higher = take number is more production-weighted." style="color:${(d.prod_coverage_pct||0)>30?'#22c55e':(d.prod_coverage_pct||0)>=10?'#eab308':'var(--muted)'}">${(d.prod_coverage_pct||0).toFixed(0)}%</td>
-      <td class="num" style="color:${d.swing!=null?(d.swing>=20?'#f44336':d.swing>=10?'#ff9800':'var(--muted)'):'var(--muted)'};font-weight:${d.swing!=null&&d.swing>=15?'700':'400'}">${d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'}</td>
+      <td class="num" style="color:${d.swing!=null?(d.swing>=20?'var(--red)':d.swing>=10?'var(--orange)':'var(--muted)'):'var(--muted)'};font-weight:${d.swing!=null&&d.swing>=15?'700':'400'}">${d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'}</td>
       <td><span class="tier ${tc}">${tierLabel(d[takeKey])}</span></td>
     </tr>`;
   }).join('');
@@ -8755,7 +8755,7 @@ window.loadIOCAggregated = function(brandName, operatorList) {
       <td><span class="tag">${r.mechanic}</span>${_hasR?' <span style="font-size:9px;color:#2dd4bf;font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>':''}</td>
       <td class="num">${r.n}</td>
       <td class="num">${fmtTake(r.take_75)}</td>
-      <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'#f44336':r.swing>=10?'#ff9800':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
+      <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'var(--red)':r.swing>=10?'var(--orange)':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
       <td class="num">${fmtNpvShared(r.npv_75)}</td>
       <td class="num">${fmtIrr(r.irr_75)}</td>
       <td class="num">${formatBreakeven(r.be_75)}</td>
@@ -8832,7 +8832,7 @@ window.loadIOC = function(operator) {
       <td class="num take-50-col" style="display:none">${fmtTake(r.take_50)}</td>
       <td class="num take-100-col" style="display:none">${fmtTake(r.take_100)}</td>
       <td class="num take-125-col" style="display:none">${fmtTake(r.take_125)}</td>
-      <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'#f44336':r.swing>=10?'#ff9800':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
+      <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'var(--red)':r.swing>=10?'var(--orange)':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
       <td class="num">${fmtNpvShared(r.npv_75)}</td>
       <td class="num">${fmtIrr(r.irr_75)}</td>
       <td class="num">${formatBreakeven(r.be_75)}</td>
@@ -10711,7 +10711,7 @@ function renderSampleAnalyses() {
   const cd = COUNTRY_DATA.filter(d => d.take_75 != null);
   const fmt = v => v == null ? '—' : v.toFixed(1) + '%';
   const delta = d => (d.take_125 != null && d.take_50 != null) ? (d.take_125 - d.take_50) : null;
-  const btnStyle = 'background:var(--accent);border:none;color:#0f172a;border-radius:4px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;margin-top:12px;';
+  const btnStyle = 'background:var(--accent);border:none;color:#fff;border-radius:4px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;margin-top:12px;';
   const outlineBtnStyle = 'background:transparent;border:1px solid var(--accent);color:var(--accent);border-radius:4px;padding:5px 14px;font-size:11px;font-weight:700;cursor:pointer;margin-top:12px;';
   const tbl = (headers, rows, colColors) => {
     const th = headers.map(h => `<th style="text-align:${h.align||'left'};color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;border-bottom:1px solid var(--border);">${h.label}</th>`).join('');
@@ -12456,12 +12456,12 @@ function _execLiveDCF(country, profileKey, price) {
 
   if (takeEl) {
     takeEl.textContent = result.take.toFixed(1) + '%';
-    takeEl.style.color = result.take > 70 ? '#f44336' : result.take > 50 ? '#ff9800' : '#4caf50';
+    takeEl.style.color = result.take > 70 ? 'var(--red)' : result.take > 50 ? 'var(--orange)' : 'var(--green)';
   }
   if (irrEl) {
     irrEl.textContent = result.irr !== null ? result.irr.toFixed(1) + '%' : 'n/a';
     if (result.irr !== null) {
-      irrEl.style.color = result.irr < 10 ? '#f44336' : result.irr < 20 ? '#ff9800' : '#4caf50';
+      irrEl.style.color = result.irr < 10 ? 'var(--red)' : result.irr < 20 ? 'var(--orange)' : 'var(--green)';
     }
   }
   if (npvEl) {
@@ -12469,7 +12469,7 @@ function _execLiveDCF(country, profileKey, price) {
       const absNpv = Math.abs(result.npv);
       const fmt = absNpv >= 1000 ? (result.npv/1000).toFixed(1) + 'B' : result.npv.toFixed(0) + 'M';
       npvEl.textContent = (result.npv < 0 ? '-' : '') + '$' + fmt;
-      npvEl.style.color = result.npv < 0 ? '#f44336' : '#4caf50';
+      npvEl.style.color = result.npv < 0 ? 'var(--red)' : 'var(--green)';
     } else {
       npvEl.textContent = 'n/a';
     }
@@ -12601,15 +12601,15 @@ function _buildTornadoChart(country, profileKey, basePrice) {
         {
           label: 'Downside (NPV Δ $M)',
           data: lowDeltas,
-          backgroundColor: 'rgba(244,67,54,0.7)',
-          borderColor: '#f44336',
+          backgroundColor: 'rgba(185,28,28,0.7)',
+          borderColor: '#B91C1C',
           borderWidth: 1,
         },
         {
           label: 'Upside (NPV Δ $M)',
           data: highDeltas,
-          backgroundColor: 'rgba(76,175,80,0.7)',
-          borderColor: '#4caf50',
+          backgroundColor: 'rgba(21,128,61,0.7)',
+          borderColor: '#15803D',
           borderWidth: 1,
         }
       ]
@@ -13011,9 +13011,9 @@ function runCustomScenario() {
     : result.irr.toFixed(1) + '%') : 'n/a';
   const irrDisplay = result.irr !== null && result.irr < 500 ? result.irr.toFixed(1) + '%' : (result.irr !== null ? 'n/a*' : 'n/a');
   const npvDisplay = result.npv !== null ? fmtNpvShared(result.npv) : 'n/a';
-  const takeColor = result.take > 70 ? '#f44336' : result.take > 50 ? '#ff9800' : '#4caf50';
-  const irrColor = result.irr === null || result.irr >= 500 ? 'var(--muted)' : result.irr < 10 ? '#f44336' : result.irr < 20 ? '#ff9800' : '#4caf50';
-  const npvColor = result.npv === null ? 'var(--muted)' : result.npv < 0 ? '#f44336' : '#4caf50';
+  const takeColor = result.take > 70 ? 'var(--red)' : result.take > 50 ? 'var(--orange)' : 'var(--green)';
+  const irrColor = result.irr === null || result.irr >= 500 ? 'var(--muted)' : result.irr < 10 ? 'var(--red)' : result.irr < 20 ? 'var(--orange)' : 'var(--green)';
+  const npvColor = result.npv === null ? 'var(--muted)' : result.npv < 0 ? 'var(--red)' : 'var(--green)';
 
   document.getElementById('sb-output').innerHTML = `
 <div class="sb-result-header">${mech} · ${DCF_PROFILES[profileKey].name} · $${price}/bbl</div>
@@ -14580,7 +14580,7 @@ function switchExplorerMode(mode, btn) {
   const activeBtn = btn || document.getElementById('mode-btn-' + mode);
   if (activeBtn) {
     activeBtn.style.background = 'var(--accent)';
-    activeBtn.style.color = '#0B0F1A';
+    activeBtn.style.color = '#fff';
     activeBtn.setAttribute('aria-pressed','true');
   }
   // Show the selected panel and trigger any renders
