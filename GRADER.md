@@ -1523,3 +1523,16 @@ Ready for the next cycle when triggered.
 - JS errors: 0
 - Summary: v230 push confirmed â€” exit code 0.
 
+
+---
+## Cycle 180 Log — 2026-08-14 05:41
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 180 â€” v231 shipped. 4/4 JS syntax gate PASS / 0 JS errors.**
+
+---
+
+**What was fixed:**
+
+- **FAQ A134 â€” Portfolio fiscal mechanic concentration risk** (Professional Credibility): New analyst FAQ covering a real gap â€” when >60% of upstream portfolio contracts share one mechanic type (e.g. all Sub-Saharan Africa PSCs), a single renegotiation wave hits the whole portfolio simultaneously. Covers: 4-step concentration audit workflow using IOC Portfolio + Screener + Reform Risk tabs; syst
