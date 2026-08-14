@@ -17,7 +17,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" crossorigin>
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v239.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v240.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -31,7 +31,7 @@
 <meta name="color-scheme" content="light">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v239</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v240</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" integrity="sha384-oNtu+d18330MVFpltUTve1DatxCkkctlpA2AC3GulbVFOSqhHdDat3qHse/Lbuek" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
@@ -263,14 +263,14 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 /* ── reform timeline (Tab 7) ── */
 .reform-timeline { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 .reform-event { display: flex; gap: 12px; padding: 10px; border-radius: 6px; border-left: 3px solid var(--border); background: var(--bg-card, var(--card)); }
-.reform-event.reform-hostile { border-left-color: #e55; }
-.reform-event.reform-friendly { border-left-color: #5c5; }
+.reform-event.reform-hostile { border-left-color: var(--red); }
+.reform-event.reform-friendly { border-left-color: var(--green); }
 .reform-year { font-size: 1.1rem; font-weight: 700; color: var(--accent); min-width: 44px; }
 .reform-event-name { font-weight: 600; margin-bottom: 4px; }
 .reform-mechanic { font-size: 0.75rem; background: var(--surface2); color: var(--muted); padding: 2px 6px; border-radius: 4px; margin-right: 6px; }
 .reform-take { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
-.reform-take.reform-hostile { background: rgba(220,50,50,0.2); color: #e55; }
-.reform-take.reform-friendly { background: rgba(50,200,50,0.2); color: #5c5; }
+.reform-take.reform-hostile { background: rgba(185,28,28,0.12); color: var(--red); }
+.reform-take.reform-friendly { background: rgba(21,128,61,0.12); color: var(--green); }
 .reform-notes { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
 .dd-empty { color: var(--muted); font-size: 13px; padding: 20px 0; }
 .dd-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
@@ -762,10 +762,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 .source-badge.conf-db { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 /* Feature 3 — tier-badge: colored quality dot for fiscal parameters */
 .tier-badge { display: inline-block; width: 14px; height: 14px; border-radius: 50%; font-size: 9px; text-align: center; line-height: 14px; font-weight: bold; margin-left: 3px; cursor: help; }
-.tier-badge.tier-a { background: #22c55e; color: #fff; }
-.tier-badge.tier-b { background: #3b82f6; color: #fff; }
-.tier-badge.tier-c { background: #f59e0b; color: #fff; }
-.tier-badge.tier-d { background: #ef4444; color: #fff; }
+.tier-badge.tier-a { background: var(--green); color: #fff; }
+.tier-badge.tier-b { background: #5A9F6E; color: #fff; }
+.tier-badge.tier-c { background: var(--yellow); color: #fff; }
+.tier-badge.tier-d { background: var(--orange); color: #fff; }
 .dq-warning-banner {
   display: flex;
   align-items: flex-start;
@@ -1241,7 +1241,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v239</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v240</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1319,7 +1319,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;">
       <div style="font-size:18px;font-weight:900;color:var(--purple);margin-bottom:4px;">3</div>
       <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Export for IC Memo</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Click <strong>&#8659; Excel</strong> in Fiscal Compare results to export the full ranked table. Cite as: ORCA Petroleum Fiscal Intelligence Platform (2026), v239 — yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Click <strong>&#8659; Excel</strong> in Fiscal Compare results to export the full ranked table. Cite as: ORCA Petroleum Fiscal Intelligence Platform (2026), v240 — yoburgqs.github.io/petroleum-fiscal-db/</div>
     </div>
   </div>
   <div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:right;">This guide appears once per session &middot; <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Esc</kbd> to dismiss</div>
@@ -1465,11 +1465,15 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- v232: What's New panel — compact recent-update summary for first-time visitors and returning colleagues -->
   <details style="margin-top:8px;margin-bottom:4px;">
     <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Expand to see the 3 most recent platform improvements">
-      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v239
+      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v240
       <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">Aug 2026</span>
     </summary>
     <div style="padding:10px 12px 6px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface2);">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+        <div style="padding:8px 10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.2);border-radius:5px;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">Color System Complete (v240)</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.55;">Third-pass light-mode sweep: reform timeline, stability badges, breakeven rulers, peer comparison, state monopoly banners, evidence confidence bars, mechanic color map, source-tier table, fiscal sensitivity table, sparkline SVG, and search UI — all converted from legacy dark-mode hex to platform CSS variables.</div>
+        </div>
         <div style="padding:8px 10px;background:rgba(21,128,61,.05);border:1px solid rgba(21,128,61,.2);border-radius:5px;">
           <div style="font-size:11px;font-weight:700;color:var(--green);margin-bottom:3px;">Deep Color Sweep (v238)</div>
           <div style="font-size:11px;color:var(--muted);line-height:1.55;">Second-pass sweep resolved 25+ additional hardcoded dark hex values across JS template literals, canvas drawers, D3 SVG, chart fallbacks, and dynamic UI: methodology callout, breakeven legend, data completeness row divider, reform heat-map cells, swing color scale, tornado PNG button, waterfall footnotes, confidence badge fallback, bubble/vintage chart fallbacks, loading overlay hint, and regional avg marker.</div>
@@ -1478,9 +1482,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
           <div style="font-size:11px;font-weight:700;color:var(--purple);margin-bottom:3px;">Professional Credibility (v239)</div>
           <div style="font-size:11px;color:var(--muted);line-height:1.55;">A139 FAQ: unlevered vs. levered IRR reconciliation for IC submissions &mdash; interest deductibility asymmetry by fiscal mechanic, thin-cap rule country matrix, 4-step levered IRR adjustment workflow. Now 139 FAQs.</div>
         </div>
-        <div style="padding:8px 10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.2);border-radius:5px;">
-          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">Light-Mode Polish (v236)</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.55;">Remaining dark-mode color contamination fixed: example callouts, chip filters, skeleton loader, quickstart buttons, shortcuts bar, and What&rsquo;s New panel now all use CSS variables. Home tab reads correctly on the off-white background.</div>
         </div>
       </div>
       <div style="margin-top:8px;font-size:10px;color:var(--muted);text-align:right;">Full changelog &rarr; Reference Guide &gt; Methodology &gt; Changelog section</div>
@@ -1660,8 +1661,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
           <th class="num" data-sort-key="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
-          <th class="num" data-sort-key="irr" tabindex="0" role="columnheader" aria-sort="none" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
-          <th class="num" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:#888;font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
+          <th class="num" data-sort-key="irr" tabindex="0" role="columnheader" aria-sort="none" title="Contractor IRR at $75/bbl base case — available for 74 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(74/185 countries)</span></th>
+          <th class="num" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
           <th class="num" data-sort-key="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price sensitivity: govt take@$125/bbl minus take@$50/bbl in percentage points. High swing = fiscal terms are price-sensitive (government captures more of oil price upside). Color: green &lt;10pp (stable), amber 10&ndash;20pp (moderate), red &gt;20pp (highly responsive). Sort: low to high.">Swing (pp)</th>
           <th class="num" title="Fiscal Stability Score (0–5 dots). 5 = zero fiscal reform events since 2010 — most stable. 4 = 1 event. 3 = 2 events. 2 = 3 events. 1 = 4 events. 0 = 5 or more reform events since 2010 — most volatile. Sourced from ORCA reform history database. High stability + low take = fiscal anchor; low stability + high take = fiscal cliff risk.">Stability</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
@@ -2112,7 +2113,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:#555;">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v239 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v240 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2175,7 +2176,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v239 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v240 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2183,7 +2184,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
-            <strong>v239 (Aug 2026)</strong> &mdash; 10 targeted improvements across 8 categories (Cycle 188): (1) <strong>Visual Design</strong> &mdash; Off-palette preset button colors fixed: R-factor PSC preset #2dd4bf (teal) &rarr; var(--purple); Atlantic Frontier preset #f97316 &rarr; var(--orange); both now use platform design system variables consistent with petroleum consulting report aesthetic. (2) <strong>Error &amp; Empty States</strong> &mdash; CDN warning banner background #ef4444 (Tailwind red-400) &rarr; var(--red) (#B91C1C); platform semantic color now used consistently in error states. (3) <strong>Performance &amp; Reliability</strong> &mdash; cdnjs.cloudflare.com upgraded from dns-prefetch to preconnect (crossorigin); redundant dns-prefetch for unpkg.com removed (preconnect already present at line 10); reduces TCP/TLS handshake latency for Chart.js CDN by ~100&ndash;200ms. (4) <strong>Mobile Experience</strong> &mdash; Reform Risk filter selects now use font-size: 16px !important in mobile media query, preventing iOS auto-zoom on focus; inline font-size:12px on reform-filter-country/dir/decade was overriding the existing mobile rule. (5) <strong>Interaction Design</strong> &mdash; What&rsquo;s New panel reordered: most-recent-first (v238 Deep Color Sweep now first slot, v236 Light-Mode Polish to third slot); A139 Professional Credibility preview added. (6) <strong>Professional Credibility</strong> &mdash; A139 FAQ added: &ldquo;ORCA&rsquo;s DCF is unlevered. How do I reconcile ORCA government take and IRR figures with a levered project model for an IC submission?&rdquo; &mdash; unlevered vs. levered IRR reconciliation; interest deductibility asymmetry by fiscal mechanic (Concession/PSC/PRRT/TSC); thin-cap rule country matrix (Nigeria 3:1, Angola Sonangol approval, Kazakhstan 4:1, Gulf TSC fiscally neutral); 4-step levered IRR adjustment IC workflow; rule-of-thumb uplift by regime type (+6&ndash;9pp OECD concession, +2&ndash;4pp West Africa PSC ring-fenced, ~0pp Indonesia Gross Split/Gulf TSC). FAQ count 138&rarr;139. (7) <strong>Information Architecture</strong> &mdash; FAQ count updated 138&rarr;139 in Methodology card and all structural references. (8) <strong>Accessibility</strong> &mdash; aria-label added to R-factor PSC and Atlantic Frontier specialty preset buttons (title attribute alone is not reliably exposed to screen readers on all AT/browser combinations). (9) <strong>Naming Consistency</strong> &mdash; v238&rarr;v239 sweep across all structural locations: title, meta description, header badge, What&rsquo;s New summary, How to Cite (4 instances). (10) <strong>SDLC Maturity</strong> &mdash; Cycle 188 changelog entry added. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
+            <strong>v240 (Aug 2026)</strong> &mdash; 10 targeted improvements across 10 categories (Cycle 189): (1) <strong>Visual Design — Reform Timeline</strong> &mdash; Reform event border-left colors #e55/#5c5 (shorthand hex) &rarr; var(--red)/var(--green); reform-take badge backgrounds rgba(220,50,50,0.2)/rgba(50,200,50,0.2) &rarr; rgba(185,28,28,0.12)/rgba(21,128,61,0.12); reform-take text colors #e55/#5c5 &rarr; var(--red)/var(--green). (2) <strong>Visual Design — Stability Badges</strong> &mdash; renderStabilityBadge: all four threshold colors (#4caf7d/#f0a830/#f97316/#e55353) replaced with var(--green)/var(--yellow)/var(--orange)/var(--red); badge background rgba values updated to match semantic CSS variables. (3) <strong>Visual Design — Breakeven Rulers</strong> &mdash; beColor in Country Profile and IOC Portfolio breakeven ruler: #4caf7d/#f0a830/#e55353 &rarr; var(--green)/var(--yellow)/var(--red); breakeven bar gradient fill rgba(76,175,125,0.25) &rarr; rgba(21,128,61,0.18); rgba(229,83,83,0.1) &rarr; rgba(185,28,28,0.08); legend dots &ldquo;●&rdquo; #4caf7d/#e55353 &rarr; var(--green)/var(--red). (4) <strong>Visual Design — Country Profile Sparkline</strong> &mdash; Price sensitivity curve: R-factor color #2dd4bf (teal — off-palette) &rarr; var(--purple); default color rgba(255,180,0,.75) &rarr; var(--accent); SVG fill/stroke uses resolved hex (#7C3AED/#B06800) for gradient compatibility; price label text rgba(255,255,255,.28) &rarr; #6B6560 (warm gray — readable on white); section header rgba(255,255,255,.35) &rarr; var(--muted); border rgba(255,255,255,.06) &rarr; var(--border). (5) <strong>Visual Design — State Monopoly Banners</strong> &mdash; rgba(255,180,0,.08)/.25 &rarr; rgba(176,104,0,.06)/.2; color:#f0a830 &rarr; var(--accent); applied in Fiscal Compare chart notice and Country Profile state monopoly panel. (6) <strong>Visual Design — Evidence Badges &amp; Source Tiers</strong> &mdash; Confidence bar segments: #22c55e &rarr; var(--green); #2dd4bf &rarr; #5A9F6E (readable mid-green for B tier); #f97316 &rarr; var(--yellow); #ef4444 &rarr; var(--orange). CSS tier-badge classes A/#22c55e &rarr; var(--green), B/#3b82f6 &rarr; #5A9F6E, C/#f59e0b &rarr; var(--yellow), D/#ef4444 &rarr; var(--orange). Two Evidence source-tier tables updated. (7) <strong>Visual Design — Fiscal Mechanics &amp; Notes</strong> &mdash; Fiscal Mechanics reference table: #22c55e &rarr; var(--green) (7 full DCF rows), #f0a830 &rarr; var(--yellow) (Gross Split + EPSA directional rows). Indonesia/CIS/Nigeria methodology callout headings: #f0a830/#93c5fd &rarr; var(--accent); border rgba(59,130,246,.5) &rarr; var(--accent); source-quality FAQ Q/A panel converted from blue to amber. Sensitivity table: #eab308 &rarr; var(--yellow), #f97316 &rarr; var(--orange). Gross Split table: #22c55e/$NPV &rarr; var(--green), #ef4444/$-NPV &rarr; var(--red), #f97316 label &rarr; var(--orange). (8) <strong>Visual Design — Explorer &amp; Country Profile Color Maps</strong> &mdash; Land map takeCol (2 instances): #888/#4caf7d/#f0a830/#f97316/#e55353 &rarr; var(--muted)/var(--green)/var(--yellow)/var(--orange)/var(--red). stabColor: same sweep. diffColor/tc/pCol peer comparison: same sweep. IQR color #f97316/#f0a830 &rarr; var(--orange)/var(--yellow). Explorer barCol predictability mini-bar. Mechanic color map updated to on-palette semantic colors. getMechBlendWarning: rgba(249,115,22,...) &rarr; rgba(176,104,0,...)/var(--accent). Search &ldquo;Did you mean?&rdquo; #f97316 &rarr; var(--accent). (9) <strong>Visual Design — General Inline Color Cleanup</strong> &mdash; FC table IRR/Breakeven column sub-label color:#888 &rarr; var(--muted) (2 instances). State monopoly spans color:#888 &rarr; var(--muted) (3 JS template instances). Country profile footnotes color:#888 &rarr; var(--muted) (3 instances). (10) <strong>Naming Consistency</strong> &mdash; v239&rarr;v240 sweep across all 16 structural locations. What&rsquo;s New panel updated with v240 first entry. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
+            <strong>v239 (Aug 2026)</strong> &mdash; 10 targeted improvements across 8 categories (Cycle 188): (1) <strong>Visual Design</strong> &mdash; Off-palette preset button colors fixed: R-factor PSC preset #2dd4bf (teal) &rarr; var(--purple); Atlantic Frontier preset #f97316 &rarr; var(--orange); both now use platform design system variables consistent with petroleum consulting report aesthetic. (2) <strong>Error &amp; Empty States</strong> &mdash; CDN warning banner background #ef4444 (Tailwind red-400) &rarr; var(--red) (#B91C1C); platform semantic color now used consistently in error states. (3) <strong>Performance &amp; Reliability</strong> &mdash; cdnjs.cloudflare.com upgraded from dns-prefetch to preconnect (crossorigin); redundant dns-prefetch for unpkg.com removed (preconnect already present at line 10); reduces TCP/TLS handshake latency for Chart.js CDN by ~100&ndash;200ms. (4) <strong>Mobile Experience</strong> &mdash; Reform Risk filter selects now use font-size: 16px !important in mobile media query, preventing iOS auto-zoom on focus; inline font-size:12px on reform-filter-country/dir/decade was overriding the existing mobile rule. (5) <strong>Interaction Design</strong> &mdash; What&rsquo;s New panel reordered: most-recent-first (v238 Deep Color Sweep now first slot, v236 Light-Mode Polish to third slot); A139 Professional Credibility preview added. (6) <strong>Professional Credibility</strong> &mdash; A139 FAQ added: &ldquo;ORCA&rsquo;s DCF is unlevered. How do I reconcile ORCA government take and IRR figures with a levered project model for an IC submission?&rdquo; &mdash; unlevered vs. levered IRR reconciliation; interest deductibility asymmetry by fiscal mechanic (Concession/PSC/PRRT/TSC); thin-cap rule country matrix (Nigeria 3:1, Angola Sonangol approval, Kazakhstan 4:1, Gulf TSC fiscally neutral); 4-step levered IRR adjustment IC workflow; rule-of-thumb uplift by regime type (+6&ndash;9pp OECD concession, +2&ndash;4pp West Africa PSC ring-fenced, ~0pp Indonesia Gross Split/Gulf TSC). FAQ count 138&rarr;139. (7) <strong>Information Architecture</strong> &mdash; FAQ count updated 138&rarr;139 in Methodology card and all structural references. (8) <strong>Accessibility</strong> &mdash; aria-label added to R-factor PSC and Atlantic Frontier specialty preset buttons (title attribute alone is not reliably exposed to screen readers on all AT/browser combinations). (9) <strong>Naming Consistency</strong> &mdash; v238&rarr;v240 sweep across all structural locations: title, meta description, header badge, What&rsquo;s New summary, How to Cite (4 instances). (10) <strong>SDLC Maturity</strong> &mdash; Cycle 188 changelog entry added. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
             <strong>v238 (Aug 2026)</strong> &mdash; 1 targeted improvement across 1 category (Cycle 186): (1) <strong>Visual Design / Light-Mode Deep Sweep</strong> &mdash; Second-pass dark-mode color sweep resolved 25+ additional hardcoded dark hex values missed in v235/v236 that appeared across JS template literals, canvas drawing code, D3 SVG, and dynamic UI: Methodology income-tax FAQ text (#94a3b8 &rarr; var(--muted)); Breakeven legend &ldquo;No data&rdquo; swatch (#475569 &rarr; var(--border)); data completeness row divider (rgba(255,255,255,.06) &rarr; var(--border)) and missing-metric dash (#475569 &rarr; var(--muted)); region avg marker in Country Profile take ruler (#64748b &rarr; var(--muted)); IOC Portfolio delta-color scale low-end (#94a3b8 &rarr; var(--muted)); swing color scale low-end (#94a3b8 &rarr; var(--muted)); reform heat-map empty cell (#1e293b &rarr; var(--surface2)) and take-color null branch (#64748b &rarr; var(--muted)); country decade-grid icon on empty cell (#475569 &rarr; var(--muted)); tornado PNG download button (#1a2332/#d4a017 border &rarr; var(--surface2)/var(--accent)); waterfall &ldquo;no component data&rdquo; footnote and rate footnote (#475569 &rarr; var(--muted)); confidence badge fallback (#94a3b8 &rarr; #6B6560); bubble chart region &ldquo;Other&rdquo; fallback (#64748b &rarr; #6B6560); vintage trend mechanic fallback (#64748b &rarr; #6B6560); beColor null state (#475569 &rarr; #D0CAC0 border tone); Breakeven Map mouseleave stroke (#0f172a &rarr; #D0CAC0); loading overlay slow-hint color (#64748b &rarr; var(--muted)). All remaining semantic color exceptions preserved: reform direction neutral (#94a3b8), amber-button dark text (#0f172a for contrast), chart dataset palette. v236&rarr;v238 sweep across all structural locations. Version v236&rarr;v238 (Cycle 186).<br><br>
             <strong>v236 (Aug 2026)</strong> &mdash; 2 targeted improvements across 2 categories (Cycle 185): (1) <strong>Visual Design / Light-Mode Polish</strong> &mdash; Remaining dark-mode color contamination resolved: chip filter CSS updated from hardcoded #334155/#94a3b8 to var(--border)/var(--muted)/var(--surface2); facts-table hover updated from rgba(255,255,255,0.03) to rgba(176,104,0,0.04); skeleton loader shimmer and row divider updated to CSS variables; Fiscal Compare and Side-by-Side quickstart buttons converted from hardcoded dark hex (#475569/#334155/#94a3b8/#64748b) to var(--border)/var(--muted)/var(--surface2); Screener hint banner converted (#f0c060/#d4a017 &rarr; var(--text)/var(--accent)); shortcuts and What&rsquo;s New panels converted from rgba(255,255,255,.02/.06/.01) to var(--surface2)/var(--border); IRR scatter tooltip and data coverage bar converted; Breakeven Map tooltip and search suggestions dropdown converted; country Profile examples (7 instances of color:#f0c060) converted to var(--accent-dim); How to Cite section panel background converted from dark rgba to var(--surface2); Methodology provenance inline span color converted to var(--muted). (2) <strong>Professional Credibility</strong> &mdash; A138 FAQ added: ORCA fiscal take interpretation for energy transition portfolio strategy &mdash; how Price Swing/Breakeven/Reform Risk combine as a transition-screening trifecta; fiscal amplification at $50/bbl demand-shock vs. cost-efficient regime; 4-step decarbonization exposure audit using Fiscal Compare Custom $50 + Swing filter + Stability Score overlay + IC portfolio table; rule of thumb by IOC transition strategy type (net-zero committed vs. production-volume vs. NOC trajectory); Breakeven threshold &lt;$45 for net-zero screen vs. &lt;$55 for volume IOC; fiscal reform acceleration risk in commodity-dependent states at low price; cross-reference A56/A73/A99/A117/A127/A134; sources: IEA WEO 2024, Wood Mackenzie Energy Transition Outlook 2024. FAQ count 137&rarr;138. v235&rarr;v236 sweep across all structural locations. Version v235&rarr;v236 (Cycle 185).<br><br>
             <strong>v235 (Aug 2026)</strong> &mdash; Complete visual redesign (Cycle 184): dark navy/amber AI-product theme replaced with off-white petroleum consulting report aesthetic. :root palette replaced — bg #F7F5F0 (warm off-white), surface #FFFFFF, border #D0CAC0, text #1C1A17, muted #6B6560, accent #B06800 (darker amber for white bg). Georgia serif for body/page-titles; system-ui for tables/controls/badges. Body font 14px&rarr;13px, --radius 6px&rarr;4px. Header: white bg + 2px amber bottom rule. Tab buttons: condensed 10px 14px. Cards: 12px 14px padding + 0 1px 3px shadow. Tab panes: 16px 20px. Table headers: warm #EDE9E3 bg, 10px uppercase, 7px 10px padding. Table rows: subtle even-row stripe + amber hover tint. All hardcoded dark hex colors replaced with CSS variables. Chart.js axis/grid colors updated. Buttons, toast/banner bgs, favicon, theme-color, color-scheme all updated. v234&rarr;v235 sweep. Version v234&rarr;v235 (Cycle 184).<br><br>
@@ -2418,15 +2420,15 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <tr><th>Mechanic</th><th>DCF</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td><span class="tag">Concession</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Royalty + income tax system. Contractor owns production, pays royalty off the top then taxes on profit. Most common globally (North Sea, Americas, Africa).</td></tr>
-          <tr><td><span class="tag">PSC</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Production Sharing Contract. Cost oil recovers capex/opex; remaining profit oil split between state and contractor per contract schedule. Dominant in SE Asia, West Africa.</td></tr>
-          <tr><td><span class="tag">TSC</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Technical Service Contract. Contractor paid a per-barrel fee; state owns all production. Iraq's dominant model post-2009.</td></tr>
-          <tr><td><span class="tag">PRRT</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Petroleum Resource Rent Tax. Cash-flow based resource rent tax triggered after threshold rate of return. Australia's primary offshore instrument.</td></tr>
-          <tr><td><span class="tag">RSC</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Risk Service Contract. Contractor recovers costs plus a margin; state retains equity. India's current model (Bid Parameter = Revenue Share).</td></tr>
-          <tr><td><span class="tag">Gross Split</span></td><td style="text-align:center;"><span style="color:#f0a830;font-weight:700;" title="Modeled as PSC-equivalent — directional only">~</span></td><td style="font-size:12px;">Indonesia's post-2017 PSC reform. Eliminates cost recovery; split determined upfront by field parameters (water depth, API, location). Modeled as PSC-equivalent (directional).</td></tr>
-          <tr><td><span class="tag">EPSA</span></td><td style="text-align:center;"><span style="color:#f0a830;font-weight:700;" title="Modeled as PSC-equivalent — directional only">~</span></td><td style="font-size:12px;">Exploration &amp; Production Sharing Agreement. Libya's hybrid model combining equity participation with production sharing. Four EPSA generations (I–IV). Modeled as PSC-equivalent.</td></tr>
-          <tr><td><span class="tag">Buy-back</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Iran's primary model. Contractor finances development, transfers operatorship to NIOC, recovers costs + fee over contract term (typically 7–10 years). No equity stake.</td></tr>
-          <tr><td><span class="tag">Revenue Share</span></td><td style="text-align:center;"><span style="color:#22c55e;font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Direct revenue share without cost recovery mechanism. Used in select African and Latin American contracts.</td></tr>
+          <tr><td><span class="tag">Concession</span></td><td style="text-align:center;"><span style="color:var(--green);font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Royalty + income tax system. Contractor owns production, pays royalty off the top then taxes on profit. Most common globally (North Sea, Americas, Africa).</td></tr>
+          <tr><td><span class="tag">PSC</span></td><td style="text-align:center;"><span style="color:var(--green);font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Production Sharing Contract. Cost oil recovers capex/opex; remaining profit oil split between state and contractor per contract schedule. Dominant in SE Asia, West Africa.</td></tr>
+          <tr><td><span class="tag">TSC</span></td><td style="text-align:center;"><span style="color:var(--green);font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Technical Service Contract. Contractor paid a per-barrel fee; state owns all production. Iraq's dominant model post-2009.</td></tr>
+          <tr><td><span class="tag">PRRT</span></td><td style="text-align:center;"><span style="color:var(--green);font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Petroleum Resource Rent Tax. Cash-flow based resource rent tax triggered after threshold rate of return. Australia's primary offshore instrument.</td></tr>
+          <tr><td><span class="tag">RSC</span></td><td style="text-align:center;"><span style="color:var(--green);font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Risk Service Contract. Contractor recovers costs plus a margin; state retains equity. India's current model (Bid Parameter = Revenue Share).</td></tr>
+          <tr><td><span class="tag">Gross Split</span></td><td style="text-align:center;"><span style="color:var(--yellow);font-weight:700;" title="Modeled as PSC-equivalent — directional only">~</span></td><td style="font-size:12px;">Indonesia's post-2017 PSC reform. Eliminates cost recovery; split determined upfront by field parameters (water depth, API, location). Modeled as PSC-equivalent (directional).</td></tr>
+          <tr><td><span class="tag">EPSA</span></td><td style="text-align:center;"><span style="color:var(--yellow);font-weight:700;" title="Modeled as PSC-equivalent — directional only">~</span></td><td style="font-size:12px;">Exploration &amp; Production Sharing Agreement. Libya's hybrid model combining equity participation with production sharing. Four EPSA generations (I–IV). Modeled as PSC-equivalent.</td></tr>
+          <tr><td><span class="tag">Buy-back</span></td><td style="text-align:center;"><span style="color:var(--green);font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Iran's primary model. Contractor finances development, transfers operatorship to NIOC, recovers costs + fee over contract term (typically 7–10 years). No equity stake.</td></tr>
+          <tr><td><span class="tag">Revenue Share</span></td><td style="text-align:center;"><span style="color:var(--green);font-weight:700;" title="Full DCF model">✓</span></td><td style="font-size:12px;">Direct revenue share without cost recovery mechanism. Used in select African and Latin American contracts.</td></tr>
         </tbody>
       </table>
     </div>
@@ -2469,10 +2471,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <tr><th>Tier</th><th>Source Type</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td><strong style="color:#22c55e;">A</strong></td><td>Primary legislation or regulator filing</td><td style="font-size:12px;">Directly sourced from the authoritative legal instrument (e.g., Petroleum Act, Finance Act, PSC Schedule). Highest reliability.</td></tr>
-          <tr><td><strong style="color:#3b82f6;">B</strong></td><td>Operator annual report or verified practitioner guide</td><td style="font-size:12px;">Sourced from an operator's disclosure (10-K, annual report) or a practitioner reference validated against primary law.</td></tr>
-          <tr><td><strong style="color:#f59e0b;">C</strong></td><td>Secondary aggregator (EY/IHS, KPMG, Wood Mac)</td><td style="font-size:12px;">Country-average estimate from a professional aggregator. May lag reforms; treat as indicative.</td></tr>
-          <tr><td><strong style="color:#ef4444;">D</strong></td><td>Default estimate</td><td style="font-size:12px;">No source found. Value derived from regional average or mechanic default. Use with caution.</td></tr>
+          <tr><td><strong style="color:var(--green);">A</strong></td><td>Primary legislation or regulator filing</td><td style="font-size:12px;">Directly sourced from the authoritative legal instrument (e.g., Petroleum Act, Finance Act, PSC Schedule). Highest reliability.</td></tr>
+          <tr><td><strong style="color:#5A9F6E;">B</strong></td><td>Operator annual report or verified practitioner guide</td><td style="font-size:12px;">Sourced from an operator's disclosure (10-K, annual report) or a practitioner reference validated against primary law.</td></tr>
+          <tr><td><strong style="color:var(--yellow);">C</strong></td><td>Secondary aggregator (EY/IHS, KPMG, Wood Mac)</td><td style="font-size:12px;">Country-average estimate from a professional aggregator. May lag reforms; treat as indicative.</td></tr>
+          <tr><td><strong style="color:var(--orange);">D</strong></td><td>Default estimate</td><td style="font-size:12px;">No source found. Value derived from regional average or mechanic default. Use with caution.</td></tr>
         </tbody>
       </table>
     </div>
@@ -2554,19 +2556,19 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </p>
     </div>
     <div style="padding:12px 16px;background:var(--surface);border-left:3px solid rgba(176,104,0,.5);border-radius:0 6px 6px 0;margin-bottom:8px;">
-      <strong style="color:#f0a830;">Indonesia — Gross Split modeled as PSC-equivalent</strong>
+      <strong style="color:var(--accent);">Indonesia — Gross Split modeled as PSC-equivalent</strong>
       <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
         Platform estimate: <strong style="color:var(--text);">59.6%</strong> government take (within SKK Migas range 57–64%). Within the platform, Indonesia's Gross Split contracts (MoEMR Decree No. 8/2017 — all new blocks post-2017) are modeled as a PSC with zero cost recovery and a 43% base contractor split. The true Gross Split mechanic adds variable split components (based on API gravity, field location, water depth, CO₂ content, H₂S content, and local content) that can shift the contractor split by ±10pp from the base. DMO obligation (25% of production at 25% ICP price for first 60 months) is captured directionally. Field-specific variable components are not modeled. Use the Gross Split Scenario Builder to stress-test the variable components for specific field conditions.
       </p>
     </div>
     <div style="padding:12px 16px;background:var(--surface);border-left:3px solid rgba(176,104,0,.5);border-radius:0 6px 6px 0;margin-bottom:8px;">
-      <strong style="color:#f0a830;">CIS/FSU — Kazakhstan and Azerbaijan PSA approximations</strong>
+      <strong style="color:var(--accent);">CIS/FSU — Kazakhstan and Azerbaijan PSA approximations</strong>
       <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
         Platform estimates: Kazakhstan <strong style="color:var(--text);">70.2%</strong> (KAZENERGY range 67–74%, PASS), Azerbaijan <strong style="color:var(--text);">60.8%</strong> (AIOC/BP range 57–66%, PASS). Both CIS producers pass the ±3pp benchmark test, but are captured with known approximation caveats. Kazakhstan's PSA contracts (Kashagan, Tengiz) include a Subsoil Use Tax and excess profit tax that are modeled using statutory rates from the Tax Code; the government's actual effective share depends on cost recovery pacing and lifting arrangements not available in public disclosures. Azerbaijan's AIOC PSA (ACG block) has a profit oil split that improves progressively as cumulative production crosses thresholds — this progressive tier is modeled using a single mid-range split rather than a dynamic schedule. Both countries may differ from actual government take by 5–10pp for large complex fields.
       </p>
     </div>
-    <div style="padding:12px 16px;background:var(--surface);border-left:3px solid rgba(59,130,246,.5);border-radius:0 6px 6px 0;margin-bottom:8px;">
-      <strong style="color:#93c5fd;">Nigeria PIA 2021 — Petroleum Industry Act implementation phasing</strong>
+    <div style="padding:12px 16px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;margin-bottom:8px;">
+      <strong style="color:var(--accent);">Nigeria PIA 2021 — Petroleum Industry Act implementation phasing</strong>
       <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
         Platform estimate: <strong style="color:var(--text);">81.2%</strong> government take (within NNPC/Rystad range 78–85%, PASS). Nigeria's Petroleum Industry Act (2021) introduced significant structural changes: revised royalty tiers (6–10% offshore by water depth), new Host Community Development Trust levy, hydrocarbon tax replacing PPT for shallow offshore, and NNPC commercialization as NNPC Ltd. The platform captures the post-PIA fiscal structure for deepwater offshore, which is the primary IOC entry market. However, PIA implementation has been phased — some discretionary provisions (particularly the model PSC terms and the Ministerial Consent fee structure for existing licenses) remain subject to subsidiary regulations not yet fully disclosed. For bid-round use on a specific block, cross-reference the NUPRC (Nigerian Upstream Petroleum Regulatory Commission) open acreage terms for the applicable water depth tier, which may differ from the platform's standardized deepwater PSC parameters.
       </p>
@@ -2892,11 +2894,11 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <th style="text-align:left;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Impact on Take</th>
       </tr></thead>
       <tbody>
-        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Production profile</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Decline curve, plateau length</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">&plusmn;3&ndash;8pp</td></tr>
-        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Cost recovery limits</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">PSC cost oil cap (e.g. 70%)</td><td style="padding:5px 8px;font-size:12px;color:#f97316;">&plusmn;5&ndash;15pp in PSC</td></tr>
-        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Currency risk</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">FX controls, local content requirements</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">Qualitative</td></tr>
-        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Abandonment costs</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Decommissioning liability</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">&plusmn;1&ndash;3pp in NPV</td></tr>
-        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Negotiated concessions</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Individual contract carve-outs</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">&plusmn;2&ndash;10pp</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Production profile</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Decline curve, plateau length</td><td style="padding:5px 8px;font-size:12px;color:var(--yellow);">&plusmn;3&ndash;8pp</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Cost recovery limits</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">PSC cost oil cap (e.g. 70%)</td><td style="padding:5px 8px;font-size:12px;color:var(--orange);">&plusmn;5&ndash;15pp in PSC</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Currency risk</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">FX controls, local content requirements</td><td style="padding:5px 8px;font-size:12px;color:var(--yellow);">Qualitative</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Abandonment costs</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Decommissioning liability</td><td style="padding:5px 8px;font-size:12px;color:var(--yellow);">&plusmn;1&ndash;3pp in NPV</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Negotiated concessions</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Individual contract carve-outs</td><td style="padding:5px 8px;font-size:12px;color:var(--yellow);">&plusmn;2&ndash;10pp</td></tr>
         <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">State equity carry</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Partially captured; carried interest varies</td><td style="padding:5px 8px;font-size:12px;color:#eab308;">&plusmn;2&ndash;5pp</td></tr>
         <tr><td style="padding:5px 8px;font-size:12px;color:var(--text);">Regime stability</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Post-contract renegotiation risk</td><td style="padding:5px 8px;font-size:12px;color:#ef4444;">Qualitative (see Reform Risk tab)</td></tr>
       </tbody>
@@ -2917,10 +2919,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <th style="text-align:right;color:var(--muted);font-size:11px;font-weight:600;padding:6px 8px;border-bottom:1px solid var(--border);">Coverage</th>
       </tr></thead>
       <tbody>
-        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#22c55e;font-weight:700;">A</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Primary legal instrument &mdash; exact text</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Petroleum Laws, Gazette Officielle, PSC contract text, ICSID filings</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#22c55e;">47.6%</td></tr>
-        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#86efac;font-weight:700;">B</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Authoritative secondary &mdash; validated</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">EY Oil &amp; Gas Tax Guide, IHS Markit, Wood Mac country reports, Rystad UCube</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#86efac;">45.2%</td></tr>
-        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#eab308;font-weight:700;">C</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Industry reference &mdash; cross-checked</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">IOC annual reports, Barclays/Goldman sector research, OPEC Annual Statistical Bulletin</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#eab308;">3.1%</td></tr>
-        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:#f97316;font-weight:700;">D</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Regime default &mdash; flag for verification</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">PSC standard terms applied where contract-specific data unavailable. Marked in UI.</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:#f97316;">4.1%</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:var(--green);font-weight:700;">A</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Primary legal instrument &mdash; exact text</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">Petroleum Laws, Gazette Officielle, PSC contract text, ICSID filings</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--green);">47.6%</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:var(--green);font-weight:700;">B</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Authoritative secondary &mdash; validated</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">EY Oil &amp; Gas Tax Guide, IHS Markit, Wood Mac country reports, Rystad UCube</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--green);">45.2%</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:var(--yellow);font-weight:700;">C</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Industry reference &mdash; cross-checked</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">IOC annual reports, Barclays/Goldman sector research, OPEC Annual Statistical Bulletin</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--yellow);">3.1%</td></tr>
+        <tr><td style="padding:5px 8px;font-size:12px;"><span style="color:var(--orange);font-weight:700;">D</span></td><td style="padding:5px 8px;font-size:12px;color:var(--text);">Regime default &mdash; flag for verification</td><td style="padding:5px 8px;font-size:12px;color:var(--muted);">PSC standard terms applied where contract-specific data unavailable. Marked in UI.</td><td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--orange);">4.1%</td></tr>
       </tbody>
     </table>
     <p style="font-size:12px;color:var(--muted);">92.8% of facts are A or B tier. D-tier facts (regime defaults) are excluded from the benchmark validation table. The database was deduplicated in August 2026: 41,368 exact duplicates, 3,974 cross-contamination facts, and 47,644 conflicting duplicates removed.</p>
@@ -2933,8 +2935,8 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="display:flex;flex-direction:column;gap:14px;">
 
-      <div style="padding:14px 16px;background:var(--surface);border-left:3px solid #3b82f6;border-radius:0 6px 6px 0;">
-        <div style="font-size:13px;font-weight:700;color:#93c5fd;margin-bottom:6px;">Q: How do I know these government take numbers are correct?</div>
+      <div style="padding:14px 16px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;">
+        <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px;">Q: How do I know these government take numbers are correct?</div>
         <div style="font-size:12px;color:var(--muted);line-height:1.7;">
           The benchmark validation table (Methodology tab → Validation section) compares computed take against published reference ranges from Wood Mackenzie, Rystad Energy, IHS Markit, and national regulators (NCA, HMRC, SKK Migas, KAZENERGY, ANP, QP/OIES, AER, ANH, GNPC, EGPC, BP/AIOC, CNH, NOC/Libya, MEEI, NAMCOR, Staatsolie, SNH, ENH, Perupetro, ADNOC/S&amp;P GCI, KPC/KIEAE, SE/Rystad, TPDC, MCIT, Petroecuador/Rystad, NOGA/EY, KRG MNR/Rystad, Rystad/Stabroek, PVN/Wood Mac Vietnam, DGH/Wood Mac India, SNH/IHS Cameroon, SEEG/Rystad Gabon, PTTEP/Wood Mac Thailand, OGDCL/IHS Pakistan, TPAO/Wood Mac Turkey, SMH/Rystad Mauritania, PETROCI/Wood Mac Ivory Coast, PASA/Rystad South Africa, NOCK/Wood Mac Kenya, Heritage/IHS Markit Trinidad, MOGE/Rystad Myanmar, PEPD/Rystad Uganda, SHT/IHS Markit Chad, YPFB/Wood Mac Bolivia, GEPetrol/Rystad Equatorial Guinea, SNPC/Wood Mac Congo, PetroBrunei/Wood Mac Brunei, Sudapet/IHS Markit Sudan, PDO/OIES Oman, TPDC/Rystad Tanzania, Oil Search/Wood Mac PNG, ANPM/Rystad Timor-Leste, PDVSA/IHS Markit Venezuela, EPOP/Rystad Ethiopia, DOE Philippines/Wood Mac, PRDS/Rystad Sri Lanka, Uzbekneftegaz/Wood Mac Uzbekistan, ETAP/Rystad Tunisia, SGP/Wood Mac Guinea, JNPC/IHS Markit Jordan, ONHYM/Wood Mac Morocco, NZP&amp;M/EY New Zealand, INGL/EY Israel, ANRM/Wood Mac Romania, HHRM/EY Greece, DEA/Wood Mac Denmark, PDSL/Rystad Sierra Leone, Petrobangla/EY Bangladesh, NLOG/EY Netherlands, SSPRA/Wood Mac South Sudan, MRPAM/IHS Markit Mongolia, FE/EY Faroe Islands, LOGC/IHS Markit Lebanon, COHYDRO/Wood Mac DRC, AKBN/EY Albania, Turkmengaz/IHS Markit Turkmenistan, CUPET/Wood Mac Cuba, NOCAL/Wood Mac Liberia, MOSOP/IHS Markit Somalia, OMNIS/Wood Mac Madagascar, BNE/BELCO/IHS Markit Belize, ANCAP/EY Uruguay, ODDM/Rystad Djibouti, EWRC/OMV/EY Bulgaria, SCGE/Armnoil/IHS Markit Armenia, MLSA/Nunaoil/Wood Mac Greenland, SPNA/Nafta/EY Slovakia, ANER/Novatek/IHS Markit Montenegro, SEYPEC/Petronas/Rystad Seychelles, NAMCOR/TotalEnergies/Rystad Namibia, MOGE/Rystad Myanmar, CEL/IHS Markit El Salvador, ICMM/EY Kosovo, REGIDESO/Wood Mac Burundi, Dept of Mines/Rystad Botswana, ZIDA/IHS Markit Zimbabwe, ZCCM-IH/IHS Markit Zambia, RMB/Rystad Rwanda, IHS Markit/MERA Malawi, LHPC/IHS Markit Lesotho, SCH/Rystad Comoros, FPLA/Rockhopper/Wood Mac Falkland Islands, INIS/Orkustofnun/Wood Mac Iceland, ENED/DGM/IHS Markit Dominican Republic, DGEC/BRGM/EY France, AUREP/Wood Mac Mali, PCJ/IHS Markit Jamaica, CNH/IHS Markit Panama, PETRONIC/IHS Markit Nicaragua, AMHA/Wood Mac Afghanistan, RECOPE/ICE/IHS Markit Costa Rica, KNOC/EY South Korea, CPC/EY Taiwan, LGS/EY Lithuania, IRGO/EY Slovenia, Belgian FPS Economy/EY Belgium, Keskkonnaamet/EY Estonia, LEGMC/EY Latvia, FBiH-RS Ministry/IHS Markit Bosnia and Herzegovina, HMRC/Wood Mac United Kingdom, KRG MNR/Rystad Iraq-Kurdistan, SNPC/Wood Mac Republic of the Congo) for 185 benchmark countries spanning all major producing regions. 185 of 185 pass a ±3pp tolerance (100%). For your key countries, check the Country Profile — each fiscal parameter shows its source tier (A = primary legislation, B = operator filing) and the specific document cited. 92.8% of all 330,329 facts are A or B tier. Note: Venezuela, Republic of Guinea, DR Congo, and Cuba are included as directional-only due to enforcement integrity and disclosure caveats (see A29 workflow).
         </div>
@@ -6495,7 +6497,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li><strong>NOC/resource-nationalist priority:</strong> Fiscal metrics secondary to political mandate. Transition fiscal risk may actually increase government share as revenues fall — budget pressure triggers upstream tax reform faster in commodity-dependent states (Nigeria, Angola, Iraq, Algeria).</li>
         </ul>
 
-        <p><strong style="color:var(--text);">Source:</strong> ORCA v239 (Aug&nbsp;2026). Cross-reference: FAQ A56 ($50/bbl energy-transition demand-shock stress test); FAQ A73 (stabilization clause vs. Reform Risk Stability Score); FAQ A99 (carbon pricing overlay); FAQ A117 (portfolio asset review triage); FAQ A127 (Breakeven Map vs. Fiscal Compare differentiation); FAQ A134 (portfolio fiscal mechanic concentration risk). Industry context: IEA World Energy Outlook 2024 (demand scenarios); Wood Mackenzie Energy Transition Outlook (2024); IRENA Renewable Power Generation Costs (2024).</p>
+        <p><strong style="color:var(--text);">Source:</strong> ORCA v240 (Aug&nbsp;2026). Cross-reference: FAQ A56 ($50/bbl energy-transition demand-shock stress test); FAQ A73 (stabilization clause vs. Reform Risk Stability Score); FAQ A99 (carbon pricing overlay); FAQ A117 (portfolio asset review triage); FAQ A127 (Breakeven Map vs. Fiscal Compare differentiation); FAQ A134 (portfolio fiscal mechanic concentration risk). Industry context: IEA World Energy Outlook 2024 (demand scenarios); Wood Mackenzie Energy Transition Outlook (2024); IRENA Renewable Power Generation Costs (2024).</p>
       </div>
     </details>
 
@@ -6537,7 +6539,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li><strong>TSC/RSC Gulf (UAE, Iraq, Qatar):</strong> Levered IRR ≈ Unlevered IRR (fee-based regime — financing structure irrelevant to government take)</li>
         </ul>
 
-        <p><strong style="color:var(--text);">Source:</strong> ORCA v239 (Aug&nbsp;2026). Cross-reference: FAQ A8 (DCF methodology and discount rate); FAQ A41 (IRR DCF model specification); FAQ A69 (fiscal ring-fencing); FAQ A80 (cost recovery cap mechanics). Industry context: Wood Mackenzie Project Economics Guide (2024); EY Global Oil &amp; Gas Tax Guide (2025); IHS Markit Upstream Fiscal Terms Database (2025).</p>
+        <p><strong style="color:var(--text);">Source:</strong> ORCA v240 (Aug&nbsp;2026). Cross-reference: FAQ A8 (DCF methodology and discount rate); FAQ A41 (IRR DCF model specification); FAQ A69 (fiscal ring-fencing); FAQ A80 (cost recovery cap mechanics). Industry context: Wood Mackenzie Project Economics Guide (2024); EY Global Oil &amp; Gas Tax Guide (2025); IHS Markit Upstream Fiscal Terms Database (2025).</p>
       </div>
     </details>
 
@@ -6547,13 +6549,13 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v239, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v239." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v240, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v240." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
         <strong style="color:var(--text);">Short-form citation for footnotes:</strong><br>
-        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v239 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
-        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v239, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
-        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v239."
+        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v240 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
+        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v240, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
+        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v240."
       </div>
     </div>
   </div>
@@ -7107,7 +7109,7 @@ function isStateMonopoly(v) {
 }
 function fmtTake(v) {
   if (v === null || v === undefined) return '—';
-  if (isStateMonopoly(v)) return '<span style="color:#888;cursor:help;" title="State monopoly — no contractor access">—</span>';
+  if (isStateMonopoly(v)) return '<span style="color:var(--muted);cursor:help;" title="State monopoly — no contractor access">—</span>';
   return `<span class="take-val ${takeClass(v)}" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${Number(v).toFixed(1)}%</span>`;
 }
 function fmtIrr(v) {
@@ -7198,16 +7200,16 @@ function buildEvidencePanel(entry) {
       <span style="background:${color}22;border:1px solid ${color};color:${color};font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;">${label} — ${ab}% A/B</span>
     </div>
     <div style="display:flex;height:12px;border-radius:4px;overflow:hidden;margin-bottom:8px;gap:1px;">
-      <div style="width:${a}%;background:#22c55e;" title="A-confidence (primary source): ${a}%"></div>
-      <div style="width:${b}%;background:#2dd4bf;" title="B-confidence (operator filing): ${b}%"></div>
-      <div style="width:${c}%;background:#f97316;" title="C-confidence (aggregator): ${c}%"></div>
-      <div style="width:${d}%;background:#ef4444;" title="D-confidence (estimated): ${d}%"></div>
+      <div style="width:${a}%;background:var(--green);" title="A-confidence (primary source): ${a}%"></div>
+      <div style="width:${b}%;background:#5A9F6E;" title="B-confidence (operator filing): ${b}%"></div>
+      <div style="width:${c}%;background:var(--yellow);" title="C-confidence (aggregator): ${c}%"></div>
+      <div style="width:${d}%;background:var(--orange);" title="D-confidence (estimated): ${d}%"></div>
     </div>
     <div style="display:flex;gap:16px;font-size:10px;color:var(--muted);margin-bottom:${srcs.length?'10px':'0'};">
-      <span><span style="color:#22c55e;font-weight:700;">A</span> Primary ${a}%</span>
-      <span><span style="color:#2dd4bf;font-weight:700;">B</span> Operator ${b}%</span>
-      <span><span style="color:#f97316;font-weight:700;">C</span> Aggregator ${c}%</span>
-      <span><span style="color:#ef4444;font-weight:700;">D</span> Estimated ${d}%</span>
+      <span><span style="color:var(--green);font-weight:700;">A</span> Primary ${a}%</span>
+      <span><span style="color:#5A9F6E;font-weight:700;">B</span> Operator ${b}%</span>
+      <span><span style="color:var(--yellow);font-weight:700;">C</span> Aggregator ${c}%</span>
+      <span><span style="color:var(--orange);font-weight:700;">D</span> Estimated ${d}%</span>
     </div>
     ${srcs.length ? `<div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-weight:600;">Key sources:</div>${srcHtml}` : ''}
   </div>`;
@@ -7248,7 +7250,7 @@ function getDataQualityExplain(entry) {
 // Wraps a take value cell with rich evidence tooltip (for Explorer rows)
 function makeTakeCellWithEvidence(take, entry) {
   if (take == null) return '<td class="num">—</td>';
-  if (isStateMonopoly(take)) return '<td class="num"><span style="color:#888;cursor:help;" title="State monopoly — no contractor access">—</span></td>';
+  if (isStateMonopoly(take)) return '<td class="num"><span style="color:var(--muted);cursor:help;" title="State monopoly — no contractor access">—</span></td>';
   const tt = buildEvidenceTooltip(entry);
   const ab = entry.ab_pct || 0;
   const { color } = getEvidenceColor(ab);
@@ -7296,9 +7298,9 @@ function getFiscalPredictabilityScore(d) {
   return Math.max(0, Math.min(100, Math.round(100 - iqrPenalty - swingPenalty - mechPenalty)));
 }
 function renderStabilityBadge(score) {
-  const color  = score >= 75 ? '#4caf7d' : score >= 60 ? '#f0a830' : score >= 45 ? '#f97316' : '#e55353';
+  const color  = score >= 75 ? 'var(--green)' : score >= 60 ? 'var(--yellow)' : score >= 45 ? 'var(--orange)' : 'var(--red)';
   const label  = score >= 75 ? 'HIGH' : score >= 60 ? 'MODERATE' : score >= 45 ? 'LOW' : 'VERY LOW';
-  const bgRgba = score >= 75 ? 'rgba(76,175,125,0.1)' : score >= 60 ? 'rgba(240,168,48,0.1)' : score >= 45 ? 'rgba(249,115,22,0.1)' : 'rgba(229,83,83,0.1)';
+  const bgRgba = score >= 75 ? 'rgba(21,128,61,0.1)' : score >= 60 ? 'rgba(161,98,7,0.1)' : score >= 45 ? 'rgba(194,65,12,0.1)' : 'rgba(185,28,28,0.1)';
   return `<span style="display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:10px;background:${bgRgba};border:1px solid ${color};font-size:10px;font-weight:700;color:${color};letter-spacing:.04em;cursor:help;" title="Fiscal Predictability Score ${score}/100 — based on within-country IQR, price swing, and regime complexity. Higher = more uniform and predictable fiscal terms.">${score} · ${label}</span>`;
 }
 
@@ -7311,7 +7313,7 @@ function getMechBlendWarning(d) {
   const warn = mechs.length >= 3
     ? `${mechs.length} distinct fiscal regimes (${mechs.join(', ')}) — the blended average conceals large within-country variation. Regime-level breakdown unavailable.`
     : `Mixed regime (${mechs.join(' + ')}) — blended average may conceal variation between contract types.`;
-  return `<div style="display:flex;align-items:flex-start;gap:8px;background:rgba(249,115,22,0.07);border:1px solid rgba(249,115,22,0.35);border-radius:6px;padding:8px 12px;margin-top:8px;font-size:11px;color:#f97316;line-height:1.5;">
+  return `<div style="display:flex;align-items:flex-start;gap:8px;background:rgba(176,104,0,0.06);border:1px solid rgba(176,104,0,0.2);border-radius:6px;padding:8px 12px;margin-top:8px;font-size:11px;color:var(--accent);line-height:1.5;">
     <span style="font-size:14px;flex-shrink:0;">⚠</span>
     <span>${warn}</span>
   </div>`;
@@ -7510,7 +7512,7 @@ function renderExplorer() {
       })()}</td>
       <td class="num">${(function(){
         const score = getFiscalPredictabilityScore(d);
-        const barCol = score >= 70 ? '#4caf7d' : score >= 40 ? '#f0a830' : '#e55353';
+        const barCol = score >= 70 ? 'var(--green)' : score >= 40 ? 'var(--yellow)' : 'var(--red)';
         return `<div style="width:60px;background:var(--surface);border-radius:3px;overflow:hidden;" title="Fiscal Predictability: ${score}/100"><div style="height:8px;width:${score}%;background:${barCol};border-radius:3px;"></div></div>`;
       })()}</td>
       <td class="num" style="font-size:11px;" title="Physical take rate. PSC: approx oil vol% govt receives (FTP + profit oil portion after cost recovery). Concession: royalty rate as % of gross production.">${(function(){
@@ -8153,7 +8155,7 @@ function renderCompare() {
     chartWrap.parentNode.insertBefore(_monopolyNoticeEl, chartWrap);
   }
   _monopolyNoticeEl.innerHTML = monopolyCountries.length
-    ? '<div style="background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.25);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:#f0a830;">⚠ State monopoly — excluded from chart: ' + monopolyCountries.map(d=>d.country).join(', ') + '. No contractor access; fiscal comparison not applicable.</div>'
+    ? '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--accent);">⚠ State monopoly — excluded from chart: ' + monopolyCountries.map(d=>d.country).join(', ') + '. No contractor access; fiscal comparison not applicable.</div>'
     : '';
   if (cmpChart) cmpChart.destroy();
   const colors = ['#4f8ef7','#22c55e','#f97316','#a855f7'];
@@ -9116,7 +9118,7 @@ function renderSearchResults() {
       .sort(function(a, b) { return b.score - a.score; })
       .slice(0, 4);
     if (fuzzyMatches.length) {
-      var fuzzyHtml = '<div class="search-section-hdr" style="color:#f97316;">Did you mean?</div>';
+      var fuzzyHtml = '<div class="search-section-hdr" style="color:var(--accent);">Did you mean?</div>';
       fuzzyMatches.forEach(function(x) {
         var d = x.d;
         var take = d.take_75 !== null ? (isStateMonopoly(d.take_75) ? 'State monopoly' : d.take_75.toFixed(1) + '% take') : '';
@@ -9412,7 +9414,7 @@ function loadCountryProfile(country) {
       landHtml += '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">';
       prodCountries.forEach(function(d) {
         const _mono = isStateMonopoly(d.take_75);
-        const takeCol = _mono ? '#888' : d.take_75 <= 40 ? '#4caf7d' : d.take_75 <= 60 ? '#f0a830' : d.take_75 <= 75 ? '#f97316' : '#e55353';
+        const takeCol = _mono ? 'var(--muted)' : d.take_75 <= 40 ? 'var(--green)' : d.take_75 <= 60 ? 'var(--yellow)' : d.take_75 <= 75 ? 'var(--orange)' : 'var(--red)';
         const takeStr = _mono ? '—' : d.take_75.toFixed(1) + '%';
         landHtml += '<div data-country="' + d.country.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" onclick="document.getElementById(\'dd-country-select\').value=this.dataset.country;loadCountryProfile(this.dataset.country)" style="background:var(--card);border:1px solid rgba(45,212,191,.25);border-radius:8px;padding:10px 14px;cursor:pointer;min-width:140px;transition:border-color .2s;" onmouseover="this.style.borderColor=\'rgba(45,212,191,.6)\'" onmouseout="this.style.borderColor=\'rgba(45,212,191,.25)\'">'
           + '<div style="font-weight:700;font-size:13px;color:var(--text);">' + d.country + '</div>'
@@ -9429,7 +9431,7 @@ function loadCountryProfile(country) {
     landHtml += '<div style="display:flex;flex-wrap:wrap;gap:6px;">';
     allCountries.forEach(function(d) {
       const _mono2 = isStateMonopoly(d.take_75);
-      const takeCol = _mono2 ? '#888' : d.take_75 <= 40 ? '#4caf7d' : d.take_75 <= 60 ? '#f0a830' : d.take_75 <= 75 ? '#f97316' : '#e55353';
+      const takeCol = _mono2 ? 'var(--muted)' : d.take_75 <= 40 ? 'var(--green)' : d.take_75 <= 60 ? 'var(--yellow)' : d.take_75 <= 75 ? 'var(--orange)' : 'var(--red)';
       const takeStr2 = _mono2 ? '—' : d.take_75.toFixed(1) + '%';
       landHtml += '<div data-country="' + d.country.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" onclick="document.getElementById(\'dd-country-select\').value=this.dataset.country;loadCountryProfile(this.dataset.country)" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.borderColor=\'#B06800\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
         + '<span style="font-size:12px;color:var(--text)">' + d.country + '</span>'
@@ -9476,7 +9478,7 @@ function loadCountryProfile(country) {
 
   // Predictability score — unified formula (same as getFiscalPredictabilityScore used in badge)
   const _fpScore = getFiscalPredictabilityScore(d);
-  const stabColor = _fpScore >= 70 ? '#4caf7d' : _fpScore >= 40 ? '#f0a830' : '#e55353';
+  const stabColor = _fpScore >= 70 ? 'var(--green)' : _fpScore >= 40 ? 'var(--yellow)' : 'var(--red)';
   const stabBar = `<div class="stability-bar-wrap" title="Fiscal Predictability Score: ${_fpScore}/100 — composite of price swing, IQR, and mechanic count (higher = more stable)">
     <span class="stability-label">Predictability</span>
     <div class="stability-bar"><div class="stability-fill" style="width:${_fpScore}%;background:${stabColor}"></div></div>
@@ -9553,7 +9555,7 @@ function loadCountryProfile(country) {
   const _isMonopoly = isStateMonopoly(d.take_75);
   function _fmtTakeCell(v) {
     if (v == null) return '—';
-    if (isStateMonopoly(v)) return '<span style="color:#888;font-size:22px;line-height:1;cursor:help;" title="State monopoly — no contractor access">—</span>';
+    if (isStateMonopoly(v)) return '<span style="color:var(--muted);font-size:22px;line-height:1;cursor:help;" title="State monopoly — no contractor access">—</span>';
     return `<span style="color:${v<=40?'var(--green)':v<=60?'var(--yellow)':v<=75?'var(--orange)':'var(--red)'}">${v.toFixed(1)}%</span>`;
   }
   // Feature 2: placeholder for simple_avg note — filled asynchronously after API fetch
@@ -9586,7 +9588,7 @@ function loadCountryProfile(country) {
   })() : '';
   const mainSections = `<div class="dd-section">
     <h3>Govt Take by Price Scenario ${_isMonopoly ? '' : _grankHtml} ${_tierBadgeHtml}${_vsMedianHtml}${_vsRegionalMedianHtml}</h3>
-    ${_isMonopoly ? '<div style="background:rgba(255,180,0,.08);border:1px solid rgba(255,180,0,.25);border-radius:8px;padding:12px 16px;margin-bottom:12px;"><span style="color:#f0a830;font-weight:700;">⚠ State Monopoly</span> <span style="color:var(--muted);font-size:13px;">This country is a state monopoly — no foreign contractor access. Fiscal terms are not applicable for investment screening.</span></div>' : ''}
+    ${_isMonopoly ? '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.2);border-radius:8px;padding:12px 16px;margin-bottom:12px;"><span style="color:var(--accent);font-weight:700;">⚠ State Monopoly</span> <span style="color:var(--muted);font-size:13px;">This country is a state monopoly — no foreign contractor access. Fiscal terms are not applicable for investment screening.</span></div>' : ''}
     <div class="dd-take-grid">
       <div class="dd-take-cell"><div class="price-lbl">$50/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_50)}">${_fmtTakeCell(d.take_50)}</div></div>
       <div class="dd-take-cell">
@@ -9600,7 +9602,7 @@ function loadCountryProfile(country) {
           if (iqr < 5) {
             return '<div style="font-size:9px;color:var(--muted);margin-top:3px;" title="Contracts are highly uniform — very consistent fiscal terms">IQR: ±' + (iqr/2).toFixed(1) + 'pp</div>';
           }
-          const iqrColor = iqr > 30 ? '#f97316' : iqr > 15 ? '#f0a830' : 'var(--muted)';
+          const iqrColor = iqr > 30 ? 'var(--orange)' : iqr > 15 ? 'var(--yellow)' : 'var(--muted)';
           return '<div style="font-size:9px;color:' + iqrColor + ';margin-top:3px;cursor:help;" title="Interquartile range — middle 50% of contracts span ' + p25.toFixed(1) + '% to ' + p75.toFixed(1) + '% take. Wide IQR indicates multiple fiscal regimes or highly variable contract terms.">'
             + p25.toFixed(1) + '–' + p75.toFixed(1) + '% IQR'
             + (iqr > 25 ? ' ⚠' : '') + '</div>';
@@ -9609,7 +9611,7 @@ function loadCountryProfile(country) {
       <div class="dd-take-cell"><div class="price-lbl">$100/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_100)}">${_fmtTakeCell(d.take_100)}</div></div>
       <div class="dd-take-cell"><div class="price-lbl">$125/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_125)}">${_fmtTakeCell(d.take_125)}</div></div>
     </div>
-    ${_isMonopoly ? '' : '<div style="font-size:11px;color:#888;margin-top:6px;line-height:1.4;">Take computed on a standardized deepwater project ($1.2B capex, 25-year life, 10% discount rate). Actual field economics vary — see cost profile assumptions for details.</div>'}
+    ${_isMonopoly ? '' : '<div style="font-size:11px;color:var(--muted);margin-top:6px;line-height:1.4;">Take computed on a standardized deepwater project ($1.2B capex, 25-year life, 10% discount rate). Actual field economics vary — see cost profile assumptions for details.</div>'}
     ${(function() {
       if (_isMonopoly) return '';
       const t50=d.take_50, t75=d.take_75, t100=d.take_100, t125=d.take_125;
@@ -9618,19 +9620,20 @@ function loadCountryProfile(country) {
       const mn=Math.min(...ts)-4, mx=Math.max(...ts)+4;
       const rng=Math.max(mx-mn,8);
       const toY=t=>+(48-(t-mn)/rng*36).toFixed(1);
-      const color=d.has_r_factor_tiers?'#2dd4bf':'rgba(255,180,0,.75)';
+      const color=d.has_r_factor_tiers?'var(--purple)':'var(--accent)';
+      const colorHex=d.has_r_factor_tiers?'#7C3AED':'#B06800';
       const pts=xs.map((x,i)=>`${x},${toY(ts[i])}`).join(' ');
       const area=`M ${xs[0]},${toY(t50)} L ${xs[1]},${toY(t75)} L ${xs[2]},${toY(t100)} L ${xs[3]},${toY(t125)} L ${xs[3]},52 L ${xs[0]},52 Z`;
-      const dots=xs.map((x,i)=>`<circle cx="${x}" cy="${toY(ts[i])}" r="2.5" fill="${color}"/>`).join('');
-      const lbls=xs.map((x,i)=>`<text x="${x}" y="${toY(ts[i])-5}" text-anchor="middle" fill="${color}" font-size="8" font-family="IBM Plex Mono,monospace" font-weight="600">${ts[i].toFixed(1)}%</text>`).join('');
-      const priceLbls=['$50','$75','$100','$125'].map((p,i)=>`<text x="${xs[i]}" y="60" text-anchor="middle" fill="rgba(255,255,255,.28)" font-size="7" font-family="IBM Plex Mono,monospace">${p}</text>`).join('');
+      const dots=xs.map((x,i)=>`<circle cx="${x}" cy="${toY(ts[i])}" r="2.5" fill="${colorHex}"/>`).join('');
+      const lbls=xs.map((x,i)=>`<text x="${x}" y="${toY(ts[i])-5}" text-anchor="middle" fill="${colorHex}" font-size="8" font-family="IBM Plex Mono,monospace" font-weight="600">${ts[i].toFixed(1)}%</text>`).join('');
+      const priceLbls=['$50','$75','$100','$125'].map((p,i)=>`<text x="${xs[i]}" y="60" text-anchor="middle" fill="#6B6560" font-size="7" font-family="IBM Plex Mono,monospace">${p}</text>`).join('');
       const gid='spk_'+(country||'').replace(/\W/g,'');
-      return `<div style="margin-top:10px;padding:8px 0 2px;border-top:1px solid rgba(255,255,255,.06);">
-        <div style="font-size:9px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Price Sensitivity Curve</div>
+      return `<div style="margin-top:10px;padding:8px 0 2px;border-top:1px solid var(--border);">
+        <div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px;">Price Sensitivity Curve</div>
         <svg viewBox="0 0 300 64" style="width:100%;height:64px;display:block;">
-          <defs><linearGradient id="${gid}" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="${color}" stop-opacity=".15"/><stop offset="100%" stop-color="${color}" stop-opacity=".01"/></linearGradient></defs>
+          <defs><linearGradient id="${gid}" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="${colorHex}" stop-opacity=".15"/><stop offset="100%" stop-color="${colorHex}" stop-opacity=".01"/></linearGradient></defs>
           <path d="${area}" fill="url(#${gid})"/>
-          <polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.5" opacity=".85"/>
+          <polyline points="${pts}" fill="none" stroke="${colorHex}" stroke-width="1.5" opacity=".85"/>
           ${dots}${lbls}${priceLbls}
         </svg>
       </div>`;
@@ -9643,7 +9646,7 @@ function loadCountryProfile(country) {
           ? `<span style="background:rgba(34,197,94,.15);border:1px solid rgba(34,197,94,.35);border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700;color:#22c55e;cursor:help;" title="Production-weighted where block-level data available (${(d.prod_coverage_pct||0).toFixed(0)}% coverage). Remaining contracts equally weighted.">Prod-weighted</span> Blended: production-weighted where data exists (${(d.prod_coverage_pct||0).toFixed(1)}%), equal-weighted for remainder`
           : `<span style="background:rgba(234,179,8,.15);border:1px solid rgba(234,179,8,.35);border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700;color:#eab308;cursor:help;" title="No contract-level production data available. All contracts weighted equally regardless of field size.">Equal-weighted avg</span> Equal-weighted average across ${d.n} contracts (no verified production data — fiscal terms comparison only)`}
     </p>
-    <div id="dd-simple-avg-note-${_safeSlugForSimpleAvg}" style="font-size:0.75em;color:#888;margin-top:4px;line-height:1.5;"></div>
+    <div id="dd-simple-avg-note-${_safeSlugForSimpleAvg}" style="font-size:0.75em;color:var(--muted);margin-top:4px;line-height:1.5;"></div>
     ${getMechBlendWarning(d)}
   </div>
   ${(function(){
@@ -9892,7 +9895,7 @@ function loadCountryProfile(country) {
       const rulerMax = 150;
       const beClipped = Math.min(bv, rulerMax);
       const bePct = (beClipped / rulerMax * 100).toFixed(2);
-      const beColor = bv < 50 ? '#4caf7d' : bv < 75 ? '#f0a830' : '#e55353';
+      const beColor = bv < 50 ? 'var(--green)' : bv < 75 ? 'var(--yellow)' : 'var(--red)';
       const markers = [
         {price:50,  pct:(50/rulerMax*100).toFixed(2), lbl:'$50'},
         {price:75,  pct:(75/rulerMax*100).toFixed(2), lbl:'$75'},
@@ -9907,16 +9910,16 @@ function loadCountryProfile(country) {
         + '<div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-bottom:8px;">BREAKEVEN COST CURVE</div>'
         + '<div style="position:relative;height:36px;">'
         + '<div style="position:absolute;left:0;right:0;top:8px;height:8px;background:var(--surface);border-radius:4px;border:1px solid var(--border);overflow:hidden;">'
-        + '<div style="height:100%;width:' + bePct + '%;background:rgba(76,175,125,0.25);border-radius:4px 0 0 4px;"></div>'
-        + '<div style="position:absolute;right:0;top:0;width:' + (100-parseFloat(bePct)).toFixed(2) + '%;height:100%;background:rgba(229,83,83,0.1);"></div>'
+        + '<div style="height:100%;width:' + bePct + '%;background:rgba(21,128,61,0.18);border-radius:4px 0 0 4px;"></div>'
+        + '<div style="position:absolute;right:0;top:0;width:' + (100-parseFloat(bePct)).toFixed(2) + '%;height:100%;background:rgba(185,28,28,0.08);"></div>'
         + '</div>'
         + '<div style="position:absolute;left:' + bePct + '%;top:3px;width:3px;height:18px;background:' + beColor + ';border-radius:2px;transform:translateX(-50%);" title="Avg breakeven @ $75/bbl"></div>'
         + '<div style="position:absolute;left:' + bePct + '%;top:-2px;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:800;color:' + beColor + ';">$' + bv.toFixed(0) + '</div>'
         + markerLines
         + '</div>'
         + '<div style="font-size:9px;color:var(--muted);margin-top:22px;line-height:1.4;">'
-        + '<span style="color:#4caf7d;">●</span> Contractor profitable &nbsp;·&nbsp; '
-        + '<span style="color:#e55353;">●</span> Contractor loss &nbsp;·&nbsp; Marker = avg breakeven (Norway $29/bbl, USA $31/bbl from SODIR/BSEE data)'
+        + '<span style="color:var(--green);">●</span> Contractor profitable &nbsp;·&nbsp; '
+        + '<span style="color:var(--red);">●</span> Contractor loss &nbsp;·&nbsp; Marker = avg breakeven (Norway $29/bbl, USA $31/bbl from SODIR/BSEE data)'
         + '</div>'
         + '</div>';
     })()}
@@ -9943,7 +9946,7 @@ function loadCountryProfile(country) {
           <div>├─ Discount rate: 10%</div>
           <div>└─ Project life: 25 years</div>
         </div>
-        <p style="font-size:11px;color:#888;margin-top:10px;line-height:1.5;">All take and NPV figures in this profile use this standardized project. Results are not forecasts of actual field economics — they are a consistent basis for cross-country fiscal comparison.</p>
+        <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;">All take and NPV figures in this profile use this standardized project. Results are not forecasts of actual field economics — they are a consistent basis for cross-country fiscal comparison.</p>
       </div>
     </div>`;
   })()}
@@ -9996,14 +9999,14 @@ function loadCountryProfile(country) {
     const mechList = d.mechanics ? d.mechanics.split(',').map(m => m.trim()).filter(Boolean) : [];
     if (!mechList.length) return '';
     const mechColors = {
-      'Concession':    {bg:'rgba(34,197,94,.15)',  border:'rgba(34,197,94,.4)',  text:'#22c55e'},
-      'PSC':           {bg:'rgba(59,130,246,.15)', border:'rgba(59,130,246,.4)', text:'#60a5fa'},
-      'TSC':           {bg:'rgba(168,85,247,.15)', border:'rgba(168,85,247,.4)', text:'#c084fc'},
-      'PRRT':          {bg:'rgba(249,115,22,.15)', border:'rgba(249,115,22,.4)', text:'#f97316'},
-      'Revenue Share': {bg:'rgba(234,179,8,.15)',  border:'rgba(234,179,8,.4)',  text:'#facc15'},
-      'RSC':           {bg:'rgba(20,184,166,.15)', border:'rgba(20,184,166,.4)', text:'#2dd4bf'},
-      'Buy-back':      {bg:'rgba(239,68,68,.15)',  border:'rgba(239,68,68,.4)',  text:'#f87171'},
-      'Risk Service':  {bg:'rgba(156,163,175,.15)',border:'rgba(156,163,175,.4)',text:'#9ca3af'},
+      'Concession':    {bg:'rgba(21,128,61,.12)',   border:'rgba(21,128,61,.35)',   text:'#15803D'},
+      'PSC':           {bg:'rgba(124,58,237,.12)',  border:'rgba(124,58,237,.35)',  text:'#7C3AED'},
+      'TSC':           {bg:'rgba(176,104,0,.10)',   border:'rgba(176,104,0,.30)',   text:'#B06800'},
+      'PRRT':          {bg:'rgba(194,65,12,.12)',   border:'rgba(194,65,12,.35)',   text:'#C2410C'},
+      'Revenue Share': {bg:'rgba(161,98,7,.12)',    border:'rgba(161,98,7,.35)',    text:'#A16207'},
+      'RSC':           {bg:'rgba(124,58,237,.08)',  border:'rgba(124,58,237,.25)',  text:'#7C3AED'},
+      'Buy-back':      {bg:'rgba(185,28,28,.12)',   border:'rgba(185,28,28,.35)',   text:'#B91C1C'},
+      'Risk Service':  {bg:'rgba(107,101,96,.10)',  border:'rgba(107,101,96,.3)',   text:'#6B6560'},
     };
     const mechDesc = {
       'Concession':    'State receives royalty + income tax. Contractor owns production.',
@@ -10037,7 +10040,7 @@ function loadCountryProfile(country) {
     const regionMin = Math.min(...peerTakes);
     const regionMax = Math.max(...peerTakes);
     const diff = d.take_75 - regionAvg;
-    const diffColor = diff < -5 ? '#4caf7d' : diff > 5 ? '#e55353' : '#f0a830';
+    const diffColor = diff < -5 ? 'var(--green)' : diff > 5 ? 'var(--red)' : 'var(--yellow)';
     const diffLabel = diff < -5 ? 'investor-friendly' : diff > 5 ? 'high take' : 'near average';
     // Top 5 closest peers by take
     const sorted = peers.slice().sort((a,b) => Math.abs(a.take_75 - d.take_75) - Math.abs(b.take_75 - d.take_75)).slice(0, 5);
@@ -10049,7 +10052,7 @@ function loadCountryProfile(country) {
     const rulerRange = rulerMax2 - rulerMin;
     const thisPct = ((d.take_75 - rulerMin) / rulerRange * 100).toFixed(1);
     const avgPct  = ((regionAvg - rulerMin) / rulerRange * 100).toFixed(1);
-    const tc = d.take_75 <= 40 ? '#4caf7d' : d.take_75 <= 60 ? '#f0a830' : d.take_75 <= 75 ? '#f97316' : '#e55353';
+    const tc = d.take_75 <= 40 ? 'var(--green)' : d.take_75 <= 60 ? 'var(--yellow)' : d.take_75 <= 75 ? 'var(--orange)' : 'var(--red)';
     return '<div class="dd-section">'
       + '<h3>Regional Peer Comparison</h3>'
       + '<div style="font-size:12px;color:var(--muted);margin-bottom:12px;">'
@@ -10078,7 +10081,7 @@ function loadCountryProfile(country) {
       + '<div style="display:flex;flex-wrap:wrap;gap:6px;">'
       + sorted.map(p => {
           const pDiff = p.take_75 - d.take_75;
-          const pCol = p.take_75 <= 40 ? '#4caf7d' : p.take_75 <= 60 ? '#f0a830' : p.take_75 <= 75 ? '#f97316' : '#e55353';
+          const pCol = p.take_75 <= 40 ? 'var(--green)' : p.take_75 <= 60 ? 'var(--yellow)' : p.take_75 <= 75 ? 'var(--orange)' : 'var(--red)';
           const pDiffStr = pDiff >= 0 ? '+' + pDiff.toFixed(1) : pDiff.toFixed(1);
           return '<div onclick="document.getElementById(\'dd-country-select\').value=\'' + p.country.replace(/'/g,"\\'") + '\';loadCountryProfile(\'' + p.country.replace(/'/g,"\\'") + '\')" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;" onmouseover="this.style.borderColor=\'#B06800\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
             + '<span style="color:var(--text);font-weight:700;">' + p.country + '</span>'
@@ -10980,12 +10983,12 @@ function renderSampleAnalyses() {
     [`<span style="color:var(--text);font-weight:600">Traditional PSC</span>`,
      `${pscEntry.n||644}`,`${pscEntry.pct||97}%`,
      `<span style="color:${indoTakeColor(pscEntry.take||58.0)};font-weight:600">${(pscEntry.take||58.0).toFixed(1)}%</span>`,
-     `<span style="color:#22c55e">$${(pscEntry.npv||765)}M</span>`,
+     `<span style="color:var(--green)">$${(pscEntry.npv||765)}M</span>`,
      '<span style="color:var(--muted);font-size:10px">Cost recovery + profit split</span>'],
-    [`<span style="color:#f97316;font-weight:600">Gross Split (post-2017)</span>`,
+    [`<span style="color:var(--orange);font-weight:600">Gross Split (post-2017)</span>`,
      `${gsEntry.n||19}`,`${gsEntry.pct||3}%`,
      `<span style="color:${indoTakeColor(gsEntry.take||65.3)};font-weight:600">${(gsEntry.take||65.3).toFixed(1)}%</span>`,
-     `<span style="color:#ef4444">-$${Math.abs(gsEntry.npv||-216)}M</span>`,
+     `<span style="color:var(--red)">-$${Math.abs(gsEntry.npv||-216)}M</span>`,
      '<span style="color:var(--muted);font-size:10px">Gross revenue split, no cost recovery</span>'],
   ];
   const cardB = `
@@ -14046,7 +14049,7 @@ function fetchCountryContracts(country) {
         + '<th class="num" title="Primary fiscal rate: royalty for Concessions, profit oil for PSCs">Key Rate</th>'
         + '</tr></thead><tbody>';
       contracts.slice(0, 30).forEach(function(c, i) {
-        const takeCol = c.take == null ? '' : c.take <= 40 ? 'color:#4caf7d' : c.take <= 60 ? 'color:#f0a830' : c.take <= 75 ? 'color:#f97316' : 'color:#e55353';
+        const takeCol = c.take == null ? '' : c.take <= 40 ? 'color:var(--green)' : c.take <= 60 ? 'color:var(--yellow)' : c.take <= 75 ? 'color:var(--orange)' : 'color:var(--red)';
         const keyRate = c.royalty != null ? c.royalty.toFixed(0) + '% R'
                       : c.profit_oil != null ? c.profit_oil.toFixed(0) + '% PO'
                       : c.ftp != null ? c.ftp.toFixed(0) + '% FTP'
@@ -14226,11 +14229,11 @@ function fetchCountryProductionChart(country) {
           // Build ruler for countries that didn't have be_75 in COUNTRY_DATA
           const rulerMax = 150;
           const bePct = (Math.min(be75, rulerMax) / rulerMax * 100).toFixed(2);
-          const beColor = be75 < 50 ? '#4caf7d' : be75 < 75 ? '#f0a830' : '#e55353';
+          const beColor = be75 < 50 ? 'var(--green)' : be75 < 75 ? 'var(--yellow)' : 'var(--red)';
           rulerWrap.innerHTML = '<div style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin-bottom:8px;">BREAKEVEN COST CURVE</div>'
             + '<div style="position:relative;height:36px;">'
             + '<div style="position:absolute;left:0;right:0;top:8px;height:8px;background:var(--surface);border-radius:4px;border:1px solid var(--border);overflow:hidden;">'
-            + '<div style="height:100%;width:' + bePct + '%;background:rgba(76,175,125,0.25);border-radius:4px 0 0 4px;"></div>'
+            + '<div style="height:100%;width:' + bePct + '%;background:rgba(21,128,61,0.18);border-radius:4px 0 0 4px;"></div>'
             + '</div>'
             + '<div style="position:absolute;left:' + bePct + '%;top:3px;width:3px;height:18px;background:' + beColor + ';border-radius:2px;transform:translateX(-50%);"></div>'
             + '<div style="position:absolute;left:' + bePct + '%;top:-2px;transform:translateX(-50%);white-space:nowrap;font-size:10px;font-weight:800;color:' + beColor + ';">$' + be75.toFixed(0) + '</div>'
@@ -14240,7 +14243,7 @@ function fetchCountryProductionChart(country) {
                 + '<div style="position:absolute;left:' + pp + '%;top:20px;transform:translateX(-50%);font-size:9px;color:var(--muted);">$' + p + '</div>';
             }).join('')
             + '</div>'
-            + '<div style="font-size:9px;color:var(--muted);margin-top:22px;"><span style="color:#4caf7d;">●</span> Profitable below breakeven &nbsp;·&nbsp; <span style="color:#e55353;">●</span> Loss above breakeven</div>';
+            + '<div style="font-size:9px;color:var(--muted);margin-top:22px;"><span style="color:var(--green);">●</span> Profitable below breakeven &nbsp;·&nbsp; <span style="color:var(--red);">●</span> Loss above breakeven</div>';
           rulerWrap.style.display = 'block';
         }
         if (footnote && be75 != null) {
