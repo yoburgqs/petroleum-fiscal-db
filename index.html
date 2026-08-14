@@ -320,7 +320,8 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
   .site-header .meta { display: none; }
   .site-header { padding: 10px 16px; gap: 10px; }
   /* v114: prevent iOS auto-zoom on select focus (requires font-size >= 16px) */
-  select { font-size: 16px; }
+  /* v239: !important added to override inline font-size styles on reform filter selects */
+  select { font-size: 16px !important; }
 }
 
 /* === v32: Live DCF Panel === */
