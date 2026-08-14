@@ -1201,3 +1201,11 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
    - Why ORCA's reference project is oil-only and the 10% NPV threshold for requiring a separate gas analysis
    - Three dimensions of gas fiscal divergence: royalty rate, revenue base, cost recovery ring-fence
    - 
+
+---
+## Cycle 167 Log — 2026-08-13 19:46
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Confirmed. Pre-push hook ran cleanly â€” 136 PASS / 0 FAIL before push, no `--no-verify`. `petroleum-fiscal-db` is live at `6517ca2`.
+
