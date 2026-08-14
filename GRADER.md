@@ -742,6 +742,40 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Cycle 182 Log — 2026-08-14
+- Test before: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 181 push state)
+- Test after: 4/4 non-empty JS syntax gate PASS / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Benchmark 185/185 (100%). Grade maintained B+. Naming Consistency A+ — found stale "Scenario Builder v231" in How to Cite section (2 instances: body text + Scenario Builder cite), "ORCA v231" in 7 FAQ source citation paragraphs (A127/A130/A131/A132/A133/A134 bodies), and "Platform v231" in Methodology provenance text — swept all to v233. Grade maintained A+.
+- Fixes: (1) Professional Credibility: A136 FAQ added — ORCA government take vs. entitlement barrels reconciliation; how PSC entitlement barrels (cost oil + profit oil) differ structurally from WI production; why applying take% directly to WI production double-counts the entitlement adjustment; 4-step reconciliation workflow (identify mechanic/WI% / compute entitlement / map ORCA take to cashflow / IC memo disclosure); rule of thumb by mechanic type (Concession WI-invariant; PSC 65% take → entitlement 28–38% gross; high-FTP PSC 3–6pp IRR impact; TSC fee-income basis); SEC ASC 932-10-55-11 + IFRS 6 reserves booking reconciliation; cross-reference A39/A100/A119/A120/A133. FAQ count 135→136. (2) Naming Consistency: stale "Scenario Builder v231" in How to Cite corrected to v233 (2 instances); "ORCA v231" in FAQ source citations swept to v233 (7 instances: A127 source, A130 source, A131 workflow IC memo + source, A132 source, A133 Scenario Builder language + source, A134 IC memo template); "Platform v231" in Methodology provenance corrected to v233; Quick Start guide v231 cite corrected to v233; v232→v233 sweep across structural locations (title, meta, header badge, print header); Methodology card updated 135→136 analyst FAQs; What's New panel updated to v233 with 3 new cards. (3) Data Reliability: A136 cross-reference audit trail — A39 (WI-invariant) + A100 (FTP entitlement) + A119 (SEC booking) + A120 (non-operator WI) + A133 (Scenario Builder calibration) now linked into coherent entitlement reconciliation framework. Version v232→v233.
+- **Holistic walkthrough (Directive 2):** Home tab — loads immediately; What's New shows v233 (A136 FAQ, naming sweep, data reliability audit trail); 136-FAQ Methodology card ✓. Fiscal Compare — auto-runs 185 countries on first activation ✓. Country Profile — auto-loads Norway ✓. Side-by-Side — North Sea Trio auto-loads ✓. IOC Portfolio — auto-loads Shell; Mechanic Mix stat shows % breakdown ✓. Navigation coherent, zero empty states ✓. **All dimensions: GOOD.**
+
+---
+
+## Updated Grade Table (Cycle 182 — 2026-08-14)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 136 FAQs (A1–A136) including A136 entitlement reconciliation audit trail (A39/A100/A119/A120/A133 cross-reference). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). reform_history.json preload priority lowered to "low" (v231). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). Directive 1 COMPLETE. Country Profile "Compare" button (v227). "Load Top 5 in Side-by-Side" button (v229). IOC Portfolio "Mechanic Mix" stat (v231). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 136-FAQ section. Methodology card updated to 136 analyst FAQs (v233). First-visit Quick Start guide updated to v233. What's New panel (v233). |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). Side-by-Side empty-state text updated (v223). No bare empty tables remain. |
+| 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 182). 136 PASS / 0 FAIL / 0 JS errors (stable since v219). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A136 accessible. Explorer "Other" chip tooltip added (v232). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | = | Skeleton loader. Favicon. Row fade-in. IOC Portfolio duplicate page-title removed (v219). |
+| 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
+| 12 | 5. Naming Consistency | A+ | ↑ | Stale "Scenario Builder v231" in How to Cite corrected (v233). "ORCA v231" in 7 FAQ source citations corrected (v233). "Platform v231" in Methodology provenance corrected (v233). v232→v233 sweep complete across all structural locations. Naming consistency gap eliminated. |
+| 13 | 7. Professional Credibility | A+ | = | 136 FAQs (A1–A136). A136 added: ORCA government take vs. entitlement barrels reconciliation — how PSC entitlement (cost oil + profit oil) differs from WI production; 4-step IC reconciliation workflow; SEC ASC 932-10-55-11 + IFRS 6 booking reconciliation; rule of thumb by mechanic (Concession WI-invariant; PSC high-FTP entitlement compression; TSC fee-income). How to Cite updated to v233. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v233 — citation template, short-form footnote, and Scenario Builder cite example all corrected. |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 182). Cycle 182 grade changes: Professional Credibility A+ maintained (A136: entitlement reconciliation, FAQ count 135→136); Naming Consistency A+ maintained with upward evidence strength (stale v231 citations eliminated across 9 locations); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint. Naming Consistency audit finding closed: no stale version citations remain in IC memo templates or source paragraphs.**
+
+---
+
 **SPRINT STATUS — CYCLE 171:**
 - Directive 1 (auto-run on all 4 tabs): ✅ COMPLETE (v219)
 - Holistic walkthrough: ✅ ALL DIMENSIONS GOOD
