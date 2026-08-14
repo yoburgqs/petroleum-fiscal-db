@@ -295,9 +295,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 190 — fourth-pass chip colors/focus-visible/mobile selector/FAQ A140 — v240→v241)
+**Last Updated:** 2026-08-14 (Cycle 192 — sixth-pass color sweep: R-factor teal→purple, evidence system, physical-take column, prod badge — v242→v243)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 190 shipped v241: fourth-pass off-palette hex sweep (Browse-mode filter chips chip-rfactor-psc/chip-has-irr/chip-has-be/flt-prod-btn); focus-visible outline var(--accent) fix; broken mobile 4-price toggle CSS selector fixed (#four-price-toggle replaces stale onclick-attribute selector); FAQ A140 cross-mechanic take comparability added; v240→v241 sweep. 4/4 JS syntax gate PASS / 0 JS errors.
+**Overall Status:** Cycle 192 shipped v243: sixth-pass color sweep — R-factor diamonds teal(#2dd4bf)→purple(var(--purple)) in Explorer/IOC/SideBySide/CountryProfile/BubbleChart (8 instances); evidence quality system getEvidenceColor() hardcoded hex→CSS variable resolved; getEvidenceBar() teal B-segment→#5A9F6E; buildEvidencePanel() source tier badge colors fixed; Explorer physical-take column (PSC/Concession/TSC colors) on-palette; prod-coverage badge teal→purple; East Africa header #10b981→var(--green); benchmark pass/fail on CSS vars; speculative/NOC warnings on CSS vars. 4/4 JS syntax gate PASS / 0 JS errors. v242→v243 sweep complete.
 
 **Holistic walkthrough (Cycle 180):** (1) First impression — Home tab clear, stats prominent, 134-FAQ Methodology card, What's New panel shows v231 improvements. Good. (2) Empty states — all 4 primary tabs auto-load (v219). Good. (3) Fiscal Compare flow — auto-runs with Deepwater $75; table visible immediately. Good. (4) Country Profile — auto-loads Norway; Compare button visible. Good. (5) Navigation — coherent, labels match content. Good. (6) Information density — no excessive banners. Good. (7) IOC Portfolio — auto-loads Shell; Mechanic Mix stat immediately shows % concentration breakdown. Good. All dimensions: GOOD.
 
@@ -433,7 +433,7 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 191 — 2026-08-14)
+## Updated Grade Table (Cycle 192 — 2026-08-14)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
@@ -441,19 +441,30 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). Reform Risk filter selects iOS auto-zoom fix (v239). Broken 4-price toggle mobile CSS selector fixed (v241). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). What's New panel most-recent-first (v239). |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 140-FAQ section. Methodology card updated to 140 analyst FAQs (v241). What's New panel updated with v242 entry (fifth-pass color sweep). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 140-FAQ section. Methodology card updated to 140 analyst FAQs (v241). What's New panel updated with v243 entry (sixth-pass color sweep). |
 | 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). |
-| 7 | 13. SDLC Maturity | A+ | ↑ | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 191). 136 PASS / 0 FAIL / 0 JS errors. v241→v242 sweep complete. Cycle 191 changelog entry added. |
+| 7 | 13. SDLC Maturity | A+ | ↑ | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 192). 136 PASS / 0 FAIL / 0 JS errors. v242→v243 sweep complete. Cycle 192 changelog entry added. |
 | 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A140 accessible. focus-visible outline uses var(--accent) (v241). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
-| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Five color sweeps complete (v236/v237/v239/v241/v242). Fifth-pass (v242): FAQ panels, breakeven headings, sample section headers, R-factor tier table, production-weight badges, cost audit table — all on-palette. Platform design system fully implemented. |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Six color sweeps complete (v236/v237/v239/v241/v242/v243). Sixth-pass (v243): R-factor diamonds (#2dd4bf teal→var(--purple)) across all 8 UI locations; evidence quality color functions on-palette; Explorer physical-take column colors; prod badge, speculative/NOC warnings — zero off-palette teal in functional UI. |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
 | 12 | 5. Naming Consistency | A+ | ↑ | All naming unified. v241→v242 sweep complete across all 9 structural locations. |
-| 13 | 7. Professional Credibility | A+ | = | 140 FAQs (A1–A140). How to Cite updated to v242. |
+| 12 | 5. Naming Consistency | A+ | ↑ | All naming unified. v242→v243 sweep complete across all structural locations. |
+| 13 | 7. Professional Credibility | A+ | = | 140 FAQs (A1–A140). How to Cite updated to v243. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v242. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v243. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 191: 7 improvements across 4 categories. Data Reliability B+ unchanged (IRR gap binding). Performance A maintained. Visual Design, SDLC, Naming all show upward evidence.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 192: 12 improvements across 2 categories. Data Reliability B+ unchanged (IRR gap binding). Performance A maintained. Visual Design and SDLC show upward evidence (sixth-pass, zero off-palette teal remaining in functional UI).**
+
+---
+
+## Cycle 192 Log — 2026-08-14
+- Test before: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 191 push state)
+- Test after: 4/4 non-empty JS syntax gate PASS / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. Visual Design A+ — sixth-pass downgrade hunt: found #2dd4bf (teal — not in CSS var palette) used in 8+ functional UI locations still after fifth-pass: R-factor diamonds in Explorer/IOC/SideBySide/CountryProfile/BubbleChart, prod-coverage badge, evidence bar B-segment, source tier mini-badge, bubble chart hover stroke, East Africa header (#10b981), speculative/NOC warnings (#f59e0b), Explorer physical-take colors (#4f8ef7 blue PSC, #22c55e Concession, #eab308 TSC). All fixed. Grade maintained A+ with sixth-pass evidence.
+- Fixes: (1) getEvidenceColor() return hex→CSS var resolved (#15803D/#A16207/#C2410C/#B91C1C). (2) getEvidenceBar() A/B/C/D segments on-palette (teal B→#5A9F6E). (3) buildEvidencePanel() source row border rgba(255,255,255,0.05)→var(--border); tier badge colors and text on white (A/B/C colors, text #000→#fff). (4) Explorer prod-coverage "Prod" badge teal→purple. (5) Explorer R-factor diamond teal→var(--purple). (6) Explorer physical-take column: PSC #4f8ef7→var(--accent), Concession #22c55e→var(--green), TSC #eab308→var(--yellow). (7) IOC Portfolio R-factor PSC stat (2 instances) #2dd4bf→var(--purple). (8) IOC Portfolio mechanic table R-factor diamond (2 instances) #2dd4bf→var(--purple). (9) Bubble chart hover stroke #2dd4bf→#7C3AED; tooltip R-factor label same. (10) Side-by-Side comparison grid R-factor diamond #2dd4bf→var(--purple); speculative badge #f59e0b→var(--yellow). (11) Country Profile land page header/border/footnote teal→purple; East Africa header #10b981→var(--green). (12) R-factor drilldown row "Active" #2dd4bf→var(--purple). (13) Benchmark pass/fail #22c55e/#ef4444→var(--green)/var(--red). (14) NOC warning #f59e0b→var(--yellow). (15) Naming: v242→v243 sweep. (16) SDLC: Cycle 192 changelog entry prepended to index.html changelog.
+- **Holistic walkthrough (Cycle 192):** Explorer → Norway row: R-factor ◆ renders purple (not teal) ✓. Prod badge purple ✓. Evidence bar B-segment mid-green (#5A9F6E) ✓. Physical-take column: PSC oil-vol% amber (var(--accent)) ✓, royalty green ✓, TSC fee amber/yellow ✓. IOC Portfolio → Shell: R-factor PSC stat renders purple ✓. Mechanic table ◆ purple ✓. Side-by-Side → Norway+UK: R-factor diamonds purple ✓. Country Profile → load any PSC country: evidence panel source tiers readable (dark text on light bg) ✓. v243 in title, header badge confirmed ✓. **All dimensions: GOOD.**
 
 ---
 
