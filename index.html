@@ -6498,6 +6498,48 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </details>
 
+    <!-- A139 -->
+    <details class="faq-item" id="faq-A139">
+      <summary><strong>A139.</strong> ORCA's DCF is unlevered (100% equity). Our IC models typically use 60–70% debt financing. How do I reconcile ORCA's government take and IRR figures with a levered project model for an IC submission?</summary>
+      <div style="padding:12px 0 4px 0;">
+        <p><strong style="color:var(--text);">ORCA uses an unlevered (all-equity) DCF by design</strong> — this ensures government take is comparable across all 185 countries regardless of each company's financing structure. A levered IRR is project-company specific, not regime-specific. For IC submissions, you apply a levered adjustment on top of ORCA's unlevered baseline rather than replacing it.</p>
+
+        <p><strong style="color:var(--text);">Why the distinction matters by fiscal mechanic:</strong></p>
+        <ul style="margin:0 0 10px 0;padding-left:20px;line-height:1.8;">
+          <li><strong>Concession regimes (royalty + CIT):</strong> Interest expense is typically deductible against CIT, creating a tax shield. At 65% debt, a 30% CIT regime yields a ~6–9pp IRR uplift from the interest tax shield on a standard $1.2B Deepwater project. CIT deductibility is confirmed in most OECD concession regimes (Norway, UK, Australia, Netherlands).</li>
+          <li><strong>PSC regimes (cost recovery + profit oil):</strong> Debt service is generally recoverable under cost oil, but interest deductibility rules vary. In Angola, Nigeria, and Malaysia, interest on shareholder loans is often capped or ring-fenced at the license level, limiting the tax shield value. In Indonesia Gross Split PSCs, there is no cost recovery at all — leverage provides no fiscal benefit. Levered uplift: 2–5pp IRR vs. 6–9pp for concessions.</li>
+          <li><strong>PRRT and SPT regimes (Australia / Norway):</strong> PRRT uplift rates on unrecovered costs (currently 13.4% for exploration, 5% + LTBR for development) act as a form of implicit interest deductibility at the regime level. Additional explicit interest deductibility against PRRT is limited. Norway SPT: interest deductible at the standard CIT layer but not the SPT layer. Net levered uplift: 3–5pp IRR.</li>
+        </ul>
+
+        <p><strong style="color:var(--text);">Thin-cap rules — country matrix:</strong></p>
+        <ul style="margin:0 0 10px 0;padding-left:20px;line-height:1.8;">
+          <li><strong>Nigeria:</strong> 3:1 debt-to-equity cap; interest on shareholder loans exceeding the cap is non-deductible under CITA Section 27. Post-PIA 2021: ring-fencing at field level limits interest allocation across licenses.</li>
+          <li><strong>Angola:</strong> Sonangol approval required for shareholder loan structures; interest deductibility at Decree-Law 07/11 CIT (25%) layer only, not cost oil.</li>
+          <li><strong>Kazakhstan:</strong> 4:1 thin-cap ratio under Tax Code Article 246. For PSA/PSC projects governed by subsoil use agreements, contractual stabilization may override the code — verify contract terms.</li>
+          <li><strong>UAE / Qatar / Iraq TSC:</strong> IOC financing structure largely irrelevant — government take is determined by TSC/RSC fee, not CIT on contractor profit. Leverage provides no material fiscal benefit in these regimes.</li>
+          <li><strong>Norway / UK / Australia / Netherlands:</strong> Full interest deductibility at CIT layer; transfer pricing arm's-length requirement applies to related-party debt.</li>
+        </ul>
+
+        <p><strong style="color:var(--text);">4-step levered IRR adjustment workflow for IC submissions:</strong></p>
+        <ol style="margin:0 0 10px 0;padding-left:20px;line-height:1.8;">
+          <li><strong>Establish the ORCA unlevered IRR baseline:</strong> Run Scenario Builder with your project parameters (capex, opex, peak rate, price). Record the unlevered contractor IRR. This is your regime-comparable baseline — cite it as "ORCA unlevered IRR" in the IC memo.</li>
+          <li><strong>Apply the interest tax shield:</strong> Calculate the annual interest payment (debt amount × rate). Multiply by the effective deductible tax rate (CIT for concessions; zero for most PSCs without cost oil interest recovery). Discount the tax shield at the cost of debt. Add to unlevered project NPV to get levered NPV, then re-derive levered IRR.</li>
+          <li><strong>Check thin-cap and ring-fencing constraints:</strong> For Nigeria, Angola, Kazakhstan — cap the deductible interest at the applicable debt-to-equity ratio. For PSC regimes — confirm whether interest is recoverable under cost oil or excluded. Adjust the tax shield value accordingly.</li>
+          <li><strong>IC memo disclosure:</strong> Present both metrics: "ORCA unlevered IRR: [X]% (regime-comparable, 100% equity basis) | Company levered IRR: [Y]% (60% debt at [rate]%, [country] thin-cap rules applied)." Do not replace the unlevered figure — include both for comparability.</li>
+        </ol>
+
+        <p><strong style="color:var(--text);">Rule of thumb by financing structure:</strong></p>
+        <ul style="margin:0 0 10px 0;padding-left:20px;line-height:1.8;">
+          <li><strong>60% debt, OECD concession, 30% CIT:</strong> Levered IRR ≈ Unlevered IRR + 6–9pp (strong tax shield)</li>
+          <li><strong>60% debt, West Africa PSC, ring-fenced:</strong> Levered IRR ≈ Unlevered IRR + 2–4pp (limited cost oil recovery)</li>
+          <li><strong>60% debt, Indonesia Gross Split:</strong> Levered IRR ≈ Unlevered IRR (no cost recovery layer — leverage fiscally neutral)</li>
+          <li><strong>TSC/RSC Gulf (UAE, Iraq, Qatar):</strong> Levered IRR ≈ Unlevered IRR (fee-based regime — financing structure irrelevant to government take)</li>
+        </ul>
+
+        <p><strong style="color:var(--text);">Source:</strong> ORCA v239 (Aug&nbsp;2026). Cross-reference: FAQ A8 (DCF methodology and discount rate); FAQ A41 (IRR DCF model specification); FAQ A69 (fiscal ring-fencing); FAQ A80 (cost recovery cap mechanics). Industry context: Wood Mackenzie Project Economics Guide (2024); EY Global Oil &amp; Gas Tax Guide (2025); IHS Markit Upstream Fiscal Terms Database (2025).</p>
+      </div>
+    </details>
+
     <div style="text-align:right;margin-top:16px;padding-top:10px;border-top:1px solid var(--border);">
       <a href="#tab-btn-tmeth" onclick="document.getElementById('tab-btn-tmeth')&&document.getElementById('tab-btn-tmeth').scrollIntoView({behavior:'smooth'});return false;" style="font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:4px;padding:3px 10px;transition:.15s;" title="Return to Methodology top">&#8679; Back to top</a>
     </div>
