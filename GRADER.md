@@ -1,3 +1,47 @@
+# 🎯 PRIORITY STAGED IMPROVEMENTS — From Zach (2026-08-13) — DO THESE NEXT
+
+**Two directives from the product owner. Both are mandatory going forward.**
+
+## Directive 1: Auto-run defaults on every tab — stop making the user press Run
+
+Users should never land on an empty tab. Each tab must load with useful content immediately.
+
+| Tab | Current behavior | Required behavior |
+|-----|-----------------|-------------------|
+| Fiscal Compare (t0) | Empty table, must click "Run Compare" | Auto-run `runFiscalCompare()` on first tab activation (after COUNTRY_DATA loads). Keep the Run button for re-runs. |
+| Country Profile (t7) | Empty dropdown, nothing shown | Auto-load "Norway" on first activation if no country is selected. User can then change the dropdown. |
+| IOC Portfolio (t5) | Empty search box, two stacked headers | Auto-load "Shell" on first activation. Also: remove the inner "Operator Fiscal Exposure Analyzer" duplicate page-title — it's redundant with the outer "IOC Portfolio View" header. |
+| Side-by-Side (t2) | Empty panel with quickstart buttons | Auto-load the North Sea quickstart comparison (Norway + UK + Netherlands) on first activation. |
+
+**Implementation pattern:**
+- Use a `var _autoRanOnce = {}` guard object keyed by tab id to ensure auto-run only fires once per session (not every tab switch).
+- Auto-run fires in `switchTab()` after the panel becomes active, with a 150ms delay (allows the panel to render).
+- Check that COUNTRY_DATA is loaded before auto-running Fiscal Compare: `if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length > 0)`
+- For Country Profile: check `if (!document.getElementById('dd-profile-content') || document.getElementById('dd-profile-content').innerHTML.trim() === '')`
+- All auto-runs must not fire if the user has already interacted with that tab.
+
+## Directive 2: Holistic product evaluation every cycle — not just "did my last edit land"
+
+**The current testing pattern is broken.** You run Playwright, confirm 136 PASS, declare cycle complete. You are confirming structural tests pass — not evaluating whether the product makes sense to a real user.
+
+**Required from every cycle forward:**
+
+After the Playwright gate passes, spend 3–5 minutes doing a holistic product walkthrough in the browser. Evaluate each of these dimensions — score them honestly (Good / Needs Work / Broken):
+
+1. **First impression** — Does the Home tab clearly communicate what the platform does? Are the stat numbers correct? Do the cards describe what's actually in the linked tab?
+2. **Empty states** — Land on each primary tab cold. Does it immediately show something useful, or is it blank/waiting?
+3. **Fiscal Compare flow** — Run it. Does the table appear quickly? Is the sort working? Is the status message clear? Does it feel like a professional tool?
+4. **Country Profile** — Load Norway, then Iraq. Does the multi-mechanic banner look like an alert or an inline note? Is it proportionate to the severity?
+5. **Navigation coherence** — Click every nav item. Does the label match what you see? Is the Reference dropdown useful or confusing?
+6. **Information density** — Are there too many banners, headers, or metadata strips before the actual content? Every element above the fold should earn its space.
+7. **IOC Portfolio** — Does it auto-load? Is the page clear about what to do?
+
+**Log your evaluation in the cycle log.** Not just the test count — a 3-line product assessment: what is working well, what looks off, what you fixed or staged.
+
+**If you find something obviously broken or ugly during the walkthrough, fix it in the same cycle** (within the 25-min budget). Do not defer obvious UX problems to "future cycles."
+
+---
+
 # 🚦 PUSH SAFETY — a broken page was LIVE for 13 minutes today (manager, 11:55 AM Aug 11) — READ FIRST
 
 Cycle 120 (v168) pushed a JS syntax error ("unexpected identifier s") at 11:32 AM; it was live on GitHub Pages until the 11:45 fix. This happened because pushes are going out with `--no-verify` (Playwright hook timeout, "Cycle 88+ precedent"). Zach may demo this platform at any moment — 13 minutes of a broken page is unacceptable.
