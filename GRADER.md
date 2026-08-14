@@ -1571,3 +1571,11 @@ Ready for the next cycle when triggered.
 **What was fixed:**
 
 - **FAQ A134 â€” Portfolio fiscal mechanic concentration risk** (Professional Credibility): New analyst FAQ covering a real gap â€” when >60% of upstream portfolio contracts share one mechanic type (e.g. all Sub-Saharan Africa PSCs), a single renegotiation wave hits the whole portfolio simultaneously. Covers: 4-step concentration audit workflow using IOC Portfolio + Screener + Reform Risk tabs; syst
+
+---
+## Cycle 181 Log — 2026-08-14 06:17
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Background push confirmed exit 0 â€” both commits live on GitHub Pages.
+
