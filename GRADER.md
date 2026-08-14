@@ -435,7 +435,7 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 193 — 2026-08-14)
+## Updated Grade Table (Cycle 194 — 2026-08-14)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
@@ -444,18 +444,27 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). Reform Risk filter selects iOS auto-zoom fix (v239). Broken 4-price toggle mobile CSS selector fixed (v241). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). What's New panel most-recent-first (v239). |
 | 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 141-FAQ section. Methodology card updated to 141 analyst FAQs (v244). What's New panel updated with v244 entry (ring-fence multi-block FAQ). |
-| 6 | 6. Error & Empty States | A+ | ↑ | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). Load error overlay on-palette — var(--red)/var(--muted) (v244). |
-| 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 193). 136 PASS / 0 FAIL / 0 JS errors. v243→v244 sweep complete. Cycle 193 changelog entry added. |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). Load error overlay on-palette — var(--red)/var(--muted) (v244). |
+| 7 | 13. SDLC Maturity | A+ | = | JS syntax gate PASS (Cycle 194). 136 PASS / 0 FAIL / 0 JS errors. v245→v246 sweep via commit. Cycle 194 log added. |
 | 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A141 accessible. focus-visible outline uses var(--accent) (v241). |
-| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
-| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Seven color passes complete (v236/v238/v239/v241/v242/v243/v244). Chart grid/axis on-palette (v244). Print header on CSS vars (v244). All hardcoded dark-mode hex eliminated from UI rendering paths. |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. JS syntax gate PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Eight color passes complete (v236/v238/v239/v241/v242/v243/v244/v246). v246 completes the sweep: 0 off-palette hex colors remain in any active rendering path — Sample Analyses cards, Reform Risk functions, IOC Portfolio, Vintage/Bubble charts, Breakeven Map, DCF waterfall (5 wfColors dicts), IRR scatter mechanic, D3 interpolator, CONF_COLORS, country profile scoring. All Tailwind and Material Design hex replaced with ORCA resolved-hex palette values. |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
-| 12 | 5. Naming Consistency | A+ | = | All naming unified. v243→v244 sweep complete across all structural locations. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. v244→v245 sweep complete. v246 commit descriptive. |
 | 13 | 7. Professional Credibility | A+ | = | 141 FAQs (A1–A141). A141: ring-fence multi-block portfolio IC workflow. How to Cite updated to v244. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v244. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 193: 9 improvements across 4 categories. Data Reliability B+ unchanged (IRR gap binding). Error & Empty States ↑ (load error overlay on-palette). Visual Design maintained with chart grid/axis and print header now on CSS vars.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 194: complete off-palette color sweep — 171 replacements across 40+ rendering sites, 0 active off-palette hex remaining. Visual Design maintained A+ with strongest evidence yet.**
+
+---
+
+## Cycle 194 Log — 2026-08-14
+- Test before: JS syntax PASS / 0 JS errors (Cycle 193 push state)
+- Test after: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) unchanged, binding constraint. Visual Design A+ — eighth-pass downgrade hunt: systematically grepped all active JS rendering code for off-palette hex. Found 40+ rendering sites still using Tailwind/Material Design colors in: Sample Analyses cards (12 cards × multiple colors), Reform Risk takeColor/cellColor/stability bar/direction counters/regional tilt, IOC Portfolio takeColor/tier legend/avgNPV/deltaColor/npv75, Breakeven Map beColor() + 3 active stroke sites, 5 wfColors dicts (drawer/scenario/country-profile/FC-compare/IOC), Vintage/Bubble chart mechanic and region color maps, IRR scatter mechanic color, D3 R-factor interpolator, CONF_COLORS, country profile rankColor/scoreColor, R-factor diamond (4 instances), prod coverage color, card border-left hex. Fixed all 171 instances. Final grep: 0 active off-palette lines (changelog text excluded). Grade maintained A+.
+- Fixes: 171 off-palette hex replacements across 40+ rendering functions. Key: wfColors unified to ORCA palette across all 5 waterfall dict instances; Vintage/Bubble mechanic+region maps on-palette; beColor() 5-step scale on-palette; IRR scatter mechanic color on-palette; D3 R-factor gradient (#0f4040/#2dd4bf → #2A1F6E/#7C3AED); Reform Risk function-scoped takeColor/cellColor rewritten; FISCAL_MECHANICS array 8 mechanic colors on-palette; all card border-left colors via CSS vars.
 
 ---
 
