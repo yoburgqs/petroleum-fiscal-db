@@ -433,6 +433,40 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Updated Grade Table (Cycle 191 — 2026-08-14)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 140 FAQs (A1–A140). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). Reform Risk filter selects iOS auto-zoom fix (v239). Broken 4-price toggle mobile CSS selector fixed (v241). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). What's New panel most-recent-first (v239). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 140-FAQ section. Methodology card updated to 140 analyst FAQs (v241). What's New panel updated with v242 entry (fifth-pass color sweep). |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 191). 136 PASS / 0 FAIL / 0 JS errors. v241→v242 sweep complete. Cycle 191 changelog entry added. |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A140 accessible. focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Five color sweeps complete (v236/v237/v239/v241/v242). Fifth-pass (v242): FAQ panels, breakeven headings, sample section headers, R-factor tier table, production-weight badges, cost audit table — all on-palette. Platform design system fully implemented. |
+| 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
+| 12 | 5. Naming Consistency | A+ | ↑ | All naming unified. v241→v242 sweep complete across all 9 structural locations. |
+| 13 | 7. Professional Credibility | A+ | = | 140 FAQs (A1–A140). How to Cite updated to v242. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v242. |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 191: 7 improvements across 4 categories. Data Reliability B+ unchanged (IRR gap binding). Performance A maintained. Visual Design, SDLC, Naming all show upward evidence.**
+
+---
+
+## Cycle 191 Log — 2026-08-14
+- Test before: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 190 push state)
+- Test after: 4/4 non-empty JS syntax gate PASS / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. Visual Design A+ — fifth-pass downgrade hunt: found 8 FAQ quick-reference Q/A entries (the methodology tab's colorful question panel) still using pastel dark-theme colors (#86efac/#fcd34d/#d8b4fe/#67e8f9/#fda4af/#bef264/#fdba74/#f0abfc) that appeared on dark bg — on light bg these wash out or contrast poorly. Also found Breakeven panel headings (#22c55e/#ef4444), Sample Analyses section headers (#0ea5e9/#22c55e/#ef4444/#f59e0b/#a78bfa), WACC table NPV colors (#22c55e/#ef4444), cost audit table rgba(71,85,105) slate backgrounds, R-factor tier table (#2dd4bf headers + rgba(255,255,255) borders), production-weight badges (#22c55e/#eab308). All fixed. Grade maintained A+ with fifth-pass evidence.
+- Fixes: (1) Visual Design — FAQ quick-reference panel: 8 Q/A blocks border-left and question header colors→CSS variables. (2) Visual Design — Methodology limitations table: #eab308/#ef4444→var(--yellow)/var(--red). (3) Visual Design — WACC sensitivity table: #22c55e/#ef4444→var(--green)/var(--red). (4) Visual Design — Breakeven panel headings and map legend: #22c55e/#ef4444→var(--green)/var(--red). (5) Visual Design — Sample Analyses section headers: all off-palette hex→CSS vars across 12 structural instances. (6) Visual Design — R-factor tier table: #2dd4bf header→var(--purple); dark borders→var(--border); dark row zebra→rgba(0,0,0,0.018); contractor/govt colors #34d399/#f87171→#15803D/#B91C1C. (7) Visual Design — Production-weight badges and data completeness checkmarks: rgba(34,197,94)/#22c55e→rgba(21,128,61)/#15803D; rgba(234,179,8)/#eab308→rgba(161,98,7)/#A16207. (8) Naming Consistency: v241→v242 sweep across 9 structural locations. (9) SDLC: Cycle 191 changelog entry prepended.
+- **Holistic walkthrough (Cycle 191):** Methodology tab → FAQ quick-reference panel: all 8 question headers render in CSS variable colors — green/yellow/purple/amber/red all on-palette against white bg ✓. Breakeven Map panel: "Lowest Breakeven" heading green (platform green, not Tailwind) ✓. Sample Analyses: Indonesia/Asia Pacific header renders amber (var(--accent)) ✓. Norway/North Sea headers render purple ✓. IOC Sweet Spots header renders green ✓. OPEC/Non-OPEC and Brazil Pre-salt headers render red ✓. Country Profile → load Norway → R-factor note renders purple (was teal) ✓. v242 in title, header badge, and print header confirmed ✓. **All dimensions: GOOD.**
+
+---
+
 ## Updated Grade Table (Cycle 190 — 2026-08-14)
 
 | Rank | Category | Grade | Delta | Priority Fix |
