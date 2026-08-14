@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" crossorigin>
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v234.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v235.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -28,11 +28,11 @@
 <meta name="twitter:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta name="twitter:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
 <link rel="canonical" href="https://yoburgqs.github.io/petroleum-fiscal-db/">
-<meta name="theme-color" content="#0F172A">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#F7F5F0">
+<meta name="color-scheme" content="light">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230F172A'/><path d='M16 6c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23E8A020'/><circle cx='14' cy='17' r='1.5' fill='%230F172A' opacity='.5'/></svg>">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v234</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v235</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" integrity="sha384-oNtu+d18330MVFpltUTve1DatxCkkctlpA2AC3GulbVFOSqhHdDat3qHse/Lbuek" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
@@ -44,75 +44,80 @@
 /* v180: Google Fonts loaded via non-blocking link in head -- CSS @import removed */
 
 :root {
-  --bg: #0F172A;
-  --surface: #1E293B;
-  --surface2: #334155;
-  --card: #1E293B;
-  --border: #475569;
-  --text: #F1F5F9;
-  --muted: #94A3B8;
-  --text-muted: #94A3B8;
-  --accent: #E8A020;
-  --accent-dim: #B87A10;
-  --green: #22C55E;
-  --positive: #22C55E;
-  --yellow: #EAB308;
-  --orange: #F97316;
-  --red: #EF4444;
-  --negative: #EF4444;
-  --purple: #A855F7;
-  --radius: 6px;
+  --bg:          #F7F5F0;
+  --surface:     #FFFFFF;
+  --surface2:    #EDE9E3;
+  --card:        #FFFFFF;
+  --border:      #D0CAC0;
+  --text:        #1C1A17;
+  --muted:       #6B6560;
+  --text-muted:  #6B6560;
+  --accent:      #B06800;
+  --accent-dim:  #8A5000;
+  --green:       #15803D;
+  --positive:    #15803D;
+  --yellow:      #A16207;
+  --orange:      #C2410C;
+  --red:         #B91C1C;
+  --negative:    #B91C1C;
+  --purple:      #7C3AED;
+  --radius:      4px;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { background: var(--bg); color: var(--text); font-family: 'Inter', system-ui, sans-serif; font-size: 14px; min-height: 100vh; overscroll-behavior-y: none; }
+body { background: var(--bg); color: var(--text); font-family: 'Georgia', 'Times New Roman', serif; font-size: 13px; line-height: 1.5; min-height: 100vh; overscroll-behavior-y: none; }
+/* Consulting report typography: tables/controls/UI chrome stay sans-serif */
+table, input, select, .tab-btn, .tab-nav, .btn, .badge, .chip,
+.card-title, .page-sub, code, kbd, .site-header {
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+}
 /* v116: overscroll-behavior-y:none prevents iOS Safari "pull-to-refresh" bounce on the page body
    (per-element overscroll-behavior:contain already applied to modals, panels, search overlay) */
 a { color: var(--accent); text-decoration: none; }
 
 /* ── Skip to content (accessibility) ── */
-.skip-link { position: absolute; top: -60px; left: 16px; background: var(--accent); color: #0B0F1A; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 0 0 var(--radius) var(--radius); z-index: 10000; text-decoration: none; transition: top .2s; }
+.skip-link { position: absolute; top: -60px; left: 16px; background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; padding: 8px 16px; border-radius: 0 0 var(--radius) var(--radius); z-index: 10000; text-decoration: none; transition: top .2s; }
 .skip-link:focus { top: 0; }
 
 /* ── header ── */
-.site-header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 16px; }
+.site-header { background: var(--surface); border-bottom: 2px solid var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 10px 20px; display: flex; align-items: center; gap: 16px; }
 .site-header h1 { font-size: 18px; font-weight: 700; letter-spacing: .5px; }
 .site-header .badge { background: var(--accent); color: #fff; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 12px; }
 .site-header .meta  { color: var(--muted); font-size: 12px; margin-left: auto; }
 
 /* ── tabs ── */
-.tab-nav { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 2px; padding: 0 24px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; align-items: stretch; }
+.tab-nav { background: var(--surface); border-bottom: 1px solid var(--border); display: flex; gap: 2px; padding: 0 20px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; align-items: stretch; }
 .tab-nav::-webkit-scrollbar { display: none; }
 .tab-nav-wrapper { position: relative; }
 .tab-nav-wrapper::after { content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 72px; background: linear-gradient(to right, transparent, var(--bg)); pointer-events: none; }
 .tab-nav-wrapper::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(to left, transparent, var(--bg)); pointer-events: none; z-index: 1; transition: width .2s; }
 .tab-nav-wrapper.scrolled::before { width: 32px; }
-.tab-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 18px; white-space: nowrap; transition: .15s; touch-action: manipulation; }
+.tab-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; padding: 10px 14px; white-space: nowrap; transition: .15s; touch-action: manipulation; }
 .tab-btn:hover  { color: var(--text); }
-.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); background: rgba(176,104,0,0.04); }
 
 /* ── Reference dropdown in tab nav ── */
 .tab-dropdown { position: relative; display: flex; align-items: stretch; }
-.tab-dropdown-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 12px 18px; white-space: nowrap; transition: .15s; display: flex; align-items: center; gap: 4px; }
+.tab-dropdown-btn { background: none; border: none; border-bottom: 3px solid transparent; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; padding: 10px 14px; white-space: nowrap; transition: .15s; display: flex; align-items: center; gap: 4px; }
 .tab-dropdown-btn:hover { color: var(--text); }
 .tab-dropdown-btn.has-active { color: var(--accent); border-bottom-color: var(--accent); }
-.tab-dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 0 0 8px 8px; min-width: 180px; z-index: 200; box-shadow: 0 8px 24px rgba(0,0,0,.4); }
+.tab-dropdown-menu { display: none; position: absolute; top: 100%; left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 0 0 4px 4px; min-width: 180px; z-index: 200; box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
 .tab-dropdown-menu.open { display: block; }
 .tab-dropdown-item { display: block; width: 100%; background: none; border: none; color: var(--muted); cursor: pointer; font-size: 13px; font-weight: 600; padding: 10px 18px; text-align: left; transition: .12s; white-space: nowrap; }
-.tab-dropdown-item:hover { background: rgba(232,160,32,.08); color: var(--text); }
-.tab-dropdown-item.active { color: var(--accent); background: rgba(232,160,32,.06); }
-.tab-pane { display: none; padding: 24px; }
+.tab-dropdown-item:hover { background: rgba(176,104,0,0.06); color: var(--text); }
+.tab-dropdown-item.active { color: var(--accent); background: rgba(176,104,0,0.04); }
+.tab-pane { display: none; padding: 16px 20px; }
 .tab-pane.active { display: block; }
 /* v116: content-visibility:auto on hidden tab panes — browser skips layout/paint for off-screen tabs
    until they become visible, reducing initial render cost on this single-file app */
 .tab-pane:not(.active) { content-visibility: auto; }
 
 /* ── cards ── */
-.card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2); }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .card-title { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
 
 /* ── controls ── */
 .controls-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-bottom: 18px; }
-.ctrl-group { display: flex; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 6px 12px; }
+.ctrl-group { display: flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 5px 10px; }
 .ctrl-group label { color: var(--muted); font-size: 12px; font-weight: 600; }
 select, input[type=text], input[type=number], input[type=range] { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); padding: 4px 8px; font-size: 13px; outline: none; }
 select:focus, input:focus { border-color: var(--accent); }
@@ -125,24 +130,25 @@ button:focus-visible, [role="tab"]:focus-visible, [role="button"]:focus-visible 
 .price-radio input[type=radio]:checked + label { background: var(--accent); border-color: var(--accent); color: #fff; }
 .search-input { background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 13px; padding: 8px 14px; width: 240px; }
 .search-input:focus { border-color: var(--accent); outline: none; }
-.btn { background: var(--accent); border: none; border-radius: 7px; color: #fff; cursor: pointer; font-size: 13px; font-weight: 600; padding: 8px 16px; transition: .15s; }
-.btn:hover { opacity: .85; }
+.btn { background: var(--accent); border: none; border-radius: var(--radius); color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 6px 14px; transition: .15s; }
+.btn:hover { background: var(--accent-dim); }
 .btn-sm { font-size: 11px; padding: 4px 10px; }
-.btn-outline { background: none; border: 1px solid var(--border); color: var(--muted); }
-.cp-quick-btn { background: rgba(232,160,32,.1); border: 1px solid rgba(232,160,32,.4); border-radius: 8px; color: var(--accent); cursor: pointer; font-size: 13px; font-weight: 600; padding: 8px 18px; transition: background .15s, border-color .15s; }
-.cp-quick-btn:hover { background: rgba(232,160,32,.22); border-color: var(--accent); }
+.btn-outline { background: transparent; border: 1px solid var(--border); color: var(--muted); border-radius: var(--radius); }
 .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.cp-quick-btn { background: rgba(176,104,0,0.08); border: 1px solid rgba(176,104,0,0.3); border-radius: var(--radius); color: var(--accent); cursor: pointer; font-size: 12px; font-weight: 600; padding: 6px 14px; transition: background .15s, border-color .15s; }
+.cp-quick-btn:hover { background: rgba(176,104,0,0.16); border-color: var(--accent); }
 
 /* ── tables ── */
 .tbl-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
 table { width: 100%; border-collapse: collapse; }
-thead th { background: var(--surface); color: var(--muted); font-size: 11px; font-weight: 600; letter-spacing: 0.03em; padding: 10px 12px; text-align: left; text-transform: uppercase; position: sticky; top: 0; white-space: nowrap; cursor: pointer; user-select: none; }
+thead th { background: #EDE9E3; color: var(--muted); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; padding: 7px 10px; text-align: left; text-transform: uppercase; position: sticky; top: 0; white-space: nowrap; cursor: pointer; user-select: none; border-bottom: 1px solid var(--border); }
 thead th:hover { color: var(--text); }
 thead th.sort-asc::after  { content: ' ▲'; color: var(--accent); }
 thead th.sort-desc::after { content: ' ▼'; color: var(--accent); }
 tbody tr { border-top: 1px solid var(--border); transition: background .1s; }
-tbody tr:hover { background: rgba(232,160,32,.06); }
-tbody td { padding: 9px 12px; white-space: nowrap; }
+tbody tr:hover { background: rgba(176,104,0,0.04); }
+tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
+tbody td { padding: 6px 10px; white-space: nowrap; }
 .num { text-align: right; font-variant-numeric: tabular-nums; }
 .monospace { font-family: 'Consolas', monospace; }
 
@@ -165,7 +171,7 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
 .cmp-row { display: contents; }
 .cmp-row .cmp-cell { background: var(--card); border-top: 1px solid var(--border); padding: 9px 14px; text-align: center; font-size: 13px; }
 .cmp-row .cmp-cell.lbl { text-align: left; color: var(--muted); font-size: 12px; font-weight: 600; background: var(--surface); }
-.cmp-row:hover .cmp-cell { background: rgba(232,160,32,.04); }
+.cmp-row:hover .cmp-cell { background: rgba(176,104,0,.04); }
 
 /* ── screener sliders ── */
 .slider-row { display: flex; flex-wrap: wrap; gap: 20px; margin-bottom: 18px; }
@@ -206,13 +212,13 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
 .tag { background: var(--surface); border: 1px solid var(--border); border-radius: 5px; color: var(--muted); display: inline-block; font-size: 11px; margin: 2px; padding: 2px 7px; }
 .count-badge { background: var(--surface); border-radius: 12px; color: var(--muted); font-size: 11px; padding: 1px 7px; }
 .help-text { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
-.page-title { font-size: 20px; font-weight: 800; margin-bottom: 4px; }
-.page-sub   { color: var(--muted); font-size: 13px; margin-bottom: 18px; }
+.page-title { font-family: 'Georgia', serif; font-size: 18px; font-weight: 700; color: var(--text); margin-bottom: 2px; letter-spacing: -0.01em; }
+.page-sub   { font-family: system-ui, sans-serif; font-size: 12px; color: var(--muted); margin-bottom: 12px; line-height: 1.4; }
 
 /* ── global search overlay (F3) ── */
-#search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.72); z-index:9999; align-items:flex-start; justify-content:center; padding-top:80px; }
+#search-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:9999; align-items:flex-start; justify-content:center; padding-top:80px; }
 #search-overlay.open { display:flex; }
-#search-modal { background:var(--card); border:1px solid var(--border); border-radius:12px; width:100%; max-width:580px; box-shadow:0 20px 60px rgba(0,0,0,.6); overflow:hidden; }
+#search-modal { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); width:100%; max-width:580px; box-shadow:0 4px 24px rgba(0,0,0,0.15); overflow:hidden; }
 #search-input-wrap { display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid var(--border); }
 #search-input-wrap .search-icon-inner { color:var(--muted); font-size:16px; flex-shrink:0; }
 #search-q { background:transparent; border:none; color:var(--text); flex:1; font-size:15px; outline:none; }
@@ -220,7 +226,7 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
 #search-results { max-height:420px; overflow-y:auto; overscroll-behavior: contain; }
 .search-section-hdr { color:var(--muted); font-size:11px; font-weight:700; letter-spacing:.8px; padding:10px 18px 4px; text-transform:uppercase; }
 .search-result { align-items:center; cursor:pointer; display:flex; gap:12px; padding:10px 18px; transition:background .1s; }
-.search-result:hover, .search-result.focused { background:rgba(232,160,32,.12); }
+.search-result:hover, .search-result.focused { background:rgba(176,104,0,.12); }
 .search-result .sr-name { color:var(--text); font-size:14px; font-weight:600; }
 .search-result .sr-sub  { color:var(--muted); font-size:12px; }
 .search-result .sr-take { color:var(--accent); font-size:12px; font-weight:700; margin-left:auto; white-space:nowrap; }
@@ -233,27 +239,27 @@ tbody td { padding: 9px 12px; white-space: nowrap; }
 .mech-checkbox-group { display:flex; flex-wrap:wrap; gap:6px; }
 .mech-checkbox-group label { align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; display:flex; font-size:12px; font-weight:600; gap:5px; padding:4px 10px; transition:.15s; }
 .mech-checkbox-group input[type=checkbox] { accent-color:var(--accent); cursor:pointer; }
-.mech-checkbox-group label:has(input:checked) { background:rgba(232,160,32,.15); border-color:var(--accent); color:var(--accent); }
+.mech-checkbox-group label:has(input:checked) { background:rgba(176,104,0,.15); border-color:var(--accent); color:var(--accent); }
 .screener-extra { display:flex; flex-wrap:wrap; gap:18px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
 .screener-filter-block { display:flex; flex-direction:column; gap:8px; }
 .screener-filter-block .filter-lbl { color:var(--muted); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
 .be-radio-group { display:flex; gap:6px; flex-wrap:wrap; }
 .be-radio-group input[type=radio] { display:none; }
 .be-radio-group label { background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; padding:4px 10px; transition:.15s; }
-.be-radio-group input[type=radio]:checked + label { background:rgba(232,160,32,.15); border-color:var(--accent); color:var(--accent); }
+.be-radio-group input[type=radio]:checked + label { background:rgba(176,104,0,.15); border-color:var(--accent); color:var(--accent); }
 .screener-count-bar { align-items:center; display:flex; gap:12px; margin-bottom:10px; }
 .ioc-checkbox-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
 .ioc-checkbox-grid label { align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; display:flex; font-size:12px; font-weight:600; gap:5px; padding:4px 10px; transition:.15s; }
 .ioc-checkbox-grid input[type=checkbox] { accent-color:var(--accent); cursor:pointer; }
-.ioc-checkbox-grid label:has(input:checked) { background:rgba(232,160,32,.15); border-color:var(--accent); color:var(--accent); }
+.ioc-checkbox-grid label:has(input:checked) { background:rgba(176,104,0,.15); border-color:var(--accent); color:var(--accent); }
 .depth-radio-group { display:flex; gap:6px; flex-wrap:wrap; }
 .depth-radio-group input[type=radio] { display:none; }
 .depth-radio-group label { background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; padding:4px 10px; transition:.15s; }
-.depth-radio-group input[type=radio]:checked + label { background:rgba(232,160,32,.15); border-color:var(--accent); color:var(--accent); }
+.depth-radio-group input[type=radio]:checked + label { background:rgba(176,104,0,.15); border-color:var(--accent); color:var(--accent); }
 .active-filters-badge { background:var(--accent); border-radius:10px; color:#fff; font-size:11px; font-weight:700; padding:1px 7px; display:inline-block; margin-left:6px; }
 #screener-result-count { color:var(--muted); font-size:13px; }
 tr.search-highlight { animation: row-flash 2s ease-out; }
-@keyframes row-flash { 0%,20% { background:rgba(232,160,32,.25); } 100% { background:transparent; } }
+@keyframes row-flash { 0%,20% { background:rgba(176,104,0,.25); } 100% { background:transparent; } }
 
 /* ── reform timeline (Tab 7) ── */
 .reform-timeline { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
@@ -262,13 +268,13 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .reform-event.reform-friendly { border-left-color: #5c5; }
 .reform-year { font-size: 1.1rem; font-weight: 700; color: var(--accent); min-width: 44px; }
 .reform-event-name { font-weight: 600; margin-bottom: 4px; }
-.reform-mechanic { font-size: 0.75rem; background: #2a3a4a; padding: 2px 6px; border-radius: 4px; margin-right: 6px; }
+.reform-mechanic { font-size: 0.75rem; background: var(--surface2); color: var(--muted); padding: 2px 6px; border-radius: 4px; margin-right: 6px; }
 .reform-take { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
 .reform-take.reform-hostile { background: rgba(220,50,50,0.2); color: #e55; }
 .reform-take.reform-friendly { background: rgba(50,200,50,0.2); color: #5c5; }
 .reform-notes { font-size: 0.85rem; color: var(--muted); margin-top: 4px; }
 .dd-empty { color: var(--muted); font-size: 13px; padding: 20px 0; }
-.dd-section { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2); }
+.dd-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .dd-section h3 { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
 .dd-section-hdr { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
 .dd-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; }
@@ -286,8 +292,8 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 #dd-country-select { background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 8px 14px; min-width: 240px; }
 #dd-mc-toggle-wrap { color: var(--muted); font-size: 12px; user-select: none; }
 #dd-mc-toggle-wrap input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
-.dd-mc-note { margin-top: 12px; padding: 8px 12px; background: rgba(232,160,32,.07); border: 1px solid rgba(232,160,32,.2); border-radius: 7px; color: #8892a8; font-size: 12px; font-style: italic; line-height: 1.5; }
-.dd-mc-note strong { color: #b0bcd4; font-style: normal; }
+.dd-mc-note { margin-top: 12px; padding: 8px 12px; background: rgba(176,104,0,0.05); border: 1px solid rgba(176,104,0,0.15); border-radius: var(--radius); color: var(--muted); font-size: 12px; font-style: italic; line-height: 1.5; }
+.dd-mc-note strong { color: var(--text); font-style: normal; }
 /* v29: DD price curve */
 .dd-price-chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; height: 200px; position: relative; }
 /* ── v26: stability bar + 2-col layout + MC badge ── */
@@ -301,7 +307,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .stability-bar { width: 80px; height: 8px; background: var(--surface); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
 .stability-fill { height: 100%; border-radius: 4px; transition: width 0.3s; }
 .stability-score { font-size: 12px; font-weight: 800; min-width: 28px; }
-.mc-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; background: rgba(232,160,32,.1); border: 1px solid rgba(232,160,32,.25); border-radius: 12px; color: #6ea6f8; font-weight: 600; margin-left: 8px; }
+.mc-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; background: rgba(176,104,0,0.08); border: 1px solid rgba(176,104,0,0.25); border-radius: 12px; color: var(--accent); font-weight: 600; margin-left: 8px; }
 
 /* v29: mobile */
 @media (max-width: 768px) {
@@ -646,7 +652,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .mono { font-family: 'IBM Plex Mono', 'Courier New', monospace; }
 
 /* === v38 Header === */
-.site-header { background: #0B0F1A; border-bottom: 1px solid var(--border); padding: 12px 28px; display: flex; align-items: center; justify-content: space-between; }
+.site-header { background: var(--surface); border-bottom: 2px solid var(--accent); box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
 .header-brand { display: flex; align-items: center; gap: 12px; }
 .brand-orca { font-family: 'IBM Plex Mono', monospace; font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: 2px; }
 .brand-sep { color: var(--border); font-size: 18px; }
@@ -659,12 +665,12 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .fc-controls { position: sticky; top: 0; z-index: 50; background: var(--bg); padding: 16px 0; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
 #fc-status { color: var(--text-muted); font-size: 12px; margin-left: 8px; font-family: 'IBM Plex Mono', monospace; }
 #fc-results table tbody tr { cursor: pointer; }
-#fc-results table tbody tr:hover { background: rgba(232,160,32,.06); }
-#fc-results table tbody tr:focus { background: rgba(232,160,32,.1); outline: 2px solid var(--accent); outline-offset: -2px; }
+#fc-results table tbody tr:hover { background: rgba(176,104,0,0.04); }
+#fc-results table tbody tr:focus { background: rgba(176,104,0,0.08); outline: 2px solid var(--accent); outline-offset: -2px; }
 .fc-drawer { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 8px 0 16px; animation: drawerSlide .2s ease-out; }
 @keyframes drawerSlide { from { opacity: 0; } to { opacity: 1; } }
 .fc-drawer-actions { margin-top: 12px; display: flex; gap: 8px; }
-.btn-run { background: var(--accent); color: #0B0F1A; font-weight: 700; padding: 10px 24px; font-size: 14px; border: none; border-radius: var(--radius); cursor: pointer; }
+.btn-run { background: var(--accent); color: #fff; font-weight: 700; padding: 6px 16px; font-size: 12px; border: none; border-radius: var(--radius); cursor: pointer; }
 .btn-run:hover { background: var(--accent-dim); }
 #fc-export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
@@ -673,7 +679,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .fc-sort-row .fc-sort-label { color: var(--muted); font-size: 12px; font-weight: 600; margin-right: 2px; }
 .fc-sort-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--muted); cursor: pointer; font-size: 12px; font-weight: 600; padding: 4px 12px; transition: .15s; }
 .fc-sort-btn:hover { border-color: var(--accent); color: var(--accent); }
-.fc-sort-btn.active { background: rgba(232,160,32,.15); border-color: var(--accent); color: var(--accent); }
+.fc-sort-btn.active { background: rgba(176,104,0,0.12); border-color: var(--accent); color: var(--accent); }
 .fc-stability-toggle { display: flex; align-items: center; gap: 5px; margin-left: 16px; }
 .fc-stability-toggle label { color: var(--muted); font-size: 12px; font-weight: 600; cursor: pointer; }
 .fc-stability-toggle input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
@@ -683,7 +689,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .mode-toggle button { background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-size: 12px; font-weight: 600; padding: 8px 20px; transition: .15s; }
 .mode-toggle button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
 .mode-toggle button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
-.mode-toggle button.active { background: var(--accent); border-color: var(--accent); color: #0B0F1A; }
+.mode-toggle button.active { background: var(--accent); border-color: var(--accent); color: #fff; }
 
 /* === v38 Reference Panel === */
 #reference-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.5); z-index: 998; }
@@ -723,8 +729,8 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 .chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
 .chip-row-label { color:var(--muted); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-right:4px; align-self:center; }
 .chip { padding:4px 12px; border-radius:4px; border:1px solid #334155; background:transparent; color:#94a3b8; font-size:12px; cursor:pointer; transition:all .15s; min-height:32px; touch-action:manipulation; }
-.chip.active { background:#e8a020; border-color:#e8a020; color:#0f172a; font-weight:600; }
-.chip:hover:not(.active) { border-color:#e8a020; color:#e8a020; }
+.chip.active { background:var(--accent); border-color:var(--accent); color:#fff; font-weight:600; }
+.chip:hover:not(.active) { border-color:var(--accent); color:var(--accent); }
 /* v41: world map toggle */
 #explorer-map-toggle { margin-left:auto; }
 #world-map-container { position:relative; }
@@ -749,11 +755,11 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   cursor: pointer;
   text-decoration: none;
 }
-.source-badge.conf-a { background: rgba(34, 197, 94, 0.15); color: #22C55E; border: 1px solid rgba(34, 197, 94, 0.3); }
-.source-badge.conf-b { background: rgba(232, 160, 32, 0.15); color: #E8A020; border: 1px solid rgba(232, 160, 32, 0.3); }
-.source-badge.conf-c { background: rgba(249, 115, 22, 0.15); color: #F97316; border: 1px solid rgba(249, 115, 22, 0.3); }
-.source-badge.conf-d { background: rgba(239, 68, 68, 0.18); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.5); font-weight: 700; }
-.source-badge.conf-db { background: rgba(148, 163, 184, 0.15); color: #94A3B8; border: 1px solid rgba(148, 163, 184, 0.3); }
+.source-badge.conf-a { background: rgba(21, 128, 61, 0.1); color: var(--green); border: 1px solid rgba(21, 128, 61, 0.3); }
+.source-badge.conf-b { background: rgba(176, 104, 0, 0.1); color: var(--accent); border: 1px solid rgba(176, 104, 0, 0.3); }
+.source-badge.conf-c { background: rgba(194, 65, 12, 0.1); color: var(--orange); border: 1px solid rgba(194, 65, 12, 0.3); }
+.source-badge.conf-d { background: rgba(185, 28, 28, 0.1); color: var(--red); border: 1px solid rgba(185, 28, 28, 0.4); font-weight: 700; }
+.source-badge.conf-db { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 /* Feature 3 — tier-badge: colored quality dot for fiscal parameters */
 .tier-badge { display: inline-block; width: 14px; height: 14px; border-radius: 50%; font-size: 9px; text-align: center; line-height: 14px; font-weight: bold; margin-left: 3px; cursor: help; }
 .tier-badge.tier-a { background: #22c55e; color: #fff; }
@@ -764,13 +770,13 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  background: rgba(245, 158, 11, 0.06);
-  border: 1px solid rgba(245, 158, 11, 0.2);
+  background: rgba(176, 104, 0, 0.07);
+  border: 1px solid rgba(176, 104, 0, 0.25);
   border-radius: 4px;
   padding: 4px 10px;
   margin-bottom: 8px;
   font-size: 11px;
-  color: #fbbf24;
+  color: var(--accent);
   line-height: 1.5;
 }
 .dq-warning-banner .dq-warn-icon { font-size: 13px; flex-shrink: 0; margin-top: 2px; }
@@ -791,14 +797,14 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   cursor: help;
   vertical-align: middle;
 }
-.dq-facts    { background: #065f46; color: #a7f3d0; border: 1px solid #059669; }
-.dq-evidence { background: #78350f; color: #fde68a; border: 1px solid #d97706; }
-.dq-proxy    { background: #374151; color: #9ca3af; border: 1px solid #4b5563; }
+.dq-facts    { background: rgba(21, 128, 61, 0.1); color: var(--green); border: 1px solid rgba(21, 128, 61, 0.3); }
+.dq-evidence { background: rgba(161, 98, 7, 0.1); color: var(--yellow); border: 1px solid rgba(161, 98, 7, 0.3); }
+.dq-proxy    { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 .dq-info-banner {
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(15, 23, 42, 0.35);
+  background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 3px;
   padding: 3px 10px;
@@ -1174,13 +1180,13 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <div id="cdnWarning" style="display:none;background:#ef4444;color:#fff;text-align:center;padding:8px 16px;font-size:13px;font-weight:600;">One or more chart libraries failed to load — bar charts, line charts, or the world map may be unavailable. Core fiscal data, Fiscal Compare rankings, and the Screener still work. Try refreshing the page. If the issue persists, check your network connection or try a different browser.</div>
 <a href="#main-tab-content" class="skip-link">Skip to main content</a>
 <div id="loading-overlay" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0f172a;display:flex;align-items:center;justify-content:center;z-index:9999;">
-  <div style="text-align:center;color:#E8A020;font-family:'IBM Plex Mono',monospace">
+  <div style="text-align:center;color:var(--accent);font-family:'IBM Plex Mono',monospace">
     <div style="margin-bottom:20px"><span style="font-size:28px;font-weight:900;letter-spacing:.15em;color:var(--accent);animation:ld-pulse 2s ease-in-out infinite;">ORCA</span></div>
     <div style="font-size:1.1em;font-weight:600;letter-spacing:1px">PETROLEUM FISCAL DATABASE</div>
     <div style="font-size:0.85em;color:#94a3b8;margin-top:8px">Petroleum Fiscal Intelligence Platform</div>
     <div style="font-size:0.75em;color:#64748b;margin-top:4px">71,576 contracts across 185 countries</div>
     <div style="margin-top:20px;width:200px;height:3px;background:#1e293b;border-radius:2px;overflow:hidden;position:relative;">
-      <div style="height:100%;background:linear-gradient(90deg,#b87a10,#E8A020,#f0c060,#E8A020,#b87a10);background-size:200% 100%;animation:ld-shimmer 1.6s ease-in-out infinite;position:absolute;width:60%;border-radius:2px;will-change:transform;"></div>
+      <div style="height:100%;background:linear-gradient(90deg,#8A5000,#B06800,#d4900a,#B06800,#8A5000);background-size:200% 100%;animation:ld-shimmer 1.6s ease-in-out infinite;position:absolute;width:60%;border-radius:2px;will-change:transform;"></div>
     </div>
     <div style="font-size:0.72em;color:#475569;margin-top:14px;letter-spacing:0.5px;">Primary legislation · Operator filings · 15+ years of sourcing</div>
   </div>
@@ -1235,7 +1241,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(232,160,32,.15);color:var(--accent);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v234</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v235</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1294,14 +1300,14 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 <span id="main-tab-content" tabindex="-1" aria-hidden="true" style="position:absolute;"></span>
 
 <!-- v115: First-visit Quick Start Guide (sessionStorage-backed — shows once per session) -->
-<div id="qs-guide" role="dialog" aria-modal="false" aria-label="Quick Start Guide for new visitors" style="display:none;background:linear-gradient(135deg,rgba(15,23,42,.97),rgba(30,41,59,.95));border-bottom:1px solid rgba(232,160,32,.35);padding:16px 24px;position:relative;">
-  <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-    <span style="font-size:13px;font-weight:800;color:#e8a020;letter-spacing:.08em;text-transform:uppercase;">Quick Start — 3 Steps to Your First Insight</span>
-    <button id="qs-dismiss-btn" aria-label="Dismiss Quick Start guide" style="margin-left:auto;background:none;border:1px solid rgba(255,255,255,.15);color:var(--muted);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;" title="Dismiss (also Escape key)">&#10005; Got it</button>
+<div id="qs-guide" role="dialog" aria-modal="false" aria-label="Quick Start Guide for new visitors" style="display:none;background:var(--surface2);border-bottom:1px solid var(--border);border-top:2px solid var(--accent);padding:14px 20px;position:relative;">
+  <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+    <span style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;">Quick Start — 3 Steps to Your First Insight</span>
+    <button id="qs-dismiss-btn" aria-label="Dismiss Quick Start guide" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;" title="Dismiss (also Escape key)">&#10005; Got it</button>
   </div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
-    <div style="background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.2);border-radius:7px;padding:12px 14px;">
-      <div style="font-size:18px;font-weight:900;color:#e8a020;margin-bottom:4px;">1</div>
+    <div style="background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:7px;padding:12px 14px;">
+      <div style="font-size:18px;font-weight:900;color:var(--accent);margin-bottom:4px;">1</div>
       <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Run Fiscal Compare</div>
       <div style="font-size:11px;color:var(--muted);line-height:1.6;">The <strong>Fiscal Compare</strong> tab auto-loads a ranked table of all 185 countries by government take (Deepwater, $75/bbl). This is the standard IOC benchmarking basis. Use the quickstart buttons or change the Profile/Price dropdowns to re-run.</div>
     </div>
@@ -1364,7 +1370,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Rank all countries by government take, NPV, IRR, or breakeven at your chosen oil price. Export to Excel for IC presentations. Use the <strong style="color:var(--text);">+ Scenario</strong> button in the header to build a custom fiscal regime and run a live DCF.</div>
-      <div style="background:rgba(232,160,32,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "Which countries offer the lowest take for a deepwater greenfield at $75/bbl?" &rarr; Set Profile = Deepwater, Price = $75, Run. Sort by Govt Take ascending.</div>
+      <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "Which countries offer the lowest take for a deepwater greenfield at $75/bbl?" &rarr; Set Profile = Deepwater, Price = $75, Run. Sort by Govt Take ascending.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t7',document.getElementById('tab-btn-t7'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
@@ -1373,7 +1379,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Take at 4 price scenarios, reform timeline, DCF sensitivity (price/opex/capex), sourced fiscal facts with A/B/C confidence badges, and closest peer comparison.</div>
-      <div style="background:rgba(232,160,32,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "What is Norway's exact SPT rate and when did the 2022 reform take effect?" &rarr; Select Norway &rarr; Key Fiscal Parameters shows SPT 56% with source citation.</div>
+      <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "What is Norway's exact SPT rate and when did the 2022 reform take effect?" &rarr; Select Norway &rarr; Key Fiscal Parameters shows SPT 56% with source citation.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('texplorer',document.getElementById('tab-btn-tscreener'));setTimeout(function(){var els=document.querySelectorAll('#texplorer .page-title');els.forEach(function(el){if(el.textContent.trim()==='Screener')el.scrollIntoView({behavior:'smooth'});});},300);">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
@@ -1382,7 +1388,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Set thresholds for take, IRR, NPV, and breakeven. Filter by mechanic, region, and water depth. 8 pre-built screens: Sweet Spot, PSC Africa, Deepwater, High IRR, and more.</div>
-      <div style="background:rgba(232,160,32,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "Find all PSC countries in Africa with take under 65% and IRR above 12%." &rarr; Use PSC Africa preset, adjust sliders.</div>
+      <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "Find all PSC countries in Africa with take under 65% and IRR above 12%." &rarr; Use PSC Africa preset, adjust sliders.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t2',document.getElementById('tab-btn-t2'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
@@ -1391,7 +1397,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">All key metrics in parallel: take, NPV, IRR, breakeven, regime mechanics, production parameters. Quickstarts load common IOC benchmarking comparisons in one click.</div>
-      <div style="background:rgba(232,160,32,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "Angola vs Nigeria vs Mozambique vs Tanzania &mdash; who offers the best contractor terms for an LNG project?"</div>
+      <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "Angola vs Nigeria vs Mozambique vs Tanzania &mdash; who offers the best contractor terms for an LNG project?"</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t5',document.getElementById('tab-btn-t5'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
@@ -1400,7 +1406,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Search any major operator to see their full global contract portfolio ranked by take. Take Distribution &amp; Peer Comparison shows take-tier distribution vs IOC peer group.</div>
-      <div style="background:rgba(232,160,32,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "What share of TotalEnergies' portfolio sits in very high take jurisdictions?" &rarr; Select TotalEnergies &rarr; Exposure Analyzer donut.</div>
+      <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "What share of TotalEnergies' portfolio sits in very high take jurisdictions?" &rarr; Select TotalEnergies &rarr; Exposure Analyzer donut.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('tbreakevenmap',document.getElementById('tab-btn-tbreakevenmap'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
@@ -1409,7 +1415,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Drag a price slider to see which countries are above or below your target threshold. Top-10 most resilient and most vulnerable lists update live. Export to CSV.</div>
-      <div style="background:rgba(232,160,32,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "At $60/bbl, which countries are uneconomic under a standard cost profile?" &rarr; Drag slider to $60.</div>
+      <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "At $60/bbl, which countries are uneconomic under a standard cost profile?" &rarr; Drag slider to $60.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('treformrisk',document.getElementById('tab-btn-treformrisk'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
@@ -1418,7 +1424,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Heatmap of reforms by decade. A country at 60% take with no changes in 30 years is safer than one at 58% that rewrites terms every 5 years. Stable vs volatile country lists.</div>
-      <div style="background:rgba(232,160,32,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "Which countries have changed fiscal terms more than 3 times since 2000?" &rarr; Reform Risk heatmap &rarr; volatile country list.</div>
+      <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:#f0c060;line-height:1.55;"><strong>Example:</strong> "Which countries have changed fiscal terms more than 3 times since 2000?" &rarr; Reform Risk heatmap &rarr; volatile country list.</div>
     </div>
   </div>
   <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Reference &amp; Data</div>
@@ -1459,12 +1465,12 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <!-- v232: What's New panel — compact recent-update summary for first-time visitors and returning colleagues -->
   <details style="margin-top:8px;margin-bottom:4px;">
     <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Expand to see the 3 most recent platform improvements">
-      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v234
+      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v235
       <span style="margin-left:auto;font-size:10px;font-weight:400;color:#475569;text-transform:none;letter-spacing:0;">Aug 2026</span>
     </summary>
     <div style="padding:10px 12px 6px;border:1px solid rgba(255,255,255,.06);border-top:none;border-radius:0 0 6px 6px;background:rgba(255,255,255,.01);">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
-        <div style="padding:8px 10px;background:rgba(232,160,32,.05);border:1px solid rgba(232,160,32,.15);border-radius:5px;">
+        <div style="padding:8px 10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.15);border-radius:5px;">
           <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">Professional Credibility</div>
           <div style="font-size:11px;color:var(--muted);line-height:1.55;">A137 FAQ added: WACC and discount rate selection for upstream petroleum ICG models &mdash; when ORCA&rsquo;s 10% basis applies, Tier 1 IOC vs. independent E&amp;P WACC benchmarks (8&ndash;10% vs. 12&ndash;15%), country risk premium overlay by Stability Score, and 4-step IC memo workflow for adjusting ORCA IRR to a project-specific hurdle rate. FAQ count 136&rarr;137.</div>
         </div>
@@ -1536,7 +1542,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div id="fc-results" class="empty-state">
     <div style="margin-bottom:10px;">Loading country data&hellip; If results do not appear automatically, select a profile and price and click <strong>Run Compare</strong>.</div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Suggested starting points: <strong>Deepwater $75/bbl</strong> — the platform's standard benchmarking basis used in Methodology. <strong>Onshore $50/bbl</strong> — screens low-breakeven regimes for unconventional plays. <strong>Giant $100/bbl</strong> — identifies high-take regimes sustainable only at elevated prices.</div>
-    <button id="fc-quickstart-deepwater" style="background:#e8a020;border:none;border-radius:6px;color:#fff;font-size:12px;font-weight:700;padding:8px 18px;cursor:pointer;margin-right:8px;" title="Load Deepwater profile at $75/bbl and run Fiscal Compare — the standard IOC benchmarking basis">⚡ Run Deepwater $75</button>
+    <button id="fc-quickstart-deepwater" style="background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-size:12px;font-weight:700;padding:8px 18px;cursor:pointer;margin-right:8px;" title="Load Deepwater profile at $75/bbl and run Fiscal Compare — the standard IOC benchmarking basis">⚡ Run Deepwater $75</button>
     <button id="fc-quickstart-onshore" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;font-size:12px;font-weight:600;padding:8px 16px;cursor:pointer;margin-right:8px;" title="Load Onshore profile at $50/bbl — screens low-breakeven regimes for unconventional plays">Onshore $50</button>
     <button id="fc-quickstart-northsea" style="background:transparent;border:1px solid #334155;border-radius:6px;color:#64748b;font-size:12px;font-weight:600;padding:8px 16px;cursor:pointer;" title="Load North Sea profile at $75/bbl — UK/Norway benchmarking basis for mature offshore plays ($600M capex, 40k bbl/d, $22/bbl opex)">North Sea $75</button>
     <div id="fc-quick-stats" style="display:none;"></div>
@@ -1549,7 +1555,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="page-title">Explorer</div>
   <div class="page-sub">Browse and filter 185 countries by fiscal mechanic, region, take, IRR, and breakeven. Bubble Chart mode plots take vs NPV across all regimes. For threshold-based filtering, use the <strong>Screener</strong> tab. Export to Excel.</div>
   <div class="explorer-mode-toggle mode-toggle" role="group" aria-label="Explorer view mode" style="display:flex;gap:0;margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--border);width:fit-content;">
-    <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#0B0F1A;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
+    <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
     <button id="mode-btn-screen" class="expl-mode-btn" data-mode="screen" aria-pressed="false" title="Screen and rank countries by fiscal criteria" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:2px solid #d4a017;font-size:13px;font-weight:600;cursor:pointer;">Screener ⋮ <span style="font-size:10px;color:#d4a017;vertical-align:middle;">★</span></button>
     <button id="mode-btn-bubble" class="expl-mode-btn" data-mode="bubble" aria-pressed="false" aria-label="Bubble Chart" title="Bubble Chart — Scatter plot: Government Take vs Contractor NPV" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:1px solid var(--border);font-size:13px;font-weight:600;cursor:pointer;">Bubble Chart ◎</button>
   </div>
@@ -1685,7 +1691,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <canvas id="irr-scatter-canvas" aria-label="IRR vs Government Take scatter chart for 74 countries with verified cost data at $75/bbl Deepwater profile. X-axis: Government Take (%), Y-axis: IRR (%). Bubble size proportional to contract count. Color by mechanic: amber=Concession, blue=PSC, green=TSC/RSC, purple=Mixed. Hover over dots to see country name, take, IRR, and mechanic." role="img" style="width:100%;display:block;cursor:crosshair;"></canvas>
     <div id="irr-scatter-tooltip" style="position:fixed;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:6px 10px;font-size:12px;color:#f1f5f9;pointer-events:none;display:none;z-index:9999;"></div>
     <div style="margin-top:8px;font-size:11px;color:var(--muted);">
-      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#e8a020;margin-right:4px;"></span>Concession
+      <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:var(--accent);margin-right:4px;"></span>Concession
       <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#3b82f6;margin:0 4px 0 12px;"></span>PSC
       <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#10b981;margin:0 4px 0 12px;"></span>TSC/RSC
       <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#8b5cf6;margin:0 4px 0 12px;"></span>Mixed
@@ -2015,11 +2021,11 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       <div style="font-size:16px;font-weight:700;color:var(--text);margin-bottom:8px;">Operator Fiscal Exposure</div>
       <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Search an operator above to see every country where they hold active contracts — with government take, tier distribution, and fiscal exposure score. 16 operators tracked: the 8 major IOCs plus 8 independent/national operators.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;">
-        <button class="ioc-quick-btn" data-ioc-op="ExxonMobil" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load ExxonMobil fiscal exposure profile">ExxonMobil</button>
-        <button class="ioc-quick-btn" data-ioc-op="Shell" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Shell fiscal exposure profile">Shell</button>
-        <button class="ioc-quick-btn" data-ioc-op="TotalEnergies" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load TotalEnergies fiscal exposure profile">TotalEnergies</button>
-        <button class="ioc-quick-btn" data-ioc-op="BP" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load BP fiscal exposure profile">BP</button>
-        <button class="ioc-quick-btn" data-ioc-op="Equinor" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Equinor fiscal exposure profile">Equinor</button>
+        <button class="ioc-quick-btn" data-ioc-op="ExxonMobil" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load ExxonMobil fiscal exposure profile">ExxonMobil</button>
+        <button class="ioc-quick-btn" data-ioc-op="Shell" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Shell fiscal exposure profile">Shell</button>
+        <button class="ioc-quick-btn" data-ioc-op="TotalEnergies" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load TotalEnergies fiscal exposure profile">TotalEnergies</button>
+        <button class="ioc-quick-btn" data-ioc-op="BP" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load BP fiscal exposure profile">BP</button>
+        <button class="ioc-quick-btn" data-ioc-op="Equinor" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Equinor fiscal exposure profile">Equinor</button>
       </div>
       <div style="font-size:11px;color:var(--muted);">Or use the <strong>Take Distribution &amp; Peer Comparison</strong> section below to see take-tier distribution and peer comparison across all 16 operators.</div>
     </div>
@@ -2078,7 +2084,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <select id="dd-country-select" aria-label="Select a country to load its complete fiscal profile">
       <option value="">— Select a country —</option>
     </select>
-    <label id="dd-mc-toggle-wrap" style="display:none;margin-left:18px;align-items:center;gap:7px;font-size:12px;color:#8892a8;cursor:pointer;">
+    <label id="dd-mc-toggle-wrap" style="display:none;margin-left:18px;align-items:center;gap:7px;font-size:12px;color:#6B6560;cursor:pointer;">
       <input type="checkbox" id="dd-mc-toggle" checked aria-label="Toggle Monte Carlo uncertainty bands on country profile charts">
       Show MC uncertainty
     </label>
@@ -2095,7 +2101,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
       ⬇ PDF
     </button>
     <button id="dd-compare-btn" title="Load this country into Side-by-Side Comparison" aria-label="Compare this country in Side-by-Side"
-            style="display:none;margin-left:8px;background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.35);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--accent);font-size:11px;font-weight:600;">
+            style="display:none;margin-left:8px;background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.35);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--accent);font-size:11px;font-weight:600;">
       ⇌ Compare
     </button>
   </div>
@@ -2106,7 +2112,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:#555;">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v234 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:#777;" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v235 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2154,7 +2160,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <a href="api/v1/country/angola.json" target="_blank" style="color:var(--accent);font-family:monospace;">api/v1/country/angola.json</a> &nbsp;&middot;&nbsp;
     <a href="api/v1/countries.json" target="_blank" style="color:var(--accent);font-family:monospace;">api/v1/countries.json</a> (full index)
   </div>
-  <pre id="api-json-output" aria-label="API JSON response for selected country" aria-live="polite" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;overflow:auto;max-height:600px;font-size:12px;color:#8892a8;white-space:pre-wrap;">Select a country above to view its JSON API response.</pre>
+  <pre id="api-json-output" aria-label="API JSON response for selected country" aria-live="polite" style="background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;overflow:auto;max-height:600px;font-size:12px;color:#6B6560;white-space:pre-wrap;">Select a country above to view its JSON API response.</pre>
 </div>
 
 <!-- ===== TAB: METHODOLOGY ===== -->
@@ -2169,7 +2175,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v234 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:#475569;font-size:12px;">Platform v235 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2367,7 +2373,7 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
 
   <!-- Quick Navigation -->
   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;">
-    <a href="#meth-calc" style="background:#1e293b;border:1px solid rgba(232,160,32,.4);color:var(--accent);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;font-weight:700;" title="Jump to DCF formula and fiscal mechanic reference table">DCF Formula &amp; Mechanics</a>
+    <a href="#meth-calc" style="background:#1e293b;border:1px solid rgba(176,104,0,.4);color:var(--accent);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;font-weight:700;" title="Jump to DCF formula and fiscal mechanic reference table">DCF Formula &amp; Mechanics</a>
     <a href="#meth-assumptions" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Key Assumptions</a>
     <a href="#meth-evidence" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Evidence Quality</a>
     <a href="#meth-weighting" style="background:#1e293b;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Production Weighting</a>
@@ -2384,12 +2390,12 @@ tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0 0 14px;">
       All fiscal metrics are computed on a standardized project basis: <strong>$1.2B deepwater capex</strong>, <strong>25-year project life</strong> (10-year for buy-back contracts), and a <strong>10% discount rate</strong>. Government take is the undiscounted share of gross revenue captured by the state across <em>all</em> fiscal instruments.
     </p>
-    <div style="background:#1e293b;border:1px solid #334155;border-left:3px solid #e8a020;border-radius:6px;padding:10px 14px;margin-bottom:14px;">
-      <span style="font-size:11px;font-weight:700;color:#e8a020;">Does govt take include income tax for concession regimes?</span>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:var(--radius);padding:10px 14px;margin-bottom:14px;">
+      <span style="font-size:11px;font-weight:700;color:var(--accent);">Does govt take include income tax for concession regimes?</span>
       <span style="font-size:12px;color:#94a3b8;margin-left:8px;">Yes. Income tax (CIT, RFCT, ring-fence tax) is explicitly included in the formula below for all mechanics including concessions. Norway's 68.0% includes SPT (56%) + ordinary CIT (22%). UK's 51.4% includes RFCT (40%) + EPL (32%) − RFES. USA's 23.4% includes federal income tax.</span>
     </div>
     <p style="font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">Formula (all mechanics)</p>
-    <pre style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 16px;font-size:12px;color:#8892a8;overflow:auto;margin:0 0 18px;">govt_take_pct = (royalties + income_tax + resource_rent_tax + profit_oil_state_share
+    <pre style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 16px;font-size:12px;color:#6B6560;overflow:auto;margin:0 0 18px;">govt_take_pct = (royalties + income_tax + resource_rent_tax + profit_oil_state_share
                + bonuses + state_equity_carry + other_levies)
                ÷ gross_undiscounted_revenue × 100
 
@@ -2543,13 +2549,13 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         Russia's fiscal terms are highly opaque and contract-specific. The platform uses a simplified Article 342 MET formula (production-volume and price-linked), which is directionally correct for export-oriented onshore producers operating at reference price. However, it does not capture Russia's additional profit-based export duties (NDPI surcharge) or the excess profit tax (EPT) introduced for large fields post-2019. Together, these can add 20–30 percentage points to effective government take for giant fields. This is a known sourcing gap; enhanced MET + EPT modeling is pending primary source acquisition (Federal Law No. 366-FZ).
       </p>
     </div>
-    <div style="padding:12px 16px;background:var(--surface);border-left:3px solid rgba(232,160,32,.5);border-radius:0 6px 6px 0;margin-bottom:8px;">
+    <div style="padding:12px 16px;background:var(--surface);border-left:3px solid rgba(176,104,0,.5);border-radius:0 6px 6px 0;margin-bottom:8px;">
       <strong style="color:#f0a830;">Indonesia — Gross Split modeled as PSC-equivalent</strong>
       <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
         Platform estimate: <strong style="color:var(--text);">59.6%</strong> government take (within SKK Migas range 57–64%). Within the platform, Indonesia's Gross Split contracts (MoEMR Decree No. 8/2017 — all new blocks post-2017) are modeled as a PSC with zero cost recovery and a 43% base contractor split. The true Gross Split mechanic adds variable split components (based on API gravity, field location, water depth, CO₂ content, H₂S content, and local content) that can shift the contractor split by ±10pp from the base. DMO obligation (25% of production at 25% ICP price for first 60 months) is captured directionally. Field-specific variable components are not modeled. Use the Gross Split Scenario Builder to stress-test the variable components for specific field conditions.
       </p>
     </div>
-    <div style="padding:12px 16px;background:var(--surface);border-left:3px solid rgba(232,160,32,.5);border-radius:0 6px 6px 0;margin-bottom:8px;">
+    <div style="padding:12px 16px;background:var(--surface);border-left:3px solid rgba(176,104,0,.5);border-radius:0 6px 6px 0;margin-bottom:8px;">
       <strong style="color:#f0a830;">CIS/FSU — Kazakhstan and Azerbaijan PSA approximations</strong>
       <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">
         Platform estimates: Kazakhstan <strong style="color:var(--text);">70.2%</strong> (KAZENERGY range 67–74%, PASS), Azerbaijan <strong style="color:var(--text);">60.8%</strong> (AIOC/BP range 57–66%, PASS). Both CIS producers pass the ±3pp benchmark test, but are captured with known approximation caveats. Kazakhstan's PSA contracts (Kashagan, Tengiz) include a Subsoil Use Tax and excess profit tax that are modeled using statutory rates from the Tax Code; the government's actual effective share depends on cost recovery pacing and lifting arrangements not available in public disclosures. Azerbaijan's AIOC PSA (ACG block) has a profit oil split that improves progressively as cumulative production crosses thresholds — this progressive tier is modeled using a single mid-range split rather than a dynamic schedule. Both countries may differ from actual government take by 5–10pp for large complex fields.
@@ -2562,7 +2568,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </p>
     </div>
     <!-- Point estimate disclosure -->
-    <div style="margin-top:16px;padding:10px 16px;background:rgba(232,160,32,.06);border-left:3px solid rgba(232,160,32,.4);border-radius:0 6px 6px 0;">
+    <div style="margin-top:16px;padding:10px 16px;background:rgba(176,104,0,.06);border-left:3px solid rgba(176,104,0,.4);border-radius:0 6px 6px 0;">
       <strong style="color:var(--accent);font-size:12px;">Point Estimate Note</strong>
       <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">Government take and NPV are presented as single-point estimates at the selected oil price. No confidence interval or Monte Carlo range is shown for the headline take figure — the platform's Monte Carlo uncertainty bands (visible in the Screener) apply to IRR only. For frontier or complex regimes (EPSA, R-factor PSC), actual take can vary ±5–15pp depending on field-specific parameters not captured in the standardized cost profile. Use the Scenario Builder to stress-test specific assumptions.</p>
     </div>
@@ -2828,7 +2834,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       if (inside) {
         badge = '✓ Pass'; color = '#22c55e';
       } else if (gap <= 3) {
-        badge = '⚠ Near'; color = '#E8A020';
+        badge = '⚠ Near'; color = '#B06800';
       } else {
         badge = '✗ Fail'; color = '#ef4444';
       }
@@ -6482,14 +6488,14 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <div class="page-title">Global Breakeven Price Map</div>
   <div class="page-sub">Country-level breakeven price — the oil price at which a standardized project achieves zero NPV (undiscounted). Coverage: 68 of 185 countries where complete royalty and cost data are available. Use the price marker slider to identify which countries are above or below a target price threshold. Export all 68 data points to CSV for further analysis.</div>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px;">
-    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);">
+    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);">
       <span style="color:var(--accent);font-weight:700;">Coverage: 68 of 185 countries</span>
       <span>· Requires complete royalty + cost data · Remaining 117 countries shown as grey on map</span>
     </div>
     <button class="btn btn-sm btn-outline" id="breakeven-csv-btn" title="Export all 68 countries with breakeven data to CSV" aria-label="Export breakeven price data for 68 countries as CSV file">&#8659; Export CSV</button>
   </div>
   
-  <div style="font-size:11px;color:var(--muted);background:rgba(232,160,32,.05);border:1px solid rgba(232,160,32,.15);border-radius:5px;padding:6px 12px;margin-bottom:8px;">
+  <div style="font-size:11px;color:var(--muted);background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.15);border-radius:5px;padding:6px 12px;margin-bottom:8px;">
     <strong style="color:var(--accent);">How to read this map:</strong> Each country is colored by its breakeven price — the oil price at which the project achieves NPV=0. Countries colored <span style="color:#22c55e;font-weight:700;">green</span> break even below $40/bbl (highly resilient). Countries colored <span style="color:#ef4444;font-weight:700;">red</span> need >$85/bbl to be profitable. Set the price marker below to see which countries are above or below a target price.
   </div>
   <div style="display:flex;align-items:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
@@ -7296,7 +7302,7 @@ function makeTakeSparkline(d, activePrice) {
   const activeIdx = prices.indexOf(activePrice);
   const ax = toX(activeIdx).toFixed(1);
   const ay = toY(vals[activeIdx]).toFixed(1);
-  return `<svg width="${W}" height="${H}" style="display:block"><polyline points="${pts}" fill="none" stroke="#e8a020" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${ax}" cy="${ay}" r="2.5" fill="#e8a020"/></svg>`;
+  return `<svg width="${W}" height="${H}" style="display:block"><polyline points="${pts}" fill="none" stroke="#B06800" stroke-width="1.5" stroke-linejoin="round"/><circle cx="${ax}" cy="${ay}" r="2.5" fill="#B06800"/></svg>`;
 }
 
 function toggleProdFilter(btn) {
@@ -7549,7 +7555,7 @@ function renderIRRScatter() {
     if (m.includes('PSC') || m.includes('Production Sharing')) return '#3b82f6';
     const parts = m.split(',');
     if (parts.length > 1) return '#8b5cf6';
-    return '#e8a020';
+    return '#B06800';
   };
 
   const maxN = Math.max(...filtered.map(d => d.n));
@@ -7816,7 +7822,7 @@ async function renderWorldMap() {
 
   const colorScale = d3.scaleSequential()
     .domain([20, 90])
-    .interpolator(t => d3.interpolateRgb('#1e3a5f', '#e8a020')(t));
+    .interpolator(t => d3.interpolateRgb('#E8F4E8', '#B06800')(t));
   // When R-factor PSC filter is active, use teal scale for R-factor countries
   const rfColorScale = d3.scaleSequential()
     .domain([20, 90])
@@ -7874,7 +7880,7 @@ async function renderWorldMap() {
       const mech = name ? mechLookup[name] : null;
       const isRF = name ? rfactorLookup[name] : false;
       if (!name) return;
-      const hoverCol = (_explorerRFactorOnly && isRF) ? '#2dd4bf' : '#e8a020';
+      const hoverCol = (_explorerRFactorOnly && isRF) ? '#2dd4bf' : '#B06800';
       d3.select(this).attr('stroke', hoverCol).attr('stroke-width', 1.5);
       tooltip.style('display', 'block')
         .html(`<strong style="color:${hoverCol}">${name}${isRF ? ' ◆' : ''}</strong><br>` +
@@ -8104,9 +8110,9 @@ function renderCompare() {
           tooltip:{callbacks:{label:ctx=>{const d2=chartCountries[ctx.datasetIndex];return ` ${d2.country}: ${ctx.parsed.y!=null?ctx.parsed.y.toFixed(1)+'%':'—'}${d2.has_r_factor_tiers?' (R-factor PSC)':''}`;}}}
         },
         scales:{
-          x:{ticks:{color:'#8892a8'},grid:{color:'#2a3555'}},
-          y:{ticks:{color:'#8892a8',callback:v=>v+'%'},grid:{color:'#2a3555'},
-             title:{display:true,text:'Govt Take (%)',color:'#8892a8'}}
+          x:{ticks:{color:'#6B6560'},grid:{color:'#D0CAC0'}},
+          y:{ticks:{color:'#6B6560',callback:v=>v+'%'},grid:{color:'#D0CAC0'},
+             title:{display:true,text:'Govt Take (%)',color:'#6B6560'}}
         }
       }
     });
@@ -8140,9 +8146,9 @@ function renderCompare() {
           tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + Math.round(ctx.raw).toLocaleString() + 'M' } }
         },
         scales: {
-          x: { ticks: { color: '#8892a8' }, grid: { color: '#2a3555' } },
-          y: { ticks: { color: '#8892a8', callback: v => '$' + Math.round(v/1000).toLocaleString() + 'B' }, grid: { color: '#2a3555' },
-               title: { display: true, text: 'Contractor NPV', color: '#8892a8' } }
+          x: { ticks: { color: '#6B6560' }, grid: { color: '#D0CAC0' } },
+          y: { ticks: { color: '#6B6560', callback: v => '$' + Math.round(v/1000).toLocaleString() + 'B' }, grid: { color: '#D0CAC0' },
+               title: { display: true, text: 'Contractor NPV', color: '#6B6560' } }
         }
       }
     });
@@ -8376,7 +8382,7 @@ function runScreener() {
       + '<div style="font-size:20px;margin-bottom:8px;opacity:.5;">⚙</div>'
       + '<strong style="color:var(--text);display:block;margin-bottom:6px;">No countries match your current filters</strong>'
       + 'Try relaxing your criteria — reduce the IRR minimum, raise the government take ceiling, or uncheck some mechanic filters.'
-      + '<br><button onclick="resetScreenerAll()" style="margin-top:12px;background:rgba(232,160,32,.12);border:1px solid rgba(232,160,32,.3);color:var(--accent);border-radius:5px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600;">Reset All Filters</button>'
+      + '<br><button onclick="resetScreenerAll()" style="margin-top:12px;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.3);color:var(--accent);border-radius:5px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600;">Reset All Filters</button>'
       + '</td></tr>';
     return;
   }
@@ -8493,9 +8499,9 @@ function renderVintage() {
         title:{display:true,text:'Avg Govt Take by Mechanic Over Time ($75/bbl)',color:'#e8ecf4',font:{size:13,weight:'bold'}}
       },
       scales:{
-        x:{ticks:{color:'#8892a8'},grid:{color:'#2a3555'}},
-        y:{ticks:{color:'#8892a8',callback:v=>v+'%'},grid:{color:'#2a3555'},
-           title:{display:true,text:'Avg Govt Take (%)',color:'#8892a8'},
+        x:{ticks:{color:'#6B6560'},grid:{color:'#D0CAC0'}},
+        y:{ticks:{color:'#6B6560',callback:v=>v+'%'},grid:{color:'#D0CAC0'},
+           title:{display:true,text:'Avg Govt Take (%)',color:'#6B6560'},
            min:0,max:100}
       }
     }
@@ -8721,7 +8727,7 @@ window.loadIOCAggregated = function(brandName, operatorList) {
       </tr>`;}).join('')}</tbody>
   </table></div>`;
   const disclosureBanner = `<div style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#94a3b8;">
-  <strong style="color:#e8a020;">Note:</strong> NPV = contractor net present value, 100% WI gross, at $75/bbl. Shows all legal entities identified as part of ${brandName} group. Some subsidiary contracts may not be captured.
+  <strong style="color:var(--accent);">Note:</strong> NPV = contractor net present value, 100% WI gross, at $75/bbl. Shows all legal entities identified as part of ${brandName} group. Some subsidiary contracts may not be captured.
   </div>`;
   outDiv.className='';
   outDiv.innerHTML=`${disclosureBanner}<div style="margin-bottom:14px;"><h3 style="font-size:16px;font-weight:800;margin:0;">${brandName} Portfolio</h3><span style="font-size:11px;color:var(--muted);">${operatorList.length} entity name(s) matched</span></div>${tbl}`;
@@ -8801,7 +8807,7 @@ window.loadIOC = function(operator) {
   const nocExcludedCount = IOC_DATA.filter(d => d.operator === operator).length - rows.length;
   const nocFootnote = `<div style="color:var(--muted);font-size:11px;margin-top:8px;">State-owned NOCs excluded. ${rows.length} operator entries shown.</div>`;
   const disclosureBanner = `<div style="background:#1e293b;border:1px solid #334155;border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:#94a3b8;">
-  <strong style="color:#e8a020;">Note:</strong> NPV figures are 100% working interest (gross). IOC net share estimated using state participation proxy where available (~25% coverage). State-owned NOCs (Saudi Aramco, NIOC, ADNOC, QatarEnergy, etc.) are excluded from this view.
+  <strong style="color:var(--accent);">Note:</strong> NPV figures are 100% working interest (gross). IOC net share estimated using state participation proxy where available (~25% coverage). State-owned NOCs (Saudi Aramco, NIOC, ADNOC, QatarEnergy, etc.) are excluded from this view.
 </div>`;
   const iocCountryList = [...new Set(rows.map(r => r.country))];
   const compareBtnHtml = iocCountryList.length >= 2 && iocCountryList.length <= 4
@@ -8884,7 +8890,7 @@ const MECHANICS_INFO = [
     typical:'Varies widely',
     examples:'Brazil (pre-salt PSC + concession offshore), UK (ring-fence corporation tax + supplementary charge), Mozambique',
     keyVars:'Regime boundary rules, field classification criteria, fiscal stability clauses',
-    color:'#8892a8'
+    color:'#6B6560'
   }
 ];
 
@@ -8901,7 +8907,7 @@ function renderMechanics() {
       <div class="mech-row"><div class="mech-key">Key Variables</div><div class="mech-val" style="color:var(--muted);font-size:12px;">${m.keyVars}</div></div>
       ${cnt ? `<div class="mech-cnt">DB records at $75/bbl: <span>${cnt.toLocaleString()}</span></div>` : ''}
       <div style="margin-top:10px;">
-        <button onclick="(function(mname){var explorerBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.trim()==='Explorer');switchTab('texplorer',explorerBtn||document.getElementById('tab-btn-texplorer'));setTimeout(function(){var chip=document.querySelector('#chip-row-mech .chip[data-value=\''+mname+'\']');if(chip&&!chip.classList.contains('active'))chip.click();},200);})(${JSON.stringify(m.name)})" style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);border-radius:5px;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600;padding:4px 10px;transition:.15s;" onmouseover="this.style.background='rgba(232,160,32,.18)'" onmouseout="this.style.background='rgba(232,160,32,.08)'">Filter Explorer → ${m.name}</button>
+        <button onclick="(function(mname){var explorerBtn=[...document.querySelectorAll('.tab-btn')].find(b=>b.textContent.trim()==='Explorer');switchTab('texplorer',explorerBtn||document.getElementById('tab-btn-texplorer'));setTimeout(function(){var chip=document.querySelector('#chip-row-mech .chip[data-value=\''+mname+'\']');if(chip&&!chip.classList.contains('active'))chip.click();},200);})(${JSON.stringify(m.name)})" style="background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:5px;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600;padding:4px 10px;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.18)'" onmouseout="this.style.background='rgba(176,104,0,.08)'">Filter Explorer → ${m.name}</button>
       </div>
     </div>`;
   }).join('');
@@ -9347,7 +9353,7 @@ function loadCountryProfile(country) {
       const _mono2 = isStateMonopoly(d.take_75);
       const takeCol = _mono2 ? '#888' : d.take_75 <= 40 ? '#4caf7d' : d.take_75 <= 60 ? '#f0a830' : d.take_75 <= 75 ? '#f97316' : '#e55353';
       const takeStr2 = _mono2 ? '—' : d.take_75.toFixed(1) + '%';
-      landHtml += '<div data-country="' + d.country.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" onclick="document.getElementById(\'dd-country-select\').value=this.dataset.country;loadCountryProfile(this.dataset.country)" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.borderColor=\'#e8a020\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
+      landHtml += '<div data-country="' + d.country.replace(/&/g,'&amp;').replace(/"/g,'&quot;') + '" onclick="document.getElementById(\'dd-country-select\').value=this.dataset.country;loadCountryProfile(this.dataset.country)" style="background:var(--card);border:1px solid var(--border);border-radius:6px;padding:6px 10px;cursor:pointer;display:flex;align-items:center;gap:8px;" onmouseover="this.style.borderColor=\'#B06800\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
         + '<span style="font-size:12px;color:var(--text)">' + d.country + '</span>'
         + '<span style="font-size:11px;font-weight:700;color:' + takeCol + '" title="' + (_mono2 ? 'State monopoly — no contractor access' : '') + '">' + takeStr2 + '</span>'
         + '</div>';
@@ -9414,7 +9420,7 @@ function loadCountryProfile(country) {
     ? `<span title="Pre-production or speculative — DCF based on standard profile, not actual production history" style="color:#f59e0b;font-size:11px;margin-left:6px;cursor:help;">⚠ speculative</span>`
     : '';
   const prodDQBadge = getDQBadge(d);
-  const backToExplorerBtn = `<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;"><button onclick="switchTab('texplorer',document.getElementById('tab-btn-texplorer'))" style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(232,160,32,.18)'" onmouseout="this.style.background='rgba(232,160,32,.08)'">← Explorer</button><button onclick="switchTab('t0',document.getElementById('tab-btn-t0'))" style="background:rgba(232,160,32,.08);border:1px solid rgba(232,160,32,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(232,160,32,.18)'" onmouseout="this.style.background='rgba(232,160,32,.08)'">Fiscal Compare</button></div>`;
+  const backToExplorerBtn = `<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;"><button onclick="switchTab('texplorer',document.getElementById('tab-btn-texplorer'))" style="background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.18)'" onmouseout="this.style.background='rgba(176,104,0,.08)'">← Explorer</button><button onclick="switchTab('t0',document.getElementById('tab-btn-t0'))" style="background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.18)'" onmouseout="this.style.background='rgba(176,104,0,.08)'">Fiscal Compare</button></div>`;
   const _hdrBeCallout = (d.be_75 != null && d.be_75 < 500) ? `<span style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${d.be_75.toFixed(0)} $/bbl</strong></span>` : `<span style="font-size:10px;color:var(--muted);margin-left:10px;" title="Breakeven requires complete capital cost data — not yet computed for this country">Breakeven: pending $/bbl data</span>`;
   let html = backToExplorerBtn + `<div id="dd-profile-head" class="dd-header">
     <strong class="dd-country-name">${d.country}</strong>${ddSpecBadge}
@@ -9612,7 +9618,7 @@ function loadCountryProfile(country) {
       <div class="dd-param"><div class="p-key">Predictability</div><div class="p-val">${renderStabilityBadge(getFiscalPredictabilityScore(d))}</div></div>
     </div>
     ${d.has_r_factor_tiers ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(45,212,191,.4);padding-left:8px;">&#x2731; <strong style="color:#2dd4bf">R-factor profit oil tiers active</strong> — government share rises as project profitability increases (R = cumulative revenue / cumulative cost). Price sensitivity in the take chart above reflects this standard PSC mechanic.</p>' : ''}
-    ${(country === 'Ireland' && d.swing != null && d.swing > 20) ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(232,160,32,.4);padding-left:8px;">&#x26A0; <strong style="color:#e8a020">Progressive PPT (R-factor sliding scale)</strong> — Ireland\'s Petroleum Production Tax is additive to the 25% CIT and rises from 10% to 40% based on field profitability (R-factor: cumulative revenue / cumulative investment). Total government take therefore spans 35%–65% across low-to-high price scenarios. The wide $50→$125 swing (+' + d.swing.toFixed(1) + 'pp) reflects this progressive PPT mechanic, not royalty or profit-oil variability.</p>' : ''}
+    ${(country === 'Ireland' && d.swing != null && d.swing > 20) ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(176,104,0,.4);padding-left:8px;">&#x26A0; <strong style="color:#B06800">Progressive PPT (R-factor sliding scale)</strong> — Ireland\'s Petroleum Production Tax is additive to the 25% CIT and rises from 10% to 40% based on field profitability (R-factor: cumulative revenue / cumulative investment). Total government take therefore spans 35%–65% across low-to-high price scenarios. The wide $50→$125 swing (+' + d.swing.toFixed(1) + 'pp) reflects this progressive PPT mechanic, not royalty or profit-oil variability.</p>' : ''}
     ${(d.has_r_factor_tiers && d.tier_schedule && d.tier_schedule.length > 0) ? `<div style="margin-top:10px;"><div style="font-size:10px;font-weight:700;color:#2dd4bf;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Profit Oil Tier Schedule (R-factor)</div><table style="width:100%;border-collapse:collapse;font-size:10px;"><thead><tr style="color:var(--muted);text-transform:uppercase;letter-spacing:.04em;"><th style="text-align:left;padding:2px 6px;border-bottom:1px solid rgba(255,255,255,.08);">R-factor Range</th><th style="text-align:right;padding:2px 6px;border-bottom:1px solid rgba(255,255,255,.08);">Contractor</th><th style="text-align:right;padding:2px 6px;border-bottom:1px solid rgba(255,255,255,.08);">Government</th></tr></thead><tbody>${d.tier_schedule.map((t,i)=>`<tr style="background:${i%2?'rgba(255,255,255,.02)':'transparent'}"><td style="padding:3px 6px;">R ${t.lo !== null ? t.lo.toFixed(1) : '0.0'} – ${t.hi !== null ? t.hi.toFixed(1) : '∞'}</td><td style="text-align:right;padding:3px 6px;color:#34d399;">${t.cont.toFixed(0)}%</td><td style="text-align:right;padding:3px 6px;color:#f87171;">${t.govt.toFixed(0)}%</td></tr>`).join('')}</tbody></table></div>` : ''}
   </div>
   ${(function(){
@@ -9788,7 +9794,7 @@ function loadCountryProfile(country) {
             + '<td style="padding:7px 8px 7px 0;font-weight:700;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;">' + lbl + '</td>'
             + '<td style="text-align:right;padding:7px 8px;font-weight:800;color:' + col + ';font-family:\'IBM Plex Mono\',monospace;">' + (take != null ? take.toFixed(1)+'%' : '—') + '</td>'
             + '<td style="text-align:right;padding:7px 8px;font-size:11px;color:' + deltaColor + ';font-family:\'IBM Plex Mono\',monospace;">' + deltaStr + '</td>'
-            + '<td style="text-align:right;padding:7px 8px;color:#e8a020;font-family:\'IBM Plex Mono\',monospace;" title="Estimated govt share = contractor NPV × take/(1−take). Per contract avg, 100% WI gross.">' + govtNpvStr + '</td>'
+            + '<td style="text-align:right;padding:7px 8px;color:var(--accent);font-family:\'IBM Plex Mono\',monospace;" title="Estimated govt share = contractor NPV × take/(1−take). Per contract avg, 100% WI gross.">' + govtNpvStr + '</td>'
             + '<td style="text-align:right;padding:7px 8px;color:var(--text);font-family:\'IBM Plex Mono\',monospace;">' + npvStr + npvSpark + '</td>'
             + '<td style="text-align:right;padding:7px 8px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;">' + irrStr + '</td>'
             + '<td id="' + beId + '" style="text-align:right;padding:7px 8px;color:' + beColor + ';font-family:\'IBM Plex Mono\',monospace;">' + beStr + '</td>'
@@ -9996,7 +10002,7 @@ function loadCountryProfile(country) {
           const pDiff = p.take_75 - d.take_75;
           const pCol = p.take_75 <= 40 ? '#4caf7d' : p.take_75 <= 60 ? '#f0a830' : p.take_75 <= 75 ? '#f97316' : '#e55353';
           const pDiffStr = pDiff >= 0 ? '+' + pDiff.toFixed(1) : pDiff.toFixed(1);
-          return '<div onclick="document.getElementById(\'dd-country-select\').value=\'' + p.country.replace(/'/g,"\\'") + '\';loadCountryProfile(\'' + p.country.replace(/'/g,"\\'") + '\')" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;" onmouseover="this.style.borderColor=\'#e8a020\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
+          return '<div onclick="document.getElementById(\'dd-country-select\').value=\'' + p.country.replace(/'/g,"\\'") + '\';loadCountryProfile(\'' + p.country.replace(/'/g,"\\'") + '\')" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;" onmouseover="this.style.borderColor=\'#B06800\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
             + '<span style="color:var(--text);font-weight:700;">' + p.country + '</span>'
             + '<span style="margin-left:6px;color:' + pCol + ';font-weight:800;">' + p.take_75.toFixed(1) + '%</span>'
             + '<span style="margin-left:4px;color:var(--muted);font-size:10px;">(' + pDiffStr + 'pp)</span>'
@@ -10089,7 +10095,7 @@ function loadCountryProfile(country) {
     function _tc(v) { return v == null ? "var(--muted)" : v <= 40 ? "var(--green)" : v <= 60 ? "var(--yellow)" : v <= 75 ? "var(--orange)" : "var(--red)"; }
     function _ft(v) { return v != null ? v.toFixed(1) + "%" : "\u2014"; }
     function _bpr(r, isSelf) {
-      var bg = isSelf ? "background:rgba(232,160,32,.12);" : "";
+      var bg = isSelf ? "background:rgba(176,104,0,.12);" : "";
       var fw = isSelf ? "font-weight:800;" : "font-weight:600;";
       var dStr, dCol;
       if (isSelf) { dStr = "\u2014"; dCol = "var(--muted)"; }
@@ -10101,7 +10107,7 @@ function loadCountryProfile(country) {
       var mech = r.mechanics ? r.mechanics.split(",")[0] : "\u2014";
       var enc = encodeURIComponent(r.country);
       var clk = isSelf ? "" : ' onclick="var c=decodeURIComponent(\'' + enc + '\');document.getElementById(\'dd-country-select\').value=c;loadCountryProfile(c)"';
-      var hov = isSelf ? "" : ' onmouseover="this.style.background=\'rgba(232,160,32,.08)\'" onmouseout="this.style.background=\'\'"';
+      var hov = isSelf ? "" : ' onmouseover="this.style.background=\'rgba(176,104,0,.08)\'" onmouseout="this.style.background=\'\'"';
       var addBtn = isSelf ? "" : '<button class="btn btn-sm btn-outline" style="font-size:9px;padding:2px 6px;margin-left:4px;" onclick="event.stopPropagation();addCompare(decodeURIComponent(\'' + enc + '\'))">+</button>';
       var tr = '<tr style="' + bg + 'cursor:' + (isSelf ? 'default' : 'pointer') + ';"' + clk + hov + '>';
       tr += '<td style="padding:6px 10px;' + fw + 'color:var(--text);white-space:nowrap;">' + r.country + (isSelf ? ' <span style="font-size:9px;color:var(--accent);">(this)</span>' : '') + addBtn + '</td>';
@@ -10244,9 +10250,9 @@ function loadCountryProfile(country) {
           tooltip: { callbacks: { label: ctx => ctx.parsed.y.toFixed(1) + '%' } }
         },
         scales: {
-          x: { ticks: { color: '#8892a8' }, grid: { color: '#2a3555' } },
-          y: { min: 0, max: 100, ticks: { color: '#8892a8', callback: v => v + '%' }, grid: { color: '#2a3555' },
-               title: { display: true, text: 'Govt Take (%)', color: '#8892a8' } }
+          x: { ticks: { color: '#6B6560' }, grid: { color: '#D0CAC0' } },
+          y: { min: 0, max: 100, ticks: { color: '#6B6560', callback: v => v + '%' }, grid: { color: '#D0CAC0' },
+               title: { display: true, text: 'Govt Take (%)', color: '#6B6560' } }
         }
       }
     });
@@ -10685,7 +10691,7 @@ function renderSampleAnalyses() {
     if (v < 85) return '#f97316';
     return '#ef4444';
   };
-  const deltaColor = v => v == null ? '' : v > 20 ? '#e8a020' : v > 10 ? '#eab308' : '#94a3b8';
+  const deltaColor = v => v == null ? '' : v > 20 ? '#B06800' : v > 10 ? '#eab308' : '#94a3b8';
 
   // ── Card 1: Regional Benchmarks ──────────────────────────────────────────
   const regionOrder = ['Middle East','Africa','Asia Pacific','Americas','Europe','Other'];
@@ -10767,11 +10773,11 @@ function renderSampleAnalyses() {
     `<span style="color:var(--text)">${d.country}</span>`,
     `<span style="color:${takeColor(d.take_50)}">${d.take_50.toFixed(1)}%</span>`,
     `<span style="color:${takeColor(d.take_125)}">${d.take_125.toFixed(1)}%</span>`,
-    `<span style="color:#e8a020;font-weight:600">+${d.swing.toFixed(1)}pp</span>`
+    `<span style="color:#B06800;font-weight:600">+${d.swing.toFixed(1)}pp</span>`
   ]);
   const card4 = `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #e8a020;">
-      <div style="font-size:10px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Price Sensitivity Leaders</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid var(--accent);">
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Price Sensitivity Leaders</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">Which regimes swing most when oil moves from $50 to $125/bbl?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">High swing = progressive (profits taxed harder at high prices). Low swing = flat/neutral terms.</div>
       ${tbl([{label:'Country'},{label:'@$50',align:'right'},{label:'@$125',align:'right'},{label:'Swing',align:'right'}], swingRows)}
@@ -10843,7 +10849,7 @@ function renderSampleAnalyses() {
   const resRows = RESERVES.map(({c,r}) => {
     const d = cd.find(x => x.country === c);
     const takeStr = d ? `<span style="color:${takeColor(d.take_75)};font-weight:600">${d.take_75.toFixed(1)}%</span>` : '<span style="color:#ef4444;font-size:10px;">state monopoly / no IOC</span>';
-    return [`<span style="color:${c==='Indonesia'?'#e8a020':'var(--text)'}${c==='Indonesia'?';font-weight:700':''}">${c}</span>`,
+    return [`<span style="color:${c==='Indonesia'?'#B06800':'var(--text)'}${c==='Indonesia'?';font-weight:700':''}">${c}</span>`,
             `${r} Gb`,
             d ? (d.region||'—') : '—',
             takeStr];
@@ -10871,7 +10877,7 @@ function renderSampleAnalyses() {
     const hasGS = c === 'Indonesia'; // Gross Split flag
     const mech = (d.n_tsc||0) > 0 && (d.n_psc||0) > 0 ? 'PSC+TSC' : (d.n_tsc||0) > 0 ? 'TSC' : (d.n_psc||0) > 0 ? (hasGS ? 'PSC+GS' : 'PSC') : d.mechanics || '—';
     const isIndo = c === 'Indonesia';
-    const nameStr = isIndo ? `<span style="color:#e8a020;font-weight:700">&#9654; ${c}</span>` : `<span style="color:var(--text)">${c}</span>`;
+    const nameStr = isIndo ? `<span style="color:var(--accent);font-weight:700">&#9654; ${c}</span>` : `<span style="color:var(--text)">${c}</span>`;
     return [nameStr, mech, d.n||'—',
             `<span style="color:${takeColor(d.take_50)}">${fmt(d.take_50)}</span>`,
             `<span style="color:${takeColor(d.take_75)};font-weight:600">${fmt(d.take_75)}</span>`,
@@ -10905,8 +10911,8 @@ function renderSampleAnalyses() {
      '<span style="color:var(--muted);font-size:10px">Gross revenue split, no cost recovery</span>'],
   ];
   const cardB = `
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid #e8a020;">
-      <div style="font-size:10px;font-weight:700;color:#e8a020;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Indonesia: Two Fiscal Regimes</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;border-left:3px solid var(--accent);">
+      <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">Indonesia: Two Fiscal Regimes</div>
       <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px;">When Indonesia introduced Gross Split PSCs in 2017, did IOCs get better or worse terms?</div>
       <div style="font-size:11px;color:var(--muted);margin-bottom:12px;">Gross Split (Permen ESDM No. 08/2017) eliminates cost recovery in exchange for a simpler gross revenue split. Result: government extracts 7.3pp more at $75/bbl and contractor NPV turns negative. IOCs strongly prefer traditional PSC — adoption has been slow.</div>
       ${tbl([{label:'Regime'},{label:'Contracts',align:'right'},{label:'Share',align:'right'},{label:'Govt Take @$75',align:'right'},{label:'Contractor NPV',align:'right'},{label:'Structure',align:'right'}], regimeRows)}
@@ -10921,7 +10927,7 @@ function renderSampleAnalyses() {
   const asiaTopN = asiaRanked.slice(0,4);
   const asiaRows = [
     ...asiaTopN.map(d=>[`<span style="color:#22c55e">${d.country}</span>`,d.region,`<span style="color:#22c55e;font-weight:600">${d.take_75.toFixed(1)}%</span>`,'Lowest in region']),
-    [`<span style="color:#e8a020;font-weight:700">Indonesia</span>`,'Asia Pacific',`<span style="color:#eab308;font-weight:600">${(cd.find(x=>x.country==='Indonesia')?.take_75||58).toFixed(1)}%</span>`,'PSC-dominant'],
+    [`<span style="color:#B06800;font-weight:700">Indonesia</span>`,'Asia Pacific',`<span style="color:#eab308;font-weight:600">${(cd.find(x=>x.country==='Indonesia')?.take_75||58).toFixed(1)}%</span>`,'PSC-dominant'],
     [`<span style="color:var(--muted)">Asia Pacific avg</span>`,'—',`<span style="color:${takeColor(asiaAvg)}">${asiaAvg?asiaAvg.toFixed(1)+'%':'—'}</span>`,asiaCountries.length + ' countries'],
     [`<span style="color:var(--muted)">Global avg</span>`,'—',`<span style="color:${takeColor(globalAvg)}">${globalAvg.toFixed(1)}%</span>`,cd.length + ' countries'],
     ...asiaRanked.slice(-3).map(d=>[`<span style="color:#ef4444">${d.country}</span>`,d.region,`<span style="color:#ef4444;font-weight:600">${d.take_75.toFixed(1)}%</span>`,'Highest in region']),
@@ -11134,7 +11140,7 @@ function renderSampleAnalyses() {
     const dlt = delta(d);
     const isHighlight = ['Guyana','Brazil','Suriname'].includes(c);
     const nameStr = isHighlight
-      ? `<span style="color:#e8a020;font-weight:700">&#9654; ${c}</span>`
+      ? `<span style="color:var(--accent);font-weight:700">&#9654; ${c}</span>`
       : `<span style="color:var(--text)">${c}</span>`;
     return [nameStr, d.mechanics || '—', d.n || '—',
             `<span style="color:${takeColor(d.take_50)}">${fmt(d.take_50)}</span>`,
@@ -11328,7 +11334,7 @@ function renderSampleAnalyses() {
     if (!d) return null;
     const mechNote = c === 'Norway' ? 'Concession (SPT+CIT)' : c === 'United Kingdom' ? 'Concession (RFCT+EPL)' : d.mechanics || '—';
     return [
-      `<span style="color:${c==='Norway'||c==='United Kingdom'?'#e8a020':'var(--text)'};${c==='Norway'||c==='United Kingdom'?'font-weight:700':''}">${c}</span>`,
+      `<span style="color:${c==='Norway'||c==='United Kingdom'?'#B06800':'var(--text)'};${c==='Norway'||c==='United Kingdom'?'font-weight:700':''}">${c}</span>`,
       mechNote,
       d.n || '—',
       `<span style="color:${takeColor(d.take_50)}">${fmt(d.take_50)}</span>`,
@@ -11455,7 +11461,7 @@ function renderReformRisk() {
         return '<tr>'
           + '<td style="padding:5px 8px;font-size:12px;color:var(--text);">'
           + r.country
-          + ' <button onclick="document.getElementById(\'dd-country-select\').value=\'' + escapedC + '\';loadCountryProfile(\'' + escapedC + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" style="background:rgba(232,160,32,.1);border:1px solid rgba(232,160,32,.3);border-radius:4px;padding:1px 6px;font-size:10px;color:var(--accent);cursor:pointer;margin-left:6px;" title="Open Country Profile for ' + r.country + '">Profile →</button>'
+          + ' <button onclick="document.getElementById(\'dd-country-select\').value=\'' + escapedC + '\';loadCountryProfile(\'' + escapedC + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:1px 6px;font-size:10px;color:var(--accent);cursor:pointer;margin-left:6px;" title="Open Country Profile for ' + r.country + '">Profile →</button>'
           + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--accent);font-weight:600;">' + r.total + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + (r.since2010>2?'#ef4444':r.since2010>0?'#f97316':'#22c55e') + ';">' + r.since2010 + '</td>'
@@ -11935,7 +11941,7 @@ function showCopyToast(msg) {
     toast.setAttribute('aria-live', 'polite');
     toast.setAttribute('aria-atomic', 'true');
     toast.setAttribute('role', 'status');
-    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1e293b;border:1px solid #e8a020;color:#f1f5f9;padding:8px 16px;border-radius:4px;font-size:12px;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;';
+    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:var(--surface);border:1px solid var(--accent);color:var(--text);padding:8px 16px;border-radius:var(--radius);font-size:12px;z-index:9999;opacity:0;transition:opacity 0.2s;pointer-events:none;';
     document.body.appendChild(toast);
   }
   toast.textContent = msg || 'Link copied to clipboard';
@@ -11949,7 +11955,7 @@ function showRoutingHint() {
   var banner = document.createElement('div');
   banner.id = 'routing-hint-banner';
   banner.style.cssText = 'background:#1e293b;border-bottom:1px solid #334155;padding:8px 16px;font-size:11px;color:#94a3b8;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;';
-  banner.innerHTML = '<span>\uD83D\uDCA1 <strong style="color:#e8a020">Shareable links:</strong> <code style="background:#0f172a;padding:1px 4px;border-radius:2px;">#/profile/angola</code> &nbsp; <code style="background:#0f172a;padding:1px 4px;border-radius:2px;">#/compare/angola+norway+usa</code> &nbsp; <code style="background:#0f172a;padding:1px 4px;border-radius:2px;color:#2dd4bf;">#/explorer/rfactor</code> — all navigate directly.</span><button onclick="this.parentElement.remove();localStorage.setItem(\'routing-hint-dismissed\',\'1\')" style="background:transparent;border:none;color:#64748b;cursor:pointer;font-size:16px;padding:0;line-height:1;">\xD7</button>';
+  banner.innerHTML = '<span>\uD83D\uDCA1 <strong style="color:#B06800">Shareable links:</strong> <code style="background:var(--surface2);padding:1px 4px;border-radius:2px;">#/profile/angola</code> &nbsp; <code style="background:var(--surface2);padding:1px 4px;border-radius:2px;">#/compare/angola+norway+usa</code> &nbsp; <code style="background:#0f172a;padding:1px 4px;border-radius:2px;color:#2dd4bf;">#/explorer/rfactor</code> — all navigate directly.</span><button onclick="this.parentElement.remove();localStorage.setItem(\'routing-hint-dismissed\',\'1\')" style="background:transparent;border:none;color:#64748b;cursor:pointer;font-size:16px;padding:0;line-height:1;">\xD7</button>';
   document.body.prepend(banner);
 }
 
@@ -13039,11 +13045,11 @@ function saveCustomScenario() {
   modal.id = 'sb-save-modal';
   modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9000;display:flex;align-items:center;justify-content:center;';
   modal.innerHTML = '<div style="background:#1e293b;border:1px solid #475569;border-radius:10px;padding:24px;min-width:300px;max-width:420px;width:90%;">'
-    + '<div style="font-size:13px;font-weight:700;color:#e8a020;margin-bottom:12px;">Save Scenario</div>'
+    + '<div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:12px;">Save Scenario</div>'
     + '<input id="sb-save-name" type="text" value="' + defaultName.replace(/"/g,'&quot;') + '" placeholder="Scenario name…" style="width:100%;background:#0f172a;border:1px solid #334155;border-radius:6px;color:#f1f5f9;padding:8px 12px;font-size:13px;margin-bottom:14px;box-sizing:border-box;" maxlength="60">'
     + '<div style="display:flex;gap:10px;justify-content:flex-end;">'
     + '<button onclick="document.getElementById(\'sb-save-modal\').remove();" style="background:transparent;border:1px solid #475569;border-radius:6px;color:#94a3b8;padding:7px 16px;font-size:12px;cursor:pointer;">Cancel</button>'
-    + '<button id="sb-save-confirm-btn" style="background:#e8a020;border:none;border-radius:6px;color:#fff;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">Save</button>'
+    + '<button id="sb-save-confirm-btn" style="background:var(--accent);border:none;border-radius:var(--radius);color:#fff;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;">Save</button>'
     + '</div></div>';
   document.body.appendChild(modal);
   var inp = document.getElementById('sb-save-name');
@@ -13382,7 +13388,7 @@ function toggleFourPrice(btn) {
   btn.dataset.active = active ? '0' : '1';
   window._fourPriceActive = !active;
   btn.style.background = active ? '' : 'var(--accent)';
-  btn.style.color = active ? '' : '#0B0F1A';
+  btn.style.color = active ? '' : '#fff';
   btn.style.borderColor = active ? '' : 'var(--accent)';
   btn.setAttribute('aria-pressed', active ? 'false' : 'true');
   btn.textContent = active ? '4-Price View' : '4-Price View ✓';
@@ -13606,7 +13612,7 @@ function renderFCResults(results, price) {
   var profileBanner = '';
   if (profileObj.name) {
     var projLifeYrs = (profileKey2 === 'marginal') ? '15yr' : (profileKey2 === 'lng') ? '30yr' : '25yr';
-    profileBanner = '<div style="background:rgba(232,160,32,.07);border:1px solid rgba(232,160,32,.2);border-radius:6px;padding:7px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;align-items:center;">'
+    profileBanner = '<div style="background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:7px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap;align-items:center;">'
       + '<span style="color:var(--accent);font-weight:700;">' + profileObj.name + ' &middot; ' + priceLbl + '</span>'
       + '<span>Peak: ' + (profileObj.peakBblDay/1000).toFixed(0) + 'k bbl/d</span>'
       + '<span>Capex: $' + (profileObj.capexMM >= 1000 ? (profileObj.capexMM/1000).toFixed(1)+'B' : profileObj.capexMM+'M') + '</span>'
@@ -13623,10 +13629,10 @@ function renderFCResults(results, price) {
   var top5btn = '<button onclick="(function(){'
     + top5safe.map(function(c) { return 'addCompare(\'' + c + '\');'; }).join('')
     + 'var btn=[...document.querySelectorAll(\'.tab-btn\')].find(function(b){return b.textContent.includes(\'Side-by-Side\');});if(btn)switchTab(\'t2\',btn);})()" '
-    + 'style="background:transparent;border:1px solid rgba(232,160,32,.4);border-radius:4px;color:var(--accent);font-size:10px;font-weight:600;padding:3px 10px;cursor:pointer;white-space:nowrap;transition:.15s;" '
-    + 'onmouseover="this.style.background=\'rgba(232,160,32,.1)\'" onmouseout="this.style.background=\'transparent\'" '
+    + 'style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:10px;font-weight:600;padding:3px 10px;cursor:pointer;white-space:nowrap;transition:.15s;" '
+    + 'onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'" '
     + 'title="Load the top 5 countries (by current sort) into Side-by-Side for detailed comparison">&#x21cc; Load Top 5 in Side-by-Side</button>';
-  var _clickHint = '<div style="font-size:11px;color:var(--muted);background:rgba(232,160,32,.05);border-left:2px solid rgba(232,160,32,.3);padding:5px 12px;margin-bottom:10px;border-radius:0 4px 4px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">'
+  var _clickHint = '<div style="font-size:11px;color:var(--muted);background:rgba(176,104,0,.05);border-left:2px solid rgba(176,104,0,.3);padding:5px 12px;margin-bottom:10px;border-radius:0 4px 4px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">'
     + '<span>\u25b6 Click any row to expand fiscal breakdown &mdash; or use +Compare to add to side-by-side</span>'
     + top5btn
     + '</div>';
@@ -13750,7 +13756,7 @@ function renderFiscalWaterfall(countries) {
       if (d.royalty != null) segments.push({label: 'Royalty ' + d.royalty + '%', color: '#3b82f6'});
       if (d.cit != null)     segments.push({label: 'CIT ' + d.cit + '%\u2009*', color: '#06b6d4'});
       if (d.spt != null)     segments.push({label: 'SPT/Windfall ' + d.spt + '%\u2009*', color: '#f59e0b'});
-      if (d.state_eq != null) segments.push({label: 'State equity ' + d.state_eq + '%\u2009*', color: '#e8a020'});
+      if (d.state_eq != null) segments.push({label: 'State equity ' + d.state_eq + '%\u2009*', color: '#B06800'});
     }
 
     html += '<div style="margin-bottom:20px;">';
@@ -13763,7 +13769,7 @@ function renderFiscalWaterfall(countries) {
     // Headline bar
     html += '<div style="display:flex;height:28px;border-radius:3px;overflow:hidden;background:#1e293b;">';
     if (take > 0) {
-      html += '<div style="width:' + take.toFixed(1) + '%;background:#e8a020;display:flex;align-items:center;' +
+      html += '<div style="width:' + take.toFixed(1) + '%;background:#B06800;display:flex;align-items:center;' +
               'justify-content:center;font-size:10px;font-weight:700;color:#0f172a;min-width:28px;">' +
               take.toFixed(0) + '%</div>';
     }
@@ -14024,7 +14030,7 @@ function buildFiscalParamTable(fiscalFactsSourced) {
     'prrt_uplift_rate': 'PRRT Uplift Rate',
   };
 
-  const CONF_COLORS = { 'A': '#22c55e', 'B': '#e8a020', 'C': '#f97316', 'D': '#ef4444' };
+  const CONF_COLORS = { 'A': '#22c55e', 'B': '#B06800', 'C': '#f97316', 'D': '#ef4444' };
   const CONF_LABELS = {
     'A': 'A — Primary legislation',
     'B': 'B — Operator filing / verified guide',
@@ -14225,9 +14231,9 @@ function fetchCountryProductionChart(country) {
               annotations: {
                 peakLine: {
                   type: 'line', xMin: peakIdx, xMax: peakIdx,
-                  borderColor: 'rgba(232,160,32,0.4)', borderWidth: 1, borderDash: [3,3],
+                  borderColor: 'rgba(176,104,0,0.4)', borderWidth: 1, borderDash: [3,3],
                   label: { display: true, content: 'Peak', position: 'start',
-                           color: '#e8a020', font: {size:8}, yAdjust: -4 }
+                           color: '#B06800', font: {size:8}, yAdjust: -4 }
                 }
               }
             } : {}
@@ -14293,7 +14299,7 @@ function renderDrawerWaterfall(canvasId, waterfallData) {
   if (!canvas || !waterfallData) return;
   const ctx = canvas.getContext('2d');
   const wfColors = { royalty:'#2196F3', ftp:'#9C27B0', profit_oil:'#FF5722', cit:'#F44336', special:'#FF9800', state_eq:'#795548', base_govt:'#607D8B', ept:'#EF4444', cost_reimb:'#78909C', prrt:'#FF9800' };
-  const fallbackColors = ['#E8A020', '#3B82F6', '#22C55E', '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6', '#F97316'];
+  const fallbackColors = ['#B06800', '#3B82F6', '#22C55E', '#8B5CF6', '#EC4899', '#6366F1', '#14B8A6', '#F97316'];
   const wfLabels = { royalty:'Royalty', ftp:'FTP', profit_oil:'Profit Oil', cit:'CIT', special:'Special', state_eq:'State Eq.', base_govt:'Govt Direct', ept:'EPT', cost_reimb:'Cost Reimb.', prrt:'PRRT' };
   const entries = Object.entries(waterfallData).filter(function(e) { return e[1] >= 0.1; });
   const total = entries.reduce(function(a, e) { return a + e[1]; }, 0);
@@ -14386,7 +14392,7 @@ function renderBubbleChart() {
 
   var regionColors = {
     'Middle East': '#f59e0b', 'Africa': '#22c55e', 'Asia': '#3b82f6',
-    'Europe': '#a855f7', 'North America': '#e8a020', 'Latin America': '#ef4444',
+    'Europe': '#a855f7', 'North America': '#B06800', 'Latin America': '#ef4444',
     'CIS/FSU': '#8b5cf6', 'Oceania': '#06b6d4', 'Other': '#64748b'
   };
 
@@ -14485,7 +14491,7 @@ function renderVintageTrendChart() {
   var decades = Object.keys(decadeSet).map(Number).sort(function(a,b){return a-b;});
 
   var mechColors = {
-    'Concession': '#e8a020', 'PSC': '#3b82f6', 'Buy-back': '#ef4444',
+    'Concession': '#B06800', 'PSC': '#3b82f6', 'Buy-back': '#ef4444',
     'TSC': '#a855f7', 'PRRT': '#22c55e', 'RSC': '#f59e0b', 'Gross Split': '#06b6d4'
   };
 
@@ -14842,8 +14848,8 @@ async function renderBreakevenMap() {
       const be = name ? beLookup[name] : null;
       const take = name ? takeLookup[name] : null;
       if (!name) return;
-      d3.select(this).attr('stroke', '#e8a020').attr('stroke-width', 2);
-      let html = '<strong style="color:#e8a020">' + name + '</strong><br>';
+      d3.select(this).attr('stroke', '#B06800').attr('stroke-width', 2);
+      let html = '<strong style="color:#B06800">' + name + '</strong><br>';
       if (be != null) {
         html += 'Breakeven: <strong>$' + be.toFixed(1) + '/bbl</strong><br>';
         if (take != null) html += 'Govt take @$75: <strong>' + take.toFixed(1) + '%</strong>';
@@ -14989,7 +14995,7 @@ async function loadPlatformData() {
       var hint = ov.querySelector('[data-slow-hint]') || document.createElement('div');
       hint.setAttribute('data-slow-hint', '1');
       hint.style.cssText = 'color:#64748b;font-size:12px;margin-top:12px;';
-      hint.innerHTML = 'Taking longer than expected \u2014 check your connection or <a href="javascript:window.location.reload()" style="color:#e8a020;text-decoration:underline;">click here to reload</a>';
+      hint.innerHTML = 'Taking longer than expected \u2014 check your connection or <a href="javascript:window.location.reload()" style="color:#B06800;text-decoration:underline;">click here to reload</a>';
       if (!hint.parentNode) { var inner = ov.querySelector('div'); if (inner) inner.appendChild(hint); }
     }
   }, 10000);
@@ -15013,7 +15019,7 @@ async function loadPlatformData() {
         + '<div style="font-size:1.4em;margin-bottom:12px">Load Error</div>'
         + '<div style="font-size:0.9em;color:#fca5a5">' + e.message + '</div>'
         + '<div style="font-size:0.75em;color:#999;margin-top:16px">Open browser console for details</div>'
-        + '<button onclick="location.reload()" style="margin-top:20px;background:#e8a020;border:none;color:#0b0f1a;border-radius:6px;padding:10px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">\u21ba Reload</button>'
+        + '<button onclick="location.reload()" style="margin-top:20px;background:var(--accent);border:none;color:#fff;border-radius:6px;padding:10px 28px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;">\u21ba Reload</button>'
         + '</div>';
     }
     // Update tab content areas so users don't see permanent "Loading..." text
@@ -15537,18 +15543,18 @@ document.addEventListener('DOMContentLoaded', function() {
 <div id="compare-basket" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:1000;background:#1e293b;border-top:1px solid #334155;padding:10px 20px;align-items:center;gap:10px;flex-wrap:wrap;">
   <span style="color:#94a3b8;font-size:12px;font-weight:600;white-space:nowrap;">Compare basket:</span>
   <div id="basket-pills" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;"></div>
-  <button id="basket-clear-btn" aria-label="Clear all countries from compare basket" style="background:transparent;border:1px solid #475569;color:#94a3b8;border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">Clear</button>
-  <button id="basket-compare-btn" aria-label="Launch side-by-side comparison of selected countries" title="Open Side-by-Side Compare tab with all basket countries loaded" style="background:#e8a020;border:none;color:#0f172a;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Compare &#8594;</button>
+  <button id="basket-clear-btn" aria-label="Clear all countries from compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 8px;font-size:11px;cursor:pointer;">Clear</button>
+  <button id="basket-compare-btn" aria-label="Launch side-by-side comparison of selected countries" title="Open Side-by-Side Compare tab with all basket countries loaded" style="background:var(--accent);border:none;color:#fff;border-radius:4px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer;">Compare &#8594;</button>
 </div>
 
 <!-- Data Vintage Footer -->
 <div id="data-vintage-footer" style="background:#0f172a;border-top:1px solid #1e293b;padding:10px 24px;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;font-size:11px;color:#64748b;font-family:monospace;">
   <div class="data-vintage-badge" style="display:flex;align-items:center;gap:8px;">
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DB: 2026-08-13</span>
+    <span class="badge-item" style="color:var(--accent);font-weight:700;">DB: 2026-08-13</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item">92.8% A/B sourced</span>
     <span class="badge-sep" style="color:#475569;">·</span>
-    <span class="badge-item" style="color:#e8a020;font-weight:700;">DCF Engine v219</span>
+    <span class="badge-item" style="color:var(--accent);font-weight:700;">DCF Engine v219</span>
     <span class="badge-sep" style="color:#475569;">·</span>
     <span class="badge-item" style="color:#94a3b8;">Platform updated: 2026-08-13</span>
     <span style="color:#475569;">|</span>
