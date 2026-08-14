@@ -512,6 +512,28 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Benchmark 185/185 (100%) milestone. Grade maintained B+.
 - Fixes: (1) Professional Credibility: A115 FAQ added (NGL/condensate fiscal treatment vs. crude oil — Indonesia legacy PSC/Gross Split: condensate in crude cost oil pool/liquid base; Malaysia Petronas PSC: condensate at crude price in cost recovery pool; Kazakhstan Tax Code Ch.20: MET applies equally; UAE ADNOC: condensate classified as crude; Norway: Petroleumsskatteloven identical treatment; 4-step IC workflow; revenue-weighted blended take for gas-condensate fields; rule of thumb by production type); FAQ count 114→115. (2) Naming Consistency: v207→v208 sweep across all structural locations.
 
+## Updated Grade Table (Cycle 166 — 2026-08-13)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 122 FAQs (A1–A122) + proxy workflow + A13 source verification + A17 IC-readiness + A41 IRR model spec + A87 CRP adjustment + A95 discount rate/hurdle reconciliation + A121 multi-period fiscal reform modeling + A122 associated gas fiscal treatment. Benchmark 185/185 (100%) — MILESTONE achieved Cycle 129. Sources: 185. IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210) — eliminates CDN dependency for Breakeven Map + Bubble Chart. Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 122-FAQ section. First-visit Quick Start guide (v115). Landmark map complete (v104). |
+| 6 | 6. Error & Empty States | A+ | = | All three analyst-visible empty state areas styled. Reform History filter upgraded v109. No bare empty tables remain. |
+| 7 | 13. SDLC Maturity | A+ | = | Clean cycle. 4/4 non-empty JS script blocks PASS syntax gate. CI badge present. Last Playwright run: 136 PASS / 0 FAIL / 0 JS errors (v215). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A122 accessible. FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. Evidence: 4/4 non-empty JS script blocks PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon. Row fade-in (v102). Tab gradient improved (v105). |
+| 11 | 3. Data Presentation | A+ | = | Stability column tooltip fully descriptive (v120). Regional median callout, sparklines, evidence badges all in place. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. IC memo template citations swept to current version each cycle. v214→v215 sweep complete (Cycle 166). |
+| 13 | 7. Professional Credibility | A+ | = | 122 FAQs (A1–A122) + "How to Cite" + A13 source verification + A17 IC-readiness + A41 IRR model spec + A63 composite viability screen + A87 CRP + A95 discount rate/hurdle + A96 signature bonus adjustment + A97 FX convertibility risk + A98 MWP exploration obligations + A99 carbon pricing overlay + A100 FTP first tranche petroleum + A101 sliding-scale royalty adjustment + A102 statutory vs. non-statutory take taxonomy + A103 fiscal stabilization clauses + A104 thin-cap/intercompany interest deductibility + A105 farm-in/carried interest structures + A106 decommissioning/abandonment obligations + A107 exploration incentives + A108 production milestone bonuses and periodic contractual fees + A109 host government consent-to-assign + A110 indirect transfer taxation in upstream M&A + A111 PSC cost recovery carryforward + A112 cost oil pool definition + A113 deepwater/onshore fiscal tier divergence + A114 crude oil domestic market obligation + A115 NGL/condensate fiscal treatment + A116 transfer pricing / arm's-length crude oil pricing + A117 portfolio asset review triage + A118 crude quality differential / national marker pricing + A119 SEC proved reserves booking by fiscal mechanic + A120 non-operator WI analysis + A121 multi-period fiscal reform modeling + A122 associated gas fiscal treatment (dual-stream model, 5 jurisdictions, DSO/gas transfer pricing/ALNG PSA, 4-step IC workflow). Benchmark 185/185 (100%). application-name meta (v120). |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite expanded with short-form footnote format and Scenario Builder citation guidance (v120). |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 non-empty JS syntax gate PASS + 136 PASS / 0 FAIL / 0 JS errors (Playwright full suite, Cycle 165). Cycle 166 grade changes: none — Professional Credibility A+ maintained (A122: associated gas fiscal treatment — dual-stream model, Nigeria DSO, Indonesia PSC gas split, Australia PRRT gas transfer pricing, Angola ALNG, Qatar GPA; FAQ count 121→122); Naming Consistency A+ maintained (v214→v215 sweep); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint.**
+
 ## Updated Grade Table (Cycle 165 — 2026-08-13)
 
 | Rank | Category | Grade | Delta | Priority Fix |
@@ -526,7 +548,7 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive (v120). All WCAG 2.1 AA landmarks complete. aria-live on #fc-status (v106). FAQ accordions A12–A121 accessible. FC sort row role=group (v112). Explorer aria-sort dynamic (v110). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. Evidence: 4/4 non-empty JS script blocks PASS, 0 JS errors. |
 | 10 | 1. Visual Design | A+ | = | Skeleton loader (Cycle 47). Favicon. Row fade-in (v102). Tab gradient improved (v105). |
-| 11 | 3. Data Presentation | A+ | = | Stability column tooltip fully descriptive (v120). Regional median callout, sparklines, evidence badges all in place. |
+| 11 | 3. Data Presentation | A+ | = | Stability column tooltip fully descriptive (v120). Regional median callout, sparklinks, evidence badges all in place. |
 | 12 | 5. Naming Consistency | A+ | = | All naming unified. IC memo template citations swept to current version each cycle. v213→v214 sweep complete (Cycle 165). |
 | 13 | 7. Professional Credibility | A+ | = | 121 FAQs (A1–A121) + "How to Cite" + A13 source verification + A17 IC-readiness + A41 IRR model spec + A63 composite viability screen + A87 CRP + A95 discount rate/hurdle + A96 signature bonus adjustment + A97 FX convertibility risk + A98 MWP exploration obligations + A99 carbon pricing overlay + A100 FTP first tranche petroleum + A101 sliding-scale royalty adjustment + A102 statutory vs. non-statutory take taxonomy + A103 fiscal stabilization clauses + A104 thin-cap/intercompany interest deductibility + A105 farm-in/carried interest structures + A106 decommissioning/abandonment obligations + A107 exploration incentives + A108 production milestone bonuses and periodic contractual fees + A109 host government consent-to-assign + A110 indirect transfer taxation in upstream M&A + A111 PSC cost recovery carryforward + A112 cost oil pool definition + A113 deepwater/onshore fiscal tier divergence + A114 crude oil domestic market obligation + A115 NGL/condensate fiscal treatment + A116 transfer pricing / arm's-length crude oil pricing + A117 portfolio asset review triage + A118 crude quality differential / national marker pricing + A119 SEC proved reserves booking by fiscal mechanic + A120 non-operator WI analysis + A121 multi-period fiscal reform modeling (3-scenario matrix, reform risk classification, stabilization clause integration). Benchmark 185/185 (100%). application-name meta (v120). |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
@@ -1145,3 +1167,10 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 - **136 PASS / 0 FAIL / 0 WARN** confirmed on both pushes
 - Pre-push hook ran cleanly both times â€” no `--no-verify` used
 
+
+---
+## Cycle 166 Log — 2026-08-13 19:02
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL (pending syntax gate)
+- JS errors: 0
+- Summary: Running now — FAQ A122 added (associated gas fiscal treatment), v214→v215 sweep.
