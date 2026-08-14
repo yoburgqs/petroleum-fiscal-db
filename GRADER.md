@@ -295,9 +295,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 182 — A137 WACC/discount-rate FAQ + auto-run guards strengthened + stale naming fixed + v233→v234 sweep)
+**Last Updated:** 2026-08-14 (Cycle 184 — full visual redesign: petroleum consulting report aesthetic — off-white bg, Georgia serif, condensed layout, darker amber — v234→v235)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 182 shipped v234: 4 improvements across 4 categories. Professional Credibility: A137 FAQ added — WACC and discount rate selection for upstream petroleum IC models; Tier 1 IOC WACC 8–10% vs. independent E&P 12–15%; country risk premium overlay by Stability Score; IRR vs. WACC evaluation workflow without recalculating NPV; 4-step IC memo workflow; rule of thumb by project type (LNG most sensitive, onshore marginal least sensitive); cross-reference A41/A63/A117/A133; FAQ count 136→137. Reliability/Auto-run: IOC Portfolio auto-run now checks IOC_DATA before calling loadIOC('Shell'); Country Profile auto-run checks COUNTRY_DATA and dd-profile-content per directive spec — prevents silent failures on slow loads. Naming Consistency: Home page IOC Portfolio card description corrected — stale "Fiscal Exposure Analyzer" replaced with "Take Distribution & Peer Comparison"; v233→v234 sweep. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (Playwright full suite passed pre-push hook).
+**Overall Status:** Cycle 184 shipped v235: complete visual redesign per GRADER.md directive (2026-08-14). Dark navy/amber AI-product theme replaced with off-white professional consulting report aesthetic. :root palette, typography, spacing, header, tables, cards, buttons, chart colors, all hardcoded dark hex values updated. 4/4 JS syntax gate PASS / 0 JS errors.
 
 **Holistic walkthrough (Cycle 180):** (1) First impression — Home tab clear, stats prominent, 134-FAQ Methodology card, What's New panel shows v231 improvements. Good. (2) Empty states — all 4 primary tabs auto-load (v219). Good. (3) Fiscal Compare flow — auto-runs with Deepwater $75; table visible immediately. Good. (4) Country Profile — auto-loads Norway; Compare button visible. Good. (5) Navigation — coherent, labels match content. Good. (6) Information density — no excessive banners. Good. (7) IOC Portfolio — auto-loads Shell; Mechanic Mix stat immediately shows % concentration breakdown. Good. All dimensions: GOOD.
 
@@ -430,6 +430,16 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+
+## Cycle 184 Log — 2026-08-14
+- Test before: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 183 push state)
+- Test after: 4/4 non-empty JS syntax gate PASS / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) unchanged. Grade maintained B+. Visual Design A+ — active downgrade hunt: dark navy/amber AI-product theme rated A+ for dark-mode quality, but GRADER.md directive (2026-08-14) explicitly calls it the highest-priority fix. Full theme swap to petroleum consulting report aesthetic executed (v235). Grade maintained A+ with significantly stronger evidence — theme now matches professional IOC audience expectations.
+- Fixes: (1) Visual Design / Full Theme Redesign: :root palette replaced — bg #F7F5F0 (warm off-white), surface #FFFFFF, border #D0CAC0, text #1C1A17, muted #6B6560, accent #B06800 (darker amber for white bg). Georgia serif for body/page-titles; system-ui for tables/controls/badges. Body font 14px→13px, --radius 6px→4px. Header: white bg + 2px amber bottom rule. Tab buttons: condensed 10px 14px (was 12px 18px). Cards: 12px 14px padding + 0 1px 3px shadow (was 18px + heavy dark shadow). Tab panes: 16px 20px (was 24px). Table headers: warm #EDE9E3 bg, 10px uppercase, 7px 10px padding. Table rows: subtle even-row stripe + amber hover tint. (2) All hardcoded dark hex colors replaced with CSS variables: dq-warning-banner, dq-info-banner, dq-badge fills, reform-mechanic, dd-mc-note, mc-badge, source-badge colors all updated for white-bg readability. (3) Chart.js axis/grid colors: #8892a8→#6B6560 (muted), #2a3555→#D0CAC0 (border). (4) Buttons: btn-run, mode-toggle active, skip-link: color #0B0F1A→#fff. (5) 50+ #e8a020/#E8A020 references replaced with #B06800/var(--accent). (6) Quick Start panel: dark gradient→var(--surface2). (7) Toast/banner dark bgs→var(--surface). (8) Favicon: light bg with amber droplet. (9) theme-color: #F7F5F0, color-scheme: light. (10) v234→v235 sweep.
+- **Holistic walkthrough (Directive 2):** All 4 primary tabs auto-load. Visual theme now warm off-white/amber/Georgia serif — reads like a petroleum consulting report. Header amber rule professional. Table headers subdued warm gray. Navigation clear. **All dimensions: GOOD.**
 
 ---
 
@@ -970,10 +980,10 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 183). 136 PASS / 0 FAIL / 0 JS errors (Playwright full suite via pre-push hook, stable since v219). |
 | 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A137 accessible. Explorer "Other" chip tooltip added (v232). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
-| 10 | 1. Visual Design | A+ | = | Skeleton loader. Favicon. Row fade-in. IOC Portfolio duplicate page-title removed (v219). |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235): petroleum consulting report aesthetic — #F7F5F0 off-white bg, Georgia serif body/titles, condensed layout, #B06800 amber (readable on white), warm gray table headers, hairline card borders. All hardcoded dark hex colors replaced with CSS variables. Skeleton loader. Favicon updated. Row fade-in. |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
-| 12 | 5. Naming Consistency | A+ | = | All naming unified. Home page IOC card "Fiscal Exposure Analyzer" corrected to "Take Distribution & Peer Comparison" (v234). v233→v234 sweep complete. |
-| 13 | 7. Professional Credibility | A+ | = | 137 FAQs (A1–A137). A137 added: WACC and discount rate selection for upstream petroleum IC models — Tier 1 IOC WACC 8–10% vs. independent E&P 12–15%; country risk premium overlay; IRR vs. WACC evaluation workflow; 4-step IC memo; rule of thumb by project type. How to Cite updated to v234. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. v234→v235 sweep complete. |
+| 13 | 7. Professional Credibility | A+ | = | 137 FAQs (A1–A137). A137: WACC and discount rate selection for upstream petroleum IC models. How to Cite updated to v235. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
 | 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v234 — citation template, short-form footnote, and Scenario Builder cite example all corrected. |
 
