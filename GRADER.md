@@ -1,3 +1,198 @@
+# 🎨 VISUAL REDESIGN — From Zach (2026-08-14) — DO THIS NEXT (before continuing FAQs)
+
+**The platform currently uses dark navy/amber AI-product styling. Zach wants it redesigned to look like a professional petroleum consulting report — off-white background, tight typography, condensed layout. This is the highest priority change.**
+
+## New Design System — implement in the next cycle
+
+### Color palette (replace :root variables exactly as written)
+
+```css
+:root {
+  --bg:          #F7F5F0;   /* warm off-white — aged paper, not bright white */
+  --surface:     #FFFFFF;   /* card/panel backgrounds */
+  --surface2:    #EDE9E3;   /* secondary surfaces, hover states */
+  --card:        #FFFFFF;   /* card fill */
+  --border:      #D0CAC0;   /* warm gray borders — subtle but visible */
+  --text:        #1C1A17;   /* near-black — not pure black, slightly warm */
+  --muted:       #6B6560;   /* secondary text */
+  --text-muted:  #6B6560;
+  --accent:      #B06800;   /* darker amber — works on white bg (was #E8A020 on dark) */
+  --accent-dim:  #8A5000;   /* hover/pressed amber */
+  --green:       #15803D;   /* darker green — readable on white */
+  --positive:    #15803D;
+  --yellow:      #A16207;   /* darker yellow */
+  --orange:      #C2410C;   /* darker orange */
+  --red:         #B91C1C;   /* darker red */
+  --negative:    #B91C1C;
+  --purple:      #7C3AED;
+  --radius:      4px;       /* tighter radius — more report-like, less app-like */
+}
+```
+
+### Typography — update body and heading rules
+
+```css
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Georgia', 'Times New Roman', serif;   /* serif for report quality */
+  font-size: 13px;
+  line-height: 1.5;
+  min-height: 100vh;
+  overscroll-behavior-y: none;
+}
+```
+
+Data tables, inputs, controls, badges — keep sans-serif:
+```css
+table, input, select, .tab-btn, .tab-nav, .btn, .badge, .chip,
+.card-title, .page-sub, code, kbd, .site-header {
+  font-family: system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+}
+```
+
+Page titles — heavier serif:
+```css
+.page-title {
+  font-family: 'Georgia', serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 2px;
+  letter-spacing: -0.01em;
+}
+.page-sub {
+  font-size: 12px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  line-height: 1.4;
+}
+```
+
+### Spacing — condense throughout (remove unnecessary whitespace)
+
+```css
+.tab-pane          { padding: 16px 20px; }   /* was 24px */
+.card              { padding: 12px 14px; margin-bottom: 10px; border-radius: var(--radius); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+thead th           { padding: 7px 10px; }    /* was 10px 12px */
+tbody td           { padding: 6px 10px; }    /* tighten rows */
+.site-header       { padding: 10px 20px; }   /* was 14px 24px */
+.tab-btn           { padding: 10px 14px; font-size: 12px; }  /* was 12px 18px */
+.ctrl-group        { padding: 5px 10px; }
+```
+
+### Header and nav — light, paper-like
+
+```css
+.site-header {
+  background: var(--surface);
+  border-bottom: 2px solid var(--accent);   /* amber bottom rule instead of gray line */
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.tab-nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+.tab-btn.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  background: rgba(176, 104, 0, 0.04);   /* very subtle amber tint on active tab */
+}
+```
+
+### Cards — clean white with hairline borders
+
+```css
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+```
+
+### Tables — professional report style
+
+```css
+thead th {
+  background: #EDE9E3;              /* warm gray header, not dark */
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+  font-family: system-ui, sans-serif;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+tbody tr:hover { background: rgba(176,104,0,0.04); }
+tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }  /* very subtle stripe */
+```
+
+### Buttons
+
+```css
+.btn {
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+}
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: var(--radius);
+}
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-run {
+  background: var(--accent);
+  font-size: 12px;
+  padding: 6px 16px;
+}
+```
+
+### Chips / filter pills
+
+```css
+.chip {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 3px;     /* square-ish, not pill — more report-like */
+  font-size: 11px;
+  padding: 3px 9px;
+}
+.chip.active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+```
+
+### Additional fixes to make light mode work correctly
+
+- All hardcoded dark hex colors in inline styles (e.g. `color: #9ca3af`, `background: rgba(15,23,42,...)`, `color: #fbbf24`, `color: #1a253b`) must be replaced with CSS variables.
+- `.dq-warning-banner`: `background: rgba(176,104,0,0.07); border-color: rgba(176,104,0,0.25); color: var(--accent);`
+- `.dq-info-banner`: `background: var(--surface2); border-color: var(--border); color: var(--muted);`
+- `.site-header .badge`: `background: var(--accent); color: #fff;`
+- Dropdown menus: `background: var(--surface); box-shadow: 0 4px 12px rgba(0,0,0,0.12);`
+- Modal overlays: `background: rgba(0,0,0,0.4);`
+
+### What NOT to change
+- D3 world map colors (breakeven color scale stays — these are data colors)
+- Chart.js dataset colors (these are semantic — green/red/amber have meaning)
+- Print CSS (`@media print`) — keep as-is
+- The amber accent color concept — keep amber, just the darker version for white bg
+
+## Implementation approach
+1. **In one cycle:** Replace the `:root` block, update `body` font, update `.page-title` and `.page-sub`, update `.tab-pane` padding, update `.card`, update `thead th` / `tbody td`. This is the core swap — do it atomically. Run Playwright after. Fix any contrast failures before pushing.
+2. **In the next cycle:** Walk through every tab holistically, find inline styles that use hardcoded dark colors, replace with variables. Condense any remaining oversized padding/margin.
+3. The test suite should still pass because it tests structure and data, not color. If a visual color test fails, fix the CSS — do not comment out the test.
+
+---
+
 # 🚀 SPRINT TO PERFECT — From Zach (2026-08-13) — THIS IS THE ACTIVE MISSION
 
 **This is not a slow burn. Sprint to a zero-doubt, battle-tested UX. When you and the cycles have produced a final perfect result, the loop will declare "PERFECT — ZERO DOUBT" in the cycle log and email Zach.**
