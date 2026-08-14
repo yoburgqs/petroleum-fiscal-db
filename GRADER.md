@@ -1,8 +1,8 @@
-# 🎨 VISUAL REDESIGN — From Zach (2026-08-14) — DO THIS NEXT (before continuing FAQs)
+# ✅ VISUAL REDESIGN — From Zach (2026-08-14) — COMPLETE (v245, Cycle 194)
 
-**The platform currently uses dark navy/amber AI-product styling. Zach wants it redesigned to look like a professional petroleum consulting report — off-white background, tight typography, condensed layout. This is the highest priority change.**
+**Implemented in Cycle 194/v245.** Platform now uses consulting report styling: off-white background, Georgia serif typography, condensed layout, light paper-like header.
 
-## New Design System — implement in the next cycle
+## Design System Applied (v245)
 
 ### Color palette (replace :root variables exactly as written)
 
@@ -295,9 +295,11 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 193 — chart grid/axis on-palette, print header CSS vars, load error state on CSS vars, A141 ring-fence multi-block FAQ — v243→v244)
+**Last Updated:** 2026-08-14 (Cycle 194 — consulting report visual redesign, v244→v245)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 193 shipped v244: chart axis tick colors #888/#666→#6B6560 and grid colors #ffffff08/#ffffff10 (dark-mode invisible)→rgba(0,0,0,0.06) in two production chart instances; print header border #333→var(--text), subtitle #555→var(--muted), meta #777→var(--muted); load error overlay #ef4444/#fca5a5/#999→var(--red)/var(--muted)/var(--muted); A141 FAQ added (ring-fence multi-block portfolio IC workflow — license-level/company-level/field-level mechanics, 4-step IC workflow, IC memo disclosure template); FAQ count 140→141; v243→v244 sweep. 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 194 shipped v245: Full visual redesign to consulting report style. Background #F7F5F0 (warm off-white aged paper), body font Georgia serif (report quality), data tables/controls/UI chrome retain system-ui sans-serif for readability. Page titles 18px Georgia 700. Condensed spacing: tab-pane 16px/20px (was 24px), card 12px/14px, thead 7px/10px, tbody 6px/10px, header 10px/20px, tab-btn 10px/14px, ctrl-group 5px/10px. Header: white bg + 2px amber bottom rule (paper-like). Table headers warm gray #EDE9E3 with 10px uppercase labels. Cards white with 1px warm border (#D0CAC0), 4px radius, subtle shadow. Chip border-radius 4px (square-ish, report-like). Color palette tuned for white background: accent #B06800 (darker amber), green #15803D, all semantic colors WCAG-compliant on white. What's New panel updated with v245 entry. Changelog entry prepended. 9/9 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
+
+**Previous [Cycle 193]:** Cycle 193 shipped v244: chart axis tick colors #888/#666→#6B6560 and grid colors #ffffff08/#ffffff10 (dark-mode invisible)→rgba(0,0,0,0.06) in two production chart instances; print header border #333→var(--text), subtitle #555→var(--muted), meta #777→var(--muted); load error overlay #ef4444/#fca5a5/#999→var(--red)/var(--muted)/var(--muted); A141 FAQ added (ring-fence multi-block portfolio IC workflow — license-level/company-level/field-level mechanics, 4-step IC workflow, IC memo disclosure template); FAQ count 140→141; v243→v244 sweep. 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
 **Holistic walkthrough (Cycle 180):** (1) First impression — Home tab clear, stats prominent, 134-FAQ Methodology card, What's New panel shows v231 improvements. Good. (2) Empty states — all 4 primary tabs auto-load (v219). Good. (3) Fiscal Compare flow — auto-runs with Deepwater $75; table visible immediately. Good. (4) Country Profile — auto-loads Norway; Compare button visible. Good. (5) Navigation — coherent, labels match content. Good. (6) Information density — no excessive banners. Good. (7) IOC Portfolio — auto-loads Shell; Mechanic Mix stat immediately shows % concentration breakdown. Good. All dimensions: GOOD.
 
