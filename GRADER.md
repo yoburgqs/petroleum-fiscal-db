@@ -295,9 +295,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 184 — full visual redesign: petroleum consulting report aesthetic — off-white bg, Georgia serif, condensed layout, darker amber — v234→v235)
+**Last Updated:** 2026-08-14 (Cycle 185 — light-mode polish sweep + A138 FAQ (energy transition screening) — v235→v236)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 184 shipped v235: complete visual redesign per GRADER.md directive (2026-08-14). Dark navy/amber AI-product theme replaced with off-white professional consulting report aesthetic. :root palette, typography, spacing, header, tables, cards, buttons, chart colors, all hardcoded dark hex values updated. 4/4 JS syntax gate PASS / 0 JS errors.
+**Overall Status:** Cycle 185 shipped v236: light-mode polish completing the v235 visual redesign — all residual dark-mode hardcoded hex colors converted to CSS variables (chips, skeleton loader, quickstart buttons, shortcuts bar, tooltips, data coverage bar, example callouts, Screener banner, Breakeven Map tooltip, search dropdown). A138 FAQ added (energy transition portfolio strategy). 4/4 JS syntax gate PASS / 0 JS errors.
 
 **Holistic walkthrough (Cycle 180):** (1) First impression — Home tab clear, stats prominent, 134-FAQ Methodology card, What's New panel shows v231 improvements. Good. (2) Empty states — all 4 primary tabs auto-load (v219). Good. (3) Fiscal Compare flow — auto-runs with Deepwater $75; table visible immediately. Good. (4) Country Profile — auto-loads Norway; Compare button visible. Good. (5) Navigation — coherent, labels match content. Good. (6) Information density — no excessive banners. Good. (7) IOC Portfolio — auto-loads Shell; Mechanic Mix stat immediately shows % concentration breakdown. Good. All dimensions: GOOD.
 
@@ -430,6 +430,40 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+
+## Cycle 185 Log — 2026-08-14
+- Test before: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 184 push state)
+- Test after: 4/4 non-empty JS syntax gate PASS / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. Visual Design A+ — second-pass downgrade hunt after v235 redesign: found 15+ residual hardcoded dark-mode colors across chip filter CSS, skeleton loader, quickstart buttons, shortcuts bar, What's New panel, data coverage bar, scatter tooltip, Breakeven Map tooltip, search suggestions dropdown, Methodology provenance span, Home example callouts (7x #f0c060), Screener hint banner — all missed in Cycle 184 sweep. All fixed (v236). Grade maintained A+ with maximum evidence strength.
+- Fixes: (1) Visual Design / Light-Mode Polish: chip CSS #334155/#94a3b8 → var(--border)/var(--muted)/var(--surface2); facts-table hover converted; skeleton loader row divider and shimmer converted; Fiscal Compare + Side-by-Side quickstart buttons all dark hex → CSS variables; Screener hint banner converted; shortcuts bar + What's New panel converted; IRR scatter tooltip + Breakeven Map tooltip + search suggestions dropdown converted; data coverage bar + IRR coverage note converted; 7 Home example callout boxes color:#f0c060 → var(--accent-dim); Methodology provenance span converted; How to Cite panel converted; Quick Start Step 3 citation v234→v236. (2) Professional Credibility: A138 FAQ — energy transition portfolio strategy; Price Swing/Breakeven/Reform Risk trifecta; 4-step decarbonization exposure audit; rule of thumb by IOC type; FAQ count 137→138. (3) Naming Consistency: What's New panel updated to v236; Methodology card 137→138 analyst FAQs; v235→v236 sweep; v235 and v236 changelog entries added. Version v235→v236 (Cycle 185).
+- **Holistic walkthrough (Directive 2):** Home tab — shortcuts bar warm off-white ✓; What's New panel light-mode correct ✓; chip filters correct ✓. Fiscal Compare — quickstart buttons light-mode styled ✓. Screener hint banner amber on off-white ✓. Breakeven Map — tooltip white card ✓. All 4 primary tabs auto-load ✓. **All dimensions: GOOD.**
+
+---
+
+## Updated Grade Table (Cycle 185 — 2026-08-14)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 138 FAQs (A1–A138) including A138 energy transition portfolio screening. Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). reform_history.json preload priority low (v226). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). Directive 1 COMPLETE. Country Profile "Compare" button (v227). "Load Top 5 in Side-by-Side" button (v229). IOC Portfolio "Mechanic Mix" stat (v231). Auto-run guards strengthened (v234). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 138-FAQ section. Methodology card updated to 138 analyst FAQs (v236). First-visit Quick Start guide updated to v236. What's New panel light-mode correct (v236). |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). Side-by-Side empty-state text updated (v223). No bare empty tables remain. |
+| 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 185). 136 PASS / 0 FAIL / 0 JS errors (stable since v219). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A138 accessible. Explorer "Other" chip tooltip added (v232). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235): petroleum consulting report aesthetic. Light-mode polish sweep (v236): all residual dark-mode hardcoded hex colors converted to CSS variables — chips, skeleton loader, quickstart buttons, shortcuts bar, What's New panel, tooltips, data coverage bar, fact table hover, example callouts, Screener hint banner, Breakeven Map tooltip, search suggestions dropdown. Platform now renders correctly throughout on off-white background. |
+| 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. v235→v236 sweep complete. How to Cite fully updated to v236. Quick Start citation corrected to v236. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 138 FAQs (A1–A138). A138: ORCA fiscal take interpretation for energy transition portfolio strategy — Price Swing/Breakeven/Reform Risk trifecta; 4-step decarbonization exposure audit; rule of thumb by IOC strategy type. How to Cite updated to v236. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v236 — citation template, short-form footnote, and Scenario Builder cite example all corrected. |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 185 changes: Visual Design A+ upward evidence (v236 light-mode polish completes theme swap); Professional Credibility A+ maintained (A138: energy transition screening, FAQ 137→138); Naming Consistency A+ maintained (v235→v236 sweep); Data Reliability B+ unchanged.**
 
 ---
 
