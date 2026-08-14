@@ -295,9 +295,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 186 — deep dark-mode color sweep — v236→v237)
+**Last Updated:** 2026-08-14 (Cycle 187 — JS semantic color sweep + zebra stripe fix — v237→v238)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 186 shipped v237: second-pass dark-mode color sweep resolved 25+ hardcoded hex values missed in v235/v236 — across JS template literals, canvas drawing, D3 SVG, chart fallbacks, and dynamic UI elements. Visual Design A+ evidence strengthened. 9/9 JS syntax gate PASS / 0 JS errors.
+**Overall Status:** Cycle 187 shipped v238: fixed dark navy v38-era zebra-row CSS still shadowing light-mode tables; replaced all Material Design green/orange/red (#4caf50/#ff9800/#f44336) with platform semantic CSS variables across JS take/IRR/NPV coloring, swing, breakeven borders, tornado chart, cashflow classes, Explorer screener. Mode toggle active state button text fixed #0B0F1A→#fff. 4/4 JS syntax gate PASS / 0 JS errors.
 
 **Holistic walkthrough (Cycle 180):** (1) First impression — Home tab clear, stats prominent, 134-FAQ Methodology card, What's New panel shows v231 improvements. Good. (2) Empty states — all 4 primary tabs auto-load (v219). Good. (3) Fiscal Compare flow — auto-runs with Deepwater $75; table visible immediately. Good. (4) Country Profile — auto-loads Norway; Compare button visible. Good. (5) Navigation — coherent, labels match content. Good. (6) Information density — no excessive banners. Good. (7) IOC Portfolio — auto-loads Shell; Mechanic Mix stat immediately shows % concentration breakdown. Good. All dimensions: GOOD.
 
@@ -430,6 +430,16 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+
+## Cycle 187 Log — 2026-08-14
+- Test before: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 186 push state)
+- Test after: 4/4 non-empty JS syntax gate PASS / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. Visual Design A+ — downgrade hunt: discovered v38-era CSS rule `tbody tr:nth-child(even) { background: rgba(30,41,59,.3); }` (dark navy zebra stripe from original dark-mode theme) still present, overriding the correct light-mode rule from v235. Fixed (v238). All JS semantic colors (take/IRR/NPV coloring, swing coloring, breakeven bar borders, tornado chart, cashflow positive/negative classes) used Material Design green #4caf50, orange #ff9800, red #f44336 — all muted and washed out against off-white bg. Replaced with platform semantic vars: var(--green)=#15803D, var(--orange)=#C2410C, var(--red)=#B91C1C. Mode toggle active button color was #0B0F1A (dark navy on amber — unreadable in light mode); fixed to #fff. Grade maintained A+ with maximum evidence.
+- Fixes: (1) CSS v38 zebra-row dark navy rgba(30,41,59,.3)→rgba(0,0,0,0.018). (2) .dcf-vs-db delta pos/neg →var(--green)/var(--red). (3) .cf-positive/.cf-negative →var(--green)/var(--red). (4) Inline btnStyle color #0f172a→#fff. (5) Mode toggle active #0B0F1A→#fff. (6) Explorer legend swatches →var(--green)/var(--yellow)/var(--red). (7) Explorer breakeven border-left →#15803D/#A16207/#B91C1C. (8) Explorer swing cell →#15803D/#A16207/#B91C1C. (9) Explorer screener swing spans →var(--red)/var(--orange) (2 locations). (10) Scenario Builder live DCF + Scenario Builder output take/IRR/NPV →var(--red)/var(--orange)/var(--green). (11) Tornado chart datasets →#B91C1C/#15803D. Version v237→v238 (Cycle 187).
+- **Holistic walkthrough (Directive 2):** Tables — zebra rows now warm off-white stripe (not dark navy blocks) ✓. Scenario Builder — take/IRR/NPV colored with platform dark green/orange/red ✓. Explorer swing and breakeven use darker readable semantics on white bg ✓. Cashflow positive/negative values correctly colored ✓. Mode toggle active reads white-on-amber ✓. **All dimensions: GOOD.**
 
 ---
 
