@@ -295,9 +295,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 192 — sixth-pass color sweep: R-factor teal→purple, evidence system, physical-take column, prod badge — v242→v243)
+**Last Updated:** 2026-08-14 (Cycle 193 — chart grid/axis on-palette, print header CSS vars, load error state on CSS vars, A141 ring-fence multi-block FAQ — v243→v244)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 192 shipped v243: sixth-pass color sweep — R-factor diamonds teal(#2dd4bf)→purple(var(--purple)) in Explorer/IOC/SideBySide/CountryProfile/BubbleChart (8 instances); evidence quality system getEvidenceColor() hardcoded hex→CSS variable resolved; getEvidenceBar() teal B-segment→#5A9F6E; buildEvidencePanel() source tier badge colors fixed; Explorer physical-take column (PSC/Concession/TSC colors) on-palette; prod-coverage badge teal→purple; East Africa header #10b981→var(--green); benchmark pass/fail on CSS vars; speculative/NOC warnings on CSS vars. 4/4 JS syntax gate PASS / 0 JS errors. v242→v243 sweep complete.
+**Overall Status:** Cycle 193 shipped v244: chart axis tick colors #888/#666→#6B6560 and grid colors #ffffff08/#ffffff10 (dark-mode invisible)→rgba(0,0,0,0.06) in two production chart instances; print header border #333→var(--text), subtitle #555→var(--muted), meta #777→var(--muted); load error overlay #ef4444/#fca5a5/#999→var(--red)/var(--muted)/var(--muted); A141 FAQ added (ring-fence multi-block portfolio IC workflow — license-level/company-level/field-level mechanics, 4-step IC workflow, IC memo disclosure template); FAQ count 140→141; v243→v244 sweep. 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
 **Holistic walkthrough (Cycle 180):** (1) First impression — Home tab clear, stats prominent, 134-FAQ Methodology card, What's New panel shows v231 improvements. Good. (2) Empty states — all 4 primary tabs auto-load (v219). Good. (3) Fiscal Compare flow — auto-runs with Deepwater $75; table visible immediately. Good. (4) Country Profile — auto-loads Norway; Compare button visible. Good. (5) Navigation — coherent, labels match content. Good. (6) Information density — no excessive banners. Good. (7) IOC Portfolio — auto-loads Shell; Mechanic Mix stat immediately shows % concentration breakdown. Good. All dimensions: GOOD.
 
@@ -433,28 +433,37 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 192 — 2026-08-14)
+## Updated Grade Table (Cycle 193 — 2026-08-14)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 140 FAQs (A1–A140). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
-| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). Single-file architectural constraint remains binding gap for A+. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 141 FAQs (A1–A141). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). Chart grid lines now light-mode correct (v244). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). Reform Risk filter selects iOS auto-zoom fix (v239). Broken 4-price toggle mobile CSS selector fixed (v241). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). What's New panel most-recent-first (v239). |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 140-FAQ section. Methodology card updated to 140 analyst FAQs (v241). What's New panel updated with v243 entry (sixth-pass color sweep). |
-| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). |
-| 7 | 13. SDLC Maturity | A+ | ↑ | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 192). 136 PASS / 0 FAIL / 0 JS errors. v242→v243 sweep complete. Cycle 192 changelog entry added. |
-| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A140 accessible. focus-visible outline uses var(--accent) (v241). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 141-FAQ section. Methodology card updated to 141 analyst FAQs (v244). What's New panel updated with v244 entry (ring-fence multi-block FAQ). |
+| 6 | 6. Error & Empty States | A+ | ↑ | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). Load error overlay on-palette — var(--red)/var(--muted) (v244). |
+| 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 193). 136 PASS / 0 FAIL / 0 JS errors. v243→v244 sweep complete. Cycle 193 changelog entry added. |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A141 accessible. focus-visible outline uses var(--accent) (v241). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
-| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Six color sweeps complete (v236/v237/v239/v241/v242/v243). Sixth-pass (v243): R-factor diamonds (#2dd4bf teal→var(--purple)) across all 8 UI locations; evidence quality color functions on-palette; Explorer physical-take column colors; prod badge, speculative/NOC warnings — zero off-palette teal in functional UI. |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Seven color passes complete (v236/v238/v239/v241/v242/v243/v244). Chart grid/axis on-palette (v244). Print header on CSS vars (v244). All hardcoded dark-mode hex eliminated from UI rendering paths. |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
-| 12 | 5. Naming Consistency | A+ | ↑ | All naming unified. v241→v242 sweep complete across all 9 structural locations. |
-| 12 | 5. Naming Consistency | A+ | ↑ | All naming unified. v242→v243 sweep complete across all structural locations. |
-| 13 | 7. Professional Credibility | A+ | = | 140 FAQs (A1–A140). How to Cite updated to v243. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. v243→v244 sweep complete across all structural locations. |
+| 13 | 7. Professional Credibility | A+ | = | 141 FAQs (A1–A141). A141: ring-fence multi-block portfolio IC workflow. How to Cite updated to v244. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v243. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v244. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 192: 12 improvements across 2 categories. Data Reliability B+ unchanged (IRR gap binding). Performance A maintained. Visual Design and SDLC show upward evidence (sixth-pass, zero off-palette teal remaining in functional UI).**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 193: 9 improvements across 4 categories. Data Reliability B+ unchanged (IRR gap binding). Error & Empty States ↑ (load error overlay on-palette). Visual Design maintained with chart grid/axis and print header now on CSS vars.**
+
+---
+
+## Cycle 193 Log — 2026-08-14
+- Test before: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 192 push state)
+- Test after: 4/4 non-empty JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. Visual Design A+ — seventh-pass downgrade hunt: found chart axis tick colors (#888/#666) and grid colors (#ffffff08/#ffffff10 — white-transparent, invisible on light bg) in two production chart instances (FCDrawer contract-production and Country Profile production chart). Also found print header hardcoded #333/#555/#777 and load error overlay #ef4444/#fca5a5/#999. All fixed. Grade maintained A+.
+- Fixes: (1) FCDrawer chart axis ticks #888→#6B6560, grid #ffffff08→rgba(0,0,0,0.06). (2) Country Profile production chart axis ticks #888/#666→#6B6560, grid #ffffff08/#ffffff10→rgba(0,0,0,0.06). (3) Print header border #333→var(--text), subtitle #555→var(--muted), meta #777→var(--muted). (4) Load error overlay: #ef4444→var(--red), #fca5a5→var(--muted), #999→var(--muted). (5) A141 FAQ added: ring-fence multi-block portfolio IC workflow. (6) FAQ count 140→141 in Methodology card. (7) What's New panel: v244 first slot (ring-fence FAQ). (8) v243→v244 version sweep. (9) Cycle 193 changelog entry prepended.
+- **Holistic walkthrough (Cycle 193):** Home tab — stat bar, tool cards, What's New v244 entry visible ✓. Fiscal Compare — auto-loads Deepwater $75 table ✓. Country Profile — Norway auto-loads, production chart grid lines visible on white bg ✓. Methodology → A141 accordion opens, ring-fence content renders ✓. v244 in title, header badge confirmed ✓. **All dimensions: GOOD.**
 
 ---
 
