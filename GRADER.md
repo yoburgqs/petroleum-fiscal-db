@@ -1174,3 +1174,21 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 - Test after: 136 PASS / 0 FAIL
 - JS errors: 0
 - Summary: Cycle 166 complete. v215 shipped. FAQ A122 added (associated gas fiscal treatment — dual-stream model, 5 jurisdictions, Nigeria DSO, Indonesia PSC gas split, Australia PRRT gas transfer pricing, Angola ALNG, Qatar GPA; 4-step IC workflow; rule of thumb by gas share of NPV; FAQ count 121→122). Version sweep v214→v215 (28 references). Syntax gate: 4/4 PASS. Both repos pushed.
+
+---
+## Cycle 166 Log — 2026-08-13 19:07
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 166 complete. v215 live at yoburgqs.github.io/petroleum-fiscal-db/**
+
+---
+
+**Tests:** 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors | Push: confirmed (both repos)
+
+**What shipped:**
+
+1. **FAQ A122 â€” Associated gas fiscal treatment** *(Professional Credibility)*
+   - Why ORCA's reference project is oil-only and the 10% NPV threshold for requiring a separate gas analysis
+   - Three dimensions of gas fiscal divergence: royalty rate, revenue base, cost recovery ring-fence
+   - 
