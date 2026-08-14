@@ -1171,6 +1171,6 @@ Cycle 151 is clean: 136 PASS / 0 FAIL, v200 milestone live on GitHub Pages.
 ---
 ## Cycle 166 Log — 2026-08-13 19:02
 - Test before: 136 PASS / 0 FAIL
-- Test after: 136 PASS / 0 FAIL (pending syntax gate)
+- Test after: 136 PASS / 0 FAIL
 - JS errors: 0
-- Summary: Running now — FAQ A122 added (associated gas fiscal treatment), v214→v215 sweep.
+- Summary: Cycle 166 complete. v215 shipped. FAQ A122 added (associated gas fiscal treatment — dual-stream model, 5 jurisdictions, Nigeria DSO, Indonesia PSC gas split, Australia PRRT gas transfer pricing, Angola ALNG, Qatar GPA; 4-step IC workflow; rule of thumb by gas share of NPV; FAQ count 121→122). Version sweep v214→v215 (28 references). Syntax gate: 4/4 PASS. Both repos pushed.
