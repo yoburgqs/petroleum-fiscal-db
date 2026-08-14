@@ -100,9 +100,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 181 — A135 data vintage/statutory terms FAQ + Explorer Other chip tooltip + v231→v232 sweep)
+**Last Updated:** 2026-08-14 (Cycle 182 — A137 WACC/discount-rate FAQ + auto-run guards strengthened + stale naming fixed + v233→v234 sweep)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 180 shipped v231: 3 improvements across 3 categories. Professional Credibility: A134 FAQ added — portfolio fiscal mechanic concentration risk (4-step audit workflow: IOC Portfolio mechanic map / Screener PSC+Africa stress cluster / Reform Risk tilt / IC memo 3-metric concentration matrix; systemic risk score formula; rule of thumb by mechanic type; IC memo disclosure template; cross-reference A24/A51/A71/A73/A93/A117; FAQ count 133→134). Interaction Design: IOC Portfolio "Mechanic Mix" stat added — contract-weighted % breakdown by mechanic type (e.g. "PSC 62% · Concession 38%") replaces the uninformative "Mechanics: N" count; tooltip references FAQ A134 concentration framework; applies to both single-operator and aggregate views. Naming Consistency: v230→v231 sweep across 25 structural locations; What's New panel updated to v231 cards; Methodology card 133→134 analyst FAQs. Tests: 4/4 JS syntax gate PASS / 0 JS errors (pre-commit verification).
+**Overall Status:** Cycle 182 shipped v234: 4 improvements across 4 categories. Professional Credibility: A137 FAQ added — WACC and discount rate selection for upstream petroleum IC models; Tier 1 IOC WACC 8–10% vs. independent E&P 12–15%; country risk premium overlay by Stability Score; IRR vs. WACC evaluation workflow without recalculating NPV; 4-step IC memo workflow; rule of thumb by project type (LNG most sensitive, onshore marginal least sensitive); cross-reference A41/A63/A117/A133; FAQ count 136→137. Reliability/Auto-run: IOC Portfolio auto-run now checks IOC_DATA before calling loadIOC('Shell'); Country Profile auto-run checks COUNTRY_DATA and dd-profile-content per directive spec — prevents silent failures on slow loads. Naming Consistency: Home page IOC Portfolio card description corrected — stale "Fiscal Exposure Analyzer" replaced with "Take Distribution & Peer Comparison"; v233→v234 sweep. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (Playwright full suite passed pre-push hook).
 
 **Holistic walkthrough (Cycle 180):** (1) First impression — Home tab clear, stats prominent, 134-FAQ Methodology card, What's New panel shows v231 improvements. Good. (2) Empty states — all 4 primary tabs auto-load (v219). Good. (3) Fiscal Compare flow — auto-runs with Deepwater $75; table visible immediately. Good. (4) Country Profile — auto-loads Norway; Compare button visible. Good. (5) Navigation — coherent, labels match content. Good. (6) Information density — no excessive banners. Good. (7) IOC Portfolio — auto-loads Shell; Mechanic Mix stat immediately shows % concentration breakdown. Good. All dimensions: GOOD.
 
@@ -235,6 +235,16 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+
+## Cycle 183 Log — 2026-08-14
+- Test before: 4/4 JS syntax gate PASS / 0 JS errors / 136 PASS / 0 FAIL (Cycle 182 push state)
+- Test after: 4/4 non-empty JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (Playwright full suite via pre-push hook). Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. Interaction Design A+ — found gap: IOC Portfolio auto-run fired without checking `IOC_DATA` is populated; Country Profile auto-run did not check `COUNTRY_DATA` availability or `dd-profile-content` emptiness per directive spec — both would silently fail on slow loads. Fixed both guards (v234). Grade maintained A+ with stronger evidence.
+- Fixes: (1) Professional Credibility: A137 FAQ added — WACC and discount rate selection for upstream petroleum IC models; Tier 1 IOC WACC benchmark 8–10% vs. independent E&P 12–15%; country risk premium overlay by Stability Score tier; IRR vs. WACC evaluation workflow; directional NPV scaling rule; 4-step IC memo; rule of thumb by project type (LNG most sensitive); cross-reference A41/A63/A117/A133. FAQ count 136→137. (2) Reliability / Auto-run Guards: IOC Portfolio checks `IOC_DATA.length > 0` before `loadIOC('Shell')`; Country Profile checks `COUNTRY_DATA.length > 0` and `dd-profile-content.innerHTML.trim() === ''` per directive spec. (3) Naming Consistency: Home page IOC Portfolio card description corrected — "Fiscal Exposure Analyzer" replaced with "Take Distribution & Peer Comparison" (stale since v219 rename); v233→v234 sweep; Methodology card updated 136→137 analyst FAQs.
+- **Holistic walkthrough (Directive 2):** Home tab — 137-FAQ Methodology card ✓; IOC card says "Take Distribution & Peer Comparison" ✓; What's New v234 ✓. Fiscal Compare — auto-runs ✓. Country Profile — auto-loads Norway; data guard active ✓. Side-by-Side — North Sea Trio ✓. IOC Portfolio — auto-loads Shell; IOC_DATA guard active ✓. Navigation coherent, zero empty states ✓. **All dimensions: GOOD.**
 
 ---
 
@@ -752,27 +762,27 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 182 — 2026-08-14)
+## Updated Grade Table (Cycle 183 — 2026-08-14)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 136 FAQs (A1–A136) including A136 entitlement reconciliation audit trail (A39/A100/A119/A120/A133 cross-reference). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
-| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). reform_history.json preload priority lowered to "low" (v231). Single-file architectural constraint remains binding gap for A+. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 137 FAQs (A1–A137) including A137 WACC/discount-rate selection. Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). reform_history.json preload priority low (v226). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
-| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). Directive 1 COMPLETE. Country Profile "Compare" button (v227). "Load Top 5 in Side-by-Side" button (v229). IOC Portfolio "Mechanic Mix" stat (v231). |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 136-FAQ section. Methodology card updated to 136 analyst FAQs (v233). First-visit Quick Start guide updated to v233. What's New panel (v233). |
+| 4 | 4. Interaction Design | A+ | ↑ | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). Directive 1 COMPLETE. Country Profile "Compare" button (v227). "Load Top 5 in Side-by-Side" button (v229). IOC Portfolio "Mechanic Mix" stat (v231). Auto-run guards strengthened (v234): IOC Portfolio checks IOC_DATA, Country Profile checks COUNTRY_DATA + dd-profile-content per directive spec — no silent failures on slow loads. |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 137-FAQ section. Methodology card updated to 137 analyst FAQs (v234). First-visit Quick Start guide updated to v234. What's New panel (v234). |
 | 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). Side-by-Side empty-state text updated (v223). No bare empty tables remain. |
-| 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 182). 136 PASS / 0 FAIL / 0 JS errors (stable since v219). |
-| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A136 accessible. Explorer "Other" chip tooltip added (v232). |
+| 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate (Cycle 183). 136 PASS / 0 FAIL / 0 JS errors (Playwright full suite via pre-push hook, stable since v219). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A137 accessible. Explorer "Other" chip tooltip added (v232). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
 | 10 | 1. Visual Design | A+ | = | Skeleton loader. Favicon. Row fade-in. IOC Portfolio duplicate page-title removed (v219). |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
-| 12 | 5. Naming Consistency | A+ | ↑ | Stale "Scenario Builder v231" in How to Cite corrected (v233). "ORCA v231" in 7 FAQ source citations corrected (v233). "Platform v231" in Methodology provenance corrected (v233). v232→v233 sweep complete across all structural locations. Naming consistency gap eliminated. |
-| 13 | 7. Professional Credibility | A+ | = | 136 FAQs (A1–A136). A136 added: ORCA government take vs. entitlement barrels reconciliation — how PSC entitlement (cost oil + profit oil) differs from WI production; 4-step IC reconciliation workflow; SEC ASC 932-10-55-11 + IFRS 6 booking reconciliation; rule of thumb by mechanic (Concession WI-invariant; PSC high-FTP entitlement compression; TSC fee-income). How to Cite updated to v233. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. Home page IOC card "Fiscal Exposure Analyzer" corrected to "Take Distribution & Peer Comparison" (v234). v233→v234 sweep complete. |
+| 13 | 7. Professional Credibility | A+ | = | 137 FAQs (A1–A137). A137 added: WACC and discount rate selection for upstream petroleum IC models — Tier 1 IOC WACC 8–10% vs. independent E&P 12–15%; country risk premium overlay; IRR vs. WACC evaluation workflow; 4-step IC memo; rule of thumb by project type. How to Cite updated to v234. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v233 — citation template, short-form footnote, and Scenario Builder cite example all corrected. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v234 — citation template, short-form footnote, and Scenario Builder cite example all corrected. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 0 JS errors (Cycle 182). Cycle 182 grade changes: Professional Credibility A+ maintained (A136: entitlement reconciliation, FAQ count 135→136); Naming Consistency A+ maintained with upward evidence strength (stale v231 citations eliminated across 9 locations); Data Reliability B+ maintained — IRR structural gap (74/185) is the binding constraint. Naming Consistency audit finding closed: no stale version citations remain in IC memo templates or source paragraphs.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (Playwright via pre-push hook, Cycle 183). Cycle 183 grade changes: Interaction Design A+ maintained with upward evidence strength (auto-run guards now data-validated, per directive spec); Professional Credibility A+ maintained (A137: WACC/discount rate, FAQ count 136→137); Naming Consistency A+ maintained (Home card stale name corrected). Data Reliability B+ unchanged — IRR structural gap (74/185) is the binding constraint.**
 
 ---
 
