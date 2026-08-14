@@ -1,4 +1,23 @@
-# 🎯 PRIORITY STAGED IMPROVEMENTS — From Zach (2026-08-13) — DO THESE NEXT
+# 🚀 SPRINT TO PERFECT — From Zach (2026-08-13) — THIS IS THE ACTIVE MISSION
+
+**This is not a slow burn. Sprint to a zero-doubt, battle-tested UX. When you and the cycles have produced a final perfect result, the loop will declare "PERFECT — ZERO DOUBT" in the cycle log and email Zach.**
+
+**What "perfect" means:**
+- Every tab auto-loads with real content (no empty states, no "click Run to start")
+- Every banner is thin, informational, proportionate — nothing looks like a system alert
+- Navigation is immediately coherent to a first-time user
+- Playwright: 136+ PASS, 0 FAIL, 0 JS errors, every cycle
+- The holistic walkthrough (Directive 2 below) scores every dimension as Good
+- You have personally walked through every tab from a blank browser, confirmed nothing is confusing, nothing is broken, nothing is redundant
+
+**Sprint rules:**
+- Make 2–3 substantive UX improvements per cycle (not just data/FAQ additions)
+- Do the holistic walkthrough every single cycle — not optional
+- If you notice something wrong during the walkthrough, fix it immediately in the same cycle
+- Prioritize the staged auto-run improvements (Directive 1) — implement them in the next 2 cycles
+- When all Directive 1 items are done AND the walkthrough is clean, declare the sprint complete
+
+# 🎯 STAGED IMPROVEMENTS — From Zach (2026-08-13) — DO THESE NEXT
 
 **Two directives from the product owner. Both are mandatory going forward.**
 
