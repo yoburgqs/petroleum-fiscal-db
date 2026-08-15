@@ -1319,7 +1319,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div id="search-modal" role="dialog" aria-label="Search countries and mechanics">
     <div id="search-input-wrap">
       <span class="search-icon-inner">&#x1f50d;</span>
-      <input id="search-q" type="text" placeholder="Search countries and mechanics..." aria-label="Search countries and mechanics" autocomplete="off">
+      <input id="search-q" type="text" placeholder="Search countries and mechanics..." aria-label="Search countries and mechanics" autocomplete="off" inputmode="search">
       <span id="search-close-btn" role="button" tabindex="0" aria-label="Close search" style="color:var(--muted);font-size:11px;cursor:pointer;">Esc</span>
     </div>
     <div id="search-results"></div>
@@ -1693,7 +1693,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       </select>
     </div>
     <div style="position:relative;display:inline-block;">
-      <input type="text" class="search-input" id="flt-search" placeholder="Search country…" aria-label="Search countries in Explorer table" autocomplete="off">
+      <input type="text" class="search-input" id="flt-search" placeholder="Search country…" aria-label="Search countries in Explorer table" autocomplete="off" inputmode="search">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.10);"></div>
     </div>
     <button id="four-price-toggle" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:var(--green);color:var(--green);" data-active="0" title="Show only countries with verified production data (>5% contract coverage)" aria-label="Toggle production data filter — show only countries with verified production data" aria-pressed="false">Prod Data Only</button><button id="explorer-excel-btn" class="btn btn-outline btn-sm" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
@@ -1941,7 +1941,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="card">
     <div class="card-title">Select Countries (max 4)</div>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
-      <input type="text" class="search-input" id="cmp-search" placeholder="Type to search countries…" aria-label="Search countries to compare side-by-side" autocomplete="off" style="width:260px;">
+      <input type="text" class="search-input" id="cmp-search" placeholder="Type to search countries…" aria-label="Search countries to compare side-by-side" autocomplete="off" inputmode="search" style="width:260px;">
       <div id="cmp-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       <button class="btn btn-outline btn-sm" id="cmp-clear-btn" aria-label="Clear all selected countries from side-by-side comparison">Clear</button>
       <button class="btn btn-outline btn-sm" id="cmp-print-btn" title="Print/export comparison as PDF" aria-label="Export comparison as PDF via browser print">⬇ Export PDF</button>
@@ -2067,7 +2067,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   </div>
 
   <div class="card">
-    <input type="text" class="search-input" id="ioc-search" placeholder="Search operator (e.g. ExxonMobil, Shell, BP, Total, Chevron, Equinor)…" aria-label="Search IOC operator" autocomplete="off" style="width:100%;max-width:500px;" oninput="updateIOCSuggestions()">
+    <input type="text" class="search-input" id="ioc-search" placeholder="Search operator (e.g. ExxonMobil, Shell, BP, Total, Chevron, Equinor)…" aria-label="Search IOC operator" autocomplete="off" inputmode="search" style="width:100%;max-width:500px;" oninput="updateIOCSuggestions()">
     <div id="ioc-suggestions" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;"></div>
     <div id="ioc-quick-btns" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
       <span style="color:var(--muted);font-size:12px;margin-right:4px;">Quick:</span>
