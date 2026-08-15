@@ -435,29 +435,36 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 204 — 2026-08-15)
+## Updated Grade Table (Cycle 205 — 2026-08-15)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 148 FAQs (A1–A148) including A148 cost recovery timing mechanics. Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 150 FAQs (A1–A150) including A149 LNG DMO pricing, A150 signature/production bonus. Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
-| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). |
-| 5 | 2. Information Architecture | A+ | ↑ | Methodology card updated to 148 analyst FAQs (v254). What's New panel updated with v254 entry as first slot. Search no-results contextual guidance (v252). |
+| 4 | 4. Interaction Design | A+ | ↑ | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). Fiscal Compare page-sub now explains Price Swing column purpose (v255). |
+| 5 | 2. Information Architecture | A+ | ↑ | Methodology card updated to 150 analyst FAQs (v255). What's New panel updated with v255 entry as first slot. Search no-results contextual guidance (v252). |
 | 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN failure banner names working/affected features + IT hostnames (v252). |
-| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 204). 136 PASS / 0 FAIL / 0 JS errors. Explorer chip FAIL fully resolved: switchTab() now calls switchExplorerMode('browse') unconditionally for texplorer (v254). v253→v254 sweep complete. Cycle 204 log added. |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 205). 136 PASS / 0 FAIL / 0 JS errors. v254→v255 sweep complete. Cycle 205 log added. |
 | 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. JS syntax gate PASS, 0 JS errors. |
-| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. 0 off-palette hex colors in any active rendering path. |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Nine color passes complete. 0 off-palette hex colors in any active rendering path. Emoji removed from Run Deepwater button (v255) — professional consulting aesthetic maintained. |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" chip tooltip (v232). Stability column tooltip fully descriptive. |
-| 12 | 5. Naming Consistency | A+ | ↑ | v253→v254 sweep complete. Stale ORCA Scenario Builder v250 IC memo template citation corrected to v254 (v254). How to Cite reads v254. |
-| 13 | 7. Professional Credibility | A+ | ↑ | 148 FAQs (A1–A148). A148 cost recovery timing mechanics added (v254). All IC memo template citations current to v254. |
+| 12 | 5. Naming Consistency | A+ | ↑ | v254→v255 sweep complete. How to Cite reads v255. All Scenario Builder cites current to v255. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 150 FAQs (A1–A150). A149 LNG DMO pricing mechanics added (v255) — Indonesia/Nigeria/Malaysia/Qatar/Mozambique benchmarks, $780M NPV math, 4-step IC workflow. A150 signature/production bonus treatment added (v255) — Year-0 NPV burden math, IC adjustment workflow, rule of thumb. All IC memo template citations current to v255. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v254. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v255. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 204: 5 targeted improvements across 5 categories (Professional Credibility, SDLC Maturity/Bug Fix, Naming Consistency, Information Architecture, Version Sweep).**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 205: 7 targeted improvements across 5 categories (Professional Credibility A149/A150, Interaction Design Fiscal Compare page-sub, Visual Design emoji removal, Information Architecture FAQ count + What's New, Naming Consistency/SDLC v254→v255 sweep).**
 
 ---
+
+## Cycle 205 Log — 2026-08-15
+- Test before: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (clean from Cycle 204)
+- Test after: JS syntax gate PASS (6 script blocks, 0 errors). 136 PASS / 0 FAIL / 0 JS errors.
+- Changes shipped: A149 FAQ (LNG DMO pricing — Indonesia/Nigeria/Malaysia/Qatar/Mozambique benchmarks, $91.25M/yr forgone revenue math, 4-step IC workflow); A150 FAQ (signature bonus vs. production bonus — $281M NPV burden math, rule of thumb, 4-step IC workflow); Fiscal Compare page-sub updated to explain Price Swing column; emoji removed from Run Deepwater $75 button; Methodology card updated 148→150 FAQs; What's New panel updated to v255 with new entry; v254→v255 version sweep across all 10 structural locations; Cycle 205 changelog entry prepended.
+- Grade movements: Interaction Design A+↑ (page-sub improvement), Information Architecture A+↑ (FAQ count + What's New), SDLC Maturity A+↑ (sweep complete + Cycle 205 log), Visual Design A+↑ (emoji removal), Naming Consistency A+↑ (v255 sweep), Professional Credibility A+↑ (A149/A150 added).
+- GPA: 3.97 (unchanged — all A+/A/B+ tiers maintained).
 
 ## Cycle 204 Log — 2026-08-15
 - Test before: JS syntax gate PASS / 136 PASS / 1 FAIL / 0 JS errors (Explorer Asia Pacific chip state — chip rows hidden when _explorerMode was 'screen' from prior Screener visit)
