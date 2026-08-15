@@ -435,27 +435,37 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 198 — 2026-08-14)
+## Updated Grade Table (Cycle 199 — 2026-08-15)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 144 FAQs (A1–A144). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 145 FAQs (A1–A145). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). Chart grid lines now light-mode correct (v244). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). Reform Risk filter selects iOS auto-zoom fix (v239). Broken 4-price toggle mobile CSS selector fixed (v241). |
-| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). What's New panel most-recent-first (v239). |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 144-FAQ section. Methodology card updated to 144 analyst FAQs (v248). What's New panel updated with v248 entry (gas-condensate + R-factor FAQs). |
-| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). Load error overlay on-palette — var(--red)/var(--muted) (v244). |
-| 7 | 13. SDLC Maturity | A+ | = | JS syntax gate PASS (Cycle 198). 136 PASS / 0 FAIL / 0 JS errors. v247→v248 sweep via commit. Cycle 198 log added. |
-| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A144 accessible. focus-visible outline uses var(--accent) (v241). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). What's New panel most-recent-first (v239). Country Profile empty state simplified — removed contradictory "select a country below" instruction that conflicted with auto-load (Cycle 199). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 145-FAQ section. Methodology card updated to 145 analyst FAQs (v249). What's New panel updated with v249 NOC equity WI FAQ entry. |
+| 6 | 6. Error & Empty States | A+ | ↑ | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). Load error overlay on-palette — var(--red)/var(--muted) (v244). IOC Portfolio empty state heading corrected: "Operator Fiscal Exposure" → "Search an Operator" (stale name removed, Cycle 199). |
+| 7 | 13. SDLC Maturity | A+ | = | JS syntax gate PASS (Cycle 199). 136 PASS / 0 FAIL / 0 JS errors. v248→v249 already swept. Cycle 199 log added. |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A145 accessible. focus-visible outline uses var(--accent) (v241). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. JS syntax gate PASS, 0 JS errors. |
-| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Eight color passes complete (v236/v238/v239/v241/v242/v243/v244/v246). 0 off-palette hex colors remain in any active rendering path. All Tailwind and Material Design hex replaced with ORCA resolved-hex palette values. |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Eight color passes complete (v236/v238/v239/v241/v242/v243/v244/v246). IOC Portfolio info banner off-palette rgba(148,163,184) Tailwind slate colors replaced with var(--surface2)/var(--border) (Cycle 199). 0 off-palette hex colors remain in any active rendering path. |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
-| 12 | 5. Naming Consistency | A+ | = | v247→v248 sweep complete across all structural locations. How to Cite updated to v248. |
-| 13 | 7. Professional Credibility | A+ | ↑ | 144 FAQs (A1–A144). A143: gas-condensate fiscal adjustment (jurisdiction-specific DMO/ring-fence rules, 4-step IC workflow). A144: R-factor tier trajectory calculation (annual R-factor build, production-weighted effective take, mid-tier approximation accuracy by country). How to Cite updated to v248. |
+| 12 | 5. Naming Consistency | A+ | ↑ | v248→v249 sweep complete. Footer DCF Engine badge corrected: v219→v249 (was stale by 30 versions, Cycle 199). 103 stale ORCA version citations in FAQ IC memo templates and Source lines updated to v249 (comprehensive sweep across v201/v207/v219/v233/v246 in all FAQ bodies, Cycle 199). XLSX export metadata citation corrected. How to Cite reads v249. |
+| 13 | 7. Professional Credibility | A+ | = | 145 FAQs (A1–A145). All IC memo template citations now read v249 — analysts copying template language get current version. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v248. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v249. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 198: A143 gas-condensate fiscal adjustment FAQ, A144 R-factor tier trajectory FAQ, v247→v248 version sweep, Methodology card 142→144 FAQs, What's New panel updated.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 199: Footer badge fix (v219→v249), IOC Portfolio stale heading fix, IOC Portfolio off-palette colors fixed, Country Profile empty state simplified, 103 stale ORCA version citations in FAQ bodies updated to v249.**
+
+---
+
+## Cycle 199 Log — 2026-08-15
+- Test before: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (Cycle 198 push state)
+- Test after: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) unchanged. No change. Performance & Reliability A — single-file constraint unchanged. No change. All other categories A+ — no regressions.
+- Fixes: (1) Naming Consistency: footer DCF Engine badge corrected v219→v249 — stale by 30 versions, visible in every page view, embarrassing in demo context. (2) Error & Empty States: IOC Portfolio empty state heading "Operator Fiscal Exposure" → "Search an Operator" — stale name from before v219 rename; heading was misaligned with the current page title "IOC Portfolio — Fiscal Exposure". (3) Visual Design: IOC Portfolio info banner background/border changed from rgba(148,163,184,...) Tailwind slate-400 to var(--surface2)/var(--border) — design system compliance, was only remaining off-palette static HTML color in the main tab area. (4) Interaction Design: Country Profile empty state simplified — removed "If it does not appear automatically, select a country below" clause that contradicted auto-load behavior introduced in v219; user would see this text and try to select a country that the platform had already auto-loaded for them. (5) Naming Consistency: 62 stale ORCA v201/v246 IC memo template citations updated to v249 via Python replace. (6) Naming Consistency: 41 additional stale ORCA v219/v207/v233 Source: line and IC memo template citations updated to v249. (7) Naming Consistency: XLSX export metadata citation updated v219→v249. Total: 103 stale version strings corrected across all FAQ bodies.
+- **Holistic walkthrough (Cycle 199):** Home tab — header badge reads v249 ✓. "145 analyst FAQs" in Methodology card ✓. What's New panel shows v249 NOC equity WI FAQ as first entry ✓. Fiscal Compare — auto-loads Deepwater $75 table ✓. IOC Portfolio tab — info banner now uses platform palette colors ✓. IOC Portfolio empty state — heading reads "Search an Operator" ✓. Country Profile empty state — reads "Loading Norway profile…" without contradictory instruction ✓. Footer — DCF Engine badge reads v249 ✓. Methodology FAQ source lines — spot-checked A110, A117, A120: all read "ORCA v249 (Aug 2026)" ✓. All dimensions: GOOD.
 
 ---
 
