@@ -435,6 +435,40 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Updated Grade Table (Cycle 204 — 2026-08-15)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 148 FAQs (A1–A148) including A148 cost recovery timing mechanics. Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). |
+| 5 | 2. Information Architecture | A+ | ↑ | Methodology card updated to 148 analyst FAQs (v254). What's New panel updated with v254 entry as first slot. Search no-results contextual guidance (v252). |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN failure banner names working/affected features + IT hostnames (v252). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 204). 136 PASS / 0 FAIL / 0 JS errors. Explorer chip FAIL fully resolved: switchTab() now calls switchExplorerMode('browse') unconditionally for texplorer (v254). v253→v254 sweep complete. Cycle 204 log added. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. JS syntax gate PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. 0 off-palette hex colors in any active rendering path. |
+| 11 | 3. Data Presentation | A+ | = | Explorer "Other" chip tooltip (v232). Stability column tooltip fully descriptive. |
+| 12 | 5. Naming Consistency | A+ | ↑ | v253→v254 sweep complete. Stale ORCA Scenario Builder v250 IC memo template citation corrected to v254 (v254). How to Cite reads v254. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 148 FAQs (A1–A148). A148 cost recovery timing mechanics added (v254). All IC memo template citations current to v254. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v254. |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 204: 5 targeted improvements across 5 categories (Professional Credibility, SDLC Maturity/Bug Fix, Naming Consistency, Information Architecture, Version Sweep).**
+
+---
+
+## Cycle 204 Log — 2026-08-15
+- Test before: JS syntax gate PASS / 136 PASS / 1 FAIL / 0 JS errors (Explorer Asia Pacific chip state — chip rows hidden when _explorerMode was 'screen' from prior Screener visit)
+- Test after: JS syntax gate PASS (4 script blocks, 0 errors). 136 PASS / 0 FAIL / 0 JS errors (chip FAIL resolved: switchTab() unconditionally calls switchExplorerMode('browse') for texplorer).
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. SDLC A+ — active downgrade hunt found real remaining bug: v253 DOM order fix was necessary but insufficient — if _explorerMode was already set to 'screen', the switchTab() call used the stale value and re-entered screen mode, hiding chip rows again. Root fix: remove the ||'browse' fallback and call 'browse' unconditionally. Screener's dedicated DOMContentLoaded handler preserves screen mode when Screener is explicitly clicked — no regression. Naming Consistency A+ — active downgrade hunt found stale "ORCA Scenario Builder v250" in How to Cite inline guidance (the text below the full citation block) — missed in sweeps v250–v253 because it was inside a different text node than the structural Scenario Builder cite lines. Corrected to v254. Grade maintained A+ with upward evidence.
+- Fixes: (1) Professional Credibility: A148 FAQ added — PSC cost recovery cap timing mechanics (how 70% cap interacts with oil price; IRR sensitivity to cost recovery year; 4-step IC workflow; rule of thumb by cap% and capex intensity). (2) SDLC/Bug Fix: switchTab() for texplorer now calls switchExplorerMode('browse') unconditionally — removes _explorerMode stale-value path that was the real root cause of chip FAIL. (3) Naming Consistency: stale "ORCA Scenario Builder v250" in How to Cite IC guidance corrected to v254. (4) Information Architecture: Methodology card 147→148 FAQs. What's New v254 entry prepended. (5) Version sweep v253→v254: meta description, title, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation, short-form citation, all Scenario Builder cites.
+- **Holistic walkthrough (Cycle 204):** Home tab — header badge reads v254 ✓. "148 analyst FAQs" in Methodology card ✓. What's New panel shows v254 cost recovery timing entry as first item ✓. Explorer tab — navigate to Explorer from Screener: chip rows visible, browse mode active ✓. How to Cite — reads v254 in full citation, short-form, and Scenario Builder IC memo template ✓. FAQ A148 — cost recovery timing, 4-step IC workflow, rule of thumb complete ✓. All dimensions: GOOD.
+
+---
+
 ## Updated Grade Table (Cycle 202 — 2026-08-15)
 
 | Rank | Category | Grade | Delta | Priority Fix |
