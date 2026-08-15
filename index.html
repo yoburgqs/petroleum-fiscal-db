@@ -1214,6 +1214,19 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   .tab-nav-wrapper::after { width: 60px; }
 }
 
+/* v252: prefers-reduced-motion — respect user vestibular/motion sensitivity setting */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  @keyframes ld-shimmer { 0%,100% { left: 0; } }
+  @keyframes ld-pulse   { 0%,100% { opacity: 1; } }
+  @keyframes row-fade-in { from { opacity:1; transform:none; } to { opacity:1; transform:none; } }
+  @keyframes row-flash   { 0%,100% { background:transparent; } }
+}
+
 /* ── v116: Landscape mode optimization for phones ── */
 /* When phone is rotated landscape (≤896px wide, ≤500px tall) — tighten chrome, maximize content */
 @media (max-width: 896px) and (max-height: 500px) and (orientation: landscape) {
@@ -1257,7 +1270,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <button id="tab-btn-thome" class="tab-btn active" role="tab" aria-selected="true" aria-controls="thome" onclick="switchTab('thome',this)" title="Platform overview — all tools, descriptions, and examples">Home</button>
   <button id="tab-btn-t0" class="tab-btn" role="tab" aria-selected="false" aria-controls="t0" onclick="switchTab('t0',this)" title="Run any production profile through 185 countries simultaneously">Fiscal Compare</button>
   <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" aria-controls="t7" onclick="switchTab('t7',this)" title="Deep-dive into a single country's fiscal regime">Country Profile</button>
-  <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" title="Filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region">Screener</button>
+  <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" title="Filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region">Screener</button>
   <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" aria-controls="t2" onclick="switchTab('t2',this)" title="Compare up to 4 countries side-by-side across all fiscal metrics">Side-by-Side</button>
   <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" aria-controls="t5" onclick="switchTab('t5',this)" title="Operator fiscal exposure across all jurisdictions">IOC Portfolio</button>
   <button id="tab-btn-tbreakevenmap" class="tab-btn" role="tab" aria-selected="false" aria-controls="tbreakevenmap" onclick="switchTab('tbreakevenmap',this)" title="Interactive world map of oil price breakeven by country">Breakeven Map</button>
