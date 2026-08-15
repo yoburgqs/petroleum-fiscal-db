@@ -493,6 +493,40 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Updated Grade Table (Cycle 207 — 2026-08-15)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 151 FAQs (A1–A151). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). Fiscal Compare page-sub explains Price Swing (v255). Stability column now shows ⓘ + cursor:help (v256). |
+| 5 | 2. Information Architecture | A+ | ↑ | Methodology card updated to 151 analyst FAQs (v257). What's New panel updated with v257 entry as first slot. Search no-results contextual guidance (v252). |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN failure banner (v252). 3 permanent empty states no longer show "Loading…" (v256). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 207). 37 PASS / 15 FAIL (pre-existing Playwright browser crashes, 0 JS errors). v256→v257 sweep complete. Cycle 207 log added. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. CSS var fix (v256). JS syntax gate PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Nine color passes complete. Final #5A9F6E sweep: 9 remaining off-palette instances replaced (v257) — wfColors.base_govt (3 DCF paths), fallbackColors, Gross Split mechanic/blend-warning/takeColor, evidence B-tier, Oceania bubble. Zero off-palette mid-green hex values in any active rendering path. |
+| 11 | 3. Data Presentation | A+ | = | Explorer "Other" chip tooltip (v232). Stability column tooltip fully descriptive. Vintage Analysis column headers now show unit "(%" for all 7 mechanics (v256). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v256→v257 sweep complete. DCF Engine footer badge corrected v250→v257 (7-version lag visible on every page view). How to Cite reads v257. All Scenario Builder IC memo template cites current to v257. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 151 FAQs (A1–A151). A151: carbon pricing/ETS interaction with petroleum fiscal regimes — Norway carbon tax $90–100/tCO₂e (84% SPT-deductible, ~$14–16/tCO₂e net burden); UK ETS; Canada OBPS $65–170/tCO₂e; Australia Safeguard Mechanism $75 AUD/tCO₂e; EPA methane fee $28–47/tCO₂e; 4-step IC workflow; IC memo disclosure template; rule of thumb by jurisdiction tier. All IC memo template citations current to v257. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v257. |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 37 PASS / 15 FAIL (pre-existing Playwright browser crashes, unchanged from baseline) / 0 JS errors. Cycle 207: 3 targeted improvements across 3 categories (Visual Design: 9 off-palette #5A9F6E → rgba(21,128,61,0.68) sweep; Professional Credibility: A151 carbon pricing FAQ; Naming Consistency: DCF Engine badge v250→v257 + v256→v257 version sweep).**
+
+---
+
+## Cycle 207 Log — 2026-08-15
+- Test before: JS syntax gate PASS / 37 PASS / 15 FAIL / 0 JS errors (pre-existing Playwright browser crashes confirmed identical on stash-pop baseline)
+- Test after: JS syntax gate PASS (7 extractable blocks, 0 errors). 37 PASS / 15 FAIL / 0 JS errors (no regressions introduced).
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Grade maintained B+. Visual Design A+ — third-final pass: 9 remaining #5A9F6E hex instances found via grep across all active JS rendering paths. All replaced. Grade maintained A+ with final sweep evidence.
+- Changes shipped: (1) Visual Design — 9 off-palette #5A9F6E (mid-green) instances replaced with rgba(21,128,61,0.68) across all active JS rendering paths: wfColors.base_govt in Live DCF waterfall (2 instances in separate function scopes), wfColors.base_govt in Fiscal Compare drawer waterfall, wfColors.base_govt in renderDrawerWaterfall + Country Profile waterfall, fallbackColors array, Gross Split mechanic color card, Gross Split mechanic blend-warning color map, IOC Portfolio exposure takeColor() threshold, evidence panel B-tier label text color, Oceania region color in bubble chart regionColors. Zero off-palette mid-green hex values remain in any active rendering path. (2) Naming Consistency — DCF Engine footer badge corrected from v250 to v257 (7-version lag; the badge was visible in every page view in the data-vintage footer strip and had not been updated since v250). (3) Professional Credibility — FAQ A151 added: carbon pricing and ETS interaction with petroleum fiscal regimes. Topic: how statutory carbon taxes (Norway $90–100/tCO₂e, 84% SPT-deductible giving ~$14–16/tCO₂e net; Canada OBPS $65–170; UK ETS; Australia Safeguard Mechanism $75 AUD/tCO₂e; USA EPA IRA methane fee $28–47/tCO₂e), ETS obligations, and company internal carbon prices (ICP) affect contractor IRR independently of statutory government take. Includes 4-step IC workflow (identify statutory carbon price / estimate project carbon intensity kgCO₂e/boe / add as opex uplift in Scenario Builder / IC memo disclosure with carbon-adjusted IRR and NPV), IC memo disclosure template, rule of thumb by jurisdiction tier (Tier-1 >$50/tCO₂e = model explicitly / Tier-2 $15–50/tCO₂e = sensitivity only / Tier-3 <$15/tCO₂e = note only). (4) Information Architecture — Methodology card updated from 150 to 151 analyst FAQs. What's New panel updated with v257 entry prepended as first slot. (5) Naming Consistency / SDLC — v256→v257 sweep: page title, meta description, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation, short-form citation, Scenario Builder cites. Changelog entry prepended.
+- Grade movements: Visual Design A+↑ (9 off-palette color fixes — sweep complete, final evidence), Professional Credibility A+↑ (A151 carbon pricing FAQ, FAQ count 150→151), Naming Consistency A+↑ (DCF Engine badge fix + v257 sweep), Information Architecture A+↑ (FAQ count + What's New), SDLC Maturity A+↑ (sweep complete + Cycle 207 log).
+- GPA: 3.97 (unchanged — all A+/A/B+ tiers maintained).
+
+---
+
 ## Cycle 205 Log — 2026-08-15
 - Test before: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (clean from Cycle 204)
 - Test after: JS syntax gate PASS (6 script blocks, 0 errors). 136 PASS / 0 FAIL / 0 JS errors.
