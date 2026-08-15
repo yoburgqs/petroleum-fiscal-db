@@ -16,7 +16,8 @@
 <!-- v180: Google Fonts non-blocking load -- eliminates render-blocking CSS @import; preconnect already at lines 8-9 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" crossorigin>
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+<!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
 <meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v251.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
@@ -1244,6 +1245,22 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   .card { margin-bottom: 10px; }
   /* Full viewport height for scrollable content areas */
   #tbl-explorer, #fc-results { max-height: calc(100vh - 120px); overflow-y: auto; }
+}
+
+/* v252: iPhone notch / Dynamic Island safe-area support (requires viewport-fit=cover in meta) */
+/* Header absorbs top safe area so content doesn't overlap the status bar cutout */
+.site-header {
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(20px, env(safe-area-inset-right));
+}
+/* Footer absorbs bottom safe area (home indicator on iPhone) */
+.site-footer, #footer-bar {
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+}
+/* Tab navigation left padding on landscape — side cutout on newer iPhones */
+.tab-nav {
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-right: max(4px, env(safe-area-inset-right));
 }
 </style>
 
