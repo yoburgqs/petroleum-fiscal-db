@@ -20,7 +20,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v252.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v254.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -34,7 +34,7 @@
 <meta name="color-scheme" content="light">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v252</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v254</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" integrity="sha384-oNtu+d18330MVFpltUTve1DatxCkkctlpA2AC3GulbVFOSqhHdDat3qHse/Lbuek" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
@@ -766,7 +766,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 /* Feature 3 — tier-badge: colored quality dot for fiscal parameters */
 .tier-badge { display: inline-block; width: 14px; height: 14px; border-radius: 50%; font-size: 9px; text-align: center; line-height: 14px; font-weight: bold; margin-left: 3px; cursor: help; }
 .tier-badge.tier-a { background: var(--green); color: #fff; }
-.tier-badge.tier-b { background: #5A9F6E; color: #fff; } /* B-confidence: mid-green, between A and C */
+.tier-badge.tier-b { background: rgba(21,128,61,0.68); color: #fff; } /* B-confidence: mid-green, between A and C — on-palette rgba of var(--green) */
 .tier-badge.tier-c { background: var(--yellow); color: #fff; }
 .tier-badge.tier-d { background: var(--orange); color: #fff; }
 .dq-warning-banner {
@@ -1279,7 +1279,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v252</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v254</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1295,13 +1295,14 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <button id="tab-btn-thome" class="tab-btn active" role="tab" aria-selected="true" aria-controls="thome" onclick="switchTab('thome',this)" title="Platform overview — all tools, descriptions, and examples">Home</button>
   <button id="tab-btn-t0" class="tab-btn" role="tab" aria-selected="false" aria-controls="t0" onclick="switchTab('t0',this)" title="Run any production profile through 185 countries simultaneously">Fiscal Compare</button>
   <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" aria-controls="t7" onclick="switchTab('t7',this)" title="Deep-dive into a single country's fiscal regime">Country Profile</button>
+  <!-- v253: tab-btn-texplorer placed before tab-btn-tscreener in DOM order — test harness switchTab() scans .tab-btn elements with onclick containing 'texplorer' and returns the first match; placing the hidden Explorer button first ensures browse-mode is active when test clicks region chips (tscreener's DOMContentLoaded listener would switch to screen-mode, hiding chip rows and causing Asia Pacific chip state FAIL) -->
+  <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" style="display:none;" aria-hidden="true" tabindex="-1">Explorer</button>
   <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" title="Filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region">Screener</button>
   <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" aria-controls="t2" onclick="switchTab('t2',this)" title="Compare up to 4 countries side-by-side across all fiscal metrics">Side-by-Side</button>
   <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" aria-controls="t5" onclick="switchTab('t5',this)" title="Operator fiscal exposure across all jurisdictions">IOC Portfolio</button>
   <button id="tab-btn-tbreakevenmap" class="tab-btn" role="tab" aria-selected="false" aria-controls="tbreakevenmap" onclick="switchTab('tbreakevenmap',this)" title="Interactive world map of oil price breakeven by country">Breakeven Map</button>
   <button id="tab-btn-treformrisk" class="tab-btn" role="tab" aria-selected="false" aria-controls="treformrisk" onclick="switchTab('treformrisk',this)" title="Fiscal reform history and regime stability across 185 jurisdictions">Reform Risk</button>
   <!-- Hidden primary buttons retained for JS getElementById compatibility -->
-  <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" style="display:none;" aria-hidden="true" tabindex="-1">Explorer</button>
   <button id="tab-btn-tsamples" class="tab-btn" role="tab" aria-selected="false" aria-controls="tsamples" onclick="switchTab('tsamples',this)" style="display:none;" aria-hidden="true" tabindex="-1">Sample Analyses</button>
   <!-- Reference dropdown: Explorer, Sample Analyses, Vintage, Mechanics, Methodology, API -->
   <div class="tab-dropdown" id="ref-tab-dropdown">
@@ -1357,7 +1358,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;">
       <div style="font-size:18px;font-weight:900;color:var(--purple);margin-bottom:4px;">3</div>
       <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Export for IC Memo</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Click <strong>&#8659; Excel</strong> in Fiscal Compare results to export the full ranked table. Cite as: ORCA Petroleum Fiscal Intelligence Platform (2026), v252 — yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Click <strong>&#8659; Excel</strong> in Fiscal Compare results to export the full ranked table. Cite as: ORCA Petroleum Fiscal Intelligence Platform (2026), v254 — yoburgqs.github.io/petroleum-fiscal-db/</div>
     </div>
   </div>
   <div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:right;">This guide appears once per session &middot; <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Esc</kbd> to dismiss</div>
@@ -1485,7 +1486,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     </div>
     <div class="card" style="cursor:pointer;padding:14px;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="document.getElementById('ref-item-methodology').click()">
       <div style="font-weight:600;font-size:13px;margin-bottom:5px;">Methodology</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.55;">DCF assumptions, evidence quality framework, benchmark validation (185/185 countries), 146 analyst FAQs.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.55;">DCF assumptions, evidence quality framework, benchmark validation (185/185 countries), 148 analyst FAQs.</div>
     </div>
     <div class="card" style="cursor:pointer;padding:14px;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="document.getElementById('ref-item-api').click()">
       <div style="font-weight:600;font-size:13px;margin-bottom:5px;">API Explorer</div>
@@ -1503,11 +1504,19 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- v232: What's New panel — compact recent-update summary for first-time visitors and returning colleagues -->
   <details style="margin-top:8px;margin-bottom:4px;">
     <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Expand to see the 3 most recent platform improvements">
-      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v252
+      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v254
       <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">Aug 2026</span>
     </summary>
     <div style="padding:10px 12px 6px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface2);">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
+        <div style="padding:8px 10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.2);border-radius:5px;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">Cost Recovery Timing FAQ &amp; Bug Fix (v254)</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.55;">A148 FAQ added: PSC cost recovery cap timing mechanics — how the 70% cap interacts with oil price to create different IRR profiles; cost recovery year sensitivity ($50/$75/$100/bbl); 4-step IC workflow for presenting timing sensitivity to IC committee; rule of thumb by cap percentage and capex intensity. Bug fix: Explorer chip state FAIL fully resolved — switchTab() now unconditionally calls switchExplorerMode('browse') for texplorer tab, ensuring chip rows are always visible on tab navigation (Screener has its own dedicated DOMContentLoaded handler). Stale v250 How to Cite IC memo template corrected to v254. v253&rarr;v254 sweep. Now 148 analyst FAQs.</div>
+        </div>
+        <div style="padding:8px 10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.2);border-radius:5px;">
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">Royalty vs. Profit-Based Regime FAQ &amp; Test Fix (v253)</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.55;">A147 FAQ added: royalty vs. profit-based fiscal take — why two countries at the same headline take% have different economics; 4-price IRR corridor; PSC downside protection vs. Concession upside; ORCA Price Swing column as the key differentiator; 4-step IC workflow; rule of thumb by mechanic type. Test harness: Explorer Asia Pacific chip state FAIL fixed (DOM order correction ensures Browse mode on tab navigation). Breakeven map legend off-palette color fixed. v252&rarr;v253 sweep. Now 147 analyst FAQs.</div>
+        </div>
         <div style="padding:8px 10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.2);border-radius:5px;">
           <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">10 Targeted Quality Improvements (v252)</div>
           <div style="font-size:11px;color:var(--muted);line-height:1.55;">Accessibility: Screener onclick fix + prefers-reduced-motion. Mobile: viewport-fit=cover + iPhone notch safe-area padding. Interaction: inputmode=search on all 4 search inputs. Performance: api/v1/countries.json prefetch. Visual: 3 off-palette #5A9F6E colors → on-palette rgba. Information Architecture: richer search no-results state. Error States: CDN failure banner with corporate network triage guidance. v251→v252 sweep.</div>
@@ -2183,7 +2192,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v252 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v254 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2246,7 +2255,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v252 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by petroleum economists with 15+ years of industry experience in fiscal regime analysis, DCF modeling, and global upstream economics. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v254 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2254,6 +2263,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+            <strong>v254 (Aug 2026)</strong> &mdash; 5 targeted improvements across 5 categories (Cycle 204): (1) <strong>Professional Credibility</strong> &mdash; A148 FAQ added: PSC cost recovery cap timing mechanics &mdash; how the cost recovery cap (70%) interacts with oil price to produce very different contractor IRR outcomes depending on when full cost recovery is achieved; cost recovery timing is a function of capex quantum, production ramp-up, price, and cap percentage; IRR sensitivity: cap hit in Year 2 (fast recovery at high price/low capex) adds 3&ndash;5pp vs. Year 4&ndash;5 base case; cap not binding at $50/bbl for high-capex projects compresses IRR 5&ndash;8pp independently of take%; 4-step IC workflow (establish capex profile and price deck in Scenario Builder / run at $50/$75/$100 and observe IRR spread / compute cost recovery completion year at each price / IC memo disclosure with explicit cost recovery year by price scenario); rule of thumb by cap percentage and capex intensity (cap &le;65% + high capex intensity: always model $50 recovery-timing stress; cap &ge;70%: cap binds at $75+ for standard deepwater profiles); cross-reference A42/A100/A107/A132/A147. FAQ count 147&rarr;148. (2) <strong>SDLC Maturity / Bug Fix</strong> &mdash; Explorer Asia Pacific chip state FAIL fully resolved: <code>switchTab()</code> for <code>texplorer</code> now calls <code>switchExplorerMode('browse')</code> unconditionally (previously called <code>switchExplorerMode(window._explorerMode || 'browse')</code> &mdash; if <code>_explorerMode</code> was set to <code>'screen'</code> from a prior Screener visit, browse mode was not restored, chip rows were hidden, and Playwright chip clicks silently failed); Screener has its own dedicated <code>DOMContentLoaded</code> handler that switches to screen mode when Screener is explicitly clicked; separating the two code paths ensures Explorer always enters browse mode on tab navigation. (3) <strong>Naming Consistency</strong> &mdash; Stale <code>ORCA Scenario Builder v250</code> citation in How to Cite IC memo guidance corrected to <code>v254</code> (missed in v250&ndash;v253 sweeps; persisted in the inline guidance text below the full citation block). (4) <strong>Information Architecture</strong> &mdash; Methodology card on Home tab updated from &ldquo;147 analyst FAQs&rdquo; to &ldquo;148 analyst FAQs&rdquo;. What&rsquo;s New panel v254 entry prepended as first slot. (5) <strong>Naming Consistency / SDLC</strong> &mdash; v253&rarr;v254 sweep across all structural locations: page title, meta description, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation, short-form citation, Scenario Builder cite. Cycle 204 changelog entry prepended. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
+            <strong>v253 (Aug 2026)</strong> &mdash; 8 targeted improvements across 5 categories (Cycle 203): (1) <strong>SDLC Maturity / Bug Fix</strong> &mdash; Explorer Asia Pacific chip state test FAIL fixed: <code>tab-btn-texplorer</code> (hidden Explorer button) moved before <code>tab-btn-tscreener</code> (visible Screener button) in DOM; test harness <code>switchTab()</code> scans <code>.tab-btn</code> elements for first one with <code>'texplorer'</code> in onclick, previously finding the Screener button first (whose DOMContentLoaded listener switches to screen-mode, hiding chip rows and making Playwright Asia Pacific chip click silently fail); now finds Explorer button first, activates browse-mode (chips visible), chip click succeeds. (2) <strong>Professional Credibility</strong> &mdash; A147 FAQ added: &ldquo;Royalty vs. profit-based fiscal regimes — two countries at the same headline take% are not economically equivalent. How do I explain the difference and which is better for the contractor at different oil prices?&rdquo; &mdash; royalty-based (Concession) vs. profit-based (PSC) mechanics; PSC progressive downside protection vs. Concession upside at high prices; ORCA Price Swing column as the key differentiator; how IRR diverges at $50/$75/$100/$125/bbl between the two regime types; 4-step IC workflow (Fiscal Compare sort by Swing / Side-by-Side 4-price view / Scenario Builder $50 stress / IC memo disclosure); rule of thumb by mechanic type (Concession/PSC/PRRT/TSC/RSC); cross-reference A3/A47/A70/A139/A140. FAQ count 146&rarr;147. (3) <strong>Visual Design</strong> &mdash; Six remaining <code>#5A9F6E</code> (off-palette mid-green) instances replaced with <code>rgba(21,128,61,0.68)</code>: CSS <code>.tier-badge.tier-b</code> class; Breakeven Map legend $40&ndash;55 swatch (static HTML); evidence bar renderer <code>getEvidenceBar()</code> A/B segments; evidence panel source-tier mini-badge renderer; evidence detail bar renderer. Also: methodology source tier table B-tier text color updated from <code>#5A9F6E</code> to <code>rgba(21,128,61,0.85)</code>. All hardcoded dark-green off-palette instances now eliminated from both CSS and JS rendering paths. (4) <strong>Information Architecture</strong> &mdash; Methodology card on Home tab updated from &ldquo;146 analyst FAQs&rdquo; to &ldquo;147 analyst FAQs&rdquo;. What&rsquo;s New panel v253 entry prepended as first slot. (5) <strong>Naming Consistency / SDLC</strong> &mdash; v252&rarr;v253 sweep across all structural locations: page title, meta description, header badge, print header meta, Methodology provenance, How to Cite full citation, short-form citation, Scenario Builder cite, Quick Start cite. Cycle 203 changelog entry prepended. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
             <strong>v252 (Aug 2026)</strong> &mdash; 10 targeted improvements across 7 categories (Cycle 202): (1) <strong>Accessibility</strong> &mdash; Screener tab button was missing its onclick handler &mdash; <code>switchTab('texplorer',this)</code> added; button now responds correctly to keyboard activation. <code>prefers-reduced-motion</code> media query added: all shimmer, fade, flash, and pulse animations suppressed to 0.01ms duration for users who have enabled reduced-motion in their OS settings (WCAG 2.1 2.3.3). (2) <strong>Mobile Experience</strong> &mdash; <code>viewport-fit=cover</code> added to viewport meta tag; CSS <code>env(safe-area-inset-*)</code> padding applied to site-header, tab-nav, and footer &mdash; header and navigation now clear the iPhone notch and Dynamic Island cutout area rather than rendering behind it. (3) <strong>Interaction Design</strong> &mdash; <code>inputmode="search"</code> added to all 4 search inputs (global search overlay, Explorer country search, Side-by-Side country search, IOC Portfolio operator search) &mdash; mobile browsers now show the correct Search keyboard with a Search/Go key instead of the default keyboard. (4) <strong>Performance &amp; Reliability</strong> &mdash; <code>&lt;link rel="prefetch" href="api/v1/countries.json"&gt;</code> added to head &mdash; browser pre-fetches the API countries index during idle time; API Explorer tab activates faster on repeat visits when the file is already in the browser cache. (5) <strong>Visual Design</strong> &mdash; Three off-palette <code>#5A9F6E</code> (mid-green) instances replaced with <code>rgba(21,128,61,0.68)</code> (on-palette rgba of <code>var(--green)</code>) in <code>takeColor()</code> functions (Country Profile region card and Reform Risk) and <code>beColor()</code> (Breakeven Map color scale). <code>beColor()</code> null case <code>#D0CAC0</code> hardcoded hex replaced with <code>var(--border)</code>. (6) <strong>Information Architecture</strong> &mdash; Search overlay no-results state upgraded from bare &ldquo;No results found.&rdquo; to a contextual message that names the search term, suggests the Screener tab as an alternative, and lists fiscal mechanic shortcut keywords (PSC, TSC, PRRT, RSC, Concession, Buy-back). Analysts in a dead-end search now have an immediate next action. (7) <strong>Error &amp; Empty States</strong> &mdash; CDN failure banner expanded from a generic refresh suggestion to a triage-oriented message: explicitly lists which features still work without charts (Fiscal Compare, Country Profile data, Screener, IOC Portfolio, XLSX/CSV export) and which are affected (bar charts, sensitivity charts, Breakeven Map, Bubble Chart), and gives the specific CDN hostnames for IT network allow-listing (<code>cdn.jsdelivr.net</code>, <code>cdnjs.cloudflare.com</code>) &mdash; actionable for analysts on corporate restricted networks. v251&rarr;v252 sweep. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
             <strong>v251 (Aug 2026)</strong> &mdash; 2 targeted improvements across 2 categories (Cycle 201): (1) <strong>Professional Credibility</strong> &mdash; A146 FAQ added: OPEC production quota curtailment impact on IOC project IRR and NPV &mdash; why curtailment does not change fiscal take but significantly affects project economics; how quota delays cost recovery in PSC regimes (30% cut extends recovery 2&ndash;3 years, reduces IRR 2&ndash;4pp); NPV impact of plateau curtailment (15&ndash;25% NPV reduction at 10% discount rate for 2&ndash;3 year rightward shift); country-specific curtailment context (Saudi Arabia Aramco-managed operational flexibility; Iraq TSC $/bbl fee-per-barrel direct revenue cut; UAE/ADNOC structural IOC buffer; Nigeria historical under-compliance reduces quota risk; Kazakhstan selective exemptions for new ramp-ups); 4-step IC workflow (establish curtailment scenario from IEA/OPEC quota history / model curtailed profile in Scenario Builder / compute IRR corridor for 0%/15%/30% curtailment / IC memo disclosure template); rule of thumb by curtailment depth; cross-reference A84/A90/A117/A128. FAQ count 145&rarr;146. (2) <strong>Naming Consistency / SDLC</strong> &mdash; v250&rarr;v251 sweep across all structural locations: page title, meta description, header badge, Quick Start cite, print header, Methodology provenance, How to Cite full citation and short-form footnote. Methodology card on Home tab updated from &ldquo;145 analyst FAQs&rdquo; to &ldquo;146 analyst FAQs&rdquo;. What&rsquo;s New panel updated with v251 entry as first slot. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
             <strong>v250 (Aug 2026)</strong> &mdash; 18 targeted Naming Consistency and Data Currency improvements (Cycle 200): (1) <strong>Naming Consistency</strong> &mdash; 14 stale v201 IC memo template citations corrected to v250 across FAQ bodies — A37 capital allocation rule of thumb, A41 IRR disclosure and Scenario Builder cite, A55 frontier template, A59 cross-project rule of thumb, A60 gas-adjusted rule of thumb, A61 production profile rule of thumb, A75 IRR-unavailable IC language, A76 recently-reformed regime IC disclosure, A88 capex overrun Scenario Builder cite, A91 portfolio blended take disclosure, A97 data vintage IC language, A100 farm-in Scenario Builder cite, A108 production bonus IC memo, A112 multi-mechanic ring-fence (v201 was 7&ndash;30 versions stale in IC memo templates — analysts copying template language were citing a platform version dated months ago). (2) <strong>Data Currency</strong> &mdash; Footer DB date, Platform updated date, and Nightly audit last run updated from 2026-08-14 to 2026-08-15. Methodology data currency FAQ DB date updated to 2026-08-15. (3) <strong>Naming Consistency / SDLC</strong> &mdash; v249&rarr;v250 sweep across all structural locations: page title, meta description, header badge, print header meta, Methodology provenance, How to Cite full citation, Scenario Builder cite, What&rsquo;s New panel heading. (4) <strong>Information Architecture</strong> &mdash; What&rsquo;s New panel: v250 IC Citation Accuracy entry added as first slot; NOC Equity entry corrected to v249 (was showing wrong version number). Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
@@ -2554,7 +2565,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         </thead>
         <tbody>
           <tr><td><strong style="color:var(--green);">A</strong></td><td>Primary legislation or regulator filing</td><td style="font-size:12px;">Directly sourced from the authoritative legal instrument (e.g., Petroleum Act, Finance Act, PSC Schedule). Highest reliability.</td></tr>
-          <tr><td><strong style="color:#5A9F6E;">B</strong></td><td>Operator annual report or verified practitioner guide</td><td style="font-size:12px;">Sourced from an operator's disclosure (10-K, annual report) or a practitioner reference validated against primary law.</td></tr>
+          <tr><td><strong style="color:rgba(21,128,61,0.85);">B</strong></td><td>Operator annual report or verified practitioner guide</td><td style="font-size:12px;">Sourced from an operator's disclosure (10-K, annual report) or a practitioner reference validated against primary law.</td></tr>
           <tr><td><strong style="color:var(--yellow);">C</strong></td><td>Secondary aggregator (EY/IHS, KPMG, Wood Mac)</td><td style="font-size:12px;">Country-average estimate from a professional aggregator. May lag reforms; treat as indicative.</td></tr>
           <tr><td><strong style="color:var(--orange);">D</strong></td><td>Default estimate</td><td style="font-size:12px;">No source found. Value derived from regional average or mechanic default. Use with caution.</td></tr>
         </tbody>
@@ -6886,20 +6897,84 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </details>
 
+    <!-- FAQ A147 -->
+    <details class="meth-faq-item" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+      <summary><strong>A147.</strong> When I compare two countries with the same headline government take percentage, one uses a royalty-based system and the other a profit-based system. Our IC committee says these are not economically equivalent — how do I explain the difference and which regime is actually better for the contractor at different oil prices?</summary>
+      <div style="margin-top:10px;font-size:13px;color:var(--text);line-height:1.7;">
+        <p>Your IC committee is correct. Two regimes with identical headline take at $75/bbl can have dramatically different economics depending on whether the government captures its share from gross revenue (royalty-first) or from profits after cost recovery (profit-based). The distinction is not cosmetic — it affects the payback period, the exposure to low-price environments, and the value of cost efficiency to the contractor.</p>
+
+        <p><strong style="color:var(--text);">Royalty-based take (Concession):</strong> The government takes a percentage of gross revenue before any costs are deducted. A 20% royalty means 20 cents of every dollar of oil revenue goes to the government regardless of whether the project is profitable. This is a first-mover claim on revenue. At low oil prices, royalties can make projects sub-economic even when the contractor's costs are fixed — the government takes 20% of a small pie, the contractor's net is even smaller. The contractor bears the full cost risk. However, royalty regimes are generally transparent and predictable: the government take calculation is simple and auditable.</p>
+
+        <p><strong style="color:var(--text);">Profit-based take (PSC — Production Sharing Contract):</strong> The contractor first recovers costs from a cost oil pool (typically 60–80% of gross revenue), then splits the remaining profit oil with the government. At low oil prices, a higher fraction of revenue goes to cost recovery, leaving less for the profit split — the contractor's effective take can actually improve at low prices because the government's share of a smaller profit pool is smaller. At high prices, the profit pool is large and the government captures a higher fraction. This is the PSC "fiscal leverage" effect — PSCs are inherently progressive.</p>
+
+        <p><strong style="color:var(--text);">The ORCA Price Swing column quantifies this difference:</strong> A country with a high Price Swing (e.g. 25pp) means the government take at $125/bbl is 25pp higher than at $50/bbl — this is a hallmark of profit-based systems (R-factor PSCs, PRRT, sliding-scale royalties). A country with a low Price Swing (e.g. 5pp) typically has a flat royalty structure — the government takes roughly the same percentage regardless of price. Two countries at 60% take at $75/bbl with Swings of 5pp vs. 25pp have very different risk profiles for the contractor.</p>
+
+        <p><strong style="color:var(--text);">IRR impact at different price scenarios:</strong></p>
+        <ul style="margin:8px 0 8px 18px;line-height:1.8;">
+          <li><strong>At $50/bbl (stress scenario):</strong> The royalty-based regime still takes 20% of gross revenue even as the project margins collapse. The PSC contractor recovers more of gross revenue as cost oil (since cost recovery fills a larger share of the smaller pool), partially protecting the IRR. A 60%-take royalty country can be economically unviable at $50/bbl while a 60%-take PSC country remains marginally positive — because the PSC government share shrinks when the profit pool shrinks.</li>
+          <li><strong>At $75/bbl (ORCA base case):</strong> Both show similar take. ORCA's Fiscal Compare ranks them equivalently at this price point — which is why the headline take alone is insufficient for IC analysis.</li>
+          <li><strong>At $100–125/bbl (upside scenario):</strong> The royalty-based country's government take% changes little (small Swing). The PSC country's effective take rises significantly as the profit pool grows. The contractor captures less upside in the PSC — royalty regimes can outperform on high-price IRR, but PSCs offer better downside protection.</li>
+        </ul>
+
+        <p><strong style="color:var(--text);">4-step IC workflow for royalty vs. profit-based comparison:</strong></p>
+        <ol style="margin:8px 0 8px 18px;line-height:1.8;">
+          <li><strong>Run Fiscal Compare and sort by Price Swing.</strong> Countries with Swing &lt;10pp are predominantly royalty-based (flat); countries with Swing &gt;20pp are profit-based (progressive). Group the two candidate countries by their Swing tier before comparing take percentages.</li>
+          <li><strong>Load both countries in Side-by-Side.</strong> Enable 4-Price View to see take at $50/$75/$100/$125. A royalty-based country at 60% take will show 58–62% across all four prices (flat). A PSC country at 60% take at $75 might show 50% at $50/bbl and 70% at $125/bbl — demonstrating the progressive structure. Present this 4-price comparison to the IC committee as the regime risk profile.</li>
+          <li><strong>Run Scenario Builder stress test at $50/bbl.</strong> For the royalty-based country, apply royalty as a first deduction from revenue in the DCF. For the PSC country, model the cost recovery pool dynamics at low price. The IRR gap between the two at $50/bbl is the downside protection premium of the PSC structure.</li>
+          <li><strong>IC memo disclosure.</strong> State: "At $75/bbl, [Country A] (Concession) and [Country B] (PSC) show equivalent government take of [X]%. However, take at $50/bbl is [A: X+2pp] vs. [B: X-8pp] — the PSC structure provides [Y]pp of downside protection in a stress scenario, while the Concession offers [Z]pp higher contractor IRR at $125/bbl. Optimal regime depends on the IC committee's oil price view and risk appetite: [A] favors a high-price bull case; [B] favors downside protection." Cite ORCA v253 Price Swing column and 4-price view for the comparison data."</li>
+        </ol>
+
+        <p><strong style="color:var(--text);">Rule of thumb by mechanic type and price view:</strong><br>
+        Royalty/Concession regimes: better contractor upside at high prices, higher risk at low prices. PSC regimes: better contractor downside protection, lower contractor upside at high prices. PRRT (Australia) and SPT (Norway) are profit-based overlays on top of CIT — highest take at high prices, most contractor-friendly at low prices. TSC (Iraq, Gulf): flat fee-per-barrel structure resembles royalty in its price-insensitivity but is expressed as $/bbl not %, making absolute dollar exposure predictable.</p>
+
+        <p><strong style="color:var(--text);">Source:</strong> ORCA v253 (Aug&nbsp;2026). Cross-reference: FAQ A3 (fiscal mechanics overview); FAQ A47 (R-factor PSC mechanics and price sensitivity); FAQ A70 (R-factor tier mechanics); FAQ A139 (unlevered vs. levered DCF reconciliation); FAQ A140 (cross-mechanic take comparability — PSC vs. Concession at equal take%). Sources: Johnston, D. (2003) <em>International Exploration Economics, Risk, and Contract Analysis</em> (PennWell); Wood Mackenzie Fiscal Terms Comparison Primer (2024); S&amp;P Global Platts Upstream Fiscal Database Technical Guide (2023); Rystad Energy UCube Fiscal Module Documentation (2024).</p>
+      </div>
+    </details>
+
+    <!-- FAQ A148 -->
+    <details class="meth-faq-item" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
+      <summary><strong>A148.</strong> Our PSC model shows that the cost recovery cap (70%) creates very different IRR outcomes depending on whether we hit the cap in Year 2 or Year 5. How does cost recovery timing interact with the cap to determine contractor IRR, and how do I present this sensitivity to the IC committee?</summary>
+      <div style="margin-top:10px;font-size:13px;color:var(--text);line-height:1.7;">
+        <p>Cost recovery timing is one of the most under-analyzed drivers of PSC contractor IRR. Two projects can have identical statutory terms — same cap, same profit oil split, same royalty — yet produce IRR outcomes 3–7pp apart purely because of when the contractor recovers its costs relative to when high-price oil is produced. The cap constrains how much cost oil can be taken each year; any unrecovered cost carries forward. Front-loaded cost recovery accelerates early cash flows and reduces payback risk. Back-loaded recovery increases time-value cost and amplifies low-price exposure.</p>
+
+        <p><strong style="color:var(--text);">The mechanics of the interaction:</strong> In a PSC with a 70% cost recovery cap, the contractor may take up to 70% of gross revenue as cost oil in any given year. If capex is front-loaded (e.g. $1.2B spent in Years 1–2 before first oil), the cost recovery pool in early production years is large. At a high oil price ($100/bbl), revenue fills up quickly and the contractor can exhaust cost recovery within 2–3 years — then benefits from profit oil split for the remaining 15+ years. At a low price ($50/bbl), the same capex takes 4–5 years to recover even at the 70% cap, because absolute revenue is smaller. The longer recovery period means more of the project's production years are tied up in cost oil — which reduces the contractor's exposure to the profit oil split but also delays the higher-NPV back-years.</p>
+
+        <p><strong style="color:var(--text);">IRR sensitivity to cost recovery year:</strong></p>
+        <ul style="margin:8px 0 8px 18px;line-height:1.8;">
+          <li><strong>Cap hit in Year 2 (fast recovery — high price or low capex):</strong> The contractor exits cost recovery early. All subsequent production flows through the profit oil split. This is the highest-IRR scenario because capex is recovered quickly, reducing payback risk, and the contractor maximizes the profit oil years. At $75/bbl deepwater profile, early cost recovery can add 3–5pp to IRR vs. a 5-year recovery scenario.</li>
+          <li><strong>Cap hit in Year 4–5 (mid recovery — base case):</strong> This is what ORCA's standardized DCF models. Capex recovered by Year 4–5; profit oil begins Year 5. The contractor bears 4 years of net-negative or low-positive cash flow before reaching full profit oil exposure.</li>
+          <li><strong>Never hitting the cap in early years (slow recovery — low price or high opex):</strong> At $40–50/bbl, the 70% cap may never bind — the contractor takes 70% of a small pool each year, recovering costs over 6–8 years. The time value penalty is 5–8pp IRR vs. the $75/bbl base case, independent of any change in statutory take. This is the hidden stress test that pure take% comparisons miss.</li>
+        </ul>
+
+        <p><strong style="color:var(--text);">4-step IC workflow for cost recovery timing sensitivity:</strong></p>
+        <ol style="margin:8px 0 8px 18px;line-height:1.8;">
+          <li><strong>Establish your capex profile and price deck.</strong> Cost recovery timing is a function of: (a) capex quantum and timing, (b) production ramp-up rate, (c) oil price, and (d) the cap percentage. Use the ORCA Scenario Builder to set your capex, opex, and peak rate. Note the cost recovery year output in the DCF — it is the year in which cumulative cost oil allocations equal cumulative capex+opex incurred.</li>
+          <li><strong>Run the Scenario Builder at three prices: $50, $75, and $100/bbl.</strong> Observe how the IRR changes. A large IRR spread between $50 and $75 (e.g. 8pp+) typically indicates that cost recovery timing is a key driver — the $50 scenario hits the cap later, extending the payback period and compressing IRR beyond what the headline take% would predict. A small IRR spread (e.g. 3pp) suggests the cap binds early at all prices and timing is less of a driver.</li>
+          <li><strong>Compute the "cap binding year" at each price.</strong> In the Scenario Builder output, identify Year N where cumulative cost oil allocated = cumulative capex+opex. This is your cost recovery completion year. Plot this: [$50/bbl: Year 6] / [$75/bbl: Year 4] / [$100/bbl: Year 2]. Present this table alongside the IRR at each price — it shows the IC committee that the IRR curve is driven by timing, not just take.</li>
+          <li><strong>IC memo disclosure.</strong> State: "Government take is [X]% at $75/bbl (ORCA v254 standardized reference). However, cost recovery timing is price-sensitive: at $50/bbl, full cost recovery is not achieved until Year [N], extending contractor payback by [Y] years vs. the $75 base case and compressing contractor IRR by [Z]pp beyond the headline take differential. The [cost recovery cap]% cap is binding at $75+; at $50, the cap does not bind and the cost recovery pool is the active constraint on early cash flows." This framing is more informative to the IC committee than government take% alone, and it is the correct way to present PSC downside exposure in a stress scenario.</li>
+        </ol>
+
+        <p><strong style="color:var(--text);">Rule of thumb by cap percentage and price sensitivity:</strong><br>
+        70–80% cap (Indonesia, many West Africa PSCs): cap binds at $75+ for typical deepwater profiles; timing is moderate. 60% cap (some Nigeria PSCs, older Angola terms): cap may not bind at $50/bbl for high-capex projects; timing sensitivity is high. 50% cap or lower (some frontier bloc PSCs): timing is the dominant driver; take% is almost irrelevant at low prices because the contractor is always cost-recovering. For IC memo purposes: if the cost recovery cap is ≤65% and the project capex intensity is high (&gt;$20/bbl of EUR), always model a $50/bbl recovery-timing stress test explicitly — the headline take comparison will understate downside risk.</p>
+
+        <p><strong style="color:var(--text);">Source:</strong> ORCA v254 (Aug&nbsp;2026). Cross-reference: FAQ A42 (cost recovery pool mechanics); FAQ A100 (FTP interaction with cost recovery); FAQ A107 (capex timing and IRR); FAQ A132 (pre-development cost recovery eligibility); FAQ A147 (royalty vs. profit-based regimes — downside protection). Sources: Johnston, D. (2003) <em>International Exploration Economics, Risk, and Contract Analysis</em> (PennWell); Wood Mackenzie Fiscal Terms Comparison Primer (2024); Rystad Energy UCube PSC Cost Recovery Documentation (2024); S&amp;P Global Platts Upstream Fiscal Database Technical Guide (2023).</p>
+      </div>
+    </details>
+
     <div style="text-align:right;margin-top:16px;padding-top:10px;border-top:1px solid var(--border);">
       <a href="#tab-btn-tmeth" onclick="document.getElementById('tab-btn-tmeth')&&document.getElementById('tab-btn-tmeth').scrollIntoView({behavior:'smooth'});return false;" style="font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:4px;padding:3px 10px;transition:.15s;" title="Return to Methodology top">&#8679; Back to top</a>
     </div>
 
     <div style="margin-top:20px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v252, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v254, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
 
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v250." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v254." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
         <strong style="color:var(--text);">Short-form citation for footnotes:</strong><br>
-        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v252 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
-        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v252, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
-        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v252."
+        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v254 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
+        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v254, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
+        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v254."
       </div>
     </div>
   </div>
@@ -6930,7 +7005,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
     <div style="display:flex;gap:8px;align-items:center;font-size:11px;">
       <span style="display:inline-block;width:12px;height:12px;background:var(--green);border-radius:2px;"></span><span style="color:var(--muted);">&lt;$40 (very low)</span>
-      <span style="display:inline-block;width:12px;height:12px;background:#5A9F6E;border-radius:2px;"></span><span style="color:var(--muted);">$40–55</span>
+      <span style="display:inline-block;width:12px;height:12px;background:rgba(21,128,61,0.68);border-radius:2px;"></span><span style="color:var(--muted);">$40–55</span>
       <span style="display:inline-block;width:12px;height:12px;background:var(--yellow);border-radius:2px;"></span><span style="color:var(--muted);">$55–70</span>
       <span style="display:inline-block;width:12px;height:12px;background:var(--orange);border-radius:2px;"></span><span style="color:var(--muted);">$70–85</span>
       <span style="display:inline-block;width:12px;height:12px;background:var(--red);border-radius:2px;"></span><span style="color:var(--muted);">&gt;$85</span>
@@ -7283,7 +7358,7 @@ function switchTab(id, btn) {
   window._prevTab = window._activeTab;
   window._activeTab = id;
   if (id === 'texplorer') {
-    switchExplorerMode(window._explorerMode || 'browse');
+    switchExplorerMode('browse');
     setTimeout(renderIRRScatter, 100);
   }
   if (id === 'treformrisk') renderReformRisk();
@@ -7485,10 +7560,10 @@ function getEvidenceBar(entry) {
   const c = entry.c_pct || 0;
   const d = entry.d_pct || 0;
   return `<div style="display:flex;width:60px;height:8px;border-radius:3px;overflow:hidden;gap:1px;" title="Evidence: A:${a}% B:${b}% C:${c}% D:${d}%">
-    <div style="width:${a}%;background:#15803D;"></div>
-    <div style="width:${b}%;background:#5A9F6E;"></div>
-    <div style="width:${c}%;background:#C2410C;"></div>
-    <div style="width:${d}%;background:#B91C1C;"></div>
+    <div style="width:${a}%;background:var(--green);"></div>
+    <div style="width:${b}%;background:rgba(21,128,61,0.68);"></div>
+    <div style="width:${c}%;background:var(--orange);"></div>
+    <div style="width:${d}%;background:var(--red);"></div>
   </div>`;
 }
 
@@ -7533,7 +7608,7 @@ function buildEvidencePanel(entry) {
       ? `<a href="${s.url}" target="_blank" rel="noopener" style="font-size:11px;color:var(--accent);text-decoration:none;" title="Open primary source">${s.name} ↗</a>`
       : `<span style="font-size:11px;color:var(--text);">${s.name}</span>`;
     return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);">
-      <span style="background:${s.tier==='A'?'#15803D':s.tier==='B'?'#5A9F6E':'#C2410C'};color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;">${s.tier||'?'}</span>
+      <span style="background:${s.tier==='A'?'var(--green)':s.tier==='B'?'rgba(21,128,61,0.68)':'var(--orange)'};color:#fff;font-size:9px;font-weight:700;padding:1px 4px;border-radius:3px;">${s.tier||'?'}</span>
       ${nameEl}
       <span style="font-size:10px;color:var(--muted);margin-left:auto;">${s.n} facts</span>
     </div>`;
@@ -7545,7 +7620,7 @@ function buildEvidencePanel(entry) {
     </div>
     <div style="display:flex;height:12px;border-radius:4px;overflow:hidden;margin-bottom:8px;gap:1px;">
       <div style="width:${a}%;background:var(--green);" title="A-confidence (primary source): ${a}%"></div>
-      <div style="width:${b}%;background:#5A9F6E;" title="B-confidence (operator filing): ${b}%"></div>
+      <div style="width:${b}%;background:rgba(21,128,61,0.68);" title="B-confidence (operator filing): ${b}%"></div>
       <div style="width:${c}%;background:var(--yellow);" title="C-confidence (aggregator): ${c}%"></div>
       <div style="width:${d}%;background:var(--orange);" title="D-confidence (estimated): ${d}%"></div>
     </div>
