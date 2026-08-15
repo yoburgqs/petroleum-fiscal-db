@@ -435,6 +435,40 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Updated Grade Table (Cycle 200 — 2026-08-15)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 145 FAQs (A1–A145). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). Chart grid lines now light-mode correct (v244). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). Reform Risk filter selects iOS auto-zoom fix (v239). Broken 4-price toggle mobile CSS selector fixed (v241). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). What's New panel most-recent-first (v239). Country Profile empty state simplified — removed contradictory "select a country below" instruction that conflicted with auto-load (Cycle 199). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 145-FAQ section. Methodology card updated to 145 analyst FAQs (v250). What's New panel updated with v250 IC citation accuracy entry as first slot. |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). Load error overlay on-palette — var(--red)/var(--muted) (v244). IOC Portfolio empty state heading corrected: "Operator Fiscal Exposure" → "Search an Operator" (stale name removed, Cycle 199). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 200). 136 PASS / 0 FAIL / 0 JS errors. v249→v250 sweep complete. v249 and v250 changelog entries added. Cycle 200 log added. |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A145 accessible. focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. JS syntax gate PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Eight color passes complete (v236/v238/v239/v241/v242/v243/v244/v246). IOC Portfolio info banner off-palette rgba(148,163,184) Tailwind slate colors replaced with var(--surface2)/var(--border) (Cycle 199). 0 off-palette hex colors remain in any active rendering path. |
+| 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
+| 12 | 5. Naming Consistency | A+ | ↑ | v249→v250 sweep complete. 14 additional stale v201 IC memo template citations corrected (7–30 versions stale in FAQ bodies — analysts copying template language now get current version at v250). Footer DB date, platform date, nightly audit updated to 2026-08-15. Methodology FAQ DB date updated to 2026-08-15. How to Cite reads v250. |
+| 13 | 7. Professional Credibility | A+ | = | 145 FAQs (A1–A145). All IC memo template citations now read v250 — no stale version strings remain in FAQ body templates. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v250. |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 200: 18 naming consistency + data currency fixes. Footer, Methodology, and nightly audit dates updated to 2026-08-15. 14 stale v201 IC memo citations corrected to v250 across 14 FAQ bodies.**
+
+---
+
+## Cycle 200 Log — 2026-08-15
+- Test before: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (Cycle 199 push state)
+- Test after: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) unchanged, binding constraint. Grade maintained B+. Naming Consistency A+ — active downgrade hunt found 14 stale v201 IC memo template citations in FAQ bodies — stale by 7–30 versions. These were IC memo language templates that analysts copy verbatim; if copied, the citation would reference a platform version from months ago. All 14 corrected to v250. Grade maintained A+ with strong evidence: 0 stale version strings remaining in FAQ body templates.
+- Fixes: (1) Naming Consistency: 14 stale v201 IC memo template citations corrected to v250 across FAQ bodies — A37 capital allocation rule of thumb, A41 IRR disclosure and Scenario Builder cite, A55 frontier IC template, A59 cross-project rule of thumb, A60 gas-adjusted rule of thumb, A61 production profile rule of thumb, A75 IRR-unavailable IC language, A76 recently-reformed regime IC disclosure, A88 capex overrun Scenario Builder cite, A91 portfolio blended take disclosure, A97 data vintage IC language, A100 farm-in Scenario Builder cite, A108 production bonus IC memo, A112 ring-fence IC memo. (2) Data Currency: footer DB date 2026-08-14→2026-08-15, Platform updated date 2026-08-14→2026-08-15, Nightly audit last run 2026-08-14→2026-08-15, Methodology data currency FAQ DB date 2026-08-14→2026-08-15. (3) Naming Consistency/SDLC: v249→v250 sweep — page title, meta description, header badge, print header meta, Methodology provenance, How to Cite full citation, Scenario Builder cite. (4) Information Architecture: What's New panel — added v250 IC Citation Accuracy entry as first slot; corrected NOC Equity entry to show v249 (was incorrectly showing v250). (5) Changelog: v249 and v250 entries prepended.
+- **Holistic walkthrough (Cycle 200):** Home tab — header badge reads v250 ✓. "145 analyst FAQs" in Methodology card ✓. What's New panel shows v250 IC Citation Accuracy entry as first item (amber border) ✓. Fiscal Compare — auto-loads Deepwater $75 table ✓. IOC Portfolio empty state — heading reads "Search an Operator" ✓. Footer — DB date reads 2026-08-15 ✓. Nightly audit reads 2026-08-15 ✓. Methodology FAQ DB date reads 2026-08-15 ✓. FAQ IC memo spot-check A88 (capex overrun): Scenario Builder cite reads v250 ✓. FAQ A75 (IRR unavailable IC language): reads "ORCA platform (v250)" ✓. How to Cite — reads v250 in full citation and short-form ✓. All dimensions: GOOD.
+
+---
+
 ## Updated Grade Table (Cycle 199 — 2026-08-15)
 
 | Rank | Category | Grade | Delta | Priority Fix |
