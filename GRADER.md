@@ -435,27 +435,37 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 194 — 2026-08-14)
+## Updated Grade Table (Cycle 197 — 2026-08-14)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 141 FAQs (A1–A141). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 142 FAQs (A1–A142). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). Chart grid lines now light-mode correct (v244). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). Reform Risk filter selects iOS auto-zoom fix (v239). Broken 4-price toggle mobile CSS selector fixed (v241). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). What's New panel most-recent-first (v239). |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 141-FAQ section. Methodology card updated to 141 analyst FAQs (v244). What's New panel updated with v244 entry (ring-fence multi-block FAQ). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 142-FAQ section. Methodology card updated to 142 analyst FAQs (v247). What's New panel updated with v247 entry (FTP mechanics FAQ + citation fixes). |
 | 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). Load error overlay on-palette — var(--red)/var(--muted) (v244). |
-| 7 | 13. SDLC Maturity | A+ | = | JS syntax gate PASS (Cycle 194). 136 PASS / 0 FAIL / 0 JS errors. v245→v246 sweep via commit. Cycle 194 log added. |
-| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A141 accessible. focus-visible outline uses var(--accent) (v241). |
+| 7 | 13. SDLC Maturity | A+ | = | JS syntax gate PASS (Cycle 197). 136 PASS / 0 FAIL / 0 JS errors. v246→v247 sweep via commit. Cycle 197 log added. |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A142 accessible. focus-visible outline uses var(--accent) (v241). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. JS syntax gate PASS, 0 JS errors. |
-| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Eight color passes complete (v236/v238/v239/v241/v242/v243/v244/v246). v246 completes the sweep: 0 off-palette hex colors remain in any active rendering path — Sample Analyses cards, Reform Risk functions, IOC Portfolio, Vintage/Bubble charts, Breakeven Map, DCF waterfall (5 wfColors dicts), IRR scatter mechanic, D3 interpolator, CONF_COLORS, country profile scoring. All Tailwind and Material Design hex replaced with ORCA resolved-hex palette values. |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Eight color passes complete (v236/v238/v239/v241/v242/v243/v244/v246). 0 off-palette hex colors remain in any active rendering path. All Tailwind and Material Design hex replaced with ORCA resolved-hex palette values. |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
-| 12 | 5. Naming Consistency | A+ | = | All naming unified. v244→v245 sweep complete. v246 commit descriptive. |
-| 13 | 7. Professional Credibility | A+ | = | 141 FAQs (A1–A141). A141: ring-fence multi-block portfolio IC workflow. How to Cite updated to v244. |
+| 12 | 5. Naming Consistency | A+ | ↑ | 5 stale IC memo template citations corrected (v143→v246 in A50; v162→v246 in A62/A63/A64/A65). A141 source citation v245→v247. v246→v247 sweep complete across all structural locations (v247). |
+| 13 | 7. Professional Credibility | A+ | ↑ | 142 FAQs (A1–A142). A142: FTP mechanics — why First Tranche Petroleum matters more than profit oil split, IRR impact by FTP rate, country-by-country benchmarks, 4-step IC workflow, IC memo disclosure template. How to Cite updated to v247. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v244. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v247. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 195: 10 UX and data currency improvements — v246 version sweep, dates to 2026-08-14, data currency signal in home hero, A/B confidence tooltip, IOC Portfolio title clarification, Sample Analyses 11px headers. Cycle 194: complete off-palette color sweep — 171 replacements across 40+ rendering sites, 0 active off-palette hex remaining.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 197: A142 FTP mechanics FAQ, 5 stale IC memo template citations corrected (v143/v162→v246), v246→v247 version sweep, Methodology card 141→142 FAQs, What's New panel updated. Cycle 195: 10 UX and data currency improvements — v246 version sweep, dates to 2026-08-14, data currency signal in home hero, A/B confidence tooltip, IOC Portfolio title clarification, Sample Analyses 11px headers.**
+
+---
+
+## Cycle 197 Log — 2026-08-14
+- Test before: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (Cycle 196 push state)
+- Test after: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) unchanged, binding constraint. Grade maintained B+. Naming Consistency A+ — active downgrade hunt found 5 stale IC memo template citations (A50: ORCA v143, A62: ORCA v162, A63: ORCA v162, A64: ORCA v162, A65: ORCA v162) plus A141 source citation v245. All corrected. Grade maintained A+ with positive evidence.
+- Fixes: (1) Professional Credibility: A142 FAQ added — First Tranche Petroleum (FTP) mechanics: why FTP reduces cost recovery pool before cost oil allocation; IRR impact of 20% FTP (2–4pp penalty); at low prices FTP can create negative contractor cashflow; country-by-country FTP benchmarks (Indonesia pre-2017 PSC 20%, Malaysia Petronas 10%, Libya EPSA-IV 20–25%, Angola/Nigeria/Iraq KRG none); 4-step IC workflow; IC memo disclosure template with FTP-adjusted cost recovery cap and downside asymmetry; rule of thumb; cross-reference A42/A100/A136/A84. FAQ count 141→142. (2) Naming Consistency: 5 stale IC memo template citations corrected — A50 scale assumption footnote v143→v246; A62 JDZ IC language v162→v246; A63 Breakeven IC memo language v162→v246; A64 Counterparty quality IC memo language v162→v246; A65 mixed-access cross-check v162→v246. A141 source citation v245→v247. (3) Naming Consistency/SDLC: v246→v247 sweep — page title, meta description, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation, How to Cite short-form, Scenario Builder cite (3 instances). (4) Information Architecture: Methodology card 141→142 analyst FAQs. What's New panel heading updated to v247, v247 entry prepended. (5) Changelog: v247/Cycle 197 entry prepended.
+- **Holistic walkthrough (Cycle 197):** Home tab — header badge reads v247 ✓. "142 analyst FAQs" in Methodology card ✓. What's New panel shows v247 FTP FAQ as first entry ✓. Fiscal Compare — auto-loads Deepwater $75 table ✓. Methodology → A142 accordion: expands, FTP mechanics content renders, 4-step workflow visible, IC memo disclosure template legible ✓. How to Cite — reads v247 in full citation and short-form footnote ✓. All dimensions: GOOD.
 
 ---
 
