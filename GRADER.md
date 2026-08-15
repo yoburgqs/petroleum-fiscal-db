@@ -2812,3 +2812,164 @@ Killed task was a redundant GRADER.md push â€” the prior task already compl
 - JS errors: 0
 - Summary: GRADER.md push confirmed. Cycle 217 / v267 fully deployed.
 
+
+
+---
+
+# UX REVAMP DIRECTIVE — From Zach (2026-08-14) — READ EVERY CYCLE UNTIL MARKED COMPLETE
+
+**10+ broken or wasteful UX elements identified by Zach in live use. Execute issues in priority order — one or two items per cycle. Mark each issue DONE inline when resolved.**
+
+**Read the current state of index.html before each fix — do not rely on memory of prior cycles.**
+
+---
+
+## Issue 1 — Reform Risk tab shows no data [PRIORITY: HIGH]
+
+**Symptom:** Reform Risk tab renders empty or shows "Reform history data not available."
+
+**Root cause:** REFORM_HISTORY is initialized as {} and populated via async fetch of reform_history.json. If the fetch has not completed when the tab is activated, renderReformRisk() reads an empty object and aborts silently.
+
+**Fix:**
+1. In the Reform Risk tab activation handler: if Object.keys(REFORM_HISTORY).length === 0, show a loading spinner card and re-call renderReformRisk() after 1.5s delay.
+2. In the fetch callback that populates REFORM_HISTORY: after assignment, if the Reform Risk tab is currently active (check active class on the tab button), call renderReformRisk() immediately.
+3. If reform_history.json returns empty or 404: show a styled info card "Reform history data is being compiled. Check back shortly." not a blank panel.
+
+**Verify:** Navigate to Reform Risk tab. Real reform event cards must appear.
+
+---
+
+## Issue 2 — Fiscal Mechanic Breakdown card wastes space [PRIORITY: HIGH]
+
+**Symptom:** The Fiscal Mechanic Breakdown block in Country Profile shows only the mechanic name (e.g., Concession) with large blank space below.
+
+**Fix:**
+1. Expand the card to show for the selected country: mechanic name, number of contracts under this mechanic, typical government take range at $50/$75/$100/bbl from dcf_results, key fiscal parameters by mechanic type (Concession: royalty rate / CIT / capex uplift; PSC: cost recovery cap / profit split / FTP; PRRT: threshold rate / uplift; TSC: fee per barrel), and one distinguishing fact.
+2. Reduce outer card padding if needed — do NOT leave blank space.
+3. If no parameter data available: show a 2-3 sentence description of the mechanic type.
+
+**Verify:** Select Norway, UAE, Angola. Card must show more than just the mechanic name.
+
+---
+
+## Issue 3 — Data Completeness shows raw code [PRIORITY: HIGH]
+
+**Symptom:** Data Completeness section renders raw JSON, [object Object], or code-like text.
+
+**Fix:**
+1. Search for completeness, dataCompleteness, coverage near renderCountryProfile.
+2. If an object is being assigned to innerHTML directly: build an HTML table instead.
+3. Format: compact table with columns Field / Coverage / Source. Use badge class for status (green=verified, yellow=partial, red=missing).
+4. If it is a simple percentage: show as a styled progress bar + percentage label.
+
+**Verify:** Open Country Profile for any country. Data Completeness must show formatted output — no raw JSON.
+
+---
+
+## Issue 4 — Reference Guide panel broken [PRIORITY: MEDIUM]
+
+**Symptom:** Clicking Reference Guide does nothing visible.
+
+**Root cause:** toggleReferencePanel() toggles .open on #reference-panel. The panel likely lacks CSS or does not exist in DOM.
+
+**Fix:**
+1. Verify #reference-panel exists in the HTML. If not, add it as a right-side slide-in panel with position:fixed; top:0; right:-420px; width:400px; height:100vh; background:var(--surface); border-left:1px solid var(--border); z-index:1000; transition:right 0.3s ease; overflow-y:auto; padding:24px 20px; with .open { right:0; }
+2. Populate with title "Platform Reference Guide" and for each major tab: name + 2-3 sentence description.
+3. Add an overlay div (#ref-overlay) that shows when panel opens and closes panel on click.
+
+**Verify:** Click Reference Guide. Panel slides in from right with text content.
+
+---
+
+## Issue 5 — Scenario Builder broken [PRIORITY: MEDIUM]
+
+**Symptom:** Clicking Scenario does nothing or modal is non-functional.
+
+**Root cause:** openScenarioBuilder() adds .open to #scenario-modal. Modal may lack CSS or be missing.
+
+**Fix:**
+1. Verify #scenario-modal exists. If CSS missing: add display:none normally, display:flex when .open class is present; inner .modal-box with padding 28px, border-radius 8px.
+2. If modal opens but content is empty: add country selector, 3 price scenario inputs ($50/$75/$100 pre-filled), Run Scenario button.
+3. If feature not built: show placeholder text explaining the feature.
+4. Add X button and Escape key listener to close.
+
+**Verify:** Click Scenario. Modal appears with content. Close button works.
+
+---
+
+## Issue 6 — Explorer hidden under Reference dropdown [PRIORITY: MEDIUM]
+
+**Symptom:** Explorer tab is buried inside a Reference dropdown, invisible in primary nav.
+
+**Fix:**
+Promote Explorer to a primary tab in the main tab bar. Remove it from the Reference dropdown.
+Suggested nav order: Home | Fiscal Compare | Country Profile | Screener | Explorer | Side-by-Side | IOC Portfolio | Breakeven Map | Reform Risk | Reference dropdown (Methodology, API, Vintage, Sample Analyses).
+If test failures result, fallback: add an "Explore" shortcut chip on the Home tab shortcuts bar.
+
+**Verify:** Explorer is reachable without opening any dropdown.
+
+---
+
+## Issue 7 — Breakeven Map non-functional [PRIORITY: MEDIUM]
+
+**Symptom:** Breakeven Map tab shows blank or empty map.
+
+**Root cause:** renderBreakevenMap() requires window.d3 which is loaded async via CDN and may not be ready.
+
+**Fix:**
+1. In Breakeven Map tab activation: check typeof window.d3 === "undefined". If true, show loading card and retry renderBreakevenMap() after 2s.
+2. Wrap countries-110m.json fetch in try/catch with console.error on failure.
+3. If D3 map fails entirely: render a sortable fallback table (Country | Breakeven $/bbl | Mechanic).
+
+**Verify:** Click Breakeven Map. World map with country coloring OR a data table appears — not blank.
+
+---
+
+## Issue 8 — Country name not prominent in Country Profile [PRIORITY: LOW]
+
+**Symptom:** Unclear which country is being analyzed at the top of Country Profile.
+
+**Fix:**
+1. At the top of the Country Profile content area add: an h2.page-title element with id cp-country-name, styled 20-22px bold, updated whenever a new country is selected.
+2. Optionally add flag emoji next to the name.
+3. Must be visible without scrolling on a standard laptop screen.
+
+**Verify:** Select Norway. "Norway" appears prominently at top of Country Profile content.
+
+---
+
+## Issue 9 — MC Uncertainty label cryptic [PRIORITY: LOW]
+
+**Symptom:** "Show MC uncertainty" checkbox text is confusing.
+
+**Fix:**
+1. Rename label to: "Show Monte Carlo uncertainty bands"
+2. Add tooltip: "Ranges show P10-P90 contractor IRR based on Monte Carlo simulation of key input uncertainties."
+3. If MC bands are not computed and stored, hide the checkbox entirely rather than showing a non-functional control.
+
+**Verify:** Checkbox reads "Show Monte Carlo uncertainty bands" with tooltip. Or is hidden if non-functional.
+
+---
+
+## Issue 10 — Contract Distribution visualization unclear [PRIORITY: LOW]
+
+**Symptom:** Contract Distribution chart is hard to read.
+
+**Fix:**
+1. Add chart title: "Contract Distribution — [Country Name]" (update dynamically).
+2. Add subtitle: "Contracts by fiscal mechanic type. Click segment to filter table."
+3. Add data labels on segments: mechanic name + count + percentage.
+4. Ensure legend is visible with contract counts.
+
+**Verify:** Contract Distribution section has title, subtitle, and labeled segments.
+
+---
+
+## Execution Rules for This Directive
+
+- Do one or two issues per cycle — do not attempt all 10 at once. Issues 1-3 take a full cycle each.
+- Always read the current index.html before making changes — do not rely on memory.
+- Run the Playwright suite after each fix. Must stay at 136 PASS / 0 FAIL.
+- Mark each issue DONE by replacing [PRIORITY: HIGH/MEDIUM/LOW] with [DONE — vXXX Cycle NNN] in this file.
+- When all 10 are DONE, add log entry: "UX REVAMP DIRECTIVE COMPLETE — all 10 issues resolved."
+- Do NOT declare an issue done without verifying the output is correct in rendered HTML.
