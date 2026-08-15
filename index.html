@@ -13,6 +13,8 @@
 <link rel="preload" href="reform_history.json" as="fetch" crossorigin="anonymous" fetchpriority="low">
 <!-- v212: world atlas self-hosted — eliminates CDN dependency for Breakeven Map + Bubble Chart -->
 <link rel="preload" href="countries-110m.json" as="fetch" crossorigin="anonymous" fetchpriority="low">
+<!-- v252: prefetch API countries index — API Explorer tab activates faster on second+ visits when browser has pre-fetched the endpoint directory -->
+<link rel="prefetch" href="api/v1/countries.json" crossorigin="anonymous">
 <!-- v180: Google Fonts non-blocking load -- eliminates render-blocking CSS @import; preconnect already at lines 8-9 -->
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'" crossorigin>
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
