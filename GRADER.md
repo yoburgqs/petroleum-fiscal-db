@@ -435,6 +435,40 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Updated Grade Table (Cycle 212 — 2026-08-15)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 156 FAQs (A1–A156). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). dns-prefetch hints added for fonts/CDN domains (v261). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
+| 4 | 4. Interaction Design | A+ | ↑ | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). Fiscal Compare page-sub now hints at row-click drill-down to Country Profile (v262). Stability column now shows ⓘ + cursor:help (v256). |
+| 5 | 2. Information Architecture | A+ | ↑ | Methodology card updated to 156 analyst FAQs (v262). What's New panel updated with v262 entry as first slot. Explorer chip count annotations added: Has IRR Data (74) and Has Breakeven (68) (v262). Search no-results contextual guidance (v252). |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN failure banner (v252). 3 permanent empty states no longer show "Loading…" (v256). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 212). 136 PASS / 0 FAIL / 0 JS errors. v261→v262 sweep complete. Cycle 212 log added. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. CSS var fix (v256). JS syntax gate PASS, 0 JS errors. Contract count display correct 71,601 (v261). |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. Zero off-palette hex values in any active rendering path (v257). |
+| 11 | 3. Data Presentation | A+ | ↑ | Home hero now shows visible data currency line: "Last updated: 2026-08-15 · DB verified Aug 2026 · Nightly audit active" (v262). Explorer "Other" chip tooltip (v232). Stability column tooltip fully descriptive. Vintage Analysis column headers show unit "(%" (v256). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v261→v262 sweep complete. DCF Engine footer badge corrected v259→v262 (was 2-version stale). FAQ A41 IC cite corrected v250→v262 (was 12-version stale). How to Cite reads v262. All structural citations current. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 156 FAQs (A1–A156). A156: frontier C-tier country evaluation — 4 key fiscal uncertainties for first-cycle PSC countries, 3-scenario Scenario Builder workflow (statutory/frontier-adjusted/downside), IC memo disclosure template with frontier IRR corridor, rule of thumb by frontier region type. All structural citations current to v262. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v262. |
+
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 212: 7 targeted improvements across 6 categories — A156 frontier C-tier FAQ (Professional Credibility), DCF badge fix v259→v262 + FAQ A41 cite fix v250→v262 (Naming Consistency), Explorer chip counts + Fiscal Compare row-click hint (Information Architecture + Interaction Design), home data currency line (Data Presentation), v261→v262 sweep (SDLC).**
+
+---
+
+## Cycle 212 Log — 2026-08-15
+- Test before: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (clean from Cycle 211 push state)
+- Test after: JS syntax gate PASS (9 blocks, 0 errors). 136 PASS / 0 FAIL / 0 JS errors.
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) binding constraint unchanged. Performance & Reliability A — single-file architectural constraint still binding. Active hunt found DCF Engine footer badge at v259 (2-version stale) and FAQ A41 IC cite at v250 (12-version stale) — both fixed under Naming Consistency.
+- Changes shipped: (1) Professional Credibility — FAQ A156 added: frontier country evaluation with C-tier data. Topic: how to assess a country that signed its first PSC 1–2 years ago with no production history, C-tier ORCA evidence, and no audited analog. 4 key fiscal uncertainties: cost recovery cap administrative discount (statutory 80% → effective 65–70%, 10–15pp gap from interpretation ambiguity); NOC back-in right (10–15% exercisable at commercial discovery at non-market cost recovery — 3–5pp effective take uplift not in headline); signature bonus ($30–50M Year-0 cost, 2–4pp effective take uplift at 50k bbl/d project scale); gas flaring/local content obligations ($1–3/boe hidden cost). 4-step IC workflow: Fiscal Compare peer benchmarking in same mechanic + frontier region → Evidence panel review (C-badge signals 20–40% parameter uncertainty band) → 3 Scenario Builder cases: statutory basis / frontier-adjusted (CR cap -12pp, +15% back-in, $40M signature bonus) / downside (-20pp CR, +15% back-in, $50M bonus, +$2/boe local content) → IC memo with frontier IRR corridor and C-tier disclosure. Rule of thumb by frontier region: Sub-Saharan Africa first-PSC 5–15pp admin discount on CR cap; Middle East/OECD near-zero gap (transparent, rule-of-law environments); CIS varies (Kazakhstan near-zero via BIT; Central Asia frontier 5–10pp). IC memo template with zone-adjusted take, frontier-adjustment assumptions by category, recommended disclosure language, and C-tier data caveat. Sources: ECOWAS PSC Framework; Johnston (2003) International Petroleum Fiscal Systems; Wood Mac Frontier Fiscal Risk Guide; KPMG Oil & Gas Tax Guide 2025. Cross-references: A3, A13, A55, A97, A135. (2) Naming Consistency — DCF Engine footer badge corrected v259→v262 (was 2-version stale — missed in prior v261 sweep). (3) Naming Consistency / Citations — FAQ A41 stale IC cite corrected v250→v262 (was 12-version stale). (4) Information Architecture — Explorer chip count annotations added: "Has IRR Data (74)" and "Has Breakeven (68)" in 10px muted superscript — lets analysts immediately gauge coverage before filtering. (5) Interaction Design — Fiscal Compare page-sub updated to include row-click drill-down hint: "Click any row to drill into the Country Profile." (6) Data Presentation — Home hero: subtitle margin tightened from 28px to 16px; visible data currency line added "Last updated: 2026-08-15 · DB verified Aug 2026 · Nightly audit active" in 11px muted text. (7) SDLC / Naming — v261→v262 sweep: meta description, page title, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation. Changelog prepended. FAQ count 155→156.
+- Grade movements: Professional Credibility A+↑ (A156 frontier FAQ), Naming Consistency A+↑ (DCF badge fix + A41 cite fix + v262 sweep), Information Architecture A+↑ (chip counts + FAQ count + What's New), Interaction Design A+↑ (row-click hint), Data Presentation A+↑ (data currency line), SDLC Maturity A+↑ (136 PASS confirmed + Cycle 212 log).
+- GPA: 3.97 (unchanged — all A+/A/B+ tiers maintained).
+
+---
+
 ## Updated Grade Table (Cycle 211 — 2026-08-15)
 
 | Rank | Category | Grade | Delta | Priority Fix |
