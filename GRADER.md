@@ -2506,3 +2506,11 @@ All pushes confirmed. v258 is fully live.
 - JS errors: 0
 - Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 209 changes: Professional Credibility A+ maintained (A153: EOR/IOR fiscal treatment — 5-regime breakdown: PSC cost oil eligibility/R-factor non-reset/DMO interaction; Concession CIT depreciation Norway 78%/UK RFCT 100%/Canada Alberta royalty tier; PRRT eligible real expenditure + uplift; Iraq TSC fiscal neutrality fee-per-barrel; Norway SPT full interest+capex deductibility at 78%; 4-step IC workflow; IC memo disclosure template; rule of thumb by EOR type; FAQ count 152→153). Information Architecture A+ maintained (Methodology card updated 152→153 analyst FAQs). Naming Consistency A+ maintained (v258→v259 sweep — 143 total references updated). Data Reliability B+ unchanged — IRR structural gap (74/185) is the binding constraint.
 
+
+---
+## Cycle 209 Log — 2026-08-15 07:21
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both commits pushed. Cycle 209 fully deployed â€” v259 is live at yoburgqs.github.io/petroleum-fiscal-db/.
+
