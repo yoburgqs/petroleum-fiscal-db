@@ -435,27 +435,37 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 197 — 2026-08-14)
+## Updated Grade Table (Cycle 198 — 2026-08-14)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 142 FAQs (A1–A142). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 144 FAQs (A1–A144). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). Chart grid lines now light-mode correct (v244). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). Reform Risk filter selects iOS auto-zoom fix (v239). Broken 4-price toggle mobile CSS selector fixed (v241). |
 | 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+←/→ tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). What's New panel most-recent-first (v239). |
-| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 142-FAQ section. Methodology card updated to 142 analyst FAQs (v247). What's New panel updated with v247 entry (FTP mechanics FAQ + citation fixes). |
+| 5 | 2. Information Architecture | A+ | = | "Back to top" link at end of 144-FAQ section. Methodology card updated to 144 analyst FAQs (v248). What's New panel updated with v248 entry (gas-condensate + R-factor FAQs). |
 | 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). CDN warning banner uses var(--red) (v239). Load error overlay on-palette — var(--red)/var(--muted) (v244). |
-| 7 | 13. SDLC Maturity | A+ | = | JS syntax gate PASS (Cycle 197). 136 PASS / 0 FAIL / 0 JS errors. v246→v247 sweep via commit. Cycle 197 log added. |
-| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A142 accessible. focus-visible outline uses var(--accent) (v241). |
+| 7 | 13. SDLC Maturity | A+ | = | JS syntax gate PASS (Cycle 198). 136 PASS / 0 FAIL / 0 JS errors. v247→v248 sweep via commit. Cycle 198 log added. |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12–A144 accessible. focus-visible outline uses var(--accent) (v241). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. JS syntax gate PASS, 0 JS errors. |
 | 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Eight color passes complete (v236/v238/v239/v241/v242/v243/v244/v246). 0 off-palette hex colors remain in any active rendering path. All Tailwind and Material Design hex replaced with ORCA resolved-hex palette values. |
 | 11 | 3. Data Presentation | A+ | = | Explorer "Other" region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
-| 12 | 5. Naming Consistency | A+ | ↑ | 5 stale IC memo template citations corrected (v143→v246 in A50; v162→v246 in A62/A63/A64/A65). A141 source citation v245→v247. v246→v247 sweep complete across all structural locations (v247). |
-| 13 | 7. Professional Credibility | A+ | ↑ | 142 FAQs (A1–A142). A142: FTP mechanics — why First Tranche Petroleum matters more than profit oil split, IRR impact by FTP rate, country-by-country benchmarks, 4-step IC workflow, IC memo disclosure template. How to Cite updated to v247. |
+| 12 | 5. Naming Consistency | A+ | = | v247→v248 sweep complete across all structural locations. How to Cite updated to v248. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 144 FAQs (A1–A144). A143: gas-condensate fiscal adjustment (jurisdiction-specific DMO/ring-fence rules, 4-step IC workflow). A144: R-factor tier trajectory calculation (annual R-factor build, production-weighted effective take, mid-tier approximation accuracy by country). How to Cite updated to v248. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v247. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v248. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 197: A142 FTP mechanics FAQ, 5 stale IC memo template citations corrected (v143/v162→v246), v246→v247 version sweep, Methodology card 141→142 FAQs, What's New panel updated. Cycle 195: 10 UX and data currency improvements — v246 version sweep, dates to 2026-08-14, data currency signal in home hero, A/B confidence tooltip, IOC Portfolio title clarification, Sample Analyses 11px headers.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Cycle 198: A143 gas-condensate fiscal adjustment FAQ, A144 R-factor tier trajectory FAQ, v247→v248 version sweep, Methodology card 142→144 FAQs, What's New panel updated.**
+
+---
+
+## Cycle 198 Log — 2026-08-14
+- Test before: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors (Cycle 197 push state)
+- Test after: 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors. Pushed clean.
+- JS errors: 0
+- Downgrade hunt: Data Reliability B+ — IRR structural gap (74/185) unchanged, binding constraint. FAQ count 142→144 (A143 + A144 added) improves credibility surface area but does not affect IRR metric. Grade maintained B+. Professional Credibility A+ — active improvement: A143 gas-condensate adjustment closes a critical gap (LNG/gas projects require explicit re-weighting of ORCA crude-oil take; previously no FAQ covered this); A144 R-factor trajectory closes the R-factor approximation uncertainty gap (ORCA's mid-tier approximation can be 3–10pp off at high prices; analysts now have a step-by-step trajectory method). Grade maintained A+ with positive evidence.
+- Fixes: (1) Professional Credibility: A143 FAQ added — gas-condensate fiscal adjustment workflow: when to re-weight ORCA crude take for regulated-price domestic gas; Indonesia PTK 007 DMO, Nigeria DPR gas ring-fence, Malaysia Petronas PSC combined pool, Australia PRRT LNG ring-fence, Norway SPT condensate vs. gas tariff; 4-step IC workflow; jurisdiction rule-of-thumb table; cross-reference A60/A84/A126/A132. FAQ count 142→143. (2) Professional Credibility: A144 FAQ added — R-factor tier trajectory: annual R-factor definition and calculation, tier-crossing year estimation, production-weighted effective take, ORCA mid-tier approximation accuracy by country (Indonesia/Angola/Malaysia/Kazakhstan/PNG), IC memo language template; cross-reference A47/A70/A142/A100. FAQ count 143→144. (3) Naming Consistency/SDLC: v247→v248 sweep across all structural locations. Methodology card 142→144. What's New panel updated. Changelog entry prepended.
+- **Holistic walkthrough (Cycle 198):** Home tab — header badge reads v248 ✓. "144 analyst FAQs" in Methodology card ✓. What's New panel shows v248 gas-condensate + R-factor FAQs as first entry ✓. Fiscal Compare — auto-loads Deepwater $75 table ✓. Methodology → A143 accordion: expands, gas-condensate content with jurisdiction table renders ✓. A144 accordion: expands, R-factor trajectory steps and country table render ✓. How to Cite — reads v248 in full citation and short-form ✓. All dimensions: GOOD.
 
 ---
 
