@@ -11099,11 +11099,11 @@ function renderSampleAnalyses() {
   };
   const takeColor = v => {
     if (v == null) return '';
-    if (v < 40) return '#15803D';
-    if (v < 55) return '#5A9F6E';
-    if (v < 70) return '#A16207';
-    if (v < 85) return '#C2410C';
-    return '#B91C1C';
+    if (v < 40) return 'var(--green)';
+    if (v < 55) return 'rgba(21,128,61,0.68)';   /* v252: mid-tier green — on-palette rgba of var(--green) */
+    if (v < 70) return 'var(--yellow)';
+    if (v < 85) return 'var(--orange)';
+    return 'var(--red)';
   };
   const deltaColor = v => v == null ? '' : v > 20 ? '#B06800' : v > 10 ? '#A16207' : 'var(--muted)';
 
@@ -11845,7 +11845,7 @@ function renderReformRisk() {
   const takeColor = v => {
     if (v == null) return 'var(--muted)';
     if (v < 40) return 'var(--green)';
-    if (v < 55) return '#5A9F6E';
+    if (v < 55) return 'rgba(21,128,61,0.68)';   /* v252: mid-tier green — on-palette rgba of var(--green) */
     if (v < 70) return 'var(--yellow)';
     if (v < 85) return 'var(--orange)';
     return 'var(--red)';
@@ -15124,12 +15124,12 @@ renderBasket(); // initialize on load
 let _beMapRendered = false;
 
 function beColor(be) {
-  if (be == null) return '#D0CAC0';
-  if (be < 40) return '#15803D';
-  if (be < 55) return '#5A9F6E';
-  if (be < 70) return '#A16207';
-  if (be < 85) return '#C2410C';
-  return '#B91C1C';
+  if (be == null) return 'var(--border)';          /* v252: #D0CAC0 → var(--border) */
+  if (be < 40) return 'var(--green)';
+  if (be < 55) return 'rgba(21,128,61,0.68)';     /* v252: mid-tier green — on-palette rgba of var(--green) */
+  if (be < 70) return 'var(--yellow)';
+  if (be < 85) return 'var(--orange)';
+  return 'var(--red)';
 }
 
 async function renderBreakevenMap() {
