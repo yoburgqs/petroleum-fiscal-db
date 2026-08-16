@@ -1304,7 +1304,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
     <button id="hdr-scenario-btn" aria-label="Open Scenario Builder — model a custom fiscal regime and run DCF" title="Build a custom fiscal regime: set royalty, CIT, profit oil split, R-factor tiers, then run DCF">+ Scenario</button>
-    <button id="hdr-ref-btn" aria-label="Open Reference Guide — fiscal mechanics, methodology, and sourcing" title="Open fiscal mechanics reference guide: concession, PSC, TSC, PRRT, RSC, Buy-back">Reference Guide</button>
   </div>
 </div>
 
@@ -1413,14 +1412,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
     <div style="color:var(--muted);font-size:14px;margin-bottom:16px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to Q3 2026.</div>
     <div style="color:var(--text);font-size:13px;font-weight:600;margin-bottom:10px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:8px 16px;display:inline-block;">Start with <strong>Fiscal Compare</strong> — ranked government take across all 185 countries in one click.</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:20px;letter-spacing:.02em;">Last updated: 2026-08-15 &nbsp;&middot;&nbsp; DB verified Aug 2026 &nbsp;&middot;&nbsp; Nightly audit active</div>
-    <div style="display:flex;justify-content:center;gap:36px;flex-wrap:wrap;">
-      <div title="71,601 individual petroleum contracts across 185 countries — each with independently sourced fiscal parameters. Includes exploration licenses, production licenses, PSAs, concessions, TSCs, RSCs, and buy-back contracts."><div style="font-size:28px;font-weight:800;color:var(--accent);">71,601</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Contracts ⓘ</div></div>
-      <div title="185 countries with at least one contract in the database, covering all major producing regions. All government take, NPV, IRR, and breakeven figures computed by ORCA's DCF engine across 13 oil price points ($30–$125/bbl)."><div style="font-size:28px;font-weight:800;color:var(--accent);">185</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Countries ⓘ</div></div>
-      <div title="330,329 verified fiscal facts across all contracts — computable from the public country_data.json. Each fact is a sourced parameter (royalty rate, CIT rate, profit oil split, cost recovery cap, etc.) with an evidence tier (A/B/C/D) assigned based on source quality."><div style="font-size:28px;font-weight:800;color:var(--accent);">330,329</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Verified facts ⓘ</div></div>
-      <div title="92.8% of fiscal parameters are sourced from A-tier (primary legislation, PSA text, government gazette) or B-tier (operator annual reports, 10-K filings) sources. Remaining 7.2% are C-tier (secondary analysis) or D-tier (directional proxy only)."><div style="font-size:28px;font-weight:800;color:var(--accent);">92.8%</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">A/B confidence ⓘ</div></div>
-      <div title="8 distinct fiscal mechanics modeled in ORCA's DCF engine: Concession, PSC (Production Sharing Contract), TSC (Technical Service Contract), PRRT (Petroleum Resource Rent Tax), Revenue Share, RSC (Risk Service Contract), Buy-back, and Gross Split. Each mechanic has a separate waterfall model."><div style="font-size:28px;font-weight:800;color:var(--accent);">8</div><div style="font-size:11px;color:var(--muted);margin-top:2px;">Fiscal mechanics ⓘ</div></div>
-    </div>
   </div>
   <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Tools</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:32px;">
@@ -1488,33 +1479,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:var(--accent-dim);line-height:1.55;"><strong>Example:</strong> "Which countries have changed fiscal terms more than 3 times since 2000?" &rarr; Reform Risk heatmap &rarr; volatile country list.</div>
     </div>
   </div>
-  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Reference &amp; Data</div>
-  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:28px;">
-    <div class="card" style="cursor:pointer;padding:14px;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('texplorer',document.getElementById('tab-btn-texplorer'))">
-      <div style="font-weight:600;font-size:13px;margin-bottom:5px;">Explorer</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.55;">Browse all 185 countries. Filter by mechanic and region. Bubble Chart mode plots take vs NPV.</div>
-    </div>
-    <div class="card" style="cursor:pointer;padding:14px;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('tsamples',document.getElementById('tab-btn-tsamples'))">
-      <div style="font-weight:600;font-size:13px;margin-bottom:5px;">Sample Analyses</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.55;">16 pre-built comparisons: OPEC vs non-OPEC, deepwater screens, R-factor regimes, reform stability.</div>
-    </div>
-    <div class="card" style="cursor:pointer;padding:14px;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="document.getElementById('ref-item-vintage').click()">
-      <div style="font-weight:600;font-size:13px;margin-bottom:5px;">Vintage Analysis</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.55;">Average take by decade, 1950s to present. Global trend toward higher state capture over time.</div>
-    </div>
-    <div class="card" style="cursor:pointer;padding:14px;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="document.getElementById('ref-item-mechanics').click()">
-      <div style="font-weight:600;font-size:13px;margin-bottom:5px;">Fiscal Mechanics</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.55;">How each regime works: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, Gross Split.</div>
-    </div>
-    <div class="card" style="cursor:pointer;padding:14px;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="document.getElementById('ref-item-methodology').click()">
-      <div style="font-weight:600;font-size:13px;margin-bottom:5px;">Methodology</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.55;">DCF assumptions, evidence quality framework, benchmark validation (185/185 countries), 315 analyst FAQs.</div>
-    </div>
-    <div class="card" style="cursor:pointer;padding:14px;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="document.getElementById('ref-item-api').click()">
-      <div style="font-weight:600;font-size:13px;margin-bottom:5px;">API Explorer</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.55;">Raw JSON for every country. Fiscal facts, R-factor schedules, confidence tiers. Machine-readable.</div>
-    </div>
-  </div>
   <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;align-items:center;margin-bottom:8px;">
     <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:4px;">Shortcuts:</span>
     <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Ctrl+K</kbd> Search</span>
@@ -1524,7 +1488,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span style="font-size:11px;color:var(--muted);">Click any table row → open Country Profile</span>
   </div>
   <!-- v232: What's New panel — compact recent-update summary for first-time visitors and returning colleagues -->
-  <details open style="margin-top:8px;margin-bottom:4px;">
+  <details style="margin-top:8px;margin-bottom:4px;">
     <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Expand to see the 5 most recent platform improvements">
       <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v315
       <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">Aug 2026</span>
@@ -1575,7 +1539,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
 
   <div class="page-title">Fiscal Compare</div>
-  <div class="page-sub">Run any of 7 standard production profiles (Deepwater · Shallow Offshore · Onshore · LNG · Marginal · Giant · North Sea) through ORCA's DCF engine against all 185 countries simultaneously. The <strong>standard IC benchmarking basis is Deepwater at $75/bbl</strong> ($1.2B capex · 50k bbl/d · $15/bbl opex · 10% discount rate). Rank results by government take, contractor NPV, IRR, or breakeven. The <strong>Price Swing</strong> column shows the take spread between $50 and $125/bbl — a key differentiator between royalty-based regimes (low swing) and profit-based regimes (high swing) at identical headline take. Click any row to open the full Country Profile with sourced parameters. Export to XLSX for IC presentations. Keyboard: Ctrl+Enter to re-run.</div>
+  <div class="page-sub">Pick a production profile and oil price. Ranked by government take — lowest take first. Click any row for the full Country Profile. Export to Excel with the ⬇ button.</div>
 
   <div class="fc-controls">
     <div class="ctrl-group">
@@ -2182,7 +2146,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
 <div id="t7" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t7">
   <div class="page-title">Country Profile</div>
-  <div class="page-sub">Full fiscal deep-dive for any single country. Government take at $50, $75, $100, and $125/bbl. Price sensitivity curve showing how take responds to oil price changes. Sourced fiscal facts (royalty rate, CIT, profit oil split, cost recovery cap) with <strong>A/B/C evidence confidence badges</strong> — hover each badge for the primary source. Reform timeline, DCF Tornado chart (capex/opex/production sensitivity), Live DCF panel, and peer comparison. Auto-loads Norway on first visit — change the dropdown to any of 185 countries.</div>
+  <div class="page-sub">Full fiscal regime for any single country — take at 4 price points, sourced parameters with confidence ratings, reform timeline, and DCF sensitivity.</div>
   <div id="dd-select-wrap">
     <select id="dd-country-select" aria-label="Select a country to load its complete fiscal profile">
       <option value="">— Select a country —</option>
@@ -10289,19 +10253,17 @@ function switchTab(id, btn) {
     setTimeout(renderIRRScatter, 100);
   }
   if (id === 'treformrisk') {
-    // v277 Issue 1: Robust async handling — show loading state and retry
-    if (!REFORM_HISTORY || Object.keys(REFORM_HISTORY).length === 0) {
-      var rrEl = document.getElementById('reform-risk-content');
-      if (rrEl) {
-        rrEl.innerHTML = '<div style="text-align:center;padding:40px 0;"><div style="color:var(--accent);font-size:14px;margin-bottom:8px;">Loading reform history…</div><div style="color:var(--muted);font-size:12px;">Data is being fetched. Retrying automatically.</div></div>';
-      }
-      // Retry after 1.5s; if data arrived in the meantime, renderReformRisk will render properly
-      setTimeout(function() { if (typeof renderReformRisk === 'function') renderReformRisk(); }, 1500);
-    } else {
-      renderReformRisk();
-    }
+    if (typeof renderReformRisk === 'function') renderReformRisk();
+    // retry once after 2s in case data was still loading
+    setTimeout(function() { if (typeof renderReformRisk === 'function' && typeof REFORM_HISTORY !== 'undefined' && Object.keys(REFORM_HISTORY).length > 0) renderReformRisk(); }, 2000);
   }
-  if (id === 'tbreakevenmap') renderBreakevenMap();
+  if (id === 'tbreakevenmap') {
+    if (window._beMapRendered && !document.querySelector('#breakeven-map-svg path')) {
+      // Map was "rendered" but SVG is empty — reset guard and retry
+      window._beMapRendered = false;
+    }
+    renderBreakevenMap();
+  }
   // Update URL hash on tab change (only for primary nav tabs; skip secondary tabs)
   var tabHashMap = { t0: 'compare', t7: 'profile', texplorer: 'explorer', t5: 'ioc' };
   if (tabHashMap[id]) {
@@ -18299,6 +18261,7 @@ renderBasket(); // initialize on load
 
 // ─── BREAKEVEN MAP TAB ──────────────────────────────────────────────────────
 let _beMapRendered = false;
+window._beMapRendered = false; // ensure window-level sync at declaration
 
 function beColor(be) {
   if (be == null) return 'var(--border)';          /* v252: #D0CAC0 → var(--border) */
