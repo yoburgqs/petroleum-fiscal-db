@@ -40,16 +40,18 @@ This provides cache-first loading for repeat visitors. The `sw.js` file lives at
 
 v309 added a summary stats bar in `renderFCResults()` using variable `_fcStatsBar`. **Do NOT remove or overwrite the `_fcStatsBar` code block** (look for the comment `// v309: FC summary stats bar`). It is correctly injected via `var html = profileBanner + _fcStatsBar + _clickHint + ...`.
 
-## PRIORITY 6 — FC REGION FILTER (v312) — DO NOT REMOVE
+## PRIORITY 6 — FC REGION FILTER + DATA FILTERS (v312) — DO NOT REMOVE
 
-v312 added region filter chips above the FC results table. **Do NOT remove:**
-- The `#fc-region-row` div (HTML chip bar with 8 buttons)
+v312 added region filter chips and data-presence toggles above the FC results table. **Do NOT remove:**
+- The `#fc-region-row` div (HTML chip bar with 8 region buttons + IRR/Breakeven checkboxes)
 - The `.fc-region-chip` CSS rules
 - The `setFCRegion()` function (look for `// v312: FC region filter`)
 - The `_activeRegion` filter block in `renderFCResults()` (look for `// v312: Apply region filter`)
+- The `_fIRR` / `_fBE` filter block (look for `// v312: Apply IRR / Breakeven data-only filters`)
+- The `window._fcFilteredResults = sorted` assignment (stores filtered set for export)
 - The `window._fcRegionFilter = ''` initialization
 
-These work together. `setFCRegion(region)` sets the filter and re-renders from `window._fcResults`. The region row is shown via `regionRow.style.display = 'flex'` when results exist.
+These work together. `setFCRegion(region)` sets the region filter and re-renders. IRR/Breakeven checkboxes trigger `renderFCResults()` via `onchange`. Export uses `_fcFilteredResults` so XLSX reflects active filters. Region row shown via `regionRow.style.display = 'flex'` when results exist.
 
 ---
 
