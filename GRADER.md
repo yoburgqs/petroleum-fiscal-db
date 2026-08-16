@@ -40,6 +40,18 @@ This provides cache-first loading for repeat visitors. The `sw.js` file lives at
 
 v309 added a summary stats bar in `renderFCResults()` using variable `_fcStatsBar`. **Do NOT remove or overwrite the `_fcStatsBar` code block** (look for the comment `// v309: FC summary stats bar`). It is correctly injected via `var html = profileBanner + _fcStatsBar + _clickHint + ...`.
 
+## PRIORITY 7 — UX DECLUTTER (v313/v316) — DO NOT RE-ADD REMOVED ELEMENTS
+
+v313 and v316 removed clutter from Home tab and Fiscal Compare. **Do NOT re-add:**
+- The stat-numbers bar (71,601 / 185 / 330K / 92.8% / 8) on the Home tab hero — removed as bragging metric, not user-facing value
+- "Last updated: 2026-08-15" subtitle line on Home tab — removed
+- The "Reference & Data" 6-card secondary grid on Home tab — removed (reference content is in the Reference dropdown)
+- The "Reference Guide" header button (#hdr-ref-btn) — removed
+- Large numbered stat blocks (24px/800-weight) in Reform Direction Distribution — replaced with compact inline sentence
+- The `open` attribute on the What's New `<details>` element — removed (starts collapsed by default now)
+
+The Reform Risk tab now uses a 500ms polling loop (max 15s) to retry when REFORM_HISTORY is slow to load — do NOT revert this to a single 2s setTimeout. See `switchTab()` code block for `id === 'treformrisk'`.
+
 ## PRIORITY 6 — FC REGION FILTER + DATA FILTERS (v312) — DO NOT REMOVE
 
 v312 added region filter chips and data-presence toggles above the FC results table. **Do NOT remove:**
