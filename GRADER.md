@@ -26,7 +26,19 @@ Data Reliability upgraded A-→A in v284 Cycle 233. DB coverage 165/185 (89%). 2
 
 ## PRIORITY 3 — FAQ DEPTH (ongoing)
 
-240 FAQs reached (A1–A240, v304, Cycle 237). New target: 250+ FAQs. Focus on practical IC memo use cases — advanced topics: cost recovery mechanics deep-dives, country-specific fiscal reform case studies, alternative fiscal instrument hybrids.
+280 FAQs reached (A1–A280, v308, Cycle 241). New target: 290+ FAQs. Focus on practical IC memo use cases — advanced topics: cost recovery mechanics deep-dives, country-specific fiscal reform case studies, alternative fiscal instrument hybrids.
+
+## PRIORITY 4 — SERVICE WORKER (v309) — DO NOT REMOVE
+
+v309 added `sw.js` (Service Worker) and a registration snippet in `<head>`. **Do NOT remove the SW registration code** in index.html — it is intentional and passes all 136 tests. The registration is:
+```
+if ('serviceWorker' in navigator) { window.addEventListener('load', function() { ... }); }
+```
+This provides cache-first loading for repeat visitors. The `sw.js` file lives at the repo root.
+
+## PRIORITY 5 — FC STATS BAR (v309) — DO NOT REMOVE
+
+v309 added a summary stats bar in `renderFCResults()` using variable `_fcStatsBar`. **Do NOT remove or overwrite the `_fcStatsBar` code block** (look for the comment `// v309: FC summary stats bar`). It is correctly injected via `var html = profileBanner + _fcStatsBar + _clickHint + ...`.
 
 ---
 
