@@ -2504,6 +2504,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <a href="#meth-assumptions" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Key Assumptions</a>
     <a href="#meth-evidence" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Evidence Quality</a>
     <a href="#meth-weighting" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Production Weighting</a>
+    <a href="#meth-coverage-summary" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Coverage Summary</a>
     <a href="#meth-validation" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Validation</a>
     <a href="#meth-discount" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Discount Rate</a>
     <a href="#meth-limitations" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Limitations</a>
@@ -2637,6 +2638,53 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </p>
     <div style="margin-top:10px;padding:10px 14px;background:rgba(234,179,8,.06);border-left:3px solid rgba(234,179,8,.4);border-radius:0 6px 6px 0;font-size:12px;color:var(--muted);line-height:1.6;">
       <strong style="color:var(--yellow);">Analyst note — USA and Russia require extra caution:</strong> USA has 37,222 contracts in the database — the largest single country by contract count. Even with production-weighting, the USA average (23.4% take) spans an enormous range from sub-10% royalty-only marginal leases to 35%+ Gulf of Mexico deepwater concessions. The reported USA take is representative of the production-weighted median GoM deepwater position; it is not comparable to a single-contract evaluation. For specific US acreage analysis, use the Scenario Builder with the GoM Deepwater preset and adjust for the target lease's specific royalty rate and bonus obligations. Russia (23.4% platform take vs. 45–55% published range) is a documented model limitation — see Known Model Limitations above.
+    </div>
+  </div>
+
+  <!-- v299: Data Coverage At a Glance — quick visual summary of metric coverage for IOC analysts -->
+  <div class="dd-section" id="meth-coverage-summary" style="margin-bottom:16px;">
+    <div class="dd-section-hdr">Data Coverage At a Glance</div>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 12px;">What data is available for each country — and what is not. Understanding coverage is essential before using ORCA data in IC submissions.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:12px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Government Take</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">All 185 countries have computed take at $30–$125/bbl across 13 price points (100% coverage). A/B-tier parameters for 92.8% of all facts.</div>
+        <div style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">NPV</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Contractor NPV computed for all 185 countries at all price points using the standardized DCF model ($1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC).</div>
+        <div style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">165/185</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">IRR (In DB)</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">165 countries have bounded IRR in the database (≤500%). 20 non-computable (very low-take or high-royalty regimes produce unbounded IRR at $75/bbl). Shown in UI: 124 (41 excluded as ≥500% in display).</div>
+        <div style="margin-top:6px;height:4px;background:var(--yellow);border-radius:2px;"></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">68/185</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Breakeven Price</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">68 countries have A/B-tier royalty AND cost data required to compute breakeven. Remaining 117 are excluded to prevent spurious precision from C-tier cost assumptions.</div>
+        <div style="margin-top:6px;height:4px;background:var(--orange);border-radius:2px;"></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Price Swing</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Take spread between $50 and $125/bbl computed for all 185 countries. Key metric for distinguishing royalty-dominant (low swing) from profit-based (high swing) regimes.</div>
+        <div style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
+        <div style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Stability Score</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">Fiscal stability index (0–5) based on Reform Risk tab legislative change history. 0 = 5+ changes since 2010; 5 = zero changes. Available for all 185 countries.</div>
+        <div style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
+      </div>
+    </div>
+    <div style="padding:8px 12px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.15);border-radius:5px;font-size:11px;color:var(--muted);line-height:1.6;">
+      <strong style="color:var(--accent);">Coverage notes:</strong> The 20 non-computable IRR countries are Armenia, Bahamas, Belgium, Bosnia, Bulgaria, China, Croatia, Faroe Islands, Greenland, Iran, Kyrgyzstan, Lithuania, Moldova, Montenegro, Romania, Serbia, Sweden, Tajikistan, Ukraine, and Vanuatu — all have sentinel values (999) confirming non-computability. Breakeven coverage of 68 is stable; do not rerun rebuild_country_data.py as it regresses breakeven from 68 to 20 due to add_breakeven_prices.py sentinel behavior. Country Profile shows full sourced fiscal facts for each country regardless of IRR/breakeven coverage.
     </div>
   </div>
 
