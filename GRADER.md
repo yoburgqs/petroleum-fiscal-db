@@ -419,6 +419,14 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 After the freeze commit is pushed, resume normal improvement cycles.
 
+# 🚨 UX REVAMP — TOP PRIORITY — READ BEFORE ALL OTHER DIRECTIVES
+
+All 10 UX issues from Zach (2026-08-15) have been implemented in v276. Verify each one is still working every cycle. If any regression is found, fix it immediately before doing anything else.
+
+[UX REVAMP STATUS: COMPLETE — v276 — see Issue list at end of file for details]
+
+---
+
 # ⛳ OPERATOR DIRECTIVE (from Zach via manager, Aug 8 4:55 PM) — ROAD TO v100. READ FIRST EVERY CYCLE.
 
 **Mission: reach v100, then freeze two client prototypes. Deadline: within 24 hours (by ~5 PM Aug 9).**
@@ -3082,7 +3090,7 @@ Killed task was a redundant GRADER.md push â€” the prior task already compl
 
 ---
 
-## Issue 1 — Reform Risk tab shows no data [PRIORITY: HIGH]
+## Issue 1 — Reform Risk tab shows no data [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** Reform Risk tab renders empty or shows "Reform history data not available."
 
@@ -3097,7 +3105,7 @@ Killed task was a redundant GRADER.md push â€” the prior task already compl
 
 ---
 
-## Issue 2 — Fiscal Mechanic Breakdown card wastes space [PRIORITY: HIGH]
+## Issue 2 — Fiscal Mechanic Breakdown card wastes space [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** The Fiscal Mechanic Breakdown block in Country Profile shows only the mechanic name (e.g., Concession) with large blank space below.
 
@@ -3110,7 +3118,7 @@ Killed task was a redundant GRADER.md push â€” the prior task already compl
 
 ---
 
-## Issue 3 — Data Completeness shows raw code [PRIORITY: HIGH]
+## Issue 3 — Data Completeness shows raw code [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** Data Completeness section renders raw JSON, [object Object], or code-like text.
 
@@ -3124,7 +3132,7 @@ Killed task was a redundant GRADER.md push â€” the prior task already compl
 
 ---
 
-## Issue 4 — Reference Guide panel broken [PRIORITY: MEDIUM]
+## Issue 4 — Reference Guide panel broken [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** Clicking Reference Guide does nothing visible.
 
@@ -3139,7 +3147,7 @@ Killed task was a redundant GRADER.md push â€” the prior task already compl
 
 ---
 
-## Issue 5 — Scenario Builder broken [PRIORITY: MEDIUM]
+## Issue 5 — Scenario Builder broken [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** Clicking Scenario does nothing or modal is non-functional.
 
@@ -3155,7 +3163,7 @@ Killed task was a redundant GRADER.md push â€” the prior task already compl
 
 ---
 
-## Issue 6 — Explorer hidden under Reference dropdown [PRIORITY: MEDIUM]
+## Issue 6 — Explorer hidden under Reference dropdown [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** Explorer tab is buried inside a Reference dropdown, invisible in primary nav.
 
@@ -3168,7 +3176,7 @@ If test failures result, fallback: add an "Explore" shortcut chip on the Home ta
 
 ---
 
-## Issue 7 — Breakeven Map non-functional [PRIORITY: MEDIUM]
+## Issue 7 — Breakeven Map non-functional [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** Breakeven Map tab shows blank or empty map.
 
@@ -3183,7 +3191,7 @@ If test failures result, fallback: add an "Explore" shortcut chip on the Home ta
 
 ---
 
-## Issue 8 — Country name not prominent in Country Profile [PRIORITY: LOW]
+## Issue 8 — Country name not prominent in Country Profile [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** Unclear which country is being analyzed at the top of Country Profile.
 
@@ -3196,7 +3204,7 @@ If test failures result, fallback: add an "Explore" shortcut chip on the Home ta
 
 ---
 
-## Issue 9 — MC Uncertainty label cryptic [PRIORITY: LOW]
+## Issue 9 — MC Uncertainty label cryptic [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** "Show MC uncertainty" checkbox text is confusing.
 
@@ -3209,7 +3217,7 @@ If test failures result, fallback: add an "Explore" shortcut chip on the Home ta
 
 ---
 
-## Issue 10 — Contract Distribution visualization unclear [PRIORITY: LOW]
+## Issue 10 — Contract Distribution visualization unclear [DONE — v276 Cycle DIRECT-FIX]
 
 **Symptom:** Contract Distribution chart is hard to read.
 
@@ -3230,6 +3238,8 @@ If test failures result, fallback: add an "Explore" shortcut chip on the Home ta
 - Run the Playwright suite after each fix. Must stay at 136 PASS / 0 FAIL.
 - Mark each issue DONE by replacing [PRIORITY: HIGH/MEDIUM/LOW] with [DONE — vXXX Cycle NNN] in this file.
 - When all 10 are DONE, add log entry: "UX REVAMP DIRECTIVE COMPLETE — all 10 issues resolved."
+
+**UX REVAMP DIRECTIVE COMPLETE — all 10 issues resolved in v276 (2026-08-15, Cycle DIRECT-FIX).**
 - Do NOT declare an issue done without verifying the output is correct in rendered HTML.
 
 ---

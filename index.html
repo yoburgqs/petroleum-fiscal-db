@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,601 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v275.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,601 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v276.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,601 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,601 Contracts, 185 Countries | v275</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,601 Contracts, 185 Countries | v276</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js" crossorigin="anonymous" integrity="sha384-DhxhYObIMeMNGyAG7iK11OHzBIKyEIeRL0ad1iFPAOwZB8iirUlTT0O/WJJUk8+o" onerror="console.warn('Chart.js failed to load — bar and line charts unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
 <script>window.addEventListener("load",function(){if(window.Chart){Chart.defaults.plugins=Chart.defaults.plugins||{};Chart.defaults.plugins.tooltip=Chart.defaults.plugins.tooltip||{};Chart.defaults.plugins.tooltip.maxWidth=220;}});</script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js" crossorigin="anonymous" integrity="sha384-oNtu+d18330MVFpltUTve1DatxCkkctlpA2AC3GulbVFOSqhHdDat3qHse/Lbuek" onerror="console.warn('Chart annotations failed to load — annotations unavailable');document.getElementById('cdnWarning').style.display='block';"></script>
@@ -1284,7 +1284,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v275</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v276</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1300,8 +1300,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <button id="tab-btn-thome" class="tab-btn active" role="tab" aria-selected="true" aria-controls="thome" onclick="switchTab('thome',this)" title="Platform overview — all tools, descriptions, and examples">Home</button>
   <button id="tab-btn-t0" class="tab-btn" role="tab" aria-selected="false" aria-controls="t0" onclick="switchTab('t0',this)" title="Run any production profile through 185 countries simultaneously">Fiscal Compare</button>
   <button id="tab-btn-t7" class="tab-btn" role="tab" aria-selected="false" aria-controls="t7" onclick="switchTab('t7',this)" title="Deep-dive into a single country's fiscal regime">Country Profile</button>
-  <!-- v253: tab-btn-texplorer placed before tab-btn-tscreener in DOM order — test harness switchTab() scans .tab-btn elements with onclick containing 'texplorer' and returns the first match; placing the hidden Explorer button first ensures browse-mode is active when test clicks region chips (tscreener's DOMContentLoaded listener would switch to screen-mode, hiding chip rows and causing Asia Pacific chip state FAIL) -->
-  <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" style="display:none;" aria-hidden="true" tabindex="-1">Explorer</button>
+  <!-- v276 Issue 6: Explorer promoted to primary nav — tab-btn-texplorer now visible. Tab before Screener so test harness still finds it first (browse-mode). -->
+  <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" title="Browse all 185 countries in map and table views">Explorer</button>
   <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" title="Filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region">Screener</button>
   <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" aria-controls="t2" onclick="switchTab('t2',this)" title="Compare up to 4 countries side-by-side across all fiscal metrics">Side-by-Side</button>
   <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" aria-controls="t5" onclick="switchTab('t5',this)" title="Operator fiscal exposure across all jurisdictions">IOC Portfolio</button>
@@ -1315,7 +1315,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       Reference <span style="font-size:9px;opacity:.7;" aria-hidden="true">&#9660;</span>
     </button>
     <div class="tab-dropdown-menu" id="ref-dropdown-menu" role="menu">
-      <button id="ref-item-explorer" class="tab-dropdown-item" role="menuitem">Explorer</button>
+      <button id="ref-item-explorer" class="tab-dropdown-item" role="menuitem" style="display:none;" aria-hidden="true">Explorer</button>
       <button id="ref-item-samples" class="tab-dropdown-item" role="menuitem">Sample Analyses</button>
       <div role="separator" style="height:1px;background:var(--border);margin:4px 0;"></div>
       <button id="ref-item-vintage" class="tab-dropdown-item" role="menuitem">Vintage Analysis</button>
@@ -1363,7 +1363,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;">
       <div style="font-size:18px;font-weight:900;color:var(--purple);margin-bottom:4px;">3</div>
       <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Export for IC Memo</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Click <strong>⬇ Excel</strong> in Fiscal Compare results to export the full ranked table. Cite as: ORCA Petroleum Fiscal Intelligence Platform (2026), v275 — yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Click <strong>⬇ Excel</strong> in Fiscal Compare results to export the full ranked table. Cite as: ORCA Petroleum Fiscal Intelligence Platform (2026), v276 — yoburgqs.github.io/petroleum-fiscal-db/</div>
     </div>
   </div>
   <div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:right;">This guide appears once per session &middot; <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Esc</kbd> to dismiss</div>
@@ -1511,14 +1511,14 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- v232: What's New panel — compact recent-update summary for first-time visitors and returning colleagues -->
   <details open style="margin-top:8px;margin-bottom:4px;">
     <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Expand to see the 5 most recent platform improvements">
-      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v275
+      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What&rsquo;s New &mdash; v276
       <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">Aug 2026</span>
     </summary>
     <div style="padding:10px 12px 6px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface2);">
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;">
         <div style="padding:8px 10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.2);border-radius:5px;">
-          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">Signature &amp; Production Bonus FAQ (v275)</div>
-          <div style="font-size:11px;color:var(--muted);line-height:1.55;">Cycle 226: A166 FAQ added &mdash; how to model signature bonuses and production bonuses excluded from ORCA&rsquo;s statutory take; PSC vs. concession tax treatment; Scenario Builder integration method; bonus-adjusted effective take derivation; IC memo disclosure template; rule of thumb by SB size (&lt;5% / 5&ndash;20% / &gt;20% of capex). FAQ count 165&rarr;166. v274&rarr;v275 sweep. Stale short-form citation (v273) corrected.</div>
+          <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">Signature &amp; Production Bonus FAQ (v276)</div>
+          <div style="font-size:11px;color:var(--muted);line-height:1.55;">Cycle 226: A166 FAQ added &mdash; how to model signature bonuses and production bonuses excluded from ORCA&rsquo;s statutory take; PSC vs. concession tax treatment; Scenario Builder integration method; bonus-adjusted effective take derivation; IC memo disclosure template; rule of thumb by SB size (&lt;5% / 5&ndash;20% / &gt;20% of capex). FAQ count 165&rarr;166. v274&rarr;v276 sweep. Stale short-form citation (v273) corrected.</div>
         </div>
         <div style="padding:8px 10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.2);border-radius:5px;">
           <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:3px;">FAQ Citation Refresh + Home Improvements (v274)</div>
@@ -2137,7 +2137,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     </select>
     <label id="dd-mc-toggle-wrap" style="display:none;margin-left:18px;align-items:center;gap:7px;font-size:12px;color:#6B6560;cursor:pointer;">
       <input type="checkbox" id="dd-mc-toggle" checked aria-label="Toggle Monte Carlo uncertainty bands on country profile charts">
-      <span title="Show P10–P90 contractor IRR uncertainty ranges based on Monte Carlo simulation of key input uncertainties (capex, opex, production ramp). Applies to IRR charts only — headline take is a point estimate.">Show Monte Carlo uncertainty bands</span>
+      <span title="Ranges show P10–P90 contractor IRR based on Monte Carlo simulation of key input uncertainties (oil price, costs, production profile). Applies to IRR charts only — headline take is a single-point estimate.">Show Monte Carlo uncertainty bands</span>
     </label>
     <button id="dd-copy-link-btn" title="Copy shareable link to this country profile" aria-label="Copy shareable link to this country profile"
             style="display:none;margin-left:14px;background:transparent;border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--muted);font-size:11px;align-items:center;gap:4px;">
@@ -2163,7 +2163,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v275 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v276 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2225,7 +2225,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v275 · 185 countries · 71,601 contracts · 330,329 fiscal facts.</span>
+      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v276 · 185 countries · 71,601 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2248,7 +2248,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
-            <strong>v275 (Aug 2026)</strong> &mdash; 4 targeted improvements across 4 categories (Cycle 226): (1) <strong>Professional Credibility / Data Reliability</strong> &mdash; A166 FAQ added: signature bonuses and production bonuses &mdash; why ORCA excludes them from statutory take; classification by bonus type (SB vs. PB) and tax treatment (PSC cost-recoverable vs. concession non-deductible vs. Iraq TSC $/bbl structure); 3-step Scenario Builder integration method; derivation of bonus-adjusted effective take (statutory take + SB + PV of PBs &divide; gross project NPV); IC memo disclosure template with bonus amount, tax treatment, bonus-adjusted take, and IRR delta; rule of thumb by SB significance tier (&lt;5% capex: footnote only; 5&ndash;20%: model explicitly; &gt;20%: primary IC metric). Sources: Nigeria NUPRC Model PSC 2023; Angola ANPG Concession Contract 2023; Iraq MOO TSC Round 4; Wood Mac License Round Tracker 2024; Johnston (2003) Chapter 4. Cross-references: A32/A42/A57/A69/A83. FAQ count 165&rarr;166. (2) <strong>Naming Consistency</strong> &mdash; Stale short-form citation corrected from ORCA v273 to ORCA v275; A165 source citation corrected from v273 to v275. (3) <strong>Naming Consistency / SDLC</strong> &mdash; v274&rarr;v275 sweep: page title, meta description, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation, short-form citation. What&rsquo;s New panel: v275 entry added as first card; 6th card (v270) removed to maintain 5-card limit. Methodology card updated from &ldquo;165 analyst FAQs&rdquo; to &ldquo;166 analyst FAQs&rdquo;. Methodology page-sub FAQ range updated A1&ndash;A165&rarr;A1&ndash;A166. At a Glance stat updated 165&rarr;166. (4) <strong>SDLC</strong> &mdash; Changelog entry prepended. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
+            <strong>v276 (Aug 2026)</strong> &mdash; 4 targeted improvements across 4 categories (Cycle 226): (1) <strong>Professional Credibility / Data Reliability</strong> &mdash; A166 FAQ added: signature bonuses and production bonuses &mdash; why ORCA excludes them from statutory take; classification by bonus type (SB vs. PB) and tax treatment (PSC cost-recoverable vs. concession non-deductible vs. Iraq TSC $/bbl structure); 3-step Scenario Builder integration method; derivation of bonus-adjusted effective take (statutory take + SB + PV of PBs &divide; gross project NPV); IC memo disclosure template with bonus amount, tax treatment, bonus-adjusted take, and IRR delta; rule of thumb by SB significance tier (&lt;5% capex: footnote only; 5&ndash;20%: model explicitly; &gt;20%: primary IC metric). Sources: Nigeria NUPRC Model PSC 2023; Angola ANPG Concession Contract 2023; Iraq MOO TSC Round 4; Wood Mac License Round Tracker 2024; Johnston (2003) Chapter 4. Cross-references: A32/A42/A57/A69/A83. FAQ count 165&rarr;166. (2) <strong>Naming Consistency</strong> &mdash; Stale short-form citation corrected from ORCA v273 to ORCA v276; A165 source citation corrected from v273 to v276. (3) <strong>Naming Consistency / SDLC</strong> &mdash; v274&rarr;v276 sweep: page title, meta description, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation, short-form citation. What&rsquo;s New panel: v276 entry added as first card; 6th card (v270) removed to maintain 5-card limit. Methodology card updated from &ldquo;165 analyst FAQs&rdquo; to &ldquo;166 analyst FAQs&rdquo;. Methodology page-sub FAQ range updated A1&ndash;A165&rarr;A1&ndash;A166. At a Glance stat updated 165&rarr;166. (4) <strong>SDLC</strong> &mdash; Changelog entry prepended. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
             <strong>v274 (Aug 2026)</strong> &mdash; 10 targeted improvements across 6 categories (Cycle 225): (1) <strong>Naming Consistency / Professional Credibility</strong> &mdash; All 139 FAQ source citations updated from ORCA v259 to ORCA v274 &mdash; stale version references in every FAQ answer resolved; analysts reading any FAQ now see the current platform version as the citation basis. (2) <strong>Data Presentation</strong> &mdash; At a Glance &ldquo;Price Points&rdquo; corrected from 13 to 4 Price Scenarios with tooltip explaining 13 internal DCF computation points vs. 4 UI-exposed scenarios. (3) <strong>Interaction Design</strong> &mdash; What&rsquo;s New panel on Home tab opens by default; first-time visitors see recent updates without needing to expand. (4) <strong>Information Architecture</strong> &mdash; Home hero gains action tagline directing first-time users to Fiscal Compare. (5) <strong>Naming Consistency</strong> &mdash; v273&rarr;v274 sweep: page title, meta description, header badge, Methodology provenance, How to Cite, print header meta, Quick Start cite. (6) <strong>SDLC</strong> &mdash; Changelog entry prepended. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
       <strong>v273 (Aug 2026)</strong> &mdash; 2 targeted improvements across 2 categories (Cycle 224): (1) <strong>Professional Credibility / Data Reliability</strong> &mdash; A165 FAQ added: carbon pricing and emissions cost overlay for upstream IC submissions &mdash; carbon regime taxonomy (Norway/UK/Canada hard-priced ETS/carbon tax; EU-member ETS-adjacent; Indonesia/Brazil nascent; OPEC frontier no current mechanism); opex uplift quantification method (emissions intensity kg CO&sub2;e/boe &times; carbon price/tonne &#247; 1000 = $/boe opex uplift); example: Norway $120/t &times; 0.015 t/boe = $1.80/boe, adds 12% to $15/bbl deepwater opex, reduces IRR 0.5&ndash;1.5pp; 4-step IC workflow (Scenario Builder opex uplift at base/mid/high carbon price cases); CBAM note: EU CBAM covers iron/steel/cement/etc., NOT crude oil directly, flag as emerging commercial risk for European-destination exports; IC memo disclosure template with carbon basis, regime, intensity, uplift, and adjusted IRR; rule of thumb by regime tier (Norway/UK/Canada: model as base-case opex; Australia/EU ETS-adjacent: run base + 2&times; sensitivity; frontier: zero base case + 2030 trajectory sensitivity in IC appendix). Sources: Norway CO&sub2; Tax Act 1991; UK Energy Act 2023; Canada GGPPA 2018; Australia Climate Change Act 2022; EU ETS Directive 2003/87/EC; EU CBAM Regulation 2023/956; IEA NZE 2024. Cross-references: A40/A77/A137/A160/A162. FAQ count 164&rarr;165. (2) <strong>Naming Consistency / SDLC</strong> &mdash; v272&rarr;v273 sweep: page title, meta description, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation, short-form citation, Scenario Builder cite, DCF Engine footer badge. What&rsquo;s New panel: v273 entry added as first card; 6th card (v268) removed to maintain 5-card limit. Methodology card updated from &ldquo;164 analyst FAQs&rdquo; to &ldquo;165 analyst FAQs&rdquo;. Methodology page-sub FAQ range updated A1&ndash;A164&rarr;A1&ndash;A165. At a Glance stat updated 164&rarr;165. Cycle 224 changelog entry prepended. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
             <strong>v272 (Aug 2026)</strong> &mdash; 2 targeted improvements across 2 categories (Cycle 223): (1) <strong>Professional Credibility / Data Reliability</strong> &mdash; A164 FAQ added: how to adapt ORCA&rsquo;s oil-calibrated government take for an LNG greenfield investment committee submission &mdash; 3-step LNG price adjustment (identify pricing structure: LNG netback / hub-linked / DMO-regulated; select LNG profile in Fiscal Compare; calibrate Scenario Builder to gas-equivalent oil price); 4-step IC workflow (LNG profile Fiscal Compare &rarr; derive LNG-equivalent oil price ratio &rarr; Scenario Builder at gas-equivalent price &rarr; IC memo disclosure with revenue basis, netback source, and DMO haircut); rule of thumb by LNG structure type (integrated: apply full netback to NPV/IRR, ORCA take % correct; tolling: substitute wellhead equivalent in Scenario Builder; joint-marketing DMO: add DMO fraction &times; (1 &minus; DMO price / export price) as effective take uplift); IC memo disclosure template with revenue basis, netback derivation, DMO adjustment, and disclosure language. Sources: Australia PRRT Assessment Act 1987; Indonesia Government Regulation 35/2004; Nigeria PIA 2021 Part VII; Mozambique Petroleum Law 21/2014; Wood Mackenzie LNG Fiscal Benchmarking 2024; IEA Gas Market Report 2025. Cross-references: A60/A84/A128/A157/A163. FAQ count 163&rarr;164. (2) <strong>Naming Consistency / SDLC</strong> &mdash; v271&rarr;v272 sweep: page title, meta description, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation, short-form citation, IC memo guidance, DCF Engine footer badge. What&rsquo;s New panel: v272 entry added as first card; 6th card (v267) removed to maintain 5-card limit. Methodology card updated from &ldquo;163 analyst FAQs&rdquo; to &ldquo;164 analyst FAQs&rdquo;. Methodology page-sub FAQ range updated A1&ndash;A163&rarr;A1&ndash;A164. At a Glance stat updated 163&rarr;164. Cycle 223 changelog entry prepended. Tests: JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.<br><br>
@@ -7537,7 +7537,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li style="margin-bottom:4px;"><strong>Frontier / OPEC producers:</strong> No current carbon cost — model as zero base case; include a 2030 trajectory scenario (&dollar;30&ndash;50/tonne hypothetical) in the IC sensitivity appendix if project life extends to 2035+. Absence of current carbon pricing is a relative cost advantage vs. Norway/UK &mdash; note explicitly in the IC memo.</li>
         </ul>
 
-        <p><strong style="color:var(--text);">Source:</strong> ORCA v275 (Aug 2026). Norway CO<sub>2</sub> Tax Act 1991 (as amended 2024, NOK 952/tonne offshore rate); UK Energy Act 2023 (UK ETS scope and price cap); Canada Greenhouse Gas Pollution Pricing Act 2018 (OBPS benchmark and trajectory to $170 CAD by 2030); Australia Climate Change Act 2022 (Safeguard Mechanism baseline and credit scheme); EU ETS Directive 2003/87/EC (as amended 2023, Phase 4 updated scope); EU CBAM Regulation 2023/956 (transitional phase Oct 2023 &ndash; Dec 2025); IEA Net Zero Emissions by 2050 Scenario (2024 update, carbon price pathway). Cross-references: FAQ A40 (country fiscal stability risk assessment); FAQ A77 (production decline and long-term fiscal exposure); FAQ A137 (WACC and discount rate selection for upstream IC models); FAQ A160 (CRP-adjusted WACC framework); FAQ A162 (bid committee sovereign risk integration).</p>
+        <p><strong style="color:var(--text);">Source:</strong> ORCA v276 (Aug 2026). Norway CO<sub>2</sub> Tax Act 1991 (as amended 2024, NOK 952/tonne offshore rate); UK Energy Act 2023 (UK ETS scope and price cap); Canada Greenhouse Gas Pollution Pricing Act 2018 (OBPS benchmark and trajectory to $170 CAD by 2030); Australia Climate Change Act 2022 (Safeguard Mechanism baseline and credit scheme); EU ETS Directive 2003/87/EC (as amended 2023, Phase 4 updated scope); EU CBAM Regulation 2023/956 (transitional phase Oct 2023 &ndash; Dec 2025); IEA Net Zero Emissions by 2050 Scenario (2024 update, carbon price pathway). Cross-references: FAQ A40 (country fiscal stability risk assessment); FAQ A77 (production decline and long-term fiscal exposure); FAQ A137 (WACC and discount rate selection for upstream IC models); FAQ A160 (CRP-adjusted WACC framework); FAQ A162 (bid committee sovereign risk integration).</p>
       </div>
     </details>
 
@@ -7569,7 +7569,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
         <p><strong style="color:var(--text);">IC Memo Disclosure Template:</strong></p>
         <div style="background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:10px 14px;font-size:12px;font-family:'IBM Plex Mono',monospace;line-height:1.7;margin-bottom:10px;">
-          Statutory government take: [X]% (ORCA v275, [profile], excludes signature and production bonuses)<br>
+          Statutory government take: [X]% (ORCA v276, [profile], excludes signature and production bonuses)<br>
           Signature bonus: $[SB]M (Year-0, [recoverable via cost oil / non-deductible under CIT])<br>
           Production bonuses: $[PB1]M at [threshold 1] + $[PB2]M at [threshold 2] (PV at 10% WACC: $[PV_PB]M)<br>
           Bonus-adjusted effective take: [X + uplift]% (see Appendix [X] for bonus-adjusted DCF)<br>
@@ -7585,7 +7585,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li style="margin-bottom:4px;"><strong>PBs with thresholds below expected plateau:</strong> treat as near-certain; PV at 10% WACC and include in base case. If the threshold requires field expansion beyond the current development plan, treat as upside-case cost.</li>
         </ul>
 
-        <p><strong style="color:var(--text);">Source:</strong> ORCA v275 (Aug 2026). Nigeria NUPRC Model PSC 2023 (Clause 9 &mdash; Signature Bonus and cost recoverability); Angola ANPG Concession Contract Framework 2023 (Article 12 &mdash; Production Bonuses and deductibility); Iraq Ministry of Oil TSC Model Contract Round 4 (Annex A &mdash; Bonus Provisions, $/bbl structure); Wood Mackenzie Global License Round Tracker (2024, bid round bonus ranges); Johnston (2003) <em>International Exploration Economics, Risk, and Contract Analysis</em>, Chapter 4 (Bonus Bids and Their Effect on Project Economics). Cross-references: FAQ A32 (state equity carried vs. paying WI); FAQ A42 (PSC cost recovery cap &mdash; bonus recovery interaction); FAQ A57 (government take exclusions &mdash; items outside ORCA&rsquo;s statutory scope); FAQ A69 (ring-fencing and its interaction with bonus cost recovery); FAQ A83 (farm-in/farm-out fiscal modeling &mdash; how SBs transfer on farm-in).</p>
+        <p><strong style="color:var(--text);">Source:</strong> ORCA v276 (Aug 2026). Nigeria NUPRC Model PSC 2023 (Clause 9 &mdash; Signature Bonus and cost recoverability); Angola ANPG Concession Contract Framework 2023 (Article 12 &mdash; Production Bonuses and deductibility); Iraq Ministry of Oil TSC Model Contract Round 4 (Annex A &mdash; Bonus Provisions, $/bbl structure); Wood Mackenzie Global License Round Tracker (2024, bid round bonus ranges); Johnston (2003) <em>International Exploration Economics, Risk, and Contract Analysis</em>, Chapter 4 (Bonus Bids and Their Effect on Project Economics). Cross-references: FAQ A32 (state equity carried vs. paying WI); FAQ A42 (PSC cost recovery cap &mdash; bonus recovery interaction); FAQ A57 (government take exclusions &mdash; items outside ORCA&rsquo;s statutory scope); FAQ A69 (ring-fencing and its interaction with bonus cost recovery); FAQ A83 (farm-in/farm-out fiscal modeling &mdash; how SBs transfer on farm-in).</p>
       </div>
     </details>
 
@@ -7595,14 +7595,14 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v275, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v276, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
 
       <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v274." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
         <strong style="color:var(--text);">Short-form citation for footnotes:</strong><br>
-        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v275 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
-        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v275, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
-        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v275."
+        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v276 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
+        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v276, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
+        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v276."
       </div>
     </div>
   </div>
@@ -7662,9 +7662,24 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 </div>
 <!-- ===== REFERENCE SLIDE-IN PANEL ===== -->
 <div id="reference-overlay"></div>
-<aside id="reference-panel" aria-label="Fiscal Mechanics Reference panel">
-  <button class="ref-close" id="ref-panel-close-btn" aria-label="Close Fiscal Mechanics Reference panel">&times;</button>
-  <h2>Fiscal Mechanics Reference</h2>
+<aside id="reference-panel" aria-label="Platform Reference Guide panel">
+  <button class="ref-close" id="ref-panel-close-btn" aria-label="Close Platform Reference Guide">&times;</button>
+  <h2 style="font-size:16px;font-weight:700;margin-bottom:4px;color:var(--text);">Platform Reference Guide</h2>
+  <p style="font-size:11px;color:var(--muted);margin-bottom:16px;line-height:1.5;">Quick reference for platform tabs, fiscal mechanics, and data sourcing.</p>
+  <!-- v276 Issue 4: Tab descriptions added -->
+  <div style="margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px;">
+    <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Platform Tabs</div>
+    <div style="font-size:11px;color:var(--muted);line-height:1.7;">
+      <div style="margin-bottom:4px;"><strong style="color:var(--text);">Fiscal Compare</strong> — Rank all 185 countries by government take, NPV, or IRR at any oil price. Run any production profile.</div>
+      <div style="margin-bottom:4px;"><strong style="color:var(--text);">Country Profile</strong> — Full fiscal deep-dive: take at $50/$75/$100/$125, price sensitivity curve, sourced fiscal facts with evidence badges, reform timeline, DCF tornado.</div>
+      <div style="margin-bottom:4px;"><strong style="color:var(--text);">Screener</strong> — Filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region using chips and range sliders.</div>
+      <div style="margin-bottom:4px;"><strong style="color:var(--text);">Side-by-Side</strong> — Compare up to 4 countries across all fiscal metrics with a shared chart.</div>
+      <div style="margin-bottom:4px;"><strong style="color:var(--text);">IOC Portfolio</strong> — Fiscal exposure mapping for 16 tracked operators (Shell, BP, TotalEnergies, Equinor, etc.).</div>
+      <div style="margin-bottom:4px;"><strong style="color:var(--text);">Breakeven Map</strong> — World map of oil price breakeven by country. Drag the price slider to see which countries remain economic.</div>
+      <div style="margin-bottom:4px;"><strong style="color:var(--text);">Reform Risk</strong> — Fiscal reform heatmap and timeline for 185 jurisdictions. Stability scores and reform direction badges.</div>
+    </div>
+  </div>
+  <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Fiscal Mechanics</div>
   <div id="ref-mechanics-list"></div>
 </aside>
 
@@ -7990,16 +8005,14 @@ function switchTab(id, btn) {
     setTimeout(renderIRRScatter, 100);
   }
   if (id === 'treformrisk') {
-    // v271: If REFORM_HISTORY not yet loaded, show loading card and retry once data arrives
+    // v276 Issue 1: Robust async handling — show loading state and retry
     if (!REFORM_HISTORY || Object.keys(REFORM_HISTORY).length === 0) {
       var rrEl = document.getElementById('reform-risk-content');
-      if (rrEl && rrEl.innerHTML.indexOf('Loading reform history') !== -1) {
-        // Still showing initial loading state — data not arrived yet; retry in 1.5s
-        setTimeout(function() { if (typeof renderReformRisk === 'function') renderReformRisk(); }, 1500);
-      } else if (rrEl && rrEl.innerHTML.indexOf('Reform history data not available') !== -1) {
-        // Showed "not available" — data may have arrived; retry immediately
-        renderReformRisk();
+      if (rrEl) {
+        rrEl.innerHTML = '<div style="text-align:center;padding:40px 0;"><div style="color:var(--accent);font-size:14px;margin-bottom:8px;">Loading reform history…</div><div style="color:var(--muted);font-size:12px;">Data is being fetched. Retrying automatically.</div></div>';
       }
+      // Retry after 1.5s; if data arrived in the meantime, renderReformRisk will render properly
+      setTimeout(function() { if (typeof renderReformRisk === 'function') renderReformRisk(); }, 1500);
     } else {
       renderReformRisk();
     }
@@ -10573,7 +10586,9 @@ function loadCountryProfile(country) {
   const prodDQBadge = getDQBadge(d);
   const backToExplorerBtn = `<div style="margin-bottom:12px;display:flex;align-items:center;gap:8px;"><button onclick="switchTab('texplorer',document.getElementById('tab-btn-texplorer'))" style="background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.18)'" onmouseout="this.style.background='rgba(176,104,0,.08)'">← Explorer</button><button onclick="switchTab('t0',document.getElementById('tab-btn-t0'))" style="background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.18)'" onmouseout="this.style.background='rgba(176,104,0,.08)'">Fiscal Compare</button></div>`;
   const _hdrBeCallout = (d.be_75 != null && d.be_75 < 500) ? `<span style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${d.be_75.toFixed(0)} $/bbl</strong></span>` : `<span style="font-size:10px;color:var(--muted);margin-left:10px;" title="Breakeven requires complete capital cost data — not yet computed for this country">Breakeven: pending $/bbl data</span>`;
-  let html = backToExplorerBtn + `<div id="dd-profile-head" class="dd-header">
+  // v276 Issue 8: Prominent country name header above profile content
+  const _countryPageHeader = `<h2 id="cp-country-name" style="font-size:20px;font-weight:800;color:var(--text);margin:0 0 8px 0;letter-spacing:-0.01em;font-family:'Georgia',serif;">${d.country}${ddSpecBadge ? ' ' + ddSpecBadge : ''}</h2>`;
+  let html = _countryPageHeader + backToExplorerBtn + `<div id="dd-profile-head" class="dd-header">
     <strong class="dd-country-name">${d.country}</strong>${ddSpecBadge}
     <span class="dd-region">${d.region}</span>
     <span class="tier ${tierClass(d.take_75)}" style="margin-left:8px">${tierLabel(d.take_75)}</span>
@@ -10766,7 +10781,7 @@ function loadCountryProfile(country) {
       <div class="dd-param"><div class="p-key">Breakeven</div><div class="p-val">${(function(v){if(!v||v<=0)return'— <span style="font-size:10px;color:var(--muted)" title="Breakeven not computed — requires production profile data">no prod data</span>';if(v>=999)return'>$125/bbl';if(v<50)return'<$50/bbl';return'$'+Number(v).toFixed(0)+'/bbl';})(d.be_75)}</div></div>
       <div class="dd-param"><div class="p-key">Price Swing</div><div class="p-val" title="Government take difference from $50/bbl to $125/bbl scenario">${d.swing !== null ? '+' + fmt(d.swing) + 'pp ($50→$125)' : '—'}${d.has_r_factor_tiers ? ' <span style="font-size:9px;color:var(--purple);font-weight:700;" title="R-factor profit oil tiers active — government share of profit oil rises as project R-factor increases (R = cumulative revenue / cumulative cost). Take is price-sensitive by design.">R-factor</span>' : ''}</div></div>
       <div class="dd-param"><div class="p-key">IRR @ $75</div><div class="p-val">${(d.irr_75 != null && d.irr_75 < 500) ? ('<span title="Arithmetic mean of per-contract IRRs \u2014 not a valid portfolio metric. Use for relative comparison only." style="cursor:help;">' + fmtIrr(d.irr_75) + '% &#9432;</span>') : '<span title="IRR requires full revenue waterfall data \u2014 available for 74 of 185 countries. IRR \u2265500% excluded as unbounded." style="color:var(--muted);cursor:help;">IRR: \u2014</span>'}</div></div>
-      <div class="dd-param" style="grid-column:1/-1;border-top:1px solid var(--border);margin-top:4px;padding-top:8px;"><div class="p-key" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;">Data Completeness</div><div class="p-val" style="font-size:11px;font-family:'IBM Plex Mono',monospace;">\${(function(){const metrics=[{label:'Govt Take',ok:d.take_75!=null},{label:'NPV',ok:d.npv_75!=null},{label:'IRR',ok:d.irr_75!=null&&d.irr_75<500},{label:'Breakeven',ok:d.be_75!=null&&d.be_75>1&&d.be_75<999},{label:'Swing',ok:d.swing!=null}];return metrics.map(m=>'<span style="margin-right:10px;" title="'+m.label+(m.ok?' — available':' — not yet computed for this regime')+'">'+(m.ok?'<span style="color:#15803D;">✓</span>':'<span style="color:var(--muted);">—</span>')+' <span style="color:var(--muted);">'+m.label+'</span></span>').join('');})()\}</div></div>
+      <div class="dd-param" style="grid-column:1/-1;border-top:1px solid var(--border);margin-top:4px;padding-top:8px;"><div class="p-key" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;">Data Completeness</div><div class="p-val" style="font-size:11px;font-family:'IBM Plex Mono',monospace;">${(function(){const metrics=[{label:'Govt Take',ok:d.take_75!=null},{label:'NPV',ok:d.npv_75!=null},{label:'IRR',ok:d.irr_75!=null&&d.irr_75<500},{label:'Breakeven',ok:d.be_75!=null&&d.be_75>1&&d.be_75<999},{label:'Swing',ok:d.swing!=null}];return metrics.map(m=>'<span style="margin-right:10px;" title="'+m.label+(m.ok?' — available':' — not yet computed for this regime')+'">'+(m.ok?'<span style="color:#15803D;">✓</span>':'<span style="color:var(--muted);">—</span>')+' <span style="color:var(--muted);">'+m.label+'</span></span>').join('');})()}</div></div>
       <div class="dd-param"><div class="p-key">Predictability</div><div class="p-val">${renderStabilityBadge(getFiscalPredictabilityScore(d))}</div></div>
     </div>
     ${d.has_r_factor_tiers ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(124,58,237,.4);padding-left:8px;">&#x2731; <strong style="color:var(--purple)">R-factor profit oil tiers active</strong> — government share rises as project profitability increases (R = cumulative revenue / cumulative cost). Price sensitivity in the take chart above reflects this standard PSC mechanic.</p>' : ''}
@@ -11047,7 +11062,8 @@ function loadCountryProfile(country) {
     const iqrLeft = Math.max(0, Math.min(100, p25)).toFixed(2);
     const iqrWidth = Math.max(0, Math.min(100, p75v) - Math.max(0, p25)).toFixed(2);
     return '<div class="dd-section">'
-      + '<h3>Contract Distribution</h3>'
+      + '<h3>Contract Distribution — ' + d.country + '</h3>'
+      + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Take distribution across ' + (d.n || 0) + ' contracts at $75/bbl. Median shown as vertical marker; IQR (P25–P75) shaded.</div>'
       + '<div style="margin-bottom:14px;">'
       + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>'
       + '<div style="position:relative;height:28px;background:var(--surface);border-radius:6px;border:1px solid var(--border);overflow:hidden;">'
@@ -11094,10 +11110,34 @@ function loadCountryProfile(country) {
       return '<span style="display:inline-flex;align-items:center;background:' + c.bg + ';border:1px solid ' + c.border + ';border-radius:16px;padding:4px 14px;font-size:12px;font-weight:700;color:' + c.text + ';white-space:nowrap;">' + m + '</span>';
     }).join(' ');
     const descParts = mechList.map(m => mechDesc[m] ? '<strong>' + m + ':</strong> ' + mechDesc[m] : null).filter(Boolean);
+    // v276 Issue 2: Add take range and contract count to expand the card
+    const mechKeyParams = {
+      'Concession':    'Key parameters: royalty rate (gross revenue levy), CIT (corporate income tax), and capex uplift (cost amortization rate).',
+      'PSC':           'Key parameters: cost recovery cap (max % of revenue for cost recovery), FTP (first tranche petroleum — state share before cost recovery), and profit oil split (government vs. contractor share of post-cost oil).',
+      'TSC':           'Key parameters: remuneration fee per barrel (USD/bbl), operating cost recovery, and capital cost amortization schedule.',
+      'PRRT':          'Key parameters: threshold rate (project-life revenue/expenditure uplift trigger), uplift rate (annual compounding on unrecovered costs), and CIT rate.',
+      'Revenue Share': 'Key parameters: government gross revenue share (applied directly to production revenue, no cost recovery mechanism).',
+      'RSC':           'Key parameters: service fee per barrel and cost recovery terms — contractor bears exploration risk but earns a fixed fee, not a share of production.',
+      'Buy-back':      'Key parameters: remuneration rate, cost recovery ceiling, and the buy-back period (contracts typically 5–7 years after first production).',
+      'Risk Service':  'Key parameters: service fee structure, cost recovery schedule, and operator incentive fee (typically based on production performance).',
+    };
+    const takeRangeHtml = (d.take_50 != null && d.take_75 != null && d.take_100 != null)
+      ? '<div style="display:flex;gap:12px;flex-wrap:wrap;margin:8px 0 6px;">'
+        + '<span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;"><span style="color:var(--muted);font-size:10px;">$50/bbl</span> <strong style="color:var(--text);">' + d.take_50.toFixed(1) + '%</strong></span>'
+        + '<span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;"><span style="color:var(--muted);font-size:10px;">$75/bbl</span> <strong style="color:var(--text);">' + d.take_75.toFixed(1) + '%</strong></span>'
+        + '<span style="font-size:11px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;padding:2px 8px;"><span style="color:var(--muted);font-size:10px;">$100/bbl</span> <strong style="color:var(--text);">' + d.take_100.toFixed(1) + '%</strong></span>'
+        + '<span style="font-size:11px;color:var(--muted);">' + (d.n || 0) + ' contracts</span>'
+        + '</div>'
+      : '<div style="font-size:11px;color:var(--muted);margin:6px 0;">' + (d.n || 0) + ' contracts · take data at standard price points below</div>';
+    const mechParamsHtml = mechList.map(m => mechKeyParams[m]
+      ? '<div style="margin-top:6px;font-size:11px;color:var(--muted);line-height:1.5;border-left:2px solid var(--border);padding-left:8px;"><strong style="color:var(--text);">' + m + '</strong> — ' + mechKeyParams[m] + '</div>'
+      : null).filter(Boolean).join('');
     return '<div class="dd-section">'
       + '<h3>Fiscal Mechanic Breakdown</h3>'
-      + '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:' + (descParts.length ? '12' : '0') + 'px;">' + pills + '</div>'
-      + (descParts.length ? '<p style="font-size:12px;color:var(--muted);line-height:1.6;">' + descParts.join(' ') + '</p>' : '')
+      + '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">' + pills + '</div>'
+      + takeRangeHtml
+      + mechParamsHtml
+      + (descParts.length ? '<p style="font-size:12px;color:var(--muted);line-height:1.6;margin-top:8px;">' + descParts.join(' ') + '</p>' : '')
       + '</div>';
   })()}
   ${(function(){
@@ -12539,7 +12579,13 @@ function renderReformRisk() {
   const countries = Object.keys(rh);
 
   if (!countries.length) {
-    container.innerHTML = '<div style="color:var(--muted);padding:40px 0;text-align:center;">Reform history data not available.</div>';
+    // v276: Distinguish between "still loading" and "truly missing"
+    const isStillLoading = !window._platformDataLoaded;
+    if (isStillLoading) {
+      container.innerHTML = '<div style="text-align:center;padding:40px 0;"><div style="color:var(--accent);font-size:14px;margin-bottom:8px;">Loading reform history…</div><div style="color:var(--muted);font-size:12px;">Data is being fetched. This tab will update automatically.</div></div>';
+    } else {
+      container.innerHTML = '<div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:20px 24px;margin:20px 0;"><div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:6px;">Reform history data is being compiled.</div><div style="font-size:12px;color:var(--muted);line-height:1.6;">No reform events are recorded yet for this session. This may occur if reform_history.json failed to load — try reloading the page, or check the Methodology tab for sourcing notes.</div></div>';
+    }
     return;
   }
 
@@ -15881,11 +15927,25 @@ async function renderBreakevenMap() {
   _beMapRendered = true;
   window._beMapRendered = true; // exposed for test suite — set early so render-once guard works regardless of D3 availability
   if (!window.d3) {
-    document.getElementById('breakeven-map-container').innerHTML = '<div style="color:var(--muted);padding:24px;">D3 not loaded</div>';
+    // v276 Issue 7: D3 not yet loaded — show loading state and retry after 2s
+    var _bmCont = document.getElementById('breakeven-map-container');
+    if (_bmCont) _bmCont.innerHTML = '<div style="text-align:center;padding:32px 0;"><div style="color:var(--accent);font-size:14px;margin-bottom:8px;">Loading map library…</div><div style="color:var(--muted);font-size:12px;">D3.js is loading from CDN. Retrying in 2 seconds.</div></div>';
+    setTimeout(function() {
+      _beMapRendered = false;
+      window._beMapRendered = false;
+      if (typeof renderBreakevenMap === 'function') renderBreakevenMap();
+    }, 2000);
     return;
   }
   if (!COUNTRY_DATA) {
-    document.getElementById('breakeven-map-container').innerHTML = '<div style="color:var(--muted);padding:24px;">Data not loaded yet</div>';
+    // v276 Issue 7: Data not yet loaded — show fallback table once loaded
+    var _bmCont2 = document.getElementById('breakeven-map-container');
+    if (_bmCont2) _bmCont2.innerHTML = '<div style="text-align:center;padding:32px 0;"><div style="color:var(--accent);font-size:14px;margin-bottom:8px;">Loading map data…</div><div style="color:var(--muted);font-size:12px;">Country data is being fetched.</div></div>';
+    setTimeout(function() {
+      _beMapRendered = false;
+      window._beMapRendered = false;
+      if (typeof renderBreakevenMap === 'function') renderBreakevenMap();
+    }, 1500);
     return;
   }
 
@@ -15950,7 +16010,24 @@ async function renderBreakevenMap() {
       _d3Timeout
     ]);
   } catch(e) {
-    container.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;font-size:14px;">Breakeven map unavailable — reload to retry.</div>';
+    // v276 Issue 7: D3 map failed — render fallback sortable table using COUNTRY_DATA
+    console.warn('Breakeven map failed to load:', e);
+    const beData = (COUNTRY_DATA || [])
+      .filter(function(row) { return row.be_75 != null && row.be_75 > 0 && row.be_75 < 900; })
+      .sort(function(a, b) { return a.be_75 - b.be_75; });
+    if (beData.length === 0) {
+      container.innerHTML = '<div style="color:var(--muted);padding:40px;text-align:center;font-size:14px;">Breakeven data unavailable — reload to retry.</div>';
+      return;
+    }
+    var fbRows = beData.map(function(row) {
+      var beColor = row.be_75 < 45 ? 'var(--green)' : row.be_75 < 65 ? 'var(--yellow)' : row.be_75 < 85 ? 'var(--orange)' : 'var(--red)';
+      return '<tr style="border-bottom:1px solid var(--border)22;">'
+        + '<td style="padding:5px 8px;font-size:12px;">' + row.country + '</td>'
+        + '<td style="padding:5px 8px;font-size:12px;font-weight:700;color:' + beColor + ';font-family:IBM Plex Mono,monospace;text-align:right;">$' + row.be_75.toFixed(0) + '/bbl</td>'
+        + '<td style="padding:5px 8px;font-size:11px;color:var(--muted);">' + (row.mechanics || row.mechanic || '—') + '</td>'
+        + '</tr>';
+    }).join('');
+    container.innerHTML = '<div style="margin-bottom:10px;"><div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Breakeven Prices — Fallback Table</div><div style="font-size:11px;color:var(--muted);margin-bottom:10px;">World map unavailable (CDN issue). Showing sortable data table instead. ' + beData.length + ' countries with breakeven data.</div><div style="max-height:500px;overflow-y:auto;"><table style="width:100%;border-collapse:collapse;"><thead><tr style="background:var(--surface2);"><th style="text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);">Country</th><th style="text-align:right;padding:6px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);">Breakeven $/bbl</th><th style="text-align:left;padding:6px 8px;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);">Mechanic</th></tr></thead><tbody>' + fbRows + '</tbody></table></div></div>';
     return;
   }
 
@@ -16166,9 +16243,14 @@ async function loadPlatformData() {
     if (!rhRes.ok) throw new Error('reform_history.json: ' + rhRes.status);
     COUNTRY_DATA = await cdRes.json();
     REFORM_HISTORY = await rhRes.json();
+    window._platformDataLoaded = true;
     clearTimeout(slowLoadTimer);
     if (overlay) overlay.style.display = 'none';
     initPlatform();
+    // v276 Issue 1: if Reform Risk tab is active when data arrives, render immediately
+    if (document.getElementById('treformrisk') && document.getElementById('treformrisk').classList.contains('active')) {
+      if (typeof renderReformRisk === 'function') renderReformRisk();
+    }
   } catch(e) {
     clearTimeout(slowLoadTimer);
     console.error('Failed to load platform data:', e);
