@@ -352,9 +352,11 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-16 (Cycle 238 — FAQs A241–A250, v305 metadata sweep)
+**Last Updated:** 2026-08-16 (Cycle 240 — FAQs A261–A270, v307 metadata sweep)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 238 shipped v305: 10 FAQs A241–A250 (hybrid PSC cap+R-factor workflow, Nigeria PIA 2021 reform, Indonesia Gross Split mechanics, EOR fiscal treatment, Guyana Stabroek reform case, ring-fence portfolio methodology, RSC vs. PSC vs. TSC, Brazil pre-salt excedente, MGT clause, Australia PRRT 2023 reform). FAQ count 240→250. 250-FAQ milestone reached. JS syntax gate PASS / 4 blocks / 0 errors.
+**Overall Status:** Cycle 240 shipped v307: 10 FAQs A261–A270 (NOC equity participation, inflation/currency risk, bid evaluation workflow, pipeline tariff interaction, insurance obligations, signature bonus DCF, brownfield/tie-back treatment, mixed-regime protocol, unitization fiscal treatment, WPT trigger analysis). FAQ count 260→270. v306→v307 metadata sweep. JS syntax gate PASS / 4 blocks / 0 errors. 136 PASS / 0 FAIL / 0 JS errors.
+
+**Previous [Cycle 239]:** Cycle 238 shipped v305: 10 FAQs A241–A250 (hybrid PSC cap+R-factor workflow, Nigeria PIA 2021 reform, Indonesia Gross Split mechanics, EOR fiscal treatment, Guyana Stabroek reform case, ring-fence portfolio methodology, RSC vs. PSC vs. TSC, Brazil pre-salt excedente, MGT clause, Australia PRRT 2023 reform). FAQ count 240→250. 250-FAQ milestone reached. JS syntax gate PASS / 4 blocks / 0 errors.
 
 **Previous [Cycle 193]:** Cycle 193 shipped v244: chart axis tick colors #888/#666→#6B6560 and grid colors #ffffff08/#ffffff10 (dark-mode invisible)→rgba(0,0,0,0.06) in two production chart instances; print header border #333→var(--text), subtitle #555→var(--muted), meta #777→var(--muted); load error overlay #ef4444/#fca5a5/#999→var(--red)/var(--muted)/var(--muted); A141 FAQ added (ring-fence multi-block portfolio IC workflow — license-level/company-level/field-level mechanics, 4-step IC workflow, IC memo disclosure template); FAQ count 140→141; v243→v244 sweep. 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
