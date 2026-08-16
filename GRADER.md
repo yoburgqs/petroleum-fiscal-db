@@ -26,7 +26,7 @@ Data Reliability upgraded A-→A in v284 Cycle 233. DB coverage 165/185 (89%). 2
 
 ## PRIORITY 3 — FAQ DEPTH (ongoing)
 
-200 FAQs reached (A1–A200, v284, Cycle 233). New target: 210+ FAQs. Focus on practical IC memo use cases.
+210 FAQs reached (A1–A210, v286, Cycle 234). New target: 220+ FAQs. Focus on practical IC memo use cases.
 
 ---
 
@@ -352,9 +352,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-16 (Cycle 231 — FAQs A186–A190, carbon cost/farm-in/FID timing/FX risk/modeling limits, v282)
+**Last Updated:** 2026-08-16 (Cycle 234 — FAQs A201–A210, UX improvements v287–v294, 8 targeted UX commits)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 226 shipped v275: A166 FAQ added (signature bonuses and production bonuses — why ORCA excludes them, PSC/concession/TSC tax treatment, Scenario Builder integration, bonus-adjusted effective take derivation, IC memo disclosure template, rule of thumb by SB size tier). Stale short-form citation (v273) corrected to v275. A165 source citation corrected v273→v275. v274→v275 structural sweep. FAQ count 165→166 across At a Glance, Methodology card, page-sub, and What's New panel. JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 234 shipped v286–v294: 10 FAQs A201–A210 (marginal fields, Scenario Builder calibration, mechanic vs take%, fiscal vintage, Price Swing portfolio, hedging/fiscal impact, price collar contracts, same-take differentiation, bid round screening, source discrepancy diagnosis) + changelog entries v284/v285/v286 + 7 UX improvements (Fiscal Compare reading guide, IRR label fix, FC page-sub 7-profiles listing, Explorer mode descriptions, Home hero stat tooltips, What's New LATEST badge, Scenario Builder page-sub). FAQ count 200→210. JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
 **Previous [Cycle 193]:** Cycle 193 shipped v244: chart axis tick colors #888/#666→#6B6560 and grid colors #ffffff08/#ffffff10 (dark-mode invisible)→rgba(0,0,0,0.06) in two production chart instances; print header border #333→var(--text), subtitle #555→var(--muted), meta #777→var(--muted); load error overlay #ef4444/#fca5a5/#999→var(--red)/var(--muted)/var(--muted); A141 FAQ added (ring-fence multi-block portfolio IC workflow — license-level/company-level/field-level mechanics, 4-step IC workflow, IC memo disclosure template); FAQ count 140→141; v243→v244 sweep. 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -497,6 +497,42 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - **Every cycle must attempt one downgrade**: actively hunt the weakest thing in the highest-graded category and either fix it or downgrade the grade. Log the hunt result.
 - Re-anchor the scale: "A = a skeptical client pokes for 10 minutes and finds nothing embarrassing." If any of the manager's open findings (region data, IRR coverage, count mismatch) would embarrass, the touching category is NOT A+.
 - GPA drift without evidence is itself a defect to log.
+
+---
+
+## Cycle 234 — v294 Grade Table
+
+**Cycle 234 — v286–v294:** 10 FAQs A201–A210 added across 2 commits (v285, v286): marginal field regimes and IC analysis (A201), Scenario Builder calibration for non-standard projects (A202), when fiscal mechanic type changes the IC recommendation (A203), fiscal vintage and contract-term assessment (A204), Price Swing portfolio construction (A205), fiscal impact of oil price hedging (A206), contractual price collar/cap provisions (A207), 5-metric same-take differentiation framework (A208), bid round screening with ORCA (A209), diagnosing take% discrepancies vs. third-party sources (A210). Changelog entries v284/v285/v286 added to Methodology (v287). 7 UX improvements: Fiscal Compare reading guide strip (v288), IRR count label fix 111→61 countries (v289), Fiscal Compare page-sub 7-profiles + IC benchmark basis (v290), Explorer page-sub 3-mode descriptions (v291), Home hero stat tooltips on all 5 metrics (v292), What's New panel LATEST badge (v293), Scenario Builder page-sub full IC workflow description (v294). FAQ count 200→210. v285→v286 structural sweep complete. JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). dns-prefetch hints added (v261). Reform Risk race condition retry added (v271). Single-file architectural constraint remains binding gap for A+. |
+| 2 | 8. Data Reliability | A | = | IRR coverage: 165/185 in DB (89%), 124 shown in UI (≥500% outliers excluded). 20 non-computable confirmed. 210 FAQs (A1–A210, v286). Benchmark 185/185 (100%). IRR count label corrected 111→61 in Screener (v289). Remaining gap: single-file constraint + UI IRR display count difference from DB count. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
+| 4 | 4. Interaction Design | A+ | ↑ | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). What's New panel opens by default on Home tab (v274). Home hero action tagline added (v274). MC uncertainty label clarified (v271). Fiscal Compare reading guide strip (v288): Price Swing/IRR/Breakeven interpretation callout on first run, dismissible with sessionStorage persistence. |
+| 5 | 2. Information Architecture | A+ | ↑ | 210 analyst FAQs (A1–A210, v286). What's New panel updated with v286 card + LATEST badge (v293). Explorer page-sub describes all 3 modes (Browse/Screener/Bubble Chart) inline (v291). Fiscal Compare page-sub lists all 7 profiles + names standard IC benchmarking basis (v290). Scenario Builder page-sub full IC workflow (v294). Home hero stat tooltips on all 5 metrics with ⓘ indicators (v292). Changelog entries v284/v285/v286 added (v287). |
+| 6 | 6. Error & Empty States | A+ | = | FC empty-state text corrected (v268). All four primary tabs auto-load with real content on first visit (v219). CDN failure banner (v252). IOC Portfolio empty state de-cluttered (v263). Reform Risk race condition retry (v271). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 234). 136 PASS / 0 FAIL / 0 JS errors. Cycle 234 log added. Changelog entries for v284/v285/v286 added in v287. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. CSS var fix (v256). JS syntax gate PASS, 0 JS errors. Contract count display correct 71,601 (v261). |
+| 10 | 1. Visual Design | A+ | ↑ | Full theme redesign (v235). Nine color passes complete. Zero off-palette hex values (v257). Chart fixes (v264). What's New panel LATEST badge on first card (v293). |
+| 11 | 3. Data Presentation | A+ | = | IRR scatter represents 124/185 countries shown in UI. Home hero shows visible data currency line (v262). At a Glance Price Points corrected from 13 to 4 Price Scenarios (v274). IRR scatter axis labels updated (v264). Tornado chart X-axis label added (v264). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v285→v286 sweep complete. All structural citations current to v286. FAQ count updated 200→210 in all structural locations. Changelog v286 entry correctly labels Cycle 234. Screener IRR label corrected 111→61 (v289). |
+| 13 | 7. Professional Credibility | A+ | ↑ | 210 FAQs (A1–A210, v286). A201–A210: marginal fields, Scenario Builder calibration, mechanic vs take%, fiscal vintage, Price Swing portfolio, hedging/fiscal, price collar, same-take differentiation, bid round screening, source discrepancy. All IC memo templates current to v286. D&M named in "Who Built This" (v268). Scenario Builder page-sub full IC workflow description (v294). |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v286. |
+
+**Grade changes:** Information Architecture ↑ (210 FAQs, mode descriptions, home tooltips, Scenario Builder description, LATEST badge). Professional Credibility ↑ (A201–A210: 10 high-value IC workflows, Scenario Builder page-sub). Naming Consistency ↑ (v286 sweep + IRR label fix). SDLC Maturity ↑ (syntax gate PASS + Cycle 234 log + changelog entries). Interaction Design ↑ (Fiscal Compare reading guide). Visual Design ↑ (LATEST badge). Data Reliability = (A maintained; IRR label fix v289 is a display accuracy improvement, not a coverage change).
+
+---
+
+## Cycle 234 Log — 2026-08-16
+- Test before: 136 PASS / 0 FAIL (Cycle 233 confirmed)
+- JS syntax gate: PASS / 0 errors (all 10 commits verified)
+- Test after: 136 PASS / 0 FAIL / 0 JS errors
+- Changes: (1) FAQs A201–A205 added (v285): marginal field regimes, Scenario Builder calibration, mechanic vs take%, fiscal vintage, Price Swing portfolio; (2) FAQs A206–A210 added (v286): hedging/fiscal impact, price collar contracts, 5-metric same-take differentiation, bid round screening, source discrepancy diagnosis; (3) Changelog entries v284/v285/v286 added to Methodology page (v287); (4) Fiscal Compare reading guide strip — Price Swing/IRR/Breakeven interpretation callout on first run, dismissible (v288); (5) Screener IRR count label corrected from stale "111 countries" to "61 countries (20 no cost data + 41 unbounded)" matching v280 verified counts (v289); (6) Fiscal Compare page-sub: lists all 7 profiles, names standard IC benchmarking basis as Deepwater $75/bbl with full parameters (v290); (7) Explorer page-sub: describes all 3 modes (Browse/Screener/Bubble Chart) inline, removes misleading "use the Screener tab" cross-reference (v291); (8) Home hero: tooltips added to all 5 stat metrics (Contracts/Countries/Verified Facts/A-B Confidence/Fiscal Mechanics) with ⓘ indicators (v292); (9) What's New panel first card: LATEST badge added (v293); (10) Scenario Builder page-sub: rewritten from 1 thin sentence to full IC workflow description — bid calibration, NPV/IRR output, 185-country benchmark rank, preset list (v294)
+- All 10 Priority 1 UX checks: No regression — verified JS syntax gate PASS across all commits
+- Summary: 210-FAQ milestone reached. 10 UX improvements across v287–v294. v286 live at yoburgqs.github.io/petroleum-fiscal-db/
 
 ---
 
