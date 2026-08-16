@@ -3571,3 +3571,38 @@ Armenia, Bahamas, Belgium, Bosnia, Bulgaria, China, Croatia, Faroe Islands, Gree
 
 Cycle 231 complete: v282 live, 190 FAQs, all tests green.
 
+---
+
+## Updated Grade Table (Cycle 232 — 2026-08-16)
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 165/185 (irr_pct < 999 filter). Grade cannot move above B+ until IRR coverage reaches 185/185. 195 FAQs (A1-A195). Benchmark 185/185 (100%). IRR structural gap is the binding constraint. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority=low (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). Scenario Builder Run DCF sticky on mobile (v134). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Alt+Tab cycling (v114). FC keyboard shortcuts complete. Auto-run on first tab activation (v219). Country Profile Compare button (v227). Load Top 5 in Side-by-Side button (v229). IOC Portfolio Mechanic Mix stat (v231). Auto-run guards data-validated (v234). |
+| 5 | 2. Information Architecture | A+ | = | Back to top link at end of 195-FAQ section. Methodology card updated to 195 analyst FAQs (v283). First-visit Quick Start guide updated to v283. Whats New panel (v283). |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load with real content on first visit (v219). No bare empty tables remain. |
+| 7 | 13. SDLC Maturity | A+ | = | 4/4 non-empty JS script blocks PASS syntax gate. 136 PASS / 0 FAIL / 0 JS errors (Playwright full suite, stable since v219). |
+| 8 | 10. Accessibility | A+ | = | IRR scatter chart aria-label fully descriptive. All WCAG 2.1 AA landmarks complete. FAQ accordions A12-A195 accessible. Explorer Other chip tooltip (v232). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. 4/4 JS syntax gate PASS, 0 JS errors. |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235): petroleum consulting report aesthetic. #F7F5F0 off-white bg, Georgia serif body/titles, #B06800 amber, warm gray table headers, hairline card borders. |
+| 11 | 3. Data Presentation | A+ | = | Explorer Other region chip tooltip enumerates FSU/Central Asia/Caribbean/Pacific Island nations (v232). Stability column tooltip fully descriptive. |
+| 12 | 5. Naming Consistency | A+ | = | All naming unified. v282 to v283 sweep complete. |
+| 13 | 7. Professional Credibility | A+ | = | 195 FAQs (A1-A195). A191: NOC back-in rights and carried interest. A192: ring-fencing and cross-block loss utilization. A193: signature and production bonuses in DCF. A194: field life extension and tail production economics. A195: stabilization clause enforceability assessment. How to Cite updated to v283. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v283. |
+
+**Summary: 1 at B+. 1 at A. 13 at A+. GPA: 3.97. Tests: 136 PASS / 0 FAIL / 0 JS errors. Cycle 232: Professional Credibility A+ maintained (A191-A195 added, FAQ count 190 to 195). Data Reliability B+ unchanged — IRR structural gap binding constraint.**
+
+---
+
+## Cycle 232 Log — 2026-08-16
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors — v283 clean.
+
+Cycle 232 complete: v283 live, 195 FAQs, all tests green. FAQs added: A191 (NOC back-in rights), A192 (ring-fencing), A193 (bonuses in DCF), A194 (tail production), A195 (stabilization clause enforceability).
+
+
