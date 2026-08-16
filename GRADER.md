@@ -1,3 +1,28 @@
+# 🔴 MANAGER DIRECTIVE — 2026-08-15 — READ FIRST BEFORE ANY GRADING OR FIXING
+
+**This directive supersedes all previous grading targets for this cycle.**
+
+## IMPORTANT UPDATE — Act on this before editing index.html
+
+1. **Pull latest main FIRST.** Your worktree is based on an older commit. Run:
+   ```
+   cd C:/Users/ztuch/petroleum-fiscal-db
+   git pull origin main
+   ```
+   This gives you v275 (current). Do NOT edit index.html until after the pull.
+
+2. **Issues already fixed — verify only, do NOT re-implement:**
+   - Issue 1 (Reform Risk async): Fixed in v271 — loop added race condition retry. Verify it works; only re-fix if broken.
+   - Issue 9 (MC label): Fixed in v271 — label changed to "Show Monte Carlo uncertainty bands" with tooltip. Verify only.
+
+3. **Issue 6 (Explorer in Reference dropdown): This was INTENTIONAL design.** Do NOT restructure the primary nav. Instead: add an "Explorer" shortcut chip to the Home tab shortcuts bar so it is discoverable without the nav restructure.
+
+4. **For all remaining issues (2, 3, 4, 5, 7, 8, 10):** Read the current v275 index.html sections first, then implement.
+
+5. **When pushing:** The pre-push hook runs Playwright tests. If tests fail, fix before merging to main.
+
+---
+
 # ✅ VISUAL REDESIGN — From Zach (2026-08-14) — COMPLETE (v245, Cycle 194)
 
 **Implemented in Cycle 194/v245.** Platform now uses consulting report styling: off-white background, Georgia serif typography, condensed layout, light paper-like header.
