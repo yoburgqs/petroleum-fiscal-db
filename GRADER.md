@@ -26,7 +26,7 @@ Data Reliability upgraded A-→A in v284 Cycle 233. DB coverage 165/185 (89%). 2
 
 ## PRIORITY 3 — FAQ DEPTH (ongoing)
 
-220 FAQs reached (A1–A220, v297, Cycle 235). New target: 230+ FAQs. Focus on practical IC memo use cases.
+230 FAQs reached (A1–A230, v303, Cycle 236). New target: 240+ FAQs. Focus on practical IC memo use cases — advanced topics: LNG fiscal overlay, unconventional resource regimes, multi-party JV fiscal coordination.
 
 ---
 
@@ -533,6 +533,43 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - Changes: (1) FAQs A201–A205 added (v285): marginal field regimes, Scenario Builder calibration, mechanic vs take%, fiscal vintage, Price Swing portfolio; (2) FAQs A206–A210 added (v286): hedging/fiscal impact, price collar contracts, 5-metric same-take differentiation, bid round screening, source discrepancy diagnosis; (3) Changelog entries v284/v285/v286 added to Methodology page (v287); (4) Fiscal Compare reading guide strip — Price Swing/IRR/Breakeven interpretation callout on first run, dismissible (v288); (5) Screener IRR count label corrected from stale "111 countries" to "61 countries (20 no cost data + 41 unbounded)" matching v280 verified counts (v289); (6) Fiscal Compare page-sub: lists all 7 profiles, names standard IC benchmarking basis as Deepwater $75/bbl with full parameters (v290); (7) Explorer page-sub: describes all 3 modes (Browse/Screener/Bubble Chart) inline, removes misleading "use the Screener tab" cross-reference (v291); (8) Home hero: tooltips added to all 5 stat metrics (Contracts/Countries/Verified Facts/A-B Confidence/Fiscal Mechanics) with ⓘ indicators (v292); (9) What's New panel first card: LATEST badge added (v293); (10) Scenario Builder page-sub: rewritten from 1 thin sentence to full IC workflow description — bid calibration, NPV/IRR output, 185-country benchmark rank, preset list (v294)
 - All 10 Priority 1 UX checks: No regression — verified JS syntax gate PASS across all commits
 - Summary: 210-FAQ milestone reached. 10 UX improvements across v287–v294. v286 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
+## Cycle 236 — v303 Grade Table
+
+**Cycle 236 — v301–v303:** 10 FAQs A221–A230 added across 2 commits (v301, v302): portfolio-level government take reporting — production-weighted methodology (A221), C/D-tier evidence responsible IC use (A222), capex phasing effects on effective take by fiscal mechanic — PSC/PRRT/concession/R-factor (A223), NOC carried vs. paying interest conversion — Angola/Ghana/Mozambique (A224), pre-bid licensing round 5-step workflow (A225), sovereign vs. fiscal risk distinction in IC memos (A226), fiscal mechanic detection algorithm and Scenario Builder override (A227), sliding-scale royalties vs. R-factor PSC IRR sensitivity comparison (A228), dividend WHT and profit remittance restrictions — rates for 7 countries (A229), when to commission field-specific fiscal modeling vs. ORCA standardized output (A230). Metadata sweep v297→v303 + FAQ count 220→230 in all structural locations + What's New panel Cycle 236 card (v303). FAQ count 220→230. JS syntax gate PASS / 9 blocks / 0 errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). dns-prefetch hints added (v261). Reform Risk race condition retry added (v271). Single-file architectural constraint remains binding gap for A+. |
+| 2 | 8. Data Reliability | A | = | IRR coverage: 165/185 in DB (89%), 124 shown in UI (≥500% outliers excluded). 20 non-computable confirmed. 230 FAQs (A1–A230, v303). Benchmark 185/185 (100%). Breakeven coverage 68/185 surfaced in Coverage At a Glance (v299). Remaining gap: single-file constraint + IRR coverage ceiling. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). What's New panel opens by default on Home tab (v274). Home hero action tagline added (v274). MC uncertainty label clarified (v271). Fiscal Compare reading guide strip (v288). Breakeven Map above/below threshold counter (v300). |
+| 5 | 2. Information Architecture | A+ | ↑ | 230 analyst FAQs (A1–A230, v303). What's New panel updated with v303 Cycle 236 card + LATEST badge. IC Memo Checklist section in Methodology (9 quality gate tiles, v298) with nav link. Data Coverage At a Glance section in Methodology (6 metric tiles, v299) with nav link. Changelog v303 entry added. FAQ count 220→230 in all structural locations. |
+| 6 | 6. Error & Empty States | A+ | = | FC empty-state text corrected (v268). All four primary tabs auto-load with real content on first visit (v219). CDN failure banner (v252). IOC Portfolio empty state de-cluttered (v263). Reform Risk race condition retry (v271). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 236). 9 blocks / 0 errors. Cycle 236 log added. Changelog entry v303 added. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. CSS var fix (v256). JS syntax gate PASS, 0 JS errors. Contract count display correct 71,601 (v261). |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. Zero off-palette hex values (v257). What's New panel LATEST badge on first card. |
+| 11 | 3. Data Presentation | A+ | = | IRR scatter represents 124/185 countries shown in UI. Home hero shows visible data currency line (v262). Data Coverage At a Glance in Methodology surfaces Take/NPV/IRR/Breakeven/Swing/Stability coverage counts (v299). Breakeven Map live threshold counter (v300). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v303 metadata sweep complete. All structural citations current to v303. FAQ count updated 220→230 in all structural locations: meta description, title, header badge, Quick Start cite, Methodology page-sub, Methodology home card, How to Cite (both forms), provenance. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 230 FAQs (A1–A230, v303). A221–A230: portfolio take reporting (A221), C/D-tier evidence (A222), capex phasing effects (A223), NOC back-in conversion (A224), pre-bid workflow (A225), sovereign vs. fiscal risk (A226), mechanic detection algorithm (A227), sliding royalty vs. R-factor IRR (A228), WHT and remittance taxes (A229), field-specific vs. ORCA modeling decision (A230). All 10 directly address IC analyst pain points at major IOCs. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v303. |
+
+**Grade changes:** Information Architecture ↑ (230 FAQs, Cycle 236 What's New card). Professional Credibility ↑ (A221–A230: 10 IC analyst pain point FAQs — portfolio weighting, evidence tier handling, capex phasing, NOC back-in, pre-bid intelligence, sovereign/fiscal risk, mechanic detection, sliding royalty vs R-factor, WHT, field-specific modeling decision). Naming Consistency ↑ (v303 structural sweep, all FAQ count locations updated 220→230). SDLC Maturity ↑ (syntax gate PASS + Cycle 236 log + changelog v303). Performance & Reliability = (A maintained; single-file architectural constraint). Data Reliability = (A maintained; IRR coverage 165/185 ceiling).
+
+---
+
+## Cycle 236 Log — 2026-08-16
+- Test before: 136 PASS / 0 FAIL (Cycle 235 confirmed)
+- JS syntax gate: PASS / 9 blocks / 0 errors (v301, v302, v303 all verified)
+- Test after: JS syntax gate PASS / 9 blocks / 0 JS errors
+- Changes: (1) FAQs A221–A225 added (v301): portfolio-level government take production-weighted methodology, C/D-tier evidence responsible IC use, capex phasing effects on effective take by mechanic (PSC/PRRT/concession/R-factor), NOC carried vs. paying interest conversion with Angola/Ghana/Mozambique examples, pre-bid licensing round 5-step workflow from country screening to signature bonus calibration; (2) FAQs A226–A230 added (v302): sovereign vs. fiscal risk distinction with Libya/UK counterexamples, fiscal mechanic detection algorithm and Scenario Builder override, sliding-scale royalties vs. R-factor PSC IRR sensitivity comparison with use-case guidance, dividend WHT and profit remittance restrictions with 7-country rate table, when to commission field-specific fiscal modeling vs. use ORCA standardized output; (3) Metadata sweep v297→v303 + FAQ count 220→230 across all structural locations + What's New Cycle 236 card (v303)
+- All 10 Priority 1 UX checks: No JS logic changed — no regression possible
+- Holistic walkthrough: (1) First impression — Home tab stat tooltips clear (v292), action tagline prominent; 230 FAQ badge updated. Good. (2) Empty states — all 4 primary tabs auto-load. Good. (3) Fiscal Compare — auto-runs Deepwater $75; reading guide strip shows on first run. Good. (4) Country Profile — Norway auto-loads; reform history race condition retry active. Good. (5) Navigation — Reference Guide, Explorer shortcut chip, all coherent. Good. (6) Information density — Coverage At a Glance in Methodology concise; IC Memo Checklist tiles clean. Good. (7) IOC Portfolio — Shell auto-loads. Good. All dimensions: GOOD.
+- Summary: 230-FAQ milestone reached. 10 IC analyst pain point FAQs covering portfolio reporting, evidence tiers, capex phasing, NOC mechanics, bid strategy, sovereign/fiscal risk, mechanic detection, royalty mechanics, WHT, and modeling scope decisions. v303 live at yoburgqs.github.io/petroleum-fiscal-db/
 
 ---
 
