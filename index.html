@@ -1639,6 +1639,9 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <button class="fc-region-chip" data-region="Europe" onclick="setFCRegion('Europe')" title="30 European producing countries" aria-pressed="false">Europe (30)</button>
     <button class="fc-region-chip" data-region="CIS/FSU" onclick="setFCRegion('CIS/FSU')" title="5 CIS/FSU producing countries" aria-pressed="false">CIS/FSU (5)</button>
     <button class="fc-region-chip" data-region="Oceania" onclick="setFCRegion('Oceania')" title="15 Oceania producing countries" aria-pressed="false">Oceania (15)</button>
+    <span style="margin-left:8px;width:1px;background:var(--border);align-self:stretch;"></span>
+    <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 124 countries with verified IRR data (IRR &lt;500%)"><input type="checkbox" id="fc-filter-irr" style="accent-color:var(--accent);" onchange="renderFCResults(window._fcResults||[],window._fcLastPrice||75)"> &#9678; IRR only</label>
+    <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 68 countries with verified breakeven price data"><input type="checkbox" id="fc-filter-be" style="accent-color:var(--accent);" onchange="renderFCResults(window._fcResults||[],window._fcLastPrice||75)"> &#9651; Breakeven only</label>
   </div>
 
   <!-- v288: Reading guide — compact interpretation tip strip for new analysts -->
@@ -16861,6 +16864,11 @@ function renderFCResults(results, price) {
   if (_activeRegion) {
     sorted = sorted.filter(function(r) { return r.region === _activeRegion; });
   }
+  // v312: Apply IRR / Breakeven data-only filters
+  var _fIRR = document.getElementById('fc-filter-irr');
+  var _fBE = document.getElementById('fc-filter-be');
+  if (_fIRR && _fIRR.checked) sorted = sorted.filter(function(r) { return r.liveIRR != null && r.liveIRR < 500; });
+  if (_fBE && _fBE.checked) sorted = sorted.filter(function(r) { return r.be_75 != null; });
 
   // Pre-compute global rank for the CURRENT sort dimension
   var rankMap = {};
