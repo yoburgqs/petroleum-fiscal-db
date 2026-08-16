@@ -1,3 +1,37 @@
+# ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-16)
+
+## PRIORITY 1 — UX ISSUES FROM ZACH (verify every cycle)
+
+All 10 UX issues were implemented in v276. Every cycle, verify these are still working. If any regression found, fix immediately:
+- Reform Risk tab: must show data (not blank). Fix: async REFORM_HISTORY guard + retry after 1.5s.
+- Fiscal Mechanic Breakdown card: must show parameters, not just mechanic name.
+- Data Completeness: must show formatted table/badges, NOT raw JSON or [object Object].
+- Reference Guide panel (#reference-panel): must slide in from right with content.
+- Scenario modal (#scenario-modal): must open and show content.
+- Explorer: must be reachable without opening dropdown (shortcut chip on Home tab).
+- Breakeven Map: must show map or fallback table (not blank). D3 async guard.
+- Country name in Country Profile: must be prominent (h2, 20px+ bold) above fold.
+- MC label: must read "Show Monte Carlo uncertainty bands" with tooltip.
+- Contract Distribution: must have title, subtitle, and labeled segments.
+
+See UX REVAMP DIRECTIVE section at end of this file for details on each fix.
+
+## PRIORITY 2 — DATA RELIABILITY UPGRADE (v277, 2026-08-16)
+
+IRR coverage expanded from 74 to 165 countries (irr_pct < 200 filter raised to < 999).
+Current coverage: Take=185, NPV=185, IRR=165, Breakeven=65, Swing=185.
+**Do NOT re-run rebuild_country_data.py** — it will regress breakeven from 65 to 20 countries due to sentinel values written by add_breakeven_prices.py. Only re-run rebuild if explicitly directed.
+
+Data Reliability was B+ (IRR coverage was binding constraint). Re-evaluate this grade.
+The 20 countries still missing IRR at $75 are genuine non-computable (all 999 sentinels):
+Armenia, Bahamas, Belgium, Bosnia, Bulgaria, China, Croatia, Faroe Islands, Greenland, Iran, Kyrgyzstan, Lithuania, Moldova, Montenegro, Romania, Serbia, Sweden, Tajikistan, Ukraine, Vanuatu.
+
+## PRIORITY 3 — FAQ DEPTH (ongoing)
+
+Continue adding analyst FAQs. Target: 175+ FAQs (currently 166). Focus on practical IC memo use cases.
+
+---
+
 # 🔴 MANAGER DIRECTIVE — 2026-08-15 — READ FIRST BEFORE ANY GRADING OR FIXING
 
 **This directive supersedes all previous grading targets for this cycle.**
