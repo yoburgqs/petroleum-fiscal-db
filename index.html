@@ -1873,7 +1873,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <div class="screener-filter-block">
         <div class="filter-lbl">IRR Data</div>
         <div class="mech-checkbox-group">
-          <label title="111 of 185 countries lack verified opex/capex for IRR computation. Uncheck to screen only countries where IRR is calculable."><input type="checkbox" id="sc-irr-nulls" checked> Include countries with no IRR data <span style="color:var(--muted);font-size:10px;">(111 countries)</span></label>
+          <label title="61 of 185 countries lack displayable IRR: 20 lack verified opex/capex for IRR computation; 41 have IRR ≥500% (excluded as unbounded returns, e.g. very-low-royalty regimes at high oil prices). Uncheck to screen only the 124 countries where IRR is available and bounded."><input type="checkbox" id="sc-irr-nulls" checked> Include countries with no displayable IRR <span style="color:var(--muted);font-size:10px;">(61 countries: 20 no cost data + 41 unbounded)</span></label>
         </div>
       </div>
     </div>
@@ -1898,7 +1898,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       </thead>
       <tbody id="tbody-screener"></tbody>
     </table>
-    <div style="font-size:10px;color:var(--muted);margin-top:6px;padding:0 4px;line-height:1.5;">* IRR is arithmetic mean of contract-level IRRs — use for relative comparison only. <strong>n/a*</strong> = IRR ≥500% excluded as unbounded returns at extreme leverage (~60 countries affected). <strong>—</strong> = insufficient cost data for IRR computation (111 of 185 countries).</div>
+    <div style="font-size:10px;color:var(--muted);margin-top:6px;padding:0 4px;line-height:1.5;">* IRR is arithmetic mean of contract-level IRRs — use for relative comparison only. <strong>n/a*</strong> = IRR ≥500% excluded as unbounded returns at extreme leverage (41 countries). <strong>—</strong> = insufficient cost data for IRR computation (20 of 185 countries). Combined: 61 countries without displayable IRR; 124 show IRR data.</div>
   </div>
 
   </div><!-- end screen mode -->
