@@ -2508,6 +2508,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <a href="#meth-discount" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Discount Rate</a>
     <a href="#meth-limitations" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Limitations</a>
     <a href="#meth-sources" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Sources</a>
+    <a href="#meth-ic-checklist" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">IC Memo Checklist</a>
     <a href="#meth-analyst-faq" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;text-decoration:none;">Key Analyst Questions</a>
   </div>
 
@@ -3050,6 +3051,53 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   </div>
 
   <!-- Section 9: Key Analyst Questions (Due Diligence FAQ) -->
+  <!-- v298: IC Memo Checklist — practical pre-submission quality gate for analysts using ORCA data -->
+  <div class="dd-section" id="meth-ic-checklist" style="margin-top:16px;">
+    <div class="dd-section-hdr">IC Memo Checklist — ORCA Fiscal Data Quality Gate</div>
+    <p style="font-size:13px;color:var(--muted);margin:0 0 14px;">Before submitting an IC memo that includes ORCA fiscal data, verify each item below. This checklist covers the six most common errors in petroleum fiscal presentations (see FAQ A220).</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--accent);">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;">&#9745; Production Profile Stated</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">All take% figures cite the profile used: <em>Deepwater · $1.2B · 50k bbl/d · $15/bbl opex</em> (or your project-specific parameters). Never present take% without stating the production basis.</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--accent);">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;">&#9745; Oil Price Basis Stated</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">Take% is cited with the oil price used: <em>"Government take at $75/bbl"</em>. For profit-sensitive regimes (PSC, PRRT, R-factor), take% changes with price — the price basis is non-negotiable disclosure.</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--accent);">
+        <div style="font-size:12px;font-weight:700;color:var(--accent);margin-bottom:6px;">&#9745; Source and Version Cited</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;"><em>ORCA v297 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</em> — or the field-specific model with its date. An undated fiscal data citation is not IC-quality. Short form for footnotes: ORCA v297 (Aug 2026).</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--green);">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">&#9745; Fiscal Mechanic Identified</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">State whether the country uses Concession, PSC, PRRT, TSC, or other mechanic. This context is needed by reviewers to interpret price sensitivity, financing implications, and reform risk.</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--green);">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">&#9745; Evidence Tier Noted (if C/D)</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">If ORCA's Country Profile shows C-tier or D-tier confidence for a key parameter, add a disclaimer: <em>"Note: take figure is directional; primary legislation verification recommended prior to FID."</em> A/B-tier parameters need no disclaimer.</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--green);">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">&#9745; Price Sensitivity Presented</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">For any PSC, PRRT, or R-factor regime, present take at $50, $75, and $100. A single-price take% for a profit-sensitive regime is incomplete. Use ORCA's Country Profile price curve or Fiscal Compare at multiple prices.</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--yellow);">
+        <div style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:6px;">&#9745; Stability Risk Disclosed</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">If Stability Score ≤2 (Reform Risk tab), include a 1-sentence reform risk disclosure. If Stability Score ≥4, no disclosure required. Score 3: use judgment based on reform direction and magnitude.</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--yellow);">
+        <div style="font-size:12px;font-weight:700;color:var(--yellow);margin-bottom:6px;">&#9745; NPV Presented Alongside Take%</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">Take% alone is not sufficient for capital allocation. Contractor NPV (from ORCA Fiscal Compare) gives the correct decision metric: identical take at different cost profiles produces materially different NPVs. Present both in IC tables.</div>
+      </div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;border-left:3px solid var(--red);">
+        <div style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:6px;">&#9745; Multi-Mechanic Flag Checked</div>
+        <div style="font-size:11px;color:var(--muted);line-height:1.6;">If ORCA shows a multi-mechanic country flag (e.g., Nigeria onshore vs. deepwater PSC), confirm which mechanic applies to the specific block. Do not use the country-level dominant mechanic for a minority-mechanic block.</div>
+      </div>
+    </div>
+    <div style="margin-top:10px;padding:8px 12px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.15);border-radius:5px;font-size:11px;color:var(--muted);">
+      <strong style="color:var(--accent);">Related FAQs:</strong> A211 (peer benchmarking) · A213 (breakeven interpretation) · A215 (disclosure language) · A216 (stability quantification) · A220 (common IC errors)
+    </div>
+  </div>
+
   <div class="dd-section" id="meth-analyst-faq">
     <div class="dd-section-hdr">Key Analyst Questions</div>
     <p style="font-size:13px;color:var(--muted);margin:0 0 16px;">Common due-diligence questions a senior IOC analyst or economist would ask when reviewing this platform for the first time — with direct answers.</p>
