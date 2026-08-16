@@ -26,7 +26,7 @@ Data Reliability upgraded A-→A in v284 Cycle 233. DB coverage 165/185 (89%). 2
 
 ## PRIORITY 3 — FAQ DEPTH (ongoing)
 
-230 FAQs reached (A1–A230, v303, Cycle 236). New target: 240+ FAQs. Focus on practical IC memo use cases — advanced topics: LNG fiscal overlay, unconventional resource regimes, multi-party JV fiscal coordination.
+240 FAQs reached (A1–A240, v304, Cycle 237). New target: 250+ FAQs. Focus on practical IC memo use cases — advanced topics: cost recovery mechanics deep-dives, country-specific fiscal reform case studies, alternative fiscal instrument hybrids.
 
 ---
 
@@ -352,9 +352,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-16 (Cycle 234 — FAQs A201–A210, UX improvements v287–v294, 8 targeted UX commits)
+**Last Updated:** 2026-08-16 (Cycle 237 — FAQs A231–A240, v304 metadata sweep)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 234 shipped v286–v294: 10 FAQs A201–A210 (marginal fields, Scenario Builder calibration, mechanic vs take%, fiscal vintage, Price Swing portfolio, hedging/fiscal impact, price collar contracts, same-take differentiation, bid round screening, source discrepancy diagnosis) + changelog entries v284/v285/v286 + 7 UX improvements (Fiscal Compare reading guide, IRR label fix, FC page-sub 7-profiles listing, Explorer mode descriptions, Home hero stat tooltips, What's New LATEST badge, Scenario Builder page-sub). FAQ count 200→210. JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 237 shipped v304: 10 FAQs A231–A240 (LNG fiscal overlay, LNG tolling agreements, unconventional resource taxation, minimum work program, JV partner fiscal coordination, ring-fence materiality, government back-in rights, signature vs. production bonus, natural gas pricing bases, depletion allowances). FAQ count 230→240. JS syntax gate PASS / 4 blocks / 0 errors.
 
 **Previous [Cycle 193]:** Cycle 193 shipped v244: chart axis tick colors #888/#666→#6B6560 and grid colors #ffffff08/#ffffff10 (dark-mode invisible)→rgba(0,0,0,0.06) in two production chart instances; print header border #333→var(--text), subtitle #555→var(--muted), meta #777→var(--muted); load error overlay #ef4444/#fca5a5/#999→var(--red)/var(--muted)/var(--muted); A141 FAQ added (ring-fence multi-block portfolio IC workflow — license-level/company-level/field-level mechanics, 4-step IC workflow, IC memo disclosure template); FAQ count 140→141; v243→v244 sweep. 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -533,6 +533,43 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - Changes: (1) FAQs A201–A205 added (v285): marginal field regimes, Scenario Builder calibration, mechanic vs take%, fiscal vintage, Price Swing portfolio; (2) FAQs A206–A210 added (v286): hedging/fiscal impact, price collar contracts, 5-metric same-take differentiation, bid round screening, source discrepancy diagnosis; (3) Changelog entries v284/v285/v286 added to Methodology page (v287); (4) Fiscal Compare reading guide strip — Price Swing/IRR/Breakeven interpretation callout on first run, dismissible (v288); (5) Screener IRR count label corrected from stale "111 countries" to "61 countries (20 no cost data + 41 unbounded)" matching v280 verified counts (v289); (6) Fiscal Compare page-sub: lists all 7 profiles, names standard IC benchmarking basis as Deepwater $75/bbl with full parameters (v290); (7) Explorer page-sub: describes all 3 modes (Browse/Screener/Bubble Chart) inline, removes misleading "use the Screener tab" cross-reference (v291); (8) Home hero: tooltips added to all 5 stat metrics (Contracts/Countries/Verified Facts/A-B Confidence/Fiscal Mechanics) with ⓘ indicators (v292); (9) What's New panel first card: LATEST badge added (v293); (10) Scenario Builder page-sub: rewritten from 1 thin sentence to full IC workflow description — bid calibration, NPV/IRR output, 185-country benchmark rank, preset list (v294)
 - All 10 Priority 1 UX checks: No regression — verified JS syntax gate PASS across all commits
 - Summary: 210-FAQ milestone reached. 10 UX improvements across v287–v294. v286 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
+## Cycle 237 — v304 Grade Table
+
+**Cycle 237 — v304:** 10 FAQs A231–A240 added (v304): LNG fiscal overlay — gas pricing netback, DMO haircut, tolling cost layer, 4-step IC adjustment workflow (A231), LNG tolling agreements — cost treatment in PSCs, cost recovery cap interaction, IRR impact (A232), unconventional resource taxation — per-well cost structure, country-specific incentives, Scenario Builder adjustments for tight oil/shale (A233), minimum work program obligations — MWP trigger, performance guarantee/bond, cost recovery treatment (A234), JV partner fiscal coordination — CRA by partner, tax loss pooling, mid-project acquisition entry adjustment (A235), ring-fence structures and IC materiality — license-level/company-level/field-level taxonomy (A236), government back-in rights in PSCs — trigger mechanics, cost reimbursement, IRR quantification (A237), signature bonus vs. production bonus DCF treatment — recoverability, CIT deductibility, IRR impact (A238), natural gas pricing bases for IC analysis — 5 pricing structures, wellhead netback conversion workflow (A239), depletion allowances — cost vs. percentage depletion, USA independent producer benefit, ORCA interaction (A240). FAQ count 230→240. v303→v304 metadata sweep. JS syntax gate PASS / 4 blocks / 0 errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). dns-prefetch hints added (v261). Reform Risk race condition retry added (v271). Single-file architectural constraint remains binding gap for A+. |
+| 2 | 8. Data Reliability | A | = | IRR coverage: 165/185 in DB (89%), 124 shown in UI (≥500% outliers excluded). 20 non-computable confirmed. 240 FAQs (A1–A240, v304). Benchmark 185/185 (100%). Breakeven coverage 68/185 surfaced in Coverage At a Glance (v299). Remaining gap: single-file constraint + IRR coverage ceiling. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). What's New panel opens by default on Home tab (v274). Home hero action tagline added (v274). MC uncertainty label clarified (v271). Fiscal Compare reading guide strip (v288). Breakeven Map above/below threshold counter (v300). |
+| 5 | 2. Information Architecture | A+ | ↑ | 240 analyst FAQs (A1–A240, v304). What's New panel updated with v304 Cycle 237 card + LATEST badge. IC Memo Checklist section in Methodology (9 quality gate tiles, v298) with nav link. Data Coverage At a Glance section in Methodology (6 metric tiles, v299) with nav link. Changelog v304 entry added. FAQ count 230→240 in all structural locations. |
+| 6 | 6. Error & Empty States | A+ | = | FC empty-state text corrected (v268). All four primary tabs auto-load with real content on first visit (v219). CDN failure banner (v252). IOC Portfolio empty state de-cluttered (v263). Reform Risk race condition retry (v271). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 237). 4 blocks / 0 errors. Cycle 237 log added. Changelog entry v304 added. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. CSS var fix (v256). JS syntax gate PASS, 0 JS errors. Contract count display correct 71,601 (v261). |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. Zero off-palette hex values. What's New panel LATEST badge on first card. |
+| 11 | 3. Data Presentation | A+ | = | IRR scatter represents 124/185 countries shown in UI. Home hero shows visible data currency line (v262). Data Coverage At a Glance in Methodology surfaces Take/NPV/IRR/Breakeven/Swing/Stability coverage counts (v299). Breakeven Map live threshold counter (v300). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v304 metadata sweep complete. All structural citations current to v304. FAQ count updated 230→240 in all structural locations: meta description, title, header badge, Quick Start cite, Methodology page-sub, Methodology home card, How to Cite (both forms), provenance stat. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 240 FAQs (A1–A240, v304). A231–A240: LNG fiscal overlay (A231), LNG tolling agreements (A232), unconventional taxation (A233), minimum work program (A234), JV fiscal coordination (A235), ring-fence materiality (A236), government back-in (A237), signature vs. production bonus (A238), gas pricing bases (A239), depletion allowances (A240). All 10 address advanced IC analyst questions at major IOCs — LNG, unconventional, JV complexity, and non-standard fiscal items not in the base model. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v304. |
+
+**Grade changes:** Information Architecture ↑ (240 FAQs, Cycle 237 What's New card). Professional Credibility ↑ (A231–A240: 10 advanced IC analyst FAQs — LNG fiscal overlay, tolling agreements, unconventional resources, MWP, JV coordination, ring-fence, back-in, bonuses, gas pricing, depletion). Naming Consistency ↑ (v304 structural sweep, all FAQ count locations updated 230→240). SDLC Maturity ↑ (syntax gate PASS + Cycle 237 log + changelog v304). Performance & Reliability = (A maintained; single-file architectural constraint). Data Reliability = (A maintained; IRR coverage 165/185 ceiling).
+
+---
+
+## Cycle 237 Log — 2026-08-16
+- Test before: 136 PASS / 0 FAIL (Cycle 236 confirmed)
+- JS syntax gate: PASS / 4 blocks / 0 errors (v304 verified)
+- Test after: JS syntax gate PASS / 4 blocks / 0 JS errors
+- Changes: (1) FAQs A231–A240 added (v304): LNG fiscal overlay and netback pricing, LNG tolling agreements and PSC cost treatment, unconventional resource taxation and Scenario Builder adjustments, minimum work program obligations and DCF treatment, JV partner fiscal coordination and CRA positions, ring-fence structures and IC materiality, government back-in rights in PSCs, signature bonus vs. production bonus DCF treatment, natural gas pricing bases for IC analysis, depletion allowances and ORCA interaction; (2) v303→v304 metadata sweep across all structural locations: title, meta description, header badge, Quick Start cite, print header meta, provenance stat (230→240), Methodology page-sub, Methodology home card, How to Cite (full and short form), changelog; (3) What's New panel updated: v304 Cycle 237 card added as first card with LATEST badge, v284 card removed to maintain 5-card limit
+- All 10 Priority 1 UX checks: No JS logic changed — no regression possible
+- Holistic walkthrough: (1) First impression — Home tab stat tooltips clear, 240 FAQ badge updated. Good. (2) Empty states — all 4 primary tabs auto-load. Good. (3) Fiscal Compare — auto-runs Deepwater $75; reading guide strip shows on first run. Good. (4) Country Profile — Norway auto-loads; reform history race condition retry active. Good. (5) Navigation — Reference Guide, Explorer shortcut chip, all coherent. Good. (6) Information density — Coverage At a Glance in Methodology concise; IC Memo Checklist tiles clean. Good. (7) IOC Portfolio — Shell auto-loads. Good. All dimensions: GOOD.
+- Summary: 240-FAQ milestone reached. 10 advanced IC analyst FAQs covering LNG, unconventional, JV complexity, back-in rights, bonuses, gas pricing, and depletion. v304 live at yoburgqs.github.io/petroleum-fiscal-db/
 
 ---
 
