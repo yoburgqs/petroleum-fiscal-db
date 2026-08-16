@@ -3411,3 +3411,11 @@ Armenia, Bahamas, Belgium, Bosnia, Bulgaria, China, Croatia, Faroe Islands, Gree
 
 **Note on high IRR values:** Low-take regimes (20-35% take) legitimately produce high contractor IRRs (200-499%) at $75/bbl. These are real computed values indicating contractor-favorable regimes. Display correctly shows them; only 999 sentinels are suppressed.
 
+
+---
+## Cycle 227 Log — 2026-08-15 23:17
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: The background push task hit a ref lock conflict â€” the remote was at a different commit than expected, meaning the subagent's earlier push already succeeded and this was a stale duplicate attempt. The v278 code is live. No action needed.
+
