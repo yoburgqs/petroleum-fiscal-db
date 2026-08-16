@@ -16869,6 +16869,8 @@ function renderFCResults(results, price) {
   var _fBE = document.getElementById('fc-filter-be');
   if (_fIRR && _fIRR.checked) sorted = sorted.filter(function(r) { return r.liveIRR != null && r.liveIRR < 500; });
   if (_fBE && _fBE.checked) sorted = sorted.filter(function(r) { return r.be_75 != null; });
+  // Store filtered set for export
+  window._fcFilteredResults = sorted;
 
   // Pre-compute global rank for the CURRENT sort dimension
   var rankMap = {};
@@ -17674,7 +17676,8 @@ function renderDrawerWaterfall(canvasId, waterfallData) {
 
 function exportFCResults() {
   if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
-  const rows = window._fcResults;
+  // v312: use filtered results if any filter is active, else fall back to full results
+  const rows = (window._fcFilteredResults && window._fcFilteredResults.length) ? window._fcFilteredResults : window._fcResults;
   if (!rows || !rows.length) { showCopyToast('Run Fiscal Compare first to generate results.'); return; }
   const data = [
     ['Rank', 'Country', 'Region', 'Mechanic', 'R_factor_Tiers', 'Take%', 'GovtTake_50', 'GovtTake_75', 'GovtTake_100', 'GovtTake_125', 'Swing_pp', 'Govt NPV ($M est)', 'Contractor NPV ($M)', 'IRR%', 'Breakeven', 'Tier'],
@@ -17710,7 +17713,9 @@ function exportFCResults() {
   const fcProfileEl = document.getElementById('fc-profile');
   const fcProfileKey = fcProfileEl ? fcProfileEl.value : '';
   const fcProfileSlug = fcProfileKey ? '_' + fcProfileKey.replace(/[^a-z0-9]/gi, '-') : '';
-  XLSX.writeFile(wb, 'ORCA_fiscal_compare_$' + fcPrice + fcProfileSlug + '_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+  var _regionSlug = (window._fcRegionFilter || '').replace(/[^a-z0-9]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+  var _regionPart = _regionSlug ? '_' + _regionSlug : '';
+  XLSX.writeFile(wb, 'ORCA_fiscal_compare_$' + fcPrice + fcProfileSlug + _regionPart + '_' + new Date().toISOString().slice(0, 10) + '.xlsx');
 }
 
 
