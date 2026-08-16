@@ -295,9 +295,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-14 (Cycle 194 — consulting report visual redesign, v244→v245)
+**Last Updated:** 2026-08-16 (Cycle 226 — A166 FAQ, stale citation fixes, v274→v275 sweep)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 194 shipped v245: Full visual redesign to consulting report style. Background #F7F5F0 (warm off-white aged paper), body font Georgia serif (report quality), data tables/controls/UI chrome retain system-ui sans-serif for readability. Page titles 18px Georgia 700. Condensed spacing: tab-pane 16px/20px (was 24px), card 12px/14px, thead 7px/10px, tbody 6px/10px, header 10px/20px, tab-btn 10px/14px, ctrl-group 5px/10px. Header: white bg + 2px amber bottom rule (paper-like). Table headers warm gray #EDE9E3 with 10px uppercase labels. Cards white with 1px warm border (#D0CAC0), 4px radius, subtle shadow. Chip border-radius 4px (square-ish, report-like). Color palette tuned for white background: accent #B06800 (darker amber), green #15803D, all semantic colors WCAG-compliant on white. What's New panel updated with v245 entry. Changelog entry prepended. 9/9 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 226 shipped v275: A166 FAQ added (signature bonuses and production bonuses — why ORCA excludes them, PSC/concession/TSC tax treatment, Scenario Builder integration, bonus-adjusted effective take derivation, IC memo disclosure template, rule of thumb by SB size tier). Stale short-form citation (v273) corrected to v275. A165 source citation corrected v273→v275. v274→v275 structural sweep. FAQ count 165→166 across At a Glance, Methodology card, page-sub, and What's New panel. JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
 **Previous [Cycle 193]:** Cycle 193 shipped v244: chart axis tick colors #888/#666→#6B6560 and grid colors #ffffff08/#ffffff10 (dark-mode invisible)→rgba(0,0,0,0.06) in two production chart instances; print header border #333→var(--text), subtitle #555→var(--muted), meta #777→var(--muted); load error overlay #ef4444/#fca5a5/#999→var(--red)/var(--muted)/var(--muted); A141 FAQ added (ring-fence multi-block portfolio IC workflow — license-level/company-level/field-level mechanics, 4-step IC workflow, IC memo disclosure template); FAQ count 140→141; v243→v244 sweep. 4/4 JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -435,27 +435,48 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
-## Updated Grade Table (Cycle 225 — 2026-08-16)
+## Updated Grade Table (Cycle 226 — 2026-08-16)
 
 | Rank | Category | Grade | Delta | Priority Fix |
 |------|----------|-------|-------|-------------|
-| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 165 FAQs (A1–A165). Benchmark 185/185 (100%). IRR structural gap remains binding constraint. |
+| 1 (lowest) | 8. Data Reliability | B+ | = | IRR coverage 74/185 — Harvesting fork issue. Grade cannot move above B+ until IRR coverage reaches ~120+. 166 FAQs (A1–A166). Benchmark 185/185 (100%). IRR structural gap remains binding constraint. |
 | 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). dns-prefetch hints added (v261). Reform Risk race condition retry added (v271). Single-file architectural constraint remains binding gap for A+. |
 | 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
-| 4 | 4. Interaction Design | A+ | ↑ | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). What's New panel opens by default on Home tab (v274). Home hero action tagline added (v274). MC uncertainty label clarified to "Show Monte Carlo uncertainty bands" with tooltip (v271). |
-| 5 | 2. Information Architecture | A+ | ↑ | 165 analyst FAQs (A1–A165, v274). What's New panel opens by default (v274). At a Glance Price Points corrected to 4 Price Scenarios with tooltip (v274). Changelog v50–v262 collapsed into details element. Reform Risk page-sub expanded (v265). Country Profile page-sub expanded (v265). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). What's New panel opens by default on Home tab (v274). Home hero action tagline added (v274). MC uncertainty label clarified to "Show Monte Carlo uncertainty bands" with tooltip (v271). |
+| 5 | 2. Information Architecture | A+ | ↑ | 166 analyst FAQs (A1–A166, v275). What's New panel updated with v275 card (v275). At a Glance FAQ count 165→166 (v275). Changelog v50–v262 collapsed into details element. Reform Risk page-sub expanded (v265). Country Profile page-sub expanded (v265). |
 | 6 | 6. Error & Empty States | A+ | = | FC empty-state text corrected (v268). All four primary tabs auto-load with real content on first visit (v219). CDN failure banner (v252). IOC Portfolio empty state de-cluttered (v263). Reform Risk race condition retry (v271). |
-| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 225). 4 non-empty blocks / 0 errors. 136 PASS / 0 FAIL / 0 JS errors. Cycle 225 log added. |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 226). 4 non-empty blocks / 0 errors. 136 PASS / 0 FAIL / 0 JS errors. Cycle 226 log added. |
 | 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
 | 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. CSS var fix (v256). JS syntax gate PASS, 0 JS errors. Contract count display correct 71,601 (v261). |
 | 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. Zero off-palette hex values in any active rendering path (v257). Side-by-Side chart titles/legend labels fixed (v264). Vintage Trend chart legend/title fixed (v264). IOC Portfolio donut chart title added (v264). Bubble chart title shown on desktop with price context (v264). |
-| 11 | 3. Data Presentation | A+ | ↑ | Home hero shows visible data currency line (v262). At a Glance Price Points corrected from 13 to 4 Price Scenarios (v274). Explorer "Other" chip tooltip (v232). IRR scatter axis labels updated to "Govt Take @$Xbbl (%)" / "Contractor IRR (%)" (v264). Tornado chart X-axis label added (v264). |
-| 12 | 5. Naming Consistency | A+ | ↑ | v273→v274 sweep complete. All 139 FAQ source citations updated from ORCA v259 to ORCA v274 (v274 — 139 stale citations corrected). All structural citations current to v274. Changelog entry correctly labels v274 (Cycle 225). |
-| 13 | 7. Professional Credibility | A+ | ↑ | 165 FAQs (A1–A165). All FAQ source citations now reference ORCA v274 (v274 — was stale at v259 for 139 citations). D&M named in "Who Built This" (v268). All IC memo templates and structural citations current to v274. |
+| 11 | 3. Data Presentation | A+ | = | Home hero shows visible data currency line (v262). At a Glance Price Points corrected from 13 to 4 Price Scenarios (v274). Explorer "Other" chip tooltip (v232). IRR scatter axis labels updated to "Govt Take @$Xbbl (%)" / "Contractor IRR (%)" (v264). Tornado chart X-axis label added (v264). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v274→v275 sweep complete. Stale short-form citation (v273) corrected to v275. A165 source citation corrected v273→v275. All structural citations current to v275. Changelog entry correctly labels v275 (Cycle 226). |
+| 13 | 7. Professional Credibility | A+ | ↑ | 166 FAQs (A1–A166). A166: signature bonuses and production bonuses (v275). D&M named in "Who Built This" (v268). All IC memo templates and structural citations current to v275. |
 | 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
-| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v274. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v275. |
 
-**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 4 non-empty blocks / 0 errors / 136 PASS / 0 FAIL / 0 JS errors. Cycle 225: 139 FAQ citations v259→v274; At a Glance 13→4 Price Scenarios; What's New open by default; Home hero action tagline; v273→v274 sweep.**
+**Summary: 1 at B+. 0 at A-. 1 at A. 13 at A+. GPA: 3.97. Tests: JS syntax gate PASS / 4 non-empty blocks / 0 errors / 136 PASS / 0 FAIL / 0 JS errors. Cycle 226: A166 FAQ (signature/production bonuses); stale v273 citation corrected; v274→v275 sweep; FAQ count 165→166.**
+
+---
+
+## Cycle Log (Cycle 226 — 2026-08-16)
+
+**Version shipped:** v275
+**Tests:** JS syntax gate PASS / 4 non-empty blocks / 0 errors / 136 PASS / 0 FAIL / 0 JS errors
+
+**Changes shipped:**
+1. A166 FAQ added — signature bonuses and production bonuses: why ORCA excludes them from statutory take; PSC (cost-recoverable) vs. concession (non-deductible) vs. Iraq TSC ($/bbl) tax treatment; 2-step Scenario Builder integration; bonus-adjusted effective take derivation; IC memo disclosure template with bonus amount, tax treatment basis, adjusted take, and IRR delta; rule of thumb by SB tier (<5% capex: footnote; 5–20%: model explicitly; >20%: primary IC metric). Sources: Nigeria NUPRC PSC 2023, Angola ANPG 2023, Iraq MOO TSC Round 4, Wood Mac 2024, Johnston (2003) Ch. 4.
+2. Stale short-form citation corrected: "ORCA v273" → "ORCA v275" (was missed in v273→v274 sweep).
+3. A165 source citation corrected: "ORCA v273" → "ORCA v275".
+4. v274→v275 structural sweep: page title, meta description, header badge, Quick Start cite, print header meta, Methodology provenance, How to Cite full citation + regime-comparison examples.
+5. What's New panel: v275 card added as first; v270 card dropped to maintain 5-card limit.
+6. At a Glance FAQ count: 165 → 166. Methodology card: 165 → 166. Methodology page-sub: A1–A165 → A1–A166.
+
+**Grade changes:** Information Architecture ↑, Naming Consistency ↑, Professional Credibility ↑, SDLC Maturity ↑. Data Reliability =B+ (IRR gap unchanged). Performance =A.
+
+**Holistic walkthrough:** (1) First impression — Home tab clear, v275 badge visible, What's New panel open showing v275 changes. Good. (2) Empty states — all 4 primary tabs auto-load. Good. (3) Fiscal Compare — auto-runs with Deepwater $75; table visible immediately. Good. (4) Country Profile — auto-loads Norway. Good. (5) Navigation — coherent, labels match content. Good. (6) Information density — no excessive banners. Good. (7) IOC Portfolio — auto-loads Shell. Good. All dimensions: GOOD.
+
+---
 
 ---
 
