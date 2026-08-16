@@ -502,6 +502,30 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Cycle 229 — v280 Grade Table
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A- | = | IRR coverage 124/185 (v280, corrected from erroneous 118 display). 180 FAQs (A1–A180, v280). Benchmark 185/185 (100%). IRR gap (61 countries not showing IRR: 41 excluded ≥500% + 20 lacking data) remains binding constraint for A-→A. |
+| 2 | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). dns-prefetch hints added (v261). Reform Risk race condition retry added (v271). Single-file architectural constraint remains binding gap for A+. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). What's New panel opens by default on Home tab (v274). Home hero action tagline added (v274). MC uncertainty label clarified to "Show Monte Carlo uncertainty bands" with tooltip (v271). |
+| 5 | 2. Information Architecture | A+ | ↑ | 180 analyst FAQs (A1–A180, v280). FAQ 175+ target surpassed at 180. What's New panel updated with v280 card. Changelog v50–v262 collapsed into details element. Reform Risk page-sub expanded (v265). Country Profile page-sub expanded (v265). |
+| 6 | 6. Error & Empty States | A+ | = | FC empty-state text corrected (v268). All four primary tabs auto-load with real content on first visit (v219). CDN failure banner (v252). IOC Portfolio empty state de-cluttered (v263). Reform Risk race condition retry (v271). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 229). 4 non-empty blocks / 0 errors. 136 PASS / 0 FAIL / 0 JS errors. Cycle 229 log added. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. CSS var fix (v256). JS syntax gate PASS, 0 JS errors. Contract count display correct 71,601 (v261). |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. Zero off-palette hex values in any active rendering path (v257). Side-by-Side chart titles/legend labels fixed (v264). Vintage Trend chart legend/title fixed (v264). IOC Portfolio donut chart title added (v264). Bubble chart title shown on desktop with price context (v264). |
+| 11 | 3. Data Presentation | A+ | ↑ | IRR scatter now represents 124/185 countries (v280, corrected). Home hero shows visible data currency line (v262). At a Glance Price Points corrected from 13 to 4 Price Scenarios (v274). Explorer "Other" chip tooltip (v232). IRR scatter axis labels updated (v264). Tornado chart X-axis label added (v264). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v279→v280 sweep complete. All structural citations current to v280. FAQ count updated 175→180 in all structural locations. Changelog v280 entry correctly labels Cycle 229. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 180 FAQs (A1–A180, v280). A176–A180: fiscal cliff/R-factor exhaustion/cost recovery limit/WPT triggers/ring-fencing/decommissioning liability. All IC memo templates current to v280. D&M named in "Who Built This" (v268). |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v280. |
+
+**Grade changes:** Information Architecture ↑ (180 FAQs surpasses 175+ target). Professional Credibility ↑ (A176–A180: 5 high-value IC workflows). Data Presentation ↑ (IRR scatter corrected to 124/185). Naming Consistency ↑ (v280 sweep + IRR count corrections). SDLC Maturity ↑ (syntax gate PASS + Cycle 229 log).
+
+---
+
 ## Updated Grade Table (Cycle 228 — 2026-08-16)
 
 | Rank | Category | Grade | Delta | Priority Fix |
