@@ -1593,6 +1593,16 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     </div>
   </div>
 
+  <!-- v288: Reading guide — compact interpretation tip strip for new analysts -->
+  <div id="fc-reading-guide" style="display:none;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:10px;font-size:11px;color:var(--muted);line-height:1.6;">
+    <strong style="color:var(--accent);">Reading this table:</strong>
+    <strong style="color:var(--text);">Govt Take</strong> = share of project economics captured by state at the selected price &amp; profile.
+    <strong style="color:var(--text);">Price Swing</strong> = take difference between $50 and $125/bbl — small swing (&lt;10pp) = royalty-dominant, stable; large swing (&gt;20pp) = profit-based, price-sensitive.
+    <strong style="color:var(--text);">IRR</strong> = pre-tax contractor return at the selected price; excluded if unbounded (&gt;500%).
+    <strong style="color:var(--text);">Breakeven</strong> = minimum oil price for positive NPV under this profile.
+    Click any row to open the full Country Profile with sourced parameters and sensitivity charts.
+    <span style="float:right;cursor:pointer;opacity:.5;" onclick="document.getElementById('fc-reading-guide').style.display='none';sessionStorage.setItem('fc-reading-guide-dismissed','1');" title="Dismiss">&#10005;</span>
+  </div>
   <div id="fc-results" class="empty-state">
     <div style="margin-bottom:10px;">Loading fiscal terms for all 185 countries&hellip; Results appear automatically. If nothing loads within 5 seconds, click <strong>Run Compare</strong> above.</div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Suggested starting points: <strong>Deepwater $75/bbl</strong> — the platform's standard benchmarking basis used in Methodology. <strong>Onshore $50/bbl</strong> — screens low-breakeven regimes for unconventional plays. <strong>Giant $100/bbl</strong> — identifies high-take regimes sustainable only at elevated prices.</div>
@@ -15417,6 +15427,9 @@ function renderFCResults(results, price) {
   // Show sort row now that results exist
   var sortRow = document.getElementById('fc-sort-row');
   if (sortRow) sortRow.style.display = '';
+  // v288: Show reading guide on first run (dismissed state stored in sessionStorage)
+  var rg = document.getElementById('fc-reading-guide');
+  if (rg && !sessionStorage.getItem('fc-reading-guide-dismissed')) rg.style.display = '';
 
   // Update active sort button
   document.querySelectorAll('.fc-sort-btn').forEach(function(btn) {
