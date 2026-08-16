@@ -3781,3 +3781,11 @@ Cycle 232 complete: v283 live, 195 FAQs, all tests green. FAQs added: A191 (NOC 
 - JS errors: 0
 - Summary: Branch is fully up to date â€” all 7 Cycle 235 commits are on `origin/main`. The failed background push was a duplicate (the first push already succeeded). `CYCLE_STATE.json` and `cycle_log.txt` have minor unstaged changes but those are non-critical tracking files. No action needed.
 
+
+---
+## Cycle 236 Log — 2026-08-16 07:25
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Expected â€” the second push failed because the first push had already advanced `origin/main` to `f8aa26e`. The pre-push hook ran Playwright first: **136 PASS / 0 FAIL / 0 JS errors** â€” the suite is clean. No action needed.
+
