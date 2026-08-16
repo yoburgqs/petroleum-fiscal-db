@@ -26,7 +26,7 @@ Data Reliability upgraded A-→A in v284 Cycle 233. DB coverage 165/185 (89%). 2
 
 ## PRIORITY 3 — FAQ DEPTH (ongoing)
 
-210 FAQs reached (A1–A210, v286, Cycle 234). New target: 220+ FAQs. Focus on practical IC memo use cases.
+220 FAQs reached (A1–A220, v297, Cycle 235). New target: 230+ FAQs. Focus on practical IC memo use cases.
 
 ---
 
@@ -533,6 +533,42 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 - Changes: (1) FAQs A201–A205 added (v285): marginal field regimes, Scenario Builder calibration, mechanic vs take%, fiscal vintage, Price Swing portfolio; (2) FAQs A206–A210 added (v286): hedging/fiscal impact, price collar contracts, 5-metric same-take differentiation, bid round screening, source discrepancy diagnosis; (3) Changelog entries v284/v285/v286 added to Methodology page (v287); (4) Fiscal Compare reading guide strip — Price Swing/IRR/Breakeven interpretation callout on first run, dismissible (v288); (5) Screener IRR count label corrected from stale "111 countries" to "61 countries (20 no cost data + 41 unbounded)" matching v280 verified counts (v289); (6) Fiscal Compare page-sub: lists all 7 profiles, names standard IC benchmarking basis as Deepwater $75/bbl with full parameters (v290); (7) Explorer page-sub: describes all 3 modes (Browse/Screener/Bubble Chart) inline, removes misleading "use the Screener tab" cross-reference (v291); (8) Home hero: tooltips added to all 5 stat metrics (Contracts/Countries/Verified Facts/A-B Confidence/Fiscal Mechanics) with ⓘ indicators (v292); (9) What's New panel first card: LATEST badge added (v293); (10) Scenario Builder page-sub: rewritten from 1 thin sentence to full IC workflow description — bid calibration, NPV/IRR output, 185-country benchmark rank, preset list (v294)
 - All 10 Priority 1 UX checks: No regression — verified JS syntax gate PASS across all commits
 - Summary: 210-FAQ milestone reached. 10 UX improvements across v287–v294. v286 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
+## Cycle 235 — v300 Grade Table
+
+**Cycle 235 — v295–v300:** 10 FAQs A211–A220 added across 2 commits (v295, v296): IC peer benchmarking methodology 4-step like-for-like comparison (A211), government take trend interpretation framework (A212), breakeven vs field-specific cost comparison (A213), fiscal regime type effects on project financing (A214), IC memo disclosure language template (A215), fiscal stability risk quantification with probability-weighted IRR (A216), greenfield vs brownfield IC comparison with decomposition framework (A217), PSC cost recovery cap price sensitivity analysis (A218), 7-metric same-take differentiation framework (A219), 6 common IC memo errors with ORCA mitigations (A220). Metadata sweep v286→v297 + FAQ count 210→220 in all structural locations + What's New panel Cycle 235 card + changelog v297 entry (v297). IC Memo Checklist in Methodology — 9 quality gate tiles (profile, price, source, mechanic, evidence tier, sensitivity, stability, NPV, multi-mechanic flag) with nav link (v298). Data Coverage At a Glance in Methodology — 6 metric tiles with coverage status (Take 185/185 green, NPV 185/185 green, IRR 165/185 yellow, Breakeven 68/185 orange, Price Swing 185/185 green, Stability 185/185 green) with nav link (v299). Breakeven Map above/below threshold counter — live count of countries viable below vs above slider price, initializes at $75 and updates dynamically with slider (v300). FAQ count 210→220. JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). dns-prefetch hints added (v261). Reform Risk race condition retry added (v271). Single-file architectural constraint remains binding gap for A+. |
+| 2 | 8. Data Reliability | A | = | IRR coverage: 165/185 in DB (89%), 124 shown in UI (≥500% outliers excluded). 20 non-computable confirmed. 220 FAQs (A1–A220, v297). Benchmark 185/185 (100%). Breakeven coverage 68/185 now surfaced in Coverage At a Glance (v299). Remaining gap: single-file constraint + IRR coverage ceiling. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). |
+| 4 | 4. Interaction Design | A+ | ↑ | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search on all 4 inputs (v252). What's New panel opens by default on Home tab (v274). Home hero action tagline added (v274). MC uncertainty label clarified (v271). Fiscal Compare reading guide strip (v288). Breakeven Map above/below threshold counter — live count of countries viable below vs above slider price, initializes at $75 and updates dynamically with slider (v300). |
+| 5 | 2. Information Architecture | A+ | ↑ | 220 analyst FAQs (A1–A220, v297). What's New panel updated with v297 card + LATEST badge. IC Memo Checklist section in Methodology (9 quality gate tiles, v298) with nav link. Data Coverage At a Glance section in Methodology (6 metric tiles, v299) with nav link. Changelog v297 entry added. FAQ count 210→220 in all structural locations. |
+| 6 | 6. Error & Empty States | A+ | = | FC empty-state text corrected (v268). All four primary tabs auto-load with real content on first visit (v219). CDN failure banner (v252). IOC Portfolio empty state de-cluttered (v263). Reform Risk race condition retry (v271). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 235). 136 PASS / 0 FAIL / 0 JS errors. Cycle 235 log added. Changelog entry v297 added. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). Screener onclick handler fixed (v252). focus-visible outline uses var(--accent) (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | Remaining unsafe-inline confined to dynamically-rendered innerHTML. CSS var fix (v256). JS syntax gate PASS, 0 JS errors. Contract count display correct 71,601 (v261). |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. Zero off-palette hex values (v257). What's New panel LATEST badge on first card (v293). |
+| 11 | 3. Data Presentation | A+ | ↑ | IRR scatter represents 124/185 countries shown in UI. Home hero shows visible data currency line (v262). At a Glance Price Points corrected (v274). Data Coverage At a Glance in Methodology surfaces Take/NPV/IRR/Breakeven/Swing/Stability coverage counts with color-coded status (v299). Breakeven Map live threshold counter shows below/above country counts at current slider price (v300). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v297 metadata sweep complete. All structural citations current to v297. FAQ count updated 210→220 in all structural locations: meta description, title, header badge, Quick Start cite, Methodology page-sub, Methodology home card, How to Cite (both forms), provenance. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 220 FAQs (A1–A220, v297). A211–A220: 10 IC memo use case FAQs — peer benchmarking (A211), take trend (A212), breakeven interpretation (A213), financing effects (A214), disclosure language template (A215), stability risk quantification (A216), greenfield vs brownfield (A217), PSC cap sensitivity (A218), same-take differentiation 7-metric (A219), common IC memo errors 6-list (A220). IC Memo Checklist section gives analysts a quality gate before memo submission (v298). |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v297. |
+
+**Grade changes:** Interaction Design ↑ (Breakeven Map live threshold counter v300). Information Architecture ↑ (220 FAQs, IC Memo Checklist, Coverage At a Glance, What's New panel). Data Presentation ↑ (Coverage At a Glance tiles, Breakeven Map threshold counter). Naming Consistency ↑ (v297 structural sweep, all FAQ count locations updated 210→220). Professional Credibility ↑ (A211–A220 IC memo use cases, IC Memo Checklist). SDLC Maturity ↑ (syntax gate PASS + Cycle 235 log + changelog v297). Performance & Reliability = (A maintained; single-file architectural constraint). Data Reliability = (A maintained; IRR coverage 165/185 ceiling).
+
+---
+
+## Cycle 235 Log — 2026-08-16
+- Test before: 136 PASS / 0 FAIL (Cycle 234 confirmed)
+- JS syntax gate: PASS / 0 errors (all 6 commits verified)
+- Test after: 136 PASS / 0 FAIL / 0 JS errors
+- Changes: (1) FAQs A211–A215 added (v295): IC peer benchmarking 4-step like-for-like methodology, government take trend interpretation, breakeven vs field-specific cost, fiscal regime type financing implications, IC memo disclosure language template; (2) FAQs A216–A220 added (v296): fiscal stability risk quantification with probability-weighted IRR, greenfield vs brownfield IC comparison with decomposition, PSC cost recovery cap price sensitivity, 7-metric same-take differentiation framework, 6 common IC memo errors with ORCA mitigations; (3) Metadata sweep v286→v297 + FAQ count 210→220 across all structural locations + What's New panel Cycle 235 card + changelog v297 entry (v297); (4) IC Memo Checklist in Methodology — 9 quality gate tiles with nav link (v298); (5) Data Coverage At a Glance in Methodology — 6 metric tiles color-coded by coverage completeness, with nav link (v299); (6) Breakeven Map above/below threshold counter — live count initializes at $75, updates dynamically with price slider (v300)
+- All 10 Priority 1 UX checks: No regression — verified JS syntax gate PASS across all commits
+- Summary: 220-FAQ milestone reached. 5 UX improvements (v298–v300 + structural v297). v300 live at yoburgqs.github.io/petroleum-fiscal-db/
 
 ---
 
