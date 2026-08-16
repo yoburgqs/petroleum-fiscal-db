@@ -8565,6 +8565,14 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <div style="font-size:11px;color:var(--muted);background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.15);border-radius:5px;padding:6px 12px;margin-bottom:8px;">
     <strong style="color:var(--accent);">How to read this map:</strong> Each country is colored by its breakeven price — the oil price at which the project achieves NPV=0. Countries colored <span style="color:var(--green);font-weight:700;">green</span> break even below $40/bbl (highly resilient). Countries colored <span style="color:var(--red);font-weight:700;">red</span> need >$85/bbl to be profitable. Set the price marker below to see which countries are above or below a target price.
   </div>
+  <!-- v300: Above/Below threshold counter — live count of countries above and below the price marker -->
+  <div id="be-threshold-summary" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:12px;">
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
+      <div><span style="color:var(--green);font-weight:700;font-size:16px;" id="be-below-count">—</span> <span style="color:var(--muted);">countries viable below <span id="be-threshold-price-below">$75</span></span></div>
+      <div><span style="color:var(--red);font-weight:700;font-size:16px;" id="be-above-count">—</span> <span style="color:var(--muted);">countries need above <span id="be-threshold-price-above">$75</span></span></div>
+      <div style="margin-left:auto;font-size:11px;color:var(--muted);">of 68 countries with breakeven data</div>
+    </div>
+  </div>
   <div style="display:flex;align-items:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
     <div style="display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted);">
       <span>Current price marker:</span>
@@ -17085,6 +17093,23 @@ async function renderBreakevenMap() {
   document.getElementById('be-lowest-list').innerHTML = listHTML(lowest);
   document.getElementById('be-highest-list').innerHTML = listHTML(highest);
 
+  // v300: Initialize threshold summary counter
+  function updateBEThresholdSummary(price) {
+    if (!COUNTRY_DATA) return;
+    var beData = COUNTRY_DATA.filter(function(d) { return d.be_75 != null && d.be_75 < 900; });
+    var below = beData.filter(function(d) { return d.be_75 <= price; }).length;
+    var above = beData.filter(function(d) { return d.be_75 > price; }).length;
+    var summaryEl = document.getElementById('be-threshold-summary');
+    if (summaryEl) {
+      summaryEl.style.display = 'block';
+      document.getElementById('be-below-count').textContent = below;
+      document.getElementById('be-above-count').textContent = above;
+      document.getElementById('be-threshold-price-below').textContent = '$' + price;
+      document.getElementById('be-threshold-price-above').textContent = '$' + price;
+    }
+  }
+  updateBEThresholdSummary(75);
+
   priceSlider?.addEventListener('input', function() {
     document.getElementById('be-price-label').textContent = '$' + this.value;
     const price = parseInt(this.value);
@@ -17095,6 +17120,7 @@ async function renderBreakevenMap() {
       p.style.strokeWidth = be > price ? '1.5' : '0.5';
       p.style.stroke = be > price ? '#B91C1C' : '#D0CAC0';
     });
+    updateBEThresholdSummary(price);
   });
 
 }
