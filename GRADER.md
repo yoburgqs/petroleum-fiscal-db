@@ -3960,3 +3960,11 @@ Cycle 232 complete: v283 live, 195 FAQs, all tests green. FAQs added: A191 (NOC 
 
 GRADER.md commit pushed. Cycle 238 fully closed â€” v305 live, 250 FAQs, 136 PASS / 0 FAIL.
 
+
+---
+## Cycle 240 Log — 2026-08-16 11:25
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle state files committed and pushed. All clean â€” cycle 240 fully resolved.
+
