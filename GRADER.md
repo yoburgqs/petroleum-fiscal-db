@@ -1,5 +1,65 @@
 # ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-16)
 
+## ROADMAP (2026-08-16) — NEW PRIORITY ORDER
+
+A professional product audit produced the following priority list. Work through these in order. FAQs are LOW priority now — the binding gaps are cross-navigation and trust signals, not content depth.
+
+### ROADMAP M1 — Cross-Navigation (HIGHEST PRIORITY)
+
+Every result surface must have an onward action. Implement in this order:
+
+**M1.1 — Breakeven Map → Country Profile**
+In `renderBreakevenMap()` (~line 18737), D3 SVG circles need a click handler:
+`.on('click', function(event, d) { loadCountryProfile(d.country); switchTab('t7', document.getElementById('tab-btn-t7')); })`
+The `d` object in the D3 datum should have a `country` property matching COUNTRY_DATA. Verify the data join uses country name.
+
+**M1.2 — Reform Risk table → Country Profile**
+In `renderReformRisk()` (~line 14852), country name cells in the heat table and event log rows should be clickable:
+Add `style="cursor:pointer;color:var(--accent);" onclick="loadCountryProfile('${c}');switchTab('t7',document.getElementById('tab-btn-t7'))"` to country name `<td>` or `<span>` elements.
+
+**M1.3 — Screener results → Side-by-Side**
+In `runScreener()` (~line 12129), after results render inject a button:
+"Load top 4 into Side-by-Side →" that calls `addCompare(country)` for the top 4 screener results then `switchTab('t2', ...)`.
+Mirror the existing `top5btn` pattern in `renderFCResults()` (~line 17588).
+
+**M1.4 — IOC Portfolio → Explorer filtered by operator countries**
+After `renderIOCExposure()` renders take-tier distribution, add a "View these countries in Explorer →" link per tier band. Pass operator country list to Explorer browse mode.
+
+### ROADMAP M2 — Evidence Tier in Fiscal Compare (HIGH PRIORITY)
+
+`COUNTRY_DATA` has `ab_pct` per country. It is shown in CP and Screener. Not shown in FC table.
+
+**M2.1 — Evidence dot in FC rows**
+In `renderFCResults()` (~line 17632), add one column using `getTierBadge(r.ab_pct, ...)`:
+`html += '<td class="num">' + getTierBadge(r.ab_pct || 0, 'Source quality: ' + (r.ab_pct||0).toFixed(0) + '% A/B-tier') + '</td>';`
+Add corresponding `<th>` header: `<th class="num" title="Data source quality: % of fiscal facts from A/B-tier (primary legislation or verified sources)">Src</th>`
+
+**M2.2 — C-tier row callout in FC drilldown**
+In the FC row drilldown drawer (search for `openFCDrilldown`), if `r.ab_pct < 60`, add a banner:
+`<div style="background:rgba(185,28,28,.07);border-left:3px solid var(--red);padding:6px 10px;font-size:11px;border-radius:0 4px 4px 0;margin-bottom:8px;">⚠ Source quality: C-tier (${ab_pct}% A/B sourced). Verify parameters in Country Profile before IC memo.</div>`
+
+### ROADMAP M3 — Reform Risk as Primary Tab (MEDIUM PRIORITY)
+
+Reform Risk is differentiated. It is buried in the Reference dropdown. Make it a primary tab.
+
+**M3.1** Find `tab-btn-treformrisk` in the tab bar HTML. Remove `display:none` and `aria-hidden="true"`. Position it after IOC Portfolio in the primary nav. Also add it to the main `switchTab()` routing.
+
+**M3.2** Make Stability column visible by default in FC table. Find the `showStability` variable in `renderFCResults()` — if it's toggled off by default, change the default to true.
+
+### ROADMAP M4 — Scenario Builder Discovery (MEDIUM PRIORITY)
+
+**M4.1** Add a Scenario Builder card to the Home tab tool grid (after the existing 5 cards). Card title: "Scenario Builder". Subtitle: "Model custom fiscal terms — set royalty, CIT, profit oil split — and rank your deal vs. 185 countries." onclick: opens the scenario modal.
+
+**M4.2** In `renderFCResults()`, extend the `_clickHint` div to include: "Found a shortlist? Use **+ Scenario** in the header to model custom terms."
+
+### DO NOT DO (loop restrictions):
+- Do NOT re-add stat number bars, "Last updated" lines, or Reference Grid (see Priority 7 below)
+- Do NOT add more than 5 FAQs per cycle — FAQ grinding is suspended pending roadmap work
+- Do NOT restructure the tab order (M7 requires explicit approval)
+- Do NOT attempt M1.4 IOC→Explorer filtering if it requires changes to Explorer's filter state management — scope to a simple link only
+
+---
+
 ## PRIORITY 1 — UX ISSUES FROM ZACH (verify every cycle)
 
 All 10 UX issues were implemented in v276. Every cycle, verify these are still working. If any regression found, fix immediately:
