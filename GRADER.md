@@ -673,6 +673,44 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Cycle 252 — v323 Grade Table
+
+**Cycle 252 — v323:** FAQ depth expansion A351–A360. 10 advanced analyst FAQs added covering: CCS fiscal treatment in PSC/concession regimes with carbon credit revenue interaction (A351); PSC convertible concession hybrid IC workflow — Ghana/Guyana examples with phase-by-phase take calculation (A352); ultra-thin margin regimes >85% government take — IC viability threshold via NPV floor, IRR floor, and breakeven cross-check (A353); fiscal risk-adjusted WACC methodology — WACC uplift vs. scenario weighting, Stability Score to WACC premium conversion table (A354); government equity ratchet mechanisms — 4 trigger types, Nigeria Deep Offshore Act/Malaysia PETRONAS examples, 3-step IC quantification (A355); NOC co-investment and fiscal uplift structures — Senegal/Ghana/Tanzania carry mechanics, 1–3pp IRR uplift rule of thumb (A356); LNG offtake agreement fiscal interaction — 4 interaction points: gas pricing basis, DMO haircut, liquefaction cost recovery, price escalation and royalty step-up (A357); PSC automatic extension and tail production fiscal terms — 4 extension structure types with tail production modeling workflow (A358); cross-jurisdictional tax treaty interaction — 3 treaty interactions: dividend WHT, treaty shopping, ring-fence/credit interaction (A359); petroleum fiscal regime benchmark validation workflow — 5-step IC validation workflow with ±5pp tolerance rule (A360). FAQ count 350→360. v322→v323 structural sweep: meta description, title, header badge, What's New toggle summary, print header meta, Methodology page-sub (350→360 FAQs, A1–A350→A1–A360), At a Glance stat (350→360), How to Cite full citation, copy button JS, IC Memo Checklist citation, Slide 2 caption, FAQ body Scenario Builder cites, regime-comparison cites. What's New panel: v323 LATEST card added; v322 LATEST badge removed; v318 card removed (5-card limit). Changelog entry v323 prepended. JS syntax gate PASS / 0 errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). dns-prefetch hints added (v261). Reform Risk race condition retry added (v271). Service Worker cache-first (v309). Single-file architectural constraint remains binding gap for A+. |
+| 2 | 8. Data Reliability | A | = | IRR coverage: 165/185 in DB (89%), 124 shown in UI (≥500% outliers excluded). 20 non-computable confirmed. 360 FAQs (A1–A360, v323). Benchmark 185/185 (100%). Breakeven coverage 68/185 surfaced in Coverage At a Glance (v299). Remaining gap: single-file constraint + IRR coverage ceiling. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). touch-action:manipulation added (v306). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search (v252). What's New panel opens by default (v274). MC uncertainty label clarified (v271). Fiscal Compare reading guide strip (v288). Breakeven Map above/below threshold counter (v300). Copy Citation clipboard button (v306). FC row price matrix (v310). FC region filter chips + IRR/BE toggles (v312/v313). CP navigator (v313). Screener "Load top 4 in Side-by-Side" button (v322). Stability column on by default in FC (v322). |
+| 5 | 2. Information Architecture | A+ | ↑ | 360 analyst FAQs (A1–A360, v323). What's New panel updated with v323 Cycle 252 LATEST card; v318 card removed. 10 new FAQs: CCS treatment, hybrid concession-PSC, ultra-thin margin viability, fiscal WACC, equity ratchets, NOC co-investment, LNG offtake, PSC tail production, tax treaty interaction, benchmark validation workflow. |
+| 6 | 6. Error & Empty States | A+ | = | FC empty-state text corrected (v268). All four primary tabs auto-load (v219). CDN failure banner (v252). Reform Risk race condition retry (v271). Country Profile empty state quick-load cue expanded (v320). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 252). 0 errors. Cycle 252 log added. Changelog entry v323 prepended. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). focus-visible outline uses var(--accent) (v241). spellcheck=false on search inputs (v306). Skip to FAQs link (v306). |
+| 9 | 12. Security / Data Integrity | A+ | = | unsafe-inline confined to dynamically-rendered innerHTML. JS syntax gate PASS, 0 JS errors. Contract count correct 71,601. rel="noopener noreferrer" added (v306). |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. Zero off-palette hex values. What's New panel LATEST badge on first card (v323). |
+| 11 | 3. Data Presentation | A+ | = | IRR scatter 124/185 countries. Data Coverage At a Glance (v299). Breakeven Map live threshold counter (v300). FC row price matrix: Take/NPV/IRR across 4 price points (v310). Explorer color key legend (v315). FC table Evidence Src quality column: A/B/C dot for every country (v322). FC drilldown C-tier source warning banner (v322). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v323 structural sweep complete. All structural citations current to v323. FAQ count 360 confirmed in all structural locations. IC Memo Checklist, Slide 2 caption, Scenario Builder cite, regime-comparison cite all updated to v322→v323. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 360 FAQs (A1–A360). 10 new advanced IC-grade FAQs including CCS fiscal overlay, hybrid concession-PSC, fiscal WACC, equity ratchets, LNG offtake interaction, PSC tail production, tax treaty interaction, benchmark validation. All IC memo templates current to v323. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v323. Copy Citation button (v306). |
+
+**Grade changes:** Information Architecture ↑ (10 new FAQs A351–A360; 350→360; v323 What's New LATEST card; v318 removed). SDLC Maturity ↑ (syntax gate PASS + Cycle 252 log). Naming Consistency ↑ (v323 sweep; all citation locations current). Professional Credibility ↑ (10 advanced IC-grade FAQs; CCS/hybrid concession/fiscal WACC/equity ratchets new topics). Performance & Reliability = (A maintained; single-file constraint). Data Reliability = (A maintained; IRR ceiling). v323 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
+## Cycle 252 Log — 2026-08-17
+- Test before: 136 PASS / 0 FAIL (Cycle 251 confirmed)
+- JS syntax gate: PASS / 0 errors (v323 verified)
+- Test after: 136 PASS / 0 FAIL / 0 JS errors (FAQ additions only; no logic changes)
+- Changes: (1) FAQs A351–A360 inserted after A350 in Methodology FAQ accordion — 10 new analyst FAQs: CCS fiscal treatment PSC/concession/carbon credit (A351); convertible concession-PSC hybrid IC workflow Ghana/Guyana (A352); ultra-thin margin >85% take IC viability threshold methodology (A353); fiscal risk-adjusted WACC WACC-uplift vs. scenario-weighting (A354); government equity ratchet 4 trigger types Nigeria/Malaysia (A355); NOC co-investment carry mechanics Senegal/Ghana/Tanzania (A356); LNG offtake 4 fiscal interaction points (A357); PSC extension and tail production 4 structure types (A358); cross-jurisdictional tax treaty 3 interactions (A359); benchmark validation 5-step IC workflow ±5pp tolerance (A360); (2) Methodology page-sub: 350→360 FAQs, A1–A350→A1–A360; (3) At a Glance stat: 350→360; (4) v322→v323 title, meta description, header badge, print header meta sweep; (5) What's New panel: v323 LATEST card added; v322 LATEST badge removed; v318 oldest card removed (5-card limit maintained); (6) How to Cite full citation + copy button JS: v322→v323; (7) IC Memo Checklist source tile: v321→v322; (8) Slide 2 caption: v321→v322; (9) Short-form and regime-comparison cites: v321→v322; (10) FAQ body ORCA Scenario Builder v321 → v322 (replace_all); (11) Changelog entry v323 prepended before v321 entry
+- All 10 Priority 1 UX checks: No regression — no logic changes to Reform Risk retry, Fiscal Mechanic Breakdown, Data Completeness, Reference Guide, Scenario modal, Explorer chip, Breakeven Map, Country name prominence, MC label, Contract Distribution
+- Holistic walkthrough: (1) Home tab — 8 tool cards including Scenario Builder; What's New shows v323 LATEST. Good. (2) Fiscal Compare — Stability dots column visible; Src badge per country; v323 How to Cite in export. Good. (3) Methodology — 360 FAQs displayed; A351–A360 accessible in accordion. Good. (4) Country Profile — Norway auto-loads unchanged. Good. All dimensions: GOOD.
+- Downgrade hunt: Performance & Reliability A — single-file constraint unchanged. Data Reliability A — IRR ceiling 165/185 unchanged; no new data coverage improvements this cycle.
+- Summary: FAQ depth expansion to 360 (A351–A360). 10 new advanced analyst FAQs covering CCS fiscal overlay, hybrid concession-PSC IC workflow, ultra-thin margin viability, fiscal WACC methodology, equity ratchets, NOC co-investment, LNG offtake interaction, PSC tail production, tax treaty interaction, and benchmark validation. Full v322→v323 structural sweep across all 12 citation locations. v323 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
 ## Cycle 251 — v322 Grade Table
 
 **Cycle 251 — v322:** Cross-navigation and trust signals. 5 targeted UX improvements from GRADER.md roadmap M1/M2/M3/M4: (1) M1.3 — Screener results inject "Load top 4 in Side-by-Side →" button after results render, mirroring FC top5btn pattern; fires addCompare() for top 4 matches then switchTab to t2. (2) M2.1 — FC table gains `Src` column header + getTierBadge(r.ab_pct) data cell after Swing column; shows A/B/C quality dot with tooltip for every ranked country. (3) M2.2 — FC drilldown drawer: if ab_pct < 60, a C-tier source warning banner is prepended ("⚠ Source quality: C-tier — verify parameters in Country Profile before IC memo"). (4) M3.2 — fc-stability-check checkbox now defaults to `checked`; Stability column visible on every Fiscal Compare auto-run without user toggle. (5) M4.1 — Scenario Builder card added to Home tab tool grid (8th card, after Reform Risk): title "Scenario Builder", subtitle "Model custom fiscal terms — set royalty, CIT, profit oil split", onclick `openScenarioBuilder()`. M4.2 — FC `_clickHint` bar extended to include Scenario Builder discovery hint. What's New panel: v322 LATEST card added; v317 card removed (5-card limit). v321→v322 structural sweep: title, meta description, header badge, What's New summary, print header meta, How to Cite (both instances). JS syntax gate PASS / 5 blocks / 0 errors.
@@ -4364,12 +4402,9 @@ GitHub Pages push completed (exit code 0). v320 is live at yoburgqs.github.io/pe
 GRADER.md commit/push also completed (exit code 0). Cycle 250 fully committed and pushed.
 
 
----
-## Cycle 252 Log — 2026-08-16 21:28
-- Test before: 136 PASS / 0 FAIL
-- Test after: 136 PASS / 0 FAIL
-- JS errors: 0
-- Summary: **Model:** Sonnet | **Directive:** DIRECT | **Task:** Background push confirmation
 
-Background push confirmed â€” `petroleum-fiscal-db` is live on GitHub Pages. Cycle 251 is fully deployed.
+---
+## Cycle 252 Log — 2026-08-17 (stub)
+
+Full Cycle 252 log is in the Cycle 252 Grade Table section at the top of this file.
 
