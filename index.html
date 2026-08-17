@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,601 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v328.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,601 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v329.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,601 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,601 Contracts, 185 Countries | v328</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,601 Contracts, 185 Countries | v329</title>
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
 <script>
 if ('serviceWorker' in navigator) {
@@ -1299,7 +1299,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v328</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v329</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1499,14 +1499,20 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- v232: What's New panel — compact recent-update summary for first-time visitors and returning colleagues -->
   <details style="margin-top:8px;margin-bottom:4px;">
     <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Expand to see the 5 most recent platform improvements">
-      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What's New &mdash; v328
+      <span style="color:var(--accent);font-size:12px;">&#9656;</span> What's New &mdash; v329
       <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">Aug 2026</span>
     </summary>
     <div style="padding:10px 12px 6px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface2);">
       <div style=”display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;”>
           <div style=”background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:10px 12px;”>
             <div style=”display:flex;align-items:center;gap:8px;margin-bottom:4px;”>
-              <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v328 (Aug 2026)</strong> — <span style=”background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:3px;padding:1px 6px;vertical-align:middle;”>LATEST</span></div>
+              <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v329 (Aug 2026)</strong> — <span style=”background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:3px;padding:1px 6px;vertical-align:middle;”>LATEST</span></div>
+            </div>
+            <div style=”font-size:11px;color:var(--muted);line-height:1.55;”>M6.2: Export XLSX now includes Methodology sheet with profile assumptions, evidence tier definitions, and IC citation — full traceability for IC memos. Evidence A/B% column added to Fiscal Compare export. FAQs A362–A371 added: HPHT drilling cost adjustment, SWF participation, cost overrun sensitivity, production bonus triggers, exploration write-off treatment, gas monetization pathways, back-in rights, fiscal vintage risk, portfolio mechanic diversification, pre-development delay risk. v328&rarr;v329 structural sweep.</div>
+          </div>
+          <div style=”background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:10px 12px;”>
+            <div style=”display:flex;align-items:center;gap:8px;margin-bottom:4px;”>
+              <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v328 (Aug 2026)</strong></div>
             </div>
             <div style=”font-size:11px;color:var(--muted);line-height:1.55;”>M5.3: Compact peer context strip after take grid in Country Profile — shows regional median, global median, and this country&rsquo;s delta vs region in one line. FC drilldown: price sensitivity delta row (Δ vs $50) added to price matrix. Country Profile: NPV global rank, breakeven global rank, and price swing regime label (royalty-dominated / profit-sensitive) added to key metrics. FAQ A361 added: deepwater frontier fiscal benchmarking IC workflow. v327&rarr;v328 structural sweep.</div>
           </div>
@@ -1527,12 +1533,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
               <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v325 (Aug 2026)</strong></div>
             </div>
             <div style=”font-size:11px;color:var(--muted);line-height:1.55;”>M1.4: IOC Portfolio navigation — added &ldquo;Explore all [operator] countries in the data &rarr;&rdquo; link below the tier distribution metrics. Clicking navigates to Explorer Browse mode for full country-level browsing. v324&rarr;v325 structural sweep.</div>
-          </div>
-          <div style=”background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:10px 12px;”>
-            <div style=”display:flex;align-items:center;gap:8px;margin-bottom:4px;”>
-              <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v324 (Aug 2026)</strong></div>
-            </div>
-            <div style=”font-size:11px;color:var(--muted);line-height:1.55;”>Cross-navigation fixes M1.1 &amp; M1.2. Breakeven Map: country paths now clickable for all ISO-mapped countries (not just those with breakeven data), pointer cursor extended to all mapped countries, SVG &lt;title&gt; tooltip added to each path for accessibility. Reform Risk: country name navigation already comprehensive across all table sections. v323&rarr;v324 structural sweep.</div>
           </div>
         </div>
       <div style="margin-top:8px;font-size:10px;color:var(--muted);text-align:right;">Showing 5 most recent updates &middot; Full changelog &rarr; Reference &gt; Methodology &gt; Changelog</div>
@@ -2253,7 +2253,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <div class="page-title" style="margin-bottom:0;">Methodology</div>
     <button onclick="window.print()" class="no-print" style="font-size:11px;padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;white-space:nowrap;" aria-label="Print or save this Methodology document as PDF">&#128424; Print / Save PDF</button>
   </div>
-  <div class="page-sub">How ORCA calculates government take: DCF model architecture (8 fiscal mechanics &mdash; Concession, PSC, TSC, PRRT, Revenue Share, RSC, Buy-back, Gross Split &mdash; across 13 price points from $30 to $125/bbl, bisection IRR solver), standardized reference project assumptions ($1.2B capex / 50k bbl/d peak / $15/bbl opex / 10% WACC for the Deepwater basis; 6 additional profiles from Marginal to Giant), evidence quality framework (A-tier = primary legislation and PSA text; B-tier = operator 10-K and annual report; C-tier = secondary industry analysis; D-tier = directional proxy &mdash; excluded from most computed outputs), production weighting methodology, benchmark validation (185/185 countries verified against Wood Mackenzie, Rystad Energy, and S&amp;P Global Commodity Insights), 361 analyst FAQs (A1&ndash;A361) covering IC workflows, rule-of-thumb adjustments, and source citation templates, and a full platform changelog.</div>
+  <div class="page-sub">How ORCA calculates government take: DCF model architecture (8 fiscal mechanics &mdash; Concession, PSC, TSC, PRRT, Revenue Share, RSC, Buy-back, Gross Split &mdash; across 13 price points from $30 to $125/bbl, bisection IRR solver), standardized reference project assumptions ($1.2B capex / 50k bbl/d peak / $15/bbl opex / 10% WACC for the Deepwater basis; 6 additional profiles from Marginal to Giant), evidence quality framework (A-tier = primary legislation and PSA text; B-tier = operator 10-K and annual report; C-tier = secondary industry analysis; D-tier = directional proxy &mdash; excluded from most computed outputs), production weighting methodology, benchmark validation (185/185 countries verified against Wood Mackenzie, Rystad Energy, and S&amp;P Global Commodity Insights), 371 analyst FAQs (A1&ndash;A371) covering IC workflows, rule-of-thumb adjustments, and source citation templates, and a full platform changelog.</div>
 
   <!-- Platform Provenance -->
   <div class="dd-section" id="meth-provenance">
@@ -2273,7 +2273,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">92.8%</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">A/B Evidence</div></div>
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">8</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Fiscal Mechanics</div></div>
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">185/185</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Benchmark PASS</div></div>
-      <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">361</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Analyst FAQs</div></div>
+      <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">371</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Analyst FAQs</div></div>
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">4</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;" title="4 UI price scenarios ($50/$75/$100/$125). DCF engine uses 13 internal points ($30-$125) for full price-curve computation.">Price Scenarios</div></div>
     </div>
   </div>
@@ -10448,21 +10448,207 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           • First-mover producing (Guyana Stabroek, Senegal Sangomar, Mozambique Rovuma): ORCA take applies; frontier risk has transferred to production risk.<br><br>
           <em>Source: ORCA v328 (Aug 2026). Wood Mackenzie Deepwater Fiscal Terms Review (2024); Rystad Energy UCube Deepwater Analytics (2025); Offshore Technology Conference deepwater fiscal benchmark surveys (2023–2025). Cross-references: FAQ A41 (DCF model specification); FAQ A85 (Guyana Stabroek reform); FAQ A305 (Mozambique LNG fiscal reform case study).</em></div>
         </div>
+        <!-- v329: FAQ A362 — HPHT fiscal cost adjustment -->
+        <div class="faq-item" id="faq-A362">
+          <div class="faq-q">A362. How do high-pressure/high-temperature (HPHT) drilling costs affect government take calculations, and what ORCA adjustment is required for IC memos?</div>
+          <div class="faq-a"><strong>HPHT fiscal challenge:</strong> HPHT wells (pressure &gt;10,000 psi / temperature &gt;300°F) carry drilling cost premiums of 40–150% vs. conventional wells at equivalent depth. Since ORCA models a standardized capex assumption per profile (e.g., Deepwater: $1.2B/50k bbl/d), HPHT projects in cost-intensive basins (North Sea, Gulf of Mexico, South China Sea) will understate contractor capex and overstate IRR if used without adjustment.<br><br>
+          <strong>Fiscal mechanic sensitivity by regime type:</strong><br>
+          <em>PSC regimes (cost recovery):</em> Higher capex is mostly cost-recoverable, reducing host government NPV share but extending the cost recovery period. Effective contractor take improves in early years (higher cost oil entitlement), but total take approaches statutory level once costs are fully recovered. Net HPHT effect: ±2–5pp effective take depending on cost recovery cap.<br>
+          <em>Concession regimes (royalty/CIT):</em> Higher capex is deductible against CIT, reducing taxable income. In high-royalty regimes (e.g., UK RFCT 30%), the HPHT cost premium provides 30% effective subsidy via tax shield. Net effect: 3–8pp IRR improvement vs. ORCA's standard profile at equivalent take%.<br>
+          <em>PRRT (Australia):</em> HPHT costs are fully deductible pre-PRRT, uplifted at PRRT uplift rate (LTBR + 5pp). HPHT projects often remain below the PRRT threshold for the first 10+ years — ORCA's Australia take understates the early-year contractor advantage for HPHT projects.<br><br>
+          <strong>4-step IC workflow:</strong><br>
+          1. Identify HPHT cost premium from operator AFE or analogous well cost databases (IHS Petrodata, Rystad WellCube).<br>
+          2. ORCA Scenario Builder → enter HPHT-adjusted capex (standard profile capex × 1.4–2.5 depending on basin).<br>
+          3. Compare Scenario Builder IRR vs. ORCA standard Fiscal Compare IRR — the delta isolates the HPHT fiscal drag.<br>
+          4. IC memo language: "ORCA standard take of X% applicable; HPHT capex uplift of Y% reduces contractor IRR by Z pp vs. standard profile. Adjusted IRR: [Scenario Builder output]."<br><br>
+          <strong>Rule of thumb by basin:</strong><br>
+          • North Sea (HPHT Elgin/Franklin type): 80–120% capex premium; concession regime offsets via RFCT deductibility.<br>
+          • Gulf of Mexico ultra-deep HPHT: 60–100% premium; federal royalty + CIT regime; net take stable, IRR compressed by cost.<br>
+          • South China Sea HPHT (China/Vietnam): 40–80% premium; PSC regimes with 50–60% cost recovery cap often binding for HPHT projects.<br><br>
+          <em>Source: ORCA v329 (Aug 2026). IHS Markit Well Cost Study (2024); Rystad Energy WellCube HPHT Benchmarking (2025); Wood Mackenzie HPHT Project Economics Review (2023). Cross-references: FAQ A41 (DCF model specification); FAQ A59 (cross-project-type capital allocation); FAQ A86 (North Sea fiscal mechanics).</em></div>
+        </div>
+        <!-- v329: FAQ A363 — Sovereign wealth fund participation -->
+        <div class="faq-item" id="faq-A363">
+          <div class="faq-q">A363. How does sovereign wealth fund (SWF) direct participation in upstream oil blocks affect effective government take, and how should IC memos disclose this?</div>
+          <div class="faq-a"><strong>SWF participation mechanism:</strong> Some governments channel upstream participation through sovereign wealth funds (Norway GPFG via Equinor, Kazakhstan NFRK via KazMunayGas, UAE ADIA/ADNOC, Angola Sonangol/FSDEA) rather than through the standard fiscal regime. This creates a dual-layer government take: the statutory fiscal regime (royalty/CIT/profit oil) plus the economic rent captured through the SWF's working interest (WI) share of contractor-side revenues.<br><br>
+          <strong>Why ORCA's take figure requires adjustment:</strong> ORCA models the statutory fiscal take — it does not add back SWF WI economics. A country where the SWF holds 20% WI as a paying partner at full cost parity is not the same as a country with equivalent statutory take where the SWF holds a 20% carried interest (where government WI earnings reduce IOC net entitlement further). The distinction matters by 5–15pp effective take at the IOC level.<br><br>
+          <strong>Three SWF participation structures:</strong><br>
+          <em>Structure 1 — Paying WI at parity:</em> SWF contributes its WI share of capex/opex; receives WI share of production. Statutory take = ORCA figure; IOC net entitlement unaffected beyond WI dilution. IC adjustment: none beyond statutory take.<br>
+          <em>Structure 2 — Carried interest pre-commerciality:</em> SWF carries during exploration at no cost; back-in at commerciality; may or may not repay. This is effectively an implicit additional tax on the IOC equal to the carry cost discounted to PV. IC adjustment: +3–8pp effective take depending on carry rate and repayment terms.<br>
+          <em>Structure 3 — Concessional back-in:</em> SWF exercises option to acquire WI at below-market terms post-discovery (common in Sub-Saharan Africa). IC adjustment: calculate dilution impact on contractor IRR as a one-time capital charge.<br><br>
+          <strong>4-step IC workflow:</strong><br>
+          1. Identify SWF/NOC WI structure from PSA or bid round documents — distinguish paying vs. carried vs. concessional back-in.<br>
+          2. ORCA Country Profile → record statutory take; note NOC WI if shown in source citations.<br>
+          3. If Structure 2 or 3: Scenario Builder → reduce IOC WI; increase effective capex by carry amount; re-run IRR.<br>
+          4. IC memo disclosure: "ORCA statutory take X%; effective IOC take [adjusted Y%] reflecting [NOC name] [WI%] [carried/paying/concessional back-in] interest per [source]."<br><br>
+          <em>Source: ORCA v329 (Aug 2026). Rystad Energy NOC Strategy Report (2025); Wood Mackenzie Government Participation in Upstream (2024); EY Oil &amp; Gas Tax Guide 2025. Cross-references: FAQ A32 (carried interest quantification); FAQ A69 (ring-fencing); FAQ A80 (NOC equity participation).</em></div>
+        </div>
+        <!-- v329: FAQ A364 — Cost overrun scenarios and contractor NPV sensitivity -->
+        <div class="faq-item" id="faq-A364">
+          <div class="faq-q">A364. How should IC memos present cost overrun sensitivity analysis, and what fiscal mechanic types are most/least sensitive to capex overruns?</div>
+          <div class="faq-a"><strong>Cost overrun risk in upstream IC analysis:</strong> Major upstream projects routinely overrun their AFE: IHS data shows average deepwater project cost overruns of 22% (P50) and 55% (P90) vs. FID budget. Cost overruns affect contractor IRR directly and, in cost recovery regimes, can trigger cost recovery period extension — with knock-on effects on host government NPV timing.<br><br>
+          <strong>Fiscal mechanic sensitivity to cost overruns:</strong><br>
+          <em>PSC (cost recovery):</em> Most cost-overrun-resilient for the contractor. Additional capex is added to unrecovered cost pool and recovered from cost oil before profit oil split. A 30% capex overrun delays cost recovery by 1–3 years but does not permanently reduce contractor NPV at high oil prices. Effective take shifts only by the time-value of the delayed recovery (typically 1–3pp NPV impact at 10% discount rate).<br>
+          <em>Concession (royalty/CIT):</em> Moderate sensitivity. Additional capex is CIT-deductible (reducing tax but not royalty). A 30% capex overrun costs the contractor (1 − CIT rate) × overrun amount in NPV terms — roughly 70% of the overrun flows through to contractor cost at 30% CIT. Royalty is revenue-based and unaffected by cost overruns.<br>
+          <em>PRRT (Australia) / SPT (Norway):</em> Least sensitive — cost overruns are uplifted at preferential rates (LTBR+5pp for PRRT) before profit extraction calculation. A $200M cost overrun generates $200M × uplift factor in deductible uplifts over project life, partially offsetting the overrun's NPV drag.<br>
+          <em>Revenue share / RSC:</em> Most overrun-exposed for contractor. Revenue share is gross-revenue-based; cost overruns reduce contractor margin directly with no fiscal offset. A 30% capex overrun on a $500M project costs the contractor the full $150M without tax shield.<br><br>
+          <strong>4-step IC workflow for cost overrun disclosure:</strong><br>
+          1. Identify base case AFE and P90 cost scenario from project team or analogous project benchmarks.<br>
+          2. ORCA Scenario Builder → P50 case (base capex); re-run with P90 capex (+30–60%); record IRR delta.<br>
+          3. Classify fiscal regime → apply mechanic-specific sensitivity rule above to explain IRR change in plain language.<br>
+          4. IC memo table: Base / P50 / P90 capex scenarios with corresponding IRR and take%; note mechanic type and cost recovery/deductibility structure.<br><br>
+          <strong>Rule of thumb IRR drag by mechanic at +30% capex overrun:</strong><br>
+          • PSC (cost recovery): −1.5 to −2.5pp IRR (delay effect only)<br>
+          • Concession (royalty/CIT): −2.0 to −3.5pp IRR (partial tax shield)<br>
+          • Revenue share / RSC: −3.5 to −6.0pp IRR (no fiscal offset)<br>
+          • PRRT/SPT: −0.5 to −1.5pp IRR (uplift mechanism offsets most of overrun)<br><br>
+          <em>Source: ORCA v329 (Aug 2026). IHS Markit Upstream Capital Cost Study (2024); Wood Mackenzie Project Execution Risk Benchmarking (2025); Rystad Energy UCube Cost Analytics (2025). Cross-references: FAQ A41 (DCF model specification); FAQ A59 (cross-project capital allocation); FAQ A64 (cost overrun and fiscal sensitivity — Australia PRRT).</em></div>
+        </div>
+        <!-- v329: FAQ A365 — Production bonus triggers and IRR impact -->
+        <div class="faq-item" id="faq-A365">
+          <div class="faq-q">A365. How do production bonus triggers embedded in PSCs affect effective government take and contractor IRR, and how should these be modeled for IC analysis?</div>
+          <div class="faq-a"><strong>Production bonus mechanics:</strong> Production bonuses are one-time cash payments from contractor to government triggered when cumulative or daily production crosses defined thresholds (e.g., $5M at first oil, $15M at 25k bbl/d, $25M at 50k bbl/d). Unlike signature bonuses, production bonuses occur during the production phase and reduce contractor cash flow at high-production, high-IRR periods — precisely when the project is generating peak value.<br><br>
+          <strong>Why standard ORCA take does not capture production bonuses:</strong> ORCA models statutory fiscal parameters (royalty, profit oil tiers, CIT, special levies). Production bonuses are typically contract-specific, not statutory, and are not always disclosed in the secondary sources ORCA uses. A country profile with C-tier evidence quality is especially likely to have undisclosed production bonus provisions.<br><br>
+          <strong>IRR impact quantification:</strong><br>
+          A $50M production bonus triggered at plateau (year 4–5 of production) reduces contractor NPV by approximately $30–40M at a 10% discount rate — roughly $0.60–0.80 per barrel of plateau production for a 50k bbl/d field. As a % of total project NPV, this equates to 1–3pp IRR impact for a standard deepwater project.<br>
+          For marginal field projects where contractor NPV margin is thin, production bonuses can be decisive: a $20M bonus on a 10k bbl/d onshore project with $50M contractor NPV reduces it by 30–40% in present value terms.<br><br>
+          <strong>4-step IC workflow:</strong><br>
+          1. ORCA Country Profile → check Evidence tier; if C-tier, flag production bonus risk explicitly in IC memo as an undisclosed provision risk.<br>
+          2. Review PSA text / bid round documents for production bonus schedule — these are almost always in Annex 1 or the financial terms section.<br>
+          3. Scenario Builder → model production bonus as additional capex-equivalent lump sum at estimated trigger year; re-run IRR.<br>
+          4. IC memo: "Production bonus provisions [present / absent / undisclosed — C-tier source]. If present: [schedule]; modeled as $[X]M NPV reduction, −[Y]pp IRR impact. If undisclosed: flag as a risk item requiring legal diligence."<br><br>
+          <strong>Countries with documented production bonus structures (indicative):</strong><br>
+          Nigeria (JOA bonus schedule), Angola (Sonangol production milestone payments), Iraq (TSC development bonus triggers), Kazakhstan (N-factor bonus linked to cumulative production), Ghana (GNPC bonus schedule in WCTP/DT block agreements).<br><br>
+          <em>Source: ORCA v329 (Aug 2026). Rystad Energy PSA Database (2025); Wood Mackenzie Contract Terms Database (2024); IHS Markit Fiscal Terms &amp; Conditions (2024). Cross-references: FAQ A3 (evidence tier system); FAQ A43 (signature bonus DCF); FAQ A69 (ring-fencing across contracts).</em></div>
+        </div>
+        <!-- v329: FAQ A366 — Exploration write-off treatment across fiscal regimes -->
+        <div class="faq-item" id="faq-A366">
+          <div class="faq-q">A366. How is dry hole and exploration write-off treatment handled across different fiscal regimes, and how does this affect portfolio-level IC analysis?</div>
+          <div class="faq-a"><strong>Exploration write-off basics:</strong> Exploration costs (seismic, G&amp;G, unsuccessful wells) are capitalized in most fiscal regimes and either (a) expensed immediately on dry hole determination, (b) amortized over a fixed period, or (c) ring-fenced within the license and only deductible against that license's income. The treatment profoundly affects the after-tax cost of exploration failure and therefore exploration economics at the portfolio level.<br><br>
+          <strong>Regime-by-regime treatment:</strong><br>
+          <em>UK (RFCT/SC/EPL regime):</em> Exploration costs and dry holes are 100% deductible in the year incurred against ring-fenced UK upstream income. Critically, if a company has no UK income (e.g., exploration-only), unused deductions are carried forward with uplift or may be surrendered to HMRC for a cash refund via the Ring Fence Expenditure Supplement (RFES) — 10pp uplift per year for up to 10 years. This makes the UK unusually exploration-friendly from a fiscal perspective: effective government co-investment in exploration failure is approximately 30–40% of drill cost.<br>
+          <em>Norway (Petroleum Tax Act):</em> Exploration costs are 78% refundable from the government (via the special tax refund for exploration companies) in the year incurred, even for companies with no production income. This is one of the most generous exploration fiscal regimes globally — the government effectively bears 78% of exploration risk, which is why Norway's high statutory take (78%) does not deter frontier exploration.<br>
+          <em>PSC regimes (Nigeria, Angola, Indonesia):</em> Exploration costs are typically cost-recoverable from cost oil once production begins. Dry holes in areas without subsequent production may be written off against other contract areas (if company-level ring-fencing) or lost permanently (if license-level ring-fencing). This is a key due diligence risk for exploration-only PSC positions.<br>
+          <em>US (federal / state):</em> IDC (intangible drilling costs) are immediately deductible for domestic producers; dry hole costs are deductible in the year drilled. Leasehold acquisition costs are amortized. Effective government co-investment in US exploration failure is approximately 25–35% (federal CIT rate × deductible portion).<br><br>
+          <strong>Portfolio-level IC implications:</strong><br>
+          A portfolio with a 25% exploration success rate (industry average deepwater) has 3 dry holes per discovery. In Norway, the government bears 78% of those dry hole costs — the after-tax exploration carry is dramatically cheaper than in a PSC regime where dry hole costs are only recoverable against future production from that license. ORCA's take figures do not reflect this exploration-phase fiscal advantage; it requires a portfolio-level adjustment.<br><br>
+          <strong>4-step IC workflow:</strong><br>
+          1. Identify exploration write-off treatment from EY Oil &amp; Gas Tax Guide for target country.<br>
+          2. Estimate portfolio-level dry hole exposure (success rate × drill cost × expected wells in program).<br>
+          3. Calculate after-tax dry hole cost per discovery using regime-specific deductibility/refundability rate.<br>
+          4. IC memo: Disclose exploration write-off treatment; if Norway/UK refund mechanism applies, quantify as a portfolio-level NPV credit.<br><br>
+          <em>Source: ORCA v329 (Aug 2026). EY Oil &amp; Gas Tax Guide 2025; HMRC Ring Fence Expenditure Supplement Technical Note; Norwegian Ministry of Finance Petroleum Tax Refund Scheme (§3c); IHS Markit Exploration Fiscal Benchmarking (2024). Cross-references: FAQ A69 (ring-fencing); FAQ A86 (North Sea fiscal mechanics); FAQ A32 (carried interest).</em></div>
+        </div>
+        <!-- v329: FAQ A367 — Gas monetization pathways and fiscal adjustment -->
+        <div class="faq-item" id="faq-A367">
+          <div class="faq-q">A367. When a discovery has material gas volumes, how should ORCA's oil-proxy fiscal take be adjusted for gas monetization pathways in IC analysis?</div>
+          <div class="faq-a"><strong>Gas monetization fiscal complexity:</strong> ORCA's DCF model uses crude oil price as the reference commodity. Gas discoveries monetized via LNG export, domestic supply obligation (DSO), or gas-to-power projects face a fundamentally different fiscal structure: (1) different reference commodity price (gas vs. oil), (2) gas-specific fiscal overlays (DMO pricing caps, LNG toll agreements, export levies), and (3) cost structures that differ materially from oil (pipeline compression, liquefaction capex). A direct application of ORCA's country take% to a gas project overstates or understates contractor economics by 5–20pp depending on regime.<br><br>
+          <strong>Three gas monetization structures and fiscal impact:</strong><br>
+          <em>Structure 1 — LNG export (market-linked price):</em> LNG netback to wellhead is typically 45–65% of JCC (Japan Crude Cocktail) benchmark, or $4–8/MMBtu at current Asian spot prices vs. $12–18/MMBtu for crude oil equivalent. Fiscal take % applied to a lower wellhead value means lower absolute government NPV — but the take% itself may be the same. Key adjustment: recalibrate ORCA Scenario Builder with gas-equivalent capex ($3–5B for LNG vs. $1.2B deepwater) and netback price.<br>
+          <em>Structure 2 — Domestic supply obligation (DSO):</em> Some regimes (Indonesia Gross Split, Australia NWS legacy, Nigeria DPPR) require a portion of gas production to be sold domestically at regulated prices (often $1–3/MMBtu vs. $5–10/MMBtu export). DSO effectively creates a hidden tax: the revenue forgone on DSO volumes is a fiscal cost not captured in ORCA's take%. Typical DSO fiscal drag: 3–8pp effective take uplift (i.e., contractor captures less than statutory take implies).<br>
+          <em>Structure 3 — Gas-to-power (domestic pricing):</em> In power-deficit markets (sub-Saharan Africa, South Asia), gas may be monetized via power purchase agreements at $2–4/MMBtu equivalent. This is structurally similar to DSO — fiscal take% is unchanged but applied to a much lower realized price. IC analysis must model at actual gas price, not oil proxy.<br><br>
+          <strong>4-step IC workflow for gas-weighted discovery:</strong><br>
+          1. Identify gas monetization pathway: LNG / DSO / domestic / gas-to-power — from government energy policy and operator's pre-FID documentation.<br>
+          2. ORCA Country Profile → record oil-proxy take%; note gas-specific fiscal provisions from source citations (often disclosed in EY Tax Guide gas chapter).<br>
+          3. Scenario Builder → use gas-equivalent netback price and gas-calibrated capex/opex; apply any DSO price haircut as revenue reduction.<br>
+          4. IC memo: "ORCA oil-proxy take X% (statutory). Gas-adjusted effective take [Y]% reflecting [DSO volume %] at [$Z/MMBtu] regulated price / LNG netback of [$W/MMBtu]. Modeled in Scenario Builder at gas-equivalent parameters."<br><br>
+          <em>Source: ORCA v329 (Aug 2026). Wood Mackenzie LNG Fiscal Terms Review (2025); EY Oil &amp; Gas Tax Guide 2025 (gas chapter); Rystad Energy Gas Fiscal Database (2024); IEA Natural Gas Market Report (2025). Cross-references: FAQ A60 (gas vs. oil fiscal adjustments); FAQ A84 (gas-weighted country adjustment); FAQ A305 (Mozambique LNG fiscal reform).</em></div>
+        </div>
+        <!-- v329: FAQ A368 — Back-in rights exercise and fiscal impact -->
+        <div class="faq-item" id="faq-A368">
+          <div class="faq-q">A368. What are government back-in rights in upstream PSCs, when are they exercised, and how do they affect IC economics versus the ORCA take figure?</div>
+          <div class="faq-a"><strong>Back-in rights defined:</strong> Government back-in rights (also called "participation rights" or "state participation options") give the NOC or state entity the right to acquire a working interest in a block after a commercial discovery is made, typically at a pre-negotiated price (historical cost, net book value, or fair value). Back-in rights are distinct from carried interest: the state pays for the acquired WI, but at potentially favorable terms not reflective of full exploration risk sharing.<br><br>
+          <strong>Why back-in rights create fiscal take above ORCA's statutory figure:</strong> When a state entity exercises a back-in right at historical cost (exploration sunk cost), it effectively acquires a portion of discovered value without paying the exploration risk premium. The delta between historical cost (what the state pays) and fair value (what the WI is worth post-discovery) is an implicit value transfer from IOC to state — functioning as an undisclosed government take component. ORCA's statutory take does not include this implicit premium.<br><br>
+          <strong>Back-in right structures by region:</strong><br>
+          <em>Sub-Saharan Africa (Nigeria, Tanzania, Uganda, Mozambique):</em> Back-in rights of 10–25% at historical cost are common; exercised at commerciality declaration. Implicit value transfer = (fair value − historical cost) × back-in WI%; typically 3–8pp effective take addition.<br>
+          <em>South/Southeast Asia (Indonesia, Myanmar, Bangladesh):</em> NOC participation ranges from 10–40%; pricing varies from historical cost to fair value depending on PSC vintage. Indonesia's Pertamina has statutory right of first refusal on any PSC assignment — effectively a back-in right on M&amp;A transactions.<br>
+          <em>MENA (Algeria, Libya, Iraq):</em> Sonatrach/NOC typically participates at 20–51% as paying WI from inception (not a back-in right); this is already reflected in the IOC's net WI used in ORCA modeling.<br>
+          <em>Latin America (Brazil, Colombia):</em> Petrobras has statutory 30% minimum WI in Brazilian pre-salt areas — this is paying WI, not a back-in right. Colombia: Ecopetrol back-in rights in some ANH contracts at defined conditions.<br><br>
+          <strong>4-step IC workflow:</strong><br>
+          1. Review PSA/PSC for back-in right clause — identify: percentage, trigger (exploration vs. commerciality vs. FID), pricing basis (historical cost / NBV / fair value / market).<br>
+          2. Estimate discovered value at back-in trigger point using ORCA NPV figure as proxy for WI fair value.<br>
+          3. Calculate implicit state premium: (fair value − exercise price) × back-in WI% as % of total contractor NPV pre-back-in.<br>
+          4. IC memo: "Back-in right: [NOC], [X]%, at [trigger], priced at [basis]. Implicit premium to state estimated at $[Y]M ([Z]% of pre-back-in contractor NPV). Effective take adjusted to [A]% vs. ORCA statutory [B]%."<br><br>
+          <em>Source: ORCA v329 (Aug 2026). Rystad Energy PSA Database — Back-In Right Provisions (2025); Wood Mackenzie Government Participation Structures (2024); EY Oil &amp; Gas Tax Guide 2025. Cross-references: FAQ A32 (carried vs. paying WI); FAQ A63 (back-in rights in valuation); FAQ A80 (NOC equity participation).</em></div>
+        </div>
+        <!-- v329: FAQ A369 — Fiscal vintage and reform risk for pre-FID IC memos -->
+        <div class="faq-item" id="faq-A369">
+          <div class="faq-q">A369. How should IOC analysts incorporate fiscal vintage risk and the probability of mid-project fiscal reform into pre-FID IC analysis?</div>
+          <div class="faq-a"><strong>Fiscal vintage risk defined:</strong> Most upstream projects span 25–35 years from FID to abandonment. Fiscal terms agreed at FID are subject to renegotiation, legislative reform, or unilateral government action (windfall profit taxes, export levy surcharges, PSC amendment) during the project life. This "fiscal vintage risk" — the risk that the fiscal regime changes materially after capital is committed — is one of the largest sources of value uncertainty in long-cycle upstream projects.<br><br>
+          <strong>ORCA's Reform Risk tab as a quantitative input:</strong> The Reform Risk tab provides country-level Stability Score (0–100) and reform frequency/magnitude data from REFORM_HISTORY. This data can be translated into a fiscal vintage risk adjustment for IC memos:<br>
+          • Stability Score ≥75: Low reform probability; use ORCA current take% as IC base case with ±3pp sensitivity.<br>
+          • Stability Score 50–74: Moderate reform risk; apply +5pp take sensitivity scenario ("adverse reform case").<br>
+          • Stability Score &lt;50: High reform risk; run two IC scenarios — base (current take) and adverse (+8–15pp take based on historical reform magnitude from Reform History tab).<br><br>
+          <strong>Fiscal vintage risk quantification methodology:</strong><br>
+          1. From Reform Risk tab: identify the last 3 significant reforms (magnitude &gt;5pp take change) — use these as the range of adverse scenarios.<br>
+          2. Assign probability weights: P(reform within project life) = 1 − (annual reform probability × project life). Use Reform History frequency data as the empirical base rate.<br>
+          3. Compute probability-weighted IRR: IRR_adjusted = P(no reform) × IRR_base + P(reform) × IRR_adverse.<br>
+          4. Compare P(no reform) IRR to ORCA base IRR — the delta is the fiscal vintage risk discount.<br><br>
+          <strong>Stabilization clause mitigation:</strong> If the PSA/PSC contains a stabilization clause (fiscal terms frozen at FID date), the vintage risk discount may be materially reduced — but stabilization clauses are often incomplete or unenforceable in practice. See FAQ A40 for full stabilization clause analysis.<br><br>
+          <strong>Rule of thumb by regime stability tier:</strong><br>
+          • Stability Score ≥80 (Norway, UAE, Australia): Fiscal vintage risk discount = −0.5 to −1.0pp IRR; use base case with disclosure only.<br>
+          • Stability Score 60–79 (Ghana, Colombia, Malaysia): −1.5 to −2.5pp IRR; run adverse scenario; disclose stabilization clause status.<br>
+          • Stability Score &lt;60 (Algeria, Angola, Bolivia): −2.5 to −5pp IRR; adverse scenario required for IC approval; flag as material risk.<br><br>
+          <em>Source: ORCA v329 (Aug 2026). ORCA Reform History database (2026); Wood Mackenzie Fiscal Policy Risk Monitor (2025); Rystad Energy Country Risk Assessments (2025); EY Petroleum Fiscal Stabilization Clause Survey (2024). Cross-references: FAQ A40 (stabilization clauses); FAQ A43 (windfall profit taxes); FAQ A76 (recently-reformed regime IC workflow).</em></div>
+        </div>
+        <!-- v329: FAQ A370 — Portfolio diversification across fiscal mechanic types -->
+        <div class="faq-item" id="faq-A370">
+          <div class="faq-q">A370. What is the rationale for diversifying an upstream portfolio across fiscal mechanic types, and how should this be analyzed using ORCA's IOC Portfolio tab?</div>
+          <div class="faq-a"><strong>Fiscal mechanic diversification rationale:</strong> Different fiscal mechanic types have systematically different sensitivity to oil price, cost overruns, and government reform risk. A portfolio concentrated in a single mechanic type carries concentrated fiscal risk — specifically, concentrated exposure to the mechanic's price sensitivity (Swing pp) and reform vulnerability. IOC portfolio construction should treat fiscal mechanic type as a diversification dimension alongside geographic and operational diversification.<br><br>
+          <strong>Mechanic-type risk profiles for portfolio construction:</strong><br>
+          <em>Concession (royalty/CIT):</em> Low price sensitivity (Swing typically 10–20pp). Revenue-based royalty means government participation is automatic and proportional — no volume risk to government. Stable take across price cycles. Best diversifier against oil price downside.<br>
+          <em>PSC (profit oil split):</em> Higher price sensitivity (Swing 20–40pp for R-factor tiers). R-factor tiers mean government take rises sharply as cumulative production increases — more favorable in early project years, increasingly fiscal at maturity. Adds price-upside exposure: contractor captures disproportionate share of windfall at high prices.<br>
+          <em>PRRT (resource rent):</em> Extremely high price sensitivity at high oil prices (Swing 40–60pp in Australia PRRT scenarios). Government take is near-zero below threshold; accelerates steeply above. Natural hedge against oil price downside for contractor; government absorbs windfall upside above threshold.<br>
+          <em>Revenue share / RSC:</em> High sensitivity to cost overruns; low price sensitivity. Government take is formulaic on gross revenue — contractor bears all cost risk. Best for low-cost, low-capex short-cycle plays; high-risk for frontier development.<br><br>
+          <strong>Using ORCA IOC Portfolio tab for mechanic diversification analysis:</strong><br>
+          1. Load IOC Portfolio tab → select target operator (or "All") → Mechanic Mix donut shows current concentration by mechanic type.<br>
+          2. Tier Distribution bar shows A/B/C/D evidence quality by concentration — a high-D-tier concentrated portfolio has both data risk and fiscal diversification risk.<br>
+          3. Cross-reference Fiscal Compare tab (sorted by Swing pp) to identify low-Swing concession regimes available for portfolio diversification.<br>
+          4. IC memo: "Current portfolio mechanic concentration: [X]% [mechanic]. Proposed acquisition adds [Y]% [mechanic]. Post-acquisition Swing pp weighted average: [Z]pp (from [current] to [target])."<br><br>
+          <strong>Optimal diversification target (rule of thumb):</strong><br>
+          • No single mechanic type &gt;60% of portfolio NAV by conventional IOC strategy.<br>
+          • Concession 30–50% / PSC 30–50% / Other 10–20% is common among diversified majors.<br>
+          • High-PRRT portfolios (Australia-heavy) require $65+ oil to generate positive PRRT liability — below that threshold, portfolio behaves like a zero-take concession on the PRRT component.<br><br>
+          <em>Source: ORCA v329 (Aug 2026). Wood Mackenzie IOC Portfolio Benchmarking (2025); Rystad Energy Capital Allocation Framework (2025). Cross-references: FAQ A37 (IC capital allocation memo); FAQ A59 (cross-project capital allocation); FAQ A71 (IOC Portfolio tab usage).</em></div>
+        </div>
+        <!-- v329: FAQ A371 — Pre-development fiscal discount and time-to-production risk -->
+        <div class="faq-item" id="faq-A371">
+          <div class="faq-q">A371. How does pre-development delay risk affect fiscal economics, and how should IOC analysts discount ORCA take figures for long lead-time projects?</div>
+          <div class="faq-a"><strong>Pre-development delay and fiscal economics:</strong> Large upstream projects frequently experience pre-FID delays (permitting, FEED extension, financing, partner alignment) and post-FID delays (fabrication, installation, commissioning). Each year of delay reduces contractor NPV by approximately 10% (at a 10% discount rate) without changing the statutory fiscal take percentage. However, some fiscal regimes amplify or dampen the economic impact of delays through time-based fiscal provisions:<br><br>
+          <strong>Fiscal provisions that amplify delay risk:</strong><br>
+          <em>PSC cost recovery clocks:</em> Many PSCs impose a maximum cost recovery period (typically 7–15 years from first oil). A 2-year delay in first oil reduces available recovery period by 2 years, potentially leaving unrecovered costs at contract expiry. This creates a "cost recovery cliff" for long-delayed projects — particularly in Angola, Nigeria, and Malaysia where recovery periods are tight against project timescales.<br>
+          <em>License expiry / relinquishment requirements:</em> Exploration licenses with fixed duration (5–8 years to commerciality declaration) penalize development delays by forcing relinquishment before FID. Some regimes allow extension (often at a cost — additional signature bonus or mandatory surrender of acreage), which is effectively a delay-triggered fiscal levy.<br>
+          <em>Windfall tax thresholds indexed to first production date:</em> The UK Energy Profits Levy (EPL) and similar windfall mechanisms may have sunset clauses linked to calendar date rather than project production date. A post-2025 first oil date in the UK puts production squarely within the EPL window; a pre-2025 startup avoids it. This creates a binary fiscal step-change from delay.<br><br>
+          <strong>Fiscal provisions that dampen delay risk:</strong><br>
+          <em>Norway PRRT uplift:</em> Pre-production costs receive LTBR+5pp uplift per year while awaiting production. A 3-year delay adds ~15pp uplift to the pre-production cost pool, partially offsetting the NPV timing drag.<br>
+          <em>UK RFES (Ring Fence Expenditure Supplement):</em> Pre-production exploration and development costs receive 10pp annual uplift (max 10 years) against future UK ring-fence income. Delay-phase costs continue to accumulate uplift value — mechanically, some UK fiscal value is created during pre-production delay.<br><br>
+          <strong>4-step IC workflow for delay risk disclosure:</strong><br>
+          1. Identify delay-sensitive fiscal provisions: cost recovery clocks, license expiry risk, windfall tax sunset dates, uplift mechanisms.<br>
+          2. Run ORCA Scenario Builder base case (on-schedule); re-run with 2-year and 4-year delay scenarios by adjusting project start year.<br>
+          3. For cost recovery cliff risk: model truncated recovery in delayed scenario; flag residual unrecovered costs as NPV impairment.<br>
+          4. IC memo: Disclose delay sensitivity by fiscal provision; quantify NPV impact of 2-year delay; flag binary fiscal events (EPL window, license expiry).<br><br>
+          <strong>Rule of thumb NPV sensitivity to 1-year delay (by mechanic):</strong><br>
+          • Concession: −9 to −11% NPV (pure time value, no fiscal amplification in most regimes).<br>
+          • PSC with cost recovery clock: −12 to −18% NPV (time value + recovery period compression).<br>
+          • Norway PRRT/UK RFES: −6 to −8% NPV (uplift mechanism partially offsets time value drag).<br>
+          • Revenue share / RSC: −9 to −11% NPV (no special provision — pure time value).<br><br>
+          <em>Source: ORCA v329 (Aug 2026). Wood Mackenzie Project Timing &amp; Fiscal Risk (2025); HMRC RFES Technical Guidance; Norwegian Ministry of Finance Petroleum Tax Regulations; IHS Markit Project Schedule Risk Benchmarking (2024). Cross-references: FAQ A40 (stabilization clauses); FAQ A43 (windfall profit taxes); FAQ A86 (North Sea fiscal mechanics); FAQ A369 (fiscal vintage risk).</em></div>
+        </div>
     <div style="text-align:right;margin-top:16px;padding-top:10px;border-top:1px solid var(--border);">
       <a href="#tab-btn-tmeth" onclick="document.getElementById('tab-btn-tmeth')&&document.getElementById('tab-btn-tmeth').scrollIntoView({behavior:'smooth'});return false;" style="font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:4px;padding:3px 10px;transition:.15s;" title="Return to Methodology top">&#8679; Back to top</a>
     </div>
 
     <div style="margin-top:20px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;" id="cite-text"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v328, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
-      <button id="cite-copy-btn" onclick="(function(){var t=document.getElementById('cite-copy-btn');navigator.clipboard.writeText('ORCA Petroleum Fiscal Intelligence Platform (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v328, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/').then(function(){t.textContent='Copied!';setTimeout(function(){t.textContent='Copy Citation';},2000);}).catch(function(){t.textContent='Copy failed';setTimeout(function(){t.textContent='Copy Citation';},2000);});})()" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:inherit;" aria-label="Copy full citation to clipboard">Copy Citation</button>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;" id="cite-text"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v329, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <button id="cite-copy-btn" onclick="(function(){var t=document.getElementById('cite-copy-btn');navigator.clipboard.writeText('ORCA Petroleum Fiscal Intelligence Platform (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v329, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/').then(function(){t.textContent='Copied!';setTimeout(function(){t.textContent='Copy Citation';},2000);}).catch(function(){t.textContent='Copy failed';setTimeout(function(){t.textContent='Copy Citation';},2000);});})()" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:inherit;" aria-label="Copy full citation to clipboard">Copy Citation</button>
 
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v328." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v329." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
         <strong style="color:var(--text);">Short-form citation for footnotes:</strong><br>
-        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v328 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
-        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v328, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
-        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v328."
+        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v329 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
+        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v329, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
+        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v329."
       </div>
     </div>
   </div>
@@ -18590,8 +18776,13 @@ function exportFCResults() {
   // v313: use filtered results if any filter is active, else fall back to full results
   const rows = (window._fcFilteredResults && window._fcFilteredResults.length) ? window._fcFilteredResults : window._fcResults;
   if (!rows || !rows.length) { showCopyToast('Run Fiscal Compare first to generate results.'); return; }
+  const fcPriceEl = document.getElementById('fc-price');
+  const fcPrice = fcPriceEl ? fcPriceEl.value : '75';
+  const fcProfileEl = document.getElementById('fc-profile');
+  const fcProfileKey = fcProfileEl ? fcProfileEl.value : 'deepwater';
+  const profileObj = DCF_PROFILES[fcProfileKey] || DCF_PROFILES['deepwater'];
   const data = [
-    ['Rank', 'Country', 'Region', 'Mechanic', 'R_factor_Tiers', 'Take%', 'GovtTake_50', 'GovtTake_75', 'GovtTake_100', 'GovtTake_125', 'Swing_pp', 'Govt NPV ($M est)', 'Contractor NPV ($M)', 'IRR%', 'Breakeven', 'Tier'],
+    ['Rank', 'Country', 'Region', 'Mechanic', 'R_factor_Tiers', 'Take%', 'GovtTake_50', 'GovtTake_75', 'GovtTake_100', 'GovtTake_125', 'Swing_pp', 'Govt NPV ($M est)', 'Contractor NPV ($M)', 'IRR%', 'Breakeven', 'Tier', 'Evidence A/B (%)'],
     ...rows.map(function(r, i) {
       const tier = getTierInfo(r.liveTake);
       const take = r.liveTake, npv = r.liveNPV;
@@ -18612,17 +18803,37 @@ function exportFCResults() {
         npv != null ? +npv.toFixed(1) : null,
         r.liveIRR != null && r.liveIRR < 500 ? +r.liveIRR.toFixed(1) : null,
         r.be_75 != null && r.be_75 > 0 && r.be_75 < 999 ? +r.be_75.toFixed(1) : null,
-        tier.label
+        tier.label,
+        r.ab_pct != null ? +r.ab_pct.toFixed(1) : null
       ];
     })
   ];
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(data);
   XLSX.utils.book_append_sheet(wb, ws, 'Fiscal Compare');
-  const fcPriceEl = document.getElementById('fc-price');
-  const fcPrice = fcPriceEl ? fcPriceEl.value : '75';
-  const fcProfileEl = document.getElementById('fc-profile');
-  const fcProfileKey = fcProfileEl ? fcProfileEl.value : '';
+  // v329: M6.2 — Methodology sheet for IC memo traceability
+  var projLifeYrs = (fcProfileKey === 'marginal') ? 15 : (fcProfileKey === 'lng') ? 30 : 25;
+  var methRows = [
+    ['ORCA Petroleum Fiscal Intelligence Platform'],
+    ['Version: v329 | yoburgqs.github.io/petroleum-fiscal-db/'],
+    [''],
+    ['Profile assumptions:'],
+    ['  Peak rate (bopd)', profileObj.peakBblDay],
+    ['  Capex ($M)', profileObj.capexMM],
+    ['  Opex ($/bbl)', profileObj.opexBbl],
+    ['  Project life (yr)', projLifeYrs],
+    ['  Discount rate (%)', +(profileObj.discountRate*100).toFixed(0)],
+    ['  Oil price ($/bbl)', +fcPrice],
+    [''],
+    ['Evidence tier definitions:'],
+    ['  A-tier: Primary legislation or signed PSA text'],
+    ['  B-tier: Verified secondary source (EY/Wood Mac/Rystad)'],
+    ['  C-tier: Directional estimate — verify before IC submission'],
+    [''],
+    ['Citation: ORCA (2026), v329. yoburgqs.github.io/petroleum-fiscal-db/']
+  ];
+  var methSheet = XLSX.utils.aoa_to_sheet(methRows);
+  XLSX.utils.book_append_sheet(wb, methSheet, 'Methodology');
   const fcProfileSlug = fcProfileKey ? '_' + fcProfileKey.replace(/[^a-z0-9]/gi, '-') : '';
   var _regionSlug = (window._fcRegionFilter || '').replace(/[^a-z0-9]/gi, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
   var _regionPart = _regionSlug ? '_' + _regionSlug : '';
