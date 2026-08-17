@@ -13641,6 +13641,25 @@ function loadCountryProfile(country) {
     </p>
     <div id="dd-simple-avg-note-${_safeSlugForSimpleAvg}" style="font-size:0.75em;color:var(--muted);margin-top:4px;line-height:1.5;"></div>
     ${getMechBlendWarning(d)}
+    ${(function() {
+      // v328 M5.3: Compact peer context strip — regional and global median take vs. this country
+      if (_isMonopoly || d.take_75 == null) return '';
+      var _cpRegion = d.region;
+      var _cpRegPeers = (COUNTRY_DATA || []).filter(function(x) { return x.region === _cpRegion && x.take_75 != null; }).map(function(x) { return x.take_75; }).sort(function(a,b){return a-b;});
+      var _cpRegMed = _cpRegPeers.length ? (_cpRegPeers.length % 2 === 0 ? (_cpRegPeers[_cpRegPeers.length/2-1]+_cpRegPeers[_cpRegPeers.length/2])/2 : _cpRegPeers[Math.floor(_cpRegPeers.length/2)]) : null;
+      var _cpAllTakes = (COUNTRY_DATA || []).filter(function(x){return x.take_75!=null;}).map(function(x){return x.take_75;}).sort(function(a,b){return a-b;});
+      var _cpGlobMed = _cpAllTakes.length ? (_cpAllTakes.length%2===0?(_cpAllTakes[_cpAllTakes.length/2-1]+_cpAllTakes[_cpAllTakes.length/2])/2:_cpAllTakes[Math.floor(_cpAllTakes.length/2)]) : null;
+      var _cpDelta = (d.take_75 != null && _cpRegMed != null) ? (d.take_75 - _cpRegMed) : null;
+      if (!_cpRegMed || !_cpGlobMed || _cpDelta === null) return '';
+      var _cpDeltaCol = Math.abs(_cpDelta) < 3 ? 'var(--muted)' : _cpDelta > 0 ? 'var(--negative)' : 'var(--positive)';
+      return '<div style="font-size:11px;color:var(--muted);margin-top:6px;padding:5px 10px;background:var(--surface2);border-radius:4px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;">'
+        + '<span>Regional median <strong style="color:var(--text);">(' + _cpRegion + '): ' + _cpRegMed.toFixed(1) + '%</strong></span>'
+        + '<span style="color:var(--border);">·</span>'
+        + '<span>Global median: <strong style="color:var(--text);">' + _cpGlobMed.toFixed(1) + '%</strong></span>'
+        + '<span style="color:var(--border);">·</span>'
+        + '<span>This country: <strong style="color:' + _cpDeltaCol + ';">' + (_cpDelta > 0 ? '+' : '') + _cpDelta.toFixed(1) + 'pp vs region</strong></span>'
+        + '</div>';
+    })()}
   </div>
   ${(function(){
     const mb = MECHANIC_BREAKDOWN[country];
