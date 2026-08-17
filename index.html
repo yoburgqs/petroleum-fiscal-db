@@ -1478,6 +1478,15 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Heatmap of reforms by decade. A country at 60% take with no changes in 30 years is safer than one at 58% that rewrites terms every 5 years. Stable vs volatile country lists.</div>
       <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:var(--accent-dim);line-height:1.55;"><strong>Example:</strong> "Which countries have changed fiscal terms more than 3 times since 2000?" &rarr; Reform Risk heatmap &rarr; volatile country list.</div>
     </div>
+    <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="openScenarioBuilder()">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+        <span style="font-size:22px;line-height:1;">&#x2692;</span>
+        <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Scenario Builder</div><div style="font-size:11px;color:var(--muted);">Model custom fiscal terms &mdash; set royalty, CIT, profit oil split</div></div>
+        <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
+      </div>
+      <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Define any combination of fiscal instruments and run a full DCF. Compare your custom regime against the 185-country database &mdash; see where it ranks by take, NPV, and IRR. Essential for bid calibration and IC scenario analysis.</div>
+      <div style="background:rgba(176,104,0,.07);border-left:3px solid var(--accent);border-radius:0 4px 4px 0;padding:8px 10px;font-size:11px;color:var(--accent-dim);line-height:1.55;"><strong>Example:</strong> "If we bid 15% royalty + 30% CIT + 60/40 profit oil, where does that rank globally?" &rarr; Set parameters &rarr; Run DCF &rarr; See rank vs. 185 countries.</div>
+    </div>
   </div>
   <div style="display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;align-items:center;margin-bottom:8px;">
     <span style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:4px;">Shortcuts:</span>
@@ -1577,7 +1586,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <button class="fc-sort-btn" data-sort="breakeven" tabindex="0" aria-label="Sort by Breakeven price (low to high)">Breakeven &#9650;</button>
     <button class="fc-sort-btn" data-sort="country" tabindex="0" aria-label="Sort alphabetically by country name">A&#8211;Z</button>
     <div class="fc-stability-toggle">
-      <input type="checkbox" id="fc-stability-check">
+      <input type="checkbox" id="fc-stability-check" checked>
       <label for="fc-stability-check" title="Adds a Stability column. Score = 5 minus number of fiscal law changes since 2010. ◆◆◆◆◆ (5) = zero changes = most stable. ◇◇◇◇◇ (0) = 5+ changes = most volatile.">Show Stability</label>
     </div>
   </div>
@@ -12285,6 +12294,29 @@ function runScreener() {
     </tr>`;
   }).join('');
   window._screenerData = data;
+
+  // M1.3: Inject "Load top 4 in Side-by-Side" button after results render
+  var top4 = data.slice(0, 4);
+  var screenerTop4Btn = document.getElementById('screener-top4-btn');
+  if (!screenerTop4Btn) {
+    screenerTop4Btn = document.createElement('div');
+    screenerTop4Btn.id = 'screener-top4-btn';
+    screenerTop4Btn.style.cssText = 'margin-bottom:10px;';
+    var countEl = document.getElementById('screener-count');
+    if (countEl && countEl.parentNode) countEl.parentNode.insertBefore(screenerTop4Btn, countEl.nextSibling);
+  }
+  if (top4.length >= 2) {
+    var top4safe = top4.map(function(d) { return d.country.replace(/'/g, "\\'"); });
+    var top4calls = top4safe.map(function(c) { return "addCompare('" + c + "');"; }).join('');
+    screenerTop4Btn.innerHTML = '<button onclick="(function(){' + top4calls + "var btn=[...document.querySelectorAll('.tab-btn')].find(function(b){return b.textContent.includes('Side-by-Side');});if(btn)switchTab('t2',btn);})()\""
+      + ' style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:11px;font-weight:600;padding:4px 12px;cursor:pointer;transition:.15s;margin-top:6px;"'
+      + ' onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'"'
+      + ' title="Load top ' + top4.length + ' Screener results into Side-by-Side for detailed comparison">'
+      + '&#x21cc; Load top ' + top4.length + ' in Side-by-Side &rarr;'
+      + '</button>';
+  } else {
+    screenerTop4Btn.innerHTML = '';
+  }
 }
 
 function exportScreenerCSV() {
@@ -17594,7 +17626,7 @@ function renderFCResults(results, price) {
     + 'onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'" '
     + 'title="Load the top 5 countries (by current sort) into Side-by-Side for detailed comparison">&#x21cc; Load Top 5 in Side-by-Side</button>';
   var _clickHint = '<div style="font-size:11px;color:var(--muted);background:rgba(176,104,0,.05);border-left:2px solid rgba(176,104,0,.3);padding:5px 12px;margin-bottom:10px;border-radius:0 4px 4px 0;display:flex;align-items:center;gap:12px;flex-wrap:wrap;">'
-    + '<span>\u25b6 Click any row to expand fiscal breakdown &mdash; or use +Compare to add to side-by-side</span>'
+    + '<span>\u25b6 Click any row to expand fiscal breakdown &mdash; or use +Compare to add to side-by-side. Found a shortlist? Use <strong>+ Scenario</strong> in the header to model custom terms.</span>'
     + top5btn
     + '</div>';
   var html = profileBanner + _fcStatsBar + _clickHint + '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
@@ -17604,6 +17636,7 @@ function renderFCResults(results, price) {
   var priceTag = price ? ' <span style="font-size:9px;color:var(--muted);font-weight:400;">@$' + price + '</span>' : '';
   html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as % of gross revenue — royalties + taxes + profit oil (all instruments)">Take%' + priceTag + '</th><th class="num" title="Estimated government NPV derived from contractor NPV using the formula: Govt NPV = Ctct NPV × take / (1 − take). Not independently modeled — use as indicative order-of-magnitude only. Actual govt NPV depends on timing of fiscal receipts and discount rates applied by the state.">Govt NPV \u24d8</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="Contractor net present value at selected price and profile. Discounted at 10%. Reflects cost recovery, profit oil/royalty, and tax deductions as applicable to the primary mechanic.">Ctct NPV' + priceTag + '</th><th class="num" ' + (sortField==='irr'?'aria-sort="descending"':'') + ' title="Contractor IRR at selected price — IRR \u2265500% excluded as unbounded; shown for countries with verified opex/capex">IRR%' + priceTag + '</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + '>Breakeven</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price sensitivity: take@$125 \u2212 take@$50 in percentage points. High swing = fiscal regime sensitive to price changes.">Swing</th>';
+  html += '<th class="num" title="Data source quality: % of fiscal facts from A/B-tier (primary legislation or verified sources). A = primary law; B = verified secondary; C = directional. Low scores require additional verification before IC submission.">Src</th>';
   if (showStability) {
     html += '<th class="num" title="Fiscal stability score since 2010. 5 dots = zero regime changes (most stable). 0 dots = 5+ changes (most volatile). Scored as: 5 minus number of reform events in ORCA database from 2010 onward. Covers legislated tax rate changes, new levies, and PSC renegotiations — not operational or political events.">Stability \u24d8</th>';
   }
@@ -17635,6 +17668,7 @@ function renderFCResults(results, price) {
     html += '<td class="num">' + irrStr + '</td>';
     html += '<td class="num">' + beStr + '</td>';
     html += '<td class="num">' + (r.swing != null ? '<span style="color:' + swingCol + ';font-weight:600">' + (r.swing > 0 ? '+' : '') + r.swing.toFixed(1) + 'pp</span>' : '\u2014') + '</td>';
+    html += '<td class="num">' + getTierBadge(r.ab_pct || 0, 'Source quality: ' + (r.ab_pct||0).toFixed(0) + '% A/B-tier') + '</td>';
     if (showStability) {
       var stab = stabilityScores[r.country] != null ? stabilityScores[r.country] : 5;
       html += '<td class="num">' + stabDots(stab) + '</td>';
@@ -17782,6 +17816,13 @@ function openFCDrilldown(country) {
   const canvasId = 'drawer-waterfall-' + slug;
 
   let html = '<div class="fc-drawer open">';  // v99: "open" class for test detection and state tracking
+  // M2.2: C-tier evidence warning banner
+  const _ab_pct = d.ab_pct || 0;
+  if (_ab_pct < 60) {
+    html += '<div style="background:rgba(185,28,28,.07);border-left:3px solid var(--red);padding:6px 10px;font-size:11px;border-radius:0 4px 4px 0;margin-bottom:8px;">'
+      + '<strong style="color:var(--red);">\u26a0 Source quality: C-tier</strong> ('
+      + _ab_pct.toFixed(0) + '% A/B sourced). Verify parameters in Country Profile before IC memo.</div>';
+  }
   html += '<div style="display:flex;align-items:baseline;gap:12px;margin-bottom:14px;flex-wrap:wrap">';
   html += '<span style="font-size:18px;font-weight:800">' + country + '</span>';
   html += '<span style="color:var(--text-muted);font-size:13px">' + (d.region||'') + '</span>';
