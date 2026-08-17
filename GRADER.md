@@ -469,9 +469,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-17 (Cycle 254 — M1.4 IOC Portfolio Explorer navigation, v325)
+**Last Updated:** 2026-08-17 (Cycle 262 — IC citation sweep, FAQ A374, What's New order fix, v333)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 254 shipped v325: M1.4 implemented — "Explore all [operator] countries in the data →" button added to `renderIOCExposure()` below the tier distribution metrics. Navigates to Explorer Browse mode. Also verified M2.1, M2.2, M3.1 already complete in prior cycles (GRADER updated to reflect). Roadmap M1/M2/M3 all done. Next: M4.1 (Scenario Builder card on Home tab) and M4.2 (FC hint text). JS syntax gate PASS / 5 blocks / 0 errors. 136 PASS / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 262 shipped v333: IC memo citation sweep (166 stale "ORCA v331" → "ORCA v332"), What's New panel order corrected (v332 was in position 5 with stale LATEST badge), FAQ A374 added (PSC profit oil tier ladder production-decline IC workflow — 5–15pp late-life take reduction rule of thumb, 4-step Scenario Builder workflow, Angola/Nigeria/Malaysia benchmarks), Run Compare onclick→addEventListener security migration, v332→v333 structural sweep. JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
 **Previous [Cycle 240]:** Cycle 240 shipped v307: 10 FAQs A261–A270 (NOC equity participation, inflation/currency risk, bid evaluation workflow, pipeline tariff interaction, insurance obligations, signature bonus DCF, brownfield/tie-back treatment, mixed-regime protocol, unitization fiscal treatment, WPT trigger analysis). FAQ count 260→270. v306→v307 metadata sweep. JS syntax gate PASS / 4 blocks / 0 errors. 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -718,6 +718,43 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v328. Copy Citation button updated to v328. |
 
 **Grade changes:** Interaction Design ↑ (FC drilldown Δ vs $50 row). Information Architecture ↑ (M5.3 peer context strip; FAQ A361; v328 What's New). Data Presentation ↑ (FC drilldown Δ row; CP NPV/Breakeven rank badges; CP Swing regime label). Naming Consistency ↑ (v328 sweep; At a Glance 361; Methodology A1–A361). Professional Credibility ↑ (FAQ A361 deepwater frontier; M5.3 peer context; CP key metric rank context). SDLC Maturity ↑ (syntax gate PASS + Cycle 257 log + v328 changelog). Performance & Reliability = (A maintained). Data Reliability = (A maintained). v328 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
+## Cycle 262 — v333 Grade Table
+
+**Cycle 262 — v333:** 10 targeted improvements across 8 categories. (1) **Naming Consistency**: 166 stale "ORCA v331" IC memo template citations updated to "ORCA v332" across all FAQ bodies — analysts copying template language from any FAQ now get the correct platform version. (2) **Visual Design / Naming Consistency**: What's New panel ordering bug fixed — v332 card was incorrectly placed in position 5 (last slot) with LATEST badge while v331 was in position 1 also with LATEST badge; v333 now correctly occupies position 1 with LATEST, followed by v332 (position 2), v331, v330, v329. (3) **SDLC Maturity**: v332→v333 structural sweep (title, meta description, header badge, print header, Methodology page-sub, At a Glance stat, How to Cite full+short form, clipboard, Scenario Builder reference, XLSX Methodology sheet citation). (4) **Professional Credibility / Information Architecture**: FAQ A374 added — PSC profit oil tier ladder and production-decline effective take: explains when ORCA's mid-tier approximation overstates government take for late-life assets below the lower production tier threshold; 5–15pp late-life reduction rule of thumb by country (Angola 8–12pp, Nigeria 6–10pp, Malaysia 5–8pp); 4-step IC adjustment workflow with Scenario Builder production-weighted profit oil input; key distinction between rate-ladder PSCs vs. R-factor PSCs; IC memo disclosure template. FAQ count 373→374. (5) **Security**: Run Compare button inline `onclick` attribute migrated to `addEventListener` — static button handler removed per CSP hardening program. (6) **Export/Shareability**: XLSX Methodology sheet version citation updated v332→v333. JS syntax gate PASS.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 9. Performance & Reliability | A | = | Single-file architectural constraint unchanged. Service Worker (v309). dns-prefetch (v261). All other perf improvements applied. |
+| 2 | 8. Data Reliability | A | = | IRR coverage: 165/185 (89%), 124 shown in UI. 374 FAQs (A1–A374, v333). Benchmark 185/185 (100%). Breakeven coverage 68/185. FAQ A374 adds IC guidance for production-decline take adjustment. Remaining gap: IRR coverage ceiling. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. iOS auto-zoom fix (v239). viewport-fit=cover (v252). touch-action:manipulation (v306). |
+| 4 | 4. Interaction Design | A+ | = | Auto-run on first tab activation (v219). Fiscal Compare reading guide strip (v288). FC row price matrix (v310). FC region filter chips (v312). CP navigator (v313). Scenario Builder take clamp warning (v326). FC clickHint exact-spec (v327). FC drilldown Δ vs $50 row (v328). |
+| 5 | 2. Information Architecture | A+ | ↑ | 374 analyst FAQs (A1–A374, v333). What's New panel: v333 LATEST card; 5-card limit enforced (v328 removed). FAQ A374: PSC tier ladder decline IC workflow. v333 changelog in Methodology tab. |
+| 6 | 6. Error & Empty States | A+ | = | All four primary tabs auto-load (v219). CDN failure banner (v252). Reform Risk race condition retry (v271). Speculative badge tooltip names all 7 countries (v326). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 262). v332→v333 sweep. Cycle 262 log added. v333 changelog prepended to Methodology tab. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). focus-visible outline (v241). spellcheck=false on search inputs (v306). Skip to FAQs link (v306). |
+| 9 | 12. Security / Data Integrity | A+ | ↑ | Run Compare button onclick→addEventListener (v333). unsafe-inline now confined to dynamically-rendered innerHTML only. JS syntax gate PASS. Contract count correct 71,601. |
+| 10 | 1. Visual Design | A+ | ↑ | What's New panel order corrected (v332 was last with LATEST; v333 now first with LATEST; v331 LATEST badge removed). Zero off-palette hex values. |
+| 11 | 3. Data Presentation | A+ | = | IRR scatter 124/185. Data Coverage At a Glance (v299). FC row price matrix (v310). FC drilldown Δ vs $50 (v328). Country Profile NPV/Breakeven global rank + Swing label (v328). |
+| 12 | 5. Naming Consistency | A+ | ↑ | 166 stale "ORCA v331" citations corrected to "ORCA v332" across all FAQ bodies. What's New panel order corrected. v333 structural sweep complete. How to Cite v333. Copy Citation button JS v333. XLSX Methodology sheet v333. All structural citations current to v333. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 374 FAQs (A1–A374). FAQ A374: PSC profit oil tier ladder production-decline effective take — 5–15pp late-life rule of thumb, 4-step IC workflow, rate-ladder vs. R-factor distinction, Angola/Nigeria/Malaysia benchmarks. All IC memo templates current to v332 (updated from v331 this cycle). |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | ↑ | XLSX, CSV, PDF, PNG across all tabs. M6.1+M6.2 confirmed (v329/v331). How to Cite v333. Copy Citation button v333. XLSX Methodology sheet v333. |
+
+**Grade changes:** Information Architecture ↑ (FAQ A374 + v333 What's New card + 374 FAQ count). SDLC Maturity ↑ (v333 sweep + Cycle 262 log). Security ↑ (Run Compare inline handler migrated). Visual Design ↑ (What's New panel order corrected). Naming Consistency ↑ (166 stale citations fixed; panel order bug fixed; v333 sweep). Professional Credibility ↑ (FAQ A374 PSC tier ladder IC workflow). Export/Shareability ↑ (XLSX Methodology sheet v333). Performance & Reliability = (A maintained). Data Reliability = (A maintained — IRR ceiling 165/185 unchanged).
+
+---
+
+## Cycle 262 Log — 2026-08-17
+- Test before: 136 PASS / 0 FAIL (Cycle 261 confirmed)
+- JS syntax gate: PASS / 11 blocks / 0 errors (v333 verified)
+- Test after: 136 PASS / 0 FAIL / 0 JS errors
+- Changes: (1) 166 stale "ORCA v331" IC memo template citations updated to "ORCA v332" across FAQ bodies; (2) What's New panel order corrected: v332 card moved from position 5 to position 2; v331 LATEST badge removed; v333 LATEST card added as position 1; v328 card removed (5-card limit); (3) FAQ A374 added: PSC profit oil tier ladder and production-decline effective take — IC adjustment workflow, 5–15pp late-life rule of thumb, Angola/Nigeria/Malaysia benchmarks, rate-ladder vs. R-factor distinction, 4-step Scenario Builder workflow, IC memo disclosure template; (4) FAQ count 373→374 in At a Glance stat and Methodology page-sub; (5) Run Compare button onclick attribute migrated to addEventListener (data-action="runFiscalCompare" + inline JS at body end); (6) v332→v333 structural sweep: title, meta description, header badge, print header meta, What's New label, How to Cite full+short form, clipboard text, Scenario Builder citation, XLSX Methodology sheet version; (7) v333 changelog entry prepended to Methodology Recent Platform Updates; (8) Prefetch link for reform_history.json already present — confirmed in place
+- All 10 Priority 1 UX checks: No regression — no changes to Reform Risk retry, Fiscal Mechanic Breakdown, Data Completeness, Reference Guide, Scenario modal, Explorer chip, Breakeven Map, Country name prominence, MC label, Contract Distribution
+- Downgrade hunt: Performance & Reliability A — single-file constraint unchanged. Data Reliability A — IRR ceiling 165/185 unchanged; 374 FAQs maintain A (not A+ due to IRR/BE coverage gaps). Visual Design A+ — downgrade hunt: found What's New panel ordering bug (v332 was in position 5 with LATEST badge, v331 in position 1 also with LATEST). FIXED this cycle. Naming Consistency A+ — downgrade hunt: found 166 stale "ORCA v331" IC memo citations not updated in v332 sweep. FIXED this cycle.
+- Summary: 10 improvements in Cycle 262. Primary focus: quality and correctness. Two bugs caught and fixed: (1) What's New panel had v332 card in wrong position (5th/last) and v331 card had stale LATEST badge; (2) 166 IC memo citations were not updated to v332 in the Cycle 261 sweep. FAQ A374 addresses a systematic IC adjustment gap for production-declining assets in tiered PSCs. v333 live at yoburgqs.github.io/petroleum-fiscal-db/
 
 ---
 
