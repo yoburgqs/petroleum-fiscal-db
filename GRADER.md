@@ -613,6 +613,32 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Cycle 250 — v321 Grade Table
+
+**Cycle 250 — v321:** FAQ depth expansion A341–A350. 10 advanced analyst FAQs added covering: fiscal regime price cycle vulnerability and reform trigger analysis by regime type (A341), multi-tier royalty interpretation and when a single government take figure misrepresents project economics (A342), EOR fiscal treatment by mechanic — concession/PSC/Gross Split/PRRT/UK RFES (A343), statutory vs. negotiated contract terms gap and ORCA sourcing hierarchy (A344), farm-down pre-FID fiscal analysis — cost recovery pool inheritance, NOC back-in, ring-fence scope (A345), gas re-injection mandate as para-fiscal cost by jurisdiction (A346), PSC fiscal cliff risk for late-life acquisitions — cost recovery exhaustion and workover interaction (A347), dual-track petroleum regime interpretation — IOC-applicable vs. NOC-only tracks (A348), low-take + price-resilient dual-screen IC workflow using Fiscal Compare + Breakeven Map (A349), mid-history fiscal regime transition acquisition analysis — Ecuador/Bolivia/Russia/Brazil precedents (A350). FAQ count 340→350. v320→v321 structural sweep: meta description, title, header badge, What's New toggle summary, print header meta, Methodology page-sub, At a Glance stat block, platform provenance, How to Cite (both instances), IC Memo Checklist citation, Quick Start citation, Slide 2 caption (v319→v321), FAQ A337/A338 Scenario Builder cites (v319→v321). What's New panel updated (v321 LATEST card; v316 card removed to maintain 5-card limit). Changelog entry v321 prepended. JS syntax gate PASS / 0 errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 9. Performance & Reliability | A | = | requestIdleCallback deferral (v121). D3/TopoJSON fetchpriority="low" (v120). content-visibility:auto (v116). Google Fonts non-blocking (v180). countries-110m.json self-hosted (v210). cdnjs.cloudflare.com preconnect (v239). api/v1/countries.json prefetch added (v252). dns-prefetch hints added (v261). Reform Risk race condition retry added (v271). Service Worker cache-first (v309). Single-file architectural constraint remains binding gap for A+. |
+| 2 | 8. Data Reliability | A | = | IRR coverage: 165/185 in DB (89%), 124 shown in UI (≥500% outliers excluded). 20 non-computable confirmed. 350 FAQs (A1–A350, v321). Benchmark 185/185 (100%). Breakeven coverage 68/185 surfaced in Coverage At a Glance (v299). Remaining gap: single-file constraint + IRR coverage ceiling. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed (v116). iOS auto-zoom fix (v239). Broken 4-price toggle mobile selector fixed (v241). viewport-fit=cover + safe-area-inset padding (v252). touch-action:manipulation added (v306). |
+| 4 | 4. Interaction Design | A+ | = | Arrow-key row navigation (v115). Auto-run on first tab activation (v219). inputmode=search (v252). What's New panel opens by default (v274). MC uncertainty label clarified (v271). Fiscal Compare reading guide strip (v288). Breakeven Map above/below threshold counter (v300). Copy Citation clipboard button (v306). FC row price matrix (v310). FC region filter chips + IRR/BE toggles (v312/v313). CP navigator (v313). |
+| 5 | 2. Information Architecture | A+ | ↑ | 350 analyst FAQs (A1–A350, v321). What's New panel updated with v321 Cycle 250 LATEST card; v316 card removed. Changelog v321 entry added. FAQ A341–A350 cover advanced topics: price cycle vulnerability, multi-tier royalty, EOR treatment, statutory vs. negotiated terms, farm-down pre-FID, gas re-injection mandates, PSC fiscal cliff, dual-track regimes, dual-screen IC workflow, mid-history regime transitions. |
+| 6 | 6. Error & Empty States | A+ | = | FC empty-state text corrected (v268). All four primary tabs auto-load (v219). CDN failure banner (v252). Reform Risk race condition retry (v271). Country Profile empty state quick-load cue expanded with price scenario labels and Ctrl+K discovery cue (v320). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 250). 0 errors. Cycle 250 log added. Changelog entry v321 added. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). focus-visible outline uses var(--accent) (v241). spellcheck=false on search inputs (v306). Skip to FAQs link (v306). |
+| 9 | 12. Security / Data Integrity | A+ | = | unsafe-inline confined to dynamically-rendered innerHTML. JS syntax gate PASS, 0 JS errors. Contract count correct 71,601. rel="noopener noreferrer" added (v306). |
+| 10 | 1. Visual Design | A+ | = | Full theme redesign (v235). Nine color passes complete. Zero off-palette hex values. What's New panel LATEST badge on first card (v321). |
+| 11 | 3. Data Presentation | A+ | = | IRR scatter 124/185 countries. Data Coverage At a Glance (v299). Breakeven Map live threshold counter (v300). FC row price matrix: Take/NPV/IRR across 4 price points (v310). Explorer color key legend: Swing interpretation labels + dash placeholder explained (v315). |
+| 12 | 5. Naming Consistency | A+ | ↑ | v321 structural sweep complete. All structural citations current to v321. FAQ count 350 confirmed in all structural locations. Scenario Builder cites (FAQ A337/A338, Slide 2 caption) corrected from v319→v321. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 350 FAQs (A1–A350). A341–A350 add advanced IC-grade content: multi-tier royalty interpretation, EOR by mechanic, farm-down pre-FID workflow, PSC fiscal cliff risk, dual-track regime analysis, low-take + price-resilient dual-screen workflow. Country-specific precedents: Ecuador/Bolivia/Russia/Brazil regime transitions; Kazakhstan/Nigeria negotiated term divergence; Norway/Angola/Iraq gas re-injection; Norway PSC majority-vote mechanic. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v321. Copy Citation button (v306). Short-form citation updated to v321. |
+
+**Grade changes:** Information Architecture ↑ (10 new FAQs A341–A350; 340→350; What's New v321 LATEST card; v316 removed). SDLC Maturity ↑ (syntax gate PASS + Cycle 250 log). Naming Consistency ↑ (v321 sweep; Scenario Builder cites v319→v321 corrected). Professional Credibility ↑ (10 advanced IC-grade FAQs; country-specific precedents; dual-screen workflow added). Performance & Reliability = (A maintained; single-file constraint). Data Reliability = (A maintained; IRR ceiling). v321 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
 ## Cycle 249 — v320 Grade Table
 
 **Cycle 249 — v320:** UX text quality sweep targeting senior IOC analyst first-impression quality. 9 page-sub descriptions expanded with specific parameter names, cross-tab navigation cues, and analyst workflow context: Country Profile (4 price scenarios named, evidence tier badges named, tornado chart named, IRR/breakeven named, + Scenario and ⇂ Compare cross-refs added), Vintage Analysis (three components named explicitly, Reform Risk cross-ref added), IOC Portfolio (all 16 operators named: Shell/BP/TotalEnergies/ExxonMobil/Chevron/Equinor/Eni/ConocoPhillips/Repsol/Petronas/CNOOC/Woodside/Santos/Harbour Energy/Tullow Oil/Kosmos Energy; Mechanic Mix stat bolded; FAQ A134 cross-ref added), Reform Risk (diamond symbol range explained; Regional Reform Tilt panel surfaced as portfolio-level reform correlation signal), Country Profile empty state (quick-load cue and price scenario labels added), Home hero callout (Ctrl+K keyboard shortcut surfaced), Side-by-Side (Atlantic Frontier Quartet and North Sea Trio quickstarts named; Scenario Builder cross-ref added; PDF/PNG/URL export options enumerated), API Explorer (example slugs added; 13 price points noted; full index URL added; Scenario Builder connection noted), Fiscal Mechanics Reference Guide (mechanic-specific parameter descriptions added for all 8 mechanics). v319→v320 structural sweep: meta description, title, header badge, What’s New toggle, print header meta, IC Memo Checklist citation, How to Cite, cite-copy-btn clipboard text, platform provenance, Methodology page-sub, short-form citation. What’s New panel updated (v320 LATEST card; v315 card removed to maintain 5-card limit). JS syntax gate PASS / 0 errors.
@@ -4213,6 +4239,14 @@ v319 push to GitHub Pages confirmed successful (exit code 0). Platform is live a
 
 
 ---
+## Cycle 250 Log — 2026-08-16
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: FAQ depth expansion A341–A350. 10 advanced analyst FAQs added (340→350). v320→v321 structural sweep across 15+ locations. Scenario Builder cites v319→v321 corrected (3 instances). What's New panel v321 LATEST card added; v316 removed. Changelog entry prepended. JS syntax gate PASS. v321 committed and pushed to main.
+
+---
+
 ## Cycle 249 Log — 2026-08-16 19:17
 - Test before: 136 PASS / 0 FAIL
 - Test after: 136 PASS / 0 FAIL
