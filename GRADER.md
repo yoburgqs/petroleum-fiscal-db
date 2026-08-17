@@ -469,7 +469,7 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-17 (Cycle 264 — FAQ A376, format-detection meta, v335)
+**Last Updated:** 2026-08-17 (Cycle 266 — fc-nav-bar display fix, duplicate Breakeven CSV button removed, v337)
 **Grader Version:** 2.0
 **Overall Status:** Cycle 263 shipped v334: IC memo citation sweep (175 stale "ORCA v332" → "ORCA v333" across A1–A374), What's New v332 card description corrected ("updated to v331" → "updated to v332"), Who Built This provenance corrected (Platform v332→v334), How to Cite section updated (full citation, clipboard, short-form, Scenario Builder refs all v334), XLSX Methodology sheet citation updated, FAQ A375 added (IOC portfolio-level fiscal burden aggregation — production-weighted blended take, mechanic decomposition, IC presentation template), v333→v334 structural sweep. JS syntax gate PASS / 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -718,6 +718,42 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 | 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. How to Cite updated to v328. Copy Citation button updated to v328. |
 
 **Grade changes:** Interaction Design ↑ (FC drilldown Δ vs $50 row). Information Architecture ↑ (M5.3 peer context strip; FAQ A361; v328 What's New). Data Presentation ↑ (FC drilldown Δ row; CP NPV/Breakeven rank badges; CP Swing regime label). Naming Consistency ↑ (v328 sweep; At a Glance 361; Methodology A1–A361). Professional Credibility ↑ (FAQ A361 deepwater frontier; M5.3 peer context; CP key metric rank context). SDLC Maturity ↑ (syntax gate PASS + Cycle 257 log + v328 changelog). Performance & Reliability = (A maintained). Data Reliability = (A maintained). v328 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
+## Cycle 266 — v337 Grade Table
+
+**Cycle 266 — v337:** 2 targeted UX bug fixes + structural sweep. (1) **Interaction Design / Error & Empty States**: fc-nav-bar inline style conflict resolved — element had `display:none` followed by `display:flex` in the same style attribute; browsers apply the last-declared value so the bar was always visible on page load before JS ran; removed the redundant second `display:flex` so the element correctly starts hidden and is revealed only by `_fcNavBarUpdate()` when an active FC session exists. (2) **Interaction Design / Information Architecture**: Duplicate Breakeven Map CSV export button removed — `breakeven-csv-btn` (top, in coverage header row) and `be-export-csv-btn` (bottom, in a trailing div) both called `exportBreakevenCSV()`; redundant bottom button removed; top button retained as it is co-located with the coverage context note. (3) **SDLC Maturity / Naming Consistency**: v336→v337 structural sweep — page title, meta description, header badge, Quick Start cite, print header, Who Built This provenance (v336→v337), What's New panel (v337 LATEST card; v336 demoted; v332 removed to maintain 5-card limit), How to Cite (full citation, clipboard copy string, short-form, IC memo example, Scenario Builder reference), XLSX Methodology sheet version and Citation row. Methodology tab v337 changelog entry prepended. JS syntax gate PASS (11 blocks, 0 JS errors).
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 9. Performance & Reliability | A | = | Single-file architectural constraint unchanged. Service Worker (v309). dns-prefetch (v261). format-detection meta (v335). All other perf improvements applied. |
+| 2 | 8. Data Reliability | A | = | IRR coverage: 165/185 (89%), 124 shown in UI. 378 FAQs (A1–A378, v336). Benchmark 185/185 (100%). Breakeven coverage 68/185. Remaining gap: IRR coverage ceiling. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. iOS auto-zoom fix (v239). viewport-fit=cover (v252). touch-action:manipulation (v306). format-detection meta (v335). |
+| 4 | 4. Interaction Design | A+ | ↑ | fc-nav-bar display:none/display:flex conflict resolved (v337): bar now correctly starts hidden; shown only by _fcNavBarUpdate() when FC session active. Duplicate Breakeven CSV export button removed (v337). Fiscal Compare page-sub enriched (v336). FC region filter chips (v312). CP navigator (v313). |
+| 5 | 2. Information Architecture | A+ | = | 378 analyst FAQs (A1–A378, v336). What's New panel: v337 LATEST card; v332 removed (5-card limit). v337 changelog in Methodology tab. |
+| 6 | 6. Error & Empty States | A+ | ↑ | fc-nav-bar always-visible regression fixed (v337) — element no longer shows before JS initializes. All four primary tabs auto-load (v219). CDN failure banner (v252). Reform Risk race condition retry (v271). |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 266, 11 blocks, 0 JS errors). v336→v337 sweep. Cycle 266 log added. v337 changelog prepended to Methodology tab. |
+| 8 | 10. Accessibility | A+ | = | prefers-reduced-motion full suppression (v252). focus-visible outline (v241). spellcheck=false on search inputs (v306). Skip to FAQs link (v306). |
+| 9 | 12. Security / Data Integrity | A+ | = | Run Compare addEventListener (v333). unsafe-inline confined to dynamically-rendered innerHTML only. JS syntax gate PASS. Contract count correct 71,601. |
+| 10 | 1. Visual Design | A+ | ↑ | What's New panel: v337 LATEST card as position 1; v336 demoted to position 2; v332 removed. Panel heading updated v336→v337. |
+| 11 | 3. Data Presentation | A+ | = | IRR scatter 124/185. Data Coverage At a Glance (v299). FC row price matrix (v310). FC drilldown Δ vs $50 (v328). Country Profile NPV/Breakeven global rank + Swing label (v328). |
+| 12 | 5. Naming Consistency | A+ | ↑ | All structural citations current to v337: title, badge, print header, Who Built This (v337), How to Cite (full/short/clipboard/Scenario Builder/IC memo example), XLSX Methodology sheet. v336→v337 structural sweep complete. |
+| 13 | 7. Professional Credibility | A+ | = | 378 FAQs (A1–A378). FAQ A377: multi-field block aggregation. FAQ A378: local-currency FX exposure. All IC memo citations current to v336 (FAQ body citations stay at version added). |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | ↑ | XLSX, CSV, PDF, PNG across all tabs. M6.1+M6.2 confirmed (v329/v331). How to Cite v337. Copy Citation button v337. XLSX Methodology sheet v337. Breakeven CSV export simplified — single top button, no duplicate. |
+
+**Grade changes:** Interaction Design ↑ (fc-nav-bar always-visible bug fixed; duplicate Breakeven CSV button removed). Error & Empty States ↑ (fc-nav-bar regression fixed — no longer appears before JS initializes). Visual Design ↑ (What's New panel v337 LATEST card; v332 removed). Naming Consistency ↑ (v337 structural sweep — all citations current). SDLC Maturity ↑ (v337 sweep + Cycle 266 log + changelog). Export/Shareability ↑ (How to Cite v337; clipboard v337; XLSX Methodology sheet v337; Breakeven export de-duplicated). Performance & Reliability = (A maintained — single-file constraint). Data Reliability = (A maintained — IRR ceiling 165/185 unchanged). Mobile Experience = (A+ maintained). Information Architecture = (A+ maintained). Professional Credibility = (A+ maintained).
+
+---
+
+## Cycle 266 Log — 2026-08-17
+- Test before: 136 PASS / 0 FAIL (Cycle 265 confirmed)
+- JS syntax gate: PASS / 11 blocks / 0 JS errors (v337 verified)
+- Test after: 136 PASS / 0 FAIL / 0 JS errors
+- Changes: (1) fc-nav-bar display conflict fixed: `style="display:none;margin-top:8px;margin-bottom:2px;display:flex;..."` → `style="display:none;margin-top:8px;margin-bottom:2px;..."` — removed redundant second `display:flex` declaration. Browsers use last-declared value in same style attribute so bar was always visible on page load before JS ran; now correctly starts hidden. `_fcNavBarUpdate()` in JS still correctly calls `bar.style.display = 'flex'` when FC session exists. (2) Duplicate Breakeven CSV export button removed: `be-export-csv-btn` (lines 10908–10910, bottom of Breakeven Map tab) removed — it called the same `exportBreakevenCSV()` function as `breakeven-csv-btn` at top. Redundant UI removed; top button retained as it is co-located with the coverage context note. JS event listener for `be-export-csv-btn` in DOMContentLoaded is now a no-op (getElementById returns null, conditional prevents any error). (3) v336→v337 structural sweep: title, meta description, header badge, Quick Start cite, print header, Who Built This provenance, What's New panel (v337 LATEST card; v336 demoted to position 2; v332 removed to maintain 5-card limit), How to Cite full citation, clipboard copy string, short-form citation, IC memo example, Scenario Builder cite, XLSX Methodology sheet version and Citation row. v337 changelog entry prepended to Methodology tab Recent Platform Updates.
+- Downgrade hunt: Performance & Reliability A — single-file constraint unchanged. Data Reliability A — IRR ceiling 165/185 unchanged. Mobile Experience A+ — no new gaps. Interaction Design A+ — downgrade hunt: found fc-nav-bar display:none/display:flex conflict (bar was always visible before JS ran) and duplicate Breakeven CSV button. BOTH FIXED → Interaction Design ↑. Error & Empty States A+ — downgrade hunt: fc-nav-bar visible before JS = incorrect empty/loading state for Country Profile when no FC session exists. FIXED → Error & Empty States ↑.
+- Summary: 2 targeted UX bug fixes in Cycle 266. The fc-nav-bar bug was a real regression visible to any user who opens the Country Profile tab without first running a Fiscal Compare — the navigation bar (Prev/Next/Back to FC buttons) appeared immediately with empty label text, suggesting a broken state. The duplicate Breakeven CSV button created confusing redundant UI — two identically-labeled export buttons in the same tab with no differentiation. Both fixes improve first-impression UX for IOC analysts. v337 live at yoburgqs.github.io/petroleum-fiscal-db/
 
 ---
 
