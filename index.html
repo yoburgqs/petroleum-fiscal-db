@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,601 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v330.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,601 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v331.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,601 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,601 Contracts, 185 Countries | v330</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,601 Contracts, 185 Countries | v331</title>
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
 <script>
 if ('serviceWorker' in navigator) {
@@ -1299,7 +1299,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v330</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v331</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1499,14 +1499,20 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- v232: What's New panel — compact recent-update summary for first-time visitors and returning colleagues -->
   <details style="margin-top:8px;margin-bottom:4px;">
     <summary style=”cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;” title=”Expand to see the 5 most recent platform improvements”>
-      <span style=”color:var(--accent);font-size:12px;”>&#9656;</span> What's New &mdash; v330
+      <span style=”color:var(--accent);font-size:12px;”>&#9656;</span> What's New &mdash; v331
       <span style=”margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;”>Aug 2026</span>
     </summary>
     <div style=”padding:10px 12px 6px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface2);”>
       <div style=”display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;”>
           <div style=”background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:10px 12px;”>
             <div style=”display:flex;align-items:center;gap:8px;margin-bottom:4px;”>
-              <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v330 (Aug 2026)</strong> — <span style=”background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:3px;padding:1px 6px;vertical-align:middle;”>LATEST</span></div>
+              <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v331 (Aug 2026)</strong> — <span style=”background:var(--accent);color:#fff;font-size:10px;font-weight:700;border-radius:3px;padding:1px 6px;vertical-align:middle;”>LATEST</span></div>
+            </div>
+            <div style=”font-size:11px;color:var(--muted);line-height:1.55;”>M6.1: Evidence A/B (%) column confirmed in FC XLSX export. M6.2: Methodology sheet confirmed in FC XLSX with v331 citation. Methodology sheet version citation corrected v329&rarr;v331. v330&rarr;v331 structural sweep.</div>
+          </div>
+          <div style=”background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:10px 12px;”>
+            <div style=”display:flex;align-items:center;gap:8px;margin-bottom:4px;”>
+              <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v330 (Aug 2026)</strong></div>
             </div>
             <div style=”font-size:11px;color:var(--muted);line-height:1.55;”>v329 changelog added to Methodology tab. 149 stale IC memo version citations updated to v329 across FAQ A1&ndash;A200. Quick Start and print header version corrected v327&rarr;v329. Who Built This provenance corrected v321&rarr;v329. FAQ A372 added: late-life PSC cost recovery exhaustion and fiscal cliff IC workflow. FAQ count 371&rarr;372. v329&rarr;v330 structural sweep.</div>
           </div>
@@ -1527,12 +1533,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
               <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v327 (Aug 2026)</strong></div>
             </div>
             <div style=”font-size:11px;color:var(--muted);line-height:1.55;”>M4.2: FC hint updated — Scenario Builder discovery text now reads &ldquo;model custom fiscal terms against this ranked list&rdquo; per directive spec. M5.4: Fiscal Mechanics reference cards now show live computed avg take @$75 per mechanic from COUNTRY_DATA (e.g. Concession: 51.3% across 142 countries). v326&rarr;v327 structural sweep.</div>
-          </div>
-          <div style=”background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:10px 12px;”>
-            <div style=”display:flex;align-items:center;gap:8px;margin-bottom:4px;”>
-              <div style=”font-size:11px;font-weight:700;color:var(--accent);”><strong>v326 (Aug 2026)</strong></div>
-            </div>
-            <div style=”font-size:11px;color:var(--muted);line-height:1.55;”>Quality sweep: DCF reference profile synced to documented $1.2B/50k bbl/d/$15 standard (v326). Quick Start citation corrected to v326. What's New card limit enforced (5 cards). Speculative country badge now names all 7 countries in tooltip. Explorer “Asia” label aligned with Fiscal Compare region taxonomy. v325&rarr;v326 structural sweep.</div>
           </div>
         </div>
       <div style="margin-top:8px;font-size:10px;color:var(--muted);text-align:right;">Showing 5 most recent updates &middot; Full changelog &rarr; Reference &gt; Methodology &gt; Changelog</div>
@@ -2196,7 +2196,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v330 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v331 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2259,7 +2259,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v330 · 185 countries · 71,601 contracts · 330,329 fiscal facts.</span>
+      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v331 · 185 countries · 71,601 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2282,6 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+            <strong>v331 (Aug 2026) &mdash; Cycle 260: M6.1 Evidence A/B column confirmed, M6.2 Methodology sheet version citation corrected, v330&rarr;v331 structural sweep</strong> &mdash; 3 targeted improvements: (1) <strong>M6.1 confirmed</strong>: Evidence A/B (%) column present as 17th column in FC XLSX export — verified in <code>exportFCResults()</code>; (2) <strong>M6.2 confirmed + corrected</strong>: Methodology sheet present in FC XLSX as second worksheet — version citation corrected from v329 to v331 so XLSX exports cite the correct platform version; (3) v330&rarr;v331 structural sweep: title, meta description, header badge, print header, What&rsquo;s New panel (v331 LATEST card; v326 removed to maintain 5-card limit), How to Cite (full+short form, citation clipboard, Scenario Builder reference). JS syntax gate PASS.<br><br>
             <strong>v330 (Aug 2026) &mdash; Cycle 259: IC memo citation sweep, stale version corrections, FAQ A372</strong> &mdash; 9 targeted improvements across 4 categories: (1) <strong>Naming Consistency</strong> &mdash; 149 stale IC memo version citations updated: all &ldquo;ORCA v274&rdquo; (141 instances), &ldquo;ORCA v250&rdquo; (1 instance), &ldquo;ORCA v295&rdquo; (6 instances), and &ldquo;ORCA v319&rdquo; (7 instances) corrected to &ldquo;ORCA v329&rdquo; across FAQ bodies A1&ndash;A100 IC memo template text; (2) <strong>Naming Consistency</strong> &mdash; Stale structural version corrections: Quick Start Guide citation v327&rarr;v329; print header meta v327&rarr;v329; Who Built This provenance v321&rarr;v329; (3) <strong>Information Architecture</strong> &mdash; v329 changelog entry added to Methodology Recent Platform Updates (was missing &mdash; Cycle 258 sweep skipped this section); (4) <strong>Professional Credibility</strong> &mdash; FAQ A372 added: late-life PSC cost recovery exhaustion and fiscal cliff IC workflow &mdash; explains when ORCA lifetime-average take understates forward-looking economics for acquiring late-life PSC assets, 4-step IC workflow, quantitative fiscal cliff magnitude by cost recovery cap tier (60%/80%/40% cap structures), IC memo disclosure template with adjusted capex basis. FAQ count 371&rarr;372. (5&ndash;9) v329&rarr;v330 structural sweep: title, meta description, header badge, print header, What&rsquo;s New panel (v330 LATEST card; v325 removed to maintain 5-card limit), Methodology page-sub (371&rarr;372 FAQs, A1&ndash;A371&rarr;A1&ndash;A372), At a Glance stat (371&rarr;372), How to Cite (full and short form, citation clipboard, Scenario Builder reference), Methodology provenance (v321&rarr;v329 correction). JS syntax gate PASS / 10 blocks / 0 errors.<br><br>
             <strong>v329 (Aug 2026) &mdash; Cycle 258: M6.1 Evidence A/B column in FC XLSX, M6.2 Methodology sheet in FC XLSX, FAQs A362&ndash;A371</strong> &mdash; 12 targeted improvements across 4 categories: (1) <strong>M6.1</strong>: Evidence A/B (%) added as 17th column in <code>exportFCResults()</code> — FC XLSX exports now include source quality alongside take/NPV/IRR, enabling analysts to filter and sort by evidence tier directly in Excel; (2) <strong>M6.2</strong>: Methodology sheet added as second worksheet in FC XLSX — contains profile assumptions (peak rate, capex, opex, project life, discount rate, price), evidence tier definitions (A/B/C), and IC citation template; FC XLSX export is now fully self-contained for IC memo use without requiring the analyst to separately document parameters; (3) <strong>FAQs A362&ndash;A371</strong>: 10 new IC workflows — HPHT drilling cost fiscal adjustment (A362), SWF direct participation and take adjustment (A363), cost overrun sensitivity by fiscal mechanic (A364), production bonus triggers and IRR impact (A365), exploration dry hole write-off treatment (A366), gas monetization pathways and fiscal interaction (A367), government back-in rights mechanics (A368), fiscal vintage and reform risk for pre-FID IC memos (A369), portfolio diversification across fiscal mechanic types (A370), pre-development delay risk (A371). FAQ count 361&rarr;371. (4) v328&rarr;v329 structural sweep across all structural locations. JS syntax gate PASS / 10 blocks / 0 errors.<br><br>
             <strong>v328 (Aug 2026) &mdash; Cycle 257: M5.3 regional peer context, FC drilldown price sensitivity, CP key metrics rank context, FAQ A361 deepwater frontier</strong> &mdash; 7 targeted improvements: (1) <strong>M5.3</strong>: compact peer context strip injected after take-at-4-prices card in Country Profile &mdash; shows regional median, global median, and this country&rsquo;s delta vs. region inline; (2) <strong>FC drilldown</strong>: &Delta; vs. $50 row added to price matrix (price sensitivity delta at a glance); (3) <strong>Country Profile NPV @ $75</strong>: global rank #N of 185 added inline; (4) <strong>Country Profile Breakeven</strong>: global rank #N of 68 added inline; (5) <strong>Country Profile Price Swing</strong>: regime label (royalty-dominated / profit-sensitive) added based on P25/P75 percentiles; (6) <strong>FAQ A361</strong> added: deepwater frontier fiscal benchmarking IC workflow &mdash; 3-tier adjustment framework, 4-step IC workflow, rule of thumb by basin maturity tier; (7) v327&rarr;v328 structural sweep: title, meta description, header badge, What&rsquo;s New panel (v328 LATEST / v323 removed), At a Glance stat (360&rarr;361 Analyst FAQs), Methodology page-sub (360&rarr;361 FAQs, A1&ndash;A361), How to Cite. JS syntax gate PASS / 10 blocks / 0 errors.<br><br>
@@ -10661,15 +10662,15 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;" id="cite-text"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v330, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
-      <button id="cite-copy-btn" onclick="(function(){var t=document.getElementById('cite-copy-btn');navigator.clipboard.writeText('ORCA Petroleum Fiscal Intelligence Platform (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v330, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/').then(function(){t.textContent='Copied!';setTimeout(function(){t.textContent='Copy Citation';},2000);}).catch(function(){t.textContent='Copy failed';setTimeout(function(){t.textContent='Copy Citation';},2000);});})()" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:inherit;" aria-label="Copy full citation to clipboard">Copy Citation</button>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;" id="cite-text"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v331, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <button id="cite-copy-btn" onclick="(function(){var t=document.getElementById('cite-copy-btn');navigator.clipboard.writeText('ORCA Petroleum Fiscal Intelligence Platform (2026). Global petroleum fiscal database: 71,601 contracts, 185 countries [v331, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/').then(function(){t.textContent='Copied!';setTimeout(function(){t.textContent='Copy Citation';},2000);}).catch(function(){t.textContent='Copy failed';setTimeout(function(){t.textContent='Copy Citation';},2000);});})()" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:inherit;" aria-label="Copy full citation to clipboard">Copy Citation</button>
 
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v330." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v331." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
         <strong style="color:var(--text);">Short-form citation for footnotes:</strong><br>
-        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v330 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
-        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v330, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
-        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v330."
+        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v331 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
+        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v331, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
+        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v331."
       </div>
     </div>
   </div>
@@ -18836,7 +18837,7 @@ function exportFCResults() {
   var projLifeYrs = (fcProfileKey === 'marginal') ? 15 : (fcProfileKey === 'lng') ? 30 : 25;
   var methRows = [
     ['ORCA Petroleum Fiscal Intelligence Platform'],
-    ['Version: v329 | yoburgqs.github.io/petroleum-fiscal-db/'],
+    ['Version: v331 | yoburgqs.github.io/petroleum-fiscal-db/'],
     [''],
     ['Profile assumptions:'],
     ['  Peak rate (bopd)', profileObj.peakBblDay],
@@ -18851,7 +18852,7 @@ function exportFCResults() {
     ['  B-tier: Verified secondary source (EY/Wood Mac/Rystad)'],
     ['  C-tier: Directional estimate — verify before IC submission'],
     [''],
-    ['Citation: ORCA (2026), v329. yoburgqs.github.io/petroleum-fiscal-db/']
+    ['Citation: ORCA (2026), v331. yoburgqs.github.io/petroleum-fiscal-db/']
   ];
   var methSheet = XLSX.utils.aoa_to_sheet(methRows);
   XLSX.utils.book_append_sheet(wb, methSheet, 'Methodology');
