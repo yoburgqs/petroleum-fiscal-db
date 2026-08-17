@@ -4,26 +4,35 @@
 
 A professional product audit produced the following priority list. Work through these in order. FAQs are LOW priority now — the binding gaps are cross-navigation and trust signals, not content depth.
 
-### ROADMAP M1 — Cross-Navigation (HIGHEST PRIORITY)
+### ROADMAP M1 — Cross-Navigation — STATUS
 
-Every result surface must have an onward action. Implement in this order:
+**M1.1 ✅ DONE (v324)** — Breakeven Map choropleth paths now clickable → Country Profile via `openCountryProfileFromFC`. All ISO-mapped countries have pointer cursor and SVG title tooltip.
+**M1.2 ✅ DONE (v71)** — Reform Risk already has Profile buttons and clickable country links throughout (Most Frequently Reformed table, stable/volatile panels, heatmap).
+**M1.3 ✅ DONE (v322)** — Screener results have "Load top N into Side-by-Side" button.
+**M1.4 — NEXT TARGET** — IOC Portfolio dead-end. After `renderIOCExposure()` renders the take-tier donut/bar chart, add a simple text link below each tier band:
 
-**M1.1 — Breakeven Map → Country Profile**
-In `renderBreakevenMap()` (~line 18737), D3 SVG circles need a click handler:
-`.on('click', function(event, d) { loadCountryProfile(d.country); switchTab('t7', document.getElementById('tab-btn-t7')); })`
-The `d` object in the D3 datum should have a `country` property matching COUNTRY_DATA. Verify the data join uses country name.
+Exact implementation for M1.4:
+- Find `renderIOCExposure()` at ~line 14417
+- After the take-tier distribution renders, find where tier rows/bands are built (e.g. "High take (>70%): 12 contracts")
+- For each tier band that lists countries, add a button: `"View in Explorer →"`
+- onclick: `switchTab('texplorer', document.getElementById('tab-btn-texplorer')); setTimeout(function() { switchExplorerMode('browse'); }, 100);`
+- This is scoped to a navigation link only — do NOT try to pre-filter the Explorer table by operator countries (too complex). Just navigate to Explorer Browse mode.
+- Also add a simpler top-level link below the IOC stats div: `"Explore all [operator] countries in the data →"` that opens Explorer Browse.
 
-**M1.2 — Reform Risk table → Country Profile**
-In `renderReformRisk()` (~line 14852), country name cells in the heat table and event log rows should be clickable:
-Add `style="cursor:pointer;color:var(--accent);" onclick="loadCountryProfile('${c}');switchTab('t7',document.getElementById('tab-btn-t7'))"` to country name `<td>` or `<span>` elements.
+### ROADMAP M3 — Reform Risk as Primary Tab — NEXT TARGET
 
-**M1.3 — Screener results → Side-by-Side**
-In `runScreener()` (~line 12129), after results render inject a button:
-"Load top 4 into Side-by-Side →" that calls `addCompare(country)` for the top 4 screener results then `switchTab('t2', ...)`.
-Mirror the existing `top5btn` pattern in `renderFCResults()` (~line 17588).
+**M3.1 — Promote Reform Risk tab to primary nav**
 
-**M1.4 — IOC Portfolio → Explorer filtered by operator countries**
-After `renderIOCExposure()` renders take-tier distribution, add a "View these countries in Explorer →" link per tier band. Pass operator country list to Explorer browse mode.
+Current: `tab-btn-treformrisk` exists but is `display:none` and `aria-hidden="true"` in the tab bar.
+
+Exact implementation:
+1. Find the `<button id="tab-btn-treformrisk"` element in the tab nav HTML (~line 1325 area)
+2. Remove `style="display:none;"` and `aria-hidden="true"` and `tabindex="-1"` from that button
+3. The button should now appear in the primary tab bar between IOC Portfolio and the Reference dropdown
+4. Verify `switchTab('treformrisk', ...)` already works (it does — the tab pane exists)
+5. Do NOT reorder other tabs — just unhide this one button
+
+**M3.2 ✅ DONE (v322)** — `fc-stability-check` has `checked` attribute by default.
 
 ### ROADMAP M2 — Evidence Tier in Fiscal Compare (HIGH PRIORITY)
 
