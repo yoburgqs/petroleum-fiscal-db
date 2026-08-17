@@ -31,17 +31,39 @@ Reform Risk is differentiated. It is buried in the Reference dropdown. Make it a
 
 **M3.2** Make Stability column visible by default in FC table. Find the `showStability` variable in `renderFCResults()` — if it's toggled off by default, change the default to true.
 
-### ROADMAP M4 — Scenario Builder Discovery (MEDIUM PRIORITY)
+### ROADMAP M4 — Scenario Builder Discovery — STATUS
 
-**M4.1** Add a Scenario Builder card to the Home tab tool grid (after the existing 5 cards). Card title: "Scenario Builder". Subtitle: "Model custom fiscal terms — set royalty, CIT, profit oil split — and rank your deal vs. 185 countries." onclick: opens the scenario modal.
+**M4.1 ✅ DONE (v322)** — Scenario Builder card added to Home tab tool grid.
 
-**M4.2** In `renderFCResults()`, extend the `_clickHint` div to include: "Found a shortlist? Use **+ Scenario** in the header to model custom terms."
+**M4.2 — NEXT TARGET (this cycle)** — Post-FC Scenario Builder prompt.
+
+Exact implementation:
+- In `renderFCResults()`, find the `_clickHint` div (search for `_clickHint = '<div`).
+- Extend the span text to add: ` — or use <strong>+ Scenario</strong> in the header to model custom fiscal terms against this ranked list.`
+- Keep it on the same line as the existing hint. Do not add a separate div.
+
+### ROADMAP M5 — Insight Surfacing — NEXT TARGET (this cycle)
+
+**M5.3 — Regional peer comparison in Country Profile**
+
+In `loadCountryProfile()` (~line 13207), after the take-at-4-prices card renders, add a compact inline peer context line:
+
+- Compute regional median take at $75: `COUNTRY_DATA.filter(d => d.region === countryData.region && d.take_75 != null).map(d => d.take_75)` → sort → median
+- Compute global median: all countries with take_75 → sort → median
+- Inject below the take card: `<div style="font-size:11px;color:var(--muted);margin-top:4px;">Regional median (${region}): ${regionalMedian.toFixed(1)}% · Global median: ${globalMedian.toFixed(1)}% · This country is ${delta > 0 ? '+' : ''}${delta.toFixed(1)}pp vs region</div>`
+
+**M5.4 — Average take per mechanic in Fiscal Mechanics reference**
+
+In the Fiscal Mechanics tab (id="t6", ~line 2138), each mechanic card has a heading. After each heading, inject the live average take across all countries using that mechanic:
+- `COUNTRY_DATA.filter(d => d.mechanic === 'PSC' && d.take_75 != null)` → average
+- Show as: `<span style="font-size:11px;color:var(--muted);">Avg take @$75: ${avg.toFixed(1)}% across ${count} countries</span>`
+- Mechanic names in COUNTRY_DATA: 'Concession', 'PSC', 'TSC', 'PRRT', 'RSC', 'Buy-back', 'Revenue Share', 'Gross Split'
+- This should be computed once at page load (COUNTRY_DATA is available globally) and injected into the static mechanic card HTML. Use `document.querySelectorAll` to find mechanic card headings after the tab renders.
 
 ### DO NOT DO (loop restrictions):
 - Do NOT re-add stat number bars, "Last updated" lines, or Reference Grid (see Priority 7 below)
-- Do NOT add ANY FAQs this cycle. FAQ grinding is FULLY SUSPENDED. The loop added FAQs in Cycle 252 despite instructions — do not repeat this. Roadmap M1/M3/M4 work only.
+- Do NOT add ANY FAQs this cycle — FAQ grinding remains suspended until M4.2 and M5.3 are done
 - Do NOT restructure the tab order (M7 requires explicit approval)
-- Do NOT attempt M1.4 IOC→Explorer filtering if it requires changes to Explorer's filter state management — scope to a simple link only
 
 ---
 
