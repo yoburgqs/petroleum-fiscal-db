@@ -1,8 +1,43 @@
-# ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-16)
+# ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-17)
 
-## ROADMAP (2026-08-16) — NEW PRIORITY ORDER
+## ROADMAP STATUS (2026-08-17) — M1–M5 COMPLETE
 
-A professional product audit produced the following priority list. Work through these in order. FAQs are LOW priority now — the binding gaps are cross-navigation and trust signals, not content depth.
+All roadmap milestones M1 through M5 are complete as of v328/Cycle 257. FAQs may resume at normal rate (up to 10 per cycle). Normal grading loop operation resumes.
+
+**Completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328)
+
+## ROADMAP M6 — Export Quality (NEXT PRIORITY)
+
+**M6.1 — Evidence tier column in FC XLSX export**
+
+In `exportFCResults()`, add `ab_pct` as a column. The function builds an array of row objects for XLSX. Add `'Evidence A/B (%)': r.ab_pct != null ? +r.ab_pct.toFixed(1) : null` to each row. Add a corresponding header. This pattern is already implemented in the Explorer XLSX export — mirror it.
+
+**M6.2 — Methodology sheet in FC XLSX**
+
+After building the main data sheet in `exportFCResults()`, add a second sheet named "Methodology" using:
+```javascript
+var methRows = [
+  ['ORCA Petroleum Fiscal Intelligence Platform'],
+  ['Version: v328 | yoburgqs.github.io/petroleum-fiscal-db/'],
+  [''],
+  ['Profile assumptions:'],
+  ['  Peak rate (bopd)', profileObj.peakRate],
+  ['  Capex ($M)', profileObj.capex],
+  ['  Opex ($/bbl)', profileObj.opex],
+  ['  Project life (yr)', profileObj.projectLife],
+  ['  Discount rate (%)', (profileObj.discountRate*100).toFixed(0)],
+  ['  Oil price ($/bbl)', fcPrice],
+  [''],
+  ['Evidence tier definitions:'],
+  ['  A-tier: Primary legislation or signed PSA text'],
+  ['  B-tier: Verified secondary source (EY/Wood Mac/Rystad)'],
+  ['  C-tier: Directional estimate — verify before IC submission'],
+  [''],
+  ['Citation: ORCA (2026), v328. yoburgqs.github.io/petroleum-fiscal-db/']
+];
+var methSheet = XLSX.utils.aoa_to_sheet(methRows);
+XLSX.utils.book_append_sheet(wb, methSheet, 'Methodology');
+```
 
 ### ROADMAP M1 — Cross-Navigation — STATUS
 
