@@ -34,35 +34,40 @@ Reform Risk is differentiated. It is buried in the Reference dropdown. Make it a
 ### ROADMAP M4 — Scenario Builder Discovery — STATUS
 
 **M4.1 ✅ DONE (v322)** — Scenario Builder card added to Home tab tool grid.
-
-**M4.2 — NEXT TARGET (this cycle)** — Post-FC Scenario Builder prompt.
-
-Exact implementation:
-- In `renderFCResults()`, find the `_clickHint` div (search for `_clickHint = '<div`).
-- Extend the span text to add: ` — or use <strong>+ Scenario</strong> in the header to model custom fiscal terms against this ranked list.`
-- Keep it on the same line as the existing hint. Do not add a separate div.
+**M4.2 ✅ DONE (v327)** — Post-FC hint updated with Scenario Builder reference.
 
 ### ROADMAP M5 — Insight Surfacing — NEXT TARGET (this cycle)
 
-**M5.3 — Regional peer comparison in Country Profile**
+**M5.3 — Regional peer comparison in Country Profile (implement this cycle)**
 
-In `loadCountryProfile()` (~line 13207), after the take-at-4-prices card renders, add a compact inline peer context line:
+In `loadCountryProfile()` (~line 13207), find where the take-at-4-prices card is built (search for `take_50` or `take_75` near the country profile render). After that card's HTML, inject a compact peer context line.
 
-- Compute regional median take at $75: `COUNTRY_DATA.filter(d => d.region === countryData.region && d.take_75 != null).map(d => d.take_75)` → sort → median
-- Compute global median: all countries with take_75 → sort → median
-- Inject below the take card: `<div style="font-size:11px;color:var(--muted);margin-top:4px;">Regional median (${region}): ${regionalMedian.toFixed(1)}% · Global median: ${globalMedian.toFixed(1)}% · This country is ${delta > 0 ? '+' : ''}${delta.toFixed(1)}pp vs region</div>`
+Exact implementation:
+```javascript
+// Compute regional median
+var _cpRegion = d.region;
+var _cpRegPeers = (COUNTRY_DATA || []).filter(function(x) { return x.region === _cpRegion && x.take_75 != null; }).map(function(x) { return x.take_75; }).sort(function(a,b){return a-b;});
+var _cpRegMed = _cpRegPeers.length ? (_cpRegPeers.length % 2 === 0 ? (_cpRegPeers[_cpRegPeers.length/2-1]+_cpRegPeers[_cpRegPeers.length/2])/2 : _cpRegPeers[Math.floor(_cpRegPeers.length/2)]) : null;
+// Compute global median
+var _cpAllTakes = (COUNTRY_DATA || []).filter(function(x){return x.take_75!=null;}).map(function(x){return x.take_75;}).sort(function(a,b){return a-b;});
+var _cpGlobMed = _cpAllTakes.length ? (_cpAllTakes.length%2===0?(_cpAllTakes[_cpAllTakes.length/2-1]+_cpAllTakes[_cpAllTakes.length/2])/2:_cpAllTakes[Math.floor(_cpAllTakes.length/2)]) : null;
+// Delta vs region
+var _cpDelta = (d.take_75 != null && _cpRegMed != null) ? (d.take_75 - _cpRegMed) : null;
+var _cpPeerHtml = (_cpRegMed && _cpGlobMed && _cpDelta !== null)
+  ? '<div style="font-size:11px;color:var(--muted);margin-top:6px;padding:5px 10px;background:var(--surface2);border-radius:4px;">'
+    + 'Regional median (' + _cpRegion + '): <strong>' + _cpRegMed.toFixed(1) + '%</strong>'
+    + ' &nbsp;·&nbsp; Global median: <strong>' + _cpGlobMed.toFixed(1) + '%</strong>'
+    + ' &nbsp;·&nbsp; This country: <span style="color:' + (_cpDelta > 0 ? 'var(--negative)' : 'var(--positive)') + ';font-weight:600;">' + (_cpDelta > 0 ? '+' : '') + _cpDelta.toFixed(1) + 'pp vs region</span>'
+    + '</div>'
+  : '';
+```
+Inject `_cpPeerHtml` after the take-at-4-prices card.
 
-**M5.4 — Average take per mechanic in Fiscal Mechanics reference**
-
-In the Fiscal Mechanics tab (id="t6", ~line 2138), each mechanic card has a heading. After each heading, inject the live average take across all countries using that mechanic:
-- `COUNTRY_DATA.filter(d => d.mechanic === 'PSC' && d.take_75 != null)` → average
-- Show as: `<span style="font-size:11px;color:var(--muted);">Avg take @$75: ${avg.toFixed(1)}% across ${count} countries</span>`
-- Mechanic names in COUNTRY_DATA: 'Concession', 'PSC', 'TSC', 'PRRT', 'RSC', 'Buy-back', 'Revenue Share', 'Gross Split'
-- This should be computed once at page load (COUNTRY_DATA is available globally) and injected into the static mechanic card HTML. Use `document.querySelectorAll` to find mechanic card headings after the tab renders.
+**M5.4 ✅ DONE (v327)** — Live avg take per mechanic injected into Fiscal Mechanics cards.
 
 ### DO NOT DO (loop restrictions):
 - Do NOT re-add stat number bars, "Last updated" lines, or Reference Grid (see Priority 7 below)
-- Do NOT add ANY FAQs this cycle — FAQ grinding remains suspended until M4.2 and M5.3 are done
+- FAQs: max 5 per cycle, only after M5.3 is implemented first this cycle
 - Do NOT restructure the tab order (M7 requires explicit approval)
 
 ---
