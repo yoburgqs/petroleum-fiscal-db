@@ -10428,6 +10428,25 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <strong>Rule of thumb:</strong> For standard IC screening (country comparison and shortlisting), ORCA's A/B-tier data requires no additional validation. For FID-stage or board-level presentations, a one-step external validation against primary legislation or a commercial DB is best practice and adds 15-30 minutes per country to the IC preparation process.<br><br>
           <em>Source: ORCA v322 (Aug 2026). EY Oil &amp; Gas Tax Guide 2025 (Ernst &amp; Young LLP); Wood Mackenzie Fiscal Terms Comparison Primer (2024); Rystad Energy UCube Fiscal Database Technical Guide (2024). Cross-references: FAQ A3 (evidence tier system); FAQ A13 (benchmark validation); FAQ A210 (diagnosing take discrepancies vs. third-party sources).</em></div>
         </div>
+        <!-- v328: FAQ A361 — deepwater frontier fiscal benchmarking -->
+        <div class="faq-item" id="faq-A361">
+          <div class="faq-q">A361. How should IOC analysts benchmark fiscal terms for deepwater frontier plays, and what adjustments are required for pre-production versus mature basin comparisons?</div>
+          <div class="faq-a"><strong>Deepwater frontier fiscal benchmarking challenge:</strong> Deepwater frontier plays (water depth &gt;1,500m, pre-FID, no production history) carry a fiscal risk premium that ORCA's country average take does not fully capture. The country take figure is a blend across all contracts including legacy onshore and shallow-offshore — a frontier deepwater block may have terms 5–15pp more favorable to attract capital.<br><br>
+          <strong>Three-tier frontier adjustment framework:</strong><br>
+          <em>Tier 1 — Use ORCA country average as ceiling, not benchmark:</em> For frontier deepwater in countries with established onshore/shallow production (e.g., Tanzania, Senegal, Mozambique), the country average take (60–72%) is typically higher than the applicable frontier PSC term (45–62%). Run ORCA Scenario Builder with the actual deepwater PSC terms from the bid round documentation — do not use the country average for frontier IC analysis.<br>
+          <em>Tier 2 — Apply frontier discount by basin maturity:</em> Frontier basins (no prior commercial discovery) typically offer a 5–12pp lower effective take vs. the country average to reflect exploration risk. Emerging basins (1–2 commercial discoveries, pre-production) offer 3–8pp lower. Producing basins: use ORCA country average directly.<br>
+          <em>Tier 3 — Pre-FID vs. post-FID term drift:</em> Some PSCs have exploration-phase fiscal incentives (extended cost recovery, reduced royalty on first 5 years of production, NOC back-in rights delayed until commerciality declaration) that increase effective contractor take by 2–6pp vs. the production-phase terms ORCA models. Identify these provisions in the PSA text and model them explicitly in Scenario Builder.<br><br>
+          <strong>4-step IC workflow for deepwater frontier:</strong><br>
+          1. ORCA Country Profile → identify blended take and mechanic; note if C/D evidence tier (frontier terms often less documented).<br>
+          2. Screener or Fiscal Compare → filter to Deepwater profile + region → identify peer frontier countries at similar maturity stage for comparator set.<br>
+          3. Scenario Builder → enter actual bid round terms (not country average); run DCF; record frontier-specific take and IRR.<br>
+          4. IC memo language: "ORCA country average take of X% adjusted to Y% using bid round PSC terms [source: government bid round document / operator prospectus]. Frontier discount vs. country average: Zpp."<br><br>
+          <strong>Rule of thumb by frontier tier:</strong><br>
+          • Pre-discovery frontier (Greenland, Falklands, Eastern Mediterranean deep): effective take 35–50% — requires $70+ breakeven to be viable at frontier risk premium.<br>
+          • Post-discovery pre-FID (Namibia Orange Basin, Tanzania deepwater): effective take 45–60% — apply 8–12pp frontier discount to ORCA country average.<br>
+          • First-mover producing (Guyana Stabroek, Senegal Sangomar, Mozambique Rovuma): ORCA take applies; frontier risk has transferred to production risk.<br><br>
+          <em>Source: ORCA v328 (Aug 2026). Wood Mackenzie Deepwater Fiscal Terms Review (2024); Rystad Energy UCube Deepwater Analytics (2025); Offshore Technology Conference deepwater fiscal benchmark surveys (2023–2025). Cross-references: FAQ A41 (DCF model specification); FAQ A85 (Guyana Stabroek reform); FAQ A305 (Mozambique LNG fiscal reform case study).</em></div>
+        </div>
     <div style="text-align:right;margin-top:16px;padding-top:10px;border-top:1px solid var(--border);">
       <a href="#tab-btn-tmeth" onclick="document.getElementById('tab-btn-tmeth')&&document.getElementById('tab-btn-tmeth').scrollIntoView({behavior:'smooth'});return false;" style="font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:4px;padding:3px 10px;transition:.15s;" title="Return to Methodology top">&#8679; Back to top</a>
     </div>
