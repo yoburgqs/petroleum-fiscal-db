@@ -54,7 +54,7 @@ Reform Risk is differentiated. It is buried in the Reference dropdown. Make it a
 
 ### DO NOT DO (loop restrictions):
 - Do NOT re-add stat number bars, "Last updated" lines, or Reference Grid (see Priority 7 below)
-- Do NOT add more than 5 FAQs per cycle — FAQ grinding is suspended pending roadmap work
+- Do NOT add ANY FAQs this cycle. FAQ grinding is FULLY SUSPENDED. The loop added FAQs in Cycle 252 despite instructions — do not repeat this. Roadmap M1/M3/M4 work only.
 - Do NOT restructure the tab order (M7 requires explicit approval)
 - Do NOT attempt M1.4 IOC→Explorer filtering if it requires changes to Explorer's filter state management — scope to a simple link only
 
