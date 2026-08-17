@@ -9,43 +9,19 @@ A professional product audit produced the following priority list. Work through 
 **M1.1 ✅ DONE (v324)** — Breakeven Map choropleth paths now clickable → Country Profile via `openCountryProfileFromFC`. All ISO-mapped countries have pointer cursor and SVG title tooltip.
 **M1.2 ✅ DONE (v71)** — Reform Risk already has Profile buttons and clickable country links throughout (Most Frequently Reformed table, stable/volatile panels, heatmap).
 **M1.3 ✅ DONE (v322)** — Screener results have "Load top N into Side-by-Side" button.
-**M1.4 — NEXT TARGET** — IOC Portfolio dead-end. After `renderIOCExposure()` renders the take-tier donut/bar chart, add a simple text link below each tier band:
+**M1.4 ✅ DONE (v325)** — IOC Portfolio dead-end resolved. Added "Explore all [operator] countries in the data →" button below the tier distribution metrics in `renderIOCExposure()`. Button navigates to Explorer Browse mode via `switchTab` + `switchExplorerMode('browse')`. 136 PASS / 0 FAIL / 0 JS errors.
 
-Exact implementation for M1.4:
-- Find `renderIOCExposure()` at ~line 14417
-- After the take-tier distribution renders, find where tier rows/bands are built (e.g. "High take (>70%): 12 contracts")
-- For each tier band that lists countries, add a button: `"View in Explorer →"`
-- onclick: `switchTab('texplorer', document.getElementById('tab-btn-texplorer')); setTimeout(function() { switchExplorerMode('browse'); }, 100);`
-- This is scoped to a navigation link only — do NOT try to pre-filter the Explorer table by operator countries (too complex). Just navigate to Explorer Browse mode.
-- Also add a simpler top-level link below the IOC stats div: `"Explore all [operator] countries in the data →"` that opens Explorer Browse.
+### ROADMAP M3 — Reform Risk as Primary Tab — STATUS
 
-### ROADMAP M3 — Reform Risk as Primary Tab — NEXT TARGET
-
-**M3.1 — Promote Reform Risk tab to primary nav**
-
-Current: `tab-btn-treformrisk` exists but is `display:none` and `aria-hidden="true"` in the tab bar.
-
-Exact implementation:
-1. Find the `<button id="tab-btn-treformrisk"` element in the tab nav HTML (~line 1325 area)
-2. Remove `style="display:none;"` and `aria-hidden="true"` and `tabindex="-1"` from that button
-3. The button should now appear in the primary tab bar between IOC Portfolio and the Reference dropdown
-4. Verify `switchTab('treformrisk', ...)` already works (it does — the tab pane exists)
-5. Do NOT reorder other tabs — just unhide this one button
+**M3.1 ✅ DONE (pre-v325 verified)** — `tab-btn-treformrisk` is already visible in the primary tab bar (no `display:none`, no `aria-hidden`, no `tabindex=-1`). Reform Risk appears between Breakeven Map and the Reference dropdown. Verified at line 1323 of index.html. No action needed.
 
 **M3.2 ✅ DONE (v322)** — `fc-stability-check` has `checked` attribute by default.
 
-### ROADMAP M2 — Evidence Tier in Fiscal Compare (HIGH PRIORITY)
+### ROADMAP M2 — Evidence Tier in Fiscal Compare — STATUS
 
-`COUNTRY_DATA` has `ab_pct` per country. It is shown in CP and Screener. Not shown in FC table.
+**M2.1 ✅ DONE (v322, verified pre-v325)** — `Src` column with `getTierBadge(r.ab_pct, ...)` is present in `renderFCResults()` at line 17782 (header) and 17814 (row). No action needed.
 
-**M2.1 — Evidence dot in FC rows**
-In `renderFCResults()` (~line 17632), add one column using `getTierBadge(r.ab_pct, ...)`:
-`html += '<td class="num">' + getTierBadge(r.ab_pct || 0, 'Source quality: ' + (r.ab_pct||0).toFixed(0) + '% A/B-tier') + '</td>';`
-Add corresponding `<th>` header: `<th class="num" title="Data source quality: % of fiscal facts from A/B-tier (primary legislation or verified sources)">Src</th>`
-
-**M2.2 — C-tier row callout in FC drilldown**
-In the FC row drilldown drawer (search for `openFCDrilldown`), if `r.ab_pct < 60`, add a banner:
-`<div style="background:rgba(185,28,28,.07);border-left:3px solid var(--red);padding:6px 10px;font-size:11px;border-radius:0 4px 4px 0;margin-bottom:8px;">⚠ Source quality: C-tier (${ab_pct}% A/B sourced). Verify parameters in Country Profile before IC memo.</div>`
+**M2.2 ✅ DONE (v322, verified pre-v325)** — C-tier warning banner in `openFCDrilldown()` is implemented at line 17963–17968. Fires when `ab_pct < 60`. No action needed.
 
 ### ROADMAP M3 — Reform Risk as Primary Tab (MEDIUM PRIORITY)
 
@@ -458,9 +434,11 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-16 (Cycle 240 — FAQs A261–A270, v307 metadata sweep)
+**Last Updated:** 2026-08-17 (Cycle 254 — M1.4 IOC Portfolio Explorer navigation, v325)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 240 shipped v307: 10 FAQs A261–A270 (NOC equity participation, inflation/currency risk, bid evaluation workflow, pipeline tariff interaction, insurance obligations, signature bonus DCF, brownfield/tie-back treatment, mixed-regime protocol, unitization fiscal treatment, WPT trigger analysis). FAQ count 260→270. v306→v307 metadata sweep. JS syntax gate PASS / 4 blocks / 0 errors. 136 PASS / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 254 shipped v325: M1.4 implemented — "Explore all [operator] countries in the data →" button added to `renderIOCExposure()` below the tier distribution metrics. Navigates to Explorer Browse mode. Also verified M2.1, M2.2, M3.1 already complete in prior cycles (GRADER updated to reflect). Roadmap M1/M2/M3 all done. Next: M4.1 (Scenario Builder card on Home tab) and M4.2 (FC hint text). JS syntax gate PASS / 5 blocks / 0 errors. 136 PASS / 0 FAIL / 0 JS errors.
+
+**Previous [Cycle 240]:** Cycle 240 shipped v307: 10 FAQs A261–A270 (NOC equity participation, inflation/currency risk, bid evaluation workflow, pipeline tariff interaction, insurance obligations, signature bonus DCF, brownfield/tie-back treatment, mixed-regime protocol, unitization fiscal treatment, WPT trigger analysis). FAQ count 260→270. v306→v307 metadata sweep. JS syntax gate PASS / 4 blocks / 0 errors. 136 PASS / 0 FAIL / 0 JS errors.
 
 **Previous [Cycle 239]:** Cycle 238 shipped v305: 10 FAQs A241–A250 (hybrid PSC cap+R-factor workflow, Nigeria PIA 2021 reform, Indonesia Gross Split mechanics, EOR fiscal treatment, Guyana Stabroek reform case, ring-fence portfolio methodology, RSC vs. PSC vs. TSC, Brazil pre-salt excedente, MGT clause, Australia PRRT 2023 reform). FAQ count 240→250. 250-FAQ milestone reached. JS syntax gate PASS / 4 blocks / 0 errors.
 
