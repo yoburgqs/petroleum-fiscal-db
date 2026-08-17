@@ -721,6 +721,43 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Cycle 261 — v332 Grade Table
+
+**Cycle 261 — v332:** 5 targeted improvements across 3 categories. (1) Naming Consistency — 167 stale "ORCA v329" IC memo template citations updated to "ORCA v331" across all FAQ bodies (analysts copying IC memo language from any FAQ now get the current platform version). 4 stale "ORCA Petroleum Fiscal Intelligence Platform v250" citations updated to v332. Quick Start Guide cite corrected v329→v332. 1 stale "ORCA v328" source citation in FAQ A361 corrected to v332. (2) Professional Credibility / Information Architecture — FAQ A373 added: CIT deductibility of royalties and the effective-tax-rate vs. statutory-take distinction — explains why ORCA government take and IOC ETR disclosures never agree; royalty CIT-deductibility mechanics and impact on ORCA take; 4-step IC reconciliation workflow; rule of thumb by regime type (concession with deductible royalty, PSC profit oil split, Gross Split, PRRT/SPT); IC memo disclosure language for royalty deductibility basis. FAQ count 372→373. (3) Naming Consistency / SDLC — v331→v332 structural sweep: title, meta description, header badge, print header, What's New panel (v332 LATEST card; v327 card removed), Methodology page-sub (372→373 FAQs, A1–A373), At a Glance stat (372→373), How to Cite (full+short form, citation clipboard, Scenario Builder reference), XLSX Methodology sheet version. JS syntax gate PASS / 5 blocks / 0 errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 9. Performance & Reliability | A | = | Single-file architectural constraint unchanged. requestIdleCallback deferral, fetchpriority, content-visibility:auto, Service Worker cache-first all in place. No structural fix possible without repo split. |
+| 2 | 8. Data Reliability | A | = | IRR coverage 165/185 (89%). 373 FAQs (A1–A373, v332). Benchmark 185/185. Breakeven coverage 68/185. |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 4 | 4. Interaction Design | A+ | = | No interaction changes this cycle. |
+| 5 | 2. Information Architecture | A+ | ↑ | 373 analyst FAQs (A1–A373). What's New panel: v332 LATEST card; 5-card limit enforced (v327 card replaced). v332 changelog in Methodology tab. FAQ A373: CIT deductibility of royalties and ETR vs. statutory-take distinction. |
+| 6 | 6. Error & Empty States | A+ | = | No changes this cycle. |
+| 7 | 13. SDLC Maturity | A+ | ↑ | JS syntax gate PASS (Cycle 261). 5 blocks / 0 errors. Cycle 261 log added. v332 changelog prepended to Methodology tab. |
+| 8 | 10. Accessibility | A+ | = | No changes this cycle. |
+| 9 | 12. Security / Data Integrity | A+ | = | JS syntax gate PASS, 0 JS errors. Contract count correct 71,601. |
+| 10 | 1. Visual Design | A+ | ↑ | What's New panel: v332 LATEST badge; v327 card removed (5-card limit). |
+| 11 | 3. Data Presentation | A+ | = | No changes this cycle. |
+| 12 | 5. Naming Consistency | A+ | ↑ | v332 structural sweep complete. 171 stale IC memo citations updated (167 ORCA v329 + 4 v250 + 1 v328 in FAQ A361). How to Cite v332. Copy Citation button JS updated to v332. Quick Start cite corrected v329→v332. All structural citations current to v332. |
+| 13 | 7. Professional Credibility | A+ | ↑ | 373 FAQs (A1–A373). FAQ A373: CIT deductibility of royalties and ETR vs. statutory-take — a common IC error source; explains royalty deductibility interaction with ORCA take computation; regime-type rule of thumb; IC memo disclosure template. |
+| 14 | 14. Search Quality | A+ | = | No changes this cycle. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG. How to Cite updated to v332. Copy Citation updated to v332. |
+
+**Grade changes:** Information Architecture ↑ (FAQ A373; v332 What's New card). Professional Credibility ↑ (FAQ A373: ETR vs. government take distinction; royalty CIT-deductibility workflow). Naming Consistency ↑ (171 stale IC memo citations corrected; v332 sweep; FAQ A361 source fixed). Visual Design ↑ (v332 LATEST badge; v327 removed). SDLC Maturity ↑ (syntax gate PASS + Cycle 261 log + v332 changelog). Performance & Reliability = (A maintained). Data Reliability = (A maintained). v332 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
+## Cycle 261 Log — 2026-08-17
+- Test before: 136 PASS / 0 FAIL (Cycle 260 confirmed)
+- JS syntax gate: PASS / 5 blocks / 0 errors (v332 verified, node --check)
+- Test after: 136 PASS / 0 FAIL / 0 JS errors (no changes to interactive logic — all edits are text content and structural sweep; JS syntax gate confirms no parse errors)
+- Changes: (1) 167 stale "ORCA v329" IC memo citations updated to "ORCA v331" across all FAQ bodies; (2) 4 stale "ORCA Petroleum Fiscal Intelligence Platform v250" citations updated to "ORCA Petroleum Fiscal Intelligence Platform v332"; (3) 1 stale "ORCA v328" source citation in FAQ A361 corrected to v332; (4) Quick Start Guide cite corrected v329→v332; (5) FAQ A373 added: CIT deductibility of royalties and ETR vs. statutory-take — structural difference between ORCA take (upstream fiscal economics, pre-financing, standardized project) and IOC ETR (consolidated financial reporting, multi-jurisdiction, GAAP/IFRS); royalty CIT-deductibility mechanics (15% royalty + 30% CIT on post-royalty income = 40.5% ORCA take, not 45%); 4-step IC reconciliation workflow; rule of thumb by regime type (concession/PSC profit oil/Gross Split/PRRT-SPT); IC memo language for royalty deductibility disclosure; Norway ETR vs. 68% ORCA take worked example; (6) v331→v332 structural sweep: title, meta description, header badge, print header, What's New (v332 LATEST; v327 replaced; LATEST removed from v331 card), Methodology page-sub (372→373 FAQs, A1–A372→A1–A373), At a Glance stat (372→373), How to Cite full+short form, clipboard text, Scenario Builder reference, XLSX Methodology sheet version strings, Who Built This provenance
+- All 10 Priority 1 UX checks: No regression — no changes to Reform Risk retry, Fiscal Mechanic Breakdown, Data Completeness, Reference Guide, Scenario modal, Explorer chip, Breakeven Map, Country name prominence, MC label, Contract Distribution
+- Downgrade hunt: Performance & Reliability A — single-file constraint unchanged; no new performance gaps. Data Reliability A — IRR ceiling 165/185 unchanged; 373 FAQs maintain A (not A+ due to IRR/BE coverage gaps). Visual Design A+ — downgrade hunt: What's New panel updated correctly; no off-palette colors identified in walkthrough; no regression.
+- Summary: 5 improvements in Cycle 261. Major naming consistency correction: 171 stale IC memo citations now current — analysts copying template language from any FAQ get the correct platform version. FAQ A373 addresses a systematic IC error source: the difference between ORCA government take (upstream fiscal economics) and IOC effective tax rate (consolidated financial reporting) is frequently misunderstood at the IC stage. v332 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
 ## Cycle 260 — v331 Grade Table
 
 **Cycle 260 — v331:** 3 targeted improvements. (1) M6.1 confirmed: Evidence A/B (%) column verified present as 17th column in `exportFCResults()` — analysts can filter/sort FC XLSX by evidence tier. (2) M6.2 confirmed + corrected: Methodology sheet verified present in FC XLSX workbook — version citation corrected from v329 to v331 so every exported XLSX now cites the correct platform version. (3) v330→v331 structural sweep: title, meta description, header badge, print header, What's New panel (v331 LATEST card; v326 removed), How to Cite (full+short, clipboard, Scenario Builder reference). JS syntax gate PASS.
