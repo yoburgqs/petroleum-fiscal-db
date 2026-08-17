@@ -18036,6 +18036,13 @@ function openFCDrilldown(country) {
   html += '<tr><td style="'+_pmLblStyle+'" title="IRR \u2265500% excluded as unbounded returns">IRR%</td>';
   _pricePoints.forEach(function(p){ var v=p[3]; var irOk=v!=null&&v<500; html += '<td style="'+_pmValStyle+';color:'+(irOk?'var(--text)':'var(--muted)')+';">'+(irOk?v.toFixed(1)+'%':'\u2014')+'</td>'; });
   html += '</tr>';
+  // v328: Δ Take row — delta vs $50 baseline shows price sensitivity in the matrix
+  var _take50base = d.take_50;
+  if (_take50base != null) {
+    html += '<tr style="background:rgba(0,0,0,.03);"><td style="'+_pmLblStyle+'" title="Take change vs $50/bbl baseline — shows how price-sensitive this regime is">\u0394 vs $50</td>';
+    _pricePoints.forEach(function(p){ var v=p[1]; var delta=(v!=null&&_take50base!=null)?(v-_take50base):null; var dStr=delta===null?'\u2014':delta===0?'=':(delta>0?'+':'')+delta.toFixed(1)+'pp'; var dCol=delta===null?'var(--muted)':Math.abs(delta)<2?'var(--muted)':delta>0?'var(--orange)':'var(--green)'; html += '<td style="'+_pmValStyle.replace('13px','11px')+';color:'+dCol+';">'+dStr+'</td>'; });
+    html += '</tr>';
+  }
   html += '</tbody></table>';
 
   if (r.waterfall) {
