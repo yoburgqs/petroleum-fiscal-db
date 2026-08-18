@@ -14197,7 +14197,7 @@ function loadCountryProfile(country) {
   var _stabDots344 = '';
   for(var _i344=0;_i344<5;_i344++){_stabDots344 += (_i344 < _stab344 ? '\u25C6' : '\u25C7');}
   const _stabColor344 = _stab344 >= 4 ? '#15803D' : _stab344 >= 3 ? '#A16207' : _stab344 >= 2 ? '#C2410C' : '#B91C1C';
-  const _takeDisplay344 = (!_isMonopoly && d.take_75 != null) ? d.take_75.toFixed(1) + '%' : '—';
+  const _takeDisplay344 = (!isStateMonopoly(d.take_75) && d.take_75 != null) ? d.take_75.toFixed(1) + '%' : '—';
   const _primaryMech344 = d.mechanic || (d.mechanics ? d.mechanics.split(',')[0].trim() : '');
   const _headlineStrip344 = `<div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:10px 0 14px;border-bottom:1px solid var(--border);margin-bottom:16px;">
   <span class="${getMechTagClass(_primaryMech344)}">${_primaryMech344 || '—'}</span>
