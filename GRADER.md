@@ -1,10 +1,27 @@
-# ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-17)
+# ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-18)
 
-## ROADMAP STATUS (2026-08-17) — M1–M6 COMPLETE
+## ROADMAP STATUS (2026-08-18) — M1–M6 COMPLETE + VISUAL POLISH DONE
 
-All roadmap milestones M1 through M6 are complete as of v331/Cycle 260. FAQs may resume at normal rate (up to 10 per cycle). Normal grading loop operation resumes.
+All roadmap milestones M1 through M6 are complete. Visual presentation improvements also complete (v344–v346). FAQs may continue at normal rate (up to 10 per cycle). Normal grading loop operation continues.
 
-**Completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331)
+**Completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331) · Visual polish (v344: mechanic colors + FC rank borders + CP headline strip · v345: removed CP duplicate country name · v346: no-print on CP nav buttons)
+
+## LOOP DIRECTION (v346+)
+
+FAQs at normal rate (up to 10 per cycle). Safe to continue adding IC analyst FAQs on fiscal mechanics, deal structures, and DCF methodology.
+
+When adding FAQs, prefer these under-covered topics:
+- Gas monetization and LNG fiscal treatment differences vs. oil
+- Fiscal treatment of associated gas (flaring, reinjection, allocation)
+- State participation (free carry, back-in, Petoro-model) — quantified IRR impact
+- Cross-border unitization fiscal treatment
+- Contractor uplift/allowances in PRRT-type systems
+
+Do NOT touch any of the presentation improvements from v344–v346. Do NOT re-add stat bars or clutter.
+
+## M6.3 Print/PDF Status — VERIFIED ADEQUATE (v346)
+
+Print CSS at line 1031 covers all requirements: hides nav/header/buttons, shows ORCA branding header, light theme, A4 landscape. The `.no-print` class is applied to CP nav buttons (v346). No further print changes required unless GRADER flags a specific regression.
 
 ## ROADMAP M6 — Export Quality — ✅ COMPLETE (v331)
 
@@ -75,7 +92,8 @@ Inject `_cpPeerHtml` after the take-at-4-prices card.
 
 ### DO NOT DO (loop restrictions):
 - Do NOT re-add stat number bars, "Last updated" lines, or Reference Grid (see Priority 7 below)
-- FAQs: max 5 per cycle, only after M5.3 is implemented first this cycle
+- Do NOT touch visual presentation improvements from v344–v346 (mechanic tags, FC rank borders, CP headline strip, no-print on CP nav buttons)
+- FAQs: up to 10 per cycle is now allowed — roadmap complete
 - Do NOT restructure the tab order (M7 requires explicit approval)
 
 ---
