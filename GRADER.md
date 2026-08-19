@@ -1,23 +1,44 @@
-# ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-18)
+# ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-19)
 
-## ROADMAP STATUS (2026-08-18) — M1–M6 COMPLETE + VISUAL POLISH DONE
+## DIRECTIVE CHANGE (2026-08-19) — UX IMPROVEMENT MODE
 
-All roadmap milestones M1 through M6 are complete. Visual presentation improvements also complete (v344–v346). FAQs may continue at normal rate (up to 10 per cycle). Normal grading loop operation continues.
+**New directive from Zach:** Shift loop focus to UX improvements. FAQs continue at reduced rate (up to 5 per cycle). Each cycle MUST also include at least one UX improvement from the priority list below.
 
-**Completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331) · Visual polish (v344: mechanic colors + FC rank borders + CP headline strip · v345: removed CP duplicate country name · v346: no-print on CP nav buttons)
+**Completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331) · Visual polish (v344–v346)
 
-## LOOP DIRECTION (v346+)
+## UX IMPROVEMENT PRIORITIES (attempt one per cycle, in order)
 
-FAQs at normal rate (up to 10 per cycle). Safe to continue adding IC analyst FAQs on fiscal mechanics, deal structures, and DCF methodology.
+### Priority A — Reference Dropdown Cleanup (M7.1)
+After Reform Risk was promoted to primary tab, the Reference dropdown still has 6 items. Collapse to 4:
+- Keep: Sample Analyses, Vintage Analysis, Fiscal Mechanics, Methodology
+- Remove from dropdown: API Explorer (fold into Methodology panel) and Reform Risk (already primary tab)
+- Target: `renderReferenceDropdown()` or the dropdown HTML in the tab bar area. Find the `<ul>` or list of dropdown items and remove the two stale entries.
+- Do NOT break existing Reform Risk tab functionality — only remove the redundant dropdown link.
 
-When adding FAQs, prefer these under-covered topics:
-- Gas monetization and LNG fiscal treatment differences vs. oil
-- Fiscal treatment of associated gas (flaring, reinjection, allocation)
-- State participation (free carry, back-in, Petoro-model) — quantified IRR impact
-- Cross-border unitization fiscal treatment
-- Contractor uplift/allowances in PRRT-type systems
+### Priority B — Keyboard Shortcut Strip (M7.2)
+Home tab has a keyboard shortcut strip. Verify Ctrl+K (search) is listed first and most prominently. Add shortcut for Reform Risk tab if it's now primary. Update any stale entries.
+- Target: Home tab HTML, look for shortcut strip div/table. Read current shortcuts, update to reflect current tab structure.
 
-Do NOT touch any of the presentation improvements from v344–v346. Do NOT re-add stat bars or clutter.
+### Priority C — Scenario Builder Pre-fill from Country Profile (M4.3)
+When "+ Scenario" button is clicked from a Country Profile, the modal opens blank. Pre-populate with the country's fiscal parameters.
+- In `loadCountryProfile()`, find the `+ Scenario` button's onclick. Change it to call `openScenarioModal(d)` passing the CP data object.
+- In `openScenarioModal()`, if a data argument is provided, pre-fill royalty, CIT, profit oil split from `d.royalty_rate`, `d.income_tax_rate`, etc.
+
+### Priority D — Regional Reform Context in Country Profile (M5.2)
+Below the reform timeline in CP, add one line: "[Country] has had N reforms since 2010. [Region] average: X.X."
+- Compute regional average from REFORM_HISTORY (already loaded) in `loadCountryProfile()`.
+- Inject after the reform history timeline HTML block.
+
+### Priority E — General UX Polish
+If A–D are all done, look at GRADER grades for the lowest-scoring categories and address the top issue. Read the grade table in this file, identify any category below A+, and implement the highest-impact fix.
+
+## FAQ DIRECTION (reduced rate)
+Up to 5 FAQs per cycle (reduced from 10 to make room for UX work). Prefer:
+- Advanced PSC cost recovery edge cases
+- Fiscal regime comparison worked examples (country A vs B at same field economics)
+- Royalty relief / price-linked royalty mechanics
+
+Do NOT touch visual presentation improvements from v344–v346. Do NOT re-add stat bars or clutter.
 
 ## M6.3 Print/PDF Status — VERIFIED ADEQUATE (v346)
 
