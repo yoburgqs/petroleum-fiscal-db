@@ -6246,3 +6246,11 @@ Background push to `petroleum-fiscal-db` origin main completed successfully (exi
 - JS errors: 0
 - Summary: Cycle 296 -- v369 fully committed. FAQs A561-A565: Liberia/Sierra Leone West Africa frontier Atlantic PSC D-tier comparison with 10pp stress-test IC protocol, PSC profit oil negotiation leverage framework (6 levers + bid-vs-walk-away ORCA calibration workflow), Kazakhstan Kashagan NCOC consortium SUA mechanics (80% cost cap, 40-70% sliding profit oil, APT post-payout, capex overrun C-tier disclosure), East Africa gas vs. oil PSC fiscal divergence (Tanzania/Kenya/Uganda/Mozambique DMO 3-5pp take premium for gas-primary), Abu Dhabi ADNOC TSC vs. Qatar QPNA concession (fee-only vs. equity-WI distinction, reserve booking, price exposure, 4-step IC workflow). UX: FAQ topic index panel with 8-category keyword navigation above Methodology FAQ list (PSC Mechanics / Concession-PRRT / Country Comparisons / Gas & LNG / NOC & State Participation / Fiscal Risk & IC Workflow / Frontier D-tier / Recent A560-A565). v368->v369 structural sweep: 15 structural locations updated, What's New panel updated (v369 LATEST, v364 removed), Methodology changelog prepended, At a Glance 565 FAQs, Methodology page-sub 565 FAQs. Data Reliability maintained A. 6 categories upgraded. Petroleum repo pushed main. Office repo copy: projects/oil-gas-expertise/fiscal_db_interface.html. Office repo pushed main.
 
+
+---
+## Cycle 296 Log — 2026-08-19 15:48
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Duplicate push task killed â€” expected, the first push already succeeded.
+
