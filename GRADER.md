@@ -6328,3 +6328,13 @@ Background push to `petroleum-fiscal-db` origin main completed successfully (exi
 - JS syntax gate: PASS / 6 blocks / 0 errors
 - Summary: Cycle 298 -- v371. FAQs A571-A575: Colombia ANH PSC royalty differential + Factor X windfall (sliding royalty 8-25%, 35% CIT, $80-100/bbl threshold, vs. Brazil ANP pre-salt and Peru Perupetro PSC); Libya EPSA IV fiscal risk under sanctions (80-90% profit oil government, OFAC/EU sanctions regime, 200-350 bps WACC premium, C-tier, IC memo legal opinion requirement); Ghana Jubilee CIT reform 2023 (Act 1094 CIT 35->30%, GNPC 13.64% carried + 10% paying, AOE R>2.5, 3-4pp take reduction, pre-/post-reform comparison); PSC gas balancing and underlifting fiscal asymmetry (in-kind vs. cash settlement, R-factor tier-crossing trap during imbalance, ~1-2pp IRR impact per $500M NPV10 deferred volumes, Scenario Builder two-run workflow); GoM vs. North Sea vs. West Africa cross-basin IC decision matrix (USA GoM 38-42%/A-tier vs. UK UKCS 48-55%/A-tier vs. Angola PSC 65-72%/B-tier vs. Nigeria PSC 63-70%/B-tier, full take/IRR/breakeven/price-swing/stability table, mandate-based decision logic, 4-step ORCA Side-by-Side + Export workflow). Structural sweep: v370->v371 across 15+ locations, stale v369 Scenario Builder citation fixed, What's New v371 LATEST + v366 removed (5-card limit: v371/v370/v369/v368/v367), FAQ topic index Recent button A571-A575, 570->575 FAQ count throughout, v371 changelog prepended. Petroleum repo committed main. Office repo copy: projects/oil-gas-expertise/fiscal_db_interface.html. Push pending Playwright tests.
 
+
+---
+## Cycle 298 Log — 2026-08-19 17:50
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Sonnet | **Directive:** PETROLEUM PLATFORM | **Task:** GRADER.md push confirmed
+
+GRADER.md push confirmed (exit code 0). All three commits are live on `origin/main` â€” cycle 298 fully closed.
+
