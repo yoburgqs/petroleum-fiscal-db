@@ -1432,9 +1432,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div style="text-align:center;padding:36px 0 28px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:6px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
     <div style="color:var(--muted);font-size:14px;margin-bottom:16px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to Q3 2026.</div>
-    <div style="color:var(--text);font-size:13px;font-weight:600;margin-bottom:10px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:8px 16px;display:inline-block;">Start with <strong>Fiscal Compare</strong> — ranked government take across all 185 countries in one click. Or press <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;font-weight:400;">Ctrl+K</kbd> to search any country by name.</div>
   </div>
-  <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Tools</div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:32px;">
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t0',document.getElementById('tab-btn-t0'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
@@ -1570,10 +1568,9 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
 
   <div class="page-title">Fiscal Compare</div>
-  <div class="page-sub">Pick a production profile and oil price — auto-loads Deepwater $75/bbl (standard IOC benchmarking basis). Ranked by government take, lowest take first. Click any row to expand the price matrix (Take%, NPV, IRR across $50–$125/bbl) or open the full Country Profile. Use region chips to narrow to a single geography. Sort by IRR or Breakeven to identify best-return or lowest-risk regimes. Export to Excel with the ⬇ button — includes Evidence A/B% column and Methodology sheet for IC memo use.</div>
 
   <!-- v365: IC Analyst Quick Reference — collapsible interpretation guide for senior analysts seeing the platform for the first time -->
-  <details id="fc-ic-ref" style="margin-bottom:12px;" open>
+  <details id="fc-ic-ref" style="margin-bottom:12px;">
     <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Expand to see IC analyst interpretation guide for take tiers, Swing, and Stability">
       <span style="color:var(--accent);font-size:12px;">&#9656;</span> IC Analyst Interpretation Guide
       <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">Click to collapse after first use</span>
@@ -1700,7 +1697,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 <!-- ===== TAB: REGIME EXPLORER (wraps Browse=t1 + Screen=t3) ===== -->
 <div id="texplorer" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-texplorer">
   <div class="page-title">Explorer</div>
-  <div class="page-sub">Browse and filter 185 countries by fiscal mechanic, region, take, IRR, and breakeven. <strong>Browse</strong> mode: chip filters + sortable table. <strong>Screener</strong> mode: set numeric thresholds (take, IRR, NPV, breakeven) and apply pre-built screens (Sweet Spot, PSC Africa, Deepwater, High IRR, R-factor PSC, Atlantic Frontier). <strong>Bubble Chart</strong> mode: scatter plot of take vs. NPV across all regimes with mechanic color coding. Toggle between modes using the buttons above. Export to Excel from any mode.</div>
   <div class="explorer-mode-toggle mode-toggle" role="group" aria-label="Explorer view mode" style="display:flex;gap:0;margin-bottom:18px;border-radius:8px;overflow:hidden;border:1px solid var(--border);width:fit-content;">
     <button id="mode-btn-browse" class="expl-mode-btn" data-mode="browse" aria-pressed="true" title="Browse all countries with filter chips and map view" style="padding:8px 20px;background:var(--accent);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;">Browse ⇕</button>
     <button id="mode-btn-screen" class="expl-mode-btn" data-mode="screen" aria-pressed="false" title="Screen and rank countries by fiscal criteria" style="padding:8px 20px;background:var(--surface);color:var(--muted);border:none;border-left:2px solid var(--accent);font-size:13px;font-weight:600;cursor:pointer;">Screener ⋮ <span style="font-size:10px;color:var(--accent);vertical-align:middle;">★</span></button>
@@ -1710,7 +1706,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
   <!-- v101: Event delegation complete — all inline onclick removed from Explorer chip rows and mode toggle buttons -->
   <!-- v41: Mechanic filter chips — v101: event delegation complete, all inline onclick removed -->
-  <div class="chip-row" id="chip-row-mech">
+  <div class="chip-row" id="chip-row-mech" style="display:none">
     <span class="chip-row-label">Mechanic</span>
     <button class="chip active" role="button" aria-pressed="true" data-filter="mechanic" data-value="all">All</button>
     <button class="chip" role="button" aria-pressed="false" data-filter="mechanic" data-value="Concession">Concession</button>
@@ -1727,7 +1723,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <button class="btn btn-outline btn-sm" id="explorer-map-toggle" style="margin-left:auto;">Map View</button>
   </div>
   <!-- v41: Region filter chips — v101: event delegation complete, all inline onclick removed -->
-  <div class="chip-row" id="chip-row-region">
+  <div class="chip-row" id="chip-row-region" style="display:none">
     <span class="chip-row-label">Region</span>
     <button class="chip active" role="button" aria-pressed="true" data-filter="region" data-value="all">All</button>
     <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Africa">Africa</button>
@@ -1750,19 +1746,18 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <input type="radio" name="price" id="p125" value="125"><label for="p125">$125</label>
       </div>
     </div>
-    <!-- Mechanic + Region dropdowns hidden: chip rows above are the canonical filter UI (v41).
-         Kept in DOM so setExplorerChip() sync logic continues to work. -->
-    <div class="ctrl-group" style="display:none">
+    <div class="ctrl-group">
       <label>Mechanic</label>
-      <select id="flt-mech" aria-label="Filter Explorer table by fiscal mechanic type">
+      <select id="flt-mech" aria-label="Filter Explorer table by fiscal mechanic type" onchange="(function(v){if(v==='rfactor'){var rc=document.getElementById('chip-rfactor-psc');setExplorerRFactor(rc);}else{_explorerRFactorOnly=false;explorerChipFilters.mechanic=v||'all';renderExplorer();}})(this.value)">
         <option value="">All Mechanics</option>
         <option>Concession</option><option>PSC</option><option>TSC</option>
         <option>PRRT</option><option>RSC</option><option>Buy-back</option><option>Revenue Share</option><option>Gross Split</option>
+        <option value="rfactor">&#9670; R-factor PSC</option>
       </select>
     </div>
-    <div class="ctrl-group" style="display:none">
+    <div class="ctrl-group">
       <label>Region</label>
-      <select id="flt-region" aria-label="Filter Explorer table by geographic region">
+      <select id="flt-region" aria-label="Filter Explorer table by geographic region" onchange="setExplorerChip('region',this.value||'all',document.querySelector('#chip-row-region .chip[data-value=\''+(this.value||'all')+'\']')||document.querySelector('#chip-row-region .chip'))">
         <option value="">All Regions</option>
         <option>Africa</option><option>Asia Pacific</option><option>Middle East</option>
         <option>Europe</option><option>Americas</option>
@@ -1784,7 +1779,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <input type="text" class="search-input" id="flt-search" placeholder="Search country…" aria-label="Search countries in Explorer table" autocomplete="off" inputmode="search" spellcheck="false">
       <div id="search-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:0 0 6px 6px;z-index:500;max-height:200px;overflow-y:auto;box-shadow:0 4px 12px rgba(0,0,0,0.10);"></div>
     </div>
-    <button id="four-price-toggle" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:var(--green);color:var(--green);" data-active="0" title="Show only countries with verified production data (>5% contract coverage)" aria-label="Toggle production data filter — show only countries with verified production data" aria-pressed="false">Prod Data Only</button><button id="explorer-excel-btn" class="btn btn-outline btn-sm" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
+    <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 124 countries with verified IRR data"><input type="checkbox" id="expl-irr-check" style="accent-color:var(--accent);" onchange="_explorerHasIRR=this.checked;renderExplorer();"> IRR only</label><label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 68 countries with verified breakeven data"><input type="checkbox" id="expl-be-check" style="accent-color:var(--accent);" onchange="_explorerHasBreakeven=this.checked;renderExplorer();"> BE only</label><button id="four-price-toggle" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;" data-active="0" aria-pressed="false" title="Toggle 4-price columns ($50 / $100 / $125)">4-Price View</button><button id="flt-prod-btn" class="btn btn-sm btn-outline" style="margin-right:6px;font-size:11px;border-color:var(--green);color:var(--green);" data-active="0" title="Show only countries with verified production data (>5% contract coverage)" aria-label="Toggle production data filter — show only countries with verified production data" aria-pressed="false">Prod Data Only</button><button class="btn btn-outline btn-sm" onclick="toggleExplorerMap()" title="Toggle world map view">Map View</button><button id="explorer-excel-btn" class="btn btn-outline btn-sm" title="Export filtered table to Excel">⬇ Excel</button><button id="explorer-copy-link" class="btn btn-outline btn-sm" style="margin-left:6px;" title="Copy link to current filtered view"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:middle;margin-right:4px"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>Copy Link</button>
   </div>
 
   <div style="font-size:11px;color:var(--muted);margin-bottom:8px;letter-spacing:.02em;font-family:'IBM Plex Mono',monospace;padding:4px 0;">
@@ -1859,8 +1854,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div id="explorer-screen-mode" style="display:none">
 
   <div class="page-title">Screener</div>
-  <div class="page-sub">Filter 185 countries by fiscal criteria — take, IRR, NPV, breakeven, mechanic, region, and water depth — to identify the most attractive regimes for a specific investment thesis. <strong>All take and IRR thresholds apply at $75/bbl</strong> (the platform base case). Eight pre-set filters cover the most common IOC screening scenarios: Sweet Spot, PSC Africa, Deepwater, Low-Risk Stable, High IRR, High Evidence, R-factor PSC, and Atlantic Frontier.</div>
-  <div style="background:rgba(176,104,0,.06);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;padding:9px 14px;margin-bottom:16px;font-size:12px;color:var(--text);"><strong style="color:var(--accent);">Screener</strong> — Filter contracts by return threshold, region, and mechanic. Use pre-sets for quick starting points or set sliders manually. <strong style="color:var(--accent);">Metrics are at $75/bbl</strong> unless noted.</div>
 
   <div class="card">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
@@ -2022,31 +2015,21 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
 <div id="t2" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t2">
   <div class="page-title">Side-by-Side Country Comparison</div>
-  <div class="page-sub">Compare up to 4 countries across all key fiscal metrics: government take at 4 price scenarios, contractor NPV, IRR, breakeven price, regime mechanics, and fiscal parameters. Export as PDF, download chart as PNG, or share via URL link. Quickstarts load the most common IOC benchmarking comparisons in one click — including the Atlantic Frontier Quartet (Guyana / Angola / Brazil / Nigeria) and the North Sea Trio (Norway / UK / Netherlands). Use the <strong>+ Scenario</strong> button to add a custom-modeled regime to any comparison.</div>
 
-  <div class="card">
-    <div class="card-title">Select Countries (max 4)</div>
-    <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+  <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;position:relative;">
       <input type="text" class="search-input" id="cmp-search" placeholder="Type to search countries…" aria-label="Search countries to compare side-by-side" autocomplete="off" inputmode="search" spellcheck="false" style="width:260px;">
       <div id="cmp-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       <button class="btn btn-outline btn-sm" id="cmp-clear-btn" aria-label="Clear all selected countries from side-by-side comparison">Clear</button>
       <button class="btn btn-outline btn-sm" id="cmp-print-btn" title="Print/export comparison as PDF" aria-label="Export comparison as PDF via browser print">⬇ Export PDF</button>
       <button class="btn btn-outline btn-sm" id="cmp-share-btn" title="Copy shareable link to this comparison">⎘ Share Link</button>
-    </div>
-    <div id="cmp-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;width:260px;z-index:100;margin-top:4px;"></div>
+      <div id="cmp-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;width:260px;z-index:100;margin-top:4px;top:100%;left:0;"></div>
   </div>
 
   <div id="cmp-output" class="empty-state">
-    <div style="margin-bottom:10px;">Select countries above or use a quickstart below to compare fiscal terms side by side.</div>
-    <div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Type country names in the search box above, or load a pre-built IOC benchmark comparison:</div>
-    <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Quickstart comparisons</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-      <button class="cmp-quickstart-btn" data-countries="Norway|Angola" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Norway (Concession, low-take SDFI) vs Angola (PSC, FTP-heavy)">Norway vs Angola</button>
-      <button class="cmp-quickstart-btn" data-countries="United States|Iraq" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>
-      <button class="cmp-quickstart-btn" data-countries="Indonesia|Malaysia" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Indonesia (cost-recovery PSC) vs Malaysia (Petronas PSC)">Indonesia vs Malaysia</button>
-      <button class="cmp-quickstart-btn" data-countries="Saudi Arabia|UAE" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare Saudi Arabia (Aramco concession, ~85% take) vs UAE (concession, ~65% take) — both Middle East Concession regimes with very different IOC access structures">Saudi Arabia vs UAE</button>
       <button class="cmp-quickstart-btn" data-countries="Guyana|Angola|Brazil|Nigeria" style="background:transparent;border:1px solid rgba(194,65,12,.4);border-radius:6px;color:var(--orange);font-size:11px;padding:5px 12px;cursor:pointer;" title="Atlantic Frontier PSC Quartet: Guyana (Stabroek ~52%), Angola (deepwater PSC ~55%), Brazil (pre-salt ~65%), Nigeria (PIA deepwater ~58%) — four PSC regimes in the same basin spanning a 30pp take range. The benchmark for IOC Atlantic capital allocation decisions.">&#9632; Atlantic Frontier Quartet</button>
       <button class="cmp-quickstart-btn" data-countries="Norway|United Kingdom|Netherlands" style="background:transparent;border:1px solid rgba(21,128,61,.35);border-radius:6px;color:var(--green);font-size:11px;padding:5px 12px;cursor:pointer;" title="North Sea Trio: Norway (Concession+SDFI, ~68% take), UK (RFCT+SC+EPL, ~49% take), Netherlands (~48% take) — the three core North Sea fiscal benchmarks in one view. Standard reference for European offshore capital allocation.">&#9632; North Sea Trio</button>
+      <button class="cmp-quickstart-btn" data-countries="United States|Iraq" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>
     </div>
   </div>
 
@@ -2066,7 +2049,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
 <div id="t4" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="ref-item-vintage">
   <div class="page-title">Vintage Analysis</div>
-  <div class="page-sub">How petroleum fiscal terms have shifted from the 1950s to the present — average government take by decade and mechanic (decade trend chart), a sourced reform event log by country and year, and a decade-by-decade take heatmap across all mechanics. The global trend is a long-run increase in state capture, punctuated by investor-friendly reforms in low-price periods. All take data at $75/bbl base case. For country-level reform history and Stability Scores, see the <strong>Reform Risk</strong> tab.</div>
 
   <div class="card">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
@@ -2148,43 +2130,32 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
 <div id="t5" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t5">
   <div class="page-title">IOC Portfolio — Fiscal Exposure</div>
-  <div class="page-sub">Search any of 16 major operators — Shell, BP, TotalEnergies, ExxonMobil, Chevron, Equinor, Eni, ConocoPhillips, Repsol, Petronas, CNOOC, Woodside, Santos, Harbour Energy, Tullow Oil, Kosmos Energy — to see their full portfolio of upstream fiscal contracts across 185 countries: government take by jurisdiction, take-tier distribution (Investible/Moderate/High/Very High), weighted average take, and <strong>Mechanic Mix</strong> (PSC/Concession/TSC concentration ratio). Use <strong>Take Distribution &amp; Peer Comparison</strong> below for cross-operator benchmarking. See FAQ A134 for portfolio mechanic concentration risk methodology.</div>
-  <div style="display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);margin-bottom:16px;">
-    <span>IOC country presence derived from operator annual reports, 10-K filings, and public project disclosures (2024–2026). Portfolio reflects countries of active operation — not necessarily current equity production. <strong style="color:var(--muted);">Last updated: Aug 2026.</strong></span>
-  </div>
 
-  <div class="card">
-    <input type="text" class="search-input" id="ioc-search" placeholder="Search operator (e.g. ExxonMobil, Shell, BP, Total, Chevron, Equinor)…" aria-label="Search IOC operator" autocomplete="off" inputmode="search" spellcheck="false" style="width:100%;max-width:500px;" oninput="updateIOCSuggestions()">
-    <div id="ioc-suggestions" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;"></div>
-    <div id="ioc-quick-btns" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
-      <span style="color:var(--muted);font-size:12px;margin-right:4px;">Quick:</span>
-    </div>
+  <input type="text" class="search-input" id="ioc-search" placeholder="Search operator (e.g. ExxonMobil, Shell, BP, Total, Chevron, Equinor)…" aria-label="Search IOC operator" autocomplete="off" inputmode="search" spellcheck="false" style="width:100%;max-width:500px;" oninput="updateIOCSuggestions()">
+  <div id="ioc-suggestions" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;"></div>
+  <div id="ioc-quick-btns" style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">
+    <span style="color:var(--muted);font-size:12px;margin-right:4px;">Quick:</span>
   </div>
 
   <div id="ioc-stats" class="ioc-stats" style="display:none;"></div>
   <div id="ioc-output" class="empty-state">
-    <div style="max-width:500px;margin:0 auto;padding:16px 0;">
-      <div style="font-size:13px;color:var(--muted);margin-bottom:16px;line-height:1.6;">Select an operator above to see every country where they hold active contracts — with government take by jurisdiction, take-tier distribution, and fiscal exposure score. 16 operators tracked: the 8 major IOCs plus 8 independent and national operators.</div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:10px;">
-        <button class="ioc-quick-btn" data-ioc-op="ExxonMobil" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load ExxonMobil fiscal exposure profile">ExxonMobil</button>
-        <button class="ioc-quick-btn" data-ioc-op="Shell" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Shell fiscal exposure profile">Shell</button>
-        <button class="ioc-quick-btn" data-ioc-op="TotalEnergies" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load TotalEnergies fiscal exposure profile">TotalEnergies</button>
-        <button class="ioc-quick-btn" data-ioc-op="BP" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load BP fiscal exposure profile">BP</button>
-        <button class="ioc-quick-btn" data-ioc-op="Equinor" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Equinor fiscal exposure profile">Equinor</button>
-      </div>
-      <div style="font-size:11px;color:var(--muted);">Or use the <strong>Take Distribution &amp; Peer Comparison</strong> section below to see take-tier distribution and peer comparison across all 16 operators.</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:16px 0;">
+      <button class="ioc-quick-btn" data-ioc-op="ExxonMobil" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load ExxonMobil fiscal exposure profile">ExxonMobil</button>
+      <button class="ioc-quick-btn" data-ioc-op="Shell" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Shell fiscal exposure profile">Shell</button>
+      <button class="ioc-quick-btn" data-ioc-op="TotalEnergies" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load TotalEnergies fiscal exposure profile">TotalEnergies</button>
+      <button class="ioc-quick-btn" data-ioc-op="BP" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load BP fiscal exposure profile">BP</button>
+      <button class="ioc-quick-btn" data-ioc-op="Equinor" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Equinor fiscal exposure profile">Equinor</button>
     </div>
   </div>
 
-<div id="ioc-exposure-section" style="margin-top:32px;border-top:1px solid var(--border);padding-top:24px;">
-  <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px;">Take Distribution &amp; Peer Comparison</div>
-  <div class="page-sub">Select an operator to see what percentage of their global contract portfolio sits in each take tier — and how their aggregate exposure compares to the IOC peer group.</div>
-
-  <div style="display:flex;gap:12px;align-items:center;margin:16px 0;flex-wrap:wrap;">
+  <div style="margin-top:24px;border-top:1px solid var(--border);padding-top:16px;">
+  <div style="font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;">Take Distribution &amp; Peer Comparison</div>
+  <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
     <select id="exposure-ioc-select" aria-label="Select IOC operator for fiscal exposure analysis" style="background:var(--surface);border:1px solid var(--border);color:var(--text);border-radius:6px;padding:8px 12px;font-size:13px;">
       <option value="">Select Operator…</option>
     </select>
     <div id="exposure-ioc-quick" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+  </div>
   </div>
 
   <div id="ioc-exposure-output" style="display:none;">
@@ -2208,7 +2179,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     </div>
   </div>
 </div>
-</div>
 
 <!-- ═══════════════════════════ TAB 6: MECHANICS GUIDE ═══════════════════════ -->
 
@@ -2224,7 +2194,6 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
 <div id="t7" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t7">
   <div class="page-title">Country Profile</div>
-  <div class="page-sub">Full fiscal deep-dive for any country — government take across 4 price scenarios ($50–$125/bbl), sourced fiscal parameters with A/B/C evidence confidence badges, reform timeline, DCF sensitivity (price/opex/capex tornado), contractor IRR, and breakeven price. Use the <strong>+ Scenario</strong> button in the header to override any parameter and run a custom DCF. Click <strong>⇌ Compare</strong> to load this country into Side-by-Side. Navigate sequentially through Fiscal Compare results with the ← / → buttons when a FC session is active.</div>
   <div id="dd-select-wrap">
     <select id="dd-country-select" aria-label="Select a country to load its complete fiscal profile">
       <option value="">— Select a country —</option>
@@ -13765,7 +13734,6 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 <!-- ===== TAB: BREAKEVEN MAP ===== -->
 <div id="tbreakevenmap" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-tbreakevenmap">
   <div class="page-title">Global Breakeven Price Map</div>
-  <div class="page-sub">Country-level breakeven price — the oil price at which a standardized project achieves zero NPV (undiscounted). Coverage: <strong>68 of 185 countries</strong> where complete royalty and verified cost data are available. The remaining 117 countries appear grey — breakeven calculation requires a cost recovery cap or royalty rate sourced at A/B-tier confidence; C/D-tier countries are excluded to prevent spurious precision. Use the price marker slider to identify which countries are above or below a target price threshold. Sort the lists below to find the most resilient and most price-sensitive regimes at any breakeven threshold. Export all 68 data points to CSV for further analysis.</div>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px;">
     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);">
       <span style="color:var(--accent);font-weight:700;">Coverage: 68 of 185 countries</span>
@@ -13774,9 +13742,6 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <button class="btn btn-sm btn-outline" id="breakeven-csv-btn" title="Export all 68 countries with breakeven data to CSV" aria-label="Export breakeven price data for 68 countries as CSV file">&#8659; Export CSV</button>
   </div>
   
-  <div style="font-size:11px;color:var(--muted);background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.15);border-radius:5px;padding:6px 12px;margin-bottom:8px;">
-    <strong style="color:var(--accent);">How to read this map:</strong> Each country is colored by its breakeven price — the oil price at which the project achieves NPV=0. Countries colored <span style="color:var(--green);font-weight:700;">green</span> break even below $40/bbl (highly resilient). Countries colored <span style="color:var(--red);font-weight:700;">red</span> need >$85/bbl to be profitable. Set the price marker below to see which countries are above or below a target price.
-  </div>
   <!-- v300: Above/Below threshold counter — live count of countries above and below the price marker -->
   <div id="be-threshold-summary" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:10px 14px;margin-bottom:10px;font-size:12px;">
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
@@ -13806,6 +13771,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <svg id="breakeven-map-svg" style="width:100%;height:500px;display:block;"></svg>
     <div id="breakeven-map-tooltip" style="position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--text);pointer-events:none;display:none;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.12);"></div>
   </div>
+  <div style="font-size:10px;color:var(--muted);margin:4px 0 8px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;"><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#15803D;margin-right:3px;vertical-align:middle;"></span>&lt;$40</span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#A16207;margin-right:3px;vertical-align:middle;"></span>$40–60</span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#C2410C;margin-right:3px;vertical-align:middle;"></span>$60–85</span><span><span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#B91C1C;margin-right:3px;vertical-align:middle;"></span>&gt;$85</span><span style="color:var(--muted);">&#9633; No data</span></div>
   
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;" role="region" aria-label="Lowest breakeven countries — most resilient to low oil prices">
@@ -14090,7 +14056,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
   </div>
 </div>
-<!-- ── Reform Risk Tab ── --><div id="treformrisk" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-treformrisk">  <div class="page-title">Reform Risk Intelligence</div>  <div class="page-sub">Track fiscal law changes across 185 jurisdictions — reforms that raised take for investors (<span style="color:var(--red);">hostile</span>) and those that improved contractor terms (<span style="color:var(--green);">friendly</span>). A country at 60% government take with no changes in 30 years carries materially lower political risk than one at 55% that renegotiates terms every cycle. Use the <strong>Stability Score</strong> (◆◆◆◆◆ = zero reforms since 2010, ◇◇◇◇◇ = 5+ reforms = most volatile) alongside headline take when screening for long-cycle capital deployment. The <strong>Regional Reform Tilt</strong> panel shows net tightening vs. liberalizing balance by region — a key signal for portfolio-level reform correlation risk. Filter by country, reform direction, and decade.</div>  <div id="reform-risk-content" style="margin-top:20px;">    <div style="color:var(--muted);font-size:13px;padding:40px 0;text-align:center;">Loading reform history&hellip;</div>  </div></div>
+<!-- ── Reform Risk Tab ── --><div id="treformrisk" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-treformrisk">  <div class="page-title">Reform Risk Intelligence</div>  <div id="reform-risk-content" style="margin-top:20px;">    <div style="color:var(--muted);font-size:13px;padding:40px 0;text-align:center;">Loading reform history&hellip;</div>  </div></div>
 
 <script>
 let REFORM_HISTORY = {}; // loaded async from reform_history.json
@@ -19456,7 +19422,6 @@ function showRoutingHint() {
 // Boot: parse hash on load, wire hashchange, show hint
 document.addEventListener('DOMContentLoaded', function(){
   if (window.location.hash) parseAndNavigate(window.location.hash);
-  showRoutingHint();
   // R-factor PSC preset count badge
   const rfCountEl = document.getElementById('rfactor-preset-count');
   if (rfCountEl && COUNTRY_DATA !== null) {
