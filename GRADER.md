@@ -1,44 +1,29 @@
 # ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-19)
 
-## DIRECTIVE CHANGE (2026-08-19) — UX IMPROVEMENT MODE
+## DIRECTIVE UPDATE (2026-08-19) — COMPREHENSIVE UI DECLUTTER COMPLETE (v371+)
 
-**New directive from Zach:** Shift loop focus to UX improvements. FAQs continue at reduced rate (up to 5 per cycle). Each cycle MUST also include at least one UX improvement from the priority list below.
+**Major UI declutter applied in v371+ commit (2026-08-19).** The following changes are LOCKED — do NOT revert:
+- `showRoutingHint()` call removed from DOMContentLoaded (routing hint no longer auto-fires)
+- Home amber instructional banner removed; "Tools" tab label removed
+- All `<div class="page-sub">` paragraphs removed from all 9 tabs (FC, Explorer, Screener, CP, SbS, IOC, Breakeven, Reform Risk, Vintage)
+- FC IC Analyst Guide `<details>` now collapsed by default (removed `open` attribute)
+- Explorer chip rows hidden (`display:none`), flt-mech / flt-region selects now visible with onchange handlers routing to same underlying JS (setExplorerChip / setExplorerRFactor)
+- IRR-only and BE-only checkboxes added inline to Explorer controls row
+- Map View button added to Explorer controls row
+- Side-by-Side card wrapper removed; quickstarts trimmed to 3 (Atlantic Frontier, North Sea Trio, USA vs Iraq)
+- IOC Portfolio attribution/prose removed; ioc-exposure-section wrapper removed; empty state = 5 operator buttons only
+- Breakeven Map "How to read" block removed; compact inline color legend added
 
-**Completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331) · Visual polish (v344–v346) · M7.1 Reference dropdown cleaned (v361) · M7.2 Shortcut strip updated (v361) · M4.3 Scenario pre-fill from CP (verified v361) · M5.2 Regional reform context in CP (verified v361)
+**DO NOT RE-ADD:** page-sub paragraphs, amber banners, routing hints, "How to read" blocks, card wrappers around SbS, or chip rows as visible UI elements.
 
-## UX IMPROVEMENT PRIORITIES (attempt one per cycle, in order)
+**Previously completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331) · Visual polish (v344–v346) · M7.1 Reference dropdown cleaned (v361) · M7.2 Shortcut strip updated (v361) · M4.3 Scenario pre-fill from CP (verified v361) · M5.2 Regional reform context in CP (verified v361)
 
-### Priority A — Reference Dropdown Cleanup (M7.1)
-After Reform Risk was promoted to primary tab, the Reference dropdown still has 6 items. Collapse to 4:
-- Keep: Sample Analyses, Vintage Analysis, Fiscal Mechanics, Methodology
-- Remove from dropdown: API Explorer (fold into Methodology panel) and Reform Risk (already primary tab)
-- Target: `renderReferenceDropdown()` or the dropdown HTML in the tab bar area. Find the `<ul>` or list of dropdown items and remove the two stale entries.
-- Do NOT break existing Reform Risk tab functionality — only remove the redundant dropdown link.
-
-### Priority B — Keyboard Shortcut Strip (M7.2)
-Home tab has a keyboard shortcut strip. Verify Ctrl+K (search) is listed first and most prominently. Add shortcut for Reform Risk tab if it's now primary. Update any stale entries.
-- Target: Home tab HTML, look for shortcut strip div/table. Read current shortcuts, update to reflect current tab structure.
-
-### Priority C — Scenario Builder Pre-fill from Country Profile (M4.3)
-When "+ Scenario" button is clicked from a Country Profile, the modal opens blank. Pre-populate with the country's fiscal parameters.
-- In `loadCountryProfile()`, find the `+ Scenario` button's onclick. Change it to call `openScenarioModal(d)` passing the CP data object.
-- In `openScenarioModal()`, if a data argument is provided, pre-fill royalty, CIT, profit oil split from `d.royalty_rate`, `d.income_tax_rate`, etc.
-
-### Priority D — Regional Reform Context in Country Profile (M5.2)
-Below the reform timeline in CP, add one line: "[Country] has had N reforms since 2010. [Region] average: X.X."
-- Compute regional average from REFORM_HISTORY (already loaded) in `loadCountryProfile()`.
-- Inject after the reform history timeline HTML block.
-
-### Priority E — General UX Polish
-If A–D are all done, look at GRADER grades for the lowest-scoring categories and address the top issue. Read the grade table in this file, identify any category below A+, and implement the highest-impact fix.
-
-## FAQ DIRECTION (reduced rate)
-Up to 5 FAQs per cycle (reduced from 10 to make room for UX work). Prefer:
-- Advanced PSC cost recovery edge cases
-- Fiscal regime comparison worked examples (country A vs B at same field economics)
-- Royalty relief / price-linked royalty mechanics
-
-Do NOT touch visual presentation improvements from v344–v346. Do NOT re-add stat bars or clutter.
+## CURRENT LOOP DIRECTIVE — FAQ MODE (up to 10/cycle)
+All UX priorities A–D from prior directives are complete. Return to FAQ-only mode:
+- Up to 10 FAQs per cycle
+- Prefer: advanced PSC cost recovery edge cases, fiscal regime comparison worked examples, royalty relief/price-linked royalty mechanics, state participation structures
+- Do NOT attempt UX changes unless GRADER flags a specific regression
+- Do NOT touch visual improvements from v344–v346 or UI declutter from v371+
 
 ## M6.3 Print/PDF Status — VERIFIED ADEQUATE (v346)
 
