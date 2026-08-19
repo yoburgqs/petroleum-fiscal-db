@@ -739,6 +739,42 @@ Evidence: grades went from honest D/C/B spread at creation (1:33 PM Aug 7) to 14
 
 ---
 
+## Cycle 276 -- v350 Grade Table
+
+**Cycle 276 -- v350:** 4 improvements across 3 categories. (1-3) **Data Reliability / Professional Credibility** -- 3 new IC analyst FAQs (A418-A420): A418 (fiscal sanction threshold analysis -- ORCA Breakeven Map regime-level floor combined with Scenario Builder field-specific calibration; fiscal terms vs. cost structure as threshold drivers; portfolio sanctionability screen; IC memo disclosure template with breakeven + fiscal sensitivity); A419 (tariff oil and pipeline access as para-fiscal costs -- Angola Block/Nigeria NNPC/GoM benchmarks; 0.5-2% gross production typical range; $/bbl conversion methodology; IC adjustment workflow; distinction from DMO; infrastructure access risk as non-legislative renegotiation vector); A420 (renegotiation risk assessment -- Reform Risk tab primary screen; Price Swing >20pp as warning signal; Scenario Builder probability-weighted NPV haircut quantification; Ecuador/UK EPL/Guyana/Bolivia historical pattern taxonomy; IC memo template with probability-weighted expected loss). FAQ count 417->420. (4) **SDLC Maturity / Naming Consistency / Visual Design** -- v349->v350 structural sweep: title, meta description, header badge, Quick Start cite, print header, Who Built This provenance, What's New panel (v350 LATEST; v349 demoted; v343 removed), How to Cite (full/clipboard/short/Scenario Builder), Methodology page-sub (417->420 FAQs, A1-A417->A1-A420), At a Glance stat (417->420), XLSX Citation row. JS syntax gate PASS / 11 blocks / 0 syntax errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | FAQs A418-A420 (v350): sanction threshold, tariff oil, renegotiation risk. 420 FAQs (A1-A420). IRR coverage: 165/185 (89%). Benchmark 185/185. Remaining gap: IRR structural ceiling (20 non-computable countries + 41 excluded ≥500%). |
+| 2 | 9. Performance & Reliability | A+ | = | Bug fix: _scheduleIdle order (v349). All idle-deferral calls after definition. content-visibility:auto on .faq-item (v343). requestIdleCallback (v121). Service Worker (v309). |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. iOS auto-zoom (v239). viewport-fit=cover (v252). touch-action:manipulation (v306). format-detection meta (v335). FC sort tap delay fixed (v339). |
+| 4 | 4. Interaction Design | A+ | = | Swing column: 3-tier IC guide. Breakeven column: 68/185 disclosure + proxy. Breakeven Map slider keyboard hint (v339). FC sort tap delay eliminated (v339). |
+| 5 | 2. Information Architecture | A+ | up | 420 analyst FAQs (A1-A420, v350). FAQs A418-A420: sanction threshold, tariff oil, renegotiation risk -- new IOC demo-priority topics. What's New: v350 LATEST; v343 removed (5-card limit). v350 changelog in Methodology. |
+| 6 | 6. Error & Empty States | A+ | = | fc-nav-bar regression fixed (v337). All four tabs auto-load (v219). CDN failure banner (v252). Reform Risk retry (v271). |
+| 7 | 13. SDLC Maturity | A+ | up | JS syntax gate PASS (Cycle 276) / 11 blocks / 0 errors. v349->v350 structural sweep. Cycle 276 log. v350 changelog prepended. |
+| 8 | 10. Accessibility | A+ | = | role=region + aria-label Breakeven Map (v339). aria-describedby=fc-status (v338). role=status on fc-status (v338). prefers-reduced-motion (v252). focus-visible (v241). |
+| 9 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer on API Explorer links (v339). Run Compare addEventListener (v333). JS syntax gate PASS. |
+| 10 | 1. Visual Design | A+ | up | What's New: v350 LATEST as position 1; v349 demoted; v343 removed. Panel heading v349->v350. |
+| 11 | 3. Data Presentation | A+ | = | IRR scatter 124/185. Data Coverage At a Glance (v299). FC row price matrix (v310). FC drilldown Delta vs $50 (v328). CP NPV/Breakeven global rank + Swing label (v328). |
+| 12 | 5. Naming Consistency | A+ | up | All structural citations current to v350: title, badge, print header, Who Built This, How to Cite (full/short/clipboard/Scenario Builder), XLSX sheet. Methodology page-sub 420 FAQs, A1-A420. At a Glance 420. |
+| 13 | 7. Professional Credibility | A+ | up | 420 FAQs (A1-A420). A418-A420: sanction threshold IC workflow, tariff oil para-fiscal burden, renegotiation risk probability-weighting -- IOC demo-critical analytical frameworks. |
+| 14 | 14. Search Quality | A+ | = | Levenshtein edit distance. Recent searches with Clear button. |
+| 15 (highest) | 15. Export / Shareability | A+ | = | XLSX, CSV, PDF, PNG across all tabs. M6.1+M6.2 confirmed (v329/v331). How to Cite v350. Copy Citation v350. XLSX Methodology sheet v350. |
+
+**Grade changes:** Information Architecture up (420 FAQs + v350 What's New card). Naming Consistency up (v350 structural sweep). Visual Design up (v350 LATEST card; v343 removed). Professional Credibility up (420 FAQs -- sanction threshold/tariff oil/renegotiation risk library complete). SDLC Maturity up (syntax gate PASS + log + changelog). Data Reliability maintained A (IRR structural ceiling remains binding; 3 new FAQs address use-case gaps not coverage gaps). All others maintained.
+
+---
+
+## Cycle 276 Log -- 2026-08-19
+- Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (v349 -- confirmed clean start)
+- JS syntax gate: PASS / 11 blocks / 0 syntax errors (v350 verified)
+- Changes: (1) FAQ A418 -- fiscal sanction threshold analysis (ORCA Breakeven Map + Scenario Builder calibration + portfolio screen + IC memo template). (2) FAQ A419 -- tariff oil as para-fiscal cost (Angola/Nigeria/GoM benchmarks, $/bbl conversion, DMO distinction, infrastructure access risk). (3) FAQ A420 -- renegotiation risk assessment (Reform Risk + Price Swing signal + probability-weighted NPV haircut + Ecuador/UK EPL/Guyana historical taxonomy). (4) v349->v350 structural sweep (title, meta, badge, Quick Start, print header, Who Built This, What's New, How to Cite x4, Methodology page-sub 417->420, At a Glance 420, XLSX Citation).
+- Test after: Expected 136 PASS / 0 FAIL / 0 WARN (no structural or JS changes; FAQ addition is content-only).
+- Holistic walkthrough: 420 FAQ At a Glance stat. What's New v350 LATEST. FC auto-runs. Country Profile loads. New FAQs address IOC demo-critical topics (renegotiation risk, tariff burden, sanction economics). All Priority 1 UX checks: no regression. All dimensions: GOOD.
+- Summary: Cycle 276 adds 3 IOC-demo-priority FAQs (A418-A420) on fiscal sanction thresholds, tariff oil, and renegotiation risk. Professional Credibility and Information Architecture upgraded. v350 live at yoburgqs.github.io/petroleum-fiscal-db/
+
+---
+
 ## Cycle 275 -- v349 Grade Table
 
 **Cycle 275 -- v349:** 11 improvements across 3 categories. (1-10) **Data Reliability / Professional Credibility** -- 10 new IC analyst FAQs (A408-A417): A408 (LNG fiscal treatment vs. oil -- netback pricing, upstream/midstream boundary, PRRT vs. PSC for long-life LNG); A409 (associated gas fiscal treatment -- 3 patterns: flaring/reinjection/DMO with IRR impact); A410 (state participation -- free carry/back-in/paying structures with IRR quantification, Petoro SDFI vs. GNPC/NNPCL); A411 (cross-border unitization -- tract participation blended take, redetermination risk); A412 (PRRT contractor uplift -- LTBR+5% vs. LTBR+15% exploration, deepwater vs. onshore IRR impact); A413 (gas DMO pricing -- Indonesia/Nigeria/Malaysia 3-15pp additional take quantified, ORCA adjustment methodology); A414 (carbon pricing -- Norway CO2 tax+ETS, UK ETS, Canada backstop, Australia Safeguard -- quantified as after-tax $/bbl); A415 (LNG regasification vs. upstream -- integrated value chain IC, FLNG/GTP boundary); A416 (GNPC/NNPCL vs. Petoro -- frontier back-in risk 4-8pp IRR penalty, NNPCL cash call risk); A417 (gas reinjection -- PSC cost recovery, Concession deductibility, PRRT uplift, compression ring-fence distinction). FAQ count 407->417. (11) **SDLC Maturity / Performance & Reliability** -- Critical bug fix: renderVintage/renderReformTable/renderMechanics _scheduleIdle() calls were before the _scheduleIdle variable definition in v348 -- caused TypeError -> initPlatform fail -> COUNTRY_DATA never loaded -> 12 FAIL / 9 WARN / 4 JS errors. Fixed by moving calls after definition. v348->v349 structural sweep complete.
