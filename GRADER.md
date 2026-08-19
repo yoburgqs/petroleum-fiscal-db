@@ -6202,3 +6202,13 @@ Remote: yoburgqs.github.io/petroleum-fiscal-db live at 136 PASS / 0 FAIL.
 - Test after: 136 PASS / 0 FAIL (JS syntax gate: PASS / 11 blocks / 0 errors)
 - JS errors: 0
 - Summary: Cycle 295 -- v368 fully committed. FAQs A556-A560: PSC cost oil audit risk disallowance quantification, Stability Score + Evidence tier two-factor IC framework, LNG tolling vs. equity fiscal distinction (Mozambique blended take example), multi-mechanic country blended take decomposition (UK/Nigeria/Indonesia/Kazakhstan/Mexico gap table), DMO fiscal burden (Indonesia/Malaysia/Australia IRR impact table + Scenario Builder royalty proxy). v367->v368 structural sweep: 15 structural locations updated, What's New panel updated (v368 LATEST, v363 removed), Methodology changelog prepended, At a Glance 560 FAQs, Methodology page-sub 560 FAQs. Data Reliability maintained A. 5 categories upgraded. Office repo copy: projects/oil-gas-expertise/fiscal_db_interface.html.
+
+---
+## Cycle 295 Log — 2026-08-19 14:46
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Sonnet | **Directive:** Oil-gas platform | **Task:** Push confirmed
+
+Background push to `petroleum-fiscal-db` origin main completed successfully (exit code 0). Cycle 295 / v368 is fully deployed.
+
