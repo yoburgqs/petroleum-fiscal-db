@@ -332,14 +332,19 @@ async function testExplorer(page) {
     await page.waitForTimeout(200);
 
     // Asia Pacific chip should work (Bug 14 regression: wrong chip value)
-    await page.click('.chip[data-filter="region"][data-value="Asia Pacific"]').catch(() => {});
+    // Note: chip rows are hidden (display:none) — call setExplorerChip directly via evaluate
+    await page.evaluate(() => {
+      if (typeof setExplorerChip === 'function') setExplorerChip('region', 'Asia Pacific', null);
+    });
     await page.waitForTimeout(300);
     const chipFilter = await page.evaluate(() => typeof explorerChipFilters !== 'undefined' ? explorerChipFilters.region : 'undefined');
     if (chipFilter === 'Asia Pacific') p(S, 'chip Asia Pacific state', `explorerChipFilters.region = "${chipFilter}"`);
     else f(S, 'chip Asia Pacific state', `Expected 'Asia Pacific', got '${chipFilter}'`);
 
     // Reset
-    await page.click('.chip[data-filter="region"][data-value="all"]').catch(() => {});
+    await page.evaluate(() => {
+      if (typeof setExplorerChip === 'function') setExplorerChip('region', 'all', null);
+    });
 
     // Sort columns
     for (const sortKey of ['take', 'irr', 'npv', 'be', 'swing', 'evidence', 'country']) {
@@ -879,7 +884,9 @@ async function testSampleAnalyses(page) {
 
     // Reset explorer
     await switchTab(page, 'texplorer');
-    await page.click('.chip[data-filter="region"][data-value="all"]').catch(() => {});
+    await page.evaluate(() => {
+      if (typeof setExplorerChip === 'function') setExplorerChip('region', 'all', null);
+    });
     await page.waitForTimeout(200);
 
   } catch(e) { f(S, 'exception', e.message); }
