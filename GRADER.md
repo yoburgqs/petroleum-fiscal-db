@@ -6287,3 +6287,11 @@ Background push to `petroleum-fiscal-db` origin main completed successfully (exi
 - JS syntax gate: PASS / 11 blocks / 0 errors (node --check via temp files)
 - Summary: Cycle 297 -- v370 fully committed. FAQs A566-A570: Mozambique LNG Area 1 vs. Area 4 PSC block-level comparison (Rovuma Basin TPF unitization, TotalEnergies/Eni terms, force majeure IC risk adjustment); Iraq federal TSC vs. KRG PSC IOC IRR ceiling (service fee vs. equity WI, Rumaila RF $2.00/bbl, Tawke/Taq Taq 30% profit oil, KRG payment risk +200-300 bps WACC); PSC cost bank cure period mechanics (time-limited cost pool eligibility, Angola/Nigeria/Congo/Trinidad/Mozambique jurisdictions, $800M stranded pool NPV modeling, FIFO mitigation); Senegal/Mauritania MSGBC Basin GTA cross-border unitization (ICA 2018, TPF 50/50, dual-regime blended take calculation, Coral Sul producing); Australia PRRT group transfer M&A (share vs. asset deal AUE inheritance, ≥90% ownership test, standalone vs. consolidated PRRT take modeling, valuation methodology). UX: live FAQ search/filter — text input above FAQ topic index, real-time oninput keyword filter across all 570 .faq-item elements, live count “Showing N of 570 FAQs”, amber focus border, aria-label accessibility. v369->v370 structural sweep: 15+ structural locations updated, What's New panel (v370 LATEST, v365 removed), FAQ topic index Recent button A566-A570, Methodology changelog prepended, At a Glance 570 FAQs, Methodology page-sub 570 FAQs. Data Reliability maintained A. 6 categories upgraded. Petroleum repo pushed main. Office repo copy: projects/oil-gas-expertise/fiscal_db_interface.html. Office repo pushed main.
 
+
+---
+## Cycle 297 Log — 2026-08-19 16:57
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: GRADER.md commit also confirmed clean. Cycle 297 / v370 fully settled â€” both repos, all commits.
+
