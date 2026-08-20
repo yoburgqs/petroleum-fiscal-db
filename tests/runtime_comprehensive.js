@@ -687,6 +687,13 @@ async function testScreener(page) {
       await page.waitForTimeout(200);
     } else f(S, 'Shell IOC checkbox', 'Checkbox not found');
 
+    // Open advanced filters details before interacting with elements inside
+    await page.evaluate(() => {
+      const d = document.getElementById('screener-advanced-details');
+      if(d && !d.open) d.open = true;
+    });
+    await page.waitForTimeout(150);
+
     // Mechanic checkboxes
     const mechCbs = await page.$$('#sc-mech-checks input[type=checkbox]');
     if (mechCbs.length >= 4) {
@@ -701,21 +708,25 @@ async function testScreener(page) {
       await mechCbs[0].click(); // re-check
     } else f(S, 'mech checkboxes', `Only ${mechCbs.length} mechanic checkboxes`);
 
-    // Reset button
-    const resetBtn = await page.$('button[onclick*="resetScreener"], button:has-text("Reset")');
-    if (resetBtn) {
-      await resetBtn.click();
+    // Reset button — v373+: reset btn is inside collapsed <details>; use evaluate to call directly
+    const resetExists = await page.evaluate(() => !!document.getElementById('screener-reset-btn'));
+    if (resetExists) {
+      await page.evaluate(() => { if(typeof resetScreenerAll === 'function') resetScreenerAll(); });
       await page.waitForTimeout(300);
-      p(S, 'reset button', 'Screener reset clicked');
-    } else w(S, 'reset button', 'No reset button found');
+      p(S, 'reset button', 'Screener reset called via evaluate');
+    } else w(S, 'reset button', 'No screener-reset-btn found');
 
-    // Preset buttons — v103+: use class="screener-preset-btn" data-action="applyScreenerPreset" (no onclick)
-    const presets = await page.$$('button[data-action="applyScreenerPreset"], button[onclick*="applyScreenerPreset"]');
-    if (presets.length >= 3) {
-      await presets[0].click();
+    // Preset select — v373+: preset buttons replaced by <select id="screener-preset-select">
+    // Hidden buttons kept for DOM compatibility; trigger via select dropdown instead
+    const presetSelect = await page.$('#screener-preset-select');
+    if (presetSelect) {
+      await page.evaluate(() => {
+        const sel = document.getElementById('screener-preset-select');
+        if(sel){ sel.value='sweetspot'; sel.dispatchEvent(new Event('change')); sel.value=''; }
+      });
       await page.waitForTimeout(300);
-      p(S, 'preset button', `${presets.length} presets available, first applied`);
-    } else w(S, 'preset buttons', `Only ${presets.length} preset buttons`);
+      p(S, 'preset select', 'Screener preset applied via select dropdown');
+    } else w(S, 'preset select', 'No screener-preset-select found');
 
   } catch(e) { f(S, 'exception', e.message); }
 }
