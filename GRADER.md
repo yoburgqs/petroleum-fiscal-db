@@ -6718,3 +6718,13 @@ Git push for `petroleum-fiscal-db` confirmed complete (exit code 0). GitHub Page
 - JS errors: 0
 - Summary: Background monitor task complete â€” no action needed.
 
+
+---
+## Cycle 311 Log — 2026-08-20 06:22
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **136 PASS / 0 FAIL / 0 WARN / 0 JS errors** â€” test suite clean after v382 push.
+
+All 136 tests pass including routing, basket mechanics, methodology anchor links, and zero console errors. Cycle 311 is fully validated.
+
