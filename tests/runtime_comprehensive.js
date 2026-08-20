@@ -670,6 +670,13 @@ async function testScreener(page) {
     if (badge) p(S, 'active filter badge', `Badge shows: "${badge}"`);
     else w(S, 'active filter badge', 'No active filter badge found');
 
+    // Open advanced filters details before interacting with elements inside (v373+: collapsed by default)
+    await page.evaluate(() => {
+      const d = document.getElementById('screener-advanced-details');
+      if(d && !d.open) d.open = true;
+    });
+    await page.waitForTimeout(150);
+
     // IOC checkbox filter — Bug 13 regression test
     const shellCb = await page.$('#sc-ioc-checks input[value="Shell"]');
     if (shellCb) {
