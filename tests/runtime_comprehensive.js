@@ -305,22 +305,22 @@ async function testExplorer(page) {
     if (rowCount >= 100) p(S, 'table rows', `${rowCount} rows in explorer`);
     else f(S, 'table rows', `Only ${rowCount} rows`);
 
-    // Region chip filters
-    for (const chip of ['Africa', 'Middle East', 'Asia Pacific', 'Americas', 'Europe']) {
-      await page.click(`.chip[data-filter="region"][data-value="${chip}"]`).catch(() => {});
+    // Region chip filters — use select dropdown (chip rows are hidden display:none in v371+)
+    for (const region of ['Africa', 'Middle East', 'Asia Pacific', 'Americas', 'Europe']) {
+      await page.selectOption('#flt-region', region).catch(() => {});
       await page.waitForTimeout(200);
       const count = await page.evaluate(() => document.querySelectorAll('#tbody-explorer tr').length);
-      if (count > 0) p(S, `chip-${chip}`, `${count} rows after ${chip} chip`);
-      else f(S, `chip-${chip}`, `0 rows after ${chip} chip`);
+      if (count > 0) p(S, `chip-${region}`, `${count} rows after ${region} chip`);
+      else f(S, `chip-${region}`, `0 rows after ${region} chip`);
     }
 
     // Reset to All
-    await page.click('.chip[data-filter="region"][data-value="all"]').catch(() => {});
+    await page.selectOption('#flt-region', '').catch(() => {});
     await page.waitForTimeout(200);
 
-    // Mechanic chips
+    // Mechanic chips — use select dropdown (chip rows are hidden display:none in v371+)
     for (const mech of ['Concession', 'PSC', 'TSC']) {
-      await page.click(`.chip[data-filter="mechanic"][data-value="${mech}"]`).catch(() => {});
+      await page.selectOption('#flt-mech', mech).catch(() => {});
       await page.waitForTimeout(200);
       const count = await page.evaluate(() => document.querySelectorAll('#tbody-explorer tr').length);
       if (count > 0) p(S, `chip-mech-${mech}`, `${count} rows after ${mech} chip`);
@@ -328,7 +328,7 @@ async function testExplorer(page) {
     }
 
     // Reset to All
-    await page.click('.chip[data-filter="mechanic"][data-value="all"]').catch(() => {});
+    await page.selectOption('#flt-mech', '').catch(() => {});
     await page.waitForTimeout(200);
 
     // Asia Pacific chip should work (Bug 14 regression: wrong chip value)
@@ -378,15 +378,21 @@ async function testExplorer(page) {
     if (countAfterPrice > 0) p(S, 'price change re-render', `${countAfterPrice} rows after $100 price`);
     else f(S, 'price change re-render', '0 rows after price change');
 
-    // R-factor chip
-    const rfChip = await page.$('#chip-rfactor-psc');
-    if (rfChip) {
-      await rfChip.click();
+    // R-factor chip — use evaluate since chip row is hidden (display:none) in v371+
+    const rfChipExists = await page.$('#chip-rfactor-psc') !== null;
+    if (rfChipExists) {
+      await page.evaluate(() => {
+        const chip = document.getElementById('chip-rfactor-psc');
+        if (chip && typeof setExplorerRFactor === 'function') setExplorerRFactor(chip);
+      });
       await page.waitForTimeout(300);
       const rfCount = await page.evaluate(() => document.querySelectorAll('#tbody-explorer tr').length);
       if (rfCount > 0) p(S, 'R-factor chip', `${rfCount} R-factor PSC countries`);
       else f(S, 'R-factor chip', '0 rows for R-factor PSC');
-      await rfChip.click(); // toggle off
+      await page.evaluate(() => {
+        const chip = document.getElementById('chip-rfactor-psc');
+        if (chip && typeof setExplorerRFactor === 'function') setExplorerRFactor(chip); // toggle off
+      });
       await page.waitForTimeout(200);
     }
 
@@ -395,7 +401,7 @@ async function testExplorer(page) {
       const r = document.querySelector('input[name="price"][value="75"]');
       if (r) r.click();
     });
-    await page.click('.chip[data-filter="region"][data-value="all"]').catch(() => {});
+    await page.selectOption('#flt-region', '').catch(() => {});
     await page.waitForTimeout(300);
     const firstExplRow = await page.$('#tbody-explorer tr[data-country]');
     if (firstExplRow) {
