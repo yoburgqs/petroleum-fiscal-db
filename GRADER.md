@@ -7121,3 +7121,11 @@ All 136 tests pass including routing, basket mechanics, methodology anchor links
 - Summary: Cycle 322 -- v393. FAQs A781-A790: gas PSC monetization route blending (LNG 39%/pipeline 44%/domestic 28% IRR, blended 38.4%, ORCA oil-basis adjustment); multi-phase cost bank FIFO vs. LIFO ($500M bank Year 7, $42M NPV10 FIFO penalty); PRRT+CIT Australia stacking (58% marginal at entry, PRRT deductible against CIT, $385M NPV10 combined); royalty-first vs. cost-recovery-first waterfall ($50M NPV10 swing on $500M capex, royalty reduces cost oil base); project finance DSCR covenant breach at $50 (DSCR 0.9x vs. 1.3x covenant, $45M equity cure, ORCA pre-debt basis); partial-year first oil proration (219-day Year 1, $7.9M royalty vs. $13.1M full-year, $2.3M NPV10 mid-year convention error); JOA non-consent 300% penalty ($120M vs. $40M pari passu, payout sequence before participation); audit disallowance G&A cap (5% cap on $350M direct, $7.4M/yr disallowance, $54M NPV10 exposure, 2-4pp ORCA understatement); SEC reserve booking fiscal discount (entitlement oil 15% vs. WI 25% Year 1, $180M PV10 shortfall, SPE-PRMS entitlement method); Libya EPSA IV (35% cost recovery + 15% profit oil contractor, effective take 12-18%, sanctions/FM risk). Structural sweep: v392->v393, What's New v393 LATEST + v388 removed, FAQ Recent A781-A790, 790 FAQ count. Petroleum repo committed and pushed to origin main. Office repo copy: projects/oil-gas-expertise/fiscal_db_interface.html.
 - Downgrade hunt: Data Reliability A -- IRR structural ceiling 165/185 unchanged; 10 new FAQs extend coverage into gas fiscal mechanics, multi-phase cost recovery timing, PRRT/CIT interaction, royalty waterfall sequencing, project finance overlay, partial-year proration, JOA non-consent, cost audit exposure, SEC reserve booking, and Libya EPSA IV structure -- all advanced IC topics. No downgrade warranted.
 
+
+---
+## Cycle 323 Log — 2026-08-20 18:24
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Confirmed. All tasks closed. Ready for the next cycle.
+
