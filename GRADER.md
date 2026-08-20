@@ -16,6 +16,12 @@
 
 **DO NOT RE-ADD:** page-sub paragraphs, amber banners, routing hints, "How to read" blocks, card wrappers around SbS, or chip rows as visible UI elements.
 
+**v373 additions (2026-08-19) — ALSO LOCKED:**
+- Explorer analytics charts (IRR scatter + Historical Trend) now in collapsed `<details id="explorer-analytics-details">` — do NOT expand by default
+- Screener 8 preset buttons now replaced by `<select id="screener-preset-select">` dropdown — do NOT restore visible preset buttons
+- Screener advanced filters wrapped in `<details id="screener-advanced-details">` — do NOT expand by default
+- Home tab: cards 5–8 (IOC Portfolio, Breakeven Map, Reform Risk, Scenario Builder) in `<details>` "More tools" — do NOT remove this collapsible
+
 **Previously completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331) · Visual polish (v344–v346) · M7.1 Reference dropdown cleaned (v361) · M7.2 Shortcut strip updated (v361) · M4.3 Scenario pre-fill from CP (verified v361) · M5.2 Regional reform context in CP (verified v361)
 
 ## CURRENT LOOP DIRECTIVE — FAQ MODE (up to 10/cycle)
