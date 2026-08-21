@@ -22261,7 +22261,7 @@ function loadCountryProfile(country) {
     : '';
   const prodDQBadge = getDQBadge(d);
   const backToExplorerBtn = `<div class="no-print" style="margin-bottom:12px;display:flex;align-items:center;gap:8px;"><button onclick="switchTab('texplorer',document.getElementById('tab-btn-texplorer'))" style="background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.18)'" onmouseout="this.style.background='rgba(176,104,0,.08)'">← Explorer</button><button onclick="switchTab('t0',document.getElementById('tab-btn-t0'))" style="background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:5px;color:var(--accent);font-size:12px;cursor:pointer;padding:4px 10px;font-weight:600;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.18)'" onmouseout="this.style.background='rgba(176,104,0,.08)'">Fiscal Compare</button></div>`;
-  const _hdrBeCallout = (d.be_75 != null && d.be_75 < 500) ? `<span style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${d.be_75.toFixed(0)} $/bbl</strong></span>` : `<span style="font-size:10px;color:var(--muted);margin-left:10px;" title="Breakeven requires complete capital cost data — not yet computed for this country">Breakeven: pending $/bbl data</span>`;
+  const _hdrBeCallout = (d.be_75 != null && d.be_75 < 500) ? `<span style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${d.be_75.toFixed(0)} $/bbl</strong></span>` : '';
   // v277 Issue 8: Prominent country name header above profile content
   const _countryPageHeader = `<h2 id="cp-country-name" class="country-profile-header" style="font-size:20px;font-weight:800;color:var(--text);margin:0 0 8px 0;letter-spacing:-0.01em;font-family:'Georgia',serif;">${d.country}${ddSpecBadge ? ' ' + ddSpecBadge : ''}</h2>`;
   // v346: Headline strip — mechanic tag, take@$75, stability dots, reform count
@@ -22945,12 +22945,7 @@ function loadCountryProfile(country) {
   (function() {
     var bv = d.be_75;
     if (bv == null || bv <= 0 || bv >= 500) {
-      _beCallout = '<div style="background:var(--surface2);border:1px solid var(--border);border-left:4px solid var(--muted);border-radius:8px;padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;gap:20px;">'
-        + '<div>'
-        + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Breakeven Price</div>'
-        + '<div style="font-size:28px;font-weight:700;color:var(--muted);">\u2014</div>'
-        + '<div style="font-size:11px;color:var(--muted);">Breakeven data not available</div>'
-        + '</div></div>';
+      _beCallout = ''; // no card when no breakeven data
       return;
     }
     var beColor = bv < 50 ? "#15803D" : bv < 70 ? "#A16207" : bv < 85 ? "#C2410C" : "#B91C1C";
@@ -28696,24 +28691,16 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Data Vintage Footer -->
-<div id="data-vintage-footer" style="background:var(--surface2);border-top:1px solid var(--border);padding:10px 24px;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--muted);font-family:monospace;">
-  <div class="data-vintage-badge" style="display:flex;align-items:center;gap:8px;">
-    <span class="badge-item" style="color:var(--accent);font-weight:700;">DB: 2026-08-15</span>
-    <span class="badge-sep" style="color:var(--muted);">·</span>
-    <span class="badge-item">92.8% A/B sourced</span>
-    <span class="badge-sep" style="color:var(--muted);">·</span>
-    <span class="badge-item" style="color:var(--accent);font-weight:700;">DCF Engine v346</span>
-    <span class="badge-sep" style="color:var(--muted);">·</span>
-    <span class="badge-item" style="color:var(--muted);">Platform updated: 2026-08-15</span>
-    <span style="color:var(--muted);">|</span>
-    <a href="https://github.com/yoburgqs/petroleum-fiscal-db/actions" target="_blank" rel="noopener noreferrer" style="color:var(--muted);text-decoration:none;" title="GitHub Actions CI — test suite runs on every push">CI &#x2197;</a>
-    <span style="color:var(--muted);">|</span>
-    <a href="api/v1/countries.json" style="color:var(--muted);text-decoration:none;" target="_blank" title="Open raw JSON API — country-level fiscal metrics for all 185 countries (govt take, NPV, IRR, mechanic, region). Also: api/v1/mechanics.json and api/v1/schema.json">API &#x2197;</a>
-    <span style="color:var(--muted);">|</span>
-    <span style="color:var(--muted);" title="Nightly audit runs at 03:00 daily via Task Scheduler — checks data completeness, DCF consistency, and sourcing coverage across all 185 countries">Nightly audit: active · last run 2026-08-15</span>
-    <span style="color:var(--muted);">|</span>
-    <span style="color:var(--muted);" title="Coverage as of 2026-08-15 — expands as sourcing progresses. IRR ≥500% excluded as unbounded (e.g. very-low-royalty regimes at high oil price)."><button id="footer-irr-link" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — IRR column shows 124/185 countries with data">IRR: 124/185 countries</button> · <button id="footer-be-link" style="background:none;border:none;color:var(--muted);cursor:pointer;padding:0;font-family:monospace;font-size:11px;text-decoration:underline dotted;" title="Click to go to Explorer — Breakeven column shows 68/185 countries with data">Breakeven: 68/185</button> · Govt Take + NPV: 185/185 · IRR ≥500% excluded</span>
-  </div>
+<div id="data-vintage-footer" style="background:var(--surface2);border-top:1px solid var(--border);padding:8px 24px;display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:10px;font-size:10px;color:var(--muted);font-family:monospace;">
+  <span>DB: 2026-08-15</span>
+  <span style="opacity:.4;">·</span>
+  <span>92.8% A/B sourced</span>
+  <span style="opacity:.4;">·</span>
+  <span>185 countries · 71,576 contracts</span>
+  <span style="opacity:.4;">|</span>
+  <a href="api/v1/countries.json" target="_blank" rel="noopener noreferrer" style="color:var(--muted);text-decoration:none;" title="Open raw JSON API">API &#x2197;</a>
+  <span style="opacity:.4;">|</span>
+  <a href="https://github.com/yoburgqs/petroleum-fiscal-db/actions" target="_blank" rel="noopener noreferrer" style="color:var(--muted);text-decoration:none;" title="GitHub Actions CI">CI &#x2197;</a>
 </div>
 
 <script>
