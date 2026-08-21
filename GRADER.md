@@ -7971,3 +7971,13 @@ No action needed. Once GitHub Pages CDN updates (~5â€“15 min), tests will p
 - JS errors: 0
 - Summary: GRADER.md committed and pushed (`3c3eb8f..1cc2536`). Pre-push test gate passed (136/0/0). Cycle 343 fully closed â€” v427 is live on GitHub Pages.
 
+
+---
+## Cycle 347 Log — 2026-08-21 18:43
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Sonnet | **Directive:** PETROLEUM PLATFORM | **Task:** Background push confirmed
+
+GitHub Pages push confirmed (exit 0). v430 is live at yoburgqs.github.io/petroleum-fiscal-db/.
+
