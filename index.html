@@ -1428,42 +1428,50 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   });
 })();
 </script>
-  <div style="text-align:center;padding:20px 0 16px;">
+  <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
     <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to Q3 2026.</div>
   </div>
+  <!-- v423: Key terms strip — defines government take and evidence tier for first-time users -->
+  <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
+    <span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Government Take</strong> = share of project economics going to the state (royalties + taxes + profit oil). Lower take = better economics for the investor.</span>
+    <span style="color:var(--border);">|</span>
+    <span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Evidence Tier</strong> = data quality. A = primary legislation · B = operator filings · C = secondary source. Filter by tier in Fiscal Compare.</span>
+    <span style="color:var(--border);">|</span>
+    <span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Profile</strong> = production assumption (capex, peak rate, opex). Start with <strong>Deepwater $75/bbl</strong> for standard IOC benchmarking.</span>
+  </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:32px;">
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t0',document.getElementById('tab-btn-t0'))">
-      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
         <span style="font-size:22px;line-height:1;">&#x25A6;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Fiscal Compare</div><div style="font-size:11px;color:var(--muted);">Run any production profile through 185 countries simultaneously</div></div>
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
-      
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a ranked table of every country by government take, NPV, IRR, and breakeven price — sortable, exportable to Excel, with one-click drill-down to any country.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t7',document.getElementById('tab-btn-t7'))">
-      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
         <span style="font-size:22px;line-height:1;">&#x25CE;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Country Profile</div><div style="font-size:11px;color:var(--muted);">Full fiscal deep-dive for any single country</div></div>
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
-      
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: every sourced fiscal parameter (royalty, CIT, profit oil splits), price sensitivity curve, IRR, breakeven, reform history timeline, and regional peer comparison.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('texplorer',document.getElementById('tab-btn-tscreener'));setTimeout(function(){var els=document.querySelectorAll('#texplorer .page-title');els.forEach(function(el){if(el.textContent.trim()==='Screener')el.scrollIntoView({behavior:'smooth'});});},300);">
-      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
         <span style="font-size:22px;line-height:1;">&#x2605;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Screener</div><div style="font-size:11px;color:var(--muted);">Filter 185 countries by fiscal return thresholds</div></div>
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
-      
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a filtered shortlist — set a maximum take %, minimum IRR, fiscal mechanic, or water depth. Export shortlist to Excel.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t2',document.getElementById('tab-btn-t2'))">
-      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
+      <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
         <span style="font-size:22px;line-height:1;">&#x229E;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Side-by-Side</div><div style="font-size:11px;color:var(--muted);">Compare up to 4 countries in parallel</div></div>
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
-      
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a column-by-column fiscal comparison of your shortlisted countries — take at 4 prices, NPV, IRR, breakeven, mechanic, reform count.</div>
     </div>
   </div>
   <details style="margin-bottom:20px;">
@@ -1630,16 +1638,24 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 68 countries with verified breakeven price data"><input type="checkbox" id="fc-filter-be" style="accent-color:var(--accent);" onchange="renderFCResults(window._fcResults||[],window._fcLastPrice||75)"> &#9651; Breakeven only</label>
   </div>
 
-  <!-- v288: Reading guide — compact interpretation tip strip for new analysts -->
-  <div id="fc-reading-guide" style="display:none;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:10px;font-size:11px;color:var(--muted);line-height:1.6;">
+  <!-- v423: Reading guide — always visible before and after results; dismissible per session -->
+  <div id="fc-reading-guide" style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:10px;font-size:11px;color:var(--muted);line-height:1.6;">
     <strong style="color:var(--accent);">Reading this table:</strong>
-    <strong style="color:var(--text);">Govt Take</strong> = share of project economics captured by state at the selected price &amp; profile.
+    <strong style="color:var(--text);">Govt Take</strong> = share of project economics captured by the state (royalties + taxes + profit oil) at the selected price &amp; profile — lower is better for the investor.
     <strong style="color:var(--text);">Price Swing</strong> = take difference between $50 and $125/bbl — small swing (&lt;10pp) = royalty-dominant, stable; large swing (&gt;20pp) = profit-based, price-sensitive.
-    <strong style="color:var(--text);">IRR</strong> = pre-tax contractor return at the selected price; 124 of 185 countries shown (41 excluded as unbounded &gt;500%; 20 structurally non-computable for this regime type).
+    <strong style="color:var(--text);">IRR</strong> = pre-tax contractor return at the selected price; 124 of 185 countries shown (others unbounded or non-computable at this profile).
     <strong style="color:var(--text);">Breakeven</strong> = minimum oil price for positive NPV under this profile.
-    Click any row to open the full Country Profile with sourced parameters and sensitivity charts.
+    Click any row to open the full Country Profile.
     <span style="float:right;cursor:pointer;opacity:.5;" onclick="document.getElementById('fc-reading-guide').style.display='none';sessionStorage.setItem('fc-reading-guide-dismissed','1');" title="Dismiss">&#10005;</span>
   </div>
+  <script>
+  (function() {
+    if (sessionStorage.getItem('fc-reading-guide-dismissed')) {
+      var el = document.getElementById('fc-reading-guide');
+      if (el) el.style.display = 'none';
+    }
+  })();
+  </script>
   <div id="fc-results" class="empty-state">
     <div style="margin-bottom:10px;">Loading fiscal terms for all 185 countries&hellip; Results appear automatically. If nothing loads within 5 seconds, click <strong>Run Compare</strong> above.</div>
     <div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Suggested starting points: <strong>Deepwater $75/bbl</strong> — the platform's standard benchmarking basis used in Methodology. <strong>Onshore $50/bbl</strong> — screens low-breakeven regimes for unconventional plays. <strong>Giant $100/bbl</strong> — identifies high-take regimes sustainable only at elevated prices.</div>
