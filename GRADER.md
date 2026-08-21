@@ -1,4 +1,4 @@
-# ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-19)
+# ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-21)
 
 ## DIRECTIVE UPDATE (2026-08-19) — COMPREHENSIVE UI DECLUTTER COMPLETE (v371+)
 
@@ -24,12 +24,58 @@
 
 **Previously completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331) · Visual polish (v344–v346) · M7.1 Reference dropdown cleaned (v361) · M7.2 Shortcut strip updated (v361) · M4.3 Scenario pre-fill from CP (verified v361) · M5.2 Regional reform context in CP (verified v361)
 
-## CURRENT LOOP DIRECTIVE — FAQ MODE (up to 10/cycle)
-All UX priorities A–D from prior directives are complete. Return to FAQ-only mode:
-- Up to 10 FAQs per cycle
-- Prefer: advanced PSC cost recovery edge cases, fiscal regime comparison worked examples, royalty relief/price-linked royalty mechanics, state participation structures
-- Do NOT attempt UX changes unless GRADER flags a specific regression
-- Do NOT touch visual improvements from v344–v346 or UI declutter from v371+
+## CURRENT LOOP DIRECTIVE — UX IMPROVEMENT MODE (updated 2026-08-21)
+
+**The loop's job is to improve the user experience, not to accumulate FAQs or maintain green grades.**
+
+FAQ-only mode is over. The self-grading rubric is not the goal — a real petroleum analyst opening this tool and finding it immediately useful is the goal. Think from that standpoint every cycle.
+
+### Primary job each cycle: find and fix ONE real user-facing problem
+Ask: "If a petroleum IC analyst opened this tool for the first time today, what would confuse them, frustrate them, or be missing?" Then fix it.
+
+Priority areas (work down this list; check off each as done in the cycle log):
+
+**P1 — First-run experience**
+- Does the Home tab immediately communicate what the tool does and what to do first?
+- Is the first action obvious? (Run a Fiscal Compare, look up a country — which is it?)
+- Are there any blank panels, loading spinners that never resolve, or empty states with no guidance when the page first loads?
+
+**P2 — FC workflow clarity**
+- After running FC, are the column headers self-explanatory to someone who hasn't read the methodology? (Take%, NPV, IRR, BE, Swing — are these labeled well?)
+- Is the profile assumption (Deepwater Standard / Onshore Standard) clearly visible before running — not buried?
+- Does the drawer/drilldown add meaningful context or just repeat the row data?
+
+**P3 — Country Profile depth and scannability**
+- Can an analyst get the full fiscal picture of a country in under 30 seconds?
+- Are the most important numbers (take at $75, mechanic, stability) prominent at the top?
+- Is there any obvious data that belongs in CP but isn't there?
+
+**P4 — Tooltip and label quality**
+- Every data point a user might not know should have a tooltip explaining what it means and how it's computed. Audit headers and badges — are there unexplained acronyms or numbers?
+- "A/B%" — is this explained inline? "IRR" — is the discount rate assumption visible?
+
+**P5 — Print/PDF quality (IC-ready)**
+- Load Norway CP → print to PDF → is it actually drop-in ready for a Goldman IC deck?
+- Does the print output have: platform name/version/date, source citations, evidence tier badges, no truncated tables?
+- Fix any print CSS gaps.
+
+**P6 — Mobile usability**
+- Can an analyst look up a country and see its take on a phone?
+- Is the FC table scrollable horizontally on mobile, or does it break layout?
+
+**P7 — Tooltip, empty state, and error quality sweep**
+- Any tab that shows a blank or error state — does it give a clear actionable message?
+- Reform Risk, Breakeven Map, Vintage — what do they show before any interaction?
+
+### Secondary job each cycle: 2-3 FAQs maximum
+FAQs are secondary. Only add 2-3 per cycle, preferring content that directly answers questions a first-time analyst would have (not advanced edge cases).
+
+### What NOT to do
+- Do NOT run a cycle that only adds FAQs and changes nothing in the UX
+- Do NOT optimize for the grade rubric — the grades are self-assessed and may be inflated
+- Do NOT re-add removed clutter (page-sub paragraphs, amber banners, chip rows, "How to read" blocks)
+- Do NOT touch v344–v346 visual polish or v371+ declutter changes
+- Do NOT restructure the primary tab order (M7.3 requires Zach's explicit approval)
 
 ## M6.3 Print/PDF Status — VERIFIED ADEQUATE (v346)
 
