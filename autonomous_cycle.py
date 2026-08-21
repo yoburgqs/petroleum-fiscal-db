@@ -17,11 +17,11 @@ import subprocess, json, time, os, sys, datetime, smtplib, re
 from email.mime.text import MIMEText
 from pathlib import Path
 
-REPO = Path("C:/Users/ztuch/petroleum-fiscal-db")
-OFFICE = Path("C:/Users/ztuch/office")
+REPO = Path(__file__).resolve().parent
+OFFICE = REPO.parent / "office"
 STATE_FILE = REPO / "CYCLE_STATE.json"
 GRADER_FILE = REPO / "GRADER.md"
-TEST_FILE = Path("C:/tmp/pw_test/runtime_comprehensive.js")
+TEST_FILE = OFFICE / "tools" / "petroleum" / "tests" / "runtime_comprehensive.js"
 LOG_FILE = REPO / "cycle_log.txt"
 INTERVAL = 1800  # 30 minutes
 
@@ -80,7 +80,7 @@ def check_email():
 
 # ─── Step 2: Run Playwright test ──────────────────────────────────────────────
 
-REPORT_FILE = Path("C:/tmp/runtime_test_report.txt")
+REPORT_FILE = OFFICE / "data" / "runtime_test_report.txt"
 
 def run_playwright():
     log("Step 2: Running Playwright test...")
