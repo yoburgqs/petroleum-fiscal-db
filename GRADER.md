@@ -499,9 +499,13 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-20 (Cycle 325 — FAQs A811-A820, v397)
+**Last Updated:** 2026-08-21 (Cycle 328 — FAQs A841-A850, v402)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 325 shipped v397: FAQs A811-A820. v396->v397 structural sweep (810->820 FAQs). JS syntax gate PASS / 0 JS errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 328 shipped v402: FAQs A841-A850. v401->v402 structural sweep (840->850 FAQs). JS syntax gate PASS / 6 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors.
+
+**Previous [Cycle 327]:** Cycle 327 shipped v399: FAQs A831-A840. v398->v399 structural sweep (830->840 FAQs). JS syntax gate PASS / 11 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors.
+
+**Previous [Cycle 325]:** Cycle 325 shipped v397: FAQs A811-A820. v396->v397 structural sweep (810->820 FAQs). JS syntax gate PASS / 0 JS errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors.
 
 **Previous [Cycle 323]:** Cycle 323 shipped v394: FAQs A791-A800. v393->v394 structural sweep (790->800 FAQs). JS syntax gate PASS / 11 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -528,6 +532,40 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 **Previous [Cycle 310]:** Cycle 310 shipped v381: 10 FAQs A661-A670 (PSC super-tier upside profit oil clause marginal retention rate; Kazakhstan MET+CIT double-layer burden and EPT overlay; Libya EPSA III vs. EPSA IV government take comparison; Guyana Stabroek PSA renegotiation risk probability-weighted NPV10; Iran IPC vs. Buy-back SEC reserve booking; T&T SPT stacked fiscal burden and Swing; Oman vs. Malaysia RSC structural comparison; PSC 50% vs. 80% cost recovery cap NPV10 impact; FTP interaction with cost cap effective ceiling; CCUS carbon tax and carbon credit mechanics). v380->v381 structural sweep (660->670 FAQs). JS syntax gate PASS / 11 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
+
+## Cycle 328 — v402 Grade Table
+
+**Cycle 328 — v402:** 10 new IC analyst FAQs (A841-A850) + v401->v402 structural sweep (840->850 FAQs). (1-10) **Data Reliability / Professional Credibility** -- A841 (partial stabilization clause: royalty excluded from PSC protection, 7pp effective take uplift from 5%->12% royalty increase on 40k bbl/d/16yr tail, $534M NPV10 incremental burden, rule of thumb $76M NPV10 per 1pp royalty increase over 16yr, ICSID vs. domestic court enforceability framework; 4-step IC workflow); A842 (mandated gas processing obligation integrated economics: $300M PSC-recoverable plant cost, $365M/yr third-party toll revenue outside ring-fence, CIT 29.5% on tolling = $257M/yr net, plant stand-alone NPV10 ~$1,886M on 500 MMscfd/20yr, government fee-cap as primary risk; 4-step IC workflow); A843 (capex depreciation schedule timing NPV10: 5yr SL vs. immediate expensing, $54.4M NPV10 difference on $1.2B capex/30% CIT at 10% WACC, rule of thumb $10M per 1yr acceleration, ORCA depreciation proxy disclosure; 4-step IC workflow); A844 (production-rate profit oil cliff distortion: 30%/20%/10% split at <30k/30-50k/>50k bbl/d tiers, infill investment NPV10-negative above threshold when retroactive all-production rate applies, deliberate production management as contractor response; 4-step IC workflow); A845 (FTP elimination bid trade-off: 10% FTP/35% contractor profit oil vs. no-FTP/28% split, $89M additional cost oil Year 1, $180-220M NPV10 advantage for no-FTP via faster cost recovery in cap-constrained years; 4-step IC workflow); A846 (Colombia ANH variable government participation: VGP 0-50% sliding by production rate, 60k bbl/d = high VGP tier = ~40% VGP + ~15% royalty + ~10-12% CIT = ~65-67% total, ORCA Concession take ~64-68% at $75, large-field premium 2-3pp analyst overlay; 4-step IC workflow); A847 (ICSID arbitration NPV10 framework: $120M tax dispute, 65% win probability, $50.9M expected NPV10 at 3.5yr duration and $5M legal costs, ICSID 80-90% enforceability vs. domestic court 30-50%; 4-step IC workflow); A848 (APT vs. CIT structural comparison: APT triggered by cumulative IRR crossing 15% hurdle, $48.7M NPV10 burden at 18% project IRR/$75/bbl at Year 7 threshold crossing, path-dependent vs. annual income base, price acceleration of threshold crossing; 4-step IC workflow); A849 (indirect cost cap exposure: 3% of direct costs cap, $9.3M Year 1 disallowance permanently lost, $72.4M NPV10 over 20yr on $30M/yr overhead vs. $20.7M cap, rule of thumb $8.5M NPV10 per $1M annual disallowance; 4-step IC workflow); A850 (NOC carried WI ENPV10 mechanics: 100% exploration carry $400M for 20% post-discovery WI, post-discovery combined NPV10 -$251M at 65% take/$75/bbl, ENPV10 -$355M at 30% P(success), breakeven P(success) >75% or promote uplift required; 4-step IC workflow). (11) **SDLC Maturity** -- v401->v402 structural sweep: Methodology page-sub (840->850 FAQs, A1-A840->A1-A850), At a Glance stat (840->850 Analyst FAQs), FAQ Recent button (A831-A840->A841-A850), FAQ search placeholder (840->850), Who Built This v402, How to Cite (full/short/clipboard/Scenario Builder v402). Cycle 328 log.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | FAQs A841-A850 (v402): 850 FAQs (A1-A850). IRR coverage 165/185 (89%). Benchmark 185/185. |
+| 2 | 9. Performance & Reliability | A+ | = | _scheduleIdle order bug fixed (v349). content-visibility:auto (v343). Service Worker (v309). |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 4 | 4. Interaction Design | A+ | = | Live FAQ search/filter (v370). FAQ topic index (v369). IC Analyst Guide (v365). |
+| 5 | 2. Information Architecture | A+ | up | 850 analyst FAQs (A1-A850, v402). v402 changelog in Methodology. |
+| 6 | 6. Error & Empty States | A+ | = | fc-nav-bar regression fixed (v337). All four tabs auto-load (v219). |
+| 7 | 13. SDLC Maturity | A+ | up | JS syntax gate PASS (Cycle 328) / 6 blocks / 0 errors. Playwright 136 PASS. v401->v402 structural sweep. Cycle 328 log. v402 changelog prepended. |
+| 8 | 10. Accessibility | A+ | = | All documented accessibility gaps closed (v239-v339). |
+| 9 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS. |
+| 10 | 1. Visual Design | A+ | = | Petroleum amber design system. What's New panel maintained. |
+| 11 | 3. Data Presentation | A+ | = | IRR scatter 124/185 with three-category tooltip (v364). |
+| 12 | 5. Naming Consistency | A+ | up | All structural citations current to v402. Methodology page-sub 850 FAQs. At a Glance 850. FAQ Recent button A841-A850. |
+| 13 | 7. Professional Credibility | A+ | up | 850 analyst FAQs. A841-A850: 10 new advanced IC topics (partial stabilization royalty gap, gas processing obligation economics, depreciation timing NPV10, production-rate cliff distortion, FTP elimination trade-off, Colombia ANH VGP, ICSID arbitration NPV10, APT vs. CIT, indirect cost cap, NOC carry ENPV10). |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes:** Information Architecture up (850 FAQs). Naming Consistency up (v402 structural sweep). Professional Credibility up (10 new topics). SDLC Maturity up (sweep + log + changelog + JS gate + Playwright 136 PASS).
+
+## Cycle 328 Log — 2026-08-21
+- Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (v401)
+- Test after: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (v402)
+- JS syntax gate: PASS / 6 blocks / 0 errors
+- JS errors: 0
+- Summary: Cycle 328 -- v402. FAQs A841-A850: partial stabilization (royalty excluded, $534M NPV10 on 7pp royalty increase, rule of thumb $76M per 1pp over 16yr); mandated gas processing obligation integrated economics ($300M PSC-recoverable, $365M/yr tolling outside ring-fence, ~$1,886M plant NPV10 at 20yr/500 MMscfd); depreciation timing NPV10 ($54.4M advantage for immediate expensing vs. 5yr SL, $10M/yr acceleration rule of thumb); production-rate profit oil cliff distortion (infill above 50k bbl/d NPV10-negative when retroactive rate applies all production — $31.7M/yr profit oil loss vs. $5.5M/yr incremental revenue); FTP elimination trade-off (no-FTP structure $180-220M NPV10 advantage from faster cost recovery, $89M additional Year 1 cost oil); Colombia ANH VGP (~40% VGP + ~15% royalty + ~10-12% CIT = ~65-67% total, 2-3pp analyst overlay for 60k bbl/d large-field); ICSID arbitration NPV10 framework ($50.9M expected NPV10 at 65% win probability, 3.5yr duration, $5M legal costs, ICSID 80-90% enforceability); APT vs. CIT structural comparison (APT cumulative IRR base vs. annual income, $48.7M NPV10 burden at Year 7 threshold crossing, price acceleration); indirect cost cap ($9.3M Year 1 disallowance permanently lost, $72.4M NPV10 over 20yr, $8.5M/yr rule of thumb); NOC carry ENPV10 ($400M exploration carry for 20% post-discovery WI, -$355M ENPV10 at 30% P(success), breakeven >75% P(success)). v401->v402 structural sweep: Methodology page-sub (840->850 FAQs), At a Glance 850, FAQ Recent button A841-A850, FAQ search placeholder 850, Who Built This v402, How to Cite full/short/clipboard/Scenario Builder v402. Petroleum repo committed (4daaf28) and pushed to origin main. Office repo copy: projects/oil-gas-expertise/fiscal_db_interface.html.
+- Downgrade hunt: Data Reliability A -- IRR structural ceiling 165/185 unchanged; 10 new FAQs extend IC coverage into stabilization clause scope gaps (royalty exclusion), integrated midstream-upstream economics (mandatory gas processing), depreciation schedule timing, production-rate incentive distortions, FTP bid optimization, country-specific participation structures (Colombia ANH), arbitration NPV10 valuation, APT/CIT structural mechanics, indirect cost recovery limits, and NOC carry structure ENPV10 analytics -- all directly supporting IC memo work product. No downgrade warranted.
+
+---
 
 ## Cycle 327 — v399 Grade Table
 
