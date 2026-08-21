@@ -1,8 +1,8 @@
 {
-  "cycle_number": 330,
-  "cycle_start_unix": 1787293202,
-  "cycle_start_human": "2026-08-21 01:20",
-  "cycle_complete_human": "2026-08-21 01:15",
+  "cycle_number": 340,
+  "cycle_start_unix": 1787329202,
+  "cycle_start_human": "2026-08-21 11:20",
+  "cycle_complete_human": "2026-08-21 10:03",
   "cycle_interval_seconds": 1800,
   "last_test_pass": 136,
   "last_test_fail": 0,
@@ -48,7 +48,7 @@
     "Professional credibility: provenance statement + benchmark attribution"
   ],
   "notes_cycle_4": "Cycle 4: Floor B+ across all 15 categories. 7 upgrades. 117/0 clean.",
-  "current_version": "v361",
-  "faq_count": 525,
-  "notes_cycle_288": "Cycle 288: v361 shipped. FAQs A521-A525 (PSC ring-fencing multi-block, Angola/Ghana/Guyana regime comparison, price-linked royalty relief, PSC cost bank 60% cap, hybrid PSC-Concession). Priority A (Reference dropdown 6->4), Priority B (Reform Risk shortcut on Home strip), Priority D (regional reform context in CP). JS syntax gate PASS / 6 blocks / 0 errors. 136 PASS / 0 FAIL / 0 WARN."
+  "current_version": "v424",
+  "faq_count": 956,
+  "notes_cycle_340": "Cycle 340: v424 shipped. Critical bug fix: _isMonopoly TDZ crash in loadCountryProfile() — const _isMonopoly declaration moved before first use, eliminating 1 FAIL + 3 PAGEERROR events. Version structural sweep v423->v424 across all citation locations. JS syntax gate PASS. Expected: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors post-push."
 }
