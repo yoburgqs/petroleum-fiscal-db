@@ -7205,3 +7205,11 @@ All 136 tests pass including routing, basket mechanics, methodology anchor links
 - JS errors: 0
 - Summary: Cycle 326 -- v398. FAQs A821-A830: PSC step-down cost cap year-by-year (80/60/40% schedule, $756M vs. $1,008M years 4-6, $477M NPV10 penalty vs. flat 80% cap); three-regime comparison Concession vs. R-factor PSC vs. Revenue Share (Concession wins at all prices, PSC 68% take at $100 worst for contractor); NOC 18% back-in at first commercial oil + carry recoupment ($288M gross at 15% uplift, +$220M NPV10 benefit, structures NPV10-neutral at zero uplift); WPT 40% at $65/bbl trigger (+5.3pp/$80, +9.3pp/$100, WACC +1.5-3.0pp hurdle adjustment); MWP liquidated damages $53M (1-well $50M + 150km seismic $3M), EMV framework for abandonment decision; NOC carry vs. contributing interest NPV10 equivalence (+$180M with uplift, neutral without); fiscal regime grandfathering farm-in ($110.6M PSC vs. $477.5M Concession NPV10 for 30% WI, $367M NPV10 forfeit); R-factor ratchet price perversity ($90/bbl triggers R>2.5 in year 8.2 vs. 9.5, net NPV10 -$92M from price increase); UK EPL 80% IA (year-1 take 6.5% vs. 12.2%, steady-state 67%, +150-200bps WACC, EPL to 2028); unitization fiscal arbitrage ($36M NPV10 per 1pp UI shift to Block B Concession). Structural sweep: v397->v398, What's New v398 LATEST + v390 removed, FAQ Recent A821-A830, 830 FAQ count. Petroleum repo committed and pushed to origin main. Office repo copy: projects/oil-gas-expertise/fiscal_db_interface.html.
 - Downgrade hunt: Data Reliability A -- IRR structural ceiling 165/185 unchanged; 10 new FAQs extend coverage into step-down cap mechanics, three-regime comparison at multiple price points, NOC participation structures, windfall tax policy mechanics, MWP liquidated damages framework, carry vs. contributing interest, farm-in grandfathering, R-factor perversity, UK EPL fiscal structure, and unitization arbitrage -- all advanced IC topics. No downgrade warranted.
+
+---
+## Cycle 326 Log — 2026-08-20 21:27
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: GRADER.md push also succeeded on retry. Both repos are clean and in sync on origin/main.
+
