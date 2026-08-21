@@ -1539,10 +1539,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="page-title">Fiscal Compare</div>
 
   <!-- v365: IC Analyst Quick Reference — collapsible interpretation guide for senior analysts seeing the platform for the first time -->
-  <details id="fc-ic-ref" style="margin-bottom:12px;">
-    <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Expand to see IC analyst interpretation guide for take tiers, Swing, and Stability">
-      <span style="color:var(--accent);font-size:12px;">&#9656;</span> IC Analyst Interpretation Guide
-      <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">Click to collapse after first use</span>
+  <details id="fc-ic-ref" open style="margin-bottom:12px;">
+    <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Collapse IC analyst interpretation guide for take tiers, Swing, and Stability">
+      <span id="fc-ic-ref-arrow" style="color:var(--accent);font-size:12px;">&#9660;</span> IC Analyst Interpretation Guide
+      <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">collapse after reading</span>
     </summary>
     <div style="padding:10px 14px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface);display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
       <div>
@@ -1584,6 +1584,25 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       </div>
     </div>
   </details>
+  <script>
+  (function() {
+    var d = document.getElementById('fc-ic-ref');
+    var arr = document.getElementById('fc-ic-ref-arrow');
+    if (sessionStorage.getItem('fc-ic-ref-collapsed')) {
+      d.removeAttribute('open');
+      if (arr) arr.innerHTML = '&#9656;';
+    }
+    d.addEventListener('toggle', function() {
+      if (d.open) {
+        sessionStorage.removeItem('fc-ic-ref-collapsed');
+        if (arr) arr.innerHTML = '&#9660;';
+      } else {
+        sessionStorage.setItem('fc-ic-ref-collapsed', '1');
+        if (arr) arr.innerHTML = '&#9656;';
+      }
+    });
+  })();
+  </script>
 
   <div class="fc-controls">
     <div class="ctrl-group">
@@ -21057,12 +21076,12 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
     <div id="faq-A964" class="faq-item" style="margin-bottom:12px;padding:10px 14px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">
-      <div class="faq-q" style="font-weight:600;font-size:13px;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="this.parentElement.classList.toggle('open');this.querySelector('.faq-chev').textContent=this.parentElement.classList.contains('open')?'▲':'▼';" aria-expanded="false" aria-controls="faq-A964-body">A964. What does "Ctct NPV&gt;0" mean in the Fiscal Compare stats bar? <span class="faq-chev" aria-hidden="true">▼</span></div>
+      <div class="faq-q" style="font-weight:600;font-size:13px;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="this.parentElement.classList.toggle('open');this.querySelector('.faq-chev').textContent=this.parentElement.classList.contains('open')?'▲':'▼';" aria-expanded="false" aria-controls="faq-A964-body">A964. What does "Project viable: X of N" mean in the Fiscal Compare stats bar? <span class="faq-chev" aria-hidden="true">▼</span></div>
       <div id="faq-A964-body" class="faq-a" style="display:none;font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.7;">
-        <p><strong>Ctct NPV&gt;0</strong> is the count of countries in the current ranked list where the contractor's net present value (NPV) is positive at the selected oil price and production profile. "Ctct" = Contractor — this distinguishes it from government NPV, which appears in the adjacent column.</p>
+        <p><strong>Project viable: X of N</strong> is the count of countries in the current ranked list where the contractor's net present value (NPV) is positive at the selected oil price and production profile. It answers the question: "How many of these regimes actually work economically for the contractor at this price?"</p>
         <p><strong>Modeling basis:</strong> Contractor NPV is calculated on a 100% working interest (WI) basis using a 10% WACC (weighted average cost of capital). No equity dilution, farm-outs, or debt financing are assumed. This is the standard reference basis for cross-country fiscal comparisons in pre-FID screening.</p>
-        <p><strong>Why it matters:</strong> A country can show a low government take (attractive) but still produce a negative contractor NPV if breakeven cost is high (e.g., deepwater) or if the fiscal structure front-loads cost recovery restrictions. Ctct NPV&gt;0 is the minimum viability screen — a country where NPV is negative at your price assumption is uneconomic under these project parameters regardless of its take ranking.</p>
-        <p><strong>Interpretation rule:</strong> Ctct NPV&gt;0 / N is your investable universe at this price point. If only 60/185 countries clear NPV&gt;0 at $50/bbl but 140/185 clear it at $80/bbl, that spread quantifies the price sensitivity of global fiscal investability — a useful IC data point.</p>
+        <p><strong>Why it matters:</strong> A country can show a low government take (attractive) but still produce a negative contractor NPV if breakeven cost is high (e.g., deepwater) or if the fiscal structure front-loads cost recovery restrictions. Project viable is the minimum viability screen — a country where NPV is negative at your price assumption is uneconomic under these project parameters regardless of its take ranking.</p>
+        <p><strong>Interpretation rule:</strong> "Project viable: X of N" is your investable universe at this price point. If only 60/185 countries are viable at $50/bbl but 140/185 are viable at $80/bbl, that spread quantifies the price sensitivity of global fiscal investability — a useful IC data point for stress-testing your shortlist against downside price scenarios.</p>
         <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v429 (Aug 2026). Cross-references: FAQ A963 (Screener region bug), FAQ A965 (Other region chip), FAQ A384 (7-step analyst workflow).</em></p>
       </div>
     </div>
@@ -21073,7 +21092,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <p><strong>Countries in Other (17):</strong> Barbados, Central African Republic, Cote d'Ivoire, Dominican Republic, Falkland Islands, Faroe Islands, French Guiana, Gambia, Greenland, Haiti, Iraq-Kurdistan, Ireland, Montenegro, Republic of the Congo, Sao Tome and Principe, UAE — Abu Dhabi, Vanuatu.</p>
         <p><strong>Why these are grouped together:</strong> These jurisdictions share one characteristic — they do not fit neatly into any single continental region by either geography or fiscal tradition. Iraq-Kurdistan is a semi-autonomous region with its own PSC framework distinct from federal Iraq. UAE — Abu Dhabi is tracked separately from the UAE federal regime. Faroe Islands and Greenland are self-governing territories with distinct upstream fiscal regimes. The Others chip allows analysts to filter to this group for completeness rather than leaving 17 jurisdictions permanently hidden by the regional filters.</p>
         <p><strong>Before v429:</strong> These 17 countries had no dedicated filter chip in Fiscal Compare — they were unreachable by any region chip. The Other (17) chip was added in Cycle 345.</p>
-        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v429 (Aug 2026). Cross-references: FAQ A963 (Screener region fix), FAQ A964 (Ctct NPV&gt;0).</em></p>
+        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v429 (Aug 2026). Cross-references: FAQ A963 (Screener region fix), FAQ A964 (Project viable stats bar).</em></p>
       </div>
     </div>
 
