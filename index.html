@@ -30172,6 +30172,29 @@ async function loadPlatformData() {
     if (document.getElementById('treformrisk') && document.getElementById('treformrisk').classList.contains('active')) {
       if (typeof renderReformRisk === 'function') renderReformRisk();
     }
+    // v424: if FC (t0) is already the active tab when data arrives, auto-run immediately
+    // (fixes race condition: user clicks FC before country_data.json finishes loading,
+    //  switchTab's 150ms guard fires with COUNTRY_DATA=null and silently skips auto-run)
+    if (document.getElementById('t0') && document.getElementById('t0').classList.contains('active')) {
+      if (!window._autoRanOnce) window._autoRanOnce = {};
+      if (!window._autoRanOnce['t0']) {
+        window._autoRanOnce['t0'] = true;
+        if (typeof runFiscalCompare === 'function') runFiscalCompare();
+      }
+    }
+    // v424: same fix for Country Profile (t7) — auto-load Norway if tab already active
+    if (document.getElementById('t7') && document.getElementById('t7').classList.contains('active')) {
+      if (!window._autoRanOnce) window._autoRanOnce = {};
+      if (!window._autoRanOnce['t7']) {
+        window._autoRanOnce['t7'] = true;
+        var sel = document.getElementById('dd-country-select');
+        var content = document.getElementById('dd-profile-content');
+        if (sel && (!sel.value || !content || content.innerHTML.trim() === '')) {
+          sel.value = 'Norway';
+          if (typeof loadCountryProfile === 'function') loadCountryProfile('Norway');
+        }
+      }
+    }
   } catch(e) {
     clearTimeout(slowLoadTimer);
     console.error('Failed to load platform data:', e);
