@@ -1,8 +1,8 @@
 {
-  "cycle_number": 342,
-  "cycle_start_unix": 1787336401,
-  "cycle_start_human": "2026-08-21 13:20",
-  "cycle_complete_human": "2026-08-21 12:01",
+  "cycle_number": 344,
+  "cycle_start_unix": 1787343601,
+  "cycle_start_human": "2026-08-21 15:20",
+  "cycle_complete_human": "2026-08-21 15:01",
   "cycle_interval_seconds": 1800,
   "last_test_pass": 136,
   "last_test_fail": 0,
@@ -48,8 +48,10 @@
     "Professional credibility: provenance statement + benchmark attribution"
   ],
   "notes_cycle_4": "Cycle 4: Floor B+ across all 15 categories. 7 upgrades. 117/0 clean.",
-  "current_version": "v426",
-  "faq_count": 959,
-  "notes_cycle_341": "Cycle 341: v425 shipped. 9 analyst UX improvements: FC column units (NPV $M, BE $/bbl, Swing pp), FC Reading Guide IRR/'â€”' clarification, Home Price Swing definition, FC drilldown WACC footnote, CP take note upgraded (full project params + WACC + WI scope), FC stats bar Median IRR, IC Summary button (one-click full IC memo paragraph copy). No new FAQs. JS syntax gate PASS / 7 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.",
-  "notes_cycle_342": "Cycle 342: v426 shipped. 9 analyst UX improvements: CP headline IRR @$75 (4th IC metric, color-coded), FC Drilldown CTA promoted to primary Full Profile, Home Key Terms IRR definition, FC Stats Bar IRR range (min/max bounded), FC Reading Guide Profile explanation, FAQs A957-A959 (farm-in valuation, 5-min IC shortlist workflow, IC memo citation framework). JS syntax gate PASS / 7 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors."
+  "current_version": "v428",
+  "faq_count": 962,
+  "notes_cycle_341": "Cycle 341: v425 shipped. 9 analyst UX improvements. JS syntax gate PASS. 136 PASS / 0 FAIL.",
+  "notes_cycle_342": "Cycle 342: v426 shipped. 9 analyst UX improvements + FAQs A957-A959. JS syntax gate PASS. 136 PASS / 0 FAIL.",
+  "notes_cycle_343": "Cycle 343: v428 shipped. 5 analyst UX fixes + FAQs A960-A962. Back-to-FC bug fixed. Breakeven in CP strip. IRR cell tooltips. JS syntax gate PASS. 136 PASS / 0 FAIL.",
+  "notes_cycle_344": "Cycle 344: v428 Cycle 344. 10 analyst UX improvements + 1 critical data fix. USA region Other->North America (was invisible to all FC region chips). North America FC chip. IRR slider @$75 label. CP Breakeven n/a state. Screener auto-Sweet Spot. SbS country count badge. FC Drilldown Peers-in-Region. FC Reading Guide Src definition. FC sort button tooltips (Govt Take, NPV, Breakeven). Screener home card preset mention. JS syntax gate PASS (12 blocks). No new FAQs."
 }
