@@ -36,10 +36,10 @@ def log(msg):
     with open(LOG_FILE, "a", encoding="utf-8") as f:
         f.write(line + "\n")
 
-def run(cmd, cwd=None, timeout=300):
+def run(cmd, cwd=None, timeout=300, env=None):
     try:
         r = subprocess.run(cmd, shell=True, capture_output=True, text=True,
-                           cwd=str(cwd or REPO), timeout=timeout)
+                           cwd=str(cwd or REPO), timeout=timeout, env=env)
         return r.stdout + r.stderr
     except subprocess.TimeoutExpired:
         return f"TIMEOUT after {timeout}s"
@@ -84,7 +84,12 @@ REPORT_FILE = OFFICE / "data" / "runtime_test_report.txt"
 
 def run_playwright():
     log("Step 2: Running Playwright test...")
-    run(f"node {TEST_FILE}", cwd=REPO, timeout=300)
+    # NODE_PATH lets node find playwright in petroleum-fiscal-db/node_modules
+    # regardless of where the JS file lives (office/tools/petroleum/tests/)
+    import os as _os
+    env = _os.environ.copy()
+    env["NODE_PATH"] = str(REPO / "node_modules")
+    run(f"node {TEST_FILE}", cwd=REPO, timeout=300, env=env)
     # Read from the report file (test writes here in structured format)
     pass_count = fail_count = warn_count = js_errors = 0
     raw = ""
