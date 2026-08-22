@@ -1492,7 +1492,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     </div>
   </div>
   <details style="margin-bottom:20px;">
-    <summary style="font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;padding:6px 2px;letter-spacing:.06em;text-transform:uppercase;user-select:none;">More tools ▸ <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7;">IOC Portfolio · Breakeven Map · Reform Risk · Scenario Builder</span></summary>
+    <summary style="font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;padding:6px 2px;letter-spacing:.06em;text-transform:uppercase;user-select:none;">More tools (4) ▸ <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7;">IOC Portfolio · Breakeven Map · Reform Risk · Scenario Builder</span></summary>
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:10px;">
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t5',document.getElementById('tab-btn-t5'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
@@ -2114,7 +2114,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
   <div id="cmp-output" class="empty-state">
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-      <button class="cmp-quickstart-btn" data-countries="Guyana|Angola|Brazil|Nigeria" style="background:transparent;border:1px solid rgba(194,65,12,.4);border-radius:6px;color:var(--orange);font-size:11px;padding:5px 12px;cursor:pointer;" title="Atlantic Frontier PSC Quartet: Guyana (Stabroek ~52%), Angola (deepwater PSC ~55%), Brazil (pre-salt ~65%), Nigeria (PIA deepwater ~58%) — four PSC regimes in the same basin spanning a 30pp take range. The benchmark for IOC Atlantic capital allocation decisions.">&#9632; Atlantic Frontier Quartet</button>
+      <button class="cmp-quickstart-btn" data-countries="Guyana|Angola|Brazil|Nigeria" style="background:transparent;border:1px solid rgba(194,65,12,.4);border-radius:6px;color:var(--orange);font-size:11px;padding:5px 12px;cursor:pointer;" title="Atlantic Frontier PSC: Guyana ~52%, Angola ~55%, Brazil ~65%, Nigeria ~58% — four PSC regimes spanning a 30pp take range. Standard IOC Atlantic capital allocation benchmark.">&#9632; Atlantic Frontier Quartet</button>
       <button class="cmp-quickstart-btn" data-countries="Norway|United Kingdom|Netherlands" style="background:transparent;border:1px solid rgba(21,128,61,.35);border-radius:6px;color:var(--green);font-size:11px;padding:5px 12px;cursor:pointer;" title="North Sea Trio: Norway (Concession+SDFI, ~68% take), UK (RFCT+SC+EPL, ~49% take), Netherlands (~48% take) — the three core North Sea fiscal benchmarks in one view. Standard reference for European offshore capital allocation.">&#9632; North Sea Trio</button>
       <button class="cmp-quickstart-btn" data-countries="United States|Iraq" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>
     </div>
@@ -22402,6 +22402,16 @@ function renderExplorer() {
   });
 
   const tbody = document.getElementById('tbody-explorer');
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="20" style="text-align:center;padding:40px 20px;color:var(--muted);">'
+      + '<div style="font-size:20px;margin-bottom:8px;opacity:.4;">◎</div>'
+      + '<strong style="color:var(--text);display:block;margin-bottom:6px;">No countries match the current filters</strong>'
+      + 'Try removing a mechanic or region filter, or clear the search field.'
+      + '<br><button onclick="(function(){document.getElementById(\'flt-mech\').value=\'\';document.getElementById(\'flt-region\').value=\'\';document.getElementById(\'flt-search\').value=\'\';if(typeof renderExplorer===\'function\')renderExplorer();})()" style="margin-top:12px;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.3);color:var(--accent);border-radius:5px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600;">Reset Filters</button>'
+      + '</td></tr>';
+    document.getElementById('explorer-count').textContent = '0 of ' + COUNTRY_DATA.length + ' countries match current filters';
+    return;
+  }
   tbody.innerHTML = data.map((d, i) => {
     const take = d[takeKey];
     const npv  = d[npvKey];
@@ -22471,7 +22481,8 @@ function renderExplorer() {
       <td><span class="tier ${tc}">${tl}</span></td>
     </tr>`;
   }).join('');
-  document.getElementById('explorer-count').textContent = `Showing ${data.length} of ${COUNTRY_DATA.length} countries`;
+  const _explPL = {'50':'$50','75':'$75','100':'$100','125':'$125'};
+  document.getElementById('explorer-count').textContent = `Showing ${data.length} of ${COUNTRY_DATA.length} countries · Take, NPV, IRR at ${_explPL[price]||('$'+price)}/bbl`;
   // Update sort indicator on column headers
   const _curSort = document.getElementById('flt-sort').value;
   document.querySelectorAll('#tbl-explorer thead th[data-sort-key]').forEach(function(th) {
@@ -23011,7 +23022,13 @@ function renderCompare() {
   const out = document.getElementById('cmp-output');
   if (compareList.length < 2) {
     out.className = 'empty-state';
-    out.innerHTML = 'Select 2–4 countries to begin comparison.';
+    if (compareList.length === 1) {
+      const _sbs1Country = compareList[0];
+      out.innerHTML = '<strong style="color:var(--text);">' + _sbs1Country + '</strong> added — add 1–3 more countries to begin comparison.'
+        + '<div style="margin-top:10px;"><span style="font-size:11px;color:var(--muted);">Search above · use Screener → Load top 5 · or click a quickstart preset below</span></div>';
+    } else {
+      out.innerHTML = 'Select 2–4 countries to compare. Type a country name above or click a quickstart preset.';
+    }
     document.getElementById('cmp-chart-wrap').style.display='none';
     return;
   }
@@ -23402,7 +23419,7 @@ function runScreener() {
   const sortNote = _screenerRfactorOnly ? ' · sorted by price sensitivity (swing ↓)' : '';
   const presetPrefix = _activePresetName ? `${_activePresetName} · ` : '';
   // v456: "click any row" hint now accent-colored and bold — matches v455 FC status hint fix
-  document.getElementById('screener-count').innerHTML = `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote} <span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:6px;">↓ click any row to open Country Profile</span>`;
+  document.getElementById('screener-count').innerHTML = `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote} <span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:6px;">↓ click any row to open Country Profile</span><span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl.">· ranked by Take @${priceLabel}</span>`;
   document.getElementById('screener-result-count').textContent = `(of ${COUNTRY_DATA.length} total)`;
 
   const tbody = document.getElementById('tbody-screener');
@@ -25021,7 +25038,7 @@ function loadCountryProfile(country) {
       + '</div>';
   })()}
   <div class="dd-section">
-    <h3>4-Price Sensitivity</h3>
+    <h3>4-Price Sensitivity <span style="font-weight:400;font-size:11px;color:var(--muted);">Take · NPV · IRR at $50–$125/bbl · Breakeven computed at $75 only</span></h3>
     <div style="overflow-x:auto;">
     <table style="width:100%;border-collapse:collapse;font-size:12px;">
       <thead>
@@ -29173,6 +29190,9 @@ function renderFCResults(results, price) {
   var _fcSwings = sorted.filter(function(r){return r.swing!=null;}).map(function(r){return r.swing;});
   var _fcAvgSwing = _fcSwings.length ? (_fcSwings.reduce(function(s,v){return s+v;},0)/_fcSwings.length).toFixed(1) : null;
   var _fcHighSwing = _fcSwings.filter(function(s){return s>20;}).length;
+  var _alphaSortNote = (sortField === 'country')
+    ? '<span style="font-size:10px;color:var(--muted);background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:4px;padding:2px 8px;margin-left:4px;" title="Sorted A–Z — click the Take% column to rank by fiscal attractiveness">↑↓ A–Z: click Take% to rank</span>'
+    : '';
   var _fcStatsBar = '';
   if (_fcAvgTake!==null) {
     _fcStatsBar = '<div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:7px 14px;background:rgba(176,104,0,.04);border:1px solid rgba(176,104,0,.12);border-radius:6px;margin-bottom:10px;font-size:11px;color:var(--muted);">'
@@ -29200,7 +29220,7 @@ function renderFCResults(results, price) {
     + 'onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'" '
     + 'title="Load the top 5 countries (by current sort) into Side-by-Side for detailed comparison — replaces any existing comparison">&#x21cc; Load Top 5 in Side-by-Side</button>';
   var _scenarioNudge = '<span style="font-size:11px;color:var(--muted);margin-right:auto;align-self:center;">Found a shortlist? &nbsp;<button onclick="openScenarioBuilder()" style="background:none;border:none;color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;padding:0;">+ Scenario</button> to model custom terms</span>';
-  var _clickHint = '<div style="display:flex;align-items:center;margin-bottom:8px;">' + _scenarioNudge + top5btn + '</div>';
+  var _clickHint = '<div style="display:flex;align-items:center;margin-bottom:8px;">' + _scenarioNudge + _alphaSortNote + top5btn + '</div>';
   var html = profileBanner + _fcStatsBar + _clickHint + '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
   html += '<th class="num" style="width:50px" title="Rank by current sort dimension (' + sortDimLabel + ', ' + sortDirLabel + '). Re-rank by clicking any other column header or using the sort buttons above. Green left border = top 10; red left border = bottom 10 (by take ranking).">#</th>';
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
@@ -29463,7 +29483,15 @@ function openFCDrilldown(country) {
     html += '</tr>';
   }
   html += '</tbody></table>';
-  html += '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;line-height:1.5;">NPV discounted at <strong>10% WACC</strong> · 100% working interest basis · pre-financing, pre-bonus · scale NPV by WI% for your stake · IRR \u2265500% excluded as unbounded</div>';
+    // v457: IOC hurdle rate callout — tells analyst immediately if base-case IRR clears the standard IOC hurdle
+  var _irrAt75 = d.irr_75;
+  var _hurdleNote = '';
+  if (_irrAt75 != null && _irrAt75 < 500) {
+    if (_irrAt75 >= 15) _hurdleNote = ' \u00b7 <span style="color:var(--green);font-weight:600;" title="IRR at $75/bbl clears typical IOC hurdle rate of 15%">\u2713 Clears IOC hurdle (15%)</span>';
+    else if (_irrAt75 >= 10) _hurdleNote = ' \u00b7 <span style="color:var(--yellow);font-weight:600;" title="IRR at $75/bbl is 10-15%, approaching IOC hurdle rate of 15%">\u26a0 Near IOC hurdle (15%)</span>';
+    else _hurdleNote = ' \u00b7 <span style="color:var(--red);font-weight:600;" title="IRR at $75/bbl is below typical IOC hurdle rate of 10%">\u2717 Below IOC hurdle</span>';
+  }
+  html += '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;line-height:1.5;">NPV discounted at <strong>10% WACC</strong> \u00b7 100% working interest basis \u00b7 pre-financing, pre-bonus \u00b7 scale NPV by WI% for your stake \u00b7 IRR \u2265500% excluded as unbounded' + _hurdleNote + '</div>';
 
   if (r.waterfall) {
     const wfLabels = { royalty:'Royalty', ftp:'FTP', profit_oil:'Profit Oil (Govt)', cit:'CIT', special:'Special/Windfall', state_eq:'State Equity', base_govt:'Govt Direct', ept:'EPT', cost_reimb:'Cost Reimb.', prrt:'PRRT' };
@@ -29536,7 +29564,7 @@ function openFCDrilldown(country) {
       } else if (_icSwing > 20) {
         _icLines.push('<strong style="color:var(--orange);">Progressive regime (Swing ' + _icSwing.toFixed(0) + 'pp)</strong> — show $50/$75/$100/$125 price sensitivity table. Government take increases substantially at higher prices.');
       } else {
-        _icLines.push('Moderate take, stable regime — standard IC citation: take at $75, evidence tier, and ORCA version.');
+        _icLines.push('Moderate take, stable regime — cite: “' + ((_icTake!=null)?_icTake.toFixed(1)+'%':'N/A') + ' govt take @$75/bbl (ORCA v457).” Evidence: ' + (r.ab_pct||0).toFixed(0) + '% A/B-sourced.');
       }
     }
     if (_icStab != null && _icStab <= 1) {
