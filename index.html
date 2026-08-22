@@ -29559,6 +29559,8 @@ let _fcDrawerOpen = null;
 function openFCDrilldown(country) {
   const existing = document.getElementById('fc-drawer-row');
   if (existing) existing.remove();
+  // Clear row highlight when drawer closes
+  document.querySelectorAll('#tbl-fc tr.fc-row-open').forEach(function(r) { r.classList.remove('fc-row-open'); r.style.removeProperty('background'); r.style.removeProperty('border-left'); });
   if (_fcDrawerOpen === country) { _fcDrawerOpen = null; return; }
   _fcDrawerOpen = country;
 
@@ -29812,6 +29814,12 @@ function openFCDrilldown(country) {
 
   const row = document.querySelector('#tbl-fc tr[data-country="' + country + '"]');
   if (row) {
+    // Clear any prior highlight
+    document.querySelectorAll('#tbl-fc tr.fc-row-open').forEach(function(r) { r.classList.remove('fc-row-open'); r.style.removeProperty('background'); r.style.removeProperty('border-left'); });
+    // Highlight the opened row
+    row.classList.add('fc-row-open');
+    row.style.background = 'rgba(176,104,0,0.08)';
+    row.style.borderLeft = '3px solid var(--accent)';
     const newRow = document.createElement('tr');
     newRow.id = 'fc-drawer-row';
     const _stabCheck = document.getElementById('fc-stability-check');
