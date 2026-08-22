@@ -23834,7 +23834,7 @@ window.loadIOCAggregated = function(brandName, operatorList) {
     ${rfPctAgg > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — higher govt take at high oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPctAgg}%</div><div class="sk">R-factor PSC</div></div>` : ''}
     <div class="ioc-stat" style="flex:1;min-width:200px;text-align:left;">
       <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">COUNTRIES</div>
-      <div style="font-size:13px;">${countries.sort().join(' · ')}</div>
+      <div style="font-size:13px;">${countries.sort().map(c=>`<span style="cursor:pointer;color:var(--accent);" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="openCountryProfileFromFC('${c.replace(/'/g,"\\'")}');event.stopPropagation();" title="Open ${c} Country Profile">${c}</span>`).join(' <span style="color:var(--border);">&middot;</span> ')}</div>
     </div>`;
   const tbl = `<div class="tbl-wrap"><table>
     <thead><tr>
@@ -23905,7 +23905,7 @@ window.loadIOC = function(operator) {
     ${rfPct > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — these positions have higher govt take at higher oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPct}%</div><div class="sk">R-factor PSC</div></div>` : ''}
     <div class="ioc-stat" style="flex:1;min-width:200px;text-align:left;">
       <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">COUNTRIES</div>
-      <div style="font-size:13px;">${countries.sort().join(' · ')}</div>
+      <div style="font-size:13px;">${countries.sort().map(c=>`<span style="cursor:pointer;color:var(--accent);" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="openCountryProfileFromFC('${c.replace(/'/g,"\\'")}');event.stopPropagation();" title="Open ${c} Country Profile">${c}</span>`).join(' <span style="color:var(--border);">&middot;</span> ')}</div>
     </div>
   `;
 
