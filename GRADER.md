@@ -8505,3 +8505,13 @@ GitHub push confirmed (exit code 0). v458 is live at yoburgqs.github.io/petroleu
 - Test after: 110 PASS / 0 FAIL
 - JS errors: 0
 - Summary: v460 — 8 analyst workflow improvements: (1) FC drilldown "Copy 4-price as IC table" button; (2) fcSetSort manual flag bug fix — preserve analyst's BE/IRR override when switching sorts; (3) CP Key Fiscal Parameters animated spinner + cleaner loading text; (4) @keyframes spin CSS added; (5) CP empty-state heading rewritten to "Loading Norway benchmark" instead of generic placeholder; (6) Screener preset label clear (×) button — analyst can now dismiss active preset without resetting whole form; (7) Screener preset JS updated for label-text child span; (8) Similar Fiscal Profile hover arrow affordance. P3 REMAINING items marked complete. Pushed to GitHub Pages.
+
+---
+## Cycle 360 Log — 2026-08-22 07:25
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Sonnet | **Directive:** DIRECT | **Task:** Background push confirmed
+
+GitHub push confirmed â€” v461 is live at yoburgqs.github.io/petroleum-fiscal-db/.
+
