@@ -24,55 +24,65 @@
 
 **Previously completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331) · Visual polish (v344–v346) · M7.1 Reference dropdown cleaned (v361) · M7.2 Shortcut strip updated (v361) · M4.3 Scenario pre-fill from CP (verified v361) · M5.2 Regional reform context in CP (verified v361)
 
-## CURRENT LOOP DIRECTIVE — UX IMPROVEMENT MODE (updated 2026-08-21)
+## CURRENT LOOP DIRECTIVE — UI BEHAVIOR FOCUS (updated 2026-08-21, course correction from Zach)
 
-**The loop's job is to improve the user experience, not to accumulate FAQs or maintain green grades.**
+**COURSE CORRECTION (2026-08-21):** Zach directive: "zoom out and focus on user interface rather than the data, correct course for the loops."
 
-FAQ-only mode is over. The self-grading rubric is not the goal — a real petroleum analyst opening this tool and finding it immediately useful is the goal. Think from that standpoint every cycle.
+### P4 TOOLTIP AUDIT — COMPLETE. DO NOT CONTINUE P4 WORK.
+All tooltip surfaces audited and completed across v437–v448:
+- FC table headers, Explorer headers, Screener column headers, Vintage headers, Reform Risk headers ✅
+- CP headline strip badge, CP evidence badge ✅
+- FC mechanic column, IOC Portfolio, SbS comparison rows ✅
+- All 3 waterfall rendering sites: FC drilldown drawer, CP Live DCF panel, Scenario Builder ✅
+- All Scenario Builder inputs: Concession, PSC, PRRT ✅
+**P4 is DONE. Do not add more tooltips. The tooltip audit is complete.**
 
-### Primary job each cycle: find and fix ONE real user-facing problem
-Ask: "If a petroleum IC analyst opened this tool for the first time today, what would confuse them, frustrate them, or be missing?" Then fix it.
+### FAQs — ZERO PER CYCLE until P1–P3 are resolved
+FAQs are now 0 per cycle. Do not add FAQs. The FAQ count is at 974. That is sufficient. Adding more FAQs does not improve the user interface. Every cycle must change UI behavior or layout.
 
-Priority areas (work down this list; check off each as done in the cycle log):
+### What the loop must do every cycle
+**Every cycle must change something a user can see or interact with differently.** Not a tooltip. Not a FAQ. An actual UI workflow change. If after reading the code you cannot find a real P1–P3 problem to fix, READ HARDER. The problems are there.
 
-**P1 — First-run experience**
-- Does the Home tab immediately communicate what the tool does and what to do first?
-- Is the first action obvious? (Run a Fiscal Compare, look up a country — which is it?)
-- Are there any blank panels, loading spinners that never resolve, or empty states with no guidance when the page first loads?
+Ask exactly: "If a petroleum IC analyst opened this tool for the first time RIGHT NOW, what is the first thing that would frustrate or confuse them?" Fix that thing.
 
-**P2 — FC workflow clarity**
-- After running FC, are the column headers self-explanatory to someone who hasn't read the methodology? (Take%, NPV, IRR, BE, Swing — are these labeled well?)
-- Is the profile assumption (Deepwater Standard / Onshore Standard) clearly visible before running — not buried?
-- Does the drawer/drilldown add meaningful context or just repeat the row data?
+---
 
-**P3 — Country Profile depth and scannability**
-- Can an analyst get the full fiscal picture of a country in under 30 seconds?
-- Are the most important numbers (take at $75, mechanic, stability) prominent at the top?
-- Is there any obvious data that belongs in CP but isn't there?
+**P1 — First-run experience (HIGHEST PRIORITY)**
+- Does the Home tab immediately communicate what the tool does and what the first action is?
+- Is "run a Fiscal Compare" or "look up a country" the obvious first step — or is it ambiguous?
+- Are there blank panels, loading states, or empty-state screens with no guidance on first load?
+- Does the IC Analyst Guide on FC actually guide a first-time user to a result, or does it just describe fields?
+- Specific check: open the page fresh (no sessionStorage). What does the analyst see? Is it immediately useful?
 
-**P4 — Tooltip and label quality**
-- Every data point a user might not know should have a tooltip explaining what it means and how it's computed. Audit headers and badges — are there unexplained acronyms or numbers?
-- "A/B%" — is this explained inline? "IRR" — is the discount rate assumption visible?
+**P2 — FC workflow clarity (HIGH PRIORITY)**
+- After running FC, can the analyst understand what to do next? Is there a clear "now look at this country" path?
+- Are column headers (Take%, NPV, IRR, BE, Swing) self-explanatory without reading methodology?
+- Is the profile assumption (Deepwater Standard profile: 200MMbbl, $8/bbl opex, etc.) clearly visible BEFORE running, not buried?
+- Does the FC drilldown drawer tell the analyst something actionable they couldn't see in the table row?
+- Does the "Load Top 5 in Side-by-Side" button appear and work after every FC run?
 
-**P5 — Print/PDF quality (IC-ready)**
-- Load Norway CP → print to PDF → is it actually drop-in ready for a Goldman IC deck?
-- Does the print output have: platform name/version/date, source citations, evidence tier badges, no truncated tables?
-- Fix any print CSS gaps.
+**P3 — Country Profile scannability (HIGH PRIORITY)**
+- Can an analyst get the complete fiscal picture of a country in under 30 seconds?
+- Are take@$50/$75/$100/$125 in a prominent, scannable location at the top?
+- Is the mechanic type (PSC/Concession/etc.) and stability rating immediately visible without scrolling?
+- Does CP have a "peer comparison" row vs regional median? (M5.3 from ROADMAP — not yet confirmed done)
+- Does the reform history timeline show something useful, or is it a wall of events?
 
-**P6 — Mobile usability**
-- Can an analyst look up a country and see its take on a phone?
-- Is the FC table scrollable horizontally on mobile, or does it break layout?
+**P5 — Print/PDF quality (medium priority, after P1–P3)**
+- Load Norway CP → print preview → is it IC-ready? Check: branding, citations, evidence badges in print, no truncated tables.
 
-**P7 — Tooltip, empty state, and error quality sweep**
-- Any tab that shows a blank or error state — does it give a clear actionable message?
-- Reform Risk, Breakeven Map, Vintage — what do they show before any interaction?
+**P6 — Mobile usability (medium priority)**
+- FC table horizontal scroll on mobile — does it work or break layout?
+- CP headline strip on small screens — readable or cramped?
 
-### Secondary job each cycle: 2-3 FAQs maximum
-FAQs are secondary. Only add 2-3 per cycle, preferring content that directly answers questions a first-time analyst would have (not advanced edge cases).
+**P7 — Empty states and error quality (medium priority)**
+- Any tab blank on first load — does it show a clear actionable message?
 
 ### What NOT to do
-- Do NOT run a cycle that only adds FAQs and changes nothing in the UX
-- Do NOT optimize for the grade rubric — the grades are self-assessed and may be inflated
+- Do NOT add FAQs (0 per cycle until P1–P3 resolved)
+- Do NOT add tooltips (P4 is COMPLETE)
+- Do NOT run a cycle that only changes text content without changing UI behavior or layout
+- Do NOT optimize for the grade rubric — self-assessed grades may be inflated
 - Do NOT re-add removed clutter (page-sub paragraphs, amber banners, chip rows, "How to read" blocks)
 - Do NOT touch v344–v346 visual polish or v371+ declutter changes
 - Do NOT restructure the primary tab order (M7.3 requires Zach's explicit approval)
