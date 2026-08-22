@@ -24,6 +24,17 @@
 
 **Previously completed:** M1 Cross-Nav (v322/324/325) · M2 Trust signals (v322) · M3 Reform Risk primary (v322/325) · M4 Scenario Builder (v322/327) · M5 Insight surfacing (v327/328) · M6 Export Quality (v329/v331) · Visual polish (v344–v346) · M7.1 Reference dropdown cleaned (v361) · M7.2 Shortcut strip updated (v361) · M4.3 Scenario pre-fill from CP (verified v361) · M5.2 Regional reform context in CP (verified v361)
 
+## DESIGN DECISIONS v449–v452 — LOCKED, DO NOT REVERT
+
+These design decisions were made by Zach's direction (2026-08-21): "make sure we end up with the most professional UX you can design."
+
+- **v449:** Take% in CP headline strip is now tier-colored (green≤40 / yellow≤60 / orange≤75 / red>75). Do NOT change this back to `color:var(--text)`.
+- **v449:** Screener count line has permanent row-click hint. Do NOT remove.
+- **v451:** CP headline strip redesigned into two visual zones (Zone A: mechanic+take; vertical separator; Zone B: NPV+IRR+BE+Swing+Stability). Do NOT flatten back to one row.
+- **v451:** **Govt NPV column is REMOVED from FC table.** The "not independently modeled" caveat made it untrustworthy at the decision point. Do NOT re-add it. Contractor NPV header is now "NPV ($M)". Do NOT rename back.
+- **v451:** Take% cell in FC table is 14px. Do NOT reduce.
+- **v452:** CP headline Zone A shows `_grankHtml452` (global rank #X of 185) and `_vsMedianHtml452` (+Xpp vs global median pill) directly under the take%. Do NOT remove these. They are computed before `_headlineStrip344` to avoid JS TDZ errors.
+
 ## CURRENT LOOP DIRECTIVE — UI BEHAVIOR FOCUS (updated 2026-08-21, course correction from Zach)
 
 **COURSE CORRECTION (2026-08-21):** Zach directive: "zoom out and focus on user interface rather than the data, correct course for the loops."
@@ -62,11 +73,13 @@ Ask exactly: "If a petroleum IC analyst opened this tool for the first time RIGH
 - Does the "Load Top 5 in Side-by-Side" button appear and work after every FC run?
 
 **P3 — Country Profile scannability (HIGH PRIORITY)**
-- Can an analyst get the complete fiscal picture of a country in under 30 seconds?
-- Are take@$50/$75/$100/$125 in a prominent, scannable location at the top?
-- Is the mechanic type (PSC/Concession/etc.) and stability rating immediately visible without scrolling?
-- Does CP have a "peer comparison" row vs regional median? (M5.3 from ROADMAP — not yet confirmed done)
-- Does the reform history timeline show something useful, or is it a wall of events?
+- ✅ Headline strip is two-zone: mechanic + tier-colored take% + global rank + vs-median pill (left) | NPV + IRR + BE + Swing + Stability (right). DONE v451-v452. DO NOT CHANGE.
+- ✅ Reform timeline: shows 4 most recent events open, older events collapsed. DONE v450.
+- ✅ Peer comparison vs regional median and global median. DONE v328.
+- ✅ Take@$50/$75/$100/$125 in "Govt Take by Price Scenario" section. DONE (original).
+- REMAINING: When CP loads a country with VERY sparse data (only 1-2 fiscal facts), does the page show a clear "limited data" warning? Check Angola, Iran, Venezuela. If those countries load with mostly "—" cells and no explanation, add an inline data-quality callout near the headline strip.
+- REMAINING: The CP "Key Fiscal Parameters" section loads asynchronously. Does it show a useful loading state or just "Loading from API…"? If the async fetch fails silently, the analyst sees a blank section with no indication it failed. Add a visible error/fallback state.
+- REMAINING: CP "Similar Fiscal Profile" section — does it render? If it shows country circles, are they clickable to navigate to that country's profile? Clicking a peer should open their profile directly.
 
 **P5 — Print/PDF quality (medium priority, after P1–P3)**
 - Load Norway CP → print preview → is it IC-ready? Check: branding, citations, evidence badges in print, no truncated tables.
