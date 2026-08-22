@@ -1732,18 +1732,20 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   </div>
 
   <!-- v423: Reading guide — always visible before and after results; dismissible per session -->
-  <div id="fc-reading-guide" style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:10px;font-size:11px;color:var(--muted);line-height:1.6;">
-    <strong style="color:var(--accent);">Reading this table:</strong>
-    <strong style="color:var(--text);">Govt Take</strong> = share of project economics captured by the state (royalties + taxes + profit oil) at the selected price &amp; profile — lower is better for the investor.
-    <strong style="color:var(--text);">NPV ($M)</strong> = Net present value of contractor cash flows discounted at 10% WACC, 100% working interest basis (scale by your WI% for your stake). Positive = value-accretive above cost of capital.
-    <strong style="color:var(--text);">Profile</strong> = the production assumption used (capex, peak rate, opex, project life) — change the <em>Profile</em> dropdown above to model a different field type (Onshore, Giant, LNG, etc.).
-    <strong style="color:var(--text);">Price Swing</strong> = take difference between $50 and $125/bbl — small swing (&lt;10pp) = royalty-dominant, stable; large swing (&gt;20pp) = profit-based, price-sensitive.
-    <strong style="color:var(--text);">IRR</strong> = pre-tax contractor return at the selected price, discounted at 10% WACC; 124 of 185 countries shown (others unbounded or non-computable at this profile). <strong>—</strong> means either unbounded (&ge;500%) or cost data unavailable — not a data error.
-    <strong style="color:var(--text);">Breakeven ($/bbl)</strong> = minimum oil price for positive NPV under this profile; 68 of 185 countries shown (requires complete royalty + cost data).
-    <strong style="color:var(--text);">Src</strong> = evidence tier for the fiscal terms used: <strong>A</strong> = primary source (official legislation, PSA text, government gazette); <strong>B</strong> = secondary source (Wood Mac, Rystad, IEA, operator filings); <strong>C</strong> = derived/estimated (peer analogy, interpolation). The % shown is the share of verified facts at that tier or better. Higher tier = higher confidence in the take figures.
-    <strong style="color:var(--text);">PROXY</strong> badge on a country name = take is modeled from statutory fiscal parameters only (no verified block-level production data for weighting). Results are directional — verify with Country Profile for final IC sourcing.
-    Click any row to drill into the 4-price matrix and waterfall; click <strong>Full Profile →</strong> to open the Country Profile.
-    <span style="float:right;cursor:pointer;opacity:.5;" onclick="document.getElementById('fc-reading-guide').style.display='none';sessionStorage.setItem('fc-reading-guide-dismissed','1');" title="Dismiss">&#10005;</span>
+  <div id="fc-reading-guide" style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:10px;font-size:11px;color:var(--muted);line-height:1.6;display:flex;gap:8px;align-items:flex-start;">
+    <div style="flex:1;">
+      <strong style="color:var(--accent);">Reading this table:</strong>
+      <strong style="color:var(--text);">Govt Take</strong> = share of project economics captured by the state (royalties + taxes + profit oil) at the selected price &amp; profile — lower is better for the investor.
+      <strong style="color:var(--text);">NPV ($M)</strong> = Net present value of contractor cash flows discounted at 10% WACC, 100% working interest basis (scale by your WI% for your stake). Positive = value-accretive above cost of capital.
+      <strong style="color:var(--text);">Profile</strong> = the production assumption used (capex, peak rate, opex, project life) — change the <em>Profile</em> dropdown above to model a different field type (Onshore, Giant, LNG, etc.).
+      <strong style="color:var(--text);">Price Swing</strong> = take difference between $50 and $125/bbl — small swing (&lt;10pp) = royalty-dominant, stable; large swing (&gt;20pp) = profit-based, price-sensitive.
+      <strong style="color:var(--text);">IRR</strong> = pre-tax contractor return at the selected price, discounted at 10% WACC; 124 of 185 countries shown (others unbounded or non-computable at this profile). <strong>—</strong> means either unbounded (&ge;500%) or cost data unavailable — not a data error.
+      <strong style="color:var(--text);">Breakeven ($/bbl)</strong> = minimum oil price for positive NPV under this profile; 68 of 185 countries shown (requires complete royalty + cost data).
+      <strong style="color:var(--text);">Src</strong> = evidence tier for the fiscal terms used: <strong>A</strong> = primary source (official legislation, PSA text, government gazette); <strong>B</strong> = secondary source (Wood Mac, Rystad, IEA, operator filings); <strong>C</strong> = derived/estimated (peer analogy, interpolation). The % shown is the share of verified facts at that tier or better. Higher tier = higher confidence in the take figures.
+      <strong style="color:var(--text);">PROXY</strong> badge on a country name = take is modeled from statutory fiscal parameters only (no verified block-level production data for weighting). Results are directional — verify with Country Profile for final IC sourcing.
+      Click any row to drill into the 4-price matrix and waterfall; click <strong>Full Profile →</strong> to open the Country Profile.
+    </div>
+    <button onclick="document.getElementById('fc-reading-guide').style.display='none';sessionStorage.setItem('fc-reading-guide-dismissed','1');" title="Dismiss reading guide" aria-label="Dismiss reading guide" style="flex-shrink:0;background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 7px;line-height:1.4;transition:.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">&#10005;</button>
   </div>
   <script>
   (function() {
