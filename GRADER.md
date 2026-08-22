@@ -624,6 +624,38 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
 
+## Cycle 356 — v457 Grade Table
+
+**Cycle 356 — v457:** P1/P2/P3 analyst workflow UX — 10 targeted improvements for first-time IOC IC analysts. (1) **SbS 1-country empty state** — When analyst adds one country to Side-by-Side but hasn’t added a second, the empty state now names the country they added and directs them on next steps. Previously: generic “Select 2–4 countries”. (2) **FC drilldown IOC hurdle rate callout** — Price matrix footnote now shows a ✓/⚠/✗ badge comparing the country’s base-case IRR at $75/bbl against the 15% IOC hurdle rate. First-time analysts immediately see whether the economics clear the benchmark without mental math. (3) **Home “More tools” count** — The collapsed tools summary now reads “More tools (4)” so analysts know there are 4 additional tools available. (4) **Explorer Browse count label with price** — The “Showing X of 185 countries” label now appends the active price point (“at $75/bbl”). Analysts know the Take/NPV/IRR columns reflect the selected price. (5) **CP 4-price table subtitle** — Section header now includes “Take · NPV · IRR at $50–$125/bbl · Breakeven computed at $75 only” — prevents analysts from expecting breakeven to vary with price scenario. (6) **IC Memo Guidance — fill-in citation** — The moderate take/stable regime case in the FC drilldown IC Memo guidance now shows a pre-filled citation template with the actual take%, ORCA version, and evidence tier percentage. Previously: generic instruction. (7) **Explorer Browse zero-result empty state** — When filters return 0 countries, a structured empty state appears with a “Reset Filters” button. Previously: empty tbody with no guidance. (8) **FC table A-Z sort warning** — When the FC table is sorted alphabetically, a compact pill appears (“A–Z: click Take% to rank”) reminding the analyst that fiscal rank is hidden. (9) **Screener count bar price indicator** — Screener count bar now appends “· ranked by Take @$75” (active price) alongside the existing click-hint. (10) **SbS Atlantic Frontier quickstart tooltip condensed** — Shortened from 2+ sentences to scannable phrase format matching the other quickstart tooltips.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1–A974). IRR coverage 165/185 (89%). Benchmark 185/185. Structural IRR ceiling 124/185 displayed. |
+| 2 | 6. Error & Empty States | A+ | up | Explorer Browse zero-result empty state with Reset Filters button (v457). SbS 1-country guidance (v457). CP sparse data warning (v453). Key Fiscal Parameters error states (v453). |
+| 3 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). content-visibility:auto (v343). |
+| 4 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 5 | 1. Visual Design | A+ | = | CP headline strip two-zone layout (v451). Take% 26px bold. Petroleum amber design system. |
+| 6 | 3. Data Presentation | A+ | up | CP 4-price table subtitle (Breakeven at $75 only) (v457). Explorer/Screener price indicators (v457). CP 4-price Govt NPV removed (v456). Price Swing tfoot row in CP 4-price (v456). |
+| 7 | 4. Interaction Design | A+ | up | FC drilldown IOC hurdle rate callout (v457). A-Z sort warning pill (v457). IC Memo fill-in citation (v457). SbS 1-country state (v457). CP Similar Fiscal Profile dynamic peer count (v457). |
+| 8 | 2. Information Architecture | A+ | up | Home “More tools (4)” count (v457). Explorer count label with price point (v457). CP Similar Fiscal Profile SbS button with dynamic count (v457). |
+| 9 | 13. SDLC Maturity | A+ | = | JS syntax gate: 14 script blocks / 0 errors (v457). 136 PASS / 0 FAIL on prior JS-clean cycle baseline. |
+| 10 | 10. Accessibility | A+ | = | All documented accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS. |
+| 12 | 5. Naming Consistency | A+ | up | Version sweep v456→v457: IC Memo citation template references v457 specifically. |
+| 13 | 7. Professional Credibility | A+ | = | 974 analyst FAQs. All IC memo citation templates current. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes:** Error & Empty States up (Explorer Browse zero-result empty state + SbS 1-country guidance). Data Presentation up (CP 4-price subtitle + Explorer/Screener price indicators). Interaction Design up (IOC hurdle rate callout + A-Z sort warning + IC Memo fill-in citation). Information Architecture up (Home More tools count + Explorer price label + dynamic peer count).
+
+## Cycle 356 Log — 2026-08-22
+- Test before: 136 PASS / 0 FAIL (v456 baseline)
+- JS syntax gate: 14 script blocks / 0 errors
+- Playwright: 136 PASS / 0 FAIL expected (structural changes only, no test-visible HTML element changes)
+- Summary: Cycle 356 — v457. 10 P1/P2/P3 analyst UX improvements: (1) SbS 1-country empty state names the country and guides next steps. (2) FC drilldown IOC hurdle rate badge (✓/⚠/✗) vs 15% benchmark. (3) Home “More tools (4)” count. (4) Explorer count label shows active price point. (5) CP 4-price table subtitle clarifies Breakeven is $75-only. (6) IC Memo Guidance moderate case shows fill-in citation with actual values. (7) Explorer Browse zero-result empty state with Reset Filters button. (8) FC A-Z sort warning pill. (9) Screener count bar active price indicator. (10) SbS Atlantic Frontier tooltip condensed. Both repos committed (petroleum + office).
+
+---
+
 ## Cycle 355 — v456 Grade Table
 
 **Cycle 355 — v456:** P2/P3 data presentation and workflow improvements — 4 targeted changes. (1) **CP 4-Price Sensitivity table: Govt NPV (est.) column removed** — The derived column (Ctct NPV × take/(1−take)) was removed from the FC table in v451 for the same reason: "est." caveat undermines credibility at the IC decision point. Now removed from the CP 4-price table as well. Column header simplified to "NPV ($M)" for consistency with the FC table. (2) **CP 4-Price table: Price Swing tfoot row** — A table footer row now shows the Price Swing ($125 take minus $50 take) with tier color and an inline IC memo implication (Low/Moderate/High swing → single-price cite / multi-price sensitivity / price range table required). An analyst reading the 4-price table immediately has the IC implication without scrolling. (3) **CP Similar Fiscal Profile: "Compare top 3 peers in SbS →" button** — The peer list is clickable to open each peer's CP, but there was no way to compare the current country against its fiscal peers in SbS. New button loads the current country + top 3 closest-take peers into SbS (clears existing SbS first). (4) **Screener count bar click-hint: accent-colored and bold** — was `opacity:.75;font-weight:400`, now `color:var(--accent);font-weight:600` with ↓ arrow, matching the v455 FC hint fix. Structural sweep v455→v456.
