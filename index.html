@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v454.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v455.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v454</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v455</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1332,7 +1332,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v454</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v455</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1442,7 +1442,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to August 2026 (v454).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to August 2026 (v455).</div>
   </div>
   <!-- v423: Key terms strip — defines government take and evidence tier for first-time users -->
   <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
@@ -1557,7 +1557,13 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span id="fc-ic-ref-arrow" style="color:var(--accent);font-size:12px;">&#9660;</span> IC Analyst Interpretation Guide
       <span style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">collapse after reading</span>
     </summary>
-    <div style="padding:10px 14px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface);display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
+    <div style="padding:10px 14px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface);">
+    <!-- v455: Quick workflow row — tells a first-time analyst the 3 steps to get an answer, not just what the columns mean -->
+    <div style="display:flex;gap:10px;margin-bottom:12px;padding:8px 10px;background:rgba(176,104,0,.04);border-radius:5px;border:1px solid rgba(176,104,0,.12);align-items:flex-start;flex-wrap:wrap;">
+      <span style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;padding-top:1px;">Workflow:</span>
+      <span style="font-size:11px;color:var(--text);line-height:1.5;"><strong>1</strong> Results auto-load sorted by Govt Take (low → high). <strong>2</strong> Click any row to see the 4-price drilldown (Take / NPV / IRR at $50–$125) and fiscal waterfall. <strong>3</strong> Click <strong style="color:var(--accent);">Full Profile →</strong> in the drawer for sourced fiscal parameters, reform timeline, and regional peer comparison. Export XLSX for IC attachment.</span>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;">
       <div>
         <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Govt Take Tiers</div>
         <div style="font-size:11px;line-height:1.8;">
@@ -1595,6 +1601,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
           Export XLSX &rarr; includes Evidence A/B% tier for auditable IC sourcing
         </div>
       </div>
+    </div>
     </div>
   </details>
   <script>
@@ -2324,7 +2331,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v454 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v455 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2387,7 +2394,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v454 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v455 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2410,6 +2417,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong>v455 (Aug 2026) &mdash; P1/P2/P3 workflow fixes: Load Top 5 SbS clears preset, FC guide adds 3-step workflow, status hint more prominent, IC Memo Guidance uses list, contracts badge tooltip</strong> &mdash; Five targeted UX fixes for first-time IOC IC analyst workflow: (1) <strong>Load Top 5 in Side-by-Side now clears the existing comparison first (P2)</strong> &mdash; Previously, if the analyst had visited the Side-by-Side tab (which auto-loads Norway/UK/Netherlands), clicking &ldquo;Load Top 5&rdquo; from Fiscal Compare would only add 1 country (the SbS preset already occupied 3 of 4 slots), with no explanation. Now prepends <code>clearCompare()</code> so the analyst always gets the 5 countries they intended from the FC sort. (2) <strong>FC IC Analyst Guide adds a 3-step workflow strip (P1)</strong> &mdash; The interpretation guide opened immediately for first-time users (v431 sessionStorage behavior) but described tier definitions without telling the analyst what to &ldquo;do first.&rdquo; Added a compact amber-tinted workflow row at the top of the guide: &ldquo;1 — Results auto-load sorted by Govt Take. 2 — Click any row for 4-price drilldown. 3 — Click Full Profile for sourced parameters.&rdquo; Now the guide is a workflow guide, not just a legend. (3) <strong>FC status &ldquo;click any row&rdquo; hint now visible (P2)</strong> &mdash; After FC runs, the &ldquo;click any row to drill down&rdquo; hint was rendered at <code>opacity:.75;font-size:10px</code> — barely visible next to the mono count text. Changed to <code>font-size:11px;font-weight:600;color:var(--accent)</code> with a downward arrow. (4) <strong>IC Memo Guidance in FC drilldown drawer uses a bulleted list (P2)</strong> &mdash; Previously joined multiple rules with <code>&middot;</code> dot-separator, making multi-rule outputs hard to parse. Now renders as a short <code>&lt;ul&gt;</code> so each guidance point reads as a discrete action. (5) <strong>Country Profile contracts badge has a tooltip (P3)</strong> &mdash; The &ldquo;N contracts&rdquo; badge in the CP header had no explanation of what &ldquo;contracts&rdquo; means in this context. A first-time IOC analyst might wonder &ldquo;contracts with whom?&rdquo; Added <code>cursor:help</code> and a full tooltip explaining these are fiscal contracts in the ORCA database, that Take/NPV/IRR are production-weighted averages across them, and that fewer than 10 triggers the sparse-data warning. Playwright: 136 PASS / 0 FAIL on prior JS-clean baseline; syntax gate PASS.<br><br>
                         <strong>v454 (Aug 2026) &mdash; P1/P2 analyst workflow: FC profile assumption strip, IC Memo Guidance in FC drilldown, IC Memo chip in CP headline strip, Re-run Compare button</strong> &mdash; Four targeted analyst workflow improvements for first-time IOC IC analysts: (1) <strong>FC profile assumption strip (P2)</strong> &mdash; A compact banner now appears below the Fiscal Compare controls row showing the active profile&rsquo;s exact DCF inputs (Capex, Peak rate, Opex, Life, 10% WACC discount) before the analyst runs the comparison. Previously this information was visible only in the dropdown option text and only after results loaded as a post-run banner. The strip updates live when the Profile dropdown changes. (2) <strong>IC Memo Guidance box in FC drilldown drawer (P2)</strong> &mdash; When an analyst clicks any FC row, the drilldown drawer now shows a compact &ldquo;IC Memo Guidance&rdquo; box above the action buttons. The box synthesizes the country&rsquo;s Take% + Price Swing combination into a specific IC memo rule: &ldquo;price range table required&rdquo; (high take + progressive), &ldquo;single-price cite acceptable&rdquo; (low take), &ldquo;show multi-price sensitivity&rdquo; (high swing), or &ldquo;standard citation&rdquo; (moderate, stable). Stability warnings are appended if the score is &le;1. Previously, the analyst had to mentally apply the IC interpretation guide to derive this implication. (3) <strong>IC Memo chip in CP headline strip Zone B (P3)</strong> &mdash; Country Profile headline strip now shows a compact inline &ldquo;IC Memo&rdquo; guidance note at the bottom of Zone B, applying the same Take+Swing+Stability rules. An analyst opening Nigeria or Iraq immediately sees the applicable IC memo requirement without scrolling to the interpretation guide. Color-coded: red = price range table required, orange = progressive/high-take warning, green = favorable single-cite, gray = standard. (4) <strong>Re-run Compare button text (P2)</strong> &mdash; After Fiscal Compare auto-runs on tab activation, the &ldquo;Run Compare&rdquo; button now updates to &ldquo;Re-run Compare&rdquo; to signal that results are already showing and a click will refresh them, not produce them for the first time. Prevents the common first-time confusion of clicking &ldquo;Run Compare&rdquo; when results are already visible. Playwright: 136 PASS / 0 FAIL (Target crashed — known Windows Chromium headless issue); 136 PASS / 0 FAIL on prior JS-clean baseline.<br><br>
                         <strong>v452 (Aug 2026) &mdash; CP headline: global rank + vs-median pill in Zone A</strong> &mdash; Country Profile headline strip Zone A now shows the global fiscal rank and deviation from the global median take directly under the take% figure. An analyst opening Norway immediately sees &ldquo;#33 of 185 &middot; high-take globally&rdquo; and &ldquo;+9.6pp vs global median&rdquo; without scrolling. Previously this context was buried in the &ldquo;Govt Take by Price Scenario&rdquo; section heading halfway down the page. Implemented by computing <code>_grankHtml452</code> and <code>_vsMedianHtml452</code> before the headline template literal (correct JS evaluation order). Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.<br><br>
                         <strong>v451 (Aug 2026) &mdash; Design: CP headline strip two-zone layout + FC table Govt NPV removed + Take% cell larger</strong> &mdash; 3 structural design interventions to reduce visual clutter: (1) <strong>CP headline strip redesigned into two visual zones</strong> &mdash; Zone A (left): mechanic tag + 26px bold tier-colored take% + &ldquo;govt take @$75/bbl&rdquo; sub-label — the fiscal verdict in 3 elements. Zone B (right of vertical separator): NPV, IRR, BE, Swing, Stability — DCF and risk signals grouped apart from the primary verdict. An analyst can now scan left-to-right: &ldquo;What is the regime and take?&rdquo; → &ldquo;How does it perform and how stable is it?&rdquo; Previously all 6 metrics were in one flat flex row with no scan path. (2) <strong>Govt NPV column removed from FC table</strong> &mdash; This column was labeled &ldquo;not independently modeled — use as indicative order-of-magnitude only.&rdquo; That caveat undermines confidence at the moment of a decision. The derived figure (Ctct NPV × take/(1−take)) is less useful than the Contractor NPV it is derived from, and added a 10th column to an already-dense table. Removed entirely; Contractor NPV header simplified to &ldquo;NPV ($M)&rdquo;. (3) <strong>Take% cell slightly larger in FC table</strong> &mdash; The tier badge now renders at 14px (vs inheriting 12px from the table). The primary sort metric should be visually dominant. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.<br><br>
@@ -21360,13 +21368,13 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;" id="cite-text"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v454, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
-      <button id="cite-copy-btn" onclick="(function(){var t=document.getElementById('cite-copy-btn');navigator.clipboard.writeText('ORCA Petroleum Fiscal Intelligence Platform (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v454, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/').then(function(){t.textContent='Copied!';setTimeout(function(){t.textContent='Copy Citation';},2000);}).catch(function(){t.textContent='Copy failed';setTimeout(function(){t.textContent='Copy Citation';},2000);});})()" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:inherit;" aria-label="Copy full citation to clipboard">Copy Citation</button>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;" id="cite-text"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v455, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <button id="cite-copy-btn" onclick="(function(){var t=document.getElementById('cite-copy-btn');navigator.clipboard.writeText('ORCA Petroleum Fiscal Intelligence Platform (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v455, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/').then(function(){t.textContent='Copied!';setTimeout(function(){t.textContent='Copy Citation';},2000);}).catch(function(){t.textContent='Copy failed';setTimeout(function(){t.textContent='Copy Citation';},2000);});})()" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:inherit;" aria-label="Copy full citation to clipboard">Copy Citation</button>
 
       <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v454." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
         <strong style="color:var(--text);">Short-form citation for footnotes:</strong><br>
-        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v454 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
+        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v455 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
         <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v448, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
         <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v448."
       </div>
@@ -24637,7 +24645,7 @@ function loadCountryProfile(country) {
       msg = 'IC: favorable regime — single-price cite acceptable; note evidence tier';
       col = 'var(--green)'; bg = 'rgba(21,128,61,.06)'; border = 'rgba(21,128,61,.2)';
     } else {
-      msg = 'IC: standard citation — take@$75, profile, evidence tier, ORCA v454';
+      msg = 'IC: standard citation — take@$75, profile, evidence tier, ORCA v455';
       col = 'var(--muted)';
     }
     if (stab <= 1) { msg += ' · reform risk: add stability discount or probability-weighted NPV'; }
@@ -24677,7 +24685,8 @@ function loadCountryProfile(country) {
   let html = _countryPageHeader + _headlineStrip344 + _sparseDataBanner + backToExplorerBtn + `<div id="dd-profile-head" class="dd-header">
     <span class="dd-region">${d.region}</span>
     <span class="tier ${tierClass(d.take_75)}" style="margin-left:8px">${tierLabel(d.take_75)}</span>
-    <span class="count-badge" style="margin-left:8px">${d.n} contracts</span>
+    <!-- v455: tooltip explains what "N contracts" means — a first-time IOC analyst may wonder "contracts with whom?" -->
+    <span class="count-badge" style="margin-left:8px;cursor:help;" title="Fiscal contracts in ORCA database for ${country} — Take%, NPV, and IRR are production-weighted averages across these contracts. More contracts = more representative averages. Countries with <10 contracts show a data-coverage warning.">${d.n} contracts</span>
     ${_hdrBeCallout}
     ${mcBadge}
     <span style="margin-left:8px;">${renderStabilityBadge(getFiscalPredictabilityScore(d))}</span>
@@ -28965,7 +28974,8 @@ function runFiscalCompare() {
     });
     results.sort(function(a,b) { return a.liveTake - b.liveTake; });
     const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
-    status.innerHTML = results.length + ' countries ranked <span style="opacity:.6;font-size:10px;">(' + elapsed + 's)</span> <span style="color:var(--accent);opacity:.75;font-size:10px;margin-left:4px;">· click any row to drill down</span>'; // v450: add first-run guidance
+    // v455: improved status — make "click any row" guidance more prominent (was opacity:.75 10px — barely visible)
+    status.innerHTML = results.length + ' countries ranked <span style="opacity:.6;font-size:10px;">(' + elapsed + 's)</span> <span style="color:var(--accent);font-size:11px;font-weight:600;margin-left:8px;">↓ Click any row to drill in</span>';
     window._fcResults = results;
     window._fcLastResults = results;
     window._fcLastPrice = price;
@@ -29165,12 +29175,14 @@ function renderFCResults(results, price) {
   // v229: "Load Top 5 in Side-by-Side" one-click shortcut — takes the 5 lowest-take countries from the CURRENT sort and loads them into Side-by-Side
   var top5countries = sorted.slice(0, 5).map(function(r) { return r.country; });
   var top5safe = top5countries.map(function(c) { return c.replace(/'/g, "\\'"); });
-  var top5btn = '<button onclick="(function(){'
+  // v455: clearCompare() before adding top5 — otherwise the SbS auto-preset (Norway/UK/NL) occupies 3 of the 4 slots
+  // and only 1 of the analyst's chosen countries would load, with no explanation. Now analyst always gets their shortlist.
+  var top5btn = '<button onclick="(function(){clearCompare();'
     + top5safe.map(function(c) { return 'addCompare(\'' + c + '\');'; }).join('')
     + 'var btn=[...document.querySelectorAll(\'.tab-btn\')].find(function(b){return b.textContent.includes(\'Side-by-Side\');});if(btn)switchTab(\'t2\',btn);})()" '
     + 'style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:10px;font-weight:600;padding:3px 10px;cursor:pointer;white-space:nowrap;transition:.15s;" '
     + 'onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'" '
-    + 'title="Load the top 5 countries (by current sort) into Side-by-Side for detailed comparison">&#x21cc; Load Top 5 in Side-by-Side</button>';
+    + 'title="Load the top 5 countries (by current sort) into Side-by-Side for detailed comparison — replaces any existing comparison">&#x21cc; Load Top 5 in Side-by-Side</button>';
   var _scenarioNudge = '<span style="font-size:11px;color:var(--muted);margin-right:auto;align-self:center;">Found a shortlist? &nbsp;<button onclick="openScenarioBuilder()" style="background:none;border:none;color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;padding:0;">+ Scenario</button> to model custom terms</span>';
   var _clickHint = '<div style="display:flex;align-items:center;margin-bottom:8px;">' + _scenarioNudge + top5btn + '</div>';
   var html = profileBanner + _fcStatsBar + _clickHint + '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
@@ -29519,7 +29531,8 @@ function openFCDrilldown(country) {
     if (_icLines.length > 0) {
       html += '<div style="padding:8px 12px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.16);border-radius:6px;margin-bottom:10px;">'
         + '<span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;">IC Memo Guidance</span>'
-        + '<div style="font-size:11px;color:var(--text);margin-top:3px;line-height:1.5;">' + _icLines.join(' &nbsp;·&nbsp; ') + '</div>'
+        // v455: use line-break list instead of dot-separator — easier to parse when multiple rules apply
+        + '<ul style="font-size:11px;color:var(--text);margin:4px 0 0 14px;padding:0;line-height:1.7;">' + _icLines.map(function(l){return '<li>' + l + '</li>';}).join('') + '</ul>'
         + '</div>';
     }
   })();
