@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v465.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v466.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v465</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v466</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1333,7 +1333,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v465</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v466</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1443,9 +1443,11 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to August 2026 (v465).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to August 2026 (v466).</div>
     <!-- v465: Live investible universe stat — populated after country_data.json loads -->
     <div id="home-hurdle-stat" style="display:none;margin-top:8px;font-size:12px;color:var(--green);font-weight:600;" aria-live="polite"></div>
+    <!-- v466: DB currency note — populated after country_data.json loads -->
+    <div id="home-db-currency" style="display:none;margin-top:4px;font-size:11px;color:var(--muted);" aria-live="polite"></div>
   </div>
   <!-- v423: Key terms strip — defines government take and evidence tier for first-time users -->
   <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
@@ -1745,11 +1747,16 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <strong style="color:var(--text);">PROXY</strong> badge on a country name = take is modeled from statutory fiscal parameters only (no verified block-level production data for weighting). Results are directional — verify with Country Profile for final IC sourcing.
       Click any row to drill into the 4-price matrix and waterfall; click <strong>Full Profile →</strong> to open the Country Profile.
     </div>
-    <button onclick="document.getElementById('fc-reading-guide').style.display='none';sessionStorage.setItem('fc-reading-guide-dismissed','1');" title="Dismiss reading guide" aria-label="Dismiss reading guide" style="flex-shrink:0;background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 7px;line-height:1.4;transition:.15s;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">&#10005;</button>
+    <div style="flex-shrink:0;display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
+      <button onclick="document.getElementById('fc-reading-guide').style.display='none';sessionStorage.setItem('fc-reading-guide-dismissed','1');" title="Dismiss for this session only" aria-label="Dismiss reading guide for this session" style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 7px;line-height:1.4;transition:.15s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">&#10005; Dismiss</button>
+      <button onclick="document.getElementById('fc-reading-guide').style.display='none';sessionStorage.setItem('fc-reading-guide-dismissed','1');try{localStorage.setItem('fc-reading-guide-hidden','1');}catch(e){}" title="Hide permanently across all sessions" aria-label="Permanently hide reading guide" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:10px;padding:0 2px;line-height:1.4;text-decoration:underline;transition:.15s;white-space:nowrap;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--muted)'">Don&#x27;t show again</button>
+    </div>
   </div>
   <script>
   (function() {
-    if (sessionStorage.getItem('fc-reading-guide-dismissed')) {
+    // v466: also check localStorage for permanent "don't show again" preference
+    var _rgHidden = sessionStorage.getItem('fc-reading-guide-dismissed') || (function(){ try { return localStorage.getItem('fc-reading-guide-hidden'); } catch(e) { return null; } })();
+    if (_rgHidden) {
       var el = document.getElementById('fc-reading-guide');
       if (el) el.style.display = 'none';
     }
@@ -2121,6 +2128,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <button class="btn btn-outline btn-sm" id="cmp-clear-btn" aria-label="Clear all selected countries from side-by-side comparison">Clear</button>
       <button class="btn btn-outline btn-sm" id="cmp-print-btn" title="Print/export comparison as PDF" aria-label="Export comparison as PDF via browser print">⬇ Export PDF</button>
       <button class="btn btn-outline btn-sm" id="cmp-share-btn" title="Copy shareable link to this comparison">⎘ Share Link</button>
+      <button class="btn btn-outline btn-sm" id="cmp-copy-table-btn" title="Copy comparison grid as tab-separated text for pasting into IC memo or Excel" aria-label="Copy comparison table as tab-separated text">&#128203; Copy Table</button>
       <div id="cmp-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;width:260px;z-index:100;margin-top:4px;top:100%;left:0;"></div>
   </div>
 
@@ -2261,6 +2269,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   </div>
 
   <div id="ioc-exposure-output" style="display:none;">
+    <!-- v466: operator name + country count header — populated by renderIOCExposure -->
+    <div id="ioc-exposure-heading" style="margin-bottom:14px;"></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
       <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Portfolio Take Distribution</div>
@@ -2336,6 +2346,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span id="fc-nav-label" style="font-size:11px;color:var(--muted);white-space:nowrap;"></span>
     <button id="fc-nav-next" onclick="fcNavStep(1)" style="background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:3px 10px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;" title="Next country in Fiscal Compare list">Next &#8594;</button>
     <button onclick="switchTab('t0',document.getElementById('tab-btn-t0'));" style="background:transparent;border:none;font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline;margin-left:4px;" title="Return to Fiscal Compare results">&#8617; Back to FC</button>
+    <button id="cp-run-fc-btn" onclick="(function(){var _priceEl=document.getElementById('cp-price-select')||document.getElementById('fc-price');var _p=_priceEl?_priceEl.value:'75';var _fcP=document.getElementById('price');if(_fcP)_fcP.value=_p;switchTab('t0',document.getElementById('tab-btn-t0'));setTimeout(function(){if(typeof runFiscalCompare==='function')runFiscalCompare();},200);})()" style="background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.3);border-radius:4px;font-size:11px;color:var(--accent);cursor:pointer;padding:2px 8px;font-weight:600;white-space:nowrap;" title="Switch to Fiscal Compare and run at the current price — ranks all 185 countries by government take">&#9654; Run FC at this price</button>
   </div>
 
   <!-- Print-only branding header — hidden on screen, visible when printing -->
@@ -2345,7 +2356,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v465 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v466 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -23474,6 +23485,11 @@ function runScreener() {
   // v456: "click any row" hint now accent-colored and bold — matches v455 FC status hint fix
   document.getElementById('screener-count').innerHTML = `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote} <span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:6px;">↓ click any row to open Country Profile</span><span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl.">· ranked by Take @${priceLabel}</span>`;
   document.getElementById('screener-result-count').textContent = `(of ${COUNTRY_DATA.length} total)`;
+  // v466: update Screener mode-toggle button to show live match count
+  (function() {
+    var _sBtn = document.getElementById('mode-btn-screen');
+    if (_sBtn) _sBtn.innerHTML = 'Screener&nbsp;(' + data.length + ')&nbsp;&#x22EE;&nbsp;<span style="font-size:10px;color:var(--accent);vertical-align:middle;">\u2605</span>';
+  })();
 
   const tbody = document.getElementById('tbody-screener');
   if (data.length === 0) {
@@ -25952,6 +25968,15 @@ function renderIOCExposure(operatorName) {
       source: iocEntry ? 'IOC_DATA' : 'COUNTRY_DATA'
     };
   }).filter(d => d.take75 != null).sort((a,b) => b.take75 - a.take75);
+
+  // v466: inject operator heading with country count
+  (function() {
+    var _hd = document.getElementById('ioc-exposure-heading');
+    if (_hd) {
+      _hd.innerHTML = '<h3 style="font-size:15px;font-weight:800;margin:0 0 2px 0;">' + operatorName + '</h3>'
+        + '<span style="font-size:11px;color:var(--muted);">' + portfolio.length + ' countr' + (portfolio.length === 1 ? 'y' : 'ies') + ' in fiscal database</span>';
+    }
+  })();
 
   if (!portfolio.length) {
     document.getElementById('exposure-metrics').innerHTML = '<div style="color:var(--muted);font-size:12px;">No fiscal data available for this operator.</div>';
@@ -29353,7 +29378,7 @@ function renderFCResults(results, price) {
       + (_fcMinR?'<span title="Lowest-take regime: '+_fcMinR.country+'"><strong style="color:var(--green);">Min take: </strong>'+_fcMinR.liveTake.toFixed(1)+'% ('+_fcMinR.country+')</span>':'')
       + (_fcMaxR?'<span title="Highest-take regime: '+_fcMaxR.country+'"><strong style="color:var(--negative);">Max take: </strong>'+_fcMaxR.liveTake.toFixed(1)+'% ('+_fcMaxR.country+')</span>':'')
       + (_fcAvgSwing!==null?'<span title="Average Price Swing (govt take@$125 minus take@$50 in percentage points) across '+_fcSwings.length+' countries with swing data. Low swing (&lt;10pp) = royalty-dominant, stable returns across price cycles; preferred for certainty mandates. High swing (&gt;20pp) = progressive/PSC regime — government captures most price upside; requires multi-price sensitivity table in IC memo. '+_fcHighSwing+' of '+sorted.length+' countries have Swing &gt;20pp. Use ‘Swing ↑’ sort button to rank by price sensitivity."><strong style="color:var(--text);">Avg swing: </strong>'+_fcAvgSwing+'pp <span style="opacity:.7;">('+_fcHighSwing+' progressive)</span></span>':'')
-      + '<span style="margin-left:auto;" title="Countries where the contractor earns a positive NPV (100% working interest, 10% WACC) at this price and profile — project is economically viable"><strong style="color:var(--text);">Project viable: </strong>'+_fcPosNPV+' of '+sorted.length+'</span>'
+      + '<span style="margin-left:auto;" title="Click to sort FC by NPV \u2014 positive-NPV countries float to top. Countries where the contractor earns a positive NPV (100% working interest, 10% WACC) at this price and profile."><button onclick="if(typeof fcSetSort===\'function\')fcSetSort(\'npv\');" style="background:none;border:none;padding:0;cursor:pointer;font-size:11px;color:var(--muted);font-family:inherit;text-decoration:underline dotted;text-underline-offset:2px;" title="Sort Fiscal Compare by NPV to see all project-viable countries ranked"><strong style="color:var(--text);">Project viable: </strong>'+_fcPosNPV+' of '+sorted.length+'</button></span>'
       + '<span title="Countries with IRR data available (IRR &lt;500% — bounded returns). Use \'IRR only\' filter to restrict table to these countries."><strong style="color:var(--text);">IRR available: </strong>'+_fcHasIRR+' of '+sorted.length+'</span>'
       + '</div>';
   }
@@ -29387,6 +29412,8 @@ function renderFCResults(results, price) {
 
   // v457: IOC hurdle divider — track whether we've crossed 15% IRR when sorted by IRR
   var _irrHurdleDividerInserted = false;
+  // v466: NPV=0 divider — track whether we've crossed NPV=0 when sorted by NPV
+  var _npvZeroDividerInserted = false;
   sorted.forEach(function(r, i) {
     var tier = getTierInfo(r.liveTake);
     var swingCol = r.swing == null ? '' : r.swing < 10 ? 'var(--positive)' : r.swing < 20 ? 'var(--accent)' : 'var(--negative)';
@@ -29402,6 +29429,15 @@ function renderFCResults(results, price) {
         var _dColspan = showStability ? 12 : 11;
         html += '<tr style="pointer-events:none;"><td colspan="' + _dColspan + '" style="padding:0;"><div style="background:rgba(176,104,0,.08);border-top:2px dashed rgba(176,104,0,.5);border-bottom:2px dashed rgba(176,104,0,.5);text-align:center;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; IOC Hurdle Rate: 15% IRR &#8212; countries below this line do not clear the standard IC threshold at this price</div></td></tr>';
         _irrHurdleDividerInserted = true;
+      }
+    }
+    // v466: insert NPV=0 threshold divider when sorted by NPV and we cross from positive to negative
+    if (sortField === 'npv' && !_npvZeroDividerInserted) {
+      var prevNpv = i > 0 ? sorted[i-1].liveNPV : null;
+      if ((r.liveNPV == null || r.liveNPV < 0) && (i === 0 || (prevNpv != null && prevNpv >= 0))) {
+        var _nColspan = showStability ? 12 : 11;
+        html += '<tr style="pointer-events:none;"><td colspan="' + _nColspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.06);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:#B91C1C;letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; NPV = $0 threshold &#8212; countries below this line do not return positive contractor value at this price &amp; profile</div></td></tr>';
+        _npvZeroDividerInserted = true;
       }
     }
     // v428: tooltip on IRR dash cell — first-time analysts often mistake "—" for missing data rather than unbounded/not computable
@@ -29643,6 +29679,24 @@ function openFCDrilldown(country) {
     const beCol = d.be_75 < 50 ? 'var(--green)' : d.be_75 < 80 ? 'var(--yellow)' : 'var(--red)';
     html += '<span style="font-size:11px;color:' + beCol + ';font-family:\'IBM Plex Mono\',monospace;margin-left:4px;">BE $' + d.be_75.toFixed(0) + '/bbl</span>';
   }
+  // v466: Reform trend signal — most recent reform direction from REFORM_HISTORY
+  (function() {
+    try {
+      var _rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? (REFORM_HISTORY[country] || []) : [];
+      if (_rh.length) {
+        var _latest = _rh.reduce(function(m, ev) { return (ev.year > (m.year || 0)) ? ev : m; }, {});
+        if (_latest.year) {
+          var _dir = (_latest.direction || '').toLowerCase();
+          var _isHostile = _dir === 'hostile' || _dir === 'unfavorable' || _dir === 'increase';
+          var _isFriendly = _dir === 'favorable' || _dir === 'friendly' || _dir === 'decrease';
+          var _rfArrow = _isHostile ? '\u2191 Hostile' : _isFriendly ? '\u2193 Friendly' : '\u2014 Neutral';
+          var _rfCol = _isHostile ? 'var(--negative)' : _isFriendly ? 'var(--green)' : 'var(--muted)';
+          var _rfTitle = 'Most recent fiscal reform: ' + _latest.year + ' — ' + (_latest.description || _dir || 'unknown direction') + '. See Reform Risk tab for full timeline.';
+          html += '<span style="font-size:10px;color:' + _rfCol + ';font-weight:700;border:1px solid currentColor;border-radius:3px;padding:1px 6px;white-space:nowrap;opacity:.9;" title="' + _rfTitle + '">Reform ' + _rfArrow + ' (' + _latest.year + ')</span>';
+        }
+      }
+    } catch(e) { /* non-critical */ }
+  })();
   html += '</div>';
 
   // v310: Expanded price matrix — Take, NPV, IRR across all 4 price points in one compact table
@@ -29815,6 +29869,15 @@ function openFCDrilldown(country) {
       html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + nextEsc + '\')" title="Open drilldown for the next country in the current fiscal ranking (#' + (_navIdx + 2) + ' of ' + _navList.length + '): ' + nextCountry + '" style="color:var(--accent);border-color:rgba(176,104,0,.4);">#' + (_navIdx + 2) + ' ' + nextCountry + ' &#8594;</button>';
     }
   })();
+  // v466: Copy IC Citation button — one-click citation for IC memo
+  html += '<button class="btn btn-sm btn-outline" id="fc-dd-copy-cite-' + slug + '" onclick="(function(btn){'
+    + 'var _take=(window._fcResults||[]).find(function(x){return x.country===\'' + cEsc + '\';});'
+    + 'var _t=_take&&_take.liveTake!=null?_take.liveTake.toFixed(1)+\'%\':\'N/A\';'
+    + 'var _n=_take&&_take.liveNPV!=null?\'$\'+Math.round(_take.liveNPV)+\'M\':\'N/A\';'
+    + 'var _i=_take&&_take.liveIRR!=null&&_take.liveIRR<500?_take.liveIRR.toFixed(1)+\'%\':\'N/A\';'
+    + 'var _cite=\'' + country.replace(/'/g,"\\'") + ': Govt Take \'+_t+\', NPV \'+_n+\', IRR \'+_i+\' — ' + _ddProfileName + ' @$' + _ddPrice + '/bbl (ORCA v466, PFID Platform, ' + new Date().toISOString().slice(0,10) + ').\';'
+    + 'navigator.clipboard.writeText(_cite).then(function(){btn.textContent=\'\u2713 Copied\';setTimeout(function(){btn.textContent=\'\u2398 IC Citation\';},2000);}).catch(function(){btn.textContent=\'Copy failed\';setTimeout(function(){btn.textContent=\'\u2398 IC Citation\';},2000);});'
+    + '})(this)" title="Copy a ready-to-paste IC memo citation: country name, govt take, NPV, IRR, profile, price, and source version">\u2398 IC Citation</button>';
   html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + cEsc + '\')" title="Collapse this drilldown row and return to the ranked table" style="margin-left:auto;">\u2715 Close</button>';
   html += '</div></div>';
 
@@ -30540,6 +30603,11 @@ function switchExplorerMode(mode, btn) {
     b.style.color = 'var(--muted)';
     b.setAttribute('aria-pressed','false');
   });
+  // v466: reset Screener button label when switching away from screen mode
+  if (mode !== 'screen') {
+    var _sBtnR = document.getElementById('mode-btn-screen');
+    if (_sBtnR) _sBtnR.innerHTML = 'Screener \u22EE <span style="font-size:10px;color:var(--accent);vertical-align:middle;">\u2605</span>';
+  }
   // Activate the clicked button (or find it by mode if called programmatically)
   const activeBtn = btn || document.getElementById('mode-btn-' + mode);
   if (activeBtn) {
@@ -31090,6 +31158,16 @@ async function loadPlatformData() {
         }
       } catch(e) { /* non-critical */ }
     })();
+    // v466: DB currency note on Home tab
+    (function() {
+      try {
+        var _dbNote = document.getElementById('home-db-currency');
+        if (_dbNote && COUNTRY_DATA && COUNTRY_DATA.length) {
+          _dbNote.textContent = 'DB current as of August 2026 \u00b7 ' + COUNTRY_DATA.length + ' countries loaded \u2713';
+          _dbNote.style.display = 'block';
+        }
+      } catch(e) { /* non-critical */ }
+    })();
     // v277 Issue 1: if Reform Risk tab is active when data arrives, render immediately
     if (document.getElementById('treformrisk') && document.getElementById('treformrisk').classList.contains('active')) {
       if (typeof renderReformRisk === 'function') renderReformRisk();
@@ -31508,6 +31586,25 @@ document.addEventListener('DOMContentLoaded', function() {
   if (cmpPrint) cmpPrint.addEventListener('click', function() { window.print(); });
   var cmpShare = document.getElementById('cmp-share-btn');
   if (cmpShare) cmpShare.addEventListener('click', function() { if (typeof shareComparison === 'function') shareComparison(); });
+  // v466: SbS copy-as-IC-table button — copies tab-separated grid for IC memo/Excel paste
+  var cmpCopyTable = document.getElementById('cmp-copy-table-btn');
+  if (cmpCopyTable) cmpCopyTable.addEventListener('click', function() {
+    try {
+      var tbl = document.querySelector('#cmp-output table');
+      if (!tbl) { cmpCopyTable.textContent = 'Nothing to copy'; setTimeout(function(){ cmpCopyTable.innerHTML = '&#128203; Copy Table'; }, 1500); return; }
+      var rows = tbl.querySelectorAll('tr');
+      var tsv = Array.from(rows).map(function(row) {
+        return Array.from(row.querySelectorAll('th,td')).map(function(cell) { return cell.innerText.replace(/\t/g,' ').replace(/\n/g,' ').trim(); }).join('\t');
+      }).join('\n');
+      navigator.clipboard.writeText(tsv).then(function() {
+        cmpCopyTable.textContent = '\u2713 Copied!';
+        setTimeout(function(){ cmpCopyTable.innerHTML = '&#128203; Copy Table'; }, 2000);
+      }).catch(function() {
+        cmpCopyTable.textContent = 'Copy failed';
+        setTimeout(function(){ cmpCopyTable.innerHTML = '&#128203; Copy Table'; }, 2000);
+      });
+    } catch(e) { /* non-critical */ }
+  });
   // Side-by-Side quickstart buttons — event delegation by data-countries attribute
   document.addEventListener('click', function(e) {
     var btn = e.target.closest('.cmp-quickstart-btn');
