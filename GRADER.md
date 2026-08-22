@@ -8458,3 +8458,11 @@ GitHub push confirmed (exit code 0). v458 is live at yoburgqs.github.io/petroleu
 - JS errors: 0
 - Summary: v459 — FC sort auto-filter (BE/IRR with manual override flags), drilldown rank+evidence badges, Screener preset label, 17-reference version sweep. Committed to petroleum-fiscal-db main + office path. Pushed to GitHub Pages.
 
+
+---
+## Cycle 358 Log — 2026-08-22 05:22
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: GRADER.md commit pushed. Both v459 commits are live on GitHub Pages.
+
