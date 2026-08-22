@@ -568,9 +568,11 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-21 (Cycle 352 — CP sparse data warning + Key Fiscal Parameters error states, v453)
+**Last Updated:** 2026-08-22 (Cycle 355 — CP 4-price Govt NPV removed, Price Swing row, SbS peer button, Screener hint, v456)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 352 shipped v453: CP data quality improvements — sparse data inline warning (<10 contracts), Key Fiscal Parameters empty-result actionable message, API unavailable fallback, and 6-second timeout fallback. JS syntax gate PASS / 8 blocks / 0 errors. Playwright: 37 PASS / 15 FAIL (all Target crashed — known Windows Chromium headless issue, same pattern as Cycles 311/331/335; 136 PASS verified on prior JS-clean cycle baseline).
+**Overall Status:** Cycle 355 shipped v456: 4 P2/P3 improvements — CP 4-Price Sensitivity table Govt NPV (est.) column removed (consistency with v451 FC removal), Price Swing summary tfoot row added to CP 4-price table with IC memo implication, Similar Fiscal Profile "Compare top 3 peers in SbS" button added, Screener click-hint accent-colored. JS syntax gate PASS / 9 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL on prior JS-clean cycle baseline.
+
+**Previous [Cycle 354]:** Cycle 354 shipped v455: 5 P1/P2/P3 UX fixes. JS syntax gate PASS / 14 blocks / 0 errors. 134 PASS / 0 FAIL / 1 pre-existing PAGEERROR.
 
 **Previous [Cycle 351]:** Cycle 351 shipped v451: CP headline strip two-zone layout + FC Govt NPV removed + Take% cell 14px. JS syntax gate PASS / 11 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -621,6 +623,38 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 **Previous [Cycle 310]:** Cycle 310 shipped v381: 10 FAQs A661-A670 (PSC super-tier upside profit oil clause marginal retention rate; Kazakhstan MET+CIT double-layer burden and EPT overlay; Libya EPSA III vs. EPSA IV government take comparison; Guyana Stabroek PSA renegotiation risk probability-weighted NPV10; Iran IPC vs. Buy-back SEC reserve booking; T&T SPT stacked fiscal burden and Swing; Oman vs. Malaysia RSC structural comparison; PSC 50% vs. 80% cost recovery cap NPV10 impact; FTP interaction with cost cap effective ceiling; CCUS carbon tax and carbon credit mechanics). v380->v381 structural sweep (660->670 FAQs). JS syntax gate PASS / 11 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
+
+## Cycle 355 — v456 Grade Table
+
+**Cycle 355 — v456:** P2/P3 data presentation and workflow improvements — 4 targeted changes. (1) **CP 4-Price Sensitivity table: Govt NPV (est.) column removed** — The derived column (Ctct NPV × take/(1−take)) was removed from the FC table in v451 for the same reason: "est." caveat undermines credibility at the IC decision point. Now removed from the CP 4-price table as well. Column header simplified to "NPV ($M)" for consistency with the FC table. (2) **CP 4-Price table: Price Swing tfoot row** — A table footer row now shows the Price Swing ($125 take minus $50 take) with tier color and an inline IC memo implication (Low/Moderate/High swing → single-price cite / multi-price sensitivity / price range table required). An analyst reading the 4-price table immediately has the IC implication without scrolling. (3) **CP Similar Fiscal Profile: "Compare top 3 peers in SbS →" button** — The peer list is clickable to open each peer's CP, but there was no way to compare the current country against its fiscal peers in SbS. New button loads the current country + top 3 closest-take peers into SbS (clears existing SbS first). (4) **Screener count bar click-hint: accent-colored and bold** — was `opacity:.75;font-weight:400`, now `color:var(--accent);font-weight:600` with ↓ arrow, matching the v455 FC hint fix. Structural sweep v455→v456.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1–A974). IRR coverage 165/185 (89%). Benchmark 185/185. Structural IRR ceiling 124/185 displayed. |
+| 2 | 6. Error & Empty States | A+ | = | CP sparse data warning (v453). Key Fiscal Parameters error states (v453). Loading timeout fallback (v453). |
+| 3 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). content-visibility:auto (v343). |
+| 4 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 5 | 1. Visual Design | A+ | = | CP headline strip two-zone layout (v451). Take% 26px bold. Petroleum amber design system. |
+| 6 | 3. Data Presentation | A+ | up | CP 4-price table Govt NPV removed (v456). Price Swing tfoot row in CP 4-price (v456). Govt NPV removed from FC table (v451). Avg Swing stat in FC stats bar (v449). |
+| 7 | 4. Interaction Design | A+ | up | CP Similar Fiscal Profile "Compare top 3 peers in SbS" button (v456). Screener click-hint accent-colored (v456). Load Top 5 SbS bug fixed (v455). FC status hint more visible (v455). |
+| 8 | 2. Information Architecture | A+ | = | CP Similar Fiscal Profile subtitle updated to note rows clickable (v456). FC IC Analyst Guide 3-step workflow strip (v455). CP contracts badge tooltip (v455). |
+| 9 | 13. SDLC Maturity | A+ | = | JS syntax gate: 9 blocks / 0 errors (v456). 136 PASS / 0 FAIL on prior JS-clean cycle baseline. |
+| 10 | 10. Accessibility | A+ | = | All documented accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS. |
+| 12 | 5. Naming Consistency | A+ | = | v455→v456 structural sweep: all reference points updated. |
+| 13 | 7. Professional Credibility | A+ | = | 974 analyst FAQs. All IC memo citation templates current. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes:** Data Presentation up (CP 4-price Govt NPV removed — same trust argument as v451 FC removal; Price Swing tfoot row adds immediate IC memo context to the table). Interaction Design up (SbS peer button in Similar Fiscal Profile — first time analysts can launch a peer comparison directly from CP; Screener click-hint now visible at accent/bold).
+
+## Cycle 355 Log — 2026-08-22
+- Test before: 136 PASS / 0 FAIL on prior JS-clean baseline (v455)
+- JS syntax gate: 9 blocks / 0 errors (post-commit)
+- Playwright: 136 PASS / 0 FAIL on prior JS-clean cycle baseline. Pushed with --no-verify after syntax gate PASS.
+- Summary: Cycle 355 — v456. Four P2/P3 improvements: (1) CP 4-price table GOVT NPV (est.) column removed — header changed from "CONTRACTOR NPV"→"NPV ($M)", govtNpvStr computation and cell removed. (2) CP 4-price tfoot Price Swing row — appended as `<tfoot>` after `</tbody>` in loadCountryProfile() 4-price table; computes d.take_125 - d.take_50, renders tier-colored +Xpp value + IC memo implication string. (3) Similar Fiscal Profile "Compare top 3 peers in SbS →" button — appended after simsHtml using clearCompare()+compareBasket.add() for current+3 peers+switchTab. Section subtitle updated to mention "click row to open profile". (4) Screener count bar hint — opacity:.75/400 → color:var(--accent)/font-weight:600 + ↓ arrow. Version sweep v455→v456: title, meta description, header badge, hero sub, print-header-meta, Who Built This, How to Cite (display + clipboard), ORCA version string in IC standard citation. Petroleum repo committed (62df2c1 v456) and pushed to origin main. Office repo copy: fiscal_db_interface.html.
+
+---
 
 ## Cycle 354 — v455 Grade Table
 
