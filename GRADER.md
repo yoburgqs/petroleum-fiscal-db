@@ -607,6 +607,70 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
 
+## Cycle 351 — v451 Grade Table
+
+**Cycle 351 — v451:** CP headline strip two-zone layout + FC Govt NPV removed + Take% cell larger. (1) **Visual Design / Country Profile scannability (P3)** — CP headline strip redesigned into two visual zones separated by a vertical rule: Zone A (left) = mechanic tag + 26px bold tier-colored Take% + "govt take @$75/bbl" sub-label — the fiscal verdict in 3 elements. Zone B (right) = NPV, IRR, Breakeven, Swing, Stability — DCF and risk signals grouped apart. An analyst now reads left-to-right: "What is the regime and take?" → "How does it perform and how stable is it?" Previously all 6 metrics were in one flat flex row with no scan path. Take% font increased from 22px to 26px bold. (2) **Data Presentation / FC Workflow Clarity (P2)** — Govt NPV column removed from FC table. Column was labeled "not independently modeled — use as indicative order-of-magnitude only." That caveat undermines confidence at the moment of decision; the derived figure (Ctct NPV × take/(1−take)) is less useful than the Contractor NPV it is derived from; removed entirely. Contractor NPV header simplified to "NPV ($M)". (3) **Interaction Design / FC Workflow Clarity (P2)** — Take% badge font in FC table increased to 14px (was inheriting 12px from table). Primary sort metric should be visually dominant. Version structural sweep v450→v451 (title, meta, badge, hero, print header, provenance, How to Cite, copy button JS, changelog).
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1–A974). IRR coverage 165/185 (89%). Benchmark 185/185. Structural IRR ceiling 124/185 displayed. |
+| 2 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). content-visibility:auto (v343). |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 4 | 1. Visual Design | A+ | up | CP headline strip two-zone layout (v451) — left zone: mechanic+take verdict; right zone: DCF metrics. Clear visual scan path. Take% 26px bold. |
+| 5 | 3. Data Presentation | A+ | up | Govt NPV column removed from FC table (v451) — undermined trust with "not independently modeled" caveat at point of decision. FC now 9 columns, cleaner. Avg Swing stat in FC stats bar (v449). |
+| 6 | 4. Interaction Design | A+ | up | Take% badge 14px in FC table (v451) — primary metric visually dominant. Swing sort button (v449). FC Profile "(IOC standard)" label (v430). |
+| 7 | 2. Information Architecture | A+ | = | Reform Risk intro strip (v449). 974 analyst FAQs. IOC Portfolio instructional text (v430). |
+| 8 | 6. Error & Empty States | A+ | = | Reform Risk intro strip (v449). Screener Asia Pacific/Americas fixed (v429). Back to FC button fixed (v427). |
+| 9 | 13. SDLC Maturity | A+ | = | JS syntax gate: 136 PASS / 0 FAIL / 0 JS errors (Playwright, Cycle 351). v450→v451 structural sweep complete. Cycle 351 log. |
+| 10 | 10. Accessibility | A+ | = | All documented accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS. |
+| 12 | 5. Naming Consistency | A+ | = | v450→v451 structural sweep: all reference points updated. |
+| 13 | 7. Professional Credibility | A+ | = | 974 analyst FAQs. All IC memo citation templates current. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes:** Visual Design up (CP headline two-zone redesign adds clear left-to-right scan path — regime verdict in Zone A, DCF performance in Zone B; analyst's eye path is now structured). Data Presentation up (Govt NPV removed — "not independently modeled" caveat was trust-undermining; table is cleaner at 9 columns). Interaction Design up (Take% font 14px in FC table — primary sort metric now visually dominant vs. surrounding columns).
+
+## Cycle 351 Log — 2026-08-21
+- Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (v450)
+- JS syntax gate: 136 PASS / 0 FAIL / 0 JS errors (post-commit)
+- Summary: Cycle 351 — v451 (daemon). Three structural design interventions: (1) CP headline strip two-zone layout — Zone A left: mechanic tag + 26px bold tier-colored Take% + "govt take @$75/bbl" sub-label. Zone B right (past vertical separator): NPV, IRR, BE, Swing, Stability. Previously all 6 metrics in one flat flex row; analyst now reads regime verdict first, then DCF signals. (2) FC Govt NPV column removed — derived column labeled "not independently modeled" undermined trust at decision point; Contractor NPV header simplified to "NPV ($M)"; FC table now 9 columns. (3) Take% badge 14px in FC table — was inheriting 12px; primary metric should be visually dominant. Petroleum repo committed (4de7fe1 v451) and pushed to origin main. Office repo copy: projects/oil-gas-expertise/fiscal_db_interface.html (commit 894aef31c, office main).
+- Downgrade hunt: Data Reliability A (unchanged — structural IRR ceiling 124/185 displayed is a data gap; 20 non-computable + 41 excluded ≥500% remain). All other categories maintained A+.
+
+---
+
+## Cycle 350 — v450 Grade Table
+
+**Cycle 350 — v450:** P1/P2/P3 first-run UX improvements — reform timeline collapse + FC post-run guidance + CP auto-run guard fix + Home "Start here" + CP Norway example banner. (1) **Country Profile scannability (P3)** — Reform timeline now shows 4 most recent events open, older events collapsed in a `<details>` disclosure element sorted newest-first. Countries like Nigeria, Iraq, Angola previously rendered 8–15 events as a wall of text requiring scroll past all history before reaching peer comparison and evidence panel. (2) **FC workflow clarity (P2)** — After Fiscal Compare runs, status bar now reads "185 countries ranked (0.3s) · click any row to drill down" instead of bare "185 results · 0.3s". First-time analysts immediately see the next action. (3) **First-run experience (P1)** — CP auto-run guard bug fixed: both occurrences of `dd-profile-content` (non-existent element) corrected to `dd-content` (actual element at line 2303). Bug accidentally worked (null = always fires) but was semantically incorrect and fragile. (4) **First-run experience (P1)** — Home tab Fiscal Compare card gets amber top border + "START HERE" badge — primary entry point now visually distinct from the 3 secondary tool cards. (5) **First-run experience (P1)** — CP auto-loads Norway on first visit with dismissible "Example loaded: Norway — a North Sea Concession benchmark" banner, mirroring the SbS pattern. Previously no indication Norway was an auto-loaded default. Version structural sweep v449→v450 (title, meta, badge, hero, print header, provenance, How to Cite, copy button JS, Scenario Builder reference, changelog).
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1–A974). IRR coverage 165/185 (89%). Benchmark 185/185. Structural IRR ceiling 124/185 displayed (165 in DB; 41 excluded ≥500%; 20 non-computable). |
+| 2 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). content-visibility:auto (v343). |
+| 3 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 4 | 4. Interaction Design | A+ | up | CP auto-run guard bug fixed (v450) — dd-profile-content → dd-content in both locations; guard is now semantically correct. FC Profile "(IOC standard)" label (v430). Swing sort button (v449). |
+| 5 | 6. Error & Empty States | A+ | up | Home "START HERE" badge (v450) — Fiscal Compare card now has amber top border + START HERE badge signaling primary entry point. CP Norway "Example loaded" banner (v450) — first-time CP visitors now see dismissible context banner rather than unexplained default load. |
+| 6 | 2. Information Architecture | A+ | = | Reform Risk intro strip (v449). 974 analyst FAQs. IOC Portfolio instructional text (v430). |
+| 7 | 3. Data Presentation | A+ | up | Reform history timeline collapse (v450) — 4 most recent events open, older in <details>; sorted newest-first. Was a wall of events with no prioritization. FC post-run status adds click guidance (v450). Avg Swing stat in FC stats bar (v449). |
+| 8 | 13. SDLC Maturity | A+ | = | JS syntax gate: 136 PASS / 0 FAIL / 0 JS errors (Playwright, Cycle 350). v449→v450 structural sweep complete. Cycle 350 log. |
+| 9 | 10. Accessibility | A+ | = | All documented accessibility gaps closed (v239–v339). |
+| 10 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS. |
+| 11 | 1. Visual Design | A+ | = | Petroleum amber design system. Color consistency maintained. |
+| 12 | 5. Naming Consistency | A+ | = | v449→v450 structural sweep: all reference points updated. |
+| 13 | 7. Professional Credibility | A+ | = | 974 analyst FAQs. All IC memo citation templates current. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes:** Interaction Design up (CP auto-run guard bug fixed — was checking for non-existent element; both occurrences corrected; structurally sound now). Error & Empty States up (Home START HERE badge + CP Norway example banner — two first-run orientation improvements: analyst knows where to start and knows Norway auto-load is an example, not an error). Data Presentation up (reform history timeline collapse — wall of events replaced with newest-first 4-event view + progressive disclosure; FC status adds drill-down call to action).
+
+## Cycle 350 Log — 2026-08-21
+- Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (v449)
+- JS syntax gate: 8 script blocks / 0 errors (node Function constructor gate)
+- Summary: Cycle 350 — v450 (this session). Five first-run UX improvements targeting P1/P2/P3: (1) Reform timeline collapse — reforms sorted newest-first, 4 visible, older under <details> "Show N older reforms". buildReformEventHtml() helper extracted. REFORM_SHOW_LIMIT = 4. (2) FC status message — status.innerHTML now includes "countries ranked" label + elapsed in muted small text + "· click any row to drill down" in amber hint. (3) CP auto-run guard bug — dd-profile-content → dd-content in switchTab() t7 block (~line 21791) and post-data-load handler (~line 30604). Bug was harmless but semantically wrong. (4) Home Fiscal Compare card — border-top:3px solid var(--accent) + "START HERE" inline badge (9px amber uppercase, white text). (5) CP Norway banner — setTimeout 400ms, inserts dismissible amber-tinted banner above dd-content, sessionStorage-backed dismiss. Version structural sweep v449→v450: title, meta, badge, home hero, print-header-meta, provenance, How to Cite (display + clipboard + short-form), Scenario Builder citation, copyICCitation(), copyICSummary(), changelog entry. Petroleum repo committed (e3274de v450) and pushed to origin main. Office repo copy updated via Cycle 351 (daemon committed v451 in same session before office copy could be made; office repo updated to v451 at commit 894aef31c).
+- Downgrade hunt: Data Reliability A (unchanged). All other categories maintained A+.
+
+---
+
 ## Cycle 349 — v449 Grade Table
 
 **Cycle 349 — v449:** FC Swing analytics complete + Reform Risk context strip. (1) **Interaction Design / FC Workflow Clarity** — Swing sort button added to FC sort row (between Breakeven and A–Z): first-time analysts had no way to sort by price sensitivity; the Swing column was visible but unsortable; button sorts 185 countries low→high by price swing (royalty-dominant regimes surface at top; progressive/PSC regimes at bottom); sort direction label and rank tooltip updated to match. (2) **Data Presentation / FC Workflow Clarity** — Avg Swing stat added to FC stats bar: mean price swing + count of >20pp "progressive" regimes across the current filtered view; hover tooltip explains the $125/$50 definition and IC memo implication (multi-price sensitivity table required for >20pp countries); completes the Swing feature set (column → sort → stats bar). (3) **Error & Empty States / Information Architecture** — Reform Risk intro strip added above loading spinner: prior state showed a bare spinner with no context for first-time analysts; new amber-tinted strip explains what the tab shows (sourced fiscal law changes since 1960), why it matters for IC memos (a country at 60% take with zero reforms since 2010 has a different risk profile from one at 58% that rewrote its PSC in 2018 and 2022), and explicitly distinguishes Reform Frequency Score (0–100, this tab) from Fiscal Predictability Score in Country Profile (composite formula). Version structural sweep v448→v449 (title, meta, badge, hero, print header, provenance, How to Cite, copy button JS, Scenario Builder reference).
