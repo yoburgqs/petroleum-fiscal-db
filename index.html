@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v451</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v452</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1332,7 +1332,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v451</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v452</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2367,6 +2367,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong>v452 (Aug 2026) &mdash; CP headline: global rank + vs-median pill in Zone A</strong> &mdash; Country Profile headline strip Zone A now shows the global fiscal rank and deviation from the global median take directly under the take% figure. An analyst opening Norway immediately sees &ldquo;#33 of 185 &middot; high-take globally&rdquo; and &ldquo;+9.6pp vs global median&rdquo; without scrolling. Previously this context was buried in the &ldquo;Govt Take by Price Scenario&rdquo; section heading halfway down the page. Implemented by computing <code>_grankHtml452</code> and <code>_vsMedianHtml452</code> before the headline template literal (correct JS evaluation order). Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.<br><br>
                         <strong>v451 (Aug 2026) &mdash; Design: CP headline strip two-zone layout + FC table Govt NPV removed + Take% cell larger</strong> &mdash; 3 structural design interventions to reduce visual clutter: (1) <strong>CP headline strip redesigned into two visual zones</strong> &mdash; Zone A (left): mechanic tag + 26px bold tier-colored take% + &ldquo;govt take @$75/bbl&rdquo; sub-label — the fiscal verdict in 3 elements. Zone B (right of vertical separator): NPV, IRR, BE, Swing, Stability — DCF and risk signals grouped apart from the primary verdict. An analyst can now scan left-to-right: &ldquo;What is the regime and take?&rdquo; → &ldquo;How does it perform and how stable is it?&rdquo; Previously all 6 metrics were in one flat flex row with no scan path. (2) <strong>Govt NPV column removed from FC table</strong> &mdash; This column was labeled &ldquo;not independently modeled — use as indicative order-of-magnitude only.&rdquo; That caveat undermines confidence at the moment of a decision. The derived figure (Ctct NPV × take/(1−take)) is less useful than the Contractor NPV it is derived from, and added a 10th column to an already-dense table. Removed entirely; Contractor NPV header simplified to &ldquo;NPV ($M)&rdquo;. (3) <strong>Take% cell slightly larger in FC table</strong> &mdash; The tier badge now renders at 14px (vs inheriting 12px from the table). The primary sort metric should be visually dominant. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.<br><br>
                         <strong>v450 (Aug 2026) &mdash; P1/P2/P3 first-run UX: Reform timeline collapse + FC post-run click guidance + CP auto-run guard fix + Home &ldquo;Start here&rdquo; + CP Norway example banner</strong> &mdash; 5 targeted first-run UX improvements: (1) <strong>Reform timeline collapse (P3 scannability)</strong> &mdash; Country Profile reform history now shows the 4 most recent events open, with older events collapsed under a &ldquo;Show N older reforms&rdquo; disclosure toggle. Countries like Nigeria, Iraq, and Angola previously rendered 8&ndash;15 reform events as a wall of text; an analyst needed to scroll past all events before seeing the regional peer comparison and evidence panel. Now sorted newest-first (most relevant for IC work) with instant access to history. (2) <strong>FC post-run status message (P2 FC workflow)</strong> &mdash; After Fiscal Compare runs, status bar now reads &ldquo;185 countries ranked (0.3s) &middot; click any row to drill down&rdquo; instead of bare &ldquo;185 results &middot; 0.3s&rdquo;. First-time analysts now immediately see the next action without scanning for the click hint bar below. (3) <strong>CP auto-run guard bug fix (P1)</strong> &mdash; The Country Profile auto-run checked for element <code>dd-profile-content</code> which does not exist in the DOM (correct element is <code>dd-content</code>). The check accidentally worked (null = always fires) but was semantically incorrect and fragile. Fixed both occurrences (switchTab guard + post-data-load race condition handler). (4) <strong>Home tab &ldquo;Start here&rdquo; badge (P1 first-run)</strong> &mdash; Fiscal Compare card now has an amber top border + small &ldquo;START HERE&rdquo; badge to signal the primary entry point. First-time users arriving at the Home tab now have a clear visual anchor for where to begin, without needing to read the Quick Start guide. (5) <strong>Country Profile example banner (P1)</strong> &mdash; When Norway auto-loads on the first CP visit, a dismissible &ldquo;Example loaded: Norway &mdash; a North Sea Concession benchmark&rdquo; banner now appears, mirroring the Side-by-Side &ldquo;Example loaded: North Sea Trio&rdquo; pattern. Previously no indication that Norway was an auto-loaded default. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.<br><br>
                         <strong>v449 (Aug 2026) &mdash; P3 scannability: tier-colored take% in CP headline strip + Screener row-click hint; FC: Price Swing sort + Avg Swing stat + Reform Risk intro strip</strong> &mdash; 2 P3 scannability improvements and 3 FC workflow improvements. <strong>P3 scannability:</strong> (1) <strong>Take% color in CP headline strip</strong> &mdash; the government take figure (22px bold) in every Country Profile now renders in tier color: green (&le;40%), yellow (41&ndash;60%), orange (61&ndash;75%), red (&gt;75%), matching the FC table row and tier legend. Previously displayed in neutral text color &mdash; an analyst could not assess fiscal attractiveness at a glance without mentally mapping the percentage. (2) <strong>Screener row-click hint</strong> &mdash; the results count line now reads &ldquo;N countries match at $X/bbl &middot; Click any row to open Country Profile&rdquo;; previously the row-click behavior was only discoverable via hover title attribute. <strong>FC workflow:</strong> (3) <strong>Swing sort button</strong> added to FC sort row &mdash; sorts all 185 countries by Price Swing low&rarr;high, surfacing royalty-dominant regimes at top and progressive/PSC regimes at bottom. (4) <strong>Avg Swing stat</strong> added to the FC stats bar with tooltip explaining $125&minus;$50 definition and IC memo implication. (5) <strong>Reform Risk intro strip</strong> &mdash; context banner above the loading spinner explaining what the tab shows and why it matters for IC memos. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.<br><br>
@@ -24539,14 +24540,40 @@ function loadCountryProfile(country) {
     var beCol = d.be_75 < 50 ? 'var(--green)' : d.be_75 < 80 ? 'var(--yellow)' : 'var(--red)';
     return '<span style="font-size:11px;color:var(--muted);" title="Breakeven oil price = minimum price for Contractor NPV ≥ 0 under this regime. &lt;$50/bbl = viable in low-price environment; $50–80 = viable at base case; &gt;$80 = requires elevated price to return positive NPV. Requires complete royalty and cost data.">BE: <strong style="color:' + beCol + ';">$' + d.be_75.toFixed(0) + '/bbl</strong></span>';
   })() : '<span style="font-size:11px;color:var(--muted);opacity:.65;" title="Breakeven not computed — insufficient per-contract cost data (opex/capex) for NPV=0 solution. Use Scenario Builder with field-specific inputs for a project-level estimate. See FAQ A381 for proxy approach using Take% and Price Swing.">BE: n/a</span>';
-  // v451: CP headline strip redesigned — two visual zones separated by a vertical rule:
-  //   Zone A (left): fiscal identity — mechanic + take (primary verdict, large colored number)
+  // v452: compute global rank + vs-median BEFORE _headlineStrip344 uses them
+  const _grank452 = getGlobalTakeRank(country);
+  const _grankHtml452 = _grank452 ? (function() {
+    var { rank, n, pctHigherThanThis } = _grank452;
+    var isHighTake = pctHigherThanThis <= 20;
+    var isLowTake  = pctHigherThanThis >= 80;
+    var color = isHighTake ? 'var(--red)' : isLowTake ? 'var(--green)' : pctHigherThanThis <= 40 ? 'var(--orange)' : 'var(--yellow)';
+    var label = isHighTake ? 'high-take globally' : isLowTake ? 'low-take globally' : 'mid-range globally';
+    return '<span style="font-size:11px;color:var(--muted);">#<strong style="color:var(--text);">' + rank + '</strong> of ' + n + ' \u00b7 <strong style="color:' + color + ';">' + label + '</strong></span>';
+  })() : '';
+  const _globalTakes452 = COUNTRY_DATA.filter(function(x){return x.take_75!=null;}).map(function(x){return x.take_75;}).sort(function(a,b){return a-b;});
+  const _globalMedian452 = _globalTakes452.length ? _globalTakes452[Math.floor(_globalTakes452.length/2)] : null;
+  const _vsMedianHtml452 = (!_isMonopoly && d.take_75 != null && _globalMedian452 != null) ? (function(){
+    var diff = d.take_75 - _globalMedian452;
+    var sign = diff >= 0 ? '+' : '';
+    var col = Math.abs(diff) < 3 ? 'var(--muted)' : diff > 0 ? 'var(--orange)' : 'var(--green)';
+    var bgCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.1)' : diff > 0 ? 'rgba(249,115,22,.1)' : 'rgba(34,197,94,.1)';
+    var borderCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.3)' : diff > 0 ? 'rgba(249,115,22,.35)' : 'rgba(34,197,94,.35)';
+    return '<span style="display:inline-flex;align-items:center;font-size:11px;color:' + col + ';font-weight:600;padding:2px 9px;background:' + bgCol + ';border:1px solid ' + borderCol + ';border-radius:12px;" title="Global median take @$75/bbl is ' + _globalMedian452.toFixed(1) + '%">' + sign + diff.toFixed(1) + 'pp vs global median</span>';
+  })() : '';
+  // v451: CP headline strip redesigned — two visual zones separated by a vertical rule.
+  // v452: Zone A now includes global rank + vs-median pill directly under the take number.
+  //   Zone A (left): fiscal identity — mechanic + take (primary verdict) + rank context
   //   Zone B (right, after separator): DCF performance + risk signals
   const _headlineStrip344 = `<div style="display:flex;align-items:center;gap:0;flex-wrap:wrap;padding:10px 0 14px;border-bottom:1px solid var(--border);margin-bottom:16px;">
-  <div style="display:flex;align-items:center;gap:10px;padding-right:18px;">
-    <span class="${getMechTagClass(_primaryMech344)}" title="${getMechTagTitle(_primaryMech344).replace(/"/g,'&quot;')}">${_primaryMech344 || '—'}</span>
-    <span style="font-size:26px;font-weight:900;color:${_takeColor344};letter-spacing:-.5px;">${_takeDisplay344}</span>
-    <span style="font-size:12px;color:var(--muted);line-height:1.3;">govt take<br>@$75/bbl</span>
+  <div style="display:flex;align-items:flex-start;gap:10px;padding-right:18px;">
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <span class="${getMechTagClass(_primaryMech344)}" title="${getMechTagTitle(_primaryMech344).replace(/"/g,'&quot;')}" style="align-self:flex-start;">${_primaryMech344 || '—'}</span>
+      <div style="display:flex;align-items:baseline;gap:8px;">
+        <span style="font-size:26px;font-weight:900;color:${_takeColor344};letter-spacing:-.5px;">${_takeDisplay344}</span>
+        <span style="font-size:12px;color:var(--muted);">govt take @$75</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${_grankHtml452}${_vsMedianHtml452}</div>
+    </div>
   </div>
   <div style="width:1px;background:var(--border);align-self:stretch;margin:0 18px;flex-shrink:0;"></div>
   <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;flex:1;">
