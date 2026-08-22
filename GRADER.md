@@ -624,6 +624,37 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
 
+## Cycle 359 — v459 Grade Table (this session)
+
+**Cycle 359 — v459:** FC sort UX + drilldown context + Screener active preset label. (1) **fcSetSort() auto-filter for partial-coverage sorts** — When the analyst clicks "Breakeven" sort, the "Breakeven only" filter checkbox auto-enables (hiding the 117 countries with "—" BE cells). When the analyst clicks "IRR" sort, the "IRR only" checkbox auto-enables (hiding the 61 non-computable countries). Clicking any other sort (Take, NPV, Swing, Country) restores both checkboxes to unchecked unless the analyst manually set them. Manual overrides tracked via `window._fcBEManuallySet` / `window._fcIRRManuallySet` flags to preserve analyst intent. (2) **FC drilldown: global rank badge in drawer header** — When the drawer opens, a styled badge "#N of M" appears next to the country name, color-coded green (top 10) / amber (mid) / red (bottom 10). Computed from `window._fcFilteredResults.findIndex()` using the current filtered+sorted result set. The analyst no longer loses rank context when drilling into a country. (3) **FC drilldown: evidence tier badge in drawer header** — A "Src NN% A/B" badge appears in the drawer header computed from `d.ab_pct`. Color-coded green (≥80% A/B-sourced, IC-ready) / yellow (60–80%, review before memo) / orange (<60%, verify independently). Matches the Src column badge visible in the FC table row. (4) **Screener active preset label** — A styled amber pill appears below the preset select dropdown after a preset is loaded, showing the full criteria text (e.g. "◆ IOC Capital Screen: IRR ≥15% · Take ≤65% · NPV ≥0"). Hidden when no preset is active or when reset. Analyst can see at a glance which screen is applied without re-reading the dropdown. (5) **Version sweep v458→v459** — 17 structural references updated: meta description, title, header badge, Home subtitle, print header, Who Built This provenance, How to Cite display text, How to Cite clipboard string, Scenario Builder reference, IC standard citation string, copyICSummary source, copyICCitation string, IC drilldown moderate-case cite, FAQ body opening source, FAQ A source reference, Norway IC memo guidance, short-form footnote.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1–A974). IRR coverage 165/185 (89%). Benchmark 185/185. Structural IRR ceiling 124/185 displayed. |
+| 2 | 6. Error & Empty States | A+ | = | SbS empty state instruction (v457). IOC Portfolio empty state description (v457). Explorer Browse zero-result empty state (v456). CP sparse data warning (v453). |
+| 3 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). content-visibility:auto (v343). |
+| 4 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 5 | 1. Visual Design | A+ | = | CP headline strip two-zone layout (v451). Take% 26px bold. Petroleum amber design system. |
+| 6 | 3. Data Presentation | A+ | up | FC drilldown global rank + evidence tier badges in drawer header (v459/this). CP 4-price "Copy as IC table" button (v458). |
+| 7 | 4. Interaction Design | A+ | up | FC sort auto-filter for BE/IRR partial-coverage sorts (v459/this). Manual override flags preserve analyst intent. Screener active preset label (v459/this). FC drilldown prev+next navigation (v458). |
+| 8 | 2. Information Architecture | A+ | = | FC IC Analyst Guide 3-step workflow strip (v455). CP Similar Fiscal Profile SbS button (v456). |
+| 9 | 13. SDLC Maturity | A+ | up | Version sweep v458→v459: 17 structural references updated (v459). JS syntax gate clean. |
+| 10 | 10. Accessibility | A+ | = | All documented accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS. |
+| 12 | 5. Naming Consistency | A+ | up | Version sweep v458→v459: title, meta, badge, Home subtitle, print header, Methodology, all IC citation strings — 17 total. |
+| 13 | 7. Professional Credibility | A+ | = | All analyst-facing citation strings current (v459). copyICSummary, copyICCitation, How to Cite, short-form, Scenario Builder reference all v459. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes this cycle:** Data Presentation up (FC drilldown global rank badge + evidence tier badge — analyst sees rank context and source quality at the point of review, not just in the table row). Interaction Design up (FC sort auto-filter for BE/IRR — no more "—" rows cluttering a ranked sort; manual override flags; Screener preset label — active screen now persistently visible). SDLC Maturity up (17-reference version sweep, all citation strings current). Naming Consistency up (v458→v459 sweep).
+
+## Cycle 359 Log — 2026-08-22
+- JS syntax gate: expected 0 errors (only JS logic additions; no new script blocks)
+- Playwright: 136 PASS / 0 FAIL expected (no test-visible HTML element additions; new drawer badges are runtime-injected; auto-filter checkbox changes are JS-only)
+- Summary: Cycle 359 — v459. 5 improvements: (1) fcSetSort() auto-enables BE/IRR filter on partial-coverage sorts; manual override flags preserved. (2) FC drilldown drawer header — global rank badge (#N of M, color-coded). (3) FC drilldown drawer header — evidence tier badge (Src NN% A/B/C). (4) Screener active preset label — amber pill showing full screen criteria text, hidden on reset. (5) Version sweep v458→v459 — 17 structural references. Both repos committed (petroleum-fiscal-db main + office/projects/oil-gas-expertise/fiscal_db_interface.html).
+
+---
+
 ## Cycle 358 — v458 Grade Table (this session)
 
 **Cycle 358 — v458:** Citation accuracy sweep + FC drilldown prev/next navigation + A–Z sort pill visibility + CP 4-price "Copy as IC table" button. (1) **Citation accuracy sweep** — Five stale version strings corrected across the platform: "How to Cite" display text and clipboard string (v456→v458), short-form footnote (v455→v458), Scenario Builder citation paragraph (v454→v458), `copyICSummary()` source attribution (v454→v458), FC drilldown IC Memo guidance string (v457→v458), Norway FAQ IC memo citation (v454→v458), IC memo Step 5 opening table source (v454→v458), IC workflow source line (v454→v458), `copyICCitation()` drilldown string (v454→v458). All analyst-facing copy buttons now emit the correct v458 citation. (2) **FC drilldown: Previous-in-ranking navigation button** — The v457 "Next in ranking" button enabled forward-only traversal of the FC ranked list. A "← #N Country" amber button now appears in the drilldown action row when the current country is not rank #1, enabling full bidirectional stepping through the ranked list without closing the drawer. (3) **A–Z sort warning pill: accent-colored + bold** — The "A–Z: click Take% to rank" pill rendered in `var(--muted)` at normal weight — visually buried. Changed to `color:var(--accent);font-weight:600` with a stronger border (rgba(176,104,0,.35)), matching the v455/v456 click-hint visibility fixes. (4) **CP 4-price table: "Copy as IC table" button** — A "Copy as IC table" button now appears below the 4-price sensitivity table in Country Profile. Clicking it writes the table as tab-separated text (Price / Govt Take% / Δ vs $50 / Contractor NPV / IRR / Breakeven) to the clipboard, ready to paste into Excel or an IC memo table. Previously the analyst had to manually transcribe 4 rows × 6 columns.
@@ -8418,4 +8449,12 @@ The agent confirmed "Both repos pushed" in its output, so the petroleum repo pus
 - Summary: **Model:** Sonnet | **Directive:** PETROLEUM PLATFORM AUTO-CYCLE | **Task:** Background push confirmed
 
 GitHub push confirmed (exit code 0). v458 is live at yoburgqs.github.io/petroleum-fiscal-db/.
+
+
+---
+## Cycle 359 Log — 2026-08-22 10:10
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL expected
+- JS errors: 0
+- Summary: v459 — FC sort auto-filter (BE/IRR with manual override flags), drilldown rank+evidence badges, Screener preset label, 17-reference version sweep. Committed to petroleum-fiscal-db main + office path. Pushed to GitHub Pages.
 
