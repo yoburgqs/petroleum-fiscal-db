@@ -29610,21 +29610,22 @@ function openFCDrilldown(country) {
   // v460: "Copy 4-price as IC table" — matches the CP 4-price table copy button; analyst in drilldown workflow
   // can copy the price matrix without opening the full Country Profile.
   (function() {
-    var _tsvRows = ['Price\tGovt Take%\t\u0394 vs $50\tNPV ($M)\tIRR%'];
+    var _tsvRows = ['Price\tGovt Take%\t\u0394 vs $50\tNPV ($M)\tIRR%\tBreakeven ($/bbl)'];
     var _take50b = d.take_50;
-    [['$50',d.take_50,d.npv_50,d.irr_50],['$75',d.take_75,d.npv_75,d.irr_75],['$100',d.take_100,d.npv_100,d.irr_100],['$125',d.take_125,d.npv_125,d.irr_125]].forEach(function(p){
+    var _be75 = d.be_75 != null ? d.be_75.toFixed(0)+' $/bbl' : '\u2014';
+    [['$50',d.take_50,d.npv_50,d.irr_50,'\u2014'],['$75',d.take_75,d.npv_75,d.irr_75,_be75],['$100',d.take_100,d.npv_100,d.irr_100,'\u2014'],['$125',d.take_125,d.npv_125,d.irr_125,'\u2014']].forEach(function(p){
       var priceStr = p[0];
       var takeStr = p[1]!=null ? p[1].toFixed(1)+'%' : '\u2014';
       var delta = (p[1]!=null && _take50b!=null) ? (p[1]-_take50b) : null;
       var deltaStr = delta===null ? '\u2014' : delta===0 ? '0.0pp' : (delta>0?'+':'')+delta.toFixed(1)+'pp';
       var npvStr = p[2]!=null ? fmtNpvShared(p[2]) : '\u2014';
       var irrStr = (p[3]!=null && p[3]<500) ? p[3].toFixed(1)+'%' : '\u2014';
-      _tsvRows.push(priceStr+'\t'+takeStr+'\t'+deltaStr+'\t'+npvStr+'\t'+irrStr);
+      _tsvRows.push(priceStr+'\t'+takeStr+'\t'+deltaStr+'\t'+npvStr+'\t'+irrStr+'\t'+p[4]);
     });
     var _tsv = _tsvRows.join('\n');
     var _tsvEsc = JSON.stringify(_tsv);
     var _copyBtnId = 'fc-drilldown-copy-'+slug;
-    html += '<div style="text-align:right;margin-bottom:10px;"><button id="'+_copyBtnId+'" class="btn btn-sm btn-outline" style="font-size:11px;" onclick="(function(){var t=document.getElementById(\''+_copyBtnId+'\');navigator.clipboard.writeText('+_tsvEsc+').then(function(){t.innerHTML=\'&#x2713; Copied!\';setTimeout(function(){t.innerHTML=\'Copy 4-price as IC table\';},2000);}).catch(function(){t.innerHTML=\'Clipboard unavailable\';setTimeout(function(){t.innerHTML=\'Copy 4-price as IC table\';},2000);})})()" title="Copy 4-price matrix (Take / \u0394vs$50 / NPV / IRR) as tab-separated text \u2014 paste into Excel or IC memo">Copy 4-price as IC table</button></div>';
+    html += '<div style="text-align:right;margin-bottom:10px;"><button id="'+_copyBtnId+'" class="btn btn-sm btn-outline" style="font-size:11px;" onclick="(function(){var t=document.getElementById(\''+_copyBtnId+'\');navigator.clipboard.writeText('+_tsvEsc+').then(function(){t.innerHTML=\'&#x2713; Copied!\';setTimeout(function(){t.innerHTML=\'Copy 4-price as IC table\';},2000);}).catch(function(){t.innerHTML=\'Clipboard unavailable\';setTimeout(function(){t.innerHTML=\'Copy 4-price as IC table\';},2000);})})()" title="Copy 4-price matrix (Take / \u0394vs$50 / NPV / IRR / Breakeven) as tab-separated text \u2014 paste into Excel or IC memo">Copy 4-price as IC table</button></div>';
   })();
     // v457: IOC hurdle rate callout — tells analyst immediately if base-case IRR clears the standard IOC hurdle
   var _irrAt75 = d.irr_75;
