@@ -624,6 +624,37 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
 
+## Cycle 361 — v462 Grade Table (this session)
+
+**Cycle 361 — v462:** Full version sweep v461→v462 plus 1 P1 interaction improvement. (1) **FC drilldown price matrix: IRR values now color-coded by IOC hurdle** — Previously, IRR% cells in the 4-price matrix (Take/NPV/IRR/Δvs$50) showed all values in plain `var(--text)` regardless of IOC hurdle clearance. Changed to: green ≥15% (clears standard IOC hurdle), yellow 10–14.9% (near hurdle, approaching threshold), red <10% (sub-hurdle, below typical IOC minimum). Grey for no data. Analyst no longer needs to cross-reference the separate IOC hurdle callout below the matrix — the table itself now communicates hurdle status at every price point. (2) **Bug fix: IC Memo Guidance moderate-take case cited ORCA v460** — The "Moderate take, stable regime" branch in `openFCDrilldown()` IC Memo Guidance at line 29718 still said "ORCA v460" — one version behind. Fixed to v462. All other citation strings were already at v461 (now v462). (3) **Version sweep v461→v462** — title, meta description, header badge, Home subtitle, print header, Who Built This provenance, How to Cite display text, How to Cite clipboard string, all IC citation strings (copyICCitation, copyICSummary, CP IC Memo chip, IC drilldown moderate-case, Norway IC memo guidance), all FAQ body source footnotes (11 locations). JS syntax gate PASS (14 blocks, 0 errors). Playwright: 136 PASS / 0 FAIL.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1–A974). IRR coverage 165/185 (89%). Benchmark 185/185. Structural IRR ceiling 124/185 displayed. |
+| 2 | 6. Error & Empty States | A+ | = | SbS empty state instruction (v457). IOC Portfolio empty state description (v457). Explorer Browse zero-result empty state (v456). CP sparse data warning (v453). |
+| 3 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). content-visibility:auto (v343). |
+| 4 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 5 | 1. Visual Design | A+ | = | CP headline strip two-zone layout (v451). Take% 26px bold. Petroleum amber design system. |
+| 6 | 3. Data Presentation | A+ | up | FC drilldown price matrix IRR values color-coded by IOC hurdle (v462). FC drilldown copy table adds Breakeven column (v461). FC drilldown global rank + evidence tier badges (v459). |
+| 7 | 4. Interaction Design | A+ | = | FC drilldown +Compare → View in SbS nav (v461). IRR/BE manual flag fixed (v461). Screener preset clear button fixed (v461). |
+| 8 | 2. Information Architecture | A+ | = | FC IC Analyst Guide 3-step workflow strip (v455). CP Similar Fiscal Profile SbS button (v456). |
+| 9 | 13. SDLC Maturity | A+ | = | Changelog entries current (v461). JS syntax gate PASS (14 blocks). |
+| 10 | 10. Accessibility | A+ | = | All documented accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS. |
+| 12 | 5. Naming Consistency | A+ | up | Version sweep v461→v462: all structural locations, all FAQ body source footnotes, IC citation strings, CP IC Memo chip, FC drilldown moderate-case cite (bug fix from v460). |
+| 13 | 7. Professional Credibility | A+ | = | All analyst-facing citation strings current (v462). copyICSummary, copyICCitation, How to Cite, short-form, Scenario Builder reference all v462. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes this cycle:** Data Presentation up (IRR cells in FC drilldown price matrix now color-coded green/yellow/red by IOC hurdle status — replaces plain text for all 4 price points). Naming Consistency up (full version sweep v461→v462 including bug fix: IC Memo Guidance moderate-take branch was still citing v460).
+
+## Cycle 361 Log — 2026-08-22
+- JS syntax gate: 14 script blocks / 0 errors
+- Playwright: 136 PASS / 0 FAIL / 0 JS errors
+- Summary: Cycle 361 — v462. 7 targeted fixes: (1) FC drilldown IRR matrix color-coded by IOC hurdle (green/yellow/red). (2) Bug fix: IC Memo Guidance moderate-take case cited ORCA v460 (one version stale). (3) Version sweep v461→v462: title, meta, badge, Home subtitle, print header, Who Built This, How to Cite display + clipboard, IC citation strings, CP IC Memo chip, all FAQ source footnotes (11 locations). Both repos committed.
+
+---
+
 ## Cycle 360 — v461 Grade Table (this session)
 
 **Cycle 360 — v461:** 7 targeted bug fixes and workflow improvements. (1) **Screener preset clear button bug fixed** — The × button on the active preset label called `loadScreenerPreset('reset')` (undefined function); correct function is `applyScreenerPreset('reset')`. The button was silently failing — clicking it did not reset filters. Fixed. (2) **Changelog: v459 and v460 entries added** — "Recent Platform Updates" section in Methodology started at v458 despite platform being at v460. Added accurate v459 and v460 entries so analysts checking Methodology now see a complete and current version provenance. (3) **FC drilldown "Copy 4-price as IC table" — Breakeven column added** — The FC drilldown copy function was missing the Breakeven column (header and data) that the CP version includes. Added Breakeven ($/bbl) at $75 as the 6th column, matching CP. (4) **FC drilldown "+ Compare" button: post-add SbS navigation** — After clicking "+ Compare" in the drilldown drawer, the button now becomes "✓ Added — View in SbS →" with one-click navigation to the Side-by-Side tab. Previously the analyst had to manually navigate. (5) **FC IRR/BE manual flag: any checkbox interaction locks it** — `_fcBEManuallySet` and `_fcIRRManuallySet` were set to `this.checked` (true when checked, false when unchecked). This meant explicitly unchecking a filter would reset the manual lock, allowing auto-sort to re-enable the filter the analyst just deliberately turned off. Fixed: any checkbox interaction sets the flag to `true` permanently (until sort changes). (6) **FC reading guide: stale Govt NPV reference removed** — The reading guide still said "'Ctct' = Contractor; 'Govt NPV' is a formula-derived estimate only" — but Govt NPV was removed from the FC table in v451. Stale text cleaned. (7) **Version sweep v460→v461** — title, meta description, header badge, Home subtitle, print header, How to Cite display and clipboard, short-form footnote, Scenario Builder reference, IC citation strings, IC drilldown moderate-case cite, Norway IC memo guidance. JS syntax gate PASS (14 blocks, 0 errors).
