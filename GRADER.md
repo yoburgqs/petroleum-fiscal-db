@@ -624,6 +624,37 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
 
+## Cycle 362 — v463 Grade Table (this session)
+
+**Cycle 362 — v463:** 7 targeted P1/P2/P3 analyst UX improvements. (1) **CP Key Fiscal Parameters loading spinner fix (P1)** — The spinner added in v460 was placed in a dead `factsSection` variable inside `renderReformTimeline()` that is never inserted to DOM. The live `factsSection` in `loadCountryProfile()` still showed plain "Loading from API…" text. Fixed: live path now shows the animated spinner ("Loading sourced fiscal parameters…"). The 6-second timeout fallback check now catches both text variants. (2) **FC drilldown Close button clarity (P2)** — Plain "Close" renamed to "✕ Close" with a descriptive tooltip "Collapse this drilldown row and return to the ranked table". (3) **CP vs-median pill: explicit @$75 price context (P2)** — "+Xpp vs global median" renamed to "+Xpp vs median @$75". Tooltip expanded to include country count. (4) **CP NPV headline strip tooltip (P3)** — NPV span in Zone B now has full analyst-facing tooltip (WACC basis, WI basis, profile, scale instruction) matching IRR/Swing/BE which already had tooltips. (5) **CP NPV: @$75 price label inline (P3)** — Added small "@$75" subscript after NPV value matching the "@10%WACC" label on IRR (v426). (6) **CP global rank label: 4-band direction signal (P3)** — "mid-range globally" replaced with "upper-mid take" (21–50th pct) and "lower-mid take" (51–80th pct), giving analysts directional context across the full range. (7) **Version sweep v462→v463** — all 30 structural locations. JS syntax gate PASS (14 blocks, 0 errors). Playwright: 136 PASS / 0 FAIL.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1–A974). IRR coverage 165/185 (89%). Benchmark 185/185. Structural IRR ceiling 124/185 displayed. |
+| 2 | 6. Error & Empty States | A+ | = | SbS empty state instruction (v457). IOC Portfolio empty state description (v457). Explorer Browse zero-result empty state (v456). CP sparse data warning (v453). CP Key Fiscal Parameters animated spinner now live (v463). |
+| 3 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). content-visibility:auto (v343). |
+| 4 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 5 | 1. Visual Design | A+ | = | CP headline strip two-zone layout (v451). Take% 26px bold. Petroleum amber design system. |
+| 6 | 3. Data Presentation | A+ | up | CP NPV headline strip now has @$75 price label inline (v463). CP global rank: 4-band direction labels (upper-mid/lower-mid take) replace single "mid-range" (v463). FC drilldown IRR matrix color-coded by IOC hurdle (v462). |
+| 7 | 4. Interaction Design | A+ | = | FC drilldown Close → "✕ Close" with descriptive tooltip (v463). FC drilldown +Compare → View in SbS nav (v461). |
+| 8 | 2. Information Architecture | A+ | up | CP vs-median pill shows @$75 price basis inline (v463). CP NPV tooltip added (P3) matching IRR/Swing/BE tooltip depth (v463). FC IC Analyst Guide 3-step workflow strip (v455). |
+| 9 | 13. SDLC Maturity | A+ | = | Changelog entries current (v463). JS syntax gate PASS (14 blocks). |
+| 10 | 10. Accessibility | A+ | = | All documented accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS. |
+| 12 | 5. Naming Consistency | A+ | up | Version sweep v462→v463: all 30 structural locations. |
+| 13 | 7. Professional Credibility | A+ | = | All analyst-facing citation strings current (v463). copyICSummary, copyICCitation, How to Cite, short-form, Scenario Builder reference all v463. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes this cycle:** Data Presentation up (CP NPV gets @$75 inline label; CP global rank now 4-band). Information Architecture up (CP vs-median pill shows price basis inline; CP NPV tooltip adds full analyst context). Naming Consistency up (v462→v463 sweep: 30 locations). Error & Empty States note updated (CP Key Fiscal Parameters spinner now actually live — v460 spinner was dead code, fixed in v463).
+
+## Cycle 362 Log — 2026-08-22
+- JS syntax gate: 14 script blocks / 0 errors
+- Playwright: 136 PASS / 0 FAIL / 0 JS errors
+- Summary: Cycle 362 — v463. 7 targeted P1/P2/P3 fixes: (1) CP Key Fiscal Parameters spinner fix (dead code path corrected, live path now shows animated spinner). (2) FC drilldown "✕ Close" with descriptive tooltip. (3) CP vs-median pill: "+Xpp vs median @$75" (price context inline). (4) CP NPV tooltip added. (5) CP NPV "@$75" inline price label. (6) CP global rank 4-band labels. (7) Version sweep v462→v463 (30 locations). Both repos committed.
+
+---
+
 ## Cycle 361 — v462 Grade Table (this session)
 
 **Cycle 361 — v462:** Full version sweep v461→v462 plus 1 P1 interaction improvement. (1) **FC drilldown price matrix: IRR values now color-coded by IOC hurdle** — Previously, IRR% cells in the 4-price matrix (Take/NPV/IRR/Δvs$50) showed all values in plain `var(--text)` regardless of IOC hurdle clearance. Changed to: green ≥15% (clears standard IOC hurdle), yellow 10–14.9% (near hurdle, approaching threshold), red <10% (sub-hurdle, below typical IOC minimum). Grey for no data. Analyst no longer needs to cross-reference the separate IOC hurdle callout below the matrix — the table itself now communicates hurdle status at every price point. (2) **Bug fix: IC Memo Guidance moderate-take case cited ORCA v460** — The "Moderate take, stable regime" branch in `openFCDrilldown()` IC Memo Guidance at line 29718 still said "ORCA v460" — one version behind. Fixed to v462. All other citation strings were already at v461 (now v462). (3) **Version sweep v461→v462** — title, meta description, header badge, Home subtitle, print header, Who Built This provenance, How to Cite display text, How to Cite clipboard string, all IC citation strings (copyICCitation, copyICSummary, CP IC Memo chip, IC drilldown moderate-case, Norway IC memo guidance), all FAQ body source footnotes (11 locations). JS syntax gate PASS (14 blocks, 0 errors). Playwright: 136 PASS / 0 FAIL.
