@@ -25418,10 +25418,11 @@ function loadCountryProfile(country) {
           const pDiff = p.take_75 - d.take_75;
           const pCol = p.take_75 <= 40 ? 'var(--green)' : p.take_75 <= 60 ? 'var(--yellow)' : p.take_75 <= 75 ? 'var(--orange)' : 'var(--red)';
           const pDiffStr = pDiff >= 0 ? '+' + pDiff.toFixed(1) : pDiff.toFixed(1);
-          return '<div onclick="document.getElementById(\'dd-country-select\').value=\'' + p.country.replace(/'/g,"\\'") + '\';loadCountryProfile(\'' + p.country.replace(/'/g,"\\'") + '\')" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;" onmouseover="this.style.borderColor=\'#B06800\'" onmouseout="this.style.borderColor=\'var(--border)\'">'
+          return '<div onclick="document.getElementById(\'dd-country-select\').value=\'' + p.country.replace(/'/g,"\\'") + '\';loadCountryProfile(\'' + p.country.replace(/'/g,"\\'") + '\')" style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:11px;display:flex;align-items:center;gap:2px;" onmouseover="this.style.borderColor=\'#B06800\';this.querySelector(\'.peer-arrow\').style.opacity=\'1\'" onmouseout="this.style.borderColor=\'var(--border)\';this.querySelector(\'.peer-arrow\').style.opacity=\'0\'">'
             + '<span style="color:var(--text);font-weight:700;">' + p.country + '</span>'
             + '<span style="margin-left:6px;color:' + pCol + ';font-weight:800;">' + p.take_75.toFixed(1) + '%</span>'
             + '<span style="margin-left:4px;color:var(--muted);font-size:10px;">(' + pDiffStr + 'pp)</span>'
+            + '<span class="peer-arrow" style="margin-left:5px;color:var(--accent);font-size:11px;opacity:0;transition:opacity .15s;">&#8594;</span>'
             + '</div>';
         }).join('')
       + '</div>'
