@@ -8789,3 +8789,11 @@ Git push to `petroleum-fiscal-db` origin confirmed complete (exit code 0). Cycle
 - **IOC Portfolio price label** â€” "Wtd Avg Take" stat blocks now show `@$75` inline so the price basis is visible without hovering. Previously invisible.
 
 - **Reform Risk headline strip** â€” A data-driven ba
+
+---
+## Cycle 369 Log — 2026-08-22 15:54
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Push confirmed complete (exit code 0). All done.
+
