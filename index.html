@@ -29807,7 +29807,7 @@ function openFCDrilldown(country) {
       html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + nextEsc + '\')" title="Open drilldown for the next country in the current fiscal ranking (#' + (_navIdx + 2) + ' of ' + _navList.length + '): ' + nextCountry + '" style="color:var(--accent);border-color:rgba(176,104,0,.4);">#' + (_navIdx + 2) + ' ' + nextCountry + ' &#8594;</button>';
     }
   })();
-  html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + cEsc + '\')" title="Collapse this drilldown row and return to the ranked table">\u2715 Close</button>';
+  html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + cEsc + '\')" title="Collapse this drilldown row and return to the ranked table" style="margin-left:auto;">\u2715 Close</button>';
   html += '</div></div>';
 
   const row = document.querySelector('#tbl-fc tr[data-country="' + country + '"]');
