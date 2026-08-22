@@ -8895,3 +8895,11 @@ Git push to `petroleum-fiscal-db` origin confirmed complete (exit code 0). Cycle
 - JS errors: 0
 - Summary: Background push confirmed â€” exit code 0. Cycle 371 / v472 is live.
 
+
+---
+## Cycle 372 Log — 2026-08-22 18:56
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All clear. v473 fully deployed â€” both commits on origin, GitHub Pages live.
+
