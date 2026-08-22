@@ -27091,7 +27091,14 @@ function ddAddCompare(country, btn) {
     return;
   }
   addCompare(country);
-  if (btn) { var o=btn.textContent; btn.textContent='\u2713 Added'; setTimeout(function(){btn.textContent=o;},1500); }
+  // v461: After adding, offer one-click navigation to SbS so the analyst can immediately see the comparison
+  if (btn) {
+    btn.textContent = '\u2713 Added \u2014 View in SbS \u2192';
+    btn.style.color = 'var(--accent)';
+    btn.style.borderColor = 'rgba(176,104,0,.4)';
+    btn.onclick = function() { switchTab('t2', document.getElementById('tab-btn-t2')); };
+    btn.title = 'Click to open Side-by-Side comparison tab';
+  }
 }
 
 function exportScreenerExcel() {
