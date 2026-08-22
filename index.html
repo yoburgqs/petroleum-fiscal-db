@@ -29490,7 +29490,13 @@ function openFCDrilldown(country) {
   (function() {
     var _icTake = r.liveTake;
     var _icSwing = r.swing;
-    var _icStab = (stabilityScores && stabilityScores[country] != null) ? stabilityScores[country] : null;
+    var _icStab = (function() {
+      if (typeof REFORM_HISTORY === 'undefined') return null;
+      var rh = REFORM_HISTORY[country];
+      if (!Array.isArray(rh)) return 5;
+      var n = rh.filter(function(e) { return (e.year || 0) >= 2010; }).length;
+      return Math.max(0, 5 - n);
+    })();
     var _icLines = [];
     if (_icTake != null && _icSwing != null) {
       if (_icTake > 75 && _icSwing > 20) {
