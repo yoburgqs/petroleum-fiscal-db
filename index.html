@@ -31070,7 +31070,6 @@ async function loadPlatformData() {
           var _hCount = COUNTRY_DATA.filter(function(c) { return c.irr_75 != null && c.irr_75 >= 15 && c.irr_75 < 500; }).length;
           var _hTotal = COUNTRY_DATA.length;
           if (_hCount > 0) {
-            _hStat.textContent = '&#x2713; ' + _hCount + ' of ' + _hTotal + ' countries clear the IOC hurdle (IRR \u226515% \u00b7 Deepwater \u00b7 $75/bbl) \u2014 open Fiscal Compare to rank them.';
             _hStat.innerHTML = '&#x2713; ' + _hCount + ' of ' + _hTotal + ' countries clear the IOC hurdle (IRR \u226515% \u00b7 Deepwater \u00b7 $75/bbl) \u2014 <span style="cursor:pointer;text-decoration:underline;" onclick="switchTab(\'t0\',document.getElementById(\'tab-btn-t0\'))">open Fiscal Compare to rank them</span>.';
             _hStat.style.display = 'block';
           }
