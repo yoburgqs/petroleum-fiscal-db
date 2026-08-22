@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v456.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v457.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v456</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v457</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1332,7 +1332,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v456</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v457</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1442,7 +1442,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to August 2026 (v456).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to August 2026 (v457).</div>
   </div>
   <!-- v423: Key terms strip — defines government take and evidence tier for first-time users -->
   <div style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:20px;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);">
@@ -1927,6 +1927,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Preset</span>
       <select id="screener-preset-select" onchange="if(this.value){applyScreenerPreset(this.value);this.value='';}" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
         <option value="">Load a screen…</option>
+        <option value="iochurdle">⭑ IOC Capital Screen — IRR ≥15% · Take ≤65% · NPV positive · All mechanics</option>
         <option value="sweetspot">Sweet Spot — Take ≤55% · BE ≤$65 · NPV positive</option>
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
         <option value="deepwater">Deepwater — Deep+mixed · PSC + Concession · Take ≤70%</option>
@@ -1938,6 +1939,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       </select>
       <!-- Hidden preset buttons kept for test selector compatibility -->
       <div style="display:none" aria-hidden="true">
+        <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="iochurdle" onclick="applyScreenerPreset('iochurdle')">IOC Capital Screen</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="sweetspot" onclick="applyScreenerPreset('sweetspot')">Sweet Spot</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="pscafrica" onclick="applyScreenerPreset('pscafrica')">PSC Africa</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="deepwater" onclick="applyScreenerPreset('deepwater')">Deepwater</button>
@@ -1962,7 +1964,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <input type="range" id="sl-npv" min="-500" max="2000" value="0" aria-label="Minimum contractor NPV in millions of dollars at $75/bbl (-500 to 2000)">
       </div>
       <div class="slider-group">
-        <label title="Filter by minimum contractor IRR at $75/bbl. Covers 124 of 185 countries (41 excluded as unbounded ≥500%; 20 non-computable). Set to 15% to apply the standard IOC hurdle rate.">Min IRR: <span class="val" id="sv-irr">0</span>% <span style="font-size:10px;color:var(--muted);">@$75</span></label>
+        <label title="Filter by minimum contractor IRR at $75/bbl. Covers 124 of 185 countries (41 excluded as unbounded ≥500%; 20 non-computable). Set to 15% to apply the standard IOC hurdle rate." style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">Min IRR: <span class="val" id="sv-irr">0</span>% <span style="font-size:10px;color:var(--muted);">@$75</span> <button onclick="(function(){var s=document.getElementById('sl-irr');s.value=15;document.getElementById('sv-irr').textContent='15';s.dispatchEvent(new Event('input'));s.dispatchEvent(new Event('change'));})()" style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);border-radius:4px;color:var(--accent);cursor:pointer;font-size:10px;font-weight:700;padding:2px 7px;line-height:1.4;white-space:nowrap;" title="Set IRR threshold to 15% — standard IOC hurdle rate used in IC memos and capital allocation decisions" aria-label="Set minimum IRR to 15 percent (standard IOC hurdle rate)">Set 15% ⟵ IOC hurdle</button></label>
         <input type="range" id="sl-irr" min="0" max="50" value="0" aria-label="Minimum contractor IRR percentage at $75/bbl (0–50%)">
       </div>
       <div class="slider-group">
@@ -2113,6 +2115,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   </div>
 
   <div id="cmp-output" class="empty-state">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;text-align:center;max-width:480px;margin-left:auto;margin-right:auto;">Compare up to 5 countries side-by-side across 4 price scenarios. Search above or start with a standard IOC benchmark set:</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
       <button class="cmp-quickstart-btn" data-countries="Guyana|Angola|Brazil|Nigeria" style="background:transparent;border:1px solid rgba(194,65,12,.4);border-radius:6px;color:var(--orange);font-size:11px;padding:5px 12px;cursor:pointer;" title="Atlantic Frontier PSC: Guyana ~52%, Angola ~55%, Brazil ~65%, Nigeria ~58% — four PSC regimes spanning a 30pp take range. Standard IOC Atlantic capital allocation benchmark.">&#9632; Atlantic Frontier Quartet</button>
       <button class="cmp-quickstart-btn" data-countries="Norway|United Kingdom|Netherlands" style="background:transparent;border:1px solid rgba(21,128,61,.35);border-radius:6px;color:var(--green);font-size:11px;padding:5px 12px;cursor:pointer;" title="North Sea Trio: Norway (Concession+SDFI, ~68% take), UK (RFCT+SC+EPL, ~49% take), Netherlands (~48% take) — the three core North Sea fiscal benchmarks in one view. Standard reference for European offshore capital allocation.">&#9632; North Sea Trio</button>
@@ -2226,6 +2229,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
   <div id="ioc-stats" class="ioc-stats" style="display:none;"></div>
   <div id="ioc-output" class="empty-state">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:10px;text-align:center;max-width:520px;margin-left:auto;margin-right:auto;">See a major IOC's global fiscal exposure — weighted-average government take across their entire portfolio, price sensitivity, and peer comparison. Search by operator name or start with a benchmark IOC:</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;padding:16px 0;">
       <button class="ioc-quick-btn" data-ioc-op="ExxonMobil" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load ExxonMobil fiscal exposure profile">ExxonMobil</button>
       <button class="ioc-quick-btn" data-ioc-op="Shell" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:6px;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600;padding:6px 14px;" aria-label="Load Shell fiscal exposure profile">Shell</button>
@@ -2331,7 +2335,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v456 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v457 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2394,7 +2398,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v456 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v457 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -2417,6 +2421,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong>v457 (Aug 2026) &mdash; P1/P2/P3 analyst workflow: Screener IOC Capital Screen preset, FC IRR hurdle divider + hurdle count, SbS/IOC Portfolio empty state instructions, Breakeven Map intro strip, IRR hurdle quick-set button, FC next-in-ranking drilldown navigation</strong> &mdash; 10 targeted UX improvements for first-time IOC IC analysts: (1) <strong>Screener: IOC Capital Screen preset (P2)</strong> &mdash; New preset added to the "Load a screen…" dropdown: "IOC Capital Screen — IRR ≥15% · Take ≤65% · NPV positive · All mechanics." Applies the standard IC hurdle filter in one click — IRR slider set to 15%, take ≤65%, NPV ≥$0. The "High IRR" preset required NPV ≥$100M; this preset uses $0 (any profitable regime), making it the correct screen for broad IC capital allocation analysis. (2) <strong>FC IRR sort: IOC hurdle threshold divider row (P1)</strong> &mdash; When the FC table is sorted by IRR, a dashed amber divider row now appears at the 15% IRR boundary — "IOC Hurdle Rate: 15% IRR — countries below this line do not clear the standard IC threshold at this price." First-time analysts sorting by IRR now immediately see where their investable set ends without counting rows or reading individual IRR values. (3) <strong>FC status bar: IOC hurdle count (P1)</strong> &mdash; After FC runs, the status bar now shows a green "✓ N clear IOC hurdle (IRR ≥15%)" count inline with the results count. An analyst seeing "185 countries ranked · ✓ 47 clear IOC hurdle" immediately understands the scale of the investable universe at current price. Updates dynamically when price scenario changes. (4) <strong>Screener: "Set 15% ← IOC hurdle" quick-set button on IRR slider (P2)</strong> &mdash; An amber inline button next to the IRR slider label sets the slider to 15% with one click. Previously 15% was mentioned only in the slider tooltip — invisible until hover. Now permanently visible as a labeled action. (5) <strong>FC drilldown: Next-in-ranking navigation button (P2)</strong> &mdash; A "#N Country →" amber button now appears in the FC drilldown drawer action row, taking the analyst to the next country in the current ranked list without closing and reopening the drawer. Standard analyst workflow: sort by take → drill into Row 1 → step through the top candidates sequentially. Previously required closing the drawer, clicking the next row, repeating. (6) <strong>Side-by-Side empty state: instructional text (P1)</strong> &mdash; "Compare up to 5 countries side-by-side across 4 price scenarios. Search above or start with a standard IOC benchmark set:" added above the quickstart buttons. First-time analysts now understand what SbS does before clicking a country. (7) <strong>IOC Portfolio empty state: capability description (P1)</strong> &mdash; Instructional text above operator buttons explains what loading an operator produces: "See a major IOC's global fiscal exposure — weighted-average government take across their entire portfolio, price sensitivity, and peer comparison." (8) <strong>Breakeven Map: intro strip (P1)</strong> &mdash; An amber-tinted explanation strip added above the map explaining what "breakeven" means in the petroleum context, how to use the price marker, and the 68-country coverage constraint. Matches the existing Reform Risk and Explorer intro strip pattern. (9–10) <strong>Version sweep v456→v457</strong> &mdash; page title, meta description, header badge, Home tab subtitle, print header, Methodology provenance, IC citation string. Syntax gate PASS.<br><br>
                         <strong>v456 (Aug 2026) &mdash; P2/P3 data presentation and workflow: CP 4-Price table Govt NPV removed, Price Swing summary row, Similar Fiscal Profile SbS button, Screener click-hint visibility</strong> &mdash; Four targeted improvements for first-time IOC IC analysts. (1) <strong>CP 4-Price Sensitivity table: Govt NPV (est.) column removed (P2)</strong> &mdash; The Country Profile 4-price table previously included a &ldquo;GOVT NPV (est.)&rdquo; column computed as Contractor NPV &times; take/(1&minus;take). This is the same derived formula removed from the FC table in v451 for the same reason: the &ldquo;est.&rdquo; caveat undermines credibility at exactly the moment an analyst is citing figures in an IC memo. Removed from the 4-price table; &ldquo;CONTRACTOR NPV&rdquo; header simplified to &ldquo;NPV ($M)&rdquo; for consistency with the FC table. The FC table and CP table now display the same columns. (2) <strong>CP 4-Price table: Price Swing summary row (P2)</strong> &mdash; The 4-price table now appends a table footer row showing the Price Swing = take at $125 minus take at $50, with tier-colored value and an inline IC memo implication (&ldquo;Low swing — royalty-dominant; single-price cite acceptable&rdquo; / &ldquo;Moderate swing — show multi-price sensitivity&rdquo; / &ldquo;High swing — progressive regime; price range table required&rdquo;). An analyst reading the 4-price table now immediately has the IC memo implication alongside the numbers, without scrolling to the headline strip. (3) <strong>CP Similar Fiscal Profile: &ldquo;Compare top 3 peers in SbS&rdquo; button (P3)</strong> &mdash; The Similar Fiscal Profile section lists up to 8 countries with take within &plusmn;6pp from different regions. Each row is clickable to open that country&rsquo;s profile, but there was no way to compare the current country against its fiscal peers in Side-by-Side without manually typing country names. Added a &ldquo;Compare top 3 peers in SbS &rarr;&rdquo; button that loads the current country plus the 3 closest-take peers into the Side-by-Side tab (clears existing SbS first). Section subtitle updated to note that rows are clickable. (4) <strong>Screener count bar click-hint now accent-colored (P3)</strong> &mdash; The &ldquo;click any row to open Country Profile&rdquo; hint in the Screener count bar was at <code>opacity:.75;font-weight:400</code> — barely visible. Changed to <code>color:var(--accent);font-weight:600</code> with a downward arrow, matching the v455 fix for the FC status hint. Playwright: 136 PASS / 0 FAIL on prior JS-clean baseline; syntax gate PASS.<br><br>
                         <strong>v455 (Aug 2026) &mdash; P1/P2/P3 workflow fixes: Load Top 5 SbS clears preset, FC guide adds 3-step workflow, status hint more prominent, IC Memo Guidance uses list, contracts badge tooltip</strong> &mdash; Five targeted UX fixes for first-time IOC IC analyst workflow: (1) <strong>Load Top 5 in Side-by-Side now clears the existing comparison first (P2)</strong> &mdash; Previously, if the analyst had visited the Side-by-Side tab (which auto-loads Norway/UK/Netherlands), clicking &ldquo;Load Top 5&rdquo; from Fiscal Compare would only add 1 country (the SbS preset already occupied 3 of 4 slots), with no explanation. Now prepends <code>clearCompare()</code> so the analyst always gets the 5 countries they intended from the FC sort. (2) <strong>FC IC Analyst Guide adds a 3-step workflow strip (P1)</strong> &mdash; The interpretation guide opened immediately for first-time users (v431 sessionStorage behavior) but described tier definitions without telling the analyst what to &ldquo;do first.&rdquo; Added a compact amber-tinted workflow row at the top of the guide: &ldquo;1 — Results auto-load sorted by Govt Take. 2 — Click any row for 4-price drilldown. 3 — Click Full Profile for sourced parameters.&rdquo; Now the guide is a workflow guide, not just a legend. (3) <strong>FC status &ldquo;click any row&rdquo; hint now visible (P2)</strong> &mdash; After FC runs, the &ldquo;click any row to drill down&rdquo; hint was rendered at <code>opacity:.75;font-size:10px</code> — barely visible next to the mono count text. Changed to <code>font-size:11px;font-weight:600;color:var(--accent)</code> with a downward arrow. (4) <strong>IC Memo Guidance in FC drilldown drawer uses a bulleted list (P2)</strong> &mdash; Previously joined multiple rules with <code>&middot;</code> dot-separator, making multi-rule outputs hard to parse. Now renders as a short <code>&lt;ul&gt;</code> so each guidance point reads as a discrete action. (5) <strong>Country Profile contracts badge has a tooltip (P3)</strong> &mdash; The &ldquo;N contracts&rdquo; badge in the CP header had no explanation of what &ldquo;contracts&rdquo; means in this context. A first-time IOC analyst might wonder &ldquo;contracts with whom?&rdquo; Added <code>cursor:help</code> and a full tooltip explaining these are fiscal contracts in the ORCA database, that Take/NPV/IRR are production-weighted averages across them, and that fewer than 10 triggers the sparse-data warning. Playwright: 136 PASS / 0 FAIL on prior JS-clean baseline; syntax gate PASS.<br><br>
                         <strong>v454 (Aug 2026) &mdash; P1/P2 analyst workflow: FC profile assumption strip, IC Memo Guidance in FC drilldown, IC Memo chip in CP headline strip, Re-run Compare button</strong> &mdash; Four targeted analyst workflow improvements for first-time IOC IC analysts: (1) <strong>FC profile assumption strip (P2)</strong> &mdash; A compact banner now appears below the Fiscal Compare controls row showing the active profile&rsquo;s exact DCF inputs (Capex, Peak rate, Opex, Life, 10% WACC discount) before the analyst runs the comparison. Previously this information was visible only in the dropdown option text and only after results loaded as a post-run banner. The strip updates live when the Profile dropdown changes. (2) <strong>IC Memo Guidance box in FC drilldown drawer (P2)</strong> &mdash; When an analyst clicks any FC row, the drilldown drawer now shows a compact &ldquo;IC Memo Guidance&rdquo; box above the action buttons. The box synthesizes the country&rsquo;s Take% + Price Swing combination into a specific IC memo rule: &ldquo;price range table required&rdquo; (high take + progressive), &ldquo;single-price cite acceptable&rdquo; (low take), &ldquo;show multi-price sensitivity&rdquo; (high swing), or &ldquo;standard citation&rdquo; (moderate, stable). Stability warnings are appended if the score is &le;1. Previously, the analyst had to mentally apply the IC interpretation guide to derive this implication. (3) <strong>IC Memo chip in CP headline strip Zone B (P3)</strong> &mdash; Country Profile headline strip now shows a compact inline &ldquo;IC Memo&rdquo; guidance note at the bottom of Zone B, applying the same Take+Swing+Stability rules. An analyst opening Nigeria or Iraq immediately sees the applicable IC memo requirement without scrolling to the interpretation guide. Color-coded: red = price range table required, orange = progressive/high-take warning, green = favorable single-cite, gray = standard. (4) <strong>Re-run Compare button text (P2)</strong> &mdash; After Fiscal Compare auto-runs on tab activation, the &ldquo;Run Compare&rdquo; button now updates to &ldquo;Re-run Compare&rdquo; to signal that results are already showing and a click will refresh them, not produce them for the first time. Prevents the common first-time confusion of clicking &ldquo;Run Compare&rdquo; when results are already visible. Playwright: 136 PASS / 0 FAIL (Target crashed — known Windows Chromium headless issue); 136 PASS / 0 FAIL on prior JS-clean baseline.<br><br>
@@ -21388,6 +21393,9 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 <!-- ===== TAB: BREAKEVEN MAP ===== -->
 <div id="tbreakevenmap" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-tbreakevenmap">
   <div class="page-title">Global Breakeven Price Map</div>
+  <div style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.6;">
+    <strong style="color:var(--accent);">What this shows:</strong> The oil price at which contractor NPV reaches zero for a standardized deepwater project in each country. A country breakeven of $55/bbl means the contractor recovers costs and earns a 10% return at $55 oil — anything above that is profit. Use the price marker to identify which countries are currently viable at spot price. Drag the slider to stress-test your portfolio under different oil price scenarios. <strong>Coverage: 68 of 185 countries</strong> — requires complete royalty structure, cost recovery terms, and capital schedule.
+  </div>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px;">
     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);">
       <span style="color:var(--accent);font-weight:700;">Coverage: 68 of 185 countries</span>
@@ -23236,7 +23244,12 @@ function applyScreenerPreset(preset) {
   const scRgn = document.getElementById('sc-region');
   if (scRgn) scRgn.value = '';
 
-  if (preset === 'sweetspot') {
+  if (preset === 'iochurdle') {
+    // v457: IOC Capital Screen — standard IC hurdle: IRR ≥15% (all mechanics), take ≤65%, positive NPV
+    setSlider('sl-irr', 15); setSlider('sl-take', 65); setSlider('sl-npv', 0);
+    if (nullIrr) nullIrr.checked = false;
+    _activePresetName = 'IOC Capital Screen';
+  } else if (preset === 'sweetspot') {
     // Low take (≤55%), reasonable breakeven (≤$65), concession + PSC
     setSlider('sl-take', 55); setSlider('sl-be', 65); setSlider('sl-npv', 0);
     setChecks('sc-mech-checks', ['Concession','PSC','PRRT','RSC']);
@@ -24664,7 +24677,7 @@ function loadCountryProfile(country) {
       msg = 'IC: favorable regime — single-price cite acceptable; note evidence tier';
       col = 'var(--green)'; bg = 'rgba(21,128,61,.06)'; border = 'rgba(21,128,61,.2)';
     } else {
-      msg = 'IC: standard citation — take@$75, profile, evidence tier, ORCA v456';
+      msg = 'IC: standard citation — take@$75, profile, evidence tier, ORCA v457';
       col = 'var(--muted)';
     }
     if (stab <= 1) { msg += ' · reform risk: add stability discount or probability-weighted NPV'; }
@@ -29008,7 +29021,10 @@ function runFiscalCompare() {
     results.sort(function(a,b) { return a.liveTake - b.liveTake; });
     const elapsed = ((performance.now() - t0) / 1000).toFixed(1);
     // v455: improved status — make "click any row" guidance more prominent (was opacity:.75 10px — barely visible)
-    status.innerHTML = results.length + ' countries ranked <span style="opacity:.6;font-size:10px;">(' + elapsed + 's)</span> <span style="color:var(--accent);font-size:11px;font-weight:600;margin-left:8px;">↓ Click any row to drill in</span>';
+    // v457: add IOC hurdle count — how many results clear the 15% IRR standard threshold
+    var _hurdleCount = results.filter(function(r) { return r.liveIRR != null && r.liveIRR >= 15 && r.liveIRR < 500; }).length;
+    var _hurdleStr = _hurdleCount > 0 ? ' <span style="color:var(--green);font-size:11px;font-weight:600;margin-left:8px;" title="Countries with IRR ≥15% at $' + price + '/bbl — clears standard IOC hurdle rate">&#x2713; ' + _hurdleCount + ' clear IOC hurdle (IRR ≥15%)</span>' : '';
+    status.innerHTML = results.length + ' countries ranked <span style="opacity:.6;font-size:10px;">(' + elapsed + 's)</span>' + _hurdleStr + ' <span style="color:var(--accent);font-size:11px;font-weight:600;margin-left:8px;">↓ Click any row to drill in</span>';
     window._fcResults = results;
     window._fcLastResults = results;
     window._fcLastPrice = price;
@@ -29235,6 +29251,8 @@ function renderFCResults(results, price) {
   html += '<th class="num" style="width:60px;"></th>';
   html += '</tr></thead><tbody>';
 
+  // v457: IOC hurdle divider — track whether we've crossed 15% IRR when sorted by IRR
+  var _irrHurdleDividerInserted = false;
   sorted.forEach(function(r, i) {
     var tier = getTierInfo(r.liveTake);
     var swingCol = r.swing == null ? '' : r.swing < 10 ? 'var(--positive)' : r.swing < 20 ? 'var(--accent)' : 'var(--negative)';
@@ -29243,6 +29261,15 @@ function renderFCResults(results, price) {
     var govtNpvStr = fmtNpvShared(govtNpv);
     var npvStr = fmtNpvShared(npv);
     var irrStr = r.liveIRR != null && r.liveIRR < 500 ? r.liveIRR.toFixed(1) + '%' : '\u2014';
+    // v457: insert IOC hurdle threshold divider row when sorted by IRR and we cross below 15%
+    if (sortField === 'irr' && !_irrHurdleDividerInserted) {
+      var prevIrr = i > 0 ? sorted[i-1].liveIRR : null;
+      if ((r.liveIRR == null || r.liveIRR >= 500 || r.liveIRR < 15) && (i === 0 || (prevIrr != null && prevIrr < 500 && prevIrr >= 15))) {
+        var _dColspan = showStability ? 12 : 11;
+        html += '<tr style="pointer-events:none;"><td colspan="' + _dColspan + '" style="padding:0;"><div style="background:rgba(176,104,0,.08);border-top:2px dashed rgba(176,104,0,.5);border-bottom:2px dashed rgba(176,104,0,.5);text-align:center;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; IOC Hurdle Rate: 15% IRR &#8212; countries below this line do not clear the standard IC threshold at this price</div></td></tr>';
+        _irrHurdleDividerInserted = true;
+      }
+    }
     // v428: tooltip on IRR dash cell — first-time analysts often mistake "—" for missing data rather than unbounded/not computable
     var irrCellTitle = (r.liveIRR == null) ? 'title="IRR not computed — insufficient cost data for this country"' : (r.liveIRR >= 500 ? 'title="IRR ≥500% (unbounded) — very-low-royalty regime at this price point; payback near-instant; excluded from IRR rankings"' : '');
     var beStr = formatBreakeven(r.be_75);
@@ -29589,6 +29616,16 @@ function openFCDrilldown(country) {
     var rEsc = r.region.replace(/'/g,"\\'");
     html += '<button class="btn btn-sm btn-outline" onclick="(function(){switchTab(\'texplorer\',document.getElementById(\'tab-btn-tscreener\'));switchExplorerMode(\'screen\',document.getElementById(\'mode-btn-screen\'));setTimeout(function(){var sel=document.getElementById(\'sc-region\');if(sel){sel.value=\'' + rEsc + '\';if(typeof runScreener===\'function\')runScreener();}},150);})()" title="Open Screener filtered to ' + r.region + ' — see all ' + r.region + ' countries ranked by take, IRR, and Breakeven">Peers in ' + r.region + ' &#8594;</button>';
   }
+  // v457: Next in ranking button — lets analyst step through ranked list without closing/reopening drawer
+  (function() {
+    var _navList = (window._fcFilteredResults && window._fcFilteredResults.length) ? window._fcFilteredResults : (window._fcResults || []);
+    var _navIdx = _navList.findIndex(function(x) { return x.country === country; });
+    if (_navIdx >= 0 && _navIdx < _navList.length - 1) {
+      var nextCountry = _navList[_navIdx + 1].country;
+      var nextEsc = nextCountry.replace(/'/g, "\\'");
+      html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + nextEsc + '\')" title="Open drilldown for the next country in the current fiscal ranking (#' + (_navIdx + 2) + ' of ' + _navList.length + '): ' + nextCountry + '" style="color:var(--accent);border-color:rgba(176,104,0,.4);">#' + (_navIdx + 2) + ' ' + nextCountry + ' &#8594;</button>';
+    }
+  })();
   html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + cEsc + '\')">Close</button>';
   html += '</div></div>';
 
