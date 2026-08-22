@@ -29734,7 +29734,7 @@ function openFCDrilldown(country) {
     if (IOC_PRESENCE[op].indexOf(country) >= 0) operators.push(op);
   }
   if (operators.length) {
-    html += '<div style="margin-top:12px;font-size:12px;color:var(--text-muted)"><strong style="color:var(--text)">IOC Operators:</strong> ' + operators.join(', ') + '</div>';
+    html += '<div style="margin-top:12px;font-size:12px;color:var(--text-muted)"><strong style="color:var(--text)">IOC Operators:</strong> ' + operators.map(function(op){ var oe=op.replace(/'/g,"\\'"); return '<span style="cursor:pointer;color:var(--accent);" onmouseover="this.style.textDecoration=\'underline\'" onmouseout="this.style.textDecoration=\'none\'" onclick="loadIOC(\''+oe+'\'\\);switchTab(\'t5\\',document.getElementById(\'tab-btn-t5\\'))" title="Open '+op+' in IOC Portfolio">'+op+'</span>';}).join(', ') + '</div>';
   }
   let depth = 'Unknown';
   if ((DEPTH_PROFILE.onshore||[]).indexOf(country) >= 0) depth = 'Onshore';
