@@ -8746,3 +8746,16 @@ Cycle 364 state committed and pushed to office repo (exit code 0). All three ope
 
 Git push to `petroleum-fiscal-db` origin confirmed complete (exit code 0). Cycle 365 is fully live on GitHub Pages.
 
+
+---
+## Cycle 367 Log — 2026-08-22 13:52
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Cycle 366 complete. Here's what was fixed:**
+
+- **FC tier dividers** â€” Fiscal Compare table now shows explicit dashed dividers at the 40%/60%/75% take tier boundaries when sorted. Analysts can scan a ranked country list and see tier breaks at a glance, not just per-cell color coding.
+
+- **IOC Portfolio price label** â€” "Wtd Avg Take" stat blocks now show `@$75` inline so the price basis is visible without hovering. Previously invisible.
+
+- **Reform Risk headline strip** â€” A data-driven ba
