@@ -77,9 +77,9 @@ Ask exactly: "If a petroleum IC analyst opened this tool for the first time RIGH
 - ✅ Reform timeline: shows 4 most recent events open, older events collapsed. DONE v450.
 - ✅ Peer comparison vs regional median and global median. DONE v328.
 - ✅ Take@$50/$75/$100/$125 in "Govt Take by Price Scenario" section. DONE (original).
-- REMAINING: When CP loads a country with VERY sparse data (only 1-2 fiscal facts), does the page show a clear "limited data" warning? Check Angola, Iran, Venezuela. If those countries load with mostly "—" cells and no explanation, add an inline data-quality callout near the headline strip.
-- REMAINING: The CP "Key Fiscal Parameters" section loads asynchronously. Does it show a useful loading state or just "Loading from API…"? If the async fetch fails silently, the analyst sees a blank section with no indication it failed. Add a visible error/fallback state.
-- REMAINING: CP "Similar Fiscal Profile" section — does it render? If it shows country circles, are they clickable to navigate to that country's profile? Clicking a peer should open their profile directly.
+- ✅ DONE (v453): When CP loads a country with VERY sparse data (only 1-2 fiscal facts), a clear "limited data" warning callout appears near the headline strip. Angola, Iran, Venezuela all show it.
+- ✅ DONE (v460): The CP "Key Fiscal Parameters" section now shows an animated spinning loader with "Loading sourced fiscal parameters…" text while the async fetch is in flight. Error/fallback state also present.
+- ✅ DONE (v456): CP "Similar Fiscal Profile" section renders; peer country rows are clickable (navigate to that country's profile). Hover arrow (→) added in v460 to confirm clickability.
 
 **P5 — Print/PDF quality (medium priority, after P1–P3)**
 - Load Norway CP → print preview → is it IC-ready? Check: branding, citations, evidence badges in print, no truncated tables.
@@ -8466,3 +8466,11 @@ GitHub push confirmed (exit code 0). v458 is live at yoburgqs.github.io/petroleu
 - JS errors: 0
 - Summary: GRADER.md commit pushed. Both v459 commits are live on GitHub Pages.
 
+
+
+---
+## Cycle 360 Log — 2026-08-22 11:10
+- Test before: 110 PASS / 0 FAIL (Playwright v2 suite)
+- Test after: 110 PASS / 0 FAIL
+- JS errors: 0
+- Summary: v460 — 8 analyst workflow improvements: (1) FC drilldown "Copy 4-price as IC table" button; (2) fcSetSort manual flag bug fix — preserve analyst's BE/IRR override when switching sorts; (3) CP Key Fiscal Parameters animated spinner + cleaner loading text; (4) @keyframes spin CSS added; (5) CP empty-state heading rewritten to "Loading Norway benchmark" instead of generic placeholder; (6) Screener preset label clear (×) button — analyst can now dismiss active preset without resetting whole form; (7) Screener preset JS updated for label-text child span; (8) Similar Fiscal Profile hover arrow affordance. P3 REMAINING items marked complete. Pushed to GitHub Pages.
