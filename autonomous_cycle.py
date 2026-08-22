@@ -124,12 +124,12 @@ CURRENT GRADER:
 {grader_content[:3000]}
 
 YOUR TASKS (execute all in order, no stopping):
-1. Read C:/Users/ztuch/petroleum-fiscal-db/index.html — identify what is actually broken or poor quality right now
-2. Update the grades in C:/Users/ztuch/petroleum-fiscal-db/GRADER.md based on what you actually see in the code
+1. Read {REPO}/index.html — identify what is actually broken or poor quality right now
+2. Update the grades in {GRADER_FILE} based on what you actually see in the code
 3. Find the 10 lowest-graded categories
 4. For each of the 10: make the specific improvement directly to index.html, then commit
-5. Copy index.html to C:/Users/ztuch/office/projects/oil-gas-expertise/fiscal_db_interface.html after all fixes
-6. Run: cd C:/Users/ztuch/petroleum-fiscal-db && git push origin main
+5. Copy index.html to {OFFICE}/projects/oil-gas-expertise/fiscal_db_interface.html after all fixes
+6. Run: cd {REPO} && git push origin main
 7. Update GRADER.md with new grades and add a cycle log entry
 8. Return a plain-English summary of exactly what you fixed (bullet list, no jargon)
 
