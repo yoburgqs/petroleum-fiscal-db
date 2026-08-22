@@ -26891,16 +26891,18 @@ function renderReformRisk() {
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Total Events</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Since 2010</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Reform Frequency Score (0\u2013100). Formula: 100 \u2212 (reforms since 2010 \xd7 15). Score 100 = no reforms since 2010 (most stable); 70 = 2 reforms; 55 = 3 reforms; 40 = 4 reforms; 0 = 7+ reforms (most volatile). This measures reform frequency only. Note: the Fiscal Predictability Score in Country Profile is different \u2014 it additionally factors price swing and within-country fiscal term consistency (IQR across contracts). Use both signals together for IC analysis.">Stability Score \u24d8</th>'
+    + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Reform direction: hostile=take raised, friendly=take cut, neutral=structural">Direction</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Take @$75</th>'
     + '</tr></thead>'
     + '<tbody>'
     + withScore.slice(0,15).map(function(r) {
-        var escapedC = r.country.replace(/'/g,"\\'");
-        return '<tr>'
-          + '<td style="padding:5px 8px;font-size:12px;color:var(--text);">'
-          + r.country
-          + ' <button onclick="document.getElementById(\'dd-country-select\').value=\'' + escapedC + '\';loadCountryProfile(\'' + escapedC + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" style="background:rgba(176,104,0,.1);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:1px 6px;font-size:10px;color:var(--accent);cursor:pointer;margin-left:6px;" title="Open Country Profile for ' + r.country + '">Profile →</button>'
-          + '</td>'
+        var escapedC = r.country.replace(/'/g,"\'");
+        var total = r.tightened + r.liberalized + r.neutral;
+        var dirHtml = total > 0
+          ? '<span style="color:var(--red);font-weight:600;" title="' + r.tightened + ' hostile reforms (take raised)">↑' + r.tightened + '</span> <span style="color:var(--muted);font-size:10px;">/</span> <span style="color:var(--green);font-weight:600;" title="' + r.liberalized + ' friendly reforms (take cut)">↓' + r.liberalized + '</span> <span style="color:var(--muted);font-size:10px;">/</span> <span style="color:var(--muted);" title="' + r.neutral + ' neutral">' + r.neutral + '</span>'
+          : '—';
+        return '<tr style="cursor:pointer;" onclick="document.getElementById(\'dd-country-select\').value=\'' + escapedC + '\';loadCountryProfile(\'' + escapedC + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" title="Click to open ' + r.country + ' Country Profile" onmouseover="this.style.background=\'rgba(176,104,0,.04)\'" onmouseout="this.style.background=\'\'">'
+          + '<td style="padding:5px 8px;font-size:12px;color:var(--text);"><strong>' + r.country + '</strong> <span style="font-size:10px;color:var(--accent);">↗</span></td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--accent);font-weight:600;">' + r.total + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + (r.since2010>2?'var(--red)':r.since2010>0?'var(--orange)':'var(--green)') + ';">' + r.since2010 + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;">'
@@ -26911,7 +26913,8 @@ function renderReformRisk() {
           + '<span style="color:' + (r.score>70?'var(--green)':r.score>40?'var(--yellow)':'var(--red)') + ';font-size:11px;">' + r.score + '</span>'
           + '</div>'
           + '</td>'
-          + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + takeColor(r.take75) + ';font-weight:' + (r.take75!=null?'600':'400') + ';">' + (r.take75!=null?r.take75.toFixed(1)+'%':'\u2014') + '</td>'
+          + '<td style="padding:5px 8px;font-size:12px;text-align:center;">' + dirHtml + '</td>'
+          + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + takeColor(r.take75) + ';font-weight:' + (r.take75!=null?'600':'400') + ';">' + (r.take75!=null?r.take75.toFixed(1)+'%':'—') + '</td>'
           + '</tr>';
       }).join('')
     + '</tbody></table></div>';
