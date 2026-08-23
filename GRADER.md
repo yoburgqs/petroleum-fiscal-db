@@ -9554,3 +9554,13 @@ Git push to `petroleum-fiscal-db` confirmed (exit 0). Cycle 385 v486 is live at 
 - Test after: 136 PASS / 0 FAIL
 - JS errors: 0
 - Summary: Cycle 389 / v490 fully deployed. 5 IOC demo-readiness improvements applied and pushed.
+
+---
+## Cycle 389 Log — 2026-08-23 11:21
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Sonnet | **Directive:** PETROLEUM PLATFORM | **Task:** Background task notification
+
+GitHub push confirmed (exit code 0). v490 is live.
+
