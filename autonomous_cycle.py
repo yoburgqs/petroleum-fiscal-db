@@ -21,6 +21,7 @@ REPO = Path(__file__).resolve().parent
 OFFICE = REPO.parent / "office"
 STATE_FILE = REPO / "CYCLE_STATE.json"
 GRADER_FILE = REPO / "GRADER.md"
+DIRECTIVE_FILE = REPO / "DIRECTIVE.md"   # small, read IN FULL — the actual steering doc
 TEST_FILE = OFFICE / "tools" / "petroleum" / "tests" / "runtime_comprehensive.js"
 LOG_FILE = REPO / "cycle_log.txt"
 INTERVAL = 1800  # 30 minutes
@@ -110,7 +111,7 @@ def run_playwright():
 
 # ─── Step 3+4: Claude grader review ──────────────────────────────────────────
 
-def run_claude_cycle(grader_content, test_results, email_content):
+def run_claude_cycle(directive, grader_tail, test_results, email_content):
     log("Step 3-6: Running Claude autonomous fix cycle...")
     prompt = f"""You are running the 30-minute autonomous improvement cycle for the ORCA petroleum fiscal platform.
 
@@ -120,21 +121,34 @@ CURRENT TEST RESULTS:
 EMAIL FROM ZACH (if any):
 {email_content or 'No new emails'}
 
-CURRENT GRADER:
-{grader_content[:3000]}
+=== ACTIVE DIRECTIVE (authoritative — follow this over anything in GRADER.md) ===
+{directive}
+=== END DIRECTIVE ===
+
+RECENT CYCLE HISTORY (last few cycles, for context — do NOT repeat this work):
+{grader_tail}
 
 YOUR TASKS (execute all in order, no stopping):
-1. Read {REPO}/index.html — identify what is actually broken or poor quality right now
-2. Update the grades in {GRADER_FILE} based on what you actually see in the code
-3. Find the 10 lowest-graded categories
-4. For each of the 10: make the specific improvement directly to index.html, then commit
-5. Copy index.html to {OFFICE}/projects/oil-gas-expertise/fiscal_db_interface.html after all fixes
+1. Pick ONE user task (T1-T6) from the directive. Do not repeat the task used in
+   the most recent cycle shown above.
+2. Walk that task end to end in {REPO}/index.html from a COLD load — no
+   sessionStorage, no localStorage. Read the real DOM and the real JS handlers.
+   Do not reason from the changelog or from what GRADER.md claims is done.
+3. Identify the single WORST friction moment in that walk — the one point where
+   the analyst stops, guesses wrong, or gives up.
+4. Fix that one moment by changing behavior or layout in index.html. Then commit.
+   Respect every item in the directive's STILL LOCKED list.
+5. Copy index.html to {OFFICE}/projects/oil-gas-expertise/fiscal_db_interface.html
 6. Run: cd {REPO} && git push origin main
-7. Update GRADER.md with new grades and add a cycle log entry
-8. Return a plain-English summary of exactly what you fixed (bullet list, no jargon)
+7. Append a cycle log entry to GRADER.md stating, in this order:
+   Task (which of T1-T6) / Friction (what and where) / Change (what is different
+   on screen) / Result (what the analyst can now do). Grade tables are optional
+   and are NOT the point of the cycle.
+8. Return that same Task/Friction/Change/Result summary in plain English.
 
-Focus on things that matter to a senior oil company analyst seeing this for the first time.
-Key question: Is this ready to demo to colleagues at a major IOC? If any answer is no, fix it.
+The measure of this cycle is whether a real analyst is less frustrated than they
+were an hour ago. Not the grade table. If you did not change what the user sees
+or does, the cycle failed — say so honestly rather than shipping a version sweep.
 
 Do NOT ask for confirmation. Execute all steps autonomously."""
 
@@ -251,8 +265,14 @@ def main():
     test_before = run_playwright()
 
     # Steps 3-6: Claude does the heavy lifting
-    grader_content = GRADER_FILE.read_text(encoding="utf-8", errors="replace") if GRADER_FILE.exists() else ""
-    claude_summary = run_claude_cycle(grader_content, test_before, email_content)
+    directive = DIRECTIVE_FILE.read_text(encoding="utf-8", errors="replace") if DIRECTIVE_FILE.exists() else ""
+    if not directive:
+        log("  WARNING: DIRECTIVE.md missing — loop has no steering document this cycle")
+    # GRADER.md is a 1.7MB append-only archive. Its HEAD is stale 2026-08-19
+    # prohibitions; the useful part is the most recent cycle logs at the TAIL.
+    grader_all = GRADER_FILE.read_text(encoding="utf-8", errors="replace") if GRADER_FILE.exists() else ""
+    grader_tail = grader_all[-4000:]
+    claude_summary = run_claude_cycle(directive, grader_tail, test_before, email_content)
 
     # Step 7
     test_after = rerun_playwright()
