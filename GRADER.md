@@ -9756,3 +9756,13 @@ Git push confirmed (exit code 0). GitHub Pages is live with v491.
 - JS errors: 0
 - Summary: Office repo is already up-to-date â€” the killed task was redundant. v494 sync commit (e092c97) is already on GitHub. No action needed.
 
+
+---
+## Cycle 394 Log — 2026-08-23 15:49
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Sonnet | **Directive:** DIRECT | **Task:** Background push notification
+
+GitHub push confirmed complete (exit code 0). Cycle 394 / v495 is live at `yoburgqs.github.io/petroleum-fiscal-db/`.
+
