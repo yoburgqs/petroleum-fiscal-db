@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v473.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v474.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v473</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v474</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1333,7 +1333,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v473</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v474</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1443,7 +1443,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to August 2026 (v473).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. Every regime. Every number sourced. Current to August 2026 (v474).</div>
     <!-- v465: Live investible universe stat — populated after country_data.json loads -->
     <div id="home-hurdle-stat" style="display:none;margin-top:8px;font-size:12px;color:var(--green);font-weight:600;" aria-live="polite"></div>
     <!-- v466: DB currency note — populated after country_data.json loads -->
@@ -1548,6 +1548,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Alt+&#8592;/&#8594;</kbd> Prev / next tab</span>
     <span style="font-size:11px;color:var(--muted);cursor:pointer;" onclick="switchTab('treformrisk',document.getElementById('tab-btn-treformrisk'))" title="Click to open Reform Risk tab">&#x26A0; Reform Risk tab → fiscal reform history &amp; stability scores</span>
     <span style="font-size:11px;color:var(--muted);">FC row → 4-price drilldown · Explorer row → Country Profile</span>
+    <span style="font-size:11px;color:var(--muted);"><kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">&#8592;/&#8594;</kbd> Prev / next country in FC drilldown</span>
+    <span style="margin-left:auto;font-size:11px;"><button onclick="(function(){sessionStorage.removeItem('orca_qs_dismissed');var g=document.getElementById('qs-guide');if(g)g.style.display='block';window.scrollTo({top:0,behavior:'smooth'});})()" style="background:none;border:none;color:var(--accent);font-size:11px;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px;" title="Re-show the Quick Start guide (3 steps to your first insight)">Re-show Quick Start</button></span>
   </div>
   </details>
 </div>
@@ -1606,6 +1608,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <div style="font-size:11px;line-height:1.8;">
           Take &gt;75% + Swing &gt;20pp &rarr; mandatory price range table ($50/$75/$100/$125)<br>
           Take &le;60% + Swing &lt;10pp &rarr; preferred regime; single-price take cite acceptable<br>
+          PSC mechanic + Swing &gt;15pp &rarr; note cost recovery cap in IC — govt take rises steeply once cost bank is depleted<br>
           Stability &#9671;&#9671;&#9671;&#9671;&#9671; &rarr; always pair with Reform Risk tab data in IC<br>
           IRR shown for 124/185 countries; use Take + Swing as proxy for unlisted countries<br>
           Export XLSX &rarr; includes Evidence A/B% tier for auditable IC sourcing
@@ -1669,7 +1672,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span><strong style="color:var(--text);">Life:</strong> <span id="fc-strip-life">25yr</span></span>
     <span><strong style="color:var(--text);">Discount:</strong> 10% WACC</span>
     <span style="color:var(--muted);font-size:10px;border-left:1px solid var(--border);padding-left:10px;" title="All NPV and IRR figures assume 100% working interest. Scale by your actual WI% for equity-stake NPV (e.g. 30% WI → multiply NPV by 0.30).">100% WI basis</span>
-    <span style="margin-left:auto;color:var(--muted);font-style:italic;" title="IC memo citation: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA v473 (Aug 2026).'">IOC standard benchmarking basis <span style="font-size:9px;opacity:.65;font-style:normal;">(ⓘ cite basis)</span></span>
+    <span style="margin-left:auto;color:var(--muted);font-style:italic;" title="IC memo citation: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA v474 (Aug 2026).'">IOC standard benchmarking basis <span style="font-size:9px;opacity:.65;font-style:normal;">(ⓘ cite basis)</span></span>
+    <span id="fc-rerun-hint" style="display:none;font-size:10px;color:var(--accent);font-weight:600;font-style:normal;padding:2px 8px;background:rgba(176,104,0,.1);border-radius:3px;cursor:pointer;" onclick="if(typeof runFiscalCompare==='function')runFiscalCompare();" title="Profile or price changed — click here or press Ctrl+Enter to re-run Compare">&#9654; Re-run Compare</span>
   </div>
   <script>
   (function() {
@@ -1694,20 +1698,29 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
         var profileCite = {
-          deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA v473 (Aug 2026).' },
-          onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $300M capex / 15k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA v473 (Aug 2026).' },
-          giant:     { label: 'Giant field profile', cite: 'Computed using ORCA Giant Field profile: $5.0B capex / 200k bbl/d / $10/bbl opex / 10% WACC / 100% WI. Source: ORCA v473 (Aug 2026).' },
-          marginal:  { label: 'Marginal / tail-end field profile', cite: 'Computed using ORCA Marginal Field profile: $80M capex / 5k bbl/d / $20/bbl opex / 10% WACC / 100% WI. Source: ORCA v473 (Aug 2026).' },
-          lng:       { label: 'LNG / gas profile', cite: 'Computed using ORCA LNG profile: $8.0B capex / 500 MMscfd / $1.50/Mscf opex / 10% WACC / 100% WI. Source: ORCA v473 (Aug 2026).' }
+          deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA v474 (Aug 2026).' },
+          onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $300M capex / 15k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA v474 (Aug 2026).' },
+          giant:     { label: 'Giant field profile', cite: 'Computed using ORCA Giant Field profile: $5.0B capex / 200k bbl/d / $10/bbl opex / 10% WACC / 100% WI. Source: ORCA v474 (Aug 2026).' },
+          marginal:  { label: 'Marginal / tail-end field profile', cite: 'Computed using ORCA Marginal Field profile: $80M capex / 5k bbl/d / $20/bbl opex / 10% WACC / 100% WI. Source: ORCA v474 (Aug 2026).' },
+          lng:       { label: 'LNG / gas profile', cite: 'Computed using ORCA LNG profile: $8.0B capex / 500 MMscfd / $1.50/Mscf opex / 10% WACC / 100% WI. Source: ORCA v474 (Aug 2026).' }
         };
-        var pc = profileCite[key] || { label: 'Custom profile', cite: 'Computed using ORCA ' + (p.name || key) + ' profile. Source: ORCA v473 (Aug 2026).' };
+        var pc = profileCite[key] || { label: 'Custom profile', cite: 'Computed using ORCA ' + (p.name || key) + ' profile. Source: ORCA v474 (Aug 2026).' };
         noteEl.title = "IC memo citation: " + pc.cite;
         noteEl.innerHTML = pc.label + ' <span style="font-size:9px;opacity:.65;font-style:normal;">(ⓘ cite basis)</span>';
       }
     }
     document.addEventListener('DOMContentLoaded', function() {
       var profSel = document.getElementById('fc-profile');
-      if (profSel) profSel.addEventListener('change', _updateFCStrip);
+      var priceSel = document.getElementById('fc-price');
+      // v474: show re-run hint when profile or price changes — analyst needs to know table is stale
+      function _showRerunHint() {
+        var hint = document.getElementById('fc-rerun-hint');
+        if (hint && document.getElementById('fc-results') && document.getElementById('fc-results').innerHTML.trim() !== '') {
+          hint.style.display = 'inline-block';
+        }
+      }
+      if (profSel) { profSel.addEventListener('change', _updateFCStrip); profSel.addEventListener('change', _showRerunHint); }
+      if (priceSel) priceSel.addEventListener('change', _showRerunHint);
       // Try to update once FC_PROFILES loads (data-driven)
       var _stripInterval = setInterval(function() {
         if (typeof FC_PROFILES !== 'undefined') { _updateFCStrip(); clearInterval(_stripInterval); }
@@ -2373,9 +2386,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       &#x1F4CB; Cite
     </button>
     <!-- v425: Copy IC Summary button — one-click copy of full IC memo paragraph for analyst use -->
+    <!-- v474: renamed from "IC Summary" to "Copy for IC Memo" — clearer action label for first-time analysts -->
     <button id="dd-ic-summary-btn" title="Copy a ready-to-paste IC memo summary paragraph for this country to clipboard — includes take at 4 prices, mechanic, swing, IRR, breakeven, stability, and source tier" aria-label="Copy IC memo summary paragraph to clipboard"
-            style="display:none;margin-left:6px;background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--accent);font-size:11px;font-weight:600;">
-      &#x1F5CE; IC Summary
+            style="display:none;margin-left:6px;background:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 10px;cursor:pointer;color:#fff;font-size:11px;font-weight:600;">
+      &#x1F5CE; Copy for IC Memo
     </button>
   </div>
   <!-- v313: FC navigation bar — ← / → through current FC ranked list without returning to FC tab -->
@@ -2394,7 +2408,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
         <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v473 · Exported <span id="print-export-date"></span></div>
+      <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db · v474 · Exported <span id="print-export-date"></span></div>
     </div>
   </div>
   <div id="cp-empty-state">
@@ -2457,7 +2471,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-provenance">
     <div class="dd-section-hdr">Who Built This</div>
     <p style="font-size:13px;color:var(--text);line-height:1.7;margin:0;">
-      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v473 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
+      This platform was built by a petroleum economist with 15+ years of upstream fiscal analysis at <strong>DeGolyer and MacNaughton</strong> (D&amp;M), a leading independent petroleum engineering consultancy, where petroleum fiscal regime modeling has been conducted for IOC clients across over 40 producing countries. Fiscal parameters are cross-referenced from primary sources — PSA and concession agreements, government gazettes, and national oil company publications — and validated against published industry benchmarks from <strong>Wood Mackenzie</strong>, <strong>Rystad Energy</strong>, and <strong>S&amp;P Global Commodity Insights</strong>. All computed results reflect a standardized reference project; they are designed for regime comparison, not contract-specific bid evaluation. <span style="color:var(--muted);font-size:12px;">Platform v474 · 185 countries · 71,576 contracts · 330,329 fiscal facts.</span>
     </p>
   </div>
 
@@ -4155,10 +4169,10 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         </ul>
         <strong style="color:var(--text);">Step 5 — IC memo structure:</strong>
         <ul style="margin:8px 0 8px 18px;list-style:disc;line-height:1.8;">
-          <li><strong>Opening table:</strong> Country | Fiscal Mechanic | Govt Take @$75 | Contractor NPV | Breakeven | Stability Score | Recommended Action. Source: ORCA v473 (Aug 2026).</li>
+          <li><strong>Opening table:</strong> Country | Fiscal Mechanic | Govt Take @$75 | Contractor NPV | Breakeven | Stability Score | Recommended Action. Source: ORCA v474 (Aug 2026).</li>
           <li><strong>Price sensitivity section:</strong> Side-by-Side chart PNG @$50/$75/$100/$125 showing take evolution — this is the IC committee's primary read of fiscal resilience to oil price cycles.</li>
           <li><strong>Fiscal risk disclosure:</strong> For each finalist, one sentence: "Country X take is sourced from [primary legislation / operator filing / Wood Mac benchmark] at Tier [A/B]. [No hostile reforms since 2016 / Last hostile reform: [year] — [impact]]."</li>
-          <li><strong>Citation:</strong> "Fiscal data: ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/ — standardized Deepwater profile ($1.2B capex / 50k bbl/d / $15/bbl opex / 10% discount rate)."</li>
+          <li><strong>Citation:</strong> "Fiscal data: ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/ — standardized Deepwater profile ($1.2B capex / 50k bbl/d / $15/bbl opex / 10% discount rate)."</li>
         </ul>
         <em>Rule of thumb: a well-assembled ORCA-backed IC shortlist has four components — (1) Screener-ranked long list with mechanic and region filter applied, (2) Fiscal Compare rank table exported to XLSX with 4-price take columns, (3) Side-by-Side PNG for the 2–4 finalists, (4) Country Profile XLSX for each finalist to back the fiscal parameters. Combined, these four exports give your IC committee everything they need to verify the fiscal ranking independently — the standard of a professional fiscal due diligence package.</em>
       </div>
@@ -4275,7 +4289,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li><strong>Onshore profile variant:</strong> $400M capex / 20,000 bbl/d peak / $10/bbl opex. Shallow water: $700M / 35,000 bbl/d / $12/bbl opex. Use the Scenario Builder to model your specific project parameters and generate a project-specific IRR — cite as "ORCA Scenario Builder, [your inputs], v270."</li>
           <li><strong>IRR coverage:</strong> 124 of 185 countries show IRR in the UI (67.0% display coverage). 165 countries have IRR data in the database (89.2%); 41 are excluded from display as unbounded ≥500% (very-low-royalty regimes). 20 countries are structurally non-computable. For the 61 countries without displayed IRR, use Fiscal Compare take figures + the IRR proxy workflow (A12) to estimate relative attractiveness.</li>
         </ul>
-        <strong style="color:var(--text);">Suggested IC disclosure language:</strong> "IRR computed using ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026), standardized Deepwater profile: $1,200M capex, 50k bbl/d peak, $15/bbl opex, 10% discount rate, $75/bbl oil price. Unlevered, pre-financing. For project-specific IRR, see Appendix [X] using actual capex/opex/production schedule inputs."
+        <strong style="color:var(--text);">Suggested IC disclosure language:</strong> "IRR computed using ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026), standardized Deepwater profile: $1,200M capex, 50k bbl/d peak, $15/bbl opex, 10% discount rate, $75/bbl oil price. Unlevered, pre-financing. For project-specific IRR, see Appendix [X] using actual capex/opex/production schedule inputs."
       </div>
     </div>
 
@@ -5403,8 +5417,8 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li style="margin-bottom:4px;"><strong>If post-vintage reforms found: model Scenario Builder.</strong> Run at the ORCA take as a base case (pre-reform) and at your estimated post-reform take (derived from gazette/press release). Disclose the pre/post-reform IRR range in the IC memo appendix. This bounds the fiscal uncertainty without requiring a full primary-source verification if IC timeline is tight.</li>
           <li style="margin-bottom:4px;"><strong>Draft data currency disclosure.</strong> If no post-vintage reforms found: one-sentence disclosure. If reforms found but bounded: three-sentence disclosure with appendix reference. If reforms unverified and high-impact: flag as a FID condition requiring independent legal/fiscal verification before commitment.</li>
         </ol>
-        <p><strong style="color:var(--text);">IC memo language template:</strong> &ldquo;Fiscal parameters for [Country] sourced from ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026). Primary benchmark source: [EY Oil &amp; Gas Tax Guide [year] / Wood Mac [year] / Rystad [year]] &mdash; effective data cut-off approximately [H1/H2 YYYY]. ORCA Reform History tab: [N] fiscal reform events in the past 5 years (most recent: [description, date]). [Choose one: (a) No material regime changes identified between benchmark cut-off and IC submission date &mdash; data is suitable for IC use. (b) Reform event identified: [description] enacted [date]. Scenario Builder sensitivity at pre/post-reform take estimates: IRR [X]% (pre) to [Y]% (post) &mdash; see Appendix [Z]. (c) Post-vintage reform unverified &mdash; independent fiscal counsel verification required prior to FID commitment.] Evidence badge: [A/B/C]. Citation: ORCA v473, yoburgqs.github.io/petroleum-fiscal-db/.&rdquo;</p>
-        <p><strong style="color:var(--text);">Source:</strong> ORCA v473 (Aug 2026). See also FAQ A13 (three-tier source verification workflow), FAQ A17 (IC-readiness tier guidance by country tier), FAQ A51 (Reform Risk workflow), FAQ A76 (recently-reformed fiscal regime IC workflow), FAQ A73 (stabilization clause vs. Reform Risk Stability Score), FAQ A87 (country risk premium adjustment).</p>
+        <p><strong style="color:var(--text);">IC memo language template:</strong> &ldquo;Fiscal parameters for [Country] sourced from ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026). Primary benchmark source: [EY Oil &amp; Gas Tax Guide [year] / Wood Mac [year] / Rystad [year]] &mdash; effective data cut-off approximately [H1/H2 YYYY]. ORCA Reform History tab: [N] fiscal reform events in the past 5 years (most recent: [description, date]). [Choose one: (a) No material regime changes identified between benchmark cut-off and IC submission date &mdash; data is suitable for IC use. (b) Reform event identified: [description] enacted [date]. Scenario Builder sensitivity at pre/post-reform take estimates: IRR [X]% (pre) to [Y]% (post) &mdash; see Appendix [Z]. (c) Post-vintage reform unverified &mdash; independent fiscal counsel verification required prior to FID commitment.] Evidence badge: [A/B/C]. Citation: ORCA v474, yoburgqs.github.io/petroleum-fiscal-db/.&rdquo;</p>
+        <p><strong style="color:var(--text);">Source:</strong> ORCA v474 (Aug 2026). See also FAQ A13 (three-tier source verification workflow), FAQ A17 (IC-readiness tier guidance by country tier), FAQ A51 (Reform Risk workflow), FAQ A76 (recently-reformed fiscal regime IC workflow), FAQ A73 (stabilization clause vs. Reform Risk Stability Score), FAQ A87 (country risk premium adjustment).</p>
       </div>
     </details>
 
@@ -21323,7 +21337,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <p><strong>How to add or replace countries:</strong> Use the country search box above the comparison table to add countries (up to 4 maximum). Type a country name, select from the dropdown, and it appears as an additional column. To remove a country, click the X on its column header. To replace the entire preset, remove each country individually and add your own selections.</p>
         <p><strong>The "Example loaded" banner:</strong> The yellow banner reading "Example loaded: North Sea Trio — Norway, UK, Netherlands" appears on first tab visit to signal that this is a preset, not your own selection. Click the × to dismiss it. On subsequent visits within the same session, the banner does not reappear and your selections are preserved.</p>
         <p><strong>Side-by-Side is most useful when:</strong> You have 2–4 candidate countries at the same exploration stage and want to compare all fiscal metrics (take, NPV, IRR, Breakeven, Swing) at four price points ($50/$75/$100/$125) simultaneously. It is the fastest route to a side-by-side IC table for a regional allocation decision. For more than 4 countries, use Fiscal Compare with a region chip and export the filtered table instead.</p>
-        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026). Cross-references: FAQ A958 (5-minute IC shortlist), FAQ A924 (two-country PSC vs. Concession comparison), FAQ A945 (Norway RFCT/SC/PRT stack), FAQ A966 (CP headline strip interpretation).</em></p>
+        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026). Cross-references: FAQ A958 (5-minute IC shortlist), FAQ A924 (two-country PSC vs. Concession comparison), FAQ A945 (Norway RFCT/SC/PRT stack), FAQ A966 (CP headline strip interpretation).</em></p>
       </div>
     </div>
 
@@ -21339,7 +21353,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li><strong>Do not use PROXY take in NPV models:</strong> PROXY countries are suitable for screening (ranking 50 countries by rough take level) but not for DCF inputs in an IC submission. Switch to Scenario Builder with your own cost assumptions if you need an NPV for a PROXY country.</li>
         </ul>
         <p><strong>Countries most commonly showing PROXY:</strong> Frontier basins with limited disclosure (many Sub-Saharan Africa PSA jurisdictions, several Central Asian states, small island nations). These make up the majority of the ~20 countries excluded from IRR display.</p>
-        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026). Cross-references: FAQ A6 (IRR suppression rules), FAQ A42 (IRR coverage gap analysis), FAQ A966 (CP headline strip interpretation — evidence tier badge).</em></p>
+        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026). Cross-references: FAQ A6 (IRR suppression rules), FAQ A42 (IRR coverage gap analysis), FAQ A966 (CP headline strip interpretation — evidence tier badge).</em></p>
       </div>
     </div>
 
@@ -21355,7 +21369,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li><strong>Ultra-deepwater ($2.5B / 75k bbl/d / $18/bbl opex):</strong> Switch for water depths >1,500m where capex escalates materially — Gulf of Mexico Paleogene, Brazil pre-salt, East Africa deepwater. These regimes typically offer cost-recovery incentives to attract capital at this investment level.</li>
         </ul>
         <p><strong>IC memo disclosure when switching from Deepwater:</strong> Any IC memo that uses a non-Deepwater profile must state the basis explicitly. Standard disclosure language: "Government take of [X]% modeled on [Giant / Marginal / Onshore] reference basis ($[capex]B capex, [rate]k bbl/d peak, $[opex]/bbl opex). Deepwater standard basis take is [Y]% for comparability with peer screening." This gives IC committee members both the project-specific number and the standard-basis number so they can contextualize against other IC submissions.</p>
-        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026). Cross-references: FAQ A72 (IRR sensitivity to profile), FAQ A924 (two-country comparison workflow), FAQ A958 (5-minute IC shortlist), FAQ A966 (FC Profile dropdown — "(IOC standard)" label).</em></p>
+        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026). Cross-references: FAQ A72 (IRR sensitivity to profile), FAQ A924 (two-country comparison workflow), FAQ A958 (5-minute IC shortlist), FAQ A966 (FC Profile dropdown — "(IOC standard)" label).</em></p>
       </div>
     </div>
 
@@ -21379,7 +21393,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li><strong>2 diamonds or below:</strong> WACC premium required. State in IC submission — "ORCA Stability Score 2/5 (Volatile). Applied [X]% WACC premium to reflect fiscal renegotiation risk. Base-case take [X]%; stress scenario assumes [X+15]pp take increase with no cost-recovery offset."</li>
           <li><strong>1 diamond + Reform Risk:</strong> This combination is a hard flag for IC. Require explicit board-level sign-off on the fiscal risk assumption. ORCA data shows what the current terms are — the stress scenario is the decision question.</li>
         </ul>
-        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026). Cross-references: FAQ A958 (5-minute IC shortlist), FAQ A966 (CP headline strip — Stability Score location), FAQ A969 (PROXY badge and IC disclosure), FAQ A970 (profile selection for field-specific IC work).</em></p>
+        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026). Cross-references: FAQ A958 (5-minute IC shortlist), FAQ A966 (CP headline strip — Stability Score location), FAQ A969 (PROXY badge and IC disclosure), FAQ A970 (profile selection for field-specific IC work).</em></p>
       </div>
     </div>
 
@@ -21399,7 +21413,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <p><strong>Expected output:</strong> At $75/bbl Deepwater profile, Angola Block 17-style parameters should produce government take of approximately 65–72%, consistent with ORCA's published Angola take of ~68%. Variation depends on whether CIT is contractor-paid or NOC-paid.</p>
         <p><strong>What to adjust for bid sensitivity:</strong> The Profit Oil — Govt split is the key bid variable. Each 5pp reduction in government profit oil share reduces effective take by approximately 2–3pp at $75/bbl. Run the Scenario Builder at 60%, 65%, and 70% government profit oil to bracket the take range in your bid round.</p>
         <p><strong>Benchmarking against ORCA:</strong> After running the Scenario Builder, compare your computed take to ORCA's Angola take in the Fiscal Compare table. A ≤3pp difference is within modeling tolerance. A >5pp gap usually means either (a) a different CIT basis (NOC-paid vs. contractor-paid), (b) the ORCA figure reflects a production-weighted average across all Angola blocks including onshore legacy contracts, or (c) R-factor tiers create a different effective split at the standardized DCF production volume. Use FAQ A28 for the full reconciliation workflow.</p>
-        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026). Cross-references: FAQ A28 (ORCA vs. Wood Mac/Rystad reconciliation), FAQ A972-basis PSC mechanic, FAQ A970 (profile selection), FAQ A407 (farm-out IC framework).</em></p>
+        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026). Cross-references: FAQ A28 (ORCA vs. Wood Mac/Rystad reconciliation), FAQ A972-basis PSC mechanic, FAQ A970 (profile selection), FAQ A407 (farm-out IC framework).</em></p>
       </div>
     </div>
 
@@ -21416,7 +21430,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         </ul>
         <p><strong>IC impact of Uplift Rate:</strong> A 3pp increase in Uplift Rate (e.g., from 8% to 11%) can delay PRRT trigger by 3–5 years on a typical deepwater project, reducing effective take by 2–4pp at $75/bbl and significantly improving NPV. At low oil prices ($50/bbl), PRRT may never trigger regardless of the uplift rate — making Australia relatively attractive in a downside scenario.</p>
         <p><strong>Rule of thumb:</strong> Use LTBR + 5pp for greenfield exploration modeling; use LTBR + 2pp for acquiring a producing Australian asset. Check the Reserve Bank of Australia website for the current LTBR before submitting to IC committee.</p>
-        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026). PRRT Assessment Act 1987 (Cth) s. 48 (uplift rates); Australian Taxation Office PRRT guidance 2025. Cross-references: FAQ A10 (Australia PRRT take overview), FAQ A970 (profile selection), FAQ A51 (Reform Risk workflow for Australia).</em></p>
+        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026). PRRT Assessment Act 1987 (Cth) s. 48 (uplift rates); Australian Taxation Office PRRT guidance 2025. Cross-references: FAQ A10 (Australia PRRT take overview), FAQ A970 (profile selection), FAQ A51 (Reform Risk workflow for Australia).</em></p>
       </div>
     </div>
 
@@ -21433,8 +21447,8 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li><strong>State Equity:</strong> 31.6% (SDFI — State's Direct Financial Interest via Petoro; however, the government acts as a commercial partner, not just a tax collector. For take calculation purposes, set State Equity to 0 if modeling a private contractor's economics without SDFI carry, or 31.6% if modeling a consortium where SDFI is a paying partner)</li>
         </ul>
         <p><strong>Why effective take ≈ 68% rather than 78%:</strong> Norwegian tax law provides extraordinary cost deductions that erode the tax base: (1) <strong>Uplift allowance:</strong> 17.69% of qualifying capex can be deducted from the SPT base over 4 years — a non-cash shield that reduces the SPT base by roughly 70.7% of capex (4 × 17.69%). (2) <strong>Linear depreciation over 6 years:</strong> both CIT and SPT allow full capex deduction over 6 years, accelerated vs. production. (3) <strong>Exploration refund:</strong> companies not in tax position can receive 78% cash refund of exploration costs from Skatteetaten — makes Norway effectively risk-shared by the government. The ORCA Scenario Builder models simplified Norwegian-style economics; for a full NCS project model, add a note that the uplift allowance and exploration refund are not captured in the simplified Concession mechanic.</p>
-        <p><strong>IC memo guidance:</strong> When citing Norway take from ORCA in an IC memo, state: "ORCA government take 68% at $75/bbl Deepwater profile (standardized project). Norwegian statutory marginal rate is 78% (22% CIT + 56% SPT), but effective take is reduced to ~68% by the 17.69% uplift allowance (SPT base reduction) and 6-year linear depreciation. Source: ORCA v473 (Aug 2026); Norwegian Petroleum Tax Act Section 5."</p>
-        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v473 (Aug 2026). Norwegian Petroleum Tax Act (Petroleumsskatteloven) Section 5 (special tax rate and uplift). Cross-references: FAQ A945 (Norway RFCT/SC/PRT stack for UK comparison), FAQ A973 (PRRT Uplift Rate), FAQ A28 (ORCA vs. Wood Mac reconciliation for high-take jurisdictions).</em></p>
+        <p><strong>IC memo guidance:</strong> When citing Norway take from ORCA in an IC memo, state: "ORCA government take 68% at $75/bbl Deepwater profile (standardized project). Norwegian statutory marginal rate is 78% (22% CIT + 56% SPT), but effective take is reduced to ~68% by the 17.69% uplift allowance (SPT base reduction) and 6-year linear depreciation. Source: ORCA v474 (Aug 2026); Norwegian Petroleum Tax Act Section 5."</p>
+        <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v474 (Aug 2026). Norwegian Petroleum Tax Act (Petroleumsskatteloven) Section 5 (special tax rate and uplift). Cross-references: FAQ A945 (Norway RFCT/SC/PRT stack for UK comparison), FAQ A973 (PRRT Uplift Rate), FAQ A28 (ORCA vs. Wood Mac reconciliation for high-take jurisdictions).</em></p>
       </div>
     </div>
 
@@ -21443,15 +21457,15 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
     <div style="margin-top:20px;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">How to Cite This Platform</div>
-      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;" id="cite-text"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v473, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
-      <button id="cite-copy-btn" onclick="(function(){var t=document.getElementById('cite-copy-btn');navigator.clipboard.writeText('ORCA Petroleum Fiscal Intelligence Platform (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v473, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/').then(function(){t.textContent='Copied!';setTimeout(function(){t.textContent='Copy Citation';},2000);}).catch(function(){t.textContent='Copy failed';setTimeout(function(){t.textContent='Copy Citation';},2000);});})()" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:inherit;" aria-label="Copy full citation to clipboard">Copy Citation</button>
+      <div style="font-size:12px;color:var(--muted);font-family:'IBM Plex Mono',monospace;line-height:1.8;" id="cite-text"><em>ORCA Petroleum Fiscal Intelligence Platform</em> (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v474, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/</div>
+      <button id="cite-copy-btn" onclick="(function(){var t=document.getElementById('cite-copy-btn');navigator.clipboard.writeText('ORCA Petroleum Fiscal Intelligence Platform (2026). Global petroleum fiscal database: 71,576 contracts, 185 countries [v474, Aug 2026]. Retrieved from https://yoburgqs.github.io/petroleum-fiscal-db/').then(function(){t.textContent='Copied!';setTimeout(function(){t.textContent='Copy Citation';},2000);}).catch(function(){t.textContent='Copy failed';setTimeout(function(){t.textContent='Copy Citation';},2000);});})()" style="margin-top:6px;background:none;border:1px solid var(--border);color:var(--muted);border-radius:3px;padding:2px 8px;font-size:11px;cursor:pointer;font-family:inherit;" aria-label="Copy full citation to clipboard">Copy Citation</button>
 
-      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v473." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
+      <div style="font-size:11px;color:var(--muted);margin-top:6px;">For IC memos and internal reports: cite this platform as you would any commercial fiscal database (Wood Mac, Rystad). Note the standardized reference project basis and data vintage (Aug 2026). For field-specific take figures, add "modeled on [your project parameters] using ORCA Scenario Builder v474." The URL <code>yoburgqs.github.io/petroleum-fiscal-db/</code> is stable and permanently citable — GitHub Pages preserves the URL even as the platform updates.</div>
       <div style="font-size:11px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
         <strong style="color:var(--text);">Short-form citation for footnotes:</strong><br>
-        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v473 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
-        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v473, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
-        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v473."
+        <span style="font-family:'IBM Plex Mono',monospace;">ORCA v474 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/</span><br>
+        <strong style="color:var(--text);">For regime-comparison IC memos:</strong> state the profile and price used, e.g. "Government take at $75/bbl Deepwater profile (ORCA v474, standardized $1.2B capex / 50k bbl/d / $15/bbl opex)."<br>
+        <strong style="color:var(--text);">For field-specific Scenario Builder results:</strong> add your input assumptions: "Modeled on [capex]/[opex]/[peak rate] using ORCA Scenario Builder v474."
       </div>
     </div>
   </div>
@@ -23181,10 +23195,13 @@ function renderCompare() {
     </div>`;
   }
   // Add export/share actions directly below the comparison grid
+  // v474: "Run Fiscal Compare for all 185 countries" shortcut — lets analyst widen view from SbS to global ranking
+  var _sbsCountriesStr = compareList.join(' / ');
   html += `<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
     <button class="cmp-inline-print-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Print or Save as PDF via browser print dialog — comparison table and chart included">⬇ Save as PDF</button>
     <button class="cmp-inline-png-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Download chart as PNG image">⬇ Chart PNG</button>
     <button class="cmp-inline-share-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Copy shareable link to this comparison">⎘ Share Link</button>
+    <button onclick="switchTab('t0',document.getElementById('tab-btn-t0'));setTimeout(function(){if(typeof runFiscalCompare==='function')runFiscalCompare();},200);" style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:6px;color:var(--accent);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.08)'" onmouseout="this.style.background='transparent'" title="Switch to Fiscal Compare — see all 185 countries ranked at the same price and profile. Your ${compareList.length} selected countries will be visible in the global ranking.">&#x25A6; Rank all 185 countries</button>
     <span style="font-size:10px;color:var(--muted);margin-left:4px;">Tip: Ctrl+P to print, select "Save as PDF" as printer for best results</span>
   </div>`;
   // Accessibility/data table: structured table mirroring the comparison grid (screen readers and tests)
@@ -23544,10 +23561,26 @@ function runScreener() {
 
   const tbody = document.getElementById('tbody-screener');
   if (data.length === 0) {
+    // v474: Diagnose which filter is most likely causing zero results — helps analyst know what to relax
+    var _diagHints = [];
+    var _diagTake = +document.getElementById('sl-take').value;
+    var _diagIRR = +document.getElementById('sl-irr').value;
+    var _diagNPV = +document.getElementById('sl-npv').value;
+    var _diagBE = +document.getElementById('sl-be').value;
+    var _totalMechs = document.querySelectorAll('#sc-mech-checks input[type=checkbox]').length;
+    var _checkedMechsCount = document.querySelectorAll('#sc-mech-checks input[type=checkbox]:checked').length;
+    if (_diagIRR >= 15) _diagHints.push('Min IRR &ge;' + _diagIRR + '% — only ' + COUNTRY_DATA.filter(function(x){var v=x['irr_'+getPriceKey()];return v!=null&&v<500&&v>=_diagIRR;}).length + ' countries have IRR data at this level');
+    else if (_diagIRR > 0) _diagHints.push('Min IRR &ge;' + _diagIRR + '% is active');
+    if (_diagTake < 60) _diagHints.push('Max take &le;' + _diagTake + '% — few countries qualify at this threshold');
+    if (_checkedMechsCount < _totalMechs && _checkedMechsCount > 0) _diagHints.push('Only ' + _checkedMechsCount + ' of ' + _totalMechs + ' fiscal mechanics selected');
+    if (_diagBE < 120) _diagHints.push('Breakeven max &le;$' + _diagBE + '/bbl — applies to only 68 of 185 countries');
+    if (scRegionActive) _diagHints.push('Region filter: ' + scRegionActive + ' only');
+    var _diagStr = _diagHints.length > 0 ? '<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:left;max-width:420px;margin-left:auto;margin-right:auto;"><strong style="color:var(--text);">Likely causes:</strong><ul style="margin:4px 0 0 16px;padding:0;">' + _diagHints.map(function(h){return '<li>' + h + '</li>';}).join('') + '</ul></div>' : '';
     tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;">'
-      + '<div style="font-size:20px;margin-bottom:8px;opacity:.5;">⚙</div>'
+      + '<div style="font-size:20px;margin-bottom:8px;opacity:.5;">&#8960;</div>'
       + '<strong style="color:var(--text);display:block;margin-bottom:6px;">No countries match your current filters</strong>'
       + 'Try relaxing your criteria — reduce the IRR minimum, raise the government take ceiling, or uncheck some mechanic filters.'
+      + _diagStr
       + '<br><button onclick="resetScreenerAll()" style="margin-top:12px;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.3);color:var(--accent);border-radius:5px;padding:5px 14px;font-size:12px;cursor:pointer;font-weight:600;">Reset All Filters</button>'
       + '</td></tr>';
     return;
@@ -24802,7 +24835,7 @@ function loadCountryProfile(country) {
       msg = 'IC: favorable regime — single-price cite acceptable; note evidence tier';
       col = 'var(--green)'; bg = 'rgba(21,128,61,.06)'; border = 'rgba(21,128,61,.2)';
     } else {
-      msg = 'IC: standard citation — take@$75, profile, evidence tier, ORCA v473';
+      msg = 'IC: standard citation — take@$75, profile, evidence tier, ORCA v474';
       col = 'var(--muted)';
     }
     if (stab <= 1) { msg += ' · reform risk: add stability discount or probability-weighted NPV'; }
@@ -27506,7 +27539,7 @@ function copyICCitation() {
   var mechStr = d.mechanics ? d.mechanics.split(',')[0].trim() : '';
   var cite = country + ': ' + takeStr
     + (tierStr ? ' (' + tierStr + ', $75/bbl Deepwater, ' + mechStr + ' regime)' : '')
-    + '. Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v473 — yoburgqs.github.io/petroleum-fiscal-db/';
+    + '. Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v474 — yoburgqs.github.io/petroleum-fiscal-db/';
   navigator.clipboard.writeText(cite).then(function(){
     var btn = document.getElementById('dd-cite-btn');
     if (btn) { var orig = btn.innerHTML; btn.innerHTML = '&#x2713; Copied!'; setTimeout(function(){ btn.innerHTML = orig; }, 2000); }
@@ -27544,7 +27577,7 @@ function copyICSummary() {
     + 'Contractor NPV: ' + npvStr + ' @$75 (10% WACC, Deepwater, 100% WI). '
     + 'IRR: ' + irrStr + ' @$75. Breakeven: ' + beStr + '. '
     + 'Fiscal predictability: ' + stabLabel + ' (score ' + stabScore + '/100).\n'
-    + 'Source: ORCA Petroleum Fiscal Intelligence Platform v473 (2026) — yoburgqs.github.io/petroleum-fiscal-db/';
+    + 'Source: ORCA Petroleum Fiscal Intelligence Platform v474 (2026) — yoburgqs.github.io/petroleum-fiscal-db/';
   navigator.clipboard.writeText(summary).then(function(){
     var btn = document.getElementById('dd-ic-summary-btn');
     if (btn) { var orig = btn.innerHTML; btn.innerHTML = '&#x2713; Copied!'; setTimeout(function(){ btn.innerHTML = orig; }, 2000); }
@@ -29262,6 +29295,9 @@ function runFiscalCompare() {
     if (s) s.textContent = 'Data loading — please wait…';
     return;
   }
+  // v474: hide re-run hint when compare actually runs
+  var _rrHint = document.getElementById('fc-rerun-hint');
+  if (_rrHint) _rrHint.style.display = 'none';
   const status = document.getElementById('fc-status');
   status.textContent = 'Running ' + COUNTRY_DATA.length + ' countries...';
 
@@ -30064,7 +30100,7 @@ function openFCDrilldown(country) {
       } else if (_icSwing > 20) {
         _icLines.push('<strong style="color:var(--orange);">Progressive regime (Swing ' + _icSwing.toFixed(0) + 'pp)</strong> — show $50/$75/$100/$125 price sensitivity table. Government take increases substantially at higher prices.');
       } else {
-        _icLines.push('Moderate take, stable regime — cite: “' + ((_icTake!=null)?_icTake.toFixed(1)+'%':'N/A') + ' govt take @$75/bbl (ORCA v473).” Evidence: ' + (r.ab_pct||0).toFixed(0) + '% A/B-sourced.');
+        _icLines.push('Moderate take, stable regime — cite: “' + ((_icTake!=null)?_icTake.toFixed(1)+'%':'N/A') + ' govt take @$75/bbl (ORCA v474).” Evidence: ' + (r.ab_pct||0).toFixed(0) + '% A/B-sourced.');
       }
     }
     if (_icStab != null && _icStab <= 1) {
@@ -30084,6 +30120,25 @@ function openFCDrilldown(country) {
   // v426: "Open Country Profile" promoted to primary (filled amber) CTA — it is the natural next step for any analyst drilling into a row
   html += '<button class="btn btn-sm" onclick="openCountryProfileFromFC(\'' + cEsc + '\')" title="Open full Country Profile: take at 4 prices, sourced fiscal parameters, reform timeline, regional peer comparison">Full Profile &#8594;</button>';
   html += '<button class="btn btn-sm btn-outline" onclick="ddAddCompare(\'' + cEsc + '\',this)">+ Compare</button>';
+  // v474: "Load in SbS with region peers" — loads this country + top 2 fiscal peers from same region into SbS
+  // Analyst can go directly from FC drilldown to a meaningful SbS without having to manually pick countries
+  (function() {
+    if (!COUNTRY_DATA) return;
+    var _sbsCountry = country;
+    var _sbsRegion = d.region || '';
+    var _sbsTake = d.take_75;
+    if (_sbsTake == null) return;
+    var _regionPeers = COUNTRY_DATA.filter(function(x) {
+      return x.region === _sbsRegion && x.country !== _sbsCountry && x.take_75 != null;
+    }).sort(function(a, b) { return Math.abs(a.take_75 - _sbsTake) - Math.abs(b.take_75 - _sbsTake); }).slice(0, 2);
+    if (_regionPeers.length > 0) {
+      var _allSbs = [_sbsCountry].concat(_regionPeers.map(function(p){return p.country;}));
+      var _sbsCalls = _allSbs.map(function(c){ return 'addCompare(\'' + c.replace(/'/g,"\\'") + '\');'; }).join('');
+      html += '<button class="btn btn-sm btn-outline" onclick="(function(){clearCompare();' + _sbsCalls + 'var b=[...document.querySelectorAll(\'.tab-btn\')].find(function(b){return b.textContent.includes(\'Side-by-Side\');});if(b)switchTab(\'t2\',b);})()" '
+        + 'title="Load ' + _sbsCountry + ' + closest ' + _regionPeers.length + ' fiscal peer' + (_regionPeers.length>1?'s':'') + ' from ' + _sbsRegion + ' into Side-by-Side comparison (matched by take%)">'
+        + '&#8652; SbS + peers</button>';
+    }
+  })();
   // v428: "Screen similar [Region]" — one-click to Screener filtered to same region
   if (r.region) {
     var rEsc = r.region.replace(/'/g,"\\'");
@@ -30110,11 +30165,13 @@ function openFCDrilldown(country) {
     + 'var _t=_take&&_take.liveTake!=null?_take.liveTake.toFixed(1)+\'%\':\'N/A\';'
     + 'var _n=_take&&_take.liveNPV!=null?\'$\'+Math.round(_take.liveNPV)+\'M\':\'N/A\';'
     + 'var _i=_take&&_take.liveIRR!=null&&_take.liveIRR<500?_take.liveIRR.toFixed(1)+\'%\':\'N/A\';'
-    + 'var _cite=\'' + country.replace(/'/g,"\\'") + ': Govt Take \'+_t+\', NPV \'+_n+\', IRR \'+_i+\' — ' + _ddProfileName + ' @$' + _ddPrice + '/bbl (ORCA v473, PFID Platform, ' + new Date().toISOString().slice(0,10) + ').\';'
+    + 'var _cite=\'' + country.replace(/'/g,"\\'") + ': Govt Take \'+_t+\', NPV \'+_n+\', IRR \'+_i+\' — ' + _ddProfileName + ' @$' + _ddPrice + '/bbl (ORCA v474, PFID Platform, ' + new Date().toISOString().slice(0,10) + ').\';'
     + 'navigator.clipboard.writeText(_cite).then(function(){btn.textContent=\'\u2713 Copied\';setTimeout(function(){btn.textContent=\'\u2398 IC Citation\';},2000);}).catch(function(){btn.textContent=\'Copy failed\';setTimeout(function(){btn.textContent=\'\u2398 IC Citation\';},2000);});'
     + '})(this)" title="Copy a ready-to-paste IC memo citation: country name, govt take, NPV, IRR, profile, price, and source version">\u2398 IC Citation</button>';
   html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + cEsc + '\')" title="Collapse this drilldown row and return to the ranked table" style="margin-left:auto;">\u2715 Close</button>';
-  html += '</div></div>';
+  // v474: keyboard nav hint — analysts don't discover ← → shortcut without a visible cue
+  html += '</div><div style="font-size:10px;color:var(--muted);padding:6px 12px 0;text-align:right;opacity:.7;" title="Use keyboard arrow keys to step through countries in the ranking">&#8592; &#8594; arrow keys to step through ranking</div>';
+  html += '</div>';
 
   const row = document.querySelector('#tbl-fc tr[data-country="' + country + '"]');
   if (row) {
