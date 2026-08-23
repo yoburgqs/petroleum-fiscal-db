@@ -242,6 +242,24 @@ Reply to this email with any priorities for the next cycle.
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
 def main():
+    # SINGLE EXECUTION POINT. This loop edits index.html, commits, and pushes to
+    # main every 30 minutes. Two machines running it produce competing pushes to
+    # the same file and a GitHub Pages deploy race. Nothing prevented that
+    # before: the script had no host guard of any kind, so any machine with a
+    # clone and a scheduler entry would run it.
+    #
+    # The hub is declared in office/data/hub_host.txt. Peripherals (Legion after
+    # cutover, Surface Pro, ChromeOS) exit here without running. Exit is 0 —
+    # a peripheral correctly declining is not a failure and should not surface
+    # as a scheduler error.
+    try:
+        sys.path.insert(0, str(OFFICE / "tools"))
+        from daemon_host import abort_if_not_hub
+        abort_if_not_hub("autonomous_cycle.py")
+    except ImportError:
+        log("WARNING: daemon_host unavailable — cannot verify this machine is "
+            "the hub. Proceeding, but two runners would collide.")
+
     force = "--once" in sys.argv
     state = load_state()
 
