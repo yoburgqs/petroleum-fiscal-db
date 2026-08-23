@@ -1,8 +1,8 @@
 {
-  "cycle_number": 377,
-  "cycle_start_unix": 1787458801,
-  "cycle_start_human": "2026-08-22 23:20",
-  "cycle_complete_human": "2026-08-22 21:59",
+  "cycle_number": 379,
+  "cycle_start_unix": 1787466001,
+  "cycle_start_human": "2026-08-23 01:20",
+  "cycle_complete_human": "2026-08-23 00:59",
   "cycle_interval_seconds": 1800,
   "last_test_pass": 136,
   "last_test_fail": 0,
@@ -48,12 +48,12 @@
     "Professional credibility: provenance statement + benchmark attribution"
   ],
   "notes_cycle_4": "Cycle 4: Floor B+ across all 15 categories. 7 upgrades. 117/0 clean.",
-  "current_version": "v478",
-  "faq_count": 965,
+  "current_version": "v480",
+  "faq_count": 974,
+  "notes_cycle_379": "Cycle 379: v480 shipped. 3 analyst UX improvements. (1) FC IC Analyst Guide: Breakeven Price Tiers section added (P2). (2) FC IC Analyst Guide: explicit no-data rule for dash cells added to IC Memo Quick Rules (P3). (3) SbS West Africa Trio quickstart button added — Angola/Nigeria/Ghana (P2). Version sweep v479->v480 (31 locations). JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_341": "Cycle 341: v425 shipped. 9 analyst UX improvements. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_342": "Cycle 342: v426 shipped. 9 analyst UX improvements + FAQs A957-A959. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_343": "Cycle 343: v428 shipped. 5 analyst UX fixes + FAQs A960-A962. Back-to-FC bug fixed. Breakeven in CP strip. IRR cell tooltips. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_344": "Cycle 344: v428 Cycle 344. 10 analyst UX improvements + 1 critical data fix. USA region Other->North America (was invisible to all FC region chips). North America FC chip. IRR slider @$75 label. CP Breakeven n/a state. Screener auto-Sweet Spot. SbS country count badge. FC Drilldown Peers-in-Region. FC Reading Guide Src definition. FC sort button tooltips (Govt Take, NPV, Breakeven). Screener home card preset mention. JS syntax gate PASS (12 blocks). No new FAQs.",
-  "notes_cycle_345": "Cycle 345: v429. 6 analyst UX fixes + FAQs A963-A965. (1) Screener region filter bug fixed — Asia Pacific/Americas returned 0 results; fixed via _regionMatch(). (2) FC Other(17) chip added — 17 countries previously unreachable. (3) Quick Start Step 3 label corrected. (4) FC stats bar Ctct NPV>0 label. (5) Screener preset description corrected. (6) Home hero date updated. FAQs A963-A965. JS syntax gate PASS (6 blocks).",
-  "notes_cycle_377": "Cycle 377: v478. 8 analyst UX fixes. (1) CP spinner trailing dash bug — 'Loading [Country] —' was left dangling; now shows '…'. (2) Australia CP tooltip expanded — adds effective take range, PRRT post-payout mechanic details, 2023 gas transfer pricing reform. (3) FC Govt Take sort button — static ▲ arrow added to HTML default state. (4) CP fiscal verdict logic — new cases for moderate-take near-hurdle (55–65% take, IRR near 15%) and high-moderate constrained (65–75% take, IRR near hurdle). (5) IOC exposure quick buttons — amber active state highlight on click and on auto-load Shell button. (6) Home hurdle stat CTA — 'open Fiscal Compare to rank them' → 'open Fiscal Compare →' (action-first). (7) FC reading guide — 'Don't show again' → 'Hide permanently' (clearer permanence). (8) renderFCResults — dynamic ▲/▼ sort arrow on active sort button per window._fcSortDir. Version sweep v477→v478 complete (all citation strings, profile cites, How-to-Cite, clipboard JS). JS syntax gate PASS. 136 PASS / 0 FAIL."
+  "notes_cycle_345": "Cycle 345: v429. 6 analyst UX fixes + FAQs A963-A965. (1) Screener region filter bug fixed \u00e2\u20ac\u201d Asia Pacific/Americas returned 0 results; fixed via _regionMatch(). (2) FC Other(17) chip added \u00e2\u20ac\u201d 17 countries previously unreachable. (3) Quick Start Step 3 label corrected. (4) FC stats bar Ctct NPV>0 label. (5) Screener preset description corrected. (6) Home hero date updated. FAQs A963-A965. JS syntax gate PASS (6 blocks)."
 }
