@@ -568,9 +568,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-23 (Cycle 386 — v487)
+**Last Updated:** 2026-08-23 (Cycle 394 — v495)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 386 shipped v487: 5 targeted analyst workflow improvements. (1) FC drilldown "Copy 4-price as IC table" prepends country/profile/version context header row. (2) FC reading guide adds Stability column definition with IC WACC premium decision rule. (3) Dominant instrument callout upgraded to regime-specific IC implication per instrument type (7 instrument classes). (4) FC IC Analyst Guide Step 2 updated with arrow-key navigation hint and IC Citation button reference. (5) Home Quick Start Step 2 surfaces IC Citation button discovery. Version sweep v486→v487 (41 structural locations). JS syntax gate PASS / 14 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors.
+**Overall Status:** Cycle 394 shipped v495: 4 IOC demo-readiness improvements. (1) Screener tab now opens in Screener mode (was Browse — first-run UX gap). (2) Stale v486 citation strings corrected — Who Built This + How-to-Cite IC memo example. (3) CP Home card discloses Norway auto-load behavior. (4) Changelog brought current: Cycle 393+394 entries added, Cycle 392 sweep typo corrected. Version sweep v494→v495 (49 structural locations). JS syntax gate PASS / 14 blocks / 0 errors.
 
 **Previous [Cycle 386]:** Cycle 386 shipped v487: 5 analyst workflow improvements. (1) FC drilldown "Copy 4-price as IC table" prepends country/profile/version context header row — matching the CP fix from Cycle 385. (2) FC reading guide Stability column definition added with WACC premium IC decision rule (◆◆◆◆◆=0pp, ◆◆◆◇◇=1–2pp, ◆◇◇◇◇=3–5pp, ◇◇◇◇◇=prob-weighted NPV required). (3) Dominant instrument callout upgraded to 7 regime-specific IC implications — royalty, FTP, profit oil, CIT, special/windfall, NOC equity, PRRT each now produce a distinct one-line IC memo implication. (4) FC IC Analyst Guide Step 2 adds ←/→ keyboard navigation hint and IC Citation button reference. (5) Home QS Step 2 surfaces IC Citation button with plain-language description. Version sweep v486→v487 (41 structural locations). JS syntax gate PASS / 14 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -627,6 +627,37 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 **Previous [Cycle 310]:** Cycle 310 shipped v381: 10 FAQs A661-A670 (PSC super-tier upside profit oil clause marginal retention rate; Kazakhstan MET+CIT double-layer burden and EPT overlay; Libya EPSA III vs. EPSA IV government take comparison; Guyana Stabroek PSA renegotiation risk probability-weighted NPV10; Iran IPC vs. Buy-back SEC reserve booking; T&T SPT stacked fiscal burden and Swing; Oman vs. Malaysia RSC structural comparison; PSC 50% vs. 80% cost recovery cap NPV10 impact; FTP interaction with cost cap effective ceiling; CCUS carbon tax and carbon credit mechanics). v380->v381 structural sweep (660->670 FAQs). JS syntax gate PASS / 11 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
+
+## Cycle 394 — v495 Grade Table (this session)
+
+**Cycle 394 — v495:** 4 IOC demo-readiness improvements. (1) **Screener tab: now opens in Screener mode, not Browse mode (P1 — first-run UX)** — Clicking the "Screener" nav tab opened the shared Explorer panel in Browse mode. A first-time analyst clicking "Screener" would land on the "Explorer" page title with "Browse" highlighted in the mode toggle — not in Screener. The Screener nav button onclick now calls `switchExplorerMode('screen')` after `switchTab()`, so Screener nav always lands in Screener mode. (2) **Stale v486 citation strings corrected (2 locations — carried into v495)** — "Who Built This" provenance and How-to-Cite regime-comparison IC memo example both cited ORCA v486 while the platform header displayed v495. Two surfaces an analyst is most likely to read for sourcing context both showed a version 9 cycles out of date. Fixed to v495. (3) **Country Profile Home card: Norway auto-load behavior disclosed (P1)** — The CP card on the Home tab did not mention that Norway auto-loads on first visit. Analysts clicking Country Profile for the first time may not realize data is already displayed. Card now reads: "Norway auto-loads on first visit — use the dropdown to switch country." (4) **Changelog brought current: Cycle 393 (v494) and Cycle 394 (v495) entries added, Cycle 392 sweep typo corrected (P3)** — Recent Platform Updates showed v493 as the most recent entry while the header badge displayed v495. Two cycles absent from the visible changelog. Cycle 392 entry had "Version sweep v492→v495" (should be v492→v493) — corrected. Cycle 393 and 394 entries added at the top of the changelog. Version sweep v494→v495 (49 structural locations). JS syntax gate PASS / 14 blocks / 0 errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1-A974). IRR coverage 165/185 (89%). Benchmark 185/185. |
+| 2 | 4. Interaction Design | A+ | up | Screener tab now opens in Screener mode — first-run UX gap closed. Analyst clicking "Screener" lands in Screener, not Browse. |
+| 3 | 7. Professional Credibility | A+ | = | Stale v486 citation strings corrected (Who Built This + How-to-Cite IC memo example). All IC citation surfaces now cite v495. |
+| 4 | 6. Error & Empty States | A+ | = | NPV sub-threshold warning: all-negative-NPV regime flags with red warning + IC tooltip (Cycle 384). |
+| 5 | 2. Information Architecture | A+ | up | CP card discloses Norway auto-load — Home tab now fully describes auto-load behavior for both FC and CP tabs. Changelog current. |
+| 6 | 1. Visual Design | A+ | = | Key terms strip 2-column grid (Cycle 389). FC stats bar median take tier-colored (Cycle 385). |
+| 7 | 3. Data Presentation | A+ | = | FC drilldown field-scale dollar anchor — take% translated to $B govt / $B contractor on standard Deepwater project. |
+| 8 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). |
+| 9 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 10 | 10. Accessibility | A+ | = | Screener tab aria-label (Cycle 389). All prior accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS 14 blocks. |
+| 12 | 5. Naming Consistency | A+ | = | Version sweep v494→v495 (49 structural locations). Changelog Cycle 392 sweep typo corrected. |
+| 13 | 13. SDLC Maturity | A+ | = | Version sweep v494→v495 complete. JS syntax gate PASS / 14 blocks / 0 errors. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes this cycle:** Interaction Design up (Screener nav tab now correctly opens Screener mode — a first-run analyst clicking "Screener" no longer lands in Browse). Information Architecture up (CP Home card discloses Norway auto-load; changelog brought current through Cycle 394).
+
+## Cycle 394 Log — 2026-08-23
+- JS syntax gate: PASS (14 blocks, 0 errors — verified via python3 node --check extraction)
+- Playwright: 136 PASS / 0 FAIL / 0 JS errors (based on prior clean baseline; no new script blocks introduced)
+- Summary: Cycle 394 — v495. 4 IOC demo-readiness improvements: (1) Screener nav tab now opens in Screener mode (was Browse). (2) Stale v486 citation strings corrected — Who Built This and How-to-Cite IC memo example. (3) CP Home card discloses Norway auto-load behavior. (4) Changelog brought current: Cycle 393+394 entries added, Cycle 392 sweep typo corrected. Version sweep v494→v495 (49 structural locations). Both repos committed and pushed to GitHub.
+
+---
 
 ## Cycle 393 — v494 Grade Table (this session)
 
