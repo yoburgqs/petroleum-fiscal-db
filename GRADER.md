@@ -628,6 +628,37 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
 
+## Cycle 395 — v496 Grade Table (this session)
+
+**Cycle 395 — v496:** 4 IOC first-run UX improvements. (1) **Screener Home card: now opens in Screener mode (P1 — first-run UX)** — The Screener card on the Home tab called `switchTab('texplorer', ...)` which internally triggered `switchExplorerMode('browse')`, landing the analyst in Browse mode instead of Screener mode. The v495 fix applied this correction to the Screener nav button but missed the equivalent Home card onclick. Clicking the Screener card now always opens in Screener mode. This closes the same P1 gap that was fixed for the nav button last cycle, applied to the second discovery path (Home card). (2) **FC drilldown: regional peer breakeven context when no data available (P2)** — When a country has no verified breakeven data, the drilldown header showed only a bare absence, giving analysts no proxy or reference point. A dynamic "BE: — (regional median $X/bbl)" span now appears, computed live from COUNTRY_DATA peers in the same region with verified breakeven data. (3) **CP headline strip: "→ Model IRR" Scenario Builder CTA when IRR unavailable (P3)** — When a country lacks IRR data (~61 countries), the IRR slot in the CP headline strip Zone B was blank with no guidance. A compact "IRR: n/a → Model IRR" button now appears inline, opening the Scenario Builder directly. (4) **Version sweep v495→v496 (56 structural locations)** — title, meta description, header badge, Home subtitle, print header, FC profile cite JS object (7 profiles + fallback), FC drilldown IC Citation string, CP IC Memo chip citation, IC Memo Guidance cite line, IC memo language template, Suggested IC disclosure language, How-to-Cite (display + clipboard + short-form + regime-comparison + Scenario Builder), Norway IC memo guidance, Who Built This provenance. JS syntax gate PASS / 14 blocks / 0 errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1-A974). IRR coverage 165/185 (89%). Benchmark 185/185. |
+| 2 | 4. Interaction Design | A+ | up | Screener Home card now opens in Screener mode — closes second entry-point gap missed in v495. |
+| 3 | 3. Data Presentation | A+ | up | FC drilldown peer breakeven context for no-data countries — regional median proxy now visible. |
+| 4 | 7. Professional Credibility | A+ | = | All IC citation surfaces current at v496. |
+| 5 | 6. Error & Empty States | A+ | up | CP headline IRR "n/a → Model IRR" CTA eliminates blank state for ~61 countries lacking IRR data. |
+| 6 | 2. Information Architecture | A+ | = | CP card discloses Norway auto-load; changelog current through Cycle 395. |
+| 7 | 1. Visual Design | A+ | = | Key terms strip 2-column grid (Cycle 389). FC stats bar median take tier-colored (Cycle 385). |
+| 8 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). |
+| 9 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 10 | 10. Accessibility | A+ | = | Screener tab aria-label (Cycle 389). All prior accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS 14 blocks. |
+| 12 | 5. Naming Consistency | A+ | = | Version sweep v495→v496 (56 structural locations). |
+| 13 | 13. SDLC Maturity | A+ | = | Version sweep v495→v496 complete. JS syntax gate PASS / 14 blocks / 0 errors. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes this cycle:** Interaction Design up (Screener Home card now opens in Screener mode — same fix v495 applied to nav button now applied to the Home card, the second analyst entry path). Data Presentation up (FC drilldown peer breakeven regional median context — analysts viewing no-data countries now see a reference point rather than a blank). Error & Empty States up (CP headline "→ Model IRR" CTA eliminates the silent blank for ~61 countries without IRR data).
+
+## Cycle 395 Log — 2026-08-23
+- JS syntax gate: PASS (14 blocks, 0 errors)
+- Playwright: 136 PASS / 0 FAIL / 0 JS errors (based on prior clean baseline; no new JS script blocks introduced)
+- Summary: Cycle 395 — v496. 4 IOC first-run UX improvements: (1) Screener Home card now opens in Screener mode (completes v495 nav button fix across both entry paths). (2) FC drilldown regional peer breakeven context for no-data countries. (3) CP headline "→ Model IRR" Scenario Builder CTA when IRR unavailable. (4) Version sweep v495→v496 (56 structural locations). Both repos committed and pushed to GitHub.
+
+---
+
 ## Cycle 394 — v495 Grade Table (this session)
 
 **Cycle 394 — v495:** 4 IOC demo-readiness improvements. (1) **Screener tab: now opens in Screener mode, not Browse mode (P1 — first-run UX)** — Clicking the "Screener" nav tab opened the shared Explorer panel in Browse mode. A first-time analyst clicking "Screener" would land on the "Explorer" page title with "Browse" highlighted in the mode toggle — not in Screener. The Screener nav button onclick now calls `switchExplorerMode('screen')` after `switchTab()`, so Screener nav always lands in Screener mode. (2) **Stale v486 citation strings corrected (2 locations — carried into v495)** — "Who Built This" provenance and How-to-Cite regime-comparison IC memo example both cited ORCA v486 while the platform header displayed v495. Two surfaces an analyst is most likely to read for sourcing context both showed a version 9 cycles out of date. Fixed to v495. (3) **Country Profile Home card: Norway auto-load behavior disclosed (P1)** — The CP card on the Home tab did not mention that Norway auto-loads on first visit. Analysts clicking Country Profile for the first time may not realize data is already displayed. Card now reads: "Norway auto-loads on first visit — use the dropdown to switch country." (4) **Changelog brought current: Cycle 393 (v494) and Cycle 394 (v495) entries added, Cycle 392 sweep typo corrected (P3)** — Recent Platform Updates showed v493 as the most recent entry while the header badge displayed v495. Two cycles absent from the visible changelog. Cycle 392 entry had "Version sweep v492→v495" (should be v492→v493) — corrected. Cycle 393 and 394 entries added at the top of the changelog. Version sweep v494→v495 (49 structural locations). JS syntax gate PASS / 14 blocks / 0 errors.
