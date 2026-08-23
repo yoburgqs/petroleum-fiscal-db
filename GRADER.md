@@ -9844,3 +9844,11 @@ Background commit/push confirmed (exit code 0). Cycle 396 is fully committed and
 - Summary: v497→v498. 4 improvements: (1) 2 new Screener presets — Frontier Markets (Sub-Saharan Africa + SE Asia, PSC/Concession, Take ≤70%, NPV positive) and Downside Resilience (BE ≤$50, Take ≤60%, all mechanics); (2) PROXY disclosure badge in CP Quick IC verdict — when prod_coverage_pct=0, appends ⚠ PROXY — statutory model inline with verdict, with IC protocol tooltip; (3) Data currency precision — "August 2026" → "August 23, 2026"; (4) Version sweep 49 structural locations updated.
 - Grade changes: Interaction Design A+ (steady; new presets deepen workflow coverage but grade ceiling already reached)
 
+
+---
+## Cycle 397 Log — 2026-08-23 18:23
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: GRADER.md commit also landed. All three background tasks complete â€” cycle 397 / v498 fully pushed across both repos.
+
