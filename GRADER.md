@@ -568,9 +568,9 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 `country_data.json`, `reform_history.json`, and `api/v1/country/*` are present in both `proto50/` and `proto102/` with identical byte counts to root files. Both frozen URLs are self-contained. No further action required on the freeze.
 
 # ORCA Petroleum Platform — UX & SDLC Grader
-**Last Updated:** 2026-08-23 (Cycle 394 — v495)
+**Last Updated:** 2026-08-23 (Cycle 396 — v497)
 **Grader Version:** 2.0
-**Overall Status:** Cycle 394 shipped v495: 4 IOC demo-readiness improvements. (1) Screener tab now opens in Screener mode (was Browse — first-run UX gap). (2) Stale v486 citation strings corrected — Who Built This + How-to-Cite IC memo example. (3) CP Home card discloses Norway auto-load behavior. (4) Changelog brought current: Cycle 393+394 entries added, Cycle 392 sweep typo corrected. Version sweep v494→v495 (49 structural locations). JS syntax gate PASS / 14 blocks / 0 errors.
+**Overall Status:** Cycle 396 shipped v497: 3 analyst workflow improvements. (1) Home QS guide expanded to 4 steps — new Step 3 (Screener presets) + Step 4 (Reform Risk WACC rule) discoverable from first visit; Re-show button added. (2) CP quick IC verdict one-liner (`_quickIcVerdict497`) — ✓/⚠/✗ synthesis of IRR, NPV, take, and breakeven for all 185 countries above the headline strip. (3) FC drilldown global peer-take count badge — "N global peers (±5pp)" or "unique fiscal profile," amber for rare regimes. Version sweep v496→v497 (52 structural locations). JS syntax gate PASS / 14 blocks / 0 errors.
 
 **Previous [Cycle 386]:** Cycle 386 shipped v487: 5 analyst workflow improvements. (1) FC drilldown "Copy 4-price as IC table" prepends country/profile/version context header row — matching the CP fix from Cycle 385. (2) FC reading guide Stability column definition added with WACC premium IC decision rule (◆◆◆◆◆=0pp, ◆◆◆◇◇=1–2pp, ◆◇◇◇◇=3–5pp, ◇◇◇◇◇=prob-weighted NPV required). (3) Dominant instrument callout upgraded to 7 regime-specific IC implications — royalty, FTP, profit oil, CIT, special/windfall, NOC equity, PRRT each now produce a distinct one-line IC memo implication. (4) FC IC Analyst Guide Step 2 adds ←/→ keyboard navigation hint and IC Citation button reference. (5) Home QS Step 2 surfaces IC Citation button with plain-language description. Version sweep v486→v487 (41 structural locations). JS syntax gate PASS / 14 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors.
 
@@ -627,6 +627,26 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 **Previous [Cycle 310]:** Cycle 310 shipped v381: 10 FAQs A661-A670 (PSC super-tier upside profit oil clause marginal retention rate; Kazakhstan MET+CIT double-layer burden and EPT overlay; Libya EPSA III vs. EPSA IV government take comparison; Guyana Stabroek PSA renegotiation risk probability-weighted NPV10; Iran IPC vs. Buy-back SEC reserve booking; T&T SPT stacked fiscal burden and Swing; Oman vs. Malaysia RSC structural comparison; PSC 50% vs. 80% cost recovery cap NPV10 impact; FTP interaction with cost cap effective ceiling; CCUS carbon tax and carbon credit mechanics). v380->v381 structural sweep (660->670 FAQs). JS syntax gate PASS / 11 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
+
+## Cycle 396 — v497 Grade Table (this session)
+
+**Cycle 396 — v497:** 3 analyst workflow improvements + version sweep. (1) **Home QS guide: 3 steps → 4 steps (P1 — first-run UX)** — Grid expanded from `repeat(3,1fr)` to `repeat(4,1fr)`. New Step 3 (Screen a Shortlist) surfaces the Screener with two named presets so analysts know it exists on first visit. New Step 4 (Check Reform Risk) discloses the WACC premium decision rule (◆◆◆◆◆=0pp / ◆◆◆◇◇=1–2pp / ◆◇◇◇◇=3–5pp / ◇◇◇◇◇=prob-weighted NPV required) inline — no longer buried in reading guide. Title updated to "4 Steps to Your First IC-Ready Insight." Re-show button added to footer. (2) **CP Quick IC verdict one-liner (P2 — first-impression clarity)** — New `_quickIcVerdict497` variable renders a ✓/⚠/✗ verdict sentence between the country name and headline strip for all 185 countries. Synthesizes IRR, NPV, take, and breakeven into a single actionable line with color-coded icon and IC-memo-ready language. Eliminates the ambiguous first impression when an analyst opens any CP and sees raw numbers without interpretation. (3) **FC drilldown: global peer-take count badge (P2 — FC workflow clarity)** — IIFE computes how many other countries in COUNTRY_DATA share ±5pp government take at $75/bbl. Displayed inline as "N global peers (±5pp)" or "unique fiscal profile" for rare regimes. Amber color for rare profiles (≤3 peers) signals scarcity, which is a real IC pricing signal. (4) **Version sweep v496→v497 (52 structural locations).** JS syntax gate PASS / 14 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1-A974). IRR coverage 165/185 (89%). Benchmark 185/185. |
+| 2 | 4. Interaction Design | A+ | up | QS guide 4-step workflow — Screener and Reform Risk now discoverable from session-first visit. |
+| 3 | 3. Data Presentation | A+ | up | FC drilldown global peer-take count — scarcity signal for rare fiscal regimes. |
+| 4 | 6. Error & Empty States | A+ | up | CP quick IC verdict eliminates ambiguous first-impression for all 185 countries. |
+| 5 | 7. Professional Credibility | A+ | = | All IC citation surfaces current at v497. |
+| 6 | 2. Information Architecture | A+ | = | CP card discloses Norway auto-load; changelog current through Cycle 396. |
+| 7 | 1. Visual Design | A+ | = | Key terms strip 2-column grid (Cycle 389). FC stats bar median take tier-colored (Cycle 385). |
+| 8 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). |
+| 9 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 10 | 10. Accessibility | A+ | = | Screener tab aria-label (Cycle 389). All prior accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS 14 blocks. |
+| 12 | 5. Naming Consistency | A+ | = | Version sweep v496→v497 (52 structural locations). |
+| 13 | 13. SDLC Maturity | A+ | = | Version sweep v496→v497 complete. JS syntax gate PASS / 14 blocks / 0 errors. |
 
 ## Cycle 395 — v496 Grade Table (this session)
 
