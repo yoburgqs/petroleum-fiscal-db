@@ -7203,3 +7203,27 @@ JS errors captured: 0
 [2026-08-22 22:20:04] Step 2: Running Playwright test...
 [2026-08-22 22:24:41]   Test: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors
 [2026-08-22 22:24:41] Step 3-6: Running Claude autonomous fix cycle...
+[2026-08-22 23:20:01] === STARTING CYCLE 377 ===
+[2026-08-22 23:20:01] Step 1: Checking email for Zach replies...
+[2026-08-22 23:20:05]   Email found: 20 message(s) matching 'petroleum':
+
+  Fri, 21 Aug 2026   ztuchman@gmail.com         [Migration] Proactive knowledge push - UX v452, JS quir
+  Fri, 21 Aug 2026   ztuchman@gmail.com         [Petroleum]
+[2026-08-22 23:20:05] Step 2: Running Playwright test...
+[2026-08-22 23:24:42]   Test: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-08-22 23:24:42] Step 3-6: Running Claude autonomous fix cycle...
+[2026-08-22 23:41:32] === STARTING CYCLE 377 (MANUAL) ===
+[2026-08-22 23:41:32] Step 1: Autonomous improvement cycle — Claude Code agent (claude-sonnet-4-6)
+[2026-08-22 23:41:32]   8 analyst UX improvements applied to index.html
+[2026-08-22 23:41:32]   Fix 1: CP spinner trailing dash bug — 'Loading [Country] —' → 'Loading [Country]…'
+[2026-08-22 23:41:32]   Fix 2: Australia CP quick button tooltip expanded — adds take%, PRRT payout mechanic, 2023 reform
+[2026-08-22 23:41:32]   Fix 3: FC Govt Take sort button — static ▲ arrow added to HTML
+[2026-08-22 23:41:32]   Fix 4: CP fiscal verdict logic — added moderate-take near-hurdle and high-moderate constrained cases
+[2026-08-22 23:41:32]   Fix 5: IOC exposure quick buttons — amber active state highlighting on click and auto-load
+[2026-08-22 23:41:32]   Fix 6: Home hurdle stat CTA — 'open Fiscal Compare to rank them' → 'open Fiscal Compare →'
+[2026-08-22 23:41:32]   Fix 7: FC reading guide — 'Don't show again' → 'Hide permanently'
+[2026-08-22 23:41:32]   Fix 8: renderFCResults — dynamic ▲/▼ sort arrow updates on active sort button
+[2026-08-22 23:41:33] Step 2: JS syntax gate: PASS (136 PASS / 0 FAIL / 0 WARN / 0 JS errors)
+[2026-08-22 23:41:33] Step 3: Version sweep v477→v478 (all citation strings, profile cites, How-to-Cite, JS copy strings)
+[2026-08-22 23:41:33] Step 4: GRADER.md cycle log appended — cycle 377
+[2026-08-22 23:41:33] Step 5: Pushing to GitHub Pages...
