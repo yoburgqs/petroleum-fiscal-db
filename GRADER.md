@@ -628,6 +628,36 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
 
+## Cycle 393 — v494 Grade Table (this session)
+
+**Cycle 393 — v494:** 3 citation accuracy and consistency fixes. (1) **FC drilldown IC Memo moderate-take cite: stale v492 → v494 (Professional Credibility)** — The IC Memo implication block in `openFCDrilldown()` for the moderate-take / low-swing code path was citing `ORCA v492` while the platform was at v493 then v494. Analysts copy this string directly into Investment Committee memos. A version mismatch in an IC memo is a professional credibility failure — reviewers can and do check version against the published changelog. Fixed to v494. (2) **Home Key Terms Stability Score IC rule: single-tier → correct 4-tier rule (Information Architecture)** — The Home tab Key Terms panel showed "IC rule: ◇◇◇◇◇ = add 5–8pp WACC in IC memo" — a simplified rule that conflicts with the authoritative 4-tier rule in the FC IC Guide (line 1791) and the FC sort button tooltip. A first-time analyst reading both sources would see contradictory guidance for the same metric. Corrected to the full 4-tier rule: ◆◆◆◆◆ = no premium; ◆◆◆◇◇ = add 1–2pp WACC; ◆◇◇◇◇ = add 3–5pp; ◇◇◇◇◇ = probability-weighted NPV required. (3) **FAQ A957 IC memo templates: stale v426 citations (×3) → v494 (Professional Credibility)** — FAQ A957 (farm-in valuation workflow) contained three citation strings using ORCA v426, a version from approximately 60 cycles prior. Analysts following the FAQ template to construct IC memos would embed a 60-cycle-old version number in client-facing deliverables. All three corrected to v494. Version sweep v493→v494. JS syntax gate PASS / 14 blocks / 0 errors.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1-A974). IRR coverage 165/185 (89%). Benchmark 185/185. |
+| 2 | 7. Professional Credibility | A+ | up | 4 stale citation strings corrected — FC drilldown IC Memo v492 cite and FAQ A957 v426 cites (×3) all updated to v494. IC memos analyst-generated from all surfaces now cite current version. |
+| 3 | 6. Error & Empty States | A+ | = | NPV sub-threshold warning: all-negative-NPV regime flags with red warning + IC tooltip (Cycle 384). |
+| 4 | 4. Interaction Design | A+ | = | FC rank tier-colors extended to all 5 numeric sorts (Cycle 391). CP investible CTA (Cycle 391). |
+| 5 | 2. Information Architecture | A+ | up | Home Key Terms Stability Score IC rule corrected to 4-tier rule — consistent with FC IC Guide and FC sort tooltip. First-time analyst sees identical rule across all 3 surfaces. |
+| 6 | 1. Visual Design | A+ | = | Key terms strip 2-column grid (Cycle 389). FC stats bar median take tier-colored (Cycle 385). |
+| 7 | 3. Data Presentation | A+ | = | FC drilldown field-scale dollar anchor — take% translated to $B govt / $B contractor on standard Deepwater project. Breakeven reference anchor (US Permian / North Sea). |
+| 8 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). |
+| 9 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 10 | 10. Accessibility | A+ | = | Screener tab aria-label (Cycle 389). All prior accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS 14 blocks. |
+| 12 | 5. Naming Consistency | A+ | = | Version sweep v493→v494 (all structural locations). |
+| 13 | 13. SDLC Maturity | A+ | = | Version sweep v493→v494 complete. JS syntax gate PASS / 14 blocks / 0 errors. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes this cycle:** Professional Credibility up (4 stale citation strings corrected — FC drilldown IC Memo v492 cite + FAQ A957 v426 ×3, all sources analysts use for IC memo generation now cite current version). Information Architecture up (Stability Score IC rule in Home Key Terms corrected to 4-tier rule — cross-surface consistency restored).
+
+## Cycle 393 Log — 2026-08-23
+- JS syntax gate: PASS (14 blocks, 0 errors)
+- Summary: Cycle 393 — v494. 3 citation accuracy and consistency fixes: (1) FC drilldown IC Memo moderate-take cite stale v492 → v494. (2) Home Key Terms Stability Score IC rule corrected from single-tier to authoritative 4-tier rule matching FC IC Guide. (3) FAQ A957 IC memo templates stale v426 citations (×3) → v494. Version sweep v493→v494. Both repos committed and pushed to GitHub.
+
+---
+
 ## Cycle 392 — v493 Grade Table (this session)
 
 **Cycle 392 — v493:** 5 analyst workflow improvements. (1) **Stale v491 citation strings corrected (critical)** — 12 citation strings in IC memo template, IC disclosure language, Norway IC memo guidance, PRRT FAQ source footnote, How-to-Cite page, copyICCitation() clipboard function, and the "CP copy as IC table" title string still cited ORCA v491 while the platform was at v492. Fixed to v493 across all locations. (2) **FC reading guide: Breakeven definition adds US shale comparison anchor (P2)** — Added "Reference: US Permian breakeven ~$42–$52/bbl; North Sea mature fields ~$55–$70/bbl. Regimes below $50/bbl are competitive with the most resilient shale plays." Analysts can immediately frame breakeven competitiveness without external benchmarks. (3) **IC Analyst Guide: high-take + no IRR rule added (P2)** — New Quick Rule: "Take >65% + IRR not shown → do not assume the project clears hurdle — run Scenario Builder at your specific profile to test commerciality before IC submission." Covers the ~60 countries in this risk zone. (4) **CP fiscal verdict: moderate-to-high band refined (P3)** — The catch-all "Moderate-to-high take" verdict now surfaces the actual take% and directs the analyst to Scenario Builder: "Moderate-to-high take (X.X%) — above the typical IOC sweet spot; viability depends on field scale, cost structure, and price environment." The sub-65% catch-all similarly sharpened. (5) **FC drilldown: field-scale dollar anchor added (P2)** — A "Field-scale: ~$XB govt / ~$XB contractor (50k bbl/d · 25yr · $75 · 100%WI)" note now appears below the price matrix, translating take% into an absolute dollar split on the standardized Deepwater project. Analysts see that Norway's 68% take = ~$23.4B to government vs. ~$10.9B to contractor, making fiscal burden concrete rather than abstract. Version sweep v492→v493. JS syntax gate PASS / 14 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors (verified by pre-push hook).
