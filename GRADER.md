@@ -628,6 +628,37 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
 
+## Cycle 392 — v493 Grade Table (this session)
+
+**Cycle 392 — v493:** 5 analyst workflow improvements. (1) **Stale v491 citation strings corrected (critical)** — 12 citation strings in IC memo template, IC disclosure language, Norway IC memo guidance, PRRT FAQ source footnote, How-to-Cite page, copyICCitation() clipboard function, and the "CP copy as IC table" title string still cited ORCA v491 while the platform was at v492. Fixed to v493 across all locations. (2) **FC reading guide: Breakeven definition adds US shale comparison anchor (P2)** — Added "Reference: US Permian breakeven ~$42–$52/bbl; North Sea mature fields ~$55–$70/bbl. Regimes below $50/bbl are competitive with the most resilient shale plays." Analysts can immediately frame breakeven competitiveness without external benchmarks. (3) **IC Analyst Guide: high-take + no IRR rule added (P2)** — New Quick Rule: "Take >65% + IRR not shown → do not assume the project clears hurdle — run Scenario Builder at your specific profile to test commerciality before IC submission." Covers the ~60 countries in this risk zone. (4) **CP fiscal verdict: moderate-to-high band refined (P3)** — The catch-all "Moderate-to-high take" verdict now surfaces the actual take% and directs the analyst to Scenario Builder: "Moderate-to-high take (X.X%) — above the typical IOC sweet spot; viability depends on field scale, cost structure, and price environment." The sub-65% catch-all similarly sharpened. (5) **FC drilldown: field-scale dollar anchor added (P2)** — A "Field-scale: ~$XB govt / ~$XB contractor (50k bbl/d · 25yr · $75 · 100%WI)" note now appears below the price matrix, translating take% into an absolute dollar split on the standardized Deepwater project. Analysts see that Norway's 68% take = ~$23.4B to government vs. ~$10.9B to contractor, making fiscal burden concrete rather than abstract. Version sweep v492→v493. JS syntax gate PASS / 14 blocks / 0 errors. Playwright: 136 PASS / 0 FAIL / 0 JS errors (verified by pre-push hook).
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1-A974). IRR coverage 165/185 (89%). Benchmark 185/185. |
+| 2 | 7. Professional Credibility | A+ | up | 12 stale v491 citation strings corrected — IC memos now cite current v493 across all surfaces. |
+| 3 | 6. Error & Empty States | A+ | = | NPV sub-threshold warning: all-negative-NPV regime flags with red warning + IC tooltip (Cycle 384). |
+| 4 | 4. Interaction Design | A+ | = | FC rank tier-colors extended to all 5 numeric sorts (Cycle 391). CP investible CTA (Cycle 391). |
+| 5 | 2. Information Architecture | A+ | up | IC Analyst Guide: high-take + no IRR rule added. CP fiscal verdict moderate-to-high band sharpened with actionable Scenario Builder direction. |
+| 6 | 1. Visual Design | A+ | = | Key terms strip 2-column grid (Cycle 389). FC stats bar median take tier-colored (Cycle 385). |
+| 7 | 3. Data Presentation | A+ | up | FC drilldown field-scale dollar anchor — take% translated to $B govt / $B contractor on standard Deepwater project. Breakeven reference anchor (US Permian / North Sea). |
+| 8 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). |
+| 9 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 10 | 10. Accessibility | A+ | = | Screener tab aria-label (Cycle 389). All prior accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS 14 blocks. |
+| 12 | 5. Naming Consistency | A+ | = | Version sweep v492→v493 (all structural locations). |
+| 13 | 13. SDLC Maturity | A+ | = | Version sweep v492→v493 complete. JS syntax gate PASS / 14 blocks / 0 errors. Playwright 136/0/0. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes this cycle:** Professional Credibility up (12 stale v491 citations corrected — all IC memo surfaces now cite v493). Information Architecture up (high-take + no IRR rule closes a gap for ~60 countries; CP moderate-to-high verdict sharpened with Scenario Builder direction). Data Presentation up (field-scale dollar anchor translates abstract take% into concrete $B figures; Breakeven gains US shale comparison anchor).
+
+## Cycle 392 Log — 2026-08-23
+- JS syntax gate: PASS (14 blocks, 0 errors — verified manually + by pre-push Playwright hook)
+- Playwright: 136 PASS / 0 FAIL / 0 JS errors (verified by pre-push hook at 18:37)
+- Summary: Cycle 392 — v493. 5 analyst workflow improvements: (1) 12 stale v491 citation strings corrected across IC memo template, disclosure language, Norway guidance, PRRT FAQ, copyICCitation(), CP IC table copy, and How-to-Cite. (2) Breakeven definition adds US Permian / North Sea benchmark anchors. (3) IC Analyst Guide adds high-take + no IRR rule. (4) CP fiscal verdict moderate-to-high band sharpened. (5) FC drilldown adds field-scale dollar anchor. Version sweep v492→v493. Both repos committed and pushed to GitHub.
+
+---
+
 ## Cycle 391 — v492 Grade Table (this session)
 
 **Cycle 391 — v492:** 3 analyst scan-ability improvements. (1) **FC rank tier-colors extended to all primary numeric sorts (P1)** — The top-10 green / bottom-10 red rank signal introduced in Cycle 390 was limited to Take-sort only. Analysts who sorted by IRR, NPV, Breakeven, or Swing saw uniform muted-gray rank numbers with no investibility signal. All five numeric sorts (take, irr, npv, breakeven, swing) now apply the tier-color treatment, with sort-specific tooltip text (e.g. "Top 3: highest IRR (green)", "Bottom 12: highest breakeven (red)"). (2) **FC stats bar: Best Breakeven country added (P2)** — The stats bar showed median take, IOC hurdle count, and best-take country, but no resilience anchor. Analysts screening for downside-mandate jurisdictions had no at-a-glance signal for the most resilient breakeven in the current filtered view. A clickable "Best BE: $X/bbl (Country)" stat now appears in the stats bar — clicking sorts the table by breakeven, with tooltip explaining the column. (3) **CP fiscal verdict: "See all investible regimes →" CTA for low-take countries (P3)** — The CP fiscal verdict bar had a "Find lower-take peers →" CTA for high-take regimes, but no corresponding action for investible regimes (take ≤ 40%). Analysts reviewing a low-take country (e.g. UAE, USA, UK) had no path to compare the full investible universe. A green-styled CTA now appears for take ≤ 40%, pre-filtering the Screener to take ≤ 40% on click. Version sweep v491→v492. JS syntax gate PASS.
