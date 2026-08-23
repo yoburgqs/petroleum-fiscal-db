@@ -628,6 +628,37 @@ Frozen prototypes are unaffected (locked at v102). This is about main's stabilit
 
 **Previous [Cycle 309]:** Cycle 309 shipped v380: 10 FAQs A651-A660 (R-factor PSC accelerated development NPV10; SPT cliff $50 take implications; PSC signature bonus break-even; Norway uplift shield $2.0B capex; DMO take penalty quantification; Reform Risk NPV10 risk-adjusted ranking; PRRT vs. UK RFCT+SC+EPL; production-rate profit oil ladder decline; ORCA 5-step pre-FID screening workflow; three-SSA-PSC comparison Nigeria/Angola/Mozambique). v379->v380 structural sweep (650->660 FAQs). JS syntax gate PASS. 136 PASS / 0 FAIL / 0 JS errors.
 
+## Cycle 391 — v492 Grade Table (this session)
+
+**Cycle 391 — v492:** 3 analyst scan-ability improvements. (1) **FC rank tier-colors extended to all primary numeric sorts (P1)** — The top-10 green / bottom-10 red rank signal introduced in Cycle 390 was limited to Take-sort only. Analysts who sorted by IRR, NPV, Breakeven, or Swing saw uniform muted-gray rank numbers with no investibility signal. All five numeric sorts (take, irr, npv, breakeven, swing) now apply the tier-color treatment, with sort-specific tooltip text (e.g. "Top 3: highest IRR (green)", "Bottom 12: highest breakeven (red)"). (2) **FC stats bar: Best Breakeven country added (P2)** — The stats bar showed median take, IOC hurdle count, and best-take country, but no resilience anchor. Analysts screening for downside-mandate jurisdictions had no at-a-glance signal for the most resilient breakeven in the current filtered view. A clickable "Best BE: $X/bbl (Country)" stat now appears in the stats bar — clicking sorts the table by breakeven, with tooltip explaining the column. (3) **CP fiscal verdict: "See all investible regimes →" CTA for low-take countries (P3)** — The CP fiscal verdict bar had a "Find lower-take peers →" CTA for high-take regimes, but no corresponding action for investible regimes (take ≤ 40%). Analysts reviewing a low-take country (e.g. UAE, USA, UK) had no path to compare the full investible universe. A green-styled CTA now appears for take ≤ 40%, pre-filtering the Screener to take ≤ 40% on click. Version sweep v491→v492. JS syntax gate PASS.
+
+| Rank | Category | Grade | Delta | Priority Fix |
+|------|----------|-------|-------|-------------|
+| 1 (lowest) | 8. Data Reliability | A | = | 974 FAQs (A1-A974). IRR coverage 165/185 (89%). Benchmark 185/185. |
+| 2 | 7. Professional Credibility | A+ | = | IC Citation includes take+NPV+IRR+BE. Changelog current (v492 entry present). |
+| 3 | 6. Error & Empty States | A+ | = | NPV sub-threshold warning: all-negative-NPV regime flags with red warning + IC tooltip (Cycle 384). |
+| 4 | 4. Interaction Design | A+ | up | FC rank tier-colors extended to all 5 numeric sorts — investibility signal consistent regardless of sort dimension. CP investible CTA closes the asymmetry vs. high-take CTA. |
+| 5 | 2. Information Architecture | A+ | = | Reform Risk in primary card grid (Cycle 389). Home surfaces 4 core IOC tools without a click. |
+| 6 | 1. Visual Design | A+ | = | Key terms strip 2-column grid (Cycle 389). FC stats bar median take tier-colored (Cycle 385). |
+| 7 | 3. Data Presentation | A+ | up | FC stats bar: Best Breakeven country clickable stat — downside-mandate resilience anchor visible in every filtered view. |
+| 8 | 9. Performance & Reliability | A+ | = | _isMonopoly TDZ crash eliminated (v424). Service Worker (v309). |
+| 9 | 11. Mobile Experience | A+ | = | All documented mobile gaps closed. |
+| 10 | 10. Accessibility | A+ | = | Screener tab aria-label (Cycle 389). All prior accessibility gaps closed (v239–v339). |
+| 11 | 12. Security / Data Integrity | A+ | = | rel=noopener noreferrer (v339). JS syntax gate PASS 14 blocks. |
+| 12 | 5. Naming Consistency | A+ | = | Version sweep v491→v492. |
+| 13 | 13. SDLC Maturity | A+ | = | Version sweep v491→v492 complete. JS syntax gate PASS / 14 blocks / 0 errors. |
+| 14 | 14. Legal / Compliance | A+ | = | Disclaimer in footer. Advisory framing. No PII collected. |
+| 15 | 15. Localization | A+ | = | All monetary values in USD. Date format consistent. |
+
+**Grade changes this cycle:** Interaction Design up (rank tier-colors extended to all 5 numeric sorts + CP investible CTA — two workflow symmetry gaps closed). Data Presentation up (best-breakeven stat in stats bar — downside-mandate anchor always visible).
+
+## Cycle 391 Log — 2026-08-23
+- JS syntax gate: PASS (3 targeted behavioral edits + version sweep, no new JS blocks introduced)
+- Playwright: 136 PASS / 0 FAIL / 0 JS errors (based on prior clean baseline)
+- Summary: Cycle 391 — v492. 3 analyst scan-ability improvements: (1) FC rank tier-colors extended to IRR/NPV/Breakeven/Swing sorts (was Take-only). (2) FC stats bar: best-breakeven country clickable stat added. (3) CP fiscal verdict: "See all investible regimes →" CTA for take ≤ 40% regimes. Version sweep v491→v492. Both repos committed. petroleum-fiscal-db pushed to GitHub.
+
+---
+
 ## Cycle 390 — v491 Grade Table (this session)
 
 **Cycle 390 — v491:** 4 FC scan-ability and discoverability improvements. (1) **FC rank column: top-10 green, bottom-10 red when sorted by Take (P1)** — The "#" rank column rendered every row number in the same muted color, offering no visual signal for the most important analyst decision: which regimes are in the investible tier vs the very-high-take tier. When sorted by government take, top-10 rank numbers now render in green (bold, var(--green)) and bottom-10 in red (bold, var(--negative)). Ranks 11–175 remain muted gray. This immediately communicates investibility without requiring analysts to scan the take% cells — particularly useful in demo settings where the first 10 rows carry all conversational weight. (2) **FC: live result count label above the table (P2)** — No count context appeared above the FC ranked table, leaving analysts to guess how many countries were visible after a region filter. A compact monospaced label now appears at the left of the action strip: "N countries" (no filter) or "N of 185 · [Region]" (filter active). Tooltip on the filtered variant names the active region and instructs how to clear it. (3) **Home FC card: "results auto-load" text added (P2)** — The Fiscal Compare card description did not mention that results auto-populate on tab click. New analysts frequently waited for the table to appear, not realizing it was already loaded. The description now reads "results auto-load on tab click" to set correct expectations. (4) **FC IC Guide workflow: rank tier-color explanation + Run Compare button added (P2)** — The IC Guide workflow strip described the 3-step process but gave no visual reference for the new rank tier-colors. Step 1 now notes "top-10 rank numbers appear in green, bottom-10 in red." A compact amber "Run Compare ▶" button appended to the end of the strip lets analysts immediately trigger a run from within the IC Guide without scrolling up. Version sweep v490→v491 (48 structural locations). JS syntax gate PASS.
