@@ -10090,3 +10090,18 @@ the same run.
 **Bookkeeping (not the improvement).** Version sweep v500→v501 across the 3 structural
 locations (title, meta description, header badge); changelog entry added. Grade tables not
 touched.
+
+---
+## Cycle 399 Log — 2026-08-24 09:14
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 400 complete — v501 pushed.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (last two cycles were T1 and T6.)
+
+## Friction
+I cleared sessionStorage and localStorage, reloaded, ran Fiscal Compare on the default sort, and clicked the hint bar's **"⇌ Load Top 5 in Side-by-Side"** button.
+
+It does not load five. `addCompare()` ended in `if (compareList.includes(country) || compareList.length >= 4) return;` — a silent no-op — while three separate entry points hand Side-by
