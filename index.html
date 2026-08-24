@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v500.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v501.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v500</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v501</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -896,7 +896,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
   /* Country comparison grid — full width stack */
   .compare-grid {
-    grid-template-columns: 120px repeat(4, 1fr) !important;
+    grid-template-columns: 120px repeat(var(--cmp-n, 4), minmax(84px, 1fr)) !important;
     font-size: 11px;
   }
 
@@ -1122,7 +1122,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 /* ── Mobile compare grid — horizontal scroll wrapper ── */
 @media (max-width: 600px) {
   .compare-grid {
-    grid-template-columns: 100px repeat(2, 1fr) !important;
+    grid-template-columns: 100px repeat(var(--cmp-n, 2), minmax(72px, 1fr)) !important;
     font-size: 10px;
   }
 }
@@ -1341,7 +1341,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v500</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v501</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1359,7 +1359,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- v277 Issue 6: Explorer promoted to primary nav — tab-btn-texplorer now visible. Tab before Screener so test harness still finds it first (browse-mode). -->
   <button id="tab-btn-texplorer" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" onclick="switchTab('texplorer',this)" title="Browse all 185 countries in map and table views">Explorer</button>
   <button id="tab-btn-tscreener" class="tab-btn" role="tab" aria-selected="false" aria-controls="texplorer" aria-label="Screener — filter all 185 countries by take, IRR, NPV, breakeven, mechanic, and region" onclick="switchTab('texplorer',this);setTimeout(function(){if(typeof switchExplorerMode==='function')switchExplorerMode('screen');},50);" title="Filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region — opens in Screener mode">Screener</button>
-  <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" aria-controls="t2" onclick="switchTab('t2',this)" title="Compare up to 4 countries side-by-side across all fiscal metrics">Side-by-Side</button>
+  <button id="tab-btn-t2" class="tab-btn" role="tab" aria-selected="false" aria-controls="t2" onclick="switchTab('t2',this)" title="Compare up to 5 countries side-by-side across all fiscal metrics">Side-by-Side</button>
   <button id="tab-btn-t5" class="tab-btn" role="tab" aria-selected="false" aria-controls="t5" onclick="switchTab('t5',this)" title="Operator fiscal exposure across all jurisdictions">IOC Portfolio</button>
   <button id="tab-btn-tbreakevenmap" class="tab-btn" role="tab" aria-selected="false" aria-controls="tbreakevenmap" onclick="switchTab('tbreakevenmap',this)" title="Interactive world map of oil price breakeven by country">Breakeven Map</button>
   <button id="tab-btn-treformrisk" class="tab-btn" role="tab" aria-selected="false" aria-controls="treformrisk" onclick="switchTab('treformrisk',this)" title="Fiscal reform history and regime stability across 185 jurisdictions">Reform Risk</button>
@@ -2191,7 +2191,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 <div id="t2" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-t2">
   <div style="display:flex;align-items:baseline;gap:10px;margin-bottom:2px;">
     <div class="page-title" style="margin-bottom:0;">Side-by-Side Country Comparison</div>
-    <span id="cmp-count-badge" style="font-size:11px;color:var(--muted);font-family:system-ui,sans-serif;" title="Countries currently in the comparison (max 4)"></span>
+    <span id="cmp-count-badge" style="font-size:11px;color:var(--muted);font-family:system-ui,sans-serif;" title="Countries currently in the comparison (max 5)"></span>
   </div>
 
   <!-- v469: Profile assumption context strip — SbS always uses pre-computed Deepwater $1.2B 10%WACC values; analyst needs to know the basis before using in IC memo -->
@@ -2532,6 +2532,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong style="color:var(--accent);">v501 (Aug 2026) &mdash; Cycle 400: &ldquo;Load Top 5 in Side-by-Side&rdquo; now actually loads 5</strong> &mdash; Task T3 &mdash; &ldquo;how do these three countries compare side by side?&rdquo; Side-by-Side accepted a maximum of <strong>4</strong> countries, but three separate entry points handed it <strong>5</strong>: the Fiscal Compare hint-bar button &ldquo;&#x21cc; Load Top 5 in Side-by-Side&rdquo;, the floating Screener basket (capacity 5, via <code>launchCompare()</code>), and the shared <code>#/compare/&hellip;</code> link route. <code>addCompare()</code> ended in <code>if (compareList.includes(country) || compareList.length &gt;= 4) return;</code> &mdash; a silent no-op &mdash; so the fifth-ranked country was discarded without any message. From a cold load, running Fiscal Compare on the default sort and clicking Load Top 5 produced Guyana / Sierra Leone / Sri Lanka / Chad and a badge reading &ldquo;4/4 countries (max)&rdquo;: <strong>Ireland</strong>, the fifth-ranked country, was gone with nothing on screen to say so. (1) <strong>Capacity raised 4&rarr;5</strong> (<code>CMP_MAX</code>), matching every place the platform already promised 5. (2) <strong>Refusals are now announced</strong> &mdash; adding past the cap, or re-adding a country already in the grid, raises a toast naming the country instead of doing nothing. (3) <strong>Fifth chart colour added</strong> (#1D4ED8); the Contractor-NPV bar chart indexed <code>colors[i]</code> with no modulo, so a fifth series would have rendered with <code>backgroundColor: "undefined88"</code>. (4) <strong>Screener door aligned</strong> &mdash; &ldquo;Load top 4&rdquo; is now &ldquo;Load top 5&rdquo; and clears the grid first, so it delivers the analyst&rsquo;s shortlist rather than silently merging into whatever was already loaded (the Fiscal Compare door has done this since v455). (5) <strong>Responsive grid made count-aware</strong> &mdash; the &le;768px and &le;600px rules forced <code>repeat(4)</code>/<code>repeat(2)</code> with <code>!important</code> regardless of how many countries were loaded; they now read a <code>--cmp-n</code> custom property set on the grid. Playwright 136 PASS / 0 FAIL / 0 WARN, 0 JS errors. Version v500&rarr;v501.<br><br>
                         <strong style="color:var(--accent);">v500 (Aug 2026) &mdash; Cycle 399: the Screener now opens on all 185 countries, and negative-IRR regimes are no longer invisible</strong> &mdash; Task T1 &mdash; &ldquo;which countries should even be on my screening list?&rdquo; (1) <strong>Two entry doors, two different universes, neither of them the real one (P1 &mdash; bug)</strong> &mdash; Clicking <strong>Screener</strong> in the primary nav auto-applied the <em>Sweet Spot</em> preset (<code>v428</code>, added to &ldquo;prevent a blank table&rdquo; &mdash; a problem <code>v468</code> had already solved by auto-running the Screener on mode activation). A first-time analyst therefore landed on <strong>141 of 185 countries</strong> with Take &le;55% / BE &le;$65 / NPV &ge;0 already applied &mdash; Brazil, Nigeria, Angola, Iraq, Kazakhstan, India and China removed before a single decision had been made. Entering through the Home <em>Screener</em> card skipped that listener and applied the old HTML slider defaults instead, returning <strong>157</strong>. Both doors now open unfiltered on all <strong>185</strong> countries; slider defaults moved to their neutral positions (Take 100% / BE $120 / NPV &minus;$500M) so the two paths agree. Presets remain one click away in the dropdown &mdash; now an explicit choice rather than a silent one. (2) <strong>Negative-IRR countries were unreachable at every filter setting (P1 &mdash; bug)</strong> &mdash; <code>runScreener()</code> applied <code>irrVal &lt; minIRR</code> unconditionally, and <code>#sl-irr</code> has a floor of 0 &mdash; so the &ldquo;off&rdquo; position was in fact a hard <code>IRR &ge; 0</code> filter. Every country with a negative modelled IRR was deleted from the Screener at <em>all</em> slider positions, including after <strong>Reset All</strong>: <strong>Saudi Arabia, Kuwait, Bahrain, Cyprus, Turkmenistan, Uzbekistan</strong> at $75/bbl, plus Malaysia, Qatar and South Sudan at $100 and India and Oman at $125. All were present in Explorer, so the Screener was the only place they vanished. <code>minIRR === 0</code> now means no IRR constraint; behaviour above 0% is unchanged. A neutral Screener returns 185 of 185 at every price deck. (3) <strong>Inert sliders are now labelled as inert</strong> &mdash; each slider sitting at its unfiltered extreme shows a muted &ldquo;&middot; no ceiling&rdquo; / &ldquo;&middot; no floor&rdquo; / &ldquo;&middot; no minimum&rdquo; flag (<code>_scUpdateNeutralFlags()</code>), and the count bar reads &ldquo;All 185 countries &mdash; no filters applied yet&rdquo; rather than &ldquo;185 countries match&rdquo;, which reads like a filter result. (4) <strong>Bookkeeping, not the improvement</strong> &mdash; version sweep v499&rarr;v500. JS syntax gate PASS (9 blocks / 0 errors). Playwright <code>runtime_comprehensive.js</code> ran this cycle against a local server: 135 PASS / 0 FAIL / 1 WARN &mdash; the WARN is the pre-existing service-worker 404 at the GitHub-Pages-absolute path <code>/petroleum-fiscal-db/sw.js</code>, unrelated to this change.<br><br>
                         <strong style="color:var(--accent);">v499 (Aug 2026) &mdash; Cycle 398: Key Fiscal Parameters now separates the modelled rate from the rate the cited source actually states</strong> &mdash; The Country Profile parameter table showed a single Value column with a source badge beside it, so an A-tier badge linking to primary legislation appeared to vouch for the number on screen. It often did not: the value was the average across ORCA&rsquo;s contracts for that country, while the cited statute carried a different rate. Angola showed a 2.58% royalty badged to Lei 10/2004, which states 20%. Brazil showed a 79.65% cost-recovery cap badged to Lei 12.351/2010, which states 50%. Across 39 countries, 62 parameter rows carried this mismatch. The table now has two numeric columns &mdash; <strong>ORCA Value</strong> (contract-weighted average, the figure the DCF engine uses) and <strong>Statutory (cited source)</strong> (the rate in the linked document) &mdash; with divergent rows flagged in orange and a reconciliation note below the table stating how many parameters diverge and how to cite each figure in an IC memo. Countries where every sourced parameter agrees now say so explicitly. Source badges were also bounded to 320px with the full source string kept in the tooltip; previously an untruncated 100-character source blob stretched the column past 700px. JS syntax gate PASS. Playwright 135 PASS / 0 FAIL local (the 136th and the lone WARN are the GitHub-Pages-absolute service-worker path, which 404s under a local server).<br><br>
                         <strong style="color:var(--accent);">v497 (Aug 2026) &mdash; Cycle 396: 3 analyst workflow improvements &mdash; Home QS guide upgraded to 4 steps with Screener + Reform Risk, CP quick IC verdict one-liner, FC drilldown global peer-take count, version sweep v496&rarr;v497</strong> &mdash; (1) <strong>Home Quick Start guide: upgraded from 3 to 4 steps (P1 &mdash; first-run UX)</strong> &mdash; The QS guide shown to first-time visitors (once per session) had 3 steps focused on Fiscal Compare &rarr; Drill &rarr; Export. Analysts arriving for a shortlisting or reform-risk task had no workflow guidance in the guide. The 4th step now introduces Screener (Sweet Spot / High-IRR / Deepwater presets, one-click to filtered shortlist) and the title is updated to reflect the expanded workflow. A "Re-show" link is now embedded in the guide footer so analysts who dismiss it early can bring it back without reloading. Step 3 now explicitly names the preset options (Sweet Spot, High-IRR, Deepwater). Step 4 (Reform Risk) gives the IC WACC premium rule inline: &ldquo;◇◇◇◇◇ = always disclose; 5 reforms since 2010 = add probability-weighted NPV scenario.&rdquo; (2) <strong>Country Profile: Quick IC verdict one-liner above the headline strip (P1 &mdash; first-run UX)</strong> &mdash; When a senior IOC analyst opens a Country Profile, the first thing they need to know is &ldquo;Is this a viable entry?&rdquo; Previously the answer required reading the full headline strip and synthesizing take%, IRR, NPV, and breakeven. A compact one-line verdict now appears immediately below the country name, before the headline strip: a ✓/⚠/✗ icon followed by a plain-language sentence. Examples: &ldquo;✓ Commercially viable at $75/bbl — IRR 17.2% clears IOC hurdle (15%) at 41.3% govt take.&rdquo; / &ldquo;⚠ Near-hurdle at $75/bbl — IRR 11.8% approaches but does not clear 15% IOC hurdle. Viable above ~$82/bbl.&rdquo; / &ldquo;✗ Sub-hurdle at $75/bbl — IRR 6.1% below 10% WACC. Breakeven $94/bbl. Run Scenario Builder to find price threshold.&rdquo; When IRR is unavailable but NPV is positive and take is low (&le;50%), a cautious positive verdict with Scenario Builder CTA appears instead. (3) <strong>FC drilldown: global peer-take count badge (P2)</strong> &mdash; The FC drilldown header shows region rank and global rank, but gave no sense of how many countries share a comparable fiscal burden. When a country has a rare fiscal profile (e.g. very low take of 23%), the analyst has no way to gauge scarcity without leaving the drilldown. A compact badge now appears showing how many other countries have government take within &plusmn;5pp at $75/bbl: &ldquo;N global peers (&plusmn;5pp)&rdquo; for common ranges, or &ldquo;unique fiscal profile&rdquo; when fewer than 4 peers exist globally. Amber color when peer count is &le;3 (rare regime); muted color otherwise. Tooltip explains that rare regimes are scarce IOC entry opportunities. (4) <strong>Version sweep v496&rarr;v497 (52 structural locations)</strong>. JS syntax gate PASS / 14 blocks / 0 errors.<br><br>
@@ -23150,12 +23151,26 @@ document.addEventListener('click', e => {
   if (!cmpSearch.contains(e.target) && !cmpDrop.contains(e.target)) cmpDrop.style.display='none';
 });
 
+// v501: SbS capacity is 5 (was 4). "Load Top 5 in Side-by-Side" called addCompare five
+// times against a 4-slot list, so the 5th-ranked country was dropped with no message —
+// the analyst landed on a grid captioned "4/4 countries (max)" and could not tell which
+// country was missing. Cap now matches every place the UI promises 5, and a refusal is
+// always announced instead of being a silent no-op.
+const CMP_MAX = 5;
 function addCompare(country) {
-  if (compareList.includes(country) || compareList.length >= 4) return;
-  if (!COUNTRY_DATA || !COUNTRY_DATA.find(function(d){ return d.country === country; })) return;
+  if (!COUNTRY_DATA || !COUNTRY_DATA.find(function(d){ return d.country === country; })) return false;
+  if (compareList.includes(country)) {
+    if (typeof showCopyToast === 'function') showCopyToast(country + ' is already in the comparison.');
+    return false;
+  }
+  if (compareList.length >= CMP_MAX) {
+    if (typeof showCopyToast === 'function') showCopyToast('Comparison is full at ' + CMP_MAX + ' countries — ' + country + ' was not added. Remove one (\u2715 on a chip) to make room.');
+    return false;
+  }
   compareList.push(country);
   renderCompare();
   _updateCompareHash();
+  return true;
 }
 function removeCompare(country) {
   compareList = compareList.filter(c => c !== country);
@@ -23187,10 +23202,12 @@ function renderCompare() {
   if (cmpBadge) {
     if (compareList.length === 0) {
       cmpBadge.textContent = '';
-    } else if (compareList.length < 4) {
-      cmpBadge.textContent = compareList.length + '/4 countries — add ' + (4 - compareList.length) + ' more';
+      cmpBadge.style.color = 'var(--muted)';
+    } else if (compareList.length < CMP_MAX) {
+      cmpBadge.textContent = compareList.length + '/' + CMP_MAX + ' countries — room for ' + (CMP_MAX - compareList.length) + ' more';
+      cmpBadge.style.color = 'var(--muted)';
     } else {
-      cmpBadge.textContent = '4/4 countries (max)';
+      cmpBadge.textContent = CMP_MAX + '/' + CMP_MAX + ' countries (full) — remove one to add another';
       cmpBadge.style.color = 'var(--accent)';
     }
   }
@@ -23200,10 +23217,10 @@ function renderCompare() {
     out.className = 'empty-state';
     if (compareList.length === 1) {
       const _sbs1Country = compareList[0];
-      out.innerHTML = '<strong style="color:var(--text);">' + _sbs1Country + '</strong> added — add 1–3 more countries to begin comparison.'
-        + '<div style="margin-top:10px;"><span style="font-size:11px;color:var(--muted);">Search above · use Screener → Load top 5 · or click a quickstart preset below</span></div>';
+      out.innerHTML = '<strong style="color:var(--text);">' + _sbs1Country + '</strong> added — add 1–4 more countries to begin comparison.'
+        + '<div style="margin-top:10px;"><span style="font-size:11px;color:var(--muted);">Search above · or use Fiscal Compare / Screener → “Load top 5 in Side-by-Side”</span></div>';
     } else {
-      out.innerHTML = 'Select 2–4 countries to compare. Type a country name above or click a quickstart preset.';
+      out.innerHTML = 'Select 2–5 countries to compare. Type a country name above or click a quickstart preset.';
     }
     document.getElementById('cmp-chart-wrap').style.display='none';
     return;
@@ -23250,7 +23267,10 @@ function renderCompare() {
 
   const selected = compareList.map(c => COUNTRY_DATA.find(d => d.country === c));
 
-  let html = `<div class="compare-grid" style="grid-template-columns: 200px repeat(${compareList.length}, 1fr);">`;
+  // v501: --cmp-n drives the responsive overrides too — the ≤768px and ≤600px rules
+  // used to force repeat(4)/repeat(2) with !important regardless of how many countries
+  // were loaded, which shifted every row out of alignment at any other count.
+  let html = `<div class="compare-grid" style="--cmp-n:${compareList.length};grid-template-columns: 200px repeat(${compareList.length}, minmax(96px, 1fr));">`;
   // header row
   html += `<div class="cmp-hdr row-label">Metric</div>`;
   selected.forEach(d => {
@@ -23309,7 +23329,9 @@ function renderCompare() {
     ? '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--accent);">⚠ State monopoly — excluded from chart: ' + monopolyCountries.map(d=>d.country).join(', ') + '. No contractor access; fiscal comparison not applicable.</div>'
     : '';
   if (cmpChart) cmpChart.destroy();
-  const colors = ['#B06800','#7C3AED','#C2410C','#15803D'];
+  // v501: 5th colour added with the 5-country cap. The NPV chart indexed colors[i]
+  // without a modulo, so a 5th series rendered with backgroundColor "undefined88".
+  const colors = ['#B06800','#7C3AED','#C2410C','#15803D','#1D4ED8'];
   if (chartCountries.length === 0) {
     chartWrap.style.display = 'none';
   } else {
@@ -23363,8 +23385,8 @@ function renderCompare() {
         datasets: selected.map((d, i) => ({
           label: d.country,
           data: [d.npv_50, d.npv_75, d.npv_100, d.npv_125],
-          backgroundColor: colors[i] + '88',
-          borderColor: colors[i],
+          backgroundColor: colors[i % colors.length] + '88',
+          borderColor: colors[i % colors.length],
           borderWidth: 1.5,
           borderRadius: 3,
         }))
@@ -23739,8 +23761,11 @@ function runScreener() {
   }).join('');
   window._screenerData = data;
 
-  // M1.3: Inject "Load top 4 in Side-by-Side" button after results render
-  var top4 = data.slice(0, 4);
+  // M1.3: Inject "Load top N in Side-by-Side" button after results render
+  // v501: 4 -> 5 to match SbS capacity and the Fiscal Compare door, and clearCompare()
+  // first so the analyst gets their shortlist rather than a silent merge with whatever
+  // was already loaded.
+  var top4 = data.slice(0, 5);
   var screenerTop4Btn = document.getElementById('screener-top4-btn');
   if (!screenerTop4Btn) {
     screenerTop4Btn = document.createElement('div');
@@ -23751,7 +23776,7 @@ function runScreener() {
   }
   if (top4.length >= 2) {
     var top4safe = top4.map(function(d) { return d.country.replace(/'/g, "\\'"); });
-    var top4calls = top4safe.map(function(c) { return "addCompare('" + c + "');"; }).join('');
+    var top4calls = 'clearCompare();' + top4safe.map(function(c) { return "addCompare('" + c + "');"; }).join('');
     screenerTop4Btn.innerHTML = '<button onclick="(function(){' + top4calls + "var btn=[...document.querySelectorAll('.tab-btn')].find(function(b){return b.textContent.includes('Side-by-Side');});if(btn)switchTab('t2',btn);})()\""
       + ' style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:11px;font-weight:600;padding:4px 12px;cursor:pointer;transition:.15s;margin-top:6px;"'
       + ' onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'"'
@@ -27556,8 +27581,8 @@ function ddAddCompare(country, btn) {
     if (btn) { var o=btn.textContent; btn.textContent='Already added'; setTimeout(function(){btn.textContent=o;},1500); }
     return;
   }
-  if (compareList.length >= 4) {
-    if (btn) { var o=btn.textContent; btn.textContent='Max 4 countries'; setTimeout(function(){btn.textContent=o;},1500); }
+  if (compareList.length >= CMP_MAX) {
+    if (btn) { var o=btn.textContent; btn.textContent='Full — max ' + CMP_MAX; setTimeout(function(){btn.textContent=o;},1800); }
     return;
   }
   addCompare(country);
