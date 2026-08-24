@@ -10829,3 +10829,16 @@ the raw model ranking.
 v506 → v507 across the 4 structural locations (meta description, title, header badge, SbS
 citation source line) plus the XLSX version fallback; changelog entry prepended. Grade tables
 not touched.
+
+---
+## Cycle 406 Log — 2026-08-24 15:52
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 406 complete and pushed. Mirror copied to `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+## Cycle 406 — v507
+
+**Task: T1** — "Which countries should even be on my screening list?" (last three cycles were T2, T6, T2)
+
+**Friction.** I cleared storage, hard-reloaded, and clicked Screener the way a first-time analyst would. It opens unfiltered on all 185 countries and ranks them by modelled NPV, numbered 1 to 185. But NPV on the standardized $1.2B deepwater profile is a near-mo
