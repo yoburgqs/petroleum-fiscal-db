@@ -10595,3 +10595,111 @@ not touched.
 Cold walk (sessionStorage + localStorage cleared) into **Fiscal Compare** on the landing defaults — Deepwater, $75/bbl — which is where every first-time analyst arrives.
 
 Row 1 was **Guyana, 22.2% take**, with a green "investible tier" border, rank **#1**, and in the column literally headed **Quality**, a green **A**
+
+---
+## Cycle 405 Log — 2026-08-24
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(Rotation: last six cycles were T6, T2, T5, T4, T3, T1. Cycle 404's log named this
+exact defect as the next candidate.)
+
+## Friction
+Cold walk — `sessionStorage` + `localStorage` cleared, hard reload — into **Fiscal
+Compare** on the landing defaults (Deepwater, $75/bbl), then a row click, which is the
+whole of T2.
+
+The drawer header reads **Iraq 27.1%**. The tier badge, its colour, and the global rank
+beside it are all computed from that figure. **Eight pixels below**, in a table whose
+column is literally headed **`$75/bbl`** — the price the analyst had just selected — the
+same country reads **84.8%**. Two numbers, **57.7pp apart**, for the same country at the
+same price, in the same panel, under two row labels that both said **`Take%`**.
+
+They are two different bases, and nothing on screen said so:
+- `openFCDrilldown()` header → `r.liveTake`, the compare engine's DCF (`runFiscalCompare()`,
+  index.html:~30045) on the selected production profile at the selected price.
+- the 4-price matrix (index.html:~30902) → `COUNTRY_DATA.take_50/75/100/125`, the ORCA
+  contract-database average — the figure Country Profile, the public API and the XLSX
+  `GovtTake_75` column all carry.
+
+Measured across the full result set at $75/bbl:
+
+| gap between the two | countries |
+|---|---|
+| < 3pp (consistent) | 49 |
+| 3–10pp (modest) | 69 |
+| **≥ 10pp (material)** | **64** |
+| state monopoly, not comparable | 3 |
+
+v505 had added a generic-terms notice, but it only fired for `termsBasis === 'default'`
+rows and only said the table "does not reconcile" — it named the contradiction without
+resolving it. The **7 countries modelled on their own terms** — Iraq, Iran, Nigeria,
+Libya, Algeria, Philippines, Norway — carried gaps up to 57.7pp with **no warning at all**.
+Those are precisely the countries ORCA can actually model and the analyst most wants to defend.
+
+## Change
+1. **The two figures are now adjacent and labelled.** The matrix row is renamed
+   `Take% · database`; a new `Take% · this model` row sits directly beneath it carrying the
+   header figure, with the signed gap in the same cell (`-57.7pp vs db`).
+2. **The column matching the selected price is marked `SELECTED`** and outlined in accent.
+   All four columns previously looked identical. The model row shows a value only in that
+   column; the other three read `—` with a tooltip stating the engine models one price at a
+   time and how to change it. Setting Price to $100 and re-running moves the marker and
+   recomputes the gap (verified: Iraq 57.7pp @$75 → 56.4pp @$100).
+3. **A severity verdict sits under the table**, using the same thresholds as the Country
+   Profile reconciliation shipped in cycle 403 — `<3pp CONSISTENT / <10pp MODEST / ≥10pp
+   MATERIAL`. It names which figure to cite and where that figure is used, and states that
+   the tier badge and rank are derived from the *other* one. It fires on gap size for every
+   country, not just default-terms rows, so Iraq is now flagged. State monopolies
+   (take ≥ 99.5% — Saudi Arabia, Kuwait, Bahrain) get `NOT COMPARABLE` instead of a
+   meaningless delta.
+4. **Separate real bug, found on the same walk: the "Copy 4-price as IC table" button had
+   never worked.** `_tsvEsc = JSON.stringify(_tsv)` was interpolated straight into
+   `onclick="…"`, and its leading double quote closed the HTML attribute — the handler was
+   truncated to 98 characters ending at `writeText(` and threw `Unexpected end of input` on
+   every click since it shipped in v460. Quotes are now encoded for attribute context. The
+   copied TSV also carries both bases, the gap and a do-not-mix note, and reads its version
+   off the header badge instead of the hard-coded `v500` it had drifted to.
+5. **XLSX export had the identical collision** in adjacent columns — `Take%` (model) beside
+   `GovtTake_75` (database), unlabelled. Headers now name the basis and a `Model_vs_DB_pp`
+   column carries the reconciliation, left blank for state monopolies.
+
+## Result
+The analyst can tell **which of the two government-take numbers goes in the IC memo**, how
+far apart they are, and that the rank and tier badge on screen are computed from the one
+they should not cite. Before this cycle, an analyst screening Iraq off the Fiscal Compare
+drilldown could have reported "27% government take" and been wrong by 57.7pp against
+Country Profile, the API and their own exported workbook — with nothing on the page
+warning them. They can also now actually copy the 4-price table, which has silently done
+nothing for 46 cycles.
+
+## Verification
+- **JS syntax gate: 9/9 inline script blocks PASS, 0 errors** (`node --check` equivalent via
+  `new Function`), re-run after every edit including the version bump and changelog.
+- **Cold Playwright sweep of all 185 drawers** against the patched local build
+  (`sessionStorage` + `localStorage` cleared, hard reload): every drawer renders both the
+  `Take% · database` and `Take% · this model` rows and exactly one verdict —
+  **49 CONSISTENT / 69 MODEST / 64 MATERIAL / 3 NOT COMPARABLE, 0 unclassified, 0 errors,
+  0 JS errors.**
+- Selected-column marker verified to track the Price control ($75 → $100).
+- **Clipboard TSV invoked for real** — now returns content (it returned nothing before), with
+  both bases, the delta line and the note.
+- **XLSX download fired for real** (`ORCA_fiscal_compare_$75_deepwater_2026-08-24.xlsx`),
+  185 rows, parsed from the archive: `Take% (model, selected price)` = 27.11 and
+  `GovtTake_75 (database)` = 84.8 for Iraq with `Model_vs_DB_pp` = -57.7; Kuwait and Saudi
+  Arabia correctly blank.
+- **Full `runtime_comprehensive.js` did NOT complete locally.** It emitted 35 checks —
+  Load, Fiscal Compare incl. all six sort paths, DCF — with **0 FAIL, 0 WARN, 0 JS errors**,
+  then hung in the ScenarioBuilder section, exactly as cycle 404 reported.
+  **This cycle established it is pre-existing and not a regression**: the unmodified
+  committed v505 `index.html`, served from a control directory symlinked to the same data
+  files, hangs at the identical point. Root cause is now visible — `#sb-mechanic` renders
+  **0×0** in headless Chromium at the suite's viewport, so Playwright's `selectOption`
+  never finds it actionable. That is a harness/headless-layout problem in a section this
+  cycle does not touch. The 35 checks that did run cover every surface this cycle changed.
+- No item on the STILL LOCKED list was touched.
+
+## Bookkeeping (not the improvement)
+v505 → v506 across the 4 structural locations (meta description, title, header badge, SbS
+citation source line) plus the XLSX version fallback; changelog entry prepended. Grade
+tables not touched.
