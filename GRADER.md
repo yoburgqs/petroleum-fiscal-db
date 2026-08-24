@@ -10336,3 +10336,116 @@ meta description, header badge); changelog entry prepended. Grade tables not tou
 **Task: T5** — "Give me something I can paste straight into an IC memo." (Last five cycles were T4, T3, T1, T1, T6.)
 
 **Friction.** I cleared sessionStorage and localStorage and walked it the way an analyst with a shortlist would: Side-by-Side, three countries, now get it into the memo. The action row under the grid offers four things — Save as PDF, Chart PNG, Share Link, Rank all 185. That's a print artifact, an image of one chart, and a URL. Non
+
+---
+
+## Cycle 403 — v504 — 2026-08-24
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(Last six cycles were T5, T4, T3, T1, T1, T6 — T2 was the stalest.)
+
+**Friction.** Walked cold in a scripted browser with `sessionStorage` and `localStorage`
+cleared, Country Profile → Nigeria.
+
+The headline strip reads **81.1% govt take @$75**, with a green IC verdict beneath it.
+Everything downstream agrees: the 4-price table, the peer set, the contract distribution.
+Then the analyst reaches the **⚙ Live DCF Model** panel (`dd-live-dcf-container`,
+`renderLiveDCFPanel` / `_execLiveDCF`, index.html ~28580–28800) and hits three 20px result
+cards, the first of which reads **Govt Take 47.3%**.
+
+Same country. Same $75/bbl. Same page. **33.8pp apart.** Equal visual weight.
+
+It is not a one-country artifact:
+
+| Country | Headline take @$75 | Live DCF panel | Gap |
+|---|---|---|---|
+| Nigeria | 81.1% | 47.3% | **−33.8pp** |
+| Indonesia | 59.5% | 22.2% | **−37.3pp** |
+| Iraq | 84.8% | 37.6% | **−47.2pp** |
+| Iran | 75.7% | 91.1% | +15.4pp |
+| Norway | 68.0% | 76.0% | +8.0pp |
+
+The entire reconciliation was one line of 11px grey text under the panel:
+`DB avg @$75: 81.1% | Live DCF @$75: 47.3% | Delta: -33.8pp (profile: Deepwater)`.
+That states the contradiction and resolves nothing. An analyst who screens Indonesia and
+reports "22% government take" to an investment committee is wrong by 37pp against Fiscal
+Compare's ranking, the API, and the XLSX export — and the page gave them no way to know.
+
+Two compounding defects found on the same walk:
+
+1. **The panel lied about the regime it modelled.** `renderLiveDCFPanel()` derived its
+   header label from `d.mechanics.split(',')[0]`, while `runLiveDCF()` resolved the mechanic
+   through `FC_MECHANIC_OVERRIDE[country]` and then `params._mechanic`. Angola rendered
+   "(Concession regime)" while the engine actually ran **PSC**. Australia and Iran likewise.
+2. **The Cost Profile Assumptions panel stated assumptions the platform never used.** This is
+   the panel an analyst opens to write the assumption footnote in their IC memo. It hardcoded
+   `$2.0B capex (years 1–5)` / `50 MBD (plateau years 6–15)` / `$12/bbl opex`, plus a
+   fabricated `Onshore — Russian benchmark` variant ($0.6B / 15 MBD / $7) with no
+   corresponding entry in `DCF_PROFILES`. The real basis for every precomputed take, NPV, IRR
+   and breakeven in `COUNTRY_DATA` is `DCF_PROFILES.deepwater` = **$1.2B capex, 50k bbl/d,
+   $15/bbl opex, 3yr ramp + 8yr plateau, 12%/yr decline**. All three lines were wrong.
+
+**Change.**
+
+1. New **`resolveLiveDCFMechanic(country)`** mirrors `runLiveDCF`'s resolution exactly
+   (override → `getDCFParams` → `_mechanic`). `_execLiveDCF()` additionally rewrites the
+   header span from `result.mechanic` after **every** run, so the label physically cannot
+   drift from what executed. Angola now reads PSC, Australia PRRT, Iran Buy-back.
+2. A **scope line** under the panel title, above the controls: states in words that this
+   panel runs **one** hypothetical project through the country's terms at a price and
+   profile the analyst chooses, that the results are that project's economics and not the
+   country's headline figures (which are averaged over N real contracts), and that the
+   reconciliation sits at the bottom of the panel. The three result cards are relabelled
+   **"Govt Take — this scenario"**, etc., and the take card's note reads "% of revenue · 1 project".
+3. The grey delta line is replaced by a **reconciliation block** headed
+   *"Which number goes in the IC memo?"*:
+   - **"✔ Cite this"** card (accent-filled): the contract average, the country's name against
+     it, the contract count, and the sentence *"This is the figure Fiscal Compare ranks on,
+     Side-by-Side shows, the XLSX exports and the API returns."*
+   - **"Scenario result — label it"** card (dashed, muted): the live figure, described as
+     "One Deepwater project on PSC terms @ $75/bbl", answering *"what would my project pay
+     here"*, with the instruction to say so in the memo if used.
+   - A **severity-coloured verdict**: consistent (<3pp, green) / modest (<10pp, yellow) /
+     **material (≥10pp, red)** — the last stating explicitly that the two figures must not
+     appear in the same sentence, and naming the pp error that would result.
+   - A collapsible **"Why the two differ (N reasons)"** list. Every reason is read off the
+     data, none asserted blind: **price** (only when ≠ $75), **project profile** (only when
+     ≠ deepwater, naming both capex/opex sets), **regime mix** (only when `d.mechanics` has
+     more than one, listing them), **R-factor tiers** (only when `tier_schedule` is populated),
+     and **terms** (always, as the base case: country-default statutory vs each contract's own
+     negotiated terms, production-weighted where flagged). Nigeria surfaces 3 reasons, Iraq 4,
+     and 5 once the price slider and profile selector are moved.
+4. **Cost Profile Assumptions** is now derived from `DCF_PROFILES.deepwater` at render time —
+   `$1.2B (95% spent years 1–3)` / `50 MBD (ramp years 1–3 · plateau years 4–11 · 12%/yr
+   decline after)` / `$15/bbl` — and the invented Russia branch is deleted. It cannot drift
+   from the engine again.
+
+**Result.** The analyst can state Nigeria's government take as **81.1%** and knows that is the
+figure every other surface in the platform uses; knows the **47.3%** on the same screen is
+their own hypothetical project rather than a competing country statistic; can name the specific
+reasons the two differ if the IC asks; knows which regime was actually modelled; and copies
+assumption-footnote values that the platform genuinely used. Before this cycle the page showed
+two government-take numbers for the same country at the same price, up to 47pp apart, both
+looking authoritative, with a grey footnote that stated the discrepancy and left the analyst to
+guess — and the assumption panel they would cite alongside it was wrong in all three lines.
+
+**Verification.**
+- JS syntax gate: `node --check` across all 9 inline script blocks — **9/9 PASS, 0 errors**.
+- Playwright `tests/runtime_comprehensive.js` **ran this cycle** against the patched local
+  build: **136 PASS / 0 FAIL / 1 WARN / 0 JS errors**. The WARN is a 404 on
+  `/petroleum-fiscal-db/sw.js` — the service worker registers at the GitHub Pages path prefix,
+  which does not exist under a local static server root. Serving artifact, absent on the live
+  site, unrelated to this change.
+- Flow re-walked cold (sessionStorage + localStorage cleared) across **9 countries** — Nigeria,
+  Norway, Angola, Indonesia, Iraq, Australia, Iran, Russia, plus the landing state. Mechanic
+  labels verified correct against the engine's resolved mechanic in every case. Reconciliation
+  block verified to re-render live when the price slider moves ($75 → $110) and when the
+  profile selector changes (Deepwater → North Sea): driver count went 3 → 5 and the verdict
+  recomputed. Cost Profile panel verified to read $1.2B / $15/bbl for both a Deepwater-default
+  country and Russia. **0 JS errors** throughout.
+- Baseline note: the incoming report said 135 PASS / 1 FAIL. Measured locally against the
+  patched build this cycle: **0 FAIL both before and after** the change.
+
+**Bookkeeping (not the improvement).** v503 → v504 across the 4 structural locations (meta
+description, title, header badge, SbS citation source line); changelog entry prepended. Grade
+tables not touched.
