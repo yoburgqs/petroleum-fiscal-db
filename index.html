@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v503.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v504.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v503</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v504</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1343,7 +1343,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v503</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v504</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2534,6 +2534,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong style="color:var(--accent);">v504 (Aug 2026) &mdash; Cycle 403: the Country Profile stopped showing two different government-take numbers for the same country</strong> &mdash; Task T2 &mdash; &ldquo;is this country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold on Nigeria. The headline reads <strong>81.1% govt take @$75</strong>. Scrolling down, the <em>Live DCF Model</em> panel renders a 20px result card reading <strong>Govt Take 47.3%</strong> &mdash; same country, same $75/bbl, same page, <strong>33.8pp apart</strong>, at equal visual weight. Indonesia was 59.5% vs 22.2% (<strong>37.3pp</strong>); Iraq 84.8% vs 37.6% (<strong>47.2pp</strong>). The only reconciliation was one line of 11px grey text stating the arithmetic &mdash; <code>DB avg @$75: 81.1% | Live DCF @$75: 47.3% | Delta: -33.8pp</code> &mdash; which names the contradiction without resolving it. An analyst screening Indonesia and reporting &ldquo;22% government take&rdquo; to an IC would be wrong by 37pp against Fiscal Compare, the API and the XLSX export. Compounding it, <code>renderLiveDCFPanel()</code> labelled the panel from <code>d.mechanics[0]</code> while <code>runLiveDCF()</code> resolved the mechanic through <code>FC_MECHANIC_OVERRIDE</code> and <code>params._mechanic</code> &mdash; so Angola rendered &ldquo;(Concession regime)&rdquo; while the engine ran <strong>PSC</strong>, and the analyst could not tell what had been modelled. (1) New <code>resolveLiveDCFMechanic()</code> mirrors the engine&rsquo;s resolution, and <code>_execLiveDCF()</code> now rewrites the header from <code>result.mechanic</code> after every run, so the label can never drift from what executed &mdash; Angola now reads PSC, Australia PRRT, Iran Buy-back. (2) A scope line under the panel title states in words that this is a what-if on <strong>one</strong> hypothetical project, not the country&rsquo;s headline; the three result cards are relabelled &ldquo;&mdash; this scenario&rdquo;. (3) The grey delta line is replaced by a <strong>reconciliation block</strong>: two side-by-side cards (&ldquo;&#10004; Cite this&rdquo; carrying the contract average and where it is used, vs the scenario result and how to label it), a severity-coloured verdict &mdash; consistent &lt;3pp / modest &lt;10pp / material &ge;10pp, the last stating explicitly that the two figures must not share a sentence &mdash; and a collapsible <em>Why the two differ</em> list whose reasons are read off the data, never asserted: price, project profile (with both capex/opex sets named), regime mix, R-factor tiers, and contract-negotiated vs country-default statutory terms. Nigeria surfaces 3 reasons, Iraq 4, and 5 once the price slider and profile selector are moved. (4) Separate correctness fix on the same walk: the <em>Cost Profile Assumptions</em> panel &mdash; the panel an analyst opens to write their IC assumption footnote &mdash; hardcoded <strong>$2.0B capex / $12 opex / plateau years 6&ndash;15</strong> plus a fabricated Russia variant, while <code>DCF_PROFILES.deepwater</code>, the actual basis of every precomputed take, NPV, IRR and breakeven in <code>COUNTRY_DATA</code>, is <strong>$1.2B / $15/bbl / ramp 3yr + plateau 8yr</strong>. All three lines were wrong. The panel is now derived from <code>DCF_PROFILES.deepwater</code> at render time and the invented Russia branch is deleted, so it cannot drift again. Verified in a cold browser (cleared sessionStorage + localStorage) across 9 countries and live through the price slider and profile selector. Tests: JS syntax gate 9/9 PASS. Version v503&rarr;v504.<br><br>
                         <strong style="color:var(--accent);">v503 (Aug 2026) &mdash; Cycle 402: the Side-by-Side comparison can now leave the page as a table</strong> &mdash; Task T5 &mdash; &ldquo;give me something I can paste straight into an IC memo.&rdquo; An analyst who has built the exact shortlist they care about in Side-by-Side had no way to get it into a document as data. The four actions under the grid were <em>Save as PDF</em>, <em>Chart PNG</em>, <em>Share Link</em> and <em>Rank all 185</em> &mdash; a print artifact, an image of one chart, and a URL. Falling back to selecting the grid by hand does not work either: <code>.compare-grid</code> is a CSS <code>display:grid</code> of <code>&lt;div&gt;</code>s, so a drag-copy of a 5-country comparison flattens into <strong>129 lines of a single vertical column</strong> &mdash; every country name, region and metric value in one stream with no attribution, so &ldquo;62 &middot; MODERATE&rdquo; cannot be traced back to a country. Meanwhile a correctly structured <code>&lt;table id="cmp-data-table"&gt;</code> mirroring the grid exactly (20 rows &times; N columns) already sat in the DOM at <code>display:none</code> with <code>aria-hidden="true"</code> &mdash; built for Playwright and screen readers, unreachable by the user. The remaining path was retyping numbers into the memo by hand, which is where IC memo errors come from. (1) New <strong>&#x2398; Copy Table for IC Memo</strong> button, first in the action row and accent-filled because it is the primary exit from this tab. (2) <code>copyComparisonTable()</code> writes <strong>two clipboard flavours</strong> via <code>ClipboardItem</code>: <code>text/html</code> &mdash; a real bordered <code>&lt;table&gt;</code> in Calibri that Word, Google Docs, Outlook and PowerPoint render as a formatted table &mdash; and <code>text/plain</code> TSV, which Excel splits into columns. Falls back to <code>writeText(tsv)</code> where <code>ClipboardItem</code> is unavailable. (3) The copied block is memo-ready, not just data: a caption naming the countries, the standing assumption line (Deepwater profile, 10% WACC, 100% WI, NPV/IRR/breakeven @ $75/bbl, take shown $50&ndash;$125), and the ORCA source line. (4) Help glyphs and footnote markers (&#9432;, &#9670;, hair spaces) are stripped so pasted headers read as plain column names. (5) Guarded: the button only renders at 2+ countries, and a direct call below that returns a toast rather than an empty table. (6) The four Side-by-Side action buttons are now <code>display:none</code> in <code>@media print</code>, so <em>Save as PDF</em> stops printing a row of buttons into the PDF. Verified in a cold browser (cleared sessionStorage + localStorage): rich-HTML paste probe returns a 20&times;3 <code>&lt;table&gt;</code> with correct headers; TSV is uniformly 4 columns across all 20 rows for a 3-country comparison. Tests: JS syntax gate 9/9 PASS / 136 PASS / 0 FAIL / 0 JS errors. Version v502&rarr;v503.<br><br>
                         <strong style="color:var(--accent);">v502 (Aug 2026) &mdash; Cycle 401: Reform Risk now answers the single-country question</strong> &mdash; The Reform Risk tab is named for &ldquo;what is my reform exposure <em>here</em>&rdquo;, but every block on it was a global aggregate &mdash; top-15 most-reformed table, top-20 decade heatmap, 8 stable / 8 volatile lists. There was no control that took a country as input, so an analyst arriving with one jurisdiction in mind had no way to ask about it. Added a <strong>per-country lookup</strong> covering all 185 countries, split into two optgroups so the coverage boundary is visible before selection: <em>Sourced reform history &mdash; scoreable (21)</em> and <em>No sourced reform history &mdash; predictability only (164)</em>. Selecting a covered country renders its Reform Frequency Score with rank among the 21 scoreable, reforms since 2010, hostile/friendly/neutral direction split with net tilt, Fiscal Predictability Score alongside it, take @ $75, the most recent reform event, and the tab&rsquo;s own IC rule <em>applied to that country</em> (&ldquo;add a 3&ndash;5pp WACC premium&rdquo;) rather than left as a general note. Selecting one of the 164 uncovered countries states plainly that there is <strong>no score</strong> &mdash; not a score of 100 &mdash; because the formula 100 &minus; 15&times;(reforms since 2010) computes to a clean 100 for a jurisdiction that was simply never sourced, which is indistinguishable from a genuine zero-reform record. It then gives the Fiscal Predictability Score, which is derived from that country&rsquo;s own contract set and exists for all 185. The Reform Risk Snapshot headline now reads &ldquo;21 of 185 jurisdictions carry a sourced reform history &mdash; the rankings below are drawn from those 21 only&rdquo;, so the denominator is legible from the first line. Both verdict cards drill through to the Country Profile. Test suite: the stale <code>max 4 limit</code> assertion (superseded by the v501 capacity change) was corrected to assert a 5th country is accepted and a 6th refused. Tests: JS syntax gate 9/9 PASS / 137 PASS / 0 FAIL / 0 WARN / 0 JS errors.<br><br>
                         <strong style="color:var(--accent);">v501 (Aug 2026) &mdash; Cycle 400: &ldquo;Load Top 5 in Side-by-Side&rdquo; now actually loads 5</strong> &mdash; Task T3 &mdash; &ldquo;how do these three countries compare side by side?&rdquo; Side-by-Side accepted a maximum of <strong>4</strong> countries, but three separate entry points handed it <strong>5</strong>: the Fiscal Compare hint-bar button &ldquo;&#x21cc; Load Top 5 in Side-by-Side&rdquo;, the floating Screener basket (capacity 5, via <code>launchCompare()</code>), and the shared <code>#/compare/&hellip;</code> link route. <code>addCompare()</code> ended in <code>if (compareList.includes(country) || compareList.length &gt;= 4) return;</code> &mdash; a silent no-op &mdash; so the fifth-ranked country was discarded without any message. From a cold load, running Fiscal Compare on the default sort and clicking Load Top 5 produced Guyana / Sierra Leone / Sri Lanka / Chad and a badge reading &ldquo;4/4 countries (max)&rdquo;: <strong>Ireland</strong>, the fifth-ranked country, was gone with nothing on screen to say so. (1) <strong>Capacity raised 4&rarr;5</strong> (<code>CMP_MAX</code>), matching every place the platform already promised 5. (2) <strong>Refusals are now announced</strong> &mdash; adding past the cap, or re-adding a country already in the grid, raises a toast naming the country instead of doing nothing. (3) <strong>Fifth chart colour added</strong> (#1D4ED8); the Contractor-NPV bar chart indexed <code>colors[i]</code> with no modulo, so a fifth series would have rendered with <code>backgroundColor: "undefined88"</code>. (4) <strong>Screener door aligned</strong> &mdash; &ldquo;Load top 4&rdquo; is now &ldquo;Load top 5&rdquo; and clears the grid first, so it delivers the analyst&rsquo;s shortlist rather than silently merging into whatever was already loaded (the Fiscal Compare door has done this since v455). (5) <strong>Responsive grid made count-aware</strong> &mdash; the &le;768px and &le;600px rules forced <code>repeat(4)</code>/<code>repeat(2)</code> with <code>!important</code> regardless of how many countries were loaded; they now read a <code>--cmp-n</code> custom property set on the grid. Playwright 136 PASS / 0 FAIL / 0 WARN, 0 JS errors. Version v500&rarr;v501.<br><br>
@@ -25699,11 +25700,21 @@ function loadCountryProfile(country) {
   </div>
   ${(function(){
     // Cost Profile Assumptions — collapsible disclosure panel
-    const isRussia = country === 'Russia';
-    const profileName = isRussia ? 'Onshore — Russian benchmark' : 'Deepwater standard';
-    const capex     = isRussia ? '$0.6B (years 1–3)' : '$2.0B (years 1–5)';
-    const peakProd  = isRussia ? '15 MBD (plateau years 4–10)' : '50 MBD (plateau years 6–15)';
-    const opex      = isRussia ? '$7/bbl' : '$12/bbl';
+    // v504: read the REAL standardized profile out of DCF_PROFILES.deepwater instead of hardcoding it.
+    // The hardcoded text said $2.0B capex / $12 opex / plateau years 6–15 and a fabricated Russia
+    // variant; the engine actually uses $1.2B / $15 / ramp 3yr + plateau 8yr for every precomputed
+    // take, NPV, IRR and breakeven in COUNTRY_DATA. An analyst opening this panel to write their IC
+    // assumption footnote was copying numbers the platform never used.
+    const _dwp = (typeof DCF_PROFILES !== 'undefined' && DCF_PROFILES.deepwater) ? DCF_PROFILES.deepwater : null;
+    const profileName = 'Deepwater standard';
+    const _capexB     = _dwp ? (_dwp.capexMM / 1000) : 1.2;
+    const _rampY      = _dwp ? _dwp.rampYears : 3;
+    const _platY      = _dwp ? _dwp.plateauYears : 8;
+    const capex       = '$' + _capexB.toFixed(1) + 'B (95% spent years 1\u2013' + _rampY + ')';
+    const peakProd    = (_dwp ? (_dwp.peakBblDay / 1000) : 50) + ' MBD (ramp years 1\u2013' + _rampY
+                        + ' \u00b7 plateau years ' + (_rampY + 1) + '\u2013' + (_rampY + _platY)
+                        + ' \u00b7 ' + (_dwp ? (_dwp.declineRate * 100).toFixed(0) : '12') + '%/yr decline after)';
+    const opex        = '$' + (_dwp ? _dwp.opexBbl : 15) + '/bbl';
     const collapseId = 'cost-profile-' + safe;
     return `<div class="dd-section">
       <h3 style="cursor:pointer;user-select:none;" onclick="(function(){var el=document.getElementById('${collapseId}');el.style.display=el.style.display==='none'?'block':'none';})()">
@@ -28118,7 +28129,7 @@ function copyComparisonTable(btn) {
   var countries = matrix[0].slice(1);
   var caption = 'ORCA fiscal comparison — ' + countries.join(' / ');
   var assump = 'Standardized Deepwater profile, 10% WACC, 100% WI. NPV / IRR / Breakeven at $75/bbl; government take shown at $50–$125/bbl.';
-  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v503 — yoburgqs.github.io/petroleum-fiscal-db/';
+  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v504 — yoburgqs.github.io/petroleum-fiscal-db/';
 
   // --- plain-text / TSV flavour (Excel-friendly) ---
   var tsv = caption + '\n' + assump + '\n\n'
@@ -28543,6 +28554,20 @@ function getDCFParams(country, mechanic) {
   return params;
 }
 
+// v504: resolve the mechanic the Live DCF engine will ACTUALLY run.
+// renderLiveDCFPanel used to label the panel from d.mechanics[0] while runLiveDCF resolved through
+// FC_MECHANIC_OVERRIDE and params._mechanic — so Angola, Nigeria and Indonesia all rendered
+// "(Concession regime)" while the engine ran PSC. Mirrors runLiveDCF's resolution exactly.
+function resolveLiveDCFMechanic(country) {
+  const d = COUNTRY_DATA.find(x => x.country === country);
+  if (!d) return 'Concession';
+  var m = (typeof FC_MECHANIC_OVERRIDE !== 'undefined' && FC_MECHANIC_OVERRIDE[country])
+    ? FC_MECHANIC_OVERRIDE[country]
+    : (d.mechanics || 'Concession').split(',')[0].trim();
+  try { var pr = getDCFParams(country, m); if (pr && pr._mechanic) m = pr._mechanic; } catch (e) {}
+  return m;
+}
+
 function runLiveDCF(country, profileKey, price) {
   const d = COUNTRY_DATA.find(x => x.country === country);
   if (!d) return null;
@@ -28590,10 +28615,19 @@ function renderLiveDCFPanel(country, containerId) {
                          (country === 'Norway' || country === 'United Kingdom') ? 'north_sea' :
                          (mechanic === 'TSC' || country === 'Iraq') ? 'onshore_me' : 'deepwater';
   const defaultPrice = 75;
+  // v504: label the regime the engine will actually run, not d.mechanics[0]
+  const _runMech504 = resolveLiveDCFMechanic(country);
 
   container.innerHTML = `
 <div class="live-dcf-panel" id="ldcf-${country.replace(/[^a-z0-9]/gi,'_')}">
-  <h3>&#9881; Live DCF Model <span style="font-size:10px;font-weight:400;text-transform:none;color:var(--muted)">(${mechanic} regime)</span></h3>
+  <h3 style="margin-bottom:4px;">&#9881; Live DCF Model <span id="ldcf-mech-${country.replace(/[^a-z0-9]/gi,'_')}" style="font-size:10px;font-weight:400;text-transform:none;color:var(--muted)">(${_runMech504} regime)</span></h3>
+  <!-- v504: scope line — this panel is a what-if on ONE synthetic project, not ${country}'s headline take.
+       Without this, its 20px "Govt Take" card reads as a second, contradictory country statistic. -->
+  <div style="font-size:11px;color:var(--muted);line-height:1.5;margin:0 0 12px 0;padding-bottom:10px;border-bottom:1px dashed var(--border);">
+    <strong style="color:var(--text);">What-if tool.</strong> Runs <strong>one</strong> hypothetical project through ${country}&rsquo;s ${_runMech504} terms at a price and profile you choose.
+    The results below are that project&rsquo;s economics &mdash; <em>not</em> ${country}&rsquo;s headline figures, which are averaged over ${d.n ? d.n.toLocaleString() : 'all'} real contracts.
+    Reconciliation of the two is at the bottom of this panel.
+  </div>
   <div class="dcf-controls">
     <div class="dcf-control-group">
       <label>Project Profile</label>
@@ -28617,17 +28651,17 @@ function renderLiveDCFPanel(country, containerId) {
   </div>
   <div class="dcf-results-row" id="ldcf-results-${country.replace(/[^a-z0-9]/gi,'_')}">
     <div class="dcf-result-card">
-      <div class="dcf-result-label">Govt Take</div>
+      <div class="dcf-result-label">Govt Take &mdash; this scenario</div>
       <div class="dcf-result-value" id="ldcf-take-${country.replace(/[^a-z0-9]/gi,'_')}">—</div>
-      <div class="dcf-result-note">% of revenue</div>
+      <div class="dcf-result-note">% of revenue &middot; 1 project</div>
     </div>
     <div class="dcf-result-card">
-      <div class="dcf-result-label">Contractor IRR</div>
+      <div class="dcf-result-label">Contractor IRR &mdash; this scenario</div>
       <div class="dcf-result-value" id="ldcf-irr-${country.replace(/[^a-z0-9]/gi,'_')}">—</div>
       <div class="dcf-result-note">25yr project</div>
     </div>
     <div class="dcf-result-card">
-      <div class="dcf-result-label">Contractor NPV</div>
+      <div class="dcf-result-label">Contractor NPV &mdash; this scenario</div>
       <div class="dcf-result-value" id="ldcf-npv-${country.replace(/[^a-z0-9]/gi,'_')}">—</div>
       <div class="dcf-result-note">10% disc. rate ($M)</div>
     </div>
@@ -28743,15 +28777,94 @@ function _execLiveDCF(country, profileKey, price) {
   // v33: Update production profile chart when profile changes
   renderProductionChart(country, profileKey);
 
-  // DB vs. Live comparison
+  // v504: keep the panel's regime label honest — name what the engine actually ran this pass.
+  const mechEl = document.getElementById('ldcf-mech-' + slug);
+  if (mechEl && result.mechanic) mechEl.textContent = '(' + result.mechanic + ' regime)';
+
+  // ================================================================
+  // v504 — RECONCILIATION BLOCK (replaces the one-line grey delta)
+  // ----------------------------------------------------------------
+  // The old line read: "DB avg @$75: 81.1% | Live DCF @$75: 47.3% | Delta: -33.8pp".
+  // It stated the contradiction without resolving it. On Nigeria that is a 33.8pp gap and on
+  // Indonesia 37.3pp, between two government-take numbers for the same country at the same price,
+  // both rendered on the same screen. An analyst answering "is this attractive at $75 and can I
+  // defend it" had no way to know which number to put in the memo. Now the block says which one,
+  // why they differ, and how big the gap is — in words.
+  // ================================================================
   const vsEl = document.getElementById('ldcf-vsdb-' + slug);
   if (vsEl && result.dbTake != null) {
-    const delta = result.take - result.dbTake;
-    const sign = delta >= 0 ? '+' : '';
-    const cls = Math.abs(delta) < 3 ? '' : delta > 0 ? 'delta-pos' : 'delta-neg';
     const cd = COUNTRY_DATA.find(x => x.country === country);
-    const rLabel = (cd && cd.tier_schedule && cd.tier_schedule.length > 0) ? ' <span style="color:var(--purple);font-size:10px;">◆ R-factor tiers active</span>' : '';
-    vsEl.innerHTML = `DB avg @$75: <strong>${result.dbTake.toFixed(1)}%</strong> &nbsp;|&nbsp; Live DCF @$${price}: <strong>${result.take.toFixed(1)}%</strong> &nbsp;|&nbsp; Delta: <span class="${cls}">${sign}${delta.toFixed(1)}pp</span> <span style="color:var(--muted);font-size:10px">(profile: ${result.profileName})</span>${rLabel}`;
+    const delta = result.take - result.dbTake;
+    const adelta = Math.abs(delta);
+    const sign = delta >= 0 ? '+' : '';
+
+    // Severity — drives the colour and the verdict sentence.
+    let sevCol, sevBg, sevBorder, verdict;
+    if (adelta < 3) {
+      sevCol = 'var(--green)'; sevBg = 'rgba(21,128,61,.05)'; sevBorder = 'rgba(21,128,61,.25)';
+      verdict = 'Consistent \u2014 this scenario lands within 3pp of the country average. Either figure is defensible; cite the country average for comparability.';
+    } else if (adelta < 10) {
+      sevCol = 'var(--yellow)'; sevBg = 'rgba(161,98,7,.05)'; sevBorder = 'rgba(161,98,7,.25)';
+      verdict = 'Modest gap \u2014 quote the country average as ' + country + '\u2019s take, and cite this scenario only if you also state the profile and price you set.';
+    } else {
+      sevCol = 'var(--red)'; sevBg = 'rgba(185,28,28,.05)'; sevBorder = 'rgba(185,28,28,.3)';
+      verdict = 'Material gap \u2014 do not put these two numbers in the same sentence. Quoting ' + result.take.toFixed(1)
+              + '% as \u201c' + country + '\u2019s government take\u201d would understate/overstate it by ' + adelta.toFixed(1)
+              + 'pp against every other tab, the API and the XLSX export.';
+    }
+
+    // Why they differ — every driver below is read off the data, none is asserted blind.
+    const drivers = [];
+    if (price !== 75) {
+      drivers.push('<strong>Price:</strong> this scenario is set to $' + price + '/bbl; the country average shown at the top of the page is fixed at $75/bbl.');
+    }
+    if (profileKey !== 'deepwater') {
+      const _dw = (typeof DCF_PROFILES !== 'undefined' && DCF_PROFILES.deepwater) ? DCF_PROFILES.deepwater : null;
+      const _pf = (typeof DCF_PROFILES !== 'undefined' && DCF_PROFILES[profileKey]) ? DCF_PROFILES[profileKey] : null;
+      drivers.push('<strong>Project profile:</strong> this scenario uses <em>' + result.profileName + '</em>'
+        + (_pf ? ' ($' + (_pf.capexMM/1000).toFixed(1) + 'B capex \u00b7 ' + (_pf.peakBblDay/1000) + 'k bbl/d \u00b7 $' + _pf.opexBbl + '/bbl opex)' : '')
+        + '; the country average is computed on the <em>Deepwater</em> standard'
+        + (_dw ? ' ($' + (_dw.capexMM/1000).toFixed(1) + 'B \u00b7 ' + (_dw.peakBblDay/1000) + 'k bbl/d \u00b7 $' + _dw.opexBbl + '/bbl)' : '') + '.');
+    }
+    if (cd && cd.mechanics && cd.mechanics.indexOf(',') > -1) {
+      drivers.push('<strong>Regime mix:</strong> ' + country + '\u2019s ' + (cd.n ? cd.n.toLocaleString() + ' ' : '')
+        + 'contracts span ' + cd.mechanics.split(',').map(function(m){return m.trim();}).join(' + ')
+        + '. This scenario models <strong>' + result.mechanic + '</strong> only, so it cannot reproduce a blended figure.');
+    }
+    if (cd && cd.tier_schedule && cd.tier_schedule.length > 0) {
+      drivers.push('<strong>R-factor tiers:</strong> government profit-oil share rises with cumulative profitability. One project traces a single R-factor path; the country average blends contracts sitting at many different R-factor stages.');
+    }
+    // Always true, and the fundamental driver — stated last so it reads as the base case.
+    drivers.push('<strong>Terms:</strong> this scenario applies ' + country + '\u2019s <em>country-default statutory</em> parameters. The country average uses each contract\u2019s own negotiated terms'
+      + (cd && cd.weighting === 'prod_weighted' ? ', production-weighted where field data exists' : '') + '.');
+
+    vsEl.innerHTML =
+      '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Which number goes in the IC memo?</div>'
+      + '<div style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px;">'
+        + '<div style="flex:1 1 220px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.35);border-radius:6px;padding:9px 12px;">'
+          + '<div style="font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;">\u2714 Cite this</div>'
+          + '<div style="font-size:19px;font-weight:900;color:var(--text);margin:3px 0 2px;">' + result.dbTake.toFixed(1) + '%</div>'
+          + '<div style="font-size:11px;color:var(--text);line-height:1.45;">' + country + '\u2019s government take @ $75/bbl</div>'
+          + '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px;">'
+            + (cd && cd.n ? cd.n.toLocaleString() + ' contracts, averaged' : 'Contract average') + '. This is the figure Fiscal Compare ranks on, Side-by-Side shows, the XLSX exports and the API returns.</div>'
+        + '</div>'
+        + '<div style="flex:1 1 220px;background:var(--surface);border:1px dashed var(--border);border-radius:6px;padding:9px 12px;">'
+          + '<div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">Scenario result \u2014 label it</div>'
+          + '<div style="font-size:19px;font-weight:900;color:var(--muted);margin:3px 0 2px;">' + result.take.toFixed(1) + '%</div>'
+          + '<div style="font-size:11px;color:var(--text);line-height:1.45;">One ' + result.profileName + ' project on ' + result.mechanic + ' terms @ $' + price + '/bbl</div>'
+          + '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px;">Answers \u201cwhat would <em>my</em> project pay here\u201d. If you use it, say so in the memo.</div>'
+        + '</div>'
+      + '</div>'
+      + '<div style="background:' + sevBg + ';border:1px solid ' + sevBorder + ';border-radius:6px;padding:8px 12px;margin-bottom:8px;">'
+        + '<span style="font-size:12px;font-weight:800;color:' + sevCol + ';">Gap ' + sign + delta.toFixed(1) + 'pp</span>'
+        + '<span style="font-size:11px;color:var(--text);line-height:1.5;margin-left:8px;">' + verdict + '</span>'
+      + '</div>'
+      + '<details style="font-size:11px;color:var(--muted);">'
+        + '<summary style="cursor:pointer;color:var(--accent);font-weight:600;list-style:revert;">Why the two differ (' + drivers.length + ' reason' + (drivers.length === 1 ? '' : 's') + ')</summary>'
+        + '<ul style="margin:7px 0 0 0;padding-left:18px;line-height:1.65;">'
+          + drivers.map(function(x){ return '<li style="margin-bottom:4px;">' + x + '</li>'; }).join('')
+        + '</ul>'
+      + '</details>';
   }
 }
 
