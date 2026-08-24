@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v508.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v509.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v508</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v509</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1346,7 +1346,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v508</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v509</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2538,6 +2538,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong style="color:var(--accent);">v509 (Aug 2026) &mdash; Cycle 408: the North Sea example no longer eats three of your five comparison slots</strong> &mdash; Task T3 &mdash; &ldquo;how do these three countries compare side by side?&rdquo; Walked cold (fresh browser context, no <code>sessionStorage</code> or <code>localStorage</code>) into <strong>Side-by-Side</strong>. Since v430 the tab auto-seeds the North Sea Trio &mdash; Norway, UK, Netherlands &mdash; as a worked example. That seed was written straight into <code>compareList</code> via three <code>addCompare()</code> calls and was thereafter indistinguishable from a country the analyst had chosen, which broke the tab&rsquo;s core task two different ways. (1) <strong>An analyst comparing their own three countries could only fit two.</strong> Typing Guyana, then Angola, then Brazil produced <code>[Norway, United Kingdom, Netherlands, Guyana, Angola]</code> and the toast &ldquo;<em>Comparison is full at 5 countries &mdash; Brazil was not added.</em>&rdquo; The two countries they had managed to add sat in the last two columns, behind three they never asked for. The example banner had promised &ldquo;search for any country above to add <em>or replace</em>&rdquo; &mdash; nothing ever replaced &mdash; and still read &ldquo;Max 4 countries&rdquo; after the cap went to 5 in v501. (2) <strong>Shared comparison links arrived corrupted.</strong> The seed had no empty-grid guard, and a <code>#/compare/&hellip;</code> route populates <code>compareList</code> <em>before</em> t2 is first activated. Opening the shared link <code>#/compare/guyana+angola+brazil</code> and clicking Side-by-Side gave the recipient <code>[Guyana, Angola, Brazil, Norway, United Kingdom]</code> at &ldquo;5/5 countries (full)&rdquo; &mdash; two North Sea countries spliced into an Atlantic-margin comparison, Netherlands silently refused, and nothing on screen attributing them to a demo. <strong>Fixed:</strong> (a) the seed now runs only when the grid is genuinely empty, so a shared or deep-linked comparison is delivered exactly as it was sent; (b) the seed is flagged as an untouched example, and the first country the analyst adds themselves <em>clears</em> it &mdash; delivering the replace the banner always described &mdash; with a toast naming what was dropped (&ldquo;<em>Cleared the 3-country example (Norway, United Kingdom, Netherlands) &mdash; building your comparison from Guyana.</em>&rdquo;); (c) editing the example (removing a chip) or keeping one of its countries counts as adopting it, so the remaining countries are then treated as the analyst&rsquo;s own and further adds append normally; (d) the banner drops the stale &ldquo;Max 4&rdquo; and states the real behaviour. Also repaired in the same flow: the four curated IOC benchmark presets (Atlantic Frontier Quartet, North Sea Trio, USA vs Iraq, West Africa Trio) existed only in the page&rsquo;s initial markup, so the first <code>renderCompare()</code> destroyed them for the rest of the session &mdash; clicking <strong>Clear</strong> then showed the instruction &ldquo;<em>or click a quickstart preset</em>&rdquo; above an empty box. They are now rebuilt from <code>_sbsQuickstartHTML()</code> on every empty render, so Clear returns to a working starting point. Verified cold in Playwright on all four paths &mdash; own-three-countries, shared link, example-edited-then-appended, and Clear&rarr;preset &mdash; <strong>0 JS errors</strong>. JS syntax gate PASS (9 blocks / 0 errors). Version v508&rarr;v509.<br><br>
                         <strong style="color:var(--accent);">v508 (Aug 2026) &mdash; Cycle 407: Venezuela is no longer listed among the world&rsquo;s most stable fiscal regimes</strong> &mdash; Task T4 &mdash; &ldquo;what is my fiscal-stability and reform exposure here?&rdquo; Walked cold (cleared <code>sessionStorage</code> + <code>localStorage</code>) into <strong>Reform Risk</strong>. The tab&rsquo;s stable/volatile pair had two defects that compounded into a quotable error. (1) The Reform Frequency Score counts only events dated 2010 or later, so a jurisdiction whose last rupture was an expropriation in 2007 scored identically to one that has never touched its terms. The left-hand card, captioned &ldquo;<em>Most Stable Regimes &mdash; predictable fiscal environment for long-term IOC projects</em>&rdquo;, therefore printed <strong>Kazakhstan, Venezuela, Ecuador, Algeria, Colombia, Canada, Russia, USA</strong>. Venezuela carries three take-raising events on file &mdash; the 1975 PDVSA nationalization (+30pp), the 2001 Hydrocarbons Law (+10pp) and the 2007 Orinoco forced conversion that drove ExxonMobil and ConocoPhillips into arbitration (+15pp) &mdash; all outside the window. Kazakhstan&rsquo;s entry was clean because the 2007 Kashagan renegotiation (+8pp) predates it; Algeria&rsquo;s because the 2005 windfall levy (+10pp) does. (2) The right-hand card&rsquo;s caption read &ldquo;3+ reform events since 2010&rdquo; but its filter was <code>score &lt; 30</code>, i.e. 5+. It rendered a single row, the United Kingdom, while <strong>Brazil, Australia and Guyana</strong> &mdash; three law changes each since 2010, the actual live reform stories &mdash; fell into neither card and were invisible in the section. Both cards also inherited a sort by <em>total lifetime events</em>, so the &ldquo;most stable&rdquo; list was ordered most-reformed-first. <strong>Fixed:</strong> the volatile filter now matches its own caption (<code>since2010 &gt;= 3</code>) and the card is retitled <strong>Actively Reforming (4)</strong>, listing UK / Brazil / Australia / Guyana with the specific years each rewrote terms. The left card is retitled <strong>Quiet Since 2010 (9)</strong> &mdash; what the filter actually measures &mdash; and its caption no longer asserts predictability. Every row now carries its most recent take-raising event inline. The six whose last take rise falls <em>before</em> the scoring window are demoted below a labelled red divider reading &ldquo;quiet only because the window starts in 2010 &hellip; do not read the score as a stable-regime finding for these&rdquo;, and Venezuela&rsquo;s row reads <em>last take rise 2007 &middot; Orinoco heavy oil nationalized &middot; +15pp &middot; 3 pre-2010 rises, +55pp cumulative</em>. Both cards show their own count in the header, so the 9-vs-4 asymmetry is on screen rather than implied. Rows stay click-through to Country Profile. Verified cold in Playwright against a local build: both card bodies, the divider, the demotion ordering, a Venezuela row click through to Country Profile, and the v502 per-country lookup &mdash; 0 JS errors. JS syntax gate PASS (9 blocks / 0 errors). Authoritative suite <code>runtime_comprehensive.js</code> ran to completion this cycle: <strong>135 PASS / 0 FAIL / 1 WARN</strong>, the WARN being the pre-existing <code>sw.js</code> 404 that only occurs off GitHub Pages. Version v507&rarr;v508.<br><br>
                         <strong style="color:var(--accent);">v507 (Aug 2026) &mdash; Cycle 406: the Screener stopped answering &ldquo;which countries should be on my list?&rdquo; with Vanuatu</strong> &mdash; Task T1. Walked cold (cleared <code>sessionStorage</code> + <code>localStorage</code>) into the Screener via the primary nav. It opens unfiltered on all 185 countries &mdash; correct since v500 &mdash; and ranks them <code>npv_75</code> descending, numbered 1 to 185. But modelled NPV on the standardized $1.2B / 50k bbl/d deepwater profile is a near-monotone inverse of take%, so that sort is a take sort wearing a different hat, and the lowest takes in the database belong to countries where nobody has ever drilled and the fiscal terms are a regional placeholder. Ranks 1&ndash;20 read: <strong>Vanuatu (5.0% take, $5.1B NPV), Bahamas, Montenegro, Greenland, Faroe Islands, Moldova, Romania, Sweden, Bulgaria, Kyrgyzstan, Bosnia, Serbia, Armenia, Croatia, Ukraine, Belgium, Lithuania, Tajikistan, Barbados, Hungary</strong> &mdash; every one of them badged <code>PROXY</code>, whose own tooltip reads &ldquo;economics use regional proxy estimates &mdash; <em>for fiscal comparison only</em>&rdquo;. Meanwhile <strong>Guyana ranked 159, UK 149, Norway 175, Indonesia 177, Iraq 179, Nigeria 182.</strong> The PROXY badge could not carry the warning, because all 20 rows above the fold carried it too, so it read as decoration rather than as a caveat. And the one-click <strong>&ldquo;Load top 5 in Side-by-Side&rdquo;</strong> button handed the analyst Vanuatu / Bahamas / Montenegro / Greenland / Faroe Islands. (1) <strong>The ranking is now grouped by data basis.</strong> The 22 countries with verified field production (<code>prod_coverage_pct &gt; 0</code> &mdash; the same test that drives the FACTS/EVIDENCE/PROXY badge) sort above the 163 whose economics are proxies, NPV-descending within each group. The top of a cold Screener now reads <strong>Canada, USA, Azerbaijan, Mexico, Argentina, Colombia, China, Australia</strong>. <strong>Nothing is filtered out</strong> &mdash; all 185 stay in the table, the count, the CSV and the XLSX; only the order changed. (2) <strong>A labelled divider row marks the boundary</strong> &mdash; &ldquo;below this line: 163 countries with no verified field production &mdash; NPV / IRR / breakeven are indicative only&rdquo; &mdash; so row 23 is no longer read with the authority of row 1. (3) <strong>The Side-by-Side handoff draws from the verified group</strong> and now names the five countries it will load on the button itself, instead of loading proxies silently. (4) <strong>A first-class toggle</strong> sits in the Screener count bar (not buried in the collapsed Advanced block): <em>Rank verified-production countries first</em>, on by default, unticking it restores the pure modelled-NPV ordering exactly. <code>Reset All</code> restores it. (5) The count line now states the split &mdash; &ldquo;22 with verified field production first, then 163 whose economics are regional proxies&rdquo; &mdash; and it recomputes under every filter and preset. (6) <strong>Refactor:</strong> the FACTS/EVIDENCE/PROXY classification was inline in <code>getDQBadge()</code>; extracted to <code>_dqTier()</code> so the badge on a row and its position in the ranking cannot drift apart. Verified cold in Playwright: default order, toggle off and back on, a preset, <code>Reset All</code>, and a near-empty result set &mdash; 0 JS errors. JS syntax gate PASS (9 blocks / 0 errors). Authoritative suite (<code>office/tools/petroleum/tests/runtime_comprehensive.js</code>) ran to completion against a local server this cycle: <strong>135 PASS / 0 FAIL / 1 WARN</strong>, the WARN being the pre-existing <code>sw.js</code> 404 that only occurs off GitHub Pages. Version v506&rarr;v507.<br><br>
                         <strong>v506 (Aug 2026) &mdash; Cycle 405: the Fiscal Compare drilldown stopped showing two different government-take numbers for the same country at the same price</strong> &mdash; Task T2 &mdash; &ldquo;is this country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold (cleared <code>sessionStorage</code> + <code>localStorage</code>) into Fiscal Compare on the landing defaults, Deepwater / $75, and clicked a row. The drawer header reads <strong>Iraq 27.1%</strong> &mdash; and the tier badge, the colour and the global rank are all computed from it. Eight pixels below, in a table whose column is literally headed <strong>$75/bbl</strong>, the same country reads <strong>84.8%</strong>. <strong>57.7pp apart, at the price the analyst had just selected, under two labels that both said &ldquo;Take%&rdquo;.</strong> These are two different bases: <code>liveTake</code> is the compare engine&rsquo;s DCF on the selected production profile, and the price table is the ORCA contract-database average (the figure Country Profile, the public API and the XLSX <code>GovtTake_75</code> column all carry). Measured across the whole result set at $75: <strong>64 of 185 countries differ by &ge;10pp</strong>, 69 by 3&ndash;10pp, only 49 agree within 3pp. v505&rsquo;s generic-terms notice covered the default-terms rows but said only that the table &ldquo;does not reconcile&rdquo;; the 7 countries modelled on their <em>own</em> terms &mdash; Iraq, Iran, Nigeria, Libya, Algeria, Philippines, Norway &mdash; carried gaps up to 57.7pp with <strong>no warning at all</strong>. (1) The price table&rsquo;s Take% row is now named <strong>Take% &middot; database</strong>, and a new <strong>Take% &middot; this model</strong> row sits directly beneath it carrying the header figure, with the signed gap (<code>-57.7pp vs db</code>) in the same cell. The two numbers are adjacent and labelled instead of 8px apart and anonymous. (2) <strong>The column matching the selected price is marked SELECTED</strong> and outlined in accent &mdash; all four columns previously looked identical, so the analyst had to remember which price they picked. The model row shows a value only in that column; the other three read &mdash; with a tooltip saying the engine models one price at a time and how to change it. Changing Price to $100 and re-running moves the marker and recomputes the gap. (3) A severity-graded verdict sits under the table, using the same thresholds as the Country Profile reconciliation from cycle 403 &mdash; <strong>&lt;3pp consistent / &lt;10pp modest / &ge;10pp material</strong> &mdash; and it names which figure to cite (the database one, and where it is used) and states that the tier badge and rank are derived from the other one. It fires on gap size for every country, not only default-terms rows, so Iraq is now flagged. State monopolies (take &ge; 99.5%: Saudi Arabia, Kuwait, Bahrain) get a NOT COMPARABLE note instead of a meaningless delta. (4) <strong>Separate bug found on the same walk: the &ldquo;Copy 4-price as IC table&rdquo; button had never worked.</strong> <code>_tsvEsc = JSON.stringify(_tsv)</code> was interpolated straight into <code>onclick="&hellip;"</code>, and its leading double quote closed the attribute &mdash; the handler was truncated to 98 characters ending at <code>writeText(</code> and threw <code>Unexpected end of input</code> on every click since it shipped in v460. Quotes are now encoded for attribute context. The copied TSV also carries both bases, the gap and the do-not-mix note, and reads its version off the header badge instead of the hard-coded <code>v500</code> it had drifted to. (5) The XLSX export had the identical collision in adjacent columns: <code>Take%</code> (model) beside <code>GovtTake_75</code> (database), unlabelled. Headers now name the basis and a <code>Model_vs_DB_pp</code> column carries the reconciliation, blank for state monopolies. Verified cold in Playwright across all three severity bands, both price settings, the clipboard artifact and a real XLSX download &mdash; 0 JS errors. Version v505&rarr;v506.<br><br>
@@ -22078,18 +22079,27 @@ function switchTab(id, btn) {
       }, 150);
     } else if (id === 't2') {
       // Side-by-Side: auto-load North Sea trio (Norway · UK · Netherlands)
+      // v509: two guards. (a) Only seed when the grid is genuinely empty — a shared
+      // #/compare/... link populates compareList BEFORE t2 is first activated, and the
+      // unguarded seed spliced Norway + UK into the sender's comparison and pushed it to
+      // the 5-country cap. (b) Mark the seed as an untouched example so the analyst's own
+      // first pick REPLACES it, which is what the banner has always promised.
       setTimeout(function() {
         if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length > 0) {
+          if (compareList.length > 0) return;   // analyst / shared link already chose — do not seed
+          _sbsSeeding = true;
           ['Norway', 'United Kingdom', 'Netherlands'].forEach(function(c) {
             if (typeof addCompare === 'function') addCompare(c);
           });
+          _sbsSeeding = false;
+          _sbsExampleUntouched = true;
           // v430: show example-loaded banner so first-time users know this is a preset
           var cmpOut = document.getElementById('cmp-output');
           if (cmpOut && !document.getElementById('sbs-example-banner')) {
             var banner = document.createElement('div');
             banner.id = 'sbs-example-banner';
             banner.style.cssText = 'background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:7px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;';
-            banner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> North Sea Trio — Norway, UK, Netherlands. Search for any country above to add or replace. Max 4 countries. <span onclick="this.parentNode.remove()" style="margin-left:auto;cursor:pointer;opacity:.5;font-size:13px;" title="Dismiss">&#10005;</span>';
+            banner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> North Sea Trio — Norway, UK, Netherlands. <strong style="color:var(--text);">Search for any country above and this example clears itself</strong> — your comparison starts fresh, with all 5 slots free. <span onclick="this.parentNode.remove()" style="margin-left:auto;cursor:pointer;opacity:.5;font-size:13px;" title="Dismiss">&#10005;</span>';
             cmpOut.parentNode.insertBefore(banner, cmpOut);
           }
         }
@@ -23189,11 +23199,32 @@ document.addEventListener('click', e => {
 // country was missing. Cap now matches every place the UI promises 5, and a refusal is
 // always announced instead of being a silent no-op.
 const CMP_MAX = 5;
+// v509: the auto-loaded North Sea Trio is a demo, not a selection. It used to occupy 3 of
+// the 5 slots permanently, so an analyst who came to compare Guyana / Angola / Brazil got
+// Guyana and Angola appended to the example and then "Comparison is full at 5 countries —
+// Brazil was not added." _sbsExampleUntouched marks the seed; the first country the analyst
+// adds themselves clears it. _sbsSeeding stops the seed's own three addCompare() calls from
+// tripping that rule.
+let _sbsExampleUntouched = false;
+let _sbsSeeding = false;
+function _sbsDropExample() {
+  _sbsExampleUntouched = false;
+  var b = document.getElementById('sbs-example-banner');
+  if (b && b.parentNode) b.parentNode.removeChild(b);
+}
 function addCompare(country) {
   if (!COUNTRY_DATA || !COUNTRY_DATA.find(function(d){ return d.country === country; })) return false;
   if (compareList.includes(country)) {
+    if (_sbsExampleUntouched && !_sbsSeeding) _sbsDropExample();   // keeping an example country = choosing it
     if (typeof showCopyToast === 'function') showCopyToast(country + ' is already in the comparison.');
     return false;
+  }
+  // First analyst-initiated add replaces the untouched example instead of stacking on it.
+  if (_sbsExampleUntouched && !_sbsSeeding) {
+    var _cleared = compareList.slice();
+    compareList = [];
+    _sbsDropExample();
+    if (typeof showCopyToast === 'function') showCopyToast('Cleared the ' + _cleared.length + '-country example (' + _cleared.join(', ') + ') — building your comparison from ' + country + '.');
   }
   if (compareList.length >= CMP_MAX) {
     if (typeof showCopyToast === 'function') showCopyToast('Comparison is full at ' + CMP_MAX + ' countries — ' + country + ' was not added. Remove one (\u2715 on a chip) to make room.');
@@ -23205,11 +23236,12 @@ function addCompare(country) {
   return true;
 }
 function removeCompare(country) {
+  _sbsDropExample();   // editing the example makes what is left the analyst's own selection
   compareList = compareList.filter(c => c !== country);
   renderCompare();
   _updateCompareHash();
 }
-function clearCompare() { compareList = []; renderCompare(); _updateCompareHash(); }
+function clearCompare() { _sbsDropExample(); compareList = []; renderCompare(); _updateCompareHash(); }
 function _updateCompareHash() {
   if (window._activeTab === 't0' || window._activeTab === 't2') {
     if (compareList.length > 0) {
@@ -23218,6 +23250,11 @@ function _updateCompareHash() {
       updateHash('compare', '');
     }
   }
+}
+
+// v509: single source for the Side-by-Side quickstart presets, so they survive a re-render.
+function _sbsQuickstartHTML() {
+  return '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">\n      <button class="cmp-quickstart-btn" data-countries="Guyana|Angola|Brazil|Nigeria" style="background:transparent;border:1px solid rgba(194,65,12,.4);border-radius:6px;color:var(--orange);font-size:11px;padding:5px 12px;cursor:pointer;" title="Atlantic Frontier PSC: Guyana ~52%, Angola ~55%, Brazil ~65%, Nigeria ~58% — four PSC regimes spanning a 30pp take range. Standard IOC Atlantic capital allocation benchmark.">&#9632; Atlantic Frontier Quartet</button>\n      <button class="cmp-quickstart-btn" data-countries="Norway|United Kingdom|Netherlands" style="background:transparent;border:1px solid rgba(21,128,61,.35);border-radius:6px;color:var(--green);font-size:11px;padding:5px 12px;cursor:pointer;" title="North Sea Trio: Norway (Concession+SDFI, ~68% take), UK (RFCT+SC+EPL, ~49% take), Netherlands (~48% take) — the three core North Sea fiscal benchmarks in one view. Standard reference for European offshore capital allocation.">&#9632; North Sea Trio</button>\n      <button class="cmp-quickstart-btn" data-countries="United States|Iraq" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>\n      <button class="cmp-quickstart-btn" data-countries="Angola|Nigeria|Ghana" style="background:transparent;border:1px solid rgba(29,78,216,.35);border-radius:6px;color:#1d4ed8;font-size:11px;padding:5px 12px;cursor:pointer;" title="West Africa Trio PSC: Angola (EPSA IV ~68%), Nigeria (PSC/PIA2021 ~58%), Ghana (Jubilee Concession ~55%) — three core West Africa PSC/Concession regimes spanning a 13pp take range. Standard IOC West Africa capital allocation benchmark.">&#9632; West Africa Trio</button>\n    </div>';
 }
 
 const PRICES = [50, 75, 100, 125];
@@ -23252,7 +23289,11 @@ function renderCompare() {
       out.innerHTML = '<strong style="color:var(--text);">' + _sbs1Country + '</strong> added — add 1–4 more countries to begin comparison.'
         + '<div style="margin-top:10px;"><span style="font-size:11px;color:var(--muted);">Search above · or use Fiscal Compare / Screener → “Load top 5 in Side-by-Side”</span></div>';
     } else {
-      out.innerHTML = 'Select 2–5 countries to compare. Type a country name above or click a quickstart preset.';
+      // v509: the four curated IOC benchmark sets used to live only in the page's initial
+      // markup, so the first renderCompare() destroyed them for the rest of the session.
+      // Clearing the grid then showed "click a quickstart preset" with no preset on screen.
+      // Rebuilt here so Clear always returns the analyst to a working starting point.
+      out.innerHTML = '<div style="font-size:12px;color:var(--muted);margin-bottom:10px;text-align:center;max-width:480px;margin-left:auto;margin-right:auto;">Compare up to ' + CMP_MAX + ' countries side-by-side across 4 price scenarios. Search above or start with a standard IOC benchmark set:</div>' + _sbsQuickstartHTML();
     }
     document.getElementById('cmp-chart-wrap').style.display='none';
     return;
@@ -28279,7 +28320,7 @@ function copyComparisonTable(btn) {
   var countries = matrix[0].slice(1);
   var caption = 'ORCA fiscal comparison — ' + countries.join(' / ');
   var assump = 'Standardized Deepwater profile, 10% WACC, 100% WI. NPV / IRR / Breakeven at $75/bbl; government take shown at $50–$125/bbl.';
-  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v508 — yoburgqs.github.io/petroleum-fiscal-db/';
+  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v509 — yoburgqs.github.io/petroleum-fiscal-db/';
 
   // --- plain-text / TSV flavour (Excel-friendly) ---
   var tsv = caption + '\n' + assump + '\n\n'
@@ -31914,7 +31955,7 @@ function exportFCResults() {
   var _orcaVer = (function() {
     var b = document.querySelector('header .badge, .badge');
     var m = b && /v\d+/.exec(b.textContent || '');
-    return m ? m[0] : 'v508';
+    return m ? m[0] : 'v509';
   })();
   var methRows = [
     ['ORCA Petroleum Fiscal Intelligence Platform'],
