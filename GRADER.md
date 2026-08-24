@@ -9907,3 +9907,16 @@ cold-load walks of Angola, Norway and Brazil.
 
 **Bookkeeping (not the improvement):** version sweep v498→v499 across 50 structural locations;
 changelog entry added. Grade tables not touched.
+
+---
+## Cycle 397 Log — 2026-08-24 07:01
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** PETROLEUM PLATFORM — USER IMPACT | **Task:** Cycle 398 / v499
+
+---
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?"
+
+**Friction.** On Country Profile, the *Key Fiscal Parameters* table showed `Parameter | Value | Source`. The Value came from the API's `fiscal_facts` (a contract-weighted average across ORCA's contracts for that country). The Source badge came from a completely separate object, `fiscal_facts_sourced`. `renderSource
