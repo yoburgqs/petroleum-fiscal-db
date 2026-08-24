@@ -9852,3 +9852,58 @@ Background commit/push confirmed (exit code 0). Cycle 396 is fully committed and
 - JS errors: 0
 - Summary: GRADER.md commit also landed. All three background tasks complete â€” cycle 397 / v498 fully pushed across both repos.
 
+
+---
+## Cycle 398 Log — 2026-08-24 (v498 → v499)
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?"
+
+**Friction:** Country Profile → Key Fiscal Parameters rendered `Parameter | Value | Source`.
+The Value was read from the API's `fiscal_facts` (a contract-weighted average across ORCA's
+contracts for that country); the Source badge was read from `fiscal_facts_sourced`. These are
+independent objects and `renderSourcedFacts()` never compared them, so an A-tier badge linking
+to primary legislation appeared to vouch for a number that legislation does not state.
+Angola: royalty rendered **2.58%** badged `Angola Petroleum Activities Law — Lei 10/2004 · A ↗`;
+that source carries **20%**. Angola cost-recovery cap **50.04%** against a sourced **65%**.
+Brazil: cost-recovery cap **79.65%** badged `Lei 12.351/2010 · A ↗`; that law states **50%**.
+Audited every hyphen-slug file under `api/v1/country/`: **62 parameter rows across 39 countries**
+carry a material mismatch (tolerance max(0.5pp, 2%)). This is the exact failure T6 is about —
+an analyst who does the responsible thing and clicks the primary source finds it contradicting
+the platform, and one who cites the platform figure under that citation misquotes a legal source.
+Location: `renderSourcedFacts()` inside `renderReformTimeline()`, index.html — the `rowDefs`
+loop and the table render immediately after it.
+
+**Change (on screen):**
+1. The table is now `Parameter | ORCA Value | Statutory (cited source) | Source`. ORCA Value is
+   the contract-weighted average the DCF engine actually uses; Statutory is the rate carried in
+   the linked document, or "—" when the parameter has no sourced value.
+2. Rows where the two disagree render both figures in orange with a ⚠ whose tooltip names both
+   numbers and explains why negotiated PSC/concession terms depart from the statutory headline
+   (grandfathered rounds, block-specific terms, sliding scales).
+3. A reconciliation note appears under the table only when something diverges: "⚠ 2 of 5 sourced
+   parameters differ from the statutory rate", plus which figure to cite against which source in
+   an IC memo. Countries where every sourced row agrees get an explicit "✓ All N sourced
+   parameters match the rate stated in the cited source" line instead — a positive confirmation
+   that was previously unavailable anywhere on the page.
+4. `[API Data]` / `[DB Average]` badges relabelled **Contract DB average** — the old strings were
+   internal jargon that told an analyst nothing about provenance.
+5. `.source-badge` was `inline-flex` with no width bound. API source strings run 80–120 chars
+   (median 80; 90% exceed 40) and stretched the Source column to 727px. The badge is now bounded
+   to 320px with the source name ellipsised in an inner span, so the tier letter and the ↗ link
+   affordance are never the part that gets clipped; the full string stays in the title tooltip.
+6. API source strings are now HTML-escaped before reaching `title=""` / `innerHTML`.
+
+**Result:** The analyst can read, on one row, the number ORCA models and the number the linked
+law states, and cite each correctly. Where the two disagree they are told before they paste the
+figure into an IC memo, instead of finding out by opening the statute. Where they agree, they now
+get an explicit confirmation they can rely on rather than an ambiguous badge.
+
+**Verification:** JS syntax gate PASS (`node --check` over all inline scripts). Playwright
+`tests/runtime_comprehensive.js` **did run this cycle**, against a local server at
+`http://localhost:8099`: **135 PASS / 0 FAIL / 1 WARN**. The absent 136th test and the single WARN
+are the service-worker registration at the GitHub-Pages-absolute path `/petroleum-fiscal-db/sw.js`,
+which 404s under any local server — pre-existing and unrelated to this change. 0 page errors on
+cold-load walks of Angola, Norway and Brazil.
+
+**Bookkeeping (not the improvement):** version sweep v498→v499 across 50 structural locations;
+changelog entry added. Grade tables not touched.
