@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v506.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v507.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v506</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v507</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1346,7 +1346,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v506</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v507</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2138,7 +2138,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span id="screener-count" aria-live="polite" aria-atomic="true" style="color:var(--muted);font-size:13px;"></span>
       <span id="screener-result-count" style="color:var(--muted);font-size:12px;margin-left:4px;"></span>
       <span id="screener-active-filters" class="screener-active-badge" style="display:none;"></span>
-      <button id="screener-reset-btn" class="btn btn-sm btn-outline" style="margin-left:auto;" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">⬇ CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">⬇ Excel</button>
+      <label id="screener-evidence-first-wrap" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): countries with verified field production are ranked above those whose economics are regional proxy estimates, NPV-descending within each group. Nothing is filtered out — a labelled divider marks the boundary. OFF: rank all 185 by modelled NPV alone, which puts the lowest-take proxy regimes (Vanuatu, Bahamas, Montenegro) at the top."><input type="checkbox" id="sc-evidence-first" checked style="cursor:pointer;">Rank verified-production countries first</label>
+      <button id="screener-reset-btn" class="btn btn-sm btn-outline" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">⬇ CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">⬇ Excel</button>
     </div>
   </div>
 
@@ -2537,7 +2538,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
-                        <strong style="color:var(--accent);">v506 (Aug 2026) &mdash; Cycle 405: the Fiscal Compare drilldown stopped showing two different government-take numbers for the same country at the same price</strong> &mdash; Task T2 &mdash; &ldquo;is this country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold (cleared <code>sessionStorage</code> + <code>localStorage</code>) into Fiscal Compare on the landing defaults, Deepwater / $75, and clicked a row. The drawer header reads <strong>Iraq 27.1%</strong> &mdash; and the tier badge, the colour and the global rank are all computed from it. Eight pixels below, in a table whose column is literally headed <strong>$75/bbl</strong>, the same country reads <strong>84.8%</strong>. <strong>57.7pp apart, at the price the analyst had just selected, under two labels that both said &ldquo;Take%&rdquo;.</strong> These are two different bases: <code>liveTake</code> is the compare engine&rsquo;s DCF on the selected production profile, and the price table is the ORCA contract-database average (the figure Country Profile, the public API and the XLSX <code>GovtTake_75</code> column all carry). Measured across the whole result set at $75: <strong>64 of 185 countries differ by &ge;10pp</strong>, 69 by 3&ndash;10pp, only 49 agree within 3pp. v505&rsquo;s generic-terms notice covered the default-terms rows but said only that the table &ldquo;does not reconcile&rdquo;; the 7 countries modelled on their <em>own</em> terms &mdash; Iraq, Iran, Nigeria, Libya, Algeria, Philippines, Norway &mdash; carried gaps up to 57.7pp with <strong>no warning at all</strong>. (1) The price table&rsquo;s Take% row is now named <strong>Take% &middot; database</strong>, and a new <strong>Take% &middot; this model</strong> row sits directly beneath it carrying the header figure, with the signed gap (<code>-57.7pp vs db</code>) in the same cell. The two numbers are adjacent and labelled instead of 8px apart and anonymous. (2) <strong>The column matching the selected price is marked SELECTED</strong> and outlined in accent &mdash; all four columns previously looked identical, so the analyst had to remember which price they picked. The model row shows a value only in that column; the other three read &mdash; with a tooltip saying the engine models one price at a time and how to change it. Changing Price to $100 and re-running moves the marker and recomputes the gap. (3) A severity-graded verdict sits under the table, using the same thresholds as the Country Profile reconciliation from cycle 403 &mdash; <strong>&lt;3pp consistent / &lt;10pp modest / &ge;10pp material</strong> &mdash; and it names which figure to cite (the database one, and where it is used) and states that the tier badge and rank are derived from the other one. It fires on gap size for every country, not only default-terms rows, so Iraq is now flagged. State monopolies (take &ge; 99.5%: Saudi Arabia, Kuwait, Bahrain) get a NOT COMPARABLE note instead of a meaningless delta. (4) <strong>Separate bug found on the same walk: the &ldquo;Copy 4-price as IC table&rdquo; button had never worked.</strong> <code>_tsvEsc = JSON.stringify(_tsv)</code> was interpolated straight into <code>onclick="&hellip;"</code>, and its leading double quote closed the attribute &mdash; the handler was truncated to 98 characters ending at <code>writeText(</code> and threw <code>Unexpected end of input</code> on every click since it shipped in v460. Quotes are now encoded for attribute context. The copied TSV also carries both bases, the gap and the do-not-mix note, and reads its version off the header badge instead of the hard-coded <code>v500</code> it had drifted to. (5) The XLSX export had the identical collision in adjacent columns: <code>Take%</code> (model) beside <code>GovtTake_75</code> (database), unlabelled. Headers now name the basis and a <code>Model_vs_DB_pp</code> column carries the reconciliation, blank for state monopolies. Verified cold in Playwright across all three severity bands, both price settings, the clipboard artifact and a real XLSX download &mdash; 0 JS errors. Version v505&rarr;v506.<br><br>
+                        <strong style="color:var(--accent);">v507 (Aug 2026) &mdash; Cycle 406: the Screener stopped answering &ldquo;which countries should be on my list?&rdquo; with Vanuatu</strong> &mdash; Task T1. Walked cold (cleared <code>sessionStorage</code> + <code>localStorage</code>) into the Screener via the primary nav. It opens unfiltered on all 185 countries &mdash; correct since v500 &mdash; and ranks them <code>npv_75</code> descending, numbered 1 to 185. But modelled NPV on the standardized $1.2B / 50k bbl/d deepwater profile is a near-monotone inverse of take%, so that sort is a take sort wearing a different hat, and the lowest takes in the database belong to countries where nobody has ever drilled and the fiscal terms are a regional placeholder. Ranks 1&ndash;20 read: <strong>Vanuatu (5.0% take, $5.1B NPV), Bahamas, Montenegro, Greenland, Faroe Islands, Moldova, Romania, Sweden, Bulgaria, Kyrgyzstan, Bosnia, Serbia, Armenia, Croatia, Ukraine, Belgium, Lithuania, Tajikistan, Barbados, Hungary</strong> &mdash; every one of them badged <code>PROXY</code>, whose own tooltip reads &ldquo;economics use regional proxy estimates &mdash; <em>for fiscal comparison only</em>&rdquo;. Meanwhile <strong>Guyana ranked 159, UK 149, Norway 175, Indonesia 177, Iraq 179, Nigeria 182.</strong> The PROXY badge could not carry the warning, because all 20 rows above the fold carried it too, so it read as decoration rather than as a caveat. And the one-click <strong>&ldquo;Load top 5 in Side-by-Side&rdquo;</strong> button handed the analyst Vanuatu / Bahamas / Montenegro / Greenland / Faroe Islands. (1) <strong>The ranking is now grouped by data basis.</strong> The 22 countries with verified field production (<code>prod_coverage_pct &gt; 0</code> &mdash; the same test that drives the FACTS/EVIDENCE/PROXY badge) sort above the 163 whose economics are proxies, NPV-descending within each group. The top of a cold Screener now reads <strong>Canada, USA, Azerbaijan, Mexico, Argentina, Colombia, China, Australia</strong>. <strong>Nothing is filtered out</strong> &mdash; all 185 stay in the table, the count, the CSV and the XLSX; only the order changed. (2) <strong>A labelled divider row marks the boundary</strong> &mdash; &ldquo;below this line: 163 countries with no verified field production &mdash; NPV / IRR / breakeven are indicative only&rdquo; &mdash; so row 23 is no longer read with the authority of row 1. (3) <strong>The Side-by-Side handoff draws from the verified group</strong> and now names the five countries it will load on the button itself, instead of loading proxies silently. (4) <strong>A first-class toggle</strong> sits in the Screener count bar (not buried in the collapsed Advanced block): <em>Rank verified-production countries first</em>, on by default, unticking it restores the pure modelled-NPV ordering exactly. <code>Reset All</code> restores it. (5) The count line now states the split &mdash; &ldquo;22 with verified field production first, then 163 whose economics are regional proxies&rdquo; &mdash; and it recomputes under every filter and preset. (6) <strong>Refactor:</strong> the FACTS/EVIDENCE/PROXY classification was inline in <code>getDQBadge()</code>; extracted to <code>_dqTier()</code> so the badge on a row and its position in the ranking cannot drift apart. Verified cold in Playwright: default order, toggle off and back on, a preset, <code>Reset All</code>, and a near-empty result set &mdash; 0 JS errors. JS syntax gate PASS (9 blocks / 0 errors). Authoritative suite (<code>office/tools/petroleum/tests/runtime_comprehensive.js</code>) ran to completion against a local server this cycle: <strong>135 PASS / 0 FAIL / 1 WARN</strong>, the WARN being the pre-existing <code>sw.js</code> 404 that only occurs off GitHub Pages. Version v506&rarr;v507.<br><br>
+                        <strong>v506 (Aug 2026) &mdash; Cycle 405: the Fiscal Compare drilldown stopped showing two different government-take numbers for the same country at the same price</strong> &mdash; Task T2 &mdash; &ldquo;is this country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold (cleared <code>sessionStorage</code> + <code>localStorage</code>) into Fiscal Compare on the landing defaults, Deepwater / $75, and clicked a row. The drawer header reads <strong>Iraq 27.1%</strong> &mdash; and the tier badge, the colour and the global rank are all computed from it. Eight pixels below, in a table whose column is literally headed <strong>$75/bbl</strong>, the same country reads <strong>84.8%</strong>. <strong>57.7pp apart, at the price the analyst had just selected, under two labels that both said &ldquo;Take%&rdquo;.</strong> These are two different bases: <code>liveTake</code> is the compare engine&rsquo;s DCF on the selected production profile, and the price table is the ORCA contract-database average (the figure Country Profile, the public API and the XLSX <code>GovtTake_75</code> column all carry). Measured across the whole result set at $75: <strong>64 of 185 countries differ by &ge;10pp</strong>, 69 by 3&ndash;10pp, only 49 agree within 3pp. v505&rsquo;s generic-terms notice covered the default-terms rows but said only that the table &ldquo;does not reconcile&rdquo;; the 7 countries modelled on their <em>own</em> terms &mdash; Iraq, Iran, Nigeria, Libya, Algeria, Philippines, Norway &mdash; carried gaps up to 57.7pp with <strong>no warning at all</strong>. (1) The price table&rsquo;s Take% row is now named <strong>Take% &middot; database</strong>, and a new <strong>Take% &middot; this model</strong> row sits directly beneath it carrying the header figure, with the signed gap (<code>-57.7pp vs db</code>) in the same cell. The two numbers are adjacent and labelled instead of 8px apart and anonymous. (2) <strong>The column matching the selected price is marked SELECTED</strong> and outlined in accent &mdash; all four columns previously looked identical, so the analyst had to remember which price they picked. The model row shows a value only in that column; the other three read &mdash; with a tooltip saying the engine models one price at a time and how to change it. Changing Price to $100 and re-running moves the marker and recomputes the gap. (3) A severity-graded verdict sits under the table, using the same thresholds as the Country Profile reconciliation from cycle 403 &mdash; <strong>&lt;3pp consistent / &lt;10pp modest / &ge;10pp material</strong> &mdash; and it names which figure to cite (the database one, and where it is used) and states that the tier badge and rank are derived from the other one. It fires on gap size for every country, not only default-terms rows, so Iraq is now flagged. State monopolies (take &ge; 99.5%: Saudi Arabia, Kuwait, Bahrain) get a NOT COMPARABLE note instead of a meaningless delta. (4) <strong>Separate bug found on the same walk: the &ldquo;Copy 4-price as IC table&rdquo; button had never worked.</strong> <code>_tsvEsc = JSON.stringify(_tsv)</code> was interpolated straight into <code>onclick="&hellip;"</code>, and its leading double quote closed the attribute &mdash; the handler was truncated to 98 characters ending at <code>writeText(</code> and threw <code>Unexpected end of input</code> on every click since it shipped in v460. Quotes are now encoded for attribute context. The copied TSV also carries both bases, the gap and the do-not-mix note, and reads its version off the header badge instead of the hard-coded <code>v500</code> it had drifted to. (5) The XLSX export had the identical collision in adjacent columns: <code>Take%</code> (model) beside <code>GovtTake_75</code> (database), unlabelled. Headers now name the basis and a <code>Model_vs_DB_pp</code> column carries the reconciliation, blank for state monopolies. Verified cold in Playwright across all three severity bands, both price settings, the clipboard artifact and a real XLSX download &mdash; 0 JS errors. Version v505&rarr;v506.<br><br>
                         <strong style="color:var(--accent);">v505 (Aug 2026) &mdash; Cycle 404: Fiscal Compare stopped ranking 153 countries it cannot actually tell apart</strong> &mdash; Task T6 &mdash; &ldquo;where did this number come from and how solid is the evidence?&rdquo; Walked cold (cleared sessionStorage + localStorage) into Fiscal Compare on the default sort. Row 1 was <strong>Guyana, 22.2% take @$75</strong>, drawn with a green &ldquo;investible tier&rdquo; border, and the column headed <strong>Quality</strong> showed a green <strong>A</strong> whose tooltip read &ldquo;93% A/B-tier&rdquo;. Every signal on that row said: lowest government take on earth, backed by primary legislation. None of it was true. <code>getDCFParams()</code> carries hard fiscal terms for exactly <strong>9</strong> countries and enriches <strong>22</strong> more from <code>COUNTRY_DATA</code>; the remaining <strong>154</strong> fall through to <code>defaults[mechanic]</code> &mdash; for Concession that is a flat 10% royalty / 25% CIT / no resource-rent tax / no state equity. <strong>153 countries therefore compute to the identical take of 22.2228%</strong> and were numbered <strong>#1 through #153</strong> in an order decided by a swing tie-breaker. Guyana was not the most investor-friendly regime in the world; it was alphabetically-ish first in a 153-way tie of a placeholder. The Quality badge made it worse: <code>ab_pct</code> measures the evidence tier of the fiscal facts <em>in the database</em>, and <strong>143 of those 153 tied rows displayed a green A</strong> &mdash; credentialing a number that had used none of those facts. (1) <code>getDCFParams()</code> now returns <code>_basis</code> (<code>country</code> / <code>db</code> / <code>default</code>) and <code>runFiscalCompare()</code> carries it onto every result as <code>termsBasis</code>. (2) <strong>The Quality column tells the truth about the row it is on.</strong> Default-terms rows no longer show an A/B/C evidence tier; they show a grey dashed <strong>G</strong>, deliberately off the A&ndash;D colour ramp, whose tooltip names the exact default terms used, states that the country&rsquo;s A/B facts were <em>not</em> used, and says the figure is directional only and not citable. (3) <strong>The rank column stopped inventing separation.</strong> True competition ranks: tied rows share a rank and render as <strong>=1</strong> rather than 1, 2, 3&hellip;153. Grouping is by exact value across the whole result set, not by contiguous run &mdash; the take comparator treats anything within 0.05pp as tied and re-orders it by swing, which had sorted USA (22.2623%) into the middle of the 22.2228% block. (4) <strong>Green &ldquo;top 10&rdquo; colouring is suppressed inside a tie group larger than 10</strong>, because a top-10 drawn from a 153-way tie is arbitrary. Bottom-10 red is untouched (Norway / Algeria / Libya still flag). (5) A table footnote, in the same style as the v468 coverage notes, states the count in words: 153 of 185 tied at 22.2%, modelled on the standard Concession default, order among them arbitrary and not a ranking, and the 31 countries modelled on their own terms are the ones the table actually separates. (6) The drilldown drawer carried the same lie one click deeper &mdash; &ldquo;#1 of 185&rdquo; and &ldquo;Src 93% A/B&rdquo;. It now reads <strong>=1 of 185</strong> and opens with a generic-terms notice naming the default terms, flagging the figure as directional, and warning that the 4-price table below is the database figure and does not reconcile to it. Also fixed on the same walk: the runtime suite&rsquo;s <code>max 4 limit</code> assertion still hard-coded 4 after <code>CMP_MAX</code> was raised to 5 in cycle 400 &mdash; it now reads <code>CMP_MAX</code> off the page (this was the standing 1 FAIL, a stale test rather than a product defect), and the <code>+Compare</code> button tooltip still said &ldquo;max 4 countries&rdquo;. Playwright ran this cycle. Version v504&rarr;v505.<br><br>
                         <strong style="color:var(--accent);">v504 (Aug 2026) &mdash; Cycle 403: the Country Profile stopped showing two different government-take numbers for the same country</strong> &mdash; Task T2 &mdash; &ldquo;is this country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold on Nigeria. The headline reads <strong>81.1% govt take @$75</strong>. Scrolling down, the <em>Live DCF Model</em> panel renders a 20px result card reading <strong>Govt Take 47.3%</strong> &mdash; same country, same $75/bbl, same page, <strong>33.8pp apart</strong>, at equal visual weight. Indonesia was 59.5% vs 22.2% (<strong>37.3pp</strong>); Iraq 84.8% vs 37.6% (<strong>47.2pp</strong>). The only reconciliation was one line of 11px grey text stating the arithmetic &mdash; <code>DB avg @$75: 81.1% | Live DCF @$75: 47.3% | Delta: -33.8pp</code> &mdash; which names the contradiction without resolving it. An analyst screening Indonesia and reporting &ldquo;22% government take&rdquo; to an IC would be wrong by 37pp against Fiscal Compare, the API and the XLSX export. Compounding it, <code>renderLiveDCFPanel()</code> labelled the panel from <code>d.mechanics[0]</code> while <code>runLiveDCF()</code> resolved the mechanic through <code>FC_MECHANIC_OVERRIDE</code> and <code>params._mechanic</code> &mdash; so Angola rendered &ldquo;(Concession regime)&rdquo; while the engine ran <strong>PSC</strong>, and the analyst could not tell what had been modelled. (1) New <code>resolveLiveDCFMechanic()</code> mirrors the engine&rsquo;s resolution, and <code>_execLiveDCF()</code> now rewrites the header from <code>result.mechanic</code> after every run, so the label can never drift from what executed &mdash; Angola now reads PSC, Australia PRRT, Iran Buy-back. (2) A scope line under the panel title states in words that this is a what-if on <strong>one</strong> hypothetical project, not the country&rsquo;s headline; the three result cards are relabelled &ldquo;&mdash; this scenario&rdquo;. (3) The grey delta line is replaced by a <strong>reconciliation block</strong>: two side-by-side cards (&ldquo;&#10004; Cite this&rdquo; carrying the contract average and where it is used, vs the scenario result and how to label it), a severity-coloured verdict &mdash; consistent &lt;3pp / modest &lt;10pp / material &ge;10pp, the last stating explicitly that the two figures must not share a sentence &mdash; and a collapsible <em>Why the two differ</em> list whose reasons are read off the data, never asserted: price, project profile (with both capex/opex sets named), regime mix, R-factor tiers, and contract-negotiated vs country-default statutory terms. Nigeria surfaces 3 reasons, Iraq 4, and 5 once the price slider and profile selector are moved. (4) Separate correctness fix on the same walk: the <em>Cost Profile Assumptions</em> panel &mdash; the panel an analyst opens to write their IC assumption footnote &mdash; hardcoded <strong>$2.0B capex / $12 opex / plateau years 6&ndash;15</strong> plus a fabricated Russia variant, while <code>DCF_PROFILES.deepwater</code>, the actual basis of every precomputed take, NPV, IRR and breakeven in <code>COUNTRY_DATA</code>, is <strong>$1.2B / $15/bbl / ramp 3yr + plateau 8yr</strong>. All three lines were wrong. The panel is now derived from <code>DCF_PROFILES.deepwater</code> at render time and the invented Russia branch is deleted, so it cannot drift again. Verified in a cold browser (cleared sessionStorage + localStorage) across 9 countries and live through the price slider and profile selector. Tests: JS syntax gate 9/9 PASS. Version v503&rarr;v504.<br><br>
                         <strong style="color:var(--accent);">v503 (Aug 2026) &mdash; Cycle 402: the Side-by-Side comparison can now leave the page as a table</strong> &mdash; Task T5 &mdash; &ldquo;give me something I can paste straight into an IC memo.&rdquo; An analyst who has built the exact shortlist they care about in Side-by-Side had no way to get it into a document as data. The four actions under the grid were <em>Save as PDF</em>, <em>Chart PNG</em>, <em>Share Link</em> and <em>Rank all 185</em> &mdash; a print artifact, an image of one chart, and a URL. Falling back to selecting the grid by hand does not work either: <code>.compare-grid</code> is a CSS <code>display:grid</code> of <code>&lt;div&gt;</code>s, so a drag-copy of a 5-country comparison flattens into <strong>129 lines of a single vertical column</strong> &mdash; every country name, region and metric value in one stream with no attribution, so &ldquo;62 &middot; MODERATE&rdquo; cannot be traced back to a country. Meanwhile a correctly structured <code>&lt;table id="cmp-data-table"&gt;</code> mirroring the grid exactly (20 rows &times; N columns) already sat in the DOM at <code>display:none</code> with <code>aria-hidden="true"</code> &mdash; built for Playwright and screen readers, unreachable by the user. The remaining path was retyping numbers into the memo by hand, which is where IC memo errors come from. (1) New <strong>&#x2398; Copy Table for IC Memo</strong> button, first in the action row and accent-filled because it is the primary exit from this tab. (2) <code>copyComparisonTable()</code> writes <strong>two clipboard flavours</strong> via <code>ClipboardItem</code>: <code>text/html</code> &mdash; a real bordered <code>&lt;table&gt;</code> in Calibri that Word, Google Docs, Outlook and PowerPoint render as a formatted table &mdash; and <code>text/plain</code> TSV, which Excel splits into columns. Falls back to <code>writeText(tsv)</code> where <code>ClipboardItem</code> is unavailable. (3) The copied block is memo-ready, not just data: a caption naming the countries, the standing assumption line (Deepwater profile, 10% WACC, 100% WI, NPV/IRR/breakeven @ $75/bbl, take shown $50&ndash;$125), and the ORCA source line. (4) Help glyphs and footnote markers (&#9432;, &#9670;, hair spaces) are stripped so pasted headers read as plain column names. (5) Guarded: the button only renders at 2+ countries, and a direct call below that returns a toast rather than an empty table. (6) The four Side-by-Side action buttons are now <code>display:none</code> in <code>@media print</code>, so <em>Save as PDF</em> stops printing a row of buttons into the PDF. Verified in a cold browser (cleared sessionStorage + localStorage): rich-HTML paste probe returns a 20&times;3 <code>&lt;table&gt;</code> with correct headers; TSV is uniformly 4 columns across all 20 rows for a 3-country comparison. Tests: JS syntax gate 9/9 PASS / 136 PASS / 0 FAIL / 0 JS errors. Version v502&rarr;v503.<br><br>
@@ -22353,25 +22355,29 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
   </details>`;
 }
 
-function getDQBadge(entry) {
+// v507: single source of truth for the FACTS / EVIDENCE / PROXY data-basis classification.
+// getDQBadge() rendered this inline, and runScreener() ranked all 185 countries by modelled NPV
+// with no reference to it — which put 20 consecutive PROXY countries at the top of the shortlist.
+// Both now read the same function, so the badge on a row and its position in the ranking can
+// never disagree. Returns {label, cls, hasProduction} — hasProduction is false only when the
+// country has zero verified field production anywhere, i.e. its economics are a regional proxy.
+function _dqTier(entry) {
   const cov = entry.prod_coverage_pct || 0;
   const wt  = entry.weighting || 'simple_avg';
-  const ab  = entry.ab_pct || 0;
-  let cls, label, tooltip;
   if (cov > 5 && (wt === 'prod_weighted' || wt === 'prod_weighted_blended')) {
-    cls     = 'dq-facts';
-    label   = 'FACTS';
-    tooltip = buildEvidenceTooltip(entry);
-  } else if (cov > 0) {
-    cls     = 'dq-evidence';
-    label   = 'EVIDENCE';
-    tooltip = buildEvidenceTooltip(entry);
-  } else {
-    cls     = 'dq-proxy';
-    label   = 'PROXY';
-    tooltip = buildEvidenceTooltip(entry);
+    return { label: 'FACTS', cls: 'dq-facts', hasProduction: true };
   }
-  return `<span class="dq-badge ${cls}" title="${tooltip}">${label}</span>`;
+  if (cov > 0) {
+    return { label: 'EVIDENCE', cls: 'dq-evidence', hasProduction: true };
+  }
+  return { label: 'PROXY', cls: 'dq-proxy', hasProduction: false };
+}
+window._dqTier = _dqTier;
+
+function getDQBadge(entry) {
+  const t = _dqTier(entry);
+  const tooltip = buildEvidenceTooltip(entry);
+  return `<span class="dq-badge ${t.cls}" title="${tooltip}">${t.label}</span>`;
 }
 
 function getDataQualityExplain(entry) {
@@ -23438,6 +23444,10 @@ function renderCompare() {
 
 // ─── TAB 3: Screener ─────────────────────────────────────────────────────────
 let _screenerRfactorOnly = false;
+// v507: when true (default) the Screener ranks the 22 countries that have verified field
+// production above the 163 whose economics are regional proxies. Nothing is filtered out —
+// only the order changes, and a labelled divider row marks the boundary.
+let _screenerEvidenceFirst = true;
 let _activePresetName = null; // tracks which preset is currently applied
 
 function applyScreenerPreset(preset) {
@@ -23566,6 +23576,11 @@ function applyScreenerPreset(preset) {
 
 function resetScreenerAll() {
   // Hard reset: all sliders to maximum range, all checkboxes checked, no IOC filter
+  // v507: also restore evidence-first ranking, otherwise "Reset All" left the analyst
+  // on the proxy-topped ordering with every filter control back at its default.
+  _screenerEvidenceFirst = true;
+  var _evFirstBox = document.getElementById('sc-evidence-first');
+  if (_evFirstBox) _evFirstBox.checked = true;
   applyScreenerPreset('reset');
   showCopyToast('All filters reset');
 }
@@ -23690,7 +23705,34 @@ function runScreener() {
     const scRegion = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
     if (scRegion && !_regionMatch(d.region, scRegion)) return false;
     return true;
-  }).sort((a,b) => _screenerRfactorOnly ? ((b.swing||0) - (a.swing||0)) : ((b[npvKey]||0) - (a[npvKey]||0)));
+  });
+
+  // v507 — Screener ranking no longer leads with proxy economics.
+  //
+  // The sort was `npv_75 DESC` over all 185 countries. Modelled NPV on the standardized
+  // $1.2B deepwater profile is a near-monotone inverse of take%, so that sort is really a
+  // take sort, and the lowest takes in the database belong to countries where no one has
+  // ever drilled and the fiscal terms are a regional placeholder. The result: ranks 1-20
+  // were Vanuatu (5.0% take), Bahamas, Montenegro, Greenland, Faroe Islands, Moldova,
+  // Romania, Sweden, Bulgaria, Kyrgyzstan, Bosnia, Serbia, Armenia, Croatia, Ukraine,
+  // Belgium, Lithuania, Tajikistan, Barbados, Hungary — every one badged PROXY, whose own
+  // tooltip reads "for fiscal comparison only". Guyana ranked 159, Norway 175, Indonesia
+  // 177, Iraq 179, Nigeria 182. The one-click "Load top 5 in Side-by-Side" button handed
+  // the analyst Vanuatu/Bahamas/Montenegro/Greenland/Faroe Islands.
+  //
+  // Countries with verified production now sort first, proxies after, NPV DESC within each
+  // group. Nothing is removed — all 185 stay in the table, the export and the count.
+  const _dqRank = d => (_dqTier(d).hasProduction ? 0 : 1);
+  if (_screenerRfactorOnly) {
+    data.sort((a,b) => (b.swing||0) - (a.swing||0));
+  } else if (_screenerEvidenceFirst) {
+    data.sort((a,b) => (_dqRank(a) - _dqRank(b)) || ((b[npvKey]||0) - (a[npvKey]||0)));
+  } else {
+    data.sort((a,b) => (b[npvKey]||0) - (a[npvKey]||0));
+  }
+  const _nVerified = data.filter(d => _dqTier(d).hasProduction).length;
+  const _nProxy    = data.length - _nVerified;
+  const _grouped   = _screenerEvidenceFirst && !_screenerRfactorOnly && _nVerified > 0 && _nProxy > 0;
 
   // active filters count badge (v99: take/irr/npv/breakeven sliders included)
   const scRegionActive = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
@@ -23724,9 +23766,15 @@ function runScreener() {
   // v469: Added Deepwater profile context to screener count — analysts need to know the profile basis before using results in IC memo
   // v500: with the Screener now opening unfiltered, the zero-filter state gets its own sentence —
   // "185 countries match" reads like a filter result; the analyst needs to know it is the whole universe.
+  // v507: the lead sentence now states the data-basis split, because that is the fact that
+  // decides whether the top of the list is usable. "185 countries" was never the analyst's
+  // problem; "which of these has anyone actually drilled" is.
+  const _basisNote = _grouped
+    ? ` \u2014 ranked by data basis: ${_nVerified} with verified field production first, then ${_nProxy} whose economics are regional proxies`
+    : '';
   const _universeLead = (activeCount === 0 && !_activePresetName)
-    ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.`
-    : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}`;
+    ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${_basisNote}`
+    : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}`;
   document.getElementById('screener-count').innerHTML = `${_universeLead} <span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:6px;">→ click any row to open Country Profile</span><span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v477: screener-result-count now shows how many were filtered out, not just total, for clearer context
   var _screenerFiltered = COUNTRY_DATA.length - data.length;
@@ -23768,9 +23816,19 @@ function runScreener() {
   tbody.innerHTML = data.map((d,i) => {
     const mechs = d.mechanics.split(',').map(m => `<span class="${getMechTagClass(m.trim())}">${m}</span>`).join('');
     const tc = tierClass(d[takeKey]);
+    // v507: labelled divider at the point the ranking stops being production-backed. Without it
+    // the analyst reads row 23 with the same authority as row 1 — the PROXY badge alone did not
+    // carry that, because every row above it was badged PROXY too and it read as decoration.
+    const _divider = (_grouped && i > 0 && _dqTier(data[i-1]).hasProduction && !_dqTier(d).hasProduction)
+      ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+        + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nProxy} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
+        + `Fiscal terms are regional proxy estimates and the NPV / IRR / breakeven shown are indicative only. `
+        + `Ranked among themselves by NPV. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
+        + `</td></tr>`
+      : '';
     // Bug 3 fix: click row to navigate to country profile
     const safeName = d.country.replace(/'/g, "\\'");
-    return `<tr style="cursor:pointer" onclick="openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
+    return _divider + `<tr style="cursor:pointer" onclick="openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
       <td class="num" style="color:var(--muted)">${i+1}</td>
       <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:9px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
@@ -23791,7 +23849,13 @@ function runScreener() {
   // v501: 4 -> 5 to match SbS capacity and the Fiscal Compare door, and clearCompare()
   // first so the analyst gets their shortlist rather than a silent merge with whatever
   // was already loaded.
-  var top4 = data.slice(0, 5);
+  // v507: the shortlist handoff must not ship proxy economics into Side-by-Side. When the
+  // ranking is grouped, take the top 5 from the verified-production group only; the button
+  // says which group it drew from so the analyst is not surprised by what loads.
+  var _sbsPool = _grouped ? data.filter(function(d){ return _dqTier(d).hasProduction; }) : data;
+  var _sbsFromVerified = _grouped && _sbsPool.length >= 2;
+  if (!_sbsFromVerified) _sbsPool = data;
+  var top4 = _sbsPool.slice(0, 5);
   var screenerTop4Btn = document.getElementById('screener-top4-btn');
   if (!screenerTop4Btn) {
     screenerTop4Btn = document.createElement('div');
@@ -23806,9 +23870,10 @@ function runScreener() {
     screenerTop4Btn.innerHTML = '<button onclick="(function(){' + top4calls + "var btn=[...document.querySelectorAll('.tab-btn')].find(function(b){return b.textContent.includes('Side-by-Side');});if(btn)switchTab('t2',btn);})()\""
       + ' style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:11px;font-weight:600;padding:4px 12px;cursor:pointer;transition:.15s;margin-top:6px;"'
       + ' onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'"'
-      + ' title="Load top ' + top4.length + ' Screener results into Side-by-Side for detailed comparison">'
-      + '&#x21cc; Load top ' + top4.length + ' in Side-by-Side &rarr;'
-      + '</button>';
+      + ' title="Load ' + (_sbsFromVerified ? 'the top ' + top4.length + ' verified-production countries' : 'the top ' + top4.length + ' Screener results') + ' into Side-by-Side for detailed comparison: ' + top4.map(function(d){return d.country;}).join(', ') + '">'
+      + '&#x21cc; Load top ' + top4.length + (_sbsFromVerified ? ' verified-production' : '') + ' in Side-by-Side &rarr;'
+      + '</button>'
+      + '<span style="font-size:10px;color:var(--muted);margin-left:8px;">' + top4.map(function(d){return d.country;}).join(' \u00b7 ') + '</span>';
   } else {
     screenerTop4Btn.innerHTML = '';
   }
@@ -28134,7 +28199,7 @@ function copyComparisonTable(btn) {
   var countries = matrix[0].slice(1);
   var caption = 'ORCA fiscal comparison — ' + countries.join(' / ');
   var assump = 'Standardized Deepwater profile, 10% WACC, 100% WI. NPV / IRR / Breakeven at $75/bbl; government take shown at $50–$125/bbl.';
-  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v506 — yoburgqs.github.io/petroleum-fiscal-db/';
+  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v507 — yoburgqs.github.io/petroleum-fiscal-db/';
 
   // --- plain-text / TSV flavour (Excel-friendly) ---
   var tsv = caption + '\n' + assump + '\n\n'
@@ -31769,7 +31834,7 @@ function exportFCResults() {
   var _orcaVer = (function() {
     var b = document.querySelector('header .badge, .badge');
     var m = b && /v\d+/.exec(b.textContent || '');
-    return m ? m[0] : 'v506';
+    return m ? m[0] : 'v507';
   })();
   var methRows = [
     ['ORCA Petroleum Fiscal Intelligence Platform'],
@@ -32904,6 +32969,12 @@ document.addEventListener('DOMContentLoaded', function() {
   // sc-irr-nulls checkbox
   var scIrrNulls = document.getElementById('sc-irr-nulls');
   if (scIrrNulls) scIrrNulls.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  // v507: evidence-first ranking toggle
+  var scEvFirst = document.getElementById('sc-evidence-first');
+  if (scEvFirst) scEvFirst.addEventListener('change', function() {
+    _screenerEvidenceFirst = scEvFirst.checked;
+    if (typeof runScreener === 'function') runScreener();
+  });
 });
 
 // v109: Screener mechanic checkboxes + breakeven/depth radios + IOC checkboxes — event delegation
