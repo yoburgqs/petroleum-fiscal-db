@@ -10243,3 +10243,83 @@ changelog entry added. Grade tables not touched.
 - Summary: Failed to authenticate. API Error: 403 Unable to verify organization membership.
 Ignoring 7 permissions.allow entries from .claude/settings.json and .claude/settings.local.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/Users/yoburg/office"].hasTrustDialogAccepted: true in /Users/yoburg/.claude.json.
 
+
+## Cycle 402 — v503
+
+**Task: T5 — "Give me something I can paste straight into an IC memo."**
+(Recent cycles were T4, T3, T1, T1, T6 — T5 was the oldest unused.)
+
+**Friction.** Cleared sessionStorage and localStorage, reloaded, and walked the task the way
+an analyst with a shortlist would: Side-by-Side, three countries, now get it into the memo.
+
+The action row `renderCompare()` builds under the grid (index.html ~23322) offers four things:
+**Save as PDF**, **Chart PNG**, **Share Link**, **Rank all 185 countries**. That is a print
+artifact, an image of one chart, and a URL. None of them is data, and none of them goes into
+an IC memo as a table.
+
+So the analyst does what anyone does — drags across the grid and hits copy. That does not work
+either. `.compare-grid` is a CSS `display:grid` of `<div>`s, not a `<table>`. Measured in a
+scripted browser run on a 5-country comparison, a drag-copy of the grid yields **129 lines of a
+single vertical column**: every country name, every region, and every metric value in one flat
+stream with no row or column structure. Pasted into Word or Excel, "62 · MODERATE" cannot be
+traced back to a country.
+
+The part that makes this the worst moment rather than merely a gap: the exact table the analyst
+needs **already exists in the DOM**. `renderCompare()` emits
+`<table id="cmp-data-table">` — 20 rows × N columns, correctly structured, mirroring the grid
+row for row — and then sets it `display:none` with `aria-hidden="true"`. It was built for
+Playwright assertions and screen readers. The user cannot select it, cannot see it, cannot copy
+it. The analyst's only remaining option is retyping numbers into the memo by hand, which is
+exactly where IC memo errors come from.
+
+Single-country IC copy has existed since v374 (`copyICCitation`) and v425 (`copyICSummary`) on
+the Country Profile. The multi-country comparison — the actual artifact a portfolio screening
+memo needs — had nothing.
+
+**Change.**
+
+1. New **`⎘ Copy Table for IC Memo`** button, placed **first** in the Side-by-Side action row
+   and accent-filled rather than outlined, because it is the primary exit from this tab.
+   Wired through the existing class-delegation handler (`cmp-inline-copy-btn`), consistent with
+   the v109 inline-handler migration.
+2. New **`copyComparisonTable()`** reads `#cmp-data-table` and writes **two clipboard flavours**
+   in a single `ClipboardItem`:
+   - **`text/html`** — a real bordered `<table>` in Calibri. Word, Google Docs, Outlook and
+     PowerPoint all render this as a formatted table on paste.
+   - **`text/plain`** — TSV. Excel splits it into columns.
+   Falls back to `writeText(tsv)` where `ClipboardItem` is unavailable, and to a toast where
+   the clipboard API is absent entirely.
+3. The copied block is **memo-ready, not just data**: a caption naming the countries, the
+   standing assumption line (Deepwater profile, 10% WACC, 100% WI; NPV/IRR/breakeven @ $75/bbl;
+   take shown $50–$125/bbl), and the ORCA source line with version and URL.
+4. Help glyphs and footnote markers (`ⓘ` U+24D8, `◆` U+25C6, hair space U+200A) are stripped so
+   pasted headers read as plain column names rather than "Predictability Score ⓘ".
+5. Guarded at both ends: the button only renders at 2+ countries (verified absent at 1), and a
+   direct call below that threshold returns a toast instead of an empty table.
+6. All four Side-by-Side action buttons are now `display:none` inside `@media print`, so
+   **Save as PDF** stops printing a row of buttons into the PDF.
+
+**Result.** The analyst clicks once and pastes a real 20-metric × N-country table — with the
+profile/price assumptions and the source attached — straight into the IC memo, or into Excel as
+columns. Before this cycle the same shortlist could leave the page only as a PDF, a chart image,
+or a URL, and the fallback was retyping the numbers by hand.
+
+**Verification.**
+- JS syntax gate: `node --check` over all 9 inline script blocks — **9/9 PASS, 0 errors**.
+- Playwright `tests/runtime_comprehensive.js` **ran this cycle** against the patched local build:
+  **136 PASS / 0 FAIL / 1 WARN / 0 JS errors**. The single WARN is a 404 on
+  `/petroleum-fiscal-db/sw.js` — the service worker registers at the GitHub Pages path prefix,
+  which does not exist under a local static server root. It is a serving artifact, absent on the
+  live site, and unrelated to this change.
+- Flow re-walked cold in a scripted browser (sessionStorage + localStorage cleared) after the
+  change: button present and visible at 3 countries; click produces toast "Comparison copied as
+  a table (3 countries × 19 metrics)"; TSV payload is **uniformly 4 columns across all 20 rows**;
+  a contenteditable paste probe confirms the rich flavour arrives as a **20×3 `<table>`** with
+  header row `Metric / Nigeria / Guyana` and row 3 reading
+  `Govt Take ($50/bbl) / 74.1% / 39.9%`.
+- Baseline note: the incoming report said 135 PASS / 1 FAIL. The `[Basket] max 5 limit`
+  assertion corrected in cycle 401 is present and passing here; this cycle measured 0 FAIL both
+  before and after the change.
+
+**Bookkeeping (not the improvement).** v502 → v503 across the 3 structural locations (title,
+meta description, header badge); changelog entry prepended. Grade tables not touched.
