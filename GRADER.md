@@ -10580,3 +10580,18 @@ not touched.
 - Note on the incoming "135 PASS / 1 FAIL": the suite defaults to `TEST_URL=`
   `https://yoburgqs.github.io/petroleum-fiscal-db/`, i.e. the deployed site, not the working tree.
   The single FAIL was the stale `max 4 limit` assertion described above — a test defect, now fixed.
+
+---
+## Cycle 404 Log — 2026-08-24 13:54
+- Test before: 135 PASS / 1 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 404 complete and pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest; last six cycles were T2, T5, T4, T3, T1, T1)
+
+## Friction
+Cold walk (sessionStorage + localStorage cleared) into **Fiscal Compare** on the landing defaults — Deepwater, $75/bbl — which is where every first-time analyst arrives.
+
+Row 1 was **Guyana, 22.2% take**, with a green "investible tier" border, rank **#1**, and in the column literally headed **Quality**, a green **A**
