@@ -9995,3 +9995,18 @@ change. 0 page errors across cold-load walks of both entry doors at all four pri
 sweep initially relabelled Cycle 398's changelog header from v499 to v500; restored. Grade
 tables not touched.
 
+
+---
+## Cycle 398 Log — 2026-08-24 08:21
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Both commits pushed, mirror copied, GRADER.md logged.
+
+## Cycle 399 — v500
+
+**Task:** T1 — "Which countries should even be on my screening list?"
+
+**Friction.** I cleared sessionStorage and localStorage, reloaded, and walked into the Screener through both doors an analyst can use. It never showed the universe it claims to screen, for two separate reasons that land on the same moment.
+
+Clicking **Screener** in the nav auto-applied the *Sweet Spot* preset. That code (v428) exists t
