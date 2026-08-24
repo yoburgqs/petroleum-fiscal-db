@@ -9920,3 +9920,78 @@ changelog entry added. Grade tables not touched.
 **Task:** T6 — "Where did this number come from and how solid is the evidence?"
 
 **Friction.** On Country Profile, the *Key Fiscal Parameters* table showed `Parameter | Value | Source`. The Value came from the API's `fiscal_facts` (a contract-weighted average across ORCA's contracts for that country). The Source badge came from a completely separate object, `fiscal_facts_sourced`. `renderSource
+
+---
+## Cycle 399 Log — 2026-08-24 (v499 → v500)
+
+**Task:** T1 — "Which countries should even be on my screening list?"
+
+**Friction.** Walked T1 from a cold load (sessionStorage and localStorage cleared, then
+reloaded) through both doors an analyst can use to reach the Screener. The Screener never
+showed the universe it claims to screen, for two independent reasons that land on the same
+moment.
+
+*Door 1 — the nav tab.* `tab-btn-tscreener`'s `DOMContentLoaded` listener (index.html,
+`if (!window._screenerAutoRan)`) auto-applied the **Sweet Spot** preset on first visit. The
+v428 comment gives the rationale as "prevents blank table on first load" — but v468 already
+made `switchExplorerMode('screen')` auto-run `runScreener()`, so the table was never going to
+be blank. The surviving effect was that a first-time analyst landed on **141 of 185
+countries**, with Take ≤55% / BE ≤$65 / NPV ≥0 applied on their behalf. Absent from that
+list: Brazil, Nigeria, Angola, Iraq, Kazakhstan, India, China, Algeria, Azerbaijan, Gabon,
+Côte d'Ivoire. The `Sweet Spot ·` prefix on the count line is the only notice, buried at the
+head of a run-on sentence that continues "→ click any row to open Country Profile".
+
+*Door 2 — the Home Screener card.* Its inline `onclick` calls `switchTab()` +
+`switchExplorerMode('screen')` directly and never fires the nav button's listener, so no
+preset was applied and the old HTML slider defaults (Take 60 / BE 70 / NPV 0) governed
+instead: **157 of 185**. Two doors labelled "Screener", two different universes, and neither
+one was the real one.
+
+*The floor underneath both.* In `runScreener()` the IRR clause read:
+
+    const irrVal = (irr === null || irr === undefined || irr >= 500) ? null : irr;
+    if (irrVal === null) { if (!includeIrrNulls && minIRR > 0) return false; }
+    else { if (irrVal < minIRR) return false; }
+
+`#sl-irr` has `min="0"`. The `else` branch therefore ran at the slider's own off position,
+making "Min IRR: 0%" a hard `IRR ≥ 0` filter. **Every country with a negative modelled IRR
+was unreachable at every filter setting, including after Reset All** — at $75/bbl: Saudi
+Arabia, Kuwait, Bahrain, Cyprus, Turkmenistan, Uzbekistan; at $100: also Malaysia, Qatar,
+South Sudan; at $125: also India, Oman. Confirmed all 185 render in Explorer browse mode, so
+the Screener was the sole place they vanished. This is the same class of defect as cycle 344
+(USA filed under region "Other"): surfaced only by walking the user's actual path, invisible
+to the rubric.
+
+**Change (on screen / in behavior).**
+1. The v428 auto-preset is removed. Both entry doors open the Screener **unfiltered**.
+2. Slider defaults moved to their neutral positions — Take **100%**, BE **$120**, NPV
+   **−$500M** — so the nav path and the Home-card path agree, and the opening state matches
+   what **Reset All** has always produced.
+3. `minIRR === 0` now means *no IRR constraint*. Behaviour above 0% is byte-identical to
+   before; the "no displayable IRR" checkbox semantics are unchanged.
+4. Each slider sitting at an unfiltered extreme carries a muted "· no ceiling" / "· no floor"
+   / "· no minimum" flag, driven by `_scUpdateNeutralFlags()` called at the top of
+   `runScreener()`, so the analyst can see which sliders are actually constraining the set.
+5. The count bar's zero-filter state reads **"All 185 countries — no filters applied yet.
+   Load a preset or move a slider to narrow."** rather than "185 countries match at $75/bbl",
+   which reads like a filter result.
+6. The IRR label's `title` no longer claims coverage without disclosing what 0% excludes.
+
+**Result.** The analyst opens the Screener, from either door, and sees all **185** countries —
+at $50, $75, $100 and $125. Saudi Arabia and Kuwait appear at 100% take with negative IRR and
+can be **knowingly rejected** rather than being silently absent from a tool that says it
+covers 185 countries. Narrowing is now a decision the analyst makes, and each slider states
+whether it is currently doing anything. Presets are unchanged and one click away in the
+dropdown — Sweet Spot still returns its subset when chosen.
+
+**Verification.** JS syntax gate **PASS** (`node --check` over 9 inline script blocks, 0
+errors). Playwright `tests/runtime_comprehensive.js` **did run this cycle** against a local
+server at `http://localhost:8099`: **135 PASS / 0 FAIL / 1 WARN**. The WARN is the
+service-worker registration at the GitHub-Pages-absolute path `/petroleum-fiscal-db/sw.js`,
+which 404s under any local server — pre-existing, identical to Cycle 398, unrelated to this
+change. 0 page errors across cold-load walks of both entry doors at all four price decks.
+
+**Bookkeeping (not the improvement).** Version sweep v499→v500; changelog entry added. The
+sweep initially relabelled Cycle 398's changelog header from v499 to v500; restored. Grade
+tables not touched.
+
