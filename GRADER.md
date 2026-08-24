@@ -10734,3 +10734,98 @@ tables not touched.
 **Task: T2** — "Is this country attractive at $75/bbl, and can I defend that?"
 
 **Friction.** Cold walk into Fiscal Compare on the landing defaults (Deepwater, $75), then a row click. The drawer header reads **Iraq 27.1%** — and the tier badge, its colour, and the global rank are all computed from it. Eight pixels below, in a table whose column is headed **`$75/bbl`**, the same country reads **84.8%**. 57.7pp apart, at 
+
+---
+## Cycle 406 — v507
+
+**Task: T1** — "Which countries should even be on my screening list?" (Last three cycles
+were T2, T6, T2; T1 and T3 were the stalest.)
+
+**Friction.** Cold walk (`sessionStorage` + `localStorage` cleared, hard reload) into the
+Screener through the primary nav. It opens unfiltered on all 185 countries — correct, and
+the v500 fix — and ranks them `npv_75` descending, numbered **1 to 185** in a `#` column
+that reads as authority.
+
+But modelled NPV on the standardized $1.2B / 50k bbl/d deepwater profile is a near-monotone
+inverse of take%, so that sort is a take sort wearing a different hat. And the lowest takes
+in this database belong to the countries where nobody has ever drilled and the fiscal terms
+are a regional placeholder. Ranks 1–20, verbatim:
+
+> Vanuatu (5.0% take, $5.1B NPV) · Bahamas · Montenegro · Greenland · Faroe Islands ·
+> Moldova · Romania · Sweden · Bulgaria · Kyrgyzstan · Bosnia and Herzegovina · Serbia ·
+> Armenia · Croatia · Ukraine · Belgium · Lithuania · Tajikistan · Barbados · Hungary
+
+Every one badged **PROXY** — whose own tooltip reads *"Economics use regional proxy
+estimates — for fiscal comparison only."* Meanwhile **Guyana ranked 159, UK 149, Norway 175,
+Indonesia 177, Iraq 179, Nigeria 182.**
+
+Two things made this the worst moment in the walk rather than a cosmetic complaint:
+
+- **The PROXY badge could not carry the warning.** All twenty rows above the fold carried
+  it, so it read as decoration, not as a caveat. A badge that appears on 163 of 185 rows
+  discriminates nothing at the point of decision.
+- **The one-click handoff shipped it downstream.** `screener-top4-btn` — "Load top 5 in
+  Side-by-Side" — took `data.slice(0,5)` and loaded **Vanuatu, Bahamas, Montenegro,
+  Greenland, Faroe Islands** into the comparison view. That is one click from the tool's
+  answer to "where should I look" to a populated side-by-side an analyst could screenshot.
+
+Location: `runScreener()`, the sort comparator at old line 23693, and the `top4` slice below
+the table render.
+
+**Change.**
+
+1. **The ranking is grouped by data basis.** The 22 countries with verified field production
+   (`prod_coverage_pct > 0` — the same test that drives the FACTS/EVIDENCE/PROXY badge) sort
+   above the 163 proxies, NPV-descending within each group. **Nothing is filtered out** —
+   all 185 remain in the table, the count, the CSV and the XLSX. Only the order changed.
+   This was deliberately a re-ranking and not a filter: 163 of 185 are PROXY, including
+   Guyana, so filtering that class would have deleted most of the database and the tool's
+   central promise along with it.
+2. **A labelled divider row marks the boundary** — "BELOW THIS LINE — 163 COUNTRIES WITH NO
+   VERIFIED FIELD PRODUCTION · fiscal terms are regional proxy estimates and the NPV / IRR /
+   breakeven shown are indicative only · usable for fiscal comparison, not defensible as a
+   screening shortlist on their own." Row 23 is no longer read with the authority of row 1.
+3. **The Side-by-Side handoff draws from the verified group** and now names the five
+   countries it will load on the button itself, so nothing loads silently.
+4. **A first-class toggle** in the Screener count bar — *"Rank verified-production countries
+   first"*, on by default. Deliberately **not** inside the collapsed `screener-advanced-details`
+   block, because the analyst needs to see that a ranking decision was made on their behalf.
+   Unticking restores the pure modelled-NPV ordering exactly (verified: Vanuatu returns to
+   rank 1). `Reset All` restores the default.
+5. **The count line states the split** — "22 with verified field production first, then 163
+   whose economics are regional proxies" — and recomputes under every filter and preset
+   (Sweet Spot: 9 / 133; Shell IOC filter: 9 / 12; take ≤30%: 1 / 93).
+6. **Refactor:** the FACTS/EVIDENCE/PROXY classification lived inline in `getDQBadge()` and
+   `runScreener()` had no reference to it at all. Extracted to `_dqTier()`; both now read it,
+   so a row's badge and its position in the ranking cannot drift apart.
+
+**Result.** A cold Screener opens on **Canada, USA, Azerbaijan, Mexico, Argentina, Colombia,
+China, Australia**. The analyst with 20 minutes before a screening meeting can read the top
+of the list as a shortlist and defend every name on it, and can hand the top five straight
+into Side-by-Side. The proxy universe is still present, still ranked, still exportable — but
+now explicitly marked as not decision-grade, and reachable in one click for anyone who wants
+the raw model ranking.
+
+**Verification.**
+- **JS syntax gate PASS** — 9 blocks / 0 errors, re-run after the version bump and changelog.
+- **Cold Playwright walk against the patched local build**, five paths: default order,
+  toggle off, toggle back on, `sweetspot` preset, `resetScreenerAll()`, and a near-empty
+  result set (take ≤30% → 94 countries, 1 verified). Divider index, group counts, button
+  contents and toggle state correct in every one. **0 JS errors.**
+- **The authoritative suite ran to completion this cycle** —
+  `office/tools/petroleum/tests/runtime_comprehensive.js` against a local server:
+  **135 PASS / 0 FAIL / 1 WARN.** The WARN and the 1 captured JS error are the same thing:
+  the pre-existing `sw.js` 404 at the GitHub-Pages-absolute path `/petroleum-fiscal-db/sw.js`,
+  which only occurs when serving from localhost. That is the documented 136 PASS / 0 FAIL
+  baseline minus the service worker. All 8 Screener checks pass, and the new data-basis line
+  is visible in their captured output.
+- **Note against cycle 405's finding:** 405 reported this suite hanging at 15 checks against
+  both local and deployed URLs, including on unmodified v505. It did **not** hang in any of
+  the three runs this cycle. The intermittency is real and still unexplained; it did not
+  reproduce here, so it remains open rather than resolved.
+- No item on the STILL LOCKED list was touched.
+
+## Bookkeeping (not the improvement)
+v506 → v507 across the 4 structural locations (meta description, title, header badge, SbS
+citation source line) plus the XLSX version fallback; changelog entry prepended. Grade tables
+not touched.
