@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v501.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v502.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v501</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v502</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1341,7 +1341,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v501</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v502</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2532,6 +2532,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong style="color:var(--accent);">v502 (Aug 2026) &mdash; Cycle 401: Reform Risk now answers the single-country question</strong> &mdash; The Reform Risk tab is named for &ldquo;what is my reform exposure <em>here</em>&rdquo;, but every block on it was a global aggregate &mdash; top-15 most-reformed table, top-20 decade heatmap, 8 stable / 8 volatile lists. There was no control that took a country as input, so an analyst arriving with one jurisdiction in mind had no way to ask about it. Added a <strong>per-country lookup</strong> covering all 185 countries, split into two optgroups so the coverage boundary is visible before selection: <em>Sourced reform history &mdash; scoreable (21)</em> and <em>No sourced reform history &mdash; predictability only (164)</em>. Selecting a covered country renders its Reform Frequency Score with rank among the 21 scoreable, reforms since 2010, hostile/friendly/neutral direction split with net tilt, Fiscal Predictability Score alongside it, take @ $75, the most recent reform event, and the tab&rsquo;s own IC rule <em>applied to that country</em> (&ldquo;add a 3&ndash;5pp WACC premium&rdquo;) rather than left as a general note. Selecting one of the 164 uncovered countries states plainly that there is <strong>no score</strong> &mdash; not a score of 100 &mdash; because the formula 100 &minus; 15&times;(reforms since 2010) computes to a clean 100 for a jurisdiction that was simply never sourced, which is indistinguishable from a genuine zero-reform record. It then gives the Fiscal Predictability Score, which is derived from that country&rsquo;s own contract set and exists for all 185. The Reform Risk Snapshot headline now reads &ldquo;21 of 185 jurisdictions carry a sourced reform history &mdash; the rankings below are drawn from those 21 only&rdquo;, so the denominator is legible from the first line. Both verdict cards drill through to the Country Profile. Test suite: the stale <code>max 4 limit</code> assertion (superseded by the v501 capacity change) was corrected to assert a 5th country is accepted and a 6th refused. Tests: JS syntax gate 9/9 PASS / 137 PASS / 0 FAIL / 0 WARN / 0 JS errors.<br><br>
                         <strong style="color:var(--accent);">v501 (Aug 2026) &mdash; Cycle 400: &ldquo;Load Top 5 in Side-by-Side&rdquo; now actually loads 5</strong> &mdash; Task T3 &mdash; &ldquo;how do these three countries compare side by side?&rdquo; Side-by-Side accepted a maximum of <strong>4</strong> countries, but three separate entry points handed it <strong>5</strong>: the Fiscal Compare hint-bar button &ldquo;&#x21cc; Load Top 5 in Side-by-Side&rdquo;, the floating Screener basket (capacity 5, via <code>launchCompare()</code>), and the shared <code>#/compare/&hellip;</code> link route. <code>addCompare()</code> ended in <code>if (compareList.includes(country) || compareList.length &gt;= 4) return;</code> &mdash; a silent no-op &mdash; so the fifth-ranked country was discarded without any message. From a cold load, running Fiscal Compare on the default sort and clicking Load Top 5 produced Guyana / Sierra Leone / Sri Lanka / Chad and a badge reading &ldquo;4/4 countries (max)&rdquo;: <strong>Ireland</strong>, the fifth-ranked country, was gone with nothing on screen to say so. (1) <strong>Capacity raised 4&rarr;5</strong> (<code>CMP_MAX</code>), matching every place the platform already promised 5. (2) <strong>Refusals are now announced</strong> &mdash; adding past the cap, or re-adding a country already in the grid, raises a toast naming the country instead of doing nothing. (3) <strong>Fifth chart colour added</strong> (#1D4ED8); the Contractor-NPV bar chart indexed <code>colors[i]</code> with no modulo, so a fifth series would have rendered with <code>backgroundColor: "undefined88"</code>. (4) <strong>Screener door aligned</strong> &mdash; &ldquo;Load top 4&rdquo; is now &ldquo;Load top 5&rdquo; and clears the grid first, so it delivers the analyst&rsquo;s shortlist rather than silently merging into whatever was already loaded (the Fiscal Compare door has done this since v455). (5) <strong>Responsive grid made count-aware</strong> &mdash; the &le;768px and &le;600px rules forced <code>repeat(4)</code>/<code>repeat(2)</code> with <code>!important</code> regardless of how many countries were loaded; they now read a <code>--cmp-n</code> custom property set on the grid. Playwright 136 PASS / 0 FAIL / 0 WARN, 0 JS errors. Version v500&rarr;v501.<br><br>
                         <strong style="color:var(--accent);">v500 (Aug 2026) &mdash; Cycle 399: the Screener now opens on all 185 countries, and negative-IRR regimes are no longer invisible</strong> &mdash; Task T1 &mdash; &ldquo;which countries should even be on my screening list?&rdquo; (1) <strong>Two entry doors, two different universes, neither of them the real one (P1 &mdash; bug)</strong> &mdash; Clicking <strong>Screener</strong> in the primary nav auto-applied the <em>Sweet Spot</em> preset (<code>v428</code>, added to &ldquo;prevent a blank table&rdquo; &mdash; a problem <code>v468</code> had already solved by auto-running the Screener on mode activation). A first-time analyst therefore landed on <strong>141 of 185 countries</strong> with Take &le;55% / BE &le;$65 / NPV &ge;0 already applied &mdash; Brazil, Nigeria, Angola, Iraq, Kazakhstan, India and China removed before a single decision had been made. Entering through the Home <em>Screener</em> card skipped that listener and applied the old HTML slider defaults instead, returning <strong>157</strong>. Both doors now open unfiltered on all <strong>185</strong> countries; slider defaults moved to their neutral positions (Take 100% / BE $120 / NPV &minus;$500M) so the two paths agree. Presets remain one click away in the dropdown &mdash; now an explicit choice rather than a silent one. (2) <strong>Negative-IRR countries were unreachable at every filter setting (P1 &mdash; bug)</strong> &mdash; <code>runScreener()</code> applied <code>irrVal &lt; minIRR</code> unconditionally, and <code>#sl-irr</code> has a floor of 0 &mdash; so the &ldquo;off&rdquo; position was in fact a hard <code>IRR &ge; 0</code> filter. Every country with a negative modelled IRR was deleted from the Screener at <em>all</em> slider positions, including after <strong>Reset All</strong>: <strong>Saudi Arabia, Kuwait, Bahrain, Cyprus, Turkmenistan, Uzbekistan</strong> at $75/bbl, plus Malaysia, Qatar and South Sudan at $100 and India and Oman at $125. All were present in Explorer, so the Screener was the only place they vanished. <code>minIRR === 0</code> now means no IRR constraint; behaviour above 0% is unchanged. A neutral Screener returns 185 of 185 at every price deck. (3) <strong>Inert sliders are now labelled as inert</strong> &mdash; each slider sitting at its unfiltered extreme shows a muted &ldquo;&middot; no ceiling&rdquo; / &ldquo;&middot; no floor&rdquo; / &ldquo;&middot; no minimum&rdquo; flag (<code>_scUpdateNeutralFlags()</code>), and the count bar reads &ldquo;All 185 countries &mdash; no filters applied yet&rdquo; rather than &ldquo;185 countries match&rdquo;, which reads like a filter result. (4) <strong>Bookkeeping, not the improvement</strong> &mdash; version sweep v499&rarr;v500. JS syntax gate PASS (9 blocks / 0 errors). Playwright <code>runtime_comprehensive.js</code> ran this cycle against a local server: 135 PASS / 0 FAIL / 1 WARN &mdash; the WARN is the pre-existing service-worker 404 at the GitHub-Pages-absolute path <code>/petroleum-fiscal-db/sw.js</code>, unrelated to this change.<br><br>
                         <strong style="color:var(--accent);">v499 (Aug 2026) &mdash; Cycle 398: Key Fiscal Parameters now separates the modelled rate from the rate the cited source actually states</strong> &mdash; The Country Profile parameter table showed a single Value column with a source badge beside it, so an A-tier badge linking to primary legislation appeared to vouch for the number on screen. It often did not: the value was the average across ORCA&rsquo;s contracts for that country, while the cited statute carried a different rate. Angola showed a 2.58% royalty badged to Lei 10/2004, which states 20%. Brazil showed a 79.65% cost-recovery cap badged to Lei 12.351/2010, which states 50%. Across 39 countries, 62 parameter rows carried this mismatch. The table now has two numeric columns &mdash; <strong>ORCA Value</strong> (contract-weighted average, the figure the DCF engine uses) and <strong>Statutory (cited source)</strong> (the rate in the linked document) &mdash; with divergent rows flagged in orange and a reconciliation note below the table stating how many parameters diverge and how to cite each figure in an IC memo. Countries where every sourced parameter agrees now say so explicitly. Source badges were also bounded to 320px with the full source string kept in the tooltip; previously an untruncated 100-character source blob stretched the column past 700px. JS syntax gate PASS. Playwright 135 PASS / 0 FAIL local (the 136th and the lone WARN are the GitHub-Pages-absolute service-worker path, which 404s under a local server).<br><br>
@@ -21870,6 +21871,21 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
   <div style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.6;">
     <strong style="color:var(--accent);">What this shows:</strong> Every sourced fiscal law change across 185 jurisdictions since 1960 — ranked by reform frequency, direction (hostile/friendly/neutral), and decade. A country ranked at 60% government take with zero reforms since 2010 carries a very different risk profile from one at 58% that rewrote its PSC terms in 2018 and 2022. Use Stability Scores here alongside Country Profile take figures when building IC memos. <strong>Reform Frequency Score</strong> (0–100) = 100 minus 15× number of reforms since 2010. Distinct from the Fiscal Predictability Score in Country Profile (which also factors price swing and term consistency). <strong style="color:var(--text);">IC rule:</strong> Score ≤ 40 → add 3–5pp WACC premium; Score ≤ 20 → add 5–8pp and show probability-weighted NPV scenario.
   </div>
+  <!-- v502: per-country lookup. Before this, the Reform Risk tab answered only the global question
+       (top-15 table, top-20 heatmap, 8+8 stable/volatile). An analyst arriving with one country in
+       mind had no control to ask about it, and the 164 jurisdictions with no sourced reform history
+       were indistinguishable from a perfect track record. -->
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:18px;">
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <label for="rr-country-lookup" style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;">Check one country</label>
+      <select id="rr-country-lookup" aria-label="Look up reform and fiscal-stability exposure for one country" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:6px 10px;border-radius:4px;font-size:12px;min-width:230px;">
+        <option value="">Select a country…</option>
+      </select>
+      <button id="rr-lookup-clear" class="btn btn-sm btn-outline" style="display:none;" title="Clear the country lookup and return to the global view">Clear</button>
+      <span style="font-size:11px;color:var(--muted);">Returns this country’s reform-frequency exposure, or says plainly when there is no sourced history to score.</span>
+    </div>
+    <div id="rr-country-verdict" style="display:none;margin-top:14px;"></div>
+  </div>
   <div id="reform-risk-content" style="margin-top:8px;">    <div style="color:var(--muted);font-size:13px;padding:40px 0;text-align:center;">Loading reform history&hellip;</div>  </div></div>
 
 <script>
@@ -27261,9 +27277,198 @@ function renderSampleAnalyses() {
 window.renderSampleAnalyses = renderSampleAnalyses;
 
 // ── Reform Risk Intelligence Tab ─────────────────────────────────────────────
+// ── v502: Reform Risk per-country lookup ────────────────────────────────────
+// The tab is named for the question "what is my reform exposure HERE", but every
+// block on it was a global aggregate: top-15 reformed, top-20 heatmap, 8 stable /
+// 8 volatile. There was no control that took a country as input. And because the
+// Reform Frequency Score is 100 − 15×(reforms since 2010), a jurisdiction ORCA has
+// simply never sourced would compute to a clean 100 — indistinguishable from a
+// genuine zero-reform record. These two functions close both gaps.
+
+function _rrEsc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// Populate once COUNTRY_DATA has landed. Two optgroups so the coverage split is
+// visible in the picker itself, before the analyst commits to a selection.
+function _rrPopulateLookup() {
+  var sel = document.getElementById('rr-country-lookup');
+  if (!sel || sel.dataset.filled === '1') return;
+  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
+  if (!cd.length) return;
+  var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+  var names = cd.map(function(d){ return d.country; }).filter(Boolean).sort();
+  var covered = names.filter(function(c){ return Array.isArray(rh[c]) && rh[c].length; });
+  var uncovered = names.filter(function(c){ return !(Array.isArray(rh[c]) && rh[c].length); });
+  function group(label, list) {
+    if (!list.length) return null;
+    var g = document.createElement('optgroup');
+    g.label = label + ' (' + list.length + ')';
+    list.forEach(function(c) {
+      var o = document.createElement('option');
+      o.value = c; o.textContent = c;
+      g.appendChild(o);
+    });
+    return g;
+  }
+  var g1 = group('Sourced reform history — scoreable', covered);
+  var g2 = group('No sourced reform history — predictability only', uncovered);
+  if (g1) sel.appendChild(g1);
+  if (g2) sel.appendChild(g2);
+  sel.dataset.filled = '1';
+  if (!sel.dataset.bound) {
+    sel.addEventListener('change', renderReformCountryVerdict);
+    sel.dataset.bound = '1';
+  }
+  var clr = document.getElementById('rr-lookup-clear');
+  if (clr && !clr.dataset.bound) {
+    clr.addEventListener('click', function() {
+      sel.value = '';
+      renderReformCountryVerdict();
+      sel.focus();
+    });
+    clr.dataset.bound = '1';
+  }
+}
+
+function renderReformCountryVerdict() {
+  var sel = document.getElementById('rr-country-lookup');
+  var out = document.getElementById('rr-country-verdict');
+  var clr = document.getElementById('rr-lookup-clear');
+  if (!sel || !out) return;
+  var c = sel.value;
+  if (!c) {
+    out.style.display = 'none';
+    out.innerHTML = '';
+    if (clr) clr.style.display = 'none';
+    return;
+  }
+  if (clr) clr.style.display = '';
+  out.style.display = 'block';
+
+  var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
+  var d = cd.filter(function(x){ return x.country === c; })[0] || null;
+  var events = Array.isArray(rh[c]) ? rh[c] : [];
+  var esc = _rrEsc(c);
+  var jsC = c.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+  var take = (d && d.take_75 != null) ? d.take_75.toFixed(1) + '%' : '—';
+  var fp = (d && typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
+  var fpLabel = fp == null ? '' : (fp >= 75 ? 'HIGH' : fp >= 60 ? 'MODERATE' : fp >= 45 ? 'LOW' : 'VERY LOW');
+  var fpColor = fp == null ? 'var(--muted)' : (fp >= 75 ? 'var(--green)' : fp >= 60 ? 'var(--yellow)' : fp >= 45 ? 'var(--orange)' : 'var(--red)');
+  var cpBtn = '<button class="btn btn-sm btn-outline" onclick="var s=document.getElementById(\'dd-country-select\');if(s)s.value=\'' + jsC + '\';loadCountryProfile(\'' + jsC + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" title="Open the full Country Profile for ' + esc + '">Open ' + esc + ' Country Profile &rsaquo;</button>';
+
+  // ── Case 1: no sourced reform history. Say so explicitly; never imply a 100. ──
+  if (!events.length) {
+    var coveredN = Object.keys(rh).filter(function(k){ return Array.isArray(rh[k]) && rh[k].length; }).length;
+    var totalN = cd.length || 185;
+    out.innerHTML =
+      '<div style="border:1px solid var(--border);border-left:3px solid var(--muted);border-radius:8px;padding:14px 16px;background:var(--surface);">'
+      + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">' + esc + ' — no Reform Frequency Score</div>'
+      + '<div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;">'
+      + 'ORCA carries a sourced fiscal-reform event log for <strong>' + coveredN + ' of ' + totalN + '</strong> jurisdictions. '
+      + esc + ' is one of the <strong>' + (totalN - coveredN) + '</strong> without one. '
+      + '<strong style="color:var(--text);">This is not a score of 100.</strong> No events on file means no coverage, not a clean record — '
+      + 'do not read it as stability and do not carry a reform-frequency premium of zero into an IC memo on this basis.'
+      + '</div>'
+      + '<div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:12px;">'
+      + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reform Frequency Score</div>'
+      + '<div style="font-size:18px;font-weight:800;color:var(--muted);">n/a</div>'
+      + '<div style="font-size:10px;color:var(--muted);">not sourced</div></div>'
+      + (fp != null
+          ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability Score</div>'
+            + '<div style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
+            + '<div style="font-size:10px;color:var(--muted);">computed from this country&rsquo;s own contracts</div></div>'
+          : '')
+      + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
+      + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
+      + '</div>'
+      + '<div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:12px;">'
+      + '<strong>What you can defend instead:</strong> the <strong>Fiscal Predictability Score</strong> exists for all ' + totalN + ' countries and is derived from this country&rsquo;s own contract set — '
+      + 'within-country take spread (IQR), take movement between $50 and $125/bbl, and number of fiscal mechanics in force. It measures how consistent the terms are, not how often the law changed. '
+      + 'For reform exposure specifically, an uncovered jurisdiction needs an external check (national petroleum law, IMF Article IV, operator annual reports) before it goes in front of an IC.'
+      + '</div>'
+      + cpBtn
+      + '</div>';
+    return;
+  }
+
+  // ── Case 2: covered. Give the score, the rank, the direction split and the IC action. ──
+  var since2010 = events.filter(function(e){ return (e.year || 0) >= 2010; }).length;
+  var score = Math.max(0, 100 - since2010 * 15);
+  var tightened = 0, liberalized = 0, neutral = 0;
+  events.forEach(function(e) {
+    if (e.take_change && e.take_change.charAt(0) === '+') tightened++;
+    else if (e.take_change && e.take_change.charAt(0) === '-') liberalized++;
+    else neutral++;
+  });
+  var scored = Object.keys(rh)
+    .filter(function(k){ return Array.isArray(rh[k]) && rh[k].length; })
+    .map(function(k) {
+      var n = rh[k].filter(function(e){ return (e.year || 0) >= 2010; }).length;
+      return { country: k, score: Math.max(0, 100 - n * 15) };
+    })
+    .sort(function(a,b){ return b.score - a.score; });
+  var rank = 0;
+  for (var i = 0; i < scored.length; i++) { if (scored[i].country === c) { rank = i + 1; break; } }
+  var scoreColor = score > 70 ? 'var(--green)' : score > 40 ? 'var(--yellow)' : 'var(--red)';
+  var latest = events.slice().sort(function(a,b){ return (b.year||0) - (a.year||0); })[0];
+
+  // The tab's own IC rule, applied to this country instead of left as a general note.
+  var icRule, icColor;
+  if (score <= 20)      { icRule = 'Add a <strong>5–8pp WACC premium</strong> and present a probability-weighted NPV scenario alongside the base case.'; icColor = 'var(--red)'; }
+  else if (score <= 40) { icRule = 'Add a <strong>3–5pp WACC premium</strong> to the base-case discount rate.'; icColor = 'var(--orange)'; }
+  else                  { icRule = 'No reform-frequency premium indicated by this signal. Reform history alone does not clear the jurisdiction — check predictability and evidence tier as well.'; icColor = 'var(--green)'; }
+
+  var tiltWord = tightened > liberalized ? 'net-tightening against the contractor'
+               : liberalized > tightened ? 'net-liberalizing toward the contractor'
+               : 'balanced';
+  var tiltColor = tightened > liberalized ? 'var(--red)' : liberalized > tightened ? 'var(--green)' : 'var(--muted)';
+
+  out.innerHTML =
+    '<div style="border:1px solid var(--border);border-left:3px solid ' + scoreColor + ';border-radius:8px;padding:14px 16px;background:var(--surface);">'
+    + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">' + esc + ' — reform exposure</div>'
+    + '<div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:12px;">'
+    + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reform Frequency Score</div>'
+    + '<div style="font-size:18px;font-weight:800;color:' + scoreColor + ';">' + score + '<span style="font-size:11px;color:var(--muted);font-weight:700;">/100</span></div>'
+    + '<div style="font-size:10px;color:var(--muted);">rank ' + rank + ' of ' + scored.length + ' scoreable</div></div>'
+    + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reforms since 2010</div>'
+    + '<div style="font-size:18px;font-weight:800;color:' + (since2010 > 2 ? 'var(--red)' : since2010 > 0 ? 'var(--orange)' : 'var(--green)') + ';">' + since2010 + '</div>'
+    + '<div style="font-size:10px;color:var(--muted);">' + events.length + ' on record since ' + (events.reduce(function(m,e){ return Math.min(m, e.year || 9999); }, 9999)) + '</div></div>'
+    + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Direction</div>'
+    + '<div style="font-size:14px;font-weight:800;"><span style="color:var(--red);">&uarr;' + tightened + '</span> <span style="color:var(--muted);font-size:11px;">/</span> <span style="color:var(--green);">&darr;' + liberalized + '</span> <span style="color:var(--muted);font-size:11px;">/</span> <span style="color:var(--muted);">&rarr;' + neutral + '</span></div>'
+    + '<div style="font-size:10px;color:' + tiltColor + ';font-weight:700;">' + tiltWord + '</div></div>'
+    + (fp != null
+        ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability</div>'
+          + '<div style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
+          + '<div style="font-size:10px;color:var(--muted);">separate signal — term consistency</div></div>'
+        : '')
+    + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
+    + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
+    + '</div>'
+    + (latest
+        ? '<div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:10px;"><strong>Most recent change (' + _rrEsc(latest.year) + '):</strong> ' + _rrEsc(latest.event)
+          + (latest.take_change ? ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;color:' + (String(latest.take_change).charAt(0) === '+' ? 'var(--red)' : 'var(--green)') + ';">' + _rrEsc(latest.take_change) + ' take</span>' : '')
+          + '</div>'
+        : '')
+    + '<div style="font-size:12px;color:var(--text);line-height:1.7;padding:8px 12px;background:var(--surface2);border-left:3px solid ' + icColor + ';border-radius:4px;margin-bottom:12px;">'
+    + '<strong style="color:' + icColor + ';">IC action:</strong> ' + icRule
+    + '</div>'
+    + cpBtn
+    + '</div>';
+}
+window.renderReformCountryVerdict = renderReformCountryVerdict;
+
 function renderReformRisk() {
   const container = document.getElementById('reform-risk-content');
   if (!container) return;
+
+  // v502: fill the per-country picker as soon as COUNTRY_DATA + REFORM_HISTORY exist.
+  // It lives in static DOM outside #reform-risk-content, so a re-render never clears
+  // a selection the analyst has already made.
+  try { _rrPopulateLookup(); } catch (e) {}
 
   const rh = REFORM_HISTORY || {};
   const countries = Object.keys(rh);
@@ -27507,7 +27712,7 @@ function renderReformRisk() {
   var tiltLabel = totalTightened > totalLiberalized ? '<span style="color:var(--negative);font-weight:700;">net-tightening</span>' : totalTightened < totalLiberalized ? '<span style="color:var(--green);font-weight:700;">net-liberalizing</span>' : '<span style="color:var(--muted);font-weight:700;">balanced</span>';
   var summaryBar = '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.22);border-radius:8px;padding:12px 18px;margin-bottom:18px;font-size:12px;color:var(--text);line-height:1.7;">'
     + '<strong style="font-size:13px;">Reform Risk Snapshot:</strong> '
-    + '<strong>' + countries.length + '</strong> countries in the reform database — <strong>' + activeReformers + '</strong> had 2+ fiscal law changes since 2010, of which <strong>' + highFreq + '</strong> had 4+. '
+    + '<strong>' + countries.length + '</strong> of <strong>' + ((COUNTRY_DATA || []).length || 185) + '</strong> jurisdictions carry a sourced reform history — the rankings below are drawn from those ' + countries.length + ' only. Of them, <strong>' + activeReformers + '</strong> had 2+ fiscal law changes since 2010, and <strong>' + highFreq + '</strong> had 4+. '
     + 'Direction across <strong>' + totalEvents + '</strong> total events: '
     + '<span style="color:var(--negative);font-weight:600;">' + totalTightened + ' tightened</span> / '
     + '<span style="color:var(--green);font-weight:600;">' + totalLiberalized + ' liberalized</span> / '

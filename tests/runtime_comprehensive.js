@@ -520,12 +520,19 @@ async function testComparison(page) {
     if (npvCanvas) p(S, 'NPV chart canvas', 'NPV chart canvas exists');
     else w(S, 'NPV chart canvas', 'NPV chart canvas not found');
 
-    // Attempt 5th country (should be blocked)
+    // v501: capacity is 5 (CMP_MAX), matching the tab tooltip, the basket and "Load Top 5".
+    // 5th country must be ACCEPTED; the 6th must be refused.
     await page.evaluate(() => addCompare('USA'));
     await page.waitForTimeout(200);
+    const listLen5 = await page.evaluate(() => compareList.length);
+    if (listLen5 === 5) p(S, '5th country accepted', `compareList length ${listLen5} (CMP_MAX=5)`);
+    else f(S, '5th country accepted', `compareList has ${listLen5} entries (should be 5)`);
+
+    await page.evaluate(() => addCompare('Brazil'));
+    await page.waitForTimeout(200);
     const listLen = await page.evaluate(() => compareList.length);
-    if (listLen <= 4) p(S, 'max 4 limit', `compareList length ${listLen} (max enforced)`);
-    else f(S, 'max 4 limit', `compareList has ${listLen} entries (should max at 4)`);
+    if (listLen <= 5) p(S, 'max 5 limit', `compareList length ${listLen} (max enforced)`);
+    else f(S, 'max 5 limit', `compareList has ${listLen} entries (should max at 5)`);
 
     // Remove one
     await page.evaluate(() => removeCompare('Norway'));
