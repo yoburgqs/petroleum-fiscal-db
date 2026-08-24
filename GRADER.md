@@ -10721,3 +10721,16 @@ nothing for 46 cycles.
 v505 → v506 across the 4 structural locations (meta description, title, header badge, SbS
 citation source line) plus the XLSX version fallback; changelog entry prepended. Grade
 tables not touched.
+
+---
+## Cycle 405 Log — 2026-08-24 14:53
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All markers live on the deployed site. Cycle complete.
+
+## Cycle 405 — v506
+
+**Task: T2** — "Is this country attractive at $75/bbl, and can I defend that?"
+
+**Friction.** Cold walk into Fiscal Compare on the landing defaults (Deepwater, $75), then a row click. The drawer header reads **Iraq 27.1%** — and the tier badge, its colour, and the global rank are all computed from it. Eight pixels below, in a table whose column is headed **`$75/bbl`**, the same country reads **84.8%**. 57.7pp apart, at 
