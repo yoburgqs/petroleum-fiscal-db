@@ -11040,3 +11040,18 @@ they are simply no longer mistaken for the analyst's own selection.
 
 **Bookkeeping (not the improvement).** v508 → v509 across 5 version locations; changelog
 entry prepended. Grade tables not touched.
+
+---
+## Cycle 408 Log — 2026-08-24 17:39
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 408 complete and pushed (v509). Mirror in sync, working tree clean apart from loop-owned state files.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (407 was T4, 406 T1, 405 T2, 404 T6)
+
+## Friction
+Walked Side-by-Side cold — fresh browser context, no sessionStorage or localStorage.
+
+Since v430 the tab auto-seeds the North Sea Trio (Norway, UK, Netherlands) as a worked example. But it seeded them through three ordinary `addCompare()` calls, so the demo became indist
