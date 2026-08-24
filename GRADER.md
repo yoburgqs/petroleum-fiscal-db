@@ -10927,3 +10927,18 @@ section for the first time; three of them appeared in neither card before.
 **Bookkeeping (not the improvement).** v507 → v508 across the 5 version locations
 (meta description, title, header badge, SbS citation source line, XLSX fallback);
 changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 407 Log — 2026-08-24 16:48
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 407 complete and pushed (v508).
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (406 was T1, 405 T2, 404 T6)
+
+## Friction
+Cold load → **Reform Risk** tab → the stable/volatile card pair in `renderReformRisk()`. Two defects that compounded into a number an analyst would be embarrassed to put in front of an IC:
+
+1. The Reform Frequency Score is `100 − 15 × (events dated ≥ 2010)`. A jurisdiction whose last rupture was an expropriation in 2007 therefore scored identic
