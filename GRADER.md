@@ -11055,3 +11055,108 @@ entry prepended. Grade tables not touched.
 Walked Side-by-Side cold — fresh browser context, no sessionStorage or localStorage.
 
 Since v430 the tab auto-seeds the North Sea Trio (Norway, UK, Netherlands) as a worked example. But it seeded them through three ordinary `addCompare()` calls, so the demo became indist
+
+---
+## Cycle 409 Log — 2026-08-24 23:20
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo."
+(408 was T3, 407 T4, 406 T1, 405 T2, 404 T6.)
+
+## Friction
+Walked every clipboard affordance cold — fresh browser context, no sessionStorage,
+no localStorage — and read what actually landed on the clipboard against a sentinel value.
+
+**1 — The FC drilldown ⎘ IC Citation pasted the one number the platform forbids citing.**
+The FC IC Analyst Guide's step 3 sends the analyst here by name: *"click ⎘ IC Citation to
+copy a ready-to-paste IC memo cite string."* The button emitted `r.liveTake` / `liveNPV` /
+`liveIRR` — the compare engine's single hypothetical project, usually on **generic mechanic
+default terms** — as a bare "Govt Take X%" with no basis label. Two inches above it in the
+same drawer, the v506 reconciliation block and the "Copy 4-price as IC table" TSV both say,
+in the platform's own words: *"Cite the database figure; do not quote both as one number."*
+
+```
+Copy 4-price as IC table  →  $75   54.1%   (Govt Take%, database)
+                             Compare model … generic Concession default terms
+                             — directional only, not citable   22.2%
+                             NOTE: … Cite the database figure.
+⎘ IC Citation             →  "Guyana: Govt Take 22.2%, NPV $4257M, IRR 138.4% …"
+```
+
+**31.9pp adrift**, and 67 of 185 countries differ by >10pp. The single sentence most likely
+to reach an investment committee carried the figure the tool itself labels not citable.
+
+**2 — Country Profile's two IC buttons had never worked, on any country, ever.**
+`copyICCitation()` (v374) and `copyICSummary()` (v425) — including the button literally
+labelled **Copy for IC Memo** — both guard on `window.COUNTRY_DATA`. `COUNTRY_DATA` is
+declared `let` at script top level, which does **not** create a window property, so that
+read was permanently `undefined`:
+
+```
+sel.value              → "Norway"        (a country IS loaded)
+COUNTRY_DATA.length    → 185             (data IS present)
+window.COUNTRY_DATA    → undefined       ← the guard reads this
+click Copy for IC Memo → clipboard unchanged ("SENTINEL")
+toast                  → "No country loaded — open a Country Profile first."
+```
+
+Nothing reached the clipboard and the failure message was false, so a second attempt pasted
+whatever was on the clipboard from before — in the walk, another country's numbers.
+
+The same dead read silently disabled two more shipped features: the Explorer **Has IRR** /
+**Has Breakeven** chips counted `(window.COUNTRY_DATA||[])` and always read **(0)**, and
+`getRegion()`'s authoritative COUNTRY_DATA lookup never ran.
+
+## Change
+- **FC drilldown citation rebuilt on the database basis.** Built at render time from
+  `_pricePoints[_selIdx]` — take, NPV, IRR, breakeven at the *selected* price, with the
+  contract count — one basis per sentence. The model figure follows on its own line,
+  explicitly `Model cross-check (not citable)`, with the signed gap and its
+  CONSISTENT / modest difference / MATERIAL difference severity. A missing database take
+  says so instead of silently substituting the model; state monopolies get a
+  not-comparable note.
+- **`window.COUNTRY_DATA` mirrored** at its single assignment point, and both CP guards
+  rewritten to read the real binding and to distinguish "data still loading" from
+  "no country selected".
+- **Regression guarded.** `getRegion()`'s consumer is the Explorer region chip row, whose
+  `data-value`s are the *coarse* taxonomy (Africa / Middle East / Asia Pacific / Americas /
+  Europe / Other); `COUNTRY_DATA.region` uses a finer one (Latin America, North America,
+  Asia, Oceania, CIS/FSU). Waking that branch as-was would have returned chip values no chip
+  carries, so `if(regionEl)regionEl.click()` would have found nothing and the "peers in
+  region" button would have started silently doing nothing. A normalisation map coerces DB
+  regions into the chip vocabulary; `Other`/`Unknown` deliberately fall through to the
+  hardcoded lists, which classify the 17 misfiled DB entries (Cote d'Ivoire, Republic of the
+  Congo, Ireland, Iraq-Kurdistan, UAE — Abu Dhabi) better than the DB does.
+- **Stale versions.** Three clipboard citations hard-coded `v500` while the platform was on
+  v509 — nine versions stale in every pasted cite. All now read the header badge via
+  `_orcaVerNow()`.
+
+## Result
+An analyst can click ⎘ IC Citation and paste a sentence whose take, NPV and IRR agree with
+Country Profile, the API and the XLSX `GovtTake_<price>` column, with the divergent model
+figure quarantined in its own labelled sentence — instead of putting a number 31.9pp off
+the database in front of an investment committee. And the Country Profile button named
+**Copy for IC Memo** copies an IC memo, for the first time since it shipped.
+
+## Verification
+Four cold Playwright walks against the patched local build, clipboard pre-set to a sentinel:
+
+| Path | Before | After |
+|---|---|---|
+| CP "Copy for IC Memo" (Norway) | clipboard unchanged; false "No country loaded" toast | full Norway paragraph, 4 prices, swing, NPV, IRR, stability |
+| CP "⎘ IC Citation" | clipboard unchanged | `Norway: Govt Take 68.0% @$75/bbl …` |
+| FC drilldown "⎘ IC Citation" (Guyana) | `Govt Take 22.2%` (model, not citable) | `Govt Take 54.1% … (ORCA contract-database average, n=143 contracts)` + labelled model cross-check line |
+| Explorer Has IRR / Has Breakeven chips | `(0)` / `(0)` | `(118)` / `(65)` |
+| `getRegion()` across all 185 countries | branch dead | 185/185 return a valid chip value, 0 unmatched |
+
+0 JS errors on every walk. JS syntax gate **PASS** (9 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle** against the local build:
+**136 PASS / 0 FAIL / 1 WARN**. The WARN is a pre-existing local-harness artifact — the
+service worker registers `/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath, which 404s
+on a root-served local server; it was present in the cold walk *before* any edit and is
+correct in production, so it was left alone.
+
+Nothing on the STILL LOCKED list was touched.
+
+**Bookkeeping (not the improvement).** v509 → v510 across 5 version locations; changelog
+entry prepended. Grade tables not touched.
