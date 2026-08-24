@@ -10688,15 +10688,33 @@ nothing for 46 cycles.
   185 rows, parsed from the archive: `Take% (model, selected price)` = 27.11 and
   `GovtTake_75 (database)` = 84.8 for Iraq with `Model_vs_DB_pp` = -57.7; Kuwait and Saudi
   Arabia correctly blank.
-- **Full `runtime_comprehensive.js` did NOT complete locally.** It emitted 35 checks —
-  Load, Fiscal Compare incl. all six sort paths, DCF — with **0 FAIL, 0 WARN, 0 JS errors**,
-  then hung in the ScenarioBuilder section, exactly as cycle 404 reported.
-  **This cycle established it is pre-existing and not a regression**: the unmodified
-  committed v505 `index.html`, served from a control directory symlinked to the same data
-  files, hangs at the identical point. Root cause is now visible — `#sb-mechanic` renders
-  **0×0** in headless Chromium at the suite's viewport, so Playwright's `selectOption`
-  never finds it actionable. That is a harness/headless-layout problem in a section this
-  cycle does not touch. The 35 checks that did run cover every surface this cycle changed.
+- **The full runtime suite did NOT complete this cycle, and no 136-check total is being
+  quoted for v506.** Reporting this in full, because the standing "136 PASS" number turns
+  out to be less well understood than the cycle logs imply:
+  - **There are two divergent copies of the suite**, 250 diff lines apart.
+    `petroleum-fiscal-db/tests/runtime_comprehensive.js` is NOT the one that produces the
+    reported number; `autonomous_cycle.py:25` runs
+    **`office/tools/petroleum/tests/runtime_comprehensive.js`**. That is the authoritative
+    copy. Cycle 404's `CMP_MAX` fix should be checked against both.
+  - The repo copy ran to **35 checks — 0 FAIL, 0 WARN, 0 JS errors** — then hung in
+    ScenarioBuilder, where `#sb-mechanic` renders **0×0** in headless Chromium so
+    Playwright's `selectOption` never finds it actionable.
+  - The authoritative office copy hung earlier still, at **15 checks**, immediately after
+    the six FC sort paths — at the `input[name="price"][value="50"]` price-toggle step —
+    and hung there **both against a local server and against the deployed GitHub Pages
+    URL**, well past the sum of Playwright's 30s action timeouts.
+  - **This is not a regression from this cycle.** Control run: the unmodified committed
+    v505 `index.html`, served from a directory symlinked to the same data files and driven
+    by the same authoritative suite, **hangs at the identical 15-check point**. The 15 and
+    35 checks that did run include the Fiscal Compare render and all six sort paths, i.e.
+    the surfaces this cycle changed, all passing with 0 JS errors.
+  - The loop harness itself wrote a completed `136 PASS / 0 FAIL / 0 WARN / 0 JS errors`
+    report to `office/data/runtime_test_report.txt` at 14:29 local, ~17 minutes before this
+    cycle began. So the suite does complete under the loop's own invocation but did not
+    complete under any of the four invocations attempted this cycle. **Why it is
+    intermittent is unknown and is the strongest candidate for the next cycle** — the
+    verification signal every cycle depends on is currently unreliable, which matters more
+    than any single UX finding.
 - No item on the STILL LOCKED list was touched.
 
 ## Bookkeeping (not the improvement)
