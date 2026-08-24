@@ -10221,3 +10221,16 @@ had no representation anywhere in the UI.
 
 v501 → v502 across the 3 structural locations (title, meta description, header badge);
 changelog entry added. Grade tables not touched.
+
+---
+## Cycle 400 Log — 2026-08-24 10:26
+- Test before: 135 PASS / 1 FAIL
+- Test after: 135 PASS / 1 FAIL
+- JS errors: 0
+- Summary: Cycle complete — pushed as `ce359ac`.
+
+## Cycle 401 — v502
+
+**Task: T4 — "What is my fiscal-stability and reform exposure here?"** (recent cycles were T3, T1, T1, T6, T6.)
+
+**Friction.** I cleared sessionStorage and localStorage, reloaded, and clicked the tab literally named **Reform Risk** with one country in mind. The tab does not accept a country. Every block `renderReformRisk()` builds is a global aggregate — top-15 most-reformed table, top-20 decade heatmap, 8 stable / 8 volatile, regional 
