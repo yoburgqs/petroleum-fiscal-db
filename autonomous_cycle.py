@@ -102,7 +102,13 @@ def run_playwright():
     if stale_report:
         REPORT_FILE.unlink()
 
-    out = run(f"node {TEST_FILE}", cwd=REPO, timeout=300, env=env)
+    # 900s, not 300s. The suite takes ~4-5 minutes to complete 136 checks, so a
+    # 300s ceiling sits ON the boundary: it finishes some runs and is killed
+    # mid-run on others. That is the whole "suite stalled at 38 checks" symptom
+    # in cycles 404/405 - the suite was not stalling, it was being killed.
+    # Measured 2026-08-24: a clean run of the office copy completed 136 PASS in
+    # just under 5 minutes.
+    out = run(f"node {TEST_FILE}", cwd=REPO, timeout=900, env=env)
     timed_out = out.startswith("TIMEOUT") or out.startswith("ERROR:")
 
     pass_count = fail_count = warn_count = js_errors = 0
