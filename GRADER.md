@@ -10010,3 +10010,83 @@ tables not touched.
 **Friction.** I cleared sessionStorage and localStorage, reloaded, and walked into the Screener through both doors an analyst can use. It never showed the universe it claims to screen, for two separate reasons that land on the same moment.
 
 Clicking **Screener** in the nav auto-applied the *Sweet Spot* preset. That code (v428) exists t
+
+## Cycle 400 — v501
+
+**Task:** T3 — "How do these three countries compare side by side?"
+
+**Friction.** I cleared sessionStorage and localStorage, reloaded, and walked the
+comparison flow the way an analyst reaches it: Fiscal Compare → run on the default sort →
+the hint bar's **"⇌ Load Top 5 in Side-by-Side"** button. It does not load five.
+
+`addCompare()` (`index.html:23154`) opened with
+
+    if (compareList.includes(country) || compareList.length >= 4) return;
+
+a **silent no-op**. Side-by-Side's capacity was 4. Three separate entry points hand it 5:
+
+  1. the Fiscal Compare hint bar, whose button is *labelled* "Load Top 5 in Side-by-Side"
+     and whose tooltip reads "Load the top 5 countries (by current sort)";
+  2. the floating Screener **basket**, whose own capacity is 5 (the test suite asserts
+     "max 5 enforced"), routed through `launchCompare()` → `parseAndNavigate()`;
+  3. a shared `#/compare/…` link, same route.
+
+Read straight off the live button, its onclick was
+`clearCompare(); addCompare('Guyana'); addCompare('Sierra Leone'); addCompare('Sri Lanka');
+addCompare('Chad'); addCompare('Ireland');`. The fifth call was thrown away. The analyst
+arrived on Side-by-Side with **four** columns and a badge reading **"4/4 countries (max)"**.
+**Ireland** — the fifth-ranked country in the sort they had just chosen — was simply not
+there, and nothing on screen said it had been dropped or which country it was. To find out,
+they would have to go back to Fiscal Compare and count rows.
+
+This is not a new regression. The v65 changelog documents the mismatch as understood and
+accepted at the time: *"it adds to Side-by-Side tab (max 4), not the floating basket used by
+Screener (max 5)"*. The gap has been shipping ever since, and the Load-Top-5 button added in
+v229 walked straight into it.
+
+Two smaller defects sat underneath, both reachable only once a fifth country exists:
+
+  - The Contractor-NPV bar chart built its datasets with `backgroundColor: colors[i] + '88'`
+    — **no modulo**, against a 4-entry `colors` array. A fifth series would have rendered
+    with the literal string `"undefined88"`.
+  - The `≤768px` and `≤600px` media rules forced
+    `grid-template-columns: … repeat(4, 1fr) !important` / `repeat(2, 1fr) !important`
+    regardless of how many countries were actually loaded. Because `.cmp-row` is
+    `display: contents`, any count other than the hard-coded one pushes every subsequent row
+    into the wrong track — already wrong today at 2 or 3 countries on a tablet width.
+
+**Change (on screen / in behavior).**
+
+1. Capacity is **5** (`CMP_MAX`), matching the tab tooltip, the empty state, the basket, and
+   the button label. Ireland now renders as a fifth column.
+2. `addCompare()` returns a boolean and **announces every refusal by toast, naming the
+   country** — both "comparison is full" and "already in the comparison". The silent no-op
+   is gone.
+3. Fifth series colour `#1D4ED8` added, and the NPV chart now indexes
+   `colors[i % colors.length]`.
+4. The Screener door is aligned with the Fiscal Compare door: "Load top 4" → **"Load top 5"**,
+   and it calls `clearCompare()` first, so it delivers the analyst's shortlist instead of
+   silently merging into whatever was already loaded. (Fiscal Compare has done this since
+   v455, for exactly this reason.)
+5. The responsive grid reads a `--cmp-n` custom property set on the grid element, so it is
+   as wide as the number of countries loaded at every breakpoint.
+6. The count badge reads "N/5 countries — room for M more" and, when full,
+   "5/5 countries (full) — remove one to add another" rather than the flat "4/4 (max)".
+
+**Result.** From any of the three doors — Fiscal Compare's Load Top 5, the Screener basket,
+or a shared comparison link — the analyst gets **all five countries they asked for**. The
+fifth column carries its own colour in both the take-vs-price line chart and the NPV bar
+chart. When the grid is genuinely full, the sixth add **says so and names the country**
+instead of doing nothing, so the analyst knows to remove one rather than assuming the click
+missed.
+
+**Verification.** JS syntax gate **PASS** (`node --check` over 9 inline script blocks, 0
+errors). Playwright `tests/runtime_comprehensive.js` **did run this cycle** against a local
+server at `http://localhost:8099`: **136 PASS / 0 FAIL / 0 WARN**, 0 JS errors — no WARN this
+cycle. All three entry doors were re-walked cold after the change and each confirmed to
+deliver a 5-column grid; the 6th-add toast and the 768px grid track count were verified in
+the same run.
+
+**Bookkeeping (not the improvement).** Version sweep v500→v501 across the 3 structural
+locations (title, meta description, header badge); changelog entry added. Grade tables not
+touched.
