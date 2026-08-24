@@ -10449,3 +10449,16 @@ guess — and the assumption panel they would cite alongside it was wrong in all
 **Bookkeeping (not the improvement).** v503 → v504 across the 4 structural locations (meta
 description, title, header badge, SbS citation source line); changelog entry prepended. Grade
 tables not touched.
+
+---
+## Cycle 403 Log — 2026-08-24 12:53
+- Test before: 135 PASS / 1 FAIL
+- Test after: 135 PASS / 1 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed.
+
+## Cycle 403 — v504
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest; last six cycles were T5, T4, T3, T1, T1, T6)
+
+**Friction.** Walked cold in a scripted browser with sessionStorage and localStorage cleared, Country Profile → Nigeria. The headline reads **81.1% govt take @$75**. Scroll down and the Live DCF Model panel renders a 20px result card reading **Govt Take 47.3%**. Same country, same price, same page, 33.8pp apart
