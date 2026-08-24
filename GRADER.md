@@ -10842,3 +10842,88 @@ not touched.
 **Task: T1** — "Which countries should even be on my screening list?" (last three cycles were T2, T6, T2)
 
 **Friction.** I cleared storage, hard-reloaded, and clicked Screener the way a first-time analyst would. It opens unfiltered on all 185 countries and ranks them by modelled NPV, numbered 1 to 185. But NPV on the standardized $1.2B deepwater profile is a near-mo
+
+---
+## Cycle 407 Log — 2026-08-24
+- Test before: 136 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (local server; the WARN is the pre-existing
+  `sw.js` 404 that only occurs when serving off the GitHub-Pages-absolute path — the
+  same run against the deployed URL is the documented 136 PASS / 0 FAIL baseline)
+- JS syntax gate: PASS — 9 blocks / 0 errors (re-run after version bump + changelog)
+- Playwright: RAN this cycle, cold (sessionStorage + localStorage cleared, hard reload)
+
+## Cycle 407 — v508
+
+**Task: T4** — "What is my fiscal-stability and reform exposure here?"
+(prior cycles: 406 = T1, 405 = T2, 404 = T6, 403 = T2)
+
+**Friction.** Cold load → **Reform Risk** tab → Section 3, the stable/volatile card
+pair rendered by `renderReformRisk()` (index.html, "Section 3: Stable vs Volatile").
+Two defects that compound into a number an analyst would be embarrassed to quote:
+
+1. `stable = withScore.filter(r => r.score >= 85).slice(0,8)`. The Reform Frequency
+   Score is `100 − 15 × (events dated ≥ 2010)`, so a jurisdiction whose last rupture
+   was an expropriation in 2007 scores identically to one that has never touched its
+   terms. The card was captioned *"Most Stable Regimes — 0–1 reform events since 2010.
+   Predictable fiscal environment for long-term IOC projects."* It printed:
+   **Kazakhstan, Venezuela, Ecuador, Algeria, Colombia, Canada, Russia, USA.**
+   Venezuela carries three take-raising events in `reform_history.json` — 1975 PDVSA
+   nationalization (+30pp), 2001 Hydrocarbons Law (+10pp), 2007 Orinoco forced
+   conversion (+15pp, the one that sent ExxonMobil and ConocoPhillips to arbitration)
+   — every one of them outside the window. Kazakhstan was clean because the 2007
+   Kashagan renegotiation (+8pp) predates 2010; Algeria because the 2005 windfall
+   levy (+10pp) does.
+
+2. `volatileList = withScore.filter(r => r.score < 30)` — but the card's own caption
+   said *"3+ reform events since 2010."* `score < 30` is 5+, not 3+. The card rendered
+   exactly one row (United Kingdom), while **Brazil, Australia and Guyana** — three
+   law changes each since 2010, the actual live reform stories — landed in neither
+   card and were invisible in the section.
+
+   Both cards also inherited `withScore`'s sort by *total lifetime events*, so the
+   "most stable" list was ordered most-reformed-first.
+
+**Change.**
+- Volatile filter now matches its own caption: `since2010 >= 3`, sorted by count
+  desc. Card retitled **"Actively Reforming (4)"** and each row names the specific
+  years terms were rewritten — UK `2011, 2016, 2022, 2023, 2024`; Brazil `2010, 2016,
+  2021`; Australia `2012, 2019, 2023`; Guyana `2015, 2020, 2022`.
+- Left card retitled **"Quiet Since 2010 (9)"** — what the filter actually measures.
+  The caption no longer claims predictability; it says explicitly this is legislative
+  activity, not a safety judgement.
+- New `_rrLastHostile(r)` derives each country's most recent take-raising event, its
+  count of pre-window rises and their cumulative pp. Every row in the quiet card now
+  carries that inline.
+- The six countries whose last take rise falls **before** the window are demoted below
+  a labelled red divider: *"Below the line — quiet only because the window starts in
+  2010 … do not read the score as a stable-regime finding for these."* Venezuela's row
+  reads `last take rise 2007 · Orinoco heavy oil nationalized — IOC forced conversion
+  · +15pp · 3 pre-2010 rises, +55pp cumulative`. Genuinely quiet rows (Ecuador, Russia,
+  India) lead; artefact rows sort most-recent-rupture-first.
+- Both card headers carry their own count, so the 9-vs-4 asymmetry is on screen rather
+  than implied by a symmetric two-column layout.
+- Rows remain click-through to Country Profile (verified).
+
+**Result.** An analyst asking "what is my reform exposure here?" can no longer read
+Venezuela, Kazakhstan or Algeria out of a green card labelled *predictable fiscal
+environment for long-term IOC projects*. Each of those names now carries the year,
+event and magnitude of the rupture that the scoring window excludes, sitting under an
+explicit warning that the clean score is an artefact. And the four countries actually
+rewriting fiscal terms right now — UK, Brazil, Australia, Guyana — are visible in this
+section for the first time; three of them appeared in neither card before.
+
+**Verification.**
+- Cold Playwright walk against the patched local build: both card bodies dumped and
+  read in full, divider present, demotion ordering correct, Venezuela row click →
+  Country Profile on `#t7` with `dd-country-select` set to Venezuela, and the v502
+  per-country lookup still correct (Guyana: score 55, rank 20 of 21). **0 JS errors.**
+- JS syntax gate **PASS** — 9 blocks / 0 errors, re-run after the version bump and
+  changelog insertion.
+- `office/tools/petroleum/tests/runtime_comprehensive.js` ran to completion against a
+  local server: **135 PASS / 0 FAIL / 1 WARN**. The WARN and the single captured JS
+  error are the same known `sw.js` 404. Cycle 405's reported hang did not reproduce.
+- Nothing on the STILL LOCKED list was touched.
+
+**Bookkeeping (not the improvement).** v507 → v508 across the 5 version locations
+(meta description, title, header badge, SbS citation source line, XLSX fallback);
+changelog entry prepended. Grade tables not touched.

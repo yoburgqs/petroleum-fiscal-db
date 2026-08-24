@@ -90,10 +90,36 @@ def run_playwright():
     import os as _os
     env = _os.environ.copy()
     env["NODE_PATH"] = str(REPO / "node_modules")
-    run(f"node {TEST_FILE}", cwd=REPO, timeout=300, env=env)
-    # Read from the report file (test writes here in structured format)
+
+    # Delete the report BEFORE running. Without this, a suite that stalls and
+    # hits the 300s timeout leaves the PREVIOUS run's report in place, and the
+    # parser below happily reports those stale numbers as the current result.
+    # That is how cycles 404 and 405 emailed "136 PASS / 0 FAIL" while the
+    # grader log recorded "38 checks, suite stalled and did not complete".
+    # A validation gate that reports the last good run when the current one
+    # fails is not a gate.
+    stale_report = REPORT_FILE.exists()
+    if stale_report:
+        REPORT_FILE.unlink()
+
+    out = run(f"node {TEST_FILE}", cwd=REPO, timeout=300, env=env)
+    timed_out = out.startswith("TIMEOUT") or out.startswith("ERROR:")
+
     pass_count = fail_count = warn_count = js_errors = 0
     raw = ""
+
+    if timed_out:
+        log(f"  *** TEST RUN DID NOT COMPLETE: {out[:80]} ***")
+        log("      Reporting 0 PASS rather than a stale total. The cycle should")
+        log("      not claim a suite result it did not obtain.")
+        return {"pass": 0, "fail": 0, "warn": 0, "js_errors": 0,
+                "raw": out[-2000:], "incomplete": True}
+
+    if not REPORT_FILE.exists():
+        log("  *** NO REPORT FILE WRITTEN — suite did not finish ***")
+        return {"pass": 0, "fail": 0, "warn": 0, "js_errors": 0,
+                "raw": out[-2000:], "incomplete": True}
+
     try:
         raw = REPORT_FILE.read_text(encoding="utf-8", errors="replace")
         m = re.search(r"PASS:\s*(\d+)", raw)
