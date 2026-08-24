@@ -10462,3 +10462,116 @@ tables not touched.
 **Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest; last six cycles were T5, T4, T3, T1, T1, T6)
 
 **Friction.** Walked cold in a scripted browser with sessionStorage and localStorage cleared, Country Profile → Nigeria. The headline reads **81.1% govt take @$75**. Scroll down and the Live DCF Model panel renders a 20px result card reading **Govt Take 47.3%**. Same country, same price, same page, 33.8pp apart
+
+## Cycle 404 — v505
+
+**Task: T6** — "Where did this number come from and how solid is the evidence?" (stalest: last six cycles were T2, T5, T4, T3, T1, T1)
+
+**Friction.** Walked cold in a scripted browser with `sessionStorage` and `localStorage` cleared:
+Home → **Fiscal Compare** → Run Compare on the landing defaults (Deepwater, $75/bbl), which is the
+default sort every first-time analyst lands on.
+
+Row 1 was **Guyana — Take% @$75 = 22.2%**, drawn with a green "investible tier" left border, rank
+**#1**, and — in the column headed **Quality** — a green **A** badge whose tooltip read
+*"Source quality: 93% A/B-tier."* Every signal on that row said the same thing: the lowest
+government take on earth, backed by primary legislation. An analyst screening for entry
+opportunities puts Guyana at the top of the list and moves on.
+
+None of that was true.
+
+`getDCFParams()` (index.html:28511) holds hard-coded fiscal terms for exactly **9** countries and
+enriches **22** more from `COUNTRY_DATA` (PSC-family only). The remaining **154** fall straight
+through to `defaults[mechanic]` — and for Concession that is a flat *10% royalty / 25% CIT / no
+resource-rent tax / no state equity*. **153 countries therefore compute to the byte-identical take
+of 22.2228%**, and `renderFCResults()` numbered them **#1 through #153** in an order decided by a
+swing tie-breaker. Guyana was not the most investor-friendly regime in the world — it was first in
+an arbitrary 153-way tie of a placeholder.
+
+The Quality column made it materially worse. `ab_pct` measures the evidence tier of the fiscal facts
+held *in the database*; it says nothing about whether the number in that row used them. Of the 153
+tied rows, **143 displayed a green A and 9 a B** — the platform was crediting primary-legislation
+sourcing to a figure that had touched none of those facts. Measured across the table: median gap
+between the Fiscal Compare take and the database take_75 is **5.4pp**, but **67 countries exceed
+10pp and 49 exceed 20pp**; the worst is **77.8pp**.
+
+The same claim was repeated one click deeper. `openFCDrilldown('Guyana')` opened on **"#1 of 185"**
+and **"Src 93% A/B"**, above a "Copy 4-price as IC table" button — and the 4-price table beneath it
+reads from `COUNTRY_DATA` (39.9 / **54.1** / 61.7 / 65.9%), so the drawer showed 22.2% in its header
+and 54.1% at the same $75 in its table, with nothing saying why.
+
+**Change.**
+1. `getDCFParams()` now returns `_basis` — `country` (hard override) / `db` (read from
+   `COUNTRY_DATA`) / `default` (generic mechanic fallback) — and `runFiscalCompare()` carries it
+   onto every result as `termsBasis`. New `describeDefaultTerms(mechanic)` renders the actual
+   fallback terms in words.
+2. **The Quality column now describes the row it is on.** Default-terms rows no longer show an
+   A/B/C evidence tier. They show a grey dashed **G**, deliberately off the A–D colour ramp, whose
+   tooltip names the exact default terms used, states that the country's A/B facts were *not* used
+   in this figure, and marks it directional-only and not citable. Rows modelled on their own terms
+   keep the A/B/C badge and gain a line saying which basis was used.
+3. **The rank column stopped inventing separation.** True competition ranking: tied rows share a
+   rank and render as **=1**, not 1, 2, 3…153. Grouping is by exact value across the whole result
+   set rather than by contiguous run — necessary because the take comparator treats anything within
+   0.05pp as tied and re-orders it by swing, which had sorted USA (22.2623%) into the middle of the
+   22.2228% block and would have truncated a contiguous scan at 106.
+4. **Green "top 10" colouring is suppressed inside a tie group larger than 10**, because a top-10
+   drawn from a 153-way tie is arbitrary. Bottom-10 red is untouched — Norway / Algeria / Libya
+   still flag red.
+5. A **table footnote**, in the established v468 coverage-note style, states the count in words:
+   *153 of 185 countries are tied at 22.2% … modelled on the standard Concession default (10%
+   royalty, 25% CIT, no resource-rent tax, no state equity) … their order relative to each other is
+   arbitrary and is not a ranking … the 31 countries modelled on their own terms are the ones this
+   table actually separates.*
+6. **The drilldown drawer** now reads **"=1 of 185"** (tooltip: tied with 152 others, position does
+   not separate them) and opens with a generic-terms notice that names the default terms, flags the
+   figure as directional only, and warns that the 4-price table below is the database figure and
+   does not reconcile to it.
+
+**Result.** An analyst landing cold on Fiscal Compare can no longer mistake a placeholder for a
+finding. Guyana at "#1, 22.2%, Quality A" now reads "=1, 22.2%, Quality G", with the row itself,
+the footnote and the drawer all saying that ORCA holds no country-specific terms for it, what
+generic terms were substituted, and that the figure is not citable. The analyst can see at a glance
+which **31** countries this table genuinely separates and which **153** it does not — and can spend
+the 20 minutes before the screening meeting on the 31, instead of building a shortlist out of the
+top of a tie. The evidence badge now answers the question the analyst is actually asking — "how
+solid is *this number*" — rather than the unrelated question of how well-sourced the database is.
+
+**Also fixed on the same walk (not the improvement).**
+- The standing **1 FAIL** was a stale test, not a product defect: `runtime_comprehensive.js`
+  asserted `compareList` maxes at 4, but `CMP_MAX` was deliberately raised 4→5 in cycle 400. The
+  assertion now reads `CMP_MAX` off the page and pushes 3 extra countries to prove the cap holds.
+- The Fiscal Compare `+Compare` button tooltip still said "max 4 countries"; it now interpolates
+  `CMP_MAX`.
+
+**Known, not fixed this cycle (next candidate).** The FC drawer header take (`liveTake`) and the
+drawer's own 4-price table (`COUNTRY_DATA.take_*`) are two different figures for the same country at
+the same price — Guyana 22.2% vs 54.1%, Iraq 27.1% vs 84.8% (57.7pp). v505 warns about this in the
+drawer for default-terms countries; it does not reconcile the two. That is the same class of defect
+cycle 403 fixed on Country Profile, and it should be the next T2 cycle.
+
+**Bookkeeping (not the improvement).** v504 → v505 across the 4 structural locations (meta
+description, title, header badge, SbS citation source line); changelog entry prepended. Grade tables
+not touched.
+
+**Verification.**
+- **JS syntax gate: 9/9 inline script blocks PASS, 0 errors** (`node --check`), re-run after every
+  edit including the final export/methodology changes.
+- **Targeted Playwright verification of every changed surface, run this cycle** against the patched
+  local build, cold each time (`sessionStorage` + `localStorage` cleared, hard reload):
+  - FC table: 185 rows, 154 `G` badges, 157 shared-rank cells, footnote text asserted verbatim,
+    green top-10 borders correctly 0, bottom-10 red borders correctly 10 (Norway / Algeria / Libya).
+  - All six sort paths re-rendered (`take`, `npv`, `irr`, `breakeven`, `swing`, `country`) —
+    185 rows each, **0 JS errors**.
+  - Drawer: Guyana `=1 of 185` + generic-terms notice; Iraq `=155 of 185` (genuinely tied with
+    Iran); Norway `#183 of 185` unshared and unchanged.
+  - XLSX export invoked for real — download fired
+    (`ORCA_fiscal_compare_$75_deepwater_2026-08-24.xlsx`), tie-aware Rank, `Tied_With`,
+    `Terms_Basis` and the `n/a — generic terms` evidence cell all correct, **0 JS errors**.
+- **Full `runtime_comprehensive.js` suite: STARTED this cycle against the patched local build
+  (`TEST_URL=http://localhost:8899/index.html`) and was still running at cycle close — 36 checks
+  emitted, 0 FAIL, 0 WARN, 0 JS errors at that point. It did NOT reach its summary line inside the
+  cycle window, so there is no full 136-check total for v505. Stating that plainly rather than
+  quoting a baseline.**
+- Note on the incoming "135 PASS / 1 FAIL": the suite defaults to `TEST_URL=`
+  `https://yoburgqs.github.io/petroleum-fiscal-db/`, i.e. the deployed site, not the working tree.
+  The single FAIL was the stale `max 4 limit` assertion described above — a test defect, now fixed.

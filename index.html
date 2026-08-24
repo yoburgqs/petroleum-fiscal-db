@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v504.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v505.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v504</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v505</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -816,6 +816,9 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 .tier-badge.tier-b { background: rgba(21,128,61,0.68); color: #fff; } /* B-confidence: mid-green, between A and C — on-palette rgba of var(--green) */
 .tier-badge.tier-c { background: var(--yellow); color: #fff; }
 .tier-badge.tier-d { background: var(--orange); color: #fff; }
+/* v505 — tier-gen: generic default terms. Grey, hollow, deliberately OFF the A-D quality
+   ramp: this row's take is not a graded-evidence number at all, so it must not read as one. */
+.tier-badge.tier-gen { background: transparent; color: var(--muted); border: 1px dashed var(--muted); line-height: 12px; }
 .dq-warning-banner {
   display: flex;
   align-items: flex-start;
@@ -1343,7 +1346,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v504</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v505</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2534,6 +2537,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong style="color:var(--accent);">v505 (Aug 2026) &mdash; Cycle 404: Fiscal Compare stopped ranking 153 countries it cannot actually tell apart</strong> &mdash; Task T6 &mdash; &ldquo;where did this number come from and how solid is the evidence?&rdquo; Walked cold (cleared sessionStorage + localStorage) into Fiscal Compare on the default sort. Row 1 was <strong>Guyana, 22.2% take @$75</strong>, drawn with a green &ldquo;investible tier&rdquo; border, and the column headed <strong>Quality</strong> showed a green <strong>A</strong> whose tooltip read &ldquo;93% A/B-tier&rdquo;. Every signal on that row said: lowest government take on earth, backed by primary legislation. None of it was true. <code>getDCFParams()</code> carries hard fiscal terms for exactly <strong>9</strong> countries and enriches <strong>22</strong> more from <code>COUNTRY_DATA</code>; the remaining <strong>154</strong> fall through to <code>defaults[mechanic]</code> &mdash; for Concession that is a flat 10% royalty / 25% CIT / no resource-rent tax / no state equity. <strong>153 countries therefore compute to the identical take of 22.2228%</strong> and were numbered <strong>#1 through #153</strong> in an order decided by a swing tie-breaker. Guyana was not the most investor-friendly regime in the world; it was alphabetically-ish first in a 153-way tie of a placeholder. The Quality badge made it worse: <code>ab_pct</code> measures the evidence tier of the fiscal facts <em>in the database</em>, and <strong>143 of those 153 tied rows displayed a green A</strong> &mdash; credentialing a number that had used none of those facts. (1) <code>getDCFParams()</code> now returns <code>_basis</code> (<code>country</code> / <code>db</code> / <code>default</code>) and <code>runFiscalCompare()</code> carries it onto every result as <code>termsBasis</code>. (2) <strong>The Quality column tells the truth about the row it is on.</strong> Default-terms rows no longer show an A/B/C evidence tier; they show a grey dashed <strong>G</strong>, deliberately off the A&ndash;D colour ramp, whose tooltip names the exact default terms used, states that the country&rsquo;s A/B facts were <em>not</em> used, and says the figure is directional only and not citable. (3) <strong>The rank column stopped inventing separation.</strong> True competition ranks: tied rows share a rank and render as <strong>=1</strong> rather than 1, 2, 3&hellip;153. Grouping is by exact value across the whole result set, not by contiguous run &mdash; the take comparator treats anything within 0.05pp as tied and re-orders it by swing, which had sorted USA (22.2623%) into the middle of the 22.2228% block. (4) <strong>Green &ldquo;top 10&rdquo; colouring is suppressed inside a tie group larger than 10</strong>, because a top-10 drawn from a 153-way tie is arbitrary. Bottom-10 red is untouched (Norway / Algeria / Libya still flag). (5) A table footnote, in the same style as the v468 coverage notes, states the count in words: 153 of 185 tied at 22.2%, modelled on the standard Concession default, order among them arbitrary and not a ranking, and the 31 countries modelled on their own terms are the ones the table actually separates. (6) The drilldown drawer carried the same lie one click deeper &mdash; &ldquo;#1 of 185&rdquo; and &ldquo;Src 93% A/B&rdquo;. It now reads <strong>=1 of 185</strong> and opens with a generic-terms notice naming the default terms, flagging the figure as directional, and warning that the 4-price table below is the database figure and does not reconcile to it. Also fixed on the same walk: the runtime suite&rsquo;s <code>max 4 limit</code> assertion still hard-coded 4 after <code>CMP_MAX</code> was raised to 5 in cycle 400 &mdash; it now reads <code>CMP_MAX</code> off the page (this was the standing 1 FAIL, a stale test rather than a product defect), and the <code>+Compare</code> button tooltip still said &ldquo;max 4 countries&rdquo;. Playwright ran this cycle. Version v504&rarr;v505.<br><br>
                         <strong style="color:var(--accent);">v504 (Aug 2026) &mdash; Cycle 403: the Country Profile stopped showing two different government-take numbers for the same country</strong> &mdash; Task T2 &mdash; &ldquo;is this country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold on Nigeria. The headline reads <strong>81.1% govt take @$75</strong>. Scrolling down, the <em>Live DCF Model</em> panel renders a 20px result card reading <strong>Govt Take 47.3%</strong> &mdash; same country, same $75/bbl, same page, <strong>33.8pp apart</strong>, at equal visual weight. Indonesia was 59.5% vs 22.2% (<strong>37.3pp</strong>); Iraq 84.8% vs 37.6% (<strong>47.2pp</strong>). The only reconciliation was one line of 11px grey text stating the arithmetic &mdash; <code>DB avg @$75: 81.1% | Live DCF @$75: 47.3% | Delta: -33.8pp</code> &mdash; which names the contradiction without resolving it. An analyst screening Indonesia and reporting &ldquo;22% government take&rdquo; to an IC would be wrong by 37pp against Fiscal Compare, the API and the XLSX export. Compounding it, <code>renderLiveDCFPanel()</code> labelled the panel from <code>d.mechanics[0]</code> while <code>runLiveDCF()</code> resolved the mechanic through <code>FC_MECHANIC_OVERRIDE</code> and <code>params._mechanic</code> &mdash; so Angola rendered &ldquo;(Concession regime)&rdquo; while the engine ran <strong>PSC</strong>, and the analyst could not tell what had been modelled. (1) New <code>resolveLiveDCFMechanic()</code> mirrors the engine&rsquo;s resolution, and <code>_execLiveDCF()</code> now rewrites the header from <code>result.mechanic</code> after every run, so the label can never drift from what executed &mdash; Angola now reads PSC, Australia PRRT, Iran Buy-back. (2) A scope line under the panel title states in words that this is a what-if on <strong>one</strong> hypothetical project, not the country&rsquo;s headline; the three result cards are relabelled &ldquo;&mdash; this scenario&rdquo;. (3) The grey delta line is replaced by a <strong>reconciliation block</strong>: two side-by-side cards (&ldquo;&#10004; Cite this&rdquo; carrying the contract average and where it is used, vs the scenario result and how to label it), a severity-coloured verdict &mdash; consistent &lt;3pp / modest &lt;10pp / material &ge;10pp, the last stating explicitly that the two figures must not share a sentence &mdash; and a collapsible <em>Why the two differ</em> list whose reasons are read off the data, never asserted: price, project profile (with both capex/opex sets named), regime mix, R-factor tiers, and contract-negotiated vs country-default statutory terms. Nigeria surfaces 3 reasons, Iraq 4, and 5 once the price slider and profile selector are moved. (4) Separate correctness fix on the same walk: the <em>Cost Profile Assumptions</em> panel &mdash; the panel an analyst opens to write their IC assumption footnote &mdash; hardcoded <strong>$2.0B capex / $12 opex / plateau years 6&ndash;15</strong> plus a fabricated Russia variant, while <code>DCF_PROFILES.deepwater</code>, the actual basis of every precomputed take, NPV, IRR and breakeven in <code>COUNTRY_DATA</code>, is <strong>$1.2B / $15/bbl / ramp 3yr + plateau 8yr</strong>. All three lines were wrong. The panel is now derived from <code>DCF_PROFILES.deepwater</code> at render time and the invented Russia branch is deleted, so it cannot drift again. Verified in a cold browser (cleared sessionStorage + localStorage) across 9 countries and live through the price slider and profile selector. Tests: JS syntax gate 9/9 PASS. Version v503&rarr;v504.<br><br>
                         <strong style="color:var(--accent);">v503 (Aug 2026) &mdash; Cycle 402: the Side-by-Side comparison can now leave the page as a table</strong> &mdash; Task T5 &mdash; &ldquo;give me something I can paste straight into an IC memo.&rdquo; An analyst who has built the exact shortlist they care about in Side-by-Side had no way to get it into a document as data. The four actions under the grid were <em>Save as PDF</em>, <em>Chart PNG</em>, <em>Share Link</em> and <em>Rank all 185</em> &mdash; a print artifact, an image of one chart, and a URL. Falling back to selecting the grid by hand does not work either: <code>.compare-grid</code> is a CSS <code>display:grid</code> of <code>&lt;div&gt;</code>s, so a drag-copy of a 5-country comparison flattens into <strong>129 lines of a single vertical column</strong> &mdash; every country name, region and metric value in one stream with no attribution, so &ldquo;62 &middot; MODERATE&rdquo; cannot be traced back to a country. Meanwhile a correctly structured <code>&lt;table id="cmp-data-table"&gt;</code> mirroring the grid exactly (20 rows &times; N columns) already sat in the DOM at <code>display:none</code> with <code>aria-hidden="true"</code> &mdash; built for Playwright and screen readers, unreachable by the user. The remaining path was retyping numbers into the memo by hand, which is where IC memo errors come from. (1) New <strong>&#x2398; Copy Table for IC Memo</strong> button, first in the action row and accent-filled because it is the primary exit from this tab. (2) <code>copyComparisonTable()</code> writes <strong>two clipboard flavours</strong> via <code>ClipboardItem</code>: <code>text/html</code> &mdash; a real bordered <code>&lt;table&gt;</code> in Calibri that Word, Google Docs, Outlook and PowerPoint render as a formatted table &mdash; and <code>text/plain</code> TSV, which Excel splits into columns. Falls back to <code>writeText(tsv)</code> where <code>ClipboardItem</code> is unavailable. (3) The copied block is memo-ready, not just data: a caption naming the countries, the standing assumption line (Deepwater profile, 10% WACC, 100% WI, NPV/IRR/breakeven @ $75/bbl, take shown $50&ndash;$125), and the ORCA source line. (4) Help glyphs and footnote markers (&#9432;, &#9670;, hair spaces) are stripped so pasted headers read as plain column names. (5) Guarded: the button only renders at 2+ countries, and a direct call below that returns a toast rather than an empty table. (6) The four Side-by-Side action buttons are now <code>display:none</code> in <code>@media print</code>, so <em>Save as PDF</em> stops printing a row of buttons into the PDF. Verified in a cold browser (cleared sessionStorage + localStorage): rich-HTML paste probe returns a 20&times;3 <code>&lt;table&gt;</code> with correct headers; TSV is uniformly 4 columns across all 20 rows for a 3-country comparison. Tests: JS syntax gate 9/9 PASS / 136 PASS / 0 FAIL / 0 JS errors. Version v502&rarr;v503.<br><br>
                         <strong style="color:var(--accent);">v502 (Aug 2026) &mdash; Cycle 401: Reform Risk now answers the single-country question</strong> &mdash; The Reform Risk tab is named for &ldquo;what is my reform exposure <em>here</em>&rdquo;, but every block on it was a global aggregate &mdash; top-15 most-reformed table, top-20 decade heatmap, 8 stable / 8 volatile lists. There was no control that took a country as input, so an analyst arriving with one jurisdiction in mind had no way to ask about it. Added a <strong>per-country lookup</strong> covering all 185 countries, split into two optgroups so the coverage boundary is visible before selection: <em>Sourced reform history &mdash; scoreable (21)</em> and <em>No sourced reform history &mdash; predictability only (164)</em>. Selecting a covered country renders its Reform Frequency Score with rank among the 21 scoreable, reforms since 2010, hostile/friendly/neutral direction split with net tilt, Fiscal Predictability Score alongside it, take @ $75, the most recent reform event, and the tab&rsquo;s own IC rule <em>applied to that country</em> (&ldquo;add a 3&ndash;5pp WACC premium&rdquo;) rather than left as a general note. Selecting one of the 164 uncovered countries states plainly that there is <strong>no score</strong> &mdash; not a score of 100 &mdash; because the formula 100 &minus; 15&times;(reforms since 2010) computes to a clean 100 for a jurisdiction that was simply never sourced, which is indistinguishable from a genuine zero-reform record. It then gives the Fiscal Predictability Score, which is derived from that country&rsquo;s own contract set and exists for all 185. The Reform Risk Snapshot headline now reads &ldquo;21 of 185 jurisdictions carry a sourced reform history &mdash; the rankings below are drawn from those 21 only&rdquo;, so the denominator is legible from the first line. Both verdict cards drill through to the Country Profile. Test suite: the stale <code>max 4 limit</code> assertion (superseded by the v501 capacity change) was corrected to assert a 5th country is accepted and a 6th refused. Tests: JS syntax gate 9/9 PASS / 137 PASS / 0 FAIL / 0 WARN / 0 JS errors.<br><br>
@@ -28129,7 +28133,7 @@ function copyComparisonTable(btn) {
   var countries = matrix[0].slice(1);
   var caption = 'ORCA fiscal comparison — ' + countries.join(' / ');
   var assump = 'Standardized Deepwater profile, 10% WACC, 100% WI. NPV / IRR / Breakeven at $75/bbl; government take shown at $50–$125/bbl.';
-  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v504 — yoburgqs.github.io/petroleum-fiscal-db/';
+  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), v505 — yoburgqs.github.io/petroleum-fiscal-db/';
 
   // --- plain-text / TSV flavour (Excel-friendly) ---
   var tsv = caption + '\n' + assump + '\n\n'
@@ -28537,21 +28541,44 @@ function getDCFParams(country, mechanic) {
   const base = { ...(defaults[mechanic] || defaults.Concession) };
   let params = { ...base, ...(countryOverrides[country] || {}) };
 
+  // v505: record WHERE these terms came from, so the UI can stop presenting a
+  // generic default as if it were this country's own fiscal regime.
+  //   'country' — hard-coded country override above (9 countries)
+  //   'db'      — at least one term read from COUNTRY_DATA for this country
+  //   'default' — nothing country-specific; pure defaults[mechanic]
+  let _basis = countryOverrides[country] ? 'country' : 'default';
+
   // For PSC mechanic: enrich from COUNTRY_DATA when DB fields are available
   // This makes the live DCF consistent with the underlying database averages
   if ((mechanic === 'PSC' || mechanic === 'EPSA' || mechanic === 'Gross Split' || mechanic === 'Revenue Share') && !countryOverrides[country]) {
     const cd = COUNTRY_DATA && COUNTRY_DATA.find(x => x.country === country);
     if (cd) {
-      if (cd.ftp != null)          params.ftp_rate           = cd.ftp / 100;
-      if (cd.cr_cap != null)       params.cost_recovery_cap  = cd.cr_cap / 100;
-      if (cd.profit_oil_govt != null) params.profit_oil_govt_pct = cd.profit_oil_govt / 100;
-      if (cd.royalty != null)      params.royalty_rate       = cd.royalty / 100;
+      if (cd.ftp != null)          { params.ftp_rate           = cd.ftp / 100;             _basis = 'db'; }
+      if (cd.cr_cap != null)       { params.cost_recovery_cap  = cd.cr_cap / 100;          _basis = 'db'; }
+      if (cd.profit_oil_govt != null) { params.profit_oil_govt_pct = cd.profit_oil_govt / 100; _basis = 'db'; }
+      if (cd.royalty != null)      { params.royalty_rate       = cd.royalty / 100;         _basis = 'db'; }
       // R-factor tier schedule — enables sliding-scale profit oil in live DCF (populated post-rebuild)
-      if (cd.tier_schedule && cd.tier_schedule.length > 0) params.tier_schedule = cd.tier_schedule;
+      if (cd.tier_schedule && cd.tier_schedule.length > 0) { params.tier_schedule = cd.tier_schedule; _basis = 'db'; }
     }
   }
 
+  params._basis = _basis;
   return params;
+}
+
+// v505: human-readable description of the generic default terms a mechanic falls back to.
+// Used by the Fiscal Compare Quality column so "where did this number come from" has an answer.
+function describeDefaultTerms(mechanic) {
+  switch (mechanic) {
+    case 'PSC': case 'EPSA': case 'Revenue Share':
+      return '60% cost-recovery cap, 10% FTP, 60% govt profit oil, 25% CIT';
+    case 'Gross Split':   return '7% royalty, 22% CIT, 10% state equity';
+    case 'TSC':           return '$4.00/bbl service fee, 35% CIT';
+    case 'RSC':           return '$2.50/bbl service fee, 20% EPT, 25% CIT';
+    case 'PRRT':          return '40% PRRT, 30% CIT, no royalty';
+    case 'Buy-back': case 'Buyback': return '80% state equity, 25% CIT';
+    default:              return '10% royalty, 25% CIT, no resource-rent tax, no state equity';
+  }
 }
 
 // v504: resolve the mechanic the Live DCF engine will ACTUALLY run.
@@ -30013,6 +30040,8 @@ function runFiscalCompare() {
       }
       return {
         country: c.country, region: c.region, n: c.n, mechanic: mechanic,
+        // v505: 'country' | 'db' | 'default' — whether this row's take used this country's own terms
+        termsBasis: params._basis || 'default',
         mechanics: c.mechanics, liveTake: res.take, liveNPV: res.npv, liveIRR: res.irr,
         swing: c.swing, take_50: c.take_50, take_75: c.take_75, take_100: c.take_100, take_125: c.take_125,
         be_75: c.be_75, waterfall: res.waterfall, has_r_factor_tiers: c.has_r_factor_tiers,
@@ -30309,7 +30338,7 @@ function renderFCResults(results, price) {
   var priceTag = price ? ' <span style="font-size:9px;color:var(--muted);font-weight:400;">@$' + price + '</span>' : '';
   html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as % of gross revenue — royalties + taxes + profit oil (all instruments)">Take%' + priceTag + '</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="Contractor net present value ($M) at selected price and profile. Discounted at 10% WACC, 100% working interest basis — scale by WI% for your stake. Positive = project viable at this price.">NPV ($M)' + priceTag + '</th><th class="num" ' + (sortField==='irr'?'aria-sort="descending"':'') + ' title="Contractor IRR at selected price — pre-tax, unlevered, 100% WI basis. IRR \u2265500% excluded as unbounded (e.g. very-low-royalty regimes at high price); shown for countries with verified opex/capex. — indicates unbounded or insufficient cost data.">IRR%' + priceTag + '</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + ' title="Breakeven oil price ($/bbl): minimum price for project NPV \u2265 0 under this regime. Coverage: 68 of 185 countries. — indicates incomplete cost data; use Take + Swing as proxy for uncovered countries.">BE ($/bbl)</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price Swing (pp): Govt Take at $125/bbl minus Take at $50/bbl. &#10;&#10;Interpretation: &lt;10pp = royalty-dominant, predictable at any price (green). 10\u201320pp = moderate price sensitivity (amber). &gt;20pp = progressive/PSC regime, govt captures most upside above $75 (red). &#10;&#10;IC use: high-swing regimes require a price-range sensitivity analysis \u2014 contractor IRR at $50/bbl degrades less than headline take implies because PSC cost recovery accelerates. Low-swing regimes are suitable for projects depending on certainty of returns across price cycles.">Swing (pp) \u24d8</th>';
-  html += '<th class="num" title="Data quality: % of fiscal facts from A/B-tier sources (primary legislation or verified secondary). A = primary law; B = verified secondary; C = directional/estimated. Low scores require additional verification before IC submission.">Quality</th>';
+  html += '<th class="num" title="Where THIS row\'s take came from. A = modelled from this country\'s own terms, \u226580% of its fiscal facts primary-sourced; B = own terms, \u226560% primary; C = own terms, \u226540% primary; D = own terms, weakly sourced. G = GENERIC: no country-specific terms in the compare engine, so the take is the standard default for its mechanic \u2014 directional only, not citable. Hover any badge for the detail.">Quality</th>';
   if (showStability) {
     html += '<th class="num" title="Fiscal stability score since 2010. 5 dots = zero regime changes (most stable). 0 dots = 5+ changes (most volatile). Scored as: 5 minus number of reform events in ORCA database from 2010 onward. Covers legislated tax rate changes, new levies, and PSC renegotiations — not operational or political events.">Stability \u24d8</th>';
   }
@@ -30338,6 +30367,52 @@ function renderFCResults(results, price) {
   // v468: Price Swing threshold dividers — low (<10pp) / moderate (10–20pp) / progressive (>20pp) when sorted by swing
   var _swing10DividerInserted = false;
   var _swing20DividerInserted = false;
+  // ── v505: tie detection ──────────────────────────────────────────────────────
+  // 153 of 185 countries have no country-specific fiscal terms in ORCA, so their
+  // take is computed from the generic mechanic default and they all land on the
+  // SAME number. Numbering them #1…#153 presented an arbitrary order as a
+  // ranking. Compute true competition ranks so tied rows share a rank.
+  var _tieVal = function(r) {
+    if (sortField === 'country') return null;
+    if (sortField === 'npv')     return r.liveNPV == null ? null : r.liveNPV;
+    if (sortField === 'irr')     return (r.liveIRR == null || r.liveIRR >= 500) ? null : r.liveIRR;
+    if (sortField === 'breakeven') return r.be_75 == null ? null : Number(r.be_75);
+    if (sortField === 'swing')   return r.swing == null ? null : Number(r.swing);
+    return r.liveTake == null ? null : r.liveTake;
+  };
+  // Group by exact value across the whole result set rather than by contiguous run: the
+  // take comparator treats anything within 0.05pp as tied and orders it by swing, so a
+  // genuinely distinct value (USA, 22.2623) can sort INSIDE the block of identical ones.
+  var _rankOf = new Array(sorted.length);
+  var _tieSizeOf = new Array(sorted.length);
+  var _valFirstIdx = {}, _valCount = {}, _valAllDefault = {}, _valMech = {};
+  sorted.forEach(function(r, i) {
+    var v = _tieVal(r); if (v === null) return;
+    var k = v.toFixed(6);
+    if (_valFirstIdx[k] === undefined) { _valFirstIdx[k] = i; _valAllDefault[k] = true; _valMech[k] = r.mechanic; }
+    _valCount[k] = (_valCount[k] || 0) + 1;
+    if (r.termsBasis !== 'default') _valAllDefault[k] = false;
+  });
+  sorted.forEach(function(r, i) {
+    var v = _tieVal(r);
+    var k = (v === null) ? null : v.toFixed(6);
+    _rankOf[i]    = (k !== null) ? _valFirstIdx[k] + 1 : i + 1;
+    _tieSizeOf[i] = (k !== null) ? _valCount[k] : 1;
+  });
+  // Largest group of rows that share one value AND are all modelled on generic default
+  // terms — this is what the table footnote reports.
+  var _defaultTie = (function() {
+    var bestK = null;
+    for (var k in _valCount) {
+      if (!_valAllDefault[k]) continue;
+      if (_valCount[k] < 10) continue;
+      if (bestK === null || _valCount[k] > _valCount[bestK]) bestK = k;
+    }
+    if (bestK === null) return null;
+    var dp = (sortField === 'npv') ? 0 : 1;
+    return { size: _valCount[bestK], start: _valFirstIdx[bestK],
+             value: Number(bestK).toFixed(dp), mechanic: _valMech[bestK] };
+  })();
   sorted.forEach(function(r, i) {
     var tier = getTierInfo(r.liveTake);
     var swingCol = r.swing == null ? '' : r.swing < 10 ? 'var(--positive)' : r.swing < 20 ? 'var(--accent)' : 'var(--negative)';
@@ -30423,20 +30498,30 @@ function renderFCResults(results, price) {
     var _rankBorderStyle = '';
     // v492: extend rank tier-colors to IRR and NPV sorts — top-10 green, bottom-10 red for all primary numeric sorts
     var _rankSortIsNumeric = (sortField === 'take' || sortField === 'irr' || sortField === 'npv' || sortField === 'breakeven' || sortField === 'swing');
-    if (_rankSortIsNumeric) {
+    // v505: a "top 10" drawn from inside a 153-way tie is arbitrary — do not paint it green.
+    var _rowTieSize = _tieSizeOf[i] || 1;
+    var _rowRank = _rankOf[i] || (i + 1);
+    var _inBigTie = _rowTieSize > 10;
+    if (_rankSortIsNumeric && !_inBigTie) {
       if (i < 10) _rankBorderStyle = 'border-left:3px solid var(--green);';
       else if (i >= sorted.length - 10) _rankBorderStyle = 'border-left:3px solid var(--negative);';
     }
     html += '<tr onclick="openFCDrilldown(\'' + cEsc + '\')" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="' + r.country + ' fiscal compare result" data-country="' + r.country + '" style="' + _rankBorderStyle + '">';
     // v491: Tier-color the rank number — top 10 green, bottom 10 red when sorted by take (investible/avoid tiers instantly scannable)
     // v492: Extended to IRR, NPV, Breakeven, Swing sorts — consistent scan signal regardless of sort dimension
-    var _rankIsTop = _rankSortIsNumeric && i < 10;
-    var _rankIsBot = _rankSortIsNumeric && i >= sorted.length - 10;
+    var _rankIsTop = _rankSortIsNumeric && !_inBigTie && i < 10;
+    var _rankIsBot = _rankSortIsNumeric && !_inBigTie && i >= sorted.length - 10;
     var _rankNumColor = _rankIsTop ? 'var(--green)' : _rankIsBot ? 'var(--negative)' : 'var(--text-muted)';
     var _rankNumWeight = (_rankIsTop || _rankIsBot) ? '700' : '400';
     var _rankTitleTop = sortField==='take' ? 'Top '+(i+1)+': investible tier (green)' : sortField==='irr' ? 'Top '+(i+1)+': highest IRR (green)' : sortField==='npv' ? 'Top '+(i+1)+': highest NPV (green)' : sortField==='breakeven' ? 'Top '+(i+1)+': most resilient breakeven (green)' : sortField==='swing' ? 'Top '+(i+1)+': most stable swing (green)' : 'Rank #'+(i+1);
     var _rankTitleBot = sortField==='take' ? 'Bottom '+(sorted.length-i)+': very high take (red)' : sortField==='irr' ? 'Bottom '+(sorted.length-i)+': lowest IRR (red)' : sortField==='npv' ? 'Bottom '+(sorted.length-i)+': lowest NPV (red)' : sortField==='breakeven' ? 'Bottom '+(sorted.length-i)+': highest breakeven (red)' : sortField==='swing' ? 'Bottom '+(sorted.length-i)+': most progressive swing (red)' : 'Rank #'+(i+1);
-    html += '<td class="num" style="color:' + _rankNumColor + ';font-weight:' + _rankNumWeight + ';" title="' + (_rankIsTop ? _rankTitleTop : _rankIsBot ? _rankTitleBot : 'Rank #'+(i+1)+' by '+sortField) + '">' + (i+1) + '</td>';
+    // v505: tied rows share a rank and are shown as "=N"; the sequence 1,2,3… is
+    // only drawn where the values actually differ.
+    var _rankDisp = _rowTieSize > 1 ? '=' + _rowRank : String(_rowRank);
+    var _rankTieTitle = _rowTieSize > 1
+      ? 'Tied at rank #' + _rowRank + ' with ' + (_rowTieSize - 1) + ' other countr' + (_rowTieSize - 1 === 1 ? 'y' : 'ies') + ' on ' + sortField + '. Their order in this table is arbitrary \u2014 do not read it as a ranking.'
+      : 'Rank #' + _rowRank + ' by ' + sortField;
+    html += '<td class="num" style="color:' + _rankNumColor + ';font-weight:' + _rankNumWeight + ';" title="' + (_rankIsTop ? _rankTitleTop : _rankIsBot ? _rankTitleBot : _rankTieTitle) + '">' + _rankDisp + '</td>';
     var _fcProxyBadge = (r.prod_coverage_pct || 0) === 0 ? '<span class="dq-badge dq-proxy" style="margin-left:4px;vertical-align:middle;" title="PROXY: No block-level production data — take is modelled from statutory fiscal parameters using a standard 50 MBD greenfield profile. Results reflect the legal regime, not actual output from this country\'s fields.">PROXY</span>' : '';
     html += '<td><strong>' + r.country + '</strong> <span style="color:var(--text-muted);font-size:11px">' + r.region + '</span>' + _fcProxyBadge + '</td>';
     html += '<td>' + getMechTagHtml(r.mechanic) + '</td>';
@@ -30445,18 +30530,53 @@ function renderFCResults(results, price) {
     html += '<td class="num" ' + irrCellTitle + '>' + irrStr + '</td>';
     html += '<td class="num">' + beStr + '</td>';
     html += '<td class="num">' + (r.swing != null ? '<span style="color:' + swingCol + ';font-weight:600">' + (r.swing > 0 ? '+' : '') + r.swing.toFixed(1) + 'pp</span>' : '\u2014') + '</td>';
-    html += '<td class="num">' + getTierBadge(r.ab_pct || 0, 'Source quality: ' + (r.ab_pct||0).toFixed(0) + '% A/B-tier') + '</td>';
+    // v505: The Quality column used to show the country's A/B evidence tier on every row.
+    // For the 153 countries with no country-specific terms in ORCA, that take never
+    // touched those sourced facts — it came from the generic mechanic default. Showing a
+    // green "A" next to it told the analyst the number was primary-legislation backed
+    // when nothing about it was. Those rows now read GEN.
+    var _qualCell;
+    if (r.termsBasis === 'default') {
+      var _genTitle = 'GENERIC TERMS \u2014 ' + r.country + '\'s take of ' + (r.liveTake != null ? r.liveTake.toFixed(1) + '%' : '\u2014')
+        + ' was modelled from the standard ' + r.mechanic + ' default (' + describeDefaultTerms(r.mechanic)
+        + '), not from ' + r.country + '\'s own fiscal terms \u2014 ORCA holds no country-specific terms for it in the compare engine. '
+        + 'The database does hold ' + (r.ab_pct||0).toFixed(0) + '% A/B-tier fiscal facts for ' + r.country
+        + ', but this figure did not use them. Directional only: do not cite it in an IC memo. '
+        + 'Open Country Profile for the sourced statutory parameters.';
+      _qualCell = '<span class="tier-badge tier-gen" title="' + _genTitle + '">G</span>';
+    } else {
+      var _basisNote = r.termsBasis === 'country'
+        ? ' Take modelled from ' + r.country + '\'s own calibrated fiscal terms.'
+        : ' Take modelled from ' + r.country + '\'s terms as held in the ORCA contract database.';
+      _qualCell = getTierBadge(r.ab_pct || 0, 'Source quality: ' + (r.ab_pct||0).toFixed(0) + '% A/B-tier.' + _basisNote);
+    }
+    html += '<td class="num">' + _qualCell + '</td>';
     if (showStability) {
       var stab = stabilityScores[r.country] != null ? stabilityScores[r.country] : 5;
       html += '<td class="num">' + stabDots(stab) + '</td>';
     }
-    html += '<td class="num"><button onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Side-by-Side compare tab (max 4 countries). Tip: use the Screener ★ + basket for larger sets.">+Compare</button></td>';
+    html += '<td class="num"><button onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Side-by-Side compare tab (max ' + CMP_MAX + ' countries). Tip: use the Screener ★ + basket for larger sets.">+Compare</button></td>';
     html += '</tr>';
   });
   html += '</tbody>';
   // v468: Coverage footnote row — when sorted by IRR or breakeven, show partial-coverage note so analysts
   // understand why some countries are missing from the sort, without needing to read the tooltip
-  if (sortField === 'irr') {
+  // v505: when a large group of rows is tied on generic default terms, say so in the table
+  // itself. Previously the analyst saw #1..#153 in strict sequence with no indication that
+  // every one of those rows carried the identical number from the identical default regime.
+  if (_defaultTie) {
+    var _dtCols = showStability ? 12 : 11;
+    var _dtUnit = sortField === 'take' ? '%' : '';
+    var _dtField = { take: 'government take', npv: 'NPV', irr: 'IRR', breakeven: 'breakeven', swing: 'price swing' }[sortField] || sortField;
+    html += '<tfoot><tr><td colspan="' + _dtCols + '" style="padding:8px 10px;font-size:11px;color:var(--muted);border-top:2px solid var(--border);background:var(--surface2);line-height:1.55;">'
+      + '<strong style="color:var(--text);">' + _defaultTie.size + ' of ' + sorted.length + ' countries are tied at ' + _defaultTie.value + _dtUnit + ' on ' + _dtField + '</strong> (rows marked '
+      + '<span class="tier-badge tier-gen" style="cursor:default;">G</span> , shown as <strong>=' + (_defaultTie.start + 1) + '</strong>). '
+      + 'ORCA holds no country-specific fiscal terms for these in the compare engine, so each one is modelled on the standard '
+      + _defaultTie.mechanic + ' default (' + describeDefaultTerms(_defaultTie.mechanic) + '). '
+      + '<strong style="color:var(--text);">Their order relative to each other is arbitrary and is not a ranking.</strong> '
+      + 'Treat them as one undifferentiated group; the ' + sorted.filter(function(x){return x.termsBasis !== 'default';}).length + ' countries modelled on their own terms are the ones this table actually separates.'
+      + '</td></tr></tfoot>';
+  } else if (sortField === 'irr') {
     var _irrCovCols = showStability ? 12 : 11;
     html += '<tfoot><tr><td colspan="' + _irrCovCols + '" style="padding:6px 10px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);background:var(--surface2);text-align:center;">IRR data: 124 of 185 countries — 41 excluded as unbounded (IRR ≥500% at this price); 20 structurally non-computable. Use the <strong>IRR only</strong> filter above to hide non-IRR rows.</td></tr></tfoot>';
   } else if (sortField === 'breakeven') {
@@ -30619,7 +30739,18 @@ function openFCDrilldown(country) {
   let html = '<div class="fc-drawer open">';  // v99: "open" class for test detection and state tracking
   // M2.2: C-tier evidence warning banner
   const _ab_pct = d.ab_pct || 0;
-  if (_ab_pct < 60) {
+  // v505: generic-terms notice takes precedence over the C-tier notice. If the take in the
+  // header came from the mechanic default rather than this country's own terms, the evidence
+  // tier is irrelevant to it — saying "93% A/B sourced" here actively misleads.
+  if (r.termsBasis === 'default') {
+    html += '<div style="background:rgba(107,101,96,.10);border-left:3px solid var(--muted);padding:7px 10px;font-size:11px;border-radius:0 4px 4px 0;margin-bottom:8px;line-height:1.5;">'
+      + '<strong style="color:var(--text);">\u26a0 Generic terms \u2014 not ' + country + '\'s own regime.</strong> '
+      + 'The ' + (r.liveTake != null ? r.liveTake.toFixed(1) + '%' : '') + ' take, NPV and IRR above are modelled on the standard '
+      + r.mechanic + ' default (' + describeDefaultTerms(r.mechanic) + '). ORCA holds no country-specific fiscal terms for '
+      + country + ' in the compare engine, so this figure is <strong>directional only</strong> and the rank beside it is shared with '
+      + 'every other default-terms country. The 4-price table below is the database figure for ' + country
+      + ' and does not reconcile to it. Use Country Profile for sourced statutory parameters before any IC memo.</div>';
+  } else if (_ab_pct < 60) {
     html += '<div style="background:rgba(185,28,28,.07);border-left:3px solid var(--red);padding:6px 10px;font-size:11px;border-radius:0 4px 4px 0;margin-bottom:8px;">'
       + '<strong style="color:var(--red);">\u26a0 Source quality: C-tier</strong> ('
       + _ab_pct.toFixed(0) + '% A/B sourced). Verify parameters in Country Profile before IC memo.</div>';
@@ -30644,10 +30775,33 @@ function openFCDrilldown(country) {
     var ridx = window._fcFilteredResults.findIndex(function(x){return x.country===country;});
     if (ridx < 0) return '';
     var total = window._fcFilteredResults.length;
-    var rankNum = ridx + 1;
     var sortLabel = (window._fcSortState === 'irr') ? 'IRR' : (window._fcSortState === 'breakeven') ? 'BE' : (window._fcSortState === 'npv') ? 'NPV' : (window._fcSortState === 'swing') ? 'Swing' : 'Take';
-    var rCol = rankNum <= 10 ? 'var(--green)' : rankNum >= total - 9 ? 'var(--negative)' : 'var(--muted)';
-    return '<span style="font-size:11px;font-family:\'IBM Plex Mono\',monospace;color:' + rCol + ';font-weight:700;background:rgba(0,0,0,.04);border:1px solid var(--border);border-radius:4px;padding:1px 7px;white-space:nowrap;" title="Global rank by current sort (' + sortLabel + '): #' + rankNum + ' of ' + total + ' countries in this view. Green = top 10; Red = bottom 10.">#' + rankNum + ' of ' + total + '</span>';
+    // v505: share the rank with every country carrying the same value, exactly as the
+    // table now does. "#1 of 185" on a country tied with 152 others was the single most
+    // misleading string in the drawer.
+    var _rv = function(x) {
+      var f = window._fcSortState;
+      if (f === 'npv') return x.liveNPV; if (f === 'irr') return (x.liveIRR != null && x.liveIRR < 500) ? x.liveIRR : null;
+      if (f === 'breakeven') return x.be_75; if (f === 'swing') return x.swing;
+      if (f === 'country') return null; return x.liveTake;
+    };
+    var _myV = _rv(window._fcFilteredResults[ridx]);
+    var _tieN = 1, rankNum = ridx + 1;
+    if (_myV != null) {
+      var _mk = Number(_myV).toFixed(6), _first = -1, _cnt = 0;
+      window._fcFilteredResults.forEach(function(x, xi) {
+        var xv = _rv(x); if (xv == null) return;
+        if (Number(xv).toFixed(6) === _mk) { _cnt++; if (_first < 0) _first = xi; }
+      });
+      if (_cnt > 0) { rankNum = _first + 1; _tieN = _cnt; }
+    }
+    var _tied = _tieN > 1;
+    var rCol = _tied ? 'var(--muted)' : rankNum <= 10 ? 'var(--green)' : rankNum >= total - 9 ? 'var(--negative)' : 'var(--muted)';
+    var _rankTxt = (_tied ? '=' : '#') + rankNum + ' of ' + total;
+    var _rankTt = _tied
+      ? 'Tied at rank ' + rankNum + ' of ' + total + ' by ' + sortLabel + ' with ' + (_tieN - 1) + ' other countries \u2014 they all carry the same value, so this position does not separate them.'
+      : 'Global rank by current sort (' + sortLabel + '): #' + rankNum + ' of ' + total + ' countries in this view. Green = top 10; Red = bottom 10.';
+    return '<span style="font-size:11px;font-family:\'IBM Plex Mono\',monospace;color:' + rCol + ';font-weight:700;background:rgba(0,0,0,.04);border:1px solid var(--border);border-radius:4px;padding:1px 7px;white-space:nowrap;" title="' + _rankTt + '">' + _rankTxt + '</span>';
   })();
   // v459: Evidence tier badge in drawer header — visible in FC table but disappears when drawer opens.
   // An analyst needs to see A/B/C evidence quality before citing figures in an IC memo.
@@ -31481,17 +31635,36 @@ function exportFCResults() {
   const fcProfileEl = document.getElementById('fc-profile');
   const fcProfileKey = fcProfileEl ? fcProfileEl.value : 'deepwater';
   const profileObj = DCF_PROFILES[fcProfileKey] || DCF_PROFILES['deepwater'];
+  // v505: shared ranks for tied rows, and a Terms_Basis column — the export is where these
+  // numbers land in an IC workbook, so a false unique rank and an unqualified evidence % must
+  // not survive the trip to Excel. Mirrors the on-screen Quality/rank treatment.
+  const _xlVal = function(x) { return x.liveTake == null ? null : Number(x.liveTake).toFixed(6); };
+  const _xlFirst = {};
+  const _xlCount = {};
+  rows.forEach(function(x, xi) {
+    const k = _xlVal(x); if (k === null) return;
+    if (_xlFirst[k] === undefined) _xlFirst[k] = xi;
+    _xlCount[k] = (_xlCount[k] || 0) + 1;
+  });
   const data = [
-    ['Rank', 'Country', 'Region', 'Mechanic', 'R_factor_Tiers', 'Take%', 'GovtTake_50', 'GovtTake_75', 'GovtTake_100', 'GovtTake_125', 'Swing_pp', 'Govt NPV ($M est)', 'Contractor NPV ($M)', 'IRR%', 'Breakeven', 'Tier', 'Evidence A/B (%)'],
+    ['Rank', 'Tied_With', 'Country', 'Region', 'Mechanic', 'Terms_Basis', 'R_factor_Tiers', 'Take%', 'GovtTake_50', 'GovtTake_75', 'GovtTake_100', 'GovtTake_125', 'Swing_pp', 'Govt NPV ($M est)', 'Contractor NPV ($M)', 'IRR%', 'Breakeven', 'Tier', 'Evidence A/B (%)'],
     ...rows.map(function(r, i) {
       const tier = getTierInfo(r.liveTake);
       const take = r.liveTake, npv = r.liveNPV;
       const govtNpv = (npv != null && take != null && take > 0 && take < 100) ? +(npv * (take/100) / (1 - take/100)).toFixed(1) : null;
+      const _k = _xlVal(r);
+      const _rank = (_k !== null && _xlFirst[_k] !== undefined) ? _xlFirst[_k] + 1 : i + 1;
+      const _tiedWith = (_k !== null && _xlCount[_k] > 1) ? _xlCount[_k] - 1 : 0;
+      const _basis = r.termsBasis === 'country' ? 'Country-specific terms'
+                   : r.termsBasis === 'db'      ? 'ORCA contract database terms'
+                   : 'GENERIC DEFAULT (' + describeDefaultTerms(r.mechanic) + ') — directional only, not citable';
       return [
-        i + 1,
+        _rank,
+        _tiedWith,
         r.country,
         r.region || '',
         r.mechanic || '',
+        _basis,
         r.has_r_factor_tiers ? 'Yes' : 'No',
         take != null ? +take.toFixed(2) : null,
         r.take_50 != null ? +r.take_50.toFixed(1) : null,
@@ -31504,7 +31677,10 @@ function exportFCResults() {
         r.liveIRR != null && r.liveIRR < 500 ? +r.liveIRR.toFixed(1) : null,
         r.be_75 != null && r.be_75 > 0 && r.be_75 < 999 ? +r.be_75.toFixed(1) : null,
         tier.label,
-        r.ab_pct != null ? +r.ab_pct.toFixed(1) : null
+        // Evidence % describes the country's fiscal facts. On a generic-default row those
+        // facts were not used, so publishing a number here would be a false credential.
+        (r.termsBasis === 'default') ? 'n/a — generic terms'
+          : (r.ab_pct != null ? +r.ab_pct.toFixed(1) : null)
       ];
     })
   ];
@@ -31513,9 +31689,17 @@ function exportFCResults() {
   XLSX.utils.book_append_sheet(wb, ws, 'Fiscal Compare');
   // v329: M6.2 — Methodology sheet for IC memo traceability
   var projLifeYrs = (fcProfileKey === 'marginal') ? 15 : (fcProfileKey === 'lng') ? 30 : 25;
+  // v505: read the version off the header badge instead of hard-coding it — this sheet still
+  // said v410 while the platform was on v504, so every exported IC workbook carried a stale
+  // citation. Reading it from the DOM means it cannot drift again.
+  var _orcaVer = (function() {
+    var b = document.querySelector('header .badge, .badge');
+    var m = b && /v\d+/.exec(b.textContent || '');
+    return m ? m[0] : 'v505';
+  })();
   var methRows = [
     ['ORCA Petroleum Fiscal Intelligence Platform'],
-    ['Version: v410 | yoburgqs.github.io/petroleum-fiscal-db/'],
+    ['Version: ' + _orcaVer + ' | yoburgqs.github.io/petroleum-fiscal-db/'],
     [''],
     ['Profile assumptions:'],
     ['  Peak rate (bopd)', profileObj.peakBblDay],
@@ -31530,7 +31714,18 @@ function exportFCResults() {
     ['  B-tier: Verified secondary source (EY/Wood Mac/Rystad)'],
     ['  C-tier: Directional estimate — verify before IC submission'],
     [''],
-    ['Citation: ORCA (2026), v410. yoburgqs.github.io/petroleum-fiscal-db/']
+    ['Terms_Basis definitions (v505) — what the Take% in each row was computed FROM:'],
+    ['  Country-specific terms: ORCA holds calibrated fiscal terms for this country'],
+    ['  ORCA contract database terms: terms read from this country\'s contracts in the database'],
+    ['  GENERIC DEFAULT: no country-specific terms held — the standard default for the'],
+    ['    mechanic was substituted. Take%, NPV and IRR on these rows are directional only.'],
+    ['    Every GENERIC DEFAULT row of the same mechanic carries the SAME Take%, so Rank is'],
+    ['    shared (see Tied_With) and does not separate them. Do not cite these in an IC memo;'],
+    ['    use the Country Profile page for the sourced statutory parameters instead.'],
+    ['  Evidence A/B (%) is reported as "n/a — generic terms" on GENERIC DEFAULT rows because'],
+    ['    the sourced facts it measures were not used to produce that row\'s Take%.'],
+    [''],
+    ['Citation: ORCA (2026), ' + _orcaVer + '. yoburgqs.github.io/petroleum-fiscal-db/']
   ];
   var methSheet = XLSX.utils.aoa_to_sheet(methRows);
   XLSX.utils.book_append_sheet(wb, methSheet, 'Methodology');
