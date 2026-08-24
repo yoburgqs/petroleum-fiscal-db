@@ -11160,3 +11160,18 @@ Nothing on the STILL LOCKED list was touched.
 
 **Bookkeeping (not the improvement).** v509 → v510 across 5 version locations; changelog
 entry prepended. Grade tables not touched.
+
+---
+## Cycle 409 Log — 2026-08-24 18:32
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 409 complete and pushed (v510). Mirror in sync; working tree clean apart from loop-owned state files.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (408 was T3, 407 T4, 406 T1, 405 T2, 404 T6.)
+
+## Friction
+I walked every clipboard path cold — fresh browser context, no sessionStorage or localStorage — and read what actually landed on the clipboard against a sentinel value. Two failures, both silent.
+
+**The worst one: the Fiscal Compare drilldown's ⎘ IC Citatio
