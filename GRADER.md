@@ -10942,3 +10942,101 @@ changelog entry prepended. Grade tables not touched.
 Cold load → **Reform Risk** tab → the stable/volatile card pair in `renderReformRisk()`. Two defects that compounded into a number an analyst would be embarrassed to put in front of an IC:
 
 1. The Reform Frequency Score is `100 − 15 × (events dated ≥ 2010)`. A jurisdiction whose last rupture was an expropriation in 2007 therefore scored identic
+
+---
+## Cycle 408 Log — 2026-08-24
+
+- Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (suite actually run this cycle)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Version: v508 → v509
+
+## Task
+**T3** — "How do these three countries compare side by side?"
+(407 was T4, 406 T1, 405 T2, 404 T6.)
+
+## Friction
+Walked cold — fresh Playwright browser context, no `sessionStorage`, no `localStorage`
+— into **Side-by-Side (t2)**.
+
+Since v430 the tab auto-seeds the **North Sea Trio** (Norway · UK · Netherlands) as a
+worked example, in `switchTab()`'s `_autoRanOnce` block at index.html:22079. The seed was
+written straight into `compareList` through three ordinary `addCompare()` calls, so from
+that point on it was indistinguishable from a country the analyst had chosen. That broke
+the tab's own core task in two separate ways.
+
+**1 — An analyst comparing their own three countries could only fit two.**
+Typing Guyana → Angola → Brazil into `#cmp-search`:
+
+```
++Guyana -> ["Norway","United Kingdom","Netherlands","Guyana"]
++Angola -> ["Norway","United Kingdom","Netherlands","Guyana","Angola"]
++Brazil -> ["Norway","United Kingdom","Netherlands","Guyana","Angola"]
+   TOAST: Comparison is full at 5 countries — Brazil was not added.
+   badge: 5/5 countries (full) — remove one to add another
+```
+
+The third country they came to compare was refused, and the two they did get sat in the
+last two columns behind three they never asked for. Escaping required three separate ✕
+clicks. The example banner had promised *"search for any country above to add **or
+replace**"* — nothing ever replaced — and still read **"Max 4 countries"** after the cap
+was raised to 5 in v501.
+
+**2 — Shared comparison links arrived corrupted.**
+The seed had no empty-grid guard, and `parseAndNavigate()` populates `compareList` for a
+`#/compare/…` route *before* t2 is first activated. Opening `#/compare/guyana+angola+brazil`
+and clicking Side-by-Side:
+
+```
+after deep link load:        ["Guyana","Angola","Brazil"]
+after clicking Side-by-Side: ["Guyana","Angola","Brazil","Norway","United Kingdom"]
+badge: 5/5 countries (full)
+```
+
+Two North Sea countries spliced into an Atlantic-margin comparison, Netherlands silently
+refused, and nothing at the decision point attributing Norway and the UK to a demo. Share
+Link is a headline SbS feature; every link it produced was delivered wrong.
+
+## Change
+- **Seed guarded** — `if (compareList.length > 0) return;`. A shared or deep-linked
+  comparison is now delivered exactly as sent.
+- **`_sbsExampleUntouched` flag** marks the seed as a demo (with `_sbsSeeding` so the
+  seed's own three `addCompare()` calls do not trip the rule). The first country the
+  analyst adds themselves **clears** the example — the replace the banner always described
+  — with a toast naming what was dropped: *"Cleared the 3-country example (Norway, United
+  Kingdom, Netherlands) — building your comparison from Guyana."*
+- **Adoption is respected** — removing a chip, or re-adding a country already in the
+  example, drops the flag, so what remains is treated as the analyst's own selection and
+  further adds append normally.
+- **Banner corrected** — stale "Max 4 countries" removed; it now states the real behaviour.
+- **Quickstart presets repaired** (same flow). The four curated IOC benchmark sets —
+  Atlantic Frontier Quartet, North Sea Trio, USA vs Iraq, West Africa Trio — existed only
+  in the page's initial markup, so the first `renderCompare()` overwrote them for the rest
+  of the session. Clicking **Clear** then rendered the instruction *"or click a quickstart
+  preset"* above an empty box (0 buttons in the DOM). Extracted to `_sbsQuickstartHTML()`
+  and rebuilt on every empty render.
+
+## Result
+An analyst can compare the three countries they came to compare. Guyana / Angola / Brazil
+now yields a clean 3-column grid at "3/5 countries — room for 2 more", with no refusal
+toast and no North Sea columns to remove first. A shared comparison link shows the
+sender's countries and only those. And **Clear** returns to a working starting point
+instead of a dead end.
+
+## Verification
+Four cold Playwright walks against the patched local build:
+
+| Path | Before | After |
+|---|---|---|
+| Own three countries typed in | 5 countries, Brazil refused | `["Guyana","Angola","Brazil"]`, 3/5 |
+| Shared `#/compare/guyana+angola+brazil` | +Norway +UK, 5/5 full | `["Guyana","Angola","Brazil"]`, 3/5 |
+| Example edited, then add | n/a | appends — `["Norway","UK","Guyana"]` |
+| Clear → quickstart preset | 0 buttons | 4 buttons; Quartet loads 4 |
+
+0 JS errors across all four. JS syntax gate **PASS** (9 blocks / 0 errors).
+`runtime_comprehensive.js` ran to completion: **136 PASS / 0 FAIL / 0 WARN / 0 JS errors**.
+Nothing on the STILL LOCKED list was touched — the v430 auto-load and its banner remain,
+they are simply no longer mistaken for the analyst's own selection.
+
+**Bookkeeping (not the improvement).** v508 → v509 across 5 version locations; changelog
+entry prepended. Grade tables not touched.
