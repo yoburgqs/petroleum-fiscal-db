@@ -10567,11 +10567,16 @@ not touched.
   - XLSX export invoked for real — download fired
     (`ORCA_fiscal_compare_$75_deepwater_2026-08-24.xlsx`), tie-aware Rank, `Tied_With`,
     `Terms_Basis` and the `n/a — generic terms` evidence cell all correct, **0 JS errors**.
-- **Full `runtime_comprehensive.js` suite: STARTED this cycle against the patched local build
-  (`TEST_URL=http://localhost:8899/index.html`) and was still running at cycle close — 36 checks
-  emitted, 0 FAIL, 0 WARN, 0 JS errors at that point. It did NOT reach its summary line inside the
-  cycle window, so there is no full 136-check total for v505. Stating that plainly rather than
-  quoting a baseline.**
+- **Full `runtime_comprehensive.js` suite: RAN this cycle against the patched local build
+  (`TEST_URL=http://localhost:8899/index.html`) but did NOT complete. It emitted 38 checks —
+  Load, Fiscal Compare (incl. all sort paths), DCF and Scenario Builder — with 0 FAIL, 0 WARN and
+  0 JS errors, then stalled in the ScenarioBuilder section for ~20 minutes without emitting
+  further. Killed at cycle close. There is therefore NO full 136-check total for v505, and none is
+  being quoted. The 38 checks that did run cover every section my change touches (Fiscal Compare
+  render, all six sort paths, DCF params, FC take clamping). The stall is in the suite/harness
+  against a local static server, not a page error — the browser reported 0 JS errors throughout,
+  and the same stall point appeared on an earlier unmodified run this cycle. Worth investigating
+  next cycle: the suite defaults to the deployed URL and is evidently not exercised locally often.**
 - Note on the incoming "135 PASS / 1 FAIL": the suite defaults to `TEST_URL=`
   `https://yoburgqs.github.io/petroleum-fiscal-db/`, i.e. the deployed site, not the working tree.
   The single FAIL was the stale `max 4 limit` assertion described above — a test defect, now fixed.
