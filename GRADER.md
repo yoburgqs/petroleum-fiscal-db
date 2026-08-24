@@ -10234,3 +10234,12 @@ changelog entry added. Grade tables not touched.
 **Task: T4 — "What is my fiscal-stability and reform exposure here?"** (recent cycles were T3, T1, T1, T6, T6.)
 
 **Friction.** I cleared sessionStorage and localStorage, reloaded, and clicked the tab literally named **Reform Risk** with one country in mind. The tab does not accept a country. Every block `renderReformRisk()` builds is a global aggregate — top-15 most-reformed table, top-20 decade heatmap, 8 stable / 8 volatile, regional 
+
+---
+## Cycle 401 Log — 2026-08-24 11:06
+- Test before: 135 PASS / 1 FAIL
+- Test after: 135 PASS / 1 FAIL
+- JS errors: 0
+- Summary: Failed to authenticate. API Error: 403 Unable to verify organization membership.
+Ignoring 7 permissions.allow entries from .claude/settings.json and .claude/settings.local.json: this workspace has not been trusted. Run Claude Code interactively here once and accept the trust dialog, or set projects["/Users/yoburg/office"].hasTrustDialogAccepted: true in /Users/yoburg/.claude.json.
+
