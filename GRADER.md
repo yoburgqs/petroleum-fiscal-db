@@ -10105,3 +10105,119 @@ touched.
 I cleared sessionStorage and localStorage, reloaded, ran Fiscal Compare on the default sort, and clicked the hint bar's **"⇌ Load Top 5 in Side-by-Side"** button.
 
 It does not load five. `addCompare()` ended in `if (compareList.includes(country) || compareList.length >= 4) return;` — a silent no-op — while three separate entry points hand Side-by
+
+---
+
+## Cycle 401 Log — 2026-08-24 (v502)
+
+- Test before: 135 PASS / 1 FAIL / 0 WARN / 0 JS errors
+- Test after: **137 PASS / 0 FAIL / 0 WARN / 0 JS errors** — Playwright **did run this cycle**
+  against `http://localhost:8099`. JS syntax gate: `node --check` over 9 inline script blocks,
+  **0 errors**.
+
+## Task
+
+**T4 — "What is my fiscal-stability and reform exposure here?"**
+(Recent picks were T3, T1, T1, T6, T6 — T4 had not been walked.)
+
+## Friction
+
+I cleared `sessionStorage` and `localStorage`, reloaded, and clicked the tab literally named
+**Reform Risk** with one jurisdiction in mind.
+
+The tab does not accept a country. Every block `renderReformRisk()` builds is a global
+aggregate: the Reform Risk Snapshot sentence, Regional Reform Tilt (5 regions), Most
+Frequently Reformed Regimes (`withScore.slice(0,15)`), the decade heatmap
+(`reformCounts.slice(0, 20)`), Most Stable (`score>=85`, `.slice(0,8)`) and Most Volatile
+(`score<30`, `.slice(0,8)`), Reform Direction, Export CSV. There is no `<select>`, no search,
+no input of any kind in the `#treformrisk` pane — only the intro strip and
+`#reform-risk-content`. The analyst's only recourse was to export the CSV and open Excel, or
+to guess that the Country Profile tab carries a reform timeline.
+
+Two things made this worse than a missing-control annoyance:
+
+1. **`reform_history.json` covers 21 countries, not 185.** Because the tab renders a top-15
+   table and a top-20 heatmap, essentially the entire dataset was already on screen — but
+   nothing said so. The snapshot read "**21** countries in the reform database", which a
+   first-time analyst reads as a filtered top-list, not as the whole thing. The remaining
+   **164** jurisdictions were invisible with no explanation.
+
+2. **The scoring formula fails silently open on uncovered countries.** Reform Frequency Score
+   is `Math.max(0, 100 - since2010 * 15)`. For a country with no sourced events that is a
+   clean **100 — "most stable"** — arithmetically indistinguishable from Norway's genuine
+   record. The tab's own intro strip states an IC rule ("Score ≤ 40 → add 3–5pp WACC
+   premium"), so the analyst is explicitly invited to act on a number that, for 164 of 185
+   jurisdictions, means *we never looked*. A zero reform-risk premium carried into an IC memo
+   on that basis is a real, defensible-looking error.
+
+The single worst moment: the analyst selects nothing, finds nothing, and either abandons the
+tab or — if the score were ever exposed for their country — reads absence of coverage as
+evidence of stability.
+
+## Change (what is different on screen)
+
+1. **A per-country lookup on the Reform Risk tab.** `<select id="rr-country-lookup">` plus a
+   Clear button, in **static DOM outside `#reform-risk-content`** so the repeated
+   `renderReformRisk()` calls on data load cannot wipe a selection the analyst has made.
+   Options are populated by `_rrPopulateLookup()`, called from the top of `renderReformRisk()`
+   and guarded by a `dataset.filled` flag.
+2. **The coverage split is visible in the picker itself**, via two optgroups:
+   *Sourced reform history — scoreable (21)* and
+   *No sourced reform history — predictability only (164)*. The analyst sees which side of the
+   line their country falls on before committing to a selection.
+3. **Covered country → verdict card** (`renderReformCountryVerdict()`): Reform Frequency Score
+   with **rank among the 21 scoreable**, reforms since 2010, total events and first year on
+   record, the hostile/friendly/neutral split with a net-tilt label, the **Fiscal
+   Predictability Score beside it** (the intro strip has always said use both signals; they
+   were never shown together), take @ $75, the most recent reform event with its take change,
+   and the tab's own **IC rule applied to that country** — "add a 3–5pp WACC premium" / "add
+   5–8pp and present a probability-weighted NPV scenario" / "no reform-frequency premium
+   indicated by this signal" — rather than left as a general note in the header.
+4. **Uncovered country → an explicit refusal to score.** The card says
+   *"{Country} — no Reform Frequency Score"*, states the denominator (21 of 185), and says in
+   the analyst's own decision language: **"This is not a score of 100. No events on file means
+   no coverage, not a clean record — do not read it as stability and do not carry a
+   reform-frequency premium of zero into an IC memo on this basis."** The Reform Frequency
+   Score tile renders **n/a**, never a number. It then hands over what *is* defensible: the
+   **Fiscal Predictability Score**, computed by `getFiscalPredictabilityScore(d)` from that
+   country's own contract set (take IQR, $50→$125 price swing, mechanic count) and available
+   for all 185, with a note that reform exposure specifically needs an external check
+   (national petroleum law, IMF Article IV, operator annual reports) before IC submission.
+5. **Both cards drill through** to the Country Profile for that country.
+6. **Snapshot headline rewritten** from "21 countries in the reform database" to
+   "**21** of **185** jurisdictions carry a sourced reform history — the rankings below are
+   drawn from those 21 only". The denominator is now legible from the first line of the tab.
+
+## Result
+
+The analyst can select their own jurisdiction on the tab named for their question and get one
+of two honest answers:
+
+- **Covered** — a Reform Frequency Score with a rank behind it, the direction of travel, the
+  most recent law change, the predictability signal alongside, and the WACC premium the
+  platform's own rule implies for that specific number. That is an IC line, not a lookup.
+- **Not covered** — a plain statement that ORCA cannot score it, why a clean-looking 100 would
+  be wrong, and the predictability score they *can* defend.
+
+Neither outcome existed before: the tab had no country input at all, and the uncovered case
+had no representation anywhere in the UI.
+
+## Verification
+
+- JS syntax gate: `node --check` over all 9 inline script blocks — **9/9 PASS, 0 errors**.
+- Playwright `tests/runtime_comprehensive.js` **ran this cycle**: **137 PASS / 0 FAIL / 0 WARN
+  / 0 JS errors**.
+- The flow was re-walked cold in a scripted browser run after the change: picker present with
+  186 options and both optgroups; Nigeria → score 70/100, rank 11 of 21, ↑0/↓1/→5
+  net-liberalizing, FP 73 MODERATE, take 81.1%, most recent change 2022 PIA; Senegal → "no
+  Reform Frequency Score", n/a tile, FP 62 MODERATE, take 56.9%; Clear resets the card;
+  Guyana drill-through lands on t7 with `dd-country-select` set to Guyana.
+- **Test-suite correction:** the incoming baseline carried 1 FAIL — `[Comparison] max 4 limit`
+  — which was a *stale assertion*, not a defect. v501 deliberately raised `CMP_MAX` from 4 to
+  5. The test now asserts the 5th country is **accepted** and the 6th is **refused**, which is
+  the intended behavior. That split is why the total moved 136 → 137.
+
+## Bookkeeping (not the improvement)
+
+v501 → v502 across the 3 structural locations (title, meta description, header badge);
+changelog entry added. Grade tables not touched.
