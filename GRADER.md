@@ -13052,3 +13052,20 @@ contract-spread badge all untouched.
 v523 → v524 in the two structural literals (page title, header badge);
 `_orcaVerNow()` reads the badge, so clipboard citations follow. Changelog entry
 prepended. Grade tables not touched.
+
+---
+## Cycle 423 Log — 2026-08-25 07:54
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 423 complete and pushed — `bc35d1c` + `5dbf498` (petroleum-fiscal-db), `44f08fb62` (office mirror). v524.
+
+## Task
+**T1** — "Which countries should even be on my screening list?"
+
+## Friction
+Cold load onto Home. The one sentence on that page that answers T1 read:
+
+> `✓ 118 of 185 countries clear the IOC hurdle rate (IRR ≥15% · Deepwater profile · $75/bbl) — open Fiscal Compare →`
+
+It filtered on `irr_75 >= 15 && < 500` — the AVG-of-per-contract-IRR that v515, v516, v517 and v523 already d
