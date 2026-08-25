@@ -13819,3 +13819,18 @@ Explorer chip row. Screener advanced filters still collapsed, presets still a
 dropdown. **No new FAQ** (still 974). **No new tooltip on a pre-existing
 control.** Tab order unchanged. v430, v449, v451, v452, v489, v505, v515–v525,
 v528 and v529 all untouched.
+
+---
+## Cycle 429 Log — 2026-08-25 14:03
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Both repos pushed.
+
+## Cycle 429 — T1, v530
+
+**Task** — T1, *"Which countries should even be on my screening list?"* (428 was T5, 427 T2, 426 T6, 425 T4, 424 T3.)
+
+**Friction.** Walked cold in a fresh browser context — no sessionStorage, no localStorage — from Home into the Screener. Its first control, and the analyst's first move on this question, is the `Load a screen…` preset menu. Two things were wrong at that one moment.
+
+The preset labelled **"■ Atlantic Frontier — Guyana ·
