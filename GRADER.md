@@ -11299,3 +11299,16 @@ changelog entry prepended. Grade tables not touched.
 - Test before: 136 PASS / 0 FAIL
 - Test after: 136 PASS / 0 FAIL / 1 WARN (pre-existing local sw.js 404)
 - JS errors: 0
+
+---
+## Cycle 410 Log — 2026-08-24 19:30
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 410 complete and pushed (v511). Working tree clean apart from loop-owned state files; mirror in sync.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (409 was T5, 408 T3, 407 T4, 406 T1, 405 T2.)
+
+## Friction
+I walked every surface that shows a government-take figure from a cold load — fresh browser context, no sessionStorage, no localStorage. Four of the five carry provenance. Fiscal Compare has a Quality column (A/B/C/D/G) and a PROXY badge on every row
