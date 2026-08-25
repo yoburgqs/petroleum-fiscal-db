@@ -13230,3 +13230,134 @@ prepended. Grade tables not touched.
 **Task:** T3 — "How do these three countries compare side by side?"
 
 **Friction.** Walked cold from Side-by-Side into Fiscal Compare, the tab SbS links to as "▦ Rank all 185 countries". Side-by-Side prints a paragraph saying IRR is *deliberately excluded* because ORCA's IRR is not a project return. Two clicks away, Fiscal Compare had a sortable `IRR% @$75` column, an "IRR only" checkbox, and a dashed amber line reading *"IOC Hurdle Rate:
+
+---
+## Cycle 425 — T4 (v526) — 2026-08-25
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?"
+
+## Friction
+Cold load (fresh context, `sessionStorage` and `localStorage` cleared) → **Reform
+Risk** → the per-country lookup (`#rr-country-lookup`), which is the only control
+on the tab that answers the single-country question T4 actually asks.
+
+The verdict card's **IC action** line, built in `renderReformCountryVerdict()`
+(index.html ~line 28084), was a pure function of the score band:
+
+```
+score <= 20  → 'Add a 5–8pp WACC premium and present a probability-weighted NPV…'
+score <= 40  → 'Add a 3–5pp WACC premium to the base-case discount rate.'
+else         → 'No reform-frequency premium indicated by this signal.'
+```
+
+`score = 100 − 15 × reforms-since-2010`. The `<= 40` band therefore needs **4 or
+more** changes since 2010. Enumerated against the live `REFORM_HISTORY`: exactly
+**one** of the 21 scoreable jurisdictions — the United Kingdom, 5 changes, score
+25 — ever reaches it. **20 of 21 returned the identical green "no premium" line.**
+A control that always returns the same answer, styled as a verdict.
+
+It contradicted two panels sitting a few inches below it on the same tab:
+
+| Country | Lookup said (before) | Same tab's own panel said |
+|---|---|---|
+| Guyana (55) | No premium indicated | *Actively Reforming* — "assume renegotiation risk over a 25-year life" |
+| Brazil (55) | No premium indicated | *Actively Reforming* |
+| Australia (55) | No premium indicated | *Actively Reforming* |
+| Venezuela (85) | No premium indicated | *Below the line* — "quiet only because the window starts in 2010 … **do not read the score as a stable-regime finding**" |
+| Algeria (100) | No premium indicated | *Below the line* |
+| Kazakhstan, Colombia, Canada, USA | No premium indicated | *Below the line* |
+
+The worst single moment: **Venezuela.** Score **85/100**, rank 7 of 21, green
+card, "No reform-frequency premium indicated by this signal" — while ORCA's own
+event log for Venezuela carries **three pre-2010 take rises totalling +55pp**,
+including the 2007 Orinoco nationalisation and forced IOC conversion. An analyst
+who arrives with one country in mind, types it, and reads the verdict is handed a
+zero reform premium for the textbook expropriation case.
+
+## Change
+The IC action now applies the two classifications **this tab already computes and
+displays**. No new thresholds were introduced — `since2010 >= 3` is the tab's own
+`activeList` filter and `last take rise < 2010` is its own `quietArtefact`
+divider test, both lifted from `renderReformRisk()`.
+
+Three verdicts now exist where there was one:
+
+1. **`IC action — Actively Reforming`** (4 countries: UK, Brazil, Australia,
+   Guyana). Names the count and the years — "3 law changes since 2010 (2015,
+   2020, 2022)" — states that terms were rewritten inside a normal
+   sanction-to-first-oil window, and calls the **3–5pp** premium (5–8pp plus a
+   probability-weighted NPV at score ≤ 20, which keeps the published escalation).
+2. **`IC action — score is a window artefact`** (6 countries: Venezuela,
+   Algeria, Colombia, Kazakhstan, Canada, USA). Names the last take-raising
+   change, its year, its size, and the cumulative pre-2010 total — "one of 3
+   pre-2010 take rises totalling +55pp" — then: "the score of 85 records where
+   the window starts, not a clean record. **Do not carry a zero reform premium on
+   this basis.**"
+3. **`IC action`** (11 countries). Now states the count and that it sits below
+   the bar — "2 law changes since 2010 (2021, 2022), below this tab's Actively
+   Reforming bar of 3" — instead of an unqualified all-clear.
+
+Two supporting changes so the screen does not undercut the verdict:
+- The **card accent and the headline score colour follow the verdict, not the raw
+  band**. Venezuela's 85 and Algeria's 100 render orange, not green. An 85 that
+  is an artefact of where the window starts must not look like a real 85.
+- The **score stat's sub-caption** changes with the case: `rank 7 of 21 · pre-2010
+  rise unscored` / `rank 20 of 21 · actively reforming` / `rank 11 of 21 scoreable`.
+- The Reform Risk **intro strip's stated IC rule** was rewritten to match, since
+  it published the same unreachable band and explicitly said a high score is not
+  an all-clear only after this cycle.
+
+## Result
+Ten of the 21 covered jurisdictions changed verdict. The **4** Actively Reforming
+and the **6** window-artefact rows match the tab's own panel counts exactly — the
+lookup and the panels no longer give opposite instructions about the same country.
+
+An analyst who types **Venezuela** into the lookup is now told, at the decision
+point and without leaving the card, that the 85 is a function of where the
+scoring window opens and that three pre-2010 rises totalling +55pp sit behind it.
+An analyst who types **Guyana** is told to carry 3–5pp and to state renegotiation
+risk in the memo, which is what the panel below already told them and the verdict
+above previously denied.
+
+## Verification
+JS syntax gate **PASS** (9 blocks / 0 errors). Playwright **ran this cycle**
+against the local build at `http://localhost:8899/index.html`, browser context
+fresh and `sessionStorage`/`localStorage` cleared before reload:
+**135 PASS / 0 FAIL / 1 WARN**, **0 page errors**. The WARN is the pre-existing
+`sw.js` 404 recorded at v525 as not a regression. Verdict label and card accent
+enumerated for all 21 covered countries plus 3 uncovered ones (Malaysia, Oman —
+"no Reform Frequency Score" path unchanged and still correct).
+
+## Second fix — the loop's own test harness was stale
+The cycle prompt reported **135 PASS / 1 FAIL**. The failure was
+`[FiscalCompare] sort-irr: Sort button not active` — an assertion on a control
+**v525 deliberately removed**. `autonomous_cycle.py` runs
+`office/tools/petroleum/tests/runtime_comprehensive.js`, not the repo copy under
+`petroleum-fiscal-db/tests/`. v525 corrected the repo copy and missed the one the
+loop actually executes, so every cycle since has reported a FAIL against a
+control the platform intentionally deleted. Line 182 of the loop harness now
+reads `['npv', 'breakeven', 'country', 'take']`, with the reason in a comment
+above it. Line 342 — the Explorer sort loop — still includes `irr` and was left
+alone: the Explorer genuinely still carries an IRR column (logged out of scope at
+v525).
+
+Loop harness after the fix: **134 PASS / 0 FAIL / 1 WARN**. The count drops by
+one because the removed assertion no longer runs — 135 PASS + 1 FAIL became
+134 PASS + 0 FAIL. Stated here rather than absorbed silently.
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. **No new FAQ** (still 974). **No new tooltip.** Tab
+order unchanged. v430 sessionStorage logic, v449 take%-tier colouring, v451
+two-zone CP headline and removed FC Govt NPV, v452 rank + vs-median pill, v489
+Reform Risk in the primary Home card grid, v502 per-country lookup (extended, not
+replaced), v514 no-coverage panel height, v515–v525 IRR removals, v521 SbS spread
+rows and v522 CP contract-spread badge all untouched.
+
+## Bookkeeping — not the improvement
+v525 → v526 in the two structural literals (page title line 42, header badge line
+1353); `_orcaVerNow()` reads the badge so clipboard citations follow. Changelog
+entry prepended. Grade tables not touched.
