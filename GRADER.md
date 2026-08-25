@@ -12800,3 +12800,16 @@ untouched.
 v521 → v522 in the two structural literals (page title, header badge);
 `_orcaVerNow()` reads the badge, so clipboard citations follow automatically —
 verified reading v522. Changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 421 Log — 2026-08-25 06:04
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 421 complete and pushed — `3b8fe63` + `ed35c31` (petroleum-fiscal-db), `2adf29a88` (office mirror). v522.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+
+## Friction
+Cold walk (fresh context, storage cleared) into Country Profile, Norway loaded. The headline strip carried a badge reading **`59.3–75.0% range`**, titled **"Monte Carlo P10–P90 take range"**. Directly under the four-price take table sat a band: *"↔ P10–P90 uncertainty band: 59.3% – 75.0% 
