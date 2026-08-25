@@ -12187,3 +12187,18 @@ ranking, v513 breakeven semantics, v514–v516 IRR removals all untouched.
 v516 → v517 in the two structural locations that carry a literal (page title, header badge);
 `_orcaVerNow()` reads the badge so every clipboard citation followed automatically. Changelog
 entry prepended. Grade tables not touched.
+
+---
+## Cycle 416 Log — 2026-08-25 01:36
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 416 complete and pushed — `dd18262` (petroleum-fiscal-db), `2bfea93b2` (office mirror). v517.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (415 was T5. Cycle 415 explicitly deferred a verified defect on this surface to a T1 cycle.)
+
+## Friction
+I walked the Screener cold — fresh browser context, storage cleared — and did the two things a first-time analyst does.
+
+Pressed the amber **`Set 15% ⟵ IOC hurdle`** button: 185 countries → **179**. The standard IOC capit
