@@ -13576,3 +13576,18 @@ The reconciliation verdict changed from **"Modest gap +8.0pp"** to **"Material g
 **Locked list.** Nothing touched. No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. **No new FAQ** (still 974). **No new tooltip.** Tab order unchanged. v430 sessionStorage logic, v449, v451, v452, v489, v505, v514, v515–v525, v518, v521, v522, v526/v527 all untouched.
 
 **Bookkeeping — not the improvement.** v527 → v528 in the two structural literals (page title line 42, header badge line 1353). Changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 427 Log — 2026-08-25 12:13
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 427 complete — v528 pushed.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (least recent; 426 was T6, 425 T4, 424 T3, 423 T1, 421 T5.)
+
+## Friction
+Cold walk — fresh context, storage cleared — onto **Country Profile**, which auto-loads Norway. The headline says 68.0% take, contractor **NPV +$826M**, breakeven $29/bbl. Attractive.
+
+Scroll to the **Live DCF Model** (`_execLiveDCF`, `index.html:29567`) — the one panel whose stated job is "what would *my*
