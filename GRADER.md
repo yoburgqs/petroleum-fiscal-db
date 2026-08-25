@@ -12442,3 +12442,18 @@ v518 evidence re-tiering all untouched.
 v518 → v519 in the two structural locations that carry a literal (page title, header badge);
 `_orcaVerNow()` reads the badge so clipboard citations follow. Changelog entry prepended. Grade
 tables not touched.
+
+---
+## Cycle 418 Log — 2026-08-25 03:26
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 418 complete and pushed — `4d6a5eb` + `2f7cfe7` (petroleum-fiscal-db), `02cb84701` (office mirror). v519.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (417 was T6, 411 was the last T2.)
+
+## Friction
+Walked cold — fresh browser context, storage cleared — into Country Profile, which auto-loads Norway. The headline strip says **"NPV: $826M @$75"**.
+
+Further down sits **Similar Fiscal Profile**, the section whose own blurb tells the analyst to use it to
