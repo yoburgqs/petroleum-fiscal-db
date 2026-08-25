@@ -13374,3 +13374,119 @@ entry prepended. Grade tables not touched.
 **Task.** T4 — "What is my fiscal-stability and reform exposure here?"
 
 **Friction.** Cold walk into Reform Risk, using the per-country lookup — the only control on that tab that answers the single-country question. The verdict card's **IC action** line (`renderReformCountryVerdict()`, index.html ~28084) was a pure function of the score band: ≤20 → 5–8pp WACC premium, ≤40 → 3–5pp,
+
+---
+## Cycle 426 — T6 (v527) — 2026-08-25
+
+**Task.** T6 — "Where did this number come from and how solid is the evidence?"
+
+**Friction.** Cold walk (fresh browser context, `sessionStorage` and
+`localStorage` cleared) onto Home — the landing tab — and read the card that
+answers the question. The *Key terms* grid's **Evidence Tier** card
+(`index.html:1477`, in the primary 2-column grid directly under the headline)
+is the first and most prominent definition of the evidence system anywhere in
+the product. It read:
+
+> Evidence Tier = data quality. A = primary legislation · B = operator filings ·
+> C = secondary source. **Filter by tier in Fiscal Compare.**
+
+**Both halves were false.**
+
+1. **"B = operator filings" is wrong, and wrong in the direction that inflates
+   confidence.** Counted from live `country_data.json`: of **142,798** tier-B
+   facts in the top-source table, **139,799 — 97.9%** — are the two bulk sources
+   `EY_IHS_BulkHarvest_2025` and `EY_KPMG_CIT_Guide_2025`, which the Methodology
+   page already concedes are "assigned at the country level rather than verified
+   per individual contract." The remaining 2,999 are national tax codes and model
+   contracts (Russian Tax Code, Iran IPC, Ireland Finance Act 1992, KRG model
+   PSC, Paraguay Decree 19.080). **Zero operator filings appear in tier B at
+   all.** A bulk source sits in the top three for **151 of 185** countries.
+
+   `buildEvidencePanel()` already knew this — v518 wrote the tooltip *"This tier
+   is 45.2% of the whole database and is largely the country-level bulk harvest —
+   it is NOT an operator filing."* The landing page asserted the opposite. An
+   analyst who read a country at 93% A/B — on the Fiscal Compare Quality badge,
+   on the evidence pill, or in the XLSX export the FC guide sells as "Evidence
+   A/B% tier for auditable IC sourcing" — read it as near-fully documented, when
+   most of the B half was never checked against any individual contract.
+
+2. **"Filter by tier in Fiscal Compare" points at a control that does not
+   exist.** FC's controls are `#fc-profile`, `#fc-price`, the sort buttons,
+   `#fc-sort-dir-btn`, `#fc-stability-check`, the region chips and
+   `#fc-filter-be` ("Breakeven only"). There is no tier filter and there never
+   has been. The platform's single routing instruction for the evidence question
+   was a dead end — and honoring it literally would have been wrong anyway, since
+   v505 established that `ab_pct` describes facts the take never used on the 154
+   default-terms rows.
+
+**Change.**
+
+- The card states what each tier actually is. B is now named as *the EY / KPMG /
+  IHS country-level tax and fiscal guides — assigned to the whole country, never
+  read off an individual contract, and not an operator filing.* D is stated too
+  (it was absent).
+- A new `#home-evidence-mix` line is **computed live** in `loadPlatformData()`
+  from `top_sources`, using the same `_isBulkSource()` definition the Country
+  Profile panel uses for its "N%+ bulk-harvested" pill — so the Home figure and
+  the per-country figure cannot drift apart. It renders: *"98% of every tier-B
+  fact on record is that bulk harvest, and it is a top source for 151 of 185
+  countries. So a combined A/B% does not mean primary-law or operator-verified —
+  read the A share on its own."* Counted off top three sources, so it is a
+  floor and is never presented as exact.
+- **The dead route is replaced by a working one.** `_homeOpenEvidence()`
+  switches to Country Profile and **opens** `#cp-evidence-panel` scrolled into
+  view. That panel is a `<details>` that has always rendered collapsed, so even
+  an analyst who found the right tab still had to find and click it. It carries
+  the A/B/C/D split, the bulk-harvested share and every source named with a
+  working link. Keyboard-operable (Enter / Space).
+
+**Result.** The analyst is no longer told that 45% of the database is
+operator-verified when it is a country-level aggregator assignment they cannot
+cite per contract — which is the whole of the T6 question, answered wrongly at
+the first place they look. And one click from Home now lands them on an **open**
+evidence panel for a country, showing the A/B/C/D split, the bulk share and the
+named sources, instead of on a Fiscal Compare filter that does not exist.
+
+**Verification.** JS syntax gate **PASS** (9 blocks / 0 errors). Playwright
+**ran this cycle** against the local build at `http://localhost:8899/index.html`,
+fresh browser context with `sessionStorage`/`localStorage` cleared before reload:
+
+- card renders **98%** and **151 of 185** from live data
+- the string "Filter by tier in Fiscal Compare" no longer appears on the page
+- the control activates `t7` and returns `cp-evidence-panel.open === true`,
+  scrolled into view (Norway: 66.1% primary law, 12%+ bulk-harvested)
+- on a **normal** Country Profile navigation the same panel still returns
+  `open === false` — the v371/v373 declutter rule is untouched
+- **0 page errors**
+
+`runtime_comprehensive.js` (the copy the loop actually executes, under
+`office/tools/petroleum/tests/`): **134 PASS / 0 FAIL / 1 WARN**. The identical
+suite was re-run against the **pre-change** build on a second local server and
+also returned **134 / 0 / 1**, so the WARN — the pre-existing `sw.js` 404 first
+recorded at v525 — is not a regression from this change. 134 is the correct
+post-v526 baseline for this harness (v526 removed the stale `sort-irr`
+assertion, taking 135+1FAIL to 134+0FAIL); the cycle prompt's 135 is the repo
+copy's count.
+
+**Deliberately out of scope, stated rather than hidden.** The Fiscal Compare
+Quality column still renders `getTierBadge(ab_pct)` — a combined A/B grade — on
+the 31 rows modelled on their own terms, so a bulk-heavy country can still show
+a green A there. Same for the XLSX export's "Evidence A/B%" column. Splitting
+A from B across those surfaces is a separate cycle; this one fixed the
+definition and the route, which is where the belief is formed.
+
+**Locked list.** Nothing touched. No page-sub paragraph, no amber instructional
+banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible
+Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown. **No new FAQ** (still 974). **No new tooltip** on any column header,
+mechanic tag, waterfall line or Scenario Builder input. Tab order unchanged.
+v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP headline
+and removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk placement,
+v502/v508/v526 Reform Risk lookup, v505 FC generic-terms G badge, v514
+no-coverage panel, v515–v525 IRR removals, v518 bulk-source labelling, v521 SbS
+spread rows and v522 CP contract-spread badge all untouched.
+
+**Bookkeeping — not the improvement.** v526 → v527 in the two structural
+literals (page title line 42, header badge line 1353); `_orcaVerNow()` reads the
+badge so clipboard citations follow. Changelog entry prepended. Grade tables not
+touched.
