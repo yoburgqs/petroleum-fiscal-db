@@ -12457,3 +12457,91 @@ tables not touched.
 Walked cold — fresh browser context, storage cleared — into Country Profile, which auto-loads Norway. The headline strip says **"NPV: $826M @$75"**.
 
 Further down sits **Similar Fiscal Profile**, the section whose own blurb tells the analyst to use it to
+
+---
+## Cycle 419 Log — 2026-08-25 09:20
+- Test before: 135 PASS / 0 FAIL / 1 WARN (local harness baseline; the 136 in prior logs is the GitHub Pages run, where the service-worker WARN becomes a PASS)
+- Test after: 135 PASS / 0 FAIL / 1 WARN — ran this cycle against the local build
+- JS errors: 0
+- Summary: Cycle 419 complete and pushed — `6c6b942` (petroleum-fiscal-db). v520.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (418 was T2, 417 T6, 416 T1, 415 T5, 414 T3 — T4 was the least recent, last used in cycle 413.)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — into **Fiscal Compare**, and ran it on its own defaults (deepwater, $75/bbl, all 185 countries). The **Stability** column is on by default and is the only reform signal anywhere in the compare table.
+
+It was built like this, in `renderFCResults()` (index.html:30900):
+
+```js
+sorted.forEach(function(c) { stabilityScores[c.country] = 5; });   // every country starts perfect
+Object.keys(rh).forEach(function(c) { ... stabilityScores[c] = Math.max(0, 5 - n); });
+```
+
+with a second default at the cell: `stabilityScores[r.country] != null ? ... : 5`.
+
+`REFORM_HISTORY` covers **21 of 185** jurisdictions. Everything else kept the default. Counted on screen:
+
+| Stability cell | rows |
+|---|---|
+| ◆◆◆◆◆ (green) | **167** |
+| ◆◆◆◆◇ | 6 |
+| ◆◆◆◇◇ | 8 |
+| ◆◆◇◇◇ | 3 |
+| ◇◇◇◇◇ | 1 |
+
+**164 of those 167 green rows — 98% — had no reform research on file at all.** The column header's own tooltip attaches an IC rule to the number: *"5 diamonds → no WACC premium; 3–4 → add 1–2pp; 1–2 → add 3–5pp."*
+
+So on a cold load, with defaults, verified in Playwright:
+
+| Country | rendered | colour | what the IC rule says | reality |
+|---|---|---|---|---|
+| Afghanistan | ◆◆◆◆◆ | green | no premium | zero reform research |
+| Belarus | ◆◆◆◆◆ | green | no premium | zero reform research |
+| Somalia | ◆◆◆◆◆ | green | no premium | zero reform research; flagged SPECULATIVE elsewhere in this same file |
+| Bolivia | ◆◆◆◆◆ | green | no premium | zero reform research |
+| **Venezuela** | ◆◆◆◆◇ | **green** | add 1–2pp | 1975 nationalization, 2001 Hydrocarbons Law, 2007 Orinoco expropriation — all outside the 2010 window |
+| Kazakhstan | ◆◆◆◆◇ | green | add 1–2pp | 2007 Kashagan renegotiation |
+| **Norway** | ◆◆◆◇◇ | **amber** | add 3–5pp | the most predictable petroleum jurisdiction in the dataset |
+
+Norway was penalised for being researched, and Venezuela rewarded for having its ruptures fall before an arbitrary window boundary.
+
+The Reform Risk tab already refuses to make either claim — **v502/v514** built an explicit "this is not a score of 100" panel for no-coverage countries, and **v508** put pre-2010 window artefacts below a divider on the Quiet-Since-2010 card. Fiscal Compare, which is where the screening decision is actually made, had received neither treatment.
+
+## Change
+The column now renders **three distinct states and never a default**.
+
+1. **`n/c`** — muted, no diamonds, no colour — for the **164** with no sourced event log. Title states that ORCA carries a log for 21 of 185, that `n/c` means NOT SCORED, that it is not a clean record and not a score of 5, and that no zero-premium reading may be carried into an IC memo on this basis.
+2. **Grey diamonds with a red `!`** for the **8** whose score is clean only because the scoring window starts in 2010 — Algeria, Colombia, USA, Canada, Kazakhstan, Venezuela, Angola, Libya. Each cell title names the year and the event of that country's last take-raising change, and says the score is not a stable-regime finding.
+3. **The green/amber/orange/red ramp survives only where it is earned** — the **13** scored on events inside the window.
+4. **Every cell is now a route.** One click opens the per-country Reform Risk panel: the full event log for a scored jurisdiction, and for an unscored one the **Fiscal Predictability Score**, which is computed from that country's own contract set and exists for all 185.
+
+Both tooltips on the affected controls — the `<th>` and the *Show Stability* checkbox label — described the removed behaviour and were rewritten. No tooltip was added to a control that did not change.
+
+## Result
+**Green ◆◆◆◆◆ rows went from 167 to 0.**
+
+An analyst screening on fiscal-stability exposure can now tell, in the compare table, the difference between a jurisdiction with a clean sourced record and one nobody has looked at — and can reach the signal that *does* exist for the unresearched one in a single click. Norway no longer reads worse than Venezuela.
+
+## Verification
+JS syntax gate **PASS** (9 blocks / 0 errors). `runtime_comprehensive.js` **ran this cycle** against the local build: **135 PASS / 0 FAIL / 1 WARN** — byte-identical counts to the committed baseline report; the WARN is the pre-existing local-harness service-worker 404. Cold Playwright walks, storage cleared:
+
+| check | result |
+|---|---|
+| row states | 185 rows — 164 `n/c` / 8 flagged / 13 scored |
+| named countries correct | Norway, Venezuela, Kazakhstan, Algeria, USA, Colombia, Canada, Libya, Russia, Brazil, UK, Afghanistan, Belarus, Somalia, Bolivia — 15/15 |
+| apostrophe escaping | `Cote d'Ivoire` renders and routes |
+| `n/c` click | lands on Reform Risk, country selected, no-coverage verdict rendered |
+| checkbox toggle | 11 ↔ 10 headers, restores cleanly |
+| drill-down drawer | colspan still 12 |
+| region filter | Europe re-renders correctly |
+| JS errors | **0** on every walk |
+
+## Deliberately out of scope — logged, not fixed
+The 2010 window that produces the flagged state also drives the Reform Frequency Score on the Reform Risk tab and the Quiet-Since-2010 card. Widening or weighting that window is a modelling decision across three surfaces and belongs to its own cycle. The FC XLSX export carries no Stability column and was not touched.
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. No new FAQ (still 974). Tab order unchanged. v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP headline and removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk placement, v516 IRR removals, v518 evidence re-tiering and v519 fiscal-analogue header/self row all untouched.
+
+## Bookkeeping — not the improvement
+v519 → v520 in the two structural locations that carry a literal (page title, header badge); `_orcaVerNow()` reads the badge so clipboard citations follow. Changelog entry prepended. Grade tables not touched.
