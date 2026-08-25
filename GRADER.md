@@ -12343,3 +12343,102 @@ prepended. Grade tables not touched.
 I walked into the Screener cold and loaded the one preset that exists to answer T6: **"High Evidence — ≥80% A/B sourced"**, which the code comment calls *"highest data quality for due diligence."*
 
 It returned **171 countries out of 185*
+
+---
+## Cycle 418 Log — 2026-08-25
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(417 was T6, 416 T1, 415 T5, 414 T3, 413 T4, 411 T2 — T2 was the least recent.)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — from load into
+Country Profile, which auto-loads **Norway** as the North Sea benchmark. The headline strip states
+**"NPV: $826M @$75"**.
+
+Further down the same page sits **Similar Fiscal Profile**, the section whose own IC-use blurb tells
+the analyst to use it to answer the committee's *"is this take reasonable?"* question. It rendered
+**five columns with no header row at all** — `simsHtml` was appended straight after the blurb div in
+`loadCountryProfile()` (~line 26071). The last column was a bare dollar figure:
+
+| Algeria | Kazakhstan | Libya | Equatorial Guinea | Iraq-Kurdistan |
+|---|---|---|---|---|
+| $788M | $785M | $766M | $621M | $387M |
+
+**Every one of those is below the $826M in the headline.** The table reads: *Norway has the best
+contractor economics of its analogue set.*
+
+It is `p.npv_50` — the **$50/bbl downside** leg introduced in v516 — while the headline is the
+**$75/bbl base case**. On the same basis as the headline, the true figures are:
+
+| country | shown (unlabelled) | actual NPV @$75 |
+|---|---|---|
+| Kazakhstan | $785M | **$1,341M** |
+| Algeria | $788M | **$1,271M** |
+| Libya | $766M | **$1,214M** |
+| Equatorial Guinea | $621M | **$1,101M** |
+| Iraq-Kurdistan | $387M | **$886M** |
+| **Norway (this)** | — | **$826M** |
+
+Norway's $826M is the **worst of the six, not the best** — a complete inversion of the ranking, on
+the table whose stated purpose is peer defensibility. Across the platform the peer that looks
+strongest in that column is not the peer that is strongest at $75 on **59 of the 178** profiles that
+render the section. The only disambiguation was a per-cell hover `title`, on a column with no name.
+
+## Change
+1. **Header row added** — `COUNTRY / REGION / TAKE @$75 / Δ TAKE / NPV @$75 / NPV @$50`. The table
+   had none; the one directly above it on the same page has a full header, which is what taught the
+   analyst to trust the columns.
+2. **`NPV @$75` column added**, on the same basis as the headline strip, coloured green or red
+   against this country's own value.
+3. **The profiled country is now the first row of its own peer table** —
+   `Norway (this) · Europe · 68.0% · — · $826M · $379M` — styled distinctly and non-clickable, so the
+   comparison is read in place instead of against a number several sections up in a different basis.
+4. **IC-use blurb rewritten** to name both columns and state that they can rank the set differently.
+5. Take% cell given a fixed width so the header aligns.
+
+## Result
+The analyst can rank fiscal analogues for an IC memo on a stated basis. On Norway the section now
+shows the profiled country **at the bottom of its analogue set on the base case, with all five peers
+above it** — the exact reverse of what it showed an hour ago, and the correct reverse. The downside
+column is still there, still correct, and now labelled as the downside, so "which of these survives a
+price break" and "which of these is worth more at $75" are two readable questions instead of one
+unlabelled number answering neither.
+
+## Verification
+JS syntax gate **PASS** (9 blocks / 0 errors). `runtime_comprehensive.js` **ran this cycle** against
+the local build: **136 PASS / 0 FAIL / 1 WARN** — the WARN is the pre-existing local-harness
+service-worker 404 (the SW registers the GitHub Pages subpath). Cold Playwright walks, storage
+cleared:
+
+| check | result |
+|---|---|
+| header + self row render | Norway, Malaysia, Nigeria, Australia, Iraq, Somalia, Netherlands — 7/7 |
+| correctly suppressed (state monopoly) | Kuwait |
+| six columns align under header | yes (screenshot verified) |
+| Norway peer set on NPV @$75 | all 5 peers above the self row |
+| negative downside preserved | Malaysia self row `-$33M` |
+| JS errors | **0** on every walk |
+
+## Deliberately out of scope — logged, not fixed
+The Country Profile prints **three different Europe figures for Norway** in one page:
+`19.1%` (regional median, self-**excluded**, `_vsRegionalMedianHtml`, section heading),
+`19.4%` (regional median, self-**included**, `_cpRegMed`, peer-context strip six lines below it in
+the **same card**), and `22.1%` (regional **mean**, `regionAvg465`, 4-price table footer) — and it
+reports the region as `n=30` in the Regional Peers block and `n=29` in the 4-price footer. That is a
+genuine T2 defensibility problem, but it is four separate computations across three sections and
+belongs to its own cycle rather than riding on this one.
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional banner, no
+routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener
+advanced filters still collapsed, presets still a dropdown. No new FAQ (still 974). No new tooltip on
+a pre-existing control — the two `title`s added are on a column that did not exist before. Tab order
+unchanged. v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP headline and
+removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk placement, v516 IRR removals and
+v518 evidence re-tiering all untouched.
+
+## Bookkeeping — not the improvement
+v518 → v519 in the two structural locations that carry a literal (page title, header badge);
+`_orcaVerNow()` reads the badge so clipboard citations follow. Changelog entry prepended. Grade
+tables not touched.
