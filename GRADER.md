@@ -12328,3 +12328,18 @@ removals all untouched.
 v517 → v518 in the two structural locations that carry a literal (page title, header badge);
 `_orcaVerNow()` reads the badge so clipboard citations follow automatically. Changelog entry
 prepended. Grade tables not touched.
+
+---
+## Cycle 417 Log — 2026-08-25 02:36
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 417 complete and pushed — `e3a55a9` + `17bfd8e` (petroleum-fiscal-db), `84d387c5a` (office mirror). v518.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (416 was T1; T6 was the least recent in the rotation.)
+
+## Friction
+I walked into the Screener cold and loaded the one preset that exists to answer T6: **"High Evidence — ≥80% A/B sourced"**, which the code comment calls *"highest data quality for due diligence."*
+
+It returned **171 countries out of 185*
