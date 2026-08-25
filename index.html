@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v533</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v534</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1350,7 +1350,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v533</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v534</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2572,6 +2572,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong style="color:var(--accent);">v534 (Aug 2026) &mdash; Cycle 433 (T2): every &ldquo;vs median&rdquo; and every rank on Country Profile was computed against 185 countries, 164 of which have no verified production data &mdash; which flipped the above/below-median verdict for five of the ten countries sampled</strong> &mdash; Task <strong>T2</strong> &mdash; &ldquo;is this one country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) into <em>Country Profile</em>, which auto-loads Norway. <strong>Friction:</strong> the profile&rsquo;s three comparative claims &mdash; the headline pill, the section-header pill and the peer strip &mdash; all read off <code>COUNTRY_DATA</code> unfiltered. Only <strong>22 of 185</strong> records carry <code>weighting = prod_weighted_blended</code>; the other 163 are equal-weighted averages with <code>prod_coverage_pct = 0</code> over as few as two contracts (Belgium 2, Bosnia 3, Sweden 4, Slovenia 5, France 5). Those 163 set the medians. The &ldquo;global median&rdquo; was <strong>28.4%</strong>; across the 21 non-monopoly producers it is <strong>59.4%</strong>. The &ldquo;Europe median (19.1%)&rdquo; the page quoted <em>is Slovenia</em> &mdash; 5 contracts, 15 facts, no production data &mdash; while the only real North Sea comparator, the UK at 49.2%, sat unmentioned in the same strip. The distortion changed the sign of the verdict, not just its size: <strong>UK +20.8pp &ldquo;above global median&rdquo; is actually &minus;10.2pp BELOW the producer median</strong>; Angola +24.6 &rarr; &minus;6.4; Brazil +27.2 &rarr; &minus;3.8; Australia +10.1 &rarr; &minus;20.9; and the <strong>USA</strong> read as mid-pack <strong>#62 of 185</strong> when it is <strong>#1 of 21 &mdash; the lowest-take producer on earth</strong>. The page also printed two different numbers for the same labelled quantity three inches apart (headline &ldquo;+48.9pp vs Europe (19.1%)&rdquo; vs peer strip &ldquo;Regional median (Europe): 19.4% &middot; +48.6pp vs region&rdquo;) because one excluded the selected country from the median and the other included it. <strong>Fixed:</strong> new <code>getProducerPeers()</code> / <code>getProducerContext()</code> read the peer set straight off the existing <code>weighting</code> field &mdash; <em>no threshold is invented</em> &mdash; and drop state monopolies exactly as <code>fmtTake</code> already does (Bahrain, Kuwait, Saudi Arabia at &ge;99.5%), leaving 21. <strong>(1)</strong> The headline rank and pill now read <em>&ldquo;#16 of 21 producers &middot; upper-mid among producers&rdquo;</em> and <em>&ldquo;+8.6pp vs producer median @$75&rdquo;</em>, with the all-185 basis kept and labelled on its own line beneath: <em>&ldquo;All 185 countries: #168 &middot; +39.6pp vs the all-country median (28.4%), which includes 164 countries with no production data.&rdquo;</em> Nothing was deleted &mdash; the analyst can now see the two bases disagree and by how much. <strong>(2)</strong> The regional pill compares against production-weighted regimes in the region only, and where there are fewer than three it <em>names</em> them rather than pretending a median exists: Norway now reads <em>&ldquo;+18.8pp vs United Kingdom (49.2%)&rdquo;</em>, Angola <em>&ldquo;&minus;18.1pp vs Libya &middot; &minus;28.1pp vs Nigeria&rdquo;</em>, Brazil <em>&ldquo;+22.8pp vs Latin America producers (32.9%)&rdquo;</em>; where a region has no other producer the pill says so instead of quoting a median of non-producers. <strong>(3)</strong> The peer strip is computed from the <em>same</em> <code>getProducerContext()</code> call as the pills, so the 19.1/19.4 contradiction cannot recur. <strong>(4)</strong> Countries outside the producer set are labelled <em>&ldquo;not production-weighted&rdquo;</em> rather than ranked as if comparable, and state monopolies are labelled as such rather than mislabelled. <strong>(5)</strong> The duplicate <em>&ldquo;Global rank #168 of 185 &middot; top 91% highest-take globally&rdquo;</em> badge is REMOVED from the section header &mdash; it restated the headline rank with no basis caveat directly beside the new producer pill, and it called Slovenia (5 contracts, no production data) &ldquo;bottom 15% (investor-friendly)&rdquo;, a screening verdict its data cannot support. <strong>Verified cold in Playwright</strong> against the local build, storage cleared, across ten profiles (Norway, UK, USA, Iraq, Angola, Brazil, Malaysia, Kazakhstan, plus the two edge cases Slovenia and Saudi Arabia): all three surfaces agree on one basis, and the strings <code>pp vs median (28.4%)</code>, <code>pp vs Europe (19.1%)</code> and <code>Regional median (</code> are absent from every one. <strong>0 JS errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness service-worker 404, present in the pre-edit baseline walk. <em>Known, not fixed &mdash; stated rather than hidden:</em> Explorer, Screener, Fiscal Compare and the Breakeven Map still rank against all 185 on the all-country basis; this cycle corrected Country Profile only, and the new headline line says so explicitly rather than leaving the analyst to assume the other tabs match. Whether 21 production-weighted countries is the right peer definition, or whether the other 164 should carry production data at all, is a data-pipeline call and not a UI one. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); <strong>no new tooltip</strong> on any pre-existing control. Tab order unchanged. v423, v430, v449, v451 (CP headline stays two-zone; Govt NPV stays removed from FC), v452 (Zone A keeps global rank + vs-median pill, still computed before the headline strip &mdash; the denominator changed, the elements and the TDZ-safe ordering did not), v489, v505, v515&ndash;v527 and v533 all untouched. Version v533&rarr;v534.<br><br>
                         <strong style="color:var(--accent);">v533 (Aug 2026) &mdash; Cycle 432 (T6): the Fiscal Compare Quality column renders <strong>G</strong> on 154 of 185 rows, and the guide that defines the column did not contain the letter G</strong> &mdash; Task <strong>T6</strong> &mdash; &ldquo;where did this number come from and how solid is the evidence?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) from Home into <em>Fiscal Compare</em> and read the one column on the flagship table that answers the provenance question. <strong>Friction:</strong> counted off the live DOM on the cold default view, the Quality column renders <strong>G&nbsp;154 &middot; A&nbsp;27 &middot; B&nbsp;3 &middot; D&nbsp;1</strong> &mdash; <strong>83% of the table is G</strong>. The <em>Reading this table</em> guide directly above it, which is visible on a cold load and is the only definition of that column anywhere on the tab, said: &ldquo;<em>Quality = data quality score: % of fiscal facts from A/B-tier sources. A = primary source&hellip; B = secondary source (Wood Mac, Rystad, IEA, operator filings); C = derived/estimated. IC rule: only cite countries with &ge;80% A/B in final IC memos.</em>&rdquo; <strong>The letter G does not appear in it.</strong> The analyst is handed a three-letter scale, looks at the table, and 83% of rows carry a letter that is not on the scale &mdash; and the prescribed decision rule (&ldquo;is this row &ge;80% A/B?&rdquo;) is a category error against a G, which is not a percentage at all. Worse, the guide points at the opposite of the truth for exactly the rows that matter: a missing A/B grade reads as <em>thin data</em>, when the cell&rsquo;s own tooltip says the reverse &mdash; &ldquo;<em>the database does hold N% A/B-tier fiscal facts for X, but this figure did not use them</em>.&rdquo; G means the take never touched the sourced facts; it is the mechanic&rsquo;s standard default, every G row on the same mechanic lands on the identical take, NPV and breakeven, and it is not citable. That is the single most decision-relevant fact on the tab and the guide omitted it. Two further claims in the same sentence were inherited falsehoods that earlier cycles disproved on other surfaces and never propagated here: <strong>(i)</strong> &ldquo;B = &hellip; operator filings&rdquo; &mdash; <strong>v527</strong> counted from live <code>country_data.json</code> that 97.9% of tier B is the EY/KPMG/IHS bulk harvest and <em>zero</em> operator filings appear in tier B; Home was corrected, this guide was not. <strong>(ii)</strong> &ldquo;only cite countries with &ge;80% A/B&rdquo; &mdash; <strong>v518</strong> established that gate passes <strong>171 of 185</strong> countries and inverts (USA/Georgia/Mongolia score 100% A/B off bulk tables while Senegal at 67.2% primary law fails), and removed it from the Screener; the guide still prescribed it as the IC rule. <strong>Fixed: (1)</strong> the Quality definition is rewritten to describe what the column actually renders, <strong>leading with G</strong> &mdash; what it means, why G rows cannot be ranked against each other, that the country&rsquo;s facts exist but were not used, and that it must not be cited. A/B/C/D are redefined as <em>the row was modelled on that country&rsquo;s own terms</em>, with the real thresholds (A&nbsp;&ge;80 &middot; B&nbsp;&ge;60 &middot; C&nbsp;&ge;40 &middot; D below) and the v518/v527 caveat that tier B is a country-level guide, never read off an individual contract. The dead &ge;80% A/B IC rule is gone. <strong>(2)</strong> A live <code>#fc-quality-mix</code> line is computed inside <code>renderFCResults()</code> off <em>exactly the branch the cell render uses</em> (<code>r.termsBasis === 'default'</code>, else the <code>ab_pct</code> thresholds), so the guide cannot drift from the table: <em>&ldquo;In this view: 154 of the 185 rows now on screen (83%) are G &mdash; generic mechanic default, not citable. The other 31 are on their own terms: 27 A &middot; 3 B &middot; 1 D.&rdquo;</em> It recounts on every render, so the region chips and the profile select move it. <strong>(3)</strong> The guide also described an <strong>IRR</strong> column that has not existed since <strong>v525</strong> (&ldquo;124 of 185 countries shown&rdquo;), and promised a citation string carrying an IRR that <strong>v523</strong> removed &mdash; v523 corrected the other two onboarding lines and missed this block. The IRR paragraph is deleted and the closing line now names the four-price matrix and citation contents the buttons actually produce. <strong>Verified cold in Playwright</strong> against the local build, storage cleared: the mix line reconciles against an independent count of the rendered <code>.tier-badge</code> cells on three views &mdash; cold default <strong>154 G / 27 A / 3 B / 1 D of 185</strong>, Europe <strong>28 G / 2 A of 30 (93%)</strong>, North America <strong>1 G / 1 A of 2 (50%)</strong>, with singular grammar on the one-row branch; the guide now contains &ldquo;G&rdquo;, contains no &ldquo;IRR&rdquo;, and neither the &ge;80% A/B rule nor &ldquo;operator filings&rdquo; appears anywhere in it. <strong>0 JS errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness service-worker 404. <em>Known, not fixed &mdash; stated rather than hidden:</em> this corrects the <em>explanation</em> of the Quality column; it does not reduce the 154 generic rows, which requires country-specific terms to be loaded into the compare engine and is a data-pipeline job. The Home quickstart&rsquo;s Fiscal Compare card and the FC IC Analyst Guide describe the Quality column in their own words and were not re-audited this cycle. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); <strong>no new tooltip</strong> on any pre-existing control. Tab order unchanged. v423 guide dismissal (session + permanent) still works, v430, v449, v451, v452, v489, v505 G badge, v515&ndash;v525 IRR removals, v527 and v532 all untouched. Version v532&rarr;v533.<br><br>
                         <strong style="color:var(--accent);">v532 (Aug 2026) &mdash; Cycle 431 (T4): the Regional Reform Tilt panel dropped 13 of the 21 jurisdictions it scores, including every country in the Americas &mdash; and Latin America is the most net-tightening region on record</strong> &mdash; Task <strong>T4</strong> &mdash; &ldquo;what is my fiscal-stability and reform exposure here?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) from Home into <em>Reform Risk</em> &mdash; the tab the Home quickstart&rsquo;s own Step 4 sends the analyst to before finalising an IC memo. <strong>Friction:</strong> the first panel under the snapshot bar is <em>Regional Reform Tilt Since 2010</em>, whose stated question is &ldquo;<em>have regions been net-tightening or net-liberalizing?</em>&rdquo; It rendered <strong>three rows &mdash; Africa, Middle East, Europe</strong>. No Americas row. No Asia-Pacific row. The cause was a hardcoded bucket map in <code>renderReformRisk()</code>: <code>var regionDefs = {'Africa':[], 'Middle East':[], 'Asia Pacific':[], 'Americas':[], 'Europe':[]}</code>, filled by <code>if (region &amp;&amp; regionDefs[region]) regionDefs[region].push(r)</code> &mdash; a silent drop for any non-matching key. <strong><code>COUNTRY_DATA</code> does not use that vocabulary.</strong> Its region strings are <code>Africa, Europe, Asia, Latin America, Oceania, Middle East, CIS/FSU, North America, Other, Unknown</code>. <code>'Asia Pacific'</code> and <code>'Americas'</code> matched nothing, ever. Counted against the data: <strong>13 of the 21 scored jurisdictions &mdash; 62% &mdash; never reached the table.</strong> Brazil, Mexico, Venezuela, Ecuador, Colombia, Guyana, USA, Canada, Australia, India, Indonesia, Kazakhstan and Russia were all invisible. <strong>Latin America is the largest scored region (6 jurisdictions) and by a wide margin the most tightening one on file &mdash; 9 tightening events against 1 liberalizing, a +8 margin, versus Africa&rsquo;s +1 (4 vs 3).</strong> The panel showed Africa as the headline tightening region and omitted the one that actually is. Worse, its footnote read &ldquo;<em>Note: Only countries in ORCA reform history database included</em>&rdquo; &mdash; which tells the analyst the absence is a sourcing gap. It is not; the data is present and scored three inches lower in the <em>Most Frequently Reformed Regimes</em> table on the same screen. An analyst screening the Atlantic Frontier (Guyana/Brazil, one of the platform&rsquo;s own flagship comparison sets) read this panel as evidence of no regional reform signal for the Americas. <strong>(1) Regions are now derived from the data</strong> rather than matched against a whitelist, so every scored jurisdiction lands in a row: <strong>3 rows became 8</strong>, covering 21 of 21. Latin America now leads the table at <code>&uarr; Tightening +8</code>. <code>Other</code>/<code>Unknown</code>/missing regions fall into a visible <em>Unclassified</em> bucket instead of vanishing. <strong>(2) Every row states the jurisdictions it rests on</strong> &mdash; <em>n of N sourced</em> under the region name, and the country names outright where there are two or fewer. &ldquo;Europe&rdquo; now reads <em>2 of 30 sourced &middot; United Kingdom, Norway</em>, and &ldquo;Middle East / Neutral / 70&rdquo; reads <em>1 of 14 sourced &middot; Iraq</em> &mdash; so a one-country row cannot be read as a finding about fourteen. <strong>(3) The tilt margin is printed beside the label.</strong> <code>&uarr; Tightening</code> alone gave Africa&rsquo;s one-event margin over 23 events the same visual weight as Latin America&rsquo;s nine-to-one. The label now carries <code>+8</code>, <code>+1</code>, <code>+3</code>. <strong>(4) A Neutral column was added</strong> and the mix bar gained a hover breakdown, because 46 of the 83 events on record carry no direction and were previously invisible &mdash; Africa&rsquo;s &ldquo;tightening&rdquo; verdict rests on 7 directional events out of 23. <strong>(5) The misleading footnote is replaced</strong> by a reconciliation the analyst can check: &ldquo;<em>Rows cover all 21 of the 21 jurisdictions with a sourced reform log, across 8 regions&hellip; a row is an average over those jurisdictions only, never over the region.</em>&rdquo; <strong>Verified cold in Playwright</strong> against the local build, storage cleared: 8 rows render, the per-row country counts sum to 21, and every row&rsquo;s tightened/liberalized/neutral totals and average stability score reconcile against an independent recomputation from <code>reform_history.json</code> + <code>country_data.json</code> (Latin America 9/1/12 &middot; 75, Africa 4/3/16 &middot; 76, Europe 7/4/2 &middot; 48, CIS/FSU 2/0/5 &middot; 85, Asia 2/1/3 &middot; 78, North America 2/1/2 &middot; 93, Oceania 1/0/3 &middot; 55, Middle East 0/0/3 &middot; 70). <strong>0 JS errors.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <em>Known, not fixed &mdash; stated rather than hidden:</em> the Home quickstart Step 4 tells the analyst to open Reform Risk &ldquo;to see the Stability Score (&#9670;&#9670;&#9670;&#9670;&#9670;)&rdquo;, but the diamond scale lives on <em>Fiscal Compare</em> &mdash; Reform Risk renders a 0&ndash;100 numeric score &mdash; and its stated rule (&ldquo;5 reforms since 2010 = probability-weighted NPV&rdquo;) does not match the tab&rsquo;s own rule (&ge;3 &rarr; 3&ndash;5pp; score &le;20 &rarr; 5&ndash;8pp plus the scenario). Separately, FAQ 7105 asserts Africa runs &ldquo;5&ndash;7 tightening events vs 1&ndash;2 liberalizing per 5-year period&rdquo; against an all-time record of 4 vs 3. Both are text corrections on other surfaces, not this panel. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); no new tooltip on a pre-existing control &mdash; the two added are on the new Neutral column and the mix bar whose contents changed. Tab order unchanged. v430, v449, v451, v452, v489, v502, v514, v520, v526 and v531 all untouched. Version v531&rarr;v532.<br><br>
                         <strong style="color:var(--accent);">v531 (Aug 2026) &mdash; Cycle 430 (T3): Side-by-Side’s Govt Take block and Economics block rank the same countries in opposite orders, and the tab tells you the values are directly comparable</strong> &mdash; Task T3 &mdash; “how do these three countries compare side by side?” Walked cold (fresh browser context, no <code>sessionStorage</code> or <code>localStorage</code>) from Home into Side-by-Side. <strong>Friction:</strong> click the tab’s first quickstart preset, <em>Atlantic Frontier Quartet</em>, and the grid says <strong>Brazil 55.6% take</strong> against <strong>Guyana 54.1%</strong> — and eight rows lower says <strong>Brazil $1.7B contractor NPV</strong> against <strong>Guyana $1.1B</strong>. Brazil takes more of the barrel and leaves the contractor 62% more value, at the same price, under a <em>Profile basis</em> strip at the top of the tab that reads “<em>Same basis as Fiscal Compare — values are directly comparable</em>.” The same set inverts against Angola too. <strong>Cause, read out of the pipeline rather than guessed:</strong> <code>rebuild_country_data.py</code> builds <code>take_50/75/100/125</code> through <code>weighted_take()</code> — production-weighted or blended per country — and builds <code>npv_50/75/100/125</code> and <code>be_75</code> through a bare <code>AVG(contractor_npv_usd_mm)</code> over every row in <code>dcf_results</code>, an unweighted mean the script’s own header labels “<em>for display only, not weighting</em>.” The two blocks are averaged over the same contracts with different weights, so they describe different contract mixes. The measured symptom: the pre-take project value the two rows jointly imply, <code>npv_75 / (1 &minus; take_75)</code>, runs from <strong>$1,306M (Russia) to $9,569M (Turkmenistan)</strong> — a 7.3× spread on a profile that is identical for every column, so they are not two views of one cash flow. <strong>631 of the 5,744 country pairs within 10pp of take (11.0%) invert on NPV</strong>, and one of the four shipped quickstart presets is such a pair. The only row anywhere near this was <em>Weighting Method</em>, which sat inside the Govt Take block and described the take rows only. <strong>(1) The Economics block now declares its own basis.</strong> A new <em>NPV weighting</em> row leads it, reading <code>Equal-weighted · all 1,193</code> and flagging <code>(≠ take basis)</code> in orange on every column whose take is production-weighted or blended — 3 of 4 columns on the Atlantic Frontier set. The old row is renamed <em>Take weighting</em> and its tooltip now says it governs the four Govt Take rows and nothing else. Because both ride the shared <code>rows</code> array, they travel into <code>#cmp-data-table</code> and both clipboard flavours with the numbers they qualify. <strong>(2) The contradiction is detected and named when it actually occurs.</strong> A computed block under the grid scans the loaded columns for any country that shows both a higher take AND a higher contractor NPV than another, and states the pair in full: “<em>Brazil takes more of the barrel than Guyana (55.6% vs 54.1%) and still shows more contractor NPV ($1.7B vs $1.1B).</em>” It gives the aggregation reason, the $1.3B–$9.6B implied-value spread, and the instruction — rank on Govt Take, read NPV as the contract-set average, do not present the NPV ordering as the fiscal ranking in an IC memo. Nothing renders when the two orderings agree. <strong>Verified cold in Playwright</strong>, storage cleared, across six sets: the cold seed (Norway/UK/Netherlands) correctly shows <em>no</em> banner because Netherlands leads on both; Atlantic Frontier Quartet and Guyana/Brazil/Angola both fire and name two pairs; Norway/Nigeria is clean; a state-monopoly column (Saudi Arabia) and a full 5-country set both render. The <em>NPV weighting</em> row is present in all six and in the export table (21 rows). <strong>0 JS errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the local build: <strong>135 PASS / 0 FAIL / 1 WARN</strong> — the WARN is the pre-existing local-harness artifact (the service worker registers <code>/petroleum-fiscal-db/sw.js</code>, the GitHub Pages subpath, which 404s on a root-served local server). <em>Known, not fixed:</em> the fix reports the divergence rather than removing it. Making the two blocks agree means production-weighting the NPV aggregate in <code>rebuild_country_data.py</code> — a data-pipeline change and a business-logic call, not a UI cycle. Stated rather than hidden. Nothing on the STILL LOCKED list was touched. Version v530&rarr;v531.<br><br>
@@ -22558,6 +22559,63 @@ function getGlobalTakeRank(country) {
   return { rank, n, pctHigherThanThis };
 }
 
+// v534 (T2): the peer basis behind every "vs median" and every rank claim on Country Profile.
+//
+// COUNTRY_DATA holds 185 records, but only 22 of them have ANY verified block-level
+// production behind the number (weighting = 'prod_weighted_blended'). The other 163 are
+// equal-weighted averages with prod_coverage_pct = 0 over as few as 2 contracts —
+// Belgium 2, Bosnia 3, Sweden 4, Slovenia 5, France 5. Those 163 dominate every median
+// the profile quoted: the "global median" was 28.4% and the "Europe median" was 19.1%,
+// which is Slovenia (5 contracts, 15 facts, no production data).
+//
+// The distortion flipped the sign of the headline verdict, not just its size:
+//   UK        +20.8pp "above global median"  ->  -10.2pp BELOW the producer median
+//   Angola    +24.6pp above                  ->   -6.4pp below
+//   Brazil    +27.2pp above                  ->   -3.8pp below
+//   Australia +10.1pp above                  ->  -20.9pp below
+//   USA       #62 of 185 (mid-pack)          ->  #1 of 21 — lowest-take producer on earth
+//
+// The producer set is read straight off the existing `weighting` field — no threshold is
+// invented here — and state monopolies are dropped exactly as fmtTake/_fmtTakeCell already
+// drop them (Bahrain, Kuwait, Saudi Arabia at >=99.5%), leaving 21.
+var _producerPeerCache = null;
+function getProducerPeers() {
+  if (_producerPeerCache) return _producerPeerCache;
+  _producerPeerCache = (COUNTRY_DATA || []).filter(function(c) {
+    return c.take_75 != null && !isStateMonopoly(c.take_75)
+        && String(c.weighting || '').indexOf('prod_weighted') === 0;
+  }).sort(function(a, b) { return a.take_75 - b.take_75; });
+  return _producerPeerCache;
+}
+function _cpMedianOf(nums) {
+  if (!nums || !nums.length) return null;
+  var v = nums.slice().sort(function(a, b) { return a - b; });
+  return v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
+}
+// Returns null only if the producer set is too small to median at all.
+function getProducerContext(countryName) {
+  var peers = getProducerPeers();
+  if (peers.length < 3) return null;
+  var self = (COUNTRY_DATA || []).filter(function(c) { return c.country === countryName; })[0];
+  var region = self ? self.region : null;
+  var idx = -1;
+  for (var i = 0; i < peers.length; i++) { if (peers[i].country === countryName) { idx = i; break; } }
+  var regionPeers = peers.filter(function(c) { return c.region === region && c.country !== countryName; });
+  var rank = idx >= 0 ? idx + 1 : null;
+  return {
+    n: peers.length,
+    median: _cpMedianOf(peers.map(function(c) { return c.take_75; })),
+    rank: rank,
+    inSet: idx >= 0,
+    // % of producers with a HIGHER take than this one — same convention as getGlobalTakeRank
+    pctHigherThanThis: rank ? Math.round((peers.length - rank) / peers.length * 100) : null,
+    region: region,
+    regionPeers: regionPeers,
+    regionMedian: regionPeers.length ? _cpMedianOf(regionPeers.map(function(c) { return c.take_75; })) : null,
+    nEqualWeighted: ((COUNTRY_DATA || []).filter(function(c) { return c.take_75 != null; }).length) - peers.length
+  };
+}
+
 // v43: Fiscal Predictability Score (0–100)
 // Penalizes: wide IQR (regime diversity), high price swing (sensitivity), multiple mechanics
 // Norway ~ 76, USA ~ 75, UK ~ 65, Brazil ~ 63, Iraq ~ 36
@@ -25832,23 +25890,42 @@ function loadCountryProfile(country) {
   })() : '<span id="cp-be-head" style="font-size:11px;color:var(--muted);opacity:.65;" title="Breakeven not computed — insufficient per-contract cost data (opex/capex) for NPV=0 solution. Use Scenario Builder with field-specific inputs for a project-level estimate. See FAQ A381 for proxy approach using Take% and Price Swing.">BE: n/a</span>';
   // v452: compute global rank + vs-median BEFORE _headlineStrip344 uses them
   const _grank452 = getGlobalTakeRank(country);
-  const _grankHtml452 = _grank452 ? (function() {
-    var { rank, n, pctHigherThanThis } = _grank452;
-    var isHighTake = pctHigherThanThis <= 20;
-    var isLowTake  = pctHigherThanThis >= 80;
-    var color = isHighTake ? 'var(--red)' : isLowTake ? 'var(--green)' : pctHigherThanThis <= 40 ? 'var(--orange)' : 'var(--yellow)';
-    var label = isHighTake ? 'high-take globally' : isLowTake ? 'low-take globally' : pctHigherThanThis <= 40 ? 'upper-mid take' : 'lower-mid take';
-    return '<span style="font-size:11px;color:var(--muted);">#<strong style="color:var(--text);">' + rank + '</strong> of ' + n + ' \u00b7 <strong style="color:' + color + ';">' + label + '</strong></span>';
+  // v534 (T2): rank and vs-median now read against the 21 production-weighted regimes, not
+  // against all 185. Both elements stay (v452 lock) and stay computed before the strip (TDZ);
+  // what changed is the denominator, and the all-185 figures move to their own second line
+  // so nothing is lost \u2014 the analyst can now see the two bases disagree, and by how much.
+  const _prodCtx534 = getProducerContext(country);
+  const _grankHtml452 = (_prodCtx534 && _prodCtx534.inSet) ? (function() {
+    var pct = _prodCtx534.pctHigherThanThis;
+    var isHighTake = pct <= 20;
+    var isLowTake  = pct >= 80;
+    var color = isHighTake ? 'var(--red)' : isLowTake ? 'var(--green)' : pct <= 40 ? 'var(--orange)' : 'var(--yellow)';
+    var label = isHighTake ? 'high-take among producers' : isLowTake ? 'low-take among producers' : pct <= 40 ? 'upper-mid among producers' : 'lower-mid among producers';
+    return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="Rank among the ' + _prodCtx534.n + ' countries whose take is production-weighted \u2014 the ones with verified block-level production behind the number. These are the regimes an IC screening actually competes for capital against. The all-185 rank is on the line below; it includes ' + _prodCtx534.nEqualWeighted + ' countries with no production data at all.">#<strong style="color:var(--text);">' + _prodCtx534.rank + '</strong> of ' + _prodCtx534.n + ' producers \u00b7 <strong style="color:' + color + ';">' + label + '</strong></span>';
+  })() : _grank452 ? (function() {
+    // Outside the producer set. Two different reasons \u2014 say which, do not conflate them.
+    // A state monopoly IS production-weighted; it is excluded because take >= 99.5% means no
+    // contractor access, so ranking it against contractor regimes is meaningless either way.
+    if (_isMonopoly) {
+      return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="State monopoly \u2014 no contractor access, so government take is not a regime an IOC can enter and is excluded from the producer peer median. The all-185 rank is shown only for completeness.">#<strong style="color:var(--text);">' + _grank452.rank + '</strong> of ' + _grank452.n + ' \u00b7 <strong style="color:var(--muted);">state monopoly \u2014 not a contractor regime</strong></span>';
+    }
+    return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="This country is not in the production-weighted set \u2014 its take is an equal-weighted average across ' + (d.n || 0) + ' contract' + ((d.n === 1) ? '' : 's') + ' with no verified production data (prod_coverage_pct = ' + (d.prod_coverage_pct || 0).toFixed(0) + '). It is a fiscal-terms comparison, not a producer benchmark, and it should not be ranked head-to-head against one. The rank shown is across all 185 countries and mixes both kinds.">#<strong style="color:var(--text);">' + _grank452.rank + '</strong> of ' + _grank452.n + ' \u00b7 <strong style="color:var(--muted);">not production-weighted</strong></span>';
   })() : '';
   const _globalTakes452 = COUNTRY_DATA.filter(function(x){return x.take_75!=null;}).map(function(x){return x.take_75;}).sort(function(a,b){return a-b;});
   const _globalMedian452 = _globalTakes452.length ? _globalTakes452[Math.floor(_globalTakes452.length/2)] : null;
-  const _vsMedianHtml452 = (!_isMonopoly && d.take_75 != null && _globalMedian452 != null) ? (function(){
-    var diff = d.take_75 - _globalMedian452;
+  const _prodMedian534 = _prodCtx534 ? _prodCtx534.median : null;
+  const _vsMedianHtml452 = (!_isMonopoly && d.take_75 != null && _prodMedian534 != null) ? (function(){
+    var diff = d.take_75 - _prodMedian534;
     var sign = diff >= 0 ? '+' : '';
     var col = Math.abs(diff) < 3 ? 'var(--muted)' : diff > 0 ? 'var(--orange)' : 'var(--green)';
     var bgCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.1)' : diff > 0 ? 'rgba(249,115,22,.1)' : 'rgba(34,197,94,.1)';
     var borderCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.3)' : diff > 0 ? 'rgba(249,115,22,.35)' : 'rgba(34,197,94,.35)';
-    return '<span style="display:inline-flex;align-items:center;font-size:11px;color:' + col + ';font-weight:600;padding:2px 9px;background:' + bgCol + ';border:1px solid ' + borderCol + ';border-radius:12px;" title="Global median govt take @$75/bbl is ' + _globalMedian452.toFixed(1) + '% (across all 185 countries with take data)">' + sign + diff.toFixed(1) + 'pp vs median @$75</span>';
+    return '<span style="display:inline-flex;align-items:center;font-size:11px;color:' + col + ';font-weight:600;padding:2px 9px;background:' + bgCol + ';border:1px solid ' + borderCol + ';border-radius:12px;cursor:help;" title="Median govt take @$75/bbl across the ' + _prodCtx534.n + ' production-weighted regimes is ' + _prodMedian534.toFixed(1) + '%. This is the number to cite. The all-185 median of ' + (_globalMedian452 != null ? _globalMedian452.toFixed(1) + '%' : 'n/a') + ' is pulled down by ' + _prodCtx534.nEqualWeighted + ' countries with no verified production data.">' + sign + diff.toFixed(1) + 'pp vs producer median @$75</span>';
+  })() : '';
+  // v534: the all-185 basis, kept and labelled, on its own muted line beneath the pill.
+  const _allBasisHtml534 = (!_isMonopoly && d.take_75 != null && _grank452 && _globalMedian452 != null && _prodCtx534) ? (function(){
+    var diffAll = d.take_75 - _globalMedian452;
+    return '<span style="font-size:10px;color:var(--muted);opacity:.8;cursor:help;" title="Shown because it is the figure the profile quoted until v534, and it is still what the Explorer and Screener rank against. It mixes ' + _prodCtx534.n + ' production-weighted regimes with ' + _prodCtx534.nEqualWeighted + ' equal-weighted averages built on as few as 2 contracts, so it is a weaker basis for an IC claim.">All 185 countries: #' + _grank452.rank + ' \u00b7 ' + (diffAll >= 0 ? '+' : '') + diffAll.toFixed(1) + 'pp vs the all-country median (' + _globalMedian452.toFixed(1) + '%), which includes ' + _prodCtx534.nEqualWeighted + ' countries with no production data</span>';
   })() : '';
   // v454: IC Memo implication for CP headline strip — distills take+swing+stability into a specific IC memo rule
   const _cpIcMemo454 = (!_isMonopoly && d.take_75 != null) ? (function() {
@@ -25893,6 +25970,7 @@ function loadCountryProfile(country) {
         <span style="font-size:12px;color:var(--muted);">govt take @$75</span>
       </div>
       <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">${_grankHtml452}${_vsMedianHtml452}</div>
+      ${_allBasisHtml534 ? `<div style="max-width:340px;line-height:1.45;">${_allBasisHtml534}</div>` : ''}
     </div>
   </div>
   <div style="width:1px;background:var(--border);align-self:stretch;margin:0 18px;flex-shrink:0;"></div>
@@ -25987,24 +26065,15 @@ function loadCountryProfile(country) {
   // factsSection is referenced in the mainSections template; define it here in loadCountryProfile scope
   const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   const factsSection = `<div class="dd-section" id="dd-facts-${ddSlug}"><h3>Key Fiscal Parameters</h3><div id="dd-facts-content-${ddSlug}" style="color:var(--muted);font-size:12px;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;" aria-hidden="true"></span>Loading sourced fiscal parameters\u2026</span></div></div>`;
-  const _grank = getGlobalTakeRank(country);
-  const _grankHtml = _grank
-    ? (function() {
-        const { rank, n, pctHigherThanThis } = _grank;
-        // pctHigherThanThis: % of countries with higher take than this one
-        // Low pctHigherThanThis = few countries higher = HIGH TAKE country
-        // High pctHigherThanThis = many countries higher = LOW TAKE country
-        const isHighTake = pctHigherThanThis <= 20;   // top 20% globally
-        const isLowTake  = pctHigherThanThis >= 80;   // bottom 20% globally
-        const color = isHighTake ? 'var(--red)' : isLowTake ? 'var(--green)' : pctHigherThanThis <= 40 ? 'var(--orange)' : 'var(--yellow)';
-        const label = isHighTake
-          ? `top ${100 - pctHigherThanThis}% highest-take globally`
-          : isLowTake
-            ? `bottom ${100 - pctHigherThanThis}% (investor-friendly)`
-            : `mid-range globally`;
-        return `<span style="font-size:11px;color:var(--muted);font-weight:400;margin-left:10px;">Global rank <strong style="color:var(--text)">#${rank} of ${n}</strong> · <strong style="color:${color}">${label}</strong></span>`;
-      })()
-    : '';
+  // v534 (T2): the "Global rank #168 of 185 · top 91% highest-take globally" badge that sat in
+  // this section header is REMOVED. It duplicated the rank already in the headline strip ten
+  // lines above, and it stated the all-185 verdict with no basis caveat right beside the pill
+  // that now gives the producer verdict — so the header read "TOP 91% HIGHEST-TAKE GLOBALLY"
+  // next to "+8.6pp vs producer median" for the same country. Worse for the 164 equal-weighted
+  // records: it called Slovenia (5 contracts, no production data) "bottom 15% (investor-
+  // friendly)", a screening verdict its data cannot support. Both ranks — producer and all-185
+  // — remain in the headline strip, each labelled with the population it was computed over.
+  const _grankHtml = '';
   // Feature 1: state monopoly display helper for take grid cells (declaration moved above NPV/Swing; removed duplicate here)
   function _fmtTakeCell(v) {
     if (v == null) return '—';
@@ -26017,27 +26086,43 @@ function loadCountryProfile(country) {
   // Compute global median take for vs-median callout
   const _globalTakes = COUNTRY_DATA.filter(x => x.take_75 != null).map(x => x.take_75).sort((a,b)=>a-b);
   const _globalMedian = _globalTakes.length ? _globalTakes[Math.floor(_globalTakes.length/2)] : null;
-  const _vsMedianHtml = (!_isMonopoly && d.take_75 != null && _globalMedian != null) ? (function(){
-    const diff = d.take_75 - _globalMedian;
+  // v534 (T2): was "+39.6pp vs median (28.4%)" off all 185. Same producer basis as the headline
+  // pill above it, so the two cannot disagree on one screen.
+  const _vsMedianHtml = (!_isMonopoly && d.take_75 != null && _prodMedian534 != null) ? (function(){
+    const diff = d.take_75 - _prodMedian534;
     const sign = diff >= 0 ? '+' : '';
     const col = Math.abs(diff) < 3 ? 'var(--muted)' : diff > 0 ? 'var(--orange)' : 'var(--green)';
-    const lbl = Math.abs(diff) < 3 ? 'at global median' : diff > 0 ? 'above global median' : 'below global median';
     var bgCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.1)' : diff > 0 ? 'rgba(249,115,22,.1)' : 'rgba(34,197,94,.1)';
     var borderCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.3)' : diff > 0 ? 'rgba(249,115,22,.35)' : 'rgba(34,197,94,.35)';
-    return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:${col};font-weight:600;margin-left:10px;padding:2px 10px;background:${bgCol};border:1px solid ${borderCol};border-radius:12px;" title="Global median government take @$75/bbl across 185 countries is ${_globalMedian.toFixed(1)}%">${sign}${diff.toFixed(1)}pp vs median (${_globalMedian.toFixed(1)}%)</span>`;
+    return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:${col};font-weight:600;margin-left:10px;padding:2px 10px;background:${bgCol};border:1px solid ${borderCol};border-radius:12px;cursor:help;" title="Median across the ${_prodCtx534.n} production-weighted regimes is ${_prodMedian534.toFixed(1)}%. All-185 median is ${_globalMedian != null ? _globalMedian.toFixed(1) + '%' : 'n/a'}; it includes ${_prodCtx534.nEqualWeighted} countries with no verified production data.">${sign}${diff.toFixed(1)}pp vs producer median (${_prodMedian534.toFixed(1)}%)</span>`;
   })() : '';
   // Compute regional median take for vs-regional-median callout
   const _regionName = d.region && d.region !== 'Unknown' ? d.region : null;
-  const _vsRegionalMedianHtml = (!_isMonopoly && d.take_75 != null && _regionName) ? (function(){
-    const rTakes = COUNTRY_DATA.filter(x => x.take_75 != null && x.region === _regionName && x.country !== d.country).map(x => x.take_75).sort((a,b)=>a-b);
-    if (rTakes.length < 3) return '';
-    const rMedian = rTakes[Math.floor(rTakes.length/2)];
+  // v534 (T2): this pill read "+48.9pp vs Europe (19.1%)" for Norway. That 19.1% is Slovenia —
+  // 5 contracts, 15 facts, zero production data — because it was the median of all 30 European
+  // records, 28 of which are equal-weighted averages over non-producing countries. It was the
+  // most quotable comparative claim on the page and it did not survive one question in an IC
+  // meeting. It now compares against production-weighted regimes in the region only, and when
+  // there are fewer than three it NAMES them instead of pretending a median exists.
+  const _vsRegionalMedianHtml = (!_isMonopoly && d.take_75 != null && _regionName && _prodCtx534) ? (function(){
+    const rp = _prodCtx534.regionPeers;
+    const pillCss = (diff) => {
+      const col = Math.abs(diff) < 3 ? 'var(--muted)' : diff > 0 ? 'rgba(249,115,22,.9)' : 'rgba(34,197,94,.9)';
+      const bgCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.08)' : diff > 0 ? 'rgba(249,115,22,.08)' : 'rgba(34,197,94,.08)';
+      const borderCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.25)' : diff > 0 ? 'rgba(249,115,22,.28)' : 'rgba(34,197,94,.28)';
+      return `font-size:11px;color:${col};font-weight:600;margin-left:6px;padding:2px 10px;background:${bgCol};border:1px solid ${borderCol};border-radius:12px;`;
+    };
+    if (rp.length === 0) {
+      return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--muted);font-weight:600;margin-left:6px;padding:2px 10px;background:rgba(148,163,184,.08);border:1px dashed rgba(148,163,184,.35);border-radius:12px;cursor:help;" title="No other country in ${_regionName} has production-weighted take data, so there is no regional benchmark worth citing. The other ${_regionName} records are equal-weighted averages over non-producing jurisdictions; a median of them is not a peer comparison. Use the ${_prodCtx534.n}-country producer median instead, or the Peer Comparison table below, which matches on fiscal terms rather than geography.">no producer peer in ${_regionName}</span>`;
+    }
+    if (rp.length < 3) {
+      const parts = rp.map(p => { const dv = d.take_75 - p.take_75; return `${dv >= 0 ? '+' : ''}${dv.toFixed(1)}pp vs ${p.country} (${p.take_75.toFixed(1)}%)`; });
+      const diff0 = d.take_75 - rp[0].take_75;
+      return `<span style="display:inline-flex;align-items:center;gap:4px;${pillCss(diff0)}cursor:help;" title="${rp.length === 1 ? rp[0].country + ' is the only other production-weighted regime in ' + _regionName : 'The only other production-weighted regimes in ' + _regionName + ' are ' + rp.map(p=>p.country).join(' and ')}. A ${_regionName} median is not shown because the region's other records are equal-weighted averages over non-producing jurisdictions.">${parts.join(' · ')}</span>`;
+    }
+    const rMedian = _prodCtx534.regionMedian;
     const diff = d.take_75 - rMedian;
-    const sign = diff >= 0 ? '+' : '';
-    const col = Math.abs(diff) < 3 ? 'var(--muted)' : diff > 0 ? 'rgba(249,115,22,.9)' : 'rgba(34,197,94,.9)';
-    var bgCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.08)' : diff > 0 ? 'rgba(249,115,22,.08)' : 'rgba(34,197,94,.08)';
-    var borderCol = Math.abs(diff) < 3 ? 'rgba(148,163,184,.25)' : diff > 0 ? 'rgba(249,115,22,.28)' : 'rgba(34,197,94,.28)';
-    return `<span style="display:inline-flex;align-items:center;gap:4px;font-size:11px;color:${col};font-weight:600;margin-left:6px;padding:2px 10px;background:${bgCol};border:1px solid ${borderCol};border-radius:12px;" title="${_regionName} median government take @$75/bbl (${rTakes.length} countries) is ${rMedian.toFixed(1)}%">${sign}${diff.toFixed(1)}pp vs ${_regionName} (${rMedian.toFixed(1)}%)</span>`;
+    return `<span style="display:inline-flex;align-items:center;gap:4px;${pillCss(diff)}cursor:help;" title="Median across the ${rp.length} other production-weighted regimes in ${_regionName}: ${rp.map(p=>p.country+' '+p.take_75.toFixed(1)+'%').join(' · ')}. Equal-weighted, non-producing ${_regionName} records are excluded.">${diff >= 0 ? '+' : ''}${diff.toFixed(1)}pp vs ${_regionName} producers (${rMedian.toFixed(1)}%)</span>`;
   })() : '';
   const mainSections = `<div class="dd-section">
     <h3>Govt Take by Price Scenario ${_isMonopoly ? '' : _grankHtml} ${_tierBadgeHtml}${_vsMedianHtml}${_vsRegionalMedianHtml}</h3>
@@ -26095,20 +26180,37 @@ function loadCountryProfile(country) {
     ${(function() {
       // v328 M5.3: Compact peer context strip — regional and global median take vs. this country
       if (_isMonopoly || d.take_75 == null) return '';
+      // v534 (T2): this strip printed "Regional median (Europe): 19.4% ... +48.6pp vs region"
+      // three inches below a headline pill reading "+48.9pp vs Europe (19.1%)" — the same
+      // labelled quantity, two different numbers on one screen, because this one included the
+      // selected country in the median and the pill excluded it. Both are now the producer
+      // basis and are computed from the SAME getProducerContext() call, so they cannot diverge.
+      if (!_prodCtx534) return '';
       var _cpRegion = d.region;
-      var _cpRegPeers = (COUNTRY_DATA || []).filter(function(x) { return x.region === _cpRegion && x.take_75 != null; }).map(function(x) { return x.take_75; }).sort(function(a,b){return a-b;});
-      var _cpRegMed = _cpRegPeers.length ? (_cpRegPeers.length % 2 === 0 ? (_cpRegPeers[_cpRegPeers.length/2-1]+_cpRegPeers[_cpRegPeers.length/2])/2 : _cpRegPeers[Math.floor(_cpRegPeers.length/2)]) : null;
-      var _cpAllTakes = (COUNTRY_DATA || []).filter(function(x){return x.take_75!=null;}).map(function(x){return x.take_75;}).sort(function(a,b){return a-b;});
-      var _cpGlobMed = _cpAllTakes.length ? (_cpAllTakes.length%2===0?(_cpAllTakes[_cpAllTakes.length/2-1]+_cpAllTakes[_cpAllTakes.length/2])/2:_cpAllTakes[Math.floor(_cpAllTakes.length/2)]) : null;
-      var _cpDelta = (d.take_75 != null && _cpRegMed != null) ? (d.take_75 - _cpRegMed) : null;
-      if (!_cpRegMed || !_cpGlobMed || _cpDelta === null) return '';
-      var _cpDeltaCol = Math.abs(_cpDelta) < 3 ? 'var(--muted)' : _cpDelta > 0 ? 'var(--negative)' : 'var(--positive)';
+      var _cpProdMed = _prodCtx534.median;
+      var _cpRegPeers = _prodCtx534.regionPeers;
+      var _cpRegMed = _prodCtx534.regionMedian;
+      if (_cpProdMed == null) return '';
+      var _cpProdDelta = d.take_75 - _cpProdMed;
+      var _cpProdCol = Math.abs(_cpProdDelta) < 3 ? 'var(--muted)' : _cpProdDelta > 0 ? 'var(--negative)' : 'var(--positive)';
+      var _cpRegCell;
+      if (_cpRegPeers.length === 0) {
+        _cpRegCell = '<span style="opacity:.8;">No other production-weighted regime in ' + _cpRegion + ' — no regional benchmark</span>';
+      } else if (_cpRegPeers.length < 3) {
+        _cpRegCell = '<span>' + (_cpRegPeers.length === 1 ? 'Only producer peer in ' : 'Producer peers in ') + _cpRegion + ': <strong style="color:var(--text);">'
+          + _cpRegPeers.map(function(p){ return p.country + ' ' + p.take_75.toFixed(1) + '%'; }).join(' · ') + '</strong></span>';
+      } else {
+        var _cpRegDelta = d.take_75 - _cpRegMed;
+        _cpRegCell = '<span>' + _cpRegion + ' producer median (' + _cpRegPeers.length + '): <strong style="color:var(--text);">' + _cpRegMed.toFixed(1) + '%</strong> · <strong style="color:'
+          + (Math.abs(_cpRegDelta) < 3 ? 'var(--muted)' : _cpRegDelta > 0 ? 'var(--negative)' : 'var(--positive)') + ';">'
+          + (_cpRegDelta > 0 ? '+' : '') + _cpRegDelta.toFixed(1) + 'pp</strong></span>';
+      }
       return '<div style="font-size:11px;color:var(--muted);margin-top:6px;padding:5px 10px;background:var(--surface2);border-radius:4px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;">'
-        + '<span>Regional median <strong style="color:var(--text);">(' + _cpRegion + '): ' + _cpRegMed.toFixed(1) + '%</strong></span>'
+        + '<span title="Median government take @$75/bbl across the ' + _prodCtx534.n + ' countries with production-weighted data. The ' + _prodCtx534.nEqualWeighted + ' equal-weighted records are excluded — they have no verified production behind them." style="cursor:help;">Producer median (' + _prodCtx534.n + '): <strong style="color:var(--text);">' + _cpProdMed.toFixed(1) + '%</strong></span>'
         + '<span style="color:var(--border);">·</span>'
-        + '<span>Global median: <strong style="color:var(--text);">' + _cpGlobMed.toFixed(1) + '%</strong></span>'
+        + '<span>This country: <strong style="color:' + _cpProdCol + ';">' + (_cpProdDelta > 0 ? '+' : '') + _cpProdDelta.toFixed(1) + 'pp</strong></span>'
         + '<span style="color:var(--border);">·</span>'
-        + '<span>This country: <strong style="color:' + _cpDeltaCol + ';">' + (_cpDelta > 0 ? '+' : '') + _cpDelta.toFixed(1) + 'pp vs region</strong></span>'
+        + _cpRegCell
         + '</div>';
     })()}
   </div>
