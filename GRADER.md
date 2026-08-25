@@ -12558,3 +12558,77 @@ v519 → v520 in the two structural locations that carry a literal (page title, 
 
 ## Friction
 Walked cold into **Fiscal Compare** and ran it on its own defaults. The **Stability** column — on by default, the only reform signal in the compare table — was built by defaulting *every* country to a perfect 5 and then overwriting only the 2
+
+---
+## Cycle 420 Log — 2026-08-25 05:07
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL / 1 WARN (pre-existing local-harness sw.js 404)
+- JS errors: 0
+- Commit: `e5d8d80` (petroleum-fiscal-db). v521.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (least recent; 419 was T4, 418 T2, 417 T6, 416 T1, 415 T5, 414 T3)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — into **Side-by-Side**, which pre-loads Norway / United Kingdom / Netherlands. The comparison table closed with a block headed **MC UNCERTAINTY**:
+
+| row | Norway | UK | Netherlands |
+|---|---|---|---|
+| MC P10 (low-case take) | 59.3% | 37.1% | 17.6% |
+| MC P50 (base take) | 68.0% | 49.2% | 23.4% |
+| MC P90 (high-case take) | 75.0% | 58.9% | 28.0% |
+
+Those are the **same nine numbers** the *Govt Take* block prints ten rows above at $50 / $75 / $125. `mcRow()` (`index.html:23422`) aliased p10 → `take_50`, p50 → `take_75`, p90 → `take_125`.
+
+`country_data.json` holds **no simulation output of any kind** — no `mc_*` field exists on any of its 185 records — and **0 of 185** countries are regressive in price, so the `Math.min`/`Math.max` guards never swapped anything. P10 was byte-identical to Govt Take ($50/bbl) and P90 to Govt Take ($125/bbl) **for all 185 countries**.
+
+Two aggravating factors:
+1. The platform's own Methodology **"Point Estimate Note"** (`index.html:3243`) states that *"No confidence interval or Monte Carlo range is shown for the headline take figure."* This table contradicted the methodology page.
+2. The three rows rode the shared `rows` array into `#cmp-data-table`, and therefore into **Copy Table for IC Memo** — so *"MC P90 (high-case take): 75.0%"* pasted into investment-committee memos, asserting a **10% exceedance probability that was never computed**.
+
+This is the v515 (fake IRR row) and v451 (untrustworthy Govt NPV column) pattern: a number given more epistemic weight than its derivation supports, sitting directly above the export button.
+
+## Change
+1. **Removed** the MC Uncertainty divider and its three rows, plus the now-dead `mcRow()` helper and `hasMC` flag. The clipboard export drops **23 rows to 20**.
+2. The dispersion ORCA *can* evidence already existed one block up as **Take IQR @$75**. It now carries that weight alone and was rebuilt for it:
+   - relabelled **Take spread across contracts**;
+   - the degenerate case stopped rendering as the number **`~0.0pp`** — a *measured dispersion of zero* — and now reads **`single term`**, stating that one statutory term prices the entire contract set and that this is **not** a low-risk finding;
+   - narrow-but-nonzero spreads stopped collapsing to `~2.8pp`, which hid the band itself. The p25–p75 band is now **always shown**, amber at 5pp+, orange at 10pp+.
+3. Surfacing the band exposed a divergence the old formatting had concealed: the spread is **unweighted** while the Govt Take rows are **production-weighted**, so Nigeria's headline **81.1%** sits *outside* its own **83.1–83.5%** band. Both the header tooltip and the per-cell tooltip now name that case and explain it, rather than leaving the analyst to decide which of the two numbers is broken.
+4. The existing "IRR is deliberately not in this table" note was extended to cover the MC removal — one note, not two stacked.
+
+## Result
+An analyst comparing three countries can no longer paste a **fabricated probability percentile** into an IC memo, and now reads the **real contract-level take band** where the table previously showed either a duplicate of the price rows or `~0.0pp`:
+
+| | old | new |
+|---|---|---|
+| Iraq | `~33.5pp` | **65.0–98.5% (33.5pp)** |
+| Somalia | `~40.4pp` | **8.0–48.4% (40.4pp)** |
+| Nigeria | `~0.4pp` | **83.1–83.5% (0.4pp)** + headline-divergence note |
+| Norway | `~0.0pp` | **single term** across 7,643 contracts |
+
+Iraq's 33.5pp spread against Norway's single statutory term is the fact that decides whether block selection matters in a jurisdiction. It was previously visible only as two bare `pp` figures with no take level attached.
+
+## Verification
+JS syntax gate **PASS** (9 blocks / 0 errors). `runtime_comprehensive.js` **ran this cycle** against the local build: **136 PASS / 0 FAIL / 1 WARN** — the WARN is the pre-existing local-harness service-worker 404. Cold Playwright walks, storage cleared:
+
+| check | result |
+|---|---|
+| MC block absent from grid | ✅ |
+| MC block absent from `#cmp-data-table` (IC clipboard) | ✅ 20 rows, was 23 |
+| degenerate spread → `single term` | Norway, Netherlands, Angola, Guyana ✅ |
+| wide spread → band + pp | Iraq 65.0–98.5%, Somalia 8.0–48.4% ✅ |
+| headline-outside-band tooltip fires | Nigeria (81.1% vs 83.1–83.5%) ✅ |
+| null p25/p75 → em-dash, no crash | ✅ |
+| quickstart presets after Clear | 4 present, load correctly ✅ |
+| take chart + NPV chart | both render ✅ |
+| JS errors | **0** on every walk |
+
+## Deliberately out of scope — logged, not fixed
+The same `{p10: take_50, p50: take_75, p90: take_125}` aliasing exists at `index.html:25439` and `:31493`, feeding a `mc-badge` on Country Profile and a "Show Monte Carlo uncertainty bands" checkbox. Those surfaces at least carry an honest tooltip ("price scenario sensitivity ($50–$125/bbl)"), and they are the T2 surface, not T3. Naming them is a cycle of its own. Flagging here so it is not lost: **the phrase "Monte Carlo" is not earned anywhere in this platform for government take.**
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. No new FAQ (974). Tab order unchanged. v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP headline and removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk placement, v511 data-basis rows, v515 IRR removal and v520 FC Stability re-scoring all untouched. No tooltip was added to a control that did not change.
+
+## Bookkeeping — not the improvement
+v520 → v521 in the two structural literals (page title, header badge); `_orcaVerNow()` reads the badge so clipboard citations follow. Changelog entry prepended. Grade tables not touched.
