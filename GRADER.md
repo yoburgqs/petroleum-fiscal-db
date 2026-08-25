@@ -12924,3 +12924,20 @@ contract-spread badge all untouched.
 literals (page title, header badge); `_orcaVerNow()` reads the badge, so
 clipboard citations follow automatically. Changelog entry prepended. Grade
 tables not touched.
+
+---
+## Cycle 422 Log — 2026-08-25 06:59
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 422 complete and pushed — `e974710` + `14b0fbe` (petroleum-fiscal-db), `9cc550f92` (office mirror). v523.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo."
+
+## Friction
+Cold walk into **Fiscal Compare**, open a row drilldown, press the two copy buttons the platform's own IC Analyst Guide points at. The `⎘ IC Citation` button produced, verbatim:
+
+> `Cyprus: Govt Take 37.4% @$75/bbl (n=71 contracts), NPV $2.4B, IRR -100.0%, BE not available`
+
+A −100% IRR is total lo
