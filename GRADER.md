@@ -11312,3 +11312,116 @@ changelog entry prepended. Grade tables not touched.
 
 ## Friction
 I walked every surface that shows a government-take figure from a cold load — fresh browser context, no sessionStorage, no localStorage. Four of the five carry provenance. Fiscal Compare has a Quality column (A/B/C/D/G) and a PROXY badge on every row
+
+---
+## Cycle 411 Log — 2026-08-24 20:00  (v512)
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL / 1 WARN  (runtime_comprehensive.js RAN this cycle against the
+  patched local build; the WARN is the known local-harness artifact — the service worker registers
+  /petroleum-fiscal-db/sw.js, the GitHub Pages subpath, which 404s on a root-served local server.
+  Re-verified this cycle: 404 local, 200 in production.)
+- JS errors: 0
+- JS syntax gate: PASS (9 blocks / 0 errors)
+
+### Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(410 was T6, 409 T5, 408 T3, 407 T4, 406 T1, 405 T2 — T2 was the least recent.)
+
+### Friction
+Walked T2 from a cold load: fresh browser context, sessionStorage and localStorage cleared,
+straight to the Country Profile tab, which auto-loads Norway as the North Sea benchmark.
+
+Breakeven is one of the four numbers an IC memo cites for this question. The page gave two
+answers at once:
+
+| Where | What it said |
+|---|---|
+| Headline strip (`#cp-be-head`, `_be344Display`) | `BE: n/a` |
+| Header callout (`_hdrBeCallout`, index.html:25218) | `Breakeven: $/bbl n/a` |
+| Fiscal Mechanics card (index.html:25635) | `— no prod data` |
+| Data Completeness row (index.html:25638) | `— Breakeven` |
+| 4-price sensitivity table, `$75` row | **`$29/bbl`** |
+| Breakeven Cost Curve ruler + footnote | **`Breakeven $29/bbl — contractor achieves positive NPV above this price.`** |
+| `Copy for IC Memo` clipboard (`copyICSummary`) | `Breakeven: —` |
+| `IC Citation` clipboard (`copyICCitation`) | breakeven silently omitted |
+
+The analyst reads "not available" four times, scrolls, reads "$29/bbl" with a chart drawn
+around it, and has to guess which one to defend. Clicking the platform's own one-click IC-memo
+button resolves the tie the wrong way: it pastes `Breakeven: —` into the memo while $29/bbl is
+still on the screen behind the button.
+
+**Cause.** `COUNTRY_DATA.be_75` is null for Norway and the United Kingdom. But
+`api/v1/country/<slug>.json` carries `avg_breakeven_usd` for both — Norway $28.7/bbl, UK
+$20.3/bbl — computed over the same contract set as the take figures already on the page.
+`fetchCountryProductionChart()` (index.html:31879) wrote that value into the four table cells,
+the ruler and the footnote, and into nothing else. Norway is the tab default, so every cold
+visitor met the contradiction; UK is the other North Sea benchmark.
+
+**Second cause, surfaced by the same walk.** `toSlug()` joins words with underscores
+(`united_kingdom`), but the published API slug — the one the API Explorer tab documents and
+links, and that index.html:3755 defines as "lowercased with spaces replaced by hyphens" —
+uses hyphens. Both file sets exist on disk: **25 multi-word countries have an underscore file
+generated 2026-08-02 and a hyphen file generated 2026-08-05**, and the profile fetched the older
+one. On 8 of those 25 the underscore file has no breakeven where the hyphen file does
+(United Kingdom, Saudi Arabia, Trinidad and Tobago, New Zealand, South Korea, Dominican
+Republic, Faroe Islands, Solomon Islands). For the UK the underscore file has 6 top-level keys
+and no `production_by_year`; the hyphen file has 10 keys and 52 years of production — so the UK
+Country Profile had also never rendered its production history chart.
+
+### Change
+1. **`cpBeFor(d)`** — one read point for the profile's breakeven: the bundled `be_75` when
+   present, otherwise the API value cached in `window._cpBeResolved`. The header callout, the
+   headline chip, the Fiscal Mechanics card, the Data Completeness row and the quick IC verdict
+   all render from it, so a repeat visit (cache warm) is correct on first paint.
+2. **`_cpApplyBe(country, be75)`** — called the moment the fetch resolves, rewrites those four
+   already-rendered slots with the value, a tier colour, and a tooltip naming the basis and the
+   file it came from. Guarded on `#cp-country-name` so a fetch landing after the analyst has
+   switched country does not write into the wrong profile.
+3. **Both clipboard exports** — `copyICCitation()` and `copyICSummary()` read `cpBeFor(d)`
+   instead of the raw `d.be_75`.
+4. **API slug** — `fetchCountryProductionChart()` now requests the published hyphen slug first
+   and falls back to the underscore file only if the hyphen one is absent or has no
+   `four_price_table`. `toSlug()` itself is unchanged, so URL deep-links and `fromSlug()`
+   round-trips are untouched (the suite's 4 slug-roundtrip assertions still pass).
+
+### Result
+An analyst opening Norway or the United Kingdom at $75/bbl now reads **one** breakeven — $29/bbl
+and $20/bbl respectively — in the headline strip, the header callout, the Fiscal Mechanics card,
+the Data Completeness row, the 4-price table and the cost curve, and gets that same number in
+both the IC citation and the "Copy for IC Memo" paragraph. They can put it in the memo and defend
+it, instead of choosing between two numbers the same page gave them. The UK profile additionally
+renders the production history chart it had never had.
+
+### Verification — cold Playwright walks against the patched local build
+| Country | Why | Result |
+|---|---|---|
+| Norway | cold default, was contradicting | all 6 slots + both exports read $29/bbl |
+| United Kingdom | was contradicting **and** on the wrong API file | all 6 slots + both exports read $20/bbl; production chart now renders |
+| Trinidad and Tobago | multi-word, hyphen file newer | $32/bbl, consistent |
+| Australia | control — bundled value present | $28/bbl, unchanged |
+| Nigeria | control — no value in either source | `n/a` everywhere, unchanged |
+| 10 multi-word countries | slug fallback | head-vs-table agree on all; 0 JS errors |
+
+### Known, not fixed this cycle — stated rather than hidden
+- **Fiscal Compare, Screener and Breakeven Map still read `COUNTRY_DATA.be_75` directly**, so
+  Norway and the UK remain blank on breakeven there. This cycle fixed the intra-page
+  contradiction, not the cross-tab gap; closing it means either backfilling `country_data.json`
+  or routing those tabs through the API, which changes the documented "68 of 185 countries"
+  coverage figure and needs its own verification pass.
+- **`avg_breakeven_usd` is exactly `1.0`** for Bahrain, Kuwait and Saudi Arabia — a floor
+  artifact of the DCF, not a real breakeven. It was already displayed before this cycle via the
+  bundled value; the slug fix now also fills the table cell for Saudi Arabia, so it is more
+  visible. This is a database question, not a UI one.
+- **`toSlug("Cote d'Ivoire")` → `cote_divoire` matches no file on disk** (the files are
+  `cote_d_ivoire.json` / `cote-d-ivoire.json`). Its API fetch 404s and has always 404'd; that
+  profile is missing its sourced parameters and production chart for a reason unrelated to this
+  fix.
+
+### Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no banner, no card wrapper, no new
+tooltip on a new control, no new FAQ, no citation re-wording — the two clipboard changes swap a
+wrong value for the right one, they do not re-word the string. Tab order unchanged.
+
+### Bookkeeping — not the improvement
+v511 -> v512 across 4 structural locations (title, meta description, header badge,
+`_orcaVerNow()` fallback); changelog entry prepended. Grade tables not touched.
