@@ -12813,3 +12813,114 @@ verified reading v522. Changelog entry prepended. Grade tables not touched.
 
 ## Friction
 Cold walk (fresh context, storage cleared) into Country Profile, Norway loaded. The headline strip carried a badge reading **`59.3–75.0% range`**, titled **"Monte Carlo P10–P90 take range"**. Directly under the four-price take table sat a band: *"↔ P10–P90 uncertainty band: 59.3% – 75.0% 
+
+---
+
+## Cycle 422 Log — 2026-08-25 (v523)
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo."
+
+**Friction.** Cold walk (fresh browser context, `sessionStorage` and
+`localStorage` cleared) from Home into **Fiscal Compare**, open a row drilldown,
+press the two copy buttons the platform's own IC Analyst Guide sends the analyst
+to (`index.html:1594`). `⎘ IC Citation` (`openFCDrilldown`, the `_lines` builder
+at the `_dbIrr` clause) produced, verbatim:
+
+> `Cyprus: Govt Take 37.4% @$75/bbl (ORCA contract-database average, n=71 contracts), NPV $2.4B, IRR -100.0%, BE not available — Deepwater profile, 10% WACC, 100% WI.`
+
+A −100% IRR is total loss of capital. It was quoted in one sentence beside a
+**+$2.4B NPV discounted at 10% WACC**. `Copy 4-price as IC table` carried a whole
+`IRR%` column into the pasted TSV, and the on-screen price matrix rendered an
+`IRR%` row **directly under the NPV row it contradicts**:
+
+| Cyprus | $50 | $75 | $100 | $125 |
+|---|---|---|---|---|
+| NPV ($M) | $697M | $2.4B | $4.0B | $5.8B |
+| ~~IRR%~~ | 37.3% | −100.0% | −100.0% | — |
+
+The figure is the same `AVG(irr_pct)` mean-of-per-contract-IRRs that **v515
+removed from Side-by-Side** and **v516 removed from Country Profile**. Verified
+independently against `country_data.json` this cycle:
+
+| measure | value |
+|---|---|
+| countries whose citation printed an IRR at $75 | 124 of 185 |
+| median of those | **239.8%** |
+| ≥100% | 115 of 124 |
+| in a plausible 5–60% band | **1** |
+| NPV row rises with price while IRR row falls | **20 countries** |
+| populate all four IRR cells | 29 of 185 |
+| populate exactly one | 58 of 185 |
+
+Malaysia: NPV `−$33M / $627M / $882M / $1.2B` over IRR `18.9% / 141.6% /
+−17.1% / 27.3%`. Two cycles removed this number from the two tabs an analyst
+*browses* and left it on the flagship tab an analyst *cites from*.
+
+**Change.**
+1. **IRR% row removed** from the drilldown price matrix. It now reads
+   Take·database / Take·this model / Contractor NPV / Δ vs $50.
+2. **IRR removed from both pasted artifacts.** The `IRR%` column is gone from
+   `Copy 4-price as IC table`; the citation's IRR clause is replaced by the
+   **$50/bbl downside leg of the same NPV** (185/185 coverage). Cyprus now
+   pastes *"contractor NPV $2.4B @$75 and $697M at the $50/bbl downside"*.
+   Suppressed rather than printed twice when $50 is the selected price.
+3. **The IOC hurdle callout is an exception flag, not a rubber stamp.** The old
+   one graded on `d.irr_75` against 15% and answered *"✓ Clears IOC hurdle"* for
+   **118 of the 124** countries carrying a figure, while stamping a red *"✗ Below
+   IOC hurdle"* on **Cyprus, Uzbekistan and Turkmenistan** — contractor NPV at
+   $75 of **+$2.4B, +$1.3B, +$1.2B**. NPV > 0 at 10% WACC *is* the hurdle test
+   and the NPV row already shows it at four prices; **180 of 185** countries pass
+   it, so a green tick would repeat the v457 mistake in a new metric and **none
+   is rendered**. What is rendered is the discriminating case: **Malaysia** and
+   **Yemen** clear at $75 and do not survive a price break, and now carry
+   *"⚠ Price-dependent entry — contractor NPV −$33M at the $50/bbl downside"*.
+   The three countries with no positive NPV at $75 are the state monopolies,
+   already covered by the NOT COMPARABLE block.
+4. A one-line note under the matrix says where IRR went and routes to Scenario
+   Builder; `CP_IRR_NOTE` travels **inside** the pasted TSV (the v516 rule,
+   applied to the Fiscal Compare twin of that button).
+5. Three onboarding lines promising *"take, NPV, IRR, breakeven"* corrected
+   (FC guide line, IC Analyst Guide steps 2 and 3).
+
+**Result.** An analyst can paste the Fiscal Compare IC citation into a memo
+without asserting a total loss of capital on a country with a $2.4B NPV, and a
+red sub-hurdle mark no longer knocks Cyprus, Uzbekistan and Turkmenistan off the
+screening list. The one country that genuinely fails a price break — Malaysia,
+−$33M at $50 — is now the one that carries a warning, where before it carried
+*"✓ Clears IOC hurdle (15%)"*.
+
+**Verification.** Cold Playwright against the local build, storage cleared, ten
+countries covering every branch: false-sub-hurdle (Cyprus, Uzbekistan,
+Turkmenistan), price-dependent (Malaysia, Yemen), state monopoly (Saudi Arabia),
+thin fact base (Belgium), plus Norway / USA / Nigeria / Iraq — and the $50 and
+$125 price-selected citation branches. No IRR in the matrix, in either clipboard
+artifact, or in the assumptions line; the reason line present in every TSV.
+**0 JS errors on every walk.** JS syntax gate **PASS** (9 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle**: **136 PASS / 0 FAIL / 1 WARN** —
+the WARN is the pre-existing local-harness artifact (the service worker
+registers `/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath, which 404s on
+a root-served local server).
+
+**Deliberately out of scope — logged, not fixed.** The Fiscal Compare **table**
+still carries an IRR sort column (`data-sort="irr"`) and an "IRR only" filter off
+the same mean; `tests/runtime_comprehensive.js` asserts that sort key, so
+removing it is a test change as well as a UI change. Explorer still exports
+`IRR @$75`. The Screener's `Set 15% ⟵ IOC hurdle` button still screens almost
+nothing out. And the **Home page** carries a headline stat card reading *"118 of
+185 countries clear the IOC hurdle rate (IRR ≥15% · Deepwater profile ·
+$75/bbl)"* built on the identical figure — found on this walk, not previously
+logged. Those are T1/T3 surfaces; each is its own cycle.
+
+**Locked list.** Nothing on STILL LOCKED was touched — no page-sub paragraph, no
+amber instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. No new FAQ (still 974). Tab order unchanged. v430
+sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP headline and
+removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk placement,
+v515 IRR removal, v517 Screener rebuild, v521 SbS spread rows and v522 CP
+contract-spread badge all untouched.
+
+**Bookkeeping — not the improvement.** v522 → v523 in the two structural
+literals (page title, header badge); `_orcaVerNow()` reads the badge, so
+clipboard citations follow automatically. Changelog entry prepended. Grade
+tables not touched.
