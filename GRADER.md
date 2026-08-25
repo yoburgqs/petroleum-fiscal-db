@@ -13505,3 +13505,74 @@ touched.
 Cold walk onto Home. The **Evidence Tier** card in the Key terms grid (`index.html:1477`) is the first and most prominent definition of the evidence system in the product. It read: *"A = primary legislation · B = operator filings · C = secondary source. Filter by tier in Fiscal Compare."*
 
 Both halves were false, an
+
+---
+## Cycle 427 Log — 2026-08-25 12:08
+
+- Test before: 134 PASS / 0 FAIL / 1 WARN (measured this cycle against the pre-change build)
+- Test after: 134 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 page errors on the cold walk (the 1 captured console error is the pre-existing `sw.js` 404, present identically before the change)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Version: v527 → v528
+
+## Task
+
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (426 was T6, 425 T4, 424 T3, 423 T1, 421 T5 — T2 was the least recent, last walked cycle 420.)
+
+## Friction
+
+Cold walk: fresh browser context, `sessionStorage` and `localStorage` cleared, reload, click **Country Profile**. It auto-loads **Norway**.
+
+The headline strip answers the question optimistically: 68.0% government take, contractor **NPV +$826M @$75**, breakeven $29/bbl, "survives $50". So far, attractive.
+
+Scroll down to the **Live DCF Model** (`renderLiveDCFPanel` / `_execLiveDCF`, index.html:29567) — the one panel on the page whose stated job is *"Runs one hypothetical project through Norway's Concession terms… answers what would my project pay here"*. Its three result tiles, on the **default cold load with no interaction whatsoever**, read:
+
+| tile | value |
+|---|---|
+| Govt Take — this scenario | 76.0% |
+| Contractor IRR — this scenario | **n/a** |
+| Contractor NPV — this scenario | **`-$-1.2B`** |
+
+Two things stop the analyst here. The string `-$-1.2B` cannot be read — is it negative, is it a typo, is the whole page broken? And if they resolve it to "negative $1.2 billion", that is a **loss larger than all the capital at risk**: the North Sea profile's total capex is $834M. It is not a possible DCF output. Ten lines below, the reconciliation block ("WHICH NUMBER GOES IN THE IC MEMO?") reconciled only *take* — 68.0% vs 76.0%, verdict "Modest gap" — and said nothing about a panel that had just reported −$1.2B against the headline's +$826M. The analyst is left with two contradictory answers to "is this attractive", an unparseable number, and a reassurance that the gap is modest.
+
+Not confined to Norway. Every state-participation country was affected: **Libya deepwater −$2,398M at 90.7% take, IRR n/a**; **Algeria deepwater −$1,859M at 86.0%, IRR n/a**.
+
+## Change
+
+**Root cause — `dcfConcession()`, index.html:29162.** The line was:
+
+```js
+let stateEq = revenue * (params.state_equity_pct || 0);
+```
+
+State participation was modelled as a levy skimmed off **gross revenue**. It is not a levy — it is a **working interest**. Petoro/SDFI (Norway 33.4%), NOC (Libya 51%) and Sonatrach (Algeria 51%) take their share of production *and fund their share of capex and opex*. The old code did three things wrong at once: charged the contractor 100% of every cost, handed the state a share of gross, and then computed CIT and Special Petroleum Tax on a taxable income that **still included the state's share** — taxing the contractor on income it never received. At Norway's 78% marginal rate that produced a negative contractor cash flow in every single year, so `calcIRR` correctly returned `null` and NPV ran past the total capital employed.
+
+1. **`dcfConcession()`** — the contractor now takes its WI share of revenue *and* of royalty, opex, capex and depreciation; CIT / SPT / windfall / severance are assessed on that net base; the state's entitlement is booked as its own equity cash flow **net of the costs it funds**, with royalty credited to government exactly once so it is not double-counted.
+2. **NPV tile render (index.html:29591)** — `fmt` was built from the **signed** value while a minus sign was *also* prefixed, so every negative scenario NPV printed `-$-1.2B`. Now built from `Math.abs()` with a single true minus (`−`).
+3. **25-Year Cashflow Breakdown (`getAnnualCF`, index.html:29906)** — carried the identical gross-revenue state-equity term. Given the same treatment, because this is the table an analyst opens to *defend* the NPV, and it was contradicting the tile directly above it.
+
+## Result
+
+Measured cold in Playwright against the local build, storage cleared:
+
+| | before | after |
+|---|---|---|
+| Norway Live DCF — Govt Take | 76.0% | **50.0%** |
+| Norway Live DCF — Contractor IRR | n/a | **63.2%** |
+| Norway Live DCF — Contractor NPV | `-$-1.2B` | **$754M** (green) |
+| Cashflow table, yr-25 cumulative NPV | −$1,204M | **+$732M** |
+| Libya deepwater | −$2,398M / 90.7% / IRR n/a | **+$1,203M / 56.4% / 63.5%** |
+| Algeria deepwater | −$1,859M / 86.0% / IRR n/a | **+$1,468M / 54.1% / 82.1%** |
+| Norway deepwater @ $20/bbl (a genuine loss) | `-$-325M` | **−$325M** (red) |
+
+The analyst can now do the thing T2 asks for. The Live DCF's +$754M lands **within 9% of the headline's +$826M** and points the same direction instead of the opposite one, so the what-if corroborates the screening number rather than destroying confidence in it. The fiscal breakdown reconciles exactly (8.1% CIT + 20.3% special + 21.7% state equity = 50.0%). The cashflow table now agrees with the tile above it, so the year-by-year defence works. And a real negative — at $20/bbl — is now legible as a negative.
+
+The reconciliation verdict changed from **"Modest gap +8.0pp"** to **"Material gap −18.0pp"**. That is not a regression: the old +8.0pp was reached *only* through the arithmetic error, and the new message is the correct guidance — one North Sea project on Norway's terms is genuinely not the same statistic as a 7,643-contract country average, and the analyst should not put both in one sentence.
+
+**Blast radius, stated rather than hidden.** Only three countries carry `state_equity_pct` on the Concession path (Norway, Libya, Algeria); `Gross Split` routes to `dcfPSC` and `Buy-back` to `dcfBuyback`, neither touched. United Kingdom, Nigeria, Iraq and USA return **byte-identical** results before and after, confirmed by direct probe.
+
+**Deliberately out of scope.** The cashflow table still prints negative annual cells as `$-104` rather than `−$104`. It is ugly but parseable, unlike the double-negative that was fixed, and it is a separate cycle. Also unresolved: the country-average take (68.0%) and the standardized-project take (50.0%) use different denominators; the reconciliation block now names the gap honestly rather than papering over it, but reconciling the two conventions is a Fork-2 question, not a UX one.
+
+**Locked list.** Nothing touched. No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. **No new FAQ** (still 974). **No new tooltip.** Tab order unchanged. v430 sessionStorage logic, v449, v451, v452, v489, v505, v514, v515–v525, v518, v521, v522, v526/v527 all untouched.
+
+**Bookkeeping — not the improvement.** v527 → v528 in the two structural literals (page title line 42, header badge line 1353). Changelog entry prepended. Grade tables not touched.
