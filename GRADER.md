@@ -12941,3 +12941,114 @@ Cold walk into **Fiscal Compare**, open a row drilldown, press the two copy butt
 > `Cyprus: Govt Take 37.4% @$75/bbl (n=71 contracts), NPV $2.4B, IRR -100.0%, BE not available`
 
 A −100% IRR is total lo
+
+---
+## Cycle 423 Log — 2026-08-25
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN (local harness; pre-change build re-measured this cycle)
+- Test after: 135 PASS / 0 FAIL / 1 WARN
+- JS errors: 0
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Commit: `bc35d1c` (petroleum-fiscal-db). v524.
+
+## Task
+**T1** — "Which countries should even be on my screening list?"
+
+## Friction
+Cold load (fresh browser context, `sessionStorage` and `localStorage` cleared)
+onto **Home**. The single sentence on that page that answers T1 —
+`#home-hurdle-stat`, populated in `loadPlatformData()` — rendered verbatim:
+
+> `✓ 118 of 185 countries clear the IOC hurdle rate (IRR ≥15% · Deepwater profile · $75/bbl) — open Fiscal Compare →`
+
+It was computed as `irr_75 != null && irr_75 >= 15 && irr_75 < 500`. `irr_75` is
+`AVG(per-contract IRR)` — the metric **v515**, **v516**, **v517** and **v523**
+deleted from Side-by-Side, Country Profile, the Screener and the Fiscal Compare
+citation respectively. Home was the last surface still quoting it, and it was
+the **first thing on screen**. v523 logged it as out of scope and belonging to a
+T1 cycle. This is that cycle.
+
+Two independent errors, both confirmed against live `country_data.json`:
+
+| exclusion | n | what was excluded |
+|---|---|---|
+| `irr_75 >= 500` ("unbounded") | 41 | the **lowest-take** countries in the database — Barbados 16.8% take / $4.09B NPV, Hungary 16.9%, Germany 18.9% |
+| `irr_75 == null` | 20 | Armenia, Bahamas, Belgium, Bulgaria, China, Croatia, Greenland, Iran … |
+| `irr_75 == -100` | 1 | Cyprus — beside a **+$2.4B** contractor NPV |
+
+Net: **64 countries with positive contractor NPV at $75 sat outside the "clears"
+count**, and the exclusion rule ran hardest against the best economics in the
+set. The honest figure on the same basis is **182 of 185**, which answers T1 with
+nothing. Separately, the link routed to **Fiscal Compare**, which auto-loads all
+185 unfiltered — so the analyst was quoted a count and then shown a list that was
+not that count.
+
+## Change
+1. **Headline recomputed** as the screen the platform already treats as
+   authoritative — the v517 **IOC Capital Screen** — from the same fields and the
+   same `_dqTier()` production test the Screener uses, so headline and
+   destination cannot drift apart. Criteria: verified field production · take
+   ≤65% · contractor NPV positive at $75 **and** at the $50/bbl downside. Now
+   reads **"✓ 14 countries pass the IOC capital screen"** with the criteria inline.
+2. **A second muted line gives the denominator honestly** — *"Screened from the
+   22 countries with verified field production. The other 163 carry
+   regional-proxy economics — indicative, not a shortlist."* 14/185 alone would
+   read as a verdict on 171 countries rather than as the absence of a test.
+3. **The click lands on that screen** — new `_homeOpenICScreen()`: Explorer tab →
+   screen mode → `applyScreenerPreset('iochurdle')`, keyboard-operable. The
+   Screener's own count line then independently states *"14 countries match"* —
+   the first time the Home number and the Screener result have agreed.
+4. **Second live bug, same path.** The `presetCriteria` label for `iochurdle`
+   still announced *"IRR ≥15% · Take ≤65% · NPV ≥0"*. v517 rebuilt the preset's
+   criteria but not its caption, so the analyst got 14 correct rows under a
+   description of a filter whose slider, quick-set button and `runScreener()`
+   branch had all been deleted in that same cycle. Corrected.
+5. **Third bug.** The same lookup still keyed `highirr`; v517 renamed the preset
+   to `downsidereturns`. The lookup missed on every apply and the active-preset
+   badge was **hidden entirely** when the Two-Price Return Screen was loaded.
+   Key corrected — badge now renders.
+6. **Three onboarding lines corrected** — Quick Start step 3 and both Screener
+   Home-card lines named a *High-IRR (IRR ≥15%)* preset absent from the dropdown
+   and a "min IRR" control removed at v517.
+
+## Result
+An analyst landing cold is handed a **14-country shortlist, every criterion of
+which was measured on every country it was applied to**, one click from the list
+itself — instead of a 118-country count built on a discredited mean that
+excluded the 41 lowest-take regimes in the database as "unbounded". Home and the
+Screener now state the same number, and the preset badge on the destination
+describes the filter that actually ran.
+
+## Verification
+Cold Playwright against the local build, storage cleared: headline renders 14
+with both lines; the link activates `texplorer`, applies the preset, renders
+**14 rows in `#tbl-screener`** and the corrected label; the `downsidereturns`
+badge renders. **0 JS errors on every walk.** JS syntax gate **PASS** (9 blocks /
+0 errors). `runtime_comprehensive.js` **ran this cycle**: **135 PASS / 0 FAIL /
+1 WARN** — and the identical suite was re-run against the **pre-change** build on
+the same server, which also returned **135 / 0 / 1**. So neither the count nor
+the WARN (the pre-existing `sw.js` 404 off GitHub Pages) is a regression from
+this change.
+
+## Deliberately out of scope — logged, not fixed
+Fiscal Compare still carries an IRR sort column (`data-sort="irr"`) and a
+15%-hurdle divider off the same mean — `tests/runtime_comprehensive.js` asserts
+that sort key, so it is a test change as well as a UI change. Explorer still
+shows an IRR column and exports `IRR @$75`. The Home key-terms grid still
+describes IRR as *"≥15% clears most IOC hurdle rates · shown for 124/185"*.
+Those are T3 and Browse surfaces; each is its own cycle.
+
+## Locked list
+Nothing on STILL LOCKED was touched — no page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. No new FAQ (still 974). No new tooltip. Tab order
+unchanged. v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP
+headline and removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk
+placement, v515/v516/v517/v523 IRR removals, v521 SbS spread rows and v522 CP
+contract-spread badge all untouched.
+
+## Bookkeeping — not the improvement
+v523 → v524 in the two structural literals (page title, header badge);
+`_orcaVerNow()` reads the badge, so clipboard citations follow. Changelog entry
+prepended. Grade tables not touched.
