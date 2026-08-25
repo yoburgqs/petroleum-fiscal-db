@@ -13591,3 +13591,117 @@ The reconciliation verdict changed from **"Modest gap +8.0pp"** to **"Material g
 Cold walk — fresh context, storage cleared — onto **Country Profile**, which auto-loads Norway. The headline says 68.0% take, contractor **NPV +$826M**, breakeven $29/bbl. Attractive.
 
 Scroll to the **Live DCF Model** (`_execLiveDCF`, `index.html:29567`) — the one panel whose stated job is "what would *my*
+
+---
+## Cycle 428 Log — 2026-08-25
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (suite RAN this cycle, local build, storage cleared)
+- JS errors: 0 · JS syntax gate PASS (9 blocks / 0 errors)
+- Version: v528 → v529
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo."
+(Least recent: 427 was T2, 426 T6, 425 T4, 424 T3, 423 T1.)
+
+## Friction
+Cold walk — fresh browser context, `sessionStorage` and `localStorage` cleared —
+from Home, following the platform's own Quick Start **step 1**: *"Export XLSX for
+IC attachment."*
+
+`exportFCResults()` (`index.html:32755`) ranked and sorted the workbook on
+`liveTake`, the compare engine's figure. For the **153 countries ORCA holds no
+country-specific terms for**, that is the *same generic mechanic default*.
+Measured on the live build at $75/bbl deepwater:
+
+| | value | rows sharing it |
+|---|---|---|
+| `Take% ` | 22.22 | **153 of 185** |
+| `Contractor NPV ($M)` | 4257 | **153 of 185** |
+| `Govt NPV ($M est)` | 1216.3 | **153 of 185** |
+| `Rank` | 1 | **153 of 185** |
+
+Guyana (database take 54.1%), Ireland (27.1%), Indonesia (59.5%) and Saudi
+Arabia (**100%**) were byte-identical in every economic column of an IC
+attachment.
+
+Worst inside that: the three **state monopolies** — Bahrain, Kuwait, Saudi
+Arabia, database government take **100%**, no contractor access at all, the exact
+case the drilldown already draws a NOT COMPARABLE block for — exported at **joint
+rank 1**, with **$4,257M of contractor NPV** and a **$1/bbl breakeven**.
+
+The sheet also carried **no per-country contractor NPV of any kind**, although
+`COUNTRY_DATA.npv_50/npv_75` is differentiated for all 185 and is what the
+Country Profile "Copy for IC Memo" string, the Screener CSV and the public API
+all quote.
+
+**The same defect was on screen.** `renderFCResults()` (`index.html:31446`)
+printed `r.liveTake` directly and never consulted the `isStateMonopoly()` guard
+that `fmtTake()` has carried since v22, so Saudi Arabia rendered
+**22.2% / $4.3B** at rank `=1` on the flagship tab.
+
+## Change
+1. **Workbook ordered and ranked on the citable database take** at the selected
+   price — the basis the drilldown tells the analyst in so many words to cite.
+   **185 distinct ranks** instead of a 153-way tie: Vanuatu #1 at 5.0%,
+   Turkmenistan #182 at 87.2%.
+2. **Citable block moved to the left** of the sheet; model block moved right and
+   relabelled `(model…)`. An analyst reads left to right.
+3. **Two new columns** — `Contractor NPV_50 (database, $M)` and
+   `Contractor NPV_75 (database, $M)`: a differentiated base case *and* its $50
+   downside leg on every row. The v516/v523 rule, applied to the workbook.
+4. **Model `Take%` / `Govt NPV` / `Contractor NPV` left EMPTY on generic-default
+   rows.** A constant repeated 153 times is not data, and in a spreadsheet it is
+   worse than absent: it sorts, it charts, it averages. `Terms_Basis` already
+   says why. (v451 precedent — removing the untrustworthy thing is the fix.)
+5. **State monopolies carry no rank, no contractor NPV, no breakeven and no
+   tier**, and sort to the bottom. `Tier` is now graded off the database take —
+   off `liveTake` it read "Inv-Friendly" on all 153 generic rows, monopolies
+   included.
+6. **On screen**, the three monopoly rows read `n/c` for rank, take and NPV with
+   a hover explaining the 100% take, and are excluded from the tie groups, so the
+   reported tie size corrected from "152 others" to **"149 others"**.
+7. Methodology sheet rewritten with an explicit CITE / DO NOT CITE split.
+
+## Result
+The FC workbook and the Country Profile memo string **now agree**: Norway
+exports `Contractor NPV_75 = 825.9` against the memo string's **$826M**. Before,
+the workbook's only NPV column said $1,211.4M on a different basis, and for 153
+countries said $4,257M regardless of country.
+
+| | before | after |
+|---|---|---|
+| distinct ranks | 32 | **185** |
+| rows sharing the modal contractor NPV | 153 / 185 | **9 / 185** |
+| Saudi Arabia rank / NPV / breakeven | 1 / $4,257M / $1/bbl | **n/c / — / —** |
+| database contractor NPV columns | 0 | **2** ($50 + $75) |
+
+The analyst can now attach the export to an IC memo without it asserting that
+the world's three closed regimes are its three most attractive, and without 153
+countries reading as economically identical. Every citable number in the
+workbook is the same number every other ORCA artifact quotes.
+
+**Verified cold in Playwright** on the local build, storage cleared: all five
+sort fields and both the $75 and $125 price legs hold the monopoly suppression;
+185 rows preserved; the drilldown still opens on a monopoly row; **0 JS errors**
+on every walk. `runtime_comprehensive.js` **ran this cycle**: 135 PASS / 0 FAIL /
+1 WARN, matching the pre-change baseline exactly — the WARN is the pre-existing
+local-harness `sw.js` 404 (the service worker registers the GitHub Pages subpath,
+which 404s on a root-served local server).
+
+**Deliberately out of scope, stated rather than hidden.** The on-screen table
+still *sorts* on the model take, so the 150 generic rows remain an
+undifferentiated block in the UI even though the export no longer is — re-basing
+the on-screen ranking also moves the tier badge, the drilldown rank and the
+divider rows, and is its own cycle. The Home glossary still describes an IRR the
+platform stopped reporting at v515/v516/v523, and the Home hero still reads
+"(v500)".
+
+**STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional
+banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible
+Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown. **No new FAQ** (still 974). **No new tooltip on a pre-existing
+control.** Tab order unchanged. v430, v449, v451, v452, v489, v505, v515–v525 and
+v528 all untouched.
+
+**Bookkeeping — not the improvement.** v528 → v529 in the two structural literals
+(page title line 42, header badge line 1353). Changelog entry prepended.
