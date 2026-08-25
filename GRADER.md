@@ -1,3 +1,55 @@
+## Cycle 431 Log — 2026-08-25 21:00
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (suite RAN this cycle against the local build; the WARN is the known local-harness sw.js 404)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- JS errors on the cold walk: 0
+
+## Cycle 431 — T4, v532
+
+**Task** — T4, *"What is my fiscal-stability and reform exposure here?"* (430 was T3, 429 T1, 428 T5, 427 T2, 426 T6.)
+
+**Friction.** Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — from Home into **Reform Risk**, which is where Home's own Quick Start Step 4 sends the analyst before finalising an IC memo.
+
+The first panel under the snapshot bar is **Regional Reform Tilt Since 2010**, whose stated question is *"have regions been net-tightening (capturing more) or net-liberalizing (attracting IOC capital)?"* It rendered **three rows: Africa, Middle East, Europe.** No Americas row. No Asia-Pacific row.
+
+Cause, read out of the code at `renderReformRisk()` (index.html:28607):
+
+```js
+var regionDefs = { 'Africa':[], 'Middle East':[], 'Asia Pacific':[], 'Americas':[], 'Europe':[] };
+withScore.forEach(function(r) {
+  var region = cd2 ? cd2.region : null;
+  if (region && regionDefs[region]) regionDefs[region].push(r);   // silent drop
+});
+```
+
+`COUNTRY_DATA` does not use that vocabulary. Its region strings are `Africa, Europe, Asia, Latin America, Oceania, Middle East, CIS/FSU, North America, Other, Unknown`. **`'Asia Pacific'` and `'Americas'` matched nothing, ever.**
+
+Counted against the data: **13 of the 21 scored jurisdictions — 62% — never reached the table.** Brazil, Mexico, Venezuela, Ecuador, Colombia, Guyana, USA, Canada, Australia, India, Indonesia, Kazakhstan, Russia.
+
+The consequence is not cosmetic. **Latin America is the largest scored region (6 jurisdictions) and by a wide margin the most tightening one on file — 9 tightening events against 1 liberalizing, a +8 margin — against Africa's +1 (4 vs 3).** The panel presented Africa as the headline tightening region and omitted the one that actually is. And its footnote read *"Note: Only countries in ORCA reform history database included"*, which tells the analyst the absence is a sourcing gap. It is not — the same 13 countries are scored three inches lower in the *Most Frequently Reformed Regimes* table on the same screen. An analyst screening the Atlantic Frontier (Guyana/Brazil, one of the platform's own flagship comparison sets) read this panel as evidence that there is no regional reform signal for the Americas.
+
+**Change.**
+
+1. **Regions derived from the data, not matched against a whitelist.** Every scored jurisdiction lands in a row: **3 rows became 8, covering 21 of 21.** Latin America now leads at `↑ Tightening +8`. `Other`/`Unknown`/missing regions fall into a visible **Unclassified** bucket instead of vanishing.
+2. **Every row states the jurisdictions it rests on** — `n of N sourced` under the region name, plus the country names outright where there are two or fewer. Europe now reads *2 of 30 sourced · United Kingdom, Norway*; the old "Middle East / Neutral / 70" reads *1 of 14 sourced · Iraq*. A one-country row can no longer be read as a finding about fourteen.
+3. **The tilt margin is printed beside the label** (`+8`, `+1`, `+3`). `↑ Tightening` alone gave Africa's one-event margin the same visual weight as Latin America's nine-to-one.
+4. **A Neutral column was added**, and the mix bar gained a hover breakdown — 46 of the 83 events on record carry no direction and were previously invisible. Africa's "tightening" verdict rests on 7 directional events out of 23.
+5. **The misleading footnote is replaced** with a reconciliation the analyst can check: *"Rows cover all 21 of the 21 jurisdictions with a sourced reform log, across 8 regions… a row is an average over those jurisdictions only, never over the region."*
+
+**Result.** An analyst asking the regional-exposure question about Latin America, Asia, CIS/FSU, North America or Oceania now gets a row for it — before, five of the eight regions on file returned nothing and the panel implied that was a data gap. They can also see how many jurisdictions each row rests on, and how thin the tightening margin is, before carrying a regional finding into an IC memo.
+
+**Verified cold in Playwright** against the local build, storage cleared: 8 rows render, per-row country counts sum to 21, and every row's tightened / liberalized / neutral totals and average stability score reconcile against an independent recomputation from `reform_history.json` + `country_data.json` — Latin America 9/1/12 · 75, Africa 4/3/16 · 76, Europe 7/4/2 · 48, CIS/FSU 2/0/5 · 85, Asia 2/1/3 · 78, North America 2/1/2 · 93, Oceania 1/0/3 · 55, Middle East 0/0/3 · 70. **0 JS errors.**
+
+**Known, not fixed — stated rather than hidden.** Two contradictions found on the same walk, both text on other surfaces rather than this panel's behaviour:
+- Home Quick Start Step 4 tells the analyst to open Reform Risk *"to see the Stability Score (◆◆◆◆◆)"*, but the diamond scale lives on **Fiscal Compare** — Reform Risk renders a 0–100 numeric score — and its stated rule ("5 reforms since 2010 = probability-weighted NPV scenario") does not match the tab's own rule (≥3 → 3–5pp; score ≤20 → 5–8pp plus the scenario).
+- FAQ 7105 asserts Africa runs "5–7 tightening events vs 1–2 liberalizing per 5-year period, 2010–2023" against an all-time record of 4 vs 3.
+
+**Bookkeeping — not the improvement.** v531 → v532 in the two structural literals (page title line 42, header badge line 1353). Changelog entry prepended.
+
+**STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. **No new FAQ** (still 974). **No new tooltip on a pre-existing control** — the two added are on the new Neutral column and on the mix bar whose contents changed. Tab order unchanged. v430, v449, v451, v452, v489, v502, v514, v520, v526 and v531 all untouched.
+
+---
 # ACTIVE DIRECTIVES — READ FIRST (manager, 2026-08-21)
 
 ## DIRECTIVE UPDATE (2026-08-19) — COMPREHENSIVE UI DECLUTTER COMPLETE (v371+)
