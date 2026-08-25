@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v521</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v522</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -319,10 +319,11 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .dd-param .p-val { font-size: 14px; font-weight: 700; margin-top: 2px; }
 #dd-select-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
 #dd-country-select { background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 14px; padding: 8px 14px; min-width: 240px; }
-#dd-mc-toggle-wrap { color: var(--muted); font-size: 12px; user-select: none; }
-#dd-mc-toggle-wrap input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
-.dd-mc-note { margin-top: 12px; padding: 8px 12px; background: rgba(176,104,0,0.05); border: 1px solid rgba(176,104,0,0.15); border-radius: var(--radius); color: var(--muted); font-size: 12px; font-style: italic; line-height: 1.5; }
-.dd-mc-note strong { color: var(--text); font-style: normal; }
+/* v522 (T2): #dd-mc-toggle-wrap and .dd-mc-note rules removed with the elements they styled -- the
+   Monte Carlo toggle and the "P10-P90 uncertainty band" line under the Country Profile price table.
+   .cp-spread-badge replaces the .mc-badge in the CP headline strip and carries the MEASURED
+   contract-level take band (p25-p75) instead of a relabelled price range. */
+.cp-spread-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; padding: 3px 8px; background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: 12px; font-weight: 600; margin-left: 8px; white-space: nowrap; }
 /* v29: DD price curve */
 .dd-price-chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 16px; height: 200px; position: relative; }
 /* ── v26: stability bar + 2-col layout + MC badge ── */
@@ -1349,7 +1350,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v521</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v522</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2428,10 +2429,12 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <select id="dd-country-select" aria-label="Select a country to load its complete fiscal profile">
       <option value="">— Select a country —</option>
     </select>
-    <label id="dd-mc-toggle-wrap" style="display:none;margin-left:18px;align-items:center;gap:7px;font-size:12px;color:#6B6560;cursor:pointer;">
-      <input type="checkbox" id="dd-mc-toggle" checked aria-label="Toggle Monte Carlo uncertainty bands on country profile charts">
-      <span title="Ranges show P10–P90 contractor IRR based on Monte Carlo simulation of key input uncertainties (oil price, costs, production profile). Applies to IRR charts only — headline take is a single-point estimate.">Show Monte Carlo uncertainty bands</span>
-    </label>
+    <!-- v522 (T2): the "Show Monte Carlo uncertainty bands" checkbox lived here. Every clause of its
+         label was false. It did not show IRR (it showed government take), there is no Monte Carlo
+         anywhere in this platform (country_data.json carries no mc_* field on any of its 185 records,
+         and none of the 239 api/v1/country/*.json files carry one either), and it did not apply to
+         "IRR charts only". What it toggled was a band restating take at $50 and $125 -- the two cells
+         already printed in the price table three rows below it. Control and band both removed. -->
     <button id="dd-copy-link-btn" title="Copy shareable link to this country profile" aria-label="Copy shareable link to this country profile"
             style="display:none;margin-left:14px;background:transparent;border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--muted);font-size:11px;align-items:center;gap:4px;">
       <span style="font-size:12px;vertical-align:middle;">&#10697;</span> Copy link
@@ -2562,6 +2565,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong style="color:var(--accent);">v522 (Aug 2026) &mdash; Cycle 421 (T2): Country Profile put a badge reading &ldquo;Monte Carlo P10&ndash;P90 take range&rdquo; beside the headline take, and a &ldquo;P10&ndash;P90 uncertainty band&rdquo; under the price table &mdash; both were the $50 and $125 take cells of that same table, relabelled as percentiles</strong> &mdash; Task <strong>T2</strong> &mdash; &ldquo;is this one country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) from Home into Country Profile and loaded Norway. <strong>Friction:</strong> the headline strip carried <em>59.3&ndash;75.0% range</em> titled <em>&ldquo;Monte Carlo P10&ndash;P90 take range&rdquo;</em>, and directly beneath the four-price take table sat <em>&ldquo;&#8596; P10&ndash;P90 uncertainty band: 59.3% &ndash; 75.0% &middot; P50 (base): 68.0%&rdquo;</em>. Those are the <strong>$50, $125 and $75 cells of the table one line above</strong>. The source was <code>const mc = {p10: d.take_50, p50: d.take_75, p90: d.take_125}</code> &mdash; an alias, not a simulation. <code>country_data.json</code> carries <strong>no <code>mc_*</code> field on any of its 185 records</strong>, and <strong>none of the 239 <code>api/v1/country/*.json</code> files carry one either</strong>. An analyst writing &ldquo;Norway P90 government take 75.0%&rdquo; into an IC memo asserted a <strong>10% exceedance probability that was never computed</strong> &mdash; and this is the T2 surface, the one page whose entire job is defensibility. The control producing it was worse: a checkbox labelled <em>&ldquo;Show Monte Carlo uncertainty bands&rdquo;</em> whose tooltip claimed <em>&ldquo;P10&ndash;P90 contractor IRR based on Monte Carlo simulation of key input uncertainties (oil price, costs, production profile)&hellip; applies to IRR charts only&rdquo;</em>. Every clause was false: it showed take, not IRR; no simulation exists; and it toggled a take band, not a chart. The platform&rsquo;s own <strong>Methodology &rarr; Point Estimate Note</strong> stated in text that <em>no Monte Carlo range is shown for the headline take figure</em>, so the page contradicted its own methodology at the decision point. <strong>(1) The badge, the band and the checkbox are removed</strong>, along with <code>mc</code>, <code>showMC</code>, <code>mcNote</code>, the <code>#dd-mc-toggle</code> change listener and the two dead CSS rules. <strong>(2) The headline slot is given to the dispersion ORCA actually measures</strong> &mdash; the interquartile take band across each country&rsquo;s own contracts (<code>p25_take</code>/<code>p75_take</code>) at $75/bbl, the same evidenced quantity v521 put into Side-by-Side. Iraq reads <em>Contract take: 65.0&ndash;98.5% (33.5pp)</em> across 610 contracts; Cyprus <em>15.3&ndash;78.1% (62.8pp)</em>; Somalia <em>8.0&ndash;48.4% (40.4pp)</em>. <strong>135 of 185 countries price every contract identically</strong> and now say so &mdash; Norway reads <em>Contract take: single term &middot; 67.3%</em> across 7,643 contracts, which is the fact that decides whether block selection matters in a jurisdiction, and was previously not on the page at all. The 22 countries with no quartiles show no badge rather than a fabricated one. <strong>(3) The 57 countries whose headline sits outside their own band</strong> (the headline is production-weighted, the band is unweighted across contracts) carry a <code>&#9432;</code> marker and a tooltip naming that case &mdash; Nigeria&rsquo;s <em>83.1&ndash;83.5%</em> band against its <em>81.1%</em> headline &mdash; instead of leaving the analyst to decide which number is broken. <strong>(4) A redundant 9px <em>&ldquo;IQR: &plusmn;0.0pp&rdquo;</em> sub-line under the $75 cell is removed</strong>; it stated the same dispersion in a second, inconsistent format and titled Norway&rsquo;s 7,643 single-term contracts <em>&ldquo;highly uniform &mdash; very consistent fiscal terms&rdquo;</em>, which reads as a low-risk finding rather than a statutory one-term regime. One dispersion statement now, in the headline, where the analyst already looked for a range. <strong>(5) Two documentation claims that pointed at the non-existent simulation are corrected</strong> &mdash; the Point Estimate Note no longer sends the reader to &ldquo;the platform&rsquo;s Monte Carlo uncertainty bands (visible in the Screener)&rdquo; (they never existed, and the Screener IRR control it referred to was removed at v517), and the API endpoint field list no longer advertises <em>&ldquo;Monte Carlo p10/p90&rdquo;</em> in the per-country JSON, which was verified absent from all 239 files. <strong>Verified cold in Playwright</strong> against the local build, storage cleared, across every branch: degenerate (Norway, Guyana), wide spread (Iraq, Cyprus, Somalia, Egypt), headline-outside-band (Norway, Nigeria), state monopoly (Saudi Arabia) and null quartiles (Belgium) &mdash; no badge, no crash. <code>#dd-mc-toggle</code> absent, <code>.mc-badge</code> count 0 on CP, <code>.dd-mc-note</code> count 0 on every country. IC citation and IC summary clipboard artifacts unchanged and free of percentile language. <strong>0 JS errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>. <em>Deliberately out of scope, stated rather than hidden:</em> the Fiscal Compare drilldown header carries the same <code>.mc-badge</code> element at <code>index.html:31611</code>, though with an honest title (&ldquo;Price scenario range ($50&ndash;$125/bbl)&rdquo;) rather than a Monte Carlo claim. It is a T3 surface and still duplicates two cells of the table beneath it; that is its own cycle. Nothing on the STILL LOCKED list was touched &mdash; no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; no new FAQ (still 974); no new tooltip on a control that did not change. v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP headline and removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk placement and v521 SbS spread rows all untouched. Tab order unchanged. Version v521&rarr;v522.<br><br>
                         <strong style="color:var(--accent);">v521 (Aug 2026) &mdash; Cycle 420 (T3): Side-by-Side closed with an &ldquo;MC Uncertainty&rdquo; block that was not a Monte Carlo &mdash; P10/P50/P90 were the $50/$75/$125 take figures already printed ten rows above, relabelled as distribution percentiles</strong> &mdash; Task <strong>T3</strong> &mdash; &ldquo;how do these three countries compare side by side?&rdquo; Walked cold (fresh context, <code>sessionStorage</code> and <code>localStorage</code> cleared) into Side-by-Side on its pre-loaded Norway / United Kingdom / Netherlands default set. The table&rsquo;s final block was headed <strong>MC UNCERTAINTY</strong> with rows <em>MC P10 (low-case take)</em>, <em>MC P50 (base take)</em> and <em>MC P90 (high-case take)</em>. It was generated by <code>mcRow()</code>, which aliased p10&nbsp;&rarr;&nbsp;<code>take_50</code>, p50&nbsp;&rarr;&nbsp;<code>take_75</code>, p90&nbsp;&rarr;&nbsp;<code>take_125</code>. <code>country_data.json</code> carries no simulation output at all &mdash; no <code>mc_*</code> field exists on any of its 185 records &mdash; and 0 of 185 countries are regressive in price, so the <code>Math.min</code>/<code>Math.max</code> guards never swapped anything: <strong>P10 was byte-identical to Govt Take ($50/bbl) and P90 to Govt Take ($125/bbl) for all 185 countries</strong>. The platform&rsquo;s own Methodology &ldquo;Point Estimate Note&rdquo; states that no Monte Carlo range is shown for headline take; this table contradicted it. Worse, the three rows rode the shared <code>rows</code> array into <code>#cmp-data-table</code> and therefore into <strong>Copy Table for IC Memo</strong> &mdash; so &ldquo;P90 government take 75.0%&rdquo; pasted into investment-committee memos, asserting a 10% exceedance probability that was never computed. <strong>Removed</strong> the block, the <code>mcRow()</code> helper and the <code>hasMC</code> flag; the clipboard export drops 23 rows to 20. The dispersion ORCA can actually evidence already existed one block up as <em>Take IQR @$75</em>, which now carries that weight alone and was rebuilt for it: relabelled <strong>Take spread across contracts</strong>; the degenerate case stopped rendering as the number &ldquo;~0.0pp&rdquo; (a measured dispersion of zero) and now reads <strong>single term</strong>, stating that one statutory term prices the whole set and that this is not a low-risk finding; and narrow-but-nonzero spreads stopped collapsing to &ldquo;~2.8pp&rdquo;, which hid the band itself &mdash; the p25&ndash;p75 band is now always shown, amber at 5pp+ and orange at 10pp+. Surfacing the band exposed a second divergence that had been hidden by the old formatting: the spread is unweighted while the Govt Take rows are production-weighted, so Nigeria&rsquo;s headline 81.1% sits outside its own 83.1&ndash;83.5% band. Both the header tooltip and the per-cell tooltip now name that case and explain it rather than leaving the analyst to decide which number is broken. Nothing on the locked list was touched. JS syntax gate PASS (9 blocks / 0 errors); <code>runtime_comprehensive.js</code> ran this cycle: 136 PASS / 0 FAIL / 1 WARN (pre-existing local-harness service-worker 404) / 0 page errors.<br><br>
                         <strong style="color:var(--accent);">v520 (Aug 2026) &mdash; Cycle 419 (T4): the Fiscal Compare Stability column gave every unresearched jurisdiction a perfect score &mdash; 167 of 185 rows read &#9670;&#9670;&#9670;&#9670;&#9670; green, and 164 of them had no reform research at all</strong> &mdash; Task <strong>T4</strong> &mdash; &ldquo;what is my fiscal-stability and reform exposure here?&rdquo; Walked cold (fresh context, <code>sessionStorage</code> and <code>localStorage</code> cleared) into <em>Fiscal Compare</em>, the default analytical surface, and ran it on its own defaults (deepwater, $75/bbl, all 185). <strong>Friction:</strong> the <em>Stability</em> column &mdash; on by default, and the only reform signal in the compare table &mdash; was built by <code>sorted.forEach(function(c){ stabilityScores[c.country] = 5; })</code> followed by an overwrite of only the <strong>21</strong> jurisdictions that carry a sourced reform log, with a second default at the cell (<code>stabilityScores[r.country] != null ? &hellip; : 5</code>). Counted on screen: <strong>167 of 185 rows rendered &#9670;&#9670;&#9670;&#9670;&#9670; in green, and 164 of those 167 (98%) had zero reform events on file.</strong> The column header&rsquo;s own IC rule reads <em>&ldquo;5 diamonds &rarr; no WACC premium&rdquo;</em>. So on a cold load the platform told an IC analyst to apply <strong>no reform premium to Afghanistan, Belarus, Somalia and Bolivia</strong>, a <strong>1&ndash;2pp premium to Venezuela</strong> (&#9670;&#9670;&#9670;&#9670;&#9671;, green &mdash; 1975 nationalization, 2001 Hydrocarbons Law, 2007 Orinoco expropriation all outside the 2010 window) and <strong>Kazakhstan</strong> (2007 Kashagan renegotiation), and a <strong>3&ndash;5pp premium to Norway</strong> (&#9670;&#9670;&#9670;&#9671;&#9671;, amber). Norway was penalised for being researched. The Reform Risk tab already refuses to make either claim &mdash; v502/v514 for no-coverage, v508 for the pre-2010 window artefact &mdash; but Fiscal Compare, which is where the screening decision is actually made, had neither. <strong>The column now renders three distinct states and never a default.</strong> <strong>(1) <code>n/c</code></strong> &mdash; muted, not green, not a diamond &mdash; for the 164 with no sourced event log, with a title stating that this is <em>not</em> a clean record and <em>not</em> a score of 5, and that no zero-premium reading may be carried into an IC memo on this basis. <strong>(2) Grey diamonds with a red <code>!</code></strong> for the 8 whose score is clean only because the window starts in 2010 &mdash; Algeria, Colombia, USA, Canada, Kazakhstan, Venezuela, Angola, Libya &mdash; each naming the year and event of its last take-raising change in the cell title. <strong>(3) The colour ramp survives only where it is earned</strong>, on the 13 scored inside the window. <strong>(4) Every cell is now a route</strong>: one click opens the per-country Reform Risk panel &mdash; the full event log for a scored jurisdiction, and for an unscored one the Fiscal Predictability Score, which is computed from that country&rsquo;s own contract set and does exist for all 185. Net effect on screen: <strong>green &#9670;&#9670;&#9670;&#9670;&#9670; rows went from 167 to 0.</strong> <strong>Verified cold in Playwright</strong> against the local build, storage cleared: 185 rows render, 164 <code>n/c</code> / 8 flagged / 13 scored; Norway, Venezuela, Kazakhstan, Algeria, USA, Colombia, Canada, Libya, Russia, Brazil, UK, Afghanistan, Belarus, Somalia, Bolivia and <code>Cote d&rsquo;Ivoire</code> (apostrophe escaping) all correct; clicking Afghanistan&rsquo;s <code>n/c</code> lands on Reform Risk with the country selected and its no-coverage verdict rendered; toggling the checkbox removes and restores the column (11&harr;10 headers); the drill-down drawer colspan stays 12; the Europe region filter re-renders correctly. <strong>0 JS errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the local build: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; identical to the committed baseline report; the WARN is the pre-existing local-harness service-worker 404. <em>Deliberately out of scope, stated rather than hidden:</em> the same 2010 window that produces the flagged state also drives the Reform Frequency Score on the Reform Risk tab and the Quiet-Since-2010 card. Widening or weighting that window is a modelling decision across three surfaces, not a rider on this one. The FC XLSX export carries no Stability column and was not touched. Nothing on the STILL LOCKED list was touched: no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; no new FAQ (still 974); no new tooltip on a pre-existing control &mdash; the two tooltips rewritten are on the exact controls whose behaviour changed, and both previously described the removed behaviour. Tab order unchanged. CP headline still two-zone with tier-coloured take%, rank and vs-median pill; FC Govt NPV still removed; v519 fiscal-analogue header and self row untouched. Version v519&rarr;v520.<br><br>
                         <strong style="color:var(--accent);">v519 (Aug 2026) &mdash; Cycle 418 (T2): the Country Profile’s fiscal-analogue table had no column headers, and its one dollar column ranked the peer set backwards</strong> &mdash; Task <strong>T2</strong> &mdash; &ldquo;is this one country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) from load into Country Profile, which auto-loads Norway. <strong>Friction:</strong> the headline strip states <em>&ldquo;NPV: $826M @$75&rdquo;</em>. Further down, <em>Similar Fiscal Profile</em> &mdash; the section whose own IC-use blurb says to use it to answer the committee’s &ldquo;is this take reasonable?&rdquo; question &mdash; rendered <strong>five columns with no header row at all</strong>. The last of them was a bare dollar figure: Algeria <code>$788M</code>, Kazakhstan <code>$785M</code>, Libya <code>$766M</code>, Equatorial Guinea <code>$621M</code>, Iraq-Kurdistan <code>$387M</code>. Every value sits <em>below</em> the $826M in the headline, so the table reads as &ldquo;Norway has the best contractor economics of its analogue set.&rdquo; It is <code>p.npv_50</code> &mdash; the <strong>$50/bbl downside</strong> leg, introduced in v516 &mdash; while the headline is the <strong>$75/bbl base case</strong>. At $75 the true figures are Kazakhstan <strong>$1,341M</strong>, Algeria <strong>$1,271M</strong>, Libya <strong>$1,214M</strong>, Equatorial Guinea <strong>$1,101M</strong>, Iraq-Kurdistan <strong>$886M</strong> &mdash; <strong>Norway’s $826M is the worst of the six, not the best.</strong> The two bases disagree on which analogue is strongest on <strong>59 of the 178</strong> profiles that render this table. The only disambiguation was a per-cell hover title, on a column with no name. <strong>(1) The table now has a header row</strong> &mdash; <code>COUNTRY / REGION / TAKE @$75 / Δ TAKE / NPV @$75 / NPV @$50</code>. <strong>(2) The base-case <code>NPV @$75</code> column was added</strong>, on the same basis as the headline strip, coloured against this country’s own value. <strong>(3) The profiled country is now the first row of its own peer table</strong> (<em>&ldquo;Norway (this) &middot; Europe &middot; 68.0% &middot; &mdash; &middot; $826M &middot; $379M&rdquo;</em>), so the comparison is read in place rather than against a number several sections up the page in a different price basis. <strong>(4) The IC-use blurb now names the two columns</strong> and states that they can rank the set differently. On Norway the section now shows the profiled country at the bottom of its analogue set on the base case, with all five peers above it &mdash; the exact reverse of what it showed an hour ago, and the correct reverse. <strong>Verified cold in Playwright</strong> against the local build, storage cleared: header and self row render on Norway, Malaysia, Nigeria, Australia, Iraq, Somalia and Netherlands; correctly suppressed on Kuwait (state monopoly); all six columns align; Malaysia’s self row carries its negative downside (<code>-$33M</code>) unchanged. <strong>0 JS errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>136 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness service-worker 404. <em>Deliberately out of scope, stated rather than hidden:</em> the Country Profile still prints three different Europe figures for Norway &mdash; <code>19.1%</code> (regional median, self-excluded, in the section heading), <code>19.4%</code> (regional median, self-included, in the peer-context strip six lines below it, same card) and <code>22.1%</code> (regional <em>mean</em>, 4-price table footer) &mdash; and reports the region as <code>n=30</code> in one place and <code>n=29</code> in another. That is a real defensibility problem and it is logged, not fixed: it is four separate computations across three sections and does not belong as a rider on this one. Nothing on the STILL LOCKED list was touched: no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; no new FAQ (still 974); no new tooltip on a pre-existing control &mdash; the two titles added are on a column that did not exist before. Tab order unchanged. CP headline still two-zone with tier-coloured take%, global rank and vs-median pill; FC Govt NPV still removed. Version v518&rarr;v519.<br><br>
@@ -3241,7 +3245,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <!-- Point estimate disclosure -->
     <div style="margin-top:16px;padding:10px 16px;background:rgba(176,104,0,.06);border-left:3px solid rgba(176,104,0,.4);border-radius:0 6px 6px 0;">
       <strong style="color:var(--accent);font-size:12px;">Point Estimate Note</strong>
-      <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">Government take and NPV are presented as single-point estimates at the selected oil price. No confidence interval or Monte Carlo range is shown for the headline take figure — the platform's Monte Carlo uncertainty bands (visible in the Screener) apply to IRR only. For frontier or complex regimes (EPSA, R-factor PSC), actual take can vary ±5–15pp depending on field-specific parameters not captured in the standardized cost profile. Use the Scenario Builder to stress-test specific assumptions.</p>
+      <p style="font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.6;">Government take and NPV are presented as single-point estimates at the selected oil price. No confidence interval or Monte Carlo range is shown for the headline take figure, and none exists anywhere in this platform: ORCA runs no simulation on government take, so there is no P10/P90 to quote. (Until v522 the Country Profile carried a badge and a band labelled &ldquo;Monte Carlo P10&ndash;P90&rdquo; that were in fact take at $50 and take at $125 relabelled as percentiles; both are removed. The Screener &ldquo;uncertainty bands&rdquo; this note used to point at never existed either, and the IRR control it referred to was removed at v517.) The dispersion the platform <em>can</em> evidence is the measured interquartile take band across a country&rsquo;s own contracts, shown in the Country Profile headline and in the Side-by-Side <em>Take spread across contracts</em> row. For frontier or complex regimes (EPSA, R-factor PSC), actual take can vary ±5–15pp depending on field-specific parameters not captured in the standardized cost profile. Use the Scenario Builder to stress-test specific assumptions.</p>
     </div>
   </div>
   <script>
@@ -3786,7 +3790,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <strong style="color:var(--text);">The platform exposes a static JSON API at three endpoints:</strong>
         <ul style="margin:8px 0 8px 16px;padding:0;">
           <li style="margin-bottom:6px;"><code style="background:var(--surface2);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px;">api/v1/countries.json</code> — full summary for all 185 countries (govt take @4 prices, NPV, IRR, mechanic, region, evidence tier, contract count). Use this for portfolio-wide screening or feeding a country comparison model.</li>
-          <li style="margin-bottom:6px;"><code style="background:var(--surface2);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px;">api/v1/country/{slug}.json</code> — per-country detail including full fiscal parameters, profit-oil tier schedules, breakeven, Monte Carlo p10/p90, and <code>source_note</code> + <code>evidence_tier</code> per parameter. Slug = country name lowercased with spaces replaced by hyphens (e.g. <code>saudi-arabia</code>, <code>trinidad-and-tobago</code>). Accessible via the API Explorer tab.</li>
+          <li style="margin-bottom:6px;"><code style="background:var(--surface2);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px;">api/v1/country/{slug}.json</code> — per-country detail including full fiscal parameters, profit-oil tier schedules, breakeven, contract-level take quartiles (<code>p25_take</code>/<code>p75_take</code>), and <code>source_note</code> + <code>evidence_tier</code> per parameter. Slug = country name lowercased with spaces replaced by hyphens (e.g. <code>saudi-arabia</code>, <code>trinidad-and-tobago</code>). Accessible via the API Explorer tab.</li>
           <li style="margin-bottom:6px;"><code style="background:var(--surface2);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:11px;">api/v1/mechanics.json</code> + <code>api/v1/schema.json</code> — mechanic definitions and field schema for parsing downstream.</li>
         </ul>
         <strong style="color:var(--text);">Recommended integration pattern:</strong> fetch <code>countries.json</code> once per session to build a ranked list; call individual <code>country/{slug}.json</code> only for the 5–10 finalist countries where full parameter sets are needed for bid modeling. All endpoints are static (no auth, no rate limit) and cached by GitHub Pages CDN. <br><br>
@@ -25356,7 +25360,6 @@ function getBreakevenRank(countryName) {
 
 function loadCountryProfile(country) {
   const content = document.getElementById('dd-content');
-  const toggleWrap = document.getElementById('dd-mc-toggle-wrap');
   const cpEmpty = document.getElementById('cp-empty-state');
   if (!country) {
     if (cpEmpty) cpEmpty.style.display = '';
@@ -25398,7 +25401,6 @@ function loadCountryProfile(country) {
     });
     landHtml += '</div></div>';
     content.innerHTML = landHtml;
-    if (toggleWrap) toggleWrap.style.display = 'none';
     return;
   }
 
@@ -25441,12 +25443,12 @@ function loadCountryProfile(country) {
   }
 
   const mechs = d.mechanics.split(',').map(m => `<span class="${getMechTagClass(m.trim())}">${m}</span>`).join(' ');
-  // MC from COUNTRY_DATA: take_50=p10 (low), take_75=p50 (base), take_125=p90 (high)
-  const mc = (d && d.take_50 != null) ? {p10: d.take_50, p50: d.take_75, p90: d.take_125} : null;
-  const showMC = mc && document.getElementById('dd-mc-toggle') && document.getElementById('dd-mc-toggle').checked;
-
-  // Show/hide toggle label based on MC data availability
-  if (toggleWrap) toggleWrap.style.display = mc ? 'inline-flex' : 'none';
+  // v522 (T2): `mc` was {p10: take_50, p50: take_75, p90: take_125} -- an alias, not a simulation.
+  // It fed a headline badge titled "Monte Carlo P10-P90 take range" and a band under the price table
+  // reading "P10-P90 uncertainty band". Quoting a P90 take asserts a 10% exceedance probability that
+  // was never computed, and the platform's own Methodology section states in text that no Monte Carlo
+  // range is shown for headline take. Removed. The dispersion ORCA can evidence for a country is the
+  // measured spread across its own contracts (p25_take / p75_take), rendered below.
 
   // Predictability score — unified formula (same as getFiscalPredictabilityScore used in badge)
   const _fpScore = getFiscalPredictabilityScore(d);
@@ -25456,7 +25458,46 @@ function loadCountryProfile(country) {
     <div class="stability-bar"><div class="stability-fill" style="width:${_fpScore}%;background:${stabColor}"></div></div>
     <span class="stability-score" style="color:${stabColor}">${_fpScore}</span>
   </div>`;
-  const mcBadge = mc ? `<span class="mc-badge" title="Monte Carlo P10–P90 take range — price scenario sensitivity ($50–$125/bbl)">${Math.min(mc.p10,mc.p90).toFixed(1)}–${Math.max(mc.p10,mc.p90).toFixed(1)}% range</span>` : '';
+  // v522 (T2): replaces the fabricated Monte Carlo badge with the dispersion this platform actually
+  // measures -- the interquartile take band across THIS country's own contracts at $75/bbl. 135 of 185
+  // countries price every contract identically; that is a statutory single-term regime, and saying so
+  // is the finding. The old badge said "59.3-75.0% range" for Norway, which was take at $50 and take
+  // at $125 -- two cells of the table below, carrying no information about contract-level variation.
+  const _cpSpread = (function() {
+    // local monopoly check: `_isMonopoly` is declared ~140 lines below this point, so referencing it
+    // here would throw a TDZ ReferenceError (the failure mode v452 hit with the rank/median pill).
+    var _isMonopolyHdr = isStateMonopoly(d.take_75);
+    if (_isMonopolyHdr) return '';
+    var p25 = d.p25_take, p75 = d.p75_take;
+    if (p25 == null || p75 == null) return '';
+    var pp = p75 - p25;
+    var hd = (d.take_75 != null && d.take_75 > 0 && d.take_75 < 200) ? d.take_75 : null;
+    // The band is UNWEIGHTED across contracts; the headline take is production-weighted where coverage
+    // permits. 57 of 185 headlines therefore sit outside their own band. Name the case rather than
+    // leave the analyst to decide which of the two numbers is broken.
+    var outside = hd != null && (hd < p25 - 0.05 || hd > p75 + 0.05);
+    var tip = pp < 0.05
+      ? 'Every one of ' + (d.n || 0).toLocaleString() + ' contracts in ' + country + ' prices to the same government take (' + p25.toFixed(1) + '% at $75/bbl). '
+        + 'This is a statutory single-term regime — block selection does not change your fiscal outcome here. It is not a low-risk finding and it is not a narrow simulation result: '
+        + 'ORCA runs no Monte Carlo on government take, so there is no P10/P90 to quote and none is shown.'
+      : 'Interquartile range (p25–p75) of government take across ' + country + '\u2019s own ' + (d.n || 0).toLocaleString() + ' contracts at $75/bbl — a MEASURED dispersion, not a simulated one. '
+        + 'A ' + pp.toFixed(1) + 'pp spread means which block you sign materially changes your take. Under 5pp = consistent terms; 10pp+ = material contract-level variation, common in mixed-mechanic and R-factor tier regimes. '
+        + 'Read it beside the evidence panel below: a narrow spread over a thin fact base is a thin sample, not a tight regime.';
+    if (outside) {
+      tip += ' Note: the headline ' + hd.toFixed(1) + '% sits outside this band because the headline is production-weighted while the band is unweighted across contracts. '
+           + 'Neither is wrong — they answer different questions. Use the headline for the country figure and this band for how much block selection matters.';
+    }
+    var col = pp < 0.05 ? 'var(--muted)' : pp > 15 ? 'var(--orange)' : pp > 5 ? 'var(--yellow)' : 'var(--muted)';
+    // Show the level, not just the shape: for a single-term regime the analyst needs the number every
+    // contract prices to, because it is not always the headline (the headline is production-weighted).
+    var txt = pp < 0.05
+      ? 'Contract take: single term \u00b7 ' + p25.toFixed(1) + '%'
+      : 'Contract take: ' + p25.toFixed(1) + '–' + p75.toFixed(1) + '% (' + pp.toFixed(1) + 'pp)';
+    // Marker on the divergent cases only, using the same help glyph the rest of the platform uses --
+    // a bare footnote dagger would point at a footnote that does not exist on this page.
+    return '<span class="cp-spread-badge" style="color:' + col + ';border-color:' + col + ';cursor:help;" title="'
+      + tip.replace(/"/g,'&quot;') + '">' + txt + (outside ? ' \u24d8' : '') + '</span>';
+  })();
 
   // Data quality badge — D override for known estimated-default countries, else approximate from contract count
   const isLowQuality = D_CONFIDENCE_COUNTRIES.has(d.country);
@@ -25735,19 +25776,18 @@ function loadCountryProfile(country) {
     <!-- v455: tooltip explains what "N contracts" means — a first-time IOC analyst may wonder "contracts with whom?" -->
     <span class="count-badge" style="margin-left:8px;cursor:help;" title="Fiscal contracts in ORCA database for ${country} — Take% and NPV are production-weighted averages across these contracts. More contracts = more representative averages. Countries with <10 contracts show a data-coverage warning.">${d.n} contracts</span>
     ${_hdrBeCallout}
-    ${mcBadge}
+    ${_cpSpread}
     <span style="margin-left:8px;">${renderStabilityBadge(getFiscalPredictabilityScore(d))}</span>
     <button class="btn btn-sm btn-outline" style="margin-left:auto;font-size:11px;" onclick="ddAddCompare('${ddCountryEsc}',this)">+ Compare</button>
     <button class="btn btn-sm btn-outline" style="margin-left:6px;font-size:11px;" onclick="ddOpenScenarioBuilder('${ddCountryEsc}')">&#128295; Scenario</button>
   </div>
   ${buildEvidencePanel(d, getDQBadge(d), getDataQualityExplain(d))}`;
 
-  // Section 2: Price scenario table + optional MC uncertainty note
-  const p10hi = mc ? Math.max(mc.p10, mc.p90) : null;
-  const p10lo = mc ? Math.min(mc.p10, mc.p90) : null;
-  const mcNote = (mc && showMC)
-    ? `<div class="dd-mc-note">&#x2194; P10–P90 uncertainty band: <strong>${p10lo.toFixed(1)}%</strong> – <strong>${p10hi.toFixed(1)}%</strong> &nbsp;·&nbsp; P50 (base): <strong>${mc.p50.toFixed(1)}%</strong> &nbsp;·&nbsp; range reflects \$50–\$125/bbl price scenarios</div>`
-    : '';
+  // Section 2: Price scenario table.
+  // v522 (T2): a `.dd-mc-note` band sat directly under this table reading "P10-P90 uncertainty band:
+  // 59.3% - 75.0% - P50 (base): 68.0%". Those were the $50, $125 and $75 cells of the table it sat
+  // beneath, relabelled as distribution percentiles. Removed -- it added no number the analyst could
+  // not read one line up, and the percentile labels asserted probabilities that were never computed.
   const safe = country.replace(/[^a-z0-9]/gi,'_').toLowerCase();
   // factsSection is referenced in the mainSections template; define it here in loadCountryProfile scope
   const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -25812,19 +25852,11 @@ function loadCountryProfile(country) {
       <div class="dd-take-cell">
         <div class="price-lbl">$75/bbl <span style="font-size:9px;color:var(--muted);">BASE</span></div>
         <div class="take-big ${_isMonopoly?'':''+takeClass(d.take_75)}">${_fmtTakeCell(d.take_75)}</div>
-        ${(function(){
-          if (_isMonopoly) return '';
-          const p25 = d.p25_take, p75 = d.p75_take;
-          if (p25 == null || p75 == null) return '';
-          const iqr = p75 - p25;
-          if (iqr < 5) {
-            return '<div style="font-size:9px;color:var(--muted);margin-top:3px;" title="Contracts are highly uniform — very consistent fiscal terms">IQR: ±' + (iqr/2).toFixed(1) + 'pp</div>';
-          }
-          const iqrColor = iqr > 30 ? 'var(--orange)' : iqr > 15 ? 'var(--yellow)' : 'var(--muted)';
-          return '<div style="font-size:9px;color:' + iqrColor + ';margin-top:3px;cursor:help;" title="Interquartile range — middle 50% of contracts span ' + p25.toFixed(1) + '% to ' + p75.toFixed(1) + '% take. Wide IQR indicates multiple fiscal regimes or highly variable contract terms.">'
-            + p25.toFixed(1) + '–' + p75.toFixed(1) + '% IQR'
-            + (iqr > 25 ? ' ⚠' : '') + '</div>';
-        })()}
+        <!-- v522 (T2): a 9px "IQR: ±0.0pp" sub-line lived here, titled "Contracts are highly uniform
+             — very consistent fiscal terms". For Norway that described 7,643 contracts on one statutory
+             term as a uniformity finding, and it stated the same dispersion as the headline badge in a
+             second, inconsistent format (±pp under 5pp, a band above it). One dispersion statement now,
+             in the headline strip, where the analyst already looked for a range. -->
       </div>
       <div class="dd-take-cell"><div class="price-lbl">$100/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_100)}">${_fmtTakeCell(d.take_100)}</div></div>
       <div class="dd-take-cell"><div class="price-lbl">$125/bbl</div><div class="take-big ${_isMonopoly?'':''+takeClass(d.take_125)}">${_fmtTakeCell(d.take_125)}</div></div>
@@ -25856,7 +25888,6 @@ function loadCountryProfile(country) {
         </svg>
       </div>`;
     })()}
-    ${mcNote}
     <p style="font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;">
       ${d.weighting === 'prod_weighted'
         ? `<span style="background:rgba(21,128,61,.12);border:1px solid rgba(21,128,61,.3);border-radius:4px;padding:1px 7px;font-size:11px;font-weight:700;color:#15803D;cursor:help;" title="Production-weighted where block-level data available (${(d.prod_coverage_pct||0).toFixed(0)}% coverage). Remaining contracts equally weighted.">Fully weighted</span> Production-weighted average (${(d.prod_coverage_pct||0).toFixed(1)}% of contracts have verified production data)`
@@ -33616,14 +33647,10 @@ document.addEventListener('DOMContentLoaded', function() {
   if (scCsv) scCsv.addEventListener('click', function() { exportScreenerCSV(); });
   var scExcel = document.getElementById('screener-excel-btn');
   if (scExcel) scExcel.addEventListener('click', function() { exportScreenerExcel(); });
-  // v104: Country Profile select + MC toggle + IOC Exposure select + API select
+  // v104: Country Profile select + IOC Exposure select + API select
+  // v522: the #dd-mc-toggle change listener was removed with the checkbox it re-rendered for.
   var ddCountry = document.getElementById('dd-country-select');
   if (ddCountry) ddCountry.addEventListener('change', function() { loadCountryProfile(this.value); });
-  var ddMcToggle = document.getElementById('dd-mc-toggle');
-  if (ddMcToggle) ddMcToggle.addEventListener('change', function() {
-    var sel = document.getElementById('dd-country-select');
-    if (sel && sel.value) loadCountryProfile(sel.value);
-  });
   var iocExpSelect = document.getElementById('exposure-ioc-select');
   if (iocExpSelect) iocExpSelect.addEventListener('change', function() { renderIOCExposure(this.value); });
   var apiCountry = document.getElementById('api-country-select');
