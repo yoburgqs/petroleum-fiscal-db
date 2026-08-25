@@ -13490,3 +13490,18 @@ spread rows and v522 CP contract-spread badge all untouched.
 literals (page title line 42, header badge line 1353); `_orcaVerNow()` reads the
 badge so clipboard citations follow. Changelog entry prepended. Grade tables not
 touched.
+
+---
+## Cycle 426 Log — 2026-08-25 11:04
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 426 complete — v527 pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (last walked cycle 417; 425 was T4, 424 T3, 423 T1.)
+
+## Friction
+Cold walk onto Home. The **Evidence Tier** card in the Key terms grid (`index.html:1477`) is the first and most prominent definition of the evidence system in the product. It read: *"A = primary legislation · B = operator filings · C = secondary source. Filter by tier in Fiscal Compare."*
+
+Both halves were false, an
