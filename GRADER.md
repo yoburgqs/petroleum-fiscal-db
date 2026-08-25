@@ -11425,3 +11425,16 @@ wrong value for the right one, they do not re-word the string. Tab order unchang
 ### Bookkeeping — not the improvement
 v511 -> v512 across 4 structural locations (title, meta description, header badge,
 `_orcaVerNow()` fallback); changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 411 Log — 2026-08-24 20:26
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 411 complete and pushed (v512). Working tree is clean apart from the loop-owned state files; mirror is in sync.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (410 was T6, 409 T5, 408 T3, 407 T4, 406 T1, 405 T2 — T2 was the least recent.)
+
+## Friction
+I walked T2 from a cold load — fresh browser context, sessionStorage and localStorage cleared — to the Country Profile tab, which auto-loads Norway. Breakeven is one of the four numbers this question tur
