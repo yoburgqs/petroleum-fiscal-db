@@ -11739,3 +11739,18 @@ untouched.
 ## Bookkeeping — not the improvement
 v513 → v514 across 4 structural locations (meta description, title, header badge,
 `_orcaVerNow()` fallback). Changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 413 Log — 2026-08-24 22:16
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 413 complete and pushed (v514, commit `0fbeafe`). Both repos pushed, mirror synced.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (least recent; 412 was T1)
+
+## Friction
+Walked it cold — fresh browser context, storage cleared — into Country Profile.
+
+Open **Norway**: a full *Fiscal Reform History* sidebar, four sourced events with direction tags and source badges. Open **Afghanistan** or **Chad**: **that section is not there.** Not empty, not "no data" — absent.
