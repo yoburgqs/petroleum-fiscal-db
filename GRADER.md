@@ -14192,3 +14192,156 @@ did not), v489, v505, v515–v527 and v533 all untouched.
 **Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* (432 was T6, 431 T4, 430 T3, 429 T1, 428 T5 — T2 was least-recently-used.)
 
 **Friction.** Walked Country Profile cold; it auto-loads Norway. The three comparative claims on the page all read `COUNTRY_DATA` unfiltered. Only **22 of 185** records are production-weighted — the other **163** are equal-weighted averages with zero production coverage ove
+
+---
+## Cycle 434 Log — 2026-08-25 18:28
+
+- Test before: 135 PASS / 0 FAIL (reported baseline)
+- Test after: **136 PASS / 0 FAIL / 0 WARN** — `runtime_comprehensive.js` **ran this cycle**
+- JS syntax gate: **PASS** (9 blocks / 0 errors)
+- JS errors: **0** on every walk
+- Version: v534 → **v535**
+- Commit: `cb8d396` · pushed to `origin/main`
+
+## Cycle 434 — T5, v535
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."*
+(433 was T2, 432 T6, 431 T4, 430 T3, 429 T1 — T5 was least-recently-used.)
+
+### Friction
+
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared
+— and exercised **every** export affordance, reading the clipboard and the print
+output back rather than trusting button labels.
+
+The clipboard paths were sound. FC drilldown `⎘ IC Citation` and `Copy 4-price as
+IC table`, Country Profile `⎘ IC Citation` and `Copy for IC Memo`, and
+Side-by-Side `⎘ Copy Table for IC Memo` all returned correct, attributed,
+memo-ready artifacts.
+
+**The print path did not.** The `@media print` block ended with two unconditional
+rules, written when Country Profile was the only printable view and never
+revisited:
+
+```css
+.tab-pane { display: none !important; }
+#t7        { display: block !important; }   /* #t7 IS Country Profile */
+```
+
+So an analyst who had built **Norway / United Kingdom / Netherlands** in
+Side-by-Side and pressed **⬇ Save as PDF** — the button sitting directly under
+their grid — got a PDF of **the Norway Country Profile** and **none of their
+comparison**. Same for **⬇ Export PDF** in the row above it, and same for
+**Ctrl+P**, which the tip line printed beside the button *explicitly instructs
+them to press*: `Tip: Ctrl+P to print, select "Save as PDF" as printer`.
+
+Measured under print-media emulation, pre-fix, from Side-by-Side:
+
+| element | computed `display` |
+|---|---|
+| `#t2` (Side-by-Side, the active tab) | `none` |
+| `#t7` (Country Profile) | `block` |
+| `#t0` (Fiscal Compare) | `none` |
+
+Rendered text of that page began: *"Country Profile … Loading Norway — North Sea
+Concession benchmark."*
+
+The failure was silent and total — not a formatting problem, **a different
+document about a different country set** — and it came from the one export path
+whose output goes into an IC pack as an attachment rather than past an analyst's
+eyes on the way. It applied to **eight of the nine tabs**: Home, Fiscal Compare,
+Explorer, Screener, Side-by-Side, IOC Portfolio, Breakeven Map, Reform Risk.
+Country Profile printed correctly by coincidence, not by design.
+
+`#print-header-meta` additionally carried a hard-coded **`v500`** — 34 versions
+stale — on every PDF the platform has ever produced.
+
+### Change
+
+1. **Print follows the active tab.** `.tab-pane.active { display:block !important }`
+   replaces the hard-coded `#t7`.
+2. **`.print-header` moved out of `#t7`.** It lived *inside* the Country Profile
+   pane, so it was structurally incapable of branding any other view. It is now a
+   sibling of the panes, directly under `<main>`.
+3. **The header names what was printed** — *"Side-by-Side — exported view"*,
+   *"Fiscal Compare — exported view"*. New `_orcaStampPrintHeader()` runs on every
+   `switchTab()` and again on `beforeprint` (confirmed to fire for
+   `window.print()`, which all three PDF buttons call, and for Ctrl+P). Explorer
+   and Screener share one pane, so the stamp reads `_explorerMode` and names the
+   mode actually on screen. The version string now reads the header badge through
+   the existing `_orcaVerNow()`.
+4. **Screen-only controls hidden in print** by explicit selector list — `.btn`,
+   search inputs, the SbS top-row buttons, quickstart presets, Explorer mode
+   toggle, FC XLSX / Breakeven CSV, chip remove-glyphs — *not* a blanket
+   `button { display:none }`, because country names inside the ranked tables are
+   rendered as unclassed `<button>` elements and a blanket rule would have blanked
+   the first column out of every printed table.
+5. The three dismissible **"Example loaded"** banners (CP / IOC / SbS) carry
+   `no-print`; each contains a ✕ dismiss control and an instruction to click it.
+
+### Result
+
+An analyst can put **any of the nine views** into an IC pack as a PDF and get
+that view — ORCA-branded, dated, stamped with the current build, and named on the
+page. The Side-by-Side PDF now contains the comparison grid, the *Profile basis:
+Deepwater · $1.2B capex · 10% WACC · 100% WI* strip and the country chips, and no
+buttons.
+
+### Verification
+
+Cold Playwright against the local build, storage cleared, under
+`emulateMedia({media:'print'})`, on all eight tabs **plus Screener mode**:
+
+```
+PASS  Home             printed=["thome"]          | Home — exported view
+PASS  Fiscal Compare   printed=["t0"]             | Fiscal Compare — exported view
+PASS  Country Profile  printed=["t7"]             | Country Profile — exported view
+PASS  Explorer         printed=["texplorer"]      | Explorer — exported view
+PASS  Side-by-Side     printed=["t2"]             | Side-by-Side — exported view
+PASS  IOC Portfolio    printed=["t5"]             | IOC Portfolio — exported view
+PASS  Breakeven Map    printed=["tbreakevenmap"]  | Breakeven Map — exported view
+PASS  Reform Risk      printed=["treformrisk"]    | Reform Risk — exported view
+Screener mode          printed=["texplorer"]      | Screener — exported view
+```
+
+In every case exactly **one** pane rendered, it was the **active** one, the print
+header was visible, and the label matched. `beforeprint` confirmed to fire on
+`window.print()`. Print-media screenshots read back from Side-by-Side and Fiscal
+Compare to confirm the correct document lands on the page. `.print-header`
+confirmed still `display:none` on screen across all eight tabs. **0 JS errors on
+every walk.**
+
+### Found on the same walk — NOT fixed, stated rather than hidden
+
+**Side-by-Side has two copy-table buttons and the discoverable one is the worse
+one.** `#cmp-copy-table-btn` ("📋 Copy Table", v466) sits at the top of the tab
+beside the search box at y≈178. v503's `⎘ Copy Table for IC Memo` sits at
+**y≈1619 — 1,440px below it**, under the whole 20-row grid. Read back from the
+clipboard on the cold-load default trio:
+
+| | top button | bottom button |
+|---|---|---|
+| lines | 22 | 27 |
+| ⓘ glyph in headers | **yes — 9 cells** | no |
+| caption naming countries | **no** | yes |
+| assumptions line | **no** | yes |
+| source line + version | **no** | yes |
+| `text/html` flavour | **no** | yes |
+
+So the top button pastes into Word as a tab blob asserting *"Contractor NPV @$75
+(base) $826M"* with nothing saying that is a standardized Deepwater profile at
+10% WACC. The top row also duplicates *Export PDF* and *Share Link*, which the
+bottom row already carries — one tab with two of every export action. That is a
+next cycle, not this one.
+
+Also noted, cosmetic only: the FC print puts the IC Analyst Interpretation Guide
+on page 1 ahead of the ranked table, and an unclassed "Run Compare ▶" button
+still renders in print. Neither produces a wrong document.
+
+### STILL LOCKED — nothing touched
+
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
+**No new tooltip** on any pre-existing control. Tab order unchanged. v371/v373,
+v423, v430, v449, v451, v452, v489, v505, v515–v527, v533 and v534 all untouched.
