@@ -12545,3 +12545,16 @@ Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instruction
 
 ## Bookkeeping — not the improvement
 v519 → v520 in the two structural locations that carry a literal (page title, header badge); `_orcaVerNow()` reads the badge so clipboard citations follow. Changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 419 Log — 2026-08-25 04:19
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 419 complete and pushed — `6c6b942` + `e0ecd17` (petroleum-fiscal-db), `dfd219e2e` (office mirror). v520.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (least recent; 418 was T2, 417 T6, 416 T1, 415 T5, 414 T3)
+
+## Friction
+Walked cold into **Fiscal Compare** and ran it on its own defaults. The **Stability** column — on by default, the only reform signal in the compare table — was built by defaulting *every* country to a perfect 5 and then overwriting only the 2
