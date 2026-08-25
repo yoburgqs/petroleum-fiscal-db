@@ -13705,3 +13705,16 @@ v528 all untouched.
 
 **Bookkeeping — not the improvement.** v528 → v529 in the two structural literals
 (page title line 42, header badge line 1353). Changelog entry prepended.
+
+---
+## Cycle 428 Log — 2026-08-25 13:11
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Both repos pushed.
+
+## Cycle 428 — T5, v529
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo." (427 was T2.)
+
+**Friction.** Walking cold from Home and following the platform's *own* Quick Start step 1 — "Export XLSX for IC attachment" — the workbook that comes out is ranked and sorted on the compare engine's `liveTake`. For the 153 countries ORCA holds no country-specific terms for, that is the same generic mechanic default. At $75/bbl deepwater, **153 
