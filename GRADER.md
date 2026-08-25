@@ -11754,3 +11754,144 @@ v513 → v514 across 4 structural locations (meta description, title, header bad
 Walked it cold — fresh browser context, storage cleared — into Country Profile.
 
 Open **Norway**: a full *Fiscal Reform History* sidebar, four sourced events with direction tags and source badges. Open **Afghanistan** or **Chad**: **that section is not there.** Not empty, not "no data" — absent.
+
+---
+## Cycle 414 Log — 2026-08-25 (v515)
+- Test before: 136 PASS / 0 FAIL / 1 WARN
+- Test after: 136 PASS / 0 FAIL / 1 WARN — suite **ran this cycle** against the local build
+- JS syntax gate: 9 blocks / 0 errors — PASS
+- JS errors on the walks: 0
+- Commit: `f103984`
+
+## Task
+**T3** — "How do these three countries compare side by side?" (least recent; 413 was T4,
+412 T1, 411 T2, 410 T6, 409 T5, 408 T3.)
+
+## Friction
+Walked it cold — fresh browser context, `sessionStorage` and `localStorage` cleared — from
+Home into Side-by-Side, and read the grid the way an analyst would.
+
+The **Economics** block ended with a row headed **`IRR @$75 (%)*`**. On the cold-load
+default set it read:
+
+| | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| IRR @$75 | **105.0%** | **93.9%** | **489.6%** |
+
+That row carried the same visual weight as Govt Take, sat four rows above
+**⎘ Copy Table for IC Memo**, and rode the shared `rows` array into `#cmp-data-table` — so
+it left the page in both clipboard flavours and landed in the memo.
+
+**It is not a rate of return on anything.** `rebuild_country_data.py:135` computes it as
+`AVG(CASE WHEN irr_pct < 999 THEN irr_pct ELSE NULL END)` — the arithmetic mean of every
+per-contract IRR in the country, over a heavy-tailed distribution dominated by contracts
+whose net early investment rounds to nothing. Measured against `country_data.json`:
+
+| | |
+|---|---|
+| countries displaying an IRR number | 124 of 185 |
+| **median of those 124** | **239.8%** |
+| ≥100% | 115 of 124 |
+| ≥200% | 77 of 124 |
+| **in a plausible 5–60% band** | **1 of 124** |
+| non-monotonic in price | 29 countries |
+
+The non-monotonicity has the same cause: the bare `999` sentinel drops a **different subset
+of contracts at each price**, so `irr_50` / `irr_75` / `irr_100` / `irr_125` are means over
+four different samples. Nigeria falls 77.4% @$50 → 19.6% @$75. Netherlands renders 489.6%
+at $75 and `null` at $100 and $125 because every contract tripped the sentinel there.
+
+`fmtIrr()` was not a guard — it only suppresses values `>= 500`, and 489.6 passes.
+
+**v511 had already put this exact figure in its own changelog** as evidence that the
+Netherlands column was a `PROXY`, added a sourcing caveat, and left the number in place. The
+caveat treated a broken metric as a provenance problem.
+
+## Change
+1. **The IRR row is removed from Side-by-Side** — and therefore from `#cmp-data-table` and
+   both clipboard flavours. This is the **v451 precedent** (Govt NPV deleted from Fiscal
+   Compare): removing an undefendable number at the decision point is the improvement.
+2. **The slot is given to real contractor-side price sensitivity** — *Contractor NPV @$50
+   (downside)* / *@$75 (base)* / *@$125 (upside)*. Economics carried one price point against
+   the Take block's four; it now mirrors it. Coverage **185/185** and monotonic in price for
+   **184/185** (Venezuela the lone exception), against IRR's 165/185 and 29 non-monotonic.
+   Same standardized Deepwater profile, so two columns are directly comparable.
+3. **A note under the grid says where IRR went** — IRR is advertised on Fiscal Compare,
+   Explorer and the Screener hurdle slider, so a silent absence would be its own confusion.
+   One line of reason (median 239.8%), then routes to Scenario Builder for a genuine IRR.
+4. **The export assumption line was factually wrong** — it promised "NPV / IRR / Breakeven at
+   $75/bbl". It now states the three NPV price points actually in the table and carries the
+   IRR explanation *inside the pasted artifact*.
+
+### Found on the same walk and also fixed — three dead preset buttons
+The Side-by-Side empty-state preset labelled **"USA vs Iraq"** carried
+`data-countries="United States|Iraq"`. `COUNTRY_DATA` calls the country **`USA`**. Clicking
+it — verified by clicking the real button, not by calling `addCompare()` — produced:
+
+```
+compareList = ["Iraq"]
+badge       = "1/5 countries — room for 4 more"
+message     = "Iraq added — add 1–4 more countries to begin comparison."
+toast       = (none)
+```
+
+One of the four cold-start doors into this tab delivered half a comparison with nothing on
+screen to say so. The same mismatch killed two Country Profile quick buttons:
+`data-cp-country="United States"` and `="United Arab Emirates"`, where the data holds `USA`
+and `UAE`. Audited **every** preset country string in the file against `country_data.json` —
+those three were the only misses; all three corrected.
+
+**Root cause: the last silent refusal in `addCompare()`.** v501 made the "comparison is full"
+and "already added" branches raise a toast, but an unresolvable name still hit
+`return false` with nothing rendered. It now names the country it could not find. That is
+why a dead button survived unnoticed.
+
+## Result
+An analyst comparing three countries no longer has a three-digit fake IRR in the grid or in
+the memo they paste. They get a downside / base / upside contractor NPV read on the same
+standardized profile instead — the row an IC actually asks for, which the tab did not have.
+And all four cold-start presets now deliver the comparison their label promises.
+
+## Verification
+Cold Playwright walks against the local build, storage cleared:
+
+| check | result |
+|---|---|
+| all 4 quickstart presets load full sets | USA/Iraq **2**, Atlantic Frontier **4**, North Sea Trio **3**, West Africa Trio **3** |
+| IRR row absent from grid and export | 2-, 3- and 5-country sets, incl. state-monopoly column (Saudi Arabia) |
+| clipboard TSV read back | 3 NPV rows present, **no IRR row**, IRR explanation in the assumption line |
+| `addCompare("Atlantis")` | new toast fires |
+| CP "USA" / "UAE" buttons | selects resolve to `USA` / `UAE` |
+| JS errors | **0** on every walk |
+
+`runtime_comprehensive.js` **ran this cycle**: **136 PASS / 0 FAIL / 1 WARN**. The WARN is
+the pre-existing local-harness artifact — the service worker registers
+`/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath, which 404s on a root-served local
+server. Correct in production; cycle 413 established the same baseline.
+
+## Known, not fixed — stated rather than hidden
+- **The same mean-IRR drives the Country Profile verdict headline.** Observed live this
+  cycle: USA reads *"✔ Commercially viable at $75/bbl — IRR 421.4% clears IOC hurdle (15%)"*.
+  With a median of 239.8%, effectively every country "clears" the hurdle, so the verdict
+  carries no information.
+- **The Screener's "Set 15% ⟵ IOC hurdle" filter screens almost nothing out**, for the same
+  reason — 123 of the 124 countries with an IRR pass a 15% floor.
+- **Fiscal Compare still offers an IRR sort column** (with a 124/185 coverage caveat).
+
+Fixing those three means either a median-based aggregate in `rebuild_country_data.py` or
+retiring the metric platform-wide. That is a data-pipeline change against the live DB, not a
+UI cycle, and it should not be done under the 30-minute loop without a backup and the writer
+lock. Separate cycle.
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional banner, no
+routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. No
+new FAQ (still 974). **No new tooltip on an existing control** — the two `ⓘ` glyphs added are
+on the two brand-new NPV rows, not on anything that already existed. The FC IC citation
+string was not touched. Tab order unchanged. v430 sessionStorage logic, v449/v451/v452 CP
+headline rules, v489 Reform Risk placement, v507 divider, v513 breakeven semantics and v514
+reform sidebar all untouched.
+
+## Bookkeeping — not the improvement
+v514 → v515 across 4 structural locations (meta description, title, header badge,
+`_orcaVerNow()` fallback). Changelog entry prepended. Grade tables not touched.
