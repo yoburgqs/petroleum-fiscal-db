@@ -13963,3 +13963,76 @@ The grid says, in the **Govt Take** block: Brazil **55.6%**, Guyana **54.1%**. E
 Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — from Home into **Reform Risk**, the tab Home's own Quick Start Step 4 sends the analyst to before finalising an IC memo.
 
 The first panel is **Regional Reform Tilt Since 2010**, which asks "have regions been net-tightening or net-liberalizing?" It rendered *
+
+---
+## Cycle 432 Log — 2026-08-25
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (suite RAN this cycle against the local build; WARN is the pre-existing local-harness `sw.js` 404)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- JS errors on every cold walk: 0
+- Version: v532 → v533 (bookkeeping, 2 structural literals — not the improvement)
+
+## Task
+
+**T6 — "Where did this number come from and how solid is the evidence?"** (431 was T4, 430 T3, 429 T1, 428 T5, 427 T2. T6 is the least-recently-used.)
+
+## Friction
+
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — from Home into **Fiscal Compare**, and read the one column on the flagship table that answers the provenance question.
+
+Counted off the live DOM on the cold default view, the **Quality** column renders **G 154 · A 27 · B 3 · D 1**. **83% of the table is G.**
+
+The **"Reading this table"** guide sits directly above it, is visible on a cold load, and is the only definition of that column anywhere on the tab. It read:
+
+> *Quality = data quality score: % of fiscal facts from A/B-tier sources. **A** = primary source (official legislation, PSA text, government gazette); **B** = secondary source (Wood Mac, Rystad, IEA, operator filings); **C** = derived/estimated (peer analogy, interpolation). IC rule: only cite countries with ≥80% A/B in final IC memos; use C-tier figures as directional only.*
+
+**The letter G does not appear in it.** The analyst is handed a three-letter scale, looks at the table, and 83% of rows carry a letter that is not on the scale. The prescribed decision rule — *"is this row ≥80% A/B?"* — is a category error against a G, which is not a percentage at all.
+
+Worse, the guide points at the **opposite** of the truth for exactly the rows that matter. Under it, a missing A/B grade reads as *thin data*. The cell's own tooltip (`index.html:31633`, v505) says the reverse: *"The database does hold N% A/B-tier fiscal facts for X, but this figure did not use them."* **G means the take never touched the sourced facts** — it is the mechanic's standard default, every G row on the same mechanic lands on the identical take, NPV and breakeven, and it is not citable. That is the single most decision-relevant fact on the tab, and the guide omitted it.
+
+Two further claims in that same sentence were inherited falsehoods that earlier cycles disproved on **other** surfaces and never propagated here:
+
+| Claim in the guide | Established by | Actual |
+|---|---|---|
+| "B = … operator filings" | **v527**, counted from live `country_data.json` | **Zero** operator filings appear in tier B. 97.9% of tier B is the EY/KPMG/IHS bulk harvest. Home was corrected; this guide was not. |
+| "only cite countries with ≥80% A/B" | **v518** | That gate passes **171 of 185** countries and *inverts* (USA/Georgia/Mongolia score 100% A/B off bulk tables; Senegal at 67.2% primary law fails). v518 removed it from the Screener. The guide still prescribed it as the IC rule. |
+
+Separately found in the same block: the guide describes an **IRR** column ("124 of 185 countries shown") that has not existed since **v525**, and promises a citation string carrying an IRR that **v523** removed. v523's own log says it corrected "three onboarding lines that promised an IRR — the Fiscal Compare guide, and IC Analyst Guide steps 2 and 3"; it corrected `index.html:1429` and `:1601` and **missed the reading guide's own two mentions**.
+
+## Change
+
+1. **The Quality definition now describes what the column actually renders, leading with G.** What G means, why G rows cannot be ranked against each other, that the country's facts exist but this figure did not use them, and that it must not be cited. A/B/C/D are redefined as *the row **was** modelled on that country's own terms*, with the real thresholds (A ≥80 · B ≥60 · C ≥40 · D below) and the v518/v527 caveat that tier B is a country-level guide never read off an individual contract. The dead ≥80% A/B IC rule is gone.
+
+2. **A live `#fc-quality-mix` line, computed inside `renderFCResults()`** off *exactly the branch the cell render uses* (`r.termsBasis === 'default'`, else the `ab_pct` thresholds) — so the guide cannot drift from the table:
+
+   > *In this view: **154 of the 185 rows now on screen (83%) are G** — generic mechanic default, not citable. The other 31 are on their own terms: 27 A · 3 B · 1 D.*
+
+   It recounts on every render, so the region chips and the profile select move it.
+
+3. **The IRR paragraph is deleted** (the column does not exist) and the closing line now names the four-price matrix and citation contents the buttons actually produce.
+
+## Result
+
+The analyst asking "how solid is this number" on the flagship tab now gets a definition that covers the badge **83% of rows actually carry**, is told those rows are not citable and cannot be ranked against each other, and reads the count **for the rows currently on screen** instead of hovering 185 cells to discover it. Before, they were given a scale that did not include the most common value, and a citation rule that could not be applied to it.
+
+## Verification
+
+Cold Playwright against the local build, storage cleared. The mix line reconciles against an **independent count of the rendered `.tier-badge` cells** on three views:
+
+| View | Rendered badges | Mix line |
+|---|---|---|
+| Cold default | G 154 · A 27 · B 3 · D 1 | 154 of 185 (83%) G; 27 A · 3 B · 1 D |
+| Region = Europe | G 28 · A 2 | 28 of 30 (93%) G; 2 A |
+| Region = N. America | G 1 · A 1 | 1 of 2 (50%) **is** G; the other 1 **is on its own terms** |
+
+Guide now contains "G"; contains no "IRR"; the ≥80% A/B rule and "operator filings" appear nowhere in it. v423 dismissal verified still working (session + reload). **0 JS errors on every walk.**
+
+## Known, not fixed — stated rather than hidden
+
+- This corrects the **explanation** of the Quality column. It does not reduce the 154 generic rows — that needs country-specific terms loaded into the compare engine, a data-pipeline job and a business-logic call, not a UI cycle.
+- The Home quickstart's Fiscal Compare card and the FC IC Analyst Guide describe the Quality column in their own words and were **not** re-audited this cycle.
+
+## STILL LOCKED — nothing touched
+
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. **No new FAQ** (still 974). **No new tooltip** on any pre-existing control. Tab order unchanged. v423 guide dismissal, v430, v449, v451, v452, v489, v505 G badge, v515–v525 IRR removals, v527 and v532 all untouched.
