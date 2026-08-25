@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v529</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v530</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1350,7 +1350,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v529</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v530</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2029,12 +2029,12 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <option value="iochurdle">⭐ IOC Capital Screen — verified production · Take ≤65% · NPV positive at $75 AND at $50</option>
         <option value="sweetspot">Sweet Spot — Take ≤55% · BE ≤$65 · NPV positive</option>
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
-        <option value="deepwater">Deepwater — Deep+mixed · PSC + Concession · Take ≤70%</option>
+        <option value="deepwater">Deepwater — deepwater-only · PSC + Concession · Take ≤70%</option>
         <option value="lowrisk">Low-Risk Stable — Take ≤55% · BE ≤$75 · Concession + PRRT</option>
         <option value="downsidereturns">Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$50</option>
         <option value="highevidence" title="Countries where the majority of ORCA's fiscal facts were read out of the primary legal instrument (tier A), measured on a record deep enough for that share to mean something: A-share ≥ 55% AND ≥ 150 facts on file. 35 of 185 match. Replaces the old ≥80% A/B screen, which passed 171 of 185 because tier B is the EY / IHS / KPMG bulk harvest.">Primary-Source Evidence — tier-A ≥ 55% · ≥150 facts on file</option>
         <option value="rfactor">◆ R-factor PSC — price-sensitive profit oil tiers</option>
-        <option value="atlanticfrontier">■ Atlantic Frontier — Guyana · Angola · Brazil · Nigeria</option>
+        <option value="atlanticfrontier" title="Atlantic margin deepwater benchmark set — the six countries named, screened as an explicit list with no take ceiling. Nigeria (81.1% take) is in the set by name; a 75% ceiling used to remove it silently.">■ Atlantic Frontier — Guyana · Angola · Brazil · Nigeria · Suriname · Gabon</option>
         <option value="frontiermarkets">▲ Frontier Markets — Sub-Saharan Africa + SE Asia · PSC · Take ≤70% · NPV positive</option>
         <option value="downsideresilience">⬇ Downside Resilience — BE ≤$50 · Take ≤60% · All regions · low-price viable</option>
       </select>
@@ -2570,6 +2570,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong style="color:var(--accent);">v530 (Aug 2026) &mdash; Cycle 429 (T1): the Screener preset named &ldquo;Atlantic Frontier &mdash; Guyana &middot; Angola &middot; Brazil &middot; Nigeria&rdquo; returned a list containing none of Angola, Brazil or Nigeria, and was byte&#8209;identical to the Deepwater preset</strong> &mdash; Task <strong>T1</strong> &mdash; &ldquo;which countries should even be on my screening list?&rdquo; Walked cold (fresh browser context, no <code>sessionStorage</code> or <code>localStorage</code>) from Home into the Screener, whose first control is the <em>Load a screen&hellip;</em> preset menu. <strong>Friction:</strong> picking a screen off that menu is a blind choice, and one of the eleven options actively contradicts itself. <code>applyScreenerPreset('atlanticfrontier')</code> implemented a named basin with the Water&nbsp;Depth radio &mdash; <code>setDepth('deepwater')</code> resolves to <code>DEPTH_PROFILE.deepwater</code>, an 11&#8209;country list &mdash; so under a badge reading &ldquo;Guyana &middot; Angola &middot; Brazil &middot; Nigeria&rdquo; the table rendered <em>Namibia, Ghana, Mozambique, Tanzania, Gabon, Cameroon, Equatorial Guinea, Sierra Leone, Senegal, Guyana, Republic of the Congo</em>: three of the four headline countries absent, two Indian&#8209;Ocean margins present, and the same eleven rows the Deepwater preset returns &mdash; two of eleven menu options were one screen. Angola, Brazil and Nigeria are also the <em>only</em> production&#8209;backed countries in that basin (ranks 10, 14 and 21 of the 22 with verified field production), so the preset dropped precisely the rows an IC screen can defend and kept eleven <code>PROXY</code> rows the page&rsquo;s own divider calls &ldquo;not defensible as a screening shortlist on their own.&rdquo; Nigeria was doubly excluded: its 81.1% take failed the preset&rsquo;s own &le;75% ceiling, a criterion the option text never mentions. <strong>Change (1)</strong> &mdash; a new explicit country&#8209;set leg, <code>_screenerCountrySet</code>, applied in <code>runScreener()</code> ahead of every threshold leg. Atlantic Frontier now screens on the six countries its own source comment always declared &mdash; Guyana, Angola, Brazil, Nigeria, Suriname, Gabon &mdash; with no take ceiling, because the option names a basin, not a threshold. It returns <strong>6 of 185</strong>, ranked production&#8209;backed first (Brazil, Angola, Nigeria), and the &ldquo;Load top&nbsp;N in Side&#8209;by&#8209;Side&rdquo; handoff now ships those three instead of Namibia, Ghana and Mozambique. <strong>Change (2)</strong> &mdash; every option in the preset menu now carries its live hit count <em>before</em> the click: <code>&rarr; 14 of 185</code>, <code>&rarr; 6 of 185</code>, <code>&rarr; 168 of 185 (barely narrows)</code>. Measured cold, six of the eleven presets do not screen &mdash; Frontier Markets 168, Downside Resilience 158, Two&#8209;Price Return 153, Sweet Spot 142, Low&#8209;Risk Stable 140 &mdash; so &ldquo;Downside Resilience &mdash; BE&nbsp;&le;$50 &mdash; low&#8209;price viable&rdquo; hands back 85% of the world. No threshold was retuned; the sizes are reported, not changed. The counts are not re&#8209;derived from a parallel evaluator: each preset is run once at boot through the real <code>applyScreenerPreset()</code>&nbsp;&rarr;&nbsp;<code>runScreener()</code> path and the row count read back, so the number on the option is by construction the number the analyst gets &mdash; which matters in this exact function, where v524 had to repair two separate cases of the captions drifting from the criteria. All 11 verified equal in Playwright. <strong>Result:</strong> the analyst reads the menu instead of guessing at it, and the basin benchmark returns the basin. <strong>Verified cold in Playwright</strong> on the local build, storage cleared: Atlantic Frontier returns exactly its six named countries and is no longer identical to Deepwater; Reset&nbsp;All clears the country set; the <code>#/explorer/rfactor</code> deep link still boots to 70 rows (the boot probe restores the default unfiltered state and cannot clobber a route); boot&nbsp;+&nbsp;probe 772&nbsp;ms; <strong>0 JS errors</strong> on every walk. JS syntax gate <strong>PASS</strong>. <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 1 WARN</strong>, matching the pre&#8209;change baseline exactly &mdash; the WARN is the pre&#8209;existing local&#8209;harness <code>sw.js</code> 404. <em>Deliberately out of scope, stated rather than hidden:</em> the five wide presets keep their thresholds &mdash; retuning them is a business&#8209;logic call, not a loop decision, and they are now labelled with what they return. The Home glossary still describes an IRR the platform stopped reporting at v515/v516/v523 and the Home hero still reads &ldquo;(v500)&rdquo;. <em>Bookkeeping, not the improvement:</em> the Deepwater option text said &ldquo;Deep+mixed&rdquo; while the code applies deepwater&#8209;only, excluding all 13 <code>mixed</code> countries; caption corrected to match behaviour. Nothing on STILL LOCKED was touched: no page&#8209;sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown. <strong>No new FAQ</strong> (still 974). <strong>No new tooltip on a pre&#8209;existing control.</strong> Tab order unchanged. v430, v449, v451, v452, v489, v505, v515&ndash;v525, v528 and v529 all untouched. Version v529&rarr;v530.<br><br>
                         <strong style="color:var(--accent);">v529 (Aug 2026) &mdash; Cycle 428 (T5): the &ldquo;Export XLSX for IC attachment&rdquo; workbook ranked Saudi Arabia, Kuwait and Bahrain <em>joint&#8209;first in the world</em>, each with $4,257M of contractor NPV and a $1/bbl breakeven &mdash; and gave 153 of its 185 rows the identical Take%, NPV and Rank</strong> &mdash; Task <strong>T5</strong> &mdash; &ldquo;give me something I can paste straight into an IC memo.&rdquo; Walked cold (fresh context, <code>sessionStorage</code> and <code>localStorage</code> cleared) from Home, following the platform&rsquo;s own Quick Start step&nbsp;1: <em>&ldquo;Export XLSX for IC attachment.&rdquo;</em> <strong>Friction:</strong> the workbook was ranked and sorted on <code>liveTake</code> &mdash; the compare engine&rsquo;s figure, which for the <strong>153 countries ORCA holds no country&#8209;specific terms for</strong> is the <em>same generic mechanic default</em>. Measured on the live build at $75/bbl deepwater: 153 of 185 rows carried an identical <code>Take%</code> of <strong>22.22</strong>, an identical <code>Contractor NPV</code> of <strong>$4,257M</strong>, an identical <code>Govt NPV</code> of $1,216.3M and a shared <code>Rank</code> of <strong>1</strong>. Guyana (database take 54.1%), Ireland (27.1%), Indonesia (59.5%) and Saudi Arabia (<strong>100%</strong>) were byte&#8209;identical in every economic column. The three <strong>state monopolies</strong> &mdash; Bahrain, Kuwait, Saudi Arabia, database take 100%, no contractor access at all, the exact case the drilldown draws a NOT&nbsp;COMPARABLE block for &mdash; sat at the head of that ranking with $4.3B of contractor NPV and a <strong>$1/bbl breakeven</strong>. The sheet also carried <strong>no per&#8209;country contractor NPV of any kind</strong>, although <code>COUNTRY_DATA.npv_50/npv_75</code> is differentiated for all 185 and is what the Country Profile &ldquo;Copy for IC Memo&rdquo; string, the Screener CSV and the public API all quote. <strong>The same defect was on screen:</strong> the flagship Fiscal Compare table printed <code>r.liveTake</code> directly, never consulting the <code>isStateMonopoly()</code> guard <code>fmtTake()</code> has carried since v22, so Saudi Arabia rendered <strong>22.2% / $4.3B</strong> at <code>=1</code>. <strong>(1) The workbook is now ordered and ranked on the citable database take at the selected price</strong> &mdash; the basis the drilldown tells the analyst in so many words to cite &mdash; giving <strong>185 distinct ranks</strong> instead of a 153&#8209;way tie: Vanuatu #1 at 5.0%, Turkmenistan #182 at 87.2%. <strong>(2) The citable block moved to the left</strong> of the sheet, the model block to the right and explicitly relabelled <code>(model&hellip;)</code>. <strong>(3) Two new columns</strong>, <code>Contractor NPV_50 (database, $M)</code> and <code>Contractor NPV_75 (database, $M)</code>, so every row carries a differentiated base case <em>and</em> its $50 downside leg &mdash; the v516/v523 rule, applied to the workbook. <strong>(4) The model Take%, Govt NPV and Contractor NPV are left EMPTY on generic&#8209;default rows.</strong> A constant repeated 153 times is not data, and in a spreadsheet it is worse than absent: it sorts, it charts and it averages. <code>Terms_Basis</code> already says why. <strong>(5) State monopolies carry no rank, no contractor NPV, no breakeven and no tier</strong>, and sort to the bottom; <code>Tier</code> is now graded off the database take (off <code>liveTake</code> it read &ldquo;Inv&#8209;Friendly&rdquo; on all 153 generic rows, monopolies included). <strong>(6) On screen, the three monopoly rows read <code>n/c</code></strong> for rank, take and NPV with a hover explaining the 100% take, and are excluded from the tie groups so the reported tie size corrected from &ldquo;152 others&rdquo; to &ldquo;149 others&rdquo;. <strong>Result:</strong> the FC workbook and the Country Profile memo string now agree &mdash; Norway exports <code>Contractor NPV_75 = 825.9</code> against the memo string&rsquo;s <strong>$826M</strong>. The most&#8209;repeated database NPV is shared by <strong>9</strong> of 185 rows, against the old model column&rsquo;s 153. <strong>Verified cold in Playwright</strong> on the local build, storage cleared: all five sort fields and both the $75 and $125 price legs hold the monopoly suppression; 185 rows preserved; the drilldown still opens on a monopoly row; <strong>0 JS errors</strong> on every walk. JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 1 WARN</strong>, matching the pre&#8209;change baseline exactly &mdash; the WARN is the pre&#8209;existing local&#8209;harness <code>sw.js</code> 404 (the service worker registers the GitHub Pages subpath, which 404s on a root&#8209;served local server). <em>Deliberately out of scope, stated rather than hidden:</em> the on&#8209;screen table still <em>sorts</em> on the model take, so the 150 generic rows remain an undifferentiated block in the UI even though the export no longer is &mdash; re&#8209;basing the on&#8209;screen ranking changes the tier badge, the drilldown rank and the divider rows, and is its own cycle. The Home glossary still describes an IRR the platform stopped reporting at v515/v516/v523, and the Home hero still reads &ldquo;(v500)&rdquo;. Nothing on STILL LOCKED was touched: no page&#8209;sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown. <strong>No new FAQ</strong> (still 974). <strong>No new tooltip on a pre&#8209;existing control.</strong> Tab order unchanged. v430, v449, v451, v452, v489, v505, v515&ndash;v525 and v528 all untouched. Version v528&rarr;v529.<br><br>
                         <strong style="color:var(--accent);">v528 (Aug 2026) &mdash; Cycle 427 (T2): state participation was modelled as a levy on gross revenue with the contractor still funding 100% of costs, so the Country Profile&rsquo;s Live DCF opened on a contractor NPV of <em>negative $1.17 billion</em> on a project with $834M of total capex &mdash; and rendered it as the unparseable string <code>-$-1.2B</code></strong> &mdash; Task <strong>T2</strong> &mdash; &ldquo;is this one country attractive at $75/bbl, and can I defend that?&rdquo;. Walked cold (fresh context, <code>sessionStorage</code> and <code>localStorage</code> cleared) onto Country Profile, which auto-loads <strong>Norway</strong>. The headline strip reads 68.0% take, contractor NPV <strong>&plus;$826M</strong>, breakeven $29/bbl &mdash; attractive. Scrolling to the <strong>Live DCF Model</strong>, the one panel on the page that answers &ldquo;what would <em>my</em> project pay here&rdquo;, its three result tiles read: Govt Take 76.0%, Contractor IRR <strong>n/a</strong>, Contractor NPV <strong><code>-$-1.2B</code></strong>. A sign-flipped, double-negative, arithmetically impossible number on the default cold load, with no interaction required to reach it. <strong>Two defects, one root cause.</strong> (1) <strong>The model.</strong> <code>dcfConcession()</code> computed <code>stateEq = revenue * state_equity_pct</code> &mdash; treating Norway&rsquo;s Petoro/SDFI 33.4%, Libya&rsquo;s NOC 51% and Algeria&rsquo;s Sonatrach 51% as a levy skimmed off gross revenue. But state participation is a <em>working interest</em>: the state takes its share of production <em>and funds its share of capex and opex</em>. The old code charged the contractor 100% of every cost, handed the state a slice of gross, and then taxed the contractor on a taxable income that still included the state&rsquo;s slice &mdash; taxing income it never received. Norway therefore returned a loss larger than all the capital at risk, and <code>calcIRR</code> returned <code>null</code> because no cashflow ever turned positive. The same defect hit every state-participation country: <strong>Libya deepwater &minus;$2,398M</strong> at 90.7% take, <strong>Algeria deepwater &minus;$1,859M</strong> at 86.0%, both IRR n/a. Now the contractor takes its WI share of revenue <em>and</em> of royalty, opex, capex and depreciation; CIT/SPT/windfall are assessed on that net base; and the state&rsquo;s own entitlement is booked as its equity cash flow <em>net of the costs it funds</em>, with royalty credited to government once so it is not double-counted. (2) <strong>The render.</strong> The NPV tile built its magnitude string from the <em>signed</em> value while separately prefixing a minus sign, so every negative scenario NPV printed as <code>-$-1.2B</code>. Now uses the absolute value with a single true minus (&minus;). (3) <strong>The 25-Year Cashflow Breakdown</strong> &mdash; the table an analyst opens to <em>defend</em> the NPV &mdash; carried the identical gross-revenue state-equity term and was given the same treatment, so the two panels reconcile instead of contradicting each other. <strong>Result, measured cold in Playwright on the local build:</strong> Norway&rsquo;s Live DCF tiles now read Govt Take <strong>50.0%</strong>, Contractor IRR <strong>63.2%</strong>, Contractor NPV <strong>&plus;$754M</strong> &mdash; within 9% of the headline&rsquo;s &plus;$826M, and pointing the same direction instead of the opposite one. The fiscal breakdown reconciles exactly (8.1% CIT &plus; 20.3% special &plus; 21.7% state equity = 50.0%). The cashflow table&rsquo;s year-25 cumulative NPV moved from <strong>&minus;$1,204M</strong> to <strong>&plus;$732M</strong>. A genuinely negative case (Norway deepwater at $20/bbl) now renders <strong>&minus;$325M</strong> in red rather than <code>-$-325M</code>. The reconciliation block&rsquo;s verdict changed from a falsely reassuring &ldquo;Modest gap &plus;8.0pp&rdquo; &mdash; a number reached only by the arithmetic error &mdash; to an honest &ldquo;Material gap &minus;18.0pp&rdquo;, which is the correct guidance: a single North Sea project is not the 7,643-contract country average. Countries with no state participation (United Kingdom, Nigeria, Iraq, USA) return byte-identical results, so the blast radius is exactly the three affected regimes. JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>134 PASS / 0 FAIL / 1 WARN</strong>, and the identical suite run against the <em>pre-change</em> build on a second local server returned the same <strong>134 / 0 / 1</strong> &mdash; the WARN is the pre-existing <code>sw.js</code> 404, not a regression. Nothing on STILL LOCKED was touched: no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown. <strong>No new FAQ</strong> (still 974). <strong>No new tooltip.</strong> Tab order unchanged. v430, v449, v451, v452, v489, v505, v514, v515&ndash;v525, v518, v521, v522 and v526/v527 all untouched. Version v527&rarr;v528.<br><br>
                         <strong style="color:var(--accent);">v527 (Aug 2026) &mdash; Cycle 426 (T6): the Home page defined evidence tier B as &ldquo;operator filings&rdquo; &mdash; 97.9% of every tier-B fact on record is a country-level bulk aggregator harvest and not one is an operator filing &mdash; and sent the analyst to a Fiscal Compare tier filter that does not exist</strong> &mdash; Task <strong>T6</strong> &mdash; &ldquo;where did this number come from and how solid is the evidence?&rdquo;. Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) onto Home and read the card that answers the question. The <em>Key terms</em> grid&rsquo;s <strong>Evidence Tier</strong> card &mdash; the first and most prominent definition of the evidence system anywhere in the product &mdash; read: <em>&ldquo;data quality. A = primary legislation &middot; B = operator filings &middot; C = secondary source. Filter by tier in Fiscal Compare.&rdquo;</em> <strong>Both halves were false.</strong> (1) Counted from live <code>country_data.json</code>: of <strong>142,798</strong> tier-B facts in the top-source table, <strong>139,799 (97.9%)</strong> are the two bulk sources <code>EY_IHS_BulkHarvest_2025</code> and <code>EY_KPMG_CIT_Guide_2025</code>, which the Methodology page already concedes are &ldquo;assigned at the country level rather than verified per individual contract&rdquo;. The remaining 2,999 are national tax codes and model contracts. <strong>Zero operator filings appear in tier B at all.</strong> A bulk source is in the top three for <strong>151 of 185</strong> countries. The platform&rsquo;s own evidence panel says so in a tooltip &mdash; <em>&ldquo;it is NOT an operator filing&rdquo;</em> (v518) &mdash; while the landing page said the opposite. The analyst reading &ldquo;A/B%&rdquo; on Fiscal Compare, in the XLSX export and on the evidence pill therefore read a country at 93% A/B as near-fully documented, when most of the B half was never checked against any individual contract. (2) <strong>Fiscal Compare has no tier filter and never has.</strong> Its controls are the profile and price selects, the sort buttons, &ldquo;Reverse&rdquo;, &ldquo;Show Stability&rdquo;, the region chips and a &ldquo;Breakeven only&rdquo; checkbox. The single routing instruction the platform gave for the evidence question led nowhere. <strong>Fixed:</strong> <strong>(a)</strong> the card now states what each tier actually is, naming B as the EY / KPMG / IHS country-level guides, <em>assigned to the whole country, never read off an individual contract, and not an operator filing</em>. <strong>(b)</strong> A new <code>#home-evidence-mix</code> line is computed live in <code>loadPlatformData()</code> off the same <code>_isBulkSource()</code> definition the Country Profile panel uses, so the Home figure and the per-country pill cannot drift apart. It renders <em>&ldquo;98% of every tier-B fact on record is that bulk harvest, and it is a top source for 151 of 185 countries &mdash; so a combined A/B% does not mean primary-law or operator-verified; read the A share on its own.&rdquo;</em> <strong>(c)</strong> The dead route is replaced by a working one. <code>_homeOpenEvidence()</code> switches to Country Profile and <strong>opens the Evidence Quality panel</strong>, which is a <code>&lt;details&gt;</code> that has always rendered collapsed &mdash; so even an analyst who found the right tab still had to find and click it. The panel carries the A/B/C/D split, the bulk-harvested share and every source named with a working link. Keyboard-operable (Enter / Space). <strong>Verified cold in Playwright</strong> against the local build with storage cleared: the card renders <strong>98% / 151 of 185</strong>; the phrase &ldquo;Filter by tier in Fiscal Compare&rdquo; no longer appears anywhere on the page; the control activates <code>t7</code> and returns <code>cp-evidence-panel.open === true</code> scrolled into view (Norway: 66.1% primary law, 12%+ bulk-harvested); and on a <em>normal</em> Country Profile navigation the same panel still returns <code>open === false</code>, so the v371/v373 declutter rule is untouched. <strong>0 page errors.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>134 PASS / 0 FAIL / 1 WARN</strong> &mdash; and the identical suite was re-run against the <em>pre-change</em> build on a second local server, which also returned <strong>134 / 0 / 1</strong>, so the WARN (the pre-existing <code>sw.js</code> 404) is not a regression from this change. Nothing on STILL LOCKED was touched &mdash; no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown. <strong>No new FAQ</strong> (still 974). <strong>No new tooltip</strong> on any column header, mechanic tag, waterfall line or Scenario Builder input. Tab order unchanged. v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP headline and removed FC Govt NPV, v452 rank &plus; vs-median pill, v489 Reform Risk placement, v502/v508/v526 Reform Risk lookup, v505 FC generic-terms G badge, v514 no-coverage panel, v515&ndash;v525 IRR removals and v518 bulk-source labelling all untouched. Version v526&rarr;v527.<br><br>
@@ -23737,6 +23738,12 @@ function renderCompare() {
 // ─── TAB 3: Screener ─────────────────────────────────────────────────────────
 let _screenerRfactorOnly = false;
 let _screenerMinFacts = 0;   // v518: fact-depth floor, set only by the Primary-Source Evidence preset
+// v530 (cycle 429, T1): explicit country-set leg. The Atlantic Frontier preset declared its
+// membership in its own option text ("Guyana \u00b7 Angola \u00b7 Brazil \u00b7 Nigeria") but had no way to
+// express it, so it was implemented with the Water Depth radio -- which resolves to
+// DEPTH_PROFILE.deepwater, an 11-country list that contains none of Angola, Brazil or Nigeria
+// and does contain Mozambique and Tanzania. A named basin is a country set, not a depth class.
+let _screenerCountrySet = null;  // null = no country-set restriction
 // v507: when true (default) the Screener ranks the 22 countries that have verified field
 // production above the 163 whose economics are regional proxies. Nothing is filtered out —
 // only the order changes, and a labelled divider row marks the boundary.
@@ -23765,6 +23772,7 @@ function applyScreenerPreset(preset) {
   // Reset all to defaults first
   _screenerRfactorOnly = false;
   _screenerMinFacts = 0;
+  _screenerCountrySet = null;   // v530
   _activePresetName = null;
   setSlider('sl-take', 100); setSlider('sl-be', 120); setSlider('sl-npv', -500); setSlider('sl-npv50', -500); setSlider('sl-evid', 0);
   setChecks('sc-mech-checks', 'all'); setDepth('all'); setBeCat('all');
@@ -23840,11 +23848,21 @@ function applyScreenerPreset(preset) {
     _screenerMinFacts = 150;
     _activePresetName = 'Primary-Source Evidence';
   } else if (preset === 'atlanticfrontier') {
-    // Atlantic Frontier PSC: Guyana, Angola, Brazil, Nigeria, Suriname, Gabon — deepwater PSC benchmark set
-    // Spans Americas + Africa so no single-region filter; PSC + deepwater + take ≤75% isolates the basin
-    setSlider('sl-take', 75);
-    setChecks('sc-mech-checks', ['PSC','EPSA','Concession']);
-    setDepth('deepwater');
+    // v530 (cycle 429, T1). The declared benchmark set has always been the six countries named in
+    // the comment below; the implementation was `setDepth('deepwater')` + take <= 75%, which is a
+    // different list entirely. What the analyst actually got, under a badge reading
+    // "Guyana · Angola · Brazil · Nigeria":
+    //     Namibia, Ghana, Mozambique, Tanzania, Gabon, Cameroon, Equatorial Guinea,
+    //     Sierra Leone, Senegal, Guyana, Republic of the Congo
+    // — three of the four headline countries absent, two Indian Ocean margins present, and
+    // byte-identical to the Deepwater preset, so two of the eleven menu options were one screen.
+    // Angola, Brazil and Nigeria are also the only production-backed countries in the basin
+    // (Brazil #10, Angola #14, Nigeria #21 in the verified-production ranking), so the preset was
+    // dropping exactly the rows an IC screen can defend and keeping eleven PROXY rows the page's
+    // own divider calls "not defensible as a screening shortlist on their own".
+    // Now an explicit country set. No take ceiling: the option text names a basin, not a
+    // threshold, and a 75% ceiling silently excluded Nigeria (81.1%) even by name.
+    _screenerCountrySet = ['Guyana','Angola','Brazil','Nigeria','Suriname','Gabon'];
     _activePresetName = 'Atlantic Frontier';
   } else if (preset === 'frontiermarkets') {
     // Frontier Markets: Sub-Saharan Africa + Southeast Asia PSC/Concession exploration screen
@@ -23880,7 +23898,7 @@ function applyScreenerPreset(preset) {
       downsidereturns: 'Two-Price Return Screen: NPV \u2265$100M @$75 \u00b7 NPV \u2265$500M @$50',
       highevidence: 'Primary-Source Evidence: tier-A \u2265\u00a055% \u00b7 \u2265\u00a0150 facts on file',
       rfactor: 'R-factor PSC: price-sensitive profit oil tiers',
-      atlanticfrontier: 'Atlantic Frontier: Guyana \u00b7 Angola \u00b7 Brazil \u00b7 Nigeria',
+      atlanticfrontier: 'Atlantic Frontier: Guyana \u00b7 Angola \u00b7 Brazil \u00b7 Nigeria \u00b7 Suriname \u00b7 Gabon \u2014 explicit set, no take ceiling',
       frontiermarkets: 'Frontier Markets: PSC \u00b7 Take \u226470% \u00b7 NPV \u22650 \u00b7 Sub-Saharan/SE Asia focus',
       downsideresilience: 'Downside Resilience: BE \u2264$50 \u00b7 Take \u226460% \u00b7 low-price viable'
     };
@@ -23946,6 +23964,45 @@ function _homeOpenEvidence(country) {
   } catch (e) { /* non-critical */ }
 }
 window._homeOpenEvidence = _homeOpenEvidence;
+
+// v530 (cycle 429, T1) — the preset menu is the Screener's first control and the analyst's first
+// move on "which countries should even be on my screening list?". It was a blind pick: eleven
+// options, each captioned with its criteria, none of them saying what it returns. Measured cold
+// against the live data, six of the eleven do not screen at all --
+//     Frontier Markets 168 of 185 · Downside Resilience 158 · Two-Price Return 153 ·
+//     Sweet Spot 142 · Low-Risk Stable 140
+// -- so "Downside Resilience -- BE <=$50 -- low-price viable" hands back 85% of the world, most of
+// it carried through the breakeven ceiling untested. The analyst discovers this only by loading
+// each one and reading the count line afterwards.
+//
+// This labels every option with its live hit count BEFORE the click. The counts are not
+// re-derived: each preset is applied through the real applyScreenerPreset() -> runScreener() path
+// once at boot and the resulting row count is read back, so the number on the option is by
+// construction the number the analyst will get. That matters here specifically -- v524 had to fix
+// two separate cases of this menu's captions drifting away from the criteria they described.
+function _labelScreenerPresets() {
+  var sel = document.getElementById('screener-preset-select');
+  if (!sel || sel.dataset.counted === '1') return;
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return;
+  var total = COUNTRY_DATA.length;
+  try {
+    [].slice.call(sel.options).forEach(function(o) {
+      if (!o.value) return;
+      applyScreenerPreset(o.value);
+      var n = window._screenerLastCount;
+      if (typeof n !== 'number') return;
+      o.dataset.hits = n;
+      var share = n / total;
+      // The count is stated plainly. A preset returning most of the database is not marked wrong --
+      // it is a legitimate wide sweep -- but the analyst is told the size before spending the click.
+      o.textContent = o.textContent + '   \u2192 ' + n + ' of ' + total + (share >= 0.75 ? ' (barely narrows)' : '');
+    });
+  } catch (e) { /* non-critical: leave the menu unlabelled rather than half-labelled */ }
+  applyScreenerPreset('reset');
+  sel.selectedIndex = 0;
+  sel.dataset.counted = '1';
+}
+window._labelScreenerPresets = _labelScreenerPresets;
 
 function resetScreenerAll() {
   // Hard reset: all sliders to maximum range, all checkboxes checked, no IOC filter
@@ -24041,6 +24098,9 @@ function runScreener() {
     if (take === null || take === undefined) return false;
     if (take > maxTake) return false;
     if (_screenerRfactorOnly && !d.has_r_factor_tiers) return false;
+    // v530: explicit country set (Atlantic Frontier). Applied before every threshold leg so a
+    // named basin returns the countries it names.
+    if (_screenerCountrySet && _screenerCountrySet.indexOf(d.country) === -1) return false;
 
     // v513 — a country with no modelled breakeven is UNTESTED, not passing.
     // Previously `be == null` fell straight through this check, so a $50 ceiling let all
@@ -24140,6 +24200,10 @@ function runScreener() {
   const _nVerified = data.filter(d => _dqTier(d).hasProduction).length;
   const _nProxy    = data.length - _nVerified;
   const _grouped   = _screenerEvidenceFirst && !_screenerRfactorOnly && _nVerified > 0 && _nProxy > 0;
+  // v530: published before the zero-result early return below, so the preset-count probe can read
+  // the size of EVERY preset -- including one that returns nothing -- off the real filter path
+  // rather than off a second, parallel re-implementation of it that would drift.
+  window._screenerLastCount = data.length;
 
   // active filters count badge (v99: take/irr/npv/breakeven sliders included)
   const scRegionActive = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
@@ -24158,6 +24222,7 @@ function runScreener() {
   if (checkedMechs.length < totalMechBoxes) activeCount++; // some mechanic unchecked = active filter
   if (minEvid > 0) activeCount++;
   if (_screenerMinFacts > 0) activeCount++; // v518: the fact-depth floor is a filter
+  if (_screenerCountrySet) activeCount++;   // v530: an explicit country set is a filter
 
   const badgeEl = document.getElementById('screener-active-filters');
   if (activeCount > 0) {
@@ -33708,6 +33773,9 @@ async function loadPlatformData() {
     clearTimeout(slowLoadTimer);
     if (overlay) overlay.style.display = 'none';
     initPlatform();
+    // v530: label the Screener preset menu with each screen's live hit count. Runs once,
+    // before the Screener is ever opened, and restores the default unfiltered state.
+    try { _labelScreenerPresets(); } catch(e) { /* non-critical */ }
     // v465: Populate live hurdle stat on Home tab after data loads
     // v524 (cycle 423, T1): this line used to read "N of 185 countries clear the IOC hurdle
     // rate (IRR >=15%)" off `irr_75`, which is AVG(per-contract IRR) -- the metric v515, v516,
