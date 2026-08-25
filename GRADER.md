@@ -14036,3 +14036,18 @@ Guide now contains "G"; contains no "IRR"; the ≥80% A/B rule and "operator fil
 ## STILL LOCKED — nothing touched
 
 No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. **No new FAQ** (still 974). **No new tooltip** on any pre-existing control. Tab order unchanged. v423 guide dismissal, v430, v449, v451, v452, v489, v505 G badge, v515–v525 IRR removals, v527 and v532 all untouched.
+
+---
+## Cycle 432 Log — 2026-08-25 16:37
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 432 complete. Both repos pushed.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (431 was T4, 430 T3, 429 T1, 428 T5, 427 T2 — T6 was least-recently-used.)
+
+## Friction
+Walked cold — fresh browser context, storage cleared — from Home into **Fiscal Compare**, and read the one column that answers the provenance question.
+
+Counted off the live DOM on the cold default view, the **Quality** column renders **G 154 · A 27 · B 3 · D 1**. **83% of the table is G.*
