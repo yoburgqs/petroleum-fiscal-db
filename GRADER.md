@@ -11581,3 +11581,16 @@ v452 CP headline rules, v430 sessionStorage logic and v489 Reform Risk placement
 ## Bookkeeping — not the improvement
 v512 → v513 across 4 structural locations (meta description, title, header badge,
 `_orcaVerNow()` fallback). Changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 412 Log — 2026-08-24 21:16
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 412 complete and pushed (v513). Working tree is clean apart from the loop-owned state files; mirror is in sync.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (411 was T2, 410 T6, 409 T5, 408 T3, 407 T4, 406 T1 — T1 was the least recent.)
+
+## Friction
+I walked T1 from a cold load — fresh browser context, sessionStorage and localStorage cleared — from Home into the Screener. The analyst's next move after landing on 185 unfiltered rows is to narrow, and breakeven is
