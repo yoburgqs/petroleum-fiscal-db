@@ -11175,3 +11175,127 @@ entry prepended. Grade tables not touched.
 I walked every clipboard path cold — fresh browser context, no sessionStorage or localStorage — and read what actually landed on the clipboard against a sentinel value. Two failures, both silent.
 
 **The worst one: the Fiscal Compare drilldown's ⎘ IC Citatio
+
+---
+## Cycle 410 Log — 2026-08-24
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?"
+(409 was T5, 408 T3, 407 T4, 406 T1, 405 T2.)
+
+**Friction.** Walked every take-bearing surface cold — fresh browser context, no
+sessionStorage, no localStorage. Four of five carry provenance:
+
+| Surface | What it shows about sourcing |
+|---|---|
+| Fiscal Compare | `Quality` column (A/B/C/D/G) + `PROXY` badge per row |
+| Explorer | Evidence stacked bar + Tier column |
+| Country Profile | Evidence Quality panel, v500 ORCA-vs-Statutory table, Evidence Chain |
+| Screener | Min Evidence A/B filter + High Evidence preset |
+| **Side-by-Side** | **nothing — 20 metric rows, none about sourcing** |
+
+Side-by-Side is the tab where the choice actually gets made, and the sourcing gap
+sits directly above **⎘ Copy Table for IC Memo**.
+
+The cold-load default set is the exhibit. *North Sea Trio — Norway / United
+Kingdom / Netherlands* loads with no user action:
+
+| | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| Govt take @$75 | 68.0% | 49.2% | **23.4%** |
+| Contractor NPV @$75 | $826M | $1.2B | **$3.6B** |
+| IRR @$75 | 105.0% | 93.9% | **489.6%** |
+| Breakeven | — | — | **<$50** |
+| Data basis | FACTS | FACTS | **PROXY** |
+| Production coverage | 18.2% | 37.6% | **0%** |
+| Fiscal facts | 63,848 | 15,899 | **278** |
+| Contracts | 7,643 | 4,211 | 135 |
+
+The Netherlands column wins every economic row and is the one with no verified
+field production behind it — its NPV, IRR and breakeven are the standardized
+deepwater profile, not Dutch field economics. The only row anywhere near saying
+so was `Weighting Method: Blended / Blended / Equal-weighted`, which is the
+technical symptom, not the warning.
+
+**Change.**
+
+1. **A `Data Basis` section now leads the table**, above Global Rank, in
+   `renderCompare()` (`index.html:23278`) — so the basis of a column is read
+   before its numbers:
+   - **Data basis** — FACTS / EVIDENCE / PROXY via `_dqTier()`, the same
+     classification behind the Fiscal Compare badge and the v507 Screener
+     ordering. Per-country tooltip states coverage %, contract count and fact
+     count, and for PROXY says plainly that NPV/IRR come from the standardized
+     profile.
+   - **Evidence tier** — % A/B with grade letter, colour-ramped via
+     `getEvidenceColor()`.
+   - **Fiscal facts held** — count, flagged orange with ⚠ under 1,000.
+
+   That third row is what makes the trap legible. **Netherlands reads
+   `97% A/B · grade A`** — the *highest* evidence grade in the set — **over 278
+   facts.** A high tier on a thin sample was indistinguishable from a high tier
+   on a deep one until the count sat next to it.
+
+2. **A caveat block under the grid names the proxy columns in words**, and fires
+   hardest in the case that costs money — when the column that *wins* is the
+   proxy:
+
+   > ⚠ **The column that wins this comparison is a proxy.** Netherlands shows the
+   > lowest government take (23.4%) of the 3 columns and the highest contractor
+   > NPV — but ORCA holds no verified field production for it. Its take is a
+   > simple average across 135 contracts (278 fiscal facts) and its NPV, IRR and
+   > breakeven come from the standardized deepwater profile, not from its own
+   > fields. The strongest column here is Norway — 63,848 facts at 18.2%
+   > production coverage. Rank on take with the proxy stated; do not present
+   > these NPV and IRR columns as like-for-like in an IC memo.
+
+   The NPV clause only renders when that column actually leads on NPV. A second,
+   quieter branch handles a proxy that is present but not winning. Nothing
+   renders when every column is production-backed.
+
+3. **The three rows travel with the clipboard export.** They ride the same
+   `rows` array that builds `#cmp-data-table`, which `copyComparisonTable()`
+   reads — so the pasted IC-memo table now opens with Data basis, Evidence tier
+   and Fiscal facts held before the first take figure, in both the rich-HTML and
+   TSV flavours.
+
+4. **Stale version in the comparison export.** `copyComparisonTable()`'s source
+   line hard-coded `v510`. v510 moved three other clipboard citations onto
+   `_orcaVerNow()` and missed this one; it now reads the header badge.
+
+**Result.** An analyst who loads three countries into Side-by-Side — including
+the analyst who does nothing at all and gets the default trio — sees, before the
+first take figure, which columns are built on verified production and which are
+not, and how many facts sit behind each. When the most attractive column is the
+least supported one, the page says so in a sentence naming both countries. And
+the table they paste into the IC memo carries the same three rows, instead of
+presenting a 278-fact proxy and a 63,848-fact production-weighted country as
+like-for-like.
+
+**Verification.** Four cold Playwright walks against the patched local build,
+clipboard pre-set to a sentinel:
+
+| Set | Expected | Result |
+|---|---|---|
+| Norway / UK / Netherlands (cold default) | winner-is-proxy caveat | fired, named Netherlands + Norway, NPV clause present |
+| Nigeria (FACTS) / Guyana (PROXY, lower take) | winner-is-proxy caveat | fired, named Guyana + Nigeria |
+| Norway / Nigeria / UK (all FACTS) | no caveat | none rendered |
+| USA (FACTS, 23.4%) / Bahrain (PROXY, 100%) | non-winning-proxy branch | fired, named Bahrain, "other column (USA)" |
+| Clipboard TSV | 3 new rows present | `Data basis` / `Evidence tier` / `Fiscal facts held` all present; source line reads v511 |
+
+0 JS errors on every walk. JS syntax gate **PASS** (9 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle** against the local build:
+**136 PASS / 0 FAIL / 1 WARN**. The WARN is the pre-existing local-harness
+artifact — the service worker registers `/petroleum-fiscal-db/sw.js`, the GitHub
+Pages subpath, which 404s on a root-served local server; verified against the
+local server this cycle (`404`), correct in production.
+
+Nothing on the STILL LOCKED list was touched. The v371/v373 declutter holds —
+this adds table rows and one conditional caveat, no card wrapper, no banner, no
+page-sub paragraph.
+
+**Bookkeeping (not the improvement).** v510 → v511 across 5 version locations;
+changelog entry prepended. Grade tables not touched.
+
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL / 1 WARN (pre-existing local sw.js 404)
+- JS errors: 0
