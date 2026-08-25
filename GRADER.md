@@ -11910,3 +11910,132 @@ v514 → v515 across 4 structural locations (meta description, title, header bad
 Walked Side-by-Side cold — fresh browser context, storage cleared. The **Economics** block ended with a row headed `IRR @$75 (%)*`. On the default set it read **Norway 105.0% · UK 93.9% · Netherlands 489.6%**.
 
 It is not a rate of return. `rebuild_country_data.py:135` computes it as `AVG(irr_
+
+---
+## Cycle 415 Log — 2026-08-25 (v516)
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (least recent; 414 was T3,
+413 T4, 412 T1, 411 T2, 410 T6, 409 T5)
+
+## Friction
+Walked Country Profile cold — fresh browser context, `sessionStorage` and `localStorage`
+cleared — and pressed the buttons an analyst presses when they are 20 minutes from an IC
+meeting. Both clipboard artifacts on this tab handed back a fabricated return:
+
+    copyICCitation():  USA: Govt Take 23.4% @$75/bbl, $3308M NPV, 421.4% IRR — ...
+    copyICSummary():   ... IRR: 421.4% @$75. Breakeven: —. ...
+
+and above them the verdict headline read, in green with a check mark:
+
+    ✔ Commercially viable at $75/bbl — IRR 421.4% clears IOC hurdle (15%) at 23.4% govt take.
+
+`irr_75` is `AVG(irr_pct)` over every contract in the country. Across the **165 countries
+that carry one the median is 333.1%**, and **only 9 of them fall below 100%**. It is not a
+rate of return on anything. An analyst who pasted that citation into an IC memo would have
+been asked, in the room, to explain a 421% IRR sitting next to a 23.4% government take.
+
+**This tab was already known to be broken.** Cycle 414 removed the same figure from
+Side-by-Side and logged the Country Profile verdict under *"Known, not fixed"*, on the
+reasoning that a proper fix meant a median-based aggregate in `rebuild_country_data.py`.
+That reasoning was wrong about the scope: **not reporting a number is a UI decision**, and
+it is the same decision v451 made when it deleted Govt NPV from Fiscal Compare and v515
+made for the Side-by-Side IRR row. The effect of deferring it was that the one tab an
+analyst actually cites from was left as the only place still shipping the number — in
+**four** separate clipboard and export artifacts.
+
+## Change
+**The Country Profile now reports no country-level IRR anywhere an analyst can read it or
+paste it.** Eleven sites:
+
+| site | before | after |
+|---|---|---|
+| quick IC verdict | "IRR 421.4% clears IOC hurdle (15%)" | NPV vs the $50/bbl downside leg |
+| fiscal character line | `irrOk` / `irrNear` branches | `downSolid` / `downFragile` branches |
+| headline strip tile | `IRR: 421.4% @10%WACC` | `Downside: $1.4B @$50 (survives $50)` |
+| IC Memo standard-citation | `· IRR 105.0% ... ORCA v500` | `· $379M @$50 downside ... ORCA v516` |
+| params grid tile | `IRR @ $75` | `NPV @ $50 (downside)` |
+| Data Completeness row | `✓ IRR` | `✓ NPV @$50` |
+| Similar Fiscal Profile peers | IRR column (every row 100–490%) | $50 downside NPV |
+| 4-Price Sensitivity table | 6th column `IRR` | column removed, 5-col grid |
+| `Copy as IC table` (TSV) | `IRR` column | removed + `CP_IRR_NOTE` appended |
+| `copyICCitation()` | `421.4% IRR` | `$1.4B @$50 downside` |
+| `copyICSummary()` | `IRR: 421.4% @$75.` | 3-price NPV + `CP_IRR_NOTE` |
+| Export XLSX | 4 × `IRR @$price` rows | removed, `IRR` note row added |
+
+**What replaces it:** the **$50/bbl downside leg of contractor NPV** — same standardized
+Deepwater profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex), 10% WACC, 100% WI.
+Present for **185 of 185** countries against IRR's 165. The logic is not a substitution of
+one metric for another: contractor NPV **already discounted at the 10% WACC** *is* the
+hurdle test, so the $50 leg is free to be the stress test the 15% hurdle was pretending to
+be.
+
+The verdict now reads, on live data:
+
+    ✔ Clears the 10% WACC across the price band — contractor NPV $3.3B @$75 and still
+      $1.4B at the $50/bbl downside, at 23.4% govt take.                        [USA]
+
+    ⚠ Price-dependent entry — contractor NPV $627M @$75 but -$33M at $50/bbl: this regime
+      does not survive a price break on the standardized profile. IC: carry a low-price
+      case.                                                                [Malaysia]
+
+Malaysia is the case that proves the point. Under the old logic it was
+*"Hurdle-cleared but high-take — IRR 105.0% clears 15%"*. It fails at $50/bbl.
+
+**Where IRR went is stated inside every pasted artifact,** not left back on the page —
+`CP_IRR_NOTE` is appended to the IC Summary, the IC table TSV and the XLSX, and a note
+under the 4-Price table routes to Scenario Builder. The `→ Model in Scenario Builder`
+button stays on the headline strip: what was removed is a country-level average that
+masqueraded as a project return, not the route to a real one.
+
+**Two stale hard-coded versions found on the same walk.** The `Copy as IC table` title row
+said `ORCA v500` and the Export XLSX Citation row said `v369` — 16 and 147 versions behind
+the build. Both now read the header badge through `_orcaVerNow()`, as v510/v511 did for the
+other clipboard cites. The 4-Price table footer colspans were realigned from a 6-column to
+a 5-column grid (the Price Swing row had been over-spanning at 7 even when there were 6).
+
+## Result
+An analyst who opens a Country Profile 20 minutes before an IC screening and presses
+**⎘ IC Citation** now pastes `USA: Govt Take 23.4% @$75/bbl, $3.3B NPV @$75, $1.4B @$50
+downside, BE $27/bbl` — a base case, a downside, and a price floor, all on one disclosed
+profile. They cannot paste a 421% return, because the tab no longer holds one. And where
+the verdict used to green-light every country it now separates the ones that survive a
+price break from the ones that do not.
+
+## Verification
+JS syntax gate **PASS** (9 blocks / 0 errors). `runtime_comprehensive.js` **ran this
+cycle**: **136 PASS / 0 FAIL / 1 WARN**. The WARN is the pre-existing local-harness
+artifact — the service worker registers `/petroleum-fiscal-db/sw.js`, the GitHub Pages
+subpath, which 404s on a root-served local server; cycles 413 and 414 recorded the same
+baseline. Cold Playwright walks, storage cleared:
+
+| check | result |
+|---|---|
+| all five verdict branches on live data | USA/Netherlands solid · Iraq/Norway/Nigeria high-take · Malaysia/Yemen price-dependent · Kuwait/Bahrain/Saudi monopoly-suppressed |
+| IC Citation clipboard read back | no IRR, downside NPV present, `v516` |
+| IC Summary clipboard read back | 3-price NPV line, no IRR line, `CP_IRR_NOTE` present |
+| `Copy as IC table` TSV read back | 5 columns, no IRR, `CP_IRR_NOTE` appended, `ORCA v516` |
+| 4-Price table cell counts | header 5 / body 5 on all countries walked |
+| JS errors | **0** on every walk |
+
+## Deliberately out of scope — stated rather than hidden
+Fiscal Compare still offers an IRR sort column, Explorer still exports `IRR @$75 (%)`, and
+the Screener's `Set 15% ⟵ IOC hurdle` button still screens almost nothing out — 123 of the
+124 countries with a displayable IRR pass a 15% floor. Those are T1 and T3 surfaces. They
+carry the same defect and should be the substance of those cycles, not smuggled into a T5
+one.
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional banner,
+no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row.
+No new FAQ (still 974). **No new tooltip on a pre-existing control** — the tooltips that
+changed are on elements whose content changed, and the params-grid tile that was removed had
+carried a tooltip reading *"arithmetic mean of per-contract IRRs — not a valid portfolio
+metric"*, which was itself an admission the tile should not have been on the page. Tab order
+unchanged. v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP headline
+and removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk placement, v507
+divider, v513 breakeven semantics, v514 reform sidebar and v515 SbS NPV rows all untouched.
+
+## Bookkeeping — not the improvement
+v515 → v516 across 4 structural locations (meta description, title, header badge,
+`_orcaVerNow()` fallback). Changelog entry prepended. Grade tables not touched.
