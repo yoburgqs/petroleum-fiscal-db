@@ -14051,3 +14051,131 @@ No page-sub paragraph, no amber instructional banner, no routing hint, no "How t
 Walked cold — fresh browser context, storage cleared — from Home into **Fiscal Compare**, and read the one column that answers the provenance question.
 
 Counted off the live DOM on the cold default view, the **Quality** column renders **G 154 · A 27 · B 3 · D 1**. **83% of the table is G.*
+
+---
+## Cycle 433 Log — 2026-08-25 17:29
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (pre-existing local-harness sw.js 404)
+- JS errors: 0
+- JS syntax gate: PASS (9 inline blocks, 0 failures)
+- Version: v533 -> v534
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(432 was T6, 431 T4, 430 T3, 429 T1, 428 T5 — T2 was least-recently-used.)
+
+## Friction
+
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared —
+into **Country Profile**, which auto-loads Norway. The question is "can I defend
+this at IC", so I read the three comparative claims the page makes:
+
+| Where | What it said |
+|---|---|
+| Headline pill (Zone A, v452) | `#168 of 185 · high-take globally` · `+39.6pp vs median @$75` |
+| Section header `<h3>` | `GLOBAL RANK #168 OF 185 · TOP 91% HIGHEST-TAKE GLOBALLY` · `+39.6PP VS MEDIAN (28.4%)` · `+48.9PP VS EUROPE (19.1%)` |
+| Peer context strip | `Regional median (Europe): 19.4% · Global median: 28.4% · This country: +48.6pp vs region` |
+
+All three read `COUNTRY_DATA` unfiltered. Counted off the live file: only
+**22 of 185** records carry `weighting = prod_weighted_blended`. The other **163**
+are equal-weighted averages with `prod_coverage_pct = 0`, over as few as **two**
+contracts — Belgium 2, Bosnia 3, Sweden 4, Slovenia 5, France 5. Those 163 set
+every median on the page.
+
+- "Global median" = **28.4%**. Across the 21 non-monopoly producers it is **59.4%**.
+- The quoted "Europe median (19.1%)" **is Slovenia** — 5 contracts, 15 facts, no
+  production data. Meanwhile the UK at 49.2%, the only other real North Sea
+  regime, is not named anywhere in that strip.
+
+**This flipped the sign of the verdict, not just its magnitude:**
+
+| Country | Page said | Producer basis |
+|---|---|---|
+| United Kingdom | +20.8pp **above** global median | **−10.2pp BELOW** producer median |
+| Angola | +24.6pp above | **−6.4pp below** |
+| Brazil | +27.2pp above | **−3.8pp below** |
+| Australia | +10.1pp above | **−20.9pp below** |
+| USA | `#62 of 185` — mid-pack | **#1 of 21 — lowest-take producer on earth** |
+| Norway | +39.6pp, "top 91% highest-take globally" | +8.6pp, 16th of 21 |
+
+Five of the ten countries sampled read on the wrong side of the median. An
+analyst who pastes "the UK is 20.8pp above the global median" into an IC memo
+loses the room to the first person who knows the North Sea.
+
+Separately, the page printed **two different numbers for the same labelled
+quantity three inches apart** — headline `+48.9pp vs Europe (19.1%)` against
+peer strip `Regional median (Europe): 19.4%` — because the pill excluded the
+selected country from the median and the strip included it.
+
+## Change
+
+New `getProducerPeers()` / `getProducerContext()` derive the peer set from the
+**existing `weighting` field — no threshold is invented** — and drop state
+monopolies exactly as `fmtTake` already does (Bahrain, Kuwait, Saudi Arabia at
+≥99.5%), leaving **21**.
+
+1. **Headline** now reads `#16 of 21 producers · upper-mid among producers` and
+   `+8.6pp vs producer median @$75`. The all-185 basis is **kept, not deleted**,
+   on its own labelled line beneath: *"All 185 countries: #168 · +39.6pp vs the
+   all-country median (28.4%), which includes 164 countries with no production
+   data."* The analyst can now see the two bases disagree and by how much.
+2. **Regional pill** compares production-weighted regimes in the region only, and
+   where there are fewer than three it **names them** instead of pretending a
+   median exists: Norway `+18.8pp vs United Kingdom (49.2%)`; Angola `−18.1pp vs
+   Libya · −28.1pp vs Nigeria`; Brazil `+22.8pp vs Latin America producers
+   (32.9%)`. Where a region has no other producer it says so.
+3. **Peer strip** is computed from the *same* `getProducerContext()` call as the
+   pills, so the 19.1/19.4 contradiction cannot recur.
+4. Countries outside the set are labelled **"not production-weighted"** rather
+   than ranked as if comparable; monopolies are labelled as monopolies.
+5. **Removed** the duplicate `Global rank #168 of 185 · top 91% highest-take
+   globally` badge from the section header — it restated the headline rank with
+   no basis caveat directly beside the new producer pill, and it called Slovenia
+   (5 contracts, no production data) *"bottom 15% (investor-friendly)"*.
+
+## Result
+
+The analyst asking "can I defend this at $75" now benchmarks the country against
+the **21 regimes that have verified production behind the number** — the ones
+their capital actually competes with — instead of against Moldova, Belgium and
+Bosnia. They are shown the all-185 figure *and* what is wrong with it, side by
+side, rather than being handed only the weaker number. Where a regional peer
+exists it is **named with its take** (`vs United Kingdom 49.2%`) instead of
+hidden inside a median; where none exists, the page says so instead of inventing
+one. Five countries whose headline verdict pointed the wrong way now point the
+right way.
+
+## Verification
+
+Cold Playwright against the local build, storage cleared, on ten profiles —
+Norway, UK, USA, Iraq, Angola, Brazil, Malaysia, Kazakhstan, plus both edge cases
+(**Slovenia**, outside the producer set; **Saudi Arabia**, state monopoly). On
+every one, all three surfaces agree on a single basis, and the old strings
+`pp vs median (28.4%)`, `pp vs Europe (19.1%)` and `Regional median (` are absent
+(checked case-insensitively — the `<h3>` is CSS-uppercased and a case-sensitive
+check gives a false pass). **0 JS errors on every walk.** `runtime_comprehensive.js`
+**ran this cycle**: 135 PASS / 0 FAIL / 1 WARN, the WARN being the local
+harness's service-worker 404, which was present in the pre-edit baseline walk.
+
+## Known, not fixed — stated rather than hidden
+
+- **Explorer, Screener, Fiscal Compare and the Breakeven Map still rank against
+  all 185 on the all-country basis.** This cycle corrected Country Profile only.
+  The new headline line names its basis explicitly so the analyst is not left to
+  assume the other tabs match — but they do not yet, and that is the obvious
+  next cycle.
+- Whether 21 production-weighted countries is the right peer definition, or
+  whether the other 164 should carry production data at all, is a data-pipeline
+  and business-logic call, not a UI one. Nothing here sets a threshold; it reads
+  an existing field.
+
+## STILL LOCKED — nothing touched
+
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
+**No new tooltip** on any pre-existing control. Tab order unchanged. v423, v430,
+v449, v451 (CP headline stays two-zone; Govt NPV stays removed from FC), **v452**
+(Zone A keeps the global rank and the vs-median pill, still computed before the
+headline strip — the denominator changed, the elements and the TDZ-safe ordering
+did not), v489, v505, v515–v527 and v533 all untouched.
