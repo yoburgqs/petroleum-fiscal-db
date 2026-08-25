@@ -12054,3 +12054,136 @@ v515 → v516 across 4 structural locations (meta description, title, header bad
 I walked Country Profile cold — fresh browser context, storage cleared — and pressed the two buttons an analyst presses when they're 20 minutes from an IC meeting. Both handed back a fabricated return:
 
 - `copyICCitation()` → `USA: Govt Take 23.4% @$7
+
+
+---
+## Cycle 416 Log — 2026-08-25
+
+- Test before: 136 PASS / 0 FAIL / 1 WARN (local build)
+- Test after: 136 PASS / 0 FAIL / 1 WARN (local build) — the WARN is the pre-existing
+  service-worker artifact: `sw.js` registers at `/petroleum-fiscal-db/sw.js`, the GitHub Pages
+  subpath, which 404s on a root-served local server. Same suite run against the live Pages URL
+  in this cycle returned **137 PASS / 0 FAIL / 0 WARN**, confirming it is harness-only.
+- JS errors: 0 on every walk
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Version: v516 → v517
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (415 was T5, 414 T3, 413 T4,
+412 T1, 411 T2, 410 T6. Cycle 415 explicitly deferred a verified defect on this surface to a
+T1 cycle: *"the Screener's `Set 15% ⟵ IOC hurdle` button still screens almost nothing out."*
+This is that cycle.)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — from Home
+into the Screener, and did the two things a first-time analyst does.
+
+**1. Pressed the amber `Set 15% ⟵ IOC hurdle` button.** 185 countries → **179**. The standard
+IOC capital-allocation test cleared 179 of 185 regimes. The six it removed were all state
+monopolies at −100% or −63.6%.
+
+**2. Loaded the starred first preset,** `⭑ IOC Capital Screen — IRR ≥15% · Take ≤65% · NPV
+positive`. It returned:
+
+    IOC Capital Screen · 105 countries match at $75/bbl
+    (80 filtered out of 185)
+
+which reads as *80 countries failed my capital screen*. It is not what happened. Of the 61
+countries the IRR criterion removed, **exactly one — Cyprus — failed the 15% test. The other
+60 were removed for having no IRR number at all**, because the preset silently unchecked
+`sc-irr-nulls`. The headline criterion, the one in the preset's name, was a data-availability
+filter wearing a hurdle-rate label. The only production-backed country it removed was **China**,
+which disappeared from the shortlist with nothing on screen to say why.
+
+The metric underneath is the one v515 and v516 already deleted from Side-by-Side and Country
+Profile: `AVG(irr_pct)` per country, **median 240.9%** across the 124 displayable values,
+**118 of which clear any positive threshold**. Removing it from the two tabs that *display* it
+while leaving it as the operative criterion of the flagship *screen* was the worst place for
+it to survive — v516 said exactly this about the Country Profile a cycle earlier.
+
+Location: `#sl-irr` / the quick-set button (index.html ~2068), `sc-irr-nulls` (~2139), the
+`minIRR > 0` branch in `runScreener()` (~23900), and `applyScreenerPreset('iochurdle')` (~23697).
+
+## Change
+1. **The Min IRR slider, the `Set 15% ⟵ IOC hurdle` button and the `sc-irr-nulls` checkbox are
+   removed**, along with the IRR filter branch in `runScreener()`.
+2. **The slot is given to the $50/bbl downside leg of contractor NPV** — `Min NPV @$50`, with a
+   `Set $0 ⟵ survives $50/bbl` quick-set. `npv_50` is modelled for **185/185** countries against
+   IRR's 124 displayable, so the untested-vs-passing ambiguity v513 had to disclose for breakeven
+   cannot arise here by construction — and it has real range (median $1,361M; a $1,000M floor
+   cuts 185 → 110). NPV>0 discounted at 10% WACC *is* the hurdle test; the $50 leg is the stress.
+3. **The results-table IRR column becomes `NPV @$50 ($M)`**, negative values red — the column
+   you read is now the axis you screen on.
+4. **A data-basis filter replaces the IRR-nulls control.** The page has known since v507 which
+   countries have verified field production (`_dqTier().hasProduction`, **22 of 185**), has
+   ranked by it and drawn a labelled divider at the boundary — but never let the analyst
+   *screen* on it, which is precisely what T1 asks.
+5. **The IOC Capital Screen is rebuilt** as *verified production · Take ≤65% · NPV positive at
+   $75 AND at $50*. **14 countries**, every one measured on every criterion applied to it.
+6. **`High IRR` is rebuilt as `Two-Price Return Screen`** (NPV ≥$100M @$75 AND ≥$500M @$50),
+   renamed away from the existing *Downside Resilience* preset so the two are not confusable.
+7. **The count line states what was done, not only how many survived.**
+8. **Both exports drop `IRR_75` and gain `NPV_50` + `Verified_Production`.**
+9. A methodology paragraph instructing the reader to *"run ORCA Screener at minIRR=12"* pointed
+   at a control that no longer exists; it now names the replacement and routes a genuine project
+   IRR to Scenario Builder.
+
+**Found on the same walk and also fixed: the Screener CSV export was malformed for 75 of the
+185 countries.** `Mechanics` is a comma-joined string (`"Concession,PSC"`, `"Concession,PSC,RSC"`)
+and the row was emitted with a bare `r.join(',')`, so in Excel every column after Mechanics
+shifted right by one or two. This is the file an analyst attaches to an IC memo. Fields are now
+RFC-4180 quoted; verified 14/14 fields on Canada, Azerbaijan and Mexico. The XLSX path was never
+affected (`json_to_sheet` quotes for us) — only the CSV button.
+
+## Result
+An analyst with 20 minutes before a screening meeting clicks the platform's own starred
+recommendation and gets **14 countries — Canada, USA, Azerbaijan, Mexico, Argentina, Colombia,
+China, Australia, Ecuador, Brazil, United Kingdom, Angola, India, Indonesia** — under a line that
+says exactly what was tested and what was excluded:
+
+    IOC Capital Screen · 14 countries match at $75/bbl — all 14 tested at the $50/bbl
+    downside and clearing $0M (npv_50 modelled for 185/185 — no untested rows) —
+    verified field production only; 163 proxy-economics countries excluded
+
+They can defend every name on it line by line. Before, they got 105 names of which 91 were
+countries the platform's own divider row calls *"not defensible as a screening shortlist on their
+own"*, under a caption that told them 80 countries had failed a returns test that 60 of them were
+never run through. China is back on the list. And the CSV they attach to the memo now opens in
+Excel with its columns in the right places.
+
+## Verification
+JS syntax gate **PASS** (9 blocks / 0 errors). `runtime_comprehensive.js` **ran this cycle**
+against the local build: **136 PASS / 0 FAIL / 1 WARN** (harness-only SW 404; the same suite
+against live Pages gave 137/0/0). Cold Playwright walks, storage cleared:
+
+| check | result |
+|---|---|
+| cold load | 185/185, no IRR slider in the DOM, `· no floor` neutral flag shown |
+| real quick-set button click | 185 → 183 |
+| IOC Capital Screen preset | 14 rows, exact expected membership, data-basis box unchecked |
+| Two-Price Return Screen preset | 153 rows |
+| Reset All | 185 rows, npv50 slider −500, data-basis box re-checked, filter badge hidden |
+| all 10 remaining presets | re-run without error |
+| CSV field alignment | 14/14 on multi-mechanic countries (was 15–16) |
+| JS errors | **0** on every walk |
+
+## Deliberately out of scope — stated rather than hidden
+Explorer/Browse still shows an IRR column, an IRR scatter chart, a *Has IRR Data* chip and an
+`IRR @$75 (%)` export column; Fiscal Compare still offers an IRR sort and a 15%-hurdle divider
+row. Those carry the same defect and are Browse and T3 surfaces. They should be the substance of
+their own cycles, not smuggled into this one.
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional banner, no
+routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener
+advanced filters still collapsed by default; presets still a dropdown. No new FAQ (still 974).
+**No new tooltip on a pre-existing control** — every tooltip that changed is on a control whose
+behaviour changed, and two controls were deleted outright. Tab order unchanged. v430
+sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP headline and removed FC Govt
+NPV, v452 rank + vs-median pill, v489 Reform Risk placement, v507 divider and evidence-first
+ranking, v513 breakeven semantics, v514–v516 IRR removals all untouched.
+
+## Bookkeeping — not the improvement
+v516 → v517 in the two structural locations that carry a literal (page title, header badge);
+`_orcaVerNow()` reads the badge so every clipboard citation followed automatically. Changelog
+entry prepended. Grade tables not touched.
