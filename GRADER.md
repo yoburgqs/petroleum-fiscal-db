@@ -12202,3 +12202,129 @@ entry prepended. Grade tables not touched.
 I walked the Screener cold — fresh browser context, storage cleared — and did the two things a first-time analyst does.
 
 Pressed the amber **`Set 15% ⟵ IOC hurdle`** button: 185 countries → **179**. The standard IOC capit
+
+---
+## Cycle 417 Log — 2026-08-25
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL / 1 WARN (pre-existing local-harness service-worker 404)
+- JS errors: 0
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Commit: `e3a55a9` (petroleum-fiscal-db). v518.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?"
+(416 was T1, 415 T5, 414 T3, 413 T4, 412 T1, 411 T2, 410 T6 — T6 was the least recent.)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — into the
+Screener and loaded the one preset that exists to answer T6: **`High Evidence — ≥80% A/B
+sourced`**, whose code comment calls it *"highest data quality for due diligence"*.
+
+It returned **171 countries. Out of 185.** It is not a filter.
+
+The cause is in `runScreener()`: `if (minEvid > 0 && (d.ab_pct || 0) < minEvid) return false;`
+where `ab_pct = a_pct + b_pct`. **Tier B is 45.2% of all 330,329 facts**, and two sources —
+`EY_KPMG_CIT_Guide_2025` and `EY_IHS_BulkHarvest_2025` — supply **224 of the 428 top-source rows**
+in `country_data.json`. So the gate did not measure how well a country was sourced; it measured
+how thoroughly the bulk harvest had run over it. At the slider's **maximum setting of 100% it
+still passed 102 of 185**. There is no position on its range that expresses "well-evidenced".
+
+And it **inverted**:
+
+| country | A/B (old gate) | tier-A (primary law) | bulk-harvested | old verdict |
+|---|---|---|---|---|
+| Georgia | **100.0%** | 37.4% | 62.6% | PASS |
+| USA | **100.0%** | 40.6% | 59.4% | PASS |
+| Mongolia | **100.0%** | 42.6% | 57.4% | PASS |
+| Thailand | 99.7% | 35.3% | 64.4% | PASS |
+| Saudi Arabia | 98.7% | 39.1% | 59.6% | PASS |
+| **Senegal** | 73.9% | **67.2%** (2nd highest in dataset) | 6.7% | **REJECTED** |
+| **Liberia** | 67.8% | **64.4%** | 0.0% | **REJECTED** |
+
+The analyst who does the responsible thing — raise the evidence gate before an IC memo —
+filtered out the primary-law countries and kept the tax-guide ones.
+
+The same conflation was on Country Profile. The Evidence Quality panel legend read
+**"B Operator / C Aggregator"**, so Brazil rendered **"HIGH — 100.0% A/B"** with
+**"C Aggregator 0.0%"** while listing `EY_IHS_BulkHarvest_2025` immediately below as a *Key
+source*; Norway showed "C Aggregator 0.0%" directly above a KPMG/EY CIT guide. Both bulk rows
+link to `https://taxsummaries.pwc.com/allcountries` — a **third firm's** index of every country
+on earth — under a link title reading *"Open primary source"*.
+
+Root cause of the mislabelling: the page carries **two contradictory tier tables**. Methodology →
+*Evidence Quality Tiers* defined B as "operator annual report" and C as "secondary aggregator
+(EY/IHS, KPMG, Wood Mac)". Methodology → *Data Sources* defined the exact reverse. The database
+follows the latter — the fact-weighted shares computed from the shipped JSON are **A 47.6 /
+B 45.2 / C 3.1 / D 4.1**, matching *Data Sources* to the decimal. Every rendered evidence
+surface followed the wrong one.
+
+## Change
+1. **The evidence slider gates on tier A alone** — facts read out of the primary legal
+   instrument. Real gradient: **128 / 107 / 52 / 27** countries at A ≥ 50/60/70/100%, against the
+   old gate's 171 at 80% and 102 at 100%.
+2. **Preset rebuilt as `Primary-Source Evidence`** — two legs on the same axis: tier-A **≥55%**
+   AND **≥150 facts on file**. The second leg is load-bearing: A-share alone rewards thin
+   coverage, since the median fact count among the 52 countries at A≥70% is **39.5** against 159
+   across all 185 (a jurisdiction whose whole record is ~12 facts from one model petroleum act
+   scores 100% A). Returns **35 of 185**.
+3. **The count line states what was tested** — "35 with ≥55% of fiscal facts read from the
+   primary legal instrument (tier A) on ≥150 facts on file; the EY / IHS / KPMG bulk harvest
+   (tier B, 45.2% of the database) does not count toward this". Zero-result diagnostics name both
+   legs and their standalone sizes.
+4. **The Evidence Quality panel headline leads with tier-A share** (Norway *66.1% primary law*,
+   Nigeria *31.1%*) plus a second pill giving that country's **bulk-harvested share** (Nigeria
+   *56%+*, Norway *12%+*) — stated as a floor, computed from top sources only. Legend relabelled
+   to what the database holds.
+5. **Bulk source rows are distinct and honestly linked** — a `BULK` chip, a readable name
+   ("EY / KPMG corporate income tax guides (2025)" instead of the raw DB key), muted styling, and
+   a link title saying where the link actually goes and that the rate must be checked against the
+   country's own petroleum act before IC.
+6. **The Methodology tier table is corrected**, with the shares added as a fourth column and the
+   prior error named rather than quietly overwritten.
+
+## Result
+An analyst asking *"how solid is this evidence?"* now gets a screen that **screens**: 35 countries
+instead of 171, selected on how much of the record was read out of the legal instrument rather
+than on how far a Big-4 tax table reached. **Senegal and Liberia are on it; USA, Georgia,
+Mongolia, Thailand and Saudi Arabia are not** — the exact reverse of before, and the correct
+reverse. When they click into a country, the panel tells them the two numbers that decide
+whether they can defend it — primary-law share and bulk-harvested share — instead of a single
+conflated figure that its own source list contradicted.
+
+## Verification
+JS syntax gate **PASS** (9 blocks / 0 errors). `runtime_comprehensive.js` **ran this cycle**
+against the local build: **136 PASS / 0 FAIL / 1 WARN** (the WARN is the pre-existing
+local-harness service-worker 404 — the SW registers the GitHub Pages subpath). Cold Playwright
+walks, storage cleared:
+
+| check | result |
+|---|---|
+| cold screener load | 185 rows + divider, slider at 0 |
+| Primary-Source Evidence preset | **35 rows**, label and slider correct |
+| admits Norway / Canada / Angola / Brazil / Australia / Senegal / Liberia | 7/7 |
+| excludes USA / Georgia / Mongolia / Thailand / Saudi Arabia | 5/5 |
+| slider A≥50 / 60 / 70 / 100% | 128 / 107 / 52 / 27 rows |
+| Reset All | 185 rows, slider 0, `_screenerMinFacts` 0 |
+| evidence panel Norway / Nigeria / Canada | tier-A + bulk pill correct; BULK chip on the 2 bulk rows, absent on Canada (has none) |
+| JS errors | **0** on every walk |
+
+## Deliberately out of scope — stated rather than hidden
+`ab_pct` still drives the Fiscal Compare **Quality** column, the Explorer evidence dot,
+`getTierBadge()`'s A/B/C/D letter, the IC citation string and both exports. They inherit the same
+conflation. Those are Browse and T5 surfaces and re-tiering them is their own cycle, not a rider
+on this one.
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional banner, no
+routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener
+advanced filters still collapsed by default; presets still a dropdown. No new FAQ (still 974).
+**No new tooltip on a pre-existing control** — every tooltip that changed is on a control whose
+behaviour changed. Tab order unchanged. v430 sessionStorage logic, v449 take%-tier colouring,
+v451 two-zone CP headline and removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk
+placement, v507 divider and evidence-first ranking, v513 breakeven semantics, v514–v517 IRR
+removals all untouched.
+
+## Bookkeeping — not the improvement
+v517 → v518 in the two structural locations that carry a literal (page title, header badge);
+`_orcaVerNow()` reads the badge so clipboard citations follow automatically. Changelog entry
+prepended. Grade tables not touched.
