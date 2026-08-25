@@ -13718,3 +13718,104 @@ v528 all untouched.
 **Task:** T5 — "Give me something I can paste straight into an IC memo." (427 was T2.)
 
 **Friction.** Walking cold from Home and following the platform's *own* Quick Start step 1 — "Export XLSX for IC attachment" — the workbook that comes out is ranked and sorted on the compare engine's `liveTake`. For the 153 countries ORCA holds no country-specific terms for, that is the same generic mechanic default. At $75/bbl deepwater, **153 
+
+---
+## Cycle 429 — T1, v530 — 2026-08-25
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after:  135 PASS / 0 FAIL / 1 WARN  (runtime_comprehensive.js RAN this cycle)
+- JS syntax gate: PASS
+- JS errors on every cold walk: 0
+
+**Task** — **T1**, "which countries should even be on my screening list?"
+(428 was T5, 427 T2, 426 T6, 425 T4, 424 T3.)
+
+**Friction.** Walked cold — fresh browser context, no `sessionStorage`, no
+`localStorage` — from Home into the Screener. Its first control, and the
+analyst's first move on T1, is the `Load a screen…` preset menu. Picking off
+that menu is a blind choice, and one of the eleven options actively contradicts
+itself.
+
+`applyScreenerPreset('atlanticfrontier')` implemented a **named basin with the
+Water Depth radio**. `setDepth('deepwater')` resolves to
+`DEPTH_PROFILE.deepwater`, an 11-country list. So under a badge reading
+"Guyana · Angola · Brazil · Nigeria" the table rendered:
+
+    Namibia, Ghana, Mozambique, Tanzania, Gabon, Cameroon,
+    Equatorial Guinea, Sierra Leone, Senegal, Guyana, Republic of the Congo
+
+Three of the four headline countries absent. Two Indian Ocean margins present.
+And **byte-identical to the Deepwater preset** — two of eleven menu options were
+one screen. Angola, Brazil and Nigeria are also the *only* production-backed
+countries in that basin (ranks 10, 14 and 21 of the 22 with verified field
+production), so the preset dropped precisely the rows an IC screen can defend and
+kept eleven `PROXY` rows the page's own divider calls "not defensible as a
+screening shortlist on their own". Nigeria was doubly excluded: 81.1% take
+against the preset's own ≤75% ceiling, a criterion the option text never mentions.
+
+The second half of the same moment: no option said what it returns. Measured
+cold against the live data, **six of the eleven presets do not screen** —
+
+| preset | returns |
+|---|---|
+| Frontier Markets | 168 of 185 |
+| Downside Resilience | 158 of 185 |
+| Two-Price Return Screen | 153 of 185 |
+| Sweet Spot | 142 of 185 |
+| Low-Risk Stable | 140 of 185 |
+
+— so "Downside Resilience — BE ≤$50 · low-price viable" hands back 85% of the
+world. The analyst discovered this only by loading each one and reading the count
+line afterwards.
+
+**Change.**
+
+1. **Explicit country-set leg** (`_screenerCountrySet`), applied in
+   `runScreener()` ahead of every threshold leg. Atlantic Frontier now screens on
+   the six countries its own source comment always declared — Guyana, Angola,
+   Brazil, Nigeria, Suriname, Gabon — with **no take ceiling**, because the option
+   names a basin, not a threshold. It returns **6 of 185**, ranked
+   production-backed first (Brazil, Angola, Nigeria), and the "Load top N in
+   Side-by-Side" handoff now ships those three instead of Namibia, Ghana and
+   Mozambique.
+2. **Live hit count on every option, before the click** — `→ 14 of 185`,
+   `→ 6 of 185`, `→ 168 of 185 (barely narrows)`. **No threshold was retuned**;
+   the sizes are reported, not changed. The counts are not re-derived from a
+   parallel evaluator: each preset runs once at boot through the real
+   `applyScreenerPreset()` → `runScreener()` path and the row count is read back,
+   so the number on the option is *by construction* the number the analyst gets.
+   That matters in this exact function — v524 had to repair two separate cases of
+   these captions drifting from the criteria they described. All 11 verified equal
+   in Playwright.
+
+**Result.** The analyst reads the menu instead of guessing at it — one glance
+separates the screens that narrow (IOC Capital 14, Atlantic Frontier 6,
+Deepwater 11, PSC Africa 31, Primary-Source Evidence 35, R-factor 70) from the
+five that do not. And the basin benchmark returns the basin: clicking Atlantic
+Frontier now yields Brazil, Angola, Nigeria, Gabon, Guyana, Suriname, with the
+three production-backed rows on top and ready to hand to Side-by-Side.
+
+**Verified cold in Playwright**, storage cleared: Atlantic Frontier returns
+exactly its six named countries and is no longer identical to Deepwater; Reset All
+clears the country set; the `#/explorer/rfactor` deep link still boots to 70 rows
+(the boot probe restores the default unfiltered state and cannot clobber a route);
+boot + probe 693 ms; 0 JS errors on every walk.
+
+**Deliberately out of scope, stated rather than hidden.** The five wide presets
+keep their thresholds — retuning them is a business-logic call, not a loop
+decision, and they are now labelled with what they return. The Home glossary still
+describes an IRR the platform stopped reporting at v515/v516/v523, and the Home
+hero still reads "(v500)".
+
+**Bookkeeping — not the improvement.** The Deepwater option text said
+"Deep+mixed" while the code applies deepwater-only, excluding all 13 `mixed`
+countries; caption corrected to match behaviour. v529 → v530 in the two
+structural literals (page title line 42, header badge line 1353). Changelog entry
+prepended.
+
+**STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional
+banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible
+Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown. **No new FAQ** (still 974). **No new tooltip on a pre-existing
+control.** Tab order unchanged. v430, v449, v451, v452, v489, v505, v515–v525,
+v528 and v529 all untouched.
