@@ -13069,3 +13069,151 @@ Cold load onto Home. The one sentence on that page that answers T1 read:
 > `✓ 118 of 185 countries clear the IOC hurdle rate (IRR ≥15% · Deepwater profile · $75/bbl) — open Fiscal Compare →`
 
 It filtered on `irr_75 >= 15 && < 500` — the AVG-of-per-contract-IRR that v515, v516, v517 and v523 already d
+
+---
+## Cycle 424 Log — 2026-08-25
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN (v524 baseline, re-run this cycle on the same local server)
+- Test after: 135 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 (the 1 WARN is the pre-existing `sw.js` 404 off GitHub Pages, present on both builds)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Commit: `32cce5a` (petroleum-fiscal-db). v524 → v525.
+
+## Task
+**T3** — "How do these three countries compare side by side?"
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared —
+from **Side-by-Side** into **Fiscal Compare**, the tab SbS links to as
+"▦ Rank all 185 countries".
+
+Side-by-Side prints a paragraph stating that IRR is *deliberately excluded* from
+its table because ORCA's IRR is not a project return. Two clicks away, Fiscal
+Compare carried a sortable `IRR% @$75` column, a `data-sort="irr"` sort button,
+an "◉ IRR only" checkbox, a dashed amber divider reading *"IOC Hurdle Rate: 15%
+IRR — countries below this line do not clear the standard IC threshold at this
+price"*, and two separate hurdle counters. Same platform, opposite instructions,
+at the point where the comparison is actually made.
+
+Measured against the live compare engine at $75/bbl on the deepwater profile —
+not read off the changelog:
+
+| statistic | value |
+|---|---|
+| median IRR | **138.4%** |
+| minimum | **39.5%** (Nigeria) |
+| maximum | 297.1% (Liberia) |
+| above 100% | 178 of 180 |
+| p25 = median = p75 | **138.4%** |
+| below the 15% hurdle | **0 of 180** |
+
+Three separate defects follow from that distribution:
+
+1. **The hurdle apparatus discriminated nothing.** With no country below 15%, the
+   divider could never render at 15%, and the counters read
+   `✓ 180 clear IOC hurdle (IRR ≥15% @$75)` and `IRR available: 180 of 180`.
+   A screen that passes 180 of 185 was presented as a filter.
+2. **The ranking ordered an artifact.** p25 = median = p75 = 138.4% — more than
+   half the table shares one identical IRR, because 153 countries carry no
+   country-specific terms and fall to the same mechanic default. Sorting by IRR
+   ordered rows that are not distinguishable.
+3. **Sorting by IRR silently deleted rows.** `fcSetSort('irr')` auto-checked the
+   "IRR only" box, dropping 5 countries — **including Libya, the highest-take
+   regime in the table at 90.7%** — while the status bar still read
+   "185 countries ranked". The tfoot that disclosed the filter never rendered,
+   because the `_defaultTie` footnote took the branch ahead of it. Confirmed by
+   running the v524 build: 180 rows, `fc-filter-irr.checked === true`, Libya
+   absent, status bar "185 countries ranked".
+
+## Change
+IRR is gone from Fiscal Compare — 37 edits, `index.html`:
+
+- the `IRR% @$75` column (`<th>` and `<td>`), row count 11 → 10, all 12 divider
+  colspans decremented
+- the `data-sort="irr"` sort button, its `(124/185)` sub-label (itself wrong —
+  the column populated 180/185), its comparator, its tie-rank branch, its
+  `hasValue` branch and its rank-tier colour branch
+- the `#fc-filter-irr` "IRR only" checkbox, its auto-check on IRR sort, and its
+  filter application
+- the "IOC Hurdle Rate: 15% IRR" divider row and its insertion tracker
+- both hurdle counters (status bar and stats strip), plus "Median IRR",
+  "IRR range" and "IRR available"
+- the `sortField === 'irr'` tfoot ("IRR data: 124 of 185…") — unreachable
+- the ` · IRR X%` fragment in the drilldown IC cite line
+- the v477 "Contradictory NPV/IRR signal" line, which fired on `0 < IRR < 10`
+  and therefore had never fired for any country and could not
+- the `IRR%` column in the Fiscal Compare **XLSX export** — the artifact that
+  reaches an IC memo
+
+`fcSetSort('irr')` now coerces to `'npv'`, so a shared `#/…` deep link or a stale
+`window._fcSortState` cannot sort the table by a column nobody can see.
+
+A permanent footnote under the table states the median and minimum, says 180 of
+185 cleared the hurdle, and names what to rank on instead: **Take%**, **NPV ($M)**
+(every row on the same profile, so the columns are comparable), **BE ($/bbl)**
+where populated, and **Scenario Builder** for a real rate of return on the
+analyst's own field.
+
+The status bar and stats strip now report **"31 of 185 on own terms
+(rest = generic default)"** in place of the hurdle count — the split that
+actually decides whether two rows in this table are distinguishable. IC Analyst
+Guide step 1, which told analysts to apply the now-deleted "IRR only" checkbox,
+was rewritten to that count.
+
+## Result
+Fiscal Compare renders **185 of 185 countries with no hidden filter** — Libya is
+back. An analyst comparing three countries can no longer rank them on, or paste
+into an IC memo, a 138% IRR that the platform's own Side-by-Side tab tells them
+is not a project return; and the two tabs no longer give opposite instructions
+about the same metric. The one number the table now offers in place of a hurdle
+count — how many rows are modelled on their own terms — is the number that tells
+the analyst whether their three columns are actually different.
+
+## Verification
+Cold Playwright against the local build, storage cleared: 10 columns and no
+`IRR%` header; `.fc-sort-btn` set is `take,npv,breakeven,swing,country`;
+`#fc-filter-irr` absent; 185 country rows with Libya present; footnote renders;
+`fcSetSort('irr')` → `_fcSortState === 'npv'`; **0 JS errors**. JS syntax gate
+**PASS** (9 blocks / 0 errors). `tests/runtime_comprehensive.js` **ran this
+cycle**: **135 PASS / 0 FAIL / 1 WARN**, and the same suite re-run against the
+**v524 build** on the same server also returned **135 / 0 / 1** — so neither the
+count nor the WARN (pre-existing `sw.js` 404) is a regression.
+
+**Test file changed this cycle:** `tests/runtime_comprehensive.js` line 189 —
+`'irr'` dropped from the FC sort-button loop. That assertion required a control
+this cycle deliberately removed; left in place it would have produced 1 FAIL.
+Stated here rather than absorbed silently into the pass count.
+
+## Deliberately out of scope — logged, not fixed
+The **Explorer** still carries an `IRR @ $75` column (`data-sort-key="irr"`, with
+a header that already admits "Arithmetic mean of per-contract IRRs — use for
+screening only"), an "IRR only" checkbox, an `irr` option in `#flt-sort`, and an
+`IRR @$75` XLSX column. The Home key-terms grid still describes IRR as
+"≥15% clears most IOC hurdle rates · shown for 124/185". Those are Browse and
+Home surfaces; each is its own cycle.
+
+## Process note — recorded because it is the kind of thing that stays hidden
+Mid-cycle I built a baseline server at `/tmp/base524` by symlinking every repo
+file into it, then ran `cp /tmp/index.v524.bak /tmp/base524/index.html`. That
+path was a symlink to the live `index.html`, so the copy wrote **through** it and
+reverted the working file to v524, silently discarding every edit made to that
+point. Caught by a `grep` audit that still found `data-sort="irr"` after the
+substitution had reported success. All 37 edits were reapplied from the backup in
+a single script and re-verified from scratch. No committed work was lost.
+
+## Locked list
+Nothing on STILL LOCKED was touched — no page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. No new FAQ (still 974). No new tooltip. Tab order
+unchanged. v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP
+headline and removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk
+placement, v515/v516/v517/v523/v524 IRR removals, v521 SbS spread rows and v522
+CP contract-spread badge all untouched. The v451 precedent — removing a column
+whose caveat made it untrustworthy at the decision point — is the one this cycle
+follows.
+
+## Bookkeeping — not the improvement
+v524 → v525 in the two structural literals (page title, header badge);
+`_orcaVerNow()` reads the badge, so clipboard citations follow. Changelog entry
+prepended. Grade tables not touched.
