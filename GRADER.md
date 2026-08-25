@@ -12039,3 +12039,18 @@ divider, v513 breakeven semantics, v514 reform sidebar and v515 SbS NPV rows all
 ## Bookkeeping — not the improvement
 v515 → v516 across 4 structural locations (meta description, title, header badge,
 `_orcaVerNow()` fallback). Changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 415 Log — 2026-08-25 00:29
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 415 complete and pushed — `02e1881` / `8bf7279` (petroleum-fiscal-db), `236961041` (office mirror). v516.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (least recent; 414 was T3, 409 was the last T5)
+
+## Friction
+I walked Country Profile cold — fresh browser context, storage cleared — and pressed the two buttons an analyst presses when they're 20 minutes from an IC meeting. Both handed back a fabricated return:
+
+- `copyICCitation()` → `USA: Govt Take 23.4% @$7
