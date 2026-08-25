@@ -186,7 +186,10 @@ async function testFiscalCompare(page) {
     else f(S, '_fcLastResults stored', JSON.stringify(stored));
 
     // Sort controls
-    for (const sort of ['npv', 'irr', 'breakeven', 'country', 'take']) {
+    // v525 (T3): 'irr' removed from this list with the FC IRR column. The compare engine's IRR
+    // on the standardized profile has a median of 138.4% and a minimum of 39.5%, so the column
+    // ranked an artifact and the 15% IOC-hurdle apparatus passed 180 of 185.
+    for (const sort of ['npv', 'breakeven', 'country', 'take']) {
       await page.click(`.fc-sort-btn[data-sort="${sort}"]`).catch(() => {});
       await page.waitForTimeout(200);
       const active = await page.evaluate(s => {
