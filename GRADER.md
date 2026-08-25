@@ -12647,3 +12647,156 @@ v520 → v521 in the two structural literals (page title, header badge); `_orcaV
 Walked cold into Side-by-Side, which pre-loads Norway / UK / Netherlands. The table closed with a block headed **MC UNCERTAINTY** — "MC P10 (low-case take)", "MC P50 (base take)", "MC P90 (high-case take)".
 
 Those are the same nine numbe
+
+---
+## Cycle 421 Log — 2026-08-25 05:58
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL / 1 WARN (pre-existing local-harness service-worker 404)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- JS errors on cold walks: 0
+- Commit: `3b8fe63` (petroleum-fiscal-db), pushed to main. v521 → v522.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(rotation: 420 was T3, 419 T4, 418 T2, 417 T6, 416 T1, 415 T5)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared —
+from Home into **Country Profile** and loaded Norway, the ordinary first move for
+an analyst who needs to defend one country's take figure.
+
+The headline strip carried a badge reading **`59.3–75.0% range`**, titled
+**"Monte Carlo P10–P90 take range — price scenario sensitivity ($50–$125/bbl)"**.
+Directly beneath the four-price take table sat an italic band:
+
+    ↔ P10–P90 uncertainty band: 59.3% – 75.0%  ·  P50 (base): 68.0%
+
+The table it sat under printed `$50 → 59.3%`, `$75 → 68.0%`, `$100 → 72.4%`,
+`$125 → 75.0%`. The "P10", "P50" and "P90" were the **first, second and fourth
+cells of that same table**, one line up, relabelled as distribution percentiles.
+
+Source at `index.html:25445`:
+
+    const mc = (d && d.take_50 != null) ? {p10: d.take_50, p50: d.take_75, p90: d.take_125} : null;
+
+An alias, not a simulation. Verified against the data rather than the changelog:
+`country_data.json` carries **no `mc_*`, `p10` or `p90` field on any of its 185
+records**, and **none of the 239 `api/v1/country/*.json` files carry one either**.
+An analyst writing *"Norway P90 government take 75.0% (Monte Carlo)"* into an IC
+memo had asserted a **10% exceedance probability that was never computed** — and
+this is the T2 surface, the one page whose entire job is defensibility.
+
+The control producing it was worse. `#dd-mc-toggle`, a checkbox labelled
+**"Show Monte Carlo uncertainty bands"**, tooltip:
+
+> "Ranges show P10–P90 contractor IRR based on Monte Carlo simulation of key input
+> uncertainties (oil price, costs, production profile). Applies to IRR charts only
+> — headline take is a single-point estimate."
+
+Every clause is false: it showed **government take**, not IRR; there is no
+simulation; and it toggled a text band, not a chart.
+
+The page also contradicted its own documentation. **Methodology → Point Estimate
+Note** states in text: *"No confidence interval or Monte Carlo range is shown for
+the headline take figure — the platform's Monte Carlo uncertainty bands (visible
+in the Screener) apply to IRR only."* Those Screener bands never existed either,
+and the Screener IRR control the sentence pointed at was **removed at v517**.
+
+## Change
+1. **Badge, band and checkbox removed** — with `mc`, `showMC`, `mcNote`, the
+   `toggleWrap` display logic, the `#dd-mc-toggle` change listener, and the two
+   now-dead CSS rules (`#dd-mc-toggle-wrap`, `.dd-mc-note`).
+2. **The headline slot is given to the dispersion ORCA can actually evidence** —
+   the interquartile take band across each country's *own contracts*
+   (`p25_take`/`p75_take`) at $75/bbl, the same measured quantity v521 put into
+   Side-by-Side. New `.cp-spread-badge`, computed in a self-contained IIFE with a
+   local monopoly check (referencing `_isMonopoly`, declared ~140 lines below,
+   would throw the TDZ error v452 already hit once).
+3. **Degenerate spreads state the finding instead of hiding it.** 135 of 185
+   countries price every contract identically. Norway now reads
+   **`Contract take: single term · 67.3%`** across 7,643 contracts — the fact that
+   decides whether block selection matters in a jurisdiction, and it was not on
+   this page in any form before.
+4. **The 57 countries whose headline sits outside their own band** carry a `ⓘ`
+   marker and a tooltip naming the cause — the headline is production-weighted,
+   the band is unweighted across contracts — rather than leaving the analyst to
+   guess which of the two numbers is broken.
+5. **A redundant 9px `IQR: ±0.0pp` sub-line under the $75 cell is removed.** It
+   stated the same dispersion in a second, inconsistent format (±pp under 5pp, a
+   band above it) and titled Norway's 7,643 single-term contracts *"highly uniform
+   — very consistent fiscal terms"*, which reads as a low-risk finding rather than
+   a statutory one-term regime. One dispersion statement now, in the headline,
+   where the analyst already looked for a range.
+6. **Two documentation claims pointing at the non-existent simulation corrected** —
+   the Point Estimate Note, and the API endpoint field list, which advertised
+   *"Monte Carlo p10/p90"* in the per-country JSON (verified absent from all 239).
+
+## Result
+An analyst defending a single country's take at $75/bbl can no longer paste a
+**fabricated percentile** into an IC memo, and now reads — in the exact slot the
+fake range occupied — **how much block selection actually changes their fiscal
+outcome in that jurisdiction**:
+
+| | old headline badge | new headline badge |
+|---|---|---|
+| Norway | `59.3–75.0% range` (= take @$50 / @$125) | **single term · 67.3%** (7,643 contracts) ⓘ |
+| Iraq | `81.5–88.1% range` | **65.0–98.5% (33.5pp)** across 610 contracts |
+| Cyprus | `29.5–43.6% range` | **15.3–78.1% (62.8pp)** |
+| Somalia | `31.5–41.2% range` | **8.0–48.4% (40.4pp)** |
+| Nigeria | `78.4–83.2% range` | **83.1–83.5% (0.4pp)** ⓘ vs 81.1% headline |
+| Saudi Arabia | `—` | no badge (state monopoly) |
+| Belgium | `—` | no badge (no quartiles) |
+
+Iraq's 33.5pp contract-level spread — sign the wrong block and your government
+take moves from 65% to 98.5% — was **not on the Country Profile page at all**
+before this cycle. The old badge in that slot restated two cells of the table
+below it and carried no information about contract-level variation whatsoever.
+
+## Verification
+Cold Playwright walks against the local build, `sessionStorage` and
+`localStorage` cleared, every branch exercised:
+
+| check | result |
+|---|---|
+| `#dd-mc-toggle` absent from DOM | ✅ |
+| `.mc-badge` count on Country Profile | ✅ 0 |
+| `.dd-mc-note` count, every country tested | ✅ 0 |
+| degenerate → `single term · X%` | Norway, Guyana ✅ |
+| wide spread → band + pp | Iraq, Cyprus, Somalia, Egypt ✅ |
+| headline-outside-band → `ⓘ` + tooltip | Norway, Nigeria ✅ |
+| state monopoly → no badge | Saudi Arabia ✅ |
+| null quartiles → no badge, no crash | Belgium ✅ |
+| IQR sub-cell gone from `.dd-take-grid` | ✅ |
+| IC citation + IC summary clipboard | ✅ unchanged, no percentile language, cite reads v522 |
+| JS errors | **0** on every walk |
+
+JS syntax gate **PASS** (9 blocks / 0 errors). `runtime_comprehensive.js`
+**ran this cycle** against the local build: **136 PASS / 0 FAIL / 1 WARN** — the
+WARN is the pre-existing local-harness artifact (service worker registers
+`/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath, which 404s on a
+root-served local server; correct in production).
+
+## Deliberately out of scope — logged, not fixed
+The Fiscal Compare drilldown header carries the same `.mc-badge` element at
+`index.html:31611`. Its title is honest — *"Price scenario range ($50–$125/bbl)"*,
+no Monte Carlo claim — but it still restates two cells of the table beneath it and
+tells the analyst nothing about contract-level variation. That is a **T3** surface
+and should be the substance of its own cycle, not smuggled into this one. Naming
+it here so it is not lost. With this cycle, the phrase **"Monte Carlo" no longer
+appears anywhere in the platform as a claim about government take.**
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional
+banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible
+Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown. No new FAQ (still 974). No new tooltip on a control that did not change —
+the tooltips that changed belong to elements whose behaviour changed. Tab order
+unchanged. v430 sessionStorage logic, v449 take%-tier colouring, v451 two-zone CP
+headline and removed FC Govt NPV, v452 rank + vs-median pill, v489 Reform Risk
+placement, v515 IRR removal, v517 Screener rebuild and v521 SbS spread rows all
+untouched.
+
+## Bookkeeping — not the improvement
+v521 → v522 in the two structural literals (page title, header badge);
+`_orcaVerNow()` reads the badge, so clipboard citations follow automatically —
+verified reading v522. Changelog entry prepended. Grade tables not touched.
