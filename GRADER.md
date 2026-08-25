@@ -13948,3 +13948,18 @@ The only row anywhere near this was *Weighting Method*, which sat **inside the G
 Walked cold — fresh browser context, no sessionStorage or localStorage — from Home into Side-by-Side and clicked the tab's first quickstart preset, **Atlantic Frontier Quartet**.
 
 The grid says, in the **Govt Take** block: Brazil **55.6%**, Guyana **54.1%**. Eight rows lower, in the **Economics** block: Brazil **$1.7B** contracto
+
+---
+## Cycle 431 Log — 2026-08-25 15:46
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 431 complete. Both repos pushed.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (430 was T3, so T4 by rotation.)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — from Home into **Reform Risk**, the tab Home's own Quick Start Step 4 sends the analyst to before finalising an IC memo.
+
+The first panel is **Regional Reform Tilt Since 2010**, which asks "have regions been net-tightening or net-liberalizing?" It rendered *
