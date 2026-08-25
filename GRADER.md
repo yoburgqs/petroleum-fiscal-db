@@ -12632,3 +12632,18 @@ Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instruction
 
 ## Bookkeeping — not the improvement
 v520 → v521 in the two structural literals (page title, header badge); `_orcaVerNow()` reads the badge so clipboard citations follow. Changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 420 Log — 2026-08-25 05:12
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 420 complete and pushed — `e5d8d80` + `dde689c` (petroleum-fiscal-db), `f63201a56` (office mirror). v521.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (least recent: 419 was T4, 418 T2, 417 T6, 416 T1, 415 T5, 414 T3)
+
+## Friction
+Walked cold into Side-by-Side, which pre-loads Norway / UK / Netherlands. The table closed with a block headed **MC UNCERTAINTY** — "MC P10 (low-case take)", "MC P50 (base take)", "MC P90 (high-case take)".
+
+Those are the same nine numbe
