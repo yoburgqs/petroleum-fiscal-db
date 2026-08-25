@@ -11594,3 +11594,148 @@ v512 → v513 across 4 structural locations (meta description, title, header bad
 
 ## Friction
 I walked T1 from a cold load — fresh browser context, sessionStorage and localStorage cleared — from Home into the Screener. The analyst's next move after landing on 185 unfiltered rows is to narrow, and breakeven is
+
+---
+## Cycle 413 Log — 2026-08-25
+
+- Test before: 136 PASS / 0 FAIL / 1 WARN (local harness)
+- Test after: 136 PASS / 0 FAIL / 1 WARN — suite **ran this cycle** against the local build
+- JS errors: 0
+- JS syntax gate: PASS (9 blocks, 0 errors)
+- Shipped: v514, commit `0fbeafe`, pushed to `main`
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?"
+(412 was T1, 411 T2, 410 T6, 409 T5, 408 T3, 407 T4 — T4 was the least recent.)
+
+## Friction
+Walked T4 from a cold load — fresh browser context, `sessionStorage` and `localStorage`
+cleared — into Country Profile and down the reform path.
+
+Open **Norway**: a full *Fiscal Reform History* sidebar — four sourced events, direction
+tags, take deltas, A/B source badges. Open **Afghanistan**, **Chad**, or any of the other
+163 countries without a sourced reform log: **that section is not there.** Not empty, not
+"no data" — absent. The analyst who just read Norway's timeline finds nothing in its place
+and no statement that coverage is the reason.
+
+Cause, `loadCountryProfile()`, index.html:26336:
+
+```js
+if (reforms.length > 0) {
+  html += dqWarningBanner + `<div class="dd-layout has-sidebar">
+    <div class="dd-main">${_enhancedSections}</div>
+    <div class="dd-sidebar">${reformSection}</div></div>`;
+} else {
+  html += dqWarningBanner + `<div class="dd-layout">${_enhancedSections}</div>`;  // reformSection discarded
+}
+```
+
+Two consequences, the second worse than the first:
+
+1. **89% of country profiles (164 of 185) had no reform section.** Silent removal, not
+   disclosure — the same silent-pass failure family as cycle 412's Screener breakeven bug.
+2. **The empty state written for this case was dead code that had never rendered**
+   (index.html:25044) — and it was wrong on its own terms. It told the analyst:
+   *"Tier A/B countries with no reform record have been actively verified as stable."*
+   **No such verification exists anywhere in the dataset.** `a_pct`/`b_pct` score the
+   sourcing confidence of *fiscal parameters*; nothing in `country_data.json` or
+   `reform_history.json` records whether reform history was ever searched for a country.
+   **162 of the 164** uncovered countries are A/B-majority (`ab_pct >= 50`), so the
+   fabricated assurance would have fired for effectively every one of them — Afghanistan
+   and Belarus among them.
+
+It also **contradicted the platform's own Reform Risk tab** on the identical countries. The
+v502 per-country verdict says, for Afghanistan: *"This is not a score of 100. No events on
+file means no coverage, not a clean record — do not read it as stability."* Two tabs, two
+opposite positions on the same fact, and the wrong one on the more-travelled path.
+
+## Change
+| | before | after |
+|---|---|---|
+| Countries with a Fiscal Reform History section | 21 of 185 | **185 of 185** |
+| Uncovered country shows | nothing | named section, same position, same `<h3>` |
+| What it says about a blank | *"actively verified as stable"* (false) | *"read this as missing coverage, not a clean record"* |
+| Defensible number offered | none | Fiscal Predictability Score + tier badge |
+| Route to the per-country reform verdict | none | button, country pre-selected |
+
+- **Sidebar renders for every country.** `has-sidebar` unconditionally; the `else` branch
+  that dropped `reformSection` is gone. Position and heading are identical whether or not
+  the country has a log, so the section is where the analyst last saw it.
+- **No-coverage state is live and honest.** Computes coverage from `REFORM_HISTORY` at
+  render time ("21 of 185"), states plainly that this is not a Reform Frequency Score of
+  100 and does not support carrying a zero reform-risk premium into an IC memo. The
+  "actively verified as stable" sentence is **deleted**.
+- **Gives the substitute rather than a dead end.** `getFiscalPredictabilityScore()` exists
+  for all 185 countries and is derived from the country's own contract set — take spread
+  between blocks, take movement $50→$125/bbl, mechanic count. Rendered with the standing
+  `renderStabilityBadge()` and one line on what it measures (term consistency) versus what
+  it does not (how often the law changed), plus the note that an uncovered jurisdiction
+  needs an external check — national petroleum law, IMF Article IV, operator annual
+  reports — before it goes in front of an IC.
+- **New `openReformRiskFor()`** wires a *"Check &lt;country&gt; on Reform Risk ›"* button to
+  the Reform Risk tab with the country pre-selected in the v502 lookup. Polls for the
+  option because `_rrPopulateLookup()` only runs once `REFORM_HISTORY` has landed.
+- **New `.dd-sidebar-nocov`** overrides `.dd-sidebar .dd-section { height: 100% }`, which
+  would otherwise stretch the short panel into a 300px-wide bordered card ~4,800px tall.
+
+## Result
+The analyst can now answer T4 for **any** country, not just the 21 with a sourced log — and
+the answer for the other 164 is a true one. They see the section where they expect it, learn
+that the blank is *missing coverage* rather than a clean record, get a stability number they
+can actually defend in the memo, and reach the per-country reform verdict in one click.
+
+The specific harm removed: an analyst screening a frontier jurisdiction would previously have
+found no reform section, inferred no reform exposure, and — had the dead empty state ever
+rendered — been told the country was "actively verified as stable" on the strength of
+evidence tiers that say nothing whatsoever about reform history.
+
+## Verification — cold Playwright walks against the patched local build
+Run via the **real user path** (click the Country Profile tab, let it settle on its Norway
+default, then select from the dropdown), not by calling `loadCountryProfile()` directly.
+
+| Country | reform log | sidebar | `nocov` class | card height | heading |
+|---|---|---|---|---|---|
+| Afghanistan | none | present | true | 483px | Fiscal Reform History |
+| Chad | none | present | true | 483px | Fiscal Reform History |
+| Nigeria | 4 events | present | false | 5,223px | Fiscal Reform History |
+| Norway | 4 events | present | false | 4,762px | Fiscal Reform History |
+| Venezuela | 3 events | present | false | 4,279px | Fiscal Reform History |
+
+Button jump: lands on `treformrisk`, `rr-country-lookup` = "Afghanistan", matching v502
+verdict rendered. **0 JS errors** on every walk. Covered countries' timelines are byte-identical
+to before — this cycle added a state, it did not alter the existing one.
+
+The full suite was also run **against the pre-change backup** to establish that the 1 WARN
+(a 404 fetching the service worker) is the pre-existing local-harness artifact — `sw.js` is
+registered at the GitHub Pages subpath `/petroleum-fiscal-db/sw.js`, which 404s on a
+root-served local server. Both builds: 136 PASS / 0 FAIL / 1 WARN. Not introduced here.
+
+## Known, not fixed — stated rather than hidden
+- **The regional reform context line has the same defect family and was not fixed.**
+  `renderReformTimeline()`'s M5.2 block averages reforms-since-2010 over *every* country in
+  the region, scoring the 164 uncovered ones as 0. Africa: 49 countries, 5 measured, average
+  0.16. The result is that **17 of the 21 covered countries read "above regional average"**,
+  and the verdict word is wrong for five of them when computed against measured peers only —
+  **Norway** reads *above* a "Europe average" of 0.2 with 2 reforms, when the only other
+  measured European jurisdiction, the UK, has 5; Venezuela and Ecuador likewise read *above*
+  when they are below their measured LatAm peers. Fixing it properly means changing the
+  denominator to measured peers *and* disclosing n, since several regions have a peer set of
+  1–2. Separate cycle.
+- **The underlying coverage gap is unchanged.** 21 of 185 countries have a sourced reform
+  log. This cycle stopped the Country Profile from hiding that; it did not close it.
+- **A first `loadCountryProfile()` call issued before the tab has initialised loses to the
+  tab's own Norway default.** Observed while building the harness, pre-existing, unrelated to
+  this change; a real user selecting from the dropdown never hits it. Not chased this cycle.
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional banner,
+no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row.
+The new content is a `dd-section` in the existing sidebar slot, matching the covered layout —
+not a banner and not a wrapper. No new FAQ (still 974). No new tooltip on an existing control.
+No citation re-wording. Tab order unchanged. v430 sessionStorage logic, v449/v451/v452 CP
+headline rules, v489 Reform Risk placement, v507 divider and v513 breakeven semantics all
+untouched.
+
+## Bookkeeping — not the improvement
+v513 → v514 across 4 structural locations (meta description, title, header badge,
+`_orcaVerNow()` fallback). Changelog entry prepended. Grade tables not touched.
