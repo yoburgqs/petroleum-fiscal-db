@@ -11438,3 +11438,146 @@ v511 -> v512 across 4 structural locations (title, meta description, header badg
 
 ## Friction
 I walked T2 from a cold load — fresh browser context, sessionStorage and localStorage cleared — to the Country Profile tab, which auto-loads Norway. Breakeven is one of the four numbers this question tur
+
+---
+## Cycle 412 Log — 2026-08-24 (v513)
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL / 1 WARN (suite RAN this cycle against the local build;
+  the WARN is the pre-existing local-harness artifact — the service worker registers
+  `/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath, which 404s on a root-served
+  local server. Correct in production.)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- JS errors on every cold walk: 0
+
+## Task
+**T1** — "Which countries should even be on my screening list?"
+(411 was T2, 410 T6, 409 T5, 408 T3, 407 T4, 406 T1 — T1 was the least recent.)
+
+## Friction
+Walked T1 from a cold load — fresh browser context, `sessionStorage` and `localStorage`
+cleared — Home → Screener nav button.
+
+The Screener opens unfiltered at 185 countries, correctly split by the v507 divider into
+22 with verified field production and 163 regional proxies. The analyst's next move for T1
+is to narrow. Breakeven is the criterion most central to "is this even worth screening",
+and `Max Breakeven` sits in the always-visible slider row.
+
+Dragging it from its $120 default to $50 — the most aggressive move the control allows,
+cutting the ceiling by 58% — produced:
+
+| | |
+|---|---|
+| `#screener-count` | "**185 countries match** at $75/bbl" |
+| `#screener-result-count` | "**(all 185 countries pass current filters)**" |
+| top 10 rows | byte-identical to the unfiltered list |
+| Breakeven column, rows 1–4 | Canada `—`, USA `—`, Azerbaijan `—`, Mexico `—` |
+
+The cause is one line in `runScreener()`:
+
+```js
+// Bug 2 fix: sentinel -1 and null mean profitable at all prices — always pass breakeven slider
+if (be !== null && be !== undefined && be > 0 && be > maxBE) return false;
+```
+
+A `null` breakeven falls straight through. **A missing measurement was being read as the
+best possible measurement.** The comment's premise is also false against the data: there
+are **zero** `-1` sentinels in `COUNTRY_DATA`. Every one of the 117 non-positive values is
+`null` — no data.
+
+Measured against the live build:
+
+| | count |
+|---|---|
+| `be_75` positive | 68 |
+| `be_75` null | 117 |
+| `be_75` `-1` sentinel | **0** |
+| rows displaying no usable breakeven | **120** (117 null + Bahrain/Kuwait/Saudi at the `<=$1` DCF floor artifact, which `formatBreakeven()` already renders as `—`) |
+
+So 120 of 185 rows were never tested, and the platform **affirmatively told the analyst
+they had passed**. Not "untested" — "all 185 countries pass current filters".
+
+The damage concentrates exactly where the analyst is looking. Of the **22 production-backed
+countries above the v507 divider — the only screenable universe the tool itself recognises —
+19 have no breakeven at all**:
+
+> Angola, Azerbaijan, Brazil, Canada, China, Colombia, Ecuador, India, Indonesia, Iraq,
+> Kazakhstan, Libya, Malaysia, Mexico, Nigeria, Norway, Oman, USA, United Kingdom
+
+Only three carry a value, and one of those is the floor artifact: Argentina $31,
+Australia $28, Saudi Arabia $1. An analyst building a low-cost shortlist would have taken
+Canada, USA, Norway, Iraq and Nigeria into the meeting under a caption saying they had
+cleared a $50/bbl breakeven screen that was never run on them.
+
+This is the same class of defect the IRR filter already solved — `sc-irr-nulls`, "Include
+countries with no displayable IRR", sitting in the same Advanced Filters block. Breakeven
+never got the equivalent treatment.
+
+## Change
+1. **`_beIsTested()` / `_bePassesCeiling()`** — new helpers next to `formatBreakeven()`.
+   *Untested* = `null`, or the `0 < v <= 1` state-monopoly floor artifact. *Tested* = a real
+   value, or the genuine `<= 0` sentinel (kept for safety though it appears nowhere in the data).
+2. **`sc-be-nulls` checkbox** under the Max Breakeven slider — "Keep 120 countries with no
+   breakeven data (marked *not tested*, not passing)". Revealed by `_scUpdateNeutralFlags()`
+   only once a ceiling is set, since it is meaningless at $120. **Checked by default: the
+   default result set is unchanged, but it is now labelled.** Unchecking removes the untested
+   countries and yields a shortlist that was actually measured.
+3. **Count line states the split** — "breakeven ≤$50/bbl: 65 measured and passing, 120
+   carried untested (no breakeven data — not evidence of a low one)".
+4. **Result line stops making the false claim.** It no longer says "all 185 countries pass
+   current filters" while carrying untested rows; it reads "(no country removed — 120 of 185
+   could not be tested on breakeven)".
+5. **Rows carry the caveat.** With a ceiling active, an untested country's Breakeven cell
+   renders **not tested** in accent type instead of a bare `—`.
+6. **Exports gain `Breakeven_Tested`** (CSV and XLSX). The shortlist leaves the tool; a blank
+   cell in an IC attachment must not read as a pass.
+7. **Reset All** restores the toggle; the zero-result diagnostic reflects the new semantics;
+   excluding untested countries counts toward the active-filter badge.
+
+## Result
+The analyst can build a low-cost screening shortlist that is **true**.
+
+| Max Breakeven = $50 | before | after (untested excluded) |
+|---|---|---|
+| countries returned | 185 | 65 |
+| what the page said | "all 185 countries pass current filters" | "65 measured and passing; countries with no breakeven data excluded" |
+| production-backed countries in the result | 22 | **2** — Argentina, Australia |
+| rank 1–4 | Canada, USA, Azerbaijan, Mexico (all untested) | Argentina, Australia (both measured) |
+
+The **Downside Resilience** preset is the clearest beneficiary: its entire premise is
+"BE ≤$50 · low-price viable", and it reported 158 low-price-viable countries. It now reports
+that 64 of those 158 were actually measured.
+
+## Verification — cold Playwright walks against the patched local build
+| State | Expectation | Result |
+|---|---|---|
+| A. cold default, no ceiling | toggle hidden, result set identical to pre-patch | 185 rows, toggle `display:none`, count line unchanged |
+| B. $50 ceiling, keep untested | same 185 rows, now disclosed and labelled | 185 rows, "120 carried untested", 4 of top 6 read *not tested* |
+| C. $50 ceiling, untested excluded | measured-only shortlist | 65 rows; production-backed group collapses 22 → 2 |
+| D. Reset All | full restore | back to state A, toggle re-checked and hidden |
+| 6 breakeven-touching presets | unchanged result sets, now disclosed | sweetspot 142, downside 158, lowrisk 140, deepwater 11, iochurdle 105, highirr 118 — all as before |
+
+0 JS errors on every walk. Full suite ran: **136 PASS / 0 FAIL**.
+
+## Known, not fixed this cycle — stated rather than hidden
+- **The underlying coverage gap is unchanged.** 117 countries still have no modelled
+  breakeven, including Norway and the UK, whose real values ($29 and $20) cycle 411
+  established are available from the published API country files. This cycle stopped the
+  Screener from *lying* about that gap; it did not close it. Routing the Screener through the
+  API, or backfilling `country_data.json`, is a separate job with its own verification pass.
+- **Saudi Arabia's `be_75 = 1`** remains in the data as a DCF floor artifact. It is now
+  classified as untested rather than as a $1/bbl breakeven, which is the correct read for
+  filtering, but the underlying value is still wrong in the database.
+- **Fiscal Compare and the Breakeven Map** read `COUNTRY_DATA.be_75` directly and were not
+  touched. Whether they carry the same silent-pass defect was not walked this cycle.
+
+## Locked list
+Nothing on STILL LOCKED was touched. No page-sub paragraph, no amber instructional banner,
+no routing hint, no "How to read" block, no card wrapper. Advanced Filters stays collapsed —
+the new control sits in the always-visible slider group, next to the slider whose behaviour
+it governs, and stays hidden until that slider is actually moved. No new FAQ. No new tooltip
+on an existing control. No citation re-wording. Tab order unchanged. v507 divider, v449/v451/
+v452 CP headline rules, v430 sessionStorage logic and v489 Reform Risk placement all untouched.
+
+## Bookkeeping — not the improvement
+v512 → v513 across 4 structural locations (meta description, title, header badge,
+`_orcaVerNow()` fallback). Changelog entry prepended. Grade tables not touched.
