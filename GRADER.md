@@ -13834,3 +13834,50 @@ v528 and v529 all untouched.
 **Friction.** Walked cold in a fresh browser context — no sessionStorage, no localStorage — from Home into the Screener. Its first control, and the analyst's first move on this question, is the `Load a screen…` preset menu. Two things were wrong at that one moment.
 
 The preset labelled **"■ Atlantic Frontier — Guyana ·
+
+---
+## Cycle 430 Log — 2026-08-25 19:45
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (suite RAN this cycle against the local build; the WARN is the known local-harness sw.js 404)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- JS errors on every cold walk: 0
+
+## Cycle 430 — T3, v531
+
+**Task** — T3, *"How do these three countries compare side by side?"* (429 was T1, 428 T5, 427 T2, 426 T6, 425 T4.)
+
+**Friction.** Walked cold in a fresh browser context — no `sessionStorage`, no `localStorage` — from Home into Side-by-Side. The tab seeds the North Sea Trio and labels it an example; the analyst's real move is the first quickstart preset, **Atlantic Frontier Quartet**.
+
+The grid it returns says, in the **Govt Take** block, **Brazil 55.6%** against **Guyana 54.1%**. Eight rows lower, in the **Economics** block, it says **Brazil $1.7B contractor NPV** against **Guyana $1.1B**. Brazil takes more of the barrel and leaves the contractor **62% more value**, at the same price. It inverts against Angola on the same set (53.0% take, $1.1B NPV). Directly above both blocks sits the *Profile basis* strip: *"Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 25yr life · 10% WACC · 100% WI — Same basis as Fiscal Compare, values are directly comparable."*
+
+So the tab hands the analyst two contradictory rankings of the same three countries and asserts that they are comparable. The analyst either does not notice, and pastes the wrong ordering into an IC memo, or notices and cannot tell which number is broken.
+
+**Cause — read out of the pipeline, not inferred from the changelog.** `tools/petroleum/rebuild_country_data.py`:
+
+| field | how it is built |
+|---|---|
+| `take_50/75/100/125` | `weighted_take()` — **production-weighted** per country, blended where coverage is partial |
+| `npv_50/75/100/125`, `be_75` | `AVG(contractor_npv_usd_mm)` over every row in `dcf_results` — an **unweighted mean** |
+
+The script's own Step 4 header calls the NPV aggregate *"for display only, not weighting."* The two blocks are averaged over the same contracts with different weights and therefore describe different contract mixes.
+
+Measured symptom, computed over all 185 countries: the pre-take project value the two rows jointly imply, `npv_75 / (1 − take_75/100)`, runs from **$1,306M (Russia) to $9,569M (Turkmenistan)** — a **7.3× spread on a profile that is identical for every column**. They are not two views of one cash flow. **631 of the 5,744 country pairs within 10pp of take — 11.0% — invert on NPV**, and one of the four shipped quickstart presets is such a pair.
+
+The only row anywhere near this was *Weighting Method*, which sat **inside the Govt Take block** and described the take rows only. Nothing on the page said the NPV rows used a different method.
+
+**Change.**
+
+1. **The Economics block now declares its own basis.** A new **`NPV weighting`** row leads it, reading `Equal-weighted · all 1,193` and flagging **`(≠ take basis)`** in orange on every column whose take is production-weighted or blended — 3 of the 4 columns on the Atlantic Frontier set, 2 of 3 on the cold seed. The old row is renamed **`Take weighting`** and its tooltip now states that it governs the four Govt Take rows and nothing else. Both ride the shared `rows` array, so they travel into `#cmp-data-table` and both clipboard flavours with the numbers they qualify (export table now 21 rows).
+
+2. **The contradiction is detected and named when it actually occurs.** A computed block under the grid scans the loaded columns for any country showing **both** a higher take **and** a higher contractor NPV than another, and states the pair in full: *"Brazil takes more of the barrel than Guyana (55.6% vs 54.1%) and still shows more contractor NPV ($1.7B vs $1.1B)."* It then gives the aggregation reason, the $1.3B–$9.6B implied-value spread, and the instruction — rank on Govt Take, read NPV as the contract-set average, do not present the NPV ordering as the fiscal ranking in an IC memo. **Nothing renders when the two orderings agree**, so it is a finding, not a standing caveat.
+
+**Result.** The analyst comparing three countries can now tell which of the two rankings is defensible, and why the other one differs, at the moment the grid shows both. Before, the two orderings sat eight rows apart with a strip between them promising they were comparable. The cold seed stays silent — Netherlands leads on take *and* NPV, so it does not invert — while the tab's own flagship preset now says out loud that it does.
+
+**Verified cold in Playwright**, storage cleared, across six sets: cold seed Norway/UK/Netherlands (**no** banner, correctly); Atlantic Frontier Quartet and Guyana/Brazil/Angola (fires, two pairs each); Norway/Nigeria (clean); Saudi Arabia state-monopoly column; full 5-country set. `NPV weighting` present in all six and in the export table. 0 JS errors on every walk.
+
+**Known, not fixed — stated rather than hidden.** This reports the divergence; it does not remove it. Making the two blocks agree means production-weighting the NPV aggregate in `rebuild_country_data.py`, which is a data-pipeline change and a business-logic call, not a UI cycle. Separately noted from the same walk and not acted on: the `Global Rank (take @$75)` row does not say which direction ranks first, and the Home glossary still describes an IRR the platform stopped reporting at v515.
+
+**Bookkeeping — not the improvement.** v530 → v531 in the two structural literals (page title line 42, header badge line 1353). Changelog entry prepended.
+
+**STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. **No new FAQ** (still 974). **No new tooltip on a pre-existing control.** Tab order unchanged. v430, v449, v451, v452, v489, v505, v515–v525, v528, v529 and v530 all untouched.
