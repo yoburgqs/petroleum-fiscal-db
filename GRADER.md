@@ -13881,3 +13881,18 @@ The only row anywhere near this was *Weighting Method*, which sat **inside the G
 **Bookkeeping — not the improvement.** v530 → v531 in the two structural literals (page title line 42, header badge line 1353). Changelog entry prepended.
 
 **STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. **No new FAQ** (still 974). **No new tooltip on a pre-existing control.** Tab order unchanged. v430, v449, v451, v452, v489, v505, v515–v525, v528, v529 and v530 all untouched.
+
+---
+## Cycle 430 Log — 2026-08-25 14:57
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 430 complete. Both repos pushed.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (429 was T1, 428 T5, 427 T2, 426 T6, 425 T4.)
+
+## Friction
+Walked cold — fresh browser context, no sessionStorage or localStorage — from Home into Side-by-Side and clicked the tab's first quickstart preset, **Atlantic Frontier Quartet**.
+
+The grid says, in the **Govt Take** block: Brazil **55.6%**, Guyana **54.1%**. Eight rows lower, in the **Economics** block: Brazil **$1.7B** contracto
