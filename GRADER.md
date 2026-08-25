@@ -13361,3 +13361,16 @@ rows and v522 CP contract-spread badge all untouched.
 v525 → v526 in the two structural literals (page title line 42, header badge line
 1353); `_orcaVerNow()` reads the badge so clipboard citations follow. Changelog
 entry prepended. Grade tables not touched.
+
+---
+## Cycle 425 Log — 2026-08-25 10:04
+- Test before: 135 PASS / 1 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** AWL (loop cycle 425) | **Task:** Cycle complete — v526 pushed
+
+## Cycle 425 — T4
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?"
+
+**Friction.** Cold walk into Reform Risk, using the per-country lookup — the only control on that tab that answers the single-country question. The verdict card's **IC action** line (`renderReformCountryVerdict()`, index.html ~28084) was a pure function of the score band: ≤20 → 5–8pp WACC premium, ≤40 → 3–5pp,
