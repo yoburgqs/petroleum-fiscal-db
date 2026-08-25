@@ -14179,3 +14179,16 @@ v449, v451 (CP headline stays two-zone; Govt NPV stays removed from FC), **v452*
 (Zone A keeps the global rank and the vs-median pill, still computed before the
 headline strip — the denominator changed, the elements and the TDZ-safe ordering
 did not), v489, v505, v515–v527 and v533 all untouched.
+
+---
+## Cycle 433 Log — 2026-08-25 17:34
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Both repos pushed.
+
+## Cycle 433 — T2, v534
+
+**Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* (432 was T6, 431 T4, 430 T3, 429 T1, 428 T5 — T2 was least-recently-used.)
+
+**Friction.** Walked Country Profile cold; it auto-loads Norway. The three comparative claims on the page all read `COUNTRY_DATA` unfiltered. Only **22 of 185** records are production-weighted — the other **163** are equal-weighted averages with zero production coverage ove
