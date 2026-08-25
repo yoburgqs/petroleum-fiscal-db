@@ -13217,3 +13217,16 @@ follows.
 v524 → v525 in the two structural literals (page title, header badge);
 `_orcaVerNow()` reads the badge, so clipboard citations follow. Changelog entry
 prepended. Grade tables not touched.
+
+---
+## Cycle 424 Log — 2026-08-25 09:00
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle 424 complete.
+
+## Cycle 424 — T3
+
+**Task:** T3 — "How do these three countries compare side by side?"
+
+**Friction.** Walked cold from Side-by-Side into Fiscal Compare, the tab SbS links to as "▦ Rank all 185 countries". Side-by-Side prints a paragraph saying IRR is *deliberately excluded* because ORCA's IRR is not a project return. Two clicks away, Fiscal Compare had a sortable `IRR% @$75` column, an "IRR only" checkbox, and a dashed amber line reading *"IOC Hurdle Rate:
