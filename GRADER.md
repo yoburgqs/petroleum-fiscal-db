@@ -14345,3 +14345,18 @@ read" block, no SbS card wrapper, no visible Explorer chip row. Screener advance
 filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
 **No new tooltip** on any pre-existing control. Tab order unchanged. v371/v373,
 v423, v430, v449, v451, v452, v489, v505, v515–v527, v533 and v534 all untouched.
+
+---
+## Cycle 434 Log — 2026-08-25 18:34
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle complete.
+
+## Cycle 434 — T5, v535
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* (LRU; 433 was T2.)
+
+**Friction.** I walked cold with storage cleared and exercised every export the platform offers, reading the clipboard and the print output back rather than trusting labels. Every clipboard path was fine. The **print path handed the analyst the wrong document.**
+
+The `@media print` block ended with two unconditional rules — `.tab-pane { displ
