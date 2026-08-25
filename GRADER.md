@@ -11895,3 +11895,18 @@ reform sidebar all untouched.
 ## Bookkeeping — not the improvement
 v514 → v515 across 4 structural locations (meta description, title, header badge,
 `_orcaVerNow()` fallback). Changelog entry prepended. Grade tables not touched.
+
+---
+## Cycle 414 Log — 2026-08-24 23:13
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 414 complete and pushed (v515, commits `f103984` / `1ca01e1`; office mirror `2b3557bad`).
+
+## Task
+**T3** — "How do these three countries compare side by side?" (least recent; 413 was T4)
+
+## Friction
+Walked Side-by-Side cold — fresh browser context, storage cleared. The **Economics** block ended with a row headed `IRR @$75 (%)*`. On the default set it read **Norway 105.0% · UK 93.9% · Netherlands 489.6%**.
+
+It is not a rate of return. `rebuild_country_data.py:135` computes it as `AVG(irr_
