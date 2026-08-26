@@ -16022,3 +16022,16 @@ advanced filters still collapsed, presets still a dropdown. Tab order unchanged.
 v371/v373, v430, v449, v451, v452, v489, v505 G badge, v525, v529, v533, v534,
 v542, v545 and v546 all untouched. Version sweep done silently at the end across
 5 structural locations and is **not** claimed as the improvement.
+
+---
+## Cycle 446 Log — 2026-08-26 06:16
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 446 complete — v547 shipped and pushed (`288d9f2`), GRADER log appended (`94b5220`), mirror committed to office (`2f8eee6db`).
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (rotation: 440 T5, 441 T3, 442 T1, 443 T4, 444 T6, 445 T2 — T5 was least-recently-used)
+
+## Friction
+Cold walk with storage cleared, Home → **Fiscal Compare** — the tab Home labels "Start here" and the only surface that produces a *shortlist* rather than one country. Two halves of one momen
