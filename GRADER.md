@@ -14532,3 +14532,149 @@ Version v535→v536.
 **Task:** T3 — *"How do these three countries compare side by side?"* (434 was T5, 433 was T2.)
 
 **Friction.** Cold walk into Side-by-Side, which seeds Norway / UK / Netherlands. The Data Basis block at the head of the grid is the only row that gives a *verdict* rather than a figure, and it read **Norway 76 · HIGH / UK 58 · LOW / Netherlands 84 · HIGH**. Th
+
+---
+## Cycle 436 Log — 2026-08-25 20:26
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (suite RAN this cycle, post-edit build)
+- JS errors: 0 (the 1 console error is the known sw.js-404 local-harness artifact)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Version: v536 → v537
+
+## Cycle 436 — T1, v537
+
+**Task:** T1 — *"Which countries should even be on my screening list?"*
+(LRU: 429 was T1, 430 T3, 431 T4, 432 T6, 433 T2, 434 T5, 435 T3.)
+
+**Friction.** Cold walk (fresh browser context, `sessionStorage` and
+`localStorage` cleared) from Home into the Screener, then into **Advanced
+Filters**, where the only cost-based screen lives. The **Breakeven Category**
+radio group (`index.html:2138`, `#be-sub50` / `#be-50-75` / `#be-75-100`)
+offered *All / Sub-$50 / $50–$75 / $75–$100*, and **none of its three real
+options worked**.
+
+Clicking **Sub-$50** — the most natural single move in a cost screen — returned
+**185 of 185 countries**, a row set byte-identical to the unfiltered list, under
+a count line reading *"185 countries match at $75/bbl"* and a result line
+reading *"(all 185 countries pass current filters)"*. The top rows were Canada,
+USA, Azerbaijan, Mexico, Argentina, Colombia, China, Australia, Ecuador,
+Brazil — and **ten of those twelve show `—` in the Breakeven column.**
+
+Cause, in `runScreener()`:
+
+```js
+const beVal = (be !== null && be !== undefined && be > 0) ? be : 0;
+if (beCat === 'sub50' && beVal >= 50) return false;
+```
+
+A **NULL breakeven was coerced to 0 and therefore scored as the best possible
+breakeven in the database.** 117 of 185 countries are null (3 more sit at the
+DCF floor artifact). So ORCA affirmatively told the analyst that **Canada, USA,
+Norway, Iraq, Nigeria and Saudi Arabia all break even below $50/bbl** — a claim
+it holds no data for on any of them. This is the identical defect **v513** fixed
+on the *Max Breakeven* slider, left live on the sibling control that screens the
+same axis four inches away.
+
+The two upper bands failed in the opposite direction: **$50–$75 returned 0
+countries and $75–$100 returned 0 countries, and always will** — all 65 measured
+breakevens in the database fall between **$27 and $34/bbl** (min 27, max 34), so
+nothing can ever land in either band. The empty table read as *"ORCA has no
+mid-cost countries"* rather than *"ORCA has no breakeven above $34"*.
+
+Net: four options, of which one was "All", one silently returned All while
+asserting a cost claim, and two were structurally empty forever. **The control
+could not narrow the list by a single country in any configuration.**
+
+**Change.**
+
+1. **The four cost bands are deleted.** The block is now **Breakeven Coverage** —
+   *All (185)* / *Measured breakeven only (65)*. Both option labels carry their
+   own live size, read off `COUNTRY_DATA` at every render rather than written
+   into the HTML, because the captions they replace described bands the dataset
+   has never contained and nothing on screen could contradict them.
+2. **The filter branch is one line** — `if (beCat === 'measured' &&
+   !_beIsTested(be)) return false;` — sharing `_beIsTested()` with the v513
+   slider, the row cell and the `Breakeven_Tested` export column, so the four
+   surfaces cannot drift on what "measured" means.
+3. **The block states the observed range in place:** *"ORCA models a breakeven
+   for 65 of 185 countries, every one between $27 and $34/bbl. The other 120 are
+   blank — not low. Cost bands are not a screen this data supports."*
+4. **The count line says what was removed and why** — *"65 with a modelled
+   breakeven; 120 countries removed for having none (absence of data, not a
+   failed test)"* — so a drop from 185 to 65 is not read as 120 countries
+   failing a cost hurdle. Zero-result diagnostic gained the matching hint.
+5. **Second live defect fixed on the same walk:** the footnote under
+   `#tbl-screener` was the table's *only* legend and it described the **IRR
+   column, which v517 deleted from this table 20 versions ago**. It also defined
+   `—` as *"insufficient cost data for IRR computation"* — while the only `—`
+   now rendered is in the Breakeven column, meaning something else, on 10 of the
+   12 rows above the fold. The legend now describes the columns actually on
+   screen and names both routes to a measured-only list.
+
+**Result.** The analyst can build a cost-screened shortlist that is true.
+*Measured breakeven only* takes 185 → **65**; stacked with the v517 data-basis
+filter it gives the **2 countries — Argentina and Australia — that have both
+verified field production and a modelled breakeven**, which is the honest answer
+to a cost screen on this database. Previously every cost screen this control
+could express returned either all 185 countries or none, and the one that
+returned 185 attached a false cost claim to every row.
+
+### Verification
+
+Cold Playwright against the local build, `sessionStorage`/`localStorage` cleared:
+
+```
+COLD / All            185 rows · labels "All (185)" / "Measured breakeven only (65)"
+                      range note: 65 of 185, every one between $27 and $34/bbl
+MEASURED ONLY          65 rows · "(120 filtered out of 185)" · 1 filter active
+                      count line carries the absence-of-data disclosure
+MEASURED + VERIFIED     2 rows · Argentina, Australia · 2 filters active
+RESET ALL             185 rows · be-all re-checked · sc-proxy-keep re-checked
+presets  iochurdle 14 · sweetspot 142 · pscafrica 31 · deepwater 11 · lowrisk 140
+         downsidereturns 153 · highevidence 35 · rfactor 70 · atlanticfrontier 6
+         frontiermarkets 168 · downsideresilience 158   (all at prior counts)
+```
+
+All eleven presets re-run at their prior counts, confirming no preset was
+perturbed. **0 JS errors on every walk.** JS syntax gate **PASS** (9 blocks / 0
+errors).
+
+`runtime_comprehensive.js` **ran this cycle** against the post-edit local build,
+not carried forward from a prior baseline:
+
+```
+PASS: 135   FAIL: 0   WARN: 1   console errors: 1
+FAILURES: none
+CONSOLE ERRORS: A bad HTTP response code (404) was received when fetching the script.
+```
+
+The single WARN and console error are the same pre-existing local-harness
+artifact recorded at v508, v520, v526, v534 and v536: `index.html:49` registers
+the service worker at `/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath.
+Confirmed directly this cycle — `curl http://localhost:8899/sw.js` returns
+**200**, `curl http://localhost:8899/petroleum-fiscal-db/sw.js` returns **404**.
+Unrelated to this change; does not occur on the deployed site.
+
+### Found on the same walk — NOT fixed, stated rather than hidden
+
+- `formatBreakeven()` renders every value under $50 as `<$50`. All 65 measured
+  breakevens span **$27–$34**, so the entire measured set collapses to one
+  indistinguishable string and the Breakeven column **cannot rank the countries
+  it does have data for**. Argentina ($31) and Australia ($28) are the shortlist
+  this cycle produces and they read identically. That is a display decision on
+  the same column and belongs to its own cycle.
+- The whole cost axis rests on 65 of 185 countries, none above $34/bbl on the
+  standardized Deepwater profile. Whether a $27–$34 band across 65 jurisdictions
+  is a plausible modelling output at all is a petroleum-economics question, not
+  a UX one, and is not decided here.
+
+### STILL LOCKED — nothing touched
+
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How
+to read" block, no SbS card wrapper, no visible Explorer chip row. Screener
+advanced filters still collapsed, presets still a dropdown. **No new FAQ** (still
+974). **No new tooltip on any control whose behaviour did not change** — the two
+tooltips added sit on the two replacement radio options, which did not
+previously exist. Tab order unchanged. v371/v373, v423, v430, v449, v451, v452,
+v489, v505, v513, v515–v527, v533, v534, v535 and v536 all untouched.
+Version v536→v537.
