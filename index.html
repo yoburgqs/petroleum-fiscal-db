@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v539.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v540.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v539</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v540</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1361,7 +1361,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v539</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v540</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v539</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v540</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2598,6 +2598,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- Recent Platform Updates / Changelog -->
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
+    <strong style="color:var(--accent);">v540 (Aug 2026) &mdash; Cycle 439 (T2): the 4-Price Sensitivity footer told an analyst the UK was &ldquo;+26.4pp above the Europe average&rdquo; when it is 18.8pp BELOW the only other European producer</strong> &mdash; Task <strong>T2</strong> &mdash; &ldquo;is this one country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold (fresh context, <code>sessionStorage</code> and <code>localStorage</code> cleared) into <em>Country Profile</em>, down to the <strong>4-Price Sensitivity</strong> table &mdash; the table the page itself labels for IC use and puts a <code>Copy as IC table</code> button under. <strong>Friction:</strong> the last row of that table, <code>regionAvgRow465</code>, was the one surface on Country Profile still averaging <code>COUNTRY_DATA</code> unfiltered. Cycle 433/v534 moved the headline rank, the vs-median pill and the peer strip onto the 21 production-weighted producers; this footer kept the old 185-record basis and therefore <em>contradicted the strip three inches above it</em>. Norway read <em>&ldquo;Region Avg 22.1% &middot; +45.9pp vs Europe avg &middot; Europe &middot; n=29&rdquo;</em> while the strip read <em>&ldquo;Only producer peer in Europe: United Kingdom 49.2%&rdquo;</em> &mdash; the 29 include Moldova, Belarus, Bosnia, Malta and Belgium, none of which produce. The dilution reversed the <strong>sign</strong> of the claim for <strong>6 of the 21 producers</strong>: <strong>United Kingdom</strong> +26.4pp &ldquo;above Europe avg&rdquo; &rarr; <strong>&minus;18.8pp below Norway</strong>, its only peer; <strong>Angola</strong> +8.9pp &ldquo;above Africa avg&rdquo; &rarr; <strong>&minus;18.1 vs Libya / &minus;28.1 vs Nigeria</strong>; <strong>Oman</strong> +16.9 &rarr; &minus;7.2 vs Iraq; <strong>Azerbaijan</strong> +15.9 &rarr; &minus;9.1 vs Kazakhstan; <strong>Malaysia</strong> +14.4 &rarr; &minus;1.6; <strong>Indonesia</strong> +14.5 &rarr; &minus;1.5. <strong>Australia</strong> claimed <em>&ldquo;+17.8pp vs Oceania avg (n=14)&rdquo;</em> against a region holding <strong>zero</strong> other production-weighted regimes (Fiji, Nauru, Palau, Kiribati). An analyst screening Angola would read it as a high-take African jurisdiction when against the two African producers it is materially cheaper &mdash; a reversed screening conclusion, not a rounding difference. <strong>Changed:</strong> the row now reads off the <em>same</em> <code>getProducerContext()</code> call as the pill and the strip, on the same three branches v534 established &mdash; <strong>&ge;3 peers</strong>: <em>&ldquo;Region Median 32.9% &middot; +22.8pp vs Latin America producer median &middot; n=4 producers&rdquo;</em>; <strong>1&ndash;2 peers</strong>: it NAMES them rather than pretending a median exists &mdash; <em>&ldquo;+18.8pp vs United Kingdom (49.2%)&rdquo;</em>, <em>&ldquo;&minus;18.1pp vs Libya (71.1%) &middot; &minus;28.1pp vs Nigeria (81.1%)&rdquo;</em>; <strong>0 peers</strong>: <em>&ldquo;No other production-weighted producer in Oceania &mdash; no regional benchmark&rdquo;</em>. Countries outside the producer set keep the all-country figure but the basis is now stated on the row itself &mdash; <em>&ldquo;Region Avg (all) &middot; Europe &middot; n=29, 2 producers&rdquo;</em> &mdash; rather than left for the analyst to assume. <strong>No threshold is invented</strong>: the producer set is the existing <code>weighting</code> field, unchanged since v534. <strong>Verified cold in Playwright</strong> against the local build, storage cleared: all four branches exercised, all 21 producers walked, every reciprocal pair reconciled (Norway +18.8 vs UK &harr; UK &minus;18.8 vs Norway; the Angola/Libya/Nigeria triangle closes at &plusmn;18.1 / &plusmn;10.0 / &plusmn;28.1), and the footer no longer contradicts the peer strip for any country. <strong>0 page errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness service-worker 404 (<code>/petroleum-fiscal-db/sw.js</code> 404s on a root-served local server). <em>Known, not fixed &mdash; stated rather than hidden:</em> <code>Copy as IC table</code> does not carry this row into the clipboard, so the pasted TSV was never wrong &mdash; the defect was on screen, where the analyst transcribes from. Explorer, Screener, Fiscal Compare and the Breakeven Map still rank on the all-185 basis; that is a T1/T3 surface and its own cycle. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); <strong>no new tooltip on any pre-existing control</strong> (the row&rsquo;s own existing <code>title</code> was rewritten to match the new basis). Tab order unchanged. v371/v373, v430, v449, v451, v452, v489, v534, v538 and v539 all untouched. Version v539&rarr;v540.<br><br>
     <strong style="color:var(--accent);">v539 (Aug 2026) &mdash; Cycle 438 (T4): Reform Risk told an analyst that Russia &mdash; a +15pp windfall tax in 2022 &mdash; carried &ldquo;no reform-frequency premium indicated&rdquo;, while flagging the USA for a +3pp change in 2007</strong> &mdash; Task <strong>T4</strong> &mdash; &ldquo;what is my fiscal-stability and reform exposure here?&rdquo; Walked cold (fresh context, <code>sessionStorage</code> and <code>localStorage</code> cleared) into <strong>Reform Risk</strong> and used the per-country lookup, which the tab&rsquo;s own intro strip routes the analyst to. <strong>Friction:</strong> <code>renderReformCountryVerdict()</code> classified a country three ways &mdash; <em>Actively Reforming</em> (<code>since2010 &gt;= 3</code>), <em>window artefact</em> (<code>lastRise.year &lt; 2010</code>), else green <em>no premium indicated</em>. Nothing tested for the symmetric case: a take rise <em>inside</em> the window that did not also trip the frequency bar of 3. Four of the 21 scoreable jurisdictions fall there, and all four returned the green card: <strong>Russia</strong> (2022 windfall tax on oil export revenues, <strong>+15pp</strong>, score 85/100), <strong>Norway</strong> (2022 COVID relief expiry, <strong>+12pp</strong>, score 70), <strong>Indonesia</strong> (2017 Gross Split PSC, <strong>+9pp</strong>, score 70) and <strong>Ecuador</strong> (2010 PSC&rarr;RSC conversion, +5pp, score 85). Meanwhile the <strong>USA</strong> returned an orange caution &mdash; &ldquo;do not carry a zero reform premium on this basis&rdquo; &mdash; for a <strong>+3pp</strong> deepwater royalty change in <strong>2007</strong>. The tab cautioned on a 19-year-old +3pp change and stayed silent on a 4-year-old +15pp one. The root cause is that the score is a <em>count</em> (<code>100 &minus; 15 &times; changes since 2010</code>) and is blind to magnitude, and no surface said so. The <em>Quiet Since 2010</em> card carried the same defect by construction &mdash; its filter comment read &ldquo;genuinely quiet (no hostile on record, <em>or the last one is inside the window</em>)&rdquo; &mdash; so Russia sat at the top of a green-bordered card whose own row printed <em>last take rise 2022 &middot; Windfall tax on oil export revenues +15pp</em>. The evidence contradicting the classification was inside the row. <strong>Changed:</strong> (1) a fourth verdict, <strong>&ldquo;IC action &mdash; take was raised inside the scoring window&rdquo;</strong>, renders orange, names the year / event / magnitude, states that the score moves the same 15 points for a +15pp rupture as for a 1pp tweak, and directs the analyst to size the premium against the cumulative pp taken since 2010 rather than the count. Where pre-2010 rises also exist it names those separately (Ecuador: +5pp in-window, <em>plus</em> +50pp before 2010 that the window never scores). The headline score and card accent follow the verdict, so an 85 with a +15pp rise behind it no longer renders in the same green as a real 85. (2) The <em>Quiet Since 2010</em> card splits into three labelled groups instead of two &mdash; <strong>1</strong> with no take-raising change on record (India), <strong>2</strong> under a new amber divider reading &ldquo;Take was raised inside the window&hellip; read the event, not the score&rdquo; (Russia, Ecuador), and the pre-existing <strong>6</strong> below the red Below-the-line divider. 1 + 2 + 6 = 9, the card&rsquo;s own count. (3) <code>_rrLastHostile()</code> now splits its cumulative total into in-window and pre-window components; the lifetime figure alone had Ecuador&rsquo;s row reading &ldquo;3 rises, +55pp cumulative&rdquo; under an in-window heading when only +5pp of it falls inside. <strong>No new threshold was introduced</strong> &mdash; the test is the tab&rsquo;s own Below-the-line year test read the other way. <strong>Verified cold in Playwright</strong> against the local build: all five verdict branches exercised (Russia / Norway / Indonesia / Ecuador orange in-window; USA window artefact; United Kingdom actively reforming; Nigeria and India green; Paraguay uncovered), quiet-card groups 1/2/6, and every printed magnitude reconciled against <code>reform_history.json</code>. <strong>0 page errors.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). STILL LOCKED &mdash; nothing touched: no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); <strong>no new tooltip</strong>. Tab order unchanged. v430, v449, v451, v452, v489, v532 and v538 untouched. Version v538&rarr;v539.<br><br>
                         <div style="font-size:13px;line-height:1.7;">
                         <strong style="color:var(--accent);">v538 (Aug 2026) &mdash; Cycle 437 (T6): the Country Profile carried two adjacent parameter tables that disagreed, and the one titled &ldquo;Evidence Chain&rdquo; was the wrong one</strong> &mdash; Task <strong>T6</strong> &mdash; &ldquo;where did this number come from and how solid is the evidence?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) into Country Profile and opened the section named for the question. <strong>Friction:</strong> <code>loadCountryProfile()</code> rendered <code>${factsSection}</code> and <code>&lt;div id="dd-fiscal-params-${safe}"&gt;</code> <em>back to back</em>. The first is the v500 table &mdash; <em>Parameter | ORCA Value | Statutory (cited source) | Source</em>. The second, <code>buildFiscalParamTable()</code>, was a collapsed section headed <em>&ldquo;Fiscal Parameters &amp; Evidence Chain &middot; N parameters sourced&rdquo;</em> with columns <em>PARAMETER | VALUE | TIER | SOURCE</em>. Its VALUE column was <code>fiscal_facts_sourced[k].value</code> &mdash; the rate the statute states &mdash; while the table four lines above showed <code>fiscal_facts[k]</code>, the contract-weighted rate the DCF engine actually uses. On <strong>63 rows across 40 countries</strong> those two numbers differ. Angola on screen: <em>Key Fiscal Parameters</em> gave Royalty Rate <strong>2.58%</strong> with the statutory 20% beside it and a <span style="color:var(--orange);">&#9888;</span> divergence flag; four lines lower, <em>Evidence Chain</em> gave Royalty Rate <strong>20.0%</strong>, tier <strong>A</strong>, Lei 10/2004 link, no ORCA value, no flag, no note. Indonesia showed State Participation <strong>4%</strong> in one table and <strong>45.0% &middot; A</strong> in the other &mdash; a 41-point gap, with the tier-A badge on the number ORCA does not model. The second table also dropped <code>levy_profit_oil_rate</code> for <strong>76 countries</strong>: on Angola, Indonesia, Nigeria, Egypt, Azerbaijan and every other major PSC jurisdiction, the parameter that drives most of government take was simply absent from the section called &ldquo;Evidence Chain&rdquo; &mdash; not marked unsourced, absent &mdash; because it iterated <code>fiscal_facts_sourced</code>, which holds only <strong>7 distinct keys across all 185 API files</strong> and no profit-oil key at all. Its legend read <em>&ldquo;B = operator filing or verified guide&rdquo;</em>, the identical claim <strong>v527</strong> removed from Home, where none of the 142,798 tier-B facts on record is an operator filing. <strong>Change: the &ldquo;Fiscal Parameters &amp; Evidence Chain&rdquo; section and <code>buildFiscalParamTable()</code> are DELETED.</strong> Removing it is the improvement &mdash; everything it showed correctly (parameter, statutory value, tier letter, source link) the table immediately above already shows, labelled, beside the ORCA value, with divergence flagged and a reconciliation note. The one thing it held alone &mdash; a separately sourced <code>cost_recovery_cap_pct</code> for <strong>Azerbaijan, Guyana and Malaysia</strong> &mdash; is now its own row, <em>&ldquo;Cost Recovery Ceiling (contractual cap)&rdquo;</em>, in the surviving table; Malaysia&rsquo;s ceiling (65.1% modelled vs 60% sourced) now carries a divergence flag the deleted table never showed. The surviving section is renamed <em>&ldquo;Key Fiscal Parameters &mdash; Evidence Chain&rdquo;</em> so the deleted section&rsquo;s name still finds the surface that answers T6, and its tier-B tooltip now reads <em>&ldquo;country-level secondary guide (EY / KPMG / IHS bulk harvest) &mdash; assigned to the whole country, never read off an individual contract; it is NOT an operator filing&rdquo;</em>, matching v518/v527. The same stale &ldquo;operator filing&rdquo; string in the Evidence Quality panel&rsquo;s stacked-bar segment title is corrected with it. <strong>Result.</strong> There is now one per-parameter evidence surface per country instead of two that contradict each other, and it is the one that separates what ORCA models from what the source states. An analyst asking where Angola&rsquo;s 2.58% royalty came from reads 2.58% modelled, 20% statutory, source linked, gap flagged &mdash; instead of finding a second table asserting 20.0% is the value. <strong>Verified cold in Playwright</strong> against the local build with storage cleared, across Angola, Indonesia, Azerbaijan, Norway, Guyana, Malaysia and Paraguay (the one country with no sourced facts): the duplicate container is gone from every profile, exactly one <code>h3</code> matching &ldquo;Evidence Chain&rdquo; remains, all three ceiling countries render the previously-lost tier-A row, and the reconciliation counts re-derive correctly (Azerbaijan 1 of 6, Malaysia 1 of 5, Guyana all 5 match, Norway all 3 match). <strong>0 page errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the post-edit local build: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness <code>sw.js</code> 404 recorded at v508, v520, v526, v534, v536 and v537, unchanged from the pre-edit baseline. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown. <strong>No new FAQ</strong> (still 974). <strong>No new tooltip on any control whose behaviour did not change.</strong> Tab order unchanged. v371/v373, v423, v430, v449, v451, v452, v489, v500, v505, v513, v515&ndash;v527, v533&ndash;v537 all untouched. Version v537&rarr;v538.<br><br>
@@ -26661,17 +26662,77 @@ function loadCountryProfile(country) {
         const swingCol = Math.abs(swing456) < 10 ? 'var(--green)' : Math.abs(swing456) < 20 ? 'var(--yellow)' : Math.abs(swing456) < 30 ? 'var(--orange)' : 'var(--red)';
         const swingSign = swing456 > 0 ? '+' : '';
         // v465: Regional average take context row — shows how this country compares to its region at $75
-        const regionPeers465 = (COUNTRY_DATA || []).filter(function(p) { return p.region === d.region && p.take_75 != null && p.country !== d.country; });
-        const regionAvg465 = regionPeers465.length > 0 ? regionPeers465.reduce(function(s,p){return s+p.take_75;},0) / regionPeers465.length : null;
-        const regionDiff465 = (regionAvg465 != null && d.take_75 != null) ? (d.take_75 - regionAvg465) : null;
-        const regionDiffStr465 = regionDiff465 == null ? '' : (regionDiff465 === 0 ? '= regional avg' : (regionDiff465 > 0 ? '+' : '') + regionDiff465.toFixed(1) + 'pp vs ' + (d.region||'region') + ' avg');
-        const regionDiffCol465 = regionDiff465 == null ? 'var(--muted)' : (regionDiff465 > 3 ? 'var(--orange)' : regionDiff465 < -3 ? 'var(--green)' : 'var(--muted)');
-        const regionAvgRow465 = regionAvg465 != null ? `<tr style="background:rgba(0,0,0,.01);">
-          <td style="padding:5px 8px 5px 0;font-size:10px;font-weight:700;color:var(--muted);" title="${d.region||'Region'} average government take at $75/bbl across ${regionPeers465.length} peers.">Region Avg</td>
-          <td style="text-align:right;padding:5px 8px;font-size:11px;font-weight:700;color:var(--muted);font-family:'IBM Plex Mono',monospace;">${regionAvg465.toFixed(1)}%</td>
-          <td colspan="2" style="padding:5px 8px;font-size:10px;color:${regionDiffCol465};font-family:'IBM Plex Mono',monospace;">${regionDiffStr465}</td>
-          <td style="padding:5px 8px;font-size:10px;color:var(--muted);">${(d.region||'region')} · n=${regionPeers465.length}</td>
-        </tr>` : '';
+        // v540 (T2): this row was the last surface on Country Profile still averaging over all 185
+        // records. Cycle 433/v534 moved the headline rank, the vs-median pill and the peer strip onto
+        // the 21 production-weighted producers; the 4-Price Sensitivity footer kept the old basis and
+        // therefore contradicted the strip three inches above it. Norway read "Region Avg 22.1% ·
+        // +45.9pp vs Europe avg · n=29" while the strip read "Only producer peer in Europe: United
+        // Kingdom 49.2%" — the 29 include Moldova, Belarus, Bosnia, Malta and Belgium, none of which
+        // produce. The dilution reversed the SIGN of the claim for 6 of the 21 producers:
+        //   United Kingdom  +26.4pp "above Europe avg"      ->  -18.8pp BELOW Norway, its only peer
+        //   Angola           +8.9pp "above Africa avg"      ->  -18.1 vs Libya / -28.1 vs Nigeria
+        //   Oman            +16.9pp above                   ->   -7.2pp below Iraq
+        //   Azerbaijan      +15.9pp above                   ->   -9.1pp below Kazakhstan
+        //   Malaysia        +14.4pp above                   ->   -1.4pp below
+        //   Indonesia       +14.5pp above                   ->   -1.3pp below
+        // and Australia claimed "+17.8pp vs Oceania avg (n=14)" against a region holding zero other
+        // production-weighted regimes (Fiji, Nauru, Palau, Kiribati...).
+        // The row now reads off the SAME getProducerContext() call as the pill and the strip, on the
+        // same three branches v534 established — median at >=3 peers, NAME them at 1-2, say so at 0.
+        // No threshold is invented: the producer set is the existing `weighting` field.
+        // Countries outside the producer set keep the all-country figure but the basis is now stated
+        // on the row rather than left for the analyst to assume.
+        const regionAvgRow465 = (function(){
+          const _rowCss = 'background:rgba(0,0,0,.01);';
+          const _lblCss = 'padding:5px 8px 5px 0;font-size:10px;font-weight:700;color:var(--muted);';
+          const _valCss = "text-align:right;padding:5px 8px;font-size:11px;font-weight:700;color:var(--muted);font-family:'IBM Plex Mono',monospace;";
+          const _basisCss = 'padding:5px 8px;font-size:10px;color:var(--muted);';
+          const _dCol = function(v){ return Math.abs(v) < 3 ? 'var(--muted)' : v > 0 ? 'var(--orange)' : 'var(--green)'; };
+          const _sgn = function(v){ return (v > 0 ? '+' : '') + v.toFixed(1) + 'pp'; };
+          const _reg = d.region || 'region';
+          const _row = function(label, labelTitle, value, deltaHtml, basis) {
+            return '<tr style="' + _rowCss + '">'
+              + '<td style="' + _lblCss + 'cursor:help;" title="' + labelTitle + '">' + label + '</td>'
+              + '<td style="' + _valCss + '">' + value + '</td>'
+              + '<td colspan="2" style="padding:5px 8px;font-size:10px;font-family:\'IBM Plex Mono\',monospace;">' + deltaHtml + '</td>'
+              + '<td style="' + _basisCss + '">' + basis + '</td>'
+              + '</tr>';
+          };
+          if (d.take_75 == null) return '';
+          // Producer basis — same peer set as the headline pill and the peer strip.
+          if (_prodCtx534 && _prodCtx534.inSet) {
+            const rp = _prodCtx534.regionPeers;
+            if (rp.length === 0) {
+              return _row('Region', 'No other country in ' + _reg + ' carries production-weighted take data, so there is no regional benchmark worth citing in an IC memo. The other ' + _reg + ' records are equal-weighted averages over non-producing jurisdictions. Use the ' + _prodCtx534.n + '-country producer median instead, or the Similar Fiscal Profile table above, which matches on fiscal terms rather than geography.',
+                '&mdash;',
+                '<span style="color:var(--muted);">No other production-weighted producer in ' + _reg + ' &mdash; no regional benchmark</span>',
+                _reg + ' &middot; 0 producers');
+            }
+            if (rp.length < 3) {
+              const parts = rp.map(function(p){ const dv = d.take_75 - p.take_75; return '<span style="color:' + _dCol(dv) + ';">' + _sgn(dv) + '</span> vs ' + p.country + ' (' + p.take_75.toFixed(1) + '%)'; });
+              return _row('Region', (rp.length === 1 ? rp[0].country + ' is the only other production-weighted regime in ' + _reg : 'The only other production-weighted regimes in ' + _reg + ' are ' + rp.map(function(p){return p.country;}).join(' and ')) + '. A ' + _reg + ' average is not shown because the region’s other records are equal-weighted averages over non-producing jurisdictions.',
+                rp.length === 1 ? rp[0].take_75.toFixed(1) + '%' : '&mdash;',
+                parts.join(' <span style="color:var(--border);">&middot;</span> '),
+                _reg + ' &middot; n=' + rp.length + ' producer' + (rp.length === 1 ? '' : 's'));
+            }
+            const rMed = _prodCtx534.regionMedian;
+            const dv = d.take_75 - rMed;
+            return _row('Region Median', 'Median government take @$75/bbl across the ' + rp.length + ' other production-weighted regimes in ' + _reg + ': ' + rp.map(function(p){return p.country + ' ' + p.take_75.toFixed(1) + '%';}).join(' · ') + '. Equal-weighted, non-producing ' + _reg + ' records are excluded — they have no verified production behind them.',
+              rMed.toFixed(1) + '%',
+              '<span style="color:' + _dCol(dv) + ';">' + _sgn(dv) + '</span> vs ' + _reg + ' producer median',
+              _reg + ' &middot; n=' + rp.length + ' producers');
+          }
+          // Not production-weighted: keep the all-country figure, but state the basis on the row.
+          const allPeers = (COUNTRY_DATA || []).filter(function(p) { return p.region === d.region && p.take_75 != null && p.country !== d.country; });
+          if (!allPeers.length) return '';
+          const allAvg = allPeers.reduce(function(s,p){return s+p.take_75;},0) / allPeers.length;
+          const nProd = allPeers.filter(function(p){ return String(p.weighting || '').indexOf('prod_weighted') === 0; }).length;
+          const dv2 = d.take_75 - allAvg;
+          return _row('Region Avg (all)', 'Simple average across all ' + allPeers.length + ' other ' + _reg + ' records at $75/bbl. Only ' + nProd + ' of them carry production-weighted data; the rest are equal-weighted averages over non-producing jurisdictions, so this figure is a data-coverage average, not a peer benchmark. This country is itself not production-weighted, so no producer-basis comparison is offered.',
+            allAvg.toFixed(1) + '%',
+            '<span style="color:' + _dCol(dv2) + ';">' + _sgn(dv2) + '</span> vs ' + _reg + ' avg',
+            _reg + ' &middot; n=' + allPeers.length + ', ' + nProd + ' producer' + (nProd === 1 ? '' : 's'));
+        })();
         return `<tfoot><tr style="border-top:2px solid var(--border);background:rgba(0,0,0,.02);">
           <td style="padding:6px 8px 6px 0;font-size:11px;font-weight:700;color:var(--muted);" title="Price Swing = govt take at $125/bbl minus take at $50/bbl. High swing = progressive regime; IC memo requires 4-price sensitivity table.">Price Swing</td>
           <td colspan="2" style="text-align:right;padding:6px 8px;font-size:12px;font-weight:800;color:${swingCol};font-family:'IBM Plex Mono',monospace;" title="Take at $125 minus take at $50 — measures how price-sensitive this regime is. <10pp: royalty-dominant, predictable. 10–20pp: moderate. >20pp: progressive PSC, multi-price table required in IC memo.">${swingSign}${swing456.toFixed(1)}pp ($50→$125)</td>
@@ -28521,7 +28582,7 @@ function renderReformCountryVerdict() {
   var cumRise = _hostile.reduce(function(s,e){ return s + (parseFloat(String(e.take_change).replace('+','')) || 0); }, 0);
   var windowArtefact = !!(lastRise && (lastRise.year || 0) < 2010 && since2010 <= 1);
   var activelyReforming = since2010 >= 3;
-  // v539 (T4): the symmetric case this tab never tested for. windowArtefact catches a take rise
+  // v540 (T4): the symmetric case this tab never tested for. windowArtefact catches a take rise
   // that falls BEFORE the scoring window. Nothing caught a take rise INSIDE it that did not also
   // trip the >=3 Actively Reforming bar. So Russia (2022 windfall tax on oil export revenues,
   // +15pp), Norway (2022 COVID relief expiry, +12pp), Indonesia (2017 Gross Split PSC, +9pp) and
@@ -28790,7 +28851,7 @@ function renderReformRisk() {
     }).sort(function(a,b){ return (b.year||0) - (a.year||0); });
     if (!h.length) return null;
     function _sum(list){ return list.reduce(function(s,e){ return s + (parseFloat(String(e.take_change).replace('+','')) || 0); }, 0); }
-    // v539: lifetime totals alone mislabelled Ecuador's row as "3 rises, +55pp" under an
+    // v540: lifetime totals alone mislabelled Ecuador's row as "3 rises, +55pp" under an
     // in-window heading, when only 1 of those 3 (+5pp) falls inside the window. Split them.
     var hIn = h.filter(function(e){ return (e.year || 0) >= 2010; });
     var hPre = h.filter(function(e){ return (e.year || 0) < 2010; });
@@ -28801,7 +28862,7 @@ function renderReformRisk() {
 
   var quiet = withScore.filter(function(r){ return r.since2010 <= 1; })
     .map(function(r){ return Object.assign({}, r, { lastHostile: _rrLastHostile(r) }); });
-  // v539 (T4): this used to read "genuinely quiet (no hostile on record, OR THE LAST ONE IS INSIDE
+  // v540 (T4): this used to read "genuinely quiet (no hostile on record, OR THE LAST ONE IS INSIDE
   // THE WINDOW)" -- i.e. a take rise dated 2010 or later counted as evidence of quiet. It is the
   // opposite: it is the most recent hard evidence of tightening. Russia sat at the top of this card
   // with its own row printing "last take rise 2022 - Windfall tax on oil export revenues +15pp".
@@ -28829,7 +28890,7 @@ function renderReformRisk() {
     if (!lh) {
       note = '<span style="color:var(--muted);">no take-raising change on record</span>';
     } else if (mode === 'inwindow') {
-      // v539: the rise is inside the scoring window. Lead with it, in the same weight the
+      // v540: the rise is inside the scoring window. Lead with it, in the same weight the
       // Below-the-line rows use, and say the size is not in the score.
       note = '<span style="color:var(--orange);font-weight:700;">raised take ' + lh.year + '</span>'
            + '<span style="color:var(--muted);"> \u00b7 ' + _rrEsc(lh.event) + ' </span>'
