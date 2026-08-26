@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v549</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v550</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1361,7 +1361,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v549</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v550</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v549</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v550</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2599,6 +2599,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- Recent Platform Updates / Changelog -->
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
+    <strong style="color:var(--accent);">v550 (Aug 2026) &mdash; Cycle 449 (T4): the Country Profile told the analyst to check reform risk and gave them no way to check it</strong> &mdash; Task <strong>T4</strong> &mdash; &ldquo;What is my fiscal-stability and reform exposure here?&rdquo; Walked cold, <code>sessionStorage</code> and <code>localStorage</code> cleared. <strong>Friction:</strong> the one-line IC verdict on Country Profile ends with &ldquo;Check reform risk before IC.&rdquo; on <strong>39 of 185</strong> profiles. For the 29 with no sourced reform log the sidebar answered it &mdash; it named the coverage gap and carried a button into the Reform Risk lookup. For the <strong>10 that do have a log</strong> (Algeria, Brazil, India, Indonesia, Iraq, Kazakhstan, Libya, Nigeria, Norway, Venezuela) it did not: <code>renderReformTimeline()</code> rendered four dated event paragraphs and a regional peer-count line, with no Reform Frequency Score, no rank, no IC action and no route to the tab that computes them. The analyst holding the most reform evidence got the least guidance, and an instruction on screen had no destination. <strong>Change:</strong> the classification moved into one function, <code>_rrClassify()</code>, called by both <code>renderReformCountryVerdict()</code> and the Country Profile sidebar &mdash; verified byte-identical across all 21 covered jurisdictions, so the two surfaces cannot drift. The sidebar now opens with a colour-accented verdict card: score /100, rank among the 21 scoreable jurisdictions, reforms since 2010, the &uarr;/&darr;/= direction split, the IC action, and a <em>Full reform detail</em> button. The headline sentence became a control that states the verdict inline and opens the lookup on that country; its trigger widened from take&gt;55 to include any non-green reform verdict. <strong>Result:</strong> Venezuela 85, Kazakhstan 85 and Algeria 100 now read on the profile as <em>pre-2010 window artefacts</em> and Norway&rsquo;s 70 as an <em>in-window +12pp</em>, instead of as an unlabelled event list; and the <strong>United Kingdom</strong> &mdash; rank 21 of 21, 5 law changes since 2010, previously a green profile with no mention of reform at all because its 49.2% take reads favourable &mdash; now surfaces it, along with the USA, Colombia, Canada, Australia, Guyana, Russia and Ecuador. <strong>Deliberately not done:</strong> Fiscal Compare, Explorer and the Screener still carry no reform verdict; <code>_rrClassify()</code> is now global so they can. <strong>STILL LOCKED &mdash; nothing touched:</strong> no new FAQ (still 974), no new tooltip on any pre-existing control, no page-sub, banner, routing hint or &ldquo;How to read&rdquo; block, tab order unchanged; v371/v373, v430, v449, v451, v452, v489, v542 and v549 all intact. Version v549&rarr;v550.<br><br>
     <strong style="color:var(--accent);">v549 (Aug 2026) &mdash; Cycle 448 (T3): Side-by-Side ranked a fee-basis take against production-sharing takes, and Iraq came last of 21 producers on a 50.7pp artefact</strong> &mdash; Task <strong>T3</strong> &mdash; &ldquo;how do these three countries compare side by side?&rdquo; Walked cold, <code>sessionStorage</code> and <code>localStorage</code> cleared. <strong>Friction:</strong> on USA vs Iraq the Iraq column read <strong>84.8% government take</strong>, <em>#21 of 21 producers</em>, <em>highest-take quartile</em>, in red &mdash; the worst regime on the board. <strong>415 of Iraq&rsquo;s 610 contracts are technical service contracts</strong>, where the contractor is paid a fixed $/bbl fee and keeps no price upside, so take% climbs toward 97&ndash;99% because of the contract structure rather than because the terms are hard. Iraq&rsquo;s TSCs average <strong>98.5% take and +$319M contractor NPV at the same time</strong>. On its 195 production-sharing and concession contracts the take at $75/bbl is <strong>34.1%</strong> with <strong>$3.0B</strong> contractor NPV. The only thing on screen that could have explained the 84.8% was the string &ldquo;Concession,PSC,TSC&rdquo; twenty-two rows lower, with no counts &mdash; so the analyst eliminates Iraq on a <strong>50.7pp</strong> artefact. The rule is <code>~/MECHANIC_COMPARABILITY.md</code> (2026-08-26): Group&nbsp;1 (Concession, PSC, Gross Split, Revenue Share) is commensurable; Group&nbsp;2 (TSC, RSC, Buy-back) is not; Group&nbsp;3 (PRRT) needs an explicit caveat. It had never reached the UX. <strong>Change:</strong> (1) a new <strong>Take basis (mechanic)</strong> row leads the Data Basis block, directly above <em>Rank among producers</em>, reading <em>Production-sharing</em>, <em>&#9888; 68% fee-basis</em> or <em>Cash-flow basis</em> per column. (2) All four <strong>Govt Take</strong> rows now print the Group-1-only take beneath the headline on a blended column &mdash; <em>PSC/Conc 34.1%</em> under Iraq&rsquo;s 84.8% &mdash; so the comparable number is on the row where the eye lands. (3) A red caveat block names each blended column with its <strong>measured gap</strong> (Iraq 50.7pp, Ecuador 7.2pp, Malaysia 1.1pp), so magnitude is read off the number rather than off how loud the box is; it asserts that the producer rank is misplaced <em>only</em> where correcting the basis actually reorders columns in the current set, and it is suppressed entirely for a column whose correction rounds to 0.0pp (Russia carries one TSC in 1,247 contracts). (4) The <strong>Fiscal Mechanics</strong> row is rebuilt from the DCF result set with per-mechanic counts and group colouring, replacing the raw <code>d.mechanics</code> string &mdash; which was built from <code>n_*</code> counters that have no bucket for the &ldquo;India RSC&rdquo; mechanic, so <strong>India read &ldquo;Concession,PSC&rdquo; while 97 of its 653 contracts are risk-service</strong>. (5) <code>country_data.json</code> gains <code>mech_mix</code> on all 185 countries and a <code>g1</code> block on the 11 that blend groups, added by <code>tools/add_mech_mix.py</code> &mdash; purely additive, no existing field rewritten, <code>rebuild_country_data.py</code> not run. <strong>Verified cold in Playwright:</strong> 0 page errors on eight sets; Denmark (109 Concession + 1 PRRT) no longer mislabelled a cash-flow column; Australia vs Denmark correctly raises no cross-basis flag; the IC-memo clipboard export carries the basis row and the corrected take with no token fusion. JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 1 WARN</strong>, the WARN being the pre-existing local-harness <code>/petroleum-fiscal-db/sw.js</code> 404. <em>Not done, stated rather than hidden:</em> Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank the blended headline take with no basis flag &mdash; this cycle fixed Side-by-Side only. <strong>STILL LOCKED &mdash; nothing touched:</strong> no new FAQ (still 974), no new tooltip on any pre-existing control, no page-sub, banner, routing hint or &ldquo;How to read&rdquo; block, tab order unchanged; v371/v373, v430, v449, v451, v452, v489 and v542 all intact. Version v548&rarr;v549.<br><br>
     <strong style="color:var(--accent);">v548 (Aug 2026) &mdash; Cycle 447 (T1): Fiscal Compare named the wrong fiscal mechanic on 39 of the 185 rows &mdash; Guyana, Indonesia and Iraq all read &ldquo;Concession&rdquo; &mdash; and the compare engine then ran that wrong mechanic</strong> &mdash; Task <strong>T1</strong> &mdash; &ldquo;which countries should even be on my screening list?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) from Home into <em>Fiscal Compare</em>, the tab Home labels <strong>Start here</strong> and the only surface that produces a shortlist. <strong>Friction.</strong> Row 1 of the cold default view was <strong>Guyana</strong>, and the <em>Mechanic</em> column read <strong>Concession</strong>. Guyana is the Stabroek PSC; ORCA itself holds <strong>134 of Guyana&rsquo;s 143 contracts as PSC</strong>. Every surface that names a mechanic &mdash; this column, the Country Profile headline tag, both peer strips, the Live DCF panel, the tornado chart, the Scenario Builder prefill, the CP citation string &mdash; and the compare <em>engine</em> that decides which DCF to run, all picked it by taking <code>d.mechanics.split(&#39;,&#39;)[0]</code>. That string is ordered alphabetically, so <strong>&ldquo;Concession&rdquo; leads it for any country holding even one Concession contract.</strong> Counted off <code>COUNTRY_DATA</code>: <strong>39 of the 185 rows named a mechanic that is not the country&rsquo;s dominant one by contract count</strong> &mdash; <strong>Indonesia</strong> (644 of 648 contracts PSC, the country that invented the PSC), <strong>Iraq</strong> (415 of 610 TSC, the largest TSC jurisdiction on earth), <strong>Iran</strong> (284 of 547 Buy-back), <strong>India</strong> 466/556, <strong>China</strong> 478/799, <strong>Kazakhstan</strong>, <strong>Libya</strong> 241/301, <strong>Algeria</strong> 158/177, <strong>Azerbaijan</strong> 156/168, <strong>Equatorial Guinea</strong> 121/125, <strong>Timor-Leste</strong> 166/175, <strong>Guyana</strong> 134/143. <code>FC_MECHANIC_OVERRIDE</code> was the hand-maintained patch for exactly this and had reached 16 countries. <strong>It was never only a label.</strong> <code>getDCFParams()</code> enriches from <code>COUNTRY_DATA</code> only on its PSC branch, so a PSC country mis-resolved to Concession never picked up its own <code>ftp</code> / <code>cr_cap</code> / <code>profit_oil_govt</code> / <code>royalty</code> &mdash; all of which ORCA holds &mdash; and fell to the generic Concession default of 10% royalty / 25% CIT. <strong>That is the origin of the 22.2% block this table has carried for six cycles:</strong> 153 rows on one identical take, 154 grey <strong>G</strong> badges, a 153-way <code>=1</code> tie at the head of the screening list. It was not a data gap. It was an alphabetical sort. Worse still, <code>runFiscalCompare()</code> ignored <code>params._mechanic</code>, so <strong>Iraq&rsquo;s $6.00/bbl TSC service-fee override was handed to <code>dcfConcession</code></strong> and Iran&rsquo;s <code>_mechanic: &#39;Buy-back&#39;</code> &mdash; which Country Profile reads &mdash; was silently dropped here. Iraq printed a 27.1% take and a <strong>+$3.7B</strong> contractor NPV on a fee contract. <strong>Change.</strong> One resolver, <code>fcResolveMechanic()</code>, is now the single read point on all thirteen call sites: <code>FC_MECHANIC_OVERRIDE</code> first, then <strong>plurality by contract count</strong> read off the <code>n_concession</code> / <code>n_psc</code> / <code>n_tsc</code> / <code>n_prrt</code> / <code>n_rsc</code> / <code>n_buyback</code> / <code>n_rev_share</code> fields ORCA already carries, then the old first-listed behaviour where no counts exist. <em>No threshold is invented</em> and exact ties keep the previous Concession-first outcome. <code>runFiscalCompare()</code> now honours <code>params._mechanic</code> when it dispatches. Each Mechanic cell carries the count it was resolved from beneath the tag &mdash; <strong>Iraq &ldquo;TSC 415/610 &middot; 68%&rdquo;</strong>, <strong>Guyana &ldquo;PSC 134/143 &middot; 94%&rdquo;</strong>, <strong>Brazil &ldquo;Concession 845/1,193 &middot; 71%&rdquo;</strong> &mdash; so the analyst reads a sourced count, not an assertion. The 16 curated <code>FC_MECHANIC_OVERRIDE</code> rows can sit below plurality on raw count (Egypt is 129/218 Concession but PSC is the IOC regime), so they are marked <strong>&middot; IOC regime</strong> and their hover names the raw plurality instead of claiming to be it. <strong>Result.</strong> On the cold default view the rows modelled on their own ORCA terms go from <strong>31 to 65 of 185</strong>; the grey <strong>G</strong> count falls <strong>154 &rarr; 120</strong>; the 22.2% tie block falls <strong>153 &rarr; 116</strong>. The model take and the citable database take now agree where they should: <strong>Guyana 22.2% &rarr; 55.4% against a citable 54.1%</strong>, a drilldown reconciliation that moves from &minus;31.9pp to <strong>+1.3pp</strong>; Indonesia 22.2 &rarr; 64.1 vs 59.5; Sierra Leone 53.0 vs 53.4; Republic of the Congo 60.6 vs 60.2; Algeria 69.9 vs 69.5. Mean |model &minus; citable| across all 185 falls from <strong>13.9pp to 8.6pp</strong>. <strong>Iraq now reads TSC and models as one</strong>: 67.2% take on a <strong>&minus;$627M</strong> contractor NPV, which is the true screening signal for a fee-based regime against a $1.2B deepwater project, in place of a Concession at +$3.7B. Iran reads Buy-back. Country Profile&rsquo;s Live DCF, the tornado chart and the Scenario Builder prefill all now run the same regime as Fiscal Compare, so the v504 label-drift class of defect cannot reopen through this path. <strong>Verified cold in Playwright</strong> against the local build, storage cleared: 11 header cells and 185 rows unchanged; all three dividers still <code>colspan=12</code>; the Mechanic count line present on the plurality rows and absent on single-mechanic countries (Norway, Australia); FC drilldowns for Iraq and Guyana render the new regime and the new reconciliation delta; <code>&#9112; Copy for IC Memo</code> still returns a 192-line table; Country Profile Live DCF reports <em>(PSC regime)</em> for Guyana, Indonesia and Egypt, <em>(TSC regime)</em> for Iraq, <em>(Concession regime)</em> for Norway. <strong>0 page errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>. <em>Deliberately not done, stated rather than hidden:</em> <strong>(1)</strong> the 120 rows still on the generic Concession default are countries whose plurality genuinely is Concession and for which ORCA holds no Concession-side terms to enrich from &mdash; Brazil, Canada, Mexico, Russia, Venezuela, Saudi Arabia. Closing those needs a <code>getDCFParams()</code> Concession enrichment branch or a data-pipeline load, not a resolver. <strong>(2)</strong> Now that Iraq reads TSC and Iran Buy-back, the table sorts a <strong>fee-basis</strong> take against production-sharing takes in one ranking. Per <code>MECHANIC_COMPARABILITY.md</code> (2026-08-26) TSC / RSC / Buy-back take% is a structural artefact of the mechanic and is <strong>not commensurable</strong> with Concession / PSC / Gross Split / Revenue Share, and PRRT needs its own caveat. Making the mechanic honest is what makes that flaggable; the flag itself is the next cycle on this surface. <strong>(3)</strong> Carried and untouched: the citable take column is still not sortable, and porting <code>getProducerPeers()</code> to this tab &mdash; the open item from v546 and v547 &mdash; is still open. <strong>STILL LOCKED &mdash; nothing touched:</strong> no new FAQ (still 974); <strong>no new tooltip on any pre-existing control</strong> &mdash; the Mechanic header tooltip was rewritten because its stated basis changed, and the one new hover belongs to a count line that did not exist; no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; tab order unchanged; v371/v373, v430, v449, v451, v452, v489, v505 G badge, v525, v529, v533, v534, v542, v545, v546 and v547 all untouched. Version sweep done silently at the end and is <strong>not</strong> claimed as the improvement. Version v547&rarr;v548.<br><br>
     <strong style="color:var(--accent);">v547 (Aug 2026) &mdash; Cycle 446 (T5): Fiscal Compare showed a take of 22.2% on 154 of 185 rows, held the citable figure for every one of them, and had no clipboard path at all</strong> &mdash; Task <strong>T5</strong> &mdash; &ldquo;give me something I can paste straight into an IC memo.&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) from Home into <em>Fiscal Compare</em> &mdash; the tab the Home card labels <strong>Start here</strong>, and the only surface that produces a <em>shortlist</em> rather than a single country. <strong>Friction, two halves of one moment.</strong> <strong>(1)</strong> Counted off the live DOM on the cold default view: <strong>154 of the 185 rows render an identical <code>22.2%</code> in the <em>Take%</em> column and an identical <code>$4.3B</code> in <em>NPV</em></strong>, because ORCA holds no country-specific terms for them in the compare engine and they fall to the generic mechanic default. The table already says so &mdash; v505 gave them a grey <strong>G</strong> and an <code>=1</code> shared rank, v533 rewrote the Quality definition around it. What no cycle had noticed is that <strong>ORCA holds a differentiated, citable contract-database take for all 154 of them</strong>: Guyana 54.1%, Indonesia 59.5%, Sri Lanka 57.2%, Chad 55.3%, Guinea 55.1% &mdash; gaps of <strong>25&ndash;35pp</strong> against what the screen printed. That figure is what the row drilldown, Country Profile, the JSON API and the v529 XLSX all carry, and the drilldown says in so many words: <em>&ldquo;Cite the database figure; do not quote both as one number.&rdquo;</em> It appeared <strong>nowhere on the flagship table</strong>. To read a citable take for a ten-country shortlist the analyst had to open ten drilldowns. <strong>(2)</strong> There was no way to copy the table. The single export affordance on the tab was <strong>Export XLSX</strong> &mdash; a file download. Side-by-Side has had <code>&#x2398; Copy for IC Memo</code> since v503, Country Profile has one, and the drilldown has <em>Copy 4-price as IC table</em>, one country at a time. The one surface that produces the shortlist had none. <strong>Change.</strong> <strong>(a)</strong> A new column, <strong>Take% <span style="color:var(--green);">db &middot; citable</span></strong>, sits immediately right of the model take and is populated for all 185 rows at the selected price, tier-coloured on the same ramp so the two read on one scale. The existing column is relabelled <strong>Take% <em>model</em></strong> &mdash; the two were never distinguishable before and the <code>#</code> rank is built from the model one. Each citable cell names the gap to its left in the tooltip (<em>&ldquo;a gap of +31.9pp. Do not put both numbers in one sentence.&rdquo;</em>). State monopolies now print their real citable <strong>100.0%</strong> here instead of <code>n/c</code>; <code>n/c</code> stays on the model columns, which have no contractor position. All eleven divider/footnote colspans moved 10&rarr;11 / 11&rarr;12 with the new column. <strong>(b)</strong> <code>&#x2398; Copy for IC Memo</code> next to <em>Export XLSX</em>, enabled at the same moment the export is. <code>copyFCForIC()</code> copies the rows <em>as shown</em> &mdash; same order, same region filter, same sort, read off <code>#tbl-fc</code> itself &mdash; so the pasted artifact and the screen the analyst just read cannot disagree. Ten columns, with the citable ORCA database take and contractor NPV as the <em>leftmost</em> numerics (the v529 rule: an analyst reads left to right and the leftmost numbers reach the memo), then breakeven, price swing, this screen&rsquo;s model take and the model basis spelled out per row (<em>Country-specific terms</em> / <em>ORCA contract database terms</em> / <em>GENERIC DEFAULT (10% royalty, 25% CIT, no resource-rent tax, no state equity) &mdash; directional only, NOT citable</em>). Caption, assumption line (price, profile, 10% WACC, 100% WI, breakeven coverage on <em>this</em> view), a counted warning line (<em>&ldquo;151 of the 185 rows have a GENERIC DEFAULT model basis&hellip; 3 rows are a state monopoly&hellip;&rdquo;</em>), the <code>CP_IRR_NOTE</code> explanation of why IRR is absent, and a <code>_orcaVerNow()</code> source line all travel inside the paste. Two clipboard flavours, mirroring v503: <code>text/html</code> so Word / Docs / Outlook render a bordered table, TSV so Excel splits into columns. <strong>Result.</strong> An analyst screening at $75/bbl reads a citable, differentiated government take for every one of the 185 countries without leaving the tab, and gets the whole shortlist into an IC memo in one click instead of ten drilldowns or a round trip through Excel &mdash; with the basis of every row stated in the pasted artifact, so a G row cannot be quoted as if it were sourced. <strong>Verified cold in Playwright</strong> against the local build, storage cleared: 11 header cells, the new column populated on all 185 rows, Guyana <code>22.2% | 54.1%</code>, Bahrain <code>n/c | 100.0% | n/c</code>, all three dividers at <code>colspan=12</code>, and the clipboard read back as a <strong>192-line</strong> table with caption, assumptions, warning and source line present. <strong>0 page errors.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness service-worker 404. <em>Deliberately not done, stated rather than hidden:</em> the citable column is <strong>not sortable</strong> and the table is still ranked on the model take. Ranking ascending on the database take puts <strong>Vanuatu (5.0%), the Bahamas, Montenegro, Greenland and the Faroe Islands</strong> at the head of the shortlist &mdash; exactly the non-producer distortion v534/v542/v546 spent three cycles removing from Country Profile and Side-by-Side. Making it sortable without first porting <code>getProducerPeers()</code> to this tab would hand the analyst a worse shortlist than the one they have. That port is the next cycle on this surface, and it is the same open item v546 left. <strong>STILL LOCKED &mdash; nothing touched:</strong> no new FAQ (still 974); no new tooltip on any pre-existing control (the two tooltips added here belong to a column that did not exist and to a button that did not exist); no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; tab order unchanged; v371/v373, v430, v449, v451, v452, v489, v505 G badge, v525, v529, v533, v534, v542, v545 and v546 all untouched. Version sweep done silently at the end across 5 structural locations and is <strong>not</strong> claimed as the improvement. Version v546&rarr;v547.<br><br>
@@ -25772,6 +25773,132 @@ function selectSearchResult(el) {
 }
 
 // ─── TAB 7: Country Profile ──────────────────────────────────────────────────
+// v550 (T4): single source of truth for the reform verdict. The Reform Risk tab computed
+// the Reform Frequency Score, the rank, the direction split and the IC action inline; the
+// Country Profile sidebar computed none of them and showed a raw event list instead. Two
+// surfaces answering the same question must not be able to drift, so the classification
+// now lives here and both call it. The logic below is moved verbatim from
+// renderReformCountryVerdict() -- no threshold, string or colour is changed.
+function _rrClassify(c) {
+  var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+  var events = Array.isArray(rh[c]) ? rh[c] : [];
+  if (!events.length) return null;
+  // ── Case 2: covered. Give the score, the rank, the direction split and the IC action. ──
+  var since2010 = events.filter(function(e){ return (e.year || 0) >= 2010; }).length;
+  var score = Math.max(0, 100 - since2010 * 15);
+  var tightened = 0, liberalized = 0, neutral = 0;
+  events.forEach(function(e) {
+    if (e.take_change && e.take_change.charAt(0) === '+') tightened++;
+    else if (e.take_change && e.take_change.charAt(0) === '-') liberalized++;
+    else neutral++;
+  });
+  var scored = Object.keys(rh)
+    .filter(function(k){ return Array.isArray(rh[k]) && rh[k].length; })
+    .map(function(k) {
+      var n = rh[k].filter(function(e){ return (e.year || 0) >= 2010; }).length;
+      return { country: k, score: Math.max(0, 100 - n * 15) };
+    })
+    .sort(function(a,b){ return b.score - a.score; });
+  var rank = 0;
+  for (var i = 0; i < scored.length; i++) { if (scored[i].country === c) { rank = i + 1; break; } }
+  var latest = events.slice().sort(function(a,b){ return (b.year||0) - (a.year||0); })[0];
+
+  // v526: the IC action used to be a pure function of the score band (<=20 / <=40 / else).
+  // Score = 100 - 15 x reforms-since-2010, so the <=40 band needs 4+ changes since 2010 and
+  // exactly ONE of the 21 scoreable jurisdictions reaches it. Every other country got the
+  // identical green line "No reform-frequency premium indicated by this signal" -- including
+  // Guyana, Brazil and Australia, which this same tab prints under "Actively Reforming ...
+  // assume renegotiation risk over a 25-year life", and Venezuela and Algeria, which it
+  // prints under "Below the line -- quiet only because the window starts in 2010 ... do not
+  // read the score as a stable-regime finding". The lookup contradicted two panels sitting
+  // three inches below it. The IC action now applies the two classifications this tab
+  // already computes and displays. No new thresholds are introduced: >=3-since-2010 is the
+  // tab's own Actively Reforming filter, and last-take-rise-before-2010 is its own
+  // Below-the-line divider test.
+  var _hostile = events.filter(function(e){ return e.take_change && String(e.take_change).charAt(0) === '+'; })
+    .sort(function(a,b){ return (b.year||0) - (a.year||0); });
+  var lastRise = _hostile.length ? _hostile[0] : null;
+  var cumRise = _hostile.reduce(function(s,e){ return s + (parseFloat(String(e.take_change).replace('+','')) || 0); }, 0);
+  var windowArtefact = !!(lastRise && (lastRise.year || 0) < 2010 && since2010 <= 1);
+  var activelyReforming = since2010 >= 3;
+  // v540 (T4): the symmetric case this tab never tested for. windowArtefact catches a take rise
+  // that falls BEFORE the scoring window. Nothing caught a take rise INSIDE it that did not also
+  // trip the >=3 Actively Reforming bar. So Russia (2022 windfall tax on oil export revenues,
+  // +15pp), Norway (2022 COVID relief expiry, +12pp), Indonesia (2017 Gross Split PSC, +9pp) and
+  // Ecuador (2010 PSC->RSC conversion, +5pp) all returned the green "No reform-frequency premium
+  // indicated" -- while the USA returned an orange caution for a +3pp deepwater royalty change in
+  // 2007. The score is a COUNT (100 - 15 x changes since 2010) and is blind to magnitude, so a
+  // +15pp rupture and a 1pp administrative tweak move it by the same 15 points. No new threshold
+  // is introduced here: the test is the tab's own Below-the-line year test, read the other way.
+  var risesInWindow = _hostile.filter(function(e){ return (e.year || 0) >= 2010; });
+  var cumInWindow = risesInWindow.reduce(function(s2,e){ return s2 + (parseFloat(String(e.take_change).replace('+','')) || 0); }, 0);
+  var inWindowRise = !activelyReforming && risesInWindow.length > 0;
+  var reformYears = events.filter(function(e){ return (e.year||0) >= 2010; })
+    .map(function(e){ return e.year; }).sort(function(a,b){ return a - b; }).join(', ');
+
+  var icRule, icColor, icLabel, scoreNote;
+  if (activelyReforming) {
+    icColor = score <= 20 ? 'var(--red)' : 'var(--orange)';
+    icLabel = 'IC action \u2014 Actively Reforming';
+    icRule = '<strong>' + since2010 + ' law changes since 2010</strong> (' + reformYears + '). Terms here have been rewritten inside a normal '
+      + 'sanction-to-first-oil window, so a base case built on terms fixed at signature is not defensible over a 25-year life. '
+      + (score <= 20
+          ? 'Add a <strong>5&ndash;8pp WACC premium</strong> and show a probability-weighted NPV scenario alongside the base case.'
+          : 'Add a <strong>3&ndash;5pp WACC premium</strong> and state renegotiation risk explicitly in the memo.');
+    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' &middot; actively reforming';
+  } else if (inWindowRise) {
+    icColor = 'var(--orange)';
+    icLabel = 'IC action \u2014 take was raised inside the scoring window';
+    icRule = 'Government take was raised in <strong>' + _rrEsc(risesInWindow[0].year) + '</strong> \u2014 ' + _rrEsc(risesInWindow[0].event)
+      + ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;color:var(--red);">' + _rrEsc(risesInWindow[0].take_change) + '</span>'
+      + (risesInWindow.length > 1
+          ? ', one of <strong>' + risesInWindow.length + '</strong> take rises since 2010 totalling <strong>+' + cumInWindow.toFixed(0) + 'pp</strong>'
+          : '')
+      + '. That change is inside the window, so the score of ' + score + ' does count it \u2014 but the score is a <strong>count of law changes</strong> '
+      + '(100 \u2212 15 \u00d7 changes since 2010) and never reads how large one was. This '
+      + _rrEsc(risesInWindow[0].take_change) + ' moves the score by the same 15 points a 1pp administrative tweak would. '
+      + '<strong>Below the Actively Reforming bar of 3 on frequency, but not a zero-premium jurisdiction.</strong> '
+      + 'Size the premium against the <strong>+' + cumInWindow.toFixed(0) + 'pp</strong> already taken since 2010, not against the count.'
+      + (_hostile.length > risesInWindow.length
+          ? ' There ' + ((_hostile.length - risesInWindow.length) === 1 ? 'is also <strong>1</strong> take rise' : 'are also <strong>' + (_hostile.length - risesInWindow.length) + '</strong> take rises')
+            + ' on record <em>before</em> 2010, totalling <strong>+' + (cumRise - cumInWindow).toFixed(0) + 'pp</strong>, which the window never scores at all.'
+          : '');
+    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' \u00b7 in-window rise, size unscored';
+  } else if (windowArtefact) {
+    icColor = 'var(--orange)';
+    icLabel = 'IC action \u2014 score is a window artefact';
+    icRule = 'The last take-raising change was <strong>' + _rrEsc(lastRise.year) + '</strong> &mdash; ' + _rrEsc(lastRise.event)
+      + ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;">' + _rrEsc(lastRise.take_change) + '</span>'
+      + (_hostile.length > 1 ? ', one of <strong>' + _hostile.length + '</strong> pre-2010 take rises totalling <strong>+' + cumRise.toFixed(0) + 'pp</strong>' : '')
+      + '. That falls outside the 2010 scoring window, so the score of ' + score + ' records where the window starts, not a clean record. '
+      + '<strong>Do not carry a zero reform premium on this basis.</strong> Size the premium against the rupture in the event log, not against the count.';
+    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' &middot; pre-2010 rise unscored';
+  } else {
+    icColor = 'var(--green)';
+    icLabel = 'IC action';
+    icRule = (since2010 === 0)
+      ? 'No fiscal law change on record since 2010, and no take-raising event on record before it either. No reform-frequency premium indicated. Reform history alone does not clear the jurisdiction \u2014 check predictability and evidence tier as well.'
+      : '<strong>' + since2010 + '</strong> law change' + (since2010 === 1 ? '' : 's') + ' since 2010 (' + reformYears + '), below this tab\u2019s Actively Reforming bar of 3. '
+        + 'No reform-frequency premium indicated. Reform history alone does not clear the jurisdiction \u2014 check predictability and evidence tier as well.';
+    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' scoreable';
+  }
+  // The card accent and the headline score follow the verdict, not the raw band. An 85 that
+  // is an artefact of where the window starts must not render in the same green as a real 85.
+  var scoreColor = (icColor === 'var(--green)')
+    ? (score > 70 ? 'var(--green)' : score > 40 ? 'var(--yellow)' : 'var(--red)')
+    : icColor;
+
+  var tiltWord = tightened > liberalized ? 'net-tightening against the contractor'
+               : liberalized > tightened ? 'net-liberalizing toward the contractor'
+               : 'balanced';
+  var tiltColor = tightened > liberalized ? 'var(--red)' : liberalized > tightened ? 'var(--green)' : 'var(--muted)';
+  return { events: events, since2010: since2010, score: score, tightened: tightened,
+           liberalized: liberalized, neutral: neutral, scored: scored, rank: rank,
+           latest: latest, icRule: icRule, icColor: icColor, icLabel: icLabel,
+           scoreNote: scoreNote, scoreColor: scoreColor, tiltWord: tiltWord, tiltColor: tiltColor };
+}
+window._rrClassify = _rrClassify;
+
 function renderReformTimeline(country) {
   // Fiscal facts from API JSON
   const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -26005,7 +26132,51 @@ function renderReformTimeline(country) {
       </div>
     </div>`;
   }
-  let html = '<h3>Fiscal Reform History</h3><div class="reform-timeline">';
+  // ── v550 (T4): the scored verdict, in the sidebar, for the 21 covered jurisdictions ──
+  // The Country Profile headline prints "Check reform risk before IC." on 39 of 185 profiles.
+  // For the 29 uncovered ones the sidebar answered it — it named the coverage gap and carried a
+  // "Check X on Reform Risk" button. For the 10 covered ones (Algeria, Brazil, India, Indonesia,
+  // Iraq, Kazakhstan, Libya, Nigeria, Norway, Venezuela) it did not: the sidebar showed four dated
+  // event paragraphs and a peer-count line, with no Reform Frequency Score, no rank, no IC action
+  // and no route to the tab that computes them. The analyst holding the MOST reform evidence got
+  // the LEAST guidance, and the instruction on screen had no destination. The score and verdict
+  // now render here, from _rrClassify() — the same function the Reform Risk tab calls, so the two
+  // surfaces cannot disagree. Crucially this carries the window caveats with it: Venezuela 85,
+  // Kazakhstan 85 and Algeria 100 are pre-2010 artefacts and Norway's 70 is an in-window +12pp,
+  // none of which the raw event list said out loud.
+  var _vcp = (typeof _rrClassify === 'function') ? _rrClassify(country) : null;
+  var _cpVerdict = '';
+  if (_vcp) {
+    var _escC = _rrEsc(country);
+    var _jsCv = String(country).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+    var _lbl = 'font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:2px;';
+    _cpVerdict =
+      '<div style="border:1px solid var(--border);border-left:3px solid ' + _vcp.scoreColor + ';border-radius:6px;'
+      + 'background:var(--surface2);padding:10px 12px;margin-bottom:12px;">'
+      + '<div style="display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start;margin-bottom:8px;">'
+      + '<div><div style="' + _lbl + '">Reform Frequency Score</div>'
+      + '<div style="font-size:17px;font-weight:800;color:' + _vcp.scoreColor + ';">' + _vcp.score
+      + '<span style="font-size:10px;color:var(--muted);font-weight:700;">/100</span></div>'
+      + '<div style="font-size:9px;color:var(--muted);">' + _vcp.scoreNote + '</div></div>'
+      + '<div><div style="' + _lbl + '">Since 2010</div>'
+      + '<div style="font-size:17px;font-weight:800;color:' + (_vcp.since2010 > 2 ? 'var(--red)' : _vcp.since2010 > 0 ? 'var(--orange)' : 'var(--green)') + ';">' + _vcp.since2010 + '</div>'
+      + '<div style="font-size:9px;color:var(--muted);">law changes</div></div>'
+      + '<div><div style="' + _lbl + '">Direction</div>'
+      + '<div style="font-size:13px;font-weight:800;"><span style="color:var(--red);">&uarr;' + _vcp.tightened + '</span>'
+      + ' <span style="color:var(--muted);font-size:10px;">/</span> <span style="color:var(--green);">&darr;' + _vcp.liberalized + '</span>'
+      + ' <span style="color:var(--muted);font-size:10px;">/</span> <span style="color:var(--muted);">=' + _vcp.neutral + '</span></div>'
+      + '<div style="font-size:9px;color:' + _vcp.tiltColor + ';font-weight:700;">' + _vcp.tiltWord + '</div></div>'
+      + '</div>'
+      + '<div style="font-size:11px;color:var(--text);line-height:1.6;padding:7px 10px;background:var(--card);'
+      + 'border-left:3px solid ' + _vcp.icColor + ';border-radius:4px;">'
+      + '<strong style="color:' + _vcp.icColor + ';">' + _vcp.icLabel + ':</strong> ' + _vcp.icRule
+      + '</div>'
+      + '<div style="margin-top:9px;"><button class="btn btn-sm btn-outline" onclick="openReformRiskFor(\'' + _jsCv + '\')" '
+      + 'title="Open the Reform Risk tab with ' + _escC + ' selected — full event log, regional tilt and peer ranking">'
+      + 'Full reform detail for ' + _escC + ' &rsaquo;</button></div>'
+      + '</div>';
+  }
+  let html = '<h3>Fiscal Reform History</h3>' + _cpVerdict + '<div class="reform-timeline">';
   const visibleReforms = reformsSorted.slice(0, REFORM_SHOW_LIMIT);
   const olderReforms = reformsSorted.slice(REFORM_SHOW_LIMIT);
   visibleReforms.forEach(r => { html += buildReformEventHtml(r, rfSlug); });
@@ -26330,10 +26501,33 @@ function loadCountryProfile(country) {
   const _hdrBeCallout = (_cpBeR != null && _cpBeR < 500) ? `<span id="cp-be-meta" style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${_cpBeR.toFixed(0)} $/bbl</strong></span>` : `<span id="cp-be-meta" style="font-size:10px;color:var(--muted);margin-left:10px;opacity:.7;" title="Breakeven price requires complete capital cost data — not yet sourced for this country">Breakeven: $/bbl n/a</span>`;
   // v277 Issue 8: Prominent country name header above profile content
   const _countryPageHeader = `<h2 id="cp-country-name" class="country-profile-header" style="font-size:20px;font-weight:800;color:var(--text);margin:0 0 8px 0;letter-spacing:-0.01em;font-family:'Georgia',serif;">${d.country}${ddSpecBadge ? ' ' + ddSpecBadge : ''}</h2>`;
+  // v550 (T4): "Check reform risk before IC." was a flat sentence on 39 of 185 profiles. It named
+  // the next step and gave no way to take it — no control, no score, no destination. It is now a
+  // control. Where ORCA has a sourced log it states the verdict inline (score + which of the four
+  // cases applies) and opens the Reform Risk tab on that country; where it does not, it still
+  // opens the lookup, which reports the coverage gap rather than implying a clean record.
+  const _cpReformCta = function(cn) {
+    var v = (typeof _rrClassify === 'function') ? _rrClassify(cn) : null;
+    var js = String(cn).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    var short = !v ? 'Check reform risk'
+      : (v.icLabel === 'IC action'
+          ? 'Reform risk ' + v.score + '/100 · no frequency premium'
+          : 'Reform risk ' + v.score + '/100 · ' + v.icLabel.replace('IC action — ', ''));
+    var col = v ? v.icColor : 'var(--muted)';
+    var tip = v ? 'Reform Frequency Score ' + v.score + '/100 — ' + v.scoreNote
+                + '. Click to open the full reform verdict for ' + cn + '.'
+              : 'ORCA holds no sourced fiscal-reform log for ' + cn
+                + '. Click to see what that means and what to check instead.';
+    return ' <span role="button" tabindex="0" onclick="event.stopPropagation();openReformRiskFor(\'' + js + '\')"'
+      + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openReformRiskFor(\'' + js + '\');}"'
+      + ' style="cursor:pointer;font-weight:700;color:' + col + ';border-bottom:1px dotted ' + col + ';white-space:nowrap;"'
+      + ' title="' + String(tip).replace(/"/g, '&quot;') + '">' + short + ' ›</span>';
+  };
   // v500: Quick IC verdict — one-line bottom-line verdict above the headline strip
   // Answers "is this entry viable?" immediately for a senior IOC analyst opening a CP for the first time
   const _quickIcVerdict497 = (!isStateMonopoly(d.take_75) && d.take_75 != null) ? (function() {
     var take = d.take_75;
+    var _cpReformV = (typeof _rrClassify === 'function') ? _rrClassify(d.country) : null;
     var npv = d.npv_75;
     var npv50 = d.npv_50;                                  // v516: the downside leg
     var be = _cpBeR;   // v512: resolved breakeven, so the verdict cites the same number the page shows
@@ -26355,7 +26549,14 @@ function loadCountryProfile(country) {
       msg = (favourable ? 'Clears the 10% WACC across the price band' : 'Clears the 10% WACC, but high-take')
           + ' \u2014 contractor NPV ' + cpNpvFmt(npv) + ' @$75 and still ' + cpNpvFmt(npv50)
           + ' at the $50/bbl downside, at ' + take.toFixed(1) + '% govt take.' + beStr
-          + (favourable ? '' : ' Check reform risk before IC.');
+          // v550 (T4): the trigger was take>55 alone, so the United Kingdom -- rank 21 of 21,
+          // 5 law changes since 2010, the single most reform-exposed regime ORCA scores -- got a
+          // green verdict with no mention of reform at all, because its 49.2% take reads
+          // favourable. Same for the USA, Colombia, Canada (pre-2010 artefact scores), Australia
+          // and Guyana (actively reforming) and Russia and Ecuador (in-window take rises). The
+          // control now also fires whenever the reform classifier itself returns a non-green
+          // verdict. No new threshold: it is the tab's own verdict, read here.
+          + ((favourable && !(_cpReformV && _cpReformV.icColor !== 'var(--green)')) ? '' : _cpReformCta(d.country));
     } else if (hasNpv && npv > 0 && hasDown && npv50 <= 0) {
       icon = '\u26a0'; col = 'var(--yellow)'; bg = 'rgba(161,98,7,.05)'; border = 'rgba(161,98,7,.2)';
       msg = 'Price-dependent entry \u2014 contractor NPV ' + cpNpvFmt(npv) + ' @$75 but ' + cpNpvFmt(npv50)
@@ -28961,115 +29162,14 @@ function renderReformCountryVerdict() {
     return;
   }
 
-  // ── Case 2: covered. Give the score, the rank, the direction split and the IC action. ──
-  var since2010 = events.filter(function(e){ return (e.year || 0) >= 2010; }).length;
-  var score = Math.max(0, 100 - since2010 * 15);
-  var tightened = 0, liberalized = 0, neutral = 0;
-  events.forEach(function(e) {
-    if (e.take_change && e.take_change.charAt(0) === '+') tightened++;
-    else if (e.take_change && e.take_change.charAt(0) === '-') liberalized++;
-    else neutral++;
-  });
-  var scored = Object.keys(rh)
-    .filter(function(k){ return Array.isArray(rh[k]) && rh[k].length; })
-    .map(function(k) {
-      var n = rh[k].filter(function(e){ return (e.year || 0) >= 2010; }).length;
-      return { country: k, score: Math.max(0, 100 - n * 15) };
-    })
-    .sort(function(a,b){ return b.score - a.score; });
-  var rank = 0;
-  for (var i = 0; i < scored.length; i++) { if (scored[i].country === c) { rank = i + 1; break; } }
-  var latest = events.slice().sort(function(a,b){ return (b.year||0) - (a.year||0); })[0];
-
-  // v526: the IC action used to be a pure function of the score band (<=20 / <=40 / else).
-  // Score = 100 - 15 x reforms-since-2010, so the <=40 band needs 4+ changes since 2010 and
-  // exactly ONE of the 21 scoreable jurisdictions reaches it. Every other country got the
-  // identical green line "No reform-frequency premium indicated by this signal" -- including
-  // Guyana, Brazil and Australia, which this same tab prints under "Actively Reforming ...
-  // assume renegotiation risk over a 25-year life", and Venezuela and Algeria, which it
-  // prints under "Below the line -- quiet only because the window starts in 2010 ... do not
-  // read the score as a stable-regime finding". The lookup contradicted two panels sitting
-  // three inches below it. The IC action now applies the two classifications this tab
-  // already computes and displays. No new thresholds are introduced: >=3-since-2010 is the
-  // tab's own Actively Reforming filter, and last-take-rise-before-2010 is its own
-  // Below-the-line divider test.
-  var _hostile = events.filter(function(e){ return e.take_change && String(e.take_change).charAt(0) === '+'; })
-    .sort(function(a,b){ return (b.year||0) - (a.year||0); });
-  var lastRise = _hostile.length ? _hostile[0] : null;
-  var cumRise = _hostile.reduce(function(s,e){ return s + (parseFloat(String(e.take_change).replace('+','')) || 0); }, 0);
-  var windowArtefact = !!(lastRise && (lastRise.year || 0) < 2010 && since2010 <= 1);
-  var activelyReforming = since2010 >= 3;
-  // v540 (T4): the symmetric case this tab never tested for. windowArtefact catches a take rise
-  // that falls BEFORE the scoring window. Nothing caught a take rise INSIDE it that did not also
-  // trip the >=3 Actively Reforming bar. So Russia (2022 windfall tax on oil export revenues,
-  // +15pp), Norway (2022 COVID relief expiry, +12pp), Indonesia (2017 Gross Split PSC, +9pp) and
-  // Ecuador (2010 PSC->RSC conversion, +5pp) all returned the green "No reform-frequency premium
-  // indicated" -- while the USA returned an orange caution for a +3pp deepwater royalty change in
-  // 2007. The score is a COUNT (100 - 15 x changes since 2010) and is blind to magnitude, so a
-  // +15pp rupture and a 1pp administrative tweak move it by the same 15 points. No new threshold
-  // is introduced here: the test is the tab's own Below-the-line year test, read the other way.
-  var risesInWindow = _hostile.filter(function(e){ return (e.year || 0) >= 2010; });
-  var cumInWindow = risesInWindow.reduce(function(s2,e){ return s2 + (parseFloat(String(e.take_change).replace('+','')) || 0); }, 0);
-  var inWindowRise = !activelyReforming && risesInWindow.length > 0;
-  var reformYears = events.filter(function(e){ return (e.year||0) >= 2010; })
-    .map(function(e){ return e.year; }).sort(function(a,b){ return a - b; }).join(', ');
-
-  var icRule, icColor, icLabel, scoreNote;
-  if (activelyReforming) {
-    icColor = score <= 20 ? 'var(--red)' : 'var(--orange)';
-    icLabel = 'IC action \u2014 Actively Reforming';
-    icRule = '<strong>' + since2010 + ' law changes since 2010</strong> (' + reformYears + '). Terms here have been rewritten inside a normal '
-      + 'sanction-to-first-oil window, so a base case built on terms fixed at signature is not defensible over a 25-year life. '
-      + (score <= 20
-          ? 'Add a <strong>5&ndash;8pp WACC premium</strong> and show a probability-weighted NPV scenario alongside the base case.'
-          : 'Add a <strong>3&ndash;5pp WACC premium</strong> and state renegotiation risk explicitly in the memo.');
-    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' &middot; actively reforming';
-  } else if (inWindowRise) {
-    icColor = 'var(--orange)';
-    icLabel = 'IC action \u2014 take was raised inside the scoring window';
-    icRule = 'Government take was raised in <strong>' + _rrEsc(risesInWindow[0].year) + '</strong> \u2014 ' + _rrEsc(risesInWindow[0].event)
-      + ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;color:var(--red);">' + _rrEsc(risesInWindow[0].take_change) + '</span>'
-      + (risesInWindow.length > 1
-          ? ', one of <strong>' + risesInWindow.length + '</strong> take rises since 2010 totalling <strong>+' + cumInWindow.toFixed(0) + 'pp</strong>'
-          : '')
-      + '. That change is inside the window, so the score of ' + score + ' does count it \u2014 but the score is a <strong>count of law changes</strong> '
-      + '(100 \u2212 15 \u00d7 changes since 2010) and never reads how large one was. This '
-      + _rrEsc(risesInWindow[0].take_change) + ' moves the score by the same 15 points a 1pp administrative tweak would. '
-      + '<strong>Below the Actively Reforming bar of 3 on frequency, but not a zero-premium jurisdiction.</strong> '
-      + 'Size the premium against the <strong>+' + cumInWindow.toFixed(0) + 'pp</strong> already taken since 2010, not against the count.'
-      + (_hostile.length > risesInWindow.length
-          ? ' There ' + ((_hostile.length - risesInWindow.length) === 1 ? 'is also <strong>1</strong> take rise' : 'are also <strong>' + (_hostile.length - risesInWindow.length) + '</strong> take rises')
-            + ' on record <em>before</em> 2010, totalling <strong>+' + (cumRise - cumInWindow).toFixed(0) + 'pp</strong>, which the window never scores at all.'
-          : '');
-    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' \u00b7 in-window rise, size unscored';
-  } else if (windowArtefact) {
-    icColor = 'var(--orange)';
-    icLabel = 'IC action \u2014 score is a window artefact';
-    icRule = 'The last take-raising change was <strong>' + _rrEsc(lastRise.year) + '</strong> &mdash; ' + _rrEsc(lastRise.event)
-      + ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;">' + _rrEsc(lastRise.take_change) + '</span>'
-      + (_hostile.length > 1 ? ', one of <strong>' + _hostile.length + '</strong> pre-2010 take rises totalling <strong>+' + cumRise.toFixed(0) + 'pp</strong>' : '')
-      + '. That falls outside the 2010 scoring window, so the score of ' + score + ' records where the window starts, not a clean record. '
-      + '<strong>Do not carry a zero reform premium on this basis.</strong> Size the premium against the rupture in the event log, not against the count.';
-    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' &middot; pre-2010 rise unscored';
-  } else {
-    icColor = 'var(--green)';
-    icLabel = 'IC action';
-    icRule = (since2010 === 0)
-      ? 'No fiscal law change on record since 2010, and no take-raising event on record before it either. No reform-frequency premium indicated. Reform history alone does not clear the jurisdiction \u2014 check predictability and evidence tier as well.'
-      : '<strong>' + since2010 + '</strong> law change' + (since2010 === 1 ? '' : 's') + ' since 2010 (' + reformYears + '), below this tab\u2019s Actively Reforming bar of 3. '
-        + 'No reform-frequency premium indicated. Reform history alone does not clear the jurisdiction \u2014 check predictability and evidence tier as well.';
-    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' scoreable';
-  }
-  // The card accent and the headline score follow the verdict, not the raw band. An 85 that
-  // is an artefact of where the window starts must not render in the same green as a real 85.
-  var scoreColor = (icColor === 'var(--green)')
-    ? (score > 70 ? 'var(--green)' : score > 40 ? 'var(--yellow)' : 'var(--red)')
-    : icColor;
-
-  var tiltWord = tightened > liberalized ? 'net-tightening against the contractor'
-               : liberalized > tightened ? 'net-liberalizing toward the contractor'
-               : 'balanced';
-  var tiltColor = tightened > liberalized ? 'var(--red)' : liberalized > tightened ? 'var(--green)' : 'var(--muted)';
+  // v550 (T4): classification moved to _rrClassify() so the Country Profile sidebar renders the
+  // identical verdict. Every displayed string below is unchanged.
+  var _v = _rrClassify(c);
+  var since2010 = _v.since2010, score = _v.score;
+  var tightened = _v.tightened, liberalized = _v.liberalized, neutral = _v.neutral;
+  var scored = _v.scored, rank = _v.rank, latest = _v.latest;
+  var icRule = _v.icRule, icColor = _v.icColor, icLabel = _v.icLabel, scoreNote = _v.scoreNote;
+  var scoreColor = _v.scoreColor, tiltWord = _v.tiltWord, tiltColor = _v.tiltColor;
 
   out.innerHTML =
     '<div style="border:1px solid var(--border);border-left:3px solid ' + scoreColor + ';border-radius:8px;padding:14px 16px;background:var(--surface);">'
