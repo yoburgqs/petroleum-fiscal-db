@@ -15190,3 +15190,20 @@ filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
 **No new tooltip on any pre-existing control** — the toolbar button's own existing
 `title` was rewritten to match its new behaviour. Tab order unchanged. v371/v373,
 v430, v449, v451, v452, v489, v534, v538, v539 and v540 all untouched.
+
+---
+## Cycle 440 Log — 2026-08-26 00:20
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** LOOP (user-impact) | **Task:** Cycle 440 complete — T5, v541 shipped and pushed
+
+## Cycle 440 — T5, v541
+
+**Task.** T5 — "Give me something I can paste straight into an IC memo." (Least-recently-used: 439 was T2, 438 T4, 437 T6, 436 T1, 435 T3, 434 T5.)
+
+**Friction.** Cold walk into **Side-by-Side**. The tab has *two* copy controls and they run different code:
+
+| control | position | label | wrote |
+|---|---|---|---|
+| `#cmp-copy-table-btn` | **y=178** — toolba
