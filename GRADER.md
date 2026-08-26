@@ -15743,3 +15743,136 @@ plus the Home hero line, and is not claimed as the improvement.
 Cold load, storage cleared. Home → Fiscal Compare → click a row → drilldown, which is exactly what Quick Start step 2 tells a first-time analyst to do.
 
 Inside `openFCDrilldown()`, the v506 reconciliation panel renders in bold: **"Do not put both numbers in one sentence. Cite the dat
+
+---
+## Cycle 445 Log — 2026-08-26 05:10
+- Test before: 135 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 135 PASS / 0 FAIL / 0 WARN / 0 JS errors (suite RAN this cycle)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Shipped: v546, commit `393a94a`, pushed to origin/main
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+Rotation: 439 T2, 440 T5, 441 T3, 442 T1, 443 T4, 444 T6 — T2 was least-recently-used.
+
+## Friction
+Cold load, `sessionStorage` and `localStorage` cleared, into **Country Profile**,
+which auto-loads Norway.
+
+The headline strip has read on the producer basis since v534 — *"#16 of 21
+producers · upper-mid among producers"* — and it keeps the all-185 rank beneath
+it under an explicit label: *"includes 164 countries with no production data."*
+
+Three sections lower, the **NPV @ $75** tile in *Fiscal Mechanics & Key Metrics*
+(`index.html`, the `dd-param` cell built in `loadCountryProfile()`) still printed
+a bare all-185 rank with no caveat at all:
+
+    NPV @ $75      $826M ✓  #175 of 185          <- coloured red
+
+v534 (cycle 433, also T2) corrected every **take** rank on this tab and v542
+(cycle 441) did the same for Side-by-Side. This tile was missed. The page
+therefore warned the analyst against a basis in one place and used it in another.
+
+**The NPV sort is worse than the take sort was.** Low take produces high
+contractor NPV, so the non-producers sit at the *top* of the list, not the
+bottom. The five countries beating the entire world on NPV@$75:
+
+| # | country | NPV@$75 |
+|---|---|---|
+| 1 | Vanuatu | $5,102M |
+| 2 | Bahamas | $4,671M |
+| 3 | Montenegro | $4,631M |
+| 4 | Greenland | $4,542M |
+| 5 | Faroe Islands | $4,514M |
+
+None produces oil. Each is a standardized $1.2B deepwater project run through
+statutory terms over as few as 2–5 contracts.
+
+The consequence is not a softened verdict — it is a uniformly false one.
+**All 21 production-weighted producers fall into the bottom half of the all-185
+NPV list.** Measured against `country_data.json`:
+
+| country | NPV@$75 | old (all-185) | correct (producer) |
+|---|---|---|---|
+| Canada | $3,906M | #28 of 185 | **#1 of 21** |
+| USA | $3,308M | #78 of 185 (grey) | **#2 of 21** |
+| Australia | $2,285M | #111 of 185 | **#8 of 21** |
+| United Kingdom | $1,160M | #149 of 185 | **#13 of 21** |
+| Norway | $826M | #175 of 185 (red) | **#16 of 21** |
+| Nigeria | $302M | #182 of 185 | #21 of 21 |
+
+Canada — the best contractor-NPV producer on earth in this dataset — read
+"#28 of 185". USA, #2 among producers, read mid-pack "#78 of 185" in neutral
+grey because the colour band (`_npvPct<=25` green / `>=75` red) is computed off
+the same corrupt denominator. Norway read bottom-6%-of-the-world in **red**.
+
+That is the worst moment in the T2 walk: it is the single tile that answers "is
+the contractor value here any good?", it sits at the screening decision point,
+and it renders a kill signal manufactured entirely by 164 countries that do not
+produce oil.
+
+## Change
+The tile now ranks against **`getProducerNpvPeers()`** — `getProducerPeers()`
+restricted to records carrying an NPV, sorted **descending so #1 is the highest
+contractor NPV**, i.e. the best place to put the money. *No threshold is
+invented*: the producer set is read off the existing `weighting` field and drops
+state monopolies exactly as `fmtTake` already does.
+
+On screen, each cell now reads `#16 of 21 producers` with a colour-coded second
+line naming the direction, so the analyst never has to infer which end of the
+list is the good end:
+
+  *highest contractor-NPV quartile* / *above producer median* / *at producer
+  median* / *below producer median* / *lowest contractor-NPV quartile*
+
+Countries outside the producer set are no longer given a placement. They read
+**not ranked · no production data**, or **not ranked · state monopoly** for
+take ≥ 99.5%, with the reason in the tooltip. **Vanuatu is the exhibit** — it
+was `#1 of 185`, the most attractive place on earth according to this tile, and
+now reads *not ranked · no production data*.
+
+The all-185 figure is **not deleted**. It moves into the tooltip alongside the
+reason it is not comparable, so nothing is lost and the two bases can still be
+seen to disagree.
+
+## Result
+An analyst screening a country at $75/bbl now reads contractor value against the
+21 regimes that actually produce oil, with the good end of the list named on
+screen. Norway reads *#16 of 21 producers · lowest contractor-NPV quartile* —
+genuinely middling-to-poor, which is defensible in an IC — instead of
+*#175 of 185* in red, which reads as bottom-6%-of-the-world and is not true.
+Canada and the USA stop being greyed out as mid-pack when they are #1 and #2.
+And the tool can no longer tell an analyst that Vanuatu is the most attractive
+contractor-NPV jurisdiction on the planet.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors.
+- `runtime_comprehensive.js` **ran this cycle** against the local build:
+  **135 PASS / 0 FAIL / 0 WARN / 0 JS errors**.
+- Cold Playwright walk, storage cleared, across **11 profiles**: Norway, Canada,
+  USA, Nigeria, United Kingdom, Australia, Malaysia, plus the edge cases Saudi
+  Arabia (state monopoly), Slovenia and Netherlands (no production data, the
+  PROXY case) and Vanuatu (the old #1). All three cell states exercised.
+  **0 page errors on every walk.**
+
+## Still open — stated rather than hidden
+- **Explorer, Screener, Fiscal Compare and the Breakeven Map still rank and
+  colour on the all-185 basis.** v534 and v542 both flagged this; it remains
+  true. Fiscal Compare is the highest-traffic of the four and is the natural
+  next target.
+- The **Breakeven `#N of 68`** rank in this same metrics grid ranks against the
+  68 countries with breakeven data, which is a producer-independent set. It was
+  not touched this cycle and has not been checked for the same distortion.
+- Carried from 443/444, untouched: the Reform Risk tab calls one number
+  "Stability Score", "Reform Frequency Score", and a five-diamond Home-card
+  "Stability Score (◆◆◆◆◆)" on a different scale on a different tab.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip on any pre-existing control. No page-sub
+paragraph, no amber instructional banner, no routing hint, no "How to read"
+block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. Tab order unchanged.
+v371/v373, v430, v449, v451, v452, v489, v534, v542 and v545 all untouched —
+the CP headline stays two-zone with its rank and vs-median pill, Govt NPV stays
+removed from FC. Version sweep done silently at the end across 5 structural
+locations and is **not** claimed as the improvement.
