@@ -14835,3 +14835,132 @@ v513, v515–v527 and v533–v537 all untouched. Version v537→v538.
 **Task.** T6 — "Where did this number come from and how solid is the evidence?" (least-recently-used; 436 was T1, 435 T3, 434 T5, 433 T2, 431 T4 — T6 last ran at cycle 426.)
 
 **Friction.** Cold walk into Country Profile, then into the section literally named for the question. `loadCountryProfile()` rendered **two parameter tables back to back** — `${factsSe
+
+---
+## Cycle 438 Log — 2026-08-25 22:20
+
+- Test before: 134 PASS / 0 FAIL / 1 WARN / 1 JS error (local harness, pre-edit v538)
+- Test after:  134 PASS / 0 FAIL / 1 WARN / 1 JS error (local harness, post-edit v539)
+- Zero test delta. Playwright RAN this cycle, twice — once against the pre-edit build
+  to establish the local baseline honestly. The single WARN is the pre-existing
+  `sw.js` 404: `index.html:49` registers the service worker at
+  `/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath, which 404s on a
+  root-served local server. It does not occur on the deployed site. The deployed
+  baseline recorded in `data/runtime_test_report.txt` is 135 PASS / 0 WARN; the
+  difference is entirely the `[ConsoleErrors]` assertion flipping PASS→WARN
+  locally, not a lost test.
+- JS syntax gate: PASS (9 blocks / 0 errors)
+
+## Cycle 438 — T4, v539
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?"
+(Least-recently-used: 437 was T6, 436 T1, 435 T3, 434 T5, 433 T2; T4 last ran at 431.)
+
+**Friction.** Cold walk (fresh browser context, `sessionStorage` and `localStorage`
+cleared) from load into **Reform Risk**, then into the per-country lookup — the
+control the tab's own intro strip routes the analyst to ("Look up the country
+below"). `renderReformCountryVerdict()` (index.html ~line 28505) classified a
+country three ways:
+
+| test | verdict |
+|---|---|
+| `since2010 >= 3` | Actively Reforming — add 3–5pp WACC premium |
+| `lastRise.year < 2010 && since2010 <= 1` | window artefact — do not carry a zero premium |
+| else | **green — "No reform-frequency premium indicated"** |
+
+Nothing tested for the symmetric case: **a take rise *inside* the window that did
+not also trip the frequency bar of 3.** Four of the 21 scoreable jurisdictions
+fall exactly there, and all four returned the green card:
+
+```
+Russia      2022  Windfall tax on oil export revenues      +15pp   score 85/100  GREEN
+Norway      2022  COVID relief package expired             +12pp   score 70/100  GREEN
+Indonesia   2017  Gross Split PSC introduced                +9pp   score 70/100  GREEN
+Ecuador     2010  PSC replaced by RSC                       +5pp   score 85/100  GREEN
+```
+
+Meanwhile **USA** returned an orange caution — *"do not carry a zero reform
+premium on this basis"* — for a **+3pp** deepwater royalty change in **2007**.
+
+The tab cautioned on a 19-year-old +3pp change and stayed silent on a 4-year-old
++15pp one. Root cause: the Reform Frequency Score is a **count**
+(`100 − 15 × changes since 2010`) and is blind to magnitude — a +15pp rupture and
+a 1pp administrative tweak move it by the same 15 points — and no surface said so.
+
+The **Quiet Since 2010** card carried the same defect by construction. Its filter
+comment read *"genuinely quiet (no hostile on record, **or the last one is inside
+the window**)"* — i.e. a post-2010 take rise was treated as evidence of quiet. So
+Russia sat at the top of a green-bordered card whose own row printed
+*last take rise 2022 · Windfall tax on oil export revenues +15pp*. The evidence
+contradicting the classification was printed inside the row.
+
+**Change.**
+
+1. **A fourth verdict** — *"IC action — take was raised inside the scoring
+   window"* — renders orange (card accent and headline score follow the verdict,
+   so an 85 with a +15pp rise behind it no longer renders in the same green as a
+   real 85). It names the year, event and magnitude, states that the score moves
+   the same 15 points for a +15pp rupture as for a 1pp tweak, and directs the
+   analyst to size the premium against the cumulative pp taken since 2010 rather
+   than the count. Where pre-2010 rises also exist it names those separately —
+   Ecuador now reads *+5pp in-window*, **plus** *2 take rises before 2010
+   totalling +50pp, which the window never scores at all.*
+2. **The Quiet Since 2010 card splits into three labelled groups**, not two:
+   **1** with no take-raising change on record (India) · **2** under a new amber
+   divider reading *"Take was raised inside the window… read the event, not the
+   score"* (Russia, Ecuador) · the pre-existing **6** below the red Below-the-line
+   divider. 1 + 2 + 6 = 9, the card's own count.
+3. **`_rrLastHostile()` now splits its cumulative total** into in-window and
+   pre-window components. The lifetime figure alone had Ecuador's row reading
+   *"3 rises, +55pp cumulative"* under an in-window heading when only +5pp of it
+   falls inside — caught and fixed during verification.
+4. The intro strip's "a high score is not an all-clear" sentence named one reason
+   (the window start). It now names both, and points at three verdicts, not two.
+
+**No new threshold was introduced.** The test is the tab's own Below-the-line year
+test (`lastRise.year < 2010`) read the other way.
+
+**Result.** An analyst screening Russia or Norway for reform exposure previously
+got a green card, a score in the 70s–80s, and the sentence *"No reform-frequency
+premium indicated"* — and could carry a zero reform premium into an IC memo on a
+jurisdiction that raised government take 12–15pp four years ago. They now get an
+orange verdict that names the change, its size, and the cumulative pp to size the
+premium against, and the tab no longer contradicts itself between the lookup and
+the panel three inches below it.
+
+### Verification
+
+Cold Playwright against the local build, storage cleared, every branch exercised:
+
+```
+Russia / Norway / Indonesia / Ecuador   orange — take raised inside the window
+USA                                     orange — window artefact (unchanged)
+United Kingdom                          red/orange — Actively Reforming (unchanged)
+Nigeria / India                         green — no premium (correct: no take-raising events)
+Paraguay                                uncovered — no Reform Frequency Score (unchanged)
+Quiet card groups                       1 / 2 / 6  = 9
+```
+
+Every printed magnitude reconciled independently against `reform_history.json`
+(Ecuador 1972 +15, 2008 +35, 2010 +5 → +50pp pre-window / +5pp in-window ✓).
+**0 page errors** on every walk.
+
+### Found on the same walk — NOT fixed, stated rather than hidden
+
+- `windowArtefact` still requires `since2010 <= 1`, so a country with a pre-2010
+  take rise and exactly 2 changes since 2010 would fall through to green. No
+  country currently occupies that gap (checked all 21), so it is latent, not live.
+  Widening it is its own cycle.
+- The Home quickstart Step 4 still tells the analyst to open Reform Risk "to see
+  the Stability Score (◆◆◆◆◆)". The diamond scale lives on Fiscal Compare; Reform
+  Risk renders a 0–100 numeric score. Flagged at cycle 431, still open.
+- Only 21 of 185 jurisdictions carry any sourced reform log at all. That is a
+  Fork 1 harvest-coverage gap, not a UX one.
+
+### STILL LOCKED — nothing touched
+
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
+**No new tooltip.** Tab order unchanged. v371/v373, v430, v449, v451, v452, v489,
+v532 and v538 all untouched. Version v538→v539.
