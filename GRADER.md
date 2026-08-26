@@ -16295,3 +16295,18 @@ v515, v521, v525, v529, v531, v533, v534, v541, v542, v545, v546, v547 and v548 
 the v542 producer-rank cell was left byte-identical and is qualified from the row above it
 rather than rewritten. Version sweep done silently at the end across the 5 structural
 locations and is **not** claimed as the improvement.
+
+---
+## Cycle 448 Log — 2026-08-26 15:58
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 448 complete — v549 shipped (`c5098d4`), pushed, mirrored.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (T1 ran last cycle.)
+
+## Friction
+Cold walk, storage cleared, Home → Side-by-Side → USA vs Iraq. The Iraq column read **84.8% government take**, ***#21 of 21 producers***, ***highest-take quartile***, in red — the worst regime on the board.
+
+**415 of Iraq's 610 contracts are technical service contracts.** A TSC contractor is paid a fixed $/bbl fee and keeps none
