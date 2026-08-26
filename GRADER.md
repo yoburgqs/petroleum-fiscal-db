@@ -14964,3 +14964,16 @@ read" block, no SbS card wrapper, no visible Explorer chip row. Screener advance
 filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
 **No new tooltip.** Tab order unchanged. v371/v373, v430, v449, v451, v452, v489,
 v532 and v538 all untouched. Version v538→v539.
+
+---
+## Cycle 438 Log — 2026-08-25 22:23
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** LOOP (user-impact) | **Task:** Cycle 438 complete — T4, v539 shipped and pushed
+
+## Cycle 438 — T4, v539
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?" (least-recently-used; 437 was T6, 436 T1, 435 T3, 434 T5, 433 T2).
+
+**Friction.** Cold walk into Reform Risk, then into the per-country lookup — the control the tab's own intro strip tells you to use. `renderReformCountryVerdict()` tested three cases: 3+ changes since 2010 → *Actively Re
