@@ -16195,3 +16195,103 @@ claimed as the improvement.
 **Friction.** Cold walk, storage cleared, Home → Fiscal Compare. Row 1 was **Guyana**, and the Mechanic column read **Concession**. Guyana is the Stabroek PSC — ORCA itself holds 134 of its 143 contracts as PSC.
 
 Every mechanic name on t
+
+---
+## Cycle 448 Log — 2026-08-26
+
+## Cycle 448 — v549 (`c5098d4`, pushed)
+
+**Task: T3 — "How do these three countries compare side by side?"** (T1 ran last cycle, so not repeated.)
+
+**Friction.** Cold walk, `sessionStorage` and `localStorage` cleared, Home → Side-by-Side,
+then USA vs Iraq. The Iraq column read **84.8% government take**, ***#21 of 21 producers***,
+***highest-take quartile***, in red — the single worst regime on the board. **415 of Iraq's
+610 contracts are technical service contracts.** In a TSC the contractor is paid a fixed
+$/bbl remuneration fee and keeps no share of the oil price, so government take% climbs
+toward 97–99% *because of the contract structure*, not because the terms are hard: Iraq's
+TSCs average **98.5% take and +$319M contractor NPV at the same time**. On Iraq's 195
+production-sharing and concession contracts the take at $75/bbl is **34.1%** with **$3.0B**
+contractor NPV.
+
+The only thing on screen that could have explained the 84.8% was the raw string
+`Concession,PSC,TSC` twenty-two rows lower in the Structure block, with **no counts** — a
+country whose take is 68% driven by one mechanic rendered identically to one where that
+mechanic is 0.1% of the set. The analyst eliminates Iraq on a **50.7pp artefact**, at the
+exact point where the choice is made and directly above *Copy for IC Memo*.
+
+The governing rule is `~/MECHANIC_COMPARABILITY.md`, written 2026-08-26: Group 1
+(Concession, PSC, Gross Split, Revenue Share) is commensurable; Group 2 (TSC, RSC,
+Buy-back) is **not**; Group 3 (PRRT) requires an explicit caveat. **It had never reached
+the UX.** Cycle 447 flagged it as the next cycle on the Fiscal Compare surface; Side-by-Side
+is where "comparison is the product" most literally, so it was fixed here first.
+
+**Change.**
+
+1. A new **Take basis (mechanic)** row leads the Data Basis block, placed directly above
+   *Rank among producers* so the basis of a column is read before its placement. It renders
+   `Production-sharing`, `⚠ 68% fee-basis`, or `Cash-flow basis` per column.
+2. All four **Govt Take** rows now print the Group-1-only take beneath the headline on a
+   blended column — `PSC/Conc 34.1%` under Iraq's `84.8%` — so the like-for-like number is
+   on the row where the eye actually lands, at every one of the four price points.
+3. A caveat block names each blended column with its **measured gap**: Iraq 50.7pp,
+   Ecuador 7.2pp, Qatar 2.7pp, Oman 2.0pp, Iran 1.3pp, Malaysia 1.1pp. Magnitude is read off
+   the number rather than off how loud the box is, so no cutoff is invented. It asserts the
+   producer rank is misplaced **only** where correcting the basis actually reorders columns
+   in the current set, and it is **suppressed entirely** for a column whose correction rounds
+   to 0.0pp — Russia carries one TSC in 1,247 contracts and keeps the row-level marker
+   without triggering a notice that corrects nothing.
+4. The **Fiscal Mechanics** row is rebuilt from the DCF result set with per-mechanic counts
+   and group colouring, replacing `d.mechanics`. That string is built from the `n_*` counters,
+   which have **no bucket for the "India RSC" mechanic** — so India rendered
+   `Concession,PSC` while **97 of its 653 contracts are risk-service**. Second defect, found
+   on the same walk and fixed in the same row.
+5. `country_data.json` gains `mech_mix` on all 185 countries and a `g1` block on the 11 that
+   blend groups, added by `tools/add_mech_mix.py` from `dcf_results` read-only. **Purely
+   additive** — every pre-existing field was asserted byte-equal after the write, and
+   `rebuild_country_data.py` was **not** run (breakeven regression risk). +17.4 KB.
+
+**Result.** An analyst comparing **Iraq, Iran, Ecuador, India, Oman, Mexico, Qatar, Malaysia,
+South Sudan, Azerbaijan or Russia** against anywhere else can now see on the take row itself
+that the headline figure mixes two non-comparable fiscal bases, read the like-for-like number
+without leaving the row, and rank on it — instead of discarding a jurisdiction whose
+production-sharing terms are 34.1% because its fee-basis contracts average 98.5%. The
+correction travels into the IC memo: the clipboard export carries both the basis row and the
+corrected take.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors (run after every edit).
+- `runtime_comprehensive.js` **ran this cycle** against the local build:
+  **135 PASS / 0 FAIL / 1 WARN / 1 JS error**. The WARN and the error are the same
+  pre-existing local-harness artefact: `index.html` registers its service worker at
+  `/petroleum-fiscal-db/sw.js`, a path that only resolves under GitHub Pages.
+- Cold Playwright walks, storage cleared, **0 page errors on all eight sets**: USA/Iraq,
+  Norway/Malaysia, Russia/Norway, Australia/Norway, Australia/Denmark, India/Nigeria, the
+  cold default Norway/UK/Netherlands, and the five-column Iran/Iraq/Oman/Qatar/Ecuador.
+  Denmark (109 Concession + 1 PRRT) is no longer mislabelled a cash-flow column — it had
+  been, because the flag keyed off `n_prrt > 0`. Australia vs Denmark correctly raises no
+  cross-basis flag. The IC-memo clipboard export reads `84.8% · PSC/Conc 34.1%` and
+  `TSC (415) · PSC (115) · Concession (80)` with no token fusion, preserving the v541 fix.
+- `country_data.json` diff asserted additive in Python: 185/185 records, every pre-existing
+  key equal, new keys exactly `{mech_mix, g1}`.
+
+## Deliberately NOT done — stated rather than hidden
+1. **Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank the blended
+   headline take with no basis flag.** This cycle fixed Side-by-Side only. `mech_mix` and
+   `g1` are now on every country record, so those surfaces can read the same data without
+   another pipeline pass — that is the next cycle on this class of defect.
+2. **PRRT is flagged but not corrected.** Australia and Denmark carry the Group-3 caveat;
+   no cash-flow-basis restatement is offered, because ORCA holds no equivalent Group-1
+   subset for them.
+3. Carried forward and untouched: the citable take column on Fiscal Compare is still not
+   sortable, and the `getProducerPeers()` port to Explorer / Screener is still open.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip on any pre-existing control — the three new hovers all
+belong to a row or a sub-line that did not exist before this cycle. No page-sub paragraph, no
+amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown. Tab order unchanged. v371/v373, v430, v449, v451, v452, v489, v505 G badge, v511,
+v515, v521, v525, v529, v531, v533, v534, v541, v542, v545, v546, v547 and v548 all intact —
+the v542 producer-rank cell was left byte-identical and is qualified from the row above it
+rather than rewritten. Version sweep done silently at the end across the 5 structural
+locations and is **not** claimed as the improvement.
