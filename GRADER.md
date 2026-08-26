@@ -15461,3 +15461,111 @@ at the end, after the real change shipped.
 Cold walk into the Screener with storage cleared, then every one of the eleven presets loaded in turn.
 
 The Screener has three safeguards, all from v507, that stop an analyst walking away with a shortlist made of regional proxy estimates: the data-basis sentence in the count line, the amber *
+
+---
+## Cycle 443 Log — 2026-08-26
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (suite RAN this cycle against the local build)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Page errors on the cold walk: 0
+- Version: v543 → v544 (bumped silently at the end, after the change shipped)
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"**
+(rotation: 442 was T1, 441 T3, 440 T5, 439 T2, 438 T4, 437 T6)
+
+## Friction
+Cold walk — `sessionStorage` and `localStorage` cleared — into Country Profile,
+which defaults to **Norway**. Under the Fiscal Reform History timeline, the M5.2
+regional context line read, verbatim from the live DOM:
+
+    2 reforms since 2010 · Europe average: 0.2 · above regional average
+
+The average at `index.html:25798` was computed over **every** country in the
+region and read a missing reform log as a count of zero:
+
+```js
+var _regionCountries = COUNTRY_DATA.filter(function(x){ return x.region === _region; });
+var _regionCounts = _regionCountries.map(function(x){
+  var ev = _rh[x.country] || [];          // <-- uncovered country contributes 0
+  return ev.filter(function(e){ return (e.year||0) >= 2010; }).length;
+});
+```
+
+ORCA holds a sourced reform log for **21 of 185** jurisdictions. So the divisor
+was overwhelmingly unresearched countries: "Europe average 0.2" was Norway(2) +
+UK(5) spread across 30; "Africa average 0.2" was 5 measured countries spread
+across 49. Measured against the real data:
+
+| | current basis | measured-only basis |
+|---|---|---|
+| covered countries reading "above regional average" | **17 of 21** | **3 of 21** |
+| Norway (2 reforms) vs UK (5 reforms) | identical verdict string | correctly separated |
+| Norway headline colour | orange (worse than region) | green (less than its peer) |
+| Iraq / Australia | "above regional average" vs an average of themselves | no comparison offered |
+
+Four countries flipped sign outright — Ecuador, Norway and Venezuela from
+"above" to "below", Algeria and Colombia from "at" to "below".
+
+The single worst moment: **on the cold-load default profile**, the platform told
+the analyst that Norway — the more stable of the only two measured European
+regimes — was worse than its region, in orange, against a number fabricated from
+28 countries nobody had researched. And it gave Norway and the UK the same
+verdict on 2 reforms and on 5, so the line carried no information even when the
+direction happened to be right.
+
+This is the identical defect family that **v514** and **v532** already fixed on
+other surfaces (absent coverage is not a clean record, and must never be averaged
+in as one). It was still live on the most-travelled surface in the platform.
+
+## Change
+The mean is taken over **measured jurisdictions only** (peers excluding self),
+the coverage basis is stated on screen, and where a region has too few measured
+peers to support a mean the line says so rather than inventing a verdict. Three
+branches, no new thresholds introduced:
+
+| measured peers | on screen now |
+|---|---|
+| **0** | `no regional comparison — Iraq is the only Middle East jurisdiction with a sourced reform log (1 of 14).` |
+| **1** | `2 reforms since 2010 · United Kingdom: 5 · less reform activity — the only two jurisdictions in Europe with a sourced log (2 of 30); a pair, not an average.` |
+| **2+** | `2 reforms since 2010 · Africa measured peers: 1.5 (mean of 4) · in line with measured peers — 5 of 49 jurisdictions in Africa carry a sourced reform log; the other 44 are unresearched and are excluded, not counted as zero.` |
+
+The one-peer case is named pairwise rather than averaged, because a single peer
+is a pair and not a distribution — and the pair is far more useful to the analyst
+than a mean of one. Colour follows the honest basis, so Norway now renders green.
+
+## Result
+An analyst reading reform exposure on the default Country Profile is now told
+Norway has had **less** reform activity than the only other measured European
+regime, and is shown that the comparison rests on **2 of 30** jurisdictions. They
+can no longer carry an "above regional average" reform premium into an IC memo
+when that premium exists only because 28 neighbouring countries were never
+researched — and where no comparison is supportable at all (Iraq, Australia) the
+page now says so instead of producing one.
+
+## Verification
+Cold Playwright against the local build, storage cleared, walking all three
+branches: Norway (cold default), United Kingdom, Nigeria, Algeria, Iraq,
+Australia, India, Russia, USA, Ecuador, Venezuela, Brazil — plus uncovered Chad,
+which correctly renders the v514 no-coverage panel with no context line at all.
+**0 page errors.** JS syntax gate PASS (9 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle**: 135 PASS / 0 FAIL / 1 WARN. The
+same suite run against the **pre-change backup** returns the identical 135/0/1,
+confirming the WARN is the pre-existing local-harness service-worker 404 and not
+this change.
+
+## Still open — stated rather than hidden
+The Reform Risk tab calls this same number **"Stability Score"** in its global
+table header while the per-country lookup card calls it **"Reform Frequency
+Score"**, and the Home card advertises a five-diamond **"Stability Score
+(◆◆◆◆◆)"** that actually lives on Fiscal Compare and is a different scale. Three
+names, two scales, one tab. Fixing it means changing which control renders where,
+not re-wording a label, so it belongs to its own cycle.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip. No page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. Tab order unchanged. v371/v373, v430, v449, v451, v452,
+v489, v534, v538–v543 all untouched.
