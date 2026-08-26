@@ -15331,3 +15331,118 @@ its own basis; the fix is the denominator and the on-screen direction, not the t
 **Task.** T3 — "How do these three countries compare side by side?" (LRU: 440 was T5, 439 T2, 438 T4, 437 T6, 436 T1; T3 last at 435.)
 
 **Friction.** Cold walk — storage cleared, full reload — into Side-by-Side on its pre-loaded Norway / UK / Netherlands set. Of the 22 rows in the grid, exactly one places a column against the rest of the world: **Global Ran
+
+---
+## Cycle 442 Log — 2026-08-26 01:55
+
+- Test before: 135 PASS / 0 FAIL / 0 JS errors
+- Test after: 135 PASS / 0 FAIL / 1 WARN — suite ACTUALLY RAN this cycle
+  (WARN = local-server `sw.js` 404 on the service-worker fetch; pre-existing,
+  not introduced here)
+- JS syntax gate: PASS (9 blocks / 0 errors), run twice — after the fix and
+  again after the version bump
+- Shipped: **v543**, commit `2aa65a2`, pushed as `f586565`
+
+### Task
+**T1 — "Which countries should even be on my screening list?"**
+LRU rotation: 441 was T3, 440 T5, 439 T2, 438 T4, 437 T6; T1 last ran at 436.
+
+### Friction
+Cold walk — `sessionStorage` and `localStorage` cleared, full reload — into the
+Screener, then every one of the eleven presets in the dropdown loaded in turn.
+
+The Screener has three safeguards built specifically to stop an analyst carrying
+away a shortlist made of regional proxy estimates: the data-basis sentence in the
+count line, the amber **BELOW THIS LINE** divider inside the table, and the
+verified-production handoff into Side-by-Side. All three landed in v507. All
+three were gated on **one flag** — `_grouped`, `runScreener()`,
+`index.html:24510` — which requires `_nVerified > 0 && _nProxy > 0` **and** a
+non-swing sort.
+
+That flag is false in exactly the two states where the analyst needs the warning
+most, and in both the page went **entirely silent about data basis**:
+
+1. **All-proxy result sets.** The **Deepwater** preset — arguably the most
+   natural screen on a page whose whole DCF profile is a standardized $1.2B
+   deepwater development — returns 11 countries, **0 of them with verified field
+   production**. On screen: a bare `Deepwater · 11 countries match at $75/bbl`
+   with no caveat of any kind, contractor NPVs rendered to $4–5B, no divider, and
+   a button reading `⇌ Load top 5 in Side-by-Side →` that shipped
+   **Namibia · Ghana · Mozambique · Tanzania · Gabon** in as an IC shortlist.
+   v507's own inline comment says the per-row PROXY badge cannot carry this by
+   itself *"because every row above it was badged PROXY too and it read as
+   decoration"* — which describes an all-proxy list exactly. The guard was
+   absent precisely where its own author said the fallback fails.
+
+2. **Interleaved mixed sets.** The **R-factor PSC** preset sorts by
+   price-sensitivity swing, so verified and proxy rows interleave and no single
+   divider is drawable. It returns 70 countries, **11 of them production-backed**,
+   and handed **Guyana · Sierra Leone · Liberia · Suriname · Sri Lanka** — five
+   proxies — to Side-by-Side while eleven genuine producers sat further down the
+   same list.
+
+### Change
+Each safeguard is now driven by what the result set actually contains rather than
+by whether one particular sort happens to make a divider drawable. Two new states
+are classified alongside `_grouped`: `_allProxy` and `_mixedUngrouped`.
+
+- **All-proxy screens** state in the count line that *none of these N countries
+  has verified field production; every take, NPV and breakeven below is a
+  regional proxy estimate, indicative only*, and carry a banner as the **first
+  row of the table itself** — same amber treatment as the v507 divider, because
+  the count line above the grid is easy to skip and the first row of the grid is
+  not. The banner names the way out: widen the screen, or load the IOC Capital
+  Screen preset for the production-backed set.
+- **Interleaved mixed screens** state the split on screen (*11 of 70 have
+  verified field production, 59 carry regional proxy economics*) and say plainly
+  that this sort interleaves the two bases, so the badge on each row is what to
+  read.
+- **The Side-by-Side handoff** now draws from the verified-production rows
+  whenever there are at least two of them, independent of the sort. Where no
+  production-backed row exists at all, the button says so on its own face:
+  `⇌ Load top 5 — all proxy-economics in Side-by-Side →`.
+
+Nothing was removed and nothing was filtered out — all rows stay in the table,
+the count and the export.
+
+### Result
+An analyst can no longer take a shortlist off the Screener without being told
+what it is built on — on **every** preset, not just the subset that happened to
+return two non-empty groups. Concretely: loading Deepwater now produces a warning
+they cannot miss instead of eleven confident $4–5B NPVs, and the one-click
+handoff from R-factor gives them **Indonesia · Malaysia · Angola · India ·
+Azerbaijan** — five countries with verified field production — where it
+previously gave five proxies.
+
+### Verification
+Cold Playwright against the local build, storage cleared, walking all eleven
+presets plus the unfiltered universe:
+
+| preset | rows | verified | banner | handoff |
+|---|---|---|---|---|
+| Deepwater | 11 | 0 | all-proxy banner fires | `all proxy-economics` stated |
+| R-factor PSC | 70 | 11 | mixed banner fires | Indonesia · Malaysia · Angola · India · Azerbaijan |
+| IOC Capital Screen | 14 | 14 | correctly none | unchanged |
+| Sweet Spot / Atlantic Frontier / reset | grouped | — | correctly none | unchanged |
+
+Regression check on the grouped path: the 185-row unfiltered default still
+renders **exactly one** divider, at row 22, with its original text. The
+zero-result branch returns before the banner is constructed and is unaffected.
+**0 page errors on every walk.**
+
+### Still open — stated rather than hidden
+Explorer, Fiscal Compare and the Breakeven Map still rank and colour on the
+all-185 basis. Each is its own surface with its own sort and colour ramp and
+belongs to its own cycle. Also still open from cycles 431/438/441: Home
+quickstart Step 4 tells the analyst to open Reform Risk "to see the Stability
+Score (◆◆◆◆◆)" — the diamond scale lives on Fiscal Compare, and Reform Risk
+renders a 0–100 numeric score.
+
+### STILL LOCKED — nothing touched
+No new FAQ (still 974). **No new tooltip** — the fix is the disclosure and the
+handoff pool, not a hover. No page-sub paragraph, no amber instructional banner
+of the v371/v373 kind, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. Tab order unchanged. v371/v373, v430, v449, v451, v452,
+v489, v534, v538–v542 all untouched. The version bump to v543 was done silently
+at the end, after the real change shipped.
