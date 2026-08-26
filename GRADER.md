@@ -15207,3 +15207,114 @@ v430, v449, v451, v452, v489, v534, v538, v539 and v540 all untouched.
 | control | position | label | wrote |
 |---|---|---|---|
 | `#cmp-copy-table-btn` | **y=178** — toolba
+
+---
+## Cycle 441 Log — 2026-08-26 01:05
+- Test before: 135 PASS / 0 FAIL / 0 JS errors
+- Test after: 135 PASS / 0 FAIL / 1 WARN — suite **RAN this cycle** against the local post-edit build (`TEST_URL=http://localhost:8080`). The WARN is the known local-harness artifact: the service worker registers `/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath, which 404s on a root-served local server. Correct in production.
+- JS errors on the T3 walk: 0 (four cold walks, four country sets)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Version: v541 → v542
+
+## Cycle 441 — T3, v542
+
+**Task.** T3 — *"How do these three countries compare side by side?"*
+(least-recently-used: 440 was T5, 439 T2, 438 T4, 437 T6, 436 T1; T3 last run at cycle 435.)
+
+**Friction.** Cold walk — `sessionStorage` and `localStorage` cleared, full reload — into
+**Side-by-Side** on its pre-loaded Norway / United Kingdom / Netherlands set. Of the 22 rows
+in the grid, exactly one places a column against the rest of the world: **Global Rank
+(take @$75)**, built by `_cmpRankMap` in `renderCompare()`. It is the row an analyst reads to
+answer *"is this regime good or bad, globally?"*, and it sits four rows above **⎘ Copy for IC
+Memo**. It carried three defects at once.
+
+**1 — Basis.** It ranked against all 185 countries:
+
+```js
+COUNTRY_DATA.filter(c => c.take_75 != null).sort((a,b) => a.take_75 - b.take_75)
+```
+
+164 of those 185 hold no verified field production at all — equal-weighted averages of
+statutory terms over as few as 2 contracts — and they crowd the low-take end of the sort, so
+every genuine producer is pushed toward the bottom of it. The verdict **inverts**; it does not
+merely soften:
+
+| country | as shown | against the producer set | reads as |
+|---|---|---|---|
+| **United Kingdom** | **#121 of 185** | **#8 of 21 producers** | bottom third → below the producer median |
+| **Australia** | **#108 of 185** | **#6 of 21** | mid-pack → top third |
+| **USA** | **#62 of 185** | **#1 of 21** | mid-pack → lowest-take producer on earth |
+| Norway | #168 of 185 | #16 of 21 | near-worst → top take quartile, but 5 producers above it |
+| Nigeria | #179 of 185 | #20 of 21 | — |
+| Brazil | #147 of 185 | #10 of 21 | near-worst → below the producer median |
+
+This is the same all-185 distortion **v534** corrected on Country Profile. Side-by-Side still
+carried it, and cycle 440 flagged it on this tab without fixing it.
+
+**2 — Direction.** `#168 of 185` never stated whether **#1** is the best regime to enter or the
+worst. Nothing on screen resolved it.
+
+**3 — Fabricated placement.** It handed a hard global rank to columns that do not have one. The
+cold-load default set is the exhibit: the **Netherlands** column is the PROXY that the caveat
+block *under this same grid* warns about — 0% production coverage, 278 fiscal facts, 135
+contracts — and the row asserted **"#61 of 185"** for it as confidently as it did for Norway's
+63,848 facts. Same for Guyana (#138 of 185) and Ghana (#127 of 185).
+
+**Change.**
+
+- The row is now **Rank among producers (take @$75)** and ranks against `getProducerPeers()` —
+  the 21 countries whose take is weighted by verified field production, with state monopolies
+  (take ≥ 99.5%, no contractor access) excluded exactly as `fmtTake` already drops them.
+  **No threshold is invented:** the producer set is read straight off the existing `weighting`
+  field, the same source v534 uses on Country Profile.
+- Each cell now reads `#8 of 21 producers` with a **colour-coded second line stating the
+  direction on screen** — *lowest-take quartile* / *below producer median* / *at producer
+  median* / *above producer median* / *highest-take quartile*. The analyst never has to guess
+  which end of the list is the good end.
+- Countries outside the producer set are **no longer given a placement**, because they do not
+  have one. They read **not ranked · no production data**, or **not ranked · state monopoly**
+  at take ≥ 99.5%, with the specific reason (contract count, `prod_coverage_pct`) in the cell
+  tooltip.
+- **Nothing is lost.** The all-185 figure moves into every cell's tooltip, alongside the count
+  of countries it mixes in — so the analyst can see the two bases disagree and by how much.
+- The median label is computed from the take against the producer median rather than from the
+  rank quantile, so the median country — Malaysia, 59.4% against a 59.4% producer median —
+  reads *at producer median* and not *above* it.
+
+**Result.** An analyst comparing three countries reads a placement against the 21 regimes that
+actually compete for the same capital, with the direction stated on screen, and stops carrying
+an inverted UK / Australia / USA ranking into an IC memo. A column ORCA holds no production for
+no longer receives a global rank it cannot support. Because the row rides the shared `rows`
+array, the corrected basis travels into the clipboard export too.
+
+**Verification.** Cold Playwright against the local build, storage cleared, four sets:
+
+- **Default trio** (Norway / UK / Netherlands) — producer, producer, no-production
+- **Guyana / Brazil / Nigeria** — no-production, producer, producer
+- **USA / Iraq** — the #1 and #21 extremes of the producer set
+- **Australia / Angola / Saudi Arabia / Ghana / Malaysia** — five columns including a state
+  monopoly and the exact-median country
+
+All three cell states exercised. Clipboard payload read back against the toolbar button:
+
+```
+Rank among producers (take @$75)	#16 of 21 producers · highest-take quartile	#8 of 21 producers · below producer median	not ranked · no production data
+```
+
+**0 page errors on every walk.** JS syntax gate PASS (9 blocks / 0 errors). Full
+`runtime_comprehensive.js` ran post-edit: **135 PASS / 0 FAIL / 1 WARN**.
+
+**Found on the same walk — NOT fixed, stated rather than hidden.** Explorer, Screener, Fiscal
+Compare and the Breakeven Map still rank and colour on the all-185 basis. Each is its own
+surface with its own sort and colour ramp, and each belongs to its own cycle.
+
+Also still open from cycles 431/438: Home quickstart Step 4 tells the analyst to open Reform
+Risk "to see the Stability Score (◆◆◆◆◆)"; the diamond scale lives on Fiscal Compare and Reform
+Risk renders a 0–100 numeric score.
+
+**STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional banner, no
+routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row.
+Screener advanced filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
+Tab order unchanged. v371/v373, v430, v449, v451, v452, v489, v534, v538, v539, v540 and v541
+all untouched. The one tooltip added belongs to a row label that had none and now has to declare
+its own basis; the fix is the denominator and the on-screen direction, not the tooltip.
