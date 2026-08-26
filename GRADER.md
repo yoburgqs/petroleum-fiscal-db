@@ -14977,3 +14977,98 @@ v532 and v538 all untouched. Version v538→v539.
 **Task.** T4 — "What is my fiscal-stability and reform exposure here?" (least-recently-used; 437 was T6, 436 T1, 435 T3, 434 T5, 433 T2).
 
 **Friction.** Cold walk into Reform Risk, then into the per-country lookup — the control the tab's own intro strip tells you to use. `renderReformCountryVerdict()` tested three cases: 3+ changes since 2010 → *Actively Re
+
+---
+## Cycle 439 Log — 2026-08-25 (v540)
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN — `runtime_comprehensive.js` RAN this cycle
+  against the local build. The WARN is the pre-existing local-harness service-worker
+  404 (`/petroleum-fiscal-db/sw.js` 404s on a root-served local server).
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Page errors on the cold walk: 0
+
+**Task.** T2 — "Is this one country attractive at $75/bbl, and can I defend that?"
+(least-recently-used; 438 was T4, 437 T6, 436 T1, 435 T3, 434 T5, 433 T2.)
+
+**Friction.** Cold walk (fresh browser context, `sessionStorage` and `localStorage`
+cleared) into Country Profile, which auto-loads Norway, and down to the **4-Price
+Sensitivity** table — the table the page itself labels for IC use and puts a
+`Copy as IC table` button under. The last row of that table, `regionAvgRow465`
+(index.html ~26663), was the one surface on Country Profile still averaging
+`COUNTRY_DATA` unfiltered. Cycle 433 / v534 moved the headline rank, the vs-median
+pill and the peer strip onto the 21 production-weighted producers; this footer kept
+the old 185-record basis and therefore **contradicted the peer strip three inches
+above it**. Norway read:
+
+    Region Avg | 22.1% | +45.9pp vs Europe avg | Europe · n=29
+
+while the strip on the same screen read *"Only producer peer in Europe: United
+Kingdom 49.2%"*. The 29 "European peers" include Moldova, Belarus, Bosnia, Malta,
+Belgium and Serbia — none of which produce.
+
+The dilution reversed the **sign** of the claim for **6 of the 21 producers**:
+
+| Country | Before (all-country basis) | After (producer basis) |
+|---|---|---|
+| United Kingdom | +26.4pp "above Europe avg" | **−18.8pp** vs Norway, its only peer |
+| Angola | +8.9pp "above Africa avg" | **−18.1** vs Libya · **−28.1** vs Nigeria |
+| Oman | +16.9pp above | **−7.2pp** vs Iraq |
+| Azerbaijan | +15.9pp above | **−9.1pp** vs Kazakhstan |
+| Malaysia | +14.4pp above | **−1.6pp** vs Asia producer median |
+| Indonesia | +14.5pp above | **−1.5pp** vs Asia producer median |
+
+and **Australia** claimed *"+17.8pp vs Oceania avg (n=14)"* against a region holding
+**zero** other production-weighted regimes (Fiji, Nauru, Palau, Kiribati).
+
+**Change.** The row now reads off the *same* `getProducerContext()` call as the pill
+and the strip, on the same three branches v534 established:
+
+- **≥3 producer peers** → `Region Median | 32.9% | +22.8pp vs Latin America producer median | Latin America · n=4 producers`
+- **1–2 peers** → it NAMES them instead of pretending a median exists:
+  `+18.8pp vs United Kingdom (49.2%)` · `−18.1pp vs Libya (71.1%) · −28.1pp vs Nigeria (81.1%)`
+- **0 peers** → `No other production-weighted producer in Oceania — no regional benchmark`
+- **Country outside the producer set** → keeps the all-country figure, but the basis
+  is now stated on the row: `Region Avg (all) | 23.8% | −4.7pp vs Europe avg | Europe · n=29, 2 producers`
+
+**No threshold is invented** — the producer set is the existing `weighting` field,
+unchanged since v534.
+
+**Result.** An analyst screening Angola no longer reads it as an above-average-take
+African jurisdiction when against the only two African producers it is 18–28pp
+cheaper — a reversed screening conclusion, not a rounding difference. The UK no
+longer reads as high-take Europe when it is the cheaper of the two North Sea
+regimes. And the 4-Price Sensitivity table no longer contradicts the peer strip
+printed three inches above it on the same page.
+
+### Verification
+
+Cold Playwright against the local build, storage cleared, all four branches
+exercised and all 21 producers walked. Every reciprocal pair reconciles
+independently: Norway +18.8 vs UK ↔ UK −18.8 vs Norway; Iraq +7.2 vs Oman ↔ Oman
+−7.2 vs Iraq; Kazakhstan +9.1 vs Azerbaijan ↔ Azerbaijan −9.1; and the
+Angola/Libya/Nigeria triangle closes at ±18.1 / ±10.0 / ±28.1. Edge cases walked:
+Slovenia (not production-weighted → labelled all-basis), Saudi Arabia (state
+monopoly → labelled all-basis), Australia (0 regional producers). **0 page errors
+on every walk.**
+
+### Found on the same walk — NOT fixed, stated rather than hidden
+
+- `Copy as IC table` does **not** carry this row into the clipboard, so the pasted
+  TSV was never wrong. The defect was on screen, which is where the analyst
+  transcribes from — but it means the blast radius was narrower than it looked.
+- Explorer, Screener, Fiscal Compare and the Breakeven Map still rank on the
+  all-185 basis. Same root cause, different tabs; those are T1/T3 surfaces and
+  belong to their own cycle. Country Profile is now internally consistent.
+- The Home quickstart Step 4 still tells the analyst to open Reform Risk "to see
+  the Stability Score (◆◆◆◆◆)"; the diamond scale lives on Fiscal Compare and
+  Reform Risk renders a 0–100 numeric score. Flagged at cycle 431 and 438, still open.
+
+### STILL LOCKED — nothing touched
+
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. **No new FAQ** (still 974). **No
+new tooltip on any pre-existing control** — the row's own existing `title` was
+rewritten to match the new basis. Tab order unchanged. v371/v373, v430, v449, v451,
+v452, v489, v534, v538 and v539 all untouched. Version v539→v540.
