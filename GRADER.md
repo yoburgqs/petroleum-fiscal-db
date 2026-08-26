@@ -15728,3 +15728,18 @@ presets still a dropdown. Tab order unchanged. `copyICCitation()` untouched.
 v371/v373, v430, v449, v451, v452, v489, v506, v514, v518, v520, v534, v538–v544
 all untouched. Version sweep done silently at the end, 4 structural locations
 plus the Home hero line, and is not claimed as the improvement.
+
+---
+## Cycle 444 Log — 2026-08-26 03:56
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 444 complete — v545 shipped and pushed (`5e62443`).
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (443 was T4; T6 was least-recently-used, last walked at 437.)
+
+## Friction
+Cold load, storage cleared. Home → Fiscal Compare → click a row → drilldown, which is exactly what Quick Start step 2 tells a first-time analyst to do.
+
+Inside `openFCDrilldown()`, the v506 reconciliation panel renders in bold: **"Do not put both numbers in one sentence. Cite the dat
