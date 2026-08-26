@@ -16035,3 +16035,148 @@ v542, v545 and v546 all untouched. Version sweep done silently at the end across
 
 ## Friction
 Cold walk with storage cleared, Home → **Fiscal Compare** — the tab Home labels "Start here" and the only surface that produces a *shortlist* rather than one country. Two halves of one momen
+
+---
+## Cycle 447 Log — 2026-08-26 07:20
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN (known local service-worker 404)
+- Test after: 135 PASS / 0 FAIL / 1 WARN — `runtime_comprehensive.js` **ran this cycle**
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- JS page errors on cold walk: 0
+- Shipped: **v548**, commit `a39c020`, pushed to origin/main
+
+## Task
+**T1 — "Which countries should even be on my screening list?"**
+(rotation: 441 T3, 442 T1, 443 T4, 444 T6, 445 T2, 446 T5 — T5 was last cycle, so not repeated)
+
+## Friction
+Cold walk (fresh browser context, `sessionStorage` and `localStorage` cleared) from
+Home into **Fiscal Compare**, the tab Home labels *Start here* and the only surface
+that produces a shortlist rather than a single country.
+
+Row 1 of the cold default view was **Guyana**, and the *Mechanic* column read
+**Concession**. Guyana is the Stabroek PSC; ORCA itself holds **134 of Guyana's 143
+contracts as PSC**.
+
+Every surface that names a mechanic — the FC Mechanic column, the Country Profile
+headline tag, both peer strips, the Live DCF panel, the tornado sensitivity chart,
+the Scenario Builder prefill, the CP citation string — **and the compare engine that
+decides which DCF to run** — resolved it with `d.mechanics.split(',')[0]`. That
+string is ordered alphabetically, so **"Concession" leads it for any country holding
+even one Concession contract.** Counted off `COUNTRY_DATA`: **39 of the 185 rows
+named a mechanic that is not the country's dominant one by contract count** —
+
+| country | shown | actual plurality |
+|---|---|---|
+| Indonesia | Concession | **PSC 644 / 648** |
+| Guyana | Concession | **PSC 134 / 143** |
+| Iraq | Concession | **TSC 415 / 610** |
+| Iran | Concession | **Buy-back 284 / 547** |
+| India | Concession | PSC 466 / 556 |
+| China | Concession | PSC 478 / 799 |
+| Libya | Concession | PSC 241 / 301 |
+| Algeria | Concession | PSC 158 / 177 |
+| Azerbaijan | Concession | PSC 156 / 168 |
+| Equatorial Guinea | Concession | PSC 121 / 125 |
+| Timor-Leste | Concession | PSC 166 / 175 |
+| Kazakhstan | Concession | PSC 184 / 302 |
+
+`FC_MECHANIC_OVERRIDE` was the hand-maintained patch for exactly this defect and
+had reached 16 countries.
+
+**It was never only a label.** `getDCFParams()` enriches from `COUNTRY_DATA` only on
+its PSC branch, so a PSC country mis-resolved to Concession never picked up its own
+`ftp` / `cr_cap` / `profit_oil_govt` / `royalty` — all of which ORCA holds — and fell
+to the generic Concession default of 10% royalty / 25% CIT. **That is the origin of
+the 22.2% block this table has carried since v505**: 153 rows on one identical take,
+154 grey `G` badges, a 153-way `=1` tie at the head of the screening list. Six
+cycles have documented, footnoted and worked around that block. It was not a data
+gap. It was an alphabetical sort.
+
+Worse, `runFiscalCompare()` ignored `params._mechanic`, so **Iraq's $6.00/bbl TSC
+service-fee override was handed to `dcfConcession`** and Iran's `_mechanic:
+'Buy-back'` — which Country Profile reads — was silently dropped. Iraq printed a
+27.1% take and **+$3.7B contractor NPV on a fee contract**.
+
+## Change
+One resolver, `fcResolveMechanic()`, is now the single read point on all **13** call
+sites: `FC_MECHANIC_OVERRIDE` first, then **plurality by contract count** read off the
+`n_concession` / `n_psc` / `n_tsc` / `n_prrt` / `n_rsc` / `n_buyback` / `n_rev_share`
+fields ORCA already carries, then the old first-listed behaviour where no counts
+exist. *No threshold is invented*; exact ties keep the previous Concession-first
+outcome. `runFiscalCompare()` now honours `params._mechanic` when it dispatches.
+
+On screen: each Mechanic cell carries the count it was resolved from beneath the tag
+— **Iraq "TSC 415/610 · 68%"**, **Guyana "PSC 134/143 · 94%"**, **Brazil
+"Concession 845/1,193 · 71%"** — so the analyst reads a sourced count, not an
+assertion. Single-mechanic countries (Norway, Australia) show no count line. The 16
+curated override rows can sit *below* plurality on raw count (Egypt is 129/218
+Concession but PSC is the IOC regime), so they are marked **· IOC regime** and their
+hover names the raw plurality rather than claiming to be it.
+
+## Result
+On the cold default view:
+
+| | before | after |
+|---|---|---|
+| rows modelled on their own ORCA terms | 31 of 185 | **65 of 185** |
+| grey `G` (generic default, not citable) | 154 | **120** |
+| rows in the 22.2% tie block | 153 | **116** |
+| mean \|model take − citable db take\|, all 185 | 13.9pp | **8.6pp** |
+
+The model take and the citable database take now agree where they should —
+**Guyana 22.2% → 55.4% against a citable 54.1%**, a drilldown reconciliation that
+moves from **−31.9pp to +1.3pp**; Indonesia 64.1 vs 59.5; Sierra Leone 53.0 vs 53.4;
+Republic of the Congo 60.6 vs 60.2; Algeria 69.9 vs 69.5.
+
+**Iraq now reads TSC and models as one**: 67.2% take on a **−$627M** contractor NPV
+— the true screening signal for a fee-based regime against a $1.2B deepwater project
+— in place of a Concession at +$3.7B. Iran reads Buy-back. Country Profile's Live
+DCF, the tornado chart and the Scenario Builder prefill all now run the same regime
+as Fiscal Compare, so the v504 label-drift class of defect cannot reopen through
+this path.
+
+An analyst screening at $75/bbl can now read a country's actual fiscal structure off
+row 1 of the flagship table, see the contract count it was derived from, and get a
+modelled take that reconciles to the citable figure on 34 more countries than before.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors (run after every edit).
+- `runtime_comprehensive.js` **ran this cycle** against the local build:
+  **135 PASS / 0 FAIL / 1 WARN / 1 JS error** — WARN and error are the same known
+  local-harness service-worker 404 present in the pre-edit baseline.
+- Cold Playwright walk, `sessionStorage` and `localStorage` cleared: **11 header
+  cells** and **185 rows** unchanged; all three dividers still `colspan=12`; the
+  Mechanic count line present on plurality rows and absent on single-mechanic
+  countries; FC drilldowns for Iraq and Guyana render the new regime and the new
+  reconciliation delta; `⎘ Copy for IC Memo` still returns a **192-line** table;
+  Country Profile Live DCF reports *(PSC regime)* for Guyana / Indonesia / Egypt,
+  *(TSC regime)* for Iraq, *(Concession regime)* for Norway. **0 page errors on
+  every walk.**
+
+## Deliberately NOT done — stated rather than hidden
+1. **120 rows remain on the generic Concession default.** Their plurality genuinely
+   *is* Concession (Brazil, Canada, Mexico, Russia, Venezuela, Saudi Arabia) and
+   ORCA holds no Concession-side terms to enrich from. Closing those needs a
+   `getDCFParams()` Concession enrichment branch or a data-pipeline load, not a
+   resolver.
+2. **Group-2 comparability is now flaggable and is not flagged.** With Iraq reading
+   TSC and Iran Buy-back, the table sorts a **fee-basis** take against
+   production-sharing takes in one ranking. Per `~/MECHANIC_COMPARABILITY.md`
+   (written 2026-08-26): TSC / RSC / Buy-back take% is a structural artefact of the
+   mechanic and is **not commensurable** with Concession / PSC / Gross Split /
+   Revenue Share; PRRT needs its own caveat. Making the mechanic honest is what
+   makes that flag possible. The flag is the next cycle on this surface.
+3. Carried from v546 and v547, untouched: the citable take column is still not
+   sortable, and the `getProducerPeers()` port to this tab is still open.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip on any pre-existing control — the Mechanic
+header tooltip was rewritten because its stated basis changed, and the one new hover
+belongs to a count line that did not exist. No page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card wrapper,
+no visible Explorer chip row. Screener advanced filters still collapsed, presets
+still a dropdown. Tab order unchanged. v371/v373, v430, v449, v451, v452, v489,
+v505 G badge, v525, v529, v533, v534, v542, v545, v546 and v547 all untouched.
+Version sweep done silently at the end across 5 structural locations and is **not**
+claimed as the improvement.
