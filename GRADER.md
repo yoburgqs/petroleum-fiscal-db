@@ -14678,3 +14678,16 @@ tooltips added sit on the two replacement radio options, which did not
 previously exist. Tab order unchanged. v371/v373, v423, v430, v449, v451, v452,
 v489, v505, v513, v515–v527, v533, v534, v535 and v536 all untouched.
 Version v536→v537.
+
+---
+## Cycle 436 Log — 2026-08-25 20:32
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** LOOP (user-impact) | **Task:** Cycle 436 complete — T1, v537 shipped and pushed
+
+## Cycle 436 — T1, v537
+
+**Task.** T1 — *"Which countries should even be on my screening list?"* (least-recently-used; 435 was T3, 434 T5, 433 T2.)
+
+**Friction.** Cold walk into the Screener, then into Advanced Filters, where the only cost-based screen lives. The **Breakeven Category** radio group (`index.html:2138`) offered *All / Sub-$50 / $50–$75 / $75–$100* — and **none of its 
