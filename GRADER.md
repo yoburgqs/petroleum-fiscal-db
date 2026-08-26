@@ -15085,3 +15085,108 @@ v452, v489, v534, v538 and v539 all untouched. Version v539→v540.
 **Task.** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (least-recently-used; 438 was T4, 437 T6, 436 T1, 435 T3, 434 T5, 433 T2.)
 
 **Friction.** Cold walk into Country Profile, down to the **4-Price Sensitivity** table — the one the page itself labels for IC use and puts a `Copy as IC table` button under. Its last row (`regionAvg
+
+---
+## Cycle 440 Log — 2026-08-26
+
+- Test before: 134 PASS / 0 FAIL / 1 WARN (local build, measured this cycle)
+- Test after: 134 PASS / 0 FAIL / 1 WARN — outcomes byte-identical to before
+- JS errors: 1 (the known local-harness `sw.js` 404 — the service worker registers
+  the GitHub Pages subpath `/petroleum-fiscal-db/sw.js`, which 404s on a root-served
+  local server; 200 in production). Playwright **ran** this cycle.
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Version: v540 → v541
+
+### Task
+**T5** — "Give me something I can paste straight into an IC memo."
+(Least-recently-used: 439 was T2, 438 T4, 437 T6, 436 T1, 435 T3, 434 T5.)
+
+### Friction
+Cold walk (fresh context, `sessionStorage` and `localStorage` cleared) into
+**Side-by-Side** on its pre-loaded Norway / United Kingdom / Netherlands set.
+
+The tab carries **two** copy controls, and they run different code:
+
+| control | position | label | what it wrote |
+|---|---|---|---|
+| `#cmp-copy-table-btn` | **y=178** — primary toolbar, above the fold, next to Clear / Export PDF / Share Link | "📋 Copy Table" | its own private TSV dump |
+| `.cmp-inline-copy-btn` | **y=1602** — below all 22 metric rows, 700px past the fold | "⎘ Copy Table for IC Memo" | `copyComparisonTable()` — the memo-ready builder |
+
+The toolbar dump was added at **v466** and never removed when **v503** built the
+proper builder. It took `innerText` off whatever `<table>` it found first inside
+`#cmp-output` and wrote `text/plain` only. What it produced carried:
+
+- **no caption**
+- **no assumption line** — no Deepwater profile, no $1.2B capex, no 10% WACC, no
+  100% WI, no price deck, and no statement of why IRR is absent
+- **no ORCA source line and no version**
+- the `ⓘ` help glyphs left inside the row labels
+- no `text/html` flavour, so it pasted into Word as a slab of tab characters
+
+A government-take and contractor-NPV table pasted into an investment-committee
+memo with no stated discount rate, no working interest and no attribution is the
+exact artifact this task exists to prevent.
+
+The empty state was the worst case: **below two countries the inline button does
+not render at all**, so the degraded toolbar button was the only reachable copy
+control on the tab — and it answered "Nothing to copy".
+
+### Change
+1. `#cmp-copy-table-btn` now calls `copyComparisonTable()` and its private dump is
+   deleted. Both controls now emit the same two clipboard flavours (`text/html`,
+   so Word / Google Docs / Outlook / PowerPoint render a real bordered table, and
+   TSV, so Excel splits it into columns), the same caption, the same assumption
+   line and the same `_orcaVerNow()` source line.
+2. Relabelled **⎘ Copy for IC Memo**, so the two controls no longer promise the
+   same thing and deliver different things. Below two countries it now returns
+   the actionable *"Load at least 2 countries into Side-by-Side first."*
+3. **Second defect, fixed in the same artifact.** `cellText()` read each cell with
+   `textContent`, which has no whitespace at an inline-element boundary. Several
+   cells put two independent readings in adjacent `<span>`s divided only by a CSS
+   border — `renderStabilityBadge()` worst of all — so *every* pasted IC table,
+   from **both** buttons, had been carrying `76 · HIGHone term` and
+   `58 · LOW15.0pp` where the screen reads a score, a grade, and the dispersion
+   basis that grade was built on. Cells are now read child-by-child, with a
+   separator inserted **only** where two pieces would otherwise collide into one
+   token — `83% A/B · A`, `Equal-weighted · all 7,643 (≠ take basis)` and `278 ⚠`
+   are unchanged; predictability now reads `76 · HIGH · one term`.
+
+### Result
+An analyst who clicks the first copy control they see on Side-by-Side — the one
+in the toolbar, the only one visible without scrolling past 22 rows — now gets a
+formatted table in Word that carries its own price deck, discount rate, working
+interest and versioned ORCA source line, instead of an unattributed block of
+tab-separated text an IC would send back. And the predictability cell arrives as
+three readable fields rather than a fused token.
+
+### Verification
+Cold Playwright against the local build, storage cleared:
+
+- Both buttons emit **byte-identical payloads** on the cold default trio.
+- Caption, assumption line and versioned source line present on **2-, 3- and
+  5-country** sets — USA/Iraq, Norway/UK/Netherlands, and
+  Norway/Nigeria/Guyana/Brazil/Saudi Arabia (including a state-monopoly column).
+- TSV column counts uniform at **3 / 4 / 6** across all **22** rows.
+- The fusion is gone from every row; **no row gained a spurious separator**.
+- Empty state: clipboard write count unchanged, guard toast raised.
+- **0 page errors on every walk.**
+- Full suite diffed line-for-line against a pre-change run in the same session:
+  identical.
+
+### Found on the same walk — NOT fixed, stated rather than hidden
+The **Global Rank (take @$75)** row still ranks on all 185 countries rather than
+the producer set — the same all-185 basis cycle 439 corrected on Country Profile
+and flagged as still open on this tab, Explorer, Screener, Fiscal Compare and the
+Breakeven Map. It is a T1/T3 surface and belongs to its own cycle.
+
+Also still open from cycles 431/438: Home quickstart Step 4 tells the analyst to
+open Reform Risk "to see the Stability Score (◆◆◆◆◆)"; the diamond scale lives on
+Fiscal Compare and Reform Risk renders a 0–100 numeric score.
+
+### STILL LOCKED — nothing touched
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
+**No new tooltip on any pre-existing control** — the toolbar button's own existing
+`title` was rewritten to match its new behaviour. Tab order unchanged. v371/v373,
+v430, v449, v451, v452, v489, v534, v538, v539 and v540 all untouched.
