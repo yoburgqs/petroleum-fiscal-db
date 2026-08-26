@@ -14691,3 +14691,134 @@ Version v536→v537.
 **Task.** T1 — *"Which countries should even be on my screening list?"* (least-recently-used; 435 was T3, 434 T5, 433 T2.)
 
 **Friction.** Cold walk into the Screener, then into Advanced Filters, where the only cost-based screen lives. The **Breakeven Category** radio group (`index.html:2138`) offered *All / Sub-$50 / $50–$75 / $75–$100* — and **none of its 
+
+---
+## Cycle 437 — T6, v538 — 2026-08-26
+
+**Task.** T6 — *"Where did this number come from and how solid is the evidence?"*
+(least-recently-used: 436 was T1, 435 T3, 434 T5, 433 T2, 431 T4; T6 last run at
+cycle 426.)
+
+**Friction.** Cold walk (fresh browser context, `sessionStorage` and
+`localStorage` cleared) into Country Profile, then into the section named for the
+question. `loadCountryProfile()` rendered **two parameter tables back to back**:
+
+```
+  ${factsSection}                                  <- "Key Fiscal Parameters" (v500)
+  <div id="dd-fiscal-params-${safe}"></div>        <- "Fiscal Parameters & Evidence Chain"
+```
+
+The first (`renderSourcedFacts`, v500) has columns *Parameter | ORCA Value |
+Statutory (cited source) | Source*. The second (`buildFiscalParamTable`,
+`index.html:32839`) was a collapsed section headed *"Fiscal Parameters & Evidence
+Chain · N parameters sourced"* with columns *PARAMETER | VALUE | TIER | SOURCE*.
+
+Its VALUE column was `fiscal_facts_sourced[k].value` — the rate the **statute**
+states. The table four lines above showed `fiscal_facts[k]` — the
+**contract-weighted** rate the DCF engine actually uses. On **63 rows across 40
+countries** those two numbers differ, and only the first table said so.
+
+Angola, on screen, in one scroll:
+
+| section | Royalty Rate |
+|---|---|
+| Key Fiscal Parameters | ORCA **2.58%** · Statutory 20% ⚠ · Lei 10/2004 · A · + reconciliation note |
+| Fiscal Parameters & Evidence Chain | **20.0%** · A · Lei 10/2004 · no ORCA value, no flag, no note |
+
+Indonesia: State Participation **4%** in one table, **45.0% · A** in the other —
+a 41-point gap, with the tier-A badge sitting on the number ORCA does not model.
+
+The second table also **dropped `levy_profit_oil_rate` for 76 countries**. On
+Angola, Indonesia, Nigeria, Egypt, Azerbaijan and every other major PSC
+jurisdiction, the parameter that drives most of government take was *absent* from
+the section called "Evidence Chain" — not marked unsourced, absent — because it
+iterated `fiscal_facts_sourced`, which holds only **7 distinct keys across all
+185 API files** and no profit-oil key at all. Its legend read *"B = operator
+filing or verified guide"* — the identical claim **v527** removed from Home,
+where none of the 142,798 tier-B facts on record is an operator filing.
+
+**Change.**
+
+1. **The "Fiscal Parameters & Evidence Chain" section and
+   `buildFiscalParamTable()` are DELETED** — the container div, the fetch IIFE
+   that populated it, and the 112-line function. Removing it *is* the change.
+   Everything it showed correctly — parameter, statutory value, tier letter,
+   source link — the table immediately above already shows, labelled, beside the
+   ORCA value, with divergence flagged and a reconciliation note.
+2. **Nothing sourced is lost.** The only sourced parameter the deleted table held
+   alone was `cost_recovery_cap_pct`, for **Azerbaijan, Guyana and Malaysia**. It
+   is now its own row — *"Cost Recovery Ceiling (contractual cap)"* — in the
+   surviving table, distinct from the modelled cost-recovery rate because for
+   those three they are two different numbers (Azerbaijan 75% ceiling vs 53.83%
+   rate). Malaysia's ceiling (65.1% modelled vs 60% sourced) now carries a
+   divergence flag the deleted table never showed.
+3. **The surviving section is renamed "Key Fiscal Parameters — Evidence Chain"**,
+   so the deleted section's name still lands on the surface that answers T6.
+4. **Its tier-B tooltip is corrected** to *"country-level secondary guide (EY /
+   KPMG / IHS bulk harvest) — assigned to the whole country, never read off an
+   individual contract; it is NOT an operator filing"*, matching v518/v527. The
+   same stale "operator filing" string in the Evidence Quality panel's
+   stacked-bar segment title is corrected with it.
+
+**Result.** One per-parameter evidence surface per country instead of two that
+contradict each other — and the survivor is the one that separates what ORCA
+models from what the source states. An analyst asking where Angola's 2.58%
+royalty came from now reads 2.58% modelled / 20% statutory / source linked / gap
+flagged, instead of scrolling four lines and finding a second table asserting
+20.0% is the value under a tier-A badge.
+
+### Verification
+
+Cold Playwright against the local build, `sessionStorage`/`localStorage` cleared,
+across seven countries chosen to exercise every branch:
+
+```
+Angola      duplicate container removed · exactly 1 h3 "Evidence Chain"
+            Royalty 2.58% | 20% ⚠ | Lei 10/2004 · A     Profit Oil (Govt) 52.3% | — | Contract DB average
+Indonesia   State Participation 4% | 45% ⚠ | EITI · A   Profit Oil (Govt) 64.39% | — | Contract DB average
+Azerbaijan  Cost Recovery Ceiling 75% | 75% | ACG PSA 2017 · A      note: 1 of 6 differ
+Malaysia    Cost Recovery Ceiling 65.1% | 60% ⚠ | PETRONAS MPM · B  note: 1 of 5 differ
+Guyana      Cost Recovery Ceiling 75% | 75% | Stabroek PSA · A      note: all 5 match
+Norway      no ceiling row (not held)                              note: all 3 match
+Paraguay    the one country with no sourced facts — 5 rows, all "Contract DB average", no note
+```
+
+**0 page errors on every walk.** JS syntax gate **PASS** (9 blocks / 0 errors).
+
+`runtime_comprehensive.js` **ran this cycle** against the post-edit local build:
+
+```
+PASS: 135   FAIL: 0   WARN: 1   console errors: 1
+CONSOLE ERRORS: A bad HTTP response code (404) was received when fetching the script.
+```
+
+Identical to the pre-edit baseline. The WARN is the same pre-existing
+local-harness artifact recorded at v508, v520, v526, v534, v536 and v537 —
+`index.html:49` registers the service worker at `/petroleum-fiscal-db/sw.js`, the
+GitHub Pages subpath, which 404s on a root-served local server. Not a regression
+from this change; does not occur on the deployed site.
+
+### Found on the same walk — NOT fixed, stated rather than hidden
+
+- **`fiscal_facts_sourced` holds 7 keys, total, across all 185 API files**:
+  `levy_income_tax_rate` (181), `levy_royalty_rate` (180),
+  `levy_cost_recovery_rate` (73), `state_participation` (34), `levy_ftp_rate`
+  (18), `special_petroleum_tax_rate` (13), `cost_recovery_cap_pct` (3). There is
+  **no profit-oil key at all**, so Profit Oil (Govt) renders "Contract DB
+  average" for all 57 countries that display one, and no route in the product
+  can source it. `PARAM_LABELS` in the deleted function listed 30 labels —
+  DMO, PRRT, windfall, revenue share, TSC fee, buy-back amortisation — none of
+  which any API file can supply. That is a harvest-coverage gap (Fork 1), not a
+  UX one, and it is not closed here.
+- The `formatBreakeven()` `<$50` collapse flagged at cycle 436 is still live and
+  still belongs to its own cycle.
+
+### STILL LOCKED — nothing touched
+
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
+**No new tooltip on any control whose behaviour did not change** — the two
+tooltips touched are corrections to existing strings that were factually wrong.
+Tab order unchanged. v371/v373, v423, v430, v449, v451, v452, v489, v500, v505,
+v513, v515–v527 and v533–v537 all untouched. Version v537→v538.

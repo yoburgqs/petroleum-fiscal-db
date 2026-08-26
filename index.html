@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v537.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v538.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v537</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v538</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1361,7 +1361,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v537</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v538</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v537</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v538</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2599,6 +2599,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
     <div style="font-size:13px;line-height:1.7;">
+                        <strong style="color:var(--accent);">v538 (Aug 2026) &mdash; Cycle 437 (T6): the Country Profile carried two adjacent parameter tables that disagreed, and the one titled &ldquo;Evidence Chain&rdquo; was the wrong one</strong> &mdash; Task <strong>T6</strong> &mdash; &ldquo;where did this number come from and how solid is the evidence?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) into Country Profile and opened the section named for the question. <strong>Friction:</strong> <code>loadCountryProfile()</code> rendered <code>${factsSection}</code> and <code>&lt;div id="dd-fiscal-params-${safe}"&gt;</code> <em>back to back</em>. The first is the v500 table &mdash; <em>Parameter | ORCA Value | Statutory (cited source) | Source</em>. The second, <code>buildFiscalParamTable()</code>, was a collapsed section headed <em>&ldquo;Fiscal Parameters &amp; Evidence Chain &middot; N parameters sourced&rdquo;</em> with columns <em>PARAMETER | VALUE | TIER | SOURCE</em>. Its VALUE column was <code>fiscal_facts_sourced[k].value</code> &mdash; the rate the statute states &mdash; while the table four lines above showed <code>fiscal_facts[k]</code>, the contract-weighted rate the DCF engine actually uses. On <strong>63 rows across 40 countries</strong> those two numbers differ. Angola on screen: <em>Key Fiscal Parameters</em> gave Royalty Rate <strong>2.58%</strong> with the statutory 20% beside it and a <span style="color:var(--orange);">&#9888;</span> divergence flag; four lines lower, <em>Evidence Chain</em> gave Royalty Rate <strong>20.0%</strong>, tier <strong>A</strong>, Lei 10/2004 link, no ORCA value, no flag, no note. Indonesia showed State Participation <strong>4%</strong> in one table and <strong>45.0% &middot; A</strong> in the other &mdash; a 41-point gap, with the tier-A badge on the number ORCA does not model. The second table also dropped <code>levy_profit_oil_rate</code> for <strong>76 countries</strong>: on Angola, Indonesia, Nigeria, Egypt, Azerbaijan and every other major PSC jurisdiction, the parameter that drives most of government take was simply absent from the section called &ldquo;Evidence Chain&rdquo; &mdash; not marked unsourced, absent &mdash; because it iterated <code>fiscal_facts_sourced</code>, which holds only <strong>7 distinct keys across all 185 API files</strong> and no profit-oil key at all. Its legend read <em>&ldquo;B = operator filing or verified guide&rdquo;</em>, the identical claim <strong>v527</strong> removed from Home, where none of the 142,798 tier-B facts on record is an operator filing. <strong>Change: the &ldquo;Fiscal Parameters &amp; Evidence Chain&rdquo; section and <code>buildFiscalParamTable()</code> are DELETED.</strong> Removing it is the improvement &mdash; everything it showed correctly (parameter, statutory value, tier letter, source link) the table immediately above already shows, labelled, beside the ORCA value, with divergence flagged and a reconciliation note. The one thing it held alone &mdash; a separately sourced <code>cost_recovery_cap_pct</code> for <strong>Azerbaijan, Guyana and Malaysia</strong> &mdash; is now its own row, <em>&ldquo;Cost Recovery Ceiling (contractual cap)&rdquo;</em>, in the surviving table; Malaysia&rsquo;s ceiling (65.1% modelled vs 60% sourced) now carries a divergence flag the deleted table never showed. The surviving section is renamed <em>&ldquo;Key Fiscal Parameters &mdash; Evidence Chain&rdquo;</em> so the deleted section&rsquo;s name still finds the surface that answers T6, and its tier-B tooltip now reads <em>&ldquo;country-level secondary guide (EY / KPMG / IHS bulk harvest) &mdash; assigned to the whole country, never read off an individual contract; it is NOT an operator filing&rdquo;</em>, matching v518/v527. The same stale &ldquo;operator filing&rdquo; string in the Evidence Quality panel&rsquo;s stacked-bar segment title is corrected with it. <strong>Result.</strong> There is now one per-parameter evidence surface per country instead of two that contradict each other, and it is the one that separates what ORCA models from what the source states. An analyst asking where Angola&rsquo;s 2.58% royalty came from reads 2.58% modelled, 20% statutory, source linked, gap flagged &mdash; instead of finding a second table asserting 20.0% is the value. <strong>Verified cold in Playwright</strong> against the local build with storage cleared, across Angola, Indonesia, Azerbaijan, Norway, Guyana, Malaysia and Paraguay (the one country with no sourced facts): the duplicate container is gone from every profile, exactly one <code>h3</code> matching &ldquo;Evidence Chain&rdquo; remains, all three ceiling countries render the previously-lost tier-A row, and the reconciliation counts re-derive correctly (Azerbaijan 1 of 6, Malaysia 1 of 5, Guyana all 5 match, Norway all 3 match). <strong>0 page errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the post-edit local build: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness <code>sw.js</code> 404 recorded at v508, v520, v526, v534, v536 and v537, unchanged from the pre-edit baseline. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown. <strong>No new FAQ</strong> (still 974). <strong>No new tooltip on any control whose behaviour did not change.</strong> Tab order unchanged. v371/v373, v423, v430, v449, v451, v452, v489, v500, v505, v513, v515&ndash;v527, v533&ndash;v537 all untouched. Version v537&rarr;v538.<br><br>
                         <strong style="color:var(--accent);">v537 (Aug 2026) &mdash; Cycle 436 (T1): the Screener&rsquo;s cost filter said 185 of 185 countries break even below $50/bbl, and its other two options could never return anything</strong> &mdash; Task <strong>T1</strong> &mdash; &ldquo;which countries should even be on my screening list?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) from Home into the Screener and opened <em>Advanced Filters</em>, where the only cost-based screen lives. <strong>Friction:</strong> the <em>Breakeven Category</em> radio group offered <em>All / Sub-$50 / $50&ndash;$75 / $75&ndash;$100</em>, and <strong>none of its three real options worked</strong>. Clicking <strong>Sub-$50</strong> &mdash; the most natural single move in a cost screen &mdash; returned <strong>185 of 185 countries</strong>, a row set byte-identical to the unfiltered list, under a count line reading <em>&ldquo;185 countries match at $75/bbl&rdquo;</em> and a result line reading <em>&ldquo;(all 185 countries pass current filters)&rdquo;</em>. The top ten rows were Canada, USA, Azerbaijan, Mexico, Argentina, Colombia, China, Australia, Ecuador, Brazil &mdash; and <strong>ten of those twelve show &ldquo;&mdash;&rdquo; in the Breakeven column</strong>. The cause sat in <code>runScreener()</code>: <code>const beVal = (be !== null &amp;&amp; be !== undefined &amp;&amp; be &gt; 0) ? be : 0;</code>, then <code>if (beCat === 'sub50' &amp;&amp; beVal &gt;= 50) return false;</code>. A <strong>NULL breakeven was coerced to 0 and therefore scored as the best possible breakeven in the database</strong>. 117 of 185 countries are null; a further 3 sit at the DCF floor artifact. So ORCA affirmatively told the analyst that <strong>Canada, USA, Norway, Iraq, Nigeria and Saudi Arabia all break even below $50/bbl</strong> &mdash; a claim it holds no data for on any of them. This is the identical defect <strong>v513</strong> fixed on the <em>Max Breakeven</em> slider, left live on the sibling control that screens the same axis four inches away. The two upper bands failed in the opposite direction: <strong>$50&ndash;$75 returned 0 countries and $75&ndash;$100 returned 0 countries</strong>, and always will &mdash; <strong>all 65 measured breakevens in the database fall between $27 and $34/bbl</strong> (min 27, max 34), so nothing can ever land in either band. Read together, the control had four options of which one was &ldquo;All&rdquo;, one silently returned All while asserting a cost claim, and two were structurally empty forever. It could not narrow the list by a single country in any configuration, and the empty result read as <em>&ldquo;ORCA has no mid-cost countries&rdquo;</em> rather than <em>&ldquo;ORCA has no breakeven above $34&rdquo;</em>. <strong>(1) The four cost bands are deleted and replaced by the distinction the data actually supports</strong> &mdash; the block is now <strong>Breakeven Coverage</strong>, with <em>All (185)</em> and <em>Measured breakeven only (65)</em>. Both option labels carry their own live size, read off <code>COUNTRY_DATA</code> at every render rather than written into the HTML, because the captions they replace described bands the dataset has never contained and nothing on screen could contradict them. <strong>(2) The filter branch is one line</strong> &mdash; <code>if (beCat === 'measured' &amp;&amp; !_beIsTested(be)) return false;</code> &mdash; sharing <code>_beIsTested()</code> with the v513 slider, the row cell and the <code>Breakeven_Tested</code> export column, so the four surfaces cannot drift on what &ldquo;measured&rdquo; means. Selecting it takes 185&nbsp;&rarr;&nbsp;65, and stacked with the v517 data-basis filter it takes the shortlist to the <strong>2 countries &mdash; Argentina and Australia &mdash; that have both verified field production and a modelled breakeven</strong>, which is the honest answer to a cost screen on this database. <strong>(3) The block states the observed range in place</strong>: <em>&ldquo;ORCA models a breakeven for 65 of 185 countries, every one between $27 and $34/bbl. The other 120 are blank &mdash; not low. Cost bands are not a screen this data supports.&rdquo;</em> <strong>(4) The count line says what was removed and why</strong> &mdash; <em>&ldquo;65 with a modelled breakeven; 120 countries removed for having none (absence of data, not a failed test)&rdquo;</em> &mdash; so a drop from 185 to 65 is not read as 120 countries failing a cost hurdle. <strong>(5) The zero-result diagnostic</strong> gained the matching hint. <strong>(6) Second live defect fixed on the same walk:</strong> the footnote under <code>#tbl-screener</code> was the table&rsquo;s <em>only</em> legend and it described the <strong>IRR column, which v517 deleted from this table 20 versions ago</strong>. It also defined <code>&mdash;</code> as <em>&ldquo;insufficient cost data for IRR computation&rdquo;</em> &mdash; and the only <code>&mdash;</code> now rendered is in the Breakeven column, meaning something else, on 10 of the 12 rows above the fold. The legend now describes the columns actually on screen, names both routes to a measured-only list, and states that <code>NPV @$50</code> is modelled 185/185 so a value there was always measured. <strong>Verified cold in Playwright</strong> against the local build, storage cleared: cold load 185/185 with the new labels reading <em>(185)</em> and <em>(65)</em>; <em>Measured breakeven only</em> &rarr; <strong>65 rows</strong> with the disclosure line and <em>(120 filtered out of 185)</em>; stacked with verified-production &rarr; <strong>2 rows, Argentina and Australia</strong>, badge <em>2 filters active</em>; <strong>Reset All</strong> restores 185 with <code>be-all</code> re-checked; and <strong>all eleven presets re-run at their prior counts</strong> (iochurdle 14, sweetspot 142, pscafrica 31, deepwater 11, lowrisk 140, downsidereturns 153, highevidence 35, rfactor 70, atlanticfrontier 6, frontiermarkets 168, downsideresilience 158), confirming no preset was perturbed. <strong>0 JS errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <em>Found on the same walk, not fixed &mdash; stated rather than hidden:</em> <code>formatBreakeven()</code> renders every value under $50 as <code>&lt;$50</code>, so all 65 measured breakevens &mdash; a $27&ndash;$34 range &mdash; collapse to one indistinguishable string, and the Breakeven column cannot rank the countries it does have data for. That is a display decision on the same column and belongs to its own cycle. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); <strong>no new tooltip on any control whose behaviour did not change</strong> &mdash; the two tooltips added sit on the two replacement radio options, which did not previously exist. Tab order unchanged. v371/v373, v423, v430, v449, v451, v452, v489, v505, v513, v515&ndash;v527, v533, v534, v535 and v536 all untouched. Version v536&rarr;v537.<br><br>
                         <strong style="color:var(--accent);">v536 (Aug 2026) &mdash; Cycle 435 (T3): the Fiscal Predictability Score awarded its best grade to the countries ORCA knows least about &mdash; 111 of 185 scored HIGH and every one of them had a zero or absent take spread, while no country with a real measured spread could reach HIGH at all</strong> &mdash; Task <strong>T3</strong> &mdash; &ldquo;how do these three countries compare side by side?&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) into <em>Side-by-Side</em>, which seeds the North Sea Trio &mdash; Norway / United Kingdom / Netherlands. <strong>Friction:</strong> the <em>Data Basis</em> block at the head of the grid is the only place in the table that renders a verdict rather than a figure, and its verdict row read <strong>Norway 76 &middot; HIGH</strong>, <strong>United Kingdom 58 &middot; LOW</strong>, <strong>Netherlands 84 &middot; HIGH</strong>. Three rows above it the same table flags the Netherlands column <strong>PROXY &middot; 278 fiscal facts &middot; 0% production coverage</strong>, and the take-spread row four rows below reports it as <em>&ldquo;single term&rdquo;</em> with a tooltip stating in terms that this is <strong>NOT evidence of low fiscal risk</strong>. The green <em>84 &middot; HIGH</em> badge was derived from precisely that zero and said the opposite, on the same screen. <code>getFiscalPredictabilityScore()</code> opened with <code>const iqr = (p25 != null &amp;&amp; p75 != null) ? Math.max(0, p75 - p25) : 0;</code> &mdash; so a country for which ORCA holds no contract-level take distribution at all was scored as though its measured dispersion were exactly zero, the best possible value of the score&rsquo;s largest component (&minus;40 of a possible &minus;78). <strong>Counted against the live dataset:</strong> only <strong>28 of 185</strong> countries have a non-degenerate measured spread. 135 price to a single statutory term and <strong>22 hold no p25/p75 whatsoever</strong> &mdash; and all 22 of those scored HIGH on the substitution: <em>Nauru 91</em> (1 contract, 2 facts), <em>Bosnia 96</em> (3 contracts, 9 facts), <em>Belgium 89</em> (2 contracts). Of the 111 countries scoring &ge;75 HIGH, <strong>111 had a zero or absent spread and none had a measured one</strong>. The ceiling among the 28 countries whose contracts actually disagree with each other is <strong>Turkmenistan at 74</strong> &mdash; one point below the HIGH band, which is therefore structurally unreachable for any country carrying real dispersion. The badge rewarded thin data and penalised evidence: the UK&rsquo;s <em>58 &middot; LOW</em> is low <em>because</em> ORCA holds 4,211 contracts at 37.6% production coverage and can see a 15.0pp spread in them. <strong>Change &mdash; three explicit states, never a default, the same principle v520 applied to the Fiscal Compare Stability column.</strong> <strong>(1)</strong> The scorer no longer substitutes a spread of zero it never measured: with null <code>p25</code>/<code>p75</code> it returns <code>null</code> and the surface renders <strong>&ldquo;&mdash; &middot; not scored&rdquo;</strong> (muted, dashed border) on Side-by-Side, Country Profile, the FC drill-down and the Reform Risk cards, and <strong>&ldquo;n/c&rdquo;</strong> in the Explorer table. 22 fabricated HIGH grades are gone. <strong>(2)</strong> Every surviving badge now carries the dispersion basis that produced it, inside the badge: <em>76 &middot; HIGH <strong>one term</strong></em>, <em>58 &middot; LOW <strong>15.0pp</strong></em>. The cold Side-by-Side trio now reads <code>76 &middot; HIGH one term</code> / <code>58 &middot; LOW 15.0pp</code> / <code>84 &middot; HIGH one term</code>, so the analyst sees on the face of the cells that the UK is the only column whose score used a measured spread at all, and that the two HIGH grades were awarded on a component that was never exercised. <strong>(3)</strong> The Reform Risk tab, which since v520 has offered this score as the fallback signal where no reform log exists, no longer asserts that it <em>&ldquo;exists for all 185 countries&rdquo;</em> &mdash; it does not, for 22 &mdash; and each of its two score cards states the basis inline. <strong>(4)</strong> The Country Profile <em>Copy for IC Memo</em> clipboard line no longer pastes <code>score null/100</code>, and where a score exists it pastes the basis with it. <strong>Result:</strong> an analyst comparing three countries can see which of the three stability grades were measured and which were assumed, and a country ORCA holds two facts about no longer outranks Norway on fiscal predictability. <strong>Verified cold in Playwright</strong> against the local build with storage cleared: the SbS trio renders the three basis chips above; a Norway / Belgium / Nauru set renders <code>76 &middot; HIGH one term</code> / <code>&mdash; &middot; not scored</code> / <code>&mdash; &middot; not scored</code>; the Explorer table renders <strong>185 rows = 22 n/c + 135 one-term + 28 measured</strong>; Country Profile returns the correct state for Norway, Nauru and the UK. <strong>0 JS errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <em>Found and stated rather than hidden:</em> the Country Profile <code>stabBar</code> variable is built but never inserted into the DOM &mdash; it was dead before this cycle and remains dead; its definition was corrected for the null case rather than left to render <code>width:null%</code> if it is ever wired up. Whether a composite whose largest term is inert for 157 of 185 countries should exist in this form at all is a modelling question, not a UI one, and is not decided here. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); no new tooltip on any control whose behaviour did not change &mdash; the three rewritten tooltips are on the exact elements whose rendering changed, and each previously described the removed behaviour. Tab order unchanged. v371/v373, v423, v430, v449, v451, v452, v489, v505, v515&ndash;v527, v533, v534 and v535 all untouched. Version v535&rarr;v536.<br><br>
                         <strong style="color:var(--accent);">v535 (Aug 2026) &mdash; Cycle 434 (T5): &ldquo;Save as PDF&rdquo; on Side-by-Side produced a PDF of the Country Profile &mdash; and the same was true of Ctrl+P on eight of the nine tabs</strong> &mdash; Task <strong>T5</strong> &mdash; &ldquo;give me something I can paste straight into an IC memo.&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) and exercised every export affordance the platform offers, reading the clipboard and the print output back rather than trusting the button labels. The clipboard paths were sound: the FC drilldown&rsquo;s <code>&#x2398; IC Citation</code> and <code>Copy 4-price as IC table</code>, the Country Profile&rsquo;s <code>&#x2398; IC Citation</code> and <code>Copy for IC Memo</code>, and Side-by-Side&rsquo;s <code>&#x2398; Copy Table for IC Memo</code> all returned correct, attributed, memo-ready artifacts. <strong>Friction:</strong> the <em>print</em> path did not. The <code>@media print</code> block at the top of the stylesheet ended with two unconditional rules &mdash; <code>.tab-pane { display: none !important; }</code> followed by <code>#t7 { display: block !important; }</code> &mdash; written when Country Profile was the only printable view and never revisited. <code>#t7</code> is Country Profile. So an analyst who had built <em>Norway / United Kingdom / Netherlands</em> in Side-by-Side and pressed <strong>&#8659; Save as PDF</strong> &mdash; or <strong>&#8659; Export PDF</strong> in the row above it, or <strong>Ctrl+P</strong>, which the tip line directly beneath the button explicitly instructs them to press &mdash; got a PDF containing <strong>the Norway Country Profile</strong> and <strong>none of their comparison</strong>. Verified under print-media emulation before the fix: from Side-by-Side, <code>#t2</code> computed to <code>display:none</code> and <code>#t7</code> to <code>display:block</code>, and the rendered page opened <em>&ldquo;Country Profile &hellip; Loading Norway &mdash; North Sea Concession benchmark&rdquo;</em>. The failure was silent and it was total &mdash; not a formatting problem, a <strong>different document about a different country set</strong>, produced by the one export path whose output goes into an IC pack as an attachment rather than through an analyst&rsquo;s eyes on the way. It applied to <strong>eight of the nine tabs</strong>: Home, Fiscal Compare, Explorer, Screener, Side-by-Side, IOC Portfolio, Breakeven Map and Reform Risk. Country Profile, the only tab that printed correctly, printed correctly by coincidence. <strong>Change: print now follows the tab the analyst is looking at</strong> &mdash; <code>.tab-pane.active { display: block !important; }</code> in place of the hard-coded <code>#t7</code>. Three things had to move with it. <strong>(1)</strong> The <code>.print-header</code> ORCA branding block lived <em>inside</em> <code>#t7</code>, so it was structurally incapable of branding any other view; it is now a sibling of the panes, directly under <code>&lt;main&gt;</code>, and brands every printed tab. <strong>(2)</strong> It gained a line naming what was printed &mdash; <em>&ldquo;Side-by-Side &mdash; exported view&rdquo;</em>, <em>&ldquo;Fiscal Compare &mdash; exported view&rdquo;</em> &mdash; stamped by a new <code>_orcaStampPrintHeader()</code> on every <code>switchTab()</code> and again on <code>beforeprint</code> (confirmed to fire for <code>window.print()</code>, which is what all three PDF buttons call, and for Ctrl+P). Explorer and Screener share one pane, so the stamp reads <code>_explorerMode</code> and names the mode actually on screen. Its version string reads the header badge through the existing <code>_orcaVerNow()</code> rather than the hard-coded <code>v500</code> that <code>#print-header-meta</code> had drifted to &mdash; a 34-version-stale build number on every PDF the platform has ever produced. <strong>(3)</strong> Screen-only controls that had never needed print rules because they had never printed are now hidden: <code>.btn</code>, the search inputs, the Side-by-Side top-row buttons, the quickstart presets, the Explorer mode toggle, the FC XLSX and Breakeven CSV buttons, and the chip remove-glyphs. They are listed by explicit selector rather than a blanket <code>button { display: none }</code>, because country names inside the ranked tables are rendered as unclassed <code>&lt;button&gt;</code> elements and a blanket rule would have blanked the first column out of every printed table. The three dismissible <em>&ldquo;Example loaded&rdquo;</em> banners (Country Profile / IOC Portfolio / Side-by-Side) carry <code>no-print</code> for the same reason &mdash; each contains a &#10005; dismiss control and an instruction to click it. <strong>Result:</strong> an analyst can put any of the nine views into an IC pack as a PDF and get that view, ORCA-branded, dated, stamped with the current build and named on the page. The Side-by-Side PDF now contains the comparison grid, the <em>Profile basis: Deepwater &middot; $1.2B capex &middot; 10% WACC &middot; 100% WI</em> strip and the country chips, and no buttons. <strong>Verified cold in Playwright</strong> against the local build with <code>sessionStorage</code> and <code>localStorage</code> cleared, under <code>emulateMedia({media:'print'})</code>, on all eight tabs plus Screener mode: in every case exactly one pane rendered, it was the active one, the print header was visible, and the view label matched the tab &mdash; 8/8 PASS plus Screener. <code>beforeprint</code> confirmed to fire on <code>window.print()</code>. A print-media screenshot from Side-by-Side was read back to confirm the comparison grid, not the Norway profile, is what lands on the page. <strong>0 JS errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <em>Found on the same walk, not fixed &mdash; stated rather than hidden:</em> Side-by-Side carries <strong>two</strong> copy-table buttons and the discoverable one is the worse one. <code>#cmp-copy-table-btn</code> (&ldquo;&#128203; Copy Table&rdquo;, v466) sits at the top of the tab beside the search box; v503&rsquo;s <code>&#x2398; Copy Table for IC Memo</code> sits <strong>1,440px below it</strong>, under the whole 20-row grid. Read back from the clipboard, the top button returns <strong>22 lines with the &#9432; help glyph embedded in nine header cells, no caption, no assumptions line, no source line and no <code>text/html</code> flavour</strong> &mdash; so it pastes into Word as a tab blob asserting <em>&ldquo;Contractor NPV @$75 (base) $826M&rdquo;</em> with nothing on the page saying that is a standardized Deepwater profile at 10% WACC. The bottom button returns 27 clean lines with all of it. The top row also duplicates <em>Export PDF</em> and <em>Share Link</em>, which the bottom row already carries. That is one tab with two of every export action &mdash; a next cycle, not this one. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); <strong>no new tooltip</strong> on any pre-existing control. Tab order unchanged. v371/v373, v423, v430, v449, v451, v452, v489, v505, v515&ndash;v527, v533 and v534 all untouched. Version v534&rarr;v535.<br><br>
@@ -22484,7 +22485,7 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
     <div style="padding:0 12px 12px;">
       <div style="display:flex;height:12px;border-radius:4px;overflow:hidden;margin-bottom:8px;gap:1px;">
         <div style="width:${a}%;background:var(--green);" title="A-confidence (primary source): ${a}%"></div>
-        <div style="width:${b}%;background:rgba(21,128,61,0.68);" title="B-confidence (operator filing): ${b}%"></div>
+        <div style="width:${b}%;background:rgba(21,128,61,0.68);" title="B-confidence (country-level secondary guide \u2014 EY / KPMG / IHS bulk harvest, not an operator filing): ${b}%"></div>
         <div style="width:${c}%;background:var(--yellow);" title="C-confidence (aggregator): ${c}%"></div>
         <div style="width:${d}%;background:var(--orange);" title="D-confidence (estimated): ${d}%"></div>
       </div>
@@ -24857,7 +24858,7 @@ function renderReformTable() {
       const conf = (r.confidence || 'B').toUpperCase();
       const confClass = conf === 'A' ? 'conf-a' : 'conf-b';
       const label = r.source.length > 60 ? r.source.slice(0,60)+'…' : r.source;
-      const confTierNote = conf === 'A' ? 'Source confidence A = Primary official source (legislation, decree, or concession agreement)' : 'Source confidence B = Verified secondary source (operator filing, annual report, or regulatory filing)';
+      const confTierNote = conf === 'A' ? 'Source confidence A = Primary official source (legislation, decree, or concession agreement)' : 'Source confidence B = country-level secondary guide (EY / KPMG / IHS bulk harvest). Assigned to the whole country, never read off an individual contract \u2014 it is NOT an operator filing.';
       srcCell = `<a href="${r.source_url}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="font-size:10px;" title="${r.source} · ${confTierNote}">${label} · ${conf} ↗</a>`;
     } else if (r.source) {
       srcCell = `<span style="font-size:10px;color:var(--muted);">${r.source.slice(0,60)}</span>`;
@@ -25444,6 +25445,11 @@ function renderReformTimeline(country) {
       ['Income Tax Rate',     'levy_income_tax_rate',      'income_tax_rate_pct'],
       ['FTP Rate',            'levy_ftp_rate',             null],
       ['Cost Recovery Cap',   'levy_cost_recovery_limit',  'levy_cost_recovery_rate'],
+      // v538 (T6): the only sourced parameter the deleted "Evidence Chain" table held that this
+      // one did not. Azerbaijan, Guyana and Malaysia carry a separately captured contractual
+      // ceiling (Azerbaijan 75% A) alongside a lower modelled recovery rate (53.83%). Distinct
+      // row, distinct label -- not a fallback key, because for those three they are two numbers.
+      ['Cost Recovery Ceiling (contractual cap)', 'cost_recovery_cap_pct', null],
       ['Profit Oil (Govt)',   'levy_profit_oil_govt_pct',  'levy_profit_oil_rate'],
       ['State Participation', 'state_participation',       null],
       ['Special Tax',         'special_petroleum_tax_rate','levy_special_tax_rate'],
@@ -26208,7 +26214,7 @@ function loadCountryProfile(country) {
   const safe = country.replace(/[^a-z0-9]/gi,'_').toLowerCase();
   // factsSection is referenced in the mainSections template; define it here in loadCountryProfile scope
   const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-  const factsSection = `<div class="dd-section" id="dd-facts-${ddSlug}"><h3>Key Fiscal Parameters</h3><div id="dd-facts-content-${ddSlug}" style="color:var(--muted);font-size:12px;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;" aria-hidden="true"></span>Loading sourced fiscal parameters\u2026</span></div></div>`;
+  const factsSection = `<div class="dd-section" id="dd-facts-${ddSlug}"><h3>Key Fiscal Parameters &mdash; Evidence Chain</h3><div id="dd-facts-content-${ddSlug}" style="color:var(--muted);font-size:12px;"><span style="display:inline-flex;align-items:center;gap:6px;"><span style="display:inline-block;width:12px;height:12px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;" aria-hidden="true"></span>Loading sourced fiscal parameters\u2026</span></div></div>`;
   // v534 (T2): the "Global rank #168 of 185 · top 91% highest-take globally" badge that sat in
   // this section header is REMOVED. It duplicated the rank already in the headline strip ten
   // lines above, and it stated the all-185 verdict with no basis caveat right beside the pill
@@ -26772,7 +26778,6 @@ function loadCountryProfile(country) {
     </div>`;
   })()}
   ${factsSection}
-  <div id="dd-fiscal-params-${safe}" style="margin-top:0;"></div>
   ${(function(){
     // Contract Distribution section
     const p25 = d.p25_take;
@@ -27129,22 +27134,6 @@ function loadCountryProfile(country) {
 
   // Fetch top contracts from API JSON
   fetchCountryContracts(country);
-
-  // Fetch fiscal parameters evidence chain from API JSON
-  (function() {
-    const _fpApiSlug = (country||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
-    const _fpSafe = (country||'').replace(/[^a-z0-9]/gi,'_').toLowerCase();
-    fetch('api/v1/country/' + _fpApiSlug + '.json')
-      .then(function(r) { return r.ok ? r.json() : null; })
-      .then(function(apiData) {
-        if (!apiData) return;
-        const container = document.getElementById('dd-fiscal-params-' + _fpSafe);
-        if (!container) return;
-        const paramHtml = buildFiscalParamTable(apiData.fiscal_facts_sourced);
-        if (paramHtml) container.innerHTML = paramHtml;
-      })
-      .catch(function() {});
-  })();
 
   // v30: Render Live DCF panel
   // v31: Clear stale tornado/cashflow containers when new country loads
@@ -32836,118 +32825,22 @@ function fetchCountryContracts(country) {
 }
 
 // Fiscal Parameters evidence chain table — collapsible, deduped by label, confidence-sorted
-function buildFiscalParamTable(fiscalFactsSourced) {
-  if (!fiscalFactsSourced || Object.keys(fiscalFactsSourced).length === 0) return '';
-
-  const PARAM_LABELS = {
-    'levy_royalty_rate': 'Royalty Rate',
-    'royalty_rate_pct': 'Royalty Rate',
-    'levy_income_tax_rate': 'Income Tax (CIT)',
-    'income_tax_rate_pct': 'Income Tax (CIT)',
-    'levy_cost_recovery_rate': 'Cost Recovery Cap',
-    'levy_cost_recovery_limit': 'Cost Recovery Cap',
-    'cost_recovery_cap_pct': 'Cost Recovery Cap',
-    'levy_profit_oil_govt_rate': 'Profit Oil — Govt Share',
-    'levy_profit_oil_govt_pct': 'Profit Oil — Govt Share',
-    'levy_profit_oil_rate': 'Profit Oil — Govt Share',
-    'profit_oil_govt_pct': 'Profit Oil — Govt Share',
-    'levy_ftp_rate': 'First Tranche Petroleum',
-    'ftp_rate': 'FTP Rate',
-    'special_petroleum_tax_rate': 'Special Petroleum Tax',
-    'levy_special_tax_rate': 'Special Petroleum Tax',
-    'levy_spt_rate': 'Special Petroleum Tax',
-    'windfall_tax_rate': 'Windfall / ISAE Tax',
-    'excess_profits_tax_rate': 'Excess Profits Tax',
-    'state_participation': 'State Participation',
-    'dmo_rate': 'DMO Rate',
-    'tsc_remuneration_fee_usd_bbl': 'TSC Remuneration Fee ($/bbl)',
-    'revenue_share_govt_min_pct': 'Revenue Share — Min',
-    'revenue_share_govt_max_pct': 'Revenue Share — Max',
-    'levy_uplift_rate': 'SPT Uplift Rate',
-    'buyback_amort_years': 'Buy-back Amortization (yrs)',
-    'prrt_rate': 'PRRT Rate',
-    'prrt_uplift_rate': 'PRRT Uplift Rate',
-  };
-
-  const CONF_COLORS = { 'A': '#15803D', 'B': '#B06800', 'C': '#C2410C', 'D': '#B91C1C' };
-  const CONF_LABELS = {
-    'A': 'A — Primary legislation',
-    'B': 'B — Operator filing / verified guide',
-    'C': 'C — Secondary aggregator',
-    'D': 'D — Default estimate'
-  };
-
-  // Deduplicate: for same display label, keep higher confidence entry (A > B > C > D)
-  var seen = {};
-  var confRank = function(c) { return {'A':0,'B':1,'C':2,'D':3}[c] != null ? {'A':0,'B':1,'C':2,'D':3}[c] : 4; };
-  for (var key in fiscalFactsSourced) {
-    if (!fiscalFactsSourced.hasOwnProperty(key)) continue;
-    var v = fiscalFactsSourced[key];
-    var label = PARAM_LABELS[key] || key;
-    var conf = (v.confidence || 'D').toUpperCase();
-    if (!seen[label] || confRank(conf) < confRank((seen[label].confidence || 'D').toUpperCase())) {
-      seen[label] = Object.assign({}, v, { raw_key: key, confidence: conf });
-    }
-  }
-
-  var rows = [];
-  for (var lbl in seen) {
-    if (!seen.hasOwnProperty(lbl)) continue;
-    var sv = seen[lbl];
-    var conf2 = sv.confidence || 'D';
-    // Detect circular self-referential URL (petroleum-facts.db) → treat as D
-    if (sv.url && sv.url.includes('petroleum-facts.db')) conf2 = 'D';
-    var color = CONF_COLORS[conf2] || '#6B6560';
-    var confLabel = CONF_LABELS[conf2] || conf2;
-    var rawVal = sv.value;
-    var valStr = rawVal != null
-      ? (typeof rawVal === 'number'
-          ? (lbl.indexOf('bbl') >= 0 ? '$' + rawVal.toFixed(2) + '/bbl' : rawVal.toFixed(1) + '%')
-          : String(rawVal))
-      : '—';
-    var srcText = (sv.source || 'N/A');
-    var srcShort = srcText.length > 55 ? srcText.slice(0, 55) + '…' : srcText;
-    var srcHtml;
-    if (conf2 === 'D') {
-      srcHtml = '<span style="color:var(--red);font-size:10px;font-style:italic;">Estimated default</span>';
-    } else if (sv.url && !sv.url.includes('petroleum-facts.db')) {
-      srcHtml = '<a href="' + sv.url + '" target="_blank" rel="noopener" style="color:var(--accent);font-size:10px;text-decoration:none;" title="' + srcText + '">' + srcShort + ' ↗</a>';
-    } else {
-      srcHtml = '<span style="color:var(--muted);font-size:10px;">' + srcShort + '</span>';
-    }
-    rows.push('<tr>'
-      + '<td style="padding:4px 8px;font-size:12px;color:var(--text);">' + lbl + '</td>'
-      + '<td style="padding:4px 8px;font-size:12px;text-align:right;font-weight:600;color:var(--text);font-family:\'IBM Plex Mono\',monospace;">' + valStr + '</td>'
-      + '<td style="padding:4px 8px;text-align:center;" title="' + confLabel + '"><span style="font-size:11px;font-weight:700;color:' + color + ';">' + conf2 + '</span></td>'
-      + '<td style="padding:4px 8px;">' + srcHtml + '</td>'
-      + '</tr>');
-  }
-
-  if (!rows.length) return '';
-
-  var paramCount = Object.keys(seen).length;
-  return '<div class="dd-section" style="margin-top:0;">'
-    + '<h3 style="cursor:pointer;user-select:none;" onclick="(function(){var b=this.querySelector(\'.fp-toggle\'),p=this.nextElementSibling;p.style.display=p.style.display===\'none\'?\'block\':\'none\';b.textContent=p.style.display===\'none\'?\'▶\':\'▼\';}).call(this)">'
-    + '<span class="fp-toggle" style="font-size:11px;margin-right:6px;color:var(--muted);">▶</span>'
-    + 'Fiscal Parameters &amp; Evidence Chain'
-    + '<span style="font-size:10px;color:var(--muted);font-weight:400;margin-left:8px;">' + paramCount + ' parameters sourced — click to expand</span>'
-    + '</h3>'
-    + '<div style="display:none;">'
-    + '<table style="width:100%;border-collapse:collapse;font-size:12px;">'
-    + '<thead><tr style="border-bottom:1px solid var(--border);">'
-    + '<th style="padding:4px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.04em;">PARAMETER</th>'
-    + '<th style="padding:4px 8px;text-align:right;color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.04em;">VALUE</th>'
-    + '<th style="padding:4px 8px;text-align:center;color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.04em;">TIER</th>'
-    + '<th style="padding:4px 8px;text-align:left;color:var(--muted);font-weight:600;font-size:11px;letter-spacing:.04em;">SOURCE</th>'
-    + '</tr></thead>'
-    + '<tbody>' + rows.join('') + '</tbody>'
-    + '</table>'
-    + '<div style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5;">'
-    + 'A = primary legislation &nbsp;·&nbsp; B = operator filing or verified guide &nbsp;·&nbsp; C = secondary aggregator &nbsp;·&nbsp; D = default estimate'
-    + '</div>'
-    + '</div>'
-    + '</div>';
-}
+// v538 (T6): buildFiscalParamTable() -- the "Fiscal Parameters & Evidence Chain" section -- is
+// DELETED. It rendered directly beneath the "Key Fiscal Parameters" table on the same Country
+// Profile, listed the same parameter names, and contradicted it. Its VALUE column carried
+// fiscal_facts_sourced[k].value (the rate the cited statute states) while the table four lines
+// above carried fiscal_facts[k] (the contract-weighted rate ORCA's DCF actually uses). On
+// **63 rows across 40 countries** those two numbers differ -- Angola royalty 2.58% modelled vs
+// 20.0% shown here, Indonesia state participation 4% modelled vs 45.0% shown here -- and this
+// table showed only the second, under a tier-A badge, with no divergence marker and no note.
+// It also dropped levy_profit_oil_rate for **76 countries**, so on every major PSC jurisdiction
+// the parameter that drives most of government take was simply absent from the section named
+// "Evidence Chain". Its legend read "B = operator filing or verified guide" -- the identical
+// claim v527 removed from the Home page, where zero of the 142,798 tier-B facts on record is an
+// operator filing. Everything it showed correctly (parameter, statutory value, tier letter,
+// source link) the v500 table above already shows, labelled, beside the ORCA value, with
+// divergence flagged. The one thing it held alone -- a sourced cost_recovery_cap_pct for
+// Azerbaijan, Guyana and Malaysia -- is now a row in that table.
 
 // v512 (T2): Country Profile breakeven — one number on the page, not two.
 // COUNTRY_DATA.be_75 is null for Norway and the UK, but api/v1/country/<slug>.json carries an

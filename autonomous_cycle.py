@@ -273,6 +273,28 @@ Reply to this email with any priorities for the next cycle.
 
 # ─── Main ─────────────────────────────────────────────────────────────────────
 
+def git_version():
+    """Newest vNNN on origin/main. git is authoritative for the version;
+    CYCLE_STATE.json only mirrors it.
+
+    Derivation is deliberately IDENTICAL to tools/assert_state.py
+    assert_version() -- origin/main, last 40 subjects, first vNNN match. If
+    the two ever diverge, the assertion that catches the orphan would itself
+    be the thing that is wrong.
+    """
+    try:
+        subprocess.run(["git", "fetch", "-q", "origin"], cwd=str(REPO),
+                       capture_output=True, timeout=60)
+        out = subprocess.run(["git", "log", "origin/main", "-40", "--format=%s"],
+                             cwd=str(REPO), capture_output=True, text=True,
+                             timeout=60).stdout
+        m = re.search(r"\bv(\d{3,4})\b", out)
+        return f"v{m.group(1)}" if m else None
+    except Exception as e:                       # noqa: BLE001
+        log(f"  WARNING: could not derive version from git: {e}")
+        return None
+
+
 def main():
     # SINGLE EXECUTION POINT. This loop edits index.html, commits, and pushes to
     # main every 30 minutes. Two machines running it produce competing pushes to
@@ -342,6 +364,15 @@ def main():
     state["last_test_warn"] = test_after["warn"]
     state["last_test_js_errors"] = test_after["js_errors"]
     state["cycle_complete_human"] = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    # current_version was previously written by Claude inside the cycle rather
+    # than by this script, so it orphaned: it sat at v429 against git's v537,
+    # 107 versions stale, while every other field stayed live. Write it from
+    # git here, after git_push(), so the mirror can never drift again.
+    gv = git_version()
+    if gv:
+        if state.get("current_version") != gv:
+            log(f"  current_version {state.get('current_version')} -> {gv} (from git)")
+        state["current_version"] = gv
     save_state(state)
 
     log(f"=== CYCLE {cycle_n} COMPLETE === {test_after['pass']} PASS / {test_after['fail']} FAIL ===")
