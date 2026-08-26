@@ -14519,3 +14519,16 @@ rewritten tooltips sit on the exact elements whose rendering changed, and each
 previously described the removed behaviour. Tab order unchanged. v371/v373, v423,
 v430, v449, v451, v452, v489, v505, v515–v527, v533, v534 and v535 all untouched.
 Version v535→v536.
+
+---
+## Cycle 435 Log — 2026-08-25 19:40
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** LOOP (user-impact) | **Task:** Cycle 435 complete — T3, v536 shipped and pushed
+
+## Cycle 435 — T3, v536
+
+**Task:** T3 — *"How do these three countries compare side by side?"* (434 was T5, 433 was T2.)
+
+**Friction.** Cold walk into Side-by-Side, which seeds Norway / UK / Netherlands. The Data Basis block at the head of the grid is the only row that gives a *verdict* rather than a figure, and it read **Norway 76 · HIGH / UK 58 · LOW / Netherlands 84 · HIGH**. Th
