@@ -15586,3 +15586,145 @@ Cold walk with storage cleared into Country Profile, which defaults to **Norway*
 > `2 reforms since 2010 · Europe average: 0.2 · above regional average`
 
 The average at `index.html:25798` was computed over *every* country in the region and treated a missing reform log as a c
+
+---
+## Cycle 444 Log — 2026-08-26
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (suite RAN this cycle; WARN confirmed pre-existing by re-running against the pre-change backup)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Page errors on cold walk: 0
+- Shipped: **v545**, pushed as `5e62443`
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"**
+Rotation: 443 was T4, 442 T1, 441 T3, 440 T5, 439 T2, 437 T6. T6 least-recently-used and not a repeat of last cycle.
+
+## Friction
+Cold load, storage cleared. Default tab is Home, so the walk is Home → Fiscal
+Compare → click a row → drilldown, which is what the Quick Start step 2 tells a
+first-time analyst to do ("Click any row… Click ⎘ IC Citation to copy a
+ready-to-paste IC memo string").
+
+Inside `openFCDrilldown()` the v506 reconciliation verdict renders, in bold:
+
+> **MATERIAL DIFFERENCE · 13.9pp** … **Do not put both numbers in one sentence.**
+> Cite the **database** figure (68.0%) — it is what Country Profile, the API and
+> the XLSX GovtTake_75 column carry.
+
+Roughly 200px below it, the v454 IC Memo block at `index.html:32849` emitted a
+quoted, paste-ready cite string built from `r.liveTake` — **the compare-model
+take, the number the verdict had just ruled out.**
+
+At the cold default ($75 / Deepwater), 15 countries reach that branch. 13 of the
+15 sit ≥3pp from the database figure; 4 sit ≥10pp:
+
+| country | cite string said | database / CP / API / XLSX | gap |
+|---|---|---|---|
+| **Nigeria** | **47.3%** | **81.1%** | **33.8pp** |
+| Algeria | 54.1% | 69.5% | 15.4pp |
+| Libya | 56.4% | 71.1% | 14.7pp |
+| Norway | 54.1% | 68.0% | 13.9pp |
+| Egypt | 54.5% | 45.1% | 9.4pp |
+
+Three further defects rode in the same string, and one in the sentence around it:
+
+1. **`@$75/bbl` was hardcoded** while the price is user-settable. Select $100 and
+   the cite read "@$75/bbl" over the $100 model number — wrong figure *and* wrong
+   label.
+2. **`(ORCA v500)` was hardcoded.** This is the identical stale stamp v506 fixed
+   on the TSV "Copy 4-price as IC table" button — with the note *"this string said
+   v500 while the platform was past it, so every pasted IC table carried a stale
+   citation."* This second string was missed and stayed 45 versions behind.
+3. **`Evidence: N% A/B-sourced`** — the combined metric the Home glossary
+   explicitly warns against, and the one v518 retired from the Screener, because
+   98% of every tier-B fact is the country-level bulk harvest. Myanmar renders
+   **99.8% A/B on 45.3% A**; Algeria 98.9% on 42.4%.
+4. **"Moderate take, stable regime"** — the branch tests take and swing only and
+   never touches reform history. **10 of the 15 countries in it carry no sourced
+   reform log at all** (Denmark, Egypt, Kenya, Tanzania, Mozambique, Myanmar,
+   Cameroon, Bangladesh, Sudan, São Tomé). Same default-to-perfect assumption
+   v520 removed from the FC Stability column and v544 from the Country Profile
+   reform context — still live here.
+
+This is the worst moment in the T6 walk because it is the one place the platform
+**actively contradicts its own verdict within a single screenful**, at the exact
+step where the analyst stops asking and starts pasting.
+
+`copyICCitation()` (Country Profile) was checked and is **correct** — it already
+uses `d.take_75` and `_orcaVerNow()`. It was not touched. This was a second,
+divergent cite string, not the locked one.
+
+## Change
+The cite is rebuilt on **one** basis — the one the verdict prescribes.
+
+- Take is the **contract-database average at the price actually selected**, with
+  the contract count; NPV and breakeven come from the same table.
+- Price label and version are read live (`_ddPrice`, `_orcaVerNow()`).
+- Where the model figure diverges ≥3pp, the line **names the gap and states
+  outright** that the header number is deliberately not what the cite carries.
+- Evidence is stated as the **tier-A share alone**, plus the bulk-harvest share
+  when present. Never combined A/B.
+- Reform exposure comes from the sourced log, or says *"not scored — that is
+  absent research, not a clean record."* "Stable regime" is gone; the lead now
+  says what the branch actually measured (`low price sensitivity, N pp swing`).
+- State-monopoly and off-grid-price cases **refuse to emit a cite** and say why.
+
+On screen now (Nigeria, cold default):
+
+> Moderate take, low price sensitivity (13pp swing $50→$125) — cite: “**Nigeria:
+> 81.1% government take @$75/bbl · contractor NPV $302M, ORCA contract-database
+> average across 834 contracts, Deepwater profile, 10% WACC, 100% WI (ORCA
+> v545).**” *The 47.3% in the header strip above is the deepwater-project model —
+> a different basis, 33.8pp away. It is deliberately not the number in this cite.*
+> Evidence: **31% of this country's facts were read out of the primary legal
+> instrument (tier A)** — and at least 56% is the EY / IHS / KPMG country-level
+> bulk harvest, assigned to the whole country and never verified against an
+> individual contract. Do not cite a combined A/B figure; it hides that split.
+> Reform exposure: **2 sourced fiscal law changes since 2010** (6 on record).
+
+Denmark, which has no reform log, now reads: *Reform exposure: **not scored** —
+ORCA holds no sourced fiscal-reform log for Denmark. That is absent research, not
+a clean record.*
+
+## Result
+An analyst who drills a Fiscal Compare row and pastes the offered string into an
+IC memo now carries **Nigeria at 81.1%, not 47.3%** — the figure that reconciles
+with Country Profile, the public API and the XLSX `GovtTake_75` column — at the
+price they actually selected, stamped with the running version, with the
+primary-law share reported separately from the bulk harvest, and with no
+stability claim the data does not support. They can no longer be handed, by the
+tool itself, the one number the tool just told them not to use.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors.
+- `runtime_comprehensive.js` **ran this cycle** against the local build:
+  **135 PASS / 0 FAIL / 1 WARN**. The same suite against the pre-change backup
+  returns an identical **135 / 0 / 1**, so the WARN is the pre-existing
+  local-harness service-worker 404, not this change.
+- Cold Playwright walk, storage cleared: Nigeria, Norway, Denmark, Australia,
+  Egypt, Saudi Arabia at $75; Norway re-run at $100 to exercise the dynamic price
+  label. **0 page errors.** The off-grid-price branch is unreachable from the UI
+  (the control is a 4-option select) and is a defensive guard only.
+
+## Still open — stated rather than hidden
+`v500` remains hardcoded in roughly 20 places of **static Methodology / FAQ
+prose** (IC memo language templates, short-form footnote citation, profile-cite
+strings at lines 1742–1776, 4347–4350, 5595–5596, 21355–21379). Those are
+documentation text, not a computed surface, and sweeping them is the bookkeeping
+the directive bans as a cycle's deliverable. The right fix is to route them
+through `_orcaVerNow()` rather than to re-type a number that will be stale again
+next cycle — that is a structural change and belongs to its own cycle.
+
+Also still open from cycle 443, untouched: the Reform Risk tab calls one number
+"Stability Score", "Reform Frequency Score" and a five-diamond Home-card
+"Stability Score (◆◆◆◆◆)" that is a different scale on a different tab.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip. No page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. Tab order unchanged. `copyICCitation()` untouched.
+v371/v373, v430, v449, v451, v452, v489, v506, v514, v518, v520, v534, v538–v544
+all untouched. Version sweep done silently at the end, 4 structural locations
+plus the Home hero line, and is not claimed as the improvement.
