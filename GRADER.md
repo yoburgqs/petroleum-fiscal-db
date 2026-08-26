@@ -16427,3 +16427,18 @@ above it, not to Zone A or Zone B. v371/v373, v430, v449, v451, v452, v489, v505
 v521, v525, v529, v531, v533, v534, v536, v540, v541, v542, v544, v545, v546, v547, v548 and
 v549 all intact. Version sweep done silently at the end across the 3 structural locations and
 is **not** claimed as the improvement.
+
+---
+## Cycle 449 Log — 2026-08-26 17:29
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 449 complete — v550 shipped (`e557d77`), pushed, mirrored.
+
+---
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (rotation: 443 T4, 444 T6, 445 T2, 446 T5, 447 T1, 448 T3 — T4 was least-recently-used.)
+
+## Friction
+Cold walk, storage cleared, Home → Country Profile → Norway. The one-line IC verdict at the top ends with **"Check reform risk before IC."** That sentence fires on **39 of 185** profiles. It names the next step and gives no way to take it — no control, n
