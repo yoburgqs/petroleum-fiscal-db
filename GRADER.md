@@ -16310,3 +16310,120 @@ locations and is **not** claimed as the improvement.
 Cold walk, storage cleared, Home → Side-by-Side → USA vs Iraq. The Iraq column read **84.8% government take**, ***#21 of 21 producers***, ***highest-take quartile***, in red — the worst regime on the board.
 
 **415 of Iraq's 610 contracts are technical service contracts.** A TSC contractor is paid a fixed $/bbl fee and keeps none
+
+---
+## Cycle 449 Log — 2026-08-26 (v550)
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"**
+(rotation: 443 T4, 444 T6, 445 T2, 446 T5, 447 T1, 448 T3 — T4 was least-recently-used.)
+
+## Friction
+Cold walk, `sessionStorage` and `localStorage` cleared. Home → Country Profile → Norway.
+
+The one-line IC verdict at the top of the profile reads:
+
+> ✔ Clears the 10% WACC, but high-take — contractor NPV $826M @$75 and still $379M at the
+> $50/bbl downside, at 68.0% govt take. **Check reform risk before IC.**
+
+That closing sentence (`_quickIcVerdict497`, `index.html`) fires on **39 of 185** profiles —
+every country with positive NPV on both legs and take > 55%. It names the next step and gives
+no way to take it: no control, no score, no destination.
+
+Scrolling to the Fiscal Reform History sidebar is supposed to be the answer. For the **29
+uncovered** countries it is: `renderReformTimeline()`'s no-log branch states the coverage gap
+("21 of 185 jurisdictions … read this as missing coverage, not a clean record"), offers the
+Fiscal Predictability Score as the fallback signal, and carries a **"Check X on Reform Risk ›"**
+button.
+
+For the **10 countries that actually have a sourced reform log** — Algeria, Brazil, India,
+Indonesia, Iraq, Kazakhstan, Libya, Nigeria, Norway, Venezuela — the covered branch rendered
+four dated event paragraphs and a regional peer-count line, and stopped. **No Reform Frequency
+Score, no rank, no direction split, no IC action, and no button.** Everything the Reform Risk
+tab computes for these countries existed only on the Reform Risk tab, reachable only by
+knowing the tab exists, opening it, and finding the lookup dropdown.
+
+So the analyst holding the **most** reform evidence got the **least** guidance — the inverse of
+what the data supports. And the guidance they were missing is not decoration: it is the window
+caveat. Venezuela scores **85**, Kazakhstan **85**, Algeria **100** — all three are pre-2010
+artefacts (Venezuela's last take rise is the 2007 Orinoco nationalisation, +15pp, one of 3
+pre-2010 rises totalling +55pp; Algeria's is Law 05-07 in 2005, +10pp). Norway's **70** is an
+in-window +12pp. Read as a raw event list with no verdict, none of that says itself.
+
+A second edge of the same defect: the sentence's trigger was `take > 55` alone. The **United
+Kingdom** — rank **21 of 21**, 5 law changes since 2010, the single most reform-exposed regime
+ORCA scores — got a green verdict with **no mention of reform at all**, because its 49.2% take
+reads favourable.
+
+## Change
+1. **`_rrClassify(country)`** — new shared function holding the score, the rank, the direction
+   split and the four-case IC action (Actively Reforming / take raised inside the window /
+   pre-2010 window artefact / clean). Moved **verbatim** out of `renderReformCountryVerdict()`,
+   which now calls it. No threshold, string or colour changed; verified byte-identical output
+   across all 21 covered jurisdictions before and after (see Verification). The two surfaces
+   answering the same question can no longer drift.
+2. **Country Profile sidebar** now opens with a verdict card, accented by the verdict rather
+   than the raw score band: **Reform Frequency Score /100** + rank of 21, **reforms since
+   2010**, the **↑/↓/= direction split** with the net tilt, the **IC action** paragraph, and a
+   **"Full reform detail for X ›"** button that opens the Reform Risk lookup on that country.
+   The timeline follows underneath, unchanged.
+3. **The headline sentence is now a control.** Where a log exists it states the verdict inline
+   — Norway reads `Reform risk 70/100 · take was raised inside the scoring window ›`, Venezuela
+   `85/100 · score is a window artefact ›`, the UK `25/100 · Actively Reforming ›` — and clicking
+   or Entering it switches to Reform Risk with that country selected. Where no log exists it
+   still reads "Check reform risk ›" and still routes, landing on the coverage-gap statement
+   rather than implying a clean record.
+4. **Trigger widened** from `take > 55` to `take > 55 OR the classifier returns a non-green
+   verdict`. No new threshold — it is the tab's own verdict, read one surface earlier.
+
+## Result
+An analyst opening Norway, Venezuela, Kazakhstan, Algeria, Nigeria, Iraq, Libya, India,
+Indonesia or Brazil now gets the reform verdict **on the profile they are already reading** —
+the score, where it ranks among the 21 scoreable jurisdictions, and, critically, whether that
+score is a real record or an artefact of a window that opens in 2010. Venezuela's 85 and
+Algeria's 100 no longer sit silently next to an event log that contradicts them.
+
+The instruction "Check reform risk before IC" now has a destination: one click from the verdict
+line to the full lookup, or the answer in place three inches below.
+
+And eight countries that previously said nothing about reform because their take reads
+favourable — **United Kingdom, USA, Colombia, Canada, Australia, Guyana, Russia, Ecuador** —
+now surface it. The UK, the most reform-exposed regime in the dataset, was the worst of these:
+5 law changes since 2010, rank 21 of 21, and a green headline that never mentioned it.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors (re-run after every edit).
+- `runtime_comprehensive.js` **ran this cycle** against the local build: **135 PASS / 0 FAIL /
+  1 WARN / 1 JS error**. The WARN and the error are the same pre-existing local-harness
+  artefact — `index.html` registers its service worker at `/petroleum-fiscal-db/sw.js`, a path
+  that only resolves under GitHub Pages.
+- **Refactor proof:** the `rr-country-verdict` innerHTML was captured for all **21** covered
+  jurisdictions before the change and after it, and compared as strings. **0 of 21 differ.**
+  The Reform Risk tab is bit-for-bit what it was; only the Country Profile gained anything.
+- Cold Playwright walks over **23 profiles** (the 21 covered plus Qatar and Denmark as
+  uncovered controls), storage cleared, **0 page errors**. Verdict card and button present on
+  all 21 covered; the uncovered branch is untouched and still shows its coverage statement.
+- Route test: clicking the headline control on Norway lands on `treformrisk` with
+  `rr-country-lookup` set to Norway and the full verdict rendered.
+
+## Deliberately NOT done — stated rather than hidden
+1. **Fiscal Compare, Explorer and the Screener still show no reform verdict at all.**
+   `_rrClassify()` is now on `window`, so any of them can read the same classification without
+   another refactor. That is the next cycle on this class.
+2. **Norway's in-window flag is arguably a false positive.** Its 2022 +12pp is a temporary
+   COVID relief package expiring as designed — the event log says so. The v540 in-window test
+   cannot tell an expiry from a rupture. Left alone: this cycle propagated the tab's existing
+   verdict, it did not re-litigate it.
+3. The three other headline-verdict branches (price-dependent entry, below-WACC, not-computed)
+   still carry no reform line. Only the branch that held the dead instruction was changed.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip on any pre-existing control — the two new hovers belong
+to a card and a control that did not exist before this cycle. No page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible
+Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. Tab
+order unchanged. CP headline strip structure untouched — the change is to the verdict line
+above it, not to Zone A or Zone B. v371/v373, v430, v449, v451, v452, v489, v505, v511, v515,
+v521, v525, v529, v531, v533, v534, v536, v540, v541, v542, v544, v545, v546, v547, v548 and
+v549 all intact. Version sweep done silently at the end across the 3 structural locations and
+is **not** claimed as the improvement.
