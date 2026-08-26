@@ -15889,3 +15889,136 @@ locations and is **not** claimed as the improvement.
 
 ## Friction
 Cold load into Country Profile, which auto-loads Norway. The headline strip has read on the producer basis since v534 — *"#16 of 21 producers"* — and keeps the all-185 rank beneath it explicitly labelled *
+
+---
+## Cycle 446 Log — 2026-08-26
+
+- Test before: 135 PASS / 0 FAIL / 0 WARN
+- Test after: **135 PASS / 0 FAIL / 1 WARN** — the WARN is the pre-existing
+  local-harness service-worker 404 (`/petroleum-fiscal-db/sw.js` 404s on a
+  root-served local server). The suite **ran this cycle**; the number is not
+  carried forward from a prior baseline.
+- JS syntax gate: **PASS**, 9 blocks / 0 errors.
+- Shipped: **v547**, commit `288d9f2`, pushed to `origin/main`. Mirror updated.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."**
+Rotation: 440 T5, 441 T3, 442 T1, 443 T4, 444 T6, 445 T2 — T5 was
+least-recently-used.
+
+## Friction
+Cold walk, fresh browser context, `sessionStorage` and `localStorage` cleared.
+Home → **Fiscal Compare** — the tab the Home card labels **Start here**, the
+default landing after one click, and the only surface on the platform that
+produces a *shortlist* rather than a single country. Two halves of one moment.
+
+**(1) The number on screen is not the number the platform tells you to cite.**
+Counted off the live DOM on the cold default view: **154 of the 185 rows render
+an identical `22.2%` in `Take%` and an identical `$4.3B` in `NPV`**, because
+ORCA holds no country-specific terms for them in the compare engine and they
+fall to the generic mechanic default. The table already discloses this — v505
+gave them a grey **G** and a shared `=1` rank, v533 rewrote the Quality
+definition around it.
+
+What no cycle had noticed: **ORCA holds a differentiated, citable
+contract-database take for every one of those 154 countries.** Measured in-page
+against `COUNTRY_DATA` — `genericWithDb = 154, genericNoDb = 0`:
+
+| country | on screen (model) | held in database | gap |
+|---|---|---|---|
+| Guyana | 22.2% | **54.1%** | +31.9pp |
+| Indonesia | 22.2% | **59.5%** | +37.3pp |
+| Sri Lanka | 22.2% | **57.2%** | +35.0pp |
+| Chad | 22.2% | **55.3%** | +33.1pp |
+| Guinea | 22.2% | **55.1%** | +32.9pp |
+
+That database figure is what the row drilldown, Country Profile, the JSON API
+and the v529 XLSX all carry, and the drilldown states it in so many words:
+*"Cite the database figure; do not quote both as one number."* It appeared
+**nowhere on the flagship table**. Reading a citable take for a ten-country
+shortlist required opening ten drilldowns.
+
+**(2) The tab had no clipboard path at all.** Enumerated every visible
+copy/export affordance on FC after a cold auto-run: exactly one —
+`#fc-export-btn`, **Export XLSX**, a file download. Side-by-Side has carried
+`⎘ Copy for IC Memo` since v503, Country Profile has one, and the drilldown has
+*Copy 4-price as IC table* — one country at a time. The one surface that
+produces the shortlist had none. For T5 that is the task failing at its
+own centerpiece.
+
+## Change
+**(a) A citable take column on the flagship table.** `Take% db · citable` sits
+immediately right of the model take, populated for all 185 rows at the selected
+price from `_fcDbTake()`, tier-coloured on the same ramp so the two read on one
+scale. The existing column is relabelled `Take% model` — the two were never
+distinguishable on screen before, and the `#` rank is built from the model one.
+Each citable cell names the gap to its left in its tooltip, with the drilldown's
+own instruction: *"a gap of +31.9pp. Do not put both numbers in one sentence."*
+State monopolies (Bahrain / Kuwait / Saudi Arabia) print their real citable
+**100.0%** here instead of `n/c`; `n/c` stays on the model columns, which have
+no contractor position. All eleven divider and footnote colspans moved
+10→11 / 11→12 with the new column.
+
+**(b) `⎘ Copy for IC Memo` on Fiscal Compare**, beside Export XLSX, enabled at
+the same moment the export is. `copyFCForIC()` copies the rows **as shown** —
+same order, same region filter, same sort, read off `#tbl-fc` itself — so the
+pasted artifact and the screen the analyst just read cannot disagree. Ten
+columns, with the **citable database take and contractor NPV as the leftmost
+numerics** (the v529 rule: an analyst reads left to right and the leftmost
+numbers are the ones that reach the memo), then breakeven, price swing, this
+screen's model take, and the model basis spelled out per row — *Country-specific
+terms* / *ORCA contract database terms* / *GENERIC DEFAULT (10% royalty, 25%
+CIT, no resource-rent tax, no state equity) — directional only, NOT citable*.
+Caption, assumption line (price, profile, 10% WACC, 100% WI, breakeven coverage
+computed for *this* view), a counted warning line — *"151 of the 185 rows have a
+GENERIC DEFAULT model basis… 3 rows are a state monopoly…"* — the `CP_IRR_NOTE`
+explanation of why IRR is absent, and a `_orcaVerNow()` source line all travel
+inside the paste. Two clipboard flavours, mirroring v503: `text/html` so Word /
+Docs / Outlook render a bordered table, TSV so Excel splits into columns.
+
+## Result
+An analyst screening at $75/bbl reads a **citable, differentiated government
+take for every one of the 185 countries without leaving the tab** — Guyana's row
+now reads `22.2% | 54.1%` instead of `22.2%` alone — and gets the whole
+shortlist into an IC memo in **one click** instead of ten drilldowns or a round
+trip through Excel. Every row in the paste carries the basis it was computed on,
+so a G row cannot be quoted as though it were sourced.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors (run before and after the
+  changelog prepend and the version bump).
+- `runtime_comprehensive.js` **ran this cycle** against the local build:
+  **135 PASS / 0 FAIL / 1 WARN / 1 JS error** — WARN and error are the same
+  known service-worker 404 the local harness always produces.
+- Cold Playwright walk, `sessionStorage` and `localStorage` cleared:
+  **11 header cells**; the new column populated on all 185 rows; Guyana
+  `22.2% | 54.1%`; Bahrain `n/c | 100.0% | n/c`; all three rendered dividers at
+  `colspan=12`; clipboard read back as a **192-line** table with caption,
+  assumption line, counted warning and versioned source line present.
+  **0 page errors.**
+
+## Deliberately NOT done — stated rather than hidden
+- **The citable column is not sortable, and the table is still ranked on the
+  model take.** Ranking ascending on the database take puts **Vanuatu (5.0%),
+  the Bahamas (10.0%), Montenegro (10.5%), Greenland (11.6%) and the Faroe
+  Islands (11.9%)** at the head of the shortlist — precisely the non-producer
+  distortion v534, v542 and v546 spent three cycles removing from Country
+  Profile and Side-by-Side. Making it sortable before porting
+  `getProducerPeers()` to this tab would hand the analyst a *worse* shortlist
+  than the one they have. That port is the next cycle on this surface, and it is
+  the same open item v546 left.
+- The paste's `#` column carries `=1` on 150 rows, because that is what the
+  screen carries. Honest, and it is what the assumption line explains.
+- Carried from 443/444/445, untouched: the Reform Risk tab calls one number
+  "Stability Score", "Reform Frequency Score", and a five-diamond Home-card
+  "Stability Score (◆◆◆◆◆)" on a different scale on a different tab.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip on any **pre-existing** control — the two
+tooltips added belong to a column that did not exist and a button that did not
+exist. No page-sub paragraph, no amber instructional banner, no routing hint, no
+"How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener
+advanced filters still collapsed, presets still a dropdown. Tab order unchanged.
+v371/v373, v430, v449, v451, v452, v489, v505 G badge, v525, v529, v533, v534,
+v542, v545 and v546 all untouched. Version sweep done silently at the end across
+5 structural locations and is **not** claimed as the improvement.
