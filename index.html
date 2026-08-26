@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v546.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v547.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v546</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v547</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1062,7 +1062,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      <button>s, and a blanket rule would blank them out of the printed table. */
   .btn, .search-input, #cmp-dropdown, #cmp-print-btn, #cmp-share-btn, #cmp-copy-table-btn,
   .cmp-quickstart-btn, .expl-mode-btn, .explorer-mode-toggle,
-  #fc-export-btn, #breakeven-csv-btn { display: none !important; }
+  #fc-export-btn, #fc-copy-ic-btn, #breakeven-csv-btn { display: none !important; }
   /* chip remove-glyphs are a screen control, not data */
   #cmp-chips span[role="button"] { display: none !important; }
 
@@ -1361,7 +1361,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v546</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v547</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v546</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v547</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1491,7 +1491,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v546).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v547).</div>
     <!-- v465: Live investible universe stat — populated after country_data.json loads -->
     <div id="home-hurdle-stat" style="display:none;margin-top:8px;font-size:12px;color:var(--green);font-weight:600;" aria-live="polite"></div>
     <!-- v466: DB currency note — populated after country_data.json loads -->
@@ -1728,6 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     </div>
     <button class="btn-run" id="fc-run-btn" data-action="runFiscalCompare" aria-label="Run Fiscal Compare — ranks all 185 countries by government take for the selected profile and price. Keyboard shortcut: Ctrl+Enter." aria-describedby="fc-status" title="Run Fiscal Compare — ranks all 185 countries by govt take for the selected profile and price. Keyboard shortcut: Ctrl+Enter (when on this tab).">Run Compare <span style="font-size:10px;opacity:.65;font-weight:400;">Ctrl+↵</span></button>
     <button class="btn btn-sm btn-outline" id="fc-export-btn" disabled title="Run Compare first to enable export">Export XLSX</button>
+    <button class="btn btn-sm btn-outline" id="fc-copy-ic-btn" disabled title="Run Compare first to enable copy">&#x2398; Copy for IC Memo</button>
     <span id="fc-status" role="status" aria-live="polite" aria-atomic="true" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Auto-loading&hellip;</span>
   </div>
   <!-- v454: Profile assumption strip — shows the active profile's key DCF inputs inline before results, so analysts can see the model basis without looking at dropdown text -->
@@ -2598,6 +2599,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- Recent Platform Updates / Changelog -->
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
+    <strong style="color:var(--accent);">v547 (Aug 2026) &mdash; Cycle 446 (T5): Fiscal Compare showed a take of 22.2% on 154 of 185 rows, held the citable figure for every one of them, and had no clipboard path at all</strong> &mdash; Task <strong>T5</strong> &mdash; &ldquo;give me something I can paste straight into an IC memo.&rdquo; Walked cold (fresh browser context, <code>sessionStorage</code> and <code>localStorage</code> cleared) from Home into <em>Fiscal Compare</em> &mdash; the tab the Home card labels <strong>Start here</strong>, and the only surface that produces a <em>shortlist</em> rather than a single country. <strong>Friction, two halves of one moment.</strong> <strong>(1)</strong> Counted off the live DOM on the cold default view: <strong>154 of the 185 rows render an identical <code>22.2%</code> in the <em>Take%</em> column and an identical <code>$4.3B</code> in <em>NPV</em></strong>, because ORCA holds no country-specific terms for them in the compare engine and they fall to the generic mechanic default. The table already says so &mdash; v505 gave them a grey <strong>G</strong> and an <code>=1</code> shared rank, v533 rewrote the Quality definition around it. What no cycle had noticed is that <strong>ORCA holds a differentiated, citable contract-database take for all 154 of them</strong>: Guyana 54.1%, Indonesia 59.5%, Sri Lanka 57.2%, Chad 55.3%, Guinea 55.1% &mdash; gaps of <strong>25&ndash;35pp</strong> against what the screen printed. That figure is what the row drilldown, Country Profile, the JSON API and the v529 XLSX all carry, and the drilldown says in so many words: <em>&ldquo;Cite the database figure; do not quote both as one number.&rdquo;</em> It appeared <strong>nowhere on the flagship table</strong>. To read a citable take for a ten-country shortlist the analyst had to open ten drilldowns. <strong>(2)</strong> There was no way to copy the table. The single export affordance on the tab was <strong>Export XLSX</strong> &mdash; a file download. Side-by-Side has had <code>&#x2398; Copy for IC Memo</code> since v503, Country Profile has one, and the drilldown has <em>Copy 4-price as IC table</em>, one country at a time. The one surface that produces the shortlist had none. <strong>Change.</strong> <strong>(a)</strong> A new column, <strong>Take% <span style="color:var(--green);">db &middot; citable</span></strong>, sits immediately right of the model take and is populated for all 185 rows at the selected price, tier-coloured on the same ramp so the two read on one scale. The existing column is relabelled <strong>Take% <em>model</em></strong> &mdash; the two were never distinguishable before and the <code>#</code> rank is built from the model one. Each citable cell names the gap to its left in the tooltip (<em>&ldquo;a gap of +31.9pp. Do not put both numbers in one sentence.&rdquo;</em>). State monopolies now print their real citable <strong>100.0%</strong> here instead of <code>n/c</code>; <code>n/c</code> stays on the model columns, which have no contractor position. All eleven divider/footnote colspans moved 10&rarr;11 / 11&rarr;12 with the new column. <strong>(b)</strong> <code>&#x2398; Copy for IC Memo</code> next to <em>Export XLSX</em>, enabled at the same moment the export is. <code>copyFCForIC()</code> copies the rows <em>as shown</em> &mdash; same order, same region filter, same sort, read off <code>#tbl-fc</code> itself &mdash; so the pasted artifact and the screen the analyst just read cannot disagree. Ten columns, with the citable ORCA database take and contractor NPV as the <em>leftmost</em> numerics (the v529 rule: an analyst reads left to right and the leftmost numbers reach the memo), then breakeven, price swing, this screen&rsquo;s model take and the model basis spelled out per row (<em>Country-specific terms</em> / <em>ORCA contract database terms</em> / <em>GENERIC DEFAULT (10% royalty, 25% CIT, no resource-rent tax, no state equity) &mdash; directional only, NOT citable</em>). Caption, assumption line (price, profile, 10% WACC, 100% WI, breakeven coverage on <em>this</em> view), a counted warning line (<em>&ldquo;151 of the 185 rows have a GENERIC DEFAULT model basis&hellip; 3 rows are a state monopoly&hellip;&rdquo;</em>), the <code>CP_IRR_NOTE</code> explanation of why IRR is absent, and a <code>_orcaVerNow()</code> source line all travel inside the paste. Two clipboard flavours, mirroring v503: <code>text/html</code> so Word / Docs / Outlook render a bordered table, TSV so Excel splits into columns. <strong>Result.</strong> An analyst screening at $75/bbl reads a citable, differentiated government take for every one of the 185 countries without leaving the tab, and gets the whole shortlist into an IC memo in one click instead of ten drilldowns or a round trip through Excel &mdash; with the basis of every row stated in the pasted artifact, so a G row cannot be quoted as if it were sourced. <strong>Verified cold in Playwright</strong> against the local build, storage cleared: 11 header cells, the new column populated on all 185 rows, Guyana <code>22.2% | 54.1%</code>, Bahrain <code>n/c | 100.0% | n/c</code>, all three dividers at <code>colspan=12</code>, and the clipboard read back as a <strong>192-line</strong> table with caption, assumptions, warning and source line present. <strong>0 page errors.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness service-worker 404. <em>Deliberately not done, stated rather than hidden:</em> the citable column is <strong>not sortable</strong> and the table is still ranked on the model take. Ranking ascending on the database take puts <strong>Vanuatu (5.0%), the Bahamas, Montenegro, Greenland and the Faroe Islands</strong> at the head of the shortlist &mdash; exactly the non-producer distortion v534/v542/v546 spent three cycles removing from Country Profile and Side-by-Side. Making it sortable without first porting <code>getProducerPeers()</code> to this tab would hand the analyst a worse shortlist than the one they have. That port is the next cycle on this surface, and it is the same open item v546 left. <strong>STILL LOCKED &mdash; nothing touched:</strong> no new FAQ (still 974); no new tooltip on any pre-existing control (the two tooltips added here belong to a column that did not exist and to a button that did not exist); no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; tab order unchanged; v371/v373, v430, v449, v451, v452, v489, v505 G badge, v525, v529, v533, v534, v542, v545 and v546 all untouched. Version sweep done silently at the end across 5 structural locations and is <strong>not</strong> claimed as the improvement. Version v546&rarr;v547.<br><br>
     <strong style="color:var(--accent);">v546 (Aug 2026) &mdash; Cycle 445 (T2): the Country Profile NPV tile ranked every real producer against Vanuatu, and marked the world&rsquo;s best contractor-NPV regime &ldquo;#28 of 185&rdquo;</strong> &mdash; Task <strong>T2</strong> &mdash; &ldquo;is this one country attractive at $75/bbl, and can I defend that?&rdquo; Walked cold (fresh context, <code>sessionStorage</code> and <code>localStorage</code> cleared) into <em>Country Profile</em>, which auto-loads Norway. <strong>Friction:</strong> the headline strip has read on the producer basis since v534 &mdash; <em>&ldquo;#16 of 21 producers &middot; upper-mid among producers&rdquo;</em>, with the all-185 rank kept beneath it and explicitly labelled <em>&ldquo;includes 164 countries with no production data&rdquo;</em>. Three sections lower, the <strong>NPV @ $75</strong> tile in <em>Fiscal Mechanics &amp; Key Metrics</em> still printed a bare all-185 rank with no caveat: <strong>&ldquo;$826M &#10003; #175 of 185&rdquo;</strong>, coloured <span style="color:var(--red);font-weight:700;">red</span>. v534 corrected every <em>take</em> rank on this tab and v542 did the same for Side-by-Side; this tile was missed, so the page warned against a basis and then used it. <strong>The NPV sort is worse than the take sort was</strong>, because low take produces high contractor NPV, which puts the non-producers at the <em>top</em>: the five countries beating the entire world on NPV@$75 are <strong>Vanuatu ($5.1B), the Bahamas, Montenegro, Greenland and the Faroe Islands</strong> &mdash; standardized-project figures run off statutory terms over as few as 2&ndash;5 contracts. The consequence is not a softened verdict, it is a uniformly false one: <strong>all 21 production-weighted producers fall in the bottom half of the all-185 NPV list.</strong> <strong>Canada</strong>, the best contractor-NPV producer on earth in this dataset, read <strong>#28 of 185</strong>. <strong>USA</strong>, #2 among producers, read <strong>#78 of 185</strong> in neutral grey. <strong>Australia</strong> #8 of 21 read #111 of 185. <strong>Norway</strong> #16 of 21 read #175 of 185 in red &mdash; a screening kill signal at the exact point an analyst decides whether the country stays on the list, and the one tile on the page that answers &ldquo;is the contractor value here any good?&rdquo; <strong>Change:</strong> the tile now ranks against <code>getProducerNpvPeers()</code> &mdash; <code>getProducerPeers()</code> restricted to those carrying an NPV, sorted descending so <strong>#1 is the highest contractor NPV</strong>. <em>No threshold is invented</em>; the producer set is read off the existing <code>weighting</code> field and drops state monopolies exactly as <code>fmtTake</code> already does. Each cell reads <strong>&ldquo;#16 of 21 producers&rdquo;</strong> with a colour-coded second line giving the direction on screen &mdash; <em>highest contractor-NPV quartile</em> / <em>above producer median</em> / <em>at producer median</em> / <em>below producer median</em> / <em>lowest contractor-NPV quartile</em> &mdash; so the analyst never has to infer which end of the list is the good end. Countries outside the producer set are no longer given a placement: they read <strong>not ranked &middot; no production data</strong> (or <strong>not ranked &middot; state monopoly</strong>), with the reason in the tooltip. <strong>Vanuatu is the exhibit</strong> &mdash; it was <strong>#1 of 185</strong>, the most attractive place on earth by this tile, and now reads <em>not ranked &middot; no production data</em>. The all-185 figure is not deleted; it moves into the tooltip together with the reason it is not comparable. <strong>Verified cold in Playwright</strong> against the local build, storage cleared, across eleven profiles (Norway, Canada, USA, Nigeria, United Kingdom, Australia, Malaysia, plus the edge cases Saudi&nbsp;Arabia, Slovenia, Netherlands and Vanuatu). All three cell states exercised; <strong>0 page errors on every walk</strong>. JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 0 WARN / 0 JS errors</strong>. <em>Still open, stated rather than hidden:</em> Explorer, Screener, Fiscal Compare and the Breakeven Map still rank and colour on the all-185 basis &mdash; v534 and v542 both flagged this and it remains true; the Breakeven rank in this same grid (<code>#N of 68</code>) is a producer-independent set and was not touched this cycle. <strong>STILL LOCKED &mdash; nothing touched:</strong> no new FAQ (still 974), no new tooltip on any pre-existing control, no page-sub paragraph, no amber banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; tab order unchanged; v371/v373, v430, v449, v451, v452, v489, v534, v542 and v545 all untouched. Version sweep done silently at the end across 5 structural locations and is not claimed as the improvement. Version v545&rarr;v546.<br><br>
     <strong style="color:var(--accent);">v544 (Aug 2026) &mdash; Cycle 443 (T4): the reform &ldquo;regional average&rdquo; scored 164 unresearched countries as zero, and told Norway it was worse than its region</strong> &mdash; Task T4 &mdash; &ldquo;what is my fiscal-stability and reform exposure here?&rdquo; Walked cold (<code>sessionStorage</code> and <code>localStorage</code> cleared) into Country Profile, which defaults to Norway. <strong>Friction:</strong> under the Fiscal Reform History timeline the M5.2 regional context line read <em>&ldquo;2 reforms since 2010 &middot; Europe average: 0.2 &middot; above regional average&rdquo;</em>. The average (<code>index.html:25798</code>) was built over <em>every</em> country in the region &mdash; <code>COUNTRY_DATA.filter(x =&gt; x.region === _region)</code> &mdash; and read a missing reform log as a count of zero (<code>var ev = _rh[x.country] || [];</code>). ORCA holds a sourced reform log for <strong>21 of 185</strong> jurisdictions, so &ldquo;Europe average 0.2&rdquo; was Norway(2) + UK(5) divided by <strong>30</strong>, and &ldquo;Africa average 0.2&rdquo; was 5 measured countries divided by <strong>49</strong>. Measured against the real data: <strong>17 of the 21</strong> covered countries read &ldquo;above regional average&rdquo; when on a measured-only basis only <strong>3</strong> do; Norway and the UK returned the <strong>identical verdict string</strong> on 2 reforms and on 5, so the line could not separate them; Norway &mdash; the <em>more</em> stable of the only two measured European regimes &mdash; was told in orange that it was worse than its region, <strong>on the cold-load default profile</strong>; and Iraq and Australia, the sole measured jurisdiction in their regions, were each compared against an &ldquo;average&rdquo; consisting of themselves diluted by 13 and 14 unresearched neighbours, both reading &ldquo;above regional average&rdquo;. This is the same defect family <strong>v514</strong> and <strong>v532</strong> already fixed elsewhere &mdash; absent coverage is not a clean record and must never be averaged in as one &mdash; still live on the most-travelled surface in the platform. <strong>Change:</strong> the mean is now taken over <strong>measured jurisdictions only</strong> (peers excluding self), the coverage is stated on screen, and where a region has too few measured peers to support a mean the line says so instead of inventing a verdict. Three branches, no new thresholds: <strong>0 peers</strong> &rarr; <em>&ldquo;no regional comparison &mdash; Iraq is the only Middle East jurisdiction with a sourced reform log (1 of 14).&rdquo;</em>; <strong>1 peer</strong> &rarr; named pairwise, because one peer is a pair and not a distribution &mdash; <em>&ldquo;2 reforms since 2010 &middot; United Kingdom: 5 &middot; less reform activity &mdash; the only two jurisdictions in Europe with a sourced log (2 of 30); a pair, not an average.&rdquo;</em>; <strong>2+ peers</strong> &rarr; <em>&ldquo;Africa measured peers: 1.5 (mean of 4) &middot; in line with measured peers &mdash; 5 of 49 jurisdictions in Africa carry a sourced reform log; the other 44 are unresearched and are excluded, not counted as zero.&rdquo;</em> Colour follows the honest basis, so Norway now renders <strong>green</strong> where it rendered orange against a fabricated 0.2. <strong>Result:</strong> an analyst reading reform exposure on the default profile is told Norway has had <em>less</em> reform activity than the only other measured European regime, and is shown that the comparison rests on 2 of 30 jurisdictions &mdash; they can no longer carry an &ldquo;above regional average&rdquo; reform premium that exists only because 28 neighbouring countries were never researched. <strong>Verified cold in Playwright</strong> against the local build across all three branches (Norway, UK, Nigeria, Algeria, Iraq, Australia, India, Russia, USA, Ecuador, Venezuela, Brazil, plus uncovered Chad, which correctly renders the v514 no-coverage panel with no context line). <strong>0 page errors.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong>: <strong>135 PASS / 0 FAIL / 1 WARN</strong>, and the same suite run against the pre-change backup returns the identical 135/0/1, confirming the WARN is the pre-existing local-harness service-worker 404 and not this change. <em>Known, not fixed:</em> the Reform Risk tab calls this same number &ldquo;Stability Score&rdquo; in its global table header while the per-country lookup calls it &ldquo;Reform Frequency Score&rdquo;, and the Home card advertises a 5-diamond &ldquo;Stability Score (&#9670;&#9670;&#9670;&#9670;&#9670;)&rdquo; that actually lives on Fiscal Compare &mdash; three names, two scales, one tab. Separate cycle. Nothing on the STILL LOCKED list was touched. Version v543&rarr;v544.<br><br>
     <strong style="color:var(--accent);">v543 (Aug 2026) &mdash; Cycle 442 (T1): the Deepwater preset returned 11 countries, every one of them proxy-economics, and the page said nothing</strong> &mdash; Task <strong>T1</strong> &mdash; &ldquo;which countries should even be on my screening list?&rdquo; Walked cold (<code>sessionStorage</code> and <code>localStorage</code> cleared) into the Screener and loaded every one of the eleven presets in the dropdown. <strong>Friction:</strong> the Screener has three safeguards against handing an analyst a shortlist built on regional proxy estimates &mdash; the data-basis sentence in the count line (v507), the amber <em>BELOW THIS LINE</em> divider in the table (v507), and the verified-production handoff into Side-by-Side (v507). All three were gated on a single flag, <code>_grouped</code>, which requires <code>_nVerified &gt; 0 &amp;&amp; _nProxy &gt; 0</code> and a non-swing sort. It is false in exactly the two states where the analyst needs the warning most, and in both the page went <strong>completely silent about data basis</strong>. <strong>(1) All-proxy results.</strong> The <strong>Deepwater</strong> preset &mdash; the most natural screen on a page whose entire DCF profile is a standardized $1.2B deepwater development &mdash; returns 11 countries, <strong>0 with verified field production</strong>. The count line read a bare &ldquo;Deepwater &middot; 11 countries match at $75/bbl&rdquo; with no caveat of any kind, NPVs rendered to $4&ndash;5B, no divider, and a button reading &ldquo;Load top 5 in Side-by-Side&rdquo; that shipped <strong>Namibia / Ghana / Mozambique / Tanzania / Gabon</strong> straight in as an IC shortlist. v507&rsquo;s own comment says the per-row PROXY badge cannot carry this alone &ldquo;because every row above it was badged PROXY too and it read as decoration&rdquo; &mdash; which describes an all-proxy list precisely. <strong>(2) Interleaved mixed results.</strong> The <strong>R-factor PSC</strong> preset sorts by price-sensitivity swing, so verified and proxy rows interleave and no single divider is drawable. It returns 70 countries, <strong>11 of them production-backed</strong>, and handed <strong>Guyana / Sierra Leone / Liberia / Suriname / Sri Lanka</strong> &mdash; five proxies &mdash; to Side-by-Side while eleven real producers sat further down the same list. <strong>Change:</strong> each safeguard is now driven by what the result set actually contains rather than by whether one particular sort happens to make a divider drawable. Two new states are classified: <code>_allProxy</code> and <code>_mixedUngrouped</code>. An all-proxy screen now states in the count line that <em>none of these N countries has verified field production</em> and carries a banner as the <strong>first row of the table itself</strong> &mdash; same amber voice as the v507 divider &mdash; pointing the analyst at the IOC Capital Screen preset for the production-backed set. An interleaved mixed screen states the split (<em>11 of 70 have verified field production</em>) and says the sort interleaves the two bases. The Side-by-Side handoff now draws from the verified-production rows whenever there are at least two of them, so R-factor hands over <strong>Indonesia &middot; Malaysia &middot; Angola &middot; India &middot; Azerbaijan</strong> instead of five proxies; where no production-backed row exists at all, the button says so on its face &mdash; <em>&ldquo;Load top 5 &mdash; all proxy-economics&rdquo;</em>. <strong>Result:</strong> an analyst can no longer take a shortlist off this page without being told what it is built on. <strong>Verified cold in Playwright</strong> against the local build, storage cleared, across all eleven presets plus the unfiltered universe: Deepwater fires the all-proxy banner, R-factor fires the mixed banner and the corrected handoff, IOC Capital Screen (14/14 verified) correctly shows neither, and the grouped presets are byte-unchanged &mdash; the 185-row default still renders exactly one divider at row 22. <strong>0 page errors.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). Full <code>runtime_comprehensive.js</code>: <strong>135 PASS / 0 FAIL / 1 WARN</strong>. Nothing on the STILL LOCKED list was touched: no new FAQ (still 974), no new tooltip, no page-sub, banner, routing hint or &ldquo;How to read&rdquo; block, Screener presets still a dropdown, advanced filters still collapsed, tab order unchanged. Version v542&rarr;v543.<br><br>
@@ -32074,7 +32076,16 @@ function renderFCResults(results, price) {
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th title="Fiscal mechanism — the legal/contractual structure governing how oil revenue is divided between government and contractor. Hover any mechanic tag in the table for a full description. See Fiscal Mechanics tab for detailed comparisons across all 8 mechanic types.">Mechanic</th>';
   var priceTag = price ? ' <span style="font-size:9px;color:var(--muted);font-weight:400;">@$' + price + '</span>' : '';
-  html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as % of gross revenue — royalties + taxes + profit oil (all instruments)">Take%' + priceTag + '</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="Contractor net present value ($M) at selected price and profile. Discounted at 10% WACC, 100% working interest basis — scale by WI% for your stake. Positive = project viable at this price.">NPV ($M)' + priceTag + '</th>';
+  html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as computed by THIS SCREEN\'s DCF engine, on the profile and price selected above. This is the column the # rank is built from. For every row marked G in the Quality column ORCA holds no country-specific terms in the compare engine, so this figure is the standard default for the mechanic and is identical across every G row on that mechanic — directional only, not citable. The citable figure is in the next column.">Take% <span style=\'font-size:9px;color:var(--muted);font-weight:400;\'>model</span>' + priceTag + '</th>';
+  // ── v547 (T5) ─────────────────────────────────────────────────
+  // Measured on the cold default view: 154 of the 185 rows on this table render an IDENTICAL
+  // 22.2% take and $4.3B contractor NPV, because they fall to the generic mechanic default.
+  // Every one of those 154 countries has a differentiated contract-database take -- Guyana 54.1%,
+  // Indonesia 59.5%, Sri Lanka 57.2%, Chad 55.3% -- and the drilldown, Country Profile, the API and
+  // the XLSX all carry it and instruct the analyst to cite it. The flagship table did not show it
+  // anywhere, so the only way to read a citable take for a 10-country shortlist was ten drilldowns
+  // or an XLSX download. It is now a column.
+  html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. It is NOT what this table is ranked on: the # column ranks the model figure to its left, so on a G row the two can differ by 25-35pp.">Take% <span style=\'font-size:9px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="Contractor net present value ($M) at selected price and profile. Discounted at 10% WACC, 100% working interest basis — scale by WI% for your stake. Positive = project viable at this price.">NPV ($M)' + priceTag + '</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + ' title="Breakeven oil price ($/bbl): minimum price for project NPV \u2265 0 under this regime. Coverage: 68 of 185 countries. — indicates incomplete cost data; use Take + Swing as proxy for uncovered countries.">BE ($/bbl)</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price Swing (pp): Govt Take at $125/bbl minus Take at $50/bbl. &#10;&#10;Interpretation: &lt;10pp = royalty-dominant, predictable at any price (green). 10\u201320pp = moderate price sensitivity (amber). &gt;20pp = progressive/PSC regime, govt captures most upside above $75 (red). &#10;&#10;IC use: high-swing regimes require a price-range sensitivity analysis \u2014 contractor IRR at $50/bbl degrades less than headline take implies because PSC cost recovery accelerates. Low-swing regimes are suitable for projects depending on certainty of returns across price cycles.">Swing (pp) \u24d8</th>';
   html += '<th class="num" title="Where THIS row\'s take came from. A = modelled from this country\'s own terms, \u226580% of its fiscal facts primary-sourced; B = own terms, \u226560% primary; C = own terms, \u226540% primary; D = own terms, weakly sourced. G = GENERIC: no country-specific terms in the compare engine, so the take is the standard default for its mechanic \u2014 directional only, not citable. Hover any badge for the detail.">Quality</th>';
   if (showStability) {
@@ -32113,6 +32124,23 @@ function renderFCResults(results, price) {
   var _fcSelPrice = (function(){ var v = parseFloat(price); return [50,75,100,125].indexOf(v) >= 0 ? v : 75; })();
   var _fcDbTake = function(r) { return _fcSelPrice===50 ? r.take_50 : _fcSelPrice===100 ? r.take_100 : _fcSelPrice===125 ? r.take_125 : r.take_75; };
   var _fcMonopoly = function(r) { return isStateMonopoly(_fcDbTake(r)); };
+  // v547 (T5): the citable database take cell. Same value the drilldown, Country Profile, the API
+  // and the XLSX GovtTake_ column carry. Tier-coloured on the same ramp as the model column so the
+  // two are read on one scale, and the tooltip names the gap between them where there is one.
+  var _fcDbTakeCell = function(r) {
+    var v = _fcDbTake(r);
+    if (v == null) {
+      return '<td class="num"><span style="color:var(--text-muted);cursor:help;font-size:12px;" title="ORCA holds no contract-database government take for ' + r.country + ' at $' + _fcSelPrice + '/bbl. Nothing on this row is citable at this price.">\u2014</span></td>';
+    }
+    var t = 'CITABLE \u2014 ' + r.country + ' government take ' + v.toFixed(1) + '% at $' + _fcSelPrice + '/bbl, from the fiscal terms ORCA holds in its contract database. Country Profile, the JSON API, this row\'s drilldown citation and the XLSX all quote this number.';
+    if (r.liveTake != null) {
+      var d = v - r.liveTake;
+      t += ' The model column to the left reads ' + r.liveTake.toFixed(1) + '%'
+         + (r.termsBasis === 'default' ? ' \u2014 generic ' + r.mechanic + ' default terms, not this country\'s' : '')
+         + ', a gap of ' + (d > 0 ? '+' : '') + d.toFixed(1) + 'pp. Do not put both numbers in one sentence.';
+    }
+    return '<td class="num"><span class="take-val ' + takeClass(v) + '" style="font-size:14px;padding:2px 7px;cursor:help;" title="' + t.replace(/"/g, '&quot;') + '">' + v.toFixed(1) + '%</span></td>';
+  };
   // ── v505: tie detection ──────────────────────────────────────────────────────
   // 153 of 185 countries have no country-specific fiscal terms in ORCA, so their
   // take is computed from the generic mechanic default and they all land on the
@@ -32174,7 +32202,7 @@ function renderFCResults(results, price) {
     if (sortField === 'npv' && !_npvZeroDividerInserted) {
       var prevNpv = i > 0 ? sorted[i-1].liveNPV : null;
       if ((r.liveNPV == null || r.liveNPV < 0) && (i === 0 || (prevNpv != null && prevNpv >= 0))) {
-        var _nColspan = showStability ? 11 : 10;
+        var _nColspan = showStability ? 12 : 11;
         html += '<tr style="pointer-events:none;"><td colspan="' + _nColspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.06);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:#B91C1C;letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; NPV = $0 threshold &#8212; countries below this line do not return positive contractor value at this price &amp; profile</div></td></tr>';
         _npvZeroDividerInserted = true;
       }
@@ -32182,24 +32210,24 @@ function renderFCResults(results, price) {
     // v467: Take-tier dividers — inject boundary rows when sorted by take, ascending (lowest first)
     if (sortField === 'take' && r.liveTake != null) {
       if (!_take40DividerInserted && r.liveTake > 40) {
-        var _t40Colspan = showStability ? 11 : 10;
+        var _t40Colspan = showStability ? 12 : 11;
         html += '<tr style="pointer-events:none;"><td colspan="' + _t40Colspan + '" style="padding:0;"><div style="background:rgba(21,128,61,.07);border-top:2px dashed rgba(21,128,61,.4);border-bottom:2px dashed rgba(21,128,61,.4);text-align:center;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Investible tier ends (≤40%) &mdash; Moderate tier begins below &#8212;</div></td></tr>';
         _take40DividerInserted = true;
       }
       // v481: Global median take divider — inserted between the tier boundaries, only when sorted by take and median is in range (40–75%)
       if (!_takeMedianDividerInserted && _fcGlobalMedianTake != null && r.liveTake > _fcGlobalMedianTake && _fcGlobalMedianTake > 40 && _fcGlobalMedianTake < 75) {
-        var _tmColspan = showStability ? 11 : 10;
+        var _tmColspan = showStability ? 12 : 11;
         var _tmLabel = _fcGlobalMedianTake.toFixed(1);
         html += '<tr style="pointer-events:none;"><td colspan="' + _tmColspan + '" style="padding:0;"><div style="background:rgba(100,100,100,.05);border-top:2px dashed rgba(100,100,100,.3);border-bottom:2px dashed rgba(100,100,100,.3);text-align:center;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Below-median regimes end (global median take: ' + _tmLabel + '%) &mdash; Above-median regimes begin below &#8212;</div></td></tr>';
         _takeMedianDividerInserted = true;
       }
       if (!_take60DividerInserted && r.liveTake > 60) {
-        var _t60Colspan = showStability ? 11 : 10;
+        var _t60Colspan = showStability ? 12 : 11;
         html += '<tr style="pointer-events:none;"><td colspan="' + _t60Colspan + '" style="padding:0;"><div style="background:rgba(176,104,0,.07);border-top:2px dashed rgba(176,104,0,.4);border-bottom:2px dashed rgba(176,104,0,.4);text-align:center;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Moderate tier ends (41–60%) &mdash; High Take tier begins below &#8212;</div></td></tr>';
         _take60DividerInserted = true;
       }
       if (!_take75DividerInserted && r.liveTake > 75) {
-        var _t75Colspan = showStability ? 11 : 10;
+        var _t75Colspan = showStability ? 12 : 11;
         html += '<tr style="pointer-events:none;"><td colspan="' + _t75Colspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.07);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; High Take tier ends (61–75%) &mdash; NOC-dominated tier begins below &#8212;</div></td></tr>';
         _take75DividerInserted = true;
       }
@@ -32207,12 +32235,12 @@ function renderFCResults(results, price) {
     // v468: Breakeven threshold dividers — inserted when sorted by breakeven ascending (most resilient first)
     if (sortField === 'breakeven' && r.be_75 != null) {
       if (!_be50DividerInserted && r.be_75 > 50) {
-        var _b50Colspan = showStability ? 11 : 10;
+        var _b50Colspan = showStability ? 12 : 11;
         html += '<tr style="pointer-events:none;"><td colspan="' + _b50Colspan + '" style="padding:0;"><div style="background:rgba(21,128,61,.07);border-top:2px dashed rgba(21,128,61,.4);border-bottom:2px dashed rgba(21,128,61,.4);text-align:center;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Resilient tier ends (&lt;$50/bbl) &mdash; Base-case viable tier begins below &#8212;</div></td></tr>';
         _be50DividerInserted = true;
       }
       if (!_be80DividerInserted && r.be_75 > 80) {
-        var _b80Colspan = showStability ? 11 : 10;
+        var _b80Colspan = showStability ? 12 : 11;
         html += '<tr style="pointer-events:none;"><td colspan="' + _b80Colspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.06);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Base-case tier ends ($50&ndash;$80) &mdash; Elevated price required (&gt;$80) below &#8212;</div></td></tr>';
         _be80DividerInserted = true;
       }
@@ -32220,12 +32248,12 @@ function renderFCResults(results, price) {
     // v468: Price Swing threshold dividers — inserted when sorted by swing ascending (most stable first)
     if (sortField === 'swing' && r.liveSwing != null) {
       if (!_swing10DividerInserted && r.liveSwing > 10) {
-        var _s10Colspan = showStability ? 11 : 10;
+        var _s10Colspan = showStability ? 12 : 11;
         html += '<tr style="pointer-events:none;"><td colspan="' + _s10Colspan + '" style="padding:0;"><div style="background:rgba(176,104,0,.07);border-top:2px dashed rgba(176,104,0,.4);border-bottom:2px dashed rgba(176,104,0,.4);text-align:center;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Low swing ends (&lt;10pp, royalty-dominant) &mdash; Moderate swing begins below &#8212;</div></td></tr>';
         _swing10DividerInserted = true;
       }
       if (!_swing20DividerInserted && r.liveSwing > 20) {
-        var _s20Colspan = showStability ? 11 : 10;
+        var _s20Colspan = showStability ? 12 : 11;
         html += '<tr style="pointer-events:none;"><td colspan="' + _s20Colspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.06);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Moderate swing ends (10&ndash;20pp) &mdash; Progressive regime begins (&gt;20pp, multi-price table required in IC memo) &#8212;</div></td></tr>';
         _swing20DividerInserted = true;
       }
@@ -32277,10 +32305,14 @@ function renderFCResults(results, price) {
       + 'Open the row for the sourced position.';
     if (_isMono) {
       html += _monoCell('n/c', _monoWhy);
+      // v547 (T5): the database take IS the citable fact for a monopoly -- 100% -- so print it
+      // rather than n/c. n/c belongs on the model columns, which have no contractor position.
+      html += _monoCell((_fcDbTake(r) != null ? Number(_fcDbTake(r)).toFixed(1) + '%' : '\u2014'), _monoWhy);
       html += _monoCell('n/c', _monoWhy);
       html += _monoCell('\u2014', _monoWhy);
     } else {
       html += '<td class="num"><span class="take-val ' + takeClass(r.liveTake) + '" style="font-size:14px;padding:2px 7px;">' + r.liveTake.toFixed(1) + '%</span></td>';
+      html += _fcDbTakeCell(r);
       html += '<td class="num">' + npvStr + '</td>';
       html += '<td class="num">' + beStr + '</td>';
     }
@@ -32319,7 +32351,7 @@ function renderFCResults(results, price) {
   // itself. Previously the analyst saw #1..#153 in strict sequence with no indication that
   // every one of those rows carried the identical number from the identical default regime.
   if (_defaultTie) {
-    var _dtCols = showStability ? 11 : 10;
+    var _dtCols = showStability ? 12 : 11;
     var _dtUnit = sortField === 'take' ? '%' : '';
     var _dtField = { take: 'government take', npv: 'NPV', breakeven: 'breakeven', swing: 'price swing' }[sortField] || sortField;
     html += '<tfoot><tr><td colspan="' + _dtCols + '" style="padding:8px 10px;font-size:11px;color:var(--muted);border-top:2px solid var(--border);background:var(--surface2);line-height:1.55;">'
@@ -32331,7 +32363,7 @@ function renderFCResults(results, price) {
       + 'Treat them as one undifferentiated group; the ' + sorted.filter(function(x){return x.termsBasis !== 'default';}).length + ' countries modelled on their own terms are the ones this table actually separates.'
       + '</td></tr></tfoot>';
   } else if (sortField === 'breakeven') {
-    var _beCovCols = showStability ? 11 : 10;
+    var _beCovCols = showStability ? 12 : 11;
     html += '<tfoot><tr><td colspan="' + _beCovCols + '" style="padding:6px 10px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);background:var(--surface2);text-align:center;">Breakeven data: 68 of 185 countries (requires verified per-contract royalty + cost data). Remaining 117 countries show — and sort to the bottom. Use the <strong>Breakeven only</strong> filter above to hide them.</td></tr></tfoot>';
   }
   html += '</table></div>';
@@ -32363,6 +32395,12 @@ function renderFCResults(results, price) {
   })();
   var exportBtn = document.getElementById('fc-export-btn');
   if (exportBtn) { exportBtn.disabled = false; exportBtn.removeAttribute('title'); }
+  // v547 (T5): the clipboard path becomes live at the same moment the export does.
+  var _fcCopyBtn = document.getElementById('fc-copy-ic-btn');
+  if (_fcCopyBtn) {
+    _fcCopyBtn.disabled = false;
+    _fcCopyBtn.title = 'Copy the ' + sorted.length + ' rows now on screen as a table you can paste straight into an IC memo (Word/Docs) or Excel. Citable ORCA database take and contractor NPV first; this screen\'s model figure and its basis alongside.';
+  }
   // v454: After first run, update Run Compare button to "Re-run" so analyst knows results are already showing
   var _fcRunBtn = document.getElementById('fc-run-btn');
   if (_fcRunBtn && !_fcRunBtn.dataset.hasRun) {
@@ -33563,6 +33601,128 @@ function renderDrawerWaterfall(canvasId, waterfallData) {
   });
 }
 
+// ── v547 (T5) — "Give me something I can paste straight into an IC memo." ──────
+// Fiscal Compare is the tab Home calls "Start here" and the only surface that produces a
+// SHORTLIST. It had no clipboard path at all: the single export affordance was a downloaded
+// XLSX. Side-by-Side has had "⎘ Copy for IC Memo" since v503, Country Profile has one, and the
+// row drilldown has "Copy 4-price as IC table" — one country at a time. To get a ten-country
+// shortlist into a memo the analyst had to open ten drilldowns or open Excel.
+// This copies the rows AS SHOWN — same order, same region filter, same sort — so the pasted
+// artifact and the screen the analyst just read cannot disagree. The citable ORCA database take
+// and contractor NPV are the leftmost numeric columns (the v529 rule: an analyst reads left to
+// right and the leftmost numbers are the ones that reach the memo); this screen's model figure
+// and the basis it was computed on follow, labelled.
+function copyFCForIC(btn) {
+  var tbl = document.getElementById('tbl-fc');
+  var trs = tbl ? tbl.querySelectorAll('tbody tr[data-country]') : [];
+  if (!trs || !trs.length) { showCopyToast('Run Fiscal Compare first — there are no rows on screen to copy.'); return; }
+  var byC = {}; (window._fcResults || []).forEach(function(x){ byC[x.country] = x; });
+  var cd  = {}; (window.COUNTRY_DATA || []).forEach(function(x){ cd[x.country] = x; });
+  var pEl = document.getElementById('fc-price');
+  var P = pEl ? parseInt(pEl.value, 10) : 75;
+  if ([50, 75, 100, 125].indexOf(P) < 0) P = 75;
+  var prEl = document.getElementById('fc-profile');
+  var prKey = prEl ? prEl.value : 'deepwater';
+  var prof = (typeof DCF_PROFILES !== 'undefined' && DCF_PROFILES[prKey]) ? DCF_PROFILES[prKey] : null;
+  var profName = prof ? prof.name : prKey;
+  var dbTake = function(x){ return P === 50 ? x.take_50 : P === 100 ? x.take_100 : P === 125 ? x.take_125 : x.take_75; };
+  var num = function(v, dp){ return (v == null || isNaN(v)) ? '' : Number(v).toFixed(dp); };
+
+  var head = ['#', 'Country', 'Region', 'Mechanic',
+    'Govt Take % @$' + P + ' — ORCA database (CITABLE)',
+    'Contractor NPV $M @$' + P + ' — ORCA database',
+    'Breakeven $/bbl',
+    'Price Swing pp ($125 − $50)',
+    'Govt Take % @$' + P + ' — this screen’s model',
+    'Model basis'];
+  var matrix = [head];
+  var nGeneric = 0, nMono = 0, nBe = 0;
+  for (var i = 0; i < trs.length; i++) {
+    var c = trs[i].getAttribute('data-country');
+    var r = byC[c];
+    if (!r) continue;
+    var meta = cd[c] || {};
+    var dv = dbTake(r);
+    var mono = (typeof isStateMonopoly === 'function') && dv != null && isStateMonopoly(dv);
+    if (mono) nMono++;
+    if (!mono && r.termsBasis === 'default') nGeneric++;
+    var hasBe = (!mono && r.be_75 != null && r.be_75 > 0 && r.be_75 < 999);
+    if (hasBe) nBe++;
+    var basis = mono ? 'STATE MONOPOLY — government take 100%, no contractor position. Model columns not applicable.'
+      : r.termsBasis === 'country' ? 'Country-specific terms'
+      : r.termsBasis === 'db' ? 'ORCA contract database terms'
+      : 'GENERIC DEFAULT (' + (typeof describeDefaultTerms === 'function' ? describeDefaultTerms(r.mechanic) : r.mechanic) + ') — mechanic standard, not this country’s terms. Directional only, NOT citable.';
+    matrix.push([
+      (trs[i].cells[0] ? String(trs[i].cells[0].textContent || '').trim() : String(i + 1)),
+      c,
+      r.region || meta.region || '',
+      r.mechanic || '',
+      num(dv, 1),
+      mono ? '' : num(meta['npv_' + P], 0),
+      hasBe ? num(r.be_75, 1) : '',
+      num(r.swing, 1),
+      mono ? '' : num(r.liveTake, 1),
+      basis
+    ]);
+  }
+  if (matrix.length < 2) { showCopyToast('No rows on screen to copy.'); return; }
+  var N = matrix.length - 1;
+
+  var sortName = ({ take: 'the model take column, low → high', npv: 'contractor NPV (model), high → low',
+    breakeven: 'breakeven, low → high', swing: 'price swing, low → high', country: 'country name, A–Z'
+  })[window._fcSortState || 'take'] || (window._fcSortState || 'take');
+  var reg = window._fcRegionFilter || '';
+  var caption = 'ORCA Fiscal Compare — ' + N + ' countries' + (reg ? ', ' + reg : '') + ' at $' + P + '/bbl, ' + profName + ' profile';
+  var assump = 'Rows in the order shown on screen, ranked on ' + sortName + '. '
+    + 'Government take and contractor NPV in the first two numeric columns are the ORCA contract-database figures — the same values Country Profile, the JSON API and the row drilldown citation carry, and the ones to cite. '
+    + 'Contractor NPV is on a standardized ' + profName + ' profile, 10% WACC, 100% working interest — scale by your WI. '
+    + 'Breakeven is populated for ' + nBe + ' of these ' + N + ' rows (it requires verified per-contract royalty and cost data).';
+  var warn = '';
+  if (nGeneric) warn += nGeneric + ' of the ' + N + ' rows have a GENERIC DEFAULT model basis: their model take column is the standard for the mechanic, identical across every such row, and is not citable. Their ORCA database take column is populated and is. ';
+  if (nMono) warn += nMono + ' row' + (nMono > 1 ? 's are' : ' is') + ' a state monopoly at 100% government take — no contractor position, not comparable with the other rows. ';
+  if (typeof CP_IRR_NOTE === 'string' && CP_IRR_NOTE) warn += CP_IRR_NOTE;
+  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/';
+
+  var tsv = caption + '\n' + assump + '\n' + (warn ? warn + '\n' : '') + '\n'
+    + matrix.map(function(row){ return row.join('\t'); }).join('\n')
+    + '\n\n' + srcLine;
+
+  function esc(x){ return String(x).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var thS = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:9pt;font-weight:bold;text-align:left;vertical-align:bottom;';
+  var tdS = 'border:1px solid #999;padding:3px 8px;font-family:Calibri,Arial,sans-serif;font-size:9.5pt;';
+  var htmlOut = '<div style="font-family:Calibri,Arial,sans-serif;">'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 2px;">' + esc(caption) + '</p>'
+    + '<p style="font-size:8.5pt;color:#555;margin:0 0 4px;">' + esc(assump) + '</p>'
+    + (warn ? '<p style="font-size:8.5pt;color:#8a4b00;margin:0 0 6px;">' + esc(warn) + '</p>' : '')
+    + '<table style="border-collapse:collapse;">'
+    + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + thS + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
+    + '<tbody>' + matrix.slice(1).map(function(row){
+        return '<tr>' + row.map(function(c, ci){ return '<td style="' + tdS + (ci === 1 ? 'font-weight:bold;' : '') + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
+      }).join('') + '</tbody></table>'
+    + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + esc(srcLine) + '</p>'
+    + '</div>';
+
+  function flash(msg) {
+    if (btn) { var o = btn.innerHTML; btn.innerHTML = '✓ Copied'; setTimeout(function(){ btn.innerHTML = o; }, 2000); }
+    showCopyToast(msg);
+  }
+  var okMsg = N + ' countries copied as a table — paste into your IC memo (Word/Docs) or Excel.';
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html': new Blob([htmlOut], { type: 'text/html' }),
+      'text/plain': new Blob([tsv], { type: 'text/plain' })
+    })]).then(function(){ flash(okMsg); }).catch(function(){
+      navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
+        .catch(function(){ showCopyToast('Clipboard unavailable — use Export XLSX instead.'); });
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
+      .catch(function(){ showCopyToast('Clipboard unavailable — use Export XLSX instead.'); });
+  } else {
+    showCopyToast('Clipboard unavailable — use Export XLSX instead.');
+  }
+}
+
 function exportFCResults() {
   if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
   // v313: use filtered results if any filter is active, else fall back to full results
@@ -34691,6 +34851,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // FC Export XLSX button
   var fcExport = document.getElementById('fc-export-btn');
   if (fcExport) fcExport.addEventListener('click', function() { exportFCResults(); });
+  // FC Copy for IC Memo button (v547)
+  var fcCopyIC = document.getElementById('fc-copy-ic-btn');
+  if (fcCopyIC) fcCopyIC.addEventListener('click', function() { copyFCForIC(fcCopyIC); });
   // FC stability checkbox
   var fcStability = document.getElementById('fc-stability-check');
   if (fcStability) fcStability.addEventListener('change', function() {
