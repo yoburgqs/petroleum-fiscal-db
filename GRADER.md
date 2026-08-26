@@ -15318,3 +15318,16 @@ Screener advanced filters still collapsed, presets still a dropdown. **No new FA
 Tab order unchanged. v371/v373, v430, v449, v451, v452, v489, v534, v538, v539, v540 and v541
 all untouched. The one tooltip added belongs to a row label that had none and now has to declare
 its own basis; the fix is the denominator and the on-screen direction, not the tooltip.
+
+---
+## Cycle 441 Log — 2026-08-26 01:10
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** LOOP (user-impact) | **Task:** Cycle 441 complete — T3, v542 shipped and pushed
+
+## Cycle 441 — T3, v542
+
+**Task.** T3 — "How do these three countries compare side by side?" (LRU: 440 was T5, 439 T2, 438 T4, 437 T6, 436 T1; T3 last at 435.)
+
+**Friction.** Cold walk — storage cleared, full reload — into Side-by-Side on its pre-loaded Norway / UK / Netherlands set. Of the 22 rows in the grid, exactly one places a column against the rest of the world: **Global Ran
