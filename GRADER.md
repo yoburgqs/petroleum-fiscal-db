@@ -15876,3 +15876,16 @@ v371/v373, v430, v449, v451, v452, v489, v534, v542 and v545 all untouched —
 the CP headline stays two-zone with its rank and vs-median pill, Govt NPV stays
 removed from FC. Version sweep done silently at the end across 5 structural
 locations and is **not** claimed as the improvement.
+
+---
+## Cycle 445 Log — 2026-08-26 05:15
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 445 complete — v546 shipped and pushed (`393a94a`), mirror updated, GRADER log appended (`ecc2004`).
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (rotation: 439 T2, 440 T5, 441 T3, 442 T1, 443 T4, 444 T6 — T2 was least-recently-used).
+
+## Friction
+Cold load into Country Profile, which auto-loads Norway. The headline strip has read on the producer basis since v534 — *"#16 of 21 producers"* — and keeps the all-185 rank beneath it explicitly labelled *
