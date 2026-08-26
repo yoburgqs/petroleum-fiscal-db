@@ -15446,3 +15446,18 @@ wrapper, no visible Explorer chip row. Screener advanced filters still collapsed
 presets still a dropdown. Tab order unchanged. v371/v373, v430, v449, v451, v452,
 v489, v534, v538–v542 all untouched. The version bump to v543 was done silently
 at the end, after the real change shipped.
+
+---
+## Cycle 442 Log — 2026-08-26 02:03
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 442 complete — v543 shipped and pushed.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (rotation: 441 was T3, 440 T5, 439 T2, 438 T4, 437 T6; T1 last ran at 436)
+
+## Friction
+Cold walk into the Screener with storage cleared, then every one of the eleven presets loaded in turn.
+
+The Screener has three safeguards, all from v507, that stop an analyst walking away with a shortlist made of regional proxy estimates: the data-basis sentence in the count line, the amber *
