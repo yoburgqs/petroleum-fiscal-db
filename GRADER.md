@@ -16442,3 +16442,126 @@ is **not** claimed as the improvement.
 
 ## Friction
 Cold walk, storage cleared, Home → Country Profile → Norway. The one-line IC verdict at the top ends with **"Check reform risk before IC."** That sentence fires on **39 of 185** profiles. It names the next step and gives no way to take it — no control, n
+
+---
+## Cycle 450 Log — 2026-08-26 (v551)
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"**
+(rotation: 444 T6, 445 T2, 446 T5, 447 T1, 448 T3, 449 T4 — T6 was least-recently-used.)
+
+## Friction
+Cold walk, `sessionStorage` and `localStorage` cleared, Home → Country Profile.
+
+The graded letter beside **Govt Take by Price Scenario** is the fastest answer on the page to
+"how solid is this?". It is visible without opening anything. On **Russia** it showed a green
+**A**, and its tooltip read:
+
+> "Source quality: 98% of facts from A+B tier sources (**primary legislation** + verified)."
+
+Three inches below it, in the Evidence Quality panel — which is collapsed by default and which
+the analyst therefore does not open — the same page said **3.8% primary law**.
+
+The cause: `getTierBadge()` graded on `ab_pct = a_pct + b_pct`. Tier B is **45.2% of all
+330,329 facts** and is overwhelmingly the EY / IHS / KPMG country-level bulk harvest. The letter
+was therefore measuring how thoroughly the bulk tables had run against a country, not how well
+that country was sourced. Two consequences, both measured against the shipped `country_data.json`:
+
+- **At ceiling.** 171 of 185 countries scored **A**. A grade that 92% of the population receives
+  carries no information.
+- **Inverted.** Russia (3.8% primary law, 94.6% secondary) scored **A**. **Senegal (67.2% primary
+  law — 2nd highest in the dataset)** and **Liberia (64.4%)** scored **B**. The analyst who used
+  the letter to pick the well-evidenced countries got the tax-guide ones.
+
+This exact conflation was named as **deliberately out of scope in v518** ("`ab_pct` still drives
+the Fiscal Compare *Quality* column, the Explorer evidence dot, the `getTierBadge()` A/B/C/D
+letter..."). This cycle closes the `getTierBadge()` half of it.
+
+## Change
+The grade is now the **worse of two legs** — the same two-legged test v518 built for the
+Screener's *Primary-Source Evidence* preset:
+
+| leg | A | B | C | D |
+|---|---|---|---|---|
+| primary-law share (`a_pct`) | ≥60% | ≥40% | ≥20% | below |
+| fact depth (`n_facts`) | ≥150 | ≥50 | ≥15 | below |
+
+The depth leg is **load-bearing, not decoration**. Grading on tier A alone does not fix the
+problem — it hands a perfect **A** to Ascension Island, French Polynesia, Nauru and Tuvalu on
+**two facts each**, and the median fact count among the 47 countries at `a_pct ≥ 80` is **16**.
+
+The badge writes its own explanation and names **which leg is binding** — "set by the SOURCING
+leg" vs "set by the DEPTH leg" — because *C because the sourcing is secondary* and *C because
+there are 30 facts on file* are different problems with different fixes.
+
+Three surfaces now read the same function, so they cannot disagree:
+- **Country Profile** headline badge — caller tooltip no longer asserts primary legislation.
+- **Fiscal Compare `Quality` column** — its header had *always* documented the primary-law
+  thresholds ("≥80% of its fiscal facts primary-sourced") while the code was fed `a_pct + b_pct`.
+  Header and code now describe the same test. `a_pct` and `n_facts` are carried onto the compare
+  result rows, which previously held only `ab_pct` — that omission is why the letter could only
+  ever be the conflated grade.
+- **Side-by-Side `Evidence tier` row** — read "98% A/B · A", now reads "4% primary law · D".
+
+The 120 generic-terms rows in Fiscal Compare still show **G** (v505) — untouched.
+
+## Result
+The distribution goes from **A 171 / B 12 / D 2** to **A 28 / B 79 / C 43 / D 35**.
+
+| | before | after |
+|---|---|---|
+| Norway (66.1% primary law, 63,848 facts) | A | **A** |
+| Senegal (67.2%, 238) | B | **A** |
+| Liberia (64.4%, 174) | B | **A** |
+| Canada (92.7%, 1,758) · Angola (83.8%, 1,065) · Brazil (65.1%, 3,591) | A | **A** |
+| United Kingdom (43.2%, 15,899) · Indonesia (52.4%, 5,888) | A | **B** |
+| Nigeria (31.1%) · Saudi Arabia (39.1%) · Kazakhstan (31.1%) · Thailand (35.3%) | A | **C** |
+| **Russia (3.8%, 3,929)** | **A** | **D** |
+| Iraq (11.8%, 3,577) | B | **D** |
+| Ascension Island (100%, **2 facts**) | A | **D** |
+
+An analyst can now scan or sort on the letter and get the primary-law-backed countries — which is
+what the letter always claimed to mean and never did. The badge and the Evidence Quality panel
+below it no longer contradict each other.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors (re-run after every edit, including after the
+  changelog and version sweep).
+- `runtime_comprehensive.js` **ran this cycle** against the local build (`http://localhost:8899`):
+  **135 PASS / 0 FAIL / 1 WARN**. The WARN and the 1 captured JS error are the same pre-existing
+  local-harness artefact — `index.html` registers its service worker at
+  `/petroleum-fiscal-db/sw.js`, a path that only resolves under GitHub Pages.
+- Cold Playwright walks, storage cleared, **0 page errors on every walk**:
+  - Country Profile badge vs Evidence Quality panel agree on Russia (**D** / 3.8%), Senegal
+    (**A** / 67.2%), Norway (**A** / 66.1%), Nigeria (**C** / 31.1%), Ascension Island
+    (**D** / 100% on 2 facts).
+  - Fiscal Compare returns **A 16 / B 36 / C 10 / D 3** across its 65 country-terms rows, with
+    the 120 generic rows still **G**. Spot-checked by country: Norway/Senegal/Liberia/Angola A,
+    UK B, Nigeria C, Iraq D.
+  - Side-by-Side default North Sea trio reads **66% / 43% / 97% primary law** with grades A / B / A,
+    sitting directly above the v511 *Fiscal facts held* row that flags Netherlands' 278 ⚠.
+
+## Deliberately NOT done — stated rather than hidden
+1. **`getEvidenceColor()` still grades off `ab_pct`.** It drives the Explorer evidence dot and the
+   Explorer Tier column. Same conflation, Browse surface, its own cycle.
+2. **The IC citation string and the XLSX exports** still carry the A/B figure. Not touched here.
+3. **Netherlands grades A on 278 facts and is simultaneously a `PROXY`** (0% production coverage).
+   Evidence tier and data basis are different axes and v511 already puts them adjacent in
+   Side-by-Side; this cycle did not merge them.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip on any pre-existing control — every tooltip that changed
+is on a control whose grading behaviour changed. No page-sub paragraph, no amber instructional
+banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip
+row. Screener advanced filters still collapsed, presets still a dropdown. Tab order unchanged.
+CP headline strip structure untouched. v371/v373, v430, v449, v451, v452, v489, v505, v511, v515,
+v518, v521, v525, v529, v531, v533, v534, v536, v540, v541, v542, v544, v545, v546, v547, v548,
+v549 and v550 all intact. Version sweep v550→v551 done silently at the end across the 3
+structural locations and is **not** claimed as the improvement.
+
+---
+## Cycle 450 Log — 2026-08-26 18:40
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0 (1 captured = known local-harness sw.js 404)
+- Summary: Cycle 450 complete — v551 shipped (`bf3dd5d`), pushed, mirrored.
