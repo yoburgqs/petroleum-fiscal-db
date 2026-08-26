@@ -15072,3 +15072,16 @@ filters still collapsed, presets still a dropdown. **No new FAQ** (still 974). *
 new tooltip on any pre-existing control** — the row's own existing `title` was
 rewritten to match the new basis. Tab order unchanged. v371/v373, v430, v449, v451,
 v452, v489, v534, v538 and v539 all untouched. Version v539→v540.
+
+---
+## Cycle 439 Log — 2026-08-25 23:15
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** LOOP (user-impact) | **Task:** Cycle 439 complete — T2, v540 shipped and pushed
+
+## Cycle 439 — T2, v540
+
+**Task.** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (least-recently-used; 438 was T4, 437 T6, 436 T1, 435 T3, 434 T5, 433 T2.)
+
+**Friction.** Cold walk into Country Profile, down to the **4-Price Sensitivity** table — the one the page itself labels for IC use and puts a `Copy as IC table` button under. Its last row (`regionAvg
