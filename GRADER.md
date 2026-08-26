@@ -14822,3 +14822,16 @@ filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
 tooltips touched are corrections to existing strings that were factually wrong.
 Tab order unchanged. v371/v373, v423, v430, v449, v451, v452, v489, v500, v505,
 v513, v515–v527 and v533–v537 all untouched. Version v537→v538.
+
+---
+## Cycle 437 Log — 2026-08-25 21:26
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** LOOP (user-impact) | **Task:** Cycle 437 complete — T6, v538 shipped and pushed
+
+## Cycle 437 — T6, v538
+
+**Task.** T6 — "Where did this number come from and how solid is the evidence?" (least-recently-used; 436 was T1, 435 T3, 434 T5, 433 T2, 431 T4 — T6 last ran at cycle 426.)
+
+**Friction.** Cold walk into Country Profile, then into the section literally named for the question. `loadCountryProfile()` rendered **two parameter tables back to back** — `${factsSe
