@@ -15569,3 +15569,20 @@ instructional banner, no routing hint, no "How to read" block, no SbS card
 wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
 presets still a dropdown. Tab order unchanged. v371/v373, v430, v449, v451, v452,
 v489, v534, v538–v543 all untouched.
+
+---
+## Cycle 443 Log — 2026-08-26 02:56
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 443 complete — v544 shipped and pushed.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (442 was T1, so no repeat.)
+
+## Friction
+Cold walk with storage cleared into Country Profile, which defaults to **Norway**. Under the Fiscal Reform History timeline, the live DOM read:
+
+> `2 reforms since 2010 · Europe average: 0.2 · above regional average`
+
+The average at `index.html:25798` was computed over *every* country in the region and treated a missing reform log as a c
