@@ -16180,3 +16180,18 @@ still a dropdown. Tab order unchanged. v371/v373, v430, v449, v451, v452, v489,
 v505 G badge, v525, v529, v533, v534, v542, v545, v546 and v547 all untouched.
 Version sweep done silently at the end across 5 structural locations and is **not**
 claimed as the improvement.
+
+---
+## Cycle 447 Log — 2026-08-26 07:14
+- Test before: 135 PASS / 0 FAIL
+- Test after: 134 PASS / 0 FAIL
+- JS errors: 1
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop cycle 447) | **Task:** Autonomous cycle complete — v548 shipped
+
+## Cycle 447 — v548 (`a39c020`, pushed)
+
+**Task: T1 — "Which countries should even be on my screening list?"** (T5 ran last cycle, so not repeated.)
+
+**Friction.** Cold walk, storage cleared, Home → Fiscal Compare. Row 1 was **Guyana**, and the Mechanic column read **Concession**. Guyana is the Stabroek PSC — ORCA itself holds 134 of its 143 contracts as PSC.
+
+Every mechanic name on t
