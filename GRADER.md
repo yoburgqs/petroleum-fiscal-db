@@ -14360,3 +14360,162 @@ v423, v430, v449, v451, v452, v489, v505, v515–v527, v533 and v534 all untouch
 **Friction.** I walked cold with storage cleared and exercised every export the platform offers, reading the clipboard and the print output back rather than trusting labels. Every clipboard path was fine. The **print path handed the analyst the wrong document.**
 
 The `@media print` block ended with two unconditional rules — `.tab-pane { displ
+
+---
+## Cycle 435 — T3, v536
+
+**Task:** T3 — *"How do these three countries compare side by side?"* (LRU; 434 was T5, 433 was T2.)
+
+### Friction
+
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared —
+into **Side-by-Side**, which seeds the North Sea Trio: Norway / United Kingdom /
+Netherlands. The tab opens with three columns already populated, so this is the
+first thing a first-time analyst reads on it.
+
+The **Data Basis** block at the head of the grid is the only place in the whole
+table that renders a *verdict* rather than a figure. It read:
+
+| | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| Data basis | FACTS | FACTS | **PROXY** |
+| Fiscal facts held | 63,848 | 15,899 | **278 ⚠** |
+| **Predictability Score** | 76 · HIGH | **58 · LOW** | **84 · HIGH** |
+| Take spread across contracts | single term | 36.4–51.4% (15.0pp) | single term |
+
+Three rows above the verdict, the table itself flags Netherlands **PROXY · 278
+fiscal facts · 0% production coverage**. Four rows below it, the take-spread row
+reports Netherlands as **"single term"**, whose tooltip states in terms that this
+is **NOT evidence of low fiscal risk**. The green **84 · HIGH** badge was derived
+from precisely that zero and said the opposite — on the same screen, four rows
+apart.
+
+`getFiscalPredictabilityScore()` (index.html, the v43 scorer) opened with:
+
+```js
+const iqr = (p25 != null && p75 != null) ? Math.max(0, p75 - p25) : 0;
+```
+
+A country for which ORCA holds **no contract-level take distribution at all** was
+therefore scored as though its measured dispersion were exactly zero — the best
+possible value of the score's **largest** component (−40 of a possible −78).
+
+**Counted against the live `country_data.json`, not asserted:**
+
+| dispersion basis | countries | scored ≥75 HIGH |
+|---|---|---|
+| measured spread (IQR ≥ 0.05pp) | **28** | **0** |
+| one statutory term (IQR = 0) | 135 | 89 |
+| no p25/p75 held at all | **22** | **22** (all of them) |
+
+- Of the **111** countries that scored HIGH, **111 had a zero or absent spread and
+  none had a measured one.**
+- The ceiling among the 28 countries whose contracts actually disagree with each
+  other is **Turkmenistan at 74** — one point below the band. HIGH was
+  **structurally unreachable** for any country carrying real dispersion.
+- The 22 with no distribution at all were the *highest* scorers: **Nauru 91**
+  (1 contract, 2 facts), **Bosnia 96** (3 contracts, 9 facts), **Belgium 89**
+  (2 contracts).
+
+The badge rewarded thin data and penalised evidence. The UK's **58 · LOW** is low
+*because* ORCA holds 4,211 UK contracts at 37.6% production coverage and can see a
+15.0pp spread in them. Netherlands' **84 · HIGH** is high *because* ORCA holds
+almost nothing about it.
+
+### Change
+
+Three explicit states, never a default — the principle **v520** already applied to
+the Fiscal Compare Stability column. **No threshold was invented:** the published
+formula and its bands are unchanged. The only changes are refusing to assert a
+dispersion of zero that was never measured, and stating on screen which basis
+produced each number.
+
+1. **The scorer stops substituting.** `_fpDispersion(d)` classifies the input;
+   with null `p25`/`p75` the score returns `null` and the surface renders
+   **"— · not scored"** (muted, dashed border) on Side-by-Side, Country Profile,
+   the FC drill-down and the Reform Risk cards, and **"n/c"** in the Explorer
+   table. **22 fabricated HIGH grades are gone.**
+2. **Every surviving badge carries its basis, inside the badge.** The cold
+   Side-by-Side trio now reads `76 · HIGH one term` / `58 · LOW 15.0pp` /
+   `84 · HIGH one term` — so the analyst sees on the face of the cells that the UK
+   is the only column whose score used a measured spread at all, and that both
+   HIGH grades were awarded on a component that was never exercised.
+3. **Reform Risk** has offered this score as the fallback signal wherever no
+   reform log exists since v520. It no longer asserts the score *"exists for all
+   185 countries"* — it does not, for 22 — and both of its score cards state the
+   basis inline.
+4. **Exports.** The CP *Copy for IC Memo* clipboard no longer pastes
+   `score null/100`, and both XLSX exports carry a **Predictability Basis** column
+   beside the number.
+
+### Result
+
+An analyst comparing three countries side by side can now see **which of the three
+stability grades were measured and which were assumed**, and a country ORCA holds
+two facts about no longer outranks Norway on fiscal predictability.
+
+### Verification
+
+Cold Playwright against the local build, `sessionStorage` and `localStorage`
+cleared:
+
+```
+SbS cold trio          ["76 · HIGH one term", "58 · LOW 15.0pp", "84 · HIGH one term"]
+SbS Norway/Belgium/Nauru ["76 · HIGH one term", "— · not scored", "— · not scored"]
+Explorer               185 rows = 22 n/c + 135 one-term + 28 measured
+CP Norway              76 · HIGH one term
+CP Nauru               — · not scored
+CP United Kingdom      58 · LOW 15.0pp
+DATASET (in-page)      none=22  single=135  measured=28  high=89  highMeasured=0
+```
+
+`highMeasured = 0` is the finding restated by the shipped code: **not one country
+with a measured spread reaches HIGH.** **0 JS errors on every walk.** JS syntax
+gate **PASS** (9 blocks / 0 errors).
+
+`runtime_comprehensive.js` **ran this cycle** against the local build, after the
+last edit to `index.html`, not carried forward from a prior baseline:
+
+```
+PASS: 135   FAIL: 0   WARN: 1   console errors: 1
+FAILURES: none
+CONSOLE ERRORS: A bad HTTP response code (404) was received when fetching the script.
+```
+
+The single console error and the single WARN are the same pre-existing
+local-harness artifact recorded at v508, v520, v526 and v534: `index.html:49`
+registers the service worker at `/petroleum-fiscal-db/sw.js`, which 404s when the
+file is served from a localhost root (`curl http://localhost:8899/sw.js` returns
+200; the `/petroleum-fiscal-db/` prefix only exists on GitHub Pages). It is
+unrelated to this change and does not occur on the deployed site.
+
+### Found on the same walk — NOT fixed, stated rather than hidden
+
+- The Country Profile **`stabBar`** variable is built and never inserted into the
+  DOM. It was dead before this cycle and remains dead; its definition was
+  corrected for the null case rather than left to render `width:null%` if it is
+  ever wired up.
+- Side-by-Side's **`Global Rank (take @$75)`** row is computed over all 185
+  countries — the same contaminated basis **v534** corrected on Country Profile
+  and explicitly left uncorrected everywhere else. Norway reads `#168 of 185` here
+  and `#16 of 21 producers` on Country Profile, for the same country at the same
+  price. The row also carries no direction label, so nothing on screen says
+  whether `#1` is the highest or the lowest take.
+- Side-by-Side still carries **two of every export action** (v534's finding):
+  `#cmp-copy-table-btn` at the top of the tab returns a worse artifact than
+  `⎘ Copy Table for IC Memo` 1,440px below it, and *Export PDF* / *Share Link*
+  appear in both rows.
+- Whether a composite whose largest term is inert for **157 of 185** countries
+  should exist in this form at all is a modelling decision across five surfaces,
+  not a rider on this cycle. Not decided here.
+
+### STILL LOCKED — nothing touched
+
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. **No new FAQ** (still 974).
+**No new tooltip on any control whose behaviour did not change** — the three
+rewritten tooltips sit on the exact elements whose rendering changed, and each
+previously described the removed behaviour. Tab order unchanged. v371/v373, v423,
+v430, v449, v451, v452, v489, v505, v515–v527, v533, v534 and v535 all untouched.
+Version v535→v536.
