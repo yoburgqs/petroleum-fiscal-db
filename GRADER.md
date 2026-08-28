@@ -17671,3 +17671,52 @@ No new FAQ (still **974**). No new tooltip on any control whose behaviour did no
 **Task:** T1 — *"Which countries should even be on my screening list?"* (least-recently-used; 458 was T2)
 
 **Friction.** Walking cold into the Screener, the first control is the preset menu. The option reading **"▲ Frontier Markets — Sub-Saharan Africa + SE Asia · PSC · Take ≤70% · NPV positive"** set a take ceiling, an NPV floor and four mechanic checkboxes — **and no region filter of any kind**. The source com
+
+---
+## Cycle 460 — v561 (`b7f8358`, pushed)
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (least-recently-used: 455 was T4, then 456 T6, 457 T5, 458 T2, 459 T1.)
+
+**Friction.** Cold load (fresh browser context, no `sessionStorage`, no `localStorage`), straight to the **Reform Risk** tab. `renderReformRisk()` composes `summaryBar + regionalTilt + topTable + heatmap + stabVol + distrib + exportBar`, so **Section 1 — "Most Frequently Reformed Regimes" — is the first ranked table the analyst reads**, above both the Quiet-Since-2010 card and the per-country lookup.
+
+Its fourth column was headed **"Stability Score"** and coloured on a green/yellow/red ramp taken directly from `score = 100 − 15 × (changes since 2010)`. That formula is a **count**, inside a **window**, blind to **magnitude** and blind to **everything dated before 2010**. Five of the fifteen rows therefore rendered green:
+
+| row | score | colour | what the row did not say |
+|---|---|---|---|
+| Algeria | 100 | green | 1971 nationalization **+25pp**; 2005 Law 05-07 windfall levy **+10pp** |
+| Colombia | 100 | green | 2003 ANH royalty rise +5pp; 2007 R-factor royalties +3pp |
+| Venezuela | 85 | green | 1975 PDVSA nationalization **+30pp**; 2001 Hydrocarbons Law +10pp; 2007 Orinoco heavy oil nationalized **+15pp** |
+| Ecuador | 85 | green | 2008 Law 42 windfall tax, 99% capture above reference price, **+35pp** |
+| Kazakhstan | 85 | green | 2007 Kashagan renegotiation +8pp |
+
+Each of those rows carried its own contradiction **one cell to the right** — Venezuela's Direction column read `↑3 / ↓0 / 1` beside the green 85 — and the column tooltip asserted "Score 100 = no reforms since 2010 (most stable)".
+
+**This is not a new finding.** The `v508` comment block, still in the file at Section 3, names Venezuela, Kazakhstan and Algeria by name and calls printing them under a stability heading **"a quotable error"**. `v508` fixed it in the *Quiet Since 2010* card. `v539` and `v540` fixed it again in the *per-country lookup verdict*. **Section 1 was never touched in any of the three passes**, and it is the surface an analyst hits first.
+
+**Change.**
+1. **Column header** is now **`Reform Frequency` / `since 2010`** instead of `Stability Score` — what the formula measures, and what its own tooltip already called it. The header no longer promises a verdict the number cannot support.
+2. **`scoreCell()`** (new) reserves the green/yellow ramp for rows with **no take-raising event on record at all**. A row with one prints **grey**, or stays **red** where the score is already ≤40 and the alarm is correct. Measured after the change: **3 yellow (Nigeria, Mexico, Iraq — no rise on record), 1 red (United Kingdom 25), 11 grey, 0 green.**
+3. **The disqualifying event is now inline under the number** on every affected row — year, event name, pp change, plus lifetime count and cumulative pp where more than one exists — prefixed **"not counted —"** when the rise predates the scoring window. Venezuela's cell now reads `85 ⚠ · not counted — take raised 2007 +15pp · Orinoco heavy oil nationalized — IOC forced conversion · 3 rises on record, +55pp cumulative`.
+4. **`_rrLastHostile()` hoisted** above Section 1 so both sections use the identical event lookup rather than a second implementation. Section 3's rendered output is byte-identical (verified: groups still 1 / 2 / 6 — India; Russia + Ecuador under the amber in-window divider; six below the red line).
+5. The table caption now states the window and what grey means, since the colour carries meaning it did not before.
+
+**No new threshold was invented.** The test is the tab's own Below-the-line year test (`lastRise.year < 2010`), applied to the table that never had it.
+
+**Result.** An analyst screening for fiscal stability can no longer read a green 85 off Venezuela or a green 100 off Algeria. The frequency number never appears on screen without the take rise that disqualifies it as a stability reading, and **green now means "no take-raising event on record" rather than "nothing happened since 2010"**.
+
+**Verification.** Playwright, cold, against a local build — all 15 ranked rows read back against `reform_history.json`; computed `getComputedStyle` colour confirmed per row; Quiet-card grouping and the Venezuela lookup verdict re-checked unchanged. **135 PASS / 0 FAIL**, **0 page errors**. JS syntax gate **PASS** (9 blocks / 0 errors). The suite's 1 WARN is the `sw.js` 404 — the service worker registers under `/petroleum-fiscal-db/`, which exists only on the deployed path, not on `localhost:8099`. Local-harness artefact, not a regression.
+
+**Deliberately NOT done — stated rather than hidden.**
+1. **No green row exists in this table at present.** That is the honest output of the rule, not a bug: none of the 15 covered ranked jurisdictions with a take rise on record deserves one. If a future jurisdiction has no rise and scores >70 it will render green.
+2. **The score is still magnitude-blind.** A +15pp rupture and a 1pp tweak still move it the same 15 points. This cycle stopped the number being *read* as stability; re-basing the formula on cumulative pp is a business-logic call, not a loop decision.
+3. **`formatBreakeven()` still renders every value under $50 as `<$50`**, collapsing all 65 measured breakevens ($27–$34) into one string — carried from v537, still open.
+4. **Methodology `#cite-copy-btn` hard-coded version and contract count** — carried from cycle 457, still open.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip — the one header tooltip that exists was left verbatim; only the *visible* header text changed. No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. Tab order unchanged. CP headline still two-zone with tier-coloured take%, global rank and vs-median pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v508, v512, v516, v522, v530, v534, v536, v539, v540, v552, v557, v558, v559 and v560 all intact. Version sweep done silently at the end across 5 structural locations; the v561 code comments and changelog entry are not the improvement.
+
+## Cycle 460 Log — 2026-08-28
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (sw.js 404, local-harness only)
+- JS errors: 0 page errors
+- Task: T4
+- Summary: Reform Risk's headline ranked table printed Venezuela at a green 85/100 "Stability Score" and Algeria at a green 100, with the Orinoco nationalization (+15pp) and the Law 05-07 windfall levy (+10pp) nowhere on the row. Header renamed to what the formula measures, green reserved for rows with no take-raising event on record, and the disqualifying event printed inline under every affected score.
