@@ -17330,3 +17330,116 @@ v511, v514, v518, v520, v532, v540, v544, v550, v551, v555 and v556 all intact.
 Walked cold — storage cleared — into **Explorer**, the surface where an analyst scans evidence across all 185 countries at once. Two things were wrong, and the second one made the first unfixable by the user.
 
 **The Evidence column was a composition bar and nothing else.** A stacked A/B/C/D b
+
+---
+## Cycle 457 Log — 2026-08-28 12:54
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (pre-existing local-harness service-worker 404)
+- JS errors: 0
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Playwright RAN this cycle against the local build (not carried forward)
+- Summary: Cycle 457 complete. v558 shipped, pushed, mirrored.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."**
+(rotation: 456=T6, 455=T4, 454=T3, 453=T1, 452=T5, 451=T2)
+
+## Friction
+Walked cold — `sessionStorage` and `localStorage` cleared — into the **Screener**, loaded the
+**IOC Capital Screen** preset (15 of 185 countries), clicked **⬇ CSV**, and **read the downloaded
+file back** rather than trusting the button label.
+
+`exportScreenerCSV()` emitted a bare header row and 15 data rows. **No caption, no assumption
+line, no price deck, no ORCA source line, no version, and no statement anywhere in the file of
+which filters produced those 15 rows.** The artifact is indistinguishable from "these are the
+only 15 countries ORCA holds."
+
+Worse, it carries **two take columns that disagree**. The last row exports:
+
+    Iraq,Middle East,"Concession,PSC,TSC",...,81.5,84.8,86.9,88.1,34.1,Yes,...
+
+`GovtTake_75 = 84.8` beside `GovtTake_75_Comparable = 34.1` — **50 percentage points apart**,
+inside a shortlist produced by a screen captioned *take ≤ 65%*. The sentence that reconciles
+them — that Iraq's published headline blends fee-basis TSC contracts whose ~99% take is a
+structural artefact of a per-barrel fee with no price upside, and which `MECHANIC_COMPARABILITY.md`
+forbids comparing across countries — was built in `renderScreener()` and rendered **only** into
+`#screener-count`, an element no exported file carries. In the IC room, "why is Iraq at 84.8 when
+your screen was ≤65%?" is unanswerable from the file.
+
+**Second defect, same artifact.** `exportScreenerExcel()` shipped a `Stability` column computed as
+a locally invented `100 − swing×3` — a formula used nowhere else, for a column that **does not
+exist on the Screener screen at all**. Reconciled against the canonical
+`getFiscalPredictabilityScore()` across all 185 countries: **179 disagree.** Australia exports 47
+against the **73** the Country Profile shows — two full bands apart, MODERATE rendered as LOW. And
+because the ad-hoc formula never returns null, it printed a hard number for the **22 countries
+where v536 explicitly ruled that no predictability reading may be carried into an IC memo**
+(no contract-level take distribution held). The export revived a score the screen suppresses.
+
+The two buttons also carried **different column sets** — XLSX had `Rank` and `Stability`, CSV had
+neither — so which button the analyst pressed decided what the IC received. That is the same
+defect v541 fixed on Side-by-Side, still live here.
+
+## Change
+- `renderScreener()` publishes the live screen as plain text on `window._screenerExportBasis` —
+  criteria, matched/universe, verified/proxy split, all-proxy warning, and the fee-basis
+  published-vs-comparable list — built from the same locals the count line already uses.
+- New shared `_scExportBasisLines()` renders the basis block; new shared `_scExportRows()` gives
+  **both** buttons one 19-column set.
+- **CSV** leads with the basis block, each line emitted as one quoted cell so Excel keeps it in
+  column A instead of splitting on commas inside the prose.
+- **XLSX** carries the basis on a second **`Screen & Basis`** sheet, so the data sheet stays a
+  clean rectangle for anyone modelling off it.
+- `Stability` is **replaced** by `Fiscal_Predictability` + `Predictability_Basis`, reading the
+  canonical score and printing `not scored` / `no contract-level take distribution held` where
+  v536 requires it, `one statutory term — spread component not exercised`, or
+  `measured spread N.Npp`.
+- Both buttons now refuse an empty screen with a guard toast instead of downloading a
+  header-only file.
+
+## Result
+An analyst who screens down to a shortlist and attaches it to an IC memo now ships a file that
+states, **inside the file**: the criteria that produced the row set, the verified-production vs
+proxy-economics split, **why Iraq's two take columns differ and which one is comparable**, the
+standardized Deepwater profile the NPVs assume, why IRR is absent, and the versioned ORCA source
+line. The predictability number in the export is now the same number the Country Profile shows,
+and is blank-with-a-reason for the 22 countries where the platform holds no basis for one.
+
+## Verification — cold, storage cleared, against the local build
+- **Exported CSV, IOC Capital Screen:** 5 numbered criteria recorded, including
+  `Max government take: ≤65% at $75/bbl, tested on the comparable take (fee-basis contracts
+  excluded from the blend)`; `Data basis: 15 with verified field production, 0 proxy`;
+  `- Iraq: published 84.8%, comparable 34.1% on 195 PSC/Concession contracts`; source line
+  `... v557 — yoburgqs.github.io/... | Exported 2026-08-28`.
+- **Predictability reconciliation, all 185 countries:** exported value vs
+  `getFiscalPredictabilityScore()` — **0 mismatches**; **22** rows correctly `not scored`;
+  the replaced formula **would have differed on 179**.
+- **XLSX:** sheets `['Screener','Screen & Basis']`, 19 columns / 185 rows, 9 basis lines.
+- **Unfiltered cold export:** criteria records `None — this is the full ORCA universe, not a
+  screen result` (22 verified / 163 proxy) — it does not present the universe as a screen result.
+- **Empty screen:** 0 downloads fired from either button; toast
+  `No countries match the current screen — nothing to export.`
+- **Defensive branch** (no screener render yet): `Screen state unavailable — open the Screener
+  tab and re-export to record the criteria.`
+- **0 page errors on every walk.** JS syntax gate **PASS** (9 blocks / 0 errors).
+- `runtime_comprehensive.js` **ran this cycle** against the local build: **135 PASS / 0 FAIL /
+  1 WARN** — the WARN is the pre-existing local-harness service-worker 404 (`sw.js` registers the
+  GitHub Pages subpath, which 404s on a root-served local server).
+
+## Deliberately NOT done — stated rather than hidden
+1. **Methodology's `#cite-copy-btn` still writes a hard-coded version and contract count**
+   (`71,576 contracts ... [v50x]`) into its citation, drifting every cycle while every other
+   citation on the platform reads `_orcaVerNow()`. Found on this walk; it is a one-line fix on a
+   different tab and belongs to its own cycle rather than being smuggled into this one.
+2. **The changelog was not backfilled.** Its head was v553 — v554–v557 have no entries. Backfilling
+   is the "changelog catch-up" the directive names as bookkeeping; only the v558 entry was added.
+3. **The Explorer table still heads its Fiscal Predictability column "Stability"** — the same word
+   Fiscal Compare uses for reform frequency. Carried over from cycles 455/456, still its own cycle.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on any pre-existing control. No page-sub paragraph, no
+amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown.
+Tab order unchanged. CP headline still two-zone with tier-coloured take%, global rank and
+vs-median pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430,
+v449, v451, v452, v489, v502, v508, v511, v514, v518, v520, v532, **v536**, v540, v541, v544,
+v550, v551, v555, v556 and v557 all intact.
