@@ -17592,3 +17592,69 @@ Version sweep done silently at the end across 5 structural locations; it is not 
 Walked cold into Country Profile, which auto-loads Norway. `p25_take === p75_take` on **135 of 185** countries, and the page read that equality as a *finding* in three places at once:
 
 - The headline badge said `Contract take: single term · 67.3%`, tooltip: *"Ever
+
+---
+## Cycle 459 Log — 2026-08-28
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (pre-existing local-harness sw.js 404)
+- JS errors: 0
+- Summary: v560 — the "Frontier Markets — Sub-Saharan Africa + SE Asia" preset had no region filter of any kind and returned 169 of 185 countries led by Canada and the USA.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (rotation: 458=T2, 457=T5, 456=T6, 455=T4, 454=T3, 453=T1 — T1 least-recently-used.)
+
+## Friction
+Walked cold — fresh browser context, no `sessionStorage`, no `localStorage` — from Home into the Screener, whose first control is the *Load a screen…* preset menu. That menu is the analyst's first move on T1.
+
+`applyScreenerPreset('frontiermarkets')` (index.html, the `frontiermarkets` branch) set a take ceiling, an NPV floor and four mechanic checkboxes — **and no region leg of any kind**. Its own source comment declared the intent ("Sub-Saharan Africa + Southeast Asia PSC/Concession exploration screen"), the option text promised it ("▲ Frontier Markets — **Sub-Saharan Africa + SE Asia** · PSC · Take ≤70% · NPV positive"), and the active-preset badge repeated it ("Sub-Saharan/SE Asia focus"). None of the three was implemented.
+
+Measured cold against the live data, it returned **169 of 185 countries**, by region:
+
+| Region | Rows returned |
+|---|---|
+| Africa | 47 |
+| Asia | 24 |
+| Europe | **29** |
+| Latin America | **24** |
+| Other | **16** |
+| Oceania | **14** |
+| Middle East | **7** |
+| CIS/FSU | **5** |
+| North America | **2** |
+| Unknown | **1** |
+
+**97 of the 169 rows were outside the declared universe.** And because the table ranks by NPV descending, so were **all five top rows** — Canada, USA, Azerbaijan, Mexico, Argentina. A new-country-entry screen for frontier basins opened on the two most mature OECD producers on earth, and the "Load top N in Side-by-Side" handoff shipped them onward into the comparison the analyst actually reasons over.
+
+This is precisely the defect **v530** repaired on the sibling option — Atlantic Frontier declared four countries and returned none of three of them — and the same repair was never carried across. The v530 preset-count labelling made it *worse* here, not better: the option rendered `→ 169 of 185 (barely narrows)`, which frames a broken geography filter as a legitimately wide sweep. "Barely narrows" is a reasonable thing to read about a threshold screen; it is the wrong thing to read about a screen whose stated region filter does not exist.
+
+A region-dropdown fix would also have been wrong. `sc-region='Africa'` returns all 49 Africa rows including North Africa, excludes SE Asia entirely, and **misses five genuinely Sub-Saharan jurisdictions filed under region "Other"** in `COUNTRY_DATA` — Côte d'Ivoire, Republic of the Congo, Gambia, Central African Republic, São Tomé and Príncipe. Same class as cycle 344's "USA filed under region Other".
+
+## Change
+1. **The preset is scoped to the universe it names**, via the v530 `_screenerCountrySet` leg. The set is **derived from `COUNTRY_DATA` at apply time** by `_frontierMarketsUniverse()`, not written out as a literal, so it cannot drift as jurisdictions are added. The boundary is **UN M49**, named on screen so the analyst can check it rather than trust it: M49 Africa minus Northern Africa (Algeria, Egypt, Libya, Morocco, Sudan, Tunisia, Western Sahara), plus M49 South-eastern Asia. The five "Other"-filed Sub-Saharan countries are picked up by name; Papua New Guinea — filed under "Asia" in the data but M49 Oceania — is excluded. **No threshold was retuned**; only the geography was made real.
+2. **The option text, the tooltip and the active-preset badge now state the actual definition** ("Sub-Saharan Africa + SE Asia (UN M49)") instead of a focus the code did not apply. The menu label recomputes through the real filter path and now reads `→ 56 of 185`, with the "(barely narrows)" tag correctly gone.
+3. **A scope sentence in the count line**, on the shared country-set code path so **Atlantic Frontier gains it too**: *"scope: Sub-Saharan Africa + South-East Asia (UN M49), 57 jurisdictions in ORCA; 56 cleared this screen's thresholds, 1 did not: Nigeria (81.1% take). Countries outside this scope are not ranked below, however they score."* Without this a scoped preset reports "56 countries match" against a universe of 185 and the analyst cannot tell whether the screen was strict or the universe was small — which is exactly the question T1 asks.
+4. **The export basis names the scope** rather than dumping 57 bare country names at the IC reader.
+
+## Result
+The analyst asking which countries belong on a frontier screening list gets **56 jurisdictions, every one of them Sub-Saharan African or South-East Asian**, ranked production-backed first: **Angola, Indonesia, Malaysia**, then the labelled divider, then 53 proxy-economics jurisdictions. Previously the same click returned 169 countries topped by Canada and the USA. They can also now defend the boundary — the scope, its size, the standard that drew it, and the single jurisdiction the thresholds excluded (Nigeria, 81.1% take) are all stated on screen and carried into the export.
+
+## Verification — cold, storage cleared, against the local build
+- **Frontier Markets: 169 → 56 rows.** Region breakdown of the result is now `{Africa: 41, Asia: 10, Other: 5}` — 56 rows, zero outside scope. Top rows Angola / Indonesia / Malaysia (the three with verified field production), then the v507 divider, then proxies.
+- **Atlantic Frontier unchanged at 6 rows** and gains the scope sentence on the shared path.
+- **No other preset perturbed** — re-ran all nine: iochurdle 15, sweetspot 143, deepwater 11, rfactor 70, highevidence 35, pscafrica 31, lowrisk 141, downsidereturns 153, downsideresilience 160. Every count identical to the pre-change baseline.
+- **Reset All clears both** `_screenerCountrySet` and `_screenerSetLabel` (verified null) and restores 185.
+- **`#/explorer/rfactor` deep link intact**: 70 rows, `_explorerRFactorOnly=true`, 0 page errors.
+- **0 page errors on every walk.** JS syntax gate **PASS** (9 blocks / 0 errors).
+
+## Two measurement errors I made on this walk, recorded because they nearly produced a false result
+1. I first read the rfactor deep link off `#tbody-screener` and saw 57 rows, then 186 — and briefly treated it as a regression I had caused. `#/explorer/rfactor` routes to Explorer **Browse** mode and renders `#tbody-explorer`; the screener tbody is hidden and holds whatever the boot probe last left in it. I was measuring a stale hidden table. The route's real output is 70 rows and was never affected.
+2. My "baseline" A/B server was serving a directory containing only `index.html` — none of the sibling data assets — so the pre-change build rendered 0 rows and 1 page error for reasons that had nothing to do with the comparison. Discarded rather than reported.
+
+## Deliberately NOT done — stated rather than hidden
+1. **The five wide presets keep their thresholds.** Sweet Spot 143, Low-Risk Stable 141, Two-Price Return 153, Downside Resilience 160 still return 76–86% of the database. Retuning them is a business-logic call, not a loop decision; they are labelled with what they return. **This cycle only fixed the one whose stated *geography* was fiction — a different and unambiguous defect.**
+2. **Mayotte, Réunion, Saint Helena and Ascension Island are in scope** under strict M49 and will read as noise to a petroleum analyst. Hand-removing them would be inventing a rule; the standard is named on screen instead so the boundary is checkable.
+3. **`formatBreakeven()` still renders every value under $50 as `<$50`**, collapsing all 65 measured breakevens ($27–$34) into one indistinguishable string — carried over from v537, still open.
+4. **Methodology `#cite-copy-btn` hard-coded version and contract count** — carried over from cycle 457, still open.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on any control whose behaviour did not change — the one tooltip added is on the `frontiermarkets` option, whose behaviour changed in this cycle. No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. Tab order unchanged. CP headline still two-zone with tier-coloured take%, global rank and vs-median pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v512, v516, v522, v530, v534, v536, v552, v557, v558 and v559 all intact. Version sweep done silently at the end across 5 structural locations, with the six v559 (T2) code comments and the v559 changelog entry deliberately left at v559 — it is not the improvement.
