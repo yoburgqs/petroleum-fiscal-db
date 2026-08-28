@@ -16580,3 +16580,120 @@ structural locations and is **not** claimed as the improvement.
 Cold walk, storage cleared, Home → Country Profile. The graded letter next to **Govt Take by Price Scenario** is the fastest answer on the page to "how solid is this?" — it's visible without opening anything.
 
 On **Russia** it s
+
+---
+## Cycle 451 Log — 2026-08-28
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(rotation: 450 was T6, 449 T4, 448 T3, 447 T1, 446 T5 — T2 was least-recently-used at 445.)
+
+## Friction
+Cold walk, `sessionStorage` and `localStorage` cleared, Home → Country Profile → Iraq.
+
+Every verdict element in Zone A of the headline strip agreed with itself, and every one of them
+was indefensible:
+
+| element | what it said |
+|---|---|
+| headline take | **84.8% govt take @$75** |
+| producer rank | **#21 of 21 producers** · *high-take among producers*, in red |
+| vs-median pill | **+25.4pp vs producer median @$75** |
+| quick IC verdict | "…**high-take** — … at **84.8%** govt take" |
+| Fiscal character | "**High fiscal burden** — government captures the majority of project economics" |
+| IC Memo row | "IC: **high take** — cite with profile basis" |
+
+**415 of Iraq's 610 contracts are technical service contracts.** Under a TSC the contractor is
+paid a fixed $/bbl remuneration fee and keeps none of the oil-price upside, so government take%
+climbs toward 97–99% *because of the contract structure*, not because the terms are hard —
+Iraq's TSCs average **98.5% take and +$319M contractor NPV at the same time**. Across its
+**195 PSC and Concession contracts** the take at $75/bbl is **34.1%**.
+
+A **50.7pp** gap, and nothing anywhere on the tab named it. The analyst eliminates the country
+on an artefact of the remuneration mechanic.
+
+The rule is `~/MECHANIC_COMPARABILITY.md`: Group 1 (Concession, PSC, Gross Split, Revenue Share)
+is commensurable; Group 2 (TSC, RSC, Buy-back) is not. **v549 brought this to Side-by-Side and
+built the data for it** — `country_data.json` carries `mech_mix` and a `g1` block — but Country
+Profile, the tab that exists to answer T2 about a single country, read neither field. Grepping
+`mech_mix` found consumers only inside the Side-by-Side closure.
+
+## Change
+1. **Comparable-take line in Zone A**, directly under the 26px figure, on the 11 countries where
+   the two numbers differ at printed precision:
+   *"⚠ **68% fee-basis** — comparable take **34.1%** / on the 195 PSC/Concession contracts ·
+   the headline 84.8% is not comparable across countries."*
+   The published 84.8% is **kept** and its tier colour is untouched — v449/v451 lock that cell.
+   The comparable figure is printed beneath it, exactly as v549 did on Side-by-Side.
+2. **One basis for every rank.** `getProducerPeers()` now sorts, and `getProducerContext()` now
+   medians, on the comparable take. The peer set is unchanged — same `weighting` field, same
+   state-monopoly exclusion, same 21 countries, no threshold invented — only the number each is
+   ordered on. Gating this per-country was tried first and produced **two countries both claiming
+   "#6 of 21"** (Iraq comparable, Australia blended); one basis everywhere is the fix.
+3. **The three verdict sentences read the same take**, so the page cannot contradict itself, and
+   each carries its basis: *"68% of contracts here are fee-basis (TSC 415) and are not described
+   by this verdict."* Without that clause, "Highly contractor-favorable" would be the same error
+   pointing the other way — an entrant to Iraq is more likely to sign a TSC than a PSC.
+
+## Result
+**Iraq moves from #21 of 21 (dead last) to #6 of 21**, and its pill from **+25.4pp** to
+**−21.5pp vs the producer median** — the sign inverts, a **46.9pp** swing, at the exact point an
+analyst decides whether the country stays on the screening list.
+
+The correction runs **both ways**, which is how it is not a thumb on the scale:
+
+| country | blended | comparable | rank move |
+|---|---|---|---|
+| **Iraq** | 84.8% | **34.1%** | #21 → **#6** |
+| Ecuador | 46.5% | 39.3% | → #8 |
+| Mexico | 32.2% | 29.7% | → #2 |
+| Oman | 77.6% | 75.6% | → #20 |
+| Malaysia | 59.4% | 58.3% | → #12 |
+| Azerbaijan | 60.8% | 59.8% | → #14 |
+| **India** | 61.9% | **63.2% (rises)** | → #16 |
+
+India rises because its 97 risk-service contracts carry a *lower* take than its PSCs. The producer
+median moves **59.4% → 55.6%**, and **Nigeria, not Iraq, is the highest-take producer** once the
+artefact is removed.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors (re-run after every edit, including after the
+  changelog and the version sweep).
+- `runtime_comprehensive.js` **ran this cycle** against the local build (`http://localhost:8899`):
+  **135 PASS / 0 FAIL / 1 WARN**. The WARN and the 1 captured JS error are the same pre-existing
+  local-harness artefact — `index.html` registers its service worker at
+  `/petroleum-fiscal-db/sw.js`, a path that only resolves under GitHub Pages.
+- Cold Playwright walks, storage cleared, **0 page errors on every walk**:
+  - All **21 producer ranks unique**, ordering verified ascending on the comparable take,
+    7 blended members.
+  - Iraq / Iran / Ecuador / Oman / Mexico / India / Malaysia all show the correction line and a
+    self-consistent verdict.
+  - **Norway / USA / Australia unchanged** apart from the median shift they share with the set.
+  - **Russia deliberately shows nothing** — 1 fee-basis contract of 1,247, comparable take 46.4%
+    against a headline of 46.4%, so a line would be noise rather than a finding.
+- **One defect introduced and caught mid-cycle:** a TDZ `ReferenceError` from declaring the new
+  block after `_quickIcVerdict497`. It was caught by the cold walk, **not** by the syntax gate —
+  the same failure mode v424 and v452 both recorded. Recorded rather than hidden.
+
+## Deliberately NOT done — stated rather than hidden
+1. **Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank and colour on the
+   blended take.** `cpFeeBasis()` and `cpCmpTakeOf()` are global so they can be fixed; each is
+   its own cycle.
+2. **Group 3 (PRRT / Australia) is untouched.** It needs a same-price caveat, not a substitution,
+   and that is a different rule.
+3. **The XLSX export and the clipboard citations still carry the blended figure.**
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip on a pre-existing control — every tooltip that changed is
+on an element whose number changed. No page-sub paragraph, no amber instructional banner, no
+routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener
+advanced filters still collapsed, presets still a dropdown. Tab order unchanged. CP headline
+still two-zone with a tier-coloured take%, global rank and vs-median pill. v371/v373, v430, v449,
+v451, v452, v489, v505, v511, v516, v518, v534, v542, v546, v549, v550 and v551 all intact.
+Version sweep v551→v552 done silently at the end across 5 structural locations and is **not**
+claimed as the improvement.
+
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (known local sw.js 404)
+- JS errors: 0 on every cold walk
+- Summary: Cycle 451 complete — v552 shipped (`b531e3a`), pushed, mirrored to the office repo.
