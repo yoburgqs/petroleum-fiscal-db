@@ -16827,3 +16827,114 @@ across 5 structural locations and is **not** claimed as the improvement.
 Cold walk into Country Profile on Iraq, then **read the clipboard back** rather than trusting the button labels. `⎘ Copy for IC Memo` returned, verbatim:
 
 > Iraq (**Concession**, 610 contracts, B-tier sourcing): Government take: … **84.8% @$75** … Contr
+
+---
+## Cycle 453 Log — 2026-08-28 14:05
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (local-harness sw.js 404 artifact) — suite RAN this cycle
+- JS errors: 0
+- Summary: Cycle 453 complete — v554 shipped (`ee8ac48`), pushed, mirrored.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (Rotation: 452 was T5, 451 T2,
+450 T6, 449 T4, 448 T3, 447 T1 — T1 was least-recently-used.)
+
+## Friction
+Cold walk (fresh browser context, `sessionStorage` and `localStorage` cleared) from Home into the
+Screener, then loaded the one preset both the Home card and the preset menu tell a first-time
+analyst to start with: **⭐ IOC Capital Screen**. It returned **14 countries. Iraq was not one of
+them.**
+
+Iraq has **verified field production**. It is NPV-positive at $75 (**$642M**) *and* at the $50
+downside (**$389M**), so it clears **both** NPV legs of that preset. Government take on its **195
+PSC/Concession contracts is 34.1%** — lower than every country the screen *did* return except the
+USA (23.4%). It was removed by exactly one line in `runScreener()`:
+
+```js
+if (take > maxTake) return false;
+```
+
+reading **84.8%** — the blended all-contract figure, **68% of which is TSC fee-basis contracts**
+where the contractor is paid a fixed $/bbl remuneration fee and keeps no price upside.
+
+`MECHANIC_COMPARABILITY.md` (2026-08-26) says that number **may not be compared across countries**,
+and **v549** (Side-by-Side), **v552** (Country Profile) and **v553** (the IC-memo clipboard) have
+each already put that correction on screen. The Screener — **the one surface that ACTS on the
+number rather than displaying it** — was still gating on the raw blend, and said nothing about
+having done so. The count line read *"14 countries match at $75/bbl"*; the result line read
+*"(171 filtered out of 185)"*. **There was no route to discover Iraq had been dropped, or why.**
+
+This was item 1 on the previous cycle's own *"deliberately NOT done"* list.
+
+## Change
+1. **`_scFeeCmpAt(d, price)` / `_scFeeCmpCount(price)`** — price-aware, using the *same* 0.1pp
+   divergence test as `cpFeeBasis()`, so the Screener cannot disagree with Country Profile about
+   which countries are affected. **10 countries at $50/$75/$100, 11 at $125** (Russia's
+   1-in-1,247 stays silent below that).
+2. **The take-ceiling leg is tested against the comparable (Group-1) take** where the published
+   figure is a fee-basis blend. The published headline is unchanged everywhere it is displayed,
+   coloured, tiered, ranked and exported.
+3. **`runScreener()`'s filter body is now a named predicate `_scPass(d, useCmp)`**, evaluated on
+   **both** bases. The count line therefore reports the *exact* difference between them rather
+   than an estimate, and cannot drift from the filter the way a parallel re-implementation would.
+4. **New `sc-fee-cmp` checkbox** under *Max Govt Take*, **hidden until a ceiling is set** — the
+   v513 `sc-be-nulls` pattern, applied to the axis that actually removes countries. Default
+   checked; restored by *Reset All* and by every preset.
+5. **Rows whose basis differs render `→ screened at 34.1%`** beneath the published `84.8%`, so an
+   analyst reading a high number inside a "≤65%" screen does not see a bug.
+6. **The count line names both directions, by country, with both numbers.** Unchecking the box
+   does *not* restore silence — it names Iraq as excluded and says which rule excluded it.
+7. **CSV and XLSX gain `GovtTake_75_Comparable` and `FeeBasis_Blend`**, so the shortlist carries
+   the correction out of the tool, as v513's `Breakeven_Tested` does.
+
+## Result
+The analyst asking *"which countries should even be on my screening list?"* gets **15, not 14**,
+and can see — in the count line *and* on the row — exactly why Iraq is there and which figure it
+was screened on. Previously the largest TSC jurisdiction on earth was structurally incapable of
+appearing in the flagship IC screen, and nothing on the page said so.
+
+**The correction is symmetric and is not a thumb on the scale.** India's comparable take is
+**63.2%** against a **61.9%** headline, so a ceiling at 62% now **REMOVES** India — verified live,
+and named on screen in the same voice as Iraq's admission.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors (re-run after the patch and again after the
+  version sweep).
+- Cold Playwright, storage cleared, against the local build:
+  - **Neutral ceiling** → control hidden, **185 rows**, byte-identical to before.
+  - **IOC Capital Screen** → **15 rows, Iraq admitted**, named in the count line, row reads
+    `84.8% → screened at 34.1%`.
+  - **Unchecked** → **14 rows**, and Iraq is *named as excluded* with the rule that excluded it.
+  - **62% ceiling** → **India removed** and named; restored when unchecked. Symmetry holds.
+  - **All four prices** — divergent set 10 / 10 / 10 / 11, control label tracks it.
+  - **Reset All** → checkbox re-checked, control hidden, 185 rows.
+  - **All 11 preset counts re-measured through the real path:** iochurdle 14→**15**, sweetspot
+    142→**143**, lowrisk 140→**141**, frontiermarkets 168→**169**, downsideresilience 158→**160**.
+    The six with no take ceiling — pscafrica 31, deepwater 11, downsidereturns 153, highevidence
+    35, rfactor 70, atlanticfrontier 6 — **unchanged**, confirming nothing was perturbed. The
+    preset menu's own hit labels update automatically because they are read off that same path.
+  - **CSV read back** — `Iraq,…,84.8,86.9,88.1,34.1,Yes,…` — 15 rows.
+  - **8-tab regression sweep.** **0 page errors on every walk.**
+- `runtime_comprehensive.js` **RAN this cycle** against the local build: **135 PASS / 0 FAIL /
+  1 WARN**. The WARN is the pre-existing local-harness artifact (the service worker registers
+  `/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath, which 404s when served from root;
+  correct in production).
+
+## Deliberately NOT done — stated rather than hidden
+1. **Fiscal Compare, Explorer and the Breakeven Map still rank and colour on the blended take.**
+   This cycle changed only the surface that *removes* countries from a list.
+2. **The Screener's Tier badge is still derived from the published take**, so Iraq shows a red
+   *NOC-dominated* tier inside a ≤65% screen. The take cell directly beneath it carries the
+   correction; changing the Tier column is a separate decision on a separate column.
+3. **Group 3 (PRRT / Australia) untouched** — it needs a same-price caveat, not a substitution.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on any control whose behaviour did not change — the two
+added sit on the new checkbox and the new row line, neither of which previously existed. No
+page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS
+card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets
+still a dropdown. Tab order unchanged. CP headline still two-zone with a tier-coloured take%,
+global rank and vs-median pill. Govt NPV column still **REMOVED** from Fiscal Compare. v371/v373,
+v430, v449, v451, v452, v489, v505, v507, v511, v513, v516, v517, v518, v530, v534, v537, v542,
+v543, v546, v548, v549, v550, v551, v552 and v553 all intact. Version sweep v553→v554 done
+silently at the end across 5 structural locations and is **not** claimed as the improvement.
