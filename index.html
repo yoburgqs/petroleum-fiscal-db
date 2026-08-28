@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v553.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v554.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v553</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v554</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1361,7 +1361,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v553</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v554</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v553</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v554</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1491,7 +1491,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v553).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v554).</div>
     <!-- v465: Live investible universe stat — populated after country_data.json loads -->
     <div id="home-hurdle-stat" style="display:none;margin-top:8px;font-size:12px;color:var(--green);font-weight:600;" aria-live="polite"></div>
     <!-- v466: DB currency note — populated after country_data.json loads -->
@@ -2086,6 +2086,11 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <div class="slider-group">
         <label>Max Govt Take: <span class="val" id="sv-take">100</span>%<span class="sc-nolimit" id="sn-take"> · no ceiling</span></label>
         <input type="range" id="sl-take" min="30" max="100" value="100" aria-label="Maximum government take percentage (30–100%). Starts at 100% — no ceiling applied, every country passes.">
+        <!-- v554: take-comparability control. Hidden while the slider sits at 100 (no ceiling =
+             nothing to test); revealed by _scUpdateNeutralFlags() the moment a ceiling is set.
+             Same pattern as the v513 sc-be-nulls control, applied to the axis that silently
+             removed the largest TSC jurisdiction on earth from the flagship IC screen. -->
+        <label id="sc-fee-cmp-wrap" style="display:none;margin-top:7px;font-size:10px;font-weight:400;color:var(--muted);cursor:pointer;line-height:1.5;align-items:flex-start;gap:5px;" title="Some countries' published take blends PSC/Concession contracts with fee-basis contracts (TSC, RSC, Buy-back) where the contractor is paid a fixed $/bbl remuneration fee and keeps no price upside. On those, the headline take% measures contract structure, not how hard the terms are, and MECHANIC_COMPARABILITY.md does not permit comparing it across countries. CHECKED (default): the ceiling is tested against the take on each country's PSC/Concession contracts alone — Iraq is screened at 34.1%, not 84.8%. The published headline is still what the table shows, colours, tiers and exports. UNCHECKED: the ceiling is tested against the published blend, which is what this Screener did before v554; the count line then names any country that basis excludes."><input type="checkbox" id="sc-fee-cmp" checked style="cursor:pointer;vertical-align:-1px;"> Test the ceiling on <span style="font-weight:700;">comparable</span> take for the <span id="sc-fee-cmp-n" style="font-weight:700;">10</span> fee-basis countries <span style="opacity:.8;">(published headline still shown and exported)</span></label>
       </div>
       <div class="slider-group">
         <label>Max Breakeven: $<span class="val" id="sv-be">120</span>/bbl<span class="sc-nolimit" id="sn-be"> · no ceiling</span></label>
@@ -22799,6 +22804,52 @@ function cpNBlendedProducers() {
   return getProducerPeers().filter(function(c) { return c.g1 && c.g1.t75 != null; }).length;
 }
 
+// ── v554 (T1): the Screener's take ceiling, tested on the basis the rest of the page
+//    already says is the one to rank on ──────────────────────────────────────────
+// T1 is "which countries should even be on my screening list?", and the ⭐ IOC Capital Screen is
+// the preset both the Home card and the preset menu tell a first-time analyst to start with.
+// Walked cold, it returns 14 countries and Iraq is not one of them.
+//
+// Iraq has verified field production. It is NPV-positive at $75 ($642M) AND at the $50 downside
+// ($389M), so it clears both NPV legs of that preset. Government take on its 195 PSC/Concession
+// contracts is 34.1% — lower than every country the screen DID return except the USA. It is
+// removed by one line, `if (take > maxTake) return false`, reading 84.8%: the blended
+// all-contract figure, 68% of which is TSC fee-basis contracts where the contractor is paid a
+// fixed $/bbl remuneration fee and keeps no price upside.
+//
+// MECHANIC_COMPARABILITY.md (2026-08-26) says that blended number may not be compared across
+// countries, and v549 (Side-by-Side), v552 (Country Profile) and v553 (the IC-memo clipboard)
+// have each already put the correction on screen. The Screener — the one surface that ACTS on
+// the number instead of displaying it — was still gating on the raw blend, and said nothing at
+// all about having done so. The count line read "14 countries match"; the result line read
+// "(171 filtered out of 185)". There was no route to discover Iraq had been dropped, or why.
+//
+// What changes is the figure the CEILING is tested against, for the 10 countries where the two
+// differ at printed precision. The published headline is unchanged everywhere it is displayed,
+// coloured, tiered, ranked and exported. The correction is symmetric by construction and is not
+// a thumb on the scale: India's comparable take is 63.2% against a 61.9% headline, so a ceiling
+// set between the two now REMOVES India. Both directions are named in the count line.
+function _scFeeCmpAt(d, price) {
+  var p = String(price || '75');
+  var head = d ? d['take_' + p] : null;
+  var g1v  = (d && d.g1 && d.g1['t' + p] != null) ? d.g1['t' + p] : null;
+  var mx = (d && Array.isArray(d.mech_mix)) ? d.mech_mix : [], n2 = 0;
+  for (var i = 0; i < mx.length; i++) if (mx[i].g === 2) n2 += (mx[i].n || 0);
+  // Same divergence test as cpFeeBasis(): print/act on the correction only where it changes the
+  // number at the precision the page prints (0.1pp). Russia holds 1 fee-basis contract of 1,247
+  // and is silent here for the same reason it is silent on Country Profile.
+  var diverges = (n2 > 0 && g1v != null && head != null
+                  && head.toFixed(1) !== g1v.toFixed(1) && !isStateMonopoly(head));
+  return { head: head, cmp: (diverges ? g1v : head), n2: n2, diverges: diverges,
+           n1: (d && d.g1 && d.g1.n != null) ? d.g1.n : null };
+}
+// Size of the affected set at a given price — read off the data so the control states its own
+// scope rather than asserting a number written into the HTML.
+function _scFeeCmpCount(price) {
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return 0;
+  return COUNTRY_DATA.filter(function(d) { return _scFeeCmpAt(d, price).diverges; }).length;
+}
+
 // ── v553 (T5): the comparability caveat, for the artifacts that LEAVE the tool ────────────
 // v549 put the fee-basis correction on Side-by-Side and v552 put it on the Country Profile
 // screen. Neither reached the clipboard. So on Iraq the page said "68% fee-basis — comparable
@@ -24520,6 +24571,8 @@ function applyScreenerPreset(preset) {
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
   const nullBe = document.getElementById('sc-be-nulls');
   if (nullBe) nullBe.checked = true;   // v513
+  const feeCmp = document.getElementById('sc-fee-cmp');
+  if (feeCmp) feeCmp.checked = true;   // v554
   // v517: sc-irr-nulls retired with the IRR axis; sc-proxy-keep replaces it.
   const keepProxy = document.getElementById('sc-proxy-keep');
   if (keepProxy) keepProxy.checked = true;
@@ -24796,6 +24849,19 @@ function _scUpdateNeutralFlags() {
     }
   }
 
+  // v554: the take-comparability control only has meaning once a take ceiling is set, and it
+  // states the size of the affected set from the data at the ACTIVE price rather than from a
+  // number written into the HTML.
+  const _tkSl = document.getElementById('sl-take');
+  const _tkWrap = document.getElementById('sc-fee-cmp-wrap');
+  if (_tkSl && _tkWrap) {
+    _tkWrap.style.display = (+_tkSl.value < 100) ? 'inline-flex' : 'none';
+    const _tkN = document.getElementById('sc-fee-cmp-n');
+    if (_tkN && typeof COUNTRY_DATA !== 'undefined') {
+      _tkN.textContent = _scFeeCmpCount(typeof getPriceKey === 'function' ? getPriceKey() : '75');
+    }
+  }
+
   // v513: the breakeven-nulls control only has meaning once a ceiling is set.
   const _beSl = document.getElementById('sl-be');
   const _beWrap = document.getElementById('sc-be-nulls-wrap');
@@ -24828,6 +24894,9 @@ function runScreener() {
   // v513: breakeven null toggle + whether a ceiling is actually being applied
   const beCeilingActive = maxBE < 120;
   const includeBeNulls  = document.getElementById('sc-be-nulls')?.checked !== false;
+  // v554: take-ceiling comparability basis. Only meaningful once a ceiling is actually set.
+  const takeCeilingActive = maxTake < 100;
+  const feeCmpOn = document.getElementById('sc-fee-cmp')?.checked !== false;
 
   // mechanic checkbox filter
   const checkedMechs = [...document.querySelectorAll('#sc-mech-checks input[type=checkbox]:checked')].map(cb => cb.value);
@@ -24856,13 +24925,20 @@ function runScreener() {
   // water depth radio
   const depCat = document.querySelector('input[name="dep-cat"]:checked')?.value || 'all';
 
-  let data = COUNTRY_DATA.filter(d => {
+  // v554 — the filter body is a named predicate taking the comparability basis as an argument,
+  // so the SAME code path can be evaluated twice: once on the active basis and once on the other.
+  // The count line then reports the exact difference between the two rather than an estimate, and
+  // cannot drift from the filter the way a parallel re-implementation of it would.
+  const _scPass = (d, useCmp) => {
     const take = d[takeKey];
     const npv  = d[npvKey];
     const be   = d[beKey];
 
     if (take === null || take === undefined) return false;
-    if (take > maxTake) return false;
+    // v554 — test the ceiling against the comparable (Group-1) take where the published figure is
+    // a fee-basis blend. See _scFeeCmpAt(). Everything else about the row is unchanged.
+    const _fc = (useCmp && takeCeilingActive) ? _scFeeCmpAt(d, price) : null;
+    if (((_fc && _fc.diverges) ? _fc.cmp : take) > maxTake) return false;
     if (_screenerRfactorOnly && !d.has_r_factor_tiers) return false;
     // v530: explicit country set (Atlantic Frontier). Applied before every threshold leg so a
     // named basin returns the countries it names.
@@ -24951,7 +25027,17 @@ function runScreener() {
     const scRegion = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
     if (scRegion && !_regionMatch(d.region, scRegion)) return false;
     return true;
-  });
+  };
+  let data = COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn));
+  // The same filter on the OTHER basis. Only computed when a ceiling is live — with no ceiling
+  // the two bases are identical by construction and the second pass would be pure waste.
+  const _dataAlt = takeCeilingActive ? COUNTRY_DATA.filter(d => _scPass(d, !feeCmpOn)) : null;
+  const _altSet  = _dataAlt ? new Set(_dataAlt.map(d => d.country)) : null;
+  const _curSet  = new Set(data.map(d => d.country));
+  // Countries the ACTIVE basis keeps that the other would drop, and the reverse. Both are named
+  // on screen; suppressing the second one would make the correction look one-directional.
+  const _basisGained = _altSet  ? data.filter(d => !_altSet.has(d.country)) : [];
+  const _basisLost   = _dataAlt ? _dataAlt.filter(d => !_curSet.has(d.country)) : [];
 
   // v507 — Screener ranking no longer leads with proxy economics.
   //
@@ -25008,6 +25094,7 @@ function runScreener() {
 
   // active filters count badge (v99: take/irr/npv/breakeven sliders included)
   const scRegionActive = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
+  const _nFeeDivForBadge = takeCeilingActive ? _scFeeCmpCount(price) : 0; // v554
   let activeCount = 0;
   if (maxTake < 100) activeCount++; // take slider below default (100)
   if (+document.getElementById('sl-npv50').value > -500) activeCount++; // v517: downside NPV floor above default
@@ -25019,6 +25106,7 @@ function runScreener() {
   if (scRegionActive) activeCount++;
   if (!includeProxy) activeCount++; // v517: excluding proxy-economics countries is a filter
   if (beCeilingActive && !includeBeNulls) activeCount++; // v513: excluding untested-breakeven countries is a filter
+  if (takeCeilingActive && !feeCmpOn && _nFeeDivForBadge > 0) activeCount++; // v554: screening the ceiling on the blended headline is a choice that removes countries
   const totalMechBoxes = document.querySelectorAll('#sc-mech-checks input[type=checkbox]').length;
   if (checkedMechs.length < totalMechBoxes) activeCount++; // some mechanic unchecked = active filter
   if (minEvid > 0) activeCount++;
@@ -25074,6 +25162,26 @@ function runScreener() {
   // on screen saying that the 120 removed were removed for absence of data, not for failing a test.
   const _beCatNote = (beCat !== 'measured') ? ''
     : ` <span style="color:var(--accent);font-weight:600;">\u2014 ${data.length} with a modelled breakeven; ${COUNTRY_DATA.length - COUNTRY_DATA.filter(x => _beIsTested(x.be_75)).length} countries removed for having none (absence of data, not a failed test)</span>`;
+  // v554 — the take basis states BOTH directions, by name and with both numbers, so the analyst
+  // can see exactly which countries the ceiling treats differently and check the claim.
+  const _fmtBasisList = arr => arr.map(d => {
+    const fc = _scFeeCmpAt(d, price);
+    return `${d.country} (published ${fc.head.toFixed(1)}%, comparable ${fc.cmp.toFixed(1)}%`
+      + (fc.n1 != null ? ` on ${Number(fc.n1).toLocaleString()} PSC/Concession contracts` : '') + ')';
+  }).join(', ');
+  const _nFeeDiv = takeCeilingActive ? _scFeeCmpCount(price) : 0;
+  const _takeBasisNote = (!takeCeilingActive || _nFeeDiv === 0) ? ''
+    : feeCmpOn
+      ? ` <span style="color:var(--accent);font-weight:600;">— take ceiling ≤${maxTake}% tested on the comparable take for ${_nFeeDiv} countries whose published headline blends fee-basis contracts (no price upside, so take% measures structure not terms)`
+        + (_basisGained.length ? `: ${_fmtBasisList(_basisGained)} — admitted, the published blend would have excluded ${_basisGained.length > 1 ? 'them' : 'it'}` : '')
+        + (_basisLost.length ? `${_basisGained.length ? '; ' : ': '}${_fmtBasisList(_basisLost)} — removed, the published blend would have kept ${_basisLost.length > 1 ? 'them' : 'it'}` : '')
+        + ((!_basisGained.length && !_basisLost.length) ? ' — no country changes side at this ceiling' : '')
+        + `</span>`
+      : ` <span style="color:var(--accent);font-weight:600;">— take ceiling ≤${maxTake}% tested on the published blended headline`
+        + (_basisLost.length ? `: ${_fmtBasisList(_basisLost)} — excluded on a figure MECHANIC_COMPARABILITY.md does not permit comparing across countries. Re-check the box under Max Govt Take to screen ${_basisLost.length > 1 ? 'them' : 'it'} on the comparable take.` : '')
+        + (_basisGained.length ? `${_basisLost.length ? ' ' : ': '}${_fmtBasisList(_basisGained)} — kept, the comparable take would have excluded ${_basisGained.length > 1 ? 'them' : 'it'}.` : '')
+        + ((!_basisGained.length && !_basisLost.length) ? ' — no fee-basis country changes side at this ceiling' : '')
+        + `</span>`;
   const _proxyNote = includeProxy ? ''
     : ` <span style="color:var(--accent);font-weight:600;">\u2014 verified field production only; ${COUNTRY_DATA.length - COUNTRY_DATA.filter(x => _dqTier(x).hasProduction).length} proxy-economics countries excluded</span>`;
   // v518 (T6) — say what the evidence gate actually tested. The old A/B gate was silent about
@@ -25085,7 +25193,7 @@ function runScreener() {
   const _universeLead = (activeCount === 0 && !_activePresetName)
     ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${_basisNote}`
     : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}`;
-  document.getElementById('screener-count').innerHTML = `${_universeLead}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}${_beCatNote} <span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:6px;">→ click any row to open Country Profile</span><span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
+  document.getElementById('screener-count').innerHTML = `${_universeLead}${_takeBasisNote}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}${_beCatNote} <span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:6px;">→ click any row to open Country Profile</span><span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v477: screener-result-count now shows how many were filtered out, not just total, for clearer context
   var _screenerFiltered = COUNTRY_DATA.length - data.length;
   // v513: "all N countries pass current filters" is only true if every row was actually
@@ -25147,6 +25255,20 @@ function runScreener() {
             + `Rows badged PROXY have no verified field production &mdash; their fiscal terms are regional estimates and their NPV / breakeven are indicative only.`)
       + `</td></tr>`
     : '';
+  // v554 — when the ceiling is live on a country whose headline is a fee-basis blend, the row
+  // must say so. Otherwise an analyst reading "84.8%" inside a screen captioned "≤ 65%" sees a
+  // bug. The published figure stays first and keeps its tier colour (v449/v451); the comparable
+  // figure is appended beneath it, and says which of the two the ceiling was applied to.
+  const _takeCmpCell = (d) => {
+    if (!takeCeilingActive) return '';
+    const fc = _scFeeCmpAt(d, price);
+    if (!fc.diverges) return '';
+    const tip = `${d.country}: ${fc.n2.toLocaleString()} of its contracts are fee-basis (fixed $/bbl remuneration, no price upside), so the published ${fc.head.toFixed(1)}% blends contract structure into the take figure. On its ${fc.n1 != null ? Number(fc.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts government take is ${fc.cmp.toFixed(1)}% at $${price}/bbl — the figure MECHANIC_COMPARABILITY.md permits comparing against other countries. `
+      + (feeCmpOn
+          ? `The ≤${maxTake}% ceiling was tested against ${fc.cmp.toFixed(1)}%.`
+          : `The ≤${maxTake}% ceiling was tested against the published ${fc.head.toFixed(1)}% — tick the box under Max Govt Take to screen on ${fc.cmp.toFixed(1)}% instead.`);
+    return `<div style="font-size:10px;font-weight:700;color:var(--accent);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${tip.replace(/"/g,'&quot;')}">${feeCmpOn ? '→ screened at ' : 'cmp '}${fc.cmp.toFixed(1)}%</div>`;
+  };
   tbody.innerHTML = _topBanner + data.map((d,i) => {
     const mechs = d.mechanics.split(',').map(m => `<span class="${getMechTagClass(m.trim())}">${m}</span>`).join('');
     const tc = tierClass(d[takeKey]);
@@ -25167,7 +25289,7 @@ function runScreener() {
       <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:9px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
       <td>${mechs}</td>
-      <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${fmtTake(d[takeKey])}</td>
+      <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${fmtTake(d[takeKey])}${_takeCmpCell(d)}</td>
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}</td>
       <td class="num">${fmtNpvShared(d[npvKey])}</td>
       <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the $75 column to the left: a regime that is positive at $75 and negative here does not survive a price break." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}</td>
@@ -25224,8 +25346,11 @@ function exportScreenerCSV() {
   // v517: IRR_75 removed — it was AVG(per-contract IRR), median 240.9%, and this shortlist is
   // attached to IC memos. NPV_50 (the downside leg the Screener now screens on) and Verified_Production
   // (the data-basis flag) replace it, so the exported file states the same basis as the screen.
-  const hdr = ['Country','Region','Mechanics','R_factor_Tiers','Verified_Production','GovtTake_50','GovtTake_75','GovtTake_100','GovtTake_125','NPV_50','NPV_75','Breakeven_75','Breakeven_Tested','Swing'];
-  const rows = data.map(d => [d.country,d.region,d.mechanics,d.has_r_factor_tiers?'Yes':'No',_dqTier(d).hasProduction?'Yes':'No',d.take_50,d.take_75,d.take_100,d.take_125,d.npv_50,d.npv_75,d.be_75,_beIsTested(d.be_75)?'Yes':'No',d.swing]);
+  // v554: an exported shortlist is the artifact that reaches the IC. GovtTake_75_Comparable and
+  // FeeBasis_Blend carry the same correction the screen now applies, so a 84.8% cell in a
+  // spreadsheet captioned "take ≤ 65%" is explained inside the file rather than only on screen.
+  const hdr = ['Country','Region','Mechanics','R_factor_Tiers','Verified_Production','GovtTake_50','GovtTake_75','GovtTake_100','GovtTake_125','GovtTake_75_Comparable','FeeBasis_Blend','NPV_50','NPV_75','Breakeven_75','Breakeven_Tested','Swing'];
+  const rows = data.map(d => { const _fc = _scFeeCmpAt(d,'75'); return [d.country,d.region,d.mechanics,d.has_r_factor_tiers?'Yes':'No',_dqTier(d).hasProduction?'Yes':'No',d.take_50,d.take_75,d.take_100,d.take_125,_fc.cmp,_fc.diverges?'Yes':'No',d.npv_50,d.npv_75,d.be_75,_beIsTested(d.be_75)?'Yes':'No',d.swing]; });
   // v517 — found on the same walk: this CSV was malformed for 75 of the 185 countries. The
   // Mechanics field is a comma-joined string ("Concession,PSC" / "Concession,PSC,RSC") and the row
   // was emitted with a bare r.join(','), so every column after Mechanics shifted right by one or two
@@ -30030,6 +30155,8 @@ function exportScreenerExcel() {
       Rank:i+1, Country:d.country, Region:d.region, Mechanics:d.mechanics,
       'R_factor_Tiers': d.has_r_factor_tiers ? 'Yes' : 'No',
       'GovtTake_50':d.take_50, 'GovtTake_75':d.take_75, 'GovtTake_100':d.take_100, 'GovtTake_125':d.take_125,
+      'GovtTake_75_Comparable': _scFeeCmpAt(d,'75').cmp,                     // v554
+      'FeeBasis_Blend': _scFeeCmpAt(d,'75').diverges ? 'Yes' : 'No',         // v554
       'Swing_pp':d.swing,
       'NPV_50_M':d.npv_50, 'NPV_75_M':d.npv_75, 'Breakeven_bbl':d.be_75,   // v517: IRR_75_pct removed (AVG of per-contract IRRs, median 240.9%)
       'Verified_Production': _dqTier(d).hasProduction ? 'Yes' : 'No',        // v517
@@ -35828,6 +35955,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // v513: breakeven-nulls toggle
   var scBeNulls = document.getElementById('sc-be-nulls');
   if (scBeNulls) scBeNulls.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  // v554: take-comparability toggle
+  var scFeeCmp = document.getElementById('sc-fee-cmp');
+  if (scFeeCmp) scFeeCmp.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   // v507: evidence-first ranking toggle
   var scEvFirst = document.getElementById('sc-evidence-first');
   if (scEvFirst) scEvFirst.addEventListener('change', function() {
