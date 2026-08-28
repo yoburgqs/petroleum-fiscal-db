@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v555.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v556.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v555</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v556</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1361,7 +1361,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v555</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v556</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v555</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v556</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1462,7 +1462,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <div style="background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:12px 14px;">
       <div style="font-size:18px;font-weight:900;color:var(--red);margin-bottom:4px;">4</div>
       <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Check Reform Risk</div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Before finalizing any IC memo: open <strong>Reform Risk</strong> to see the Stability Score (◆◆◆◆◆). 5 reforms since 2010 = add probability-weighted NPV scenario. IC rule: ◇◇◇◇◇ = always disclose.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;">Before finalizing any IC memo: open <strong>Reform Risk</strong> and look up your country. It returns one IC action &mdash; the premium to carry, or a plain statement that no reform-frequency premium is indicated, or that no sourced reform log exists at all (164 of 185 jurisdictions). The same verdict backs the Stability column on Fiscal Compare.</div>
     </div>
   </div>
   <div style="margin-top:10px;font-size:11px;color:var(--muted);text-align:right;">This guide appears once per session &middot; <kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:monospace;font-size:10px;">Esc</kbd> to dismiss &middot; <button onclick="(function(){sessionStorage.removeItem('orca_qs_dismissed');var g=document.getElementById('qs-guide');if(g)g.style.display='block';window.scrollTo({top:0,behavior:'smooth'});})()" style="background:none;border:none;color:var(--accent);font-size:11px;cursor:pointer;padding:0;text-decoration:underline dotted;">Re-show</button></div>
@@ -1491,7 +1491,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v555).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v556).</div>
     <!-- v465: Live investible universe stat — populated after country_data.json loads -->
     <div id="home-hurdle-stat" style="display:none;margin-top:8px;font-size:12px;color:var(--green);font-weight:600;" aria-live="polite"></div>
     <!-- v466: DB currency note — populated after country_data.json loads -->
@@ -1513,7 +1513,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">IRR</strong> = contractor internal rate of return at the selected price (10% WACC basis). IRR &ge;15% clears most IOC hurdle rates; &lt;10% = sub-hurdle. Shown for 124/185 countries.</span></div>
     <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">NPV</strong> = contractor net present value at 10% WACC, 100% WI, standardized production profile. Positive NPV at $75/bbl is the primary investment screen.</span></div>
     <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Breakeven</strong> = minimum oil price for contractor NPV &ge;0 on the standardized profile. &lt;$40/bbl = resilient; &gt;$70/bbl = high-cost regime. Available for 68/185 countries.</span></div>
-    <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Stability Score</strong> = fiscal regime predictability (&#9670;&#9670;&#9670;&#9670;&#9670; = most stable). Score = 5 minus fiscal law changes since 2010. IC rule: &#9670;&#9670;&#9670;&#9670;&#9670; = no premium; &#9670;&#9670;&#9670;&#9671;&#9671; = add 1&ndash;2pp WACC; &#9670;&#9671;&#9671;&#9671;&#9671; = add 3&ndash;5pp; &#9671;&#9671;&#9671;&#9671;&#9671; = probability-weighted NPV required.</span></div>
+    <div style="padding:8px 10px;border:1px solid var(--border);border-radius:4px;background:var(--card-bg,var(--bg));"><span style="font-size:11px;color:var(--muted);"><strong style="color:var(--text);">Stability Score</strong> = reform frequency (&#9670;&#9670;&#9670;&#9670;&#9670; = no sourced law change since 2010). Score = 5 minus fiscal law changes since 2010, and it is a <em>count</em> &mdash; it never reads how large a change was. Do not convert diamonds to a premium yourself: the Reform Risk lookup returns the IC action for the country, and the Fiscal Compare cell carries that same verdict. A muted row with a red <strong>!</strong> means the count is not the verdict there.</span></div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:32px;">
     <!-- v450: Fiscal Compare card has amber top border + "Start here" badge to signal primary entry point -->
@@ -1548,7 +1548,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Reform Risk</div><div style="font-size:11px;color:var(--muted);">Fiscal stability scores + law change history across 185 countries</div></div>
         <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: Stability Score (&#9670;&#9670;&#9670;&#9670;&#9670;), reform heatmap by decade, and IC rule — a country at 60% take with zero reforms warrants no WACC premium; 5 rewrites since 2010 requires probability-weighted NPV in your IC memo.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a per-country lookup that returns one IC action, a Reform Frequency Score (0–100), the reform heatmap by decade, and the direction split — and it says plainly when a jurisdiction has no sourced reform log rather than scoring it as clean.</div>
     </div>
   </div>
   <details style="margin-bottom:20px;">
@@ -1810,7 +1810,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <button id="fc-sort-dir-btn" tabindex="0" aria-label="Reverse current sort order" onclick="fcToggleSortDir()" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:11px;font-weight:600;padding:3px 9px;cursor:pointer;transition:.15s;margin-left:4px;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'" title="Reverse the current sort order (e.g. switch from lowest take to highest take, or from highest IRR to lowest IRR) without changing the sort dimension. Resets when you click a different sort button.">&#x21c5; Reverse</button>
     <div class="fc-stability-toggle">
       <input type="checkbox" id="fc-stability-check" checked>
-      <label for="fc-stability-check" title="Show the Stability column in the FC table. It scores reform frequency only where ORCA has a sourced event log, and prints n/c for the rest rather than assuming a clean record. Score = 5 minus fiscal law changes since 2010. IC rule, and it applies ONLY to a scored row: 5 diamonds → no reform-frequency premium; 3–4 → add 1–2pp; 1–2 → add 3–5pp; 0 → probability-weighted NPV required. A grey row with a red ! scores clean only because its last take rise predates the 2010 window — the rule does not apply to it either. An n/c row carries no reform-frequency premium of zero; it carries no reading at all, and needs an external check before it goes to an IC. Click any cell for the country’s Reform Risk panel.">Show Stability ⓘ</label>
+      <label for="fc-stability-check" title="Show the Stability column in the FC table. It scores reform frequency only where ORCA has a sourced event log, and prints n/c for the rest rather than assuming a clean record. Score = 5 minus fiscal law changes since 2010. This control states no premium ladder of its own: every cell carries that country’s reform verdict and IC action from the same classifier the Reform Risk tab and the Country Profile sidebar use, so the three surfaces cannot give you three different premiums for one country. A muted row with a red ! means the diamond count is NOT the verdict there — either the last take rise predates the 2010 window, or it falls inside the window and the count never reads how large it was (Russia 2022, +15pp, is a 4-diamond row). An n/c row carries no reform-frequency premium of zero; it carries no reading at all, and needs an external check before it goes to an IC. Hover any cell for that country’s IC action; click it for the full Reform Risk panel.">Show Stability ⓘ</label>
     </div>
   </div>
 
@@ -32759,14 +32759,37 @@ function renderFCResults(results, price) {
         return e.take_change && String(e.take_change).charAt(0) === '+';
       }).sort(function(a, b) { return (b.year || 0) - (a.year || 0); });
       var lh = hostile.length ? hostile[0] : null;
+      // ── v556 (T4): the verdict comes from _rrClassify, not from a second copy of the rules ──
+      // Until now this cell re-derived its own flag: stale = last take rise predates 2010.
+      // That test is neither the same as, nor a subset of, the classification the Reform Risk
+      // tab and the Country Profile sidebar both run (_rrClassify, unified in v550). Measured
+      // against the live data, the two disagreed on 10 of the 21 scoreable jurisdictions:
+      //   Russia   FC GREEN ◆◆◆◆◇  |  RR "take was raised inside the window — 2022 windfall
+      //                                 tax +15pp — not a zero-premium jurisdiction"
+      //   Ecuador  FC GREEN ◆◆◆◆◇  |  RR in-window rise +5pp
+      //   Norway   FC AMBER ◆◆◆◇◇  |  RR in-window rise +12pp
+      //   Indonesia FC AMBER        |  RR in-window rise +9pp
+      //   UK/Australia/Brazil/Guyana rendered with no flag at all  |  RR "Actively Reforming"
+      //   Angola/Libya  FC GREY + red !  |  RR green, no premium indicated (their score is NOT
+      //                                 a window artefact — both carry 2 counted in-window changes)
+      // The in-window-rise class is the one this cell never had: v540 added it to _rrClassify
+      // after finding that a count-based score is blind to magnitude, and Fiscal Compare — the
+      // surface where the screening decision is actually made — kept running the v520 rules.
+      var v = (typeof _rrClassify === 'function') ? _rrClassify(c) : null;
+      var _earned = !v || v.icColor === 'var(--green)';
       stabilityInfo[c] = {
         score: Math.max(0, 5 - n),
         since2010: n,
         first: events.reduce(function(m, e) { return Math.min(m, e.year || 9999); }, 9999),
         total: events.length,
         lastHostile: lh,
-        // clean solely because the last take-raising event predates the scoring window
-        stale: !!(lh && (lh.year || 0) < 2010)
+        verdict: v,
+        // The diamond count carries the verdict only where _rrClassify agrees it does.
+        // "Actively Reforming" is earned by the count itself (3+ changes → few diamonds), so it
+        // keeps its ramp. The two classes the count CANNOT express — a rupture before the window
+        // opened, and a rupture inside it whose size the count never reads — are muted and marked.
+        countIsVerdict: _earned || v.icLabel.indexOf('Actively Reforming') !== -1,
+        muted: !!(v && v.icColor !== 'var(--green)' && v.icLabel.indexOf('Actively Reforming') === -1)
       };
     });
   }
@@ -32797,9 +32820,12 @@ function renderFCResults(results, price) {
 
     var score = info.score;
     var lh = info.lastHostile;
-    // State 2 — scored, but clean only because the window starts in 2010. Not green.
-    // State 3 — scored on events inside the window.
-    var color = info.stale
+    var v = info.verdict;
+    // State 2 — the diamond count is not the verdict: either the rupture predates the window,
+    //           or it sits inside the window and the count never reads how large it was.
+    //           Muted, marked, and the cell states the reform verdict's own IC action.
+    // State 3 — the count is the verdict. Colour ramp survives.
+    var color = info.muted
       ? 'var(--muted)'
       : (score >= 4 ? '#15803D' : score >= 3 ? '#A16207' : score >= 2 ? '#C2410C' : '#B91C1C');
     var filled = '', empty = '';
@@ -32809,19 +32835,24 @@ function renderFCResults(results, price) {
     var t = country + ' — ' + score + '/5. ' + info.since2010 + ' sourced fiscal law change'
       + (info.since2010 === 1 ? '' : 's') + ' since 2010, ' + info.total + ' on record since '
       + (info.first < 9999 ? info.first : 'n/a') + '. ';
-    if (info.stale) {
-      t += 'FLAGGED: this score is clean only because the scoring window starts in 2010. The last '
-        + 'take-raising event on record is ' + lh.year + ' — ' + lh.event + ' (' + lh.take_change
-        + ') — which falls outside the window and is therefore not counted. Do not read this as a '
-        + 'stable-regime finding. ';
-    } else if (lh) {
+    if (info.muted) {
+      t += 'FLAGGED — the diamond count is not the verdict for this country. ';
+    }
+    if (lh) {
       t += 'Last take-raising event ' + lh.year + ' — ' + lh.event + ' (' + lh.take_change + '). ';
     } else {
       t += 'No take-raising event on record. ';
     }
+    // v556: one IC action per country, taken from the same classifier the Reform Risk tab and the
+    // Country Profile sidebar render. This cell no longer states a premium ladder of its own.
+    if (v && v.icLabel && v.icRule) {
+      t += v.icLabel.replace(/^IC action\s*—\s*/, 'Reform verdict: ').replace(/^IC action$/, 'Reform verdict: no premium indicated')
+        + '. ' + v.icRule.replace(/<[^>]+>/g, '').replace(/&[a-z]+;/g, function(e){
+            return e === '&ndash;' ? '–' : e === '&mdash;' ? '—' : e === '&rsquo;' ? '\u2019' : ' '; }) + ' ';
+    }
     t += 'Click to open the full event log on the Reform Risk tab.';
 
-    var mark = info.stale
+    var mark = info.muted
       ? '<span style="color:var(--red);font-size:10px;font-weight:800;margin-left:3px;">!</span>'
       : '';
     return btnOpen + 'title="' + t.replace(/"/g, '&quot;') + '">'
