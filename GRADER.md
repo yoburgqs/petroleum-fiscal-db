@@ -17852,3 +17852,121 @@ Breakeven ($/bbl)    Norway —    United Kingdom —    Netherlands <$50
 ```
 
 That reads as "the Netherlands is the 
+
+---
+## Cycle 462 Log — 2026-08-28
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (WARN = pre-existing local-harness sw.js 404)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Playwright RAN this cycle against the local build. Page errors: 0 on every walk.
+- Shipped: `7708c75` (v563). Mirror byte-identical to source. Pushed to origin/main.
+
+## Cycle 462 — Task T6
+
+**Task.** T6 — "Where did this number come from and how solid is the evidence?"
+(least-recently-used: 456 was T6, 457 T5, 458 T2, 459 T1, 460 T4, 461 T3.)
+
+**Friction — Fiscal Compare, cold load, above the fold.**
+
+Walked cold (fresh browser context, `sessionStorage` and `localStorage` cleared)
+into *Fiscal Compare* and started from the **Quality** column — the tab's only
+provenance signal — asking what the letter actually governs.
+
+Counted off the live DOM: **120 of the 185 rows carry `termsBasis === 'default'`**,
+and **119 of those print an identical `22.2%` take and an identical `$4.3B` NPV** —
+the standard Concession default, which used none of those countries' fiscal facts.
+The table is sorted on that column, so all 120 sat at the **top**, every one shown
+as **`=1`**.
+
+Consequences, all on the landing tab:
+
+| Surface | What it said | What was true |
+|---|---|---|
+| `#` rank, rows 1–120 | `=1` | one shared constant, 120 times |
+| "Investible tier ends (≤40%)" band | 120 countries | 1 on its own terms (USA) |
+| Stats strip | **◆ 120 investible (take ≤40%)** | 1 |
+| Stats strip | **Median take: 22.2%** | the generic constant itself |
+| Stats strip | **Min take: 22.2% (Ireland)** | a country ORCA holds no terms for |
+| Stats strip | **Best BE: $1/bbl (Bahrain)** | the `0<v≤1` DCF floor artifact, on a state monopoly |
+| **Load Top 5 in Side-by-Side** | Ireland, Tunisia, **Venezuela**, Brunei, UAE — Dubai | Venezuela's citable take is **74.9%** |
+| Green top-10 / red bottom-10 | absent | suppressed by the 120-way tie, so no scan signal existed |
+
+The disclosure existed and was correctly worded — a grey **G** badge (v505), the
+`=1` shared rank, a `tfoot` footnote stating their order *"is not a ranking"*. But
+the footnote sits **188 rows below** the block it describes, and none of it changed
+*where those rows sat*. **The evidence grade was a badge that governed nothing.**
+This is the open item **v547** named for "the next cycle on this surface" — 16
+cycles ago.
+
+**Change — behaviour and layout, not wording.**
+
+1. Generic-default rows are **partitioned to the bottom** on every numeric sort
+   (take / NPV / breakeven / swing), applied *after* the sort and *after* the
+   Reverse toggle so they land there in both directions. A–Z is untouched.
+2. They carry **no rank number** — an em dash, not `=1` — with a tooltip naming
+   the mechanic default and routing to the citable column.
+3. A **boundary divider** states the split in place: *"End of the ranking (65
+   countries modelled on their own terms) — 120 generic-default rows below"*, with
+   the reason and a pointer to **Take% db · citable**.
+4. `_tieVal()` returns null for generic rows so they cannot form a tie group with
+   a ranked country — Australia's own-terms 42.2% had collided with the generic
+   PRRT default of 42.20 and rendered `=2`.
+5. **Top-10 green and bottom-10 red work again** — both were suppressed by the
+   120-way tie, and "bottom 10" is now measured inside the ranked block.
+6. Every take statistic in the strip — avg, median, min, max, investible count —
+   is computed over own-terms rows only and says so on screen.
+7. **Second live defect on the same strip:** `Best BE` filtered `be_75 > 0`,
+   admitting the `0 < v ≤ 1` DCF floor artifact that `_beIsTested()` and
+   `formatBreakeven()` both reject. Now $27/bbl (Netherlands).
+8. Threshold dividers suppressed at row 0 (flag still set, so they cannot fire
+   late) — with the generic block gone the first ranked row can already be past a
+   threshold, and filtered to Africa "Investible tier ends" rendered above row 1.
+9. The partition travels inside `⎘ Copy for IC Memo`.
+
+**No threshold was invented, no data file was regenerated, and no row or column
+was removed from the table.**
+
+**Result.** Fiscal Compare now opens on **USA (1), Australia (2), United Kingdom
+(3), China (4), Nigeria (5)** — every one modelled on its own fiscal terms —
+instead of on 120 interchangeable rows tied at a constant. "Load Top 5" loads
+those same five. The analyst reading top-down reaches the countries ORCA actually
+models immediately instead of scrolling past 120 rows to a footnote. The Quality
+column now governs position, not just a badge.
+
+**Verified cold in Playwright** against the local build, storage cleared: ranks
+1–65, then the divider, then 117 em dashes and 3 `n/c` monopolies; green/red
+markers on the correct ten rows at each end; all four numeric sorts plus A–Z plus
+Reverse; the Africa chip (29 ranked / 20 generic, strip reading "◆ 0 investible
+on own terms"); the clipboard read back as **192 lines** with ranks 1–65, em
+dashes below and the new warning sentence; Load Top 5 seating the five ranked
+countries in Side-by-Side.
+
+**Found on this walk, not fixed — stated rather than hidden.**
+
+1. The Country Profile **Key Fiscal Parameters — Evidence Chain** table prints the
+   raw internal tokens `EY_IHS_BulkHarvest_2025` / `EY_KPMG_CIT_Guide_2025` as if
+   they were cited sources, links them to `taxsummaries.pwc.com` (a third firm's
+   index of every country, not a citation for the parameter), and **counts them in
+   the "✓ All N sourced parameters match" verdict** — **46 rows across 35
+   countries**, including Nigeria, Russia, Saudi Arabia, the UK, Indonesia and the
+   Netherlands (where 1 of the 2 "matching" parameters is bulk). This is exactly
+   the defect **v518** fixed in the *Evidence Quality* panel four inches above,
+   never applied to the per-parameter table. Next cycle on this surface.
+2. "Project viable: 183 of 185" and the swing statistics still pool the generic
+   block. Only the take statistics were corrected this cycle.
+3. `formatBreakeven()` on Fiscal Compare, Country Profile and the Breakeven Map is
+   unchanged and still carries the v562 defect — still the largest open item.
+
+**STILL LOCKED — nothing touched.** No new FAQ. No new tooltip on any control
+whose behaviour did not change — every tooltip edited here belongs to a cell, chip
+or button this cycle changed. No page-sub paragraph, no amber instructional
+banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible
+Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown. Tab order unchanged. CP headline still two-zone with tier-coloured
+take%, global rank and vs-median pill. Govt NPV still removed from Fiscal Compare
+and Side-by-Side; the v562 Breakeven row still removed from Side-by-Side.
+v371/v373, v430, v449, v451, v452, v489, **v505 G badge**, v508, v512, v513, v515,
+v516, v522, v529, v530, v531, v533, v534, v536, v537, v539, v540, v547, v549,
+v551, v552, v555 and v557–v562 all intact. Version sweep v562→v563 done silently
+at the end across 5 structural locations; it is not the improvement.
