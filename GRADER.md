@@ -17209,3 +17209,109 @@ structural locations and is **not** claimed as the improvement.
 Walked cold from the Home quickstart's own Step 4 ("before finalizing any IC memo, open Reform Risk") into Fiscal Compare, where the screening decision actually gets made.
 
 The FC Stability cell re-derived its own flag — `stale = last take rise predates 2010` — instead of calling `_rrClassify()`, the 
+
+---
+## Cycle 456 Log — 2026-08-28 12:00
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (local build) — suite RAN this cycle
+- JS errors: 0
+- Version: v556 → v557 (5 structural locations, swept silently at the end, not the improvement)
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"**
+(rotation: 455=T4, 454=T3, 453=T1, 452=T5, 451=T2, 450=T6)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — into **Explorer**,
+the browse surface where an analyst scans evidence across all 185 countries at once.
+
+**1. The Evidence column was a composition bar and nothing else.** A stacked A/B/C/D bar answers
+*what mix of sources*; it cannot answer *how much*. A country whose entire fiscal record is four
+facts read out of one model petroleum act rendered a **solid 100% green bar** — the strongest
+evidence signal available in the table — pixel-identical to a country with four thousand
+primary-law facts. `getEvidenceBar()` (index.html ~22400) read only `a_pct/b_pct/c_pct/d_pct`;
+the header at index.html:1984 said "Evidence quality: % of fiscal facts backed by primary (A) or
+verified (B) sources".
+
+Measured against the shipped `country_data.json`:
+- **31 countries render `a_pct >= 95`, and the MEDIAN fact count among them is 4.**
+- **23 of those 31 hold fewer than 15 facts** and are graded **D** by `_evidenceGrade()` — the
+  platform's own two-legged test (primary-law share AND fact depth) that has driven the Fiscal
+  Compare *Quality* column, the Country Profile badge and the Side-by-Side *Evidence tier* row
+  since v551. This column never called it.
+- Across all 185 countries the two graders **disagreed on 156**, and **67 countries showed a green
+  HIGH dot beside a real grade of C or D** — Russia (98.3% A/B, 3.8% primary law), Nigeria,
+  Saudi Arabia, Kazakhstan, Venezuela, Oman, Thailand, Pakistan, Ghana, Bolivia, Trinidad, PNG.
+- It landed on **the rows read first**. Explorer's cold default sort is lowest government take, so
+  row 1 is **Vanuatu — 5.0% take, 14 facts, grade D** and row 2 is **Bahamas — 10.0%, 8 facts,
+  grade D**, both under a full-width green bar. The Screener's own "Rank verified-production
+  countries first" tooltip already names Vanuatu / Bahamas / Montenegro as the trap.
+
+**2. Found on the same walk: clicking the Evidence column header did nothing.**
+`setExplorerSort(key)` works by writing the key into `<select id="flt-sort">` — and that select had
+**no `evidence` option**. Assigning an absent value to a `<select>` sets it to `""`, so the click
+sorted by the **default case (Govt Take)**, left `aria-sort="none"` and no `sort-asc` class, and
+**blanked the visible Sort dropdown**. Measured cold: value `"take"` → `""` on click, row order
+unchanged. The header is `tabindex="0" role="columnheader"` and its title reads *"Sort: weakest
+first"*. The one control built to answer this task's question had been silently failing —
+the same class of defect as the v460 screener-preset button.
+
+## Change
+1. `getEvidenceBar()` **leads with the grade letter** from `_evidenceGrade()` and **states the fact
+   count** it was computed over, coloured on the depth thresholds (<15 red, <50 orange). Vanuatu
+   now reads `D ▇ 14 facts`, not a green bar.
+2. `getEvidenceDot()` and `makeTakeCellWithEvidence()` colour off the same grade.
+3. The Country Profile **Evidence Quality pill** stops rendering *"3.8% primary law"* in green for
+   Russia — it is now red, the colour of the grade it reports.
+4. The Explorer `evidence` **sort key** sorts on grade rank → primary-law share → fact depth. It
+   sorted on `ab_pct`, which puts 171 of 185 at grade A — a ceiling, so "weakest first" returned
+   an arbitrary slice.
+5. **`<option value="evidence">` added to `#flt-sort`**, so the header click and the dropdown share
+   one source of truth and both work.
+6. **`getEvidenceColor()` is DELETED, not orphaned.** It was the last grader on the platform still
+   scoring evidence as `a_pct + b_pct`. `_evidenceGrade()` is now the only evidence grader, so a
+   fifth surface cannot regrow off `ab_pct`.
+7. Both Evidence column header tooltips (Explorer and Screener) state the actual two-legged basis.
+
+## Result
+An analyst scanning **Explorer or the Screener** now reads the **same evidence grade** the Fiscal
+Compare *Quality* column, the Country Profile badge and the Side-by-Side *Evidence tier* row give —
+**0 mismatches across all 185 countries** — and reads the **fact count next to it**, so 100%
+primary law on 4 facts can no longer present as the best-evidenced row on the page. Sorting the
+Evidence column weakest-first now returns actual weak countries instead of silently doing nothing.
+
+## Verification — cold, storage cleared, against the local build
+- **Explorer cold default sort:** Vanuatu `D · 14 facts`, Bahamas `D · 8 facts` — both with red
+  take-cell dots; Montenegro `C · 30`; Greenland `B · 62`; Faroe Islands `B · 98`.
+- **Reconciliation:** Explorer bar letter vs `_evidenceGrade()` across all 185 countries —
+  **0 mismatches**. Distribution **A 28 / B 79 / C 43 / D 35**.
+- **Evidence header click:** `flt-sort` `"take"` → `"evidence"`, `aria-sort` `none` → `ascending`,
+  class `num` → `num sort-asc`, row order changes. Weakest-first returns UAE—Abu Dhabi (D/36),
+  Paraguay (D/74), Iraq-Kurdistan (D/166), Somalia (D/246), Russia (D/3,929), Iraq (D/3,577).
+- **Country Profile, Russia:** pill `3.8% primary law (tier A)` now `#B91C1C` (was `#15803D`).
+- **Screener Evidence column:** Canada `A · 1,758` · USA `B · 125,336` · Azerbaijan `B · 1,194` ·
+  Mexico `C · 3,468`.
+- **0 page errors on every walk.** JS syntax gate **PASS** (9 blocks / 0 errors).
+- `runtime_comprehensive.js` **ran this cycle** against the local build: **135 PASS / 0 FAIL /
+  1 WARN** — the WARN is the pre-existing local-harness service-worker 404 (`sw.js` registers the
+  GitHub Pages subpath, which 404s on a root-served local server). The same suite against the
+  deployed page returned 136 PASS / 0 FAIL / 0 WARN pre-push.
+
+## Deliberately NOT done — stated rather than hidden
+1. **`buildEvidenceTooltip()` still opens with the raw A/B/C/D composition** and does not carry the
+   grade letter. It is the hover text on the take cell, a secondary surface, and rewriting it would
+   duplicate `_evidenceGradeWhy()`. Left alone rather than half-merged.
+2. **The `_bulkPct()` floor is still computed from the top three sources only** and is presented as
+   "N%+ bulk-harvested". The true share is unknown without a full source join; that is a pipeline
+   question, not a rendering defect.
+3. **The Explorer table still heads its Fiscal Predictability column "Stability"** — the same word
+   Fiscal Compare uses for reform frequency. Carried over from cycle 455, still its own cycle.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on a pre-existing control — the two rewritten belong to
+the exact columns whose grading behaviour changed. No page-sub paragraph, no amber instructional
+banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row.
+Screener advanced filters still collapsed, presets still a dropdown. Tab order unchanged. CP
+headline still two-zone with tier-coloured take%, global rank and vs-median pill. Govt NPV still
+REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v502, v508,
+v511, v514, v518, v520, v532, v540, v544, v550, v551, v555 and v556 all intact.
