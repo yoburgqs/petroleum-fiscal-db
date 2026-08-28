@@ -17733,3 +17733,103 @@ Each of those rows carried its own contradiction **one cell to the right** — V
 
 ## Friction
 Cold load into the **Reform Risk** tab. The first ranked table on the page — *Most Frequently Reformed Regimes*, Section 1 of `renderReformRisk()` — had a column headed **"Stability Score"** coloured on a green ramp taken straight from `100 − 15 × (chang
+
+## Cycle 461 Log — 2026-08-28
+- Test before: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 136 PASS / 0 FAIL / 0 WARN / 0 JS errors (suite RAN this cycle, twice)
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Task: **T3** — "How do these three countries compare side by side?" (LRU: 455 T4, 456 T6, 457 T5, 458 T2, 459 T1, 460 T4)
+
+### Friction
+Cold load (fresh browser context, no `sessionStorage`, no `localStorage`) into
+**Side-by-Side**, which auto-seeds the North Sea Trio. Read the *Economics*
+block bottom-up. It closed on:
+
+    Breakeven ($/bbl)     Norway —     United Kingdom —     Netherlands <$50
+
+which reads as *"the Netherlands is the only one of these three that clears its
+costs below $50"* — a fourth apparent win handed to the one column the orange
+proxy block **directly beneath the same grid** says holds no verified field
+production at all (278 facts, 0% coverage, against Norway's 63,848 at 18.2%).
+Row was defined in the shared `rows` array in `renderCompare()`, so it also rode
+into `#cmp-data-table` and both clipboard flavours.
+
+Four defects, none fixable by re-wording:
+
+| # | Defect | Evidence |
+|---|---|---|
+| 1 | **Two possible values across 185 countries** | `formatBreakeven()` collapses every value `< 50` to the literal string `<$50`; all **65** populated breakevens in `country_data.json` fall in **$27–$34**. Rendered outputs: `<$50` (65 countries), `—` (120). A row with two states cannot rank three columns. |
+| 2 | **Tooltip advertised unreachable bands** | It offered "$50–$80 = viable at base case" and ">$80 = requires elevated price". No country has `be_75 >= 50` — two of three decision bands impossible, the third universal. |
+| 3 | **The dash was mislabelled** | Tooltip said "insufficient cost data". `rebuild_country_data.py` builds it as `AVG(breakeven_price_usd WHERE >0 AND <999)`, so `—` means every contract returned a value *outside* the modelled band. Norway's 7,643 and the UK's 4,211 contracts are not missing cost data. |
+| 4 | **Stale — the engine no longer reproduces it** | At the four published prices, `dcf_results.breakeven_price_usd` is populated for **362 of 71,576** rows at $75 (0.5%), of which **44** are usable → **5 countries**: Malaysia $51, Angola $58, Egypt $60, Saudi Arabia $62, Indonesia $88. **None of the five is among the 65 the row printed**; four render `—`. At every *non-published* price (30/40/60/65/70/80/90/110…) the column is 100% populated. |
+
+Defect 4 is the documented **"breakeven regression risk"** that bars re-running
+`rebuild_country_data.py` — so regenerating the data was not an option, and
+printing the raw `$27`/`$34` values would have given false precision to stale
+figures (63 of the 65 are zero-production proxy countries).
+
+### Change
+1. **The `Breakeven ($/bbl)` row is REMOVED** from Side-by-Side — and therefore
+   from `#cmp-data-table` and both clipboard flavours. Fourth deletion on the
+   v451 (Govt NPV off Fiscal Compare) / v515 (fake IRR off this table) / v555
+   (derived Govt NPV) principle: removing an undefendable number at the decision
+   point *is* the improvement.
+2. **The note under the grid says where it went**, carrying the two-states,
+   unreachable-bands, mislabelled-dash and 44-of-71,576 evidence, and routes the
+   downside question to **Contractor NPV @$50** — same question, same
+   standardized profile, **185/185 covered**.
+3. **The clipboard assumption line** promised "breakeven at $75/bbl" and no
+   longer delivers one. It now states the omission and its reason *inside the
+   pasted artifact*, where an analyst asked "where is breakeven?" in the IC room
+   needs it.
+4. **Three dangling references corrected** — the *NPV weighting* header tooltip
+   and per-cell tooltip, and the visible "Govt Take and Contractor NPV rank
+   these columns in opposite orders" block, all of which still read "the NPV and
+   Breakeven rows".
+
+**No threshold was invented. No data file was regenerated.**
+
+### Result
+An analyst comparing three countries no longer reads a low-price advantage off a
+row that had two possible values, stale numbers, and an empty state labelled as
+the opposite of what it meant. The downside comparison now runs on **Contractor
+NPV @$50**, which is populated for every column and on the same profile — so all
+three columns can actually be ranked on it, which the removed row never allowed.
+
+### Verification
+Playwright, cold, against a local build: row absent from the grid and from the
+export table at **2-, 3- and 5-country sets** (including a fee-basis column,
+Iraq); clipboard TSV carries no `<$50` data cell; the four quickstart presets
+still load their full sets after Clear; 0 page errors on every walk. Full suite
+run twice this cycle: **136 PASS / 0 FAIL / 0 WARN**. JS syntax gate **PASS**
+(9 blocks / 0 errors).
+
+### Deliberately NOT done — stated rather than hidden
+1. **Fiscal Compare, Country Profile and the whole Breakeven Map tab still
+   render this same figure.** `formatBreakeven()` was left untouched on purpose —
+   those surfaces are outside this cycle's task, and correcting them properly
+   means recomputing `breakeven_price_usd` at the four published prices, a
+   data-pipeline change, not a UI edit. This is the largest open item on the
+   platform as of this cycle.
+2. **The Fiscal Predictability Score still renders green HIGH for one-term
+   regimes.** On the cold default set the Netherlands (a 278-fact proxy) scores
+   84 · HIGH and the UK (4,211 contracts, a real 15.0pp measured spread) scores
+   58 · LOW — the score rewards ORCA holding too few contracts to see
+   disagreement. The basis chip ("one term") is on screen since v536 and the
+   tooltip states it outright, but the colour still says otherwise. Same defect
+   class as cycle 460's Reform Risk fix; not repeated this cycle.
+3. **Methodology `#cite-copy-btn` hard-coded version and contract count** —
+   carried from cycle 457, still open.
+
+### STILL LOCKED — nothing touched
+No new FAQ (908 `faq-item` nodes, unchanged). No new tooltip — one tooltip was
+*deleted* with its row and three were *corrected* to stop referring to it; none
+added. No page-sub paragraph, no amber instructional banner, no routing hint, no
+"How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener
+advanced filters still collapsed, presets still a dropdown. Tab order unchanged.
+CP headline still two-zone with tier-coloured take%, global rank and vs-median
+pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-Side. v371/v373,
+v430, v449, v451, v452, v489, v508, v512, v515, v516, v522, v530, v531, v534,
+v536, v539, v540, v549, v552, v555, v557, v558, v559, v560 and v561 all intact.
+Version sweep v561→v562 done silently at the end across 5 structural locations;
+it is not the improvement.
