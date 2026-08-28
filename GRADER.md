@@ -17458,3 +17458,122 @@ v550, v551, v555, v556 and v557 all intact.
 Walked cold into the Screener, loaded the IOC Capital Screen preset (15 of 185), clicked **⬇ CSV**, and read the downloaded file back instead of trusting the button.
 
 The file was a bare header row and 15 data rows. No caption, no assumptions, no price deck,
+
+---
+## Cycle 458 Log — 2026-08-28 (v559)
+- Test before: 135 PASS / 0 FAIL / 0 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (pre-existing local-harness service-worker 404)
+- JS errors: 0
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Playwright: RAN this cycle against the local build (not carried forward)
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(rotation: 457=T5, 456=T6, 455=T4, 454=T3, 453=T1, 452=T5, 451=T2 — T2 was the least recent)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — into
+**Country Profile**, which auto-loads Norway.
+
+`COUNTRY_DATA.p25_take === p75_take` on **135 of 185** countries, and the profile read that
+equality as a positive finding in **three places at once**:
+
+1. **Headline badge** (`_cpSpread`, above the fold) — `Contract take: single term · 67.3%`,
+   tooltip: *"Every one of 7,643 contracts in Norway prices to the same government take (67.3%
+   at $75/bbl). This is a statutory single-term regime — **block selection does not change your
+   fiscal outcome here**."*
+2. **Contract Distribution panel** — *"Contracts are tightly clustered (low dispersion)"* over a
+   **zero-width IQR band** with the P25 and P75 markers stacked on the same point.
+3. **Fiscal Predictability** — `getFiscalPredictabilityScore()` charged the IQR term (its largest,
+   worth up to −40) exactly **zero**, and `renderStabilityBadge()` labelled the result
+   `76 · HIGH  one term`.
+
+**Four sections below that claim, the same page prints its own contract table**, fetched by
+`fetchCountryContracts()` from `api/v1/country/<slug>.json`. Read back against all 185 profiles,
+that table **refutes the claim outright on 41 of the 135**:
+
+| country | bundled claim | own contract sample | spread |
+|---|---|---|---|
+| Uzbekistan | every contract 82.4% | 26.6–82.4% | 55.8pp |
+| Angola | every contract 54.1% | 30.0–75.2% | 45.2pp |
+| Colombia | every contract 32.7% | 8.0–47.4% | 39.4pp |
+| Indonesia | every contract 59.6% | 42.5–79.7% | 37.2pp |
+| Netherlands | every contract 22.9% | 22.9–53.7% | 30.8pp |
+| **Norway** (the cold default) | every contract 67.3% | **51.1–80.7%**, 14 distinct values | **29.6pp** |
+| …35 more | | | |
+
+On Norway the counterexamples are **printed on the same screen**: Ekofisk PL018 at **51.1%** and
+NOR PL093 at **80.7%** are both rows in the contract table, directly beneath the sentence saying
+they cannot differ. This is the T2 decision point — *"block selection does not change your fiscal
+outcome here"* is an IC-quotable sentence, and on these 41 countries the platform's own evidence
+disproves it.
+
+## Change
+The claim is **withdrawn where the page's own evidence contradicts it**, and **corroborated where
+it holds**.
+
+- `cpRecordObsSpread()` records min / max / spread / distinct-count off the contract rows the table
+  already renders, cached per country.
+- `cpSpreadParts()` and `cpDistNote()` are **single builders** shared by the synchronous render path
+  and by `_cpApplyObsSpread()`, so first paint and post-fetch patch cannot drift, and a returning
+  analyst hitting the cache never sees the refuted claim paint and then correct.
+- **Where the sample refutes** — badge reads `Contract take: 51.1–80.7% observed (≥29.6pp) ⚠` in
+  orange; the distribution caption leads with the conflict; a **dashed observed-range band** is
+  drawn across the bar that previously rendered nothing at all, with a labelled min–max line
+  beneath it; the predictability basis chip changes from `one term` to `≥29.6pp obs` and gains
+  **UPPER BOUND** in its tooltip.
+- **Where the sample agrees** (94 countries) — the badge gains a **✓** and the tooltip states the
+  check was run and held. Denmark, Guyana and Vanuatu now assert single-term status on
+  corroborated rather than merely bundled grounds.
+
+**Nothing is overwritten and nothing is rescored.** `p25_take`/`p75_take` are untouched and still
+displayed; the predictability score is not recomputed. A top-N-by-production sample cannot
+*establish* a population IQR — but one counterexample *refutes* a universal claim, and every
+observed figure is labelled a **floor** on the true spread, not a measurement of it. The 1pp
+refutation bar is not an invented business threshold: it is one tenth of the smallest step in the
+platform's own take colour bands, and all 41 conflicts clear it by more than 11×.
+
+## Result
+An analyst asking whether a country is attractive at $75/bbl is no longer told the block does not
+matter when the platform's own contract table shows it moves government take by up to 55.8pp — and
+can see the range, the counterexample rows and the corrected predictability basis in one scroll.
+Where the terms genuinely are single-term, that now reads as a check that was run and passed rather
+than an assertion nobody tested.
+
+## Verification — cold, storage cleared, against the local build
+- **11 profiles, every branch exercised:** conflict (Norway, Angola, Uzbekistan, Indonesia,
+  Colombia, Netherlands), corroborated (Denmark, Guyana, Vanuatu), bundled-spread unchanged (Iraq
+  `65.0–98.5% (33.5pp)`, Brazil `50.4–68.2% (17.8pp)`), state monopoly (Saudi Arabia — no badge),
+  not scored (Nauru — no badge).
+- **Predictability patch:** Norway and Angola show `≥29.6pp obs` / `≥45.2pp obs` on **both** CP
+  badge slots with UPPER BOUND in the tooltip; Denmark/Saudi Arabia keep `one term`; Iraq keeps
+  `33.5pp`. Other tabs untouched.
+- **Cached revisit:** switching away to Denmark and back to Norway renders
+  `Contract take: 51.1–80.7% observed (≥29.6pp) ⚠` at **120ms, before the fetch** — no flash of the
+  refuted claim.
+- **0 page errors on every walk.** JS syntax gate **PASS** (9 blocks / 0 errors).
+- `runtime_comprehensive.js` **ran this cycle**: **135 PASS / 0 FAIL / 1 WARN** — the WARN is the
+  pre-existing local-harness service-worker 404 (`sw.js` registers the GitHub Pages subpath, which
+  404s on a root-served local server).
+
+## Deliberately NOT done — stated rather than hidden
+1. **Side-by-Side, Explorer and Fiscal Compare still render the unreconciled `one term` basis chip.**
+   The reconciliation needs the per-country API sample and those tabs do not fetch it. Own cycle.
+2. **The Methodology `#cite-copy-btn` hard-coded version and contract count** — carried over from
+   cycle 457, still open.
+3. **The predictability score itself is not recomputed** for the 41. Whether a composite whose
+   largest term is inert for 157 of 185 countries should exist in this form is a modelling
+   question, not a UI one, and is not decided here.
+4. **`stabBar` in `loadCountryProfile()` is still dead code** — built, never inserted into the DOM,
+   as v536 recorded. Ids were briefly added to it this cycle and backed out once the live badge was
+   identified as `renderStabilityBadge()`.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on any control whose behaviour did not change — the
+rewritten tooltips are on the exact elements whose rendering changed. No page-sub paragraph, no
+amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown.
+Tab order unchanged. CP headline still two-zone with tier-coloured take%, global rank and
+vs-median pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430,
+v449, v451, v452, v489, v512, v516, v522, v534, v536, v552, v557 and v558 all intact.
+Version sweep done silently at the end across 5 structural locations; it is not the improvement.
