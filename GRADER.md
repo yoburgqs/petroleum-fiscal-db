@@ -17443,3 +17443,18 @@ Tab order unchanged. CP headline still two-zone with tier-coloured take%, global
 vs-median pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430,
 v449, v451, v452, v489, v502, v508, v511, v514, v518, v520, v532, **v536**, v540, v541, v544,
 v550, v551, v555, v556 and v557 all intact.
+
+---
+## Cycle 457 Log — 2026-08-28 13:00
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 457 complete — v558 shipped, pushed, mirrored, and confirmed live on the deployed page.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (rotation: 456=T6, 455=T4, 454=T3, 453=T1, 452=T5, 451=T2)
+
+## Friction
+Walked cold into the Screener, loaded the IOC Capital Screen preset (15 of 185), clicked **⬇ CSV**, and read the downloaded file back instead of trusting the button.
+
+The file was a bare header row and 15 data rows. No caption, no assumptions, no price deck,
