@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v556.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v557.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v556</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v557</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1361,7 +1361,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v556</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v557</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v556</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v557</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1491,7 +1491,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v556).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v557).</div>
     <!-- v465: Live investible universe stat — populated after country_data.json loads -->
     <div id="home-hurdle-stat" style="display:none;margin-top:8px;font-size:12px;color:var(--green);font-weight:600;" aria-live="polite"></div>
     <!-- v466: DB currency note — populated after country_data.json loads -->
@@ -1951,12 +1951,23 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     </div>
     <div class="ctrl-group">
       <label>Sort</label>
-      <select id="flt-sort" aria-label="Sort Explorer table by selected metric" title="Sort options: Govt Take = rank by fiscal burden (lower = more contractor-favorable); IRR = rank by project returns (higher = more profitable); NPV = rank by contractor net present value; Breakeven = rank by minimum oil price for positive NPV (lower = more resilient); Swing = rank by fiscal price-sensitivity (higher = more progressive regime); A-Z = alphabetical">
+      <select id="flt-sort" aria-label="Sort Explorer table by selected metric" title="Sort options: Govt Take = rank by fiscal burden (lower = more contractor-favorable); IRR = rank by project returns (higher = more profitable); NPV = rank by contractor net present value; Breakeven = rank by minimum oil price for positive NPV (lower = more resilient); Swing = rank by fiscal price-sensitivity (higher = more progressive regime); Evidence = rank by evidence grade, weakest first (grade, then primary-law share, then fact depth); A-Z = alphabetical">
         <option value="take">Govt Take</option>
         <option value="irr">IRR</option>
         <option value="npv">NPV</option>
         <option value="be">Breakeven</option>
         <option value="swing">Swing (pp)</option>
+        <!-- v557 (T6): the Evidence column header carries data-sort-key="evidence", tabindex="0",
+             role="columnheader" and the title "Sort: weakest first" -- but this <select> had no
+             matching <option>, and setExplorerSort() works by writing the key into it:
+                 document.getElementById('flt-sort').value = key; renderExplorer();
+             Assigning an absent value to a <select> sets it to "", so clicking the Evidence header
+             sorted by the DEFAULT case (Govt Take), left aria-sort="none" and no sort-asc class,
+             AND blanked the visible Sort dropdown. Measured cold: value "take" -> "" on click,
+             row order unchanged. The one control built to answer "how solid is the evidence?"
+             had been silently failing. Adding the option is the fix -- the select is the single
+             source of truth for the sort key, so header click and dropdown now agree. -->
+        <option value="evidence">Evidence (weakest first)</option>
         <option value="country">Country A-Z</option>
       </select>
     </div>
@@ -1981,7 +1992,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
           <th class="num">Contracts</th>
           <th>Mechanics</th>
           <th class="num" data-sort-key="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take as % of gross revenue at $75/bbl (royalties + taxes + profit oil — all instruments). Lower = better for investor. Sort: low→high.">Govt Take</th>
-          <th class="num" data-sort-key="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence quality: % of fiscal facts backed by primary (A) or verified (B) sources. Hover any row's take% for full breakdown. Sort: weakest first.">Evidence</th>
+          <th class="num" data-sort-key="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts the country&#39;s regime was built from. The grade is the worse of two legs: primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15) &mdash; so 100% primary law on 4 facts grades D, not A. Same grade as Fiscal Compare&#39;s Quality column. Sort: weakest grade first.">Evidence</th>
           <th class="num" title="Price sensitivity sparkline — mini line chart showing government take at $50, $75, $100, and $125/bbl (left to right). A steep upward slope = progressive regime (take rises sharply with price — common in profit-based PSCs and PRRT). A flat line = royalty-dominant (take barely changes with price). The highlighted dot marks the currently selected price scenario. Use 'Swing (pp)' column for the precise numeric value of this sensitivity.">Curve</th>
           <th class="num expl-mp-col" style="display:none">@$50</th>
           <th class="num expl-mp-col" style="display:none">@$100</th>
@@ -2218,7 +2229,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <thead>
         <tr>
           <th>#</th><th>Country</th><th>Region</th><th>Mechanics</th>
-          <th class="num" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take</th><th class="num" title="Evidence quality: % of fiscal facts backed by A/B sources. Click for breakdown.">Evidence</th>
+          <th class="num" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take</th><th class="num" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
           <th class="num" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV</th>
           <th class="num" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries.">NPV @$50 ($M)</th><th class="num">Breakeven ($/bbl)</th>
           <th class="num" title="Production Coverage — percentage of a country's contracts that have verified field-level production data. High Prod Cov (≥30%, green) means government take is production-weighted by actual output. Low coverage means equal-weighting across contracts, which can over-represent small or inactive blocks. Click 'Prod Data Only' in Explorer to filter to high-coverage countries only.">Prod Cov <span style="font-size:10px;cursor:help;">ⓘ</span></th><th class="num" title="Price Swing — government take at $125/bbl minus take at $50/bbl, in percentage points. Measures fiscal progressivity: how much more government captures at high prices vs. low prices. High swing (>20pp, red) = regime is highly price-progressive — contractor upside is capped. Low swing (<10pp, green) = stable fiscal terms across the price cycle. Useful for stress-testing IOC economics in oil price scenarios.">Swing (pp)</th><th title="Fiscal tier: classification of fiscal regime by government take level at $75/bbl. IF = Investor-Friendly (≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = NOC-dominated (>75%). Used for portfolio-level screening when comparing across diverse geographies.">Tier</th>
@@ -22383,33 +22394,72 @@ function fmtIrr(v) {
 // ─── Evidence Quality System ─────────────────────────────────────────────────
 // Returns colored confidence dot + mini bar for use anywhere in the UX.
 // ab_pct = % of facts that are A or B confidence (primary or verified sources).
-function getEvidenceColor(abPct) {
-  if (abPct >= 80) return { color: '#15803D', label: 'HIGH',   grade: 'A' };
-  if (abPct >= 60) return { color: '#A16207', label: 'GOOD',   grade: 'B' };
-  if (abPct >= 40) return { color: '#C2410C', label: 'MIXED',  grade: 'C' };
-  return             { color: '#B91C1C', label: 'WEAK',   grade: 'D' };
-}
+// v557 (T6): getEvidenceColor(ab_pct) is DELETED, not left dormant. It was the last grader on
+// the platform still scoring evidence as a_pct + b_pct, and tier B is 45.2% of the database and
+// is largely the EY / IHS / KPMG country-level bulk harvest -- so it returned HIGH/green for 171
+// of 185 countries, including Russia at 3.8% primary law. Its three remaining callers (the
+// Explorer take-cell dot, the Explorer/Screener Evidence bar, the Country Profile Evidence
+// Quality pill) now call _evidenceGrade(). The function is removed rather than orphaned so a
+// fifth surface cannot regrow off ab_pct: _evidenceGrade() is the only evidence grader left.
 
 function getEvidenceDot(entry) {
-  const ab = entry.ab_pct || 0;
-  const { color, label } = getEvidenceColor(ab);
+  // v557 (T6): was getEvidenceColor(entry.ab_pct) -- green on 171 of 185 countries.
+  const color = _evidenceGrade(entry).color;
   const tt = buildEvidenceTooltip(entry);
   return `<span class="ev-dot" style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};vertical-align:middle;cursor:help;margin-left:4px;" title="${tt}"></span>`;
 }
 
+// ── v557 (T6): the Explorer / Screener "Evidence" column was a composition bar and nothing else ──
+// A stacked A/B/C/D bar answers "what MIX of sources" and cannot answer "how MUCH". A country
+// whose entire fiscal record is four facts read out of one model petroleum act rendered a SOLID
+// 100% green bar -- the strongest evidence signal available in the table -- pixel-identical to a
+// country with four thousand primary-law facts. Measured against the shipped country_data.json:
+//   * 31 countries render a_pct >= 95. The MEDIAN fact count among them is 4.
+//   * 23 of those 31 hold fewer than 15 facts and are graded D by _evidenceGrade() -- the
+//     platform's own two-legged test (primary-law share AND fact depth) that has driven the
+//     Fiscal Compare Quality column, the Country Profile badge and the Side-by-Side Evidence
+//     tier row since v551. This column never called it.
+//   * It lands on the rows read FIRST. Explorer's cold default sort is lowest government take,
+//     and rows 1 and 2 are Vanuatu (5.0% take, 14 facts, grade D) and Bahamas (10.0%, 8 facts,
+//     grade D) -- both under a full-width green bar. The Screener's own "Rank verified-production
+//     countries first" tooltip already names Vanuatu / Bahamas / Montenegro as the trap.
+// The bar now LEADS with the same letter the other three surfaces show and states the fact count
+// it was computed over, so 100% primary law on 4 facts can no longer read as A-grade evidence.
 function getEvidenceBar(entry) {
-  // Stacked bar: A (green) | B (teal) | C (orange) | D (red)
   const a = entry.a_pct || 0;
   const b = entry.b_pct || 0;
   const c = entry.c_pct || 0;
   const d = entry.d_pct || 0;
-  return `<div style="display:flex;width:60px;height:8px;border-radius:3px;overflow:hidden;gap:1px;" title="Evidence: A:${a}% B:${b}% C:${c}% D:${d}%">
-    <div style="width:${a}%;background:var(--green);"></div>
-    <div style="width:${b}%;background:rgba(21,128,61,0.68);"></div>
-    <div style="width:${c}%;background:var(--orange);"></div>
-    <div style="width:${d}%;background:var(--red);"></div>
+  const g  = _evidenceGrade(entry);
+  const nf = g.nFacts || 0;
+  // Depth is the leg the old bar could not express, so it is coloured on its own thresholds --
+  // the same ones _evidenceGrade() uses: <15 facts is D-depth, <50 is C-depth.
+  const nfCol = nf < 15 ? 'var(--red)' : nf < 50 ? 'var(--orange)' : 'var(--muted)';
+  const tip = _evidenceGradeWhy(entry)
+    + ' Source mix — A ' + a.toFixed(0) + '% / B ' + b.toFixed(0) + '% / C ' + c.toFixed(0)
+    + '% / D ' + d.toFixed(0) + '%. Same grade as the Fiscal Compare Quality column, the Country'
+    + ' Profile badge and the Side-by-Side Evidence tier row.';
+  return `<div style="display:flex;align-items:center;justify-content:flex-end;gap:5px;cursor:help;" title="${tip.replace(/"/g,'&quot;')}">
+    <span style="color:${g.color};font-weight:700;font-size:11px;line-height:1;">${g.letter}</span>
+    <div style="display:flex;width:44px;height:8px;border-radius:3px;overflow:hidden;gap:1px;flex:none;">
+      <div style="width:${a}%;background:var(--green);"></div>
+      <div style="width:${b}%;background:rgba(21,128,61,0.68);"></div>
+      <div style="width:${c}%;background:var(--orange);"></div>
+      <div style="width:${d}%;background:var(--red);"></div>
+    </div>
+    <span style="font-size:9px;color:${nfCol};font-weight:${nf < 50 ? '700' : '400'};white-space:nowrap;">${nf.toLocaleString()} facts</span>
   </div>`;
 }
+
+// Weakest-first ordering for the Evidence column. It used to sort on ab_pct, which puts 171 of
+// 185 countries at grade A -- a ceiling, so "sort: weakest first" returned an arbitrary slice of
+// the database. Composite: grade rank, then primary-law share, then fact depth.
+function _evidenceSortVal(entry) {
+  const g = _evidenceGrade(entry);
+  const rank = { d: 0, c: 1, b: 2, a: 3 }[g.grade];
+  return rank * 1e10 + Math.round((g.aPct || 0) * 100) * 1e4 + Math.min(9999, g.nFacts || 0);
+}
+window._evidenceSortVal = _evidenceSortVal;
 
 // ── v551 (T6): the evidence grade letter, re-tiered onto what it claims to measure ──
 // It used to be `abPct >= 80 ? A : ...` where abPct = a_pct + b_pct. Tier B is 45.2% of all
@@ -22526,7 +22576,9 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
   const c = (entry.c_pct || 0).toFixed(1);
   const d = (entry.d_pct || 0).toFixed(1);
   const ab = (entry.ab_pct || 0).toFixed(1);
-  const { color, label } = getEvidenceColor(entry.ab_pct || 0);
+  // v557 (T6): the "X% primary law" pill was coloured by getEvidenceColor(ab_pct), so Russia
+  // rendered "3.8% primary law (tier A)" in full green. Coloured by the grade it is reporting.
+  const color = _evidenceGrade(entry).color;
   const _bulk = _bulkPct(entry);
   const srcs = (entry.top_sources || []);
   // v518 (T6) — a source row was rendered identically whether it was Norway's Petroleumsskatteloven
@@ -22623,8 +22675,10 @@ function makeTakeCellWithEvidence(take, entry) {
   if (take == null) return '<td class="num">—</td>';
   if (isStateMonopoly(take)) return '<td class="num"><span style="color:var(--muted);cursor:help;" title="State monopoly — no contractor access">—</span></td>';
   const tt = buildEvidenceTooltip(entry);
-  const ab = entry.ab_pct || 0;
-  const { color } = getEvidenceColor(ab);
+  // v557 (T6): the dot beside every Explorer take% was green wherever a_pct + b_pct >= 80, which
+  // is 171 of 185 countries including Russia at 3.8% primary law. It now carries the same grade
+  // colour as the Evidence column two cells to its right.
+  const color = _evidenceGrade(entry).color;
   return `<td class="num" style="position:relative;" title="${tt}">
     <span style="font-weight:600">${fmtTake(take)}</span>
     <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:${color};margin-left:4px;vertical-align:middle;"></span>
@@ -23176,7 +23230,7 @@ function renderExplorer() {
       case 'npv':     va = -(a[npvKey]  ?? -999); vb = -(b[npvKey]  ?? -999); break;
       case 'be':      va = a.be_75 ?? 999; vb = b.be_75 ?? 999; break;
       case 'swing':    va = a.swing ?? 999; vb = b.swing ?? 999; break;
-      case 'evidence': va = a.ab_pct ?? 0; vb = b.ab_pct ?? 0; break;
+      case 'evidence': va = _evidenceSortVal(a); vb = _evidenceSortVal(b); break;
       case 'country':  va = a.country; vb = b.country; break;
       default: va = a[takeKey] ?? 999; vb = b[takeKey] ?? 999;
     }
