@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v554.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v555.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v554</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v555</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1361,7 +1361,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v554</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v555</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v554</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v555</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1491,7 +1491,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <div style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</div>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v554).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;">71,576 contracts · 185 countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (v555).</div>
     <!-- v465: Live investible universe stat — populated after country_data.json loads -->
     <div id="home-hurdle-stat" style="display:none;margin-top:8px;font-size:12px;color:var(--green);font-weight:600;" aria-live="polite"></div>
     <!-- v466: DB currency note — populated after country_data.json loads -->
@@ -3947,9 +3947,9 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         The platform reports <strong style="color:var(--text);">Contractor NPV</strong> (the net present value accruing to the IOC after all fiscal deductions) and <strong style="color:var(--text);">IRR</strong> (the return rate at which that NPV equals zero). For equity stake decisions, use them as a two-part filter:<br><br>
         <strong style="color:var(--text);">Step 1 — IRR as the entry gate.</strong> Compare IRR to your firm's hurdle rate (typically 12–15% for E&amp;P, higher for frontier acreage). Countries with IRR below your hurdle should be flagged — either negotiate better terms, use a lower-cost profile, or drop. Use the "Has IRR Data" chip in Explorer to filter to the 124 countries with verified IRR (displayed; 165 countries have IRR in the database, but 41 with ≥500% unbounded returns are excluded from the table).<br><br>
         <strong style="color:var(--text);">Step 2 — NPV as the equity-stake calibrator.</strong> Once a country clears the IRR hurdle, Contractor NPV tells you the absolute value creation per standard project profile. A 20% equity stake in a $2,000M NPV project creates $400M of value at your working interest. Compare across the shortlist — a higher-take country with a bigger resource base may outperform a low-take country with a marginal structure.<br><br>
-        <strong style="color:var(--text);">Step 3 — Government NPV as a negotiation anchor.</strong> The platform estimates Government NPV = Contractor NPV × (Govt Take%) ÷ (100% − Govt Take%). If Govt NPV is very large relative to Contractor NPV, the government has strong incentive to maintain terms; if it's small, there may be appetite for side-agreements or signature bonuses in exchange for better fiscal terms.<br><br>
+        <strong style="color:var(--text);">Step 3 &mdash; sizing the government&rsquo;s position.</strong> Use the <strong style="color:var(--text);">Govt Take</strong> figure directly, at a stated price. Do <em>not</em> convert it into a government NPV with Contractor NPV &times; take &divide; (100 &minus; take): ORCA models government <em>take</em> and contractor NPV, and no government NPV, so that expression multiplies a production-weighted take by an unweighted-mean NPV and scales an undiscounted revenue share onto a discounted figure. It was removed from Side-by-Side at v555 and from Fiscal Compare at v451. Where the two columns of a comparison differ most on take, they differ most on this quantity too, so it inverted rankings rather than refining them. For a genuine government cash-flow NPV on your own terms and profile, build both sides in <strong style="color:var(--text);">Scenario Builder</strong>, where take and cash flow come from one run.<br><br>
         <strong style="color:var(--text);">Key calibration:</strong> All platform NPV and IRR figures use a standardized production profile (e.g. deepwater: $1.2B capex, 50k bbl/d peak, 8-year plateau). Use the Scenario Builder to re-run with your actual project parameters for equity stake modeling — the standardized figures are directional screeners, not deal inputs.<br><br>
-        <em>Rule of thumb for equity sizing: if Contractor NPV ÷ (1 − Govt Take%) ÷ Total Project Value &lt; 1.2×, the fiscal burden is high relative to project economics — increase hurdle rate or reduce working interest to maintain return discipline.</em>
+        <em>Equity sizing: compare Contractor NPV across the shortlist on the same standardized profile and the same price, then apply your working interest. The grossed-up &ldquo;total project value&rdquo; implied by Contractor NPV &divide; (1 &minus; Govt Take%) is not a usable denominator here &mdash; across the 185 countries it ranges from $1.3B to $9.6B on a profile that is identical for every one of them, because take and NPV are averaged over each country&rsquo;s contracts with different weights.</em>
       </div>
     </div>
 
@@ -24176,7 +24176,42 @@ function renderCompare() {
     {label:'Contractor NPV @$50 (downside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $50/bbl on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI). This is the low-price stress case — the row an IC asks for first. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>fmtNpvShared(d.npv_50)},
     {label:'Contractor NPV @$75 (base)',  key:(d)=>fmtNpvShared(d.npv_75)},
     {label:'Contractor NPV @$125 (upside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $125/bbl on the same standardized profile. Read against the $50 row: the gap is how much of the upside this regime lets the contractor keep, and it is the contractor-side mirror of the Price Swing row above.">\u24d8</span>', key:(d)=>fmtNpvShared(d.npv_125)},
-    {label:'Govt NPV @$75 (est.)', key:(d)=>{ const t=d.take_75,n=d.npv_75; if(t==null||n==null||t<=0||t>=100)return'—'; return fmtNpvShared(n*(t/100)/(1-t/100)); }, bold:false},
+    // v555 (T3): the 'Govt NPV @$75 (est.)' row is REMOVED. It was Contractor NPV x take/(1-take),
+    // computed here in the browser, and it is the one row on this tab that contradicted the
+    // correction printed four rows above it.
+    //
+    // Walked cold on the shipped 'USA vs Iraq' quickstart. The Govt Take row read
+    // '84.8%  PSC/Conc 34.1%' -- v549 put that correction in the cell precisely because
+    // MECHANIC_COMPARABILITY.md says Iraq's blended figure may not be compared across countries,
+    // 415 of its 610 contracts being fee-basis TSCs. Four rows lower this row then took the
+    // UNCORRECTED 84.8%, turned it into a 5.58x multiplier, and printed:
+    //     Govt NPV @$75 (est.)     USA $1.0B     Iraq $3.6B
+    // On the comparable 34.1% the same formula gives Iraq $332M -- BELOW the USA, not 3.5x above
+    // it. An 10.8x error that inverts the ranking of the two columns, in the row an analyst reads
+    // to size the government's position, and it rode the shared `rows` array into #cmp-data-table
+    // and both clipboard flavours with no caveat attached.
+    //
+    // Three independent defects, none fixable by swapping in the comparable take:
+    //  1. WEIGHTING. take_* is production-weighted per country; npv_* is a bare unweighted
+    //     AVG(contractor_npv_usd_mm) over every contract. This row multiplied one by the other --
+    //     the exact arithmetic the v531 box below this grid says in bold "cannot be ranked
+    //     against each other". The NPV weighting row already marks every column where the two
+    //     bases differ, and it differed for all three columns of the cold default set.
+    //  2. DISCOUNTING. take% is an undiscounted share of production value over contract life;
+    //     contractor NPV is discounted at 10% WACC. Government royalty and bonus cash flows land
+    //     earlier than contractor profit oil, so an undiscounted share cannot be scaled onto a
+    //     discounted contractor NPV and called a present value.
+    //  3. IT IS NOT MODELLED. dcf_results holds govt_take_pct and contractor_npv_usd_mm and no
+    //     government NPV at all; npv_10_usd_mm duplicates contractor_npv_usd_mm in 71,565 of
+    //     71,576 rows at $75. ORCA has never computed this quantity.
+    // t/(1-t) also blows up exactly where the take figure is least trustworthy: Turkmenistan
+    // 87.2% -> 6.81x, Uzbekistan 85.6% -> 5.94x, Iraq 84.8% -> 5.58x. Seven of the twelve
+    // countries this row ranked highest hold zero verified production.
+    //
+    // v451 deleted this same quantity from Fiscal Compare for the same reason and v515 deleted
+    // the fake IRR from this table; this is the third. It was also the only row in the Economics
+    // block carrying no basis tooltip, while every row around it has one. Where it went is stated
+    // in the note under the grid, because FAQ A19 Step 3 taught analysts to use it.
     {label:'Breakeven ($/bbl) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Breakeven oil price: minimum price for Contractor NPV \u2265 0 under this regime and the standardized profile. Computed by iterating the DCF engine across prices. &lt;$50 = profitable even at low-price cycle; $50\u2013$80 = viable at base case; &gt;$80 = requires elevated price for positive returns. Coverage: 68 of 185 countries (requires complete royalty + cost data). \u2014 indicates insufficient cost data \u2014 use Take + Swing as a proxy.">\u24d8</span>',     key:(d)=>formatBreakeven(d.be_75)},
     {label:'─── Structure ───', key:()=>'', bold:true, divider:true},
     {label:'# Contracts',           key:(d)=>d.n},
@@ -24406,7 +24441,7 @@ function renderCompare() {
   // monotonic in price for 184 of 185. This note says where IRR went, because the platform
   // advertises IRR on Fiscal Compare, Explorer and the Screener hurdle-rate slider.
   html += `<div style="margin-top:8px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--muted);border-radius:5px;padding:8px 12px;font-size:11px;color:var(--muted);line-height:1.55;">
-    <strong style="color:var(--text);">IRR and Monte Carlo percentiles are deliberately not in this table.</strong> ORCA&rsquo;s stored IRR is the arithmetic mean of every per-contract IRR in a country, which a handful of near-zero-net-investment contracts dominate: the median across the 124 countries that carry one is <strong style="color:var(--text);">239.8%</strong>, and only one of the 124 lands in a plausible 5&ndash;60% band. It is also not monotonic in price for 29 countries, because a different set of contracts is excluded at each price point. It is not a project return and two columns of it are not comparable. Rank these countries on <strong style="color:var(--text);">Govt Take</strong>, on the <strong style="color:var(--text);">three contractor NPV rows</strong> above (same standardized profile, so directly comparable), and on <strong style="color:var(--text);">Breakeven</strong> where it is populated. For a genuine IRR on your own field, run the profile through <span style="color:var(--accent);font-weight:600;">Scenario Builder</span>. <br><br>The <strong style="color:var(--text);">&ldquo;MC Uncertainty&rdquo;</strong> block that used to close this table has been removed for the same reason: it was not a Monte Carlo. It aliased P10 to take at $50, P50 to take at $75 and P90 to take at $125 &mdash; the identical three figures the <strong style="color:var(--text);">Govt Take</strong> block prints above, relabelled as distribution percentiles. ORCA holds no simulation output on government take, so quoting a &ldquo;P90 take&rdquo; asserted a 10% exceedance probability that was never computed. The dispersion this platform can actually evidence is the <strong style="color:var(--text);">Take spread across contracts</strong> row, measured across each country&rsquo;s own contract set.
+    <strong style="color:var(--text);">Government NPV, IRR and Monte Carlo percentiles are deliberately not in this table.</strong> ORCA&rsquo;s stored IRR is the arithmetic mean of every per-contract IRR in a country, which a handful of near-zero-net-investment contracts dominate: the median across the 124 countries that carry one is <strong style="color:var(--text);">239.8%</strong>, and only one of the 124 lands in a plausible 5&ndash;60% band. It is also not monotonic in price for 29 countries, because a different set of contracts is excluded at each price point. It is not a project return and two columns of it are not comparable. Rank these countries on <strong style="color:var(--text);">Govt Take</strong>, on the <strong style="color:var(--text);">three contractor NPV rows</strong> above (same standardized profile, so directly comparable), and on <strong style="color:var(--text);">Breakeven</strong> where it is populated. For a genuine IRR on your own field, run the profile through <span style="color:var(--accent);font-weight:600;">Scenario Builder</span>. <br><br>The <strong style="color:var(--text);">&ldquo;MC Uncertainty&rdquo;</strong> block that used to close this table has been removed for the same reason: it was not a Monte Carlo. It aliased P10 to take at $50, P50 to take at $75 and P90 to take at $125 &mdash; the identical three figures the <strong style="color:var(--text);">Govt Take</strong> block prints above, relabelled as distribution percentiles. ORCA holds no simulation output on government take, so quoting a &ldquo;P90 take&rdquo; asserted a 10% exceedance probability that was never computed. The dispersion this platform can actually evidence is the <strong style="color:var(--text);">Take spread across contracts</strong> row, measured across each country&rsquo;s own contract set.<br><br>The <strong style="color:var(--text);">&ldquo;Govt NPV @$75 (est.)&rdquo;</strong> row that used to sit under the contractor NPV rows has been removed. It was not a modelled figure &mdash; ORCA stores government <em>take</em> and contractor NPV and no government NPV anywhere, so the row was computed in the browser as <em>Contractor NPV &times; take &divide; (100 &minus; take)</em>. That multiplies a <strong style="color:var(--text);">production-weighted</strong> take by an <strong style="color:var(--text);">unweighted-mean</strong> contractor NPV &mdash; the two bases the <em>NPV weighting</em> row above marks as different &mdash; and scales an <strong style="color:var(--text);">undiscounted</strong> revenue share onto a <strong style="color:var(--text);">10%-discounted</strong> NPV, so it was not a present value of anything. It also read off the published headline take rather than the comparable one: on <strong style="color:var(--text);">USA vs Iraq</strong> it printed Iraq at <strong style="color:var(--text);">$3.6B against the USA&rsquo;s $1.0B</strong>, where Iraq&rsquo;s comparable 34.1% gives <strong style="color:var(--text);">$332M</strong> &mdash; below the USA, not three times above it. To size the government&rsquo;s position, read the <strong style="color:var(--text);">Govt Take</strong> rows, which is the figure this platform actually publishes; for a government cash-flow NPV on your own field and terms, build it in <span style="color:var(--accent);font-weight:600;">Scenario Builder</span>.
   </div>`;
   // v468: Reading direction note when 3+ countries loaded — helps first-time users understand the column layout
   if (compareList.length >= 3) {
@@ -33049,8 +33084,8 @@ function renderFCResults(results, price) {
     var tier = getTierInfo(r.liveTake);
     var swingCol = r.swing == null ? '' : r.swing < 10 ? 'var(--positive)' : r.swing < 20 ? 'var(--accent)' : 'var(--negative)';
     var take = r.liveTake; var npv = r.liveNPV;
-    var govtNpv = (npv != null && take != null && take > 0 && take < 100) ? npv * (take/100) / (1 - take/100) : null;
-    var govtNpvStr = fmtNpvShared(govtNpv);
+    // v555: the Fiscal Compare Govt NPV estimate was computed here and never rendered -- dead
+    // since v451 removed the column. Deleted so the column cannot be reintroduced by accident.
     var npvStr = fmtNpvShared(npv);
     // v466: insert NPV=0 threshold divider when sorted by NPV and we cross from positive to negative
     if (sortField === 'npv' && !_npvZeroDividerInserted) {
