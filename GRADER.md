@@ -17658,3 +17658,16 @@ The analyst asking which countries belong on a frontier screening list gets **56
 
 ## STILL LOCKED — nothing touched
 No new FAQ (still **974**). No new tooltip on any control whose behaviour did not change — the one tooltip added is on the `frontiermarkets` option, whose behaviour changed in this cycle. No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. Tab order unchanged. CP headline still two-zone with tier-coloured take%, global rank and vs-median pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v512, v516, v522, v530, v534, v536, v552, v557, v558 and v559 all intact. Version sweep done silently at the end across 5 structural locations, with the six v559 (T2) code comments and the v559 changelog entry deliberately left at v559 — it is not the improvement.
+
+---
+## Cycle 459 Log — 2026-08-28 14:52
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Confirmed live on the deployed page, 0 errors. Cycle complete.
+
+## Cycle 459 — v560
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* (least-recently-used; 458 was T2)
+
+**Friction.** Walking cold into the Screener, the first control is the preset menu. The option reading **"▲ Frontier Markets — Sub-Saharan Africa + SE Asia · PSC · Take ≤70% · NPV positive"** set a take ceiling, an NPV floor and four mechanic checkboxes — **and no region filter of any kind**. The source com
