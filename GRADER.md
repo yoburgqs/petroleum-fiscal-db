@@ -16812,3 +16812,18 @@ Tab order unchanged. CP headline still two-zone with a tier-coloured take%, glob
 vs-median pill. v371/v373, v430, v449, v451, v452, v489, v505, v511, v516, v518, v534, v542, v546,
 v548, v549, v550, v551 and v552 all intact. Version sweep v552→v553 done silently at the end
 across 5 structural locations and is **not** claimed as the improvement.
+
+---
+## Cycle 452 Log — 2026-08-28 08:06
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 452 complete — v553 shipped (`d8bd960`), pushed, mirrored.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (Rotation: 451 was T2, 450 T6, 449 T4, 448 T3, 447 T1, 446 T5 — T5 was least-recently-used.)
+
+## Friction
+Cold walk into Country Profile on Iraq, then **read the clipboard back** rather than trusting the button labels. `⎘ Copy for IC Memo` returned, verbatim:
+
+> Iraq (**Concession**, 610 contracts, B-tier sourcing): Government take: … **84.8% @$75** … Contr
