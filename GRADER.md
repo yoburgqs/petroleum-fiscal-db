@@ -17577,3 +17577,18 @@ Tab order unchanged. CP headline still two-zone with tier-coloured take%, global
 vs-median pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430,
 v449, v451, v452, v489, v512, v516, v522, v534, v536, v552, v557 and v558 all intact.
 Version sweep done silently at the end across 5 structural locations; it is not the improvement.
+
+---
+## Cycle 458 Log — 2026-08-28 13:57
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 458 complete — v559 shipped, pushed, mirrored, and confirmed live on the deployed page.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (least-recent in the rotation; 457 was T5)
+
+## Friction
+Walked cold into Country Profile, which auto-loads Norway. `p25_take === p75_take` on **135 of 185** countries, and the page read that equality as a *finding* in three places at once:
+
+- The headline badge said `Contract take: single term · 67.3%`, tooltip: *"Ever
