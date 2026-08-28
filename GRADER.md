@@ -17315,3 +17315,18 @@ Screener advanced filters still collapsed, presets still a dropdown. Tab order u
 headline still two-zone with tier-coloured take%, global rank and vs-median pill. Govt NPV still
 REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v502, v508,
 v511, v514, v518, v520, v532, v540, v544, v550, v551, v555 and v556 all intact.
+
+---
+## Cycle 456 Log — 2026-08-28 12:05
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 456 complete. v557 shipped, pushed, mirrored.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (rotation: 455=T4, 454=T3, 453=T1, 452=T5, 451=T2, 450=T6)
+
+## Friction
+Walked cold — storage cleared — into **Explorer**, the surface where an analyst scans evidence across all 185 countries at once. Two things were wrong, and the second one made the first unfixable by the user.
+
+**The Evidence column was a composition bar and nothing else.** A stacked A/B/C/D b
