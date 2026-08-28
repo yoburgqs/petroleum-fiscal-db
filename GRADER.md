@@ -17833,3 +17833,22 @@ v430, v449, v451, v452, v489, v508, v512, v515, v516, v522, v530, v531, v534,
 v536, v539, v540, v549, v552, v555, v557, v558, v559, v560 and v561 all intact.
 Version sweep v561→v562 done silently at the end across 5 structural locations;
 it is not the improvement.
+
+---
+## Cycle 461 Log — 2026-08-28 16:41
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Pushed `2c1f19b` (v562) and `5fb90e9` (cycle log); mirror byte-identical to source.
+
+## Cycle 461 — Task T3
+
+**Task:** T3 — "How do these three countries compare side by side?" (least-recently-used; 455 was T4, 456 T6, 457 T5, 458 T2, 459 T1, 460 T4)
+
+**Friction.** Cold load into Side-by-Side, which auto-seeds the North Sea Trio. The Economics block ended on:
+
+```
+Breakeven ($/bbl)    Norway —    United Kingdom —    Netherlands <$50
+```
+
+That reads as "the Netherlands is the 
