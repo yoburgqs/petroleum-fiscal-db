@@ -16938,3 +16938,18 @@ global rank and vs-median pill. Govt NPV column still **REMOVED** from Fiscal Co
 v430, v449, v451, v452, v489, v505, v507, v511, v513, v516, v517, v518, v530, v534, v537, v542,
 v543, v546, v548, v549, v550, v551, v552 and v553 all intact. Version sweep v553→v554 done
 silently at the end across 5 structural locations and is **not** claimed as the improvement.
+
+---
+## Cycle 453 Log — 2026-08-28 09:00
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 453 complete — v554 shipped (`ee8ac48`), pushed, mirrored.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (Rotation: 452 was T5, 451 T2, 450 T6, 449 T4, 448 T3, 447 T1 — T1 was least-recently-used.)
+
+## Friction
+Cold walk, storage cleared, Home → Screener → loaded the one preset both the Home card and the preset menu tell a first-time analyst to start with: **⭐ IOC Capital Screen**. It returned **14 countries. Iraq was not one of them.**
+
+Iraq has verified field p
