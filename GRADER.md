@@ -17970,3 +17970,16 @@ v371/v373, v430, v449, v451, v452, v489, **v505 G badge**, v508, v512, v513, v51
 v516, v522, v529, v530, v531, v533, v534, v536, v537, v539, v540, v547, v549,
 v551, v552, v555 and v557–v562 all intact. Version sweep v562→v563 done silently
 at the end across 5 structural locations; it is not the improvement.
+
+---
+## Cycle 462 Log — 2026-08-28 18:08
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 462 complete. All steps executed; `7708c75` (v563) and `764df63` pushed to `origin/main`, mirror byte-identical.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (least-recently-used; 461 was T3.)
+
+## Friction
+Walked Fiscal Compare cold, starting from the **Quality** column — the tab's only provenance signal — and asked what the letter actually governs. Counted off the live DOM: **120 of the 185 rows carry `termsBasis === 'default'`**, and **119 of them pr
