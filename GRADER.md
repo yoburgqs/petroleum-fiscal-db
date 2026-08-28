@@ -17720,3 +17720,16 @@ Each of those rows carried its own contradiction **one cell to the right** — V
 - JS errors: 0 page errors
 - Task: T4
 - Summary: Reform Risk's headline ranked table printed Venezuela at a green 85/100 "Stability Score" and Algeria at a green 100, with the Orinoco nationalization (+15pp) and the Law 05-07 windfall levy (+10pp) nowhere on the row. Header renamed to what the formula measures, green reserved for rows with no take-raising event on record, and the disqualifying event printed inline under every affected score.
+
+---
+## Cycle 460 Log — 2026-08-28 15:44
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 460 complete — v561 pushed (`b7f8358`), GRADER log pushed (`21c3766`), mirror copied.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (least-recently-used: 455 was T4; 456 T6, 457 T5, 458 T2, 459 T1.)
+
+## Friction
+Cold load into the **Reform Risk** tab. The first ranked table on the page — *Most Frequently Reformed Regimes*, Section 1 of `renderReformRisk()` — had a column headed **"Stability Score"** coloured on a green ramp taken straight from `100 − 15 × (chang
