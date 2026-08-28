@@ -16953,3 +16953,126 @@ silently at the end across 5 structural locations and is **not** claimed as the 
 Cold walk, storage cleared, Home → Screener → loaded the one preset both the Home card and the preset menu tell a first-time analyst to start with: **⭐ IOC Capital Screen**. It returned **14 countries. Iraq was not one of them.**
 
 Iraq has verified field p
+
+---
+## Cycle 454 Log — 2026-08-28 (v555)
+
+- Test before: 135 PASS / 0 FAIL / 0 WARN
+- Test after: **135 PASS / 0 FAIL / 1 WARN** — `runtime_comprehensive.js` **RAN this cycle**
+  against the local build. The WARN is the pre-existing local-harness artifact (the service
+  worker registers `/petroleum-fiscal-db/sw.js`, the GitHub Pages subpath, which 404s when
+  served from root; correct in production).
+- JS errors: 0
+- JS syntax gate: **PASS**, 9 blocks / 0 errors — run after the patch and again after the sweep.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Rotation: 453 was T1, 452 T5,
+451 T2, 450 T6, 449 T4, 448 T3 — T3 was least-recently-used.
+
+## Friction
+Cold walk, `sessionStorage` and `localStorage` cleared, Home → Side-by-Side → the shipped
+**USA vs Iraq** quickstart.
+
+The *Govt Take ($75/bbl)* row reads **`84.8%  ·  PSC/Conc 34.1%`**. v549 put that correction
+in the cell because `MECHANIC_COMPARABILITY.md` does not permit comparing Iraq's blended
+figure across countries — 415 of its 610 contracts are fee-basis TSCs where the contractor
+is paid a fixed $/bbl remuneration and keeps no price upside.
+
+**Four rows lower, `Govt NPV @$75 (est.)` used the uncorrected 84.8%.** At `index.html:24179`,
+inside the shared Side-by-Side `rows` array:
+
+```js
+{label:'Govt NPV @$75 (est.)', key:(d)=>{ const t=d.take_75,n=d.npv_75;
+  if(t==null||n==null||t<=0||t>=100)return'—'; return fmtNpvShared(n*(t/100)/(1-t/100)); }}
+```
+
+84.8% → a **5.58× multiplier** → the row printed:
+
+| | USA | Iraq |
+|---|---|---|
+| Contractor NPV @$75 | $3.3B | $642M |
+| **Govt NPV @$75 (est.)** | **$1.0B** | **$3.6B** |
+
+On the page's own comparable 34.1% the same formula gives Iraq **$332M** — *below* the USA,
+not 3.5× above it. An **10.8× error that inverts the ranking of the two columns**, in the row
+an analyst reads to size the government's position. On Norway/Iraq/Nigeria it put Iraq first
+($3.6B) ahead of Norway ($1.8B); corrected, Iraq is last. It rode the shared `rows` array into
+`#cmp-data-table` and **both clipboard flavours** — verified by reading the clipboard back —
+with no caveat attached.
+
+**Three independent defects, none fixable by swapping in the comparable take:**
+
+1. **Weighting.** `take_*` is production-weighted per country; `npv_*` is a bare unweighted
+   `AVG(contractor_npv_usd_mm)` over every contract. This row multiplied one by the other —
+   the exact arithmetic the **v531 box directly below this grid** states in bold "cannot be
+   ranked against each other". The *NPV weighting* row already marks the mismatch, and it
+   differed for all three columns of the cold default set.
+2. **Discounting.** take% is an undiscounted share of production value over contract life;
+   contractor NPV is discounted at 10% WACC. Government royalty and bonus cash flows land
+   earlier than contractor profit oil, so an undiscounted share scaled onto a discounted NPV
+   is not a present value of anything.
+3. **It is not modelled.** Verified against the live DB: `dcf_results` holds `govt_take_pct`
+   and `contractor_npv_usd_mm` and **no government NPV column at all**; `npv_10_usd_mm`
+   duplicates `contractor_npv_usd_mm` in **71,565 of 71,576** rows at $75. ORCA has never
+   computed this quantity.
+
+`t/(1−t)` also blows up exactly where the take figure is least trustworthy — Turkmenistan
+87.2% → **6.81×**, Uzbekistan 85.6% → **5.94×**, Iraq 84.8% → **5.58×** — and **7 of the 12
+countries this row ranked highest hold zero verified production**. It was also the only row
+in the Economics block carrying **no basis tooltip**, while every row around it has one.
+
+## Change
+1. **The `Govt NPV @$75 (est.)` row is REMOVED** from the grid, from `#cmp-data-table` and
+   from both clipboard flavours. This is the **v451 precedent** — the same quantity, deleted
+   from Fiscal Compare for the same reason — and **v515**, which deleted the fake IRR from
+   this same table. Removing an undefendable number at the decision point is the improvement.
+2. **The existing "deliberately not in this table" note absorbs it** rather than a new box
+   being added. Retitled *"Government NPV, IRR and Monte Carlo percentiles are deliberately
+   not in this table"* and carrying the measured USA/Iraq case ($3.6B vs $332M), the two
+   basis defects, and a route to Scenario Builder for a real government cash-flow NPV.
+3. **FAQ A19 Step 3 corrected.** It taught this formula as a *"negotiation anchor"* — the
+   doctrine the row came from. Its closing rule-of-thumb, which grossed project value up by
+   `1/(1 − take)`, is corrected too: that denominator ranges **$1.3B to $9.6B** across the 185
+   countries on a profile identical for every one of them. No new FAQ added; still **974**.
+4. **Dead residue deleted** at `33052–33053` — Fiscal Compare computed `govtNpvStr` and never
+   rendered it, orphaned since v451 removed the column. Deleted so it cannot be reintroduced.
+
+## Result
+An analyst comparing Iraq — or Turkmenistan, Uzbekistan, Qatar, Nigeria, or any of the other
+high-take columns — against a low-take peer no longer reads a government-side dollar figure
+built from the exact number the same screen told them two rows earlier not to compare, and
+can no longer paste one into an IC memo. The Economics block now contains only rows whose
+basis is stated and whose values ORCA actually models.
+
+## Verification
+- **Cold Playwright, storage cleared, local build, 5 sets:** cold default trio
+  (Norway/UK/Netherlands), USA/Iraq, Norway/Iraq/Nigeria, Atlantic Frontier Quartet, and a
+  5-country set including the Saudi Arabia state monopoly. **0 row labels containing "Govt
+  NPV"** in every set; removal note present in every set.
+- **Clipboard read back** on USA/Iraq: `text/plain` (TSV) and `text/html` **both free of
+  Govt NPV**; caption, assumption line and versioned source line intact; the Govt Take row
+  still carries `84.8% · PSC/Conc 34.1%`.
+- **9-tab regression sweep — 0 page errors.** (The 10th, `tsamples`, is `display:none;
+  aria-hidden="true"` in the pre-edit file — pre-existing, not caused here.)
+- `_orcaVerNow()` returns **v555** after the sweep, so PDFs and pasted source lines stamp
+  correctly.
+
+## Deliberately NOT done — stated rather than hidden
+1. **The Fiscal Compare XLSX export keeps its `Govt NPV (model, $M est)` column** (`34677`).
+   There `liveTake`/`liveNPV` come from **one** `dcfConcession`/`dcfPSC`/… run on a single
+   mechanic and profile — the same cash flow — so the weighting defect does not apply. The
+   discounting objection still does. Different basis, different tab, its own decision.
+2. **Explorer and the Breakeven Map still rank and colour on the blended take** — carried
+   forward from cycle 453, unchanged.
+3. **Group 3 (PRRT / Australia) untouched** — needs a same-price caveat, not a substitution.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on any control — a row was removed, none added. No
+page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no
+SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. Tab order unchanged. CP headline still two-zone with tier-coloured
+take%, global rank and vs-median pill. Govt NPV still **REMOVED** from Fiscal Compare (and now
+its dead code too). v371/v373, v430, v449, v451, v452, v489, v505, v507, v511, v513, v515,
+v516, v517, v518, v530, v531, v534, v537, v542, v543, v546, v548, v549, v550, v551, v552,
+v553 and v554 all intact. Version sweep v554→v555 done silently at the end across 5 structural
+locations and is **not** claimed as the improvement.
