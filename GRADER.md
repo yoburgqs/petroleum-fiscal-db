@@ -17076,3 +17076,16 @@ its dead code too). v371/v373, v430, v449, v451, v452, v489, v505, v507, v511, v
 v516, v517, v518, v530, v531, v534, v537, v542, v543, v546, v548, v549, v550, v551, v552,
 v553 and v554 all intact. Version sweep v554→v555 done silently at the end across 5 structural
 locations and is **not** claimed as the improvement.
+
+---
+## Cycle 454 Log — 2026-08-28 09:53
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 454 complete — v555 shipped (`5e9adde`), pushed (`fee82c1..d8ec47a`), mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (rotation: 453=T1, 452=T5, 451=T2, 450=T6, 449=T4, 448=T3 — T3 least-recently-used)
+
+## Friction
+Cold walk into Side-by-Side on the shipped **USA vs Iraq** quickstart. The Govt Take row reads `84.8% · PSC/Conc 34.1%` — v549 put that correction there because Iraq's blended take i
