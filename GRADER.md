@@ -17089,3 +17089,108 @@ locations and is **not** claimed as the improvement.
 
 ## Friction
 Cold walk into Side-by-Side on the shipped **USA vs Iraq** quickstart. The Govt Take row reads `84.8% · PSC/Conc 34.1%` — v549 put that correction there because Iraq's blended take i
+
+---
+## Cycle 455 Log — 2026-08-28 11:05
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (pre-existing local-harness service-worker 404)
+- JS errors: 0 (10-tab cold sweep)
+- Shipped: v556 (`750d3b6`), pushed `12ff883..750d3b6`, mirrored to
+  `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"**
+(rotation: 454=T3, 453=T1, 452=T5, 451=T2, 450=T6, 449=T4 — T4 least-recently-used)
+
+## Friction
+Cold walk (fresh context, `sessionStorage` and `localStorage` cleared) from the Home
+quickstart **Step 4** — *"Before finalizing any IC memo: open Reform Risk"* — and then into
+**Fiscal Compare**, the surface where the screening decision is actually made.
+
+**The FC Stability cell re-derived its own flag instead of asking the classifier.**
+`stabilityInfo` (`index.html:32748`) and `stabCell` (`:32778`) tested `stale = last
+take-raising event predates 2010`. That is neither the same as, nor a subset of,
+`_rrClassify()` — the classifier the Reform Risk lookup and the Country Profile sidebar were
+unified on at **v550** precisely so two surfaces answering one question could not drift.
+Fiscal Compare was never brought in, so it kept running the **v520** rules and missed the
+in-window-rise class **v540** added after finding a count-based score is blind to magnitude.
+
+Counted off the live DOM, the two disagreed on **10 of the 21** scoreable jurisdictions:
+
+| Country | Fiscal Compare cell | Reform Risk verdict |
+|---|---|---|
+| **Russia** | **GREEN ◆◆◆◆◇** | 2022 windfall tax **+15pp** — *"not a zero-premium jurisdiction; size against the +15pp already taken"* |
+| Ecuador | GREEN ◆◆◆◆◇ | in-window take rise +5pp |
+| Norway | AMBER ◆◆◆◇◇ | in-window take rise +12pp |
+| Indonesia | AMBER ◆◆◆◇◇ | in-window take rise +9pp |
+| UK / Australia / Brazil / Guyana | no flag | **Actively Reforming** |
+| Angola / Libya | **GREY + red !** | green, no premium indicated — their score is *not* a window artefact; both carry 2 counted in-window changes |
+
+So the shortlist surface painted **Russia's 2022 windfall tax green**, and flagged two
+countries whose scores are honestly earned.
+
+**Compounding it: three surfaces each published their own premium ladder.**
+
+| Surface | Rule it stated |
+|---|---|
+| Home key-terms strip + quickstart Step 4 | ◆◆◆◆◆ no premium / ◆◆◆◇◇ 1–2pp / ◆◇◇◇◇ 3–5pp / ◇◇◇◇◇ probability-weighted NPV |
+| FC Stability control | the same ladder |
+| Reform Risk (owns the question) | ≥3 changes → 3–5pp; 5–8pp + scenario at score ≤ 20 |
+
+`score ≤ 20` requires **6+** changes since 2010. **No jurisdiction in the database reaches
+it** — the UK tops out at 5. The Home card's headline instruction, *"5 reforms since 2010 =
+add probability-weighted NPV scenario"*, therefore named a case its own destination tab
+**refuses to make**, on the one country that satisfies it.
+
+## Change
+1. **`stabilityInfo` now carries the `_rrClassify` verdict**, and the cell's colour, its red
+   `!` and its tooltip all follow it. There is no second copy of the rules. Muted + `!` now
+   means exactly one thing: *the diamond count is not the verdict here* — either the rupture
+   predates the window, or it sits inside the window and the count never reads how large it
+   was. Actively-reforming rows keep their earned ramp, because there the count **is** the
+   verdict. **On screen: flagged rows 8 → 10.** Russia, Ecuador, Norway and Indonesia gain the
+   flag and lose their green/amber ramp; **Angola and Libya lose a flag they should never have
+   carried** and render their honest amber score.
+2. **Every scored cell's tooltip now carries that country's IC action verbatim** from
+   `_rrClassify`, instead of a generic ladder.
+3. **The three competing ladders are deleted.** The FC Stability control, the Home key-terms
+   strip, Home quickstart Step 4 and the Reform Risk "You get" line now point at the
+   per-country verdict rather than restating a rule that contradicts it.
+
+## Result
+An analyst screening on Fiscal Compare can no longer read a **green** Stability score on a
+country the platform's own reform verdict says carries a premium — and can no longer get
+**three different WACC premiums for one country from three surfaces**. Hovering any Stability
+cell returns the same IC action the Reform Risk tab and the Country Profile sidebar return.
+
+## Verification
+- **Cold Playwright, storage cleared, local build:** **185** Stability cells (164 `n/c` / 21
+  scored) **before and after** — no row lost. All **21** scored rows reconcile against
+  `_rrClassify`: **0 mismatches**. Flagged **8 → 10** with the expected membership
+  (Algeria, Canada, Colombia, Ecuador, Indonesia, Kazakhstan, Norway, Russia, USA, Venezuela).
+- Clicking **Russia's** Stability cell lands on `treformrisk` with the lookup set to Russia and
+  the in-window-rise verdict rendered (`rank 5 of 21 · in-window rise, size unscored`).
+- **10-tab cold sweep — 0 page errors.**
+- **JS syntax gate PASS** (9 blocks / 0 errors). `_orcaVerNow()` returns **v556**.
+- `runtime_comprehensive.js` **ran this cycle**: **135 PASS / 0 FAIL / 1 WARN** — the WARN is
+  the pre-existing local-harness service-worker 404.
+
+## Deliberately NOT done — stated rather than hidden
+1. **The escalation branch in `_rrClassify` (`score ≤ 20` → 5–8pp + probability-weighted NPV)
+   remains unreachable** for every jurisdiction in the database. Whether the bar should move to
+   5 changes is a **threshold decision, not a rendering defect**, and it is Zach's call. This
+   cycle removed the surfaces that asserted a *different* bar; it did not pick one.
+2. **The Explorer table still heads its Fiscal Predictability column "Stability"** — the same
+   word Fiscal Compare uses for reform frequency. Two metrics, one name, two tabs. Its own cycle.
+3. **The FC XLSX export carries no Stability column** and was not touched.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on any control — the two rewritten belong to the
+exact controls whose behaviour changed, and both previously described the removed ladder. No
+page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no
+SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. Tab order unchanged. CP headline still two-zone with tier-coloured
+take%, global rank and vs-median pill. Govt NPV still REMOVED from Fiscal Compare and
+Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v502, v508, v514, v520, v532, v540,
+v544, v550 and v555 all intact. Version sweep v555→v556 done silently at the end across 5
+structural locations and is **not** claimed as the improvement.
