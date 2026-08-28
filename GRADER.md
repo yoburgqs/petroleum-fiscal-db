@@ -17194,3 +17194,18 @@ take%, global rank and vs-median pill. Govt NPV still REMOVED from Fiscal Compar
 Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v502, v508, v514, v520, v532, v540,
 v544, v550 and v555 all intact. Version sweep v555→v556 done silently at the end across 5
 structural locations and is **not** claimed as the improvement.
+
+---
+## Cycle 455 Log — 2026-08-28 11:11
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 455 complete. v556 shipped, pushed, mirrored.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (rotation: 454=T3, 453=T1, 452=T5, 451=T2, 450=T6, 449=T4)
+
+## Friction
+Walked cold from the Home quickstart's own Step 4 ("before finalizing any IC memo, open Reform Risk") into Fiscal Compare, where the screening decision actually gets made.
+
+The FC Stability cell re-derived its own flag — `stale = last take rise predates 2010` — instead of calling `_rrClassify()`, the 
