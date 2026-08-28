@@ -16710,3 +16710,105 @@ claimed as the improvement.
 
 ## Friction
 Cold walk into Country Profile on **Iraq**. Every element of the headline agreed with itself, and every one was indefensible: **84.8% govt take**, **#21 of 21 producers** in red, **+25.4pp vs the producer median**, a verdict sentence saying *"high-take… at 84.8%"*, a Fiscal chara
+
+---
+## Cycle 452 Log — 2026-08-28
+
+**Task: T5 — "Give me something I can paste straight into an IC memo."**
+Rotation: 451 was T2, 450 T6, 449 T4, 448 T3, 447 T1, 446 T5 — T5 was least-recently-used.
+
+## Friction
+Cold walk (fresh context, `sessionStorage` and `localStorage` cleared) Home → Country Profile →
+**Iraq**, then **read the clipboard back** through the real buttons rather than trusting the
+labels. `⎘ Copy for IC Memo` (`copyICSummary()`, index.html:30201) returned, verbatim:
+
+    Iraq (Concession, 610 contracts, B-tier sourcing):
+    Government take: 81.5% @$50 · 84.8% @$75 · 86.9% @$100 · 88.1% @$125/bbl.
+    Contractor NPV (10% WACC, Deepwater, 100% WI): ... $642M @$75 (base). ...
+
+**Two independent defects in one artifact.**
+
+1. **The mechanic.** `var mechStr = (d.mechanics || '').split(',')[0].trim()` — the alphabetical
+   read that **v548 replaced on thirteen call sites and missed on this one**, the only one whose
+   output leaves the tool. **53 of 185 countries** pasted a mechanic that is not their own
+   plurality: Iraq (415 of 610 TSC — the largest TSC jurisdiction on earth) as *Concession*, plus
+   Indonesia, India, Iran, China, Egypt, Algeria, Angola and 45 others. The sibling `⎘ IC Citation`
+   on the same tab already read `fcResolveMechanic()` and said *"TSC regime"* — so **the two
+   clipboard artifacts contradicted each other on the same country in the same session.**
+
+2. **The take and the NPV were the blended all-contract figures.** Per
+   `~/MECHANIC_COMPARABILITY.md`, Group 2 (TSC / RSC / Buy-back) take% is a structural artefact of
+   a fixed $/bbl remuneration fee and is not commensurable with Group 1. v549 built the data
+   (`mech_mix`, `g1`) and corrected Side-by-Side; **v552 corrected the Country Profile screen.**
+   Neither reached the clipboard — v552's own log recorded it as deliberately not done.
+
+The compounding effect is the reason this was the worst moment: **v552 made the screen right and
+left the clipboard wrong.** The warning line sat ~200px above the button. The pasted paragraph
+carried none of it, and the pasted paragraph is the one that outlives the session and gets
+defended in a room where the tool is not open.
+
+## Change
+Both Country Profile IC artifacts now carry the basis with the number.
+
+- `copyICSummary()` names the resolved mechanic via `fcResolveMechanic()`.
+- New `_icFeeBasisNote(d)` / `_icBasisLine(d)` emit one line, placed with the metrics and directly
+  above `CP_IRR_NOTE` so the caveat survives the memo being cut down. For Iraq: *"Basis — this
+  headline is not comparable across countries as published: 415 of 610 contracts (68%) are
+  fee-basis (TSC 415), where the contractor is paid a fixed $/bbl remuneration fee and keeps no
+  price upside … this country's fee contracts average 98.5% take and $319M contractor NPV. On the
+  195 production-sharing and concession contracts, government take is 28.6% @$50 · 34.1% @$75 ·
+  37.8% @$100 · 39.7% @$125/bbl and contractor NPV is $3.0B @$75. Rank Iraq against
+  production-sharing countries on 34.1%, not 84.8% — the headline is the correct all-contract
+  average and is the figure the ORCA database and JSON API publish."*
+- New `_icFeeBasisClause(d)` adds the same fact compressed to one clause in `copyICCitation()`.
+
+**The published headline is kept** in both — it is what the database and the JSON API return and
+v449/v451 lock that cell — and the comparable figure travels with it, exactly as v549 and v552 do
+on screen.
+
+**No emphasis word is used, deliberately.** A first draft printed *"a POSITIVE $319M contractor
+NPV"*. That reads as an argument on Iraq (98.5% take *and* a positive NPV is the paradox proving
+take% is measuring structure) and as noise on India, whose fee contracts sit at **52.5%** — below
+its own headline. The sign of the number carries it. Recorded because it was caught in review of
+the emitted string, not by any gate.
+
+## Result
+An analyst pasting Iraq into an IC memo now pastes a **TSC**, the **34.1%** figure to rank on, the
+four-price comparable curve and the **$3.0B** comparable NPV — and the memo states, in itself, why
+84.8% is both correct and unrankable. Previously it pasted *"Iraq (Concession …) 84.8% … $642M"*
+with no route back to the truth the screen had displayed.
+
+The correction runs **both ways**, which is how it is not a thumb on the scale: India's pasted
+memo now reads *"rank India on 63.2%, not 61.9%"* — **upward**, because its 97 risk-service
+contracts carry a lower take than its PSCs.
+
+## Verification
+- JS syntax gate: **PASS**, 9 blocks / 0 errors (re-run after every edit, including after the
+  changelog and the version sweep).
+- Cold Playwright, storage cleared, clipboard read back through the real buttons:
+  - Basis note and citation clause fire on **exactly the same 10 countries** — Iraq 50.7pp,
+    Ecuador 7.2pp, South Sudan 4.3pp, Qatar 2.7pp, Mexico 2.5pp, Oman 2.0pp, India **+1.3pp**,
+    Iran 1.3pp, Malaysia 1.1pp, Azerbaijan 1.0pp.
+  - **0 disagreements** between note and clause across all 185; **0** `undefined` / `NaN` in any
+    emitted string.
+  - Nothing emitted for Norway, USA, Russia, Australia, Guyana. **Russia stays silent** (1
+    fee-basis contract of 1,247, `diverges` suppresses at printed precision). **Australia stays
+    silent** — PRRT is Group 3 and needs a same-price caveat, not a substitution.
+  - Mechanic now correct on **53 of 185** in the pasted summary.
+  - **15/15 cold button walks PASS. 0 page errors on every walk.**
+
+## Deliberately NOT done — stated rather than hidden
+1. Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank and colour on the
+   blended take.
+2. The FC `⎈ Copy for IC Memo` table and the XLSX export still carry the blended column with no
+   basis note. `_icFeeBasisNote()` is global so that is a contained next cycle.
+3. Group 3 (PRRT / Australia) untouched.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still 974). No new tooltip on any pre-existing control. No page-sub paragraph, no
+amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown.
+Tab order unchanged. CP headline still two-zone with a tier-coloured take%, global rank and
+vs-median pill. v371/v373, v430, v449, v451, v452, v489, v505, v511, v516, v518, v534, v542, v546,
+v548, v549, v550, v551 and v552 all intact. Version sweep v552→v553 done silently at the end
+across 5 structural locations and is **not** claimed as the improvement.
