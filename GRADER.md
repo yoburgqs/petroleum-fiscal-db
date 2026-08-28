@@ -16697,3 +16697,16 @@ claimed as the improvement.
 - Test after: 135 PASS / 0 FAIL / 1 WARN (known local sw.js 404)
 - JS errors: 0 on every cold walk
 - Summary: Cycle 451 complete — v552 shipped (`b531e3a`), pushed, mirrored to the office repo.
+
+---
+## Cycle 451 Log — 2026-08-28 07:12
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Here's the summary.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (rotation: 450 was T6, 449 T4, 448 T3, 447 T1, 446 T5 — T2 was least-recently-used.)
+
+## Friction
+Cold walk into Country Profile on **Iraq**. Every element of the headline agreed with itself, and every one was indefensible: **84.8% govt take**, **#21 of 21 producers** in red, **+25.4pp vs the producer median**, a verdict sentence saying *"high-take… at 84.8%"*, a Fiscal chara
