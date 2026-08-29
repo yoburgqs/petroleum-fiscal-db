@@ -19731,3 +19731,35 @@ Ignoring 7 permissions.allow entries from .claude/settings.json and .claude/sett
 - JS errors: 0
 - Summary: API Error: Can't reach the API server — check your internet or DNS (ENOTFOUND)
 
+
+---
+
+## Cycle 483 — T3, shipped as v577
+
+**Task.** T3 — *"How do these three countries compare side by side?"* (v576 was T4/T2; T3 was least-recently-used of the remaining rotation.)
+
+**Friction.** Walked Side-by-Side cold in Chromium with `sessionStorage` and `localStorage` cleared — twice: once on the seeded North Sea Trio the tab loads with no user action, once on an analyst-built Guyana / Angola / Brazil set. Measured the **rendered box model**, not the markup.
+
+The grid ends, and the analyst then meets a single always-open `<div>` of **688 words and 342px**. It is four stacked notices explaining why *IRR*, *"MC Uncertainty"*, *"Govt NPV @$75 (est.)"* and *"Breakeven ($/bbl)"* were removed from this table in earlier cycles (v513/v515/v549). Every word of it is about rows that are **not on screen** — a first-time analyst has never seen any of them. It is writing aimed at a returning user who noticed something missing.
+
+Two costs, both measured:
+
+1. It pushed **⎘ Copy Table for IC Memo** — the primary exit from this tab — to page-Y **1800** on a 900px viewport, with tab scroll height 2619px.
+2. It sat immediately below the two caveats that *are* set-specific and actionable — the **proxy-column** warning (`Guyana is a proxy column…` / `The column that wins this comparison is a proxy…`) and the **Take and NPV rank in opposite orders** warning. A reader who learns to skip the wall skips those too.
+
+Checked and *not* the problem, so recorded rather than "fixed": the example-seed → first-add replacement works and does raise its toast (`Cleared the 3-country example (Norway, United Kingdom, Netherlands) — building your comparison from Guyana.`, confirmed by instrumenting `showCopyToast`); the "Example loaded" banner is present; the v511 proxy caveat fires on **both** branches, including the quiet not-winning branch; and Netherlands grading **A** on 278 facts is correct under the documented worse-of-two-legs rule (≥150 facts = A), not a bug.
+
+**Change.** The block is now `<details id="cmp-absent-note">`, **collapsed by default**. The summary keeps what is load-bearing at the decision point in **one line**: the four metrics are absent, each was removed because it could not be compared between countries, rank on **Govt Take** and the **three contractor NPV rows**, and **Scenario Builder** is where a genuine IRR or breakeven on your own field and terms comes from. The full 688 words are one click away — collapsed, not deleted, because v515 was right that a silent absence would be its own confusion. An `@media print` rule forces `.cmp-absent-body` open and hides the disclosure chevron, so an **IC-pack PDF still carries the whole reasoning** even though the screen does not.
+
+**Result.** The analyst can now read the comparison, read the two caveats that apply to *their* three countries, and reach the export button without scrolling through an essay about metrics the table does not contain.
+
+| | before | after |
+|---|---|---|
+| note height | 342px | **52px** |
+| `Copy Table for IC Memo` page-Y | 1800 | **1510** |
+| tab scroll height | 2619 | **2330** |
+| words before the export button | 688 | **58** |
+
+**Verification.** Cold Playwright, storage cleared: collapsed by default (52px, 58-word summary); expands on click to 384px and collapses again; proxy caveat still renders; hidden `#cmp-data-table` feeding both clipboard flavours untouched at **21 rows × 4 cols**, so the IC-memo export is unchanged; under `emulateMedia({media:'print'})` the body computes `display:block` at 324px and the chevron `display:none`. **0 JS errors.** JS syntax gate **PASS** (10 blocks / 0 errors). `runtime_comprehensive.js` **ran this cycle** against the local build — **135 PASS / 0 FAIL / 1 WARN**, the WARN being the known local-harness `sw.js` 404 (service worker registers the GitHub Pages subpath; correct in production).
+
+**STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; no new FAQ (still 974); no new tooltip; v430 sessionStorage collapse memory, v449/v451/v452 CP headline and the v451 Govt NPV removal all intact. **No row and no column was added or removed.** Tab order unchanged. Version bump v576→v577 done silently at the end across 5 structural sites; it is **not** the deliverable.
