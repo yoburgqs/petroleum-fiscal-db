@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v581</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v582</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1393,7 +1393,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v581</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v582</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1463,7 +1463,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v581</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v582</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1805,7 +1805,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v581';
+  return m ? m[0] : 'v582';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1880,7 +1880,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v581');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v582');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -22246,10 +22246,19 @@ const MECH_COUNTS = {"Concession": 64673, "PSC": 6412, "EPSA": 208, "Buy-back": 
 
 // ─── utility ─────────────────────────────────────────────────────────────────
 function switchTab(id, btn) {
+  // v582 (T2): a call with an id that has no pane used to strip .active from every pane AND
+  // every tab button and then activate nothing — the entire application went blank, with no
+  // JS error, no active tab, and nothing on screen to explain what had happened. Three live
+  // links passed 'tscenario', which is a MODAL (#scenario-modal), never a tab pane. Refuse the
+  // navigation and leave the analyst where they were rather than emptying the page.
+  var panel = document.getElementById(id);
+  if (!panel) {
+    try { console.warn('switchTab: no tab pane "' + id + '" \u2014 navigation ignored, view left intact'); } catch (e) {}
+    return;
+  }
   document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => { b.classList.remove('active'); b.setAttribute('aria-selected', 'false'); });
-  var panel = document.getElementById(id);
-  if (panel) panel.classList.add('active');
+  panel.classList.add('active');
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
   window._prevTab = window._activeTab;
   window._activeTab = id;
@@ -28908,7 +28917,7 @@ function loadCountryProfile(country) {
         return `<tfoot><tr style="border-top:2px solid var(--border);background:rgba(0,0,0,.02);">
           <td style="padding:6px 8px 6px 0;font-size:11px;font-weight:700;color:var(--muted);" title="Price Swing = govt take at $125/bbl minus take at $50/bbl. High swing = progressive regime; IC memo requires 4-price sensitivity table.">Price Swing</td>
           <td colspan="2" style="text-align:right;padding:6px 8px;font-size:12px;font-weight:800;color:${swingCol};font-family:'IBM Plex Mono',monospace;" title="Take at $125 minus take at $50 — measures how price-sensitive this regime is. <10pp: royalty-dominant, predictable. 10–20pp: moderate. >20pp: progressive PSC, multi-price table required in IC memo.">${swingSign}${swing456.toFixed(1)}pp ($50→$125)</td>
-          <td colspan="2" style="text-align:left;padding:6px 8px;font-size:10px;color:var(--muted);">${Math.abs(swing456) < 10 ? 'Low swing — royalty-dominant; single-price cite acceptable' : Math.abs(swing456) < 20 ? 'Moderate swing — show multi-price sensitivity in IC memo' : 'High swing — progressive regime; price range table required in IC memo'}<a onclick="switchTab('tscenario',document.getElementById('tab-btn-tscenario'));return false;" href="#" style="color:var(--accent);font-size:10px;font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;margin-left:10px;white-space:nowrap;" title="Open Scenario Builder to model custom fiscal terms for this regime">&#8594; Model in Scenario Builder</a></td>
+          <td colspan="2" style="text-align:left;padding:6px 8px;font-size:10px;color:var(--muted);">${Math.abs(swing456) < 10 ? 'Low swing — royalty-dominant; single-price cite acceptable' : Math.abs(swing456) < 20 ? 'Moderate swing — show multi-price sensitivity in IC memo' : 'High swing — progressive regime; price range table required in IC memo'}<a onclick="ddOpenScenarioBuilder('${_irrCty576}');return false;" href="#" style="color:var(--accent);font-size:10px;font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;margin-left:10px;white-space:nowrap;" title="Open the Scenario Builder pre-filled with ${d.country}'s mechanic, royalty, CIT, special tax and state equity — add your own capex, opex and production profile">&#8594; Model in Scenario Builder</a></td>
         </tr>${regionAvgRow465}</tfoot>`;
       })()}
       </tbody>
@@ -28955,7 +28964,7 @@ function loadCountryProfile(country) {
     <p id="dd-be-footnote-${safe}" style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;">Breakeven = price at which contractor NPV = 0. Loading from database…</p>
     <!-- v516: the platform advertises IRR on Fiscal Compare, Explorer and the Screener hurdle slider,
          so a silent absence here would be its own confusion. Say where it went, once, under the table. -->
-    <p style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5;border-left:2px solid var(--border);padding-left:8px;"><strong style="color:var(--text);">No IRR column.</strong> The country-level IRR this page used to show was an arithmetic mean of per-contract IRRs — median 333% across the 165 countries that carry one, and only 9 of those below 100%. It is not a project return, and it was being pasted into IC memos. Contractor NPV at four prices is on the same standardized Deepwater profile and is computed for all 185 countries. For a genuine project IRR, <a onclick="switchTab('tscenario',document.getElementById('tab-btn-tscenario'));return false;" href="#" style="color:var(--accent);font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;" title="Open Scenario Builder to compute an IRR from your own capex, opex and production profile">run Scenario Builder with your own capex and opex →</a></p>
+    <p style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5;border-left:2px solid var(--border);padding-left:8px;"><strong style="color:var(--text);">No IRR column.</strong> The country-level IRR this page used to show was an arithmetic mean of per-contract IRRs — median 333% across the 165 countries that carry one, and only 9 of those below 100%. It is not a project return, and it was being pasted into IC memos. Contractor NPV at four prices is on the same standardized Deepwater profile and is computed for all 185 countries. For a genuine project IRR, <a onclick="ddOpenScenarioBuilder('${_irrCty576}');return false;" href="#" style="color:var(--accent);font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;" title="Open the Scenario Builder pre-filled with ${d.country}'s fiscal terms and compute a project IRR from your own capex, opex and production profile">run Scenario Builder with your own capex and opex →</a></p>
     ${(function(){
       // v458: Copy as IC table — tab-separated text ready to paste into Excel or IC memo
       // v486: prepend a title row with country + profile + version so IC analysts see context when pasting into Excel
@@ -33216,7 +33225,7 @@ function ddOpenScenarioBuilder(country) {
   var _sbBanner = document.getElementById('sb-prefill-banner');
   var _sbBannerText = document.getElementById('sb-prefill-text');
   if (_sbBanner && _sbBannerText) {
-    _sbBannerText.textContent = 'Parameters pre-filled from Country Profile: ' + country + ' — edit any field and click Run DCF to customize.';
+    _sbBannerText.textContent = 'Parameters pre-filled for ' + country + ' — edit any field and click Run DCF to customize.';  // v582 (T2): no longer says "from Country Profile" — this path is now reachable from the Fiscal Compare drilldown too.
     _sbBanner.style.display = 'flex';
   }
 
@@ -34982,7 +34991,7 @@ function openFCDrilldown(country) {
   // confusion. Say where it went, once, and route to the tool that computes a real one.
   html += '<div style="max-width:480px;font-size:10px;color:var(--muted);margin:-8px 0 12px;padding-left:8px;border-left:2px solid var(--border);line-height:1.5;">'
     + '<strong style="color:var(--text);">No IRR row.</strong> The country-level IRR is an arithmetic mean of per-contract IRRs \u2014 median 239.8% across the 124 countries that carry one at $75/bbl, and it falls as price rises for 20 countries whose NPV rises. It is not a project return. Contractor NPV above is on the same standardized profile and is computed for all 185 countries. '
-    + '<a href="#" onclick="switchTab(\'tscenario\',document.getElementById(\'tab-btn-tscenario\'));return false;" style="color:var(--accent);font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;" title="Open Scenario Builder to compute an IRR from your own capex, opex and production profile">Run Scenario Builder for a project IRR \u2192</a></div>';
+    + '<a href="#" onclick="ddOpenScenarioBuilder(\'' + cEsc + '\');return false;" style="color:var(--accent);font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;" title="Open the Scenario Builder pre-filled with ' + country + '\u2019s fiscal terms and compute a project IRR from your own capex, opex and production profile">Run Scenario Builder for a project IRR \u2192</a></div>';
   // v506: the verdict. Two government-take figures now sit adjacent and labelled; this says
   // which one goes in the IC memo and what the gap means. Severity thresholds match the
   // Country Profile reconciliation shipped in cycle 403: <3pp consistent, <10pp modest,
