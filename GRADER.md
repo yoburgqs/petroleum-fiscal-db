@@ -19763,3 +19763,18 @@ Checked and *not* the problem, so recorded rather than "fixed": the example-seed
 **Verification.** Cold Playwright, storage cleared: collapsed by default (52px, 58-word summary); expands on click to 384px and collapses again; proxy caveat still renders; hidden `#cmp-data-table` feeding both clipboard flavours untouched at **21 rows × 4 cols**, so the IC-memo export is unchanged; under `emulateMedia({media:'print'})` the body computes `display:block` at 324px and the chevron `display:none`. **0 JS errors.** JS syntax gate **PASS** (10 blocks / 0 errors). `runtime_comprehensive.js` **ran this cycle** against the local build — **135 PASS / 0 FAIL / 1 WARN**, the WARN being the known local-harness `sw.js` 404 (service worker registers the GitHub Pages subpath; correct in production).
 
 **STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; no new FAQ (still 974); no new tooltip; v430 sessionStorage collapse memory, v449/v451/v452 CP headline and the v451 Govt NPV removal all intact. **No row and no column was added or removed.** Tab order unchanged. Version bump v576→v577 done silently at the end across 5 structural sites; it is **not** the deliverable.
+
+---
+## Cycle 483 Log — 2026-08-29 13:31
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Here is the summary.
+
+## Cycle 483 — T3, shipped as v577
+
+**Task.** T3 — *"How do these three countries compare side by side?"* (v576, the last real cycle, was T4/T2.)
+
+**Friction.** I walked Side-by-Side cold in Chromium with storage cleared — twice: once on the North Sea Trio the tab seeds itself with, once on an analyst-built Guyana/Angola/Brazil set — and measured the rendered box model rather than reading the markup.
+
+The comparison grid ends, and the analyst then
