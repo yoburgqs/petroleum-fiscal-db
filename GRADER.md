@@ -19960,3 +19960,18 @@ v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk
 placement and the v578 Explorer grouping are all intact. Tab order unchanged.
 Version bump v579→v580 across 5 structural sites, done silently at the end; it
 is **not** the deliverable.
+
+---
+## Cycle 485 Log — 2026-08-29 16:11
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed as **v580**.
+
+## Cycle 485 — T5
+
+**Task.** T5 — *"Give me something I can paste straight into an IC memo."* (least-recently-used; 484 was T1, 483 T3, v576 T4/T2, 474 T6, 473 T5).
+
+**Friction.** Walked Fiscal Compare cold with storage cleared, clicked `⎘ Copy for IC Memo`, and read the clipboard back instead of trusting the label.
+
+The tab has two government-take columns. `Take% model` is what this screen's engine computes; `Take% db · citable` is the ORCA database f
