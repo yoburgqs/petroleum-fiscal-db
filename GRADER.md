@@ -18854,3 +18854,146 @@ across 5 structural locations; it is not the improvement.
 **Friction.** I cleared storage, loaded cold, opened Country Profile and went to the section named for the question — *Key Fiscal Parameters — Evidence Chain*.
 
 On the **United Kingdom**, the *Special Tax* row reads ORCA 38%, Statutory 38%. Its Source badge was the literal string `EY_IHS_Bu
+
+---
+## Cycle 469 Log — 2026-08-29
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN (local build, `TEST_URL` set)
+- Test after: 135 PASS / 0 FAIL / 1 WARN — **run this cycle, not carried forward**
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Page errors on the cold 185-country sweep: 0
+- Version: v569 → v570 (silent, at the end, 5 structural locations — not the improvement)
+
+## Cycle 469 — T2: "Is this one country attractive at $75/bbl, and can I defend that?"
+
+**Task.** T2, least-recently-used (468 was T6, 467 T5, 466 T1, 465 T4, 464 T3, 463 T2).
+
+**Friction.** Cleared `sessionStorage` and `localStorage`, loaded cold, opened
+Country Profile on **Nigeria** — the tab that exists to answer T2 about a single
+country. Zone A of the headline strip, the block where the verdict is formed,
+read:
+
+> Concession · **81.1% govt take @$75** · #21 of 21 producers · high-take among
+> producers · +25.5pp vs producer median · NPV $302M ·
+> *"High fiscal burden — government captures the majority of project economics;
+> NOC/state-dominant structure"*
+
+Every element agreed with every other one. On a 20-minute clock the analyst
+closes the tab.
+
+**Six screens further down**, the same page states that Nigeria does not run one
+fiscal regime. Its *Fiscal Regime Breakdown* table reads:
+
+| Regime | Contracts | Avg take | Avg contractor NPV |
+|---|---|---|---|
+| Concession | 659 (79%) | 83.0% | **$60M** |
+| PSC | 175 (21%) | 68.3% | **$1,213M** |
+
+Every IOC deepwater asset in the ranked contract table below — Bonga, OML 118,
+OML 125, OML 133 — is in the **second** block. The 81.1% / $302M headline is
+dominated by 659 onshore NOC/Concession contracts an IOC will never bid, and it
+is **20× wrong on contractor NPV** for the ones it will.
+
+Nigeria is not the worst case. On **Russia** the 46.4% headline sits between
+Concession 22.9% (1,191 contracts) and PSC 56.4% (69) and describes **neither**.
+Yemen 38.6pp apart, Iraq 37.2pp, Egypt 23.2pp, Mexico and Bolivia 20.5pp.
+
+The page was **not silent** — `getMechBlendWarning()` prints *"blended average
+may conceal variation between contract types"* and the breakdown table prints
+*"use per-regime figures for investment analysis"*. Both sit below the fold,
+both are hedged, and **neither carries a number**. The one screen the analyst
+actually reads carried a single take and a single NPV.
+
+**Change.** A regime-split block (`_cpRegimeSplit570`, rendered in Zone A
+immediately after `_cpCmpLine552`) now sits **directly under the 26px take
+figure** on the **13** countries where two Group-1 regimes differ by ≥5pp. It
+names each regime with its own contract count, share, take and contractor NPV:
+
+> ⚠ **2 regimes here — take differs 14.7pp**  ·  breakdown ↓
+> Concession  659 (79%)  **83.0%**  $60M
+> PSC  175 (21%)  **68.3%**  $1.2B
+> The 81.1% headline is the blend of all of them. Contractor NPV across them
+> runs $60M to $1.2B. Screen on the regime you would sign.
+
+Clicking it scrolls to and flashes the *Fiscal Regime Breakdown* table, which
+now carries `id="cp-regime-breakdown"`.
+
+Numbers are read from `MECHANIC_BREAKDOWN` — **the same array that table
+renders** — so the headline and the table cannot disagree. Group membership
+comes from the existing `mech_mix.g` field. Group-2 fee-basis rows (TSC / RSC /
+Buy-back) are excluded, because **v552** already handles them and
+`~/MECHANIC_COMPARABILITY.md` forbids ranking their take against Group 1. On
+**Iraq** both lines render and each states a different true thing: the v552 line
+says the 84.8% headline blends 415 TSCs and the comparable take is 34.1%; the
+new line says that 34.1% is itself a blend of PSC 171 @ 60.4% and Concession
+24 @ 23.2%.
+
+**No published figure, tier colour, rank or median pill was altered.** v449,
+v451 and v452 lock those cells and none of them was touched. **No threshold was
+invented:** the ≥5pp bar is the materiality bar `_cpCmpLine552` already uses on
+this same strip, and the ≥5%-secondary-share gate is the breakdown section's own.
+
+**Result.** An analyst screening Nigeria sees, **before scrolling**, that the
+regime they would actually sign carries **14.7pp lower take and 20× the
+contractor NPV** of the number the headline gives them — and can click straight
+to the table that sources it. Previously that fact was six screens away in a
+section titled for the data rather than for the decision.
+
+**Verified cold in Playwright**, storage cleared, against the local build. Sweep
+of all 185 profiles: block fires on **13** (Angola, Bolivia, Brazil, China,
+Colombia, Ecuador, Egypt, India, Iraq, Mexico, Nigeria, Russia, Yemen), **0**
+chip/table number mismatches, **0** page errors, click-to-jump confirmed to
+scroll and flash the target. Correctly silent on Norway (one mechanic),
+Kazakhstan (0.6pp gap) and Saudi Arabia (state monopoly).
+
+> **Defect caught by the sweep, not by reading the code.** On **Indonesia** the
+> block rendered while its breakdown section was gated off — the section requires
+> a secondary mechanic at ≥5% of contracts and Indonesia's Gross Split block is
+> 3% (19 of 667) — so "breakdown ↓" pointed at an element that does not exist.
+> The block now carries that same existing gate; Indonesia correctly drops out of
+> both, and the two surfaces stay coupled.
+
+**Tests — RUN this cycle, not carried forward.** JS syntax gate **PASS**
+(9 blocks / 0 errors). `runtime_comprehensive.js` against the **local** build
+with `TEST_URL=http://localhost:8791/index.html`: **135 PASS / 0 FAIL / 1 WARN**.
+The suite's default target is the live production site, so an unset `TEST_URL`
+grades the deployed build and not the working tree — the harness trap recorded
+in cycle 468. The WARN is the known local-harness `sw.js` 404; the diff touches
+no service-worker code (`git diff` on `index.html` contains zero `sw.js` /
+`serviceWorker` hits).
+
+### Found on this walk, not fixed — stated rather than hidden
+1. **New: `MECHANIC_BREAKDOWN` and `mech_mix` disagree on the same quantity.**
+   Nigeria's Concession block is 83.0% take / $60M NPV in `MECHANIC_BREAKDOWN`
+   and 77.5% / $427M in `mech_mix`; Bolivia's is 89.6% vs 44.3%. Two arrays,
+   different vintages, both live, both read by this page — `mech_mix` drives the
+   v552 comparable take and `MECHANIC_BREAKDOWN` drives the breakdown table.
+   This cycle deliberately used `MECHANIC_BREAKDOWN` only, so the new block
+   cannot contradict the table it links to, but reconciling the two is its own
+   cycle and is the largest open correctness item found here.
+2. **New: `MECHANIC_BREAKDOWN` covers only 20 countries.** `mech_mix` shows
+   **74** countries with more than one mechanic. Ecuador, Cyprus, Malaysia,
+   Mauritania, Senegal, Suriname, Sierra Leone and others carry Group-1 take
+   gaps of 40–60pp with no breakdown table and therefore no headline block.
+3. **New: generic-default contamination in `mech_mix`.** Senegal, Suriname,
+   Ethiopia, Mauritania and Sierra Leone all carry a Concession block at exactly
+   0.0% take and exactly **$5,533.1M** NPV — the no-fiscal-terms DCF result,
+   identical across countries. Sierra Leone holds 41 of its 44 contracts in that
+   state. Fiscal Compare partitions this block out (v563); `mech_mix` does not.
+4. `formatBreakeven()` still collapses all 65 populated values to `<$50` on
+   Fiscal Compare, Country Profile and the Breakeven Map. Carried from
+   v562/v563/v566/v568/v569; unchanged.
+5. The **Breakeven Map** tab remains unwalked.
+6. The FC *Project viable* counter still pools the generic-default block.
+7. The three surviving `◆◆◆◆◆` reform rows (Algeria, Colombia, USA) are window
+   artefacts. Carried from v566.
+
+### STILL LOCKED — nothing touched
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not
+change — the only tooltip added belongs to the new block itself. No page-sub
+paragraph, no amber instructional banner, no routing hint, no "How to read"
+block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. Tab order unchanged. CP
+headline still two-zone with tier-coloured take%, global rank and vs-median pill.
+Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373, v430,
+v449, v451, v452, v489, v505, v508, v512–v569 all intact.
