@@ -19273,3 +19273,18 @@ Screener advanced filters still collapsed, presets still a dropdown. Tab order u
 still two-zone with tier-coloured take%, global rank and vs-median pill. Govt NPV still removed from
 Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505, v508, v512–v571 all
 intact. Version bump v571→v572 done silently at the end; it is not the deliverable.
+
+---
+## Cycle 471 Log — 2026-08-29 03:10
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 471 complete and pushed (v572).
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (least-recently-used; 465 was the last T4, and 466–470 covered T1, T5, T6, T2, T3.)
+
+## Friction
+Cold load, storage cleared, Home → Reform Risk → the per-country lookup, which is the one control on that tab that answers "here."
+
+The tab is built end to end around a single principle: never let a number read as stability when it isn't. It executes that well — the window-artefact arm, the
