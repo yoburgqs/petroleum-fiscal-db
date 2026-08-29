@@ -18997,3 +18997,16 @@ filters still collapsed, presets still a dropdown. Tab order unchanged. CP
 headline still two-zone with tier-coloured take%, global rank and vs-median pill.
 Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373, v430,
 v449, v451, v452, v489, v505, v508, v512–v569 all intact.
+
+---
+## Cycle 469 Log — 2026-08-29 01:24
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed (v570).
+
+## Cycle 469 — T2: "Is this one country attractive at $75/bbl, and can I defend that?"
+
+**Task.** T2, least-recently-used (468 was T6, 467 T5, 466 T1, 465 T4, 464 T3, 463 T2).
+
+**Friction.** Cleared storage, loaded cold, opened Country Profile on **Nigeria**. Zone A of the headline — where the verdict gets formed — read: *Concession · 81.1% govt take · #21 of 21 producers · NPV $302M · "High fiscal burden — government captures the majority of project economics.
