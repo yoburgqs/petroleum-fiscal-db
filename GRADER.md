@@ -19536,3 +19536,16 @@ rank and vs-median pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-
 v371/v373, v430, v449, v451, v452, v489, v505, v508, v512–v573 all intact. Version bump
 v573→v574 is **not** the deliverable — this cycle is what makes future bumps propagate without
 one.
+
+---
+## Cycle 473 Log — 2026-08-29 05:23
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed (v574). Local server on :8791 left running for the next cycle.
+
+## Cycle 473 — T5
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* (least-recently-used; 467 was the last T5, and 468–472 covered T6, T2, T3, T4, T1.)
+
+**Friction.** Walked cold with storage cleared, hit every citation affordance, and read the clipboard back instead of trusting the buttons. The *dynamic* paths were fine — Country Profile's `⎘ IC Citation`, the FC drilldown cite, `
