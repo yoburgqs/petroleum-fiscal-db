@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v579</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v580</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1393,7 +1393,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v579</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v580</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1463,7 +1463,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v579</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v580</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1805,7 +1805,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v579';
+  return m ? m[0] : 'v580';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1880,7 +1880,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v579');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v580');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2750,6 +2750,7 @@ window.copyPlatformCitation = function(btn) {
   <!-- Recent Platform Updates / Changelog -->
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
+    <strong style="color:var(--accent);">v580 (Aug 2026) &mdash; Cycle 485 (T5): Fiscal Compare ranked Nigeria <em>#5 in the world</em> on a citable government take of 81.1%, and that rank travelled into the IC memo</strong> &mdash; Task <strong>T5</strong> &mdash; &ldquo;give me something I can paste straight into an IC memo.&rdquo; Walked cold, <code>sessionStorage</code> and <code>localStorage</code> cleared, Home &rarr; Fiscal Compare &rarr; <code>&#x2398; Copy for IC Memo</code>, and read the clipboard back. <strong>Friction.</strong> The <code>#</code> column, the top-10 green / bottom-10 red borders and all four take-tier dividers were computed on <strong>Take% <em>model</em></strong>, while the column immediately to its right &mdash; <strong>Take% db &middot; citable</strong> &mdash; is the one the drilldown, Country Profile, the JSON API, the XLSX and the paste itself all tell the analyst to cite. Measured over the 65 rows the table ranks: ranking on the citable column instead moves the <strong>median row 13 places and the worst row 57</strong>. <strong>Nigeria rendered at #5</strong> on a citable take of <strong>81.1%</strong> &mdash; 62nd of 65, and inside the &ldquo;&gt;75% Very High: requires exceptional economics&rdquo; band this same tab defines two panels up. China sat at #4 on 61.0% (51st); Sudan #8 on 57.4% (42nd). Meanwhile <strong>Ecuador, the Philippines, Georgia and Trinidad</strong> &mdash; citable ranks 6, 7, 8 and 9 &mdash; rendered at #48, #49, #50 and #58, below the fold. The <em>Investible tier ends (&le;40%)</em> divider fell above <strong>Australia at a citable 38.5%</strong>, pushing an investible country out of the investible tier on a number the page says not to quote. And because <code>copyFCForIC()</code> copies the rows as shown, that ordering left the tool: an IC reader treats a numbered list as a ranking of the number beside it. The header tooltip disclosed the split in prose and blamed it on &ldquo;a G row&rdquo; &mdash; the measured divergence is entirely on <em>non</em>-G rows. <strong>Change.</strong> The <code>take</code> sort, the <code>#</code> rank, the tie groups, the top/bottom-10 borders and all four tier dividers are now built on the citable database take at the selected price. <strong>Nothing below the divider moves</strong>: the 120 generic-default rows keep the old model comparator, so Vanuatu does not surface. <strong>Why this was declined before, and why it is no longer blocked.</strong> v547 named the reason in its own log &mdash; ranking on the database take would head the shortlist with Vanuatu (5.0%), the Bahamas, Montenegro, Greenland and the Faroe Islands. That reason expired at <strong>v563</strong>, which partitioned every generic-default row out of the ranking: all five of those jurisdictions, and all three state monopolies, carry <code>termsBasis === &#39;default&#39;</code> and were already unranked below the line. Re-verified on the live result set &mdash; 65 own-terms rows, every one with a populated database take at $50/$75/$100/$125, no non-producer and no monopoly among them. v529 had already re-based the <strong>XLSX</strong> ranking on the citable take and recorded the screen as a separate cycle; screen and workbook now agree. Three header tooltips that asserted the old basis were corrected, and the pasted preamble now reads <em>&ldquo;ranked on the ORCA database take column &mdash; the CITABLE one &mdash; low &rarr; high&rdquo;</em>. <strong>Result.</strong> The position an analyst reads and the number they cite are the same number. Cold default now opens <strong>USA 23.4 &middot; Somalia 36.9 &middot; Australia 38.5 &middot; Madagascar 43.5 &middot; Egypt 45.1</strong>, monotonic on the citable column with 0 inversions, genuine ties marked <code>=6</code> / <code>=8</code>, and the investible divider correctly below Australia. <strong>Verified cold in Playwright</strong>, storage cleared: default, NPV sort (unchanged), $125 leg, Africa / Europe / Middle East region filters, the reverse-sort state and the clipboard read-back &mdash; <strong>0 page errors on every walk</strong>, generic block head byte-identical (Ireland, Tunisia, Venezuela, Brunei&hellip;). JS syntax gate <strong>PASS</strong> (10 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the local build: <strong>134 PASS / 0 FAIL / 1 WARN</strong> &mdash; and the same suite run against the pre-change HEAD on the same server returned the <em>identical</em> 134 / 0 / 1 with a byte-identical assertion list, so the change is regression-free; the 135 figure in the loop prompt is the production-URL baseline, and the WARN is the known local-harness <code>sw.js</code> 404. <strong>STILL LOCKED &mdash; nothing touched:</strong> no new FAQ (still 974); <strong>no new tooltip</strong> (three existing ones were corrected because they asserted a basis this cycle changed); no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no row and no column added or removed from any table</strong>; v430 sessionStorage logic, v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk placement and v578 all intact; tab order unchanged. Version bump v579&rarr;v580 done silently at the end across 5 structural sites; it is <strong>not</strong> the deliverable.<br><br>
     <strong style="color:var(--accent);">v579 (Aug 2026) &mdash; an eleven-attribute audit of the rendered product: the accent colour failed WCAG AA on every ground it is painted on, the Breakeven Map drew a five-band scale with four empty bands, and every CSV shipped without a UTF-8 BOM</strong> &mdash; Measured in a browser rather than read from the DOM. <strong>Contrast:</strong> <code>--accent</code> returned 4.35 / 3.99 / 3.60 against surface, page and panel grounds against a 4.5 floor, across 1,046 text nodes; the evidence tier-B badge returned 2.91. Both retoned, a ~3% luminance shift. <strong>Breakeven Map:</strong> bands were fixed at $40/55/70/85 while every modelled country sits between $27 and $34 &mdash; 68 countries in band one, four bands empty, 177 country paths in 2 fills. Bands are now quintiles of the live distribution. <strong>Exports:</strong> UTF-8 BOM added to all four CSVs (the reform log is full of em-dashes and rendered as mojibake in Excel on Windows); the Screener CSV moved its provenance block below the table so row 1 is the header and the file parses; autofilter on every data sheet (freeze panes were attempted and verified not to survive the bundled SheetJS writer, so the call was removed rather than left looking like a feature); chart PNGs now export at 2&times;. <strong>Accessibility:</strong> the document had no <code>h1</code> and Home, Explorer, Screener and Side-by-Side rendered no headings at all &mdash; all thirteen page titles are now real headings, plus a banner landmark, labels on the two live-DCF controls, and a reduced-motion rule that 188 still-animating elements were ignoring. <strong>Layout:</strong> Country Profile no longer scrolls sideways at 390px. <strong>Type:</strong> 56 declarations raised off the 9px floor to 10px.
     <strong style="color:var(--accent);">v578 (Aug 2026) &mdash; Cycle 484 (T1): Explorer answered &ldquo;which countries should be on my list?&rdquo; with Vanuatu, Bahamas and Montenegro &mdash; the exact defect v507 fixed on the Screener, still live on the sibling table 71 versions later</strong> &mdash; Task <strong>T1</strong> &mdash; &ldquo;which countries should even be on my screening list?&rdquo; Walked cold in Chromium with <code>sessionStorage</code> and <code>localStorage</code> cleared, into the <strong>Explorer</strong> tab &mdash; which sits <em>before</em> Screener in the primary nav and is where a first-time analyst lands. <strong>Friction:</strong> <code>#tbl-explorer</code> ranks all 185 countries and its cold default sort is <em>Govt Take ascending</em>, under a control whose own tooltip reads &ldquo;lower = more contractor-favorable&rdquo;. Measured against live <code>country_data.json</code>, ranks 1&ndash;12 are <strong>Vanuatu 5.0%, Bahamas 10.0%, Montenegro 10.5%, Greenland 11.6%, Faroe Islands 11.9%, Moldova 12.4%, Romania 13.6%, Sweden 13.7%, Bulgaria 13.8%, Kyrgyzstan 13.8%, Bosnia 15.6%, Serbia 15.9%</strong> &mdash; every one badged <code>PROXY</code>, their low take an artefact of ORCA holding a royalty rate and no profit-oil or income-tax terms. The <strong>first row with any verified field production is USA at rank 62</strong>; Canada 100, United Kingdom 121, Angola 129, Guyana 138, Brazil 147, Indonesia 158, Norway 168, Nigeria 179, Iraq 180. So the analyst scrolled past <strong>61 proxy placeholders</strong> before reaching a country anyone has drilled. This is precisely what <strong>v507</strong> diagnosed and fixed on <code>#tbl-screener</code> in cycle 406 &mdash; same sentence, same countries &mdash; and Explorer&rsquo;s ordering is <em>worse</em> than the one v507 repaired: v507&rsquo;s Screener sorted <code>npv_75</code> DESC, which it called &ldquo;a take sort wearing a different hat&rdquo;; Explorer sorts take directly, with no indirection. The per-row <code>PROXY</code> badge could not carry the warning because every row above the fold carried it too. <strong>Change:</strong> the Explorer ranking is now <strong>grouped by data basis</strong> &mdash; the 22 countries with verified field production sort above the 163 proxies, by the chosen metric <em>within each group</em>, reusing the same <code>_dqTier()</code> test that drives the row badge and the v507 Screener ordering, so badge and position cannot drift. <strong>Nothing is filtered out</strong> &mdash; all 185 stay in the table, the count and the export; only the order changed. The cold Explorer now opens <strong>USA, Argentina, Mexico, Canada, Colombia, Australia, Ecuador, United Kingdom, Angola, Brazil, Malaysia, Indonesia</strong>. A <strong>labelled amber divider</strong> marks the boundary at row 22 &mdash; <em>&ldquo;below this line &mdash; 163 countries with no verified field production&rdquo;</em> &mdash; so row 23 is no longer read with the authority of row 1. The count line states the split and recomputes under every filter. A <strong>first-class toggle</strong> &mdash; <em>Verified production first</em>, checked by default &mdash; sits in the Explorer control row beside <em>IRR only</em> and <em>BE only</em>, and unticking it restores the previous ordering exactly. Grouping is <strong>excluded from the A&ndash;Z sort</strong>, which is a lookup rather than a ranking &mdash; regrouping the alphabet would break the thing the analyst is scanning &mdash; and that case takes the v543 mixed-basis note in the count line instead of going silent. Same for the toggle-off state and any all-proxy result. <strong>Result:</strong> an analyst who opens Explorer and sorts by government take now sees a screening list of countries that produce oil, instead of eleven jurisdictions where nobody has drilled and a twelfth at rank 62. <strong>Verified cold in Playwright</strong>, storage cleared, across seven states: cold default (185 rows, 1 divider at index 22, top 8 all production-backed); sort=NPV (grouped, Canada/USA/Azerbaijan); sort=A&ndash;Z (<strong>0 dividers</strong>, alphabet intact, mixed-basis note fires); toggle OFF (Vanuatu order restored byte-for-byte, note fires); toggle back ON (order identical to cold default); Region=Europe (2 verified / 28 proxy, divider at index 2, United Kingdom and Norway on top); <em>Prod Data Only</em> (10 rows, all verified, <strong>no divider and no note</strong>, correctly). <strong>0 page errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (10 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the local build: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness artifact (the service worker registers the GitHub Pages subpath <code>/petroleum-fiscal-db/sw.js</code>, which 404s on a root-served local server; correct in production). <em>Found on this walk, not fixed:</em> the <em>Prod Data Only</em> button filters on <code>prod_coverage_pct &gt; 5</code> and returns <strong>10</strong> countries, while <code>_dqTier()</code> counts <strong>22</strong> as production-backed at <code>&gt; 0</code> &mdash; two thresholds for &ldquo;verified production&rdquo; on the same control row, disagreeing by 12 countries. Reconciling them is its own cycle. <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, <strong>no visible Explorer chip row</strong>; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); <strong>no new tooltip on any control whose behaviour did not change</strong> &mdash; the one tooltip added sits on the toggle this cycle created. <strong>No row and no column was added or removed from any table.</strong> v430 sessionStorage logic, v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk placement and the v577 collapsed absent-metrics note are all intact. Tab order unchanged. Version v577&rarr;v578.<br><br>
     <strong style="color:var(--accent);">v577 (Aug 2026) &mdash; Cycle 483 (T3): 688 words explaining four rows that are not in the table stood between the comparison and the button that exports it</strong> &mdash; Task <strong>T3</strong> &mdash; &ldquo;how do these three countries compare side by side?&rdquo; Walked cold in Chromium with <code>sessionStorage</code> and <code>localStorage</code> cleared, on the seeded North Sea Trio and again on an analyst-built Guyana / Angola / Brazil set, <strong>measuring the rendered box model</strong> rather than reading the markup. <strong>Friction:</strong> the Side-by-Side grid ends and the analyst then meets a single always-open <code>&lt;div&gt;</code> of <strong>688 words and 342px</strong> &mdash; four stacked notices explaining why <em>IRR</em>, <em>&ldquo;MC Uncertainty&rdquo;</em>, <em>&ldquo;Govt NPV @$75 (est.)&rdquo;</em> and <em>&ldquo;Breakeven ($/bbl)&rdquo;</em> were removed in earlier cycles. Every word is about rows a first-time analyst has <strong>never seen</strong>; it is written for a returning user who noticed something missing. It pushed <strong>&#x2398; Copy Table for IC Memo</strong> &mdash; the primary exit from this tab &mdash; to page-Y <strong>1800</strong> on a 900px viewport, and it sat immediately below the two caveats that <em>are</em> set-specific and actionable (the <em>proxy column</em> warning and the <em>Take and NPV rank in opposite orders</em> warning), so the reader who skips the wall skips those too. <strong>Change:</strong> the block is now a <code>&lt;details id="cmp-absent-note"&gt;</code>, <strong>collapsed by default</strong>. The summary keeps what is load-bearing at the decision point in <strong>one line</strong> &mdash; the four metrics are absent, they were removed as not comparable between countries, rank on Govt Take and the contractor NPV rows, and Scenario Builder is where a genuine IRR or breakeven on your own field comes from. The full reasoning is one click away, not deleted. v515 was right that a silent absence would be its own confusion, so nothing is hidden that was not already said &mdash; only the 688-word justification is folded. An <code>@media print</code> rule forces <code>.cmp-absent-body</code> open and hides the disclosure chevron, so an <strong>IC-pack PDF still carries the full reasoning</strong> even though the screen does not. <strong>Result:</strong> note height <strong>342px &rarr; 52px</strong>; <em>Copy Table for IC Memo</em> moves from page-Y <strong>1800 to 1510</strong> and the tab&rsquo;s scroll height from <strong>2619 to 2330</strong>; the proxy and Take-vs-NPV caveats are now the prose directly under the grid instead of the opening of a wall. <strong>Verified cold in Playwright:</strong> collapsed by default (52px, 58-word summary), expands on click to the full 384px and collapses again; the proxy caveat still renders; the hidden <code>#cmp-data-table</code> that feeds both clipboard flavours is untouched at <strong>21 rows &times; 4 cols</strong>, so the IC-memo export is byte-identical; under <code>emulateMedia({media:'print'})</code> the body computes <code>display:block</code> at 324px and the chevron <code>display:none</code>. <strong>0 JS errors.</strong> JS syntax gate <strong>PASS</strong> (10 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the local build: <strong>135 PASS / 0 FAIL / 1 WARN</strong> &mdash; the WARN is the pre-existing local-harness artifact (the service worker registers the GitHub Pages subpath <code>/petroleum-fiscal-db/sw.js</code>, which 404s on a root-served local server; correct in production). <strong>STILL LOCKED &mdash; nothing touched:</strong> no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; <strong>no new FAQ</strong> (still 974); <strong>no new tooltip</strong>; the v430 sessionStorage collapse memory, the v449/v451/v452 CP headline and the v451 Govt NPV removal are all intact. <strong>No row and no column was added or removed.</strong> Tab order unchanged. Version v576&rarr;v577.<br><br>
@@ -33721,6 +33722,43 @@ function renderFCResults(results, price) {
     }
   });
 
+  // ── v580 (T5) — the # rank now ranks the column the analyst is told to cite ──
+  // These three were defined 400 lines below, next to the cells that render them. They are
+  // hoisted here because the RANK is now built from the citable database take, so the sort
+  // needs the same accessor the cell does. Same expressions, same price resolution, moved.
+  var _fcSelPrice = (function(){ var v = parseFloat(price); return [50,75,100,125].indexOf(v) >= 0 ? v : 75; })();
+  var _fcDbTake = function(r) { return _fcSelPrice===50 ? r.take_50 : _fcSelPrice===100 ? r.take_100 : _fcSelPrice===125 ? r.take_125 : r.take_75; };
+  var _fcMonopoly = function(r) { return isStateMonopoly(_fcDbTake(r)); };
+  // Measured on the cold default view (185 rows, $75/bbl, Deepwater): of the 65 rows this table
+  // actually ranks, ordering them on the CITABLE database take instead of this screen's model
+  // take moves the median row 13 places and the worst row 57. Nigeria rendered as #5 in the
+  // world on a citable take of 81.1% -- 62nd of the 65, and inside the ">75% Very High: requires
+  // exceptional economics" band this same tab defines. China #4 was 51st, Sudan #8 was 42nd.
+  // Ecuador, the Philippines, Georgia and Trinidad -- citable ranks 6, 7, 8 and 9 -- rendered at
+  // #48, #49, #50 and #58, below the fold. The header tooltip disclosed the split in prose and
+  // blamed it on "a G row"; the divergence measured above is entirely on non-G rows.
+  // v547 declined this change for a stated reason: ranking on the database take would put
+  // Vanuatu (5.0%), the Bahamas, Montenegro, Greenland and the Faroe Islands -- jurisdictions
+  // with no production -- at the head of the shortlist. That reason no longer holds. v563
+  // partitioned every generic-default row out of the ranking, and all five of those countries
+  // (plus all three state monopolies) carry termsBasis === 'default': they are already below the
+  // divider, unranked. Re-verified on the live result set this cycle -- 65 own-terms rows, all 65
+  // with a populated database take at $50/$75/$100/$125, none of them a non-producer, none a
+  // monopoly. So the blocker was removed by a later cycle and nobody went back for the item.
+  var _fcTakeCmpDb = function(a, b) {
+    var va = _fcDbTake(a), vb = _fcDbTake(b);
+    if (va == null && vb == null) return (b.swing||0) - (a.swing||0);
+    if (va == null) return 1;
+    if (vb == null) return -1;
+    var d = va - vb;
+    return Math.abs(d) > 0.05 ? d : ((b.swing||0) - (a.swing||0));
+  };
+  // The pre-v580 comparator, kept verbatim. The generic-default block below the divider is still
+  // ordered by it, so nothing under the line moves: those rows share one model constant, their
+  // order is declared arbitrary on screen, and ordering them by the database take would put
+  // Vanuatu at the head of a block the analyst reads immediately after the ranking.
+  var _fcTakeCmpModel = function(a, b) { var d = a.liveTake - b.liveTake; return Math.abs(d) > 0.05 ? d : ((b.swing||0) - (a.swing||0)); };
+
   // Sort results based on current sort field
   var sorted = [].concat(results);
   if (sortField === 'country') {
@@ -33748,7 +33786,7 @@ function renderFCResults(results, price) {
       return a.swing - b.swing;
     });
   } else {
-    sorted.sort(function(a,b) { var d = a.liveTake - b.liveTake; return Math.abs(d) > 0.05 ? d : ((b.swing||0) - (a.swing||0)); });
+    sorted.sort(_fcTakeCmpDb);   // v580 (T5): rank the citable column, not the model column
   }
 
   // v313: Apply region filter if active
@@ -33781,6 +33819,13 @@ function renderFCResults(results, price) {
   if (_fcGenericLast) {
     var _fcOwnPart = [], _fcGenPart = [];
     sorted.forEach(function(r) { (r.termsBasis === 'default' ? _fcGenPart : _fcOwnPart).push(r); });
+    // v580 (T5): the ranked block above the divider is now ordered on the citable database take.
+    // The generic block below it is re-ordered back onto the old model comparator so that nothing
+    // under the divider moves — see the note on _fcTakeCmpModel.
+    if (sortField === 'take') {
+      _fcGenPart.sort(_fcTakeCmpModel);
+      if (window._fcSortDir === 'desc') _fcGenPart.reverse();
+    }
     sorted = _fcOwnPart.concat(_fcGenPart);
     _fcRankedN = _fcOwnPart.length;
   }
@@ -34098,11 +34143,11 @@ function renderFCResults(results, price) {
     : '<span style="font-size:11px;color:var(--muted);white-space:nowrap;font-family:\'IBM Plex Mono\',monospace;" title="Showing all ' + sorted.length + ' countries (no region filter active)"><strong style="color:var(--text);">' + sorted.length + '</strong> countries</span>';
   var _clickHint = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">' + _countLabel + _scenarioNudge + _alphaSortNote + _rowHint + top5btn + '</div>';
   var html = profileBanner + _fcStatsBar + _clickHint + '<div class="tbl-wrap"><table id="tbl-fc"><thead><tr>';
-  html += '<th class="num" style="width:50px" title="Rank by current sort dimension (' + sortDimLabel + ', ' + sortDirLabel + '), over the ' + _fcRankedN + ' countries modelled on their OWN fiscal terms. Re-rank by clicking any other column header or using the sort buttons above. Green left border = top 10; red left border = bottom 10. The ' + (sorted.length - _fcRankedN) + ' rows on the generic mechanic default are partitioned below the divider and carry no rank: their figure is the same constant on every one of them, so ordering them would be ordering an artifact.">#</th>';
+  html += '<th class="num" style="width:50px" title="Rank by current sort dimension (' + sortDimLabel + ', ' + sortDirLabel + '), over the ' + _fcRankedN + ' countries modelled on their OWN fiscal terms.' + (sortField === 'take' ? ' Since v580 this rank is built on the Take% db \u00b7 citable column \u2014 the figure the drilldown, Country Profile, the API and \u2318 Copy for IC Memo all quote \u2014 so the position you read and the number you cite are the same number. It was previously built on the model column to its left, which moved the median row 13 places.' : '') + ' Re-rank by clicking any other column header or using the sort buttons above. Green left border = top 10; red left border = bottom 10. The ' + (sorted.length - _fcRankedN) + ' rows on the generic mechanic default are partitioned below the divider and carry no rank: their figure is the same constant on every one of them, so ordering them would be ordering an artifact.">#</th>';
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th title="Fiscal mechanism \u2014 the structure governing how revenue is split between government and contractor, AND the mechanic this row\'s DCF was actually run on. It is the mechanic the PLURALITY of that country\'s contracts in ORCA use (the count under each tag), not the first one listed alphabetically: before v548 any country holding a single Concession contract read Concession, which named 39 of these 185 rows wrongly \u2014 Indonesia, Guyana, Iraq, Iran, India, China. Hover any tag for a full description.">Mechanic</th>';
   var priceTag = price ? ' <span style="font-size:10px;color:var(--muted);font-weight:400;">@$' + price + '</span>' : '';
-  html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as computed by THIS SCREEN\'s DCF engine, on the profile and price selected above. This is the column the # rank is built from. For every row marked G in the Quality column ORCA holds no country-specific terms in the compare engine, so this figure is the standard default for the mechanic and is identical across every G row on that mechanic — directional only, not citable. The citable figure is in the next column.">Take% <span style=\'font-size:10px;color:var(--muted);font-weight:400;\'>model</span>' + priceTag + '</th>';
+  html += '<th class="num" ' + (sortField==='take'?'aria-sort="ascending"':'') + ' title="Government take as computed by THIS SCREEN\'s DCF engine, on the profile and price selected above. Since v580 this is NOT the column the # rank is built from \u2014 the rank follows the citable database take in the next column. Use this one only for profile sensitivity: it is the only take in the tool that moves with the profile selector. For every row marked G in the Quality column ORCA holds no country-specific terms in the compare engine, so this figure is the standard default for the mechanic and is identical across every G row on that mechanic — directional only, not citable. The citable figure is in the next column.">Take% <span style=\'font-size:10px;color:var(--muted);font-weight:400;\'>model</span>' + priceTag + '</th>';
   // ── v547 (T5) ─────────────────────────────────────────────────
   // Measured on the cold default view: 154 of the 185 rows on this table render an IDENTICAL
   // 22.2% take and $4.3B contractor NPV, because they fall to the generic mechanic default.
@@ -34111,7 +34156,7 @@ function renderFCResults(results, price) {
   // the XLSX all carry it and instruct the analyst to cite it. The flagship table did not show it
   // anywhere, so the only way to read a citable take for a 10-country shortlist was ten drilldowns
   // or an XLSX download. It is now a column.
-  html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. It is NOT what this table is ranked on: the # column ranks the model figure to its left, so on a G row the two can differ by 25-35pp.">Take% <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="MODEL — contractor net present value ($M) this screen computes on the profile selected above (' + _fcProfName + '), 10% WACC, 100% working interest. This is the only NPV in the tool that moves with the profile selector, and it is what the # column ranks. It is NOT the citable figure and it is NOT what ⌘ Copy for IC Memo pastes: on a generic-default row it is the mechanic standard, identical across 119 of the 185 rows. The citable database NPV is the column to its right.">NPV ($M) <span style=\'font-size:10px;color:var(--muted);font-weight:700;\'>model</span>' + priceTag + '</th><th class="num" title="CITABLE — contractor net present value ($M) from the fiscal terms ORCA holds in its contract database, on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI). This is the figure Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo all carry — the one that reaches your memo. Fixed basis: it does not move with the profile selector.">NPV ($M) <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>';
+  html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. Since v580 this IS what the # column ranks and where the tier dividers fall, so a row position and the number you cite agree. The model column to its left can differ from it by 25-35pp.">Take% <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="MODEL — contractor net present value ($M) this screen computes on the profile selected above (' + _fcProfName + '), 10% WACC, 100% working interest. This is the only NPV in the tool that moves with the profile selector, and it is what the # column ranks. It is NOT the citable figure and it is NOT what ⌘ Copy for IC Memo pastes: on a generic-default row it is the mechanic standard, identical across 119 of the 185 rows. The citable database NPV is the column to its right.">NPV ($M) <span style=\'font-size:10px;color:var(--muted);font-weight:700;\'>model</span>' + priceTag + '</th><th class="num" title="CITABLE — contractor net present value ($M) from the fiscal terms ORCA holds in its contract database, on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI). This is the figure Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo all carry — the one that reaches your memo. Fixed basis: it does not move with the profile selector.">NPV ($M) <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + ' title="Breakeven oil price ($/bbl): minimum price for project NPV \u2265 0 under this regime. Coverage: 68 of 185 countries. — indicates incomplete cost data; use Take + Swing as proxy for uncovered countries.">BE ($/bbl)</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price Swing (pp): Govt Take at $125/bbl minus Take at $50/bbl. &#10;&#10;Interpretation: &lt;10pp = royalty-dominant, predictable at any price (green). 10\u201320pp = moderate price sensitivity (amber). &gt;20pp = progressive/PSC regime, govt captures most upside above $75 (red). &#10;&#10;IC use: high-swing regimes require a price-range sensitivity analysis \u2014 contractor IRR at $50/bbl degrades less than headline take implies because PSC cost recovery accelerates. Low-swing regimes are suitable for projects depending on certainty of returns across price cycles.">Swing (pp) \u24d8</th>';
   // v551 (T6): the stated thresholds were never the ones in force. This header said the letter
   // meant "% of its fiscal facts primary-sourced" while getTierBadge() was fed a_pct + b_pct.
@@ -34132,7 +34177,11 @@ function renderFCResults(results, price) {
   // v481: Global median take divider — computed from all COUNTRY_DATA take_75 values; shows where this result set crosses the global median
   var _takeMedianDividerInserted = false;
   var _fcGlobalMedianTake = (function() {
-    var allTakes = (window.COUNTRY_DATA||[]).filter(function(x){return x.take_75!=null;}).map(function(x){return x.take_75;}).sort(function(a,b){return a-b;});
+    // v580 (T5): read at the selected price. The divider is now compared against the citable take
+    // at $50/$100/$125 too, so a fixed $75 median would have drawn the "global median" line in the
+    // wrong place on every non-default price. COUNTRY_DATA.take_N is the same database series.
+    var _mk = 'take_' + _fcSelPrice;
+    var allTakes = (window.COUNTRY_DATA||[]).filter(function(x){return x[_mk]!=null;}).map(function(x){return x[_mk];}).sort(function(a,b){return a-b;});
     if (!allTakes.length) return null;
     var m = Math.floor(allTakes.length/2);
     return allTakes.length%2===0 ? (allTakes[m-1]+allTakes[m])/2 : allTakes[m];
@@ -34150,9 +34199,8 @@ function renderFCResults(results, price) {
   // any of the three, so liveTake is the generic Concession default. All three rendered
   // "22.2% / $4.3B" and sorted to the TOP of the ranking, joint-first with 150 other generic rows.
   // _fcMonopoly is the single read point for the condition, shared with exportFCResults().
-  var _fcSelPrice = (function(){ var v = parseFloat(price); return [50,75,100,125].indexOf(v) >= 0 ? v : 75; })();
-  var _fcDbTake = function(r) { return _fcSelPrice===50 ? r.take_50 : _fcSelPrice===100 ? r.take_100 : _fcSelPrice===125 ? r.take_125 : r.take_75; };
-  var _fcMonopoly = function(r) { return isStateMonopoly(_fcDbTake(r)); };
+  // v580 (T5): _fcSelPrice / _fcDbTake / _fcMonopoly moved up to the sort block — the rank is
+  // built from the citable take now, so the comparator needs the same accessor these cells use.
   // v547 (T5): the citable database take cell. Same value the drilldown, Country Profile, the API
   // and the XLSX GovtTake_ column carry. Tier-coloured on the same ramp as the model column so the
   // two are read on one scale, and the tooltip names the gap between them where there is one.
@@ -34230,7 +34278,11 @@ function renderFCResults(results, price) {
     if (sortField === 'npv')     return r.liveNPV == null ? null : r.liveNPV;
     if (sortField === 'breakeven') return r.be_75 == null ? null : Number(r.be_75);
     if (sortField === 'swing')   return r.swing == null ? null : Number(r.swing);
-    return r.liveTake == null ? null : r.liveTake;
+    // v580 (T5): the take ranking is built on the citable database take, so tie groups must be
+    // measured on the same value. Reading liveTake here would report ties that the visible rank
+    // order no longer has.
+    var _tv = _fcDbTake(r);
+    return _tv == null ? null : _tv;
   };
   // Group by exact value across the whole result set rather than by contiguous run: the
   // take comparator treats anything within 0.05pp as tied and orders it by swing, so a
@@ -34329,25 +34381,31 @@ function renderFCResults(results, price) {
     // set, so it cannot fire late). With the generic block partitioned out, the first ranked row
     // can already be past a threshold -- filtered to Africa the lowest own-terms take is Nigeria
     // at 47.3%, and "Investible tier ends" rendered above the first row as a stray banner.
-    if (sortField === 'take' && r.liveTake != null && !_rowIsGeneric) {
-      if (!_take40DividerInserted && r.liveTake > 40) {
+    // v580 (T5): the tier boundaries are drawn on the CITABLE take, the same column the rank is
+    // now built from. On the model take, "Investible tier ends (<=40%)" fell between USA and
+    // Australia -- but Australia's citable take is 38.5%, inside the investible band, so the
+    // divider pushed an investible country out of the investible tier using a number the page
+    // tells the analyst not to cite.
+    var _rDbTake = _fcDbTake(r);
+    if (sortField === 'take' && _rDbTake != null && !_rowIsGeneric) {
+      if (!_take40DividerInserted && _rDbTake > 40) {
         var _t40Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
         if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _t40Colspan + '" style="padding:0;"><div style="background:rgba(21,128,61,.07);border-top:2px dashed rgba(21,128,61,.4);border-bottom:2px dashed rgba(21,128,61,.4);text-align:center;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Investible tier ends (≤40%) &mdash; Moderate tier begins below &#8212;</div></td></tr>';
         _take40DividerInserted = true;
       }
       // v481: Global median take divider — inserted between the tier boundaries, only when sorted by take and median is in range (40–75%)
-      if (!_takeMedianDividerInserted && _fcGlobalMedianTake != null && r.liveTake > _fcGlobalMedianTake && _fcGlobalMedianTake > 40 && _fcGlobalMedianTake < 75) {
+      if (!_takeMedianDividerInserted && _fcGlobalMedianTake != null && _rDbTake > _fcGlobalMedianTake && _fcGlobalMedianTake > 40 && _fcGlobalMedianTake < 75) {
         var _tmColspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
         var _tmLabel = _fcGlobalMedianTake.toFixed(1);
         if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _tmColspan + '" style="padding:0;"><div style="background:rgba(100,100,100,.05);border-top:2px dashed rgba(100,100,100,.3);border-bottom:2px dashed rgba(100,100,100,.3);text-align:center;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Below-median regimes end (global median take: ' + _tmLabel + '%) &mdash; Above-median regimes begin below &#8212;</div></td></tr>';
         _takeMedianDividerInserted = true;
       }
-      if (!_take60DividerInserted && r.liveTake > 60) {
+      if (!_take60DividerInserted && _rDbTake > 60) {
         var _t60Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
         if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _t60Colspan + '" style="padding:0;"><div style="background:rgba(176,104,0,.07);border-top:2px dashed rgba(176,104,0,.4);border-bottom:2px dashed rgba(176,104,0,.4);text-align:center;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Moderate tier ends (41–60%) &mdash; High Take tier begins below &#8212;</div></td></tr>';
         _take60DividerInserted = true;
       }
-      if (!_take75DividerInserted && r.liveTake > 75) {
+      if (!_take75DividerInserted && _rDbTake > 75) {
         var _t75Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
         if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _t75Colspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.07);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; High Take tier ends (61–75%) &mdash; NOC-dominated tier begins below &#8212;</div></td></tr>';
         _take75DividerInserted = true;
@@ -36094,7 +36152,10 @@ function copyFCForIC(btn) {
   if (matrix.length < 2) { showCopyToast('No rows on screen to copy.'); return; }
   var N = matrix.length - 1;
 
-  var sortName = ({ take: 'the model take column, low → high', npv: 'contractor NPV (model), high → low',
+  // v580 (T5): was 'the model take column, low → high'. The rank in the # column of this very
+  // paste is now built on the citable database take, so the sentence has to say so — an IC
+  // reader treats a numbered list as a ranking of the number beside it.
+  var sortName = ({ take: 'the ORCA database take column — the CITABLE one — low → high', npv: 'contractor NPV (model), high → low',
     breakeven: 'breakeven, low → high', swing: 'price swing, low → high', country: 'country name, A–Z'
   })[window._fcSortState || 'take'] || (window._fcSortState || 'take');
   var reg = window._fcRegionFilter || '';
