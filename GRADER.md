@@ -19409,3 +19409,18 @@ Tab order unchanged. CP headline still two-zone with tier-coloured take%, global
 vs-median pill. Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373, v430,
 v449, v451, v452, v489, v505, v508, v512–v572 all intact. Version bump v572→v573 done silently at
 the end; it is not the deliverable.
+
+---
+## Cycle 472 Log — 2026-08-29 04:05
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 472 complete and pushed (v573).
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (471 was T4; T1 is next in rotation.)
+
+## Friction
+Walked cold with storage cleared: Home → Screener → the preset dropdown, and picked the one option named for the question an IC asks first — **Downside Resilience**. It returned **158 of 185 countries**. That is not a shortlist. Three defects were stacked in that one control:
+
+1. **It named a criterion it does not apply.** The dropdown 
