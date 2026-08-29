@@ -19288,3 +19288,124 @@ intact. Version bump v571→v572 done silently at the end; it is not the deliver
 Cold load, storage cleared, Home → Reform Risk → the per-country lookup, which is the one control on that tab that answers "here."
 
 The tab is built end to end around a single principle: never let a number read as stability when it isn't. It executes that well — the window-artefact arm, the
+
+---
+## Cycle 472 Log — 2026-08-29 04:00
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN
+- JS errors: 0
+- Version: v572 → v573 (bumped silently at the end; not the deliverable)
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (least-recently-used; 471 was T4,
+and 466–470 covered T1, T5, T6, T2, T3 — so T1 is next in rotation.)
+
+## Friction
+Cold load, `sessionStorage` and `localStorage` cleared. Home → **Screener** (which correctly
+auto-runs and lands in screen mode) → the **preset dropdown**, which is where a first-time analyst
+with 20 minutes goes to turn 185 countries into a shortlist. Picked the one option named for the
+question an IC asks first: **⬇ Downside Resilience**.
+
+It returned **158 of 185** — 85% of the database — under its own menu annotation "(barely narrows)".
+That is not a shortlist. Three defects were stacked in the single control:
+
+**(a) It named a criterion it does not apply.** Both the dropdown option and the active-preset badge
+that stays on screen while you read the result read `BE ≤$50`. **v568 deleted the breakeven ceiling
+from `runScreener()` and updated neither caption.** For five versions the platform told the analyst
+they had screened on breakeven; they had not. This is the same class of defect v524 fixed on
+`iochurdle` (badge announcing an IRR criterion v517 had deleted) — left live on a sibling option in
+the same dropdown.
+
+**(b) The leg that replaced it removes exactly two countries.** `NPV @$50 ≥ $0` — Malaysia
+(−$33M) and Yemen (−$139M). **183 of 185 are NPV-positive at $50.** So the leg doing all the
+work was `take ≤60%`.
+
+**(c) And that ceiling is anti-correlated with the property the preset is named for.** Contractor
+value survives a price break best where the regime insulates contractor cash flow from price —
+service terms, high royalties. Of the **24** countries that retain ≥50% of their $75 NPV at $50,
+**seventeen sit above 55% take**:
+
+| country | % of $75 NPV kept at $50 | govt take @$75 |
+|---|---|---|
+| Turkmenistan | 75% | 87.2% |
+| Uzbekistan | 74% | 85.6% |
+| Iran | 70% | 75.7% |
+| Libya | 63% | 71.1% |
+| Iraq | 61% | 84.8% |
+| Nigeria | 53% | 81.1% |
+
+The low-take PSCs the ceiling was keeping are the ones that collapse — Cambodia keeps 16%,
+Cameroon 27%, Benin 31%, and Malaysia and Yemen go negative outright. **A 60% take ceiling cut 17
+of the 24 genuinely resilient regimes out of the downside screen.**
+
+## Change
+1. **`_npvRetention(d)`** — `npv_50 / npv_75`. Both legs are modelled **185/185**, so unlike the
+   breakeven ceiling (68 populated, every one $27–$34) and the retired IRR hurdle (124 displayable,
+   median 239.8%) there is no untested-but-passing gap. Real gradient: **−14% to +75%, median 45%**.
+   Returns `null` where `npv_75 ≤ 0` — exactly Bahrain, Kuwait and Saudi Arabia, whose contractor
+   position is nil — and the filter treats null as **not passing**, per the v513 precedent that
+   absence of a measurement is not a passed stress test.
+2. **The preset is now one leg on the axis it names**: retain ≥50% of $75 contractor NPV at
+   $50/bbl. **158 → 24 of 185.** The take ceiling is gone; it belongs to a fiscal-attractiveness
+   screen (Sweet Spot, IOC Capital Screen), not this one.
+3. **The screened axis is now on screen for all 185 rows.** Every `NPV @$50` cell carries a second
+   line reading `NN% kept`, banded off the observed distribution (≥50% green · 35–49% muted ·
+   <35% orange · negative red), and the column header gained the sub-label `% of $75 kept`.
+   The shortlist is auditable without dividing two columns by hand across 185 rows.
+4. **Two more stale breakeven captions corrected** — Sweet Spot (`BE ≤$65`) and Low-Risk Stable
+   (`BE ≤$75`) advertised legs v568 also removed, on the dropdown, the badge, and the two Home
+   cards that repeated them.
+5. **The criterion travels with the export** — new `NPV_Retention_50v75_pct` column in CSV/XLSX,
+   and the basis block prepended to the shortlist names the retention leg and states that the three
+   state monopolies were **excluded, not carried**. Zero-result diagnostic and active-filter badge
+   wired to match.
+
+## Result
+The analyst who asks "which regimes survive a price break?" now gets a **24-country shortlist they
+can defend line by line**, instead of 158 rows under a badge describing a filter that does not run.
+They can see the number they screened on in every row of the table, carry it into the IC memo
+through the export, and — most importantly — the screen no longer removes seventeen of the
+twenty-four countries that actually answer the question.
+
+## Verification — RUN this cycle
+Playwright cold (`sessionStorage` + `localStorage` cleared) on: cold Screener load (185/185, new
+header, `% kept` on every row); Downside Resilience (**24 rows**, `1 filter active`, badge reading
+the real criterion, production divider at 7 verified / 17 proxy); `_scExportBasisLines()` read back
+(retention criterion present, exclusion stated); **Reset All** (restores 185, clears the leg, hides
+the badge); and **all eleven presets re-run** — iochurdle 15, sweetspot 143, pscafrica 31,
+deepwater 11, lowrisk 141, downsidereturns 153, highevidence 35, rfactor 70, atlanticfrontier 6,
+frontiermarkets 56, downsideresilience 24 — confirming only the target preset moved.
+**0 page errors on every walk.** JS syntax gate **PASS** (9 blocks / 0 errors).
+`runtime_comprehensive.js` with `TEST_URL=http://localhost:8791/index.html`, run twice — before and
+after the version bump: **135 PASS / 0 FAIL / 1 WARN** both times. The WARN is the known
+local-harness `sw.js` 404; `git diff index.html` contains zero `sw.js` / `serviceWorker` hits.
+
+### Found on this walk, not fixed — stated rather than hidden
+1. `formatBreakeven()` still collapses all 65 populated values ($27–$34) to `<$50`, so the
+   **Breakeven column has two possible outputs across 185 rows** and cannot rank two countries.
+   Its own tooltip now admits it "is not screened on, and it cannot rank two rows" — which is an
+   argument for deleting the column, as v451 deleted Govt NPV. That is its own walk.
+   Carried from v562–v572.
+2. Selecting the blank `Load a screen…` option does not reset the screen — the `onchange` is
+   `if(this.value){…}` and the select resets its own value to `''` after applying. **Reset All**
+   and the badge `×` both work. Pre-existing, not a regression; low impact but real.
+3. Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank and colour on the
+   blended headline take, so Iraq remains mis-placed on those four surfaces. `cpCmpTakeOf()` is
+   global. Carried from v549/v552/v571 — still the largest open item.
+4. `.stability-bar-wrap` renders nowhere — dead code. Carried from v572.
+5. The `# Contracts` row still prints `7643` unseparated. Carried from v571.
+6. `MECHANIC_BREAKDOWN` (20 countries) and `mech_mix` (74) still disagree. Carried from v570.
+7. Generic-default contamination in `mech_mix` — five countries at exactly 0.0% take /
+   $5,533.1M NPV. Carried from v570.
+8. The **Breakeven Map** tab remains unwalked.
+9. The three `◆◆◆◆◆` reform rows (Algeria, Colombia, USA) are window artefacts. Carried from v566.
+
+### STILL LOCKED — nothing touched
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not change — every
+tooltip edited belongs to a cell or header whose rendered value changed. No page-sub paragraph, no
+amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown.
+Tab order unchanged. CP headline still two-zone with tier-coloured take%, global rank and
+vs-median pill. Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373, v430,
+v449, v451, v452, v489, v505, v508, v512–v572 all intact. Version bump v572→v573 done silently at
+the end; it is not the deliverable.
