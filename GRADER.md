@@ -18721,3 +18721,121 @@ file was regenerated.
 **Friction.** I cleared storage, loaded cold, opened Fiscal Compare and pressed the tab's only clipboard button — **⎘ Copy for IC Memo**.
 
 The NPV column on screen is the figure the screen models on whichever profile you selected. The clipboar
+
+---
+## Cycle 468 Log — 2026-08-29 (v569)
+
+**Task.** T6 — "Where did this number come from and how solid is the evidence?"
+Least-recently-used (467 was T5, 466 T1, 465 T4, 464 T3, 463 T2, 462 T6).
+
+**Friction.** Walked cold — fresh browser context, `sessionStorage` and
+`localStorage` cleared — into Country Profile and opened the section named for
+the question: *Key Fiscal Parameters — Evidence Chain*.
+
+On the **United Kingdom**, the *Special Tax* row read ORCA **38%**, Statutory
+**38%**. Its Source badge was the literal string `EY_IHS_BulkHarvest_2025`.
+Hovering it: *"Source confidence B = Verified secondary source (operator filing,
+annual report, or regulatory filing)."* Clicking it: `https://taxsummaries.pwc.com/`
+— the bare PwC Worldwide Tax Summaries home page. Not EY. Not IHS. Not the United
+Kingdom. Not the supplementary charge. Below the table: *"✓ All 3 sourced
+parameters match the rate stated in the cited source."*
+
+Four independent falsehoods converging on one number an analyst was about to put
+in an IC memo:
+
+1. The **name** was an internal database key, printed as if it were a citation.
+2. The **tier claim** is false by this page's own Methodology table, which says of
+   tier B in bold *"Not an operator filing"*, and by **v527**, which counted
+   **zero** operator filings among 142,798 tier-B facts. **v538** corrected this
+   exact string on the Evidence Chain table it *deleted* and never applied it to
+   the table that survived — **30 rows** still carried it.
+3. The **link** is a country index, not a citation for any parameter.
+4. Worst: the **verdict counted the bulk row as corroboration.** It is not. The
+   bulk harvest is a country-level assignment applied to every contract in the
+   country — the same assignment that populated the ORCA Value — so the two
+   columns agreeing is the same datum printed twice.
+
+Measured on the shipped API files: **41 of the 46 bulk rows are exact-equal** to
+the ORCA value. **46 rows across 35 countries**, and **19 of those countries
+displayed the clean ✓ verdict** — Saudi Arabia, United Kingdom, Netherlands,
+Mozambique, Oman, Turkey, Ukraine, Algeria, Australia, Brunei, Colombia, Denmark,
+Georgia, India, Kazakhstan, Myanmar, Suriname, Tanzania, Venezuela. Saudi
+Arabia's *State Participation 98.2%*, the figure driving its monopoly
+classification, is one of them.
+
+All of this sat **four inches below** the Evidence Quality panel, which has
+rendered these same two sources correctly since **v518** — readable name, BULK
+chip, honest link title. The fix was never applied one section down.
+
+**Change.**
+1. Bulk rows render the v518 treatment in the per-parameter table: readable name
+   (*EY / IHS Markit bulk fiscal harvest (2025)*), a **BULK** chip in both the
+   Statutory and Source cells, muted styling, and a link title stating it opens
+   the PwC index and is not a citation for this parameter.
+2. `_BULK_LABEL` promoted out of `buildEvidencePanel()` to sit beside
+   `_BULK_SOURCES`, so the two surfaces cannot drift apart again.
+3. Bulk rows **excluded from `sourcedCount` and `divergentCount`**. The UK now
+   reads *"✓ All 2 independently sourced parameters match."*
+4. A note names the excluded parameters and says why in one sentence, and routes
+   the analyst to the country's own petroleum act.
+5. **Somalia**, whose only two sourced parameters are both bulk, went from
+   *"⚠ 1 of 2 sourced parameters differ from the statutory rate"* — a statutory
+   comparison with no statute in it — to *"⚠ No parameter on this table is
+   independently sourced."*
+6. The false tier-B string corrected to match Methodology and v527/v538.
+
+**No value, take, NPV or rank was altered, no row was removed, and no data file
+was regenerated.** Every number still renders; what changed is what the screen
+claims about it.
+
+**Result.** An analyst asking where the UK's 38% supplementary charge came from
+is now told it carries no independent source — rather than being shown an
+operator-filing badge, a tier-B letter and a tick confirming it.
+
+**Verified cold in Playwright** against the local build, storage cleared. Sweep
+of all **185** profiles: **35** show the bulk disclosure (matching the API count
+exactly), **1** has zero independent sources, **0** still print a raw token,
+**0** page errors. Azerbaijan's *PwC Tax Summaries — Azerbaijan CIT* row is
+deliberately untouched — honestly named and deep-linked to the actual country
+page, so it is a real citation. The Evidence Quality panel still renders its BULK
+chips and **still opens collapsed** — v371/v373 intact.
+
+**Tests — RUN this cycle, not carried forward.** JS syntax gate **PASS**
+(9 blocks / 0 errors). `runtime_comprehensive.js` against the local build:
+**135 PASS / 0 FAIL / 1 WARN**.
+
+> **Harness note worth keeping.** The suite's default is
+> `https://yoburgqs.github.io/petroleum-fiscal-db/` — the *live production* site.
+> A run without `TEST_URL` grades the deployed build and not the working tree; the
+> first run this cycle returned 136/0/0 and was measuring v568 in production. Set
+> `TEST_URL=http://localhost:<port>/index.html`. This is a "stable but wrong"
+> trap: a clean number from the wrong target.
+
+The WARN is the known `sw.js` 404 local-harness artifact and **reproduces
+identically on the pre-change build (135 / 0 / 1)** — confirmed by running the
+same suite against a full mirror of the repo root with only `index.html` swapped.
+
+### Found on this walk, not fixed — stated rather than hidden
+1. **New:** exact self-agreement is not unique to bulk. **362 of 456** non-bulk
+   sourced rows are also exact-equal to the ORCA value, so the ✓ verdict is a
+   weak signal even where the source is genuinely primary law. Quantifying what
+   the tick is actually worth is its own cycle.
+2. `formatBreakeven()` still collapses all 65 populated values to `<$50` on
+   Fiscal Compare, Country Profile and the Breakeven Map. Carried from
+   v562/v563/v566/v568; still the largest open item.
+3. The **Breakeven Map** tab remains unwalked.
+4. The FC *Project viable* counter still pools the generic-default block.
+5. The three surviving `◆◆◆◆◆` reform rows (Algeria, Colombia, USA) are window
+   artefacts. Carried from v566.
+
+### STILL LOCKED — nothing touched
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not
+change — every tooltip edited belongs to a badge or cell this cycle rewrote, and
+each previously asserted something false. No page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. Tab order unchanged. CP headline still two-zone with
+tier-coloured take%, global rank and vs-median pill. Govt NPV still removed from
+Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505,
+v508, v512–v568 all intact. Version sweep v568→v569 done silently at the end
+across 5 structural locations; it is not the improvement.
