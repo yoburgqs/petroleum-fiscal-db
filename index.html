@@ -276,7 +276,7 @@ tbody td { padding: 6px 10px; white-space: nowrap; }
 .be-radio-group input[type=radio] { display:none; }
 .be-radio-group label { background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; padding:4px 10px; transition:.15s; }
 .be-radio-group input[type=radio]:checked + label { background:rgba(176,104,0,.15); border-color:var(--accent); color:var(--accent); }
-.screener-count-bar { align-items:center; display:flex; gap:12px; margin-bottom:10px; }
+.screener-count-bar { align-items:center; display:flex; flex-wrap:wrap; gap:12px; margin-bottom:10px; }
 .ioc-checkbox-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
 .ioc-checkbox-grid label { align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; display:flex; font-size:12px; font-weight:600; gap:5px; padding:4px 10px; transition:.15s; }
 .ioc-checkbox-grid input[type=checkbox] { accent-color:var(--accent); cursor:pointer; }
@@ -295,7 +295,12 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .reform-event { display: flex; gap: 12px; padding: 10px; border-radius: 6px; border-left: 3px solid var(--border); background: var(--bg-card, var(--card)); }
 .reform-event.reform-hostile { border-left-color: var(--red); }
 .reform-event.reform-friendly { border-left-color: var(--green); }
-.reform-year { font-size: 1.1rem; font-weight: 700; color: var(--accent); min-width: 44px; }
+.reform-year { font-size: 1.1rem; font-weight: 700; color: var(--accent); min-width: 44px; flex: 0 0 auto; }
+/* v576: .reform-body is a flex item with the default min-width:auto, so it could not
+   shrink below its min-content width (320px) inside the 266px profile sidebar. Every
+   reform entry rendered 86px past the 1440px viewport and the page scrolled sideways —
+   event names, notes and source badges were all cut off mid-word. */
+.reform-body { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
 .reform-event-name { font-weight: 600; margin-bottom: 4px; }
 .reform-mechanic { font-size: 0.75rem; background: var(--surface2); color: var(--muted); padding: 2px 6px; border-radius: 4px; margin-right: 6px; }
 .reform-take { font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
@@ -306,7 +311,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .dd-section { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 10px; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
 .dd-section h3 { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; }
 .dd-section-hdr { font-size: 13px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; margin-bottom: 12px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-.dd-header { display: flex; align-items: baseline; gap: 16px; margin-bottom: 18px; }
+.dd-header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 16px; margin-bottom: 18px; }
 .dd-country-name { font-size: 22px; font-weight: 800; }
 .dd-region { color: var(--muted); font-size: 14px; }
 .dd-take-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
@@ -733,7 +738,7 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .fc-stability-toggle input[type=checkbox] { accent-color: var(--accent); cursor: pointer; }
 
 /* === v38 Explorer mode toggle === */
-.mode-toggle { display: flex; gap: 0; margin-bottom: 18px; }
+.mode-toggle { display: flex; flex-wrap: wrap; gap: 0; margin-bottom: 18px; }
 .mode-toggle button { background: var(--bg); border: 1px solid var(--border); color: var(--text-muted); cursor: pointer; font-size: 12px; font-weight: 600; padding: 8px 20px; transition: .15s; }
 .mode-toggle button:first-child { border-radius: var(--radius) 0 0 var(--radius); }
 .mode-toggle button:last-child { border-radius: 0 var(--radius) var(--radius) 0; }
@@ -798,7 +803,11 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      the full string stays in the title tooltip. */
   display: inline-block;
   vertical-align: middle;
-  max-width: 320px;
+  /* v576: the 320px cap was set for the wide Source column. The same pill is reused in the
+     ~250px reform sidebar, where a fixed 320px ran 86px past the viewport and scrolled the
+     whole page sideways. min() keeps the v500 cap where there is room and bounds it to the
+     container where there is not; ellipsis + title tooltip still carry the full string. */
+  max-width: min(320px, 100%);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1443,7 +1452,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span style="font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;">Quick Start — 4 Steps to Your First IC-Ready Insight</span>
     <button id="qs-dismiss-btn" aria-label="Dismiss Quick Start guide" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--muted);padding:3px 10px;border-radius:4px;font-size:11px;cursor:pointer;" title="Dismiss (also Escape key)">&#10005; Got it</button>
   </div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;">
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;">
     <div style="background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:7px;padding:12px 14px;">
       <div style="font-size:18px;font-weight:900;color:var(--accent);margin-bottom:4px;">1</div>
       <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px;">Fiscal Compare</div>
@@ -24094,7 +24103,7 @@ function addCompare(country) {
     var _cleared = compareList.slice();
     compareList = [];
     _sbsDropExample();
-    if (typeof showCopyToast === 'function') showCopyToast('Cleared the ' + _cleared.length + '-country example (' + _cleared.join(', ') + ') — building your comparison from ' + country + '.');
+    if (typeof showCopyToast === 'function' && _cleared.length) showCopyToast('Cleared the ' + _cleared.length + '-country example (' + _cleared.join(', ') + ') — building your comparison from ' + country + '.');
   }
   if (compareList.length >= CMP_MAX) {
     if (typeof showCopyToast === 'function') showCopyToast('Comparison is full at ' + CMP_MAX + ' countries — ' + country + ' was not added. Remove one (\u2715 on a chip) to make room.');
@@ -27752,7 +27761,7 @@ function loadCountryProfile(country) {
       : '';
     return '<div style="display:flex;align-items:center;gap:8px;padding:5px 12px;background:' + bg + ';border:1px solid ' + border + ';border-radius:5px;margin-bottom:10px;" title="One-line IC verdict — distills govt take, contractor NPV at $75 and at the $50/bbl downside, and breakeven into a single screen decision. Standardized Deepwater profile, 10% WACC, 100% WI. Country-level IRR is deliberately not part of this test: the bundled figure is an arithmetic mean of per-contract IRRs and clears a 15% hurdle for almost every country. Run Scenario Builder for a project IRR.">'
       + '<span style="font-size:14px;font-weight:900;color:' + col + ';flex-shrink:0;">' + icon + '</span>'
-      + '<span style="font-size:11px;color:var(--text);line-height:1.4;">' + msg + _proxyDisclosure + '</span>'
+      + '<span style="font-size:11px;color:var(--text);line-height:1.4;min-width:0;">' + msg + _proxyDisclosure + '</span>'
       + '</div>';
   })() : '';
   // v346: Headline strip — mechanic tag, take@$75, stability dots, reform count
@@ -27808,7 +27817,16 @@ function loadCountryProfile(country) {
   // v516: the route to a genuine, project-level IRR stays on the strip -- what was removed is the
   // country-level average that masqueraded as one. Scenario Builder computes an IRR from the
   // analyst's own capex / opex / production profile, which is the only IRR this platform can defend.
-  const _irrRoute516 = _isMonopoly ? '' : '<span style="font-size:11px;color:var(--muted);opacity:.85;" title="Country-level IRR is not reported: the bundled figure is an arithmetic mean of per-contract IRRs and clears a 15% hurdle for almost every country. Scenario Builder computes a project IRR from your own capex, opex and production profile.">IRR: <button onclick="openScenarioBuilder()" style="background:none;border:1px dotted var(--border);border-radius:3px;color:var(--accent);font-size:10px;font-weight:600;cursor:pointer;padding:1px 6px;vertical-align:middle;" title="Open Scenario Builder \u2014 model a contractor IRR for this fiscal regime with your project-specific capex, opex and production profile">\u2192 Model in Scenario Builder</button></span>';
+  // v576 (T2): after v516 removed the bundled mean IRR, this button is the ONLY IRR affordance left
+  // on the profile -- so it has to land the analyst on THIS country's regime. It called the bare
+  // openScenarioBuilder(), which opens the modal on generic defaults AND explicitly hides the
+  // pre-fill banner, so the builder silently kept whatever the previously-opened country left in the
+  // fields. Walked cold: Australia (PRRT) opened on Concession; then Indonesia (PSC) opened on PRRT;
+  // then Iraq (TSC) opened on PSC -- each time the PREVIOUS country's regime, with nothing on screen
+  // saying so. ddOpenScenarioBuilder() resolves the mechanic via fcResolveMechanic() and loads this
+  // country's royalty / CIT / SPT / state equity, and shows the amber banner naming the country.
+  const _irrCty576 = String(d.country || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+  const _irrRoute516 = _isMonopoly ? '' : '<span style="font-size:11px;color:var(--muted);opacity:.85;" title="Country-level IRR is not reported: the bundled figure is an arithmetic mean of per-contract IRRs and clears a 15% hurdle for almost every country. Scenario Builder computes a project IRR from your own capex, opex and production profile.">IRR: <button onclick="ddOpenScenarioBuilder(\'' + _irrCty576 + '\')" style="background:none;border:1px dotted var(--border);border-radius:3px;color:var(--accent);font-size:10px;font-weight:600;cursor:pointer;padding:1px 6px;vertical-align:middle;" title="Open Scenario Builder pre-filled with ' + d.country + '\u2019s fiscal terms \u2014 mechanic, royalty, CIT, special tax and state equity are loaded from this profile. Add your own capex, opex and production profile to compute a project IRR.">\u2192 Model in Scenario Builder</button></span>';
   const _swing344 = (d.take_50 != null && d.take_125 != null) ? (d.take_125 - d.take_50) : null;
   const _swing344Html = (!_isMonopoly && _swing344 !== null) ? (function() {
     var swCol = _swing344 < 10 ? 'var(--green)' : _swing344 < 20 ? 'var(--yellow)' : 'var(--red)';
