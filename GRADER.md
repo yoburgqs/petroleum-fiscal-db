@@ -19834,3 +19834,16 @@ This is precisely what **v507** diagnosed and fixed on `#tbl-screener` in cycle 
 **Found on this walk, not fixed.** The *Prod Data Only* button filters on `prod_coverage_pct > 5` and returns **10** countries, while `_dqTier()` counts **22** as production-backed at `> 0`. Two thresholds for "verified production" sit on the same control row and disagree by 12 countries. Reconciling them is its own cycle.
 
 **STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, **no visible Explorer chip row**; Screener advanced filters still collapsed, presets still a dropdown; **no new FAQ** (still 974); **no new tooltip on any control whose behaviour did not change** — the one tooltip added sits on the toggle this cycle created. **No row and no column was added or removed from any table.** v430 sessionStorage logic, v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk placement and the v577 collapsed absent-metrics note are all intact. Tab order unchanged. Version bump v577→v578 done silently at the end across 5 structural sites; it is **not** the deliverable.
+
+---
+## Cycle 484 Log — 2026-08-29 14:23
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 484 complete and pushed as **v578**.
+
+## Cycle 484 — T1
+
+**Task.** T1 — *"Which countries should even be on my screening list?"* (least-recently-used; 483/482 were T3, 474/473 T6, 470 T3, 469 T2, 468 T6, 467 T5, 466 T1).
+
+**Friction.** Walked the **Explorer** tab cold in Chromium with `sessionStorage` and `localStorage` cleared. Explorer sits *before* Screener in the primary nav, so it's where a first-time analyst lands. It ranks all 185 countries, and its cold default sort is **Govt Take 
