@@ -19975,3 +19975,104 @@ is **not** the deliverable.
 **Friction.** Walked Fiscal Compare cold with storage cleared, clicked `⎘ Copy for IC Memo`, and read the clipboard back instead of trusting the label.
 
 The tab has two government-take columns. `Take% model` is what this screen's engine computes; `Take% db · citable` is the ORCA database f
+
+---
+## Cycle 486 Log — 2026-08-29 17:00
+- Test before: 135 PASS / 0 FAIL / 1 WARN (local)
+- Test after: 135 PASS / 0 FAIL / 1 WARN (local; WARN = known sw.js 404 off GitHub Pages)
+- JS errors: 0 · JS syntax gate PASS (10 blocks / 0 errors)
+- Shipped as **v581**, commit `86869f4`, pushed to origin/main.
+
+## Cycle 486 — T6
+
+**Task.** T6 — *"Where did this number come from and how solid is the evidence?"*
+(485 was T5, 484 T1, 483 T3, v576 T4/T2, 474 T6.)
+
+**Friction.** Walked Explorer cold in Chromium with `sessionStorage` and
+`localStorage` cleared. The count line above `#tbl-explorer` reads
+*"ranked by data basis: **22** with verified field production first, then 163
+whose economics are regional proxies."* The button on the control row directly
+beneath it is labelled **Prod Data Only**, tooltip *"show only countries with
+verified production data."* Clicking it returned **10**.
+
+The filter tested `prod_coverage_pct > 5` (index.html:23488) — a threshold that
+exists nowhere else in the product. `_dqTier()` (index.html:22808), declared in
+**v507** as the single source of truth for the FACTS / EVIDENCE / PROXY data
+basis and already driving the badge on every Explorer row, the **v578** Explorer
+grouping and the v507 Screener ordering, calls a country production-backed at
+coverage `> 0`. Two definitions of "verified production", three inches apart on
+the same control row, disagreeing by 12 countries.
+
+The 12 dropped were **USA, Argentina, Mexico, Australia, Ecuador, Brazil,
+Malaysia, China, India, Libya, Oman and Saudi Arabia** — ranks 1, 2, 3, 6, 7,
+10, 11, 14, 15, 18, 19 and 22 of the production-backed group: the entire top of
+the ranking except Canada and Colombia. And it happened **silently** — the count
+line collapsed to a bare *"Showing 10 of 185 countries"*, no divider was drawn,
+no reason given. An analyst doing exactly the right thing for T6 — restrict me
+to countries where the evidence is real — walked away with a screening list
+containing no United States and no Brazil, and no indication either had been
+removed.
+
+(This was carried forward as *found, not fixed* by cycles 484 and 485. v578's
+own log recorded the state as *"Prod Data Only (10 rows, all verified, no
+divider and no note, **correctly**)"* — the "correctly" was the error.)
+
+**Change.**
+1. The filter now calls `_dqTier(d).hasProduction` — the platform's own
+   definition — and returns the same **22** the count line names and the row
+   badges mark.
+2. An all-production-backed result is no longer silent. The count line states
+   the depth split: *"every country here has verified field production, but not
+   to the same depth: 10 production-weighted on more than 5% of their contracts
+   (FACTS), 12 on a partial match as thin as 0.2% (EVIDENCE). Read the badge on
+   each row before ranking them against each other."* The thin-end figure is
+   measured off the rows actually on screen, so under *Region = Africa* it reads
+   **0.7%** (Libya), not 0.2%; where every row is FACTS the sentence adapts
+   rather than claim a depth difference that is not there. The `>5%` threshold
+   is no longer hidden inside a filter — it is stated on screen as the FACTS
+   boundary it actually is.
+3. The button's tooltip and `aria-label` describe the set they return and name
+   the coverage range inside it (37.6% United Kingdom → 0.2% USA).
+
+**Result.** An analyst asking the T6 question gets the 22 countries this product
+calls evidence-backed, can see which 10 are backed deeply and which 12 thinly,
+and is no longer handed a shortlist that quietly excludes the largest producer
+in the database.
+
+**Verification.** Cold Playwright, storage cleared, eleven states:
+
+| state | result |
+|---|---|
+| cold default | 185 rows, divider at 22, order unchanged |
+| filter ON | 22 rows, note fires, badges 10 FACTS / 12 EVIDENCE |
+| filter + Region=Africa | 3 rows (Angola, Libya, Nigeria), thin-end 0.7% |
+| filter + Region=Europe | 2 rows (UK, Norway), all-FACTS wording fires |
+| filter + sort=NPV | 22 rows, Canada / USA / Azerbaijan |
+| filter + IRR only | 20 rows, note recomputes to 10 / 10 |
+| filter + grouping toggle OFF | 22 rows, no grouping to do, note intact |
+| filter + no-match search | empty state unchanged |
+| filter OFF | cold order restored exactly |
+| mixed-basis path (Europe, prod off) | unchanged — 2 verified / 28 proxy, divider at 2 |
+| A–Z sort | unchanged — 0 dividers, alphabet intact, mixed-basis note |
+
+**0 page errors on every walk.** JS syntax gate **PASS** (10 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle** against the local build:
+**135 PASS / 0 FAIL / 1 WARN**. The WARN is the known local-harness `sw.js` 404
+(the service worker registers the GitHub Pages subpath).
+
+**Found on this walk, not fixed.** `exportExplorer()` rebuilds its own filter set
+from mechanic, region and search only — it ignores *Prod Data Only*, *IRR only*,
+*BE only* and the R-factor filter entirely, so `⬇ Excel` after filtering to 22
+exports all 185 rows. A second divergence between what is on screen and what
+leaves the tool; its own cycle.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still 974). **No new tooltip** —
+one existing tooltip was *corrected* because it described a threshold this cycle
+removed. No page-sub paragraph, no amber instructional banner, no routing hint,
+no "How to read" block, no SbS card wrapper, no visible Explorer chip row;
+Screener advanced filters still collapsed, presets still a dropdown. **No row and
+no column was added or removed from any table.** v430 sessionStorage logic,
+v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk
+placement, the v578 Explorer grouping and the v580 Fiscal Compare citable
+ranking are all intact. Tab order unchanged. Version bump v580→v581 across 5
+structural sites, done silently at the end; it is **not** the deliverable.
