@@ -19144,3 +19144,23 @@ filters still collapsed, presets still a dropdown. Tab order unchanged. CP
 headline still two-zone with tier-coloured take%, global rank and vs-median pill.
 Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373, v430,
 v449, v451, v452, v489, v505, v508, v512–v570 all intact.
+
+---
+## Cycle 470 Log — 2026-08-29 02:17
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 470 complete and pushed (v571).
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (least-recently-used; 469 was T2, 464 was the last T3.)
+
+## Friction
+Cold load, storage cleared, Side-by-Side → the shipped **USA vs Iraq** quickstart.
+
+*Rank among producers (take @$75)* is the only row in the 22-row grid that places a column against the outside world. The Iraq cell printed two lines that contradict each other:
+
+```
+#6 of 21 producers
+above producer median      ← orange
+
