@@ -19778,3 +19778,59 @@ Checked and *not* the problem, so recorded rather than "fixed": the example-seed
 **Friction.** I walked Side-by-Side cold in Chromium with storage cleared — twice: once on the North Sea Trio the tab seeds itself with, once on an analyst-built Guyana/Angola/Brazil set — and measured the rendered box model rather than reading the markup.
 
 The comparison grid ends, and the analyst then
+
+---
+## Cycle 484 Log — 2026-08-29 (v578)
+
+**Task.** T1 — *"Which countries should even be on my screening list?"* Least-recently-used: 483 and 482 were T3, 474/473 T6, 470 T3, 469 T2, 468 T6, 467 T5, 466 T1.
+
+**Friction.** Walked cold in Chromium, `sessionStorage` and `localStorage` cleared, into the **Explorer** tab — which sits *before* Screener in the primary nav and is where a first-time analyst lands.
+
+`#tbl-explorer` ranks all 185 countries, and its cold default sort is **Govt Take ascending**, under a `<select>` whose own tooltip reads *"lower = more contractor-favorable."* Measured against live `country_data.json`, ranks 1–12 are:
+
+| # | country | take @$75 | basis |
+|---|---|---|---|
+| 1 | Vanuatu | 5.0% | PROXY |
+| 2 | Bahamas | 10.0% | PROXY |
+| 3 | Montenegro | 10.5% | PROXY |
+| 4 | Greenland | 11.6% | PROXY |
+| 5 | Faroe Islands | 11.9% | PROXY |
+| 6 | Moldova | 12.4% | PROXY |
+| 7 | Romania | 13.6% | PROXY |
+| 8 | Sweden | 13.7% | PROXY |
+| 9 | Bulgaria | 13.8% | PROXY |
+| 10 | Kyrgyzstan | 13.8% | PROXY |
+| 11 | Bosnia and Herzegovina | 15.6% | PROXY |
+| 12 | Serbia | 15.9% | PROXY |
+
+Their low take is an artefact of ORCA holding a royalty rate and no profit-oil or income-tax terms — the DCF hands the balance to the contractor. **The first row with any verified field production is USA at rank 62.** Canada 100, United Kingdom 121, Angola 129, Guyana 138, Brazil 147, Indonesia 158, Norway 168, Nigeria 179, Iraq 180. The analyst scrolls past **61 proxy placeholders** before reaching a country anyone has drilled.
+
+This is precisely what **v507** diagnosed and fixed on `#tbl-screener` in cycle 406 — same sentence, same countries — **left live on the sibling table for 71 versions**, on the tab that comes first in the nav. Explorer's ordering is in fact *worse* than the one v507 repaired: v507's Screener sorted `npv_75` DESC, which it called "a take sort wearing a different hat"; Explorer sorts take directly, with no indirection. The per-row `PROXY` badge could not carry the warning, because every row above the fold carried it too.
+
+**Change.**
+1. `renderExplorer()` groups the ranking by **data basis** — the 22 countries with verified field production sort above the 163 proxies, by the chosen metric *within each group*. Reuses the same `_dqTier()` test that drives the row badge and the v507 Screener ordering, so badge and position cannot drift. The metric comparator is byte-unchanged; only what it is applied within changed.
+2. **Nothing is filtered out.** All 185 stay in the table, the count and the export; only the order moved.
+3. A **labelled amber divider** at the boundary — *"BELOW THIS LINE — 163 COUNTRIES WITH NO VERIFIED FIELD PRODUCTION"* — so row 23 is not read with the authority of row 1.
+4. The **count line states the split** and recomputes under every filter.
+5. A **first-class toggle**, *Verified production first*, checked by default, in the Explorer control row beside *IRR only* / *BE only*. Unticking restores the previous ordering exactly.
+6. Grouping is **excluded from the A–Z sort** — a lookup, not a ranking; regrouping the alphabet would break the thing being scanned. That state, the toggle-off state and any all-proxy result take the **v543 mixed-basis note** in the count line rather than going silent.
+
+**Result.** An analyst who opens Explorer and sorts by government take now reads **USA, Argentina, Mexico, Canada, Colombia, Australia, Ecuador, United Kingdom, Angola, Brazil, Malaysia, Indonesia** — a screening list of countries that produce oil — instead of eleven jurisdictions where nobody has drilled and a twelfth at rank 62.
+
+**Verification.** Cold Playwright, storage cleared, seven states:
+
+| state | rows | dividers | top of list |
+|---|---|---|---|
+| cold default (take asc) | 185 | 1 @ idx 22 | USA · Argentina · Mexico · Canada |
+| sort = NPV | 185 | 1 @ idx 22 | Canada · USA · Azerbaijan · Mexico |
+| sort = A–Z | 185 | **0** | Afghanistan · Albania · Algeria (alphabet intact, note fires) |
+| toggle OFF | 185 | 0 | Vanuatu · Bahamas · Montenegro (prior order restored, note fires) |
+| toggle back ON | 185 | 1 @ idx 22 | identical to cold default |
+| Region = Europe | 30 | 1 @ idx 2 | United Kingdom · Norway (2 verified / 28 proxy) |
+| Prod Data Only | 10 | 0 | all verified — no divider, no note, correctly |
+
+**0 page errors on every walk.** JS syntax gate **PASS** (10 blocks / 0 errors). `runtime_comprehensive.js` **ran this cycle** against the local build — **135 PASS / 0 FAIL / 1 WARN**, the WARN being the known local-harness `sw.js` 404 (the service worker registers the GitHub Pages subpath; correct in production).
+
+**Found on this walk, not fixed.** The *Prod Data Only* button filters on `prod_coverage_pct > 5` and returns **10** countries, while `_dqTier()` counts **22** as production-backed at `> 0`. Two thresholds for "verified production" sit on the same control row and disagree by 12 countries. Reconciling them is its own cycle.
+
+**STILL LOCKED — nothing touched.** No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, **no visible Explorer chip row**; Screener advanced filters still collapsed, presets still a dropdown; **no new FAQ** (still 974); **no new tooltip on any control whose behaviour did not change** — the one tooltip added sits on the toggle this cycle created. **No row and no column was added or removed from any table.** v430 sessionStorage logic, v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk placement and the v577 collapsed absent-metrics note are all intact. Tab order unchanged. Version bump v577→v578 done silently at the end across 5 structural sites; it is **not** the deliverable.
