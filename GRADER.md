@@ -18576,3 +18576,22 @@ wrapper, no visible Explorer chip row. Screener advanced filters still collapsed
 tier-coloured take%, global rank and vs-median pill; v566 `n/c` stability state
 intact. Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373,
 v430, v449, v451, v452, v489, v505, v508, v512–v566 all intact.
+
+---
+## Cycle 466 Log — 2026-08-28 21:51
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed and mirror verified identical. Cycle complete.
+
+---
+
+## Cycle 466 — T1
+
+**Task.** T1 — "Which countries should even be on my screening list?" (465 was T4, 464 T3, 463 T2 — no repeat.)
+
+**Friction.** I cleared storage, loaded cold, went to the Screener, and made the one gesture T1 is made of: drop the breakeven ceiling and see who survives a low-price world.
+
+The **Max Breakeven** slider ran $20–$120. Every populated breakeven in the database is **$27–$34**. So across its 101 positions:
+
+|
