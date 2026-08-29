@@ -20089,3 +20089,108 @@ structural sites, done silently at the end; it is **not** the deliverable.
 **Task.** T6 — *"Where did this number come from and how solid is the evidence?"* (485 was T5, 484 T1, 483 T3.)
 
 **Friction.** Walked Explorer cold in Chromium, storage cleared. The count line above the table says *"ranked by data basis: **22** with verified field production first, then 163 whose economics are regional proxies."* The button on the control row three inches below it 
+
+## Cycle 487 Log — 2026-08-29 18:12
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (known local-harness sw.js 404)
+- JS errors: 0
+- Shipped as: v582
+
+**Task.** T2 — *"Is this one country attractive at $75/bbl, and can I defend
+that?"* (486 was T6, 485 T5, 484 T1, 483 T3; T2 and T4 were the least-recently
+used and T2 was the older of the two outside the v576 pair.)
+
+**Friction.** Walked Country Profile cold in Chromium with `sessionStorage` and
+`localStorage` cleared — Home → Country Profile → Norway autoloads. The page
+reads well down to the **4-Price Sensitivity** table, which is where the analyst
+actually settles the $75/bbl question. Immediately under it the platform gives
+its own instruction:
+
+> **No IRR column.** … For a genuine project IRR, *run Scenario Builder with your
+> own capex and opex →*
+
+and the Price Swing row in the same table's footer offers *→ Model in Scenario
+Builder*. Both are `<a onclick="switchTab('tscenario',
+document.getElementById('tab-btn-tscenario'))">`.
+
+**There is no `#tscenario` pane and no `#tab-btn-tscenario` button.** The
+Scenario Builder is a modal, `#scenario-modal` (index.html:21914), opened by
+`openScenarioBuilder()` / `ddOpenScenarioBuilder(country)`. `switchTab()`
+(index.html:22248) removed `.active` from every one of the 13 panes and every tab
+button, then did `var panel = document.getElementById(id); if (panel) …` — found
+nothing, activated nothing, and returned. Measured in the browser immediately
+after the click:
+
+| | |
+|---|---|
+| `.tab-pane.active` | `[]` |
+| `.tab-btn.active` | `[]` |
+| `#tab-content-main` innerText | **0 chars** |
+| `window._activeTab` | `"tscenario"` — a pane that does not exist |
+| page errors | **0** |
+
+The entire application went blank, silently, from the one place on the tab that
+tells the analyst to click it. A third instance of the same call sat in the
+Fiscal Compare drilldown (*"Run Scenario Builder for a project IRR →"*,
+index.html:34985). An audit of every `switchTab()` target id found exactly these
+three dead ones (`tscenario` ×3); the fourth suspect, `tfc`, survives only as
+prose inside the v428 changelog entry and is not a live call.
+
+**Change.**
+
+1. **All three links now call `ddOpenScenarioBuilder(<country>)`.** The modal
+   opens **pre-filled** with that country's mechanic, royalty, CIT, special tax
+   and state equity, on a region-appropriate production profile — which is what
+   the link text promised all along. Norway opens `Concession` / `north_sea`;
+   Angola opens `PSC` / `deepwater`; the FC drilldown opens whichever country
+   the drawer is showing. The two CP sites interpolate `_irrCty576` (the escaped
+   country already in scope in `loadCountryProfile()`); the FC site uses `cEsc`,
+   already in scope in `openFCDrilldown()`.
+2. **`switchTab()` no longer empties the page on an unknown id.** It resolves the
+   panel *first* and returns early with a `console.warn` if there is none,
+   leaving the current tab and its content intact. This is the root cause that
+   let three dead links ship silently: a bad id produced no exception, no test
+   failure and no visible error — only a blank screen.
+3. The pre-fill banner read *"Parameters pre-filled from Country Profile: X"*.
+   That path is now reachable from the Fiscal Compare drilldown as well, so it
+   reads *"Parameters pre-filled for X"*.
+
+**Result.** An analyst who follows the platform's own instruction to model a real
+project IRR lands in the Scenario Builder with the country's fiscal terms already
+loaded and can run it against their own capex and opex — instead of on a blank
+page with no active tab and no indication of what happened. And no future
+mistyped tab id can blank the application again.
+
+**Verification.** Cold Playwright, storage cleared:
+
+| state | result |
+|---|---|
+| CP cold (Norway) | pane `t7`, btn `tab-btn-t7`, 17,299 chars |
+| click *run Scenario Builder…* | modal `open`, prefill **Norway**, `Concession` / `north_sea`, page intact |
+| click *→ Model in Scenario Builder* | modal `open`, prefill **Norway**, page intact |
+| switch to Angola, click link | modal `open`, prefill **Angola**, `PSC` / `deepwater` |
+| FC drilldown link | modal `open`, prefill **Afghanistan** (drawer country), pane `t0` still active |
+| `switchTab('tdoesnotexist')` | **no-op** — `t7` still active, 18,760 chars on screen |
+| 7-tab navigation sweep | all tabs still switch normally |
+
+**0 page errors on every walk.** JS syntax gate **PASS** (10 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle** against the local build:
+**135 PASS / 0 FAIL / 1 WARN** — the WARN is the known local-harness `sw.js` 404
+(the service worker registers the GitHub Pages subpath).
+
+**Found on this walk, not fixed.** Carried forward from cycle 486 and still open:
+`exportExplorer()` rebuilds its own filter set from mechanic, region and search
+only, ignoring *Prod Data Only*, *IRR only*, *BE only* and the R-factor filter —
+`⬇ Excel` after filtering to 22 rows still exports all 185. Its own cycle.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still 974). No new tooltip on a
+pre-existing control — two tooltips were *corrected* because they now describe a
+control that works. No page-sub paragraph, no amber instructional banner, no
+routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer
+chip row; Screener advanced filters still collapsed, presets still a dropdown. No
+row and no column added or removed from any table. v430 sessionStorage logic,
+v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk
+placement, the v578 Explorer grouping, the v580 FC citable ranking and the v581
+Explorer `_dqTier` reconciliation are all intact. Tab order unchanged. Version
+bump v581→v582 across 5 structural sites, done silently at the end; it is **not**
+the deliverable.
