@@ -18453,3 +18453,126 @@ the improvement.
 **Friction.** I cleared storage, loaded cold, and walked both surfaces that answer this. The Reform Risk tab is genuinely good — its per-country lookup names the coverage gap outright and refuses to imply a clean record.
 
 The Country Profile does the opposite. Its headline str
+
+---
+## Cycle 466 Log — 2026-08-28 21:45
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN (local harness)
+- Test after: 135 PASS / 0 FAIL / 1 WARN — suite RAN this cycle against the local
+  build, not carried forward. The WARN is the pre-existing `/petroleum-fiscal-db/sw.js`
+  404, reproduced identically on the pre-change build.
+- JS syntax gate: PASS (9 inline blocks, 0 errors)
+- Version: v566 → v567 (5 structural locations, done silently at the end)
+
+### Task
+**T1 — "Which countries should even be on my screening list?"**
+(465 was T4, 464 was T3, 463 was T2 — no repeat.)
+
+### Friction
+Walked cold into the **Screener** — `sessionStorage` and `localStorage` cleared —
+and reached for the one gesture T1 is made of: drop the breakeven ceiling and see
+who survives a low-price world.
+
+The `sl-be` "Max Breakeven" slider ranged **$20–$120**. In `country_data.json`
+every one of the **65** populated `be_75` values falls between **$27 and $34/bbl**.
+Counted across all 101 slider positions:
+
+| slider band | positions | effect on the result set |
+|---|---|---|
+| $120 – $34 | **87** | **removes nothing.** Count stays 185/185. |
+| $33 – $27  | 7  | the only live band: 184 → 124 |
+| $26 – $20  | 7  | removes **every country that had a breakeven**, leaving **120 rows, none of them ever tested** |
+
+So the entire range an IC analyst actually reaches for — $80, $65, $50 — was
+inert, and at the bottom the control inverted outright: the strictest breakeven
+screen on the platform returned exclusively the untested set.
+
+Worse than inert, the screen **asserted a measurement that had not happened**. At
+a $50 ceiling both the count bar and the criteria panel read:
+
+> *Max breakeven ≤$50/bbl: 65 measured and passing, 120 carried untested*
+
+True word by word, and read as a passed stress test. No country in this database
+can fail a $50 ceiling.
+
+**Four presets set this ceiling and all four were no-ops** — Sweet Spot $65, PSC
+Africa $80, Low-Risk Stable $75, and **Downside Resilience $50**, whose entire
+stated rationale was *"BE ≤$50 (competitive with Permian shale) — regimes viable
+at downside price."* Measured on the live build, that leg removed **0 countries**;
+the take ceiling was doing the whole screen.
+
+Elements: `#sl-be` / `#sc-be-nulls` (DOM), the ceiling leg in `runScreener()`,
+`_scUpdateNeutralFlags()`, the `_beNote` count string, the `crit.push('Max
+breakeven…')` criteria line, the `_diagBE` hint, the *not tested* cell state, and
+`applyScreenerPreset()`'s four `setSlider('sl-be', …)` calls.
+
+### Change
+The slider and its coverage checkbox are **REMOVED**, together with every piece of
+machinery that existed only to disclose them.
+
+**Re-ranging to $26–$35 was considered and rejected.** v562 established that these
+65 values are a survival from an earlier recompute the engine no longer
+reproduces — `dcf_results` now populates 5 countries at $75 (Malaysia $51, Angola
+$58, Egypt $60, Saudi Arabia $62, Indonesia $88) and **not one is among the 65**.
+Sharpening the axis would screen harder on worse data.
+
+The three no-op preset legs are deleted, and **Downside Resilience is rebuilt on
+the axis that actually tests downside**: contractor **NPV @$50 ≥ $0M**, modelled
+for **185/185** countries with no untested rows. The Screener legend — which still
+pointed the analyst at the removed slider, the same defect v537 fixed on this very
+element — now states that breakeven is reference only, gives its real $27–$34
+range, and routes downside screening to NPV @$50.
+
+Same principle as v451 (Govt NPV), v515/v517 (IRR), v555 and v562: **a criterion
+that screens on data availability rather than on the property it names is deleted,
+and where it went is stated.**
+
+No take, NPV, rank or threshold was altered and no data file was regenerated.
+`formatBreakeven()`, `_beIsTested()` and the Advanced *Breakeven Coverage* filter
+are untouched — the last because it is honestly labelled as a coverage filter and
+never as a price test.
+
+### Result
+Verified cold in Playwright against the local build, storage cleared. The
+**Downside Resilience** preset went from **160 countries to 158**, and the two it
+now drops are:
+
+| country | take @$75 | NPV @$75 | NPV @$50 |
+|---|---|---|---|
+| **Malaysia** | 59.4% | **+$627M** | **−$33M** |
+| **Yemen**    | 53.4% | **+$1,016M** | **−$139M** |
+
+Precisely the two regimes in that set that are value-creating at $75 and
+value-destroying at $50 — the ones that do not survive a price break — which a
+preset named for downside resilience had been returning as resilient.
+
+The count bar now reads *"all 158 tested at the $50/bbl downside and clearing $0M
+(npv_50 modelled for 185/185 — no untested rows)"* in place of a breakeven test
+that measured nothing.
+
+An analyst can no longer set a ceiling that silently does nothing, can no longer
+be told 65 countries passed a stress test that no country could fail, and gets a
+downside screen where every row in the result set was actually measured.
+
+### Found on this walk, not fixed — stated rather than hidden
+1. **`formatBreakeven()` still collapses all 65 values to the literal `<$50`** on
+   Fiscal Compare, Country Profile and the Breakeven Map. The column is now
+   honestly labelled reference-only on the Screener, but the two-state rendering
+   is unchanged. Carried from v562/v563; still the largest open item.
+2. **The Breakeven Map is an entire tab built on this axis** and was not walked
+   this cycle.
+3. Country Profile's Evidence Chain still prints raw internal tokens
+   (`EY_IHS_BulkHarvest_2025`). Carried from v563.
+4. The three surviving `◆◆◆◆◆` reform rows (Algeria, Colombia, USA) are window
+   artefacts. Carried from v566.
+
+### STILL LOCKED — nothing touched
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not
+change — the two rewritten belong to the legend and the cell this cycle changed,
+and both previously described removed behaviour. No page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+**presets still a dropdown**. Tab order unchanged. CP headline still two-zone with
+tier-coloured take%, global rank and vs-median pill; v566 `n/c` stability state
+intact. Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373,
+v430, v449, v451, v452, v489, v505, v508, v512–v566 all intact.
