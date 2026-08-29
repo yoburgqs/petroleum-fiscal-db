@@ -18139,3 +18139,18 @@ badge, v508, v512, v513, v515, v516, v522, v529, v530, v531, v533, v534, v536, v
 v539, v540, v547, v549, v551, v552, v555, v557–v562 and v563 all intact. Version
 sweep v563→v564 done silently at the end across 5 structural locations; it is not
 the improvement.
+
+---
+## Cycle 463 Log — 2026-08-28 19:07
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. `6bf34ec` (v564) and `158a2a9` pushed to `origin/main`; mirror byte-identical.
+
+## Cycle 463 — T2
+
+**Task.** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (462 was T6, 461 was T3.)
+
+**Friction.** Walked cold into Country Profile — fresh context, storage cleared — and read the biggest element on the page. For **Saudi Arabia**, the Breakeven Price card printed at 28px in green:
+
+> **$1/bbl** — Resilient at $1, cushioned against most price scenarios — 
