@@ -18706,3 +18706,18 @@ vs-median pill; v566 `n/c` stability state intact. Govt NPV still removed from
 Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505,
 v508, v512–v567 all intact. No take, rank or threshold was altered and no data
 file was regenerated.
+
+---
+## Cycle 467 Log — 2026-08-28 22:50
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Here is the summary in plain English.
+
+## Cycle 467 — T5: "Give me something I can paste straight into an IC memo."
+
+**Task.** T5, the least-recently-used task (last run at cycle 441; 466 was T1, 465 T4, 464 T3, 463 T2, 462 T6).
+
+**Friction.** I cleared storage, loaded cold, opened Fiscal Compare and pressed the tab's only clipboard button — **⎘ Copy for IC Memo**.
+
+The NPV column on screen is the figure the screen models on whichever profile you selected. The clipboar
