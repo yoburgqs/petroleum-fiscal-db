@@ -19847,3 +19847,116 @@ This is precisely what **v507** diagnosed and fixed on `#tbl-screener` in cycle 
 **Task.** T1 — *"Which countries should even be on my screening list?"* (least-recently-used; 483/482 were T3, 474/473 T6, 470 T3, 469 T2, 468 T6, 467 T5, 466 T1).
 
 **Friction.** Walked the **Explorer** tab cold in Chromium with `sessionStorage` and `localStorage` cleared. Explorer sits *before* Screener in the primary nav, so it's where a first-time analyst lands. It ranks all 185 countries, and its cold default sort is **Govt Take 
+
+---
+## Cycle 485 — T5, shipped as v580 (2026-08-29)
+
+**Task.** T5 — *"Give me something I can paste straight into an IC memo."*
+Least-recently-used: 484 was T1, 483 T3, v576 T4/T2, 474 T6, 473 T5.
+
+**Friction.** Walked cold in Chromium over a local HTTP server with
+`sessionStorage` and `localStorage` cleared: Home → **Fiscal Compare** →
+`⎘ Copy for IC Memo` → **read the clipboard back** rather than trusting the
+button label.
+
+Fiscal Compare carries two government-take columns. `Take% model` is what this
+screen's DCF engine computes on the selected profile. `Take% db · citable` is
+the ORCA contract-database figure — the one the row drilldown, Country Profile,
+the JSON API, the XLSX `GovtTake_` column and the pasted artifact itself all
+tell the analyst to cite.
+
+**The `#` rank was built on the model column.** So were the top-10 green /
+bottom-10 red rank borders and all four take-tier dividers. Measured over the
+65 rows the table actually ranks (the other 120 are partitioned out by v563):
+
+| row | screen rank | citable take | rank on the citable column |
+|---|---|---|---|
+| Nigeria | **#5** | **81.1%** | **62 of 65** |
+| China | #4 | 61.0% | 51 |
+| Sudan | #8 | 57.4% | 42 |
+| Ecuador | #48 | 46.5% | 6 |
+| Philippines | #49 | 46.5% | 7 |
+| Georgia | #50 | 47.1% | 8 |
+| Trinidad and Tobago | #58 | 47.1% | 9 |
+
+Median rank shift **13 places**, worst **57**. Nigeria rendered as the 5th most
+attractive regime on earth while its citable take sits inside the *">75% Very
+High — requires exceptional economics"* band this same tab defines two panels
+higher. The *Investible tier ends (≤40%)* divider fell **above Australia at a
+citable 38.5%**, pushing an investible country out of the investible tier on a
+number the page says not to quote.
+
+And it left the tool. `copyFCForIC()` copies the rows *as shown*, so the paste
+carried a numbered list whose ranks contradict the column beside them — an IC
+reader treats a numbered list as a ranking of the number next to it. The header
+tooltip did disclose the split in prose, and blamed it on *"a G row"*; the
+divergence measured above is entirely on **non-G rows**.
+
+**Change.** The `take` sort, the `#` rank, the tie groups, the rank borders and
+all four tier dividers now run on the **citable database take at the selected
+price** (`_fcSelPrice` / `_fcDbTake` hoisted from the cell renderers up to the
+sort block). The global-median divider was made price-aware to match. Nothing
+below the divider moves: the 120 generic-default rows are re-sorted back onto
+the old model comparator, so Vanuatu does not surface. Three header tooltips
+that asserted the old basis were corrected, and the pasted preamble now reads
+*"ranked on the ORCA database take column — the CITABLE one — low → high"*.
+
+**Why this was declined before, and why it is no longer blocked.** v547 named
+its reason in its own log: ranking on the database take would head the shortlist
+with **Vanuatu (5.0%), the Bahamas, Montenegro, Greenland and the Faroe
+Islands**. That reason expired at **v563**, which partitioned every
+generic-default row out of the ranking — all five of those jurisdictions, and
+all three state monopolies, carry `termsBasis === 'default'` and were already
+unranked below the line. Re-verified on the live result set this cycle: **65
+own-terms rows, every one with a populated database take at $50/$75/$100/$125,
+no non-producer and no monopoly among them.** The blocker was removed by a later
+cycle and nobody went back for the item. v529 had already re-based the **XLSX**
+ranking on the citable take and explicitly logged the screen as a separate
+cycle; screen and workbook now agree.
+
+**Result.** The position an analyst reads and the number they cite are the same
+number. The cold default now opens **USA 23.4 · Somalia 36.9 · Australia 38.5 ·
+Madagascar 43.5 · Egypt 45.1 · Philippines/Ecuador =6 · Georgia/Trinidad =8 · UK
+10** — monotonic on the citable column with **0 inversions**, genuine ties marked
+`=6` / `=8`, and the investible divider correctly below Australia. An analyst who
+takes the top ten off this screen and pastes it into an IC memo now gets ten
+countries that are actually the ten lowest on the figure the memo will quote.
+
+**Verification.** Cold Playwright, storage cleared, seven states:
+
+| state | result |
+|---|---|
+| cold default (take asc, $75) | 65 ranked, 0 inversions, 4 dividers correctly placed |
+| sort = NPV | unchanged behaviour, NPV=$0 divider intact |
+| price = $125 | 0 inversions, tier dividers move to the $125 boundaries |
+| Region = Africa / Europe / Middle East | 29 / 2 / 3 ranked, dividers correct, no stray banner at i=0 |
+| reverse (desc) | Turkmenistan 87.2 → Kazakhstan 69.9, monotonic desc |
+| generic block below the divider | **byte-identical** (Ireland, Tunisia, Venezuela, Brunei…) |
+| clipboard read-back | 192 lines, rank sentence updated, rows match screen |
+
+**0 page errors on every walk.** JS syntax gate **PASS** (10 blocks / 0 errors).
+
+`runtime_comprehensive.js` **ran this cycle** against the local build:
+**134 PASS / 0 FAIL / 1 WARN**. The same suite run against the **pre-change
+HEAD** on the same server returned an **identical 134 / 0 / 1 with a
+byte-identical assertion list**, so this change is regression-free. The 135
+figure in the loop prompt is the production-URL baseline; one assertion depends
+on production and does not fire locally. The WARN is the known local-harness
+`sw.js` 404 (the service worker registers the GitHub Pages subpath).
+
+**Found on this walk, not fixed.** Carried forward from cycle 484 and still
+open: *Prod Data Only* filters on `prod_coverage_pct > 5` and returns 10
+countries while `_dqTier()` counts 22 as production-backed at `> 0` — two
+thresholds for "verified production" on the same control row, disagreeing by 12
+countries.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still 974). **No new tooltip** —
+three existing ones were *corrected* because they asserted a basis this cycle
+changed. No page-sub paragraph, no amber instructional banner, no routing hint,
+no "How to read" block, no SbS card wrapper, no visible Explorer chip row;
+Screener advanced filters still collapsed, presets still a dropdown. **No row
+and no column was added or removed from any table.** v430 sessionStorage logic,
+v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk
+placement and the v578 Explorer grouping are all intact. Tab order unchanged.
+Version bump v579→v580 across 5 structural sites, done silently at the end; it
+is **not** the deliverable.
