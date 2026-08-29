@@ -17983,3 +17983,159 @@ at the end across 5 structural locations; it is not the improvement.
 
 ## Friction
 Walked Fiscal Compare cold, starting from the **Quality** column — the tab's only provenance signal — and asked what the letter actually governs. Counted off the live DOM: **120 of the 185 rows carry `termsBasis === 'default'`**, and **119 of them pr
+
+---
+## Cycle 463 Log — 2026-08-28
+
+- Test before: 135 PASS / 0 FAIL / 0 JS errors
+- Test after:  135 PASS / 0 FAIL / 0 JS errors (Playwright RAN this cycle against the
+  local build, storage cleared — not carried forward from a prior baseline). The one
+  WARN is `GET /petroleum-fiscal-db/sw.js 404`, the service-worker path under a local
+  server root; confirmed in the http server log as a harness artifact, not a page error.
+- JS syntax gate: PASS (9 inline script blocks, 0 errors)
+- Commit `6bf34ec` (v564) pushed to `origin/main`; mirror byte-identical.
+
+## Task
+
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(462 was T6, 461 was T3.)
+
+## Friction
+
+Walked cold into **Country Profile** — fresh browser context, `sessionStorage` and
+`localStorage` cleared — and read the largest element on the page, the **Breakeven
+Price** card. For **Saudi Arabia** it printed, at 28px in green:
+
+    $1/bbl
+    NPV = 0 at this oil price (undiscounted)
+    Resilient at $1 — cushioned against most price scenarios
+    Ranked #3 of 68 countries by breakeven (lower = more resilient)
+
+Saudi Arabia's database government take is **100.0%** — a state monopoly with no
+contractor position. `_beIsTested()` (v513) exists *specifically* to reject
+`0 < v <= 1` as "the DCF floor artifact for state-monopoly regimes (Bahrain /
+Kuwait / Saudi Arabia)", and `formatBreakeven()` renders exactly those three as an
+em dash on Fiscal Compare, the Explorer and the Screener. Country Profile bypassed
+both guards on **six** surfaces — the callout card, the Fiscal Mechanics tile
+(`cp-be-param`), the header strip (`cp-be-meta`), the 4-price sensitivity row, the
+breakeven cost curve and the ruler — while **two surfaces on the same page**, the
+v344 headline (`_be344Display`, gated on `_isMonopoly`) and the Data Completeness
+row (gated on `> 1`), suppressed them correctly. The inconsistency is what makes it
+an oversight rather than a decision: the page already knew the rule.
+
+The guard was also bypassed **twice per country**, once synchronously and once
+asynchronously: `api/v1/country/{saudi-arabia,bahrain,kuwait}.json` each carry
+`avg_breakeven_usd = 1.0` at all four prices, and that writer lands *after* the
+synchronous render — so fixing only the sync path would have left the four price
+cells, the cost curve and its footnote still announcing `$1/bbl`.
+
+**The ordinal was the second, larger defect.** The 65 real values hold only **eight
+distinct integers, $27–$34**, and 43 of the 65 sit on two of them — **26 countries
+at exactly $29** and **17 at exactly $30**. The card coloured the top quartile green
+and the bottom quartile red off that ordinal, and the sort is stable on
+`COUNTRY_DATA` order, so **alphabetical position decided the verdict colour**.
+Counted off the live DOM:
+
+| tie block | ranks | colour printed |
+|---|---|---|
+| $29/bbl (26 countries) | Belarus, Bulgaria, Cook Islands, Dominican Republic, French Polynesia — #13–17 | **GREEN** |
+| $29/bbl (same value) | Guadeloupe … Tuvalu — #18–38 | grey |
+| $30/bbl (17 countries) | Bahamas … Malta — #39–50 | grey |
+| $30/bbl (same value) | Portugal, Rwanda, Solomon Islands, Western Sahara, Zimbabwe — #51–55 | **RED** |
+
+So Zimbabwe was painted as one of the least resilient fiscal regimes in the database
+for being **$1/bbl** above the green block, and two countries with the *identical*
+number got opposite verdicts. **v505 already established this exact rule for Fiscal
+Compare** — "a top 10 drawn from inside a 153-way tie is arbitrary, do not paint it
+green" — and it was never applied here.
+
+Found on the same walk: **Norway is the DEFAULT Country Profile** and carries no
+bundled `be_75` — its $28.7/bbl arrives from `api/v1/country/norway.json` (v512).
+The card was rendered once, synchronously, before that fetch landed, so on the cold
+default load the card was **absent entirely** while the Fiscal Mechanics tile three
+inches below it read `$29/bbl`. That is the same sync-vs-async contradiction v512
+fixed for four other slots and missed here.
+
+## Change
+
+1. **`cpBeFor()`** — the single Country Profile read point (v512) — guards `> 1`
+   instead of `> 0`. One character, and it is why the profile led with "$1/bbl".
+2. **The async `avg_breakeven_usd` writer** applies the same rule, as do the ruler
+   and footnote gates and `_cpApplyBe()`.
+3. **The three monopolies** now show an explicit card — *"not modelled — no
+   contractor position to break even"* — stating that take is 100.0%, that the
+   stored $1/bbl is the DCF solver floor, and that it is suppressed for the same
+   reason Fiscal Compare, the Explorer and the Screener render it as an em dash.
+   Em dash in all four price cells, no cost curve, no ruler, and a **settled**
+   footnote instead of a permanent "Loading from database…".
+4. **`getBreakevenRank()` is DELETED**, replaced by **`getBreakevenBand()`**. No
+   ordinal, no quartile colouring, no invented threshold, no row or country removed.
+   Each country now reads its value beside the size of its tie:
+   *"Tied with 25 other countries at exactly $29/bbl — all 65 modelled countries
+   fall in a $27–$34/bbl band across 8 distinct values, so breakeven does not
+   separate them. Use government take and the $50 downside NPV to discriminate."*
+   Countries whose value is resolved from the API rather than the bundled table are
+   not counted as members of their own tie (`inSet` / `others`) — Norway reads
+   "tied with 26", Poland "tied with 25", off the same $29.
+5. **The verdict sentence stopped varying by bands no country occupies.** All 65 are
+   under $50, so "Moderate / Elevated / Vulnerable" had exactly one reachable state
+   and read as a per-country finding when it was a property of the whole set. It now
+   states the margin: "Clears the $75/bbl base case by $46/bbl — and so does every
+   other modelled country."
+6. **One builder, both paths.** `cpBuildBeCallout()` is called by the synchronous
+   render and re-called by `_cpApplyBe()`, so Norway's card is present on the cold
+   default load. `getBreakevenBand` / `cpBeBandNote` / `cpBeTieBadge` are exposed on
+   `window` — this region of the file is a nested scope (`getPeerCountries` beside it
+   is not global either), so the async resolver could not otherwise see them.
+
+**No value was changed, no country was dropped from the page, no data file was
+regenerated and no threshold was invented.**
+
+## Result
+
+Swept **all 185 country profiles** cold in Playwright: **zero** now print `$1/bbl`,
+an ordinal breakeven rank, or the collapsed `<$50/bbl` string. 3 show "not modelled"
+with the reason, 67 show a value with its tie (65 bundled + Norway + the UK resolved
+from the API), 115 correctly show no card. 0 JS errors across the sweep.
+
+The analyst can no longer carry **"Zimbabwe is the least resilient regime in the
+database"** or **"Saudi Arabia breaks even at $1/bbl"** into an IC meeting — and
+where breakeven genuinely cannot discriminate, the page now says so in one sentence
+and names the two metrics that can.
+
+## Found on this walk, not fixed — stated rather than hidden
+
+1. **`formatBreakeven()` itself is still unchanged**, and Fiscal Compare, the
+   Screener, the Explorer and both IOC tables still call it. It still collapses all
+   65 values ($27–$34) to the literal string `<$50`, so the Fiscal Compare Breakeven
+   **column** remains a two-state field that cannot rank its three columns — while
+   the stats strip four inches above it prints the real number ("Best BE: $27/bbl").
+   This cycle fixed Country Profile only. The FC column is the next cycle on this
+   defect.
+2. **The `$50` and `$80` sort dividers in `renderCompare()`** (lines ~33552–33565,
+   "Resilient tier ends (<$50/bbl)" / "Base-case tier ends ($50–$80)") are
+   **unreachable code**: no country in `country_data.json` has `be_75 >= 50`, so
+   neither divider can ever render. Left in place, not deleted, pending the FC pass.
+3. **v562's finding #4 stands and was not re-litigated here:** the 65 populated
+   values are a survival from an earlier recompute, and `dcf_results` at $75 has only
+   5 countries in the usable band — none of them among the 65. Everything above
+   changes how the number is *presented*, not whether it is *current*. That remains
+   the largest open item on this data, and it is a harvest question, not a UX one.
+4. The Country Profile **Evidence Chain** table still prints the raw internal tokens
+   `EY_IHS_BulkHarvest_2025` / `EY_KPMG_CIT_Guide_2025` as cited sources across 46
+   rows / 35 countries — carried forward from cycle 462, untouched.
+
+## STILL LOCKED — nothing touched
+
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not
+change — every tooltip edited here belongs to a card, cell or footnote this cycle
+changed. No page-sub paragraph, no amber instructional banner, no routing hint, no
+"How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener
+advanced filters still collapsed, presets still a dropdown. Tab order unchanged. CP
+headline still two-zone with tier-coloured take%, global rank and vs-median pill.
+Govt NPV still removed from Fiscal Compare and Side-by-Side; the v562 Breakeven row
+still removed from Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505 G
+badge, v508, v512, v513, v515, v516, v522, v529, v530, v531, v533, v534, v536, v537,
+v539, v540, v547, v549, v551, v552, v555, v557–v562 and v563 all intact. Version
+sweep v563→v564 done silently at the end across 5 structural locations; it is not
+the improvement.
