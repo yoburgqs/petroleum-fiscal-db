@@ -19424,3 +19424,115 @@ the end; it is not the deliverable.
 Walked cold with storage cleared: Home → Screener → the preset dropdown, and picked the one option named for the question an IC asks first — **Downside Resilience**. It returned **158 of 185 countries**. That is not a shortlist. Three defects were stacked in that one control:
 
 1. **It named a criterion it does not apply.** The dropdown 
+
+## Cycle 473 Log — 2026-08-29 05:18 (v574)
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (least-recently-used:
+467 was the last T5; 468=T6, 469=T2, 470=T3, 471=T4, 472=T1.)
+
+## Friction
+Walked cold — fresh context, `sessionStorage` and `localStorage` cleared — across every
+citation affordance the platform offers, **reading the clipboard back** rather than trusting
+the button labels.
+
+The **dynamic** paths were sound. Country Profile's `⎘ IC Citation`, the FC drilldown cite,
+`⎘ Copy for IC Memo`, the Screener export basis block and the print header all resolve the
+build through `_orcaVerNow()` and correctly printed the live version.
+
+**The static ones did not.** The one section written for the express purpose of answering this
+task — **"How to Cite This Platform"** on Methodology — hard-coded `v500` in six places at
+once: `#cite-text` on screen, the `Copy Citation` clipboard string, the short-form footnote,
+the regime-comparison example and the Scenario Builder example. So did:
+
+| Surface | Frozen at | Platform was |
+|---|---|---|
+| Methodology "How to Cite" block (6 strings) | v500 | v573 |
+| Methodology provenance line | v500 | v573 |
+| Home hero vintage line | v571 | v573 |
+| FC profile strip `(ⓘ cite basis)` tooltip | v500 | v573 |
+| FC `profileCite` — 7 per-profile IC cite strings + fallback | v500 | v573 |
+| FAQ A957 / A959 IC-memo boilerplate + short-form footnote | v500 | v573 |
+| FAQ A37 / A41 / A89 memo templates | v500 | v573 |
+| 54 further FAQ lines labelled as pastable IC-memo language | v219–v500 | v573 |
+
+Two consequences, both at the decision point:
+
+1. **A memo assembled in ONE session carried two different ORCA build numbers in its own
+   footnotes** — `v573` from the Country Profile citation, `v500` from the block that exists
+   to tell you how to cite. ORCA's published numbers moved materially in between: **v534
+   reversed the *sign* of the vs-median verdict for the UK, Angola, Brazil and Australia**,
+   and **v552/v553 changed Iraq's citable take from 84.8% to a comparable 34.1%**. A reader
+   re-opening the tool against a v500 footnote cannot tell a data revision from an error.
+2. **`#cite-copy-btn` was worse than stale.** It wrote a *frozen literal* rather than reading
+   the block above it, so the citation on screen and the citation in the clipboard were two
+   independent copies of the same sentence and only one of them was ever updated.
+
+Version sweeps were the previous mechanism and they do not hold: the **v426 and v428**
+changelog entries *both* list "How to Cite" and `cite-copy-btn` as swept, and both drifted
+again anyway.
+
+## Change
+These strings are now **derived, not swept**.
+
+- `_orcaStampCitations()` resolves the build off the header badge and the contract/country
+  counts off `COUNTRY_DATA`, then stamps every `.orca-cite-ver` / `.orca-cite-n` /
+  `.orca-cite-k` node, and rewrites the version inside **attribute-borne** citations
+  (`.orca-cite-title` — the FC tooltip, which a `<span>` cannot enter).
+- `Copy Citation` now calls `copyPlatformCitation()`, which copies `#cite-text`
+  **as rendered**. Screen and clipboard can no longer disagree.
+- The FC `profileCite` map **builds** its version instead of freezing it, across all seven
+  profiles plus the custom-profile fallback.
+- **81 citation strings converted**, including the **54 FAQ lines explicitly labelled** as
+  pastable IC-memo / disclosure / footnote language.
+
+## Result
+Every citation the platform hands an analyst names **the build that produced the numbers on
+screen**. The `v573 → v574` bump that closes this cycle propagated to all 81 automatically,
+with no sweep — which is the point of the change, not a side effect of it.
+
+## Verification — RAN this cycle
+Playwright cold (`sessionStorage` + `localStorage` cleared), **after** the v573→v574 bump:
+badge `v574`; **81/81 spans correct, 0 wrong**; screen citation **byte-identical** to the
+clipboard (`IDENTICAL: true`); provenance line *"Platform v574 · 185 countries · 71,576
+contracts"*; short-form footnote *"ORCA v574 (Aug 2026)"*; the FC cite-basis tooltip correct
+on **all seven profiles** (deepwater / onshore / giant / marginal / lng / shallow /
+north_sea); Country Profile's `⎘ IC Citation` and the Methodology block now **agree at
+v574**; FAQ search unaffected (*Showing 27 of 974* for "prrt"). **0 page errors on every
+walk.** JS syntax gate **PASS** (10 blocks / 0 errors), plus a span-balance check across
+every touched line — PASS. `runtime_comprehensive.js` with
+`TEST_URL=http://localhost:8791/index.html`, run **three times** (baseline, post-change,
+post-changelog): **135 PASS / 0 FAIL / 1 WARN** every time. The WARN is the known
+local-harness `sw.js` 404; `git diff index.html` contains **zero** `sw.js` / `serviceWorker`
+hits and zero `meth-changelog` hits.
+
+### Found on this walk, not fixed — stated rather than hidden
+1. **1,047 FAQ `Source: ORCA vNNN` provenance lines remain frozen, deliberately.** Those date
+   *the answer*, not the citation; restamping them to v574 would falsely assert that all 974
+   FAQs were re-verified at this build. That is a worse error than staleness.
+2. **~295 quoted disclosure sentences inside deep FAQ bodies** still name an old build
+   (v219–v500). Same defect class, but they sit behind FAQ search rather than on a
+   discoverable citation surface. The mechanism now exists to convert them; bounded follow-on.
+3. `#meth-changelog` was not touched — a changelog naming its own version is correct.
+4. `formatBreakeven()` still collapses all 65 populated values ($27–$34) to `<$50`. Carried
+   from v562–v573.
+5. Selecting the blank `Load a screen…` option does not reset the screen. Carried from v573.
+6. Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank and colour on the
+   blended headline take, so Iraq remains mis-placed on those four surfaces. Carried from
+   v549/v552/v571 — still the largest open item.
+7. `.stability-bar-wrap` renders nowhere — dead code. Carried from v572.
+8. The `# Contracts` row still prints `7643` unseparated. Carried from v571.
+9. `MECHANIC_BREAKDOWN` (20 countries) and `mech_mix` (74) still disagree; five countries in
+   `mech_mix` sit at exactly 0.0% take / $5,533.1M NPV. Carried from v570.
+10. The **Breakeven Map** tab remains unwalked.
+
+### STILL LOCKED — nothing touched
+No new FAQ (frozen at 974). **No new tooltip on any control whose behaviour did not change** —
+the single tooltip added belongs to `#cite-copy-btn`, whose handler was replaced. No page-sub
+paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still
+a dropdown. Tab order unchanged. CP headline still two-zone with tier-coloured take%, global
+rank and vs-median pill. Govt NPV still REMOVED from Fiscal Compare and Side-by-Side.
+v371/v373, v430, v449, v451, v452, v489, v505, v508, v512–v573 all intact. Version bump
+v573→v574 is **not** the deliverable — this cycle is what makes future bumps propagate without
+one.
