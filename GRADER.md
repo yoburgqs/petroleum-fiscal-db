@@ -19549,3 +19549,106 @@ one.
 **Task:** T5 — *"Give me something I can paste straight into an IC memo."* (least-recently-used; 467 was the last T5, and 468–472 covered T6, T2, T3, T4, T1.)
 
 **Friction.** Walked cold with storage cleared, hit every citation affordance, and read the clipboard back instead of trusting the buttons. The *dynamic* paths were fine — Country Profile's `⎘ IC Citation`, the FC drilldown cite, `
+
+---
+## Cycle 474 — T6 (v575, 2026-08-29)
+
+**Task.** T6 — *"Where did this number come from and how solid is the evidence?"*
+(Least-recently-used: 468 was the last T6; 469=T2, 470=T3, 471=T4, 472=T1, 473=T5.)
+
+**Friction.** Walked cold — fresh browser context, `sessionStorage` and `localStorage`
+cleared — into **Fiscal Compare**, the landing tab, and **counted the Quality column off the
+live DOM** rather than reading what the page says about it.
+
+The rendered badges are **A 16 · B 36 · C 10 · D 3 · G 120**. The `#fc-quality-mix`
+summary sentence sitting directly above the table said:
+
+> "In this view: 120 of the 185 rows now on screen (65%) are G — generic mechanic default,
+> not citable. **The other 65 are on their own terms: 58 A · 6 B · 1 D.**"
+
+**Every graded count was wrong, and the error ran in one direction.** It overstated
+primary-law-backed coverage by **3.6×** (58 claimed vs 16 rendered), understated mixed
+sourcing 6× (6 vs 36), and **made an entire grade vanish** — it reported **zero C** over a
+table rendering **ten**, including Nigeria, Saudi Arabia and Kazakhstan. An analyst who reads
+that line concludes 89% of the citable rows are primary-law backed. The table beside it says
+25%. This is the tab's one whole-view answer to "how solid is the evidence", and it was
+wrong in the flattering direction.
+
+**Cause.** `v533` built the mix line with its own private copy of the grading rule —
+`ab_pct >= 80 ? 'A' : >=60 ? 'B' : >=40 ? 'C' : 'D'` — expressly so that "the guide cannot
+drift from the table". Then **`v551` deleted that rule from the cell** as broken: it graded
+171 of 185 countries A and ranked Russia (3.8% primary law) above Senegal (67.2%). v551
+replaced it with `_evidenceGrade()` — the **worse** of primary-law share and fact depth. The
+mix line was never repointed, so for 42 cycles the tab's evidence summary has been the output
+of a formula the tab itself had disowned. **A copied threshold is not a shared source of
+truth**; it is a second implementation waiting to diverge, and the comment claiming otherwise
+is what stopped anyone re-checking it.
+
+The *Reading this table* guide two lines above carried the same dead rule in prose —
+*"graded by the share of its fiscal facts from A- or B-tier sources (A ≥80% · B ≥60% ·
+C ≥40% · D below)"* — and closed with advice that v551 **inverted**: *"a high A/B grade is
+not the same as primary-law sourcing."* True of the old letter; false of the current one,
+which *is* primary-law share. So one screen carried **three mutually contradictory statements
+about the same letter**: the guide's definition, the mix line's counts, and the badges with
+their own tooltips (*"Graded on primary-law share AND fact count, not on A+B"*).
+
+**Change.**
+
+1. **The mix line no longer owns a threshold.** It calls `_evidenceGrade(r).letter` — the
+   exact function `getTierBadge()` renders — so it reads **"16 A · 36 B · 10 C · 3 D"** and
+   cannot diverge from the badges again *by construction* rather than by upkeep.
+2. **The guide states the real rule**: graded on the **worse** of primary-law share
+   (A ≥60% · B ≥40% · C ≥20% · D below) and fact depth (A ≥150 facts · B ≥50 · C ≥15 ·
+   D below); a country needs both legs; tier B does **not** count toward the letter — and why,
+   naming the Russia/Senegal inversion the old rule produced.
+
+**Result.** The one sentence on the landing tab that answers *"how solid is this whole view?"*
+now answers it correctly. Grade **C** — ten countries including **Nigeria, Saudi Arabia and
+Kazakhstan**, all of which an analyst screening at $75 will open — is visible in the summary
+instead of silently folded into A. The analyst can now read the evidence summary and the
+badges as one statement instead of choosing between them.
+
+**Verification — RAN this cycle.** Playwright cold, storage cleared. The mix line reconciles
+**cell-for-cell** against an independent count of the rendered `.tier-badge` elements on
+**13 views**: cold default; four profiles (onshore / LNG / giant / North Sea); two prices
+($50 / $125); six region chips — Africa **20 G / 6 A / 18 B / 4 C / 1 D of 49**, Europe
+**28 G / 1 A / 1 B of 30**, N. America **1 G / 1 B of 2** (singular-grammar branch intact),
+CIS/FSU **2 G / 1 B / 2 C of 5**, Middle East **11 G / 1 A / 1 B / 1 D of 14**, All
+**120 G / 16 A / 36 B / 10 C / 3 D of 185**. **0 page errors on every walk.** JS syntax gate
+**PASS** (10 blocks / 0 errors). `runtime_comprehensive.js` with
+`TEST_URL=http://localhost:8791/index.html`, run **twice** (post-change, post-version-bump):
+**135 PASS / 0 FAIL / 1 WARN** both times — the WARN is the known local-harness `sw.js` 404.
+Post-bump: header badge **v575**, **81/81** `.orca-cite-ver` spans stamped v575, **0 wrong**.
+
+### Found on this walk, not fixed — stated rather than hidden
+1. The discredited `ab_pct` threshold may survive on surfaces other than Fiscal Compare;
+   only this tab was audited this cycle. Bounded follow-on.
+2. The 120 generic-default rows are unchanged — reducing them needs country-specific terms
+   loaded into the compare engine, a data-pipeline job, not a rendering one.
+3. `formatBreakeven()` still collapses all 65 populated values ($27–$34) to `<$50`. Carried
+   from v562–v574.
+4. Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank and colour on the
+   blended headline take, so Iraq remains mis-placed on those four surfaces. Carried from
+   v549/v552/v571 — still the largest open item.
+5. Selecting the blank `Load a screen…` option does not reset the screen. Carried from v573.
+6. `.stability-bar-wrap` renders nowhere — dead code. Carried from v572.
+7. The `# Contracts` row still prints `7643` unseparated. Carried from v571.
+8. `MECHANIC_BREAKDOWN` (20 countries) and `mech_mix` (185) still disagree in scope.
+   Carried from v570.
+9. The **Breakeven Map** tab remains unwalked.
+
+### STILL LOCKED — nothing touched
+**No new FAQ** (frozen at 974). **No new tooltip on any control** — none was added this cycle.
+No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block,
+no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. Tab order unchanged. **No row and no column was added or removed.**
+CP headline still two-zone with tier-coloured take%, global rank and vs-median pill. Govt NPV
+still REMOVED from Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489,
+v505 G badge, v508, v512–v574 all intact. Version bump v574→v575 done silently at the end
+across 7 structural sites; it is **not** the deliverable.
+
+## Cycle 474 Log — 2026-08-29 06:15
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 (the 1 captured console error is the local-harness sw.js 404)
+- Summary: Cycle complete and pushed (v575). Local server on :8791 left running for the next cycle.
