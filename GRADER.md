@@ -19010,3 +19010,137 @@ v449, v451, v452, v489, v505, v508, v512–v569 all intact.
 **Task.** T2, least-recently-used (468 was T6, 467 T5, 466 T1, 465 T4, 464 T3, 463 T2).
 
 **Friction.** Cleared storage, loaded cold, opened Country Profile on **Nigeria**. Zone A of the headline — where the verdict gets formed — read: *Concession · 81.1% govt take · #21 of 21 producers · NPV $302M · "High fiscal burden — government captures the majority of project economics.
+
+---
+## Cycle 470 Log — 2026-08-29 02:12
+- Test before: 135 PASS / 0 FAIL / 1 WARN (local, TEST_URL set)
+- Test after: 135 PASS / 0 FAIL / 1 WARN — suite RAN this cycle, not carried forward
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- JS page errors on the cold walk: 0
+- Version: v570 → v571
+
+## Cycle 470 — T3: "How do these three countries compare side by side?"
+
+**Task.** T3, least-recently-used (469 was T2, 468 T6, 467 T5, 466 T1, 465 T4, 464 T3).
+
+**Friction.** Cleared `sessionStorage` and `localStorage`, loaded cold, opened
+Side-by-Side, clicked the shipped **USA vs Iraq** quickstart. *Rank among
+producers (take @$75)* is the only row in the 22-row grid that places a column
+against the outside world — the row an analyst reads to decide whether a country
+stays on the screening list. The Iraq cell printed, on two lines of the same
+cell:
+
+    #6 of 21 producers
+    above producer median          (orange)
+
+Those halves disagree. `getProducerPeers()` sorts and `getProducerContext()`
+medians on the **comparable** (Group-1-only) take since v552 — Iraq at **34.1%**
+against a producer median of **55.6%**, hence #6 — but `_cmpProducerRankCell()`
+(index.html:24187) was never converted with them. Its above/below-median leg
+still measured `d.take_75`, the **blended headline of 84.8%**, against that
+comparable median. The cell tooltip then settled the contradiction the wrong
+way: *"Producer median take @$75/bbl is 55.6% and this country is at 84.8%"* —
+the exact cross-basis comparison `~/MECHANIC_COMPARABILITY.md` forbids, printed
+on the one row built to prevent it. **415 of Iraq's 610 contracts are fee-basis
+TSCs**, whose take% is set by the remuneration fee rather than by the fiscal
+terms.
+
+All 21 producers were walked. Iraq is the **only** one the mislabel reaches,
+because it is the only blended producer whose correction crosses the median:
+
+| producer | headline | comparable | gap | label shown | correct |
+|---|---|---|---|---|---|
+| Iraq | 84.8% | 34.1% | **50.7** | above producer median | **below producer median** |
+| Ecuador | 46.5% | 39.3% | 7.2 | below | below |
+| Mexico | 32.2% | 29.7% | 2.5 | lowest quartile | lowest quartile |
+| Oman | 77.6% | 75.6% | 2.0 | highest quartile | highest quartile |
+| India | 61.9% | 63.2% | −1.3 | highest quartile | highest quartile |
+| Malaysia | 59.4% | 58.3% | 1.1 | above | above |
+| Azerbaijan | 60.8% | 59.8% | 1.0 | above | above |
+
+One country is enough when it ships on a preset and the wrong verdict is the
+elimination verdict. Faced with a rank saying near-best and a label in warning
+orange saying worse-than-median, the analyst falls back to the 84.8% two rows
+down and drops Iraq — the same failure v549 and v552 spent two cycles killing on
+the other tabs.
+
+**Second defect, same moment.** The red cross-basis caveat under the grid
+(index.html:24551) still carried v549's wording, written when the rank row *did*
+rank the headline: *"the Rank among producers row above — which ranks the
+headline figure — places it wrongly for this comparison"*, and in its
+no-reorder arm *"read it with the same correction applied."* Both predate v552
+and were never updated, so the page was instructing the analyst to distrust the
+one row that is already correct and to hand-correct it a second time.
+
+**Change.**
+1. Both legs of the cell read `cpCmpTakeOf(d,'75')` — one basis for the whole
+   cell, as v552 established. Iraq now reads **"#6 of 21 producers · below
+   producer median"** in green, and the tooltip compares 34.1% with 55.6%.
+2. On any column where the two bases differ at printed precision, the cell
+   states the number the placement was computed on:
+   **"ranked on 34.1% comparable, not 84.8%"**. Without it a corrected label is
+   still unreadable beside an 84.8% two rows below, and the analyst cannot tell
+   a fix from a bug. Fires on all seven blended producers and only those.
+3. The caveat now states what the row does — *"already computed on this
+   comparable basis, for every column … the rank row is the like-for-like
+   ordering, the headline take is not"* — and points the manual correction at
+   the Govt Take rows, which do still carry the blended figure. Both arms
+   rewritten; `_rankMoved` (which columns actually reorder) is still computed,
+   not assumed.
+4. The tooltip's hardcoded "These 21" now reads `ctx.n`.
+
+**Result.** An analyst comparing Iraq against anything reads one coherent
+placement — rank, label and tooltip all on the comparable take — instead of a
+cell that contradicts itself, and no longer eliminates a 34.1%-comparable-take
+regime on an orange *above producer median* that was an artefact of the TSC
+remuneration fee. The correction row travels into the IC-memo clipboard export.
+
+**Verification — RUN this cycle.** Playwright cold (storage cleared) on six
+sets: USA / Iraq; Iraq / Nigeria / Norway; the cold-load Norway / UK /
+Netherlands default; the five-blended set Mexico / Ecuador / Oman / Malaysia /
+India; a five-column set carrying a state monopoly and a no-production column
+(Australia / Angola / Saudi Arabia / Ghana / Malaysia); and Brazil / Malaysia
+for the *at producer median* branch. All five cell states exercised. Both
+caveat arms exercised — USA / Iraq takes the no-reorder arm (USA sits below
+Iraq on either basis), Iraq / Nigeria / Norway takes the reorder arm. Clipboard
+payload read back:
+
+    Rank among producers (take @$75)	#1 of 21 producers · lowest-take quartile	#6 of 21 producers · below producer median · ranked on 34.1% comparable, not 84.8%
+
+v541's separator logic inserts the middots; no token fusion; TSV column counts
+uniform. **0 page errors on every walk.** `runtime_comprehensive.js` run with
+`TEST_URL=http://localhost:8791/index.html`: **135 PASS / 0 FAIL / 1 WARN**. The
+WARN is the known local-harness `sw.js` 404; `git diff` on index.html contains
+zero `sw.js` / `serviceWorker` hits.
+
+### Found on this walk, not fixed — stated rather than hidden
+1. **Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank and
+   colour on the blended headline take.** Iraq is still mis-placed on those four
+   surfaces. `cpCmpTakeOf()` is global; each is its own cycle. Carried from v549
+   and v552, still the largest open item on this axis.
+2. **New: the `# Contracts` row prints `7643` / `4211` / `834` unseparated**
+   while every other count in the same grid uses `toLocaleString()` — including
+   the *Fiscal Mechanics* row two rows below it, which reads `Concession (7,643)`
+   for the same number.
+3. `MECHANIC_BREAKDOWN` and `mech_mix` still disagree on the same quantity
+   (Nigeria 83.0% / $60M vs 77.5% / $427M). Carried from v570.
+4. `MECHANIC_BREAKDOWN` covers only 20 countries against `mech_mix`'s 74 with
+   more than one mechanic. Carried from v570.
+5. Generic-default contamination in `mech_mix` — five countries at exactly 0.0%
+   take and exactly $5,533.1M NPV. Carried from v570.
+6. `formatBreakeven()` still collapses all 65 populated values to `<$50` on
+   Fiscal Compare, Country Profile and the Breakeven Map. Carried from
+   v562–v570.
+7. The **Breakeven Map** tab remains unwalked.
+8. The three surviving `◆◆◆◆◆` reform rows (Algeria, Colombia, USA) are window
+   artefacts. Carried from v566.
+
+### STILL LOCKED — nothing touched
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not
+change — the two tooltips edited belong to the cells whose numbers changed. No
+page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown. Tab order unchanged. CP
+headline still two-zone with tier-coloured take%, global rank and vs-median pill.
+Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373, v430,
+v449, v451, v452, v489, v505, v508, v512–v570 all intact.
