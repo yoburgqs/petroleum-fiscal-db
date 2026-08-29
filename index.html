@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v571</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v572</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1361,7 +1361,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v571</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v572</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1431,7 +1431,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v571</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v572</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2634,6 +2634,8 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <!-- Recent Platform Updates / Changelog -->
   <div class="dd-section" id="meth-changelog">
     <div class="dd-section-hdr">Recent Platform Updates</div>
+    <strong style="color:var(--accent);">v572 (Aug 2026) &mdash; Cycle 471 (T4): the Fiscal Predictability Score awarded its <em>highest possible grade</em> &mdash; 100/100 HIGH, in green &mdash; to Bahrain, Kuwait and Saudi Arabia. Each takes 100% of the barrel at $50, $75, $100 and $125/bbl alike, leaving modelled contractor NPV at $0 and IRR at &minus;100%. That pins take spread at 0pp, price swing at 0pp and mechanic count at one, so all three score inputs sat at their most favourable value <em>because</em> the contractor share is nil. formatBreakeven() already refused to print a breakeven for exactly these three; the stability score now refuses too. _fpDispersion() returns a new <code>monopoly</code> state and the score returns not-scored, propagated to the Reform Risk lookup, the Country Profile badge, the Explorer Stability column (now <code>n/c &middot; monopoly</code>, agreeing with the State Monopoly tag already in the same row), the Screener and Country Profile XLSX exports and the IC clipboard citation.</strong>
+    <br><br>
     <strong style="color:var(--accent);">v571 (Aug 2026) &mdash; Cycle 470 (T3): Side-by-Side&rsquo;s <em>Rank among producers</em> cell was computed on two different bases at once, and told the analyst Iraq was &ldquo;#6 of 21&rdquo; and &ldquo;above producer median&rdquo; in the same breath</strong> &mdash; Task <strong>T3</strong> &mdash; &ldquo;how do these three countries compare side by side?&rdquo; Walked cold, <code>sessionStorage</code> and <code>localStorage</code> cleared, into Side-by-Side on the shipped <em>USA vs Iraq</em> quickstart. <strong>Friction:</strong> <em>Rank among producers (take @$75)</em> is the only row in the 22-row grid that places a column against the outside world &mdash; the row an analyst reads to decide whether a country stays on the screening list. On Iraq it printed <strong>&ldquo;#6 of 21 producers&rdquo;</strong> above <strong>&ldquo;above producer median&rdquo;</strong> in orange. Those two halves of one cell disagree. <code>v552</code> moved <code>getProducerPeers()</code> to sort and <code>getProducerContext()</code> to median on the <strong>comparable</strong> (Group-1-only) take, so <code>ctx.rank</code> and <code>ctx.median</code> are comparable-basis &mdash; Iraq at <strong>34.1%</strong> against a producer median of <strong>55.6%</strong>, hence #6. But <code>_cmpProducerRankCell()</code> was never converted with them: its above/below-median leg still measured <code>d.take_75</code>, the <strong>blended headline of 84.8%</strong>, against that comparable median. The cell tooltip then settled the contradiction the wrong way &mdash; <em>&ldquo;Producer median take @$75/bbl is 55.6% and this country is at 84.8%&rdquo;</em> &mdash; which is precisely the cross-basis comparison <code>~/MECHANIC_COMPARABILITY.md</code> forbids, printed on the one row built to prevent it. <strong>415 of Iraq&rsquo;s 610 contracts are fee-basis TSCs</strong> whose take% is set by the remuneration fee, not by the fiscal terms. Faced with a rank saying near-best and a label in warning orange saying worse-than-median, the analyst falls back to the 84.8% in the Govt Take rows and eliminates the country &mdash; the exact failure v549 and v552 spent two cycles killing on the other tabs. All 21 producers were walked: Iraq is the only one the mislabel reaches, because it is the only blended producer whose <strong>50.7pp</strong> correction crosses the median (Ecuador 7.2, Mexico 2.5, Oman 2.0, India &minus;1.3, Malaysia 1.1, Azerbaijan 1.0 do not). One country is enough when it ships on a preset and the wrong verdict is the elimination verdict. <strong>Second defect, same moment:</strong> the red cross-basis caveat under the grid still carried v549&rsquo;s wording &mdash; <em>&ldquo;the Rank among producers row above, which ranks the headline figure, places it wrongly for this comparison&rdquo;</em> &mdash; and its no-reorder arm said <em>&ldquo;read it with the same correction applied&rdquo;</em>. Both were written before v552 and were never updated, so the page was instructing the analyst to distrust the one row that is already correct and to hand-correct it a second time. <strong>Change:</strong> (1) both legs of the cell now read <code>cpCmpTakeOf()</code> &mdash; one basis for the whole cell &mdash; so Iraq reads <strong>&ldquo;#6 of 21 producers &middot; below producer median&rdquo;</strong> in green, and the tooltip compares 34.1% with 55.6%. (2) On any column where the two bases differ at printed precision, the cell now states the number the placement was computed on: <strong>&ldquo;ranked on 34.1% comparable, not 84.8%&rdquo;</strong> &mdash; without it, a corrected label is still unreadable beside an 84.8% two rows below, and the analyst cannot tell a fix from a bug. It fires on all seven blended producers, and only on those. (3) The caveat now states what the row does &mdash; <em>&ldquo;already computed on this comparable basis, for every column&hellip; the rank row is the like-for-like ordering, the headline take is not&rdquo;</em> &mdash; and points the hand-correction at the Govt Take rows, which do still carry the blended figure. (4) The tooltip&rsquo;s hardcoded &ldquo;These 21&rdquo; now reads <code>ctx.n</code>. <strong>Verified cold in Playwright</strong> against the local build, storage cleared, on six sets: USA / Iraq, Iraq / Nigeria / Norway, the cold-load Norway / UK / Netherlands default, the five-blended set Mexico / Ecuador / Oman / Malaysia / India, a five-column set carrying a state monopoly and a no-production column (Australia / Angola / Saudi&nbsp;Arabia / Ghana / Malaysia), and Brazil / Malaysia for the <em>at producer median</em> branch. All five cell states exercised; both arms of the rewritten caveat exercised (USA / Iraq takes the no-reorder arm, since USA sits below Iraq on either basis; Iraq / Nigeria / Norway takes the reorder arm). Because the row rides the shared <code>rows</code> array it travels into both clipboard flavours, confirmed by reading the payload back: <code>Rank among producers (take @$75)&#9;#1 of 21 producers &middot; lowest-take quartile&#9;#6 of 21 producers &middot; below producer median &middot; ranked on 34.1% comparable, not 84.8%</code>, with v541&rsquo;s separator logic inserting the middots and no token fusion. TSV column counts uniform. <strong>0 page errors on every walk.</strong> JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the local build with <code>TEST_URL</code> set: <strong>135 PASS / 0 FAIL / 1 WARN</strong>, the WARN being the pre-existing local-harness <code>sw.js</code> 404 &mdash; the diff contains zero <code>sw.js</code> / <code>serviceWorker</code> hits. <em>Found on this walk, not fixed &mdash; stated rather than hidden:</em> Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank and colour on the blended headline take, so Iraq is still mis-placed on those four surfaces; <code>cpCmpTakeOf()</code> is global and each is its own cycle. The <em># Contracts</em> row prints <code>7643</code> unseparated while every other count in the grid uses <code>toLocaleString()</code>. <code>MECHANIC_BREAKDOWN</code> and <code>mech_mix</code> still disagree on the same quantity (carried from v570). <code>formatBreakeven()</code> still collapses all 65 populated values to <code>&lt;$50</code>. The Breakeven Map tab remains unwalked. <strong>STILL LOCKED &mdash; nothing touched:</strong> no new FAQ (still 974); no new tooltip on any control whose behaviour did not change &mdash; the two tooltips edited belong to the cells whose numbers changed; no page-sub paragraph, amber instructional banner, routing hint or &ldquo;How to read&rdquo; block; no SbS card wrapper, no visible Explorer chip row; Screener advanced filters still collapsed, presets still a dropdown; tab order unchanged; CP headline still two-zone with tier-coloured take%, global rank and vs-median pill; Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505, v508, v512&ndash;v570 all intact. Version v570&rarr;v571.<br><br>
     <strong style="color:var(--accent);">v570 (Aug 2026) &mdash; Cycle 469 (T2): Country Profile answered &ldquo;is this country attractive at $75?&rdquo; with one take and one NPV for countries that run two fiscal regimes 15&ndash;37pp apart</strong> &mdash; Task <strong>T2</strong>. Walked cold, storage cleared. On <strong>Nigeria</strong> Zone A read <em>Concession &middot; 81.1% govt take &middot; #21 of 21 producers &middot; &ldquo;High fiscal burden&rdquo;</em>. Six screens lower the same page states Nigeria runs <strong>659 Concession contracts at 83.0% take and $60M contractor NPV</strong> and <strong>175 PSC contracts at 68.3% and $1,213M</strong> &mdash; and every IOC deepwater asset in the ranked contract table (Bonga, OML 118/125/133) is in the second block. On <strong>Russia</strong> the 46.4% headline sits between Concession 22.9% (1,191 contracts) and PSC 56.4% (69), describing neither. The page was not silent &mdash; <code>getMechBlendWarning()</code> says &ldquo;may conceal variation&rdquo; and the breakdown table says &ldquo;use per-regime figures&rdquo; &mdash; but both are below the fold, hedged, and carry no number. <strong>Change:</strong> a regime-split block now sits in Zone A directly under the take figure on the <strong>13</strong> countries where two Group-1 regimes differ by &ge;5pp, naming each regime with its own contract count, take and contractor NPV, and stating that the headline is the blend of them. Clicking it scrolls to and flashes the Fiscal Regime Breakdown table, which now carries <code>id="cp-regime-breakdown"</code>. Numbers are read from <code>MECHANIC_BREAKDOWN</code> &mdash; the same array that table renders &mdash; so the two cannot disagree; group membership comes from the existing <code>mech_mix.g</code> field, and Group-2 fee-basis rows are excluded because v552 already handles them and MECHANIC_COMPARABILITY.md forbids ranking their take against Group&nbsp;1. On Iraq both lines render and each states a different true thing. <strong>No published figure, tier colour, rank or pill was altered</strong> (v449/v451/v452 locked). No threshold was invented: the &ge;5pp bar is the one <code>_cpCmpLine552</code> already uses on this same strip, and the &ge;5%-secondary-share gate is the breakdown section&rsquo;s own. <strong>Result:</strong> an analyst screening Nigeria sees, before scrolling, that the regime they would actually sign carries <strong>14.7pp lower take and 20&times; the contractor NPV</strong> of the headline. <strong>Verified cold in Playwright:</strong> 185-country sweep &mdash; block fires on 13, <strong>0</strong> chip/table number mismatches, <strong>0</strong> page errors, click-to-jump confirmed. The sweep caught a real defect mid-cycle: on Indonesia the block rendered while its breakdown section was gated off at 3% secondary share, so &ldquo;breakdown &darr;&rdquo; pointed at nothing; the block now carries that same gate and Indonesia correctly drops out of both. JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the local build (<code>TEST_URL</code> set &mdash; the default target is production): <strong>135 PASS / 0 FAIL / 1 WARN</strong>, the WARN being the known local-harness <code>sw.js</code> 404; the diff touches no service-worker code. Version v569&rarr;v570.<br><br>
     <strong style="color:var(--accent);">v569 (Aug 2026) &mdash; Cycle 468 (T6): the Country Profile answered &ldquo;where did this number come from?&rdquo; with an internal database key, a tier it does not hold, a link to a third firm&rsquo;s home page, and a &ldquo;&#10003; all parameters match&rdquo; verdict counting rows that agree with themselves</strong> &mdash; Task <strong>T6</strong>. Walked cold, <code>sessionStorage</code> and <code>localStorage</code> cleared, into <em>Country Profile</em> and opened the section named for the question: <em>Key Fiscal Parameters &mdash; Evidence Chain</em>. <strong>Friction.</strong> On the <strong>United Kingdom</strong>, the <em>Special Tax</em> row reads ORCA <strong>38%</strong>, Statutory <strong>38%</strong> &mdash; and its Source badge was the literal string <code>EY_IHS_BulkHarvest_2025</code>. Hovering it said <em>&ldquo;Source confidence B = Verified secondary source (operator filing, annual report, or regulatory filing)&rdquo;</em>. Clicking it opened <code>https://taxsummaries.pwc.com/</code> &mdash; the bare PwC Worldwide Tax Summaries home page: not EY, not IHS, not the United Kingdom, not the supplementary charge. Below the table: <em>&ldquo;&#10003; All 3 sourced parameters match the rate stated in the cited source.&rdquo;</em> Four independent falsehoods converging on one number an analyst was about to put in an IC memo. <strong>(1)</strong> The name was an internal key. <strong>(2)</strong> The tier claim is false by this page&rsquo;s own Methodology table, which says of tier B in bold <em>&ldquo;Not an operator filing&rdquo;</em>, and by <strong>v527</strong>, which counted <strong>zero</strong> operator filings among 142,798 tier-B facts; <strong>v538</strong> corrected this exact string on the Evidence Chain table it deleted and never applied it to the table that survived &mdash; <strong>30 rows</strong> still carried it. <strong>(3)</strong> The link is a country index, not a citation. <strong>(4)</strong> Worst: the verdict <em>counted the bulk row as corroboration</em>. It is not. The bulk harvest is a country-level assignment applied to every contract in the country &mdash; the same assignment that populated the ORCA Value &mdash; so the two columns agreeing is the same datum printed twice. Measured on the shipped API files: <strong>41 of the 46 bulk rows are exact-equal</strong> to the ORCA value. <strong>46 rows across 35 countries</strong> were affected, and <strong>19 of those countries displayed the clean &#10003; verdict</strong> &mdash; Saudi Arabia, the United Kingdom, the Netherlands, Mozambique, Oman, Turkey, Ukraine, Algeria, Australia, Brunei, Colombia, Denmark, Georgia, India, Kazakhstan, Myanmar, Suriname, Tanzania and Venezuela. Saudi Arabia&rsquo;s <em>State Participation 98.2%</em>, the figure that drives its monopoly classification, is one of them. All of this sat <strong>four inches below</strong> the Evidence Quality panel, which has rendered these same two sources correctly since <strong>v518</strong> &mdash; readable name, <span style="color:var(--orange);font-weight:700;">BULK</span> chip, honest link title. The fix was never applied one section down. <strong>Change.</strong> <strong>(a)</strong> Bulk rows now render the v518 treatment in the per-parameter table: the readable name (<em>EY / IHS Markit bulk fiscal harvest (2025)</em>), a <span style="color:var(--orange);font-weight:700;">BULK</span> chip in both the Statutory and Source cells, muted styling, and a link title stating that it opens the PwC index and is not a citation for this parameter. <code>_BULK_LABEL</code> was promoted out of <code>buildEvidencePanel()</code> to sit beside <code>_BULK_SOURCES</code> so the two surfaces cannot drift apart again. <strong>(b)</strong> Bulk rows are <strong>excluded from <code>sourcedCount</code> and <code>divergentCount</code></strong>, so the verdict counts independent corroboration only: the UK now reads <em>&ldquo;&#10003; All 2 independently sourced parameters match&rdquo;</em>. <strong>(c)</strong> A note names the excluded parameters and says why in one sentence &mdash; <em>&ldquo;1 further parameter (Special Tax) carries no independent source &hellip; the same assignment that populated the ORCA Value, so the two columns agreeing is self-agreement, not corroboration&rdquo;</em> &mdash; and tells the analyst to verify against the country&rsquo;s own petroleum act. <strong>(d)</strong> <strong>Somalia</strong>, whose only two sourced parameters are both bulk, went from asserting <em>&ldquo;&#9888; 1 of 2 sourced parameters differ from the statutory rate&rdquo;</em> &mdash; a statutory comparison with no statute in it &mdash; to <em>&ldquo;&#9888; No parameter on this table is independently sourced.&rdquo;</em> <strong>(e)</strong> The false tier-B string is corrected to match Methodology and v527/v538. <strong>No value, take, NPV or rank was altered, no row was removed, and no data file was regenerated</strong> &mdash; every number still renders; what changed is what the screen claims about it. <strong>Result.</strong> An analyst asking where the UK&rsquo;s 38% supplementary charge came from is now told it carries no independent source, rather than being shown an operator-filing badge and a tick confirming it. <strong>Verified cold in Playwright</strong> against the local build, storage cleared: a sweep of all <strong>185</strong> profiles returns <strong>35</strong> showing the bulk disclosure (matching the API count exactly), <strong>1</strong> with zero independent sources, <strong>0</strong> still printing a raw token, and <strong>0</strong> page errors. Azerbaijan&rsquo;s <em>PwC Tax Summaries &mdash; Azerbaijan CIT</em> row is deliberately untouched: it is honestly named and deep-linked to the actual country page, so it is a real citation. The Evidence Quality panel above still renders its BULK chips and <strong>still opens collapsed</strong> &mdash; the v371/v373 declutter rule is intact. JS syntax gate <strong>PASS</strong> (9 blocks / 0 errors). <code>runtime_comprehensive.js</code> <strong>ran this cycle</strong> against the local build: <strong>135 PASS / 0 FAIL / 1 WARN</strong>. The suite defaults to the <em>live production URL</em>, so the first run silently graded the deployed build and not this change; re-run with <code>TEST_URL</code> pointed at localhost. The WARN is the known <code>sw.js</code> 404 local-harness artifact and <strong>reproduces identically on the pre-change build</strong> (135 / 0 / 1), confirmed by running the same suite against a full mirror of the repo root with only <code>index.html</code> swapped. <em>Found on this walk, not fixed, stated rather than hidden:</em> <strong>(i)</strong> exact self-agreement is not unique to bulk &mdash; <strong>362 of 456</strong> non-bulk sourced rows are also exact-equal to the ORCA value, so the &#10003; verdict is a weak signal even where the source is genuinely primary law; quantifying that is its own cycle. <strong>(ii)</strong> <code>formatBreakeven()</code> still collapses all 65 populated values to <code>&lt;$50</code>, carried from v562/v563/v566/v568 and still the largest open item. <strong>(iii)</strong> The <em>Breakeven Map</em> tab remains unwalked. <strong>(iv)</strong> The FC <em>Project viable</em> counter still pools the generic block. <strong>STILL LOCKED &mdash; nothing touched:</strong> no new FAQ (still 974); no new tooltip on any control whose behaviour did not change &mdash; every tooltip edited here belongs to a badge or cell this cycle rewrote, and each previously asserted something false; no page-sub paragraph, no amber instructional banner, no routing hint, no &ldquo;How to read&rdquo; block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown. Tab order unchanged. CP headline still two-zone with tier-coloured take%, global rank and vs-median pill. Govt NPV still removed from Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505, v508, v512&ndash;v568 all intact. Version sweep v568&rarr;v569 done silently at the end across 5 structural locations; it is not the improvement.<br><br>
@@ -23084,8 +23086,33 @@ function getProducerNpvContext(countryName) {
 // a default. No threshold is invented here -- the score keeps its published formula, and the
 // only changes are (a) refusing to assert a dispersion of zero that was never measured, and
 // (b) stating on screen which of the three dispersion bases produced the number.
+// v572 (T4): a jurisdiction whose government take is ~100% at every modelled price has no
+// contractor position left to be stable ABOUT. Bahrain, Kuwait and Saudi Arabia each carry
+// take_75 = 100.0 at $50/$75/$100/$125, npv_75 = $0 and irr_75 = -100% -- and therefore
+// p25_take = p75_take = 100 (spread 0pp), swing = 0pp and one mechanic. Every one of the
+// three inputs to the Fiscal Predictability Score is at its most favourable value BECAUSE
+// the contractor share is nil, so the score returned 100/HIGH/green -- the top stability
+// reading this platform can emit, shared only with Bahamas and Vanuatu -- for the three
+// jurisdictions closed to IOC equity. formatBreakeven() already refuses to print a breakeven
+// for exactly these three (the be_75 = 1.0 state-monopoly sentinel). The stability score
+// now refuses on the same grounds instead of rewarding the absence of an investor.
+function _fpNoContractorPosition(d) {
+  return !!(d && d.take_75 != null && d.take_75 >= 99.5);
+}
+function _fpMonopolyReason(d) {
+  var nm = (d && d.country) ? d.country : 'This country';
+  var t  = (d && d.take_75 != null) ? d.take_75.toFixed(1) : '100.0';
+  var nC = (d && d.n != null) ? Number(d.n).toLocaleString() : 'its';
+  return 'Fiscal Predictability is NOT SCORED for ' + nm + ' \u2014 there is no contractor position to score. '
+    + 'Government take is ' + t + '% at $50, $75, $100 and $125/bbl alike; modelled contractor NPV is $0 and IRR is \u2212100% '
+    + 'across all ' + nC + ' contracts. That pins take spread at 0pp, price swing at 0pp and mechanic count at one, '
+    + 'so all three score inputs sit at their most favourable value BECAUSE the contractor share is nil \u2014 and the score read '
+    + '100/100 HIGH, this platform\u2019s top stability grade, for a regime closed to IOC equity. '
+    + 'Read it as a state monopoly, not as stability. Carry no predictability claim for ' + nm + ' into an IC memo.';
+}
 function _fpDispersion(d) {
   if (!d) return { state: 'none', iqr: null };
+  if (_fpNoContractorPosition(d)) return { state: 'monopoly', iqr: null };
   const p25 = d.p25_take, p75 = d.p75_take;
   if (p25 == null || p75 == null) return { state: 'none', iqr: null };
   const iqr = Math.max(0, p75 - p25);
@@ -23094,6 +23121,7 @@ function _fpDispersion(d) {
 function getFiscalPredictabilityScore(d) {
   const disp = _fpDispersion(d);
   if (disp.state === 'none') return null;   // no dispersion input -- not scored, not zero
+  if (disp.state === 'monopoly') return null;  // v572 (T4): 100% take = no contractor position to score
   const swing = d.swing || 0;
   const nMechs = (d.mechanics || '').split(',').filter(Boolean).length;
   const iqrPenalty   = Math.min(40, disp.iqr * 0.8);
@@ -23105,6 +23133,11 @@ function renderStabilityBadge(score, d) {
   // v536 (T3): the badge now names the dispersion basis the score was built on, because the
   // IQR term is the score's largest component and it is inert for 111 of 185 countries.
   const disp = _fpDispersion(d);
+  // v572 (T4): state-monopoly branch first -- its reason is the opposite of the 'none' branch's.
+  // 'none' means ORCA holds no distribution; here it holds one and the distribution is degenerate.
+  if (disp.state === 'monopoly') {
+    return `<span class="orca-fp-badge" style="display:inline-flex;align-items:center;gap:5px;padding:2px 9px;border-radius:10px;background:var(--surface2);border:1px dashed var(--red);font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.04em;cursor:help;" title="${_fpMonopolyReason(d)}">\u2014 \u00b7 no contractor position</span>`;
+  }
   if (score == null || disp.state === 'none') {
     const nC = (d && d.n != null) ? Number(d.n).toLocaleString() : 'its';
     const nm = (d && d.country) ? d.country : 'This country';
@@ -23347,6 +23380,10 @@ function renderExplorer() {
         // v536 (T3): null = ORCA holds no contract-level take distribution, so the IQR term has no
         // input. Previously that country was scored as if its measured spread were zero and drew a
         // long green bar. Rendered as n/c, muted, in the v520 Stability-column pattern.
+        if (score == null && _fpNoContractorPosition(d)) {
+          // v572 (T4): 100%-take jurisdictions used to draw a full-width green bar reading 100.
+          return `<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);cursor:help;" title="${_fpMonopolyReason(d)}">n/c \u00b7 monopoly</span>`;
+        }
         if (score == null) {
           return `<span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);cursor:help;" title="Fiscal Predictability not scored for ${d.country} — ORCA holds no p25/p75 take distribution across its ${d.n != null ? Number(d.n).toLocaleString() : '?'} contracts, so the interquartile-range component (up to −40 pts, the largest of the three) has no input. This is NOT a score of 100 and NOT a stable-regime finding.">n/c</span>`;
         }
@@ -25733,7 +25770,8 @@ function _scExportRows() {
       Breakeven_Tested: _beIsTested(d.be_75) ? 'Yes' : 'No',
       Swing_pp: d.swing,
       Fiscal_Predictability: fp == null ? 'not scored' : fp,
-      Predictability_Basis: disp.state === 'none' ? 'no contract-level take distribution held'
+      Predictability_Basis: disp.state === 'monopoly' ? 'not scored — state monopoly, ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% take at every price, contractor NPV $0'
+        : disp.state === 'none' ? 'no contract-level take distribution held'
         : disp.state === 'single' ? 'one statutory term — spread component not exercised'
         : 'measured spread ' + disp.iqr.toFixed(1) + 'pp'
     };
@@ -27367,7 +27405,14 @@ function loadCountryProfile(country) {
   // The bar used to render width:null% (0) beside the number "null"; before that it rendered a
   // fabricated high score built on an assumed spread of zero. Both are now replaced by an explicit
   // not-scored state, and where a score does exist the bar states which dispersion basis produced it.
-  const stabBar = _fpScore == null
+  const stabBar = (_fpDisp.state === 'monopoly')
+    ? `<div class="stability-bar-wrap" title="${_fpMonopolyReason(d)}">
+    <span class="stability-label">Predictability</span>
+    <div class="stability-bar"><div class="stability-fill" style="width:0%;background:var(--muted)"></div></div>
+    <span class="stability-score" style="color:var(--muted);font-size:11px;">not scored</span>
+    <span style="font-size:10px;color:var(--red);margin-left:5px;white-space:nowrap;font-weight:700;">no contractor position</span>
+  </div>`
+    : _fpScore == null
     ? `<div class="stability-bar-wrap" title="Fiscal Predictability is NOT SCORED for ${d.country} — ORCA holds no p25/p75 take distribution across its ${d.n != null ? Number(d.n).toLocaleString() : '?'} contracts, so the interquartile-range component (the largest of the three, up to −40 pts) has no input. Not a score of 100, and not a stable-regime finding.">
     <span class="stability-label">Predictability</span>
     <div class="stability-bar"><div class="stability-fill" style="width:0%;background:var(--muted)"></div></div>
@@ -29099,7 +29144,7 @@ function exportCountryProfile() {
     // v536 (T3): the score's largest component is inert for 157 of 185 countries, so the exported
     // number is not interpretable without its dispersion basis. Exported beside it rather than left
     // for the reader to assume the spread was measured.
-    { Metric: 'Predictability Basis', Value: (function(){ const b = _fpDispersion(d); return b.state === 'none' ? 'not scored — no p25/p75 distribution' : b.state === 'single' ? 'one statutory term — IQR component not exercised (score is price swing + mechanic count only)' : 'measured spread ' + b.iqr.toFixed(1) + 'pp across contracts'; })() },
+    { Metric: 'Predictability Basis', Value: (function(){ const b = _fpDispersion(d); return b.state === 'monopoly' ? 'not scored — state monopoly: ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% government take at every modelled price, contractor NPV $0 / IRR −100%. No contractor position to score.' : b.state === 'none' ? 'not scored — no p25/p75 distribution' : b.state === 'single' ? 'one statutory term — IQR component not exercised (score is price swing + mechanic count only)' : 'measured spread ' + b.iqr.toFixed(1) + 'pp across contracts'; })() },
     { Metric: '', Value: '' },
     { Metric: 'Govt Take @$50 (%)', Value: d.take_50 != null ? +d.take_50.toFixed(1) : null },
     { Metric: 'Govt Take @$75 (%)', Value: d.take_75 != null ? +d.take_75.toFixed(1) : null },
@@ -29151,7 +29196,7 @@ function exportCountryProfile() {
       'Contractor NPV @$75 ($M)': p.npv_75 != null ? +p.npv_75.toFixed(1) : null,
       'Swing (pp)': p.swing != null ? +p.swing.toFixed(1) : null,
       'Predictability': (function(){ const v = getFiscalPredictabilityScore(p); return v == null ? 'not scored' : v; })(),
-      'Predictability Basis': (function(){ const b = _fpDispersion(p); return b.state === 'none' ? 'no p25/p75 distribution' : b.state === 'single' ? 'one term — IQR not exercised' : b.iqr.toFixed(1) + 'pp measured'; })(),
+      'Predictability Basis': (function(){ const b = _fpDispersion(p); return b.state === 'monopoly' ? 'state monopoly — no contractor position' : b.state === 'none' ? 'no p25/p75 distribution' : b.state === 'single' ? 'one term — IQR not exercised' : b.iqr.toFixed(1) + 'pp measured'; })(),
       'Mechanics': p.mechanics || '',
       'R-factor Tiers': p.has_r_factor_tiers ? 'Yes' : 'No',
       'Contracts': p.n,
@@ -30278,7 +30323,9 @@ function renderReformCountryVerdict() {
   // v536 (T3): this tab offers the Fiscal Predictability Score as the fallback signal where no
   // reform log exists, so it must state the same basis caveat the score carries everywhere else.
   var fpDisp = (typeof _fpDispersion === 'function') ? _fpDispersion(d) : { state: 'none', iqr: null };
-  var fpNote = fp == null
+  var fpNote = (fpDisp.state === 'monopoly')
+    ? 'not scored \u2014 state monopoly, no contractor position'
+    : fp == null
     ? 'not scored \u2014 no contract-level take distribution held'
     : (fpDisp.state === 'single'
         ? 'one statutory term \u2014 spread component not exercised'
@@ -30311,7 +30358,13 @@ function renderReformCountryVerdict() {
       + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
       + '</div>'
       + '<div style="font-size:12px;color:var(--text);line-height:1.7;margin-bottom:12px;">'
-      + (fp != null
+      + (fpDisp.state === 'monopoly'
+          ? '<strong>Neither signal is available for this country, and the second one is not a gap in coverage.</strong> There is no sourced reform log. '
+            + 'The <strong>Fiscal Predictability Score</strong> is withheld because ' + esc + ' takes <strong>' + take + '</strong> of the barrel at $50, $75, $100 and $125/bbl alike, '
+            + 'leaving modelled contractor NPV at $0 and IRR at &minus;100%. All three score inputs \u2014 take spread, price swing, mechanic count \u2014 sit at their most favourable value '
+            + '<em>because</em> the contractor share is nil, so the score used to read <strong>100/100 HIGH</strong>, the top grade on this platform, for a regime closed to IOC equity. '
+            + 'What you can defend: ' + esc + ' is a state-monopoly jurisdiction. Fiscal stability is not the question here \u2014 access is. '
+          : fp != null
           ? '<strong>What you can defend instead:</strong> the <strong>Fiscal Predictability Score</strong> above is derived from this country&rsquo;s own contract set &mdash; '
             + 'within-country take spread (IQR), take movement between $50 and $125/bbl, and number of fiscal mechanics in force. It measures how consistent the terms are, not how often the law changed. '
             + (fpDisp.state === 'single'
@@ -31174,7 +31227,8 @@ function copyICSummary() {
   var stabScore = getFiscalPredictabilityScore(d);
   // v536 (T3): null means no contract-level take distribution is held, so no predictability claim
   // may be pasted into an IC memo for this country.
-  var stabLabel = stabScore == null ? 'predictability not scored — no contract-level take distribution held'
+  var stabLabel = _fpNoContractorPosition(d) ? 'predictability not scored — state monopoly, ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% government take at every modelled price and $0 contractor NPV; there is no contractor position to score'
+    : stabScore == null ? 'predictability not scored — no contract-level take distribution held'
     : stabScore >= 70 ? 'stable' : stabScore >= 40 ? 'moderate stability' : 'volatile';
   var nStr = d.n ? d.n.toLocaleString() + ' contracts' : '';
   var summary = country + ' (' + mechStr + ', ' + nStr + ', ' + tierStr + '-tier sourcing):\n'

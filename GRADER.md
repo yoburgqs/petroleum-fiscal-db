@@ -19164,3 +19164,112 @@ Cold load, storage cleared, Side-by-Side → the shipped **USA vs Iraq** quickst
 #6 of 21 producers
 above producer median      ← orange
 
+
+---
+## Cycle 471 Log — 2026-08-29 (v572)
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (least-recently-used: 465 was the
+last T4; 466=T1, 467=T5, 468=T6, 469=T2, 470=T3.)
+
+## Friction
+Cold load, storage cleared, Home → Reform Risk → the per-country lookup, which is the one control
+on the tab that answers "here". The tab is built end to end around one principle: never let a
+number read as stability when it is not. It executes that well — the window-artefact arm, the
+"this is not a score of 100" arm for the 164 uncovered jurisdictions, the "spread component not
+exercised" basis note. It fails at exactly that principle in one place.
+
+Select **Saudi Arabia**, **Kuwait** or **Bahrain**. The panel returned:
+
+```
+FISCAL PREDICTABILITY SCORE
+100 HIGH                              ← green
+GOVT TAKE @ $75
+100.0%
+```
+
+100/100 is the maximum the platform can emit. Only five of 185 countries reach it, and three of
+them are these. The reason is `getFiscalPredictabilityScore()` (index.html:23094) subtracting
+three penalties from 100:
+
+| input | Bahrain / Kuwait / Saudi Arabia | penalty |
+|---|---|---|
+| IQR (`p25_take`→`p75_take`) | 100.0 → 100.0 = **0pp** | 0 of −40 |
+| price swing $50→$125 | take is 100.0% at **every** price = **0pp** | 0 of −30 |
+| mechanic count | 1 (Concession) | 0 |
+
+Every input sits at its most favourable value **because the contractor share is nil**. The same
+three rows carry `npv_75 = 0.0` and `irr_75 = -100.0` — total loss of capital — and `be_75 = 1.0`,
+which is the state-monopoly sentinel `formatBreakeven()` (index.html:22749) already honours,
+naming Bahrain/Kuwait/Saudi Arabia in its own comment. So the platform already held the concept
+"state monopoly — no investor perspective" and applied it to breakeven, but the stability score
+never received it, and rewarded the annihilation of the contractor position with a top grade.
+
+The analyst asks what their fiscal-stability exposure is in Kuwait and is handed the most
+reassuring number on the platform for a jurisdiction closed to IOC equity. v536 fixed the adjacent
+case (best grade to the countries ORCA knows *least* about) via the `none`/`single` dispersion
+states; these three have n = 54 / 177 / 381 contracts and a real distribution, so they passed every
+existing guard.
+
+## Change
+`_fpDispersion()` gains a fourth state, `monopoly`, set from the data — `take_75 >= 99.5` — not
+from a country list, so it stays correct if the DB moves. `getFiscalPredictabilityScore()` returns
+**not scored** for that state. Scored countries 163 → 160; nulls 22 → 25; the three are the only
+rows that moved, and Bahamas/Vanuatu/Barbados/Qatar/Norway/Algeria are unchanged.
+
+Propagated to every surface that renders the score, each with the monopoly reason rather than the
+"no distribution held" reason, which would have been false here:
+
+| surface | before | after |
+|---|---|---|
+| Reform Risk lookup | `100 HIGH` + "derived from this country's own contract set" | tile removed; new arm names 100% take at all four prices, $0 NPV, −100% IRR, and that the score *used to* read 100/100 HIGH for a regime closed to IOC equity |
+| Country Profile badge (×2) | green `100 HIGH` | `— · no contractor position`, red-dashed |
+| Explorer Stability column | full-width green bar, `100` | `n/c · monopoly` — now agrees with the **State Monopoly** tag already in the same row |
+| Screener XLSX / CSV basis | `one statutory term` | `not scored — state monopoly, 100.0% take at every price, contractor NPV $0` |
+| Country Profile XLSX | `one statutory term — IQR not exercised` | full monopoly reason |
+| IC clipboard citation | `stable (score 100/100, spread component not exercised)` | `predictability not scored — state monopoly, 100.0% government take at every modelled price and $0 contractor NPV; there is no contractor position to score` |
+
+## Result
+The analyst can no longer paste "Kuwait — fiscal predictability 100/100, stable" into an IC memo,
+because the platform no longer says it, on screen or in either export or in the clipboard artifact.
+Asking the stability question about Bahrain, Kuwait or Saudi Arabia now returns the reason the
+question does not apply — 100% take at every price, $0 contractor NPV, −100% IRR — and redirects to
+the one that does: access, not stability. The Explorer row stops contradicting itself.
+
+## Verification — RUN this cycle
+Playwright cold (sessionStorage + localStorage cleared) on the Reform Risk lookup for Saudi Arabia,
+Kuwait, Bahrain (all three monopoly arms), Qatar (uncovered-but-scored control, still `67 MODERATE ·
+measured spread 1.2pp`), Norway and Algeria (scored controls, unchanged); Country Profile for Kuwait
+(both badge instances) and Norway; the Explorer table for all four. IC clipboard payload read back
+via `navigator.clipboard.readText()`. **0 page errors on every walk.**
+`runtime_comprehensive.js` with `TEST_URL=http://localhost:8791/index.html`, run twice — before and
+after the version bump: **135 PASS / 0 FAIL / 1 WARN** both times. The WARN is the known local-harness
+`sw.js` 404; `git diff index.html` contains zero `sw.js` / `serviceWorker` hits.
+
+### Found on this walk, not fixed — stated rather than hidden
+1. `.stability-bar-wrap` (index.html:27370) renders **nowhere** — 0 instances on Country Profile or
+   any other tab. It was patched for consistency but appears to be dead code. Not deleted this
+   cycle; deletion is its own walk.
+2. The Screener table body was empty on a cold load with no filter run (0 rows), so its Stability
+   cell was verified through the export path and the shared badge, not on screen.
+3. Fiscal Compare, Explorer, the Screener and the Breakeven Map still rank and colour on the blended
+   headline take, so Iraq remains mis-placed on those four surfaces. `cpCmpTakeOf()` is global.
+   Carried from v549/v552/v571 — still the largest open item.
+4. The `# Contracts` row still prints `7643` unseparated while the Fiscal Mechanics row two rows
+   below prints `Concession (7,643)`. Carried from v571.
+5. `MECHANIC_BREAKDOWN` (20 countries) and `mech_mix` (74) still disagree on the same quantity.
+   Carried from v570.
+6. Generic-default contamination in `mech_mix` — five countries at exactly 0.0% take / $5,533.1M NPV.
+   Carried from v570.
+7. `formatBreakeven()` still collapses all 65 populated values to `<$50`. Carried from v562–v571.
+8. The **Breakeven Map** tab remains unwalked.
+9. The three `◆◆◆◆◆` reform rows (Algeria, Colombia, USA) are window artefacts. Carried from v566.
+
+### STILL LOCKED — nothing touched
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not change — every
+tooltip edited belongs to a cell whose value changed. No page-sub paragraph, no amber instructional
+banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row.
+Screener advanced filters still collapsed, presets still a dropdown. Tab order unchanged. CP headline
+still two-zone with tier-coloured take%, global rank and vs-median pill. Govt NPV still removed from
+Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505, v508, v512–v571 all
+intact. Version bump v571→v572 done silently at the end; it is not the deliverable.
