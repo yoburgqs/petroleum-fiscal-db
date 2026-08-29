@@ -18839,3 +18839,18 @@ tier-coloured take%, global rank and vs-median pill. Govt NPV still removed from
 Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505,
 v508, v512–v568 all intact. Version sweep v568→v569 done silently at the end
 across 5 structural locations; it is not the improvement.
+
+---
+## Cycle 468 Log — 2026-08-29 00:10
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed (v569).
+
+## Cycle 468 — T6: "Where did this number come from and how solid is the evidence?"
+
+**Task.** T6, least-recently-used (467 was T5, 466 T1, 465 T4, 464 T3, 463 T2, 462 T6).
+
+**Friction.** I cleared storage, loaded cold, opened Country Profile and went to the section named for the question — *Key Fiscal Parameters — Evidence Chain*.
+
+On the **United Kingdom**, the *Special Tax* row reads ORCA 38%, Statutory 38%. Its Source badge was the literal string `EY_IHS_Bu
