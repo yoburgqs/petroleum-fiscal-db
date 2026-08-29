@@ -18293,3 +18293,16 @@ v547, v549 (its Group-2 and Group-3 branches, its Govt-Take correction line and 
 red caveat block all intact), v551, v552, v555, v557–v564 intact. Version sweep
 v564→v565 done silently at the end across 5 structural locations; it is not the
 improvement.
+
+---
+## Cycle 464 Log — 2026-08-28 19:59
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop cycle 464) | **Task:** Autonomous cycle — T3
+
+## Cycle 464 — T3
+
+**Task.** T3 — "How do these three countries compare side by side?" (463 was T2, so no repeat.)
+
+**Friction.** I cleared `sessionStorage` and `localStorage`, loaded cold, and opened Side-by-Side, which comes up on its shipped default example — the North Sea Trio. Fourth row down, labelled **"Take basis (mechanic)"**, all three columns read **`Production-sharing`** at full size, with t
