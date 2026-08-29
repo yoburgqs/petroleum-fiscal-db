@@ -18154,3 +18154,142 @@ the improvement.
 **Friction.** Walked cold into Country Profile — fresh context, storage cleared — and read the biggest element on the page. For **Saudi Arabia**, the Breakeven Price card printed at 28px in green:
 
 > **$1/bbl** — Resilient at $1, cushioned against most price scenarios — 
+
+---
+## Cycle 464 Log — 2026-08-28
+- Test before: 135 PASS / 0 FAIL / 0 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN (pre-existing local-harness `sw.js` 404)
+- JS errors: 0
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Playwright: RAN this cycle against a local server, not carried forward.
+- Commit `2665bd2` (v565) pushed to `origin/main`; mirror byte-identical.
+
+## Cycle 464 — T3
+
+**Task.** T3 — "How do these three countries compare side by side?" (463 was T2,
+462 was T6, 461 was T3.)
+
+**Friction.** Walked Side-by-Side cold — `sessionStorage` and `localStorage` cleared,
+first-time context — and landed on the shipped default example, the **North Sea Trio**
+(Norway / United Kingdom / Netherlands). Fourth row from the top of the Data Basis
+block, labelled **"Take basis (mechanic)"**, all three columns read:
+
+> **Production-sharing**
+> <small>Concession</small>
+
+Those three countries hold **11,989 Concession contracts and not one PSC** between
+them. Norway is the textbook tax-and-royalty concession regime. The value of a row
+whose own label ends in "(mechanic)" named a mechanic none of them uses, at full
+size, in primary text colour, with the true mechanic demoted to a 10px muted
+sub-line that elsewhere carries unrelated annotations ("3 mechanics, all
+comparable", "1 PRRT of 110") and therefore does not read as a correction.
+
+The cause is a naming collision inside v549. That cycle correctly imported
+`~/MECHANIC_COMPARABILITY.md` into the UX and needed a display name for
+comparability **Group 1** — Concession, PSC, Gross Split, Revenue Share. It chose
+"Production-sharing", which is also the name of one **member** of that group. So the
+group label is only accurate on the columns that are actually PSCs. Measured over
+`country_data.json`:
+
+| | count |
+|---|---|
+| columns reaching the Group-1 branch | **173 of 185** |
+| of those, holding **zero** production-sharing contracts | **106** |
+| of those, pure PSC (label strictly correct) | **5** |
+| Concession + PSC blends (label names one of two) | **61** |
+
+The row contradicted the **Fiscal Mechanics** row four lines lower in the same
+table, which read `Concession (7,643)` for the same column.
+
+**The export was worse than the screen.** `copyComparisonTable()` (v541) joins
+adjacent spans on ` · ` where they would otherwise fuse into one token, so
+**⎘ Copy for IC Memo** pasted:
+
+```
+Take basis (mechanic)   Production-sharing · Concession
+...
+Fiscal Mechanics        Concession (7,643)
+```
+
+which asserts Norway runs *both* mechanics, four rows above a line saying it runs
+one. That is the worst moment in the walk: it is a factual misstatement about the
+single most basic characteristic of a regime, on the comparison surface, inside the
+artefact the analyst carries into the room, on the default set every first-time
+visitor sees.
+
+Second defect on the same cell: a fee-blended column's sub-line read
+`blended — see below`. In a pasted memo "below" points at nothing, and the row
+labelled "(mechanic)" named no mechanic at all.
+
+**Change.** `_cmpMechBasisCell()` — the mechanic is now the **value** of the row and
+the comparability verdict is the **qualifier** under it. The inverse of what shipped.
+
+1. A Group-1 column prints **its own mechanics**, ordered by contract count and
+   joined with ` · ` — `Concession`, `Concession · PSC`, `PSC · Gross Split ·
+   Concession` — read from `mech_mix`, not from a group constant.
+2. The sub-line becomes the verdict: green **`price-linked — comparable`**, carrying
+   the PRRT tail where one exists (Denmark: `price-linked — comparable · 1 PRRT of
+   110`). This completes the three-colour verdict language the row already used on
+   its other two branches — red `⚠ N% fee-basis`, yellow `Cash-flow basis`, now
+   green `price-linked` — so the comparability call is scannable across five columns
+   without reading a word.
+3. The blended sub-line now names both sides of the blend —
+   `TSC blended with PSC and Concession` — instead of pointing off-page.
+4. The tooltip states group membership explicitly and closes with
+   "It is NOT a production-sharing regime unless PSC is named above."
+
+The PRRT-pure branch (Australia) was already truthful and is untouched. **No take,
+NPV, rank, count or threshold was altered, no country was dropped, no data file was
+regenerated.**
+
+**Result.** Swept **all 185 countries** through the cell cold in Playwright:
+**0 columns now name a mechanic the country does not hold**, down from 173. 0 JS
+errors across the sweep. Distribution is now 105 `Concession`, 61 Concession/PSC
+blends, 5 `PSC`, 1 `PSC · Gross Split · Concession`, 1 `Cash-flow basis`, 12 flagged
+fee-basis.
+
+The pasted IC memo is internally consistent on this row for the first time:
+
+```
+Metric                  Iraq                                                    USA          Norway
+Take basis (mechanic)   ⚠ 68% fee-basis · TSC blended with PSC and Concession   Concession · price-linked — comparable   Concession · price-linked — comparable
+Fiscal Mechanics        TSC (415) · PSC (115) · Concession (80)                 Concession (37,222)                      Concession (7,643)
+```
+
+An analyst can no longer put **"Norway: production-sharing"** in front of an
+investment committee on this platform's authority — and on a column that genuinely
+blends groups, the memo now names which mechanics are being blended rather than
+telling the reader to look "below".
+
+## Found on this walk, not fixed — stated rather than hidden
+
+1. **The same Group-1 vocabulary is used nowhere else**, so no other tab carried this
+   defect — but the converse is the standing v549 gap, unchanged: Fiscal Compare, the
+   Explorer, the Screener and the Breakeven Map still rank the blended headline take
+   with **no basis flag at all**. Iraq is still ranked on 84.8% on four surfaces.
+2. **Cycle 463's finding #1 stands, untouched.** `formatBreakeven()` still collapses
+   all 65 populated values ($27–$34) to the literal string `<$50`, so the Fiscal
+   Compare Breakeven **column** remains a two-state field. This cycle went to
+   Side-by-Side, where the Breakeven row was already removed in v562, so the walk
+   never reached it.
+3. **The `$50`/`$80` sort dividers in `renderCompare()` are still unreachable code**
+   (no country has `be_75 >= 50`). Carried forward from 463, left in place.
+4. **Country Profile's Evidence Chain still prints raw internal tokens**
+   (`EY_IHS_BulkHarvest_2025`, `EY_KPMG_CIT_Guide_2025`) across 46 rows / 35
+   countries. Carried forward from 462, untouched.
+
+## STILL LOCKED — nothing touched
+
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not
+change — the only tooltip edited belongs to the cell this cycle rewrote. No page-sub
+paragraph, no amber instructional banner, no routing hint, no "How to read" block, no
+SbS card wrapper, no visible Explorer chip row. Screener advanced filters still
+collapsed, presets still a dropdown. Tab order unchanged. CP headline still two-zone
+with tier-coloured take%, global rank and vs-median pill. Govt NPV still removed from
+Fiscal Compare and Side-by-Side; the v562 Breakeven row still removed from
+Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505 G badge, v508, v512,
+v513, v515, v516, v522, v529, v530, v531, v533, v534, v536, v537, v539, v540, v542,
+v547, v549 (its Group-2 and Group-3 branches, its Govt-Take correction line and its
+red caveat block all intact), v551, v552, v555, v557–v564 intact. Version sweep
+v564→v565 done silently at the end across 5 structural locations; it is not the
+improvement.
