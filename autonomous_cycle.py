@@ -123,6 +123,24 @@ def run_playwright():
 
     if not REPORT_FILE.exists():
         log("  *** NO REPORT FILE WRITTEN — suite did not finish ***")
+        # Log what node actually SAID. Cycles 475-482 hit this branch eight
+        # times in a row and left no diagnosis, because `out` was captured and
+        # then discarded — the loop ran unvalidated for five hours and the only
+        # trace was a count of zero. The suite itself is fine: 135 PASS when run
+        # from a shell, via this same function, under `env -i` with the plist's
+        # PATH, and as a one-shot launchd job. Whatever differs is only visible
+        # in this output, so it gets written down.
+        if out and out.strip():
+            head = out.strip().splitlines()
+            log(f"      node said ({len(out)} chars, first 5 lines):")
+            for line in head[:5]:
+                log(f"        | {line[:160]}")
+            if len(head) > 5:
+                log(f"        | ... and {len(head)-5} more line(s); tail:")
+                log(f"        | {head[-1][:160]}")
+        else:
+            log("      node produced NO output at all — it did not start, or "
+                "exited before writing a byte.")
         return {"pass": 0, "fail": 0, "warn": 0, "js_errors": 0,
                 "raw": out[-2000:], "incomplete": True}
 
@@ -377,5 +395,52 @@ def main():
 
     log(f"=== CYCLE {cycle_n} COMPLETE === {test_after['pass']} PASS / {test_after['fail']} FAIL ===")
 
+# ── single-instance guard ─────────────────────────────────────────────────────
+# NOT the cause of the 2026-08-29 cycles 475-482 validation blackout. Legion
+# proposed this as the root cause (Windows used MultipleInstancesPolicy=
+# IgnoreNew; launchd has no direct equivalent). Measured and disproven: cycle
+# 473 ran 47.8m under a 30m StartInterval and launchd started no second
+# instance — every gap from 470-483 is exactly 30.0m measured END->start, never
+# start->start. launchd serialises a single label by itself.
+#
+# Kept as defence in depth for the case launchd does NOT cover: a hand-run
+# `python autonomous_cycle.py` colliding with the scheduled one. That is a real
+# scenario — this file was being invoked by hand on 2026-08-29 while the
+# scheduler was live. run_playwright() deletes the report file on entry, so two
+# instances would silently delete each other's output and both report zero.
+#
+# Mirrors overnight_chain.acquire_lock(), WITHOUT the age threshold that made
+# that function clear locks it had proven alive. Liveness is the only test.
+PIDFILE = Path("/tmp/petroleum_cycle.pid")
+
+
+def claim_single_instance():
+    """Return True if we own the cycle. False means another one is alive."""
+    if PIDFILE.exists():
+        try:
+            other = int(PIDFILE.read_text().strip())
+        except Exception:
+            other = None
+        if other and other != os.getpid():
+            try:
+                os.kill(other, 0)
+                log(f"ABORT: cycle already running (pid {other}). Dropping this "
+                    f"invocation rather than racing it.")
+                return False
+            except (ProcessLookupError, PermissionError, OSError):
+                log(f"Clearing stale cycle pidfile (pid {other} is gone).")
+    PIDFILE.write_text(str(os.getpid()))
+    return True
+
+
 if __name__ == "__main__":
-    main()
+    if not claim_single_instance():
+        sys.exit(0)
+    try:
+        main()
+    finally:
+        try:
+            if PIDFILE.exists() and PIDFILE.read_text().strip() == str(os.getpid()):
+                PIDFILE.unlink()
+        except Exception:
+            pass
