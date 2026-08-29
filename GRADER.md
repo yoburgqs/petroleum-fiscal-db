@@ -18595,3 +18595,114 @@ v430, v449, v451, v452, v489, v505, v508, v512–v566 all intact.
 The **Max Breakeven** slider ran $20–$120. Every populated breakeven in the database is **$27–$34**. So across its 101 positions:
 
 |
+
+---
+
+## Cycle 467 — T5
+
+**Task.** T5 — "Give me something I can paste straight into an IC memo."
+(LRU: 466 was T1, 465 T4, 464 T3, 463 T2, 462 T6 — T5 last used at cycle 441.)
+
+**Friction.** Cleared `sessionStorage` and `localStorage`, loaded cold, opened
+Fiscal Compare and pressed the tab's only clipboard affordance — **⎘ Copy for IC
+Memo** (`#fc-copy-ic-btn` → `copyFCForIC()`, index.html:35392).
+
+The NPV column on screen is `r.liveNPV`: the figure `renderFCResults()` models on
+the profile selected above the table. The clipboard pastes `meta['npv_'+P]`: the
+ORCA contract-database figure, on a **fixed Deepwater basis**. Two different
+numbers, two different bases, **one column on screen**, and no disclosure
+anywhere that they were not the same thing. `copyFCForIC()`'s own header comment
+claims the opposite — *"so the pasted artifact and the screen the analyst just
+read cannot disagree."*
+
+Measured against the live build, all 185 rows at $75/bbl Deepwater:
+
+| | |
+|---|---|
+| rows differing by >$200M | **171 of 185** |
+| median absolute gap | **$1,026M** |
+| rows where the two disagree on the **sign** | 5 |
+
+| country | screen (model) | pasted (database) |
+|---|---|---|
+| **Iraq** | **−$627M** | **+$642M** |
+| **Iran** | **−$1,636M** | **+$899M** |
+| Saudi Arabia / Kuwait / Bahrain | +$4,257M | $0M |
+| Nigeria | $1.6B | $302M |
+| Norway | $1.2B | $826M |
+
+And **119 of the 185 model NPVs are the identical $4,257M** — the generic
+mechanic default — so the column the analyst was reading could not tell Saudi
+Arabia from Russia from Qatar.
+
+Worse on a non-default profile. `copyFCForIC()` looked the profile up in
+`DCF_PROFILES`, but Fiscal Compare runs on `FC_PROFILES`, and three of the seven
+options in `#fc-profile` — `giant`, `onshore`, `marginal` — **do not exist in
+`DCF_PROFILES` at all**. Selecting Giant produced a memo captioned *"185
+countries at $75/bbl, **giant** profile"* asserting *"Contractor NPV is on a
+standardized **giant** profile"* while carrying the Deepwater database numbers:
+Norway pasted at **$826M** against the **$3,891M** on screen.
+
+**Change.**
+1. Fiscal Compare gains a **`NPV ($M) db · citable`** column beside the model NPV
+   — the same remedy **v547** applied to Take% on this same table for this same
+   reason. Green positive / red negative, tooltip naming the gap to the model
+   column and stating *"THE TWO DISAGREE ON THE SIGN — cite this column"* where
+   they do. The existing column is relabelled **`NPV ($M) model`** and keeps the
+   sort and the *Project viable* counter unchanged.
+2. `copyFCForIC()` reads `FC_PROFILES`, so the caption prints *Giant*, not *giant*.
+3. The pasted artifact carries **both** NPV columns, each with its real basis —
+   database as fixed standardized Deepwater, model as the profile actually
+   selected. The false *"NPV is on a standardized &lt;selected&gt; profile"* claim
+   is gone.
+4. The paste **names** the disagreeing rows — *"On 2 rows the citable database NPV
+   and this screen's model NPV disagree on the SIGN … Iraq, Iran"* — instead of
+   leaving the contradiction for the IC to find.
+5. Fixed the garbled v563 sentence that read *"not ranked — they carry — in the #
+   column"*; it now reads *they carry "—" in the # column*.
+6. 12 divider/footer colspans bumped 12→13 (11→12) for the new column.
+
+**Result.** The analyst sees the number that will land in the memo **before**
+pressing copy, on the same row as the profile-sensitive one, and the pasted table
+matches the screen it was copied from row for row. Iraq and Iran no longer flip
+from value-destroying on screen to value-accretive in the memo with nothing said.
+
+Verified cold in Playwright against the local build: header 12 cells / body 12
+cells, dividers span 1803 of 1805px, screen and clipboard agree on USA, Nigeria,
+Norway, Iraq, Iran and the Saudi Arabia monopoly row, at **both** Deepwater and
+Giant.
+
+**Tests — RUN this cycle, not carried forward.** JS syntax gate PASS.
+Playwright **135 PASS / 0 FAIL / 1 WARN / 1 JS error**. The WARN and the error
+are a 404 on `/petroleum-fiscal-db/sw.js`, an artifact of serving from a local
+root rather than the Pages path, and **reproduce identically on the pre-change
+file** — confirmed by re-running the suite against the backup.
+
+### Found on this walk, not fixed — stated rather than hidden
+1. `formatBreakeven()` still collapses all 65 populated values to the literal
+   `<$50` on Fiscal Compare, Country Profile and the Breakeven Map. Carried from
+   v562/v563/v567; still the largest open item. Visible again this cycle: the
+   screen reads `<$50` for Australia where the paste carries the real `28.0`.
+2. The **Breakeven Map** is an entire tab built on that axis and has still not
+   been walked.
+3. Country Profile's Evidence Chain still prints raw internal tokens
+   (`EY_IHS_BulkHarvest_2025`). Carried from v563.
+4. The three surviving `◆◆◆◆◆` reform rows (Algeria, Colombia, USA) are window
+   artefacts. Carried from v566.
+5. **New:** the FC *Project viable: 183 of 185* counter runs on the model NPV, so
+   it counts the 119 generic-default rows that all share the same $4,257M. On the
+   citable database basis the figure is 182 — close by coincidence, not by
+   construction. Not touched this cycle; the counter is the model column's own
+   summary and is now labelled as such by the header.
+
+### STILL LOCKED — nothing touched
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not
+change — the two added belong to the column introduced and the column relabelled
+this cycle. No page-sub paragraph, no amber instructional banner, no routing
+hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row.
+Screener advanced filters still collapsed, **presets still a dropdown**. Tab order
+unchanged. CP headline still two-zone with tier-coloured take%, global rank and
+vs-median pill; v566 `n/c` stability state intact. Govt NPV still removed from
+Fiscal Compare and Side-by-Side. v371/v373, v430, v449, v451, v452, v489, v505,
+v508, v512–v567 all intact. No take, rank or threshold was altered and no data
+file was regenerated.
