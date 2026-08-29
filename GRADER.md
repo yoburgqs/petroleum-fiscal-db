@@ -20076,3 +20076,16 @@ v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk
 placement, the v578 Explorer grouping and the v580 Fiscal Compare citable
 ranking are all intact. Tab order unchanged. Version bump v580→v581 across 5
 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 486 Log — 2026-08-29 17:05
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** AWL (petroleum loop) | **Task:** Cycle 486 — T6
+
+## Cycle 486 — shipped as v581
+
+**Task.** T6 — *"Where did this number come from and how solid is the evidence?"* (485 was T5, 484 T1, 483 T3.)
+
+**Friction.** Walked Explorer cold in Chromium, storage cleared. The count line above the table says *"ranked by data basis: **22** with verified field production first, then 163 whose economics are regional proxies."* The button on the control row three inches below it 
