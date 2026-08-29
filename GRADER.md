@@ -19652,3 +19652,22 @@ across 7 structural sites; it is **not** the deliverable.
 - Test after: 135 PASS / 0 FAIL / 1 WARN
 - JS errors: 0 (the 1 captured console error is the local-harness sw.js 404)
 - Summary: Cycle complete and pushed (v575). Local server on :8791 left running for the next cycle.
+
+---
+## Cycle 474 Log — 2026-08-29 06:18
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Pushed. Cycle complete.
+
+---
+
+## Cycle 474 — T6, shipped as v575
+
+**Task.** T6 — *"Where did this number come from and how solid is the evidence?"* (least-recently-used; 468 was the last T6).
+
+**Friction.** I walked Fiscal Compare cold with storage cleared and **counted the Quality column off the live DOM** instead of reading what the page claims about it.
+
+The badges actually rendered are **A 16 · B 36 · C 10 · D 3 · G 120**. The summary sentence sitting directly above the table said:
+
+> "The o
