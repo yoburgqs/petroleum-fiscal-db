@@ -18438,3 +18438,18 @@ v371/v373, v430, v449, v451, v452, v489, v505, v508, v512–v565 intact — incl
 v520's FC `n/c`, whose vocabulary this cycle adopted rather than replaced. Version
 sweep v565→v566 done silently at the end across 5 structural locations; it is not
 the improvement.
+
+---
+## Cycle 465 Log — 2026-08-28 20:57
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop cycle 465) | **Task:** Autonomous cycle — T4
+
+## Cycle 465 — T4
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?" (464 was T3, 463 was T2 — no repeat.)
+
+**Friction.** I cleared storage, loaded cold, and walked both surfaces that answer this. The Reform Risk tab is genuinely good — its per-country lookup names the coverage gap outright and refuses to imply a clean record.
+
+The Country Profile does the opposite. Its headline str
