@@ -18306,3 +18306,135 @@ improvement.
 **Task.** T3 — "How do these three countries compare side by side?" (463 was T2, so no repeat.)
 
 **Friction.** I cleared `sessionStorage` and `localStorage`, loaded cold, and opened Side-by-Side, which comes up on its shipped default example — the North Sea Trio. Fourth row down, labelled **"Take basis (mechanic)"**, all three columns read **`Production-sharing`** at full size, with t
+
+---
+## Cycle 465 Log — 2026-08-28
+
+- Test before: 135 PASS / 0 FAIL / 0 JS errors
+- Test after: 135 PASS / 0 FAIL / 1 WARN — the WARN is the pre-existing local
+  `sw.js` 404, reproduced on the pre-change build served separately on :8124,
+  so it is not a regression from this change. Playwright RAN this cycle against
+  the local build; the number is not carried forward.
+- JS syntax gate: PASS (9 blocks / 0 errors)
+- Page errors on the 185-country cold sweep: 0
+
+## Cycle 465 — T4
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?"
+(464 was T3, 463 was T2, so no repeat.)
+
+**Friction.** Cleared `sessionStorage` and `localStorage`, loaded cold, and walked
+the two surfaces that answer this question: the Reform Risk tab and the Country
+Profile. The Reform Risk tab is in good shape — the per-country lookup names the
+coverage gap explicitly for uncovered jurisdictions and refuses to imply a 100.
+
+The Country Profile does not. Its Zone B headline strip — top of the page, beside
+take%, rank and mechanic — computed:
+
+```js
+const _rh344     = REFORM_HISTORY[d.country] || [];
+const _reforms344 = _rh344.filter(e => (e.year||0) >= 2010).length;
+const _stab344    = Math.max(0, 5 - _reforms344);
+```
+
+**That expression cannot tell "no reforms" from "no reform log."** An empty array
+means the same thing to it either way. `reform_history.json` carries a sourced
+event log for **21 of 185** jurisdictions. For the other **164** the strip rendered
+
+```
+Stability: ◆◆◆◆◆ (0 reforms since 2010 · Reform Risk →)
+```
+
+in green `#15803D` — byte-identical to a genuinely quiet covered jurisdiction —
+with a tooltip closing on the IC rule *"5 diamonds → no discount warranted."*
+Verified live: Malaysia, Qatar, Oman, Egypt, China and Saudi Arabia all returned it.
+
+Scroll down the **same profile** and the Fiscal Reform History section reads:
+
+> *No sourced reform log. ORCA holds a sourced fiscal-law change log for 21 of 185
+> jurisdictions. Malaysia is not one of them. Read this as missing coverage, not a
+> clean record. It is not a Reform Frequency Score of 100 and it does not support
+> carrying a zero reform-risk premium into an IC memo.*
+
+One page, two opposite answers, and the headline is the one an analyst with 20
+minutes reads. Worse, the platform had already settled this question elsewhere:
+**Fiscal Compare has printed `n/c` in its Stability column for exactly these
+countries since v520** — confirmed live (China, Ethiopia, Egypt, Madagascar,
+Senegal, Tanzania … all `n/c`). The Country Profile headline was never brought
+in line, so the same country got two different verdicts on two tabs.
+
+**Change.** Absence is now its own state on the strip, using the vocabulary the
+FC column already established rather than a new one:
+
+- Uncovered country → **`n/c`**, muted, dashed border, followed by
+  *"(no sourced reform log · 21 of 185 jurisdictions covered · Reform Risk →)"*.
+  The coverage count is computed live from `REFORM_HISTORY` at render time, not
+  hardcoded, so it tracks the data file.
+- Its tooltip states that this is missing coverage, that it is **not** five
+  diamonds, **not** a Reform Frequency Score of 100, carries **no** reform premium
+  of zero and in fact carries no reading at all; names FC's `n/c` as the same
+  finding; and says the jurisdiction needs an external check — national petroleum
+  law, IMF Article IV, or operator annual reports — before it goes to an IC.
+- The **21 covered jurisdictions are untouched**: same diamonds, same colour ramp,
+  same "(N reforms since 2010)" text, same IC premium ladder in the tooltip.
+
+**No take, NPV, rank, count or threshold was altered, no country was dropped, and
+no data file was regenerated.** The change is confined to three new `const`s and
+the one `<span>` that renders them.
+
+**Result.** Swept **all 185 country profiles** cold in Playwright:
+
+| | before | after |
+|---|---|---|
+| render `n/c` (no sourced log) | 0 | **164** |
+| render the diamond scale | 185 | **21** |
+| render green `◆◆◆◆◆` | **167** | **3** |
+| unexpected / unparsed | 0 | **0** |
+| page errors across the sweep | 0 | **0** |
+
+The three profiles still showing `◆◆◆◆◆` — **Algeria, Colombia, USA** — all
+genuinely hold a sourced log with no change since 2010. Every false maximum is
+gone. An analyst can no longer read "no WACC premium warranted" off a Qatar or
+Malaysia profile on this platform's authority, and the Country Profile and Fiscal
+Compare now return the same answer for the same country.
+
+## Found on this walk, not fixed — stated rather than hidden
+
+1. **The three surviving `◆◆◆◆◆` rows are window artefacts.** Algeria last raised
+   take in 2005 (+10pp, Law 05-07), Colombia in 2007 (+3pp) and the USA in 2007
+   (+3pp) — all outside the 2010 scoring window. Fiscal Compare marks these rows
+   with a red `!`; the CP strip carries no such marker. That is a different defect
+   affecting 3 countries, and folding it in here would have required hoisting
+   `_rrLastHostile()` out of the Reform Risk render scope. Left for a later cycle.
+2. **The Reform Risk per-country lookup prints a bare `GOVT TAKE @ $75 100.0%`**
+   for the three state monopolies (Saudi Arabia, Kuwait, Bahrain) —
+   `renderReformCountryVerdict()`'s `var take = d.take_75.toFixed(1) + '%'` has no
+   `isStateMonopoly()` guard, while Fiscal Compare, the Explorer, the Screener and
+   the Country Profile all render it as an em dash. Same verdict panel also prints
+   **Fiscal Predictability 100 HIGH** for them — the platform's maximum, and one of
+   only five perfect scores — under a heading that reads *"What you can defend
+   instead."* All three penalty terms are zero there only because the model
+   produces a constant with no contractor position (IQR 0, swing 0, one mechanic).
+   The other two perfect 100s are Bahamas (4 contracts) and Vanuatu (7). Real, and
+   a strong candidate for the next T4 or T2 cycle.
+3. **Cycle 463 finding #1 stands, untouched.** `formatBreakeven()` still collapses
+   all 65 populated values ($27–$34) to the literal string `<$50`.
+4. **The `$50`/`$80` sort dividers in `renderCompare()` are still unreachable code.**
+   Carried forward from 463.
+5. **Country Profile's Evidence Chain still prints raw internal tokens**
+   (`EY_IHS_BulkHarvest_2025`, `EY_KPMG_CIT_Guide_2025`). Carried forward from 462.
+
+## STILL LOCKED — nothing touched
+
+No new FAQ (frozen at 974). No new tooltip on any control whose behaviour did not
+change — the single rewritten tooltip belongs to the element this cycle changed,
+and its previous text described the removed behaviour. No page-sub paragraph, no
+amber instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row. Screener advanced filters still collapsed,
+presets still a dropdown. Tab order unchanged. CP headline still two-zone with
+tier-coloured take%, global rank and vs-median pill. Govt NPV still removed from
+Fiscal Compare and Side-by-Side; v562 Breakeven row still removed from Side-by-Side.
+v371/v373, v430, v449, v451, v452, v489, v505, v508, v512–v565 intact — including
+v520's FC `n/c`, whose vocabulary this cycle adopted rather than replaced. Version
+sweep v565→v566 done silently at the end across 5 structural locations; it is not
+the improvement.
