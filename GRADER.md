@@ -20847,3 +20847,16 @@ comparability work, v555/v562 row removals — all intact. Tab order unchanged.
 **No take, NPV, IRR, breakeven, rank or score value was altered and no data file
 was regenerated.** Version bump v586→v587 across 5 structural sites, done
 silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 492 Log — 2026-08-29 22:47
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Both repos pushed.
+
+## Cycle 492 — v587
+
+**Task: T1** — "Which countries should even be on my screening list?" (least recent; 491 was T3, 484 was the last T1)
+
+**Friction.** The Screener table is the tool T1 is asked of, and it could not be reordered at all. No clickable header, no button row, no select — its only ordering was NPV-descending inside the evidence-first grouping, decided entirely by which preset you loaded. Meanwhile the global CSS at `index.html:177` gave *ever
