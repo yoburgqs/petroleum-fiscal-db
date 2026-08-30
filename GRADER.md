@@ -21797,3 +21797,119 @@ across 5 structural sites, done silently at the end; it is **not** the deliverab
 
 ## Friction
 Walked cold into Country Profile on **Guyana** and drilled into the mechanic to defend the 54.1% headline. The most citable-looking thing on the tab is the **Profit Oil Tier Schedule (R-factor)** table — a precise four-row ladder, 60/40 rising to 15/85. On a tab built entirely around evidence badging, it was 
+
+---
+## Cycle 501 Log — 2026-08-30 (T5 / v596)
+- Test before: 135 PASS / 0 FAIL
+- Test after: **135 PASS / 0 FAIL / 1 WARN** — suite RAN this cycle (`runtime_comprehensive.js`
+  against the local build). The WARN is the pre-existing local-harness `sw.js` 404.
+- JS syntax gate: **PASS** (15 blocks / 0 errors)
+- JS page errors on every walk: **0**
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (499 was T2, 498 T3,
+497 T6, 496 T1, 495 T4 — T5 was least recent.)
+
+## Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — from
+Home through **every** paste affordance the platform offers, reading the **clipboard
+back** rather than trusting the button labels.
+
+The Country Profile headline strip renders **`⚠ PROXY — statutory model`** for Greenland.
+The Fiscal Compare reading guide states the rule in the product's own words:
+
+> *"**PROXY** badge on a country name = take is modeled from statutory fiscal parameters
+> only (no verified block-level production data for weighting) … **IC rule: never cite a
+> PROXY country's take as definitive; always state "statutory model basis (ORCA PROXY)"
+> in the IC memo** and cross-check with primary concession/PSA terms before submission."*
+
+The two buttons that turn that page into memo text — `Copy for IC Memo` and
+`⎘ IC Citation` — sit **above** that headline and looked identical for every country.
+Read back from the clipboard, **none of the artifacts carried it**:
+
+| artifact | function / line | carried the basis? |
+|---|---|---|
+| CP `Copy for IC Memo` | `copyICSummary()` | **no** |
+| CP `⎘ IC Citation` | `copyICCitation()` | **no** |
+| FC drilldown `⎘ IC Citation` | `openFCDrilldown()` `_lines` | **no** |
+| FC drilldown `Copy 4-price as IC table` | `_tsvRows` | **no** |
+| FC `⎘ Copy for IC Memo` | `copyFCForIC()` | **no** |
+| Side-by-Side `⎘ Copy for IC Memo` | `copyComparisonTable()` | **yes** — `Data basis` row |
+
+So the caveat existed in **exactly one of six** artifacts, and not in the two on the
+highest-traffic surfaces. The analyst read the warning on screen, scrolled up, clicked the
+button whose entire purpose is to produce the memo text, and pasted the exact memo the
+tool's own rule forbids.
+
+**Not an edge case, and biased toward the rows most likely to be pasted.** Measured
+against the shipped `country_data.json`:
+
+| data basis | countries | coverage |
+|---|---|---|
+| `PROXY` (`prod_coverage_pct == 0.0`, `simple_avg`) | **163** | none |
+| `PART-PROD` | 12 | 0.2% (USA) – 3.4% (Mexico) |
+| `PROD-WTD` | 10 | 6.2% (Colombia) – **37.6%** (UK, the deepest on record) |
+
+**All 30 of the 30 lowest-take countries** on the default ascending Fiscal Compare
+ranking are PROXY — Vanuatu 5.0%, Bahamas 10.0%, Montenegro, Greenland, Faroe Islands.
+Low take and absent production evidence are the same rows, so the head of a screening
+shortlist is precisely where the unweighted countries collect. And no country is fully
+production-weighted, so the silence was misleading on all 185, not just the 163.
+
+## Change
+One helper set — `_icProdBasis` / `_icProdBasisNote` / `_icProdBasisLine` /
+`_icProdBasisClause` / `_icProdBasisCell` — computed from **`_dqTier()`**, the same
+function that drives the on-screen badge, so the two cannot drift the way the A+B and
+primary-law grading methods did. Wired into all five artifacts that lacked it, in three
+registers: a full sentence on its own line for the paragraph artifacts, one bracketed
+clause for the single-line citations, a short cell for the tables.
+
+- **FC `Copy for IC Memo`** gains a **12th column, `Data basis`** — a different axis from
+  the existing `Model basis`, which is about the compare engine's *terms* — plus a
+  counted warning naming the PROXY rows (*"163 of the 185 rows carry a PROXY data
+  basis…"*), in both the TSV and `text/html` clipboard flavours.
+- **On screen**, the CP copy buttons now declare the basis **before the click**: an amber
+  `⚠ PROXY basis — copies as directional` pill for the 163, a green
+  `PROD-WTD / PART-PROD — N% production-weighted` pill for the 22.
+
+## Result
+An analyst pasting Greenland into an IC memo now pastes, **attached to the number**, that
+ORCA holds no verified block-level production for any of its 31 contracts, that the take
+is a simple average of statutory terms, and that it is directional ±5–15pp and not
+citable as definitive without the primary PSA terms — instead of a bare
+`Govt Take 11.6% @$75/bbl, $4.5B NPV` that reads exactly like Norway's. And they can see
+which kind of country they are on **before** they copy.
+
+## Verification — cold, Playwright, local build, storage cleared
+All three branches, all six artifacts:
+
+| branch | country | on-screen pill | pasted basis |
+|---|---|---|---|
+| PROXY | Greenland (31 contracts) | `⚠ PROXY basis — copies as directional` | full PROXY statement |
+| PART-PROD | Australia 0.3% · USA 0.2% | `PART-PROD — 0.3% production-weighted` | coverage + unweighted remainder |
+| PROD-WTD | Norway 18.2% | `PROD-WTD — 18.2% production-weighted` | coverage + 37.6% ceiling |
+
+FC `Copy for IC Memo` table: **12 header columns · 185 data rows · 163 PROXY cells ·
+22 production-weighted cells · 0 empty**. Every count matches the independent DB-side
+query exactly. **0 page errors** on every walk.
+
+## Found on the same walk, NOT fixed — stated rather than hidden
+`copyICSummary()` and `copyICCitation()` still derive **"A-tier sourcing"** from
+`ab_pct >= 80` — the A+B method the FC reading guide explicitly names as discredited
+(*"grading on A+B graded how thoroughly the bulk tables had run — it scored 171 of 185
+countries A and ranked Russia (3.8% primary law) above Senegal (67.2%)"*). The screen
+uses `_evidenceGrade()` (worse of primary-law share AND fact depth). They **disagree on
+15 of 185** countries; the paste **overstates** on 5 — Mali (pasted A, screen C), Zambia,
+Mongolia, Guinea, Jordan (pasted A, screen B). Real, contained, and its own cycle.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on any pre-existing control — the two `title`
+attributes added belong to a pill this cycle created. No page-sub paragraph, amber
+instructional banner, routing hint or "How to read" block; no SbS card wrapper; no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.**
+**No published take, NPV, rank, tier colour or pill value was altered** — what changed is
+what the pasted artifact *says about the basis of* the take. v371/v373 declutter, v430
+sessionStorage logic, v449, v451, v452, v489 and all later locks intact. Version sweep
+**v595 → v596** across 5 structural sites, done silently at the end; it is **not** the
+deliverable.
