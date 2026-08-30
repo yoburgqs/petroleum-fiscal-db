@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v591</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v592</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -884,8 +884,13 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   cursor: help;
   vertical-align: middle;
 }
-.dq-facts    { background: rgba(21, 128, 61, 0.1); color: var(--green); border: 1px solid rgba(21, 128, 61, 0.3); }
-.dq-evidence { background: rgba(161, 98, 7, 0.1); color: var(--yellow); border: 1px solid rgba(161, 98, 7, 0.3); }
+/* v592 (T6): was .dq-facts / .dq-evidence. The badge grades PRODUCTION BASIS, not source
+   quality — but it sat on the country name reading FACTS or EVIDENCE, the two most
+   source-quality words available, three columns from an Evidence column grading the other
+   axis. Iraq rendered a green FACTS badge beside evidence grade D. Class names renamed with
+   the labels so a future surface cannot regrow the collision off the stylesheet. */
+.dq-prodwtd  { background: rgba(21, 128, 61, 0.1); color: var(--green); border: 1px solid rgba(21, 128, 61, 0.3); }
+.dq-partprod { background: rgba(161, 98, 7, 0.1); color: var(--yellow); border: 1px solid rgba(161, 98, 7, 0.3); }
 .dq-proxy    { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
 .dq-info-banner {
   display: flex;
@@ -1399,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v591</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v592</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1469,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v591</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v592</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1811,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v591';
+  return m ? m[0] : 'v592';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1886,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v591');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v592');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -23024,19 +23029,52 @@ function _dqTier(entry) {
   const cov = entry.prod_coverage_pct || 0;
   const wt  = entry.weighting || 'simple_avg';
   if (cov > 5 && (wt === 'prod_weighted' || wt === 'prod_weighted_blended')) {
-    return { label: 'FACTS', cls: 'dq-facts', hasProduction: true };
+    return { label: 'PROD-WTD', cls: 'dq-prodwtd', hasProduction: true };
   }
   if (cov > 0) {
-    return { label: 'EVIDENCE', cls: 'dq-evidence', hasProduction: true };
+    return { label: 'PART-PROD', cls: 'dq-partprod', hasProduction: true };
   }
   return { label: 'PROXY', cls: 'dq-proxy', hasProduction: false };
 }
 window._dqTier = _dqTier;
 
+// v592 (T6): this badge answered the wrong question in the right words. It is computed
+// entirely from prod_coverage_pct and weighting -- how much of the take is weighted by
+// verified field output -- and carried NO source-quality information at all. It was labelled
+// FACTS / EVIDENCE / PROXY and handed buildEvidenceTooltip(), which opens "Primary legal
+// instrument (tier A): 11.8% of facts". So an analyst asking "how solid is the evidence?"
+// hovered a green badge reading FACTS on Iraq and got a sourcing sentence back. Measured over
+// the shipped country_data.json: 10 countries carry the top rung, and 4 of them grade C or D
+// on evidence -- Iraq D at 11.8% primary law, Nigeria, Kazakhstan and Colombia C. Brazil runs
+// the other way: middle rung, evidence grade A. The badge is anti-correlated with the letter
+// it was being read as. The ladder is now PROD-WTD / PART-PROD / PROXY -- three labels on one
+// axis, none of them a sourcing word -- and the tooltip states the production basis and then
+// names that country's actual evidence grade and where to read it, so the two questions stay
+// separate at the point where they were being confused.
 function getDQBadge(entry) {
   const t = _dqTier(entry);
-  const tooltip = buildEvidenceTooltip(entry);
-  return `<span class="dq-badge ${t.cls}" title="${tooltip}">${t.label}</span>`;
+  const cov = entry.prod_coverage_pct || 0;
+  const nc  = entry.n != null ? Number(entry.n).toLocaleString() : '?';
+  const g   = _evidenceGrade(entry);
+  let basis;
+  if (t.label === 'PROD-WTD') {
+    basis = 'PRODUCTION-WEIGHTED: this country\u2019s take is weighted by verified field output across '
+          + cov.toFixed(1) + '% of its ' + nc + ' contracts. Strongest production basis ORCA produces.';
+  } else if (t.label === 'PART-PROD') {
+    basis = 'PARTIAL PRODUCTION: verified field output exists for ' + cov.toFixed(1) + '% of its '
+          + nc + ' contracts; the remainder is equal-weighted. Cite with the coverage figure attached.';
+  } else {
+    basis = 'PROXY: ORCA holds no verified field production for this country. Take is a simple average '
+          + 'across ' + nc + ' contracts and the NPV / IRR / breakeven come from the standardized '
+          + 'deepwater profile. Describes the legal regime, not realised economics.';
+  }
+  const tooltip = basis
+    + ' \u2014 This badge grades PRODUCTION BASIS only. It says nothing about how well sourced the '
+    + 'fiscal terms are: that is the Evidence column, which grades this country ' + g.letter
+    + ' (' + g.label + ', ' + g.aPct.toFixed(1) + '% primary law over '
+    + Number(g.nFacts).toLocaleString() + ' facts). The two are independent \u2014 a country can be '
+    + 'production-weighted on thinly sourced terms, or proxy-modelled on primary law.';
+  return `<span class="dq-badge ${t.cls}" title="${tooltip.replace(/"/g,'&quot;')}">${t.label}</span>`;
 }
 
 function getDataQualityExplain(entry) {
@@ -23908,10 +23946,10 @@ function renderExplorer() {
   // the UK is matched on 37.6% of its contracts and Australia on 0.3%, and an all-verified result
   // used to print no basis note at all -- so `Prod Data Only` read as one uniform quality band.
   // The depth split is now stated wherever the result is entirely production-backed.
-  const _explFacts = data.filter(d => _dqTier(d).label === 'FACTS').length;
+  const _explFacts = data.filter(d => _dqTier(d).label === 'PROD-WTD').length;
   // The thin end of the set is measured off the rows actually on screen, not hard-coded — under a
-  // region filter the shallowest EVIDENCE country is a different one.
-  const _explThin = data.filter(d => _dqTier(d).label === 'EVIDENCE')
+  // region filter the shallowest PART-PROD country is a different one.
+  const _explThin = data.filter(d => _dqTier(d).label === 'PART-PROD')
                         .reduce((m, d) => Math.min(m, d.prod_coverage_pct || 0), Infinity);
   const _explBasisNote = _explGrouped
     ? ` — ranked by data basis: ${_explVerified} with verified field production first, then ${_explProxy} whose economics are regional proxies`
@@ -23921,8 +23959,8 @@ function renderExplorer() {
             ? ` — data basis is mixed and this sort does not group it: ${_explVerified} of ${data.length} have verified field production, ${_explProxy} carry regional proxy economics. Read the badge on each row.`
             : (_explProxy === 0 && data.length > 0
                 ? (data.length - _explFacts > 0
-                    ? ` — every country here has verified field production, but not to the same depth: ${_explFacts} production-weighted on more than 5% of their contracts (FACTS), ${data.length - _explFacts} on a partial match ${_explThin < 1 ? `as thin as ${_explThin.toFixed(1)}%` : `below that`} (EVIDENCE). Read the badge on each row before ranking them against each other.`
-                    : ` — all ${data.length} are production-weighted on more than 5% of their contracts (FACTS) — the deepest evidence basis in the database.`)
+                    ? ` — every country here has verified field production, but not to the same depth: ${_explFacts} production-weighted on more than 5% of their contracts (PROD-WTD), ${data.length - _explFacts} on a partial match ${_explThin < 1 ? `as thin as ${_explThin.toFixed(1)}%` : `below that`} (PART-PROD). Read the badge on each row before ranking them against each other. Production basis is not source quality — that is the Evidence column.`
+                    : ` — all ${data.length} are production-weighted on more than 5% of their contracts (PROD-WTD) — the deepest production basis in the database. That is separate from source quality; read the Evidence column for that.`)
                 : '')));
   document.getElementById('explorer-count').innerHTML = `Showing ${data.length} of ${COUNTRY_DATA.length} countries · Take, NPV, IRR at ${_explPL[price]||('$'+price)}/bbl`
     + (_explGrouped ? _explBasisNote : `<span style="color:var(--accent);font-weight:600;">${_explBasisNote}</span>`);
@@ -24792,12 +24830,12 @@ function renderCompare() {
     const cov = d.prod_coverage_pct || 0;
     const nc = d.n != null ? Number(d.n).toLocaleString() : '?';
     const nf = d.n_facts != null ? Number(d.n_facts).toLocaleString() : '?';
-    if (t.label === 'FACTS') {
+    if (t.label === 'PROD-WTD') {
       return _cmpEsc(d.country + ': take is weighted by verified field production across '
         + cov.toFixed(1) + '% of its ' + nc + ' contracts (' + nf + ' fiscal facts). '
         + 'This is the strongest basis ORCA produces — citable as this country’s realised economics.');
     }
-    if (t.label === 'EVIDENCE') {
+    if (t.label === 'PART-PROD') {
       return _cmpEsc(d.country + ': partial production coverage (' + cov.toFixed(1) + '% of '
         + nc + ' contracts, ' + nf + ' fiscal facts). Take is production-weighted where output data '
         + 'exists and equal-weighted for the remainder. Cite with the coverage figure attached.');
