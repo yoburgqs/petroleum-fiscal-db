@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v583</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v584</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1393,7 +1393,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v583</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v584</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1463,7 +1463,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v583</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v584</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1805,7 +1805,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v583';
+  return m ? m[0] : 'v584';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1880,7 +1880,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v583');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v584');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -23444,6 +23444,7 @@ let explorerSort = {col: 'take', dir: 1}; // dir: 1=asc, -1=desc
 // would break the alphabet the analyst is scanning. That case gets the v543 mixed-basis note
 // in the count line instead of silence.
 var _explorerEvidenceFirst = true;
+var _explorerRendered = null;   // v584 (T5): set by renderExplorer(), read by exportExplorer()
 function _explorerDqRank(d) { return _dqTier(d).hasProduction ? 0 : 1; }
 function _toggleExplorerEvidenceFirst(cb) {
   _explorerEvidenceFirst = !!cb.checked;
@@ -23559,6 +23560,45 @@ function renderExplorer() {
   // Grouped only when the split is real — an all-verified or all-proxy result has no boundary to
   // draw, and v543 established that those two states need a stated caveat, not a silent one.
   const _explGrouped  = _explGroupable && _explVerified > 0 && _explProxy > 0;
+
+  // v584 (T5): the single source of truth for "what is on the Explorer screen right now".
+  // exportExplorer() used to rebuild its own query from mechanic + region-dropdown + search and
+  // then sort by take DESC unconditionally. It matched the table in NONE of the seven states
+  // walked this cycle -- including the COLD DEFAULT with no filter touched, where the screen is
+  // ranked USA / Argentina / Mexico (v578 evidence-first) and the file led Bahrain / Kuwait /
+  // Saudi Arabia. It also ignored Prod Data Only, IRR only, BE only, the R-factor filter and the
+  // region CHIP entirely, so filtering to 22 countries still exported 185. The export no longer
+  // has a query; it reads this.
+  _explorerRendered = {
+    rows: data.slice(),
+    price: price,
+    sort: sort,
+    grouped: _explGrouped,
+    verified: _explVerified,
+    proxy: _explProxy,
+    boundaryRank: _explGrouped ? _explVerified : null,
+    filters: {
+      mechanic: _explorerRFactorOnly ? 'R-factor profit oil tiers' : (mech || null),
+      region: region || null,
+      regionFromChip: !!chipRegion,
+      search: search || null,
+      prodOnly: !!prodOnly,
+      irrOnly: !!_explorerHasIRR,
+      beOnly: !!_explorerHasBreakeven,
+      evidenceFirst: !!_explorerEvidenceFirst
+    }
+  };
+
+  // v584 (T5): the Excel button now states how many rows it will write. The divergence this cycle
+  // fixed was invisible precisely because the button said nothing about its own scope -- an
+  // analyst filtered to 22 countries, clicked a button labelled "Excel", and got 185.
+  const _explXlBtn = document.getElementById('explorer-excel-btn');
+  if (_explXlBtn) {
+    _explXlBtn.textContent = '\u2b07 Excel (' + data.length + ')';
+    _explXlBtn.title = data.length
+      ? 'Download these ' + data.length + ' countries as they are ranked on screen, plus a Filters & Assumptions sheet recording the filters, the $' + price + '/bbl price and the data-basis split.'
+      : 'Nothing to export \u2014 no countries match the current filters.';
+  }
 
   // v110: Update aria-sort on Explorer column headers to reflect active sort
   const _sortDirMap = { country: 'ascending', take: 'ascending', evidence: 'ascending', be: 'ascending', swing: 'ascending', irr: 'descending', npv: 'descending' };
@@ -29633,45 +29673,91 @@ function exportCountryProfile() {
   XLSX.writeFile(wb, `orca_${slug}_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
-// ─── EXPORT: Global Explorer → Excel (v28) ───────────────────────────────────
+// ─── EXPORT: Global Explorer → Excel (v28; rebuilt v584) ─────────────────────
+// v584 (T5): this used to be a second, independent query over COUNTRY_DATA. It now exports the
+// array renderExplorer() actually put on screen, in screen order, with the screen's rank.
 function exportExplorer() {
   if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
-  const price = parseInt(document.querySelector('input[name="price"]:checked')?.value || 75);
-  const fltMech = document.getElementById('flt-mech').value;
-  const fltRegion = document.getElementById('flt-region').value;
-  const fltSearch = document.getElementById('flt-search').value.trim().toLowerCase();
-  let data = COUNTRY_DATA.filter(d => {
-    if (fltMech && !_mechMatch(d, fltMech)) return false;
-    if (fltRegion && d.region !== fltRegion) return false;
-    if (fltSearch && !d.country.toLowerCase().includes(fltSearch)) return false;
-    return true;
-  });
-  const priceKey = p => ({ 50:'take_50', 75:'take_75', 100:'take_100', 125:'take_125' }[p] || 'take_75');
-  const pk = priceKey(price);
-  data = data.sort((a, b) => (b[pk]||0) - (a[pk]||0));
-  const rows = data.map((d, i) => ({
+  if (!_explorerRendered) { if (typeof renderExplorer === 'function') renderExplorer(); }
+  const R = _explorerRendered;
+  if (!R || !R.rows.length) { showCopyToast('Nothing to export — no countries match the current filters.'); return; }
+
+  const price   = R.price;                       // the price radio the table is rendered at
+  const pk      = 'take_' + price;
+  const npvKey  = 'npv_'  + price;
+  const irrKey  = 'irr_'  + price;
+  const f       = R.filters;
+
+  // Sheet 1 — the screening list exactly as ranked on screen.
+  const rows = R.rows.map((d, i) => ({
     Rank: i + 1,
     Country: d.country,
+    'Data Basis': _dqTier(d).label,
     Region: d.region,
     Contracts: d.n,
     Mechanics: d.mechanics,
-    [`Govt Take @$${price}`]: d[pk] !== null ? +d[pk].toFixed(1) : null,
-    'Govt Take @$50': d.take_50 !== null ? +d.take_50.toFixed(1) : null,
-    'Govt Take @$75': d.take_75 !== null ? +d.take_75.toFixed(1) : null,
-    'Govt Take @$100': d.take_100 !== null ? +d.take_100.toFixed(1) : null,
-    'Govt Take @$125': d.take_125 !== null ? +d.take_125.toFixed(1) : null,
-    'Contractor NPV $75 ($M)': d.npv_75 !== null ? +d.npv_75.toFixed(1) : null,
-    'IRR @$75 (%)': d.irr_75 !== null && d.irr_75 < 500 ? +d.irr_75.toFixed(1) : null,
-    'Breakeven ($/bbl)': d.be_75,
-    'Swing (pp)': d.swing !== null ? +d.swing.toFixed(1) : null,
+    [`Govt Take @$${price} (%)`]: d[pk] !== null && d[pk] !== undefined ? +d[pk].toFixed(1) : null,
+    'Govt Take @$50 (%)': d.take_50 !== null ? +d.take_50.toFixed(1) : null,
+    'Govt Take @$75 (%)': d.take_75 !== null ? +d.take_75.toFixed(1) : null,
+    'Govt Take @$100 (%)': d.take_100 !== null ? +d.take_100.toFixed(1) : null,
+    'Govt Take @$125 (%)': d.take_125 !== null ? +d.take_125.toFixed(1) : null,
+    // v584: NPV and IRR were hardcoded to $75 while the table showed the active price. At the
+    // $100 radio the file disagreed with the screen and labelled the disagreement "$75".
+    [`Contractor NPV @$${price} ($M)`]: d[npvKey] !== null && d[npvKey] !== undefined ? +d[npvKey].toFixed(1) : null,
+    [`IRR @$${price} (%)`]: (d[irrKey] !== null && d[irrKey] !== undefined && d[irrKey] < 500) ? +d[irrKey].toFixed(1) : null,
+    'Breakeven @$75 ($/bbl)': (d.be_75 && d.be_75 > 1 && d.be_75 < 999) ? d.be_75 : null,
+    'Swing $50→$125 (pp)': d.swing !== null ? +d.swing.toFixed(1) : null,
     'Stability Score': d.swing !== null ? Math.max(0, Math.min(100, Math.round(100 - d.swing * 3))) : null,
     'Evidence A/B (%)': d.ab_pct != null ? +d.ab_pct.toFixed(1) : null,
     'Prod Coverage (%)': d.prod_coverage_pct != null ? +d.prod_coverage_pct.toFixed(1) : null,
     'R-factor Tiers': d.has_r_factor_tiers ? 'Yes' : 'No',
   }));
-  const ws = XLSX.utils.json_to_sheet(rows);
+
+  // Sheet 2 — what the ranking on sheet 1 is, so it survives being pasted out of context.
+  const SORT_LABEL = { take:'Government take (lowest first)', irr:'IRR (highest first)',
+                       npv:'Contractor NPV (highest first)', be:'Breakeven (lowest first)',
+                       swing:'Price swing (smallest first)', evidence:'Evidence quality (best first)',
+                       country:'Country A–Z' };
+  const applied = [];
+  if (f.mechanic) applied.push('Mechanic = ' + f.mechanic);
+  if (f.region)   applied.push('Region = ' + f.region + (f.regionFromChip ? ' (map/chip)' : ''));
+  if (f.search)   applied.push('Search = "' + f.search + '"');
+  if (f.prodOnly) applied.push('Prod Data Only — verified field production');
+  if (f.irrOnly)  applied.push('IRR only — verified IRR held');
+  if (f.beOnly)   applied.push('BE only — verified breakeven held');
+
+  const ctx = [
+    { Field: 'Export', Value: 'ORCA Global Explorer — screening list' },
+    { Field: 'Countries in this file', Value: R.rows.length + ' of ' + COUNTRY_DATA.length },
+    { Field: 'Filters applied', Value: applied.length ? applied.join('; ') : 'none — all ' + COUNTRY_DATA.length + ' countries' },
+    { Field: 'Ranked by', Value: SORT_LABEL[R.sort] || R.sort },
+    { Field: 'Price assumption', Value: '$' + price + '/bbl (Brent, real)' },
+    { Field: '', Value: '' },
+    // The v578 divider is the caveat that makes the on-screen rank readable. Without it in the
+    // workbook, a pasted rank list silently mixes production-backed and proxy countries.
+    { Field: 'Ranking basis', Value: R.grouped
+        ? 'Verified production first: ranks 1–' + R.boundaryRank + ' are backed by verified field production; ranks ' + (R.boundaryRank + 1) + '–' + R.rows.length + ' carry regional proxy estimates and are indicative only. See the Data Basis column.'
+        : (R.sort === 'country'
+            ? 'A–Z lookup, not a ranking. ' + R.verified + ' of these ' + R.rows.length + ' countries have verified field production; the other ' + R.proxy + ' carry regional proxy estimates. See the Data Basis column.'
+            : (R.proxy === 0
+                ? 'Every country in this file has verified field production. FACTS = production-weighted on more than 5% of contracts; EVIDENCE = a thinner partial match. See the Data Basis column.'
+                : 'No country in this file has verified field production — all economics are regional proxy estimates, indicative only and not defensible as a screening shortlist on their own.')) },
+    { Field: 'Data Basis key', Value: 'FACTS = take production-weighted, >5% contract coverage. EVIDENCE = partial production match. PROXY = no verified production; regional estimate.' },
+    { Field: 'Govt take', Value: 'Production-weighted where production data exists, equal-weighted otherwise.' },
+    { Field: 'Breakeven', Value: 'Reported at $75/bbl for all rows — it is a price, not a function of the price radio.' },
+    { Field: '', Value: '' },
+    { Field: 'Source', Value: 'ORCA Petroleum Fiscal Intelligence Platform' },
+    { Field: 'Export Date', Value: new Date().toISOString().slice(0,10) },
+    { Field: 'Citation', Value: 'ORCA Petroleum Fiscal Intelligence Platform (2026). ' + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '') + ', Aug 2026. https://yoburgqs.github.io/petroleum-fiscal-db/' },
+  ];
+
   const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Country Summary');
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{wch:6},{wch:24},{wch:11},{wch:16},{wch:10},{wch:26},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16},{wch:22},{wch:14},{wch:20},{wch:18},{wch:14},{wch:16},{wch:17},{wch:14}];
+  XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Screening List');
+  const ws2 = XLSX.utils.json_to_sheet(ctx);
+  ws2['!cols'] = [{wch:24},{wch:110}];
+  XLSX.utils.book_append_sheet(wb, ws2, 'Filters & Assumptions');
   XLSX.writeFile(wb, `petroleum_fiscal_export_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
 
