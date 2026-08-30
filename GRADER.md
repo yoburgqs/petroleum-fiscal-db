@@ -20911,3 +20911,16 @@ Cold Playwright, `sessionStorage` and `localStorage` cleared, 1440×900, against
 
 ### STILL LOCKED — nothing touched
 No new FAQ (still **974**). No new tooltip on any control this cycle did not change — every tooltip added here belongs to a chip or cell this cycle created. No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. The Evidence Quality panel **still renders collapsed by default** — v371/v373 declutter intact. v430 sessionStorage logic, v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk placement, v507 Screener grouping, v587 Screener sort — all intact. Tab order unchanged. Version sweep v587→v588 across 5 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 493 Log — 2026-08-29 23:55
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 493 complete. Both repos pushed.
+
+## Cycle 493 — v588
+
+**Task: T6** — "Where did this number come from and how solid is the evidence?" (stalest; the last six version commits ran T1, T3, T4, T5, T4, T2)
+
+**Friction.** Walked cold into the two surfaces that exist to answer T6. On **Tuvalu**, the platform answers with every superlative it has: a green pill reading **`100.0% primary law (tier A)`**, a legend reading **`D Default estimate 0.0%`**, and the verdict **`✓ All 2 independently source
