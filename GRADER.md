@@ -22849,3 +22849,18 @@ them. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v5
 v538, v551, v557, v569, v575, v588, v601, v604 and all other locks intact. Version sweep
 **v604 → v605** across 5 structural sites plus the stale meta description, done silently at the
 end; it is **not** the deliverable.
+
+---
+## Cycle 510 Log — 2026-08-30 15:33
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos clean and pushed. (The two local test servers on :8110/:8111 are still running — the cleanup command was denied.)
+
+## Cycle 510 — T6 / v605
+
+**Task — T6:** "Where did this number come from and how solid is the evidence?" — stalest of the six (509=T4, 508=T1, 507=T5, 506=T2, 505=T3, 504=T6).
+
+**Friction.** Walked cold into Country Profile, the tab that answers the provenance question, then did what the analyst actually does with the answer — carried it out of the tool.
+
+Country Profile
