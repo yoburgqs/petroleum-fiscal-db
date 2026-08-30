@@ -21928,3 +21928,101 @@ deliverable.
 Country Profile prints **`⚠ PROXY — statutory model`** in its headline for Greenland. The Fiscal Compare reading guide states the rule outright: *"never cite a PROXY country's take as definitive; always state 'statutory model basis (ORCA PROXY)' in the IC memo."*
 
 I read the **clipboard back** from every past
+
+---
+## Cycle 502 Log — 2026-08-30 (T1 / v597)
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN (local harness)
+- Test after: **136 PASS / 0 FAIL / 1 WARN** — `runtime_comprehensive.js` **RAN this cycle**
+  against the local build at `http://localhost:8123`, storage cleared. No test was lost; one
+  case was added. The WARN is the pre-existing local-harness `sw.js` 404 (the service worker
+  registers the GitHub Pages subpath, which 404s on a root-served local server; correct in
+  production).
+- JS errors: **0 page errors** on every walk.
+- JS syntax gate: **PASS** (10 blocks / 0 errors).
+- Version: v596 → **v597**, pushed to both repos.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" Stalest of the six: the last
+six version commits ran T6 (493), T4 (495), T6 (497), T3 (498), T2 (499) and T5 (501).
+
+## Friction
+Walked T1 cold, `sessionStorage` and `localStorage` cleared, from the nav: **Screener tab →
+IOC Capital Screen preset (15 of 185) → `+` on the top three → `Compare` on the floating
+basket.** That button is the only "now do something with my shortlist" affordance on the
+page, and it sits in a bar pinned to the bottom of the viewport.
+
+It landed on **Fiscal Compare** — the all-185 ranking — with `#t2` still `display:none`.
+The analyst's shortlist had rendered correctly on **Side-by-Side**, a tab they were never
+taken to, and nothing on screen said where it had gone. Measured: `activeTabId: "t0"`,
+`t2Visible: "none"`, `compareList: ["Canada","USA","Azerbaijan"]`.
+
+Root cause, `parseAndNavigate()` at `index.html:32832` — **`#/compare` is two routes wearing
+one name, and the branch only handled one of them:**
+
+| form | written by | payload | rendered by | branch sent it to |
+|---|---|---|---|---|
+| `#/compare` (bare) | `switchTab()` — `tabHashMap` maps `t0 → 'compare'` | none; a tab bookmark | Fiscal Compare (`t0`) | `t0` ✓ |
+| `#/compare/<a>+<b>+<c>` | `_updateCompareHash()`, `shareComparison()` (SbS "Share Link"), `launchCompare()` (the basket) | `compareList` | `renderCompare()` → **`#t2` only** | `t0` ✗ |
+
+Every producer of the country-list form is Side-by-Side's own state, so the route was
+**written by** Side-by-Side and **read into** Fiscal Compare, which has no knowledge of
+`compareList`. A round trip through the platform's own share link moved the analyst to the
+wrong tool.
+
+**Second path, same defect, worse:** a cold `#/compare/norway+angola+brazil` — the artifact
+you email a colleague — put the *recipient* on Fiscal Compare too.
+
+## Change
+The branch routes on the param. A country list goes to `t2`, where country lists are
+rendered; the bare form still goes to `t0`, so the Fiscal Compare tab bookmark is unchanged.
+The list is populated **before** the switch, because the `t2` activation seed
+(Norway/UK/Netherlands) is guarded by `if (compareList.length > 0) return;` — filling it
+first is what stops a shared link being spliced with the example trio, which is the v509
+guard used in the order it was written for.
+
+**Test correction.** `tests/runtime_comprehensive.js` asserted `expectedTab: 't0'` for
+`'#/compare/norway+iraq'` with the comment *"compare routes to t0 first (per code)"* — written
+from the implementation rather than the requirement, so the suite had **locked the defect in**
+and reported 135 PASS over it. It now asserts `t2` for the country-list form, and a new case
+covers the bare `#/compare → t0`. This is why the count moved 135 → 136.
+
+## Result
+An analyst who screens 185 countries down to a shortlist and presses `Compare` now arrives at
+their three countries **side by side, grid rendered, badge reading "3/5 countries — room for
+2 more"** — instead of on a 185-row ranking with no trace of their picks. A shared
+`#/compare/` link opens on the comparison it was made from. T1 ends with the shortlist on
+screen rather than at a tab the analyst had to find by accident.
+
+## Verification — cold, Playwright, local build, storage cleared
+
+| check | result |
+|---|---|
+| Basket → Compare | lands `t2`, grid visible, 3 countries, 0 page errors |
+| Cold `#/compare/guyana+angola+brazil` | lands `t2` with **exactly** those 3 — not spliced with the seed trio |
+| Bare `#/compare` | still `t0` |
+| Fiscal Compare tab click | still `t0`, still writes `#/compare` |
+| Legacy `#compare=A,B` | still `t2` |
+| SbS → Share Link → open URL cold | same 3 countries, on `t2` |
+| SbS cold, no param | still seeds the example trio |
+
+**15 of 15 regression checks PASS. 0 page errors on every walk.**
+
+## Found on the same walk, NOT fixed — stated rather than hidden
+The Screener table's **Region** column prints the raw `country_data.json` values — `North
+America`, `Latin America`, `CIS/FSU`, `Oceania`, `Asia` — while the Region **filter** offers
+`Americas`, `Asia Pacific`, `Other`. Two of the six filter options name a region that appears
+nowhere in the data and nowhere in the column the analyst is reading. `_regionMatch()` (v429)
+maps them correctly, so nothing is lost — this is a vocabulary mismatch, not a data bug, and
+it is its own cycle. Verified: `Americas → Latin America + North America`,
+`Asia Pacific → Asia + Oceania`, `Other → Other + CIS/FSU + Unknown`.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip. No page-sub paragraph, amber instructional
+banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip
+row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools"
+still collapsed. **No tab added, removed or reordered.** **No published take, NPV, rank, tier
+colour or pill value was altered.** v371/v373 declutter, v430 sessionStorage logic, v449,
+v451, v452, v489 and all later locks intact. Version sweep **v596 → v597** across 5
+structural sites, done silently at the end; it is **not** the deliverable. No changelog
+catch-up (directive-banned bookkeeping) — the record lives in the code comment and here.
