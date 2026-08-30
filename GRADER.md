@@ -21387,3 +21387,21 @@ middle band — all intact. No changelog entry added; the in-page changelog's ne
 remains v581, cycles 487–496 having added none, the directive treating changelog catch-up as
 bookkeeping. Version sweep **v590 → v591** across 5 structural sites, done silently at the
 end; it is **not** the deliverable.
+
+---
+## Cycle 496 Log — 2026-08-30 02:36
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 496 complete — v591 pushed to both repos.
+
+## Task
+**T1** — "Which countries should even be on my screening list?"
+
+Chose T1 over the staler T5/T3 because the **Breakeven Map** was the one tab this loop had never walked — carried as an open item since v568 — and it's a screening surface.
+
+## Friction
+Cold walk (fresh context, storage cleared) into the Breakeven Map. The tab's verdict is the two cards under the map. The left one, **"Lowest Breakeven (Most Resilient)"**, opened with:
+
+| | |
+
