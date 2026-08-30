@@ -21660,3 +21660,127 @@ deliverable.
 **Task:** T3 — "How do these three countries compare side by side?" (stalest; last walked cycle 461).
 
 **Friction:** Walked cold into Side-by-Side with storage cleared and built the analyst's own three-country set. The four **Govt Take** rows are the rows this tab explicitly tells you to rank on — the box under the grid says in bold *"Rank these countries on Govt Take."* Those four rows rendered as twelve bare percentages with **no ordering marked
+
+---
+## Cycle 499 Log — 2026-08-30 06:11
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (known local-harness sw.js 404) — suite RAN this cycle against the local build
+- JS errors: 0 (syntax gate PASS, 10 blocks)
+- Shipped: v595, pushed to origin/main as 47e93be
+
+**Task:** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest; last walked cycle 451/v552, 13 cycles ago).
+
+**Friction.** Walked cold into Country Profile with `sessionStorage` and `localStorage`
+cleared, loaded **Guyana**, and drilled into the mechanic to defend the 54.1% headline.
+The most citable-looking artifact on the tab is the **Profit Oil Tier Schedule
+(R-factor)** table rendered inline at `loadCountryProfile()` line 29557 — a precise
+four-row ladder, 60/40 rising to 15/85. On a tab whose entire apparatus is evidence
+badging — the Evidence Chain, `top_sources`, A/B/C tier badges, the v518/v569 `BULK`
+chip — this was **the only numeric block carrying no tier, no source, no quote and no
+qualifier of any kind.**
+
+Measured against the live database, what sits behind it:
+
+| | |
+|---|---|
+| `r_factor` rows in `profit_oil_tiers` | **32,404 — every one confidence B**, not one tier A |
+| carrying a `source_quote` | **0** |
+| carrying no `source_id` at all | **20,328 (62.7%)** |
+| countries rendering the table | **70** |
+| whose note says MODEL / standard template | **63 of 70** |
+| borrowed from another region outright | **6** |
+| distinct ladders covering 98 countries | **19** — the largest shared verbatim by **22** |
+
+The notes say it plainly: *"Guyana PPCom EPE Model PSC"*, *"Tanzania Model PSC"*,
+*"India DGH NELP VI-X Model PSC"*. **Cuba's** ladder is a *"West Africa proxy"*,
+**Cyprus's** a *"Mediterranean proxy"*, **Mongolia's** *"CIS-adjacent"*.
+
+This is not a sourcing nicety. `_resolve_tier_govt_share()` in `petroleum_dcf.py`
+resolves PSC contracts on these tiers, so **the template drives the headline take that
+the panel at the foot of the same tab tells the analyst to "✔ CITE THIS"** — while the
+Evidence Chain four sections up lists a flat `Profit Oil (Govt)` that, for **38 of the
+70**, matches **no tier** in the ladder printed above it. **Egypt** prints a flat
+**82.5%** against a ladder topping out at **80%**. **Iraq-Kurdistan** prints **37.6%**
+against a ladder whose floor is **40%**. Nothing on the page reconciled the two.
+
+**Change.** The block is rebuilt as `_cpTierSchedule594(d)` (top-level declaration, so
+no TDZ — the v424/v452/v552 failure mode), in the established v518/v569 chip idiom:
+
+1. Header carries a **tier-B chip**, a **MODEL** chip, and a **PROXY** chip where the
+   template was borrowed from another region.
+2. **"Schedule as filed:"** prints the real derivation string from the DB, the contract
+   count it was applied to, and that no source record or quote exists.
+3. **Template reuse is named with a count** — *"The identical ladder is on file for 3
+   other countries — India, Iraq-Kurdistan, Sri Lanka. Do not cite these thresholds as
+   a term negotiated for Guyana."* Computed client-side by ladder signature over
+   `COUNTRY_DATA`.
+4. Where the flat `Profit Oil (Govt)` matches no tier, **the conflict is stated inline**
+   with both numbers, flags when the flat figure lies outside the ladder's range
+   entirely, and says which of the two the DCF actually resolves on.
+5. **Egypt's tiers are production-rate tiers, not R-factor.** The title and column
+   header now say so instead of mislabelling them under `R-FACTOR RANGE`.
+
+`country_data.json` gains seven `tier_*` provenance fields, patched from the DB in
+place by a targeted script. **`rebuild_country_data.py` was NOT run** (breakeven
+regression risk, per CLAUDE.md); verified programmatically that **no pre-existing value
+in any of the 185 records changed** — only new keys were added.
+
+**Result.** An analyst defending 54.1% for Guyana is now told, at the table itself,
+that the ladder is a **model template with no source on file**, that **three other
+countries on three continents carry it byte-identical**, and that the **flat 50%
+printed lower on the same page disagrees with it** — instead of pasting a four-tier
+ladder into an IC memo as Guyana's negotiated terms. Guyana's signed Stabroek PSA is a
+flat 50/50 profit-oil split with no R-factor at all.
+
+**Verified cold in Playwright**, storage cleared, against the local build — 185-country
+sweep:
+
+| metric | result |
+|---|---|
+| block fires | 70 |
+| MODEL chip | 63 |
+| PROXY chip | 6 |
+| flat-vs-ladder conflict stated | 38 |
+| shared-ladder line | 61 |
+| production-rate relabel | 1 |
+| empty tables | 0 |
+| page errors | **0** |
+
+Every count matches the independent DB-side query exactly. **Norway correctly renders
+nothing** (no R-factor tiers).
+
+### Recovered work, stated rather than absorbed
+
+The working tree already held **31 uncommitted hunks / 228 lines** in `index.html`
+before this cycle touched it: a complete, self-labelled **v594 (T5)** Scenario Builder
+cycle — IRR card reading, clipboard control, a `$M` cash-flow unit fix, and an unclosed
+`#tmethodology` div — written but never committed, almost certainly lost to the
+**2026-08-30 overnight chain failure** in the inbox. It was committed **separately and
+unmodified** as `36ebc46` so it is not credited to this cycle. It is not this cycle's
+work.
+
+### Known, not fixed, stated rather than hidden
+
+- The same unsourced tier ladders drive **Fiscal Compare, the Screener, Side-by-Side
+  and the Breakeven Map** rankings. Only Country Profile discloses it. Those are T1/T3
+  surfaces and belong to their own cycles.
+- **Guyana's own reform log**, on this same page, quotes tier-A/B sourced reporting
+  saying government take at $75/bbl is *"~30–35%"* and *"14–30% at $50–75/bbl"* against
+  a headline of **54.1%** — a 20–24pp contradiction between the published figure and
+  the page's own evidence. That is a data-pipeline question, not a UI edit, and it is a
+  separate moment from this cycle's.
+- The `Fiscal character` line still reads *"contractor NPV stays positive through the
+  $50/bbl downside case"* two lines below a headline that says NPV positivity separates
+  nothing (180 of 182 regimes clear it). Minor, and its own cycle.
+
+### STILL LOCKED — nothing touched
+
+No new FAQ (still **974**). No new tooltip on a control whose behaviour is unchanged —
+every `title` added belongs to a chip this cycle created. No page-sub paragraph, amber
+instructional banner, routing hint or "How to read" block; no SbS card wrapper; no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.**
+**No published take, NPV, rank, tier colour or pill was altered** — what changed is
+what the page *claims about* the tier table. v371/v373 declutter, v430 sessionStorage
+logic, v449, v451, v452, v489 and all later locks intact. Version sweep **v594 → v595**
+across 5 structural sites, done silently at the end; it is **not** the deliverable.
