@@ -21070,3 +21070,140 @@ silently at the end; it is **not** the deliverable.
 **Friction.** The first line of Country Profile — the line that exists to answer T2 — opened with a green ✔ and *"Clears the 10% WACC across the price band — contractor NPV $2.7B @$75 and still $1.2B at the $50/bbl downside, at 37.0% govt take."* Two defects, both measured off live `country_data.json`:
 
 1. **The test pass
+
+---
+
+## Cycle 495 — v590
+
+**Task: T4** — "What is my fiscal-stability and reform exposure here?" (stalest by a wide
+margin; the last six version commits ran T2, T6, T6, T1, T3, T5)
+
+### Friction
+
+Walked T4 cold — `sessionStorage` and `localStorage` cleared, 1440×900 — from Home
+(Reform Risk card) into the Reform Risk tab, and separately through Country Profile for a
+covered country (Nigeria, Brazil) and an uncovered one (Malaysia).
+
+**Section 3 is the tab's verdict section.** It is two cards, `QUIET SINCE 2010` and
+`ACTIVELY REFORMING`, and it is the only place on the tab that renders a per-country
+judgement rather than a ranking. Their filters, in `renderReformRisk()`:
+
+```js
+var quiet      = withScore.filter(function(r){ return r.since2010 <= 1; });   // 31843
+var activeList = withScore.filter(function(r){ return r.since2010 >= 3; });   // 31846
+```
+
+**Nothing rendered the band between them.** Measured live against `_rrCountScored()`:
+
+| band | n | countries |
+|---|---|---|
+| `since2010 <= 1` | 13 | Kazakhstan, Libya, Russia, USA, India, Iraq, Venezuela, Ecuador, Algeria, Colombia, Ghana, Guyana, Canada |
+| **`since2010 == 2`** | **6** | **Norway, Australia, Nigeria, Indonesia, Angola, Mexico — rendered nowhere** |
+| `since2010 >= 3` | 2 | United Kingdom, Brazil |
+
+The two cards printed counts of 13 and 2 against a covered set of 21. The missing 6 were
+never counted, never named, and never stated as missing. **Norway is the platform's default
+Country Profile** — it loads automatically as the North Sea benchmark — and **Nigeria is its
+most-cited PSC jurisdiction**. An analyst who came to this tab to ask about either scrolled
+the section, found the country in neither card, and had no way to tell "ORCA holds no reform
+log for this country" from "this country fell between two filters." Both look identical:
+absence.
+
+Three of the six raised government take *inside* the scoring window and still fell through:
+Norway 2022 +12pp (COVID relief expiry), Australia 2023 +5pp (LNG uplift shelter capped),
+Indonesia 2017 +9pp (Gross Split PSC). Angola's last rise is 2004 +3pp, before the window.
+Nigeria's two in-window changes are the 2021 Petroleum Industry Act and the 2022 divestiture
+wave, both carried as fiscal changes of unrecorded size.
+
+This is **the same defect class v508 fixed at the `>=3` boundary** — it found Brazil,
+Australia and Guyana appearing in neither card when the right-hand filter was `score<30`
+while its caption said "3+" — and left open at `==2`.
+
+### Change
+
+A third card, **`REFORMED TWICE SINCE 2010 (6)`**, now sits between the two. The Section 3
+grid goes from `1fr 1fr` to `1.15fr 1fr .8fr` with `align-items:start`.
+
+Each row prints, in this order: the country button and take@$75 (same `_rrRowBtn` /
+`takeColor` treatment as the other cards); then `2 changes since 2010 · <years> · score 70 ·
+one short of the bar of 3`; then the country's most recent take-raising event under the same
+three-way treatment the Quiet card already uses —
+
+- raised inside the window → orange, `raised take 2022 · <event> +12pp · size not in the score`
+- raised before it → red, `last take rise 2004 · <event> +3pp · before the window, not counted`
+- none on record → muted, `no take-raising change on record — both in-window changes are of unrecorded size`
+
+The card caption states the thing the count hides: *"one below the Actively Reforming bar of
+3, so this tab's IC rule indicates no frequency premium for them. **3 of these 6 raised
+government take inside the window anyway.** What falls short is the count, not the size."*
+The `3 of 6` is computed, not written.
+
+A footer line under the grid asserts the partition: *"These three cards partition all 21
+jurisdictions with a sourced reform log (13 + 6 + 2), every one of them exactly once. A
+country you do not find here has no sourced reform log at all — use the lookup at the top of
+the tab, which covers all 185 countries and says so explicitly."*
+
+No threshold was invented. `3` is the tab's own Actively Reforming bar and `2010` its own
+window; the new card is the residue of the two filters already on the page.
+
+### Result
+
+An analyst asking "what is my reform exposure in Norway?" — or Nigeria, Angola, Indonesia,
+Australia, Mexico — **now finds the country in the tab's verdict section instead of finding
+nothing.** They can see it sits one change below the premium bar, and they can see the take
+rise the frequency score does not weigh, on the row, without opening the lookup or the
+Country Profile event log. An analyst whose country is genuinely uncovered can now establish
+that from the page — the partition footer makes absence mean one thing instead of two.
+
+### Verification
+
+- **JS syntax gate: 10/10 blocks PASS** (before and after the version sweep).
+- **Playwright RAN this cycle** against a cold local build (`TEST_URL=http://localhost:8899/index.html`):
+  **135 PASS / 0 FAIL / 1 WARN**. The WARN is the pre-existing `sw.js` 404 under the local
+  static server. **0 page errors.**
+- Cold walk repeated at **1440, 1280 and 1024** px: `document.scrollWidth == window.innerWidth`
+  at all three — the third column introduces no horizontal overflow. Measured card widths at
+  1440: 533 / 464 / 371 px.
+- All six rows render; **0** occurrences of `undefined`, `NaN` or `[object` anywhere in the
+  tab's rendered text.
+- Partition asserted on screen and verified: **13 + 6 + 2 = 21**, matching
+  `Object.keys(REFORM_HISTORY)`.
+- Row affordance exercised: clicking the Norway row in the new card switches to Country
+  Profile with `dd-country-select` = `Norway`.
+
+### Found on this walk, not fixed
+
+- The Reform Risk **intro strip** opens *"Every sourced fiscal law change across **185
+  jurisdictions** since 1960"*. It is 21. The Snapshot line immediately beneath it says
+  *"21 of 185 jurisdictions carry a sourced reform history"* — the tab contradicts itself in
+  two consecutive paragraphs. Left because correcting it changes no layout and no behaviour;
+  it belongs bundled with a structural change to that strip.
+- The Home **Reform Risk** card reads *"Fiscal stability scores + law change history across
+  185 countries"*. Same conflation: the Predictability Score covers 163, the law-change
+  history 21.
+- **`Most Frequently Reformed Regimes`** is sorted by *lifetime* total events and sliced to
+  15, but the tab's IC rule keys off changes since 2010. Brazil (3 since 2010, Actively
+  Reforming) ranks below Nigeria and Kazakhstan, which are not; and 6 covered countries —
+  Ghana, Guyana, Canada, Russia, USA, India — are cut off the table entirely.
+- The **decade heatmap** is captioned "Top 20 most-reformed countries" but there are only 21
+  covered, so it is very nearly the whole researched set presented as a leaderboard.
+- Carried and still open: CP **Regional Peers** printing "30 countries in region" then 3 rows
+  then "24 more" (3 + 24 ≠ 30); Norway's peer-set mismatch (#30 of 30 vs #17 of 21);
+  `formatBreakeven()` collapsing all 65 populated values to `<$50`; the Screener Region
+  filter/column vocabulary split; SbS `# Contracts` printing `d.n` raw; the Vintage Sourced
+  Event Log opening oldest-first; the **Breakeven Map** tab still unwalked.
+
+### STILL LOCKED — nothing touched
+
+**No new FAQ** (still 974). **No new tooltip** on any control. No page-sub paragraph, no
+amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown; Home "More tools" still collapsed. **No row and no column added to or removed from
+any table** — the change is a third card in an existing card grid. v430 sessionStorage logic,
+v449 tier colours + Screener row-click hint, v451 two-zone CP headline + Govt NPV removal,
+v452 rank + vs-median pill, v489 Reform Risk in the primary Home grid, v508/v540/v561/v583
+Quiet-card treatments, v550 reform-CTA `take <= 55` gate, v585 direction split, v589 CP
+verdict — all intact and unmodified. Tab order unchanged. No changelog entry added; the
+in-page changelog's newest entry remains v581 and cycles 487–494 added none, the directive
+treating changelog catch-up as bookkeeping. Version sweep **v589 → v590** across 5 structural
+sites, done silently at the end; it is **not** the deliverable.
