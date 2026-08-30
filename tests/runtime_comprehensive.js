@@ -461,6 +461,52 @@ async function testIOC(page) {
       p(S, 'IOC Enter search', 'Output populated for ExxonMobil');
     else w(S, 'IOC Enter search', 'Output seems empty');
 
+    // ── v599 (T6) regression: brand entry points must resolve to the legal-entity GROUP ──
+    // Before v599 the cold-load seed, the five empty-state benchmark buttons and Enter in the
+    // search box all called loadIOC(), an exact operator-string match. IOC_DATA holds an
+    // operator literally named "Shell", so the tab opened on 112 of the group's 1,036
+    // contracts without Shell Offshore Inc. (474, USA), SPDC (Nigeria) or A/S Norske Shell,
+    // while the "Quick:" button labelled "Shell" returned the group. Against the pre-change
+    // build this case FAILS on contract count and on the missing provenance block.
+    await page.fill('#ioc-search', 'Shell');
+    await page.press('#ioc-search', 'Enter');
+    await page.waitForTimeout(700);
+    const shellRollup = await page.evaluate(() => {
+      const stats = (document.getElementById('ioc-stats') || {}).innerText || '';
+      const m = stats.replace(/,/g, '').match(/(\d+)\s*\n?\s*CONTRACTS/i);
+      const prov = document.getElementById('ioc-entity-provenance');
+      return { contracts: m ? Number(m[1]) : 0, prov: !!prov,
+               summary: prov ? prov.querySelector('summary').innerText.replace(/\s+/g, ' ') : '' };
+    });
+    if (shellRollup.contracts > 500 && shellRollup.prov)
+      p(S, 'brand roll-up (v599)', `"Shell" -> ${shellRollup.contracts} contracts, provenance block present`);
+    else
+      f(S, 'brand roll-up (v599)', `"Shell" -> ${shellRollup.contracts} contracts, provenance=${shellRollup.prov} (exact-match regression)`);
+
+    // ── v599 (T6) regression: brand match is word-boundary, and named non-members are shown ──
+    // Substring matching put Albpetrol Sh.A. and ABP Norway AS inside BP, and Turkmenistan /
+    // Marubeni inside Eni. Aker BP ASA matches "BP" at a word boundary but is a separate
+    // Oslo-listed company; it is excluded BY NAME and the exclusion is printed on screen.
+    const bpBtn = await page.$('#ioc-quick-btns button:text-is("BP")');
+    if (bpBtn) {
+      await bpBtn.click();
+      await page.waitForTimeout(700);
+      const bp = await page.evaluate(() => {
+        const el = document.getElementById('ioc-entity-provenance');
+        // textContent, not innerText: <details> is collapsed by default (v371/v373 declutter)
+        // and innerText omits everything the analyst has not expanded yet.
+        const t = el ? el.textContent : '';
+        const h3 = document.querySelector('#ioc-output h3');
+        return { has: !!el, brand: h3 ? h3.textContent.trim() : '',
+                 excluded: /EXCLUDED/.test(t) && /Aker BP ASA/.test(t),
+                 albpetrol: /Albpetrol/i.test(t) };
+      });
+      if (bp.has && /^BP\b/.test(bp.brand) && bp.excluded && !bp.albpetrol)
+        p(S, 'brand boundary + exclusions (v599)', 'BP roll-up names Aker BP ASA as excluded; Albpetrol not matched');
+      else
+        f(S, 'brand boundary + exclusions (v599)', `brand="${bp.brand}" provenance=${bp.has} akerBPnamed=${bp.excluded} albpetrolMatched=${bp.albpetrol}`);
+    } else w(S, 'brand boundary + exclusions (v599)', 'BP quick button not found');
+
     // IOC Exposure Analyzer tab (t5 -> exposure section)
     const expSel = await page.$('#exposure-ioc-select');
     if (expSel) {

@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v598</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v599</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v598</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v599</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v598</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v599</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v598';
+  return m ? m[0] : 'v599';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v598');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v599');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -22478,7 +22478,11 @@ function switchTab(id, btn) {
         if (typeof IOC_DATA !== 'undefined' && IOC_DATA && IOC_DATA.length > 0) {
           var search = document.getElementById('ioc-search');
           if (search) search.value = 'Shell';
-          if (typeof loadIOC === 'function') loadIOC('Shell');
+          // v599 (T6): was loadIOC('Shell') — an exact operator-string match that opened the
+          // tab on 112 of the Shell group's 1,036 contracts, without Shell Offshore Inc. (USA),
+          // SPDC (Nigeria) or A/S Norske Shell. Same resolver as every other brand entry point.
+          if (typeof loadIOCBrand === 'function') loadIOCBrand('Shell');
+          else if (typeof loadIOC === 'function') loadIOC('Shell');
           // v477: also pre-select Shell in the exposure dropdown so Take Distribution is populated on first load
           // v478: also highlight Shell quick button in the exposure section
           var expSel = document.getElementById('exposure-ioc-select');
@@ -27169,17 +27173,71 @@ function renderReformTable() {
   });
 })();
 
+// ── v599 (T6): one brand → legal-entity resolver, and the entities named on screen ──────────
+// Walked T6 cold into IOC Portfolio. The tab held TWO answers for the same brand name and no
+// way to see where either came from.
+//   • The tab's own cold-load seed (switchTab 't5') and the five benchmark buttons in the
+//     empty state called loadIOC(name) — an EXACT operator-string match. IOC_DATA holds an
+//     operator literally called "Shell", so the match SUCCEEDED and the tab opened on a
+//     portfolio of 112 contracts / 14 countries / 39.0% weighted take, under the heading
+//     "Shell" and the banner "Example loaded: Shell — major IOC benchmark". Absent from it:
+//     Shell Offshore Inc. (474 contracts, USA — the group's largest single position),
+//     Shell Petroleum Development Company (SPDC) (Nigeria), A/S Norske Shell (Norway),
+//     SHELL U.K. LIMITED, and 44 more. 87% of the group's contracts were not in the number.
+//     Equinor is the extreme case: the entity spelled "Equinor" holds 22 contracts at 39.1%,
+//     while the group holds 901 at 61.3% — Norway sits under "Equinor Energy AS" (785) and
+//     "Statoil Petroleum AS" (200), neither of which is the string "Equinor".
+//   • The "Quick:" button row three inches above, built from the same 16 brand names, called
+//     loadIOCAggregated() and returned the group. Two identically-labelled buttons on one tab,
+//     22.2pp apart on the headline Wtd Avg Take, and neither named one legal entity it counted.
+// Brand matching was also a naked substring test, which is not a company test:
+//     "Eni" matched China National Petroleum Corp Turkm-ENI-stan, Marub-ENI Oil & Gas (USA),
+//           Phoenix Óleo & Gás, Zenith Aran Oil — 5 entities, 12 contracts.
+//     "BP"  matched Al-BP-etrol Sh.A. (Albania's state company) and A-BP Norway AS.
+// Matching is now on word boundaries, every brand entry point resolves through one function,
+// and the roll-up prints the entity list it was built from.
+const IOC_BRAND_NOT = {
+  // Matches the brand at a word boundary but is not that company. Named and shown on screen
+  // rather than dropped silently, because it moves the headline a long way.
+  'bp': [{ entity: 'Aker BP ASA',
+           why: 'Aker BP ASA is a separate Oslo-listed company; BP holds a minority shareholding and does not operate its licences. Its 625 Norwegian concession contracts at ~66% take are by far the largest block matching the string "BP", and counting them moves the BP group’s weighted average take from 30.4% to 48.5%.' }]
+};
+function _iocBrandEntities(brand) {
+  const list = (typeof ALL_OPERATORS !== 'undefined' && ALL_OPERATORS) ? ALL_OPERATORS : [];
+  const b = String(brand == null ? '' : brand).trim().toLowerCase();
+  if (!b) return { entities: [], excluded: [] };
+  const re = new RegExp('(^|[^a-z0-9])' + b.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z0-9]|$)');
+  const not = IOC_BRAND_NOT[b] || [];
+  const notNames = not.map(x => x.entity);
+  const hits = list.filter(o => re.test(String(o).toLowerCase()));
+  return { entities: hits.filter(o => notNames.indexOf(o) === -1),
+           excluded: not.filter(x => hits.indexOf(x.entity) !== -1) };
+}
+window._iocBrandEntities = _iocBrandEntities;
+
+// Every BRAND entry point on this tab routes through here: the cold-load seed, the five
+// benchmark buttons in the empty state, the 16 "Quick:" buttons, and Enter in the search box.
+// A single named legal entity — picked from the suggestion list under the search box — still
+// loads on its own through loadIOC(), which is what that list is for.
+window.loadIOCBrand = function(brand) {
+  const r = _iocBrandEntities(brand);
+  if (r.entities.length > 1) { loadIOCAggregated(brand, r.entities, r.excluded); return; }
+  loadIOC(r.entities.length ? r.entities[0] : brand);
+};
+
 // Quick buttons — aggregate all operators matching brand name
 const qb = document.getElementById('ioc-quick-btns');
 TOP_OPERATORS.forEach(op => {
-  const matches = ALL_OPERATORS.filter(o => o.toLowerCase().includes(op.toLowerCase()));
+  // v599 (T6): word-boundary match, not substring — "Eni" was matching Turkm-eni-stan and
+  // Marub-eni. The button now reports the same entity count the roll-up will actually use.
+  const matches = _iocBrandEntities(op).entities;
   if (matches.length) {
     const btn = document.createElement('button');
     btn.className = 'btn btn-outline btn-sm';
     btn.textContent = op;
     btn.setAttribute('aria-label', 'Load ' + op + ' portfolio');
     btn.title = 'View ' + op + ' fiscal portfolio — ' + matches.length + ' operator entit' + (matches.length === 1 ? 'y' : 'ies');
-    btn.onclick = () => { document.getElementById('ioc-search').value = op; loadIOCAggregated(op, matches); };
+    btn.onclick = () => { document.getElementById('ioc-search').value = op; loadIOCBrand(op); };
     qb.appendChild(btn);
   }
 });
@@ -27197,13 +27255,19 @@ window.updateIOCSuggestions = function() {
 document.getElementById('ioc-search').addEventListener('keydown', e => {
   if (e.key === 'Enter') {
     const q = e.target.value;
+    // v599 (T6): typing "Shell" and pressing Enter used to hit the exact operator string
+    // "Shell" and return 112 of the group's 1,036 contracts. A query that names more than one
+    // group entity is a brand query and loads the group; the suggestion buttons under the box
+    // remain the way to load one named legal entity on its own.
+    const _brand = (typeof _iocBrandEntities === 'function') ? _iocBrandEntities(q) : { entities: [] };
+    if (_brand.entities.length > 1) { loadIOCBrand(q); return; }
     const exact = ALL_OPERATORS.find(o => o.toLowerCase() === q.toLowerCase())
                || ALL_OPERATORS.find(o => o.toLowerCase().includes(q.toLowerCase()));
     if (exact) loadIOC(exact);
   }
 });
 
-window.loadIOCAggregated = function(brandName, operatorList) {
+window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
   const statsDiv = document.getElementById('ioc-stats');
   const outDiv   = document.getElementById('ioc-output');
   // Collect all rows for all matching operators
@@ -27213,12 +27277,16 @@ window.loadIOCAggregated = function(brandName, operatorList) {
     outDiv.innerHTML=`No contracts found for "${brandName}".`;
     return;
   }
-  // Deduplicate by country+mechanic (keep highest n)
+  // Deduplicate by country+mechanic (keep highest n). v599: what gets folded away is now
+  // recorded, not discarded, so the provenance block below can report it. Summing group
+  // entities instead would double-count: "Statoil Petroleum AS" (200 Norwegian concessions)
+  // and "Equinor Energy AS" (785) are the same company either side of its 2018 rename.
   const seen = {};
   const rows = [];
+  const folded = [];
   allRows.sort((a,b)=>b.n-a.n).forEach(r => {
     const key = r.country + '|' + r.mechanic;
-    if (!seen[key]) { seen[key] = true; rows.push(r); }
+    if (!seen[key]) { seen[key] = r; rows.push(r); } else { folded.push(r); }
   });
   // Reuse loadIOC display logic by temporarily faking the operator rows
   const totalContracts = rows.reduce((s,r)=>s+r.n,0);
@@ -27273,8 +27341,62 @@ window.loadIOCAggregated = function(brandName, operatorList) {
   const disclosureBanner = `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--muted);">
   <strong style="color:var(--accent);">Note:</strong> NPV = contractor net present value, 100% WI gross, at $75/bbl. Shows all legal entities identified as part of ${brandName} group. Some subsidiary contracts may not be captured.
   </div>`;
+
+  // ── v599 (T6): the provenance block. "Where did this number come from?" on this tab means
+  // "which legal entities were rolled into it?" — and no surface answered that. It is built
+  // from allRows (pre-dedup) so every entity is named with the contracts it brought, the
+  // contracts folded away as a duplicate country x mechanic, and any entity excluded by name.
+  const _iocEsc = function(x) { return String(x == null ? '' : x)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); };
+  const _entAgg = {};
+  allRows.forEach(function(r) {
+    const e = _entAgg[r.operator] || (_entAgg[r.operator] = { brought: 0, counted: 0, cs: {} });
+    e.brought += r.n; e.cs[r.country] = 1;
+  });
+  rows.forEach(function(r) { _entAgg[r.operator].counted += r.n; });
+  const _entNames = Object.keys(_entAgg).sort(function(a, b) { return _entAgg[b].brought - _entAgg[a].brought; });
+  const _foldedN = folded.reduce(function(s, r) { return s + r.n; }, 0);
+  const _entRows = _entNames.map(function(nm) {
+    const e = _entAgg[nm];
+    const dropped = e.brought - e.counted;
+    return `<tr>
+      <td style="padding:3px 8px 3px 0;font-size:11px;">${_iocEsc(nm)}</td>
+      <td class="num" style="padding:3px 8px;font-size:11px;font-family:'IBM Plex Mono',monospace;">${e.counted.toLocaleString()}</td>
+      <td class="num" style="padding:3px 8px;font-size:11px;font-family:'IBM Plex Mono',monospace;color:${dropped ? 'var(--orange)' : 'var(--border)'};" title="${dropped ? _iocEsc(nm + ' brought ' + dropped.toLocaleString() + ' further contracts in a country and mechanic another group entity already covers. They are folded, not summed, because group entities are frequently the same licences under a renamed company.') : 'Nothing folded.'}">${dropped ? dropped.toLocaleString() : '—'}</td>
+      <td class="num" style="padding:3px 0 3px 8px;font-size:11px;font-family:'IBM Plex Mono',monospace;">${Object.keys(e.cs).length}</td>
+    </tr>`;
+  }).join('');
+  const _exList = Array.isArray(excludedList) ? excludedList : [];
+  const _exHtml = _exList.length ? `<div style="margin-top:10px;border-top:1px solid var(--border);padding-top:8px;">
+      <div style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.04em;margin-bottom:4px;">EXCLUDED &mdash; NAME MATCHES, DIFFERENT COMPANY</div>
+      ${_exList.map(function(x) { return `<div style="font-size:11px;color:var(--muted);line-height:1.55;margin-bottom:4px;"><strong style="color:var(--text);">${_iocEsc(x.entity)}</strong> &mdash; ${_iocEsc(x.why)}</div>`; }).join('')}
+    </div>` : '';
+  const _provenance = `<details id="ioc-entity-provenance" style="background:var(--card);border:1px solid var(--border);border-radius:8px;margin-bottom:14px;">
+    <summary style="padding:9px 12px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;user-select:none;font-size:11px;color:var(--muted);">
+      <span style="font-size:12px;font-weight:700;color:var(--text);">Rolled up from ${_entNames.length} legal entit${_entNames.length === 1 ? 'y' : 'ies'}</span>
+      <span style="font-family:'IBM Plex Mono',monospace;">${totalContracts.toLocaleString()} contracts counted</span>
+      ${_foldedN ? `<span style="color:var(--orange);font-family:'IBM Plex Mono',monospace;" title="Contracts an entity brought in a country and mechanic another group entity already covers. Folded rather than summed, because group entities are frequently the same licences under a renamed company.">${_foldedN.toLocaleString()} folded as duplicate</span>` : ''}
+      ${_exList.length ? `<span style="color:var(--orange);font-weight:700;">${_exList.length} excluded by name</span>` : ''}
+      <span style="margin-left:auto;">entities ▸</span>
+    </summary>
+    <div style="padding:0 12px 12px;">
+      <div style="max-height:260px;overflow-y:auto;">
+      <table style="width:100%;border-collapse:collapse;">
+        <thead><tr style="border-bottom:1px solid var(--border);">
+          <th style="text-align:left;padding:2px 8px 5px 0;font-size:10px;color:var(--muted);font-weight:700;">Legal entity in the contract record</th>
+          <th class="num" style="padding:2px 8px 5px;font-size:10px;color:var(--muted);font-weight:700;">Counted</th>
+          <th class="num" style="padding:2px 8px 5px;font-size:10px;color:var(--muted);font-weight:700;" title="Contracts in a country and mechanic another group entity already covers.">Folded</th>
+          <th class="num" style="padding:2px 0 5px 8px;font-size:10px;color:var(--muted);font-weight:700;">Countries</th>
+        </tr></thead>
+        <tbody>${_entRows}</tbody>
+      </table>
+      </div>
+      ${_exHtml}
+    </div>
+  </details>`;
+
   outDiv.className='';
-  outDiv.innerHTML=`${disclosureBanner}<div style="margin-bottom:14px;"><h3 style="font-size:16px;font-weight:800;margin:0;">${brandName} Portfolio</h3><span style="font-size:11px;color:var(--muted);">${operatorList.length} entity name(s) matched</span></div>${tbl}`;
+  outDiv.innerHTML=`${disclosureBanner}<div style="margin-bottom:10px;"><h3 style="font-size:16px;font-weight:800;margin:0;">${brandName} Portfolio</h3><span style="font-size:11px;color:var(--muted);">group roll-up — ${_entNames.length} legal entit${_entNames.length === 1 ? 'y' : 'ies'} across ${countries.length} countr${countries.length === 1 ? 'y' : 'ies'}</span></div>${_provenance}${tbl}`;
   document.getElementById('ioc-suggestions').innerHTML='';
 };
 
@@ -39364,7 +39486,11 @@ document.addEventListener('DOMContentLoaded', function() {
     var search = document.getElementById('ioc-search');
     if (search) search.value = op;
     if (typeof updateIOCSuggestions === 'function') updateIOCSuggestions();
-    if (typeof loadIOC === 'function') loadIOC(op);
+    // v599 (T6): these five buttons called the exact-match loader while the "Quick:" row
+    // three inches above called the group roll-up, so two buttons labelled "Equinor"
+    // returned 22 and 901 contracts. One resolver now serves both.
+    if (typeof loadIOCBrand === 'function') loadIOCBrand(op);
+    else if (typeof loadIOC === 'function') loadIOC(op);
   });
 });
 
