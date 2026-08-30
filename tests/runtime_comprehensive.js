@@ -284,6 +284,69 @@ async function testCountryProfile(page) {
       p(S, 'peer link', 'Peer comparison link clicked without error');
     } else w(S, 'peer link', 'No peer link found in profile');
 
+    // ── v601 (T2) regression: Key Fiscal Parameters — Evidence Chain ──────────
+    // Rows with no source of any kind used to render a bare numeric value, an em-dash in the
+    // Statutory column and a badge reading "Contract DB average" — identical weight to an A-tier
+    // row citing a petroleum act. On Norway (the cold-load default) that row read
+    // "State Participation 0%" while the Live DCF panel on the same page ran Norway on 33.4%.
+    // The peer-link click above can leave t7 hidden; innerText is empty for an unrendered pane.
+    await switchTab(page, 't7');
+    await page.waitForTimeout(300);
+    await page.evaluate(() => {
+      const sel = document.getElementById('dd-country-select');
+      if (sel) { sel.value = 'Norway'; loadCountryProfile('Norway'); }
+    });
+    await page.waitForTimeout(2200);
+    const ec = await page.evaluate(() => {
+      const el = document.getElementById('dd-content');
+      const t = el ? el.innerText : '';
+      const i = t.indexOf('KEY FISCAL PARAMETERS');
+      const seg = i < 0 ? '' : t.slice(i, i + 2600);
+      return {
+        found: i >= 0,
+        marksUnsourced: /NO SOURCE|NOT RECORDED/.test(seg),
+        namesConflict: /DCF USES 33\.4%/.test(seg),
+        hasDenominator: /3 of the 5 rows above are independently sourced; 2 are not sourced at all/.test(seg),
+        bareDbBadge: /Contract DB average/.test(seg),
+        hasControl: !!document.querySelector('#dd-content button[onclick*="_cpScrollToLiveDcf"]')
+      };
+    });
+    if (!ec.found) {
+      w(S, 'evidence chain present', 'Key Fiscal Parameters table did not render for Norway');
+    } else {
+      if (ec.marksUnsourced) p(S, 'unsourced rows marked', 'Rows with no source carry NO SOURCE / NOT RECORDED');
+      else f(S, 'unsourced rows marked', 'Unsourced parameter row renders no absence marker');
+
+      if (!ec.bareDbBadge) p(S, 'no bare "Contract DB average"', 'Absence is named, not described as a method');
+      else f(S, 'no bare "Contract DB average"', 'Unsourced row still badged "Contract DB average"');
+
+      if (ec.namesConflict) p(S, 'DCF conflict surfaced', 'Norway State Participation names the 33.4% the DCF engine uses');
+      else f(S, 'DCF conflict surfaced', 'Table shows State Participation 0% without naming the DCF value');
+
+      if (ec.hasDenominator) p(S, 'verdict carries denominator', '"3 of the 5 rows above ... 2 are not sourced at all"');
+      else f(S, 'verdict carries denominator', 'Sourced-parameter verdict still reports a count with no denominator');
+
+      if (ec.hasControl) p(S, 'conflict note is a control', 'Conflict note ends in a button, not an instruction');
+      else f(S, 'conflict note is a control', 'No _cpScrollToLiveDcf control in the conflict note');
+    }
+
+    // A country with every parameter sourced must be untouched by the above.
+    await page.evaluate(() => {
+      const sel = document.getElementById('dd-country-select');
+      if (sel) { sel.value = 'USA'; loadCountryProfile('USA'); }
+    });
+    await page.waitForTimeout(2200);
+    const clean = await page.evaluate(() => {
+      const el = document.getElementById('dd-content');
+      const t = el ? el.innerText : '';
+      const i = t.indexOf('KEY FISCAL PARAMETERS');
+      const seg = i < 0 ? '' : t.slice(i, i + 1600);
+      return { found: i >= 0, noNoise: !/NO SOURCE|NOT RECORDED|DCF USES|carr(y|ies) no source at all/.test(seg) };
+    });
+    if (clean.found && clean.noNoise) p(S, 'fully sourced country unchanged', 'USA evidence chain shows no absence markers');
+    else if (clean.found) f(S, 'fully sourced country unchanged', 'USA evidence chain gained an absence marker it should not have');
+    else w(S, 'fully sourced country unchanged', 'USA evidence chain did not render');
+
     // Hash routing — Bug 15 regression test
     await page.evaluate(() => { window.location.hash = '#/profile/norway'; });
     await page.waitForTimeout(600);

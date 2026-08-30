@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v600</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v601</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v600</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v601</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v600</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v601</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v600';
+  return m ? m[0] : 'v601';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v600');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v601');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -28013,6 +28013,20 @@ function _rrClassify(c) {
 }
 window._rrClassify = _rrClassify;
 
+// v601 (T2): the Evidence Chain conflict note ends in a control. Scrolls the Live DCF panel into
+// view and flashes its Fiscal Breakdown, so "the DCF panel uses a different number" is something
+// the analyst can see rather than something they have to take on trust.
+function _cpScrollToLiveDcf() {
+  var el = document.getElementById('dd-live-dcf-container');
+  if (!el) return;
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); }
+  var prev = el.style.boxShadow;
+  el.style.transition = 'box-shadow .3s';
+  el.style.boxShadow = '0 0 0 3px rgba(185,28,28,.45)';
+  setTimeout(function() { el.style.boxShadow = prev || ''; }, 1800);
+}
+window._cpScrollToLiveDcf = _cpScrollToLiveDcf;
+
 function renderReformTimeline(country) {
   // Fiscal facts from API JSON
   const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -28058,6 +28072,18 @@ function renderReformTimeline(country) {
     let sharedLabels = [];    // v588: which parameters those are, named on screen
     let sharedSrcName = '';   // v588: the instrument itself
     let sharedOthers = [];    // v588: the other jurisdictions it also stands in for
+    // v601 (T2): rows that carry NO source of any kind. Until now they rendered a bare numeric
+    // value, an em-dash in the Statutory column, and a badge reading "Contract DB average" -- a
+    // phrase that names a method, not an absence -- at exactly the same visual weight as an A-tier
+    // row citing a petroleum act. On Norway, the country this tab cold-loads by default, that row
+    // read "State Participation | 0% | -- | Contract DB average" while the Live DCF panel higher up
+    // THIS SAME PAGE was running Norway on 33.4% state equity and reporting it as 21.7% of revenue,
+    // the largest of its three Fiscal Breakdown lines. Petoro/SDFI holds 30-33.6% on the licences
+    // named in this page's own top-contracts table.
+    let unsourcedCount = 0;
+    let unsourcedLabels = [];
+    let unsourcedZeroLabels = [];  // an unsourced 0 cannot be told apart from a fact never harvested
+    let modelConflicts = [];       // [{label, shown, modelled}] -- table value vs the engine's own
 
     // v500: API source strings are free text — escape before they reach title="" or innerHTML
     const _esc = function(s) {
@@ -28073,6 +28099,33 @@ function renderReformTimeline(country) {
     };
     const _fmtPct = function(v) { return (Math.round(v * 100) / 100) + '%'; };
     const _mono = 'font-family:IBM Plex Mono,monospace;';
+    // v601 (T2): the value this platform's OWN DCF engine uses for the same parameter. Only
+    // reported where getDCFParams() resolves through the 9-country hard override table
+    // (params._basis === 'country'); a generic mechanic default is not a second opinion and is
+    // not presented as one.
+    const _MODEL_KEY = {
+      'Royalty Rate': 'royalty_rate',
+      'Income Tax Rate': 'cit_rate',
+      'Cost Recovery Cap': 'cost_recovery_cap',
+      'Cost Recovery Ceiling (contractual cap)': 'cost_recovery_cap',
+      'State Participation': 'state_equity_pct',
+      'Special Tax': 'spt_rate',
+      'FTP Rate': 'ftp_rate',
+      'Profit Oil (Govt)': 'profit_oil_govt_pct'
+    };
+    const _modelParam = function(label) {
+      try {
+        if (typeof getDCFParams !== 'function' || typeof resolveLiveDCFMechanic !== 'function') return null;
+        const mk = _MODEL_KEY[label];
+        if (!mk) return null;
+        const pr = getDCFParams(country, resolveLiveDCFMechanic(country));
+        if (!pr || pr._basis !== 'country') return null;
+        // The key itself must come from the country override, not from defaults[mechanic].
+        if (!Array.isArray(pr._overrideKeys) || pr._overrideKeys.indexOf(mk) === -1) return null;
+        const v = pr[mk];
+        return (typeof v === 'number' && isFinite(v)) ? v * 100 : null;
+      } catch (e) { return null; }
+    };
 
     if (fk) {
       // API data available — build rows with source badges
@@ -28087,6 +28140,7 @@ function renderReformTimeline(country) {
         let badgeHtml;
         let statHtml = '<span style="color:var(--muted);" title="No statutory rate has been captured for this parameter — the modelled value is a contract-database average only.">—</span>';
         let isDivergent = false;
+        let isUnsourcedConflict = false;   // v601 (T2)
         if (srcMeta) {
           // Detect D-confidence: explicit 'd' confidence level OR self-referential petroleum-facts.db URL
           const rawConf = (srcMeta.confidence || 'c').toLowerCase();
@@ -28215,11 +28269,55 @@ function renderReformTimeline(country) {
             badgeHtml = `<span class="source-badge ${confClass}" style="max-width:340px;${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</span>`;
           }
         } else {
-          badgeHtml = '<span class="source-badge conf-db" title="No primary source captured for this parameter — value is the average across this country\'s contracts in the ORCA database.">Contract DB average</span>';
+          // v601 (T2): no source of any kind for this row. The old badge read "Contract DB
+          // average", which names a method and reads like provenance; the Statutory cell was a
+          // bare em-dash. Both are now explicit about the absence, and where the platform's own
+          // DCF engine holds a DIFFERENT value for the same parameter, the disagreement is stated
+          // in the cell rather than left for the analyst to find two sections apart.
+          unsourcedCount++;
+          unsourcedLabels.push(label);
+          const _uZero = (numVal != null && Math.abs(numVal) < 1e-9);
+          if (_uZero) unsourcedZeroLabels.push(label);
+          const _mv601 = _modelParam(label);
+          const _conf601 = (_mv601 != null && numVal != null &&
+            Math.abs(_mv601 - numVal) > Math.max(0.5, 0.02 * Math.max(Math.abs(_mv601), 1)));
+          let _badgeTip601;
+          if (_conf601) {
+            isUnsourcedConflict = true;
+            modelConflicts.push({ label: label, shown: val, modelled: _fmtPct(_mv601) });
+            const cTip = _esc(label + ': this page carries two different answers. The table shows '
+              + val + ', which is the average across this country\u2019s contract records and carries no '
+              + 'citation of any kind. The Live DCF panel further up this same page runs ' + country
+              + ' on ' + _fmtPct(_mv601) + ' and reports the result in its Fiscal Breakdown. That figure is a '
+              + 'hard-coded country override inside the DCF engine \u2014 also not a citation. Establish this '
+              + 'rate from ' + country + '\u2019s own petroleum act before either number goes in an IC memo.');
+            statHtml = '<span style="cursor:help;background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
+              + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;'
+              + 'letter-spacing:.04em;white-space:nowrap;" title="' + cTip + '">\u26a0 DCF USES ' + _fmtPct(_mv601) + '</span>';
+            _badgeTip601 = cTip;
+          } else {
+            const uTip = _esc(label + ': no statute, no secondary guide, no bulk harvest \u2014 no citation of '
+              + 'any kind is on record for this parameter. The number shown is whatever this country\u2019s '
+              + 'contract records average to, and nothing corroborates it'
+              + (_uZero ? '. Here that average is zero, and ORCA cannot tell a measured zero from a parameter '
+                        + 'that was never harvested \u2014 read it as "no record", not as "this regime has none"' : '')
+              + '. Establish it from ' + country + '\u2019s own petroleum act before an IC memo.');
+            statHtml = '<span style="cursor:help;background:rgba(107,101,96,.08);border:1px dashed var(--border);'
+              + 'color:var(--muted);font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;'
+              + 'letter-spacing:.04em;white-space:nowrap;" title="' + uTip + '">'
+              + (_uZero ? 'NOT RECORDED' : 'NO SOURCE') + '</span>';
+            _badgeTip601 = uTip;
+          }
+          badgeHtml = '<span class="source-badge conf-db" style="opacity:.85;cursor:help;" title="' + _badgeTip601 + '">'
+            + (_conf601 ? '\u26a0 ' : '') + 'No source \u00b7 contract average</span>';
         }
         const valHtml = isDivergent
           ? '<span style="color:var(--orange);font-weight:700;">' + val + '</span>'
-          : val;
+          : isUnsourcedConflict
+            // v601 (T2): the cell the DCF engine contradicts is coloured like the contradiction,
+            // so the row is findable in a table scan rather than only on hover.
+            ? '<span style="color:var(--red);font-weight:700;">' + val + '</span>'
+            : val;
         rows.push([label, valHtml, statHtml, badgeHtml]);
       });
 
@@ -28277,19 +28375,67 @@ function renderReformTimeline(country) {
         + (sharedCount === 1 ? 'it' : 'them') + ' in an IC memo.</strong>'
         + '</div>'
       : '';
+    // v601 (T2): the tick line used to report a bare count -- "All 3 independently sourced
+    // parameters match" -- with no denominator, under a five-row table. Three of five reads as a
+    // whole-table pass when three is the only number on screen. The denominator is now on the line.
+    const _coverage601 = unsourcedCount > 0
+      ? ' <strong style="color:var(--orange);">' + sourcedCount + ' of the ' + rows.length
+        + ' rows above ' + (sourcedCount === 1 ? 'is' : 'are') + ' independently sourced; '
+        + unsourcedCount + ' ' + (unsourcedCount === 1 ? 'is' : 'are') + ' not sourced at all.</strong> '
+      : '';
+    // v601 (T2): the severe case -- an unsourced row this platform's own DCF engine contradicts.
+    // Ends in a control, not an instruction: v550's rule that naming a next step without a way to
+    // take it is not a fix.
+    const _conflictNote601 = modelConflicts.length
+      ? '<div style="margin-top:8px;background:rgba(185,28,28,.06);border:1px solid rgba(185,28,28,.30);border-left:3px solid var(--red);border-radius:5px;padding:9px 11px;font-size:11px;color:var(--muted);line-height:1.55;">'
+        + '<strong style="color:var(--text);">\u26a0 This page carries two different values for '
+        + modelConflicts.map(function(c){ return _esc(c.label); }).join(', ') + '.</strong> '
+        + modelConflicts.map(function(c) {
+            return 'The table above shows <strong style="color:var(--text);">' + _esc(c.shown)
+              + '</strong> with no citation behind it. The Live DCF panel further up this same page runs '
+              + _esc(country) + ' on <strong style="color:var(--text);">' + _esc(c.modelled)
+              + '</strong> and carries that through to its Fiscal Breakdown.';
+          }).join(' ')
+        + ' Neither figure is a source \u2014 one is an unsourced contract average, the other a hard-coded '
+        + 'engine override. <strong style="color:var(--text);">Do not quote either until you have the rate from '
+        + _esc(country) + '\u2019s own petroleum act.</strong> '
+        + '<button type="button" onclick="_cpScrollToLiveDcf()" style="margin-top:6px;background:rgba(185,28,28,.10);'
+        + 'border:1px solid rgba(185,28,28,.40);border-radius:4px;color:var(--red);font-size:11px;font-weight:700;'
+        + 'cursor:pointer;padding:3px 9px;" title="Scroll to the Live DCF panel on this page and show the value '
+        + 'its Fiscal Breakdown is built on">Show what the DCF panel used \u2192</button>'
+        + '</div>'
+      : '';
+    // v601 (T2): every other absence on this table already has a named state -- BULK (v569),
+    // N JURISDICTIONS (v588), Estimated default D. "No source at all" had none.
+    const _unsourcedNote601 = unsourcedCount > 0
+      ? '<div style="margin-top:8px;background:rgba(107,101,96,.05);border:1px solid var(--border);border-left:3px solid var(--muted);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
+        + '<strong style="color:var(--text);">' + unsourcedCount + ' of the ' + rows.length + ' rows above ('
+        + _esc(unsourcedLabels.join(', ')) + ') carr' + (unsourcedCount === 1 ? 'ies' : 'y')
+        + ' no source at all.</strong> Not primary law, not a secondary guide, not the bulk harvest \u2014 nothing. '
+        + 'The value shown is the average across this country\u2019s contract records and nothing corroborates it.'
+        + (unsourcedZeroLabels.length
+            ? ' <strong style="color:var(--text);">' + _esc(unsourcedZeroLabels.join(' and ')) + '</strong> average'
+              + (unsourcedZeroLabels.length === 1 ? 's' : '') + ' to zero, and ORCA cannot tell a measured zero from a '
+              + 'parameter that was never harvested \u2014 read that as "no record", not as "this regime has none".'
+            : '')
+        + ' <strong style="color:var(--text);">Establish ' + (unsourcedCount === 1 ? 'it' : 'these')
+        + ' from ' + _esc(country) + '\u2019s own petroleum act before an IC memo.</strong>'
+        + '</div>'
+      : '';
     const _mainNote = divergentCount > 0
       ? '<div style="margin-top:8px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
         + '<strong style="color:var(--text);">⚠ ' + divergentCount + ' of ' + sourcedCount + ' independently sourced parameter' + _pl(sourcedCount) + ' differ from the statutory rate.</strong> '
+        + _coverage601
         + 'ORCA’s take%, NPV and IRR are built from the contract terms in the ORCA Value column, not from the statute. '
         + 'The gap is normally real — grandfathered licence rounds, block-specific terms and sliding scales. '
         + 'In an IC memo, cite the statutory figure against the linked source and the ORCA figure as a contract-weighted average.'
         + '</div>'
       : (sourcedCount > 0
-        ? '<div style="margin-top:8px;font-size:11px;color:var(--muted);">✓ ' + (sourcedCount === 1 ? 'The 1 independently sourced parameter matches' : 'All ' + sourcedCount + ' independently sourced parameters match') + ' the rate stated in the cited source.</div>'
-        : ((bulkCount > 0 || sharedCount > 0)
+        ? '<div style="margin-top:8px;font-size:11px;color:var(--muted);">✓ ' + (sourcedCount === 1 ? 'The 1 independently sourced parameter matches' : 'All ' + sourcedCount + ' independently sourced parameters match') + ' the rate stated in the cited source.' + _coverage601 + '</div>'
+        : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
-    const reconNote = _mainNote + _bulkNote + _sharedNote;
+    const reconNote = _mainNote + _conflictNote601 + _unsourcedNote601 + _bulkNote + _sharedNote;
 
     // v500: Parameter | ORCA Value | Statutory (cited source) | Source
     // Previously the Source badge sat next to the contract average and read as though the primary
@@ -33925,6 +34071,11 @@ function getDCFParams(country, mechanic) {
   }
 
   params._basis = _basis;
+  // v601 (T2): _basis describes the object, not the key. The Country Profile evidence table needs
+  // to know whether a SPECIFIC parameter is this country's own override or a generic mechanic
+  // default -- without it, Algeria and Libya reported the PSC default profit-oil split (60%) as a
+  // hard-coded override contradicting their own table. Metadata only; no term is changed.
+  params._overrideKeys = Object.keys(countryOverrides[country] || {});
   return params;
 }
 

@@ -22397,3 +22397,142 @@ end; it is **not** the deliverable.
 **Task — T3:** "How do these three countries compare side by side?" (stalest task; last run cycle 483. Cycles 502/503/504 were T1/T4/T6.)
 
 **Friction.** Walked cold into Side-by-Side with storage cleared, cleared the seeded North Sea Trio, and built a normal screening trio by hand: Norway, Iraq, Guyana. The four Govt Take rows carry a lowest/highest order marker (`_cmpOrderMark`, `index.html:24999`) that correctly ranks on the *co
+
+## Cycle 506 — T2 / v601 — 2026-08-30
+
+**Task — T2:** "Is this one country attractive at $75/bbl, and can I defend that?" (stalest of the
+six; the last five version commits ran T5 (501), T1 (502), T4 (503), T6 (504), T3 (505) — T2 last
+ran at cycle 499.)
+
+**Friction.** Walked cold with `sessionStorage` and `localStorage` cleared into **Country Profile**,
+which auto-loads **Norway**. The headline verdict answers the first half of T2 well and then hands
+the analyst an explicit instruction for the second half: *"**Defend on the take and its evidence
+tier** (n=7,643 contracts), not on the NPV."* Followed it to the section named for exactly that job
+— **Key Fiscal Parameters — Evidence Chain** (`renderSourcedFacts()`, `index.html:28028`).
+
+Five rows, all in identical formatting:
+
+| Parameter | ORCA Value | Statutory (cited source) | Source |
+|---|---|---|---|
+| Royalty Rate | 0% | 0% | Norwegian Petroleum Act 1996 §4-2 · **A** ↗ |
+| Income Tax Rate | 22% | 22% | Petroleumsskatteloven §5 · **A** ↗ |
+| Cost Recovery Cap | 100% | — | Contract DB average |
+| **State Participation** | **0%** | — | Contract DB average |
+| Special Tax | 56% | 56% | Petroleumsskatteloven §5 · **A** ↗ |
+
+Beneath it: *"✓ All 3 independently sourced parameters match the rate stated in the cited source."*
+
+Three defects converging on one screen.
+
+1. **Two of the five rows carry no source of any kind** — not primary law, not a secondary guide,
+   not even the EY/IHS bulk harvest that v569 built a whole disclosure for. Their Statutory cell was
+   a bare em-dash and their Source badge read **"Contract DB average"** — a phrase that names a
+   *method* and reads as provenance. v569 gave `BULK` a named state, v588 gave the shared regional
+   instrument `N JURISDICTIONS`, D-tier has `Estimated default · D`. *No source at all* — the
+   weakest state on the table — was the only one with no marker, and rendered at the same visual
+   weight as a row citing a petroleum act.
+2. **The tick line has no denominator.** "All 3 … match" under a five-row table reads as a
+   whole-table pass when 3 is the only number on screen.
+3. **Worst: `State Participation 0%` is contradicted by this page's own DCF engine.** Norway is one
+   of the 9 countries in `getDCFParams()`'s `countryOverrides` map (`index.html:33892`):
+   `state_equity_pct: 0.334`. The **Live DCF Model** panel *higher up this same page* runs Norway on
+   that 33.4% and prints **State Equity 21.7%** in its Fiscal Breakdown — the largest of its three
+   fiscal lines, larger than corporate income tax at 8.1%. Meanwhile this table asserts 0%, unsourced.
+   Two answers to the same question, on one screen, roughly a scroll apart. The page's own
+   **Top Contracts** table settles which is closer: it lists *Petoro Norway Oseberg (33.6%)*,
+   *Petoro Statfjord (30%)*, *Petoro Gullfaks (30%)*, *Petoro Ekofisk (5%)*.
+   The harvested value is a **missing-data zero**, not a measurement, and Petoro/SDFI direct state
+   participation is the single most recognisable feature of the NCS fiscal regime. An analyst who
+   followed the headline's own instruction and defended on this table would walk into an IC meeting
+   saying Norway has no state participation — on the default cold-load page of the tab that exists
+   to answer T2.
+
+**Change.**
+
+- **(a)** Unsourced rows are now a named state. The dead em-dash in the Statutory column becomes a
+  chip: **`NO SOURCE`**, or **`NOT RECORDED`** where the unsourced value is zero — because ORCA
+  cannot tell a measured zero from a parameter that was never harvested, and the two read
+  identically as "0%". The badge changes from `Contract DB average` to **`No source · contract
+  average`**. Muted styling, so a scan separates them from the A-tier rows.
+- **(b)** Where the platform's own DCF engine holds a **different** value for the same parameter,
+  the cell states it: **`⚠ DCF USES 33.4%`**, value in red, badge prefixed `⚠`. Guarded twice —
+  `params._basis === 'country'` **and** the specific key present in `params._overrideKeys`, a new
+  inert metadata field added to `getDCFParams()`. Without the second guard Algeria and Libya
+  reported the generic `defaults.PSC` profit-oil split (60%) as a hard-coded override contradicting
+  their own table — a false positive found and removed during this cycle, not shipped.
+- **(c)** A red note names the conflict, states that *neither* figure is a citation (one an
+  unsourced contract average, the other an engine override), and **ends in a control**, per v550's
+  rule that naming a next step without a way to take it is not a fix: *"Show what the DCF panel
+  used →"* scrolls `#dd-live-dcf-container` into view and flashes it.
+- **(d)** A grey note names the unsourced parameters, and where any of them is zero says outright:
+  read it as *"no record"*, not *"this regime has none"*.
+- **(e)** The tick line gains its denominator — *"3 of the 5 rows above are independently sourced;
+  2 are not sourced at all."* Paraguay and Somalia, which have unsourced rows and **zero** sourced
+  ones, previously rendered **no verdict line at all**; they now render *"⚠ No parameter on this
+  table is independently sourced."*
+
+**No fiscal value was altered.** Every number still renders exactly as before; what changed is what
+the screen claims about it. No take, NPV, rank, score, tier colour or pill value touched, no
+threshold introduced, no data file regenerated.
+
+**Result.** An analyst who follows the Country Profile's own instruction to *defend on the evidence
+tier* is now told, at the row, that 2 of Norway's 5 fiscal parameters have no source behind them,
+and that the one the page prints as 0% is one the platform's own DCF engine runs at 33.4% — with a
+button that shows them where. They can no longer defend "Norway has no state participation" off
+this table without having been told twice not to.
+
+**Reach, measured cold in Playwright across all 185 profiles, storage cleared:** **77** profiles now
+carry the unsourced disclosure, **9** carry a `NOT RECORDED` zero chip, **1** (Norway) carries the
+DCF conflict, **75** carry the new denominator (the other 2 — Paraguay, Somalia — carry the
+zero-sourced verdict instead), **0** render `undefined`/`NaN`, **0** page errors. Fully sourced
+countries (USA and the 108 others with no unsourced rows) are byte-identical to before.
+
+**Tests ran this cycle.** Six new `CountryProfile` cases added to **both** harness copies
+(`petroleum-fiscal-db/tests/` and `office/tools/petroleum/tests/`). Against the pre-change build
+served on **:8091** (full repo mirror, only `index.html` swapped) five of the six **FAIL** —
+*"Unsourced parameter row renders no absence marker"*, *"Unsourced row still badged 'Contract DB
+average'"*, *"Table shows State Participation 0% without naming the DCF value"*, *"verdict still
+reports a count with no denominator"*, *"No `_cpScrollToLiveDcf` control"* — **143 PASS / 5 FAIL**.
+The sixth (USA unchanged) passes on both builds by design. Against this build: **148 PASS / 0 FAIL /
+1 WARN**. The 1 WARN and the 1 captured JS error are the pre-existing local-harness `sw.js` 404 and
+reproduce identically on the unchanged build. JS syntax gate **PASS, 10/10 blocks**, re-run after
+the version sweep.
+
+**Found on the same walk, not fixed — stated rather than hidden.**
+
+1. The **Top Contracts** table prints per-contract **IRR** values of 167.2%, 136.3% and 91.4% in a
+   column headed `IRR%`, with no caveat — while the headline strip's own tooltip says country-level
+   IRR was removed in v516 precisely because the bundled mean of these figures *"is not a project
+   return"*. The figures the platform disowned in aggregate are still shipped raw per row.
+2. The same table shows **~8 distinct assets repeated 30 times** for Norway (Statfjord ×4, Ekofisk
+   ×5, Gullfaks ×5, Oseberg ×5, PL018 ×4, PL001 ×4), each repeat re-stating the same take, NPV and
+   production. The `51.1%–80.7% over 14 distinct values` observed-spread claim rendered three
+   sections above is computed off that duplicated sample.
+3. **Predictability reads `76 · HIGH`** on Norway while the chip beside it reads `≥29.6pp obs` — a
+   country whose own contracts span 30 percentage points is labelled high-predictability, because
+   the IQR penalty is `min(40, iqr × 0.8)`. Rescaling that is a threshold change and its own cycle.
+4. Algeria (69.89%) and Libya (79.73%) print an unsourced **Profit Oil (Govt)** while their Live DCF
+   runs the generic 60% PSC default. Deliberately *not* flagged as a conflict here — a generic
+   mechanic default is not a second opinion, and calling it a "hard-coded engine override" would be
+   false. v505's `_basis` already distinguishes the two; surfacing that gap honestly is its own cycle.
+5. The three items carried from cycles 504/505 are untouched and still open: `renderIOCExposure()`
+   filtering `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows pinning `take_75` to the
+   country value; `nocExcludedCount` in `loadIOC()` always 0. So is the 2-country `_cmpOrderMark`
+   asymmetry from 505.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip on any control whose
+behaviour did not change — every tooltip written here belongs to a cell this cycle rewrote, and each
+replaced either a bare em-dash or a badge that named a method instead of an absence. No page-sub
+paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home
+"More tools" still collapsed. Evidence Quality panel still opens collapsed. **No tab added, removed
+or reordered.** **No published country take, NPV, rank, score, tier colour or pill value was
+altered, and no threshold was introduced.** v371/v373 declutter, v430 sessionStorage logic, v449,
+v451, v452, v489, v569, v588 and all later locks intact. Version sweep **v600 → v601** across 5
+display sites, done silently at the end; it is **not** the deliverable.
+
+## Cycle 506 Log — 2026-08-30
+- Test before (pre-change build, :8091): 143 PASS / 5 FAIL (the five new cases)
+- Test after (this build, :8090): 148 PASS / 0 FAIL / 1 WARN
+- JS errors: 1 — pre-existing local-harness `sw.js` 404, identical on the unchanged build
+- Summary: T2 / v601. Country Profile's evidence table stopped presenting unsourced parameters as sourced, and named the 33.4% state participation its own DCF engine uses against the 0% it prints.
