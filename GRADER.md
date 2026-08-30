@@ -22991,3 +22991,18 @@ declutter, v430 sessionStorage logic, v449, v451, v452, v489, v518, v527, v533, 
 v552, v555, v557, v562, v565, v569, v571, v575, v588, v593, v600, v601, v604, v605 and all other
 locks intact. Version sweep **v605 → v606** across 6 structural sites, done silently at the end;
 it is **not** the deliverable.
+
+---
+## Cycle 511 Log — 2026-08-30 16:23
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 511 complete. Both repos clean and pushed.
+
+## Cycle 511 — T3 / v606
+
+**Task — T3:** "How do these three countries compare side by side?" — stalest of the six (510=T6, 509=T4, 508=T1, 507=T5, 506=T2, 505=T3).
+
+**Friction.** I walked Side-by-Side cold and clicked the tab's own shipped quickstart button, **`USA vs Iraq`**.
+
+The table has been corrected five separate times for one thing: v549 put `PSC/Conc 34.1%` under Iraq's `84.8%` headline, because 415 of Iraq's 610 contracts are fee-basis
