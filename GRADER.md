@@ -22549,3 +22549,43 @@ display sites, done silently at the end; it is **not** the deliverable.
 **Task — T2:** "Is this one country attractive at $75/bbl, and can I defend that?" — stalest of the six (last five version commits ran T5, T1, T4, T6, T3).
 
 **Friction.** Cold load with storage cleared lands on Country Profile, which auto-loads Norway. The headline verdict ends with an explicit instruction: *"Defend on the take and its evidence tier, not on the NPV."* I followed it to the section named for that job — **Key Fiscal 
+
+## Cycle 507 — T5 / v602
+
+**Task — T5:** "Give me something I can paste straight into an IC memo." Stalest of the six (506=T2, 505=T3, 504=T6, 503=T4, 502=T1, 501=T5).
+
+**Friction.** Walked T5 cold: Home → Fiscal Compare → set a profile → Run Compare → **Export XLSX**, the button the Quick Start calls "Export XLSX for IC attachment". The workbook's second sheet is **Methodology**, added at v329 explicitly "for IC memo traceability" — it is the page an IC reviewer opens to check what was modelled, and the only place the project assumptions behind the model column are ever written down.
+
+`exportFCResults()` (index.html:38305) built that sheet from `DCF_PROFILES[fcProfileKey] || DCF_PROFILES['deepwater']`. **`DCF_PROFILES` is the Scenario Builder's table.** Fiscal Compare runs on `FC_PROFILES` — `runFiscalCompare()` does `const profile = FC_PROFILES[profileKey]` (index.html:35636) and hands *that* object to `dcfPSC`/`dcfConcession`/`dcfTSC`. The two tables are keyed differently, so the sheet described a project the engine never ran. Measured on the live build, **4 of the 7 selectable profiles**:
+
+| Profile selected | Engine actually ran | Methodology sheet printed |
+|---|---|---|
+| Onshore | 20,000 bopd / $200M / $8 opex | 50,000 / $1,200M / $15 — no DCF key, fell back to Deepwater |
+| Marginal | 10,000 bopd / $100M / $6 opex | 50,000 / $1,200M / $15 — no DCF key, fell back to Deepwater |
+| Giant | 150,000 bopd / $2,000M / $10 opex | 50,000 / $1,200M / $15 — no DCF key, fell back to Deepwater |
+| LNG | 100,000 bopd / $3,000M / $20 opex | **200,000 / $5,000M / $4** |
+
+LNG was the worst case: `DCF_PROFILES` *has* an `lng` key, so there was no fallback to notice — it silently substituted a different LNG project, with **opex wrong by 5×** in the direction that flatters the model NPV, peak rate doubled and capex up $2B. Nothing inside the workbook revealed any of this: the file is named for the profile (`ORCA_fiscal_compare_$75_giant_2026-08-30.xlsx`), the "DO NOT CITE" note said "one hypothetical *giant* project", and the dropdown label already states the correct figures — so the workbook contradicted the control used to produce it, on a sheet whose only job is to be the record. **v568 fixed exactly this cross-wiring in `copyFCForIC()`; this call site was missed.**
+
+Second defect on the same sheet: `Project life (yr)` printed 15 for Marginal and 30 for LNG. The engine has no such setting — `buildProductionProfile()` opens `const years = 25` and every mechanic function then runs `const years = prod.length`. Verified: `prod.length === 25` for deepwater, lng, marginal, giant and onshore alike. A reviewer taking the 30-year LNG figure at face value was reconciling against a horizon never modelled — and LNG still has 18.7 MMbbl/yr of production in year 25, so the profile is truncated, not depleted.
+
+**Change.** `profileObj` now reads `FC_PROFILES` — the table the engine consumes. The Profile assumptions block is retitled **"Profile assumptions — <Name> (the profile selected when this sheet was exported)"**, adds ramp / plateau / decline (the parameters that actually differ between profiles), replaces `Project life` with **`Modelled horizon (yr) 25`** plus a stated note that the horizon is fixed at 25 for all seven and that a profile still producing in year 25 is truncated rather than depleted, and states the 100% working-interest basis. The "DO NOT CITE" line prints the profile *name* instead of the raw select key (`north_sea` → `North Sea`).
+
+**Result.** An analyst who exports Giant, Onshore, Marginal or LNG for an IC attachment now gets a Methodology sheet stating the assumptions the numbers in the sheet were actually computed from. A reviewer reconciling the model NPV against the stated capex, rate and opex will now arrive at the figure in the workbook instead of one built on a different project — and for LNG, will not size the deal off a $4/bbl opex the engine never used.
+
+**Also fixed — the loop's own verification was dead.** `office/tools/petroleum/tests/runtime_comprehensive.js` (the copy the autonomous loop runs) set `REPO_ROOT = path.resolve(__dirname, '..')`. That is right for the copy at `petroleum-fiscal-db/tests/` but not for this one at `office/tools/petroleum/tests/` — one level up is `office/tools/petroleum`, which holds no `country_data.json`, so `page.route()` threw ENOENT inside `setup()` and the process died **before a single assertion ran.** That is why cycle 506 reported **"0 PASS / 0 FAIL"** and emailed it as a result. `REPO_ROOT` now probes candidate roots for the fixture and throws a named error listing them if none is found. The harness runs again.
+
+**Regression tests — 21 new cases**, added to both harness copies (`testFCExportMethodology`). For every option in `#fc-profile` it captures the workbook via a stubbed `XLSX.writeFile` and asserts the Methodology sheet's peak rate / capex / opex against `FC_PROFILES[key]`, the horizon against the engine's fixed 25, and that the header names the profile. **Verified to FAIL on the pre-change build** (18 FAIL — the 4 profile mismatches plus horizon and naming across all 7) and PASS on this one.
+
+- Test before (pre-change build, :8093): 147 PASS / 18 FAIL — the new cases
+- Test after (this build, :8090): **169 PASS / 0 FAIL / 1 WARN**
+- JS errors: 1 — pre-existing local-harness `sw.js` 404, identical on the unchanged build
+- JS syntax gate: **PASS, 10/10 blocks**, re-run after the version sweep
+
+**Found on the same walk, not fixed — stated rather than hidden.**
+
+1. The FC profile strip (`index.html:36048`) carries the same project-life fiction on screen: `projLifeYrs = (profileKey2 === 'marginal') ? '15yr' : (profileKey2 === 'lng') ? '30yr' : '25yr'`, rendered as `Life: 30yr` for LNG. Same false claim, different surface. Not fixed here because the strip is a locked layout element and correcting it changes what the analyst reads on screen — its own cycle.
+2. `exportFCResults()` still writes `Contractor NPV_50` and `Contractor NPV_75` (database) but the row order and rank respond to the selected price, so at $100 or $125 the sheet ranks on a price whose database NPV column is not present. Adding the other two columns is straightforward; deciding whether the sheet should carry all four is a scope call.
+3. The items carried from cycles 504/505/506 are untouched and still open: `renderIOCExposure()` filtering `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows pinning `take_75` to the country value; `nocExcludedCount` in `loadIOC()` always 0; the 2-country `_cmpOrderMark` asymmetry; the Top Contracts per-row `IRR%` column the platform disowned in aggregate at v516; Norway's `76 · HIGH` predictability against a `≥29.6pp obs` chip.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** **No published country take, NPV, rank, score, tier colour or pill value was altered, and no threshold was introduced** — every figure changed here is a stated assumption in an exported workbook, corrected to match the engine that was already running. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v569, v588, v601 and all later locks intact. Version sweep **v601 → v602** across 5 display sites, done silently at the end; it is **not** the deliverable.

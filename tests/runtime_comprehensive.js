@@ -719,6 +719,79 @@ async function testComparison(page) {
 }
 
 // ─── SECTION 7: DCF Engine Tests ──────────────────────────────────────────
+// ── v602 (T5) ───────────────────────────────────────────────────────────────────
+// The Export XLSX "Methodology" sheet is the workbook's traceability page — the one an IC
+// reviewer opens to check what was modelled. It read DCF_PROFILES (the Scenario Builder's
+// table) while Fiscal Compare runs on FC_PROFILES, so on 4 of the 7 selectable profiles it
+// stated assumptions the engine never used: onshore/marginal/giant have no DCF key at all and
+// silently fell back to Deepwater, and 'lng' exists in BOTH tables with different numbers
+// (200k bopd/$5,000M/$4 opex vs the engine's 100k/$3,000M/$20). Assert the sheet against the
+// table the engine actually consumes, for every option in the select.
+async function testFCExportMethodology(page) {
+  const S = 'FCExportMeth';
+  try {
+    await switchTab(page, 't0');
+    await page.waitForTimeout(400);
+    // Capture the workbook instead of writing a file to disk.
+    await page.evaluate(() => {
+      if (!window.__origWriteFile) window.__origWriteFile = XLSX.writeFile;
+      XLSX.writeFile = function (wb, name) {
+        window.__cap = { name: name, meth: XLSX.utils.sheet_to_json(wb.Sheets['Methodology'], { header: 1 }) };
+      };
+    });
+    const keys = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('#fc-profile option')).map(o => o.value));
+    if (!keys.length) { f(S, 'profile options', 'No options in #fc-profile'); return; }
+
+    for (const key of keys) {
+      await page.selectOption('#fc-profile', key);
+      await page.evaluate(() => { const b = document.getElementById('fc-run-btn'); if (b) b.click(); });
+      await page.waitForTimeout(1200);
+      const r = await page.evaluate(k => {
+        window.__cap = null;
+        exportFCResults();
+        const c = window.__cap;
+        if (!c) return { err: 'exportFCResults wrote no workbook' };
+        const grab = s => {
+          const row = c.meth.find(x => x[0] && String(x[0]).trim().startsWith(s));
+          return row ? row[1] : null;
+        };
+        const e = FC_PROFILES[k];
+        return {
+          name: c.name,
+          engine: e ? [e.peakBblDay, e.capexMM, e.opexBbl] : null,
+          sheet: [grab('Peak rate'), grab('Capex'), grab('Opex')],
+          horizon: grab('Modelled horizon'),
+          header: (c.meth.find(x => x[0] && String(x[0]).startsWith('Profile assumptions')) || [])[0] || '',
+          profName: e ? e.name : k
+        };
+      }, key);
+
+      if (r.err) { f(S, `export-${key}`, r.err); continue; }
+      if (!r.engine) { f(S, `export-${key}`, `FC_PROFILES has no '${key}' — select offers it`); continue; }
+
+      if (String(r.engine) === String(r.sheet)) {
+        p(S, `meth-matches-engine-${key}`,
+          `${r.sheet[0]} bopd / $${r.sheet[1]}M / $${r.sheet[2]} opex`);
+      } else {
+        f(S, `meth-matches-engine-${key}`,
+          `Methodology sheet says [${r.sheet}] but engine ran [${r.engine}]`);
+      }
+
+      // buildProductionProfile() hardcodes 25 years for every profile.
+      if (r.horizon === 25) p(S, `meth-horizon-${key}`, 'Modelled horizon 25yr (matches engine)');
+      else f(S, `meth-horizon-${key}`, `Horizon ${r.horizon}, engine models 25`);
+
+      // The sheet must name the profile, not print the raw select key.
+      if (r.header.indexOf(r.profName) >= 0) p(S, `meth-names-profile-${key}`, r.profName);
+      else f(S, `meth-names-profile-${key}`, `Header does not name '${r.profName}': ${r.header}`);
+    }
+    await page.evaluate(() => { if (window.__origWriteFile) XLSX.writeFile = window.__origWriteFile; });
+  } catch (e) {
+    f(S, 'exception', e.message);
+  }
+}
+
 async function testDCF(page) {
   const S = 'DCF';
   const profile = { peakBblDay: 50000, rampYears: 3, plateauYears: 8, declineRate: 0.12, capexMM: 1200, opexBbl: 15, discountRate: 0.10 };
@@ -1379,6 +1452,7 @@ async function testConsoleErrors() {
 
     await testLoad(page);
     await testFiscalCompare(page);
+    await testFCExportMethodology(page);
     await testDCF(page);         // run DCF tests early while on t0
     await testScenarioBuilder(page);
     await testCountryProfile(page);

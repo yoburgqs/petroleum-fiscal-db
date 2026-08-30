@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v601</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v602</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v601</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v602</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v601</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v602</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v601';
+  return m ? m[0] : 'v602';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v601');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v602');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -38302,7 +38302,26 @@ function exportFCResults() {
   const fcPrice = fcPriceEl ? fcPriceEl.value : '75';
   const fcProfileEl = document.getElementById('fc-profile');
   const fcProfileKey = fcProfileEl ? fcProfileEl.value : 'deepwater';
-  const profileObj = DCF_PROFILES[fcProfileKey] || DCF_PROFILES['deepwater'];
+  // v602 (T5): this read DCF_PROFILES, the Scenario Builder's table. Fiscal Compare runs on
+  // FC_PROFILES -- runFiscalCompare() does `const profile = FC_PROFILES[profileKey]` and hands
+  // THAT object to dcfPSC/dcfConcession/dcfTSC. The two tables are keyed differently, so the
+  // Methodology sheet -- the one artifact in this workbook whose entire job is to state what was
+  // modelled -- described a project the engine never ran, on 4 of the 7 selectable profiles.
+  // Measured on the live build:
+  //   onshore   engine  20,000 bopd / $200M / $8    sheet printed  50,000 / $1,200M / $15  (no DCF key -> fell back to deepwater)
+  //   marginal  engine  10,000 bopd / $100M / $6    sheet printed  50,000 / $1,200M / $15  (no DCF key -> fell back to deepwater)
+  //   giant     engine 150,000 bopd / $2,000M / $10 sheet printed  50,000 / $1,200M / $15  (no DCF key -> fell back to deepwater)
+  //   lng       engine 100,000 bopd / $3,000M / $20 sheet printed 200,000 / $5,000M / $4
+  // LNG was the worst: DCF_PROFILES HAS an 'lng' key, so there was no fallback to notice -- it
+  // silently substituted a different LNG project, with opex wrong by 5x in the direction that
+  // flatters the model NPV. The file is named for the profile (..._giant_....xlsx) and the
+  // dropdown label already states the correct figures, so the workbook contradicted the control
+  // used to produce it, and nothing inside the workbook revealed it.
+  // v568 fixed exactly this cross-wiring in copyFCForIC(); this call site was missed.
+  const profileObj = (typeof FC_PROFILES !== 'undefined' && FC_PROFILES[fcProfileKey])
+    ? FC_PROFILES[fcProfileKey]
+    : (typeof FC_PROFILES !== 'undefined' ? FC_PROFILES['deepwater'] : DCF_PROFILES['deepwater']);
+  const profileName = profileObj && profileObj.name ? profileObj.name : fcProfileKey;
   // v505: shared ranks for tied rows, and a Terms_Basis column — the export is where these
   // numbers land in an IC workbook, so a false unique rank and an unqualified evidence % must
   // not survive the trip to Excel. Mirrors the on-screen Quality/rank treatment.
@@ -38411,7 +38430,16 @@ function exportFCResults() {
   const ws = XLSX.utils.aoa_to_sheet(data);
   XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Fiscal Compare');
   // v329: M6.2 — Methodology sheet for IC memo traceability
-  var projLifeYrs = (fcProfileKey === 'marginal') ? 15 : (fcProfileKey === 'lng') ? 30 : 25;
+  // v602 (T5): this claimed a 15-year life for Marginal and a 30-year life for LNG. The engine
+  // has no such setting -- buildProductionProfile() opens `const years = 25` and every mechanic
+  // function then runs `const years = prod.length`, so all seven profiles are modelled over
+  // exactly 25 years. Verified on the live build: prod.length === 25 for deepwater, lng,
+  // marginal, giant and onshore alike. The differences between profiles are ramp, plateau and
+  // decline inside a fixed 25-year window, not the length of the window. An IC reviewer who
+  // took the 30-year LNG figure at face value was reconciling against a horizon that was never
+  // modelled -- and LNG still has 18.7 MMbbl/yr of production in year 25, so the profile is
+  // truncated rather than depleted. State the modelled horizon, and say that it is fixed.
+  var projLifeYrs = 25;
   // v505: read the version off the header badge instead of hard-coding it — this sheet still
   // said v410 while the platform was on v504, so every exported IC workbook carried a stale
   // citation. Reading it from the DOM means it cannot drift again.
@@ -38424,13 +38452,22 @@ function exportFCResults() {
     ['ORCA Petroleum Fiscal Intelligence Platform'],
     ['Version: ' + _orcaVer + ' | yoburgqs.github.io/petroleum-fiscal-db/'],
     [''],
-    ['Profile assumptions:'],
+    // v602 (T5): the profile is now named, and every figure below is read from FC_PROFILES —
+    // the table runFiscalCompare() actually passes to the DCF functions.
+    ['Profile assumptions — ' + profileName + ' (the profile selected when this sheet was exported):'],
     ['  Peak rate (bopd)', profileObj.peakBblDay],
     ['  Capex ($M)', profileObj.capexMM],
     ['  Opex ($/bbl)', profileObj.opexBbl],
-    ['  Project life (yr)', projLifeYrs],
+    ['  Ramp-up (yr)', profileObj.rampYears],
+    ['  Plateau (yr)', profileObj.plateauYears],
+    ['  Decline rate (%/yr, post-plateau)', +(profileObj.declineRate*100).toFixed(1)],
+    ['  Modelled horizon (yr)', projLifeYrs],
     ['  Discount rate (%)', +(profileObj.discountRate*100).toFixed(0)],
     ['  Oil price ($/bbl)', +fcPrice],
+    ['  Working interest', '100% — scale contractor NPV by your actual WI'],
+    ['  Note: the modelled horizon is fixed at 25 years for ALL seven profiles. Profiles differ by'],
+    ['    ramp, plateau and decline inside that window, not by its length. A profile still producing'],
+    ['    in year 25 is truncated at the horizon, not depleted.'],
     [''],
     ['Evidence tier definitions:'],
     ['  A-tier: Primary legislation or signed PSA text'],
@@ -38443,7 +38480,8 @@ function exportFCResults() {
     ['    Country Profile "Copy for IC Memo" string, the Screener CSV and the public API carry.'],
     ['  Rank and row order are computed from GovtTake_$' + _xlPP + ' (database), ascending.'],
     ['  DO NOT CITE: the three "(model...)" columns at the right of the sheet. Those are one'],
-    ['    hypothetical ' + fcProfileKey + ' project run through the compare engine, and on a GENERIC'],
+    // v602 (T5): printed the raw lowercase select key ("north_sea", "lng"). Use the profile name.
+    ['    hypothetical ' + profileName + ' project run through the compare engine, and on a GENERIC'],
     ['    DEFAULT row they are left EMPTY on purpose — every generic row of a mechanic produces the'],
     ['    identical number, so a value there would separate nothing. Model_vs_DB_pp is the gap.'],
     [''],
