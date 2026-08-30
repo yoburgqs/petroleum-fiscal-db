@@ -22536,3 +22536,16 @@ display sites, done silently at the end; it is **not** the deliverable.
 - Test after (this build, :8090): 148 PASS / 0 FAIL / 1 WARN
 - JS errors: 1 — pre-existing local-harness `sw.js` 404, identical on the unchanged build
 - Summary: T2 / v601. Country Profile's evidence table stopped presenting unsourced parameters as sourced, and named the 33.4% state participation its own DCF engine uses against the 0% it prints.
+
+---
+## Cycle 506 Log — 2026-08-30 12:03
+- Test before: 140 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 506 complete. Both repos pushed.
+
+## Cycle 506 — T2 / v601
+
+**Task — T2:** "Is this one country attractive at $75/bbl, and can I defend that?" — stalest of the six (last five version commits ran T5, T1, T4, T6, T3).
+
+**Friction.** Cold load with storage cleared lands on Country Profile, which auto-loads Norway. The headline verdict ends with an explicit instruction: *"Defend on the take and its evidence tier, not on the NPV."* I followed it to the section named for that job — **Key Fiscal 
