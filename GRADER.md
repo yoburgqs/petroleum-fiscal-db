@@ -23167,3 +23167,105 @@ semantics, v549, v552, v570, v594, v601, v606 and all other locks intact. Versio
 **Task — T2:** "Is this one country attractive at $75/bbl, and can I defend that?" — the stalest of the six (511=T3, 510=T6, 509=T4, 508=T1, 507=T5, 506=T2).
 
 **Friction.** The Country Profile's own prescribed next step for T2 is the Scenario Builder — the Fiscal-character line says "Run Scenario Builder to test at your actual project parameters before IC submission", the IRR field is literally `→ Model in Scenario Builder`, and four 
+
+---
+## Cycle 513 — T5 / v608
+
+**Task — T5:** "Give me something I can paste straight into an IC memo." — the stalest of the six
+(512=T2, 511=T3, 510=T6, 509=T4, 508=T1, 507=T5).
+
+**Friction.** Walked cold — fresh context, `sessionStorage` and `localStorage` cleared — and
+exercised every export and clipboard affordance the platform offers, reading the produced artifact
+back rather than trusting the button label. The clipboard paths are in good order: Country Profile's
+`⎘ IC Citation` and IC-summary paragraph, Fiscal Compare's `⎘ Copy for IC Memo`, and Side-by-Side's
+copy control all return correct, attributed, caveated, memo-ready text with a live build number.
+The **downloaded CSVs have had none of that treatment**, and the worst is the Breakeven Map's.
+
+That tab's own screen text is emphatic and correct: *"65 countries, 8 distinct values, $27–$34/bbl.
+The widest gap between any two of them is $7/bbl and 43 of the 65 sit on just two integers."* …
+*"Breakeven tells you ORCA has modelled a cost structure for these 65 — **it does not rank them**.
+The other 120 are blank, which is absence of data, not a low breakeven."* It then routes downside
+screening elsewhere under the heading **"DOWNSIDE RESILIENCE — THE AXIS THAT DOES SEPARATE THEM."**
+
+`⇓ Export CSV` (`#breakeven-csv-btn`, the tab's **only** visible control) undid all of it.
+`exportBreakevenCSV()` emitted 65 rows sorted breakeven-ascending with **no caption, no basis line,
+no source line, no version, and no retention column** — so in a spreadsheet the file reads as a
+league table with Belgium, the Faroe Islands, Sweden and Vanuatu as the cheapest barrels on earth.
+That is precisely the reading the page spends four paragraphs preventing, delivered in the one
+artifact that leaves the tool and lands in an IC pack unaccompanied by the page.
+
+Two further defects in the same function. The **Mechanic column read `d.mechanic` against a field
+named `d.mechanics`** and has therefore exported **empty on all 65 rows** since it was added —
+and per `MECHANIC_COMPARABILITY.md` the mechanic is the comparability qualifier, without which
+these takes may not be compared at all. And **contractor NPV appeared in no column**, so the file
+carried a breakeven and a take with no statement of the contractor position, discount rate or
+working interest behind them.
+
+**Change.** `exportBreakevenCSV()` now prepends the tab's own correction, **computed from the
+exported rows rather than asserted**: observed breakeven range and distinct-value count, an explicit
+*"ROW ORDER IS NOT A RANKING … do not cite a row position as a placing"*, the count of countries
+absent for want of a modelled cost structure, the standardized Deepwater / $1.2B capex / 10% WACC /
+100% WI basis, the IRR suppression rule, and a `_orcaVerNow()` source line at **top and bottom**.
+Mechanic reads `d.mechanics` and is populated 65/65. Three columns added — **Contractor NPV @$75**,
+**@$50**, and **NPV Retention $50 vs $75** — the axis the screen names. Ties broken by country name
+A–Z so the order inside the two integers holding 43 of the 65 is visibly alphabetical.
+
+**Measured while writing the caveat, and stated rather than assumed.** The first draft asserted the
+retention column "spans −14% to +75%". Checked against the exported rows: across **these 65** it
+spans only **39%–48% over 9 distinct values** — barely more separation than breakeven's 8. The
+database-wide −14%/+75% is real but does not hold within this subset, which is a self-similar
+cluster of low-take Concession regimes on near-identical modelled cost structures. Shipping the
+first draft would have repeated the exact error the block exists to correct. The header now states
+the in-file range, the database range, why they differ, and routes ranking work to the Screener's
+full 185-country export.
+
+**Result.** An analyst exporting the Breakeven Map into an IC memo now carries the fiscal mechanic,
+the contractor position at both prices, the discount rate, the WI basis, ORCA attribution with a
+live build number, and an explicit statement that the row order is not a ranking and this file is a
+**coverage list, not a shortlist** — with a pointer to the export that is one.
+
+**Verified.** Cold Playwright against the local build, storage cleared, clicking the real button on
+the real tab: 65 data rows, **0 blank Mechanic**, **0 blank Retention**, header block present,
+source line at both ends, 0 page errors. JS syntax gate **PASS** (10 blocks / 0 errors).
+
+### The validation gate was blind for seven cycles — fixed
+
+- Test before: **261 PASS / 0 FAIL / 1 WARN**
+- Test after:  **261 PASS / 0 FAIL / 1 WARN**  (the WARN is the known local-harness `sw.js` 404)
+
+Cycles **506–512 all reported 0 PASS / 0 FAIL**, and the emails said so. The suite was not stalling.
+`autonomous_cycle.py` runs the **office copy** at `office/tools/petroleum/tests/runtime_comprehensive.js`,
+which resolves its fixtures with `REPO_ROOT = path.resolve(__dirname, '..')`. Correct when the file
+sat in `petroleum-fiscal-db/tests/`; after the copy it resolves to `office/tools/petroleum/`, which
+holds no `country_data.json`. Every run died on **ENOENT in ~1 second**, before writing a report —
+so the honest `NO REPORT FILE WRITTEN` branch correctly reported zero, and the loop ran unvalidated
+for roughly 3.5 hours across seven cycles. The diagnostic that made this findable was added after
+the identical cycles-475–482 episode and worked exactly as intended; nobody had read it.
+
+`REPO_ROOT` now probes `ORCA_REPO_ROOT`, then `__dirname/..`, then the sibling
+`petroleum-fiscal-db`, then `~/petroleum-fiscal-db`, accepting the first that actually contains
+`country_data.json`, and throws a named error rather than an ENOENT stack if none does. Verified by
+running the office copy exactly as the cycle does: it now completes and writes `/tmp/runtime_test_report.txt`
+with **235 PASS / 0 FAIL / 1 WARN**. (235, not 261 — the office copy is an older revision of the
+suite. It is now producing a real number instead of a zero.)
+
+**Found on the same walk, not fixed.** `exportReformRiskCSV()` writes **Mechanic and Source empty
+on all 83 rows**: the records carry `mechanic_to`, and `reform_history.json` has **no `source` field
+at all** — so that column cannot be filled from the current data and needs a harvesting decision,
+not a UX one. Same class of defect as the Breakeven Mechanic column, different tab, its own cycle.
+Also still open from cycles 504–512, untouched: the dead `#cp-run-fc-btn`; the Scenario Builder's
+region-substring profile inference; the 120 default-basis countries; the SbS Contractor NPV chart
+mapping `selected` rather than `chartCountries`; `⬇ Chart PNG` dropping the notices;
+`exportFCResults()` writing only `Contractor NPV_50/75` while ranking on the selected price; the
+"Evidence Quality A/B (%)" header on a scale the badge no longer uses; `renderIOCExposure()`
+filtering on `d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip.** No page-sub
+paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home
+"More tools" still collapsed. **No tab added, removed or reordered.** **No row or column added or
+removed from any on-screen table, and no published country take, NPV, rank, score, tier colour or
+pill value was altered** — the change is confined to the exported artifact. v371/v373 declutter,
+v430 sessionStorage logic, v449, v451, v452, v489, v505, v573, v591, v606 and v607 all intact.
+Version sweep **v607 → v608** across 6 structural sites, done silently at the end; it is **not** the
+deliverable.
