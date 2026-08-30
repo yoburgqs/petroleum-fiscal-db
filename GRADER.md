@@ -20713,3 +20713,137 @@ Version bump v585→v586 across 5 structural sites, done silently at the end; it
 
 ## Friction
 Side-by-Side auto-seeds Norway / UK / Netherlands as an *example*. Anyone who came to compare a different three has to type their own into `#cmp-search` — the only control that does it. Its handler was twelve lines: one `input` listener running a bare substring filter, and 
+
+---
+## Cycle 492 Log — 2026-08-29 22:42
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN
+- Test after: 135 PASS / 0 FAIL / 1 WARN — `runtime_comprehensive.js` **ran this cycle**
+- JS errors: 0 · JS syntax gate PASS (10 blocks / 0 errors)
+- Shipped as **v587**. Both repos pushed.
+
+### Task
+**T1** — "Which countries should even be on my screening list?"
+(491 was T3, 490 T4, 489 T5, 488 T4, 487 T2, 486 T6, 485 T5, 484 T1 — T1 was least recent.)
+
+### Friction
+`#tbl-screener` is the table T1 is asked of, and **it could not be reordered at all**.
+It had no sort control of any kind — not a clickable header, not a button row, not a
+select. Its only ordering was `npv DESC` inside the v507 evidence-first grouping,
+fixed, decided entirely by which preset was loaded.
+
+Meanwhile the global rule at `index.html:177` —
+
+```
+thead th { … cursor: pointer; user-select: none; … }
+thead th:hover { color: var(--text); }
+```
+
+— gave **every** header on **every** table the browser's universal "this is
+clickable" affordance. So all 12 Screener headers showed a hand cursor, darkened
+on hover, and swallowed the click. Walked cold in Playwright (storage cleared,
+1440×900): clicking **Govt Take** left the top five as Canada / USA / Azerbaijan /
+Mexico / Argentina — byte-identical. No `onclick`, no `data-sort` attribute, no
+delegated listener on the thead. Clicked three times; nothing moved, three times.
+
+The analyst who loads **IOC Capital Screen**, gets 15 countries, and wants them
+ranked by take — the second half of T1, after filtering — had nowhere to go.
+Both neighbouring tables can do this: Fiscal Compare has `.fc-sort-btn` buttons,
+`#tbl-explorer` has `data-sort-key` headers wired to a delegated listener since
+v107. The Screener was the one that could not, and it is the one built for T1.
+
+### Change
+1. **Nine headers now sort** — Country, Region, Govt Take, Evidence, Contractor
+   NPV, NPV @$50, Prod Cov, Swing, and Tier (which shares the `take` key, because
+   the tier *is* the take bucket). Click cycles **asc → desc → off**; the third
+   click is the route back to the default ranking.
+2. **First click sends each column the way an analyst reads it** — lowest take
+   first, highest NPV first, strongest evidence first, lowest swing first. Same
+   directions Fiscal Compare's sort buttons already use.
+3. **Mechanics and Breakeven are deliberately NOT sortable**, and no longer carry
+   the hand cursor. Mechanics is an unordered multi-value tag list; the legend
+   under this very table states Breakeven *"cannot rank two rows"* — 65 modelled
+   values all between $27–$34, the other 120 blank.
+4. **The false affordance is gone page-wide.** `thead th` is now `cursor:default`;
+   pointer, hover-darken and `focus-visible` belong to `th[data-sort-key]` and
+   `th[data-sc-sort]` only. No other table promises a click it cannot honour.
+5. **Indicator reuses CSS that already existed** — `thead th.sort-asc::after ▲` /
+   `.sort-desc::after ▼` has been in the stylesheet since the Explorer table was
+   built; `#tbl-screener` simply never set the class, because it had no sort.
+   `aria-sort` is set alongside. Headers are tabbable; **Enter and Space sort**.
+6. **The count line names the active sort** and carries a `↺ default order` button.
+   `sortNote` had only ever been concatenated into the *filtered* branch of
+   `_universeLead`, so sorting the unfiltered 185-country universe — the commonest
+   T1 entry point, and the state the page cold-loads into — would have reordered
+   the table silently. Fixed in the same cycle that introduced the risk.
+7. **An explicit sort ungroups**, which correctly drops `_grouped` and fires the
+   **v543 mixed-data-basis banner**. That is the honest outcome, not a regression:
+   the v507 divider genuinely cannot be drawn once rows are ordered by something
+   else, and going silent about data basis in that state is precisely the defect
+   v543 was written to fix. The banner text was generalised so it names the sort
+   that interleaved the two bases instead of always saying "price sensitivity".
+8. **Missing values sort LAST in both directions** rather than being coerced to 0
+   — the v537/v568 lesson from the breakeven ceiling, which classified every
+   un-modelled country as affirmatively passing. Ties break alphabetically so an
+   exported shortlist is reproducible.
+9. **Preset load and Reset All both clear the sort** — a preset defines the whole
+   screen, ranking included, so a stale column sort cannot silently override the
+   R-factor preset's own swing order. The XLSX/CSV export basis now states the
+   ordering, which the file never carried.
+
+### Result
+An analyst can rank a screen result. **IOC Capital Screen → click Govt Take →**
+USA, Argentina, Mexico, Canada, Colombia, Australia, Ecuador, United Kingdom,
+Angola, Brazil, Indonesia, Azerbaijan, China, India, Iraq — ascending take, still
+15 countries, nothing filtered by the sort. Before this cycle that click did
+nothing, and did nothing on a header that showed a hand cursor and darkened
+under the pointer.
+
+### Verification
+Cold Playwright against the local build, `sessionStorage` and `localStorage`
+cleared, 1440×900. **36 checks, all pass.**
+- Cold default ranking **byte-identical** — Canada / USA / Azerbaijan / Mexico /
+  Argentina, 185 rows, exactly **1** `BELOW THIS LINE` divider. Nothing about the
+  cold load, the presets or the v507 grouping changes until the analyst clicks.
+- All nine columns verified to reorder, asserted against **raw data values** and
+  not rendered text — which is how the harness caught that Bahrain / Kuwait /
+  Saudi Arabia sit at the top of a take-descending sort correctly (`take_75 = 100`,
+  the three state monopolies, rendered `—` by `fmtTake`).
+- Nulls-last verified on `swing` in **both** directions. `prod_coverage_pct` has
+  0 nulls and 163 real zeros, so no missing-data hazard exists on that column.
+- asc → desc → off cycle restores the default order **exactly**; indicator clears.
+- Preset load and Reset All both clear the sort. Export basis reads
+  `Ranked by: Govt Take low→high` when sorted and `Ranked by: verified field
+  production first, then contractor NPV descending within each group` when not.
+- Keyboard: Enter on a focused header sorts.
+- **Explorer header sort verified still working** (`data-sort-key="swing"` →
+  Saudi Arabia / Oman / USA) — the CSS change did not touch its listener.
+- **0 page errors.** Overflow measured against a pre-change baseline taken from
+  `git stash`: 935 elements right-overflow 1440px both before and after — the
+  Screener's 12-column table sits in an `overflow-x:auto` wrapper by design, so
+  this tab has never been a 0-overflow surface.
+
+### Found on this walk, not fixed
+- The **Region filter and the Region column disagree on vocabulary.** The column
+  prints `North America`, `Latin America`, `CIS/FSU`, `Asia`, `Oceania`; the
+  `#sc-region` dropdown offers `Africa / Middle East / Asia Pacific / Americas /
+  Europe / Other`. The mapping is complete and correct (49+14+41+28+30+23 = 185),
+  but **Kazakhstan and Azerbaijan — two top-20 producers — are reachable only
+  under "Other"**, which reads as the unclassified junk bucket. Worth a cycle;
+  not worse than a sort control that did not exist.
+- Carried from 488/489/490/491 and still open: the `# Contracts` row on
+  Side-by-Side prints `d.n` raw (7643, 4211) while every other count in the same
+  table is `toLocaleString()`d. The Sourced Event Log on Vintage still opens
+  oldest-first, leading with the 1938 PEMEX nationalization.
+
+### STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on a control this cycle did not change.
+No page-sub paragraph, no amber instructional banner, no routing hint, no
+"How to read" block, no SbS card wrapper, no visible Explorer chip row; Screener
+advanced filters still collapsed, presets still a dropdown; Home "More tools"
+still collapsed. v430 sessionStorage logic, v449/v451/v452 CP headline, the v451
+Govt NPV removal, v489 Reform Risk placement, v549/v552/v565/v571 SbS
+comparability work, v555/v562 row removals — all intact. Tab order unchanged.
+**No take, NPV, IRR, breakeven, rank or score value was altered and no data file
+was regenerated.** Version bump v586→v587 across 5 structural sites, done
+silently at the end; it is **not** the deliverable.
