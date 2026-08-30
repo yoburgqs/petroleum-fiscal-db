@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v590</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v591</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1399,7 +1399,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v590</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v591</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1469,7 +1469,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v590</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v591</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1811,7 +1811,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v590';
+  return m ? m[0] : 'v591';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1886,7 +1886,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v590');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v591');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -21849,14 +21849,14 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 <div id="tbreakevenmap" class="tab-pane" role="tabpanel" tabindex="0" aria-labelledby="tab-btn-tbreakevenmap">
   <h2 class="page-title">Global Breakeven Price Map</h2>
   <div style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.6;">
-    <strong style="color:var(--accent);">What this shows:</strong> The oil price at which contractor NPV reaches zero for a standardized deepwater project in each country. A country breakeven of $55/bbl means the contractor recovers costs and earns a 10% return at $55 oil — anything above that is profit. Use the price marker to identify which countries are currently viable at spot price. Drag the slider to stress-test your portfolio under different oil price scenarios. <strong>Coverage: 68 of 185 countries</strong> — requires complete royalty structure, cost recovery terms, and capital schedule.
+    <strong style="color:var(--accent);">What this shows:</strong> The oil price at which contractor NPV reaches zero for a standardized deepwater project in each country. A country breakeven of $29/bbl means the contractor recovers costs and earns a 10% return at $29 oil — anything above that is profit. <strong>Coverage: 65 of 185 countries, and every one of them falls between $27 and $34/bbl.</strong> That is the whole observed range: this axis says which countries ORCA has modelled a cost structure for, not which ones survive a low-price world. For downside screening use <strong>NPV @$50</strong> (modelled 185/185) — the right-hand card below, and the Screener’s <em>Downside Resilience</em> preset.
   </div>
   <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px;">
     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:5px 12px;font-size:11px;color:var(--muted);">
-      <span style="color:var(--accent);font-weight:700;">Coverage: 68 of 185 countries</span>
-      <span>· Requires complete royalty + cost data · Remaining 117 countries shown as grey on map</span>
+      <span style="color:var(--accent);font-weight:700;">Coverage: 65 of 185 countries</span>
+      <span>· Requires complete royalty + cost data · Remaining 120 countries shown as grey on map</span>
     </div>
-    <button class="btn btn-sm btn-outline" id="breakeven-csv-btn" title="Export all 68 countries with breakeven data to CSV" aria-label="Export breakeven price data for 68 countries as CSV file">&#8659; Export CSV</button>
+    <button class="btn btn-sm btn-outline" id="breakeven-csv-btn" title="Export all 65 countries with a modelled breakeven to CSV" aria-label="Export breakeven price data for 65 countries as CSV file">&#8659; Export CSV</button>
   </div>
   
   <!-- v300: Above/Below threshold counter — live count of countries above and below the price marker -->
@@ -21864,7 +21864,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;">
       <div><span style="color:var(--green);font-weight:700;font-size:16px;" id="be-below-count">—</span> <span style="color:var(--muted);">countries viable below <span id="be-threshold-price-below">$75</span></span></div>
       <div><span style="color:var(--red);font-weight:700;font-size:16px;" id="be-above-count">—</span> <span style="color:var(--muted);">countries need above <span id="be-threshold-price-above">$75</span></span></div>
-      <div style="margin-left:auto;font-size:11px;color:var(--muted);">of 68 countries with breakeven data</div>
+      <div style="margin-left:auto;font-size:11px;color:var(--muted);">of 65 countries with a modelled breakeven</div>
     </div>
   </div>
   <div style="display:flex;align-items:center;gap:16px;margin:16px 0;flex-wrap:wrap;">
@@ -21889,13 +21889,25 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <div id="breakeven-map-tooltip" style="position:absolute;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--text);pointer-events:none;display:none;z-index:10;box-shadow:0 4px 12px rgba(0,0,0,0.12);"></div>
   </div>
   
+  <!-- v591 (T1): these two cards were "Lowest Breakeven (Most Resilient)" and "Highest
+       Breakeven (Most Price-Sensitive)", each a top-10 ranked leaderboard off be_75.
+       The Most Resilient card opened with Bahrain $1.0, Kuwait $1.0 and Saudi Arabia $1.0 -
+       the three 100%-government-take state monopolies, whose $1 is the DCF floor artifact
+       that formatBreakeven() and _beIsTested() both refuse to print as a breakeven anywhere
+       else on the platform. Below them the remaining 65 values span $27-$34 across 8 distinct
+       integers, so the "Most Price-Sensitive" card was ranking France ($34) against Belgium
+       ($27) and calling a $7 spread a resilience verdict.
+       Left card now shows the distribution instead of a ranking, because the distribution is
+       the reason no ranking is defensible. Right card carries the downside axis that is
+       actually measured for every country - NPV @$50 / NPV @$75 - the same axis v568 rebuilt
+       the Downside Resilience preset on. -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;" role="region" aria-label="Lowest breakeven countries — most resilient to low oil prices">
-      <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Lowest Breakeven (Most Resilient)</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;" role="region" aria-label="Distribution of modelled breakeven prices across the covered countries">
+      <div style="font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Breakeven Distribution — every modelled country</div>
       <div id="be-lowest-list"></div>
     </div>
-    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;" role="region" aria-label="Highest breakeven countries — most price-sensitive">
-      <div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Highest Breakeven (Most Price-Sensitive)</div>
+    <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;" role="region" aria-label="Downside resilience ranked by share of contractor NPV retained when oil falls from 75 to 50 dollars">
+      <div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Downside Resilience — the axis that does separate them</div>
       <div id="be-highest-list"></div>
     </div>
   </div>
@@ -37925,15 +37937,24 @@ async function renderBreakevenMap() {
     752:'Sweden', 246:'Finland'
   };
 
+  // v591: _beIsTested() is the platform-wide definition of "has a breakeven" — it rejects
+  // null and it rejects the 0 < v <= 1 DCF floor artifact that Bahrain, Kuwait and Saudi
+  // Arabia carry. formatBreakeven() already renders those three as "—" on Fiscal Compare and
+  // Country Profile; this tab was the one surface still treating $1.0 as a real breakeven,
+  // and it ranked them as the three most price-resilient countries on earth.
+  const _beOK = (typeof _beIsTested === 'function') ? _beIsTested
+              : function(v) { return v != null && (v <= 0 || v > 1); };
   const beLookup = {};
   const takeLookup = {};
   COUNTRY_DATA.forEach(d => {
-    beLookup[d.country] = d.be_75;
+    beLookup[d.country] = _beOK(d.be_75) ? d.be_75 : null;
     takeLookup[d.country] = d.take_75;
   });
   // v470: Update breakeven legend with live country counts so analysts immediately see distribution
   (function() {
-    var _beAll = COUNTRY_DATA.map(function(d){ return d.be_75; });
+    // v591: tested-only, so the three floor artifacts are counted as No data (which is what
+    // the map now paints them) rather than inflating the lowest band.
+    var _beAll = COUNTRY_DATA.map(function(d){ return _beOK(d.be_75) ? d.be_75 : null; });
     var _cntNoData = _beAll.filter(function(v){ return v==null; }).length;
     var _upd = function(id, txt){ var el=document.getElementById(id); if(el) el.textContent=txt; };
     // v579: bands derived from the data, so the legend describes the map that is drawn.
@@ -38100,26 +38121,94 @@ async function renderBreakevenMap() {
     .attr('fill', '#6B6560').attr('font-size', 10).attr('text-anchor', 'end')
     .text(mapped + ' countries with breakeven data');
 
-  const withBE = COUNTRY_DATA.filter(d => d.be_75 != null).sort((a, b) => a.be_75 - b.be_75);
-  const lowest = withBE.slice(0, 10);
-  const highest = withBE.slice(-10).reverse();
+  // ── v591 LEFT CARD: the distribution, not a leaderboard ──────────────────────────────
+  // 65 countries hold 8 distinct integer breakevens. The widest gap between any two of them
+  // is $7/bbl and two integers hold two-thirds of the set. A ranked top-10 off that is a
+  // ranking of rounding, and the old card led it with a $1.00 artifact.
+  const withBE = COUNTRY_DATA.filter(d => _beOK(d.be_75)).sort((a, b) => a.be_75 - b.be_75);
+  (function() {
+    const host = document.getElementById('be-lowest-list');
+    if (!host) return;
+    if (!withBE.length) { host.innerHTML = '<div style="font-size:12px;color:var(--muted);">No modelled breakeven in this build.</div>'; return; }
+    const buckets = [];
+    withBE.forEach(function(d) {
+      const last = buckets[buckets.length - 1];
+      if (last && last.v === d.be_75) { last.n++; last.names.push(d.country); }
+      else buckets.push({ v: d.be_75, n: 1, names: [d.country] });
+    });
+    const maxN = Math.max.apply(null, buckets.map(function(b) { return b.n; }));
+    const lo = withBE[0].be_75, hi = withBE[withBE.length - 1].be_75;
+    const modal = buckets.slice().sort(function(a, b) { return b.n - a.n; }).slice(0, 2);
+    const modalN = modal.reduce(function(t, b) { return t + b.n; }, 0);
+    let h = '';
+    buckets.forEach(function(b) {
+      const pct = Math.max(3, Math.round(b.n / maxN * 100));
+      const names = b.names.slice(0, 12).join(', ') + (b.names.length > 12 ? ' +' + (b.names.length - 12) + ' more' : '');
+      h += '<div style="display:flex;align-items:center;gap:8px;padding:3px 0;font-size:12px;cursor:help;" title="' + b.n + ' countries model a $' + b.v.toFixed(0) + '/bbl breakeven: ' + names.replace(/"/g, '&quot;') + '">'
+         + '<span style="width:34px;color:var(--text);font-family:\'IBM Plex Mono\',monospace;font-weight:700;">$' + b.v.toFixed(0) + '</span>'
+         + '<span style="flex:1;background:var(--surface2);border-radius:2px;height:12px;overflow:hidden;"><span style="display:block;height:12px;width:' + pct + '%;background:' + beColor(b.v) + ';"></span></span>'
+         + '<span style="width:24px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums;">' + b.n + '</span>'
+         + '</div>';
+    });
+    h += '<div style="margin-top:10px;padding-top:9px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);line-height:1.6;">'
+       + '<strong style="color:var(--text);">' + withBE.length + ' countries, ' + buckets.length + ' distinct values, $' + lo.toFixed(0) + '\u2013$' + hi.toFixed(0) + '/bbl.</strong> '
+       + 'The widest gap between any two of them is $' + (hi - lo).toFixed(0) + '/bbl and ' + modalN + ' of the ' + withBE.length
+       + ' sit on just two integers ($' + modal.map(function(b) { return b.v.toFixed(0); }).sort().join(' and $') + '). '
+       + 'Breakeven tells you ORCA has modelled a cost structure for these ' + withBE.length + ' \u2014 it does not rank them. '
+       + 'The other ' + (COUNTRY_DATA.length - withBE.length) + ' are blank, which is absence of data, not a low breakeven.'
+       + '</div>';
+    host.innerHTML = h;
+  })();
 
-  function listHTML(items) {
-    return items.map(d => {
-      const col = beColor(d.be_75);
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;">'
-        + '<span style="color:var(--text);">' + d.country + '</span>'
-        + '<span style="color:' + col + ';font-weight:700;font-variant-numeric:tabular-nums;">$' + d.be_75.toFixed(1) + '</span>'
+  // ── v591 RIGHT CARD: the downside axis that is actually measured ─────────────────────
+  // npv_75 and npv_50 are modelled for 185/185. The ratio runs -14% (Yemen) to +75%
+  // (Turkmenistan) with a 45% median, so unlike breakeven it discriminates. Same axis the
+  // Screener's Downside Resilience preset was rebuilt on at v568. Null where npv_75 <= 0,
+  // which is exactly the three state monopolies — no contractor position, no downside result.
+  (function() {
+    const host = document.getElementById('be-highest-list');
+    if (!host) return;
+    const retFn = (typeof _npvRetention === 'function') ? _npvRetention : null;
+    if (!retFn) { host.innerHTML = '<div style="font-size:12px;color:var(--muted);">Downside retention unavailable.</div>'; return; }
+    const rows = COUNTRY_DATA.map(function(d) { return { c: d.country, r: retFn(d), npv50: d.npv_50, take: d.take_75 }; })
+                             .filter(function(x) { return x.r !== null && x.r !== undefined; })
+                             .sort(function(a, b) { return b.r - a.r; });
+    if (!rows.length) { host.innerHTML = '<div style="font-size:12px;color:var(--muted);">Downside retention unavailable.</div>'; return; }
+    const row = function(x) {
+      const pct = x.r * 100;
+      const col = pct < 0 ? 'var(--red)' : pct >= 50 ? '#15803D' : pct >= 35 ? 'var(--text)' : 'var(--orange)';
+      return '<div class="be-ret-row" data-country="' + String(x.c).replace(/"/g, '&quot;') + '" role="button" tabindex="0"'
+        + ' title="' + String(x.c).replace(/"/g, '&quot;') + ' keeps ' + pct.toFixed(0) + '% of its $75/bbl contractor NPV at $50/bbl (NPV @$50 = $' + Math.round(x.npv50) + 'M, govt take ' + (x.take != null ? x.take.toFixed(1) + '%' : 'n/a') + '). Click to open the Country Profile."'
+        + ' style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;">'
+        + '<span style="color:var(--text);">' + x.c + '</span>'
+        + '<span style="color:' + col + ';font-weight:700;font-variant-numeric:tabular-nums;">' + pct.toFixed(0) + '% kept</span>'
         + '</div>';
-    }).join('');
-  }
-  document.getElementById('be-lowest-list').innerHTML = listHTML(lowest);
-  document.getElementById('be-highest-list').innerHTML = listHTML(highest);
+    };
+    const top = rows.slice(0, 5), bot = rows.slice(-5);
+    let h = '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Keeps the most at $50/bbl</div>'
+          + top.map(row).join('')
+          + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 2px;">Keeps the least \u2014 negative = value destroyed</div>'
+          + bot.map(row).join('')
+          + '<div style="margin-top:10px;padding-top:9px;border-top:1px solid var(--border);font-size:11px;color:var(--muted);line-height:1.6;">'
+          + 'Share of contractor NPV surviving a $75 \u2192 $50/bbl price break. Modelled for <strong style="color:var(--text);">' + rows.length + ' of ' + COUNTRY_DATA.length + '</strong> countries \u2014 no untested rows \u2014 and it spans '
+          + (bot[bot.length - 1].r * 100).toFixed(0) + '% to ' + (top[0].r * 100).toFixed(0) + '%, which is a gradient breakeven does not have. '
+          + 'The ' + (COUNTRY_DATA.length - rows.length) + ' with no figure have $0 contractor NPV at $75 (state monopolies): no position for a price break to erode.'
+          + '</div>';
+    host.innerHTML = h;
+    host.querySelectorAll('.be-ret-row').forEach(function(el) {
+      const go = function() {
+        const c = el.getAttribute('data-country');
+        if (c && typeof openCountryProfileFromFC === 'function') openCountryProfileFromFC(c);
+      };
+      el.addEventListener('click', go);
+      el.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    });
+  })();
 
   // v300: Initialize threshold summary counter
   function updateBEThresholdSummary(price) {
     if (!COUNTRY_DATA) return;
-    var beData = COUNTRY_DATA.filter(function(d) { return d.be_75 != null && d.be_75 < 900; });
+    var beData = COUNTRY_DATA.filter(function(d) { return _beOK(d.be_75) && d.be_75 < 900; });
     var below = beData.filter(function(d) { return d.be_75 <= price; }).length;
     var above = beData.filter(function(d) { return d.be_75 > price; }).length;
     var summaryEl = document.getElementById('be-threshold-summary');
@@ -38151,7 +38240,11 @@ async function renderBreakevenMap() {
 function exportBreakevenCSV() {
   if (!COUNTRY_DATA) { showCopyToast('Data not loaded yet.'); return; }
   var rows = [['Country','Region','Mechanic','Breakeven ($/bbl)','Govt Take @$75 (%)','IRR @$75 (%)']];
-  var sorted = COUNTRY_DATA.filter(function(d) { return d.be_75 != null; })
+  // v591: the $1.0 state-monopoly floor artifact is not exported — in a spreadsheet it reads
+  // as the cheapest barrel on earth with nothing on screen to contradict it.
+  var _csvOK = (typeof _beIsTested === 'function') ? _beIsTested
+             : function(v) { return v != null && (v <= 0 || v > 1); };
+  var sorted = COUNTRY_DATA.filter(function(d) { return _csvOK(d.be_75); })
     .sort(function(a,b) { return a.be_75 - b.be_75; });
   sorted.forEach(function(d) {
     rows.push([
