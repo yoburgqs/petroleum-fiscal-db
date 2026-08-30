@@ -22644,3 +22644,20 @@ Third defect on the same walk: the Quick Start guide's step 3 carried the litera
 3. Items carried from cycles 504–507, all untouched and still open: the FC profile strip's `Life: 30yr` project-life fiction (index.html:36048) — the on-screen twin of the v602 export defect; `exportFCResults()` writing only `Contractor NPV_50/75` while ranking on the selected price; `renderIOCExposure()` filtering `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows pinning `take_75` to the country value; `nocExcludedCount` always 0; the 2-country `_cmpOrderMark` asymmetry; the Top Contracts per-row `IRR%` column; Norway's `76 · HIGH` predictability against a `≥29.6pp obs` chip.
 
 **STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** **No published country take, NPV, rank, score, tier colour or pill value was altered, and no threshold was introduced** — the 65% ceiling is unchanged; what changed is which of two already-computed figures it is tested against on Home, brought into line with the Screener that has tested it that way since v554. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v554, v569, v588, v601, v602 and all other locks intact. Version sweep **v602 → v603** across 5 display sites plus the stale `orca-cite-ver` span, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 508 Log — 2026-08-30 13:43
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos clean and pushed. Cycle 508 complete.
+
+## Cycle 508 — T1 / v603
+
+**Task — T1:** "Which countries should even be on my screening list?" (stalest — 507 ran T5, 506 T2, 505 T3, 504 T6, 503 T4, 502 T1)
+
+**Friction.** Cold load with storage cleared lands on Home. The one line on that page that answers T1 read:
+
+> ✓ **14 countries** pass the IOC capital screen — verified field production · take ≤65% · contractor NPV positive at $75 *and* at the $50 downside — **open the screen →**
+
+Clicking
