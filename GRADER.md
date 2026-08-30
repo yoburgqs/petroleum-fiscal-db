@@ -20452,3 +20452,119 @@ Version bump v583→v584 across 5 structural sites, done silently at the end; it
 The paste artifact of the screening tab is the Explorer's **⬇ Excel** button. `exportExplorer()` was a second, independent query over `COUNTRY_DATA` — it read only the mechanic dropdown, the region *dropdown* and the search box, then sorted by take DESC unconditionally.
 
 Walked cold with storage c
+
+---
+## Cycle 490 Log — 2026-08-29 20:55
+
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (known local-harness `sw.js` 404), 0 JS errors
+- JS syntax gate: PASS (10 blocks / 0 errors)
+- Shipped as **v585**
+
+### Task
+**T4** — "What is my fiscal-stability and reform exposure here?"
+(489 was T5, 488 T4, 487 T2, 486 T6, 485 T5, 484 T1, 483 T3. This clears the
+finding carried forward from 488 and 489.)
+
+### Friction
+Direction was computed from one rule in four separate places: `take_change`
+starts `'+'` → tightened, `'-'` → liberalized, **everything else** → neutral.
+**46 of the 83 sourced events (55%)** carry no `take_change`, so more than half
+the record landed in a bucket whose column header read *"neutral=structural"*,
+and the tilt was then a bare majority of the 45% that remained.
+
+Walked cold with `sessionStorage` and `localStorage` cleared. The Reform Risk
+lookup card (`renderReformCountryVerdict`, via `_rrClassify` at index.html:26955)
+printed, **in green**:
+
+| country | split | verdict | take @$75 |
+|---|---|---|---|
+| Nigeria | `↑0 / ↓1 / →5` | **net-liberalizing toward the contractor** | 81.1% |
+| Iraq | `↑0 / ↓0 / →3` | balanced | 84.8% |
+| Mexico | `↑0 / ↓0 / →3` | balanced | 32.2% |
+
+Nigeria's verdict rests on **one** event, a 2003 −15pp. The **2021 Petroleum
+Industry Act** — the fiscal rewrite behind the current IOC divestiture wave —
+was one of the five counted as neutral. Mexico's three "neutral" events are the
+**1938 PEMEX nationalization**, the **2013 Energy Reform** and the **2018 AMLO
+licensing suspension**.
+
+The bucket was two categorically different things under one label:
+- **11 context events** (`fiscal_change:false`) — a discovery, first oil,
+  conflict, a review that concluded without renegotiation. v583 made this a
+  first-class concept, but **for the score only**; Direction never saw it.
+- **35 unmeasured fiscal law changes** — real changes whose take impact ORCA has
+  never quantified. They are the **largest events in the file**.
+
+Same defect on five more surfaces: the ranked table's Direction column, the
+Regional Reform Tilt (all 8 regions read "Tightening", including Middle East at
+a margin of **0** off 2 unmeasured events and 1 context event), the Reform
+Direction distribution bar (55% flat grey), the Snapshot line ("net-tightening
+overall" from 27 vs 10 while 35 sat unmeasured), and the Sourced Event Log,
+where Nigeria's PIA wore the badge **`→ Neutral`** one row from Guyana's
+Liza-1 discovery.
+
+### Change
+Four helpers at `index.html:22206` — `_rrEventDir()`, `_rrSplit()`, `_rrTilt()`,
+`_rrDirCells()` — are now the single source for every surface that prints
+direction. A tilt is asserted **only where `|tightened − liberalized| >
+unmeasured`**: if every unmeasured change went the other way, would the sign
+survive? That is the arithmetic of the claim, not a new threshold. Where it does
+not survive, the direction word is **withheld** and the count is printed instead.
+
+1. **Lookup card + Country Profile sidebar** — `↑0 / ↓1 / ?5` · *"direction not
+   established · only 1 of 6 fiscal changes carries a quantified take move (−1
+   on it); the 5 unmeasured could level or reverse it."* Four verdict states:
+   *firm* (named, red/green), *not established*, *not measured*, *no fiscal
+   change on record*. Only the first is ever coloured green.
+2. **Ranked table** — same split, verdict beneath the numbers, and the `<th>`
+   tooltip rewritten (it asserted *"neutral=structural"*, which is now false).
+3. **Regional Reform Tilt** — the Neutral column split into **Unmeasured** and
+   **No fiscal change**; the bar gains an amber segment; the tilt runs the same
+   test. **Europe is now the only named tilt** of the 8; the rest print their
+   measured margin with the unmeasured count beneath it.
+4. **Reform Direction panel + Snapshot** — `↑27 / ↓10 / ?35 / ·11`, and the
+   global claim is now *"direction not established"* with its basis stated.
+5. **Sourced Event Log** — `? Size not recorded` and `· No fiscal change`
+   replace `→ Neutral`; the direction filter gains both states. Returns
+   **35 / 11**, matching `reform_history.json` exactly.
+6. **CSV export** — the `Direction` column read `e.direction` off the raw
+   `REFORM_HISTORY` record, which has no such field. It has **exported empty on
+   every row since it was added**. Now carries the four-state split.
+
+### Result
+**4 of 21** jurisdictions still carry a named direction — **Colombia, Ecuador,
+United Kingdom, Venezuela** — and those are the evidenced tightening stories
+(UK: `↑6 / ↓3`, all 9 measured). The other **17** show the measured margin with
+its denominator attached. An analyst can no longer read "Nigeria is
+net-liberalizing toward the contractor" off a green card on an 81.1%-take
+jurisdiction, or quote "Latin America: Tightening +8" without seeing the 8
+unmeasured changes that could level it.
+
+### Verification
+Cold Playwright, storage cleared. All **21** jurisdictions enumerated through
+`_rrClassify`; four surfaces read individually (lookup card, CP sidebar, ranked
+table, event log); event-log filter returns **35 unmeasured / 11 context**,
+matching the source JSON; **no element right-overflows 1440px**; **0 page
+errors**. JS syntax gate **PASS** (10 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle** against the local build:
+**135 PASS / 0 FAIL / 1 WARN**.
+
+### Found on this walk, not fixed
+Carried from 488/489 — the Sourced Event Log opens **oldest-first**, leading
+with the 1938 PEMEX nationalization and burying the 2024 UK EPL repeal at row 83.
+Its own cycle.
+
+### STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip on a control this cycle did not
+change** — the two rewritten described a bucket that no longer exists. No
+page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row; Screener advanced
+filters still collapsed, presets still a dropdown. No take, NPV, IRR, breakeven,
+rank or score value was altered and no data file was regenerated. v430
+sessionStorage logic, v449/v451/v452 CP headline, the v451 Govt NPV removal,
+v489 Reform Risk placement, v578 Explorer grouping, v580 FC citable ranking,
+v581 `_dqTier`, the v582 `switchTab` guard, the v583 reform fiscal/context split
+and the v584 Explorer Excel scope are all intact. Tab order unchanged.
+Version bump v584→v585 across 5 structural sites, done silently at the end; it
+is **not** the deliverable.
