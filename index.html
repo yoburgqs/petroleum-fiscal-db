@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v588</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v589</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1399,7 +1399,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v588</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v589</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1469,7 +1469,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v588</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v589</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1811,7 +1811,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v588';
+  return m ? m[0] : 'v589';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1886,7 +1886,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v588');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v589');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -28300,6 +28300,59 @@ function cpBeTieBadge(country) {
 }
 window.cpBeTieBadge = cpBeTieBadge;
 
+// v589 (T2): the base rate of the Country Profile entry test, and how much of it is
+// already carried by government take.
+//
+// v516 removed the previous verdict -- mean IRR against a 15% hurdle -- with the reason
+// written into its own comment: "that cleared for essentially every country and so carried
+// no information." The replacement test (npv_75 > 0 AND npv_50 > 0) has the same property.
+// Measured on live country_data.json: 180 of 182 non-monopoly countries clear it. Only
+// Malaysia and Yemen do not. A line that says the same thing about 98.9% of the database
+// is not a verdict, and it was the first line an analyst read on this tab.
+//
+// Worse, the two figures it cites as evidence are not independent of the take it also
+// cites. Contractor NPV is computed on ONE fixed Deepwater profile ($1.2B capex / 50k bbl/d
+// / $15/bbl opex), so gross revenue is a constant across all 185 countries and NPV is
+// essentially the leftover after government take: npv_75 regresses on take_75 at
+// r2 = 0.89, slope about -$61M per point of take. The analyst read a profitability test,
+// a downside stress test and a fiscal-burden reading agreeing with each other. They were
+// reading one number three times.
+//
+// Everything here is measured off COUNTRY_DATA at render time, never written into the
+// prose, so the sentence cannot go stale the way v575 found the Fiscal Compare mix line had.
+var _cpFloorBaseCache = null;
+function cpFloorBase() {
+  if (_cpFloorBaseCache) return _cpFloorBaseCache;
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return null;
+  var elig = COUNTRY_DATA.filter(function(d) {
+    return !isStateMonopoly(d.take_75) && d.take_75 != null
+        && d.npv_75 != null && d.npv_50 != null;
+  });
+  if (elig.length < 2) return null;
+  var pass = elig.filter(function(d) { return d.npv_75 > 0 && d.npv_50 > 0; });
+  var fail = elig.filter(function(d) { return !(d.npv_75 > 0 && d.npv_50 > 0); });
+  var n = elig.length, mx = 0, my = 0;
+  elig.forEach(function(d) { mx += d.take_75; my += d.npv_75; });
+  mx /= n; my /= n;
+  var sxy = 0, sxx = 0, syy = 0;
+  elig.forEach(function(d) {
+    sxy += (d.take_75 - mx) * (d.npv_75 - my);
+    sxx += (d.take_75 - mx) * (d.take_75 - mx);
+    syy += (d.npv_75 - my) * (d.npv_75 - my);
+  });
+  var r2 = (sxx > 0 && syy > 0) ? (sxy * sxy) / (sxx * syy) : null;
+  _cpFloorBaseCache = {
+    n: n,
+    nPass: pass.length,
+    nFail: fail.length,
+    failNames: fail.map(function(d) { return d.country; }).sort(),
+    r2: r2,
+    slope: sxx > 0 ? sxy / sxx : null
+  };
+  return _cpFloorBaseCache;
+}
+window.cpFloorBase = cpFloorBase;
+
 function loadCountryProfile(country) {
   const content = document.getElementById('dd-content');
   const cpEmpty = document.getElementById('cp-empty-state');
@@ -28537,15 +28590,53 @@ function loadCountryProfile(country) {
     // essentially every country and so carried no information. It is now whether contractor NPV,
     // already discounted at the 10% WACC, survives the $50/bbl downside leg on the same
     // standardized profile. NPV>0 at 10% IS the hurdle test; the $50 leg is the stress.
+    // v589 (T2): this branch fires for 180 of the 182 non-monopoly countries in the database.
+    // It used to lead with a green tick and the words "Clears the 10% WACC across the price
+    // band" -- a pass that 98.9% of the database shares, stated as though it were a finding,
+    // on the first line an analyst reads when asking whether a country is attractive at $75.
+    // And the two figures it offered as corroboration are not independent of the take it
+    // quotes: contractor NPV is computed on ONE fixed Deepwater profile, so gross revenue is
+    // constant across all 185 countries and NPV is close to the residual after government
+    // take (r2 = 0.89 against take_75). The line now leads with the tier that actually varies,
+    // reports the floor check WITH its base rate, and says outright that the NPV pair
+    // restates the take. Numbers from cpFloorBase(), measured at render time.
     if (hasNpv && npv > 0 && hasDown && npv50 > 0) {
+      var _fb589 = (typeof cpFloorBase === 'function') ? cpFloorBase() : null;
+      // Tier scale and vocabulary are the platform's own -- the v449 CP headline colours and
+      // the Fiscal Compare "Tier" column legend (IF / MOD / HI / NOC). No new threshold.
+      var _tierLbl589 = take <= 40 ? 'investor-friendly tier (\u226440%)'
+                      : take <= 60 ? 'moderate tier (41\u201360%)'
+                      : take <= 75 ? 'high-take tier (61\u201375%)'
+                      : 'NOC-dominated tier (>75%)';
+      // v550's reform-CTA gate keeps its own take<=55 threshold. The tier bands above are a
+      // display scale; silently widening which countries get a reform callout is not this change.
       var favourable = take <= 55;
-      icon = '\u2714';
-      col = favourable ? 'var(--green)' : 'var(--yellow)';
-      bg  = favourable ? 'rgba(21,128,61,.05)' : 'rgba(161,98,7,.05)';
-      border = favourable ? 'rgba(21,128,61,.2)' : 'rgba(161,98,7,.2)';
-      msg = (favourable ? 'Clears the 10% WACC across the price band' : 'Clears the 10% WACC, but high-take')
-          + ' \u2014 contractor NPV ' + cpNpvFmt(npv) + ' @$75 and still ' + cpNpvFmt(npv50)
-          + ' at the $50/bbl downside, at ' + take.toFixed(1) + '% govt take' + _cmpBasisNote552 + '.' + beStr
+      icon = '\u25CF';
+      col = take <= 40 ? 'var(--green)' : take <= 60 ? 'var(--yellow)'
+          : take <= 75 ? 'var(--orange)' : 'var(--red)';
+      bg  = take <= 40 ? 'rgba(21,128,61,.05)' : take <= 60 ? 'rgba(161,98,7,.05)'
+          : take <= 75 ? 'rgba(194,65,12,.05)' : 'rgba(185,28,28,.05)';
+      border = take <= 40 ? 'rgba(21,128,61,.2)' : take <= 60 ? 'rgba(161,98,7,.2)'
+          : take <= 75 ? 'rgba(194,65,12,.25)' : 'rgba(185,28,28,.2)';
+      // The base-rate clause is what stops the pass reading as a verdict. If cpFloorBase()
+      // cannot measure (data not loaded), the clause is omitted rather than guessed.
+      var _baseClause589 = (_fb589 && _fb589.n)
+        ? ' \u2014 but so do ' + _fb589.nPass + ' of ' + _fb589.n + ' non-monopoly regimes here'
+        : '';
+      var _dependClause589 = (_fb589 && _fb589.r2 != null && _fb589.slope != null)
+        ? ', and on ORCA\u2019s single fixed Deepwater profile contractor NPV tracks govt take at r\u00b2\u00a0'
+          + _fb589.r2.toFixed(2) + ' (\u2248\u2212$' + Math.abs(_fb589.slope).toFixed(0)
+          + 'M per point of take), so these two figures restate the take rather than test it'
+        : '';
+      msg = '<strong>' + take.toFixed(1) + '% govt take @$75</strong> \u2014 ' + _tierLbl589
+          + _cmpBasisNote552 + '. Clears the 10% WACC at $75 (' + cpNpvFmt(npv)
+          + ') and at the $50/bbl downside (' + cpNpvFmt(npv50) + ')'
+          + _baseClause589 + _dependClause589
+          // The contract count travels with the instruction, so "defend on the take" is
+          // self-calibrating: Norway reads n=7,643, Vanuatu reads n=7. Same figure the
+          // headline strip already prints as a chip; no new threshold, no new judgement.
+          + '. <strong>Defend on the take and its evidence tier' + (d.n != null ? ' (n=' + Number(d.n).toLocaleString() + ' contracts)' : '')
+          + ', not on the NPV.</strong>' + beStr
           // v550 (T4): the trigger was take>55 alone, so the United Kingdom -- rank 21 of 21,
           // 5 law changes since 2010, the single most reform-exposed regime ORCA scores -- got a
           // green verdict with no mention of reform at all, because its 49.2% take reads
@@ -28556,8 +28647,16 @@ function loadCountryProfile(country) {
           + ((favourable && !(_cpReformV && _cpReformV.icColor !== 'var(--green)')) ? '' : _cpReformCta(d.country));
     } else if (hasNpv && npv > 0 && hasDown && npv50 <= 0) {
       icon = '\u26a0'; col = 'var(--yellow)'; bg = 'rgba(161,98,7,.05)'; border = 'rgba(161,98,7,.2)';
+      // v589 (T2): this is the rare branch -- 2 of 182 non-monopoly countries reach it. Saying so
+      // is what makes it worth reading, now that the passing branch no longer claims to be a finding.
+      var _fbF589 = (typeof cpFloorBase === 'function') ? cpFloorBase() : null;
+      var _rareF589 = (_fbF589 && _fbF589.nFail)
+        ? ' Only ' + _fbF589.nFail + ' of ' + _fbF589.n + ' non-monopoly regimes in ORCA fail this ('
+          + _fbF589.failNames.join(', ') + '), so unlike the take reading it is genuinely discriminating.'
+        : '';
       msg = 'Price-dependent entry \u2014 contractor NPV ' + cpNpvFmt(npv) + ' @$75 but ' + cpNpvFmt(npv50)
-          + ' at $50/bbl: this regime does not survive a price break on the standardized profile.' + beStr
+          + ' at $50/bbl: this regime does not survive a price break on the standardized profile, at '
+          + take.toFixed(1) + '% govt take' + _cmpBasisNote552 + '.' + _rareF589 + beStr
           + ' IC: carry a low-price case.';
     } else if (hasNpv && npv > 0) {
       icon = '\u2714'; col = take <= 55 ? 'var(--green)' : 'var(--yellow)';
@@ -28578,7 +28677,7 @@ function loadCountryProfile(country) {
     var _proxyDisclosure = _isProxyCountry
       ? ' <span style="font-size:10px;color:var(--yellow);font-weight:700;background:rgba(161,98,7,.08);border:1px solid rgba(161,98,7,.25);border-radius:3px;padding:1px 5px;white-space:nowrap;cursor:help;" title="PROXY basis: no block-level production data — take modeled from statutory fiscal parameters. IC rule: state \'statutory model basis (ORCA PROXY)\' and cross-check primary PSA/concession terms before IC submission. Take may diverge ±5–15pp from actual block economics.">⚠ PROXY — statutory model</span>'
       : '';
-    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 12px;background:' + bg + ';border:1px solid ' + border + ';border-radius:5px;margin-bottom:10px;" title="One-line IC verdict — distills govt take, contractor NPV at $75 and at the $50/bbl downside, and breakeven into a single screen decision. Standardized Deepwater profile, 10% WACC, 100% WI. Country-level IRR is deliberately not part of this test: the bundled figure is an arithmetic mean of per-contract IRRs and clears a 15% hurdle for almost every country. Run Scenario Builder for a project IRR.">'
+    return '<div style="display:flex;align-items:center;gap:8px;padding:5px 12px;background:' + bg + ';border:1px solid ' + border + ';border-radius:5px;margin-bottom:10px;" title="One-line IC read. The government take and its tier are the discriminating figures and are what you can cite. The NPV pair below them is a FLOOR CHECK, not a ranking: contractor NPV is computed on one fixed standardized Deepwater profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex, 10% WACC, 100% WI) that is identical for all 185 countries, so gross revenue is a constant and NPV is close to the residual left after government take — it regresses on take at r² 0.89. Almost every non-monopoly regime clears it; the line states the exact pass count. Do not read a larger NPV as a better project: the top of that ranking is Vanuatu, the Bahamas and Montenegro, jurisdictions with no verified production. Country-level IRR is deliberately absent — the bundled figure is an arithmetic mean of per-contract IRRs and clears a 15% hurdle for almost every country. Run Scenario Builder for a project NPV or IRR on your own field.">'
       + '<span style="font-size:14px;font-weight:900;color:' + col + ';flex-shrink:0;">' + icon + '</span>'
       + '<span style="font-size:11px;color:var(--text);line-height:1.4;min-width:0;">' + msg + _proxyDisclosure + '</span>'
       + '</div>';
