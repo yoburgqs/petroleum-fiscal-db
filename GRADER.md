@@ -21055,3 +21055,18 @@ unchanged. No changelog entry added — the in-page changelog's newest entry is
 v581 and cycles 487–493 also added none; the directive treats changelog catch-up
 as bookkeeping. Version sweep **v588→v589** across 5 structural sites, done
 silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 494 Log — 2026-08-30 00:57
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle complete.
+
+## Cycle 494 — v589
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest by six cycles; 493 ran T6)
+
+**Friction.** The first line of Country Profile — the line that exists to answer T2 — opened with a green ✔ and *"Clears the 10% WACC across the price band — contractor NPV $2.7B @$75 and still $1.2B at the $50/bbl downside, at 37.0% govt take."* Two defects, both measured off live `country_data.json`:
+
+1. **The test pass
