@@ -22136,3 +22136,16 @@ or reordered.** **No published take, NPV, rank, score, tier colour or pill value
 no threshold was introduced.** v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452,
 v489 and all later locks intact. Version sweep **v597 → v598** across 5 sites, done silently at
 the end; it is **not** the deliverable.
+
+---
+## Cycle 503 Log — 2026-08-30 08:44
+- Test before: 134 PASS / 0 FAIL
+- Test after: 135 PASS / 1 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle 503 complete.
+
+## Cycle 503 — T4 / v598
+
+**Task — T4:** "What is my fiscal-stability and reform exposure here?" — the stalest task; it last ran at v590, seven version commits ago.
+
+**Friction.** I walked T4 cold with storage cleared into the Reform Risk per-country lookup, the only control on the platform that takes one country and returns a reform verdict. Those verdicts exist to say the Reform Frequency Score is a *count* and never a *magnitude* — so each one ends by p
