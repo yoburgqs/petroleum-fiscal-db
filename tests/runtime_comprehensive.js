@@ -806,6 +806,40 @@ async function testReformRisk(page) {
     if (allReforms > 0) p(S, '_ALL_REFORMS', `${allReforms} reform events`);
     else f(S, '_ALL_REFORMS', '_ALL_REFORMS empty');
 
+    // v598 (T4): the per-country lookup must carry that country's own sourced event log.
+    // Three surfaces route here promising "the full event log", and until v598 this tab
+    // held only global aggregates — the selected country's events were nowhere on it.
+    const lookup = await page.$('#rr-country-lookup');
+    if (lookup) {
+      await page.selectOption('#rr-country-lookup', 'Venezuela');
+      await page.waitForTimeout(400);
+      const vz = await page.evaluate(() => {
+        const v = document.getElementById('rr-country-verdict');
+        const t = v ? v.innerText : '';
+        return { rows: v ? v.querySelectorAll('.reform-event').length : 0,
+                 inWin: /IN THE 2010 SCORING WINDOW/i.test(t),
+                 preWin: /BEFORE THE WINDOW/i.test(t),
+                 y2007: t.indexOf('2007') > -1, y1975: t.indexOf('1975') > -1 };
+      });
+      if (vz.rows === 4 && vz.inWin && vz.preWin && vz.y2007 && vz.y1975)
+        p(S, 'lookup event log (covered)', 'Venezuela: 4 events, split at the 2010 window, 1975+2007 ruptures on screen');
+      else f(S, 'lookup event log (covered)', `Venezuela log wrong: ${JSON.stringify(vz)}`);
+
+      // An uncovered jurisdiction must render no event rows and still say why.
+      await page.selectOption('#rr-country-lookup', 'Saudi Arabia');
+      await page.waitForTimeout(400);
+      const sa = await page.evaluate(() => {
+        const v = document.getElementById('rr-country-verdict');
+        return { rows: v ? v.querySelectorAll('.reform-event').length : 0,
+                 nocov: v ? /no Reform Frequency Score/i.test(v.innerText) : false };
+      });
+      if (sa.rows === 0 && sa.nocov) p(S, 'lookup event log (uncovered)', 'Saudi Arabia: 0 event rows, no-coverage verdict intact');
+      else f(S, 'lookup event log (uncovered)', `Uncovered case wrong: ${JSON.stringify(sa)}`);
+
+      await page.selectOption('#rr-country-lookup', '');
+      await page.waitForTimeout(200);
+    } else w(S, 'lookup event log', '#rr-country-lookup not found');
+
   } catch(e) { f(S, 'exception', e.message); }
 }
 
