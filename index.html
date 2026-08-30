@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v595</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v596</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v595</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v596</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v595</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v596</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v595';
+  return m ? m[0] : 'v596';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v595');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v596');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -23448,6 +23448,90 @@ function _icFeeBasisClause(d) {
     + '%, which is the figure to rank on)';
 }
 
+// ---------------------------------------------------------------------------
+// v596 (T5): the production-data basis never left the tool.
+//
+// Country Profile prints "⚠ PROXY — statutory model" in the headline strip, the
+// Fiscal Compare reading guide states the rule outright — "never cite a PROXY country's
+// take as definitive; always state 'statutory model basis (ORCA PROXY)' in the IC memo"
+// — and Side-by-Side already carries a "Data basis" row that travels into its paste.
+// The two highest-traffic paste artifacts did not: CP "Copy for IC Memo" / "⎘ IC Citation",
+// the FC row-drilldown citation, the FC 4-price IC table and the FC "Copy for IC Memo"
+// table all dropped it. So the analyst read the warning on screen, clicked the button
+// whose entire purpose is to produce the memo text, and pasted the exact memo the tool's
+// own rule forbids.
+//
+// It is not a rare edge: 163 of the 185 published countries hold ZERO verified block-level
+// production (prod_coverage_pct == 0, simple_avg weighting), and the omission is biased
+// toward the rows most likely to be pasted — all 30 of the lowest-take countries on the
+// default Fiscal Compare ranking are PROXY. No country is fully production-weighted: the
+// deepest coverage on record is the United Kingdom at 37.6%, and PART-PROD countries run
+// as thin as the USA at 0.2% and Australia at 0.3% — both of which pasted with no basis
+// statement at all.
+//
+// Three registers on one axis, computed from _dqTier() so this can never drift from the
+// on-screen badge the way the two grading methods did.
+function _icProdBasis(d) {
+  var e = d || {};
+  var t = (typeof _dqTier === 'function') ? _dqTier(e) : null;
+  var cov = e.prod_coverage_pct || 0;
+  var n = e.n != null ? Number(e.n) : null;
+  var nStr = n != null ? n.toLocaleString() : '?';
+  var name = e.country || 'this country';
+  var label = t ? t.label : (cov > 0 ? 'PART-PROD' : 'PROXY');
+  return { label: label, cov: cov, n: n, nStr: nStr, name: name };
+}
+
+// Full sentence, for the paragraph-shaped artifacts. Always returns text: the basis is
+// never "clean" — even the top rung is a minority of contracts, and saying so is the point.
+function _icProdBasisNote(d) {
+  var b = _icProdBasis(d);
+  if (b.label === 'PROXY') {
+    return 'Data basis — statutory model basis (ORCA PROXY): ORCA holds no verified '
+      + 'block-level production for any of ' + b.name + '’s ' + b.nStr + ' contracts, so this '
+      + 'take is the simple average of statutory fiscal terms and is not production-weighted. '
+      + 'ORCA’s stated IC rule is that a PROXY take is directional — it may diverge '
+      + '±5–15pp from block-level economics — and must not be cited as definitive '
+      + 'without cross-checking the primary concession/PSA terms. 163 of the 185 published '
+      + 'countries are on this basis.';
+  }
+  if (b.label === 'PART-PROD') {
+    return 'Data basis — partially production-weighted: verified block-level production is '
+      + 'held for ' + b.cov.toFixed(1) + '% of ' + b.name + '’s ' + b.nStr + ' contracts; the '
+      + 'remaining ' + (100 - b.cov).toFixed(1) + '% enter the average unweighted. Read the take '
+      + 'as indicative of statutory terms rather than of realised field economics, and state the '
+      + 'coverage in the memo.';
+  }
+  return 'Data basis — production-weighted, the deepest tier ORCA publishes: verified '
+    + 'block-level production is held for ' + b.cov.toFixed(1) + '% of ' + b.name + '’s '
+    + b.nStr + ' contracts; the other ' + (100 - b.cov).toFixed(1) + '% enter unweighted. No '
+    + 'country in the database exceeds 37.6% coverage.';
+}
+
+// Own line, immediately above the fee-basis line, so the caveat travels with the numbers
+// whichever way the memo is later cut down.
+function _icProdBasisLine(d) {
+  var n = _icProdBasisNote(d);
+  return n ? n + '\n' : '';
+}
+
+// The same fact compressed to one clause, for the single-line IC citation.
+function _icProdBasisClause(d) {
+  var b = _icProdBasis(d);
+  if (b.label === 'PROXY') {
+    return ' [statutory model basis — ORCA PROXY: no verified block-level production held; '
+      + 'directional, ±5–15pp, not to be cited as definitive]';
+  }
+  return ' [production-weighted on ' + b.cov.toFixed(1) + '% of ' + b.nStr + ' contracts]';
+}
+
+// Short cell value for the tabular artifacts.
+function _icProdBasisCell(d) {
+  var b = _icProdBasis(d);
+  if (b.label === 'PROXY') return 'PROXY — statutory model, no verified production (directional, not citable as definitive)';
+  return b.label + ' — production-weighted on ' + b.cov.toFixed(1) + '% of contracts';
+}
+
 // v546 (T2): contractor-NPV rank on the PRODUCER basis.
 // The "NPV @ $75" tile in Fiscal Mechanics & Key Metrics ranked against all 185 countries.
 // v534 corrected every TAKE rank on this same tab to the producer basis and v542 did the same
@@ -28708,6 +28792,43 @@ function loadCountryProfile(country) {
     icSummaryBtn.title = 'Copy IC memo summary paragraph for ' + country + ' to clipboard';
     icSummaryBtn.setAttribute('aria-label', 'Copy IC memo summary for ' + country + ' to clipboard');
   }
+  // v596 (T5): the headline strip three inches below already stamps "⚠ PROXY — statutory model"
+  // on the 163 countries with no verified block-level production. The two buttons that turn this
+  // page into memo text sat ABOVE it and looked identical for every country, so the analyst read
+  // the warning, scrolled up, and copied an artifact that had dropped it. Both buttons now carry
+  // the basis on their face, before the click, and the pasted text carries it too.
+  (function() {
+    var pb = (typeof _icProdBasis === 'function') ? _icProdBasis(d) : null;
+    var isProxy = pb && pb.label === 'PROXY';
+    var mark = document.getElementById('dd-ic-basis-mark');
+    if (!mark && icSummaryBtn && icSummaryBtn.parentNode) {
+      mark = document.createElement('span');
+      mark.id = 'dd-ic-basis-mark';
+      mark.style.cssText = 'display:none;margin-left:6px;font-size:10px;font-weight:700;'
+        + 'letter-spacing:.3px;padding:3px 7px;border-radius:4px;white-space:nowrap;'
+        + 'border:1px solid rgba(176,104,0,.55);background:rgba(176,104,0,.12);color:var(--accent);';
+      icSummaryBtn.parentNode.insertBefore(mark, icSummaryBtn.nextSibling);
+    }
+    if (mark) {
+      if (isProxy) {
+        mark.style.display = 'inline-flex';
+        mark.textContent = '⚠ PROXY basis — copies as directional';
+        mark.title = 'ORCA holds no verified block-level production for ' + country
+          + ', so its take is a simple average of statutory terms. Both copy buttons state this in '
+          + 'the pasted text: a PROXY take is directional (±5–15pp) and is not to be cited '
+          + 'as definitive without cross-checking the primary concession/PSA terms.';
+      } else {
+        mark.style.display = 'inline-flex';
+        mark.style.borderColor = 'rgba(21,128,61,.5)';
+        mark.style.background = 'rgba(21,128,61,.10)';
+        mark.style.color = '#15803D';
+        mark.textContent = pb ? (pb.label + ' — ' + pb.cov.toFixed(1) + '% production-weighted') : '';
+        mark.title = 'Verified block-level production is held for ' + (pb ? pb.cov.toFixed(1) : '0') + '% of '
+          + country + '’s contracts; the rest enter the average unweighted. The pasted text states this.';
+      }
+      if (isProxy) { mark.style.borderColor = 'rgba(176,104,0,.55)'; mark.style.background = 'rgba(176,104,0,.12)'; mark.style.color = 'var(--accent)'; }
+    }
+  })();
 
   const mechs = d.mechanics.split(',').map(m => `<span class="${getMechTagClass(m.trim())}">${m}</span>`).join(' ');
   // v522 (T2): `mc` was {p10: take_50, p50: take_75, p90: take_125} -- an alias, not a simulation.
@@ -32807,6 +32928,7 @@ function copyICCitation() {
   var beStr = (_beRes != null) ? 'BE $' + _beRes.toFixed(0) + '/bbl' : '';
   var metricsStr = [npvStr, downStr, beStr].filter(Boolean).join(', ');
   var cite = country + ': Govt Take ' + takeStr + ' @$75/bbl' + _icFeeBasisClause(d)
+    + _icProdBasisClause(d)   // v596 (T5)
     + (metricsStr ? ', ' + metricsStr : '')
     + (tierStr ? ' — Deepwater profile, 10% WACC, 100% WI, ' + mechStr + ' regime, ' + tierStr + ' sourcing' : '')
     + '. Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/';
@@ -32860,6 +32982,7 @@ function copyICSummary() {
     + 'Contractor NPV (10% WACC, Deepwater, 100% WI): ' + npv50Str + ' @$50 (downside) · ' + npvStr + ' @$75 (base) · ' + npv125Str + ' @$125 (upside). '
     + 'Breakeven: ' + beStr + '. '
     + 'Fiscal predictability: ' + (stabScore == null ? stabLabel : stabLabel + ' (score ' + stabScore + '/100' + (_fpDispersion(d).state === 'single' ? ', spread component not exercised — all contracts price to one statutory term' : ', measured spread ' + _fpDispersion(d).iqr.toFixed(1) + 'pp') + ')') + '.\n'
+    + _icProdBasisLine(d)   // v596 (T5)
     + _icBasisLine(d)
     + CP_IRR_NOTE + '\n'
     + 'Source: ORCA Petroleum Fiscal Intelligence Platform ' + _orcaVerNow() + ' (2026) — yoburgqs.github.io/petroleum-fiscal-db/';
@@ -36507,6 +36630,9 @@ function openFCDrilldown(country) {
     // v523: the answer to "where is IRR?" travels inside the pasted artifact, not back on the page
     // -- the same rule v516 applied to the Country Profile TSV.
     _tsvRows.push('');
+    // v596 (T5): the production-data basis travels with the matrix. The take rows above are
+    // a simple average of statutory terms for 163 of the 185 countries and said so nowhere.
+    if (typeof _icProdBasisNote === 'function') _tsvRows.push(_icProdBasisNote(d));
     _tsvRows.push(typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '');
     var _tsv = _tsvRows.join('\n');
     var _tsvEsc = JSON.stringify(_tsv).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
@@ -36819,6 +36945,11 @@ function openFCDrilldown(country) {
     if (_dbIsMonopoly) {
       _lines.push('Note: ' + country + ' is a state monopoly in the database (take ≥ 99.5%) — there is no contractor position, and any modelled figure below is a generic what-if, not an available fiscal regime.');
     }
+    // v596 (T5): the production-data basis of the database take, on its own line, directly under
+    // the sentence it qualifies. The FC reading guide states the rule -- "always state 'statutory
+    // model basis (ORCA PROXY)' in the IC memo" -- and this button, which the IC Analyst Guide
+    // routes the analyst to, was emitting the take without it.
+    if (typeof _icProdBasisNote === 'function') _lines.push(_icProdBasisNote(d));
     if (_liveT != null) {
       _lines.push('Model cross-check (not citable): a single hypothetical ' + _ddProfileName.toLowerCase() + ' project'
         + (r.termsBasis === 'default' ? ' on generic ' + r.mechanic + ' terms' : r.termsBasis === 'country' ? ' on ' + country + ' country-specific terms' : ' on ORCA contract-database terms')
@@ -37599,9 +37730,16 @@ function copyFCForIC(btn) {
     // v568 (T5): the model NPV now travels with the artifact. It is the number that was on screen
     // when the analyst pressed copy; omitting it is what let the two disagree unnoticed.
     'Contractor NPV $M @$' + P + ' — this screen’s model, ' + profName + ' profile',
-    'Model basis'];
+    'Model basis',
+    // v596 (T5): the DATA basis -- how much of the citable database take is weighted by verified
+    // field production. A different axis from "Model basis", which is about the compare engine's
+    // terms. Side-by-Side has carried this as a "Data basis" row since it was built; the flagship
+    // shortlist paste had no column for it, so 163 PROXY rows left the tool indistinguishable
+    // from the 22 with production behind them.
+    'Data basis'];
   var matrix = [head];
   var nGeneric = 0, nMono = 0, nBe = 0;
+  var nProxy = 0, proxyNames = [];   // v596 (T5)
   var nSignFlip = 0, flipNames = [];   // v568 (T5)
   for (var i = 0; i < trs.length; i++) {
     var c = trs[i].getAttribute('data-country');
@@ -37624,6 +37762,8 @@ function copyFCForIC(btn) {
       : r.termsBasis === 'country' ? 'Country-specific terms'
       : r.termsBasis === 'db' ? 'ORCA contract database terms'
       : 'GENERIC DEFAULT (' + (typeof describeDefaultTerms === 'function' ? describeDefaultTerms(r.mechanic) : r.mechanic) + ') — mechanic standard, not this country’s terms. Directional only, NOT citable.';
+    var _pb = (typeof _icProdBasis === 'function') ? _icProdBasis(meta) : null;   // v596 (T5)
+    if (_pb && _pb.label === 'PROXY') { nProxy++; if (proxyNames.length < 8) proxyNames.push(c); }
     matrix.push([
       (trs[i].cells[0] ? String(trs[i].cells[0].textContent || '').trim() : String(i + 1)),
       c,
@@ -37635,7 +37775,8 @@ function copyFCForIC(btn) {
       num(r.swing, 1),
       mono ? '' : num(r.liveTake, 1),
       mono ? '' : num(r.liveNPV, 0),
-      basis
+      basis,
+      (typeof _icProdBasisCell === 'function') ? _icProdBasisCell(meta) : ''   // v596 (T5)
     ]);
   }
   if (matrix.length < 2) { showCopyToast('No rows on screen to copy.'); return; }
@@ -37662,6 +37803,16 @@ function copyFCForIC(btn) {
   if (nGeneric) warn += nGeneric + ' of the ' + N + ' rows have a GENERIC DEFAULT model basis: their model take column is the standard for the mechanic, identical across every such row, and is not citable. Their ORCA database take column is populated and is. '
     + 'Since v563 those rows are not ranked: they carry \u201c\u2014\u201d in the # column and sit at the end of the table, after the ' + (N - nGeneric - nMono) + ' countries modelled on their own fiscal terms. Do not read their position as a placing. ';
   if (nMono) warn += nMono + ' row' + (nMono > 1 ? 's are' : ' is') + ' a state monopoly at 100% government take — no contractor position, not comparable with the other rows. ';
+  // v596 (T5): the PROXY count, on this view, with the rule stated. The omission was biased —
+  // low take and no production evidence are the same rows, so the head of an ascending shortlist
+  // is where the unweighted countries collect.
+  if (nProxy) warn += nProxy + ' of the ' + N + ' rows carry a PROXY data basis: ORCA holds no verified '
+    + 'block-level production for them, so their take is the simple average of statutory terms and is '
+    + 'not production-weighted. ORCA’s stated IC rule is that a PROXY take is directional (±5–15pp '
+    + 'against block-level economics) and must not be cited as definitive without cross-checking the '
+    + 'primary concession/PSA terms. See the Data basis column'
+    + (proxyNames.length ? ' — includes ' + proxyNames.join(', ') + (nProxy > proxyNames.length ? ' and ' + (nProxy - proxyNames.length) + ' more' : '') : '')
+    + '. No country in the database exceeds 37.6% production coverage. ';
   if (nSignFlip) warn += 'On ' + nSignFlip + ' row' + (nSignFlip > 1 ? 's' : '') + ' the citable database NPV and this screen’s model NPV disagree on the SIGN — one says the contractor creates value at this price and the other says it destroys it: '
     + flipNames.join(', ') + (nSignFlip > flipNames.length ? ' and ' + (nSignFlip - flipNames.length) + ' more' : '')
     + '. Cite the database column and do not quote the model figure for these rows without saying which basis it is on. ';
