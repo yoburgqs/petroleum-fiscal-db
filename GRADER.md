@@ -20700,3 +20700,16 @@ v451 Govt NPV removal, v489 Reform Risk placement, v549/v552/v565/v571 SbS
 comparability work, v555/v562 row removals — all intact. Tab order unchanged.
 Version bump v585→v586 across 5 structural sites, done silently at the end; it is
 **not** the deliverable.
+
+---
+## Cycle 491 Log — 2026-08-29 21:53
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 491 shipped as **v586**. Both repos pushed.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (490 was T4, 489 T5, 488 T4, 487 T2, 486 T6, 485 T5, 484 T1, 483 T3 — T3 was least recent.)
+
+## Friction
+Side-by-Side auto-seeds Norway / UK / Netherlands as an *example*. Anyone who came to compare a different three has to type their own into `#cmp-search` — the only control that does it. Its handler was twelve lines: one `input` listener running a bare substring filter, and 
