@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v586</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v587</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -174,8 +174,14 @@ button:focus-visible, [role="tab"]:focus-visible, [role="button"]:focus-visible 
 /* ── tables ── */
 .tbl-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
 table { width: 100%; border-collapse: collapse; }
-thead th { background: #EDE9E3; color: var(--muted); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; padding: 7px 10px; text-align: left; text-transform: uppercase; position: sticky; top: 0; white-space: nowrap; cursor: pointer; user-select: none; border-bottom: 1px solid var(--border); }
-thead th:hover { color: var(--text); }
+thead th { background: #EDE9E3; color: var(--muted); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; padding: 7px 10px; text-align: left; text-transform: uppercase; position: sticky; top: 0; white-space: nowrap; cursor: default; user-select: none; border-bottom: 1px solid var(--border); }
+/* v587 (T1): the hand cursor and the hover-darken are the browser's universal "this is clickable"
+   promise, and this rule made EVERY th on every table make it. On #tbl-screener nothing was
+   listening, so all 12 headers invited a click and swallowed it. The affordance now belongs to
+   the headers that actually sort, and to no others. */
+thead th[data-sort-key], thead th[data-sc-sort] { cursor: pointer; }
+thead th[data-sort-key]:hover, thead th[data-sc-sort]:hover { color: var(--text); }
+thead th[data-sc-sort]:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; color: var(--text); }
 thead th.sort-asc::after  { content: ' ▲'; color: var(--accent); }
 thead th.sort-desc::after { content: ' ▼'; color: var(--accent); }
 tbody tr { border-top: 1px solid var(--border); transition: background .1s; }
@@ -1393,7 +1399,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v586</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v587</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1463,7 +1469,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v586</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v587</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1805,7 +1811,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v586';
+  return m ? m[0] : 'v587';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1880,7 +1886,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v586');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v587');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2360,11 +2366,18 @@ window.copyPlatformCitation = function(btn) {
     <table id="tbl-screener">
       <thead>
         <tr>
-          <th>#</th><th>Country</th><th>Region</th><th>Mechanics</th>
-          <th class="num" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take</th><th class="num" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
-          <th class="num" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV</th>
-          <th class="num" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the $75 contractor NPV still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). Observed range &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th><th class="num">Breakeven ($/bbl)</th>
-          <th class="num" title="Production Coverage — percentage of a country's contracts that have verified field-level production data. High Prod Cov (≥30%, green) means government take is production-weighted by actual output. Low coverage means equal-weighting across contracts, which can over-represent small or inactive blocks. Click 'Prod Data Only' in Explorer to filter to high-coverage countries only.">Prod Cov <span style="font-size:10px;cursor:help;">ⓘ</span></th><th class="num" title="Price Swing — government take at $125/bbl minus take at $50/bbl, in percentage points. Measures fiscal progressivity: how much more government captures at high prices vs. low prices. High swing (>20pp, red) = regime is highly price-progressive — contractor upside is capped. Low swing (<10pp, green) = stable fiscal terms across the price cycle. Useful for stress-testing IOC economics in oil price scenarios.">Swing (pp)</th><th title="Fiscal tier: classification of fiscal regime by government take level at $75/bbl. IF = Investor-Friendly (≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = NOC-dominated (>75%). Used for portfolio-level screening when comparing across diverse geographies.">Tier</th>
+          <!-- v587 (T1): these headers now sort. Before this cycle #tbl-screener had no sort control
+               of any kind -- not a header, not a button, not a select -- while every one of its 12
+               headers rendered cursor:pointer and darkened on hover. Ranking the result of a screen
+               is the second half of T1 and it could not be done. Mechanics and Breakeven are left
+               unsortable on purpose: Mechanics is a multi-value tag list with no order, and the
+               legend under this table states that Breakeven "cannot rank two rows" -- all 65 modelled
+               values fall in $27-$34 and the other 120 are blank. Neither carries the hand cursor now. -->
+          <th>#</th><th data-sc-sort="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z. Click again for Z–A, a third time to return to the default ranking.">Country</th><th data-sc-sort="region" tabindex="0" role="columnheader" aria-sort="none" title="Group the result set by region, A–Z. Click again to reverse, a third time to return to the default ranking.">Region</th><th>Mechanics</th>
+          <th class="num" data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take</th><th class="num" data-sc-sort="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
+          <th class="num" data-sc-sort="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV</th>
+          <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the $75 contractor NPV still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). Observed range &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th><th class="num">Breakeven ($/bbl)</th>
+          <th class="num" data-sc-sort="prodcov" tabindex="0" role="columnheader" aria-sort="none" title="Production Coverage — percentage of a country's contracts that have verified field-level production data. High Prod Cov (≥30%, green) means government take is production-weighted by actual output. Low coverage means equal-weighting across contracts, which can over-represent small or inactive blocks. Click 'Prod Data Only' in Explorer to filter to high-coverage countries only.">Prod Cov <span style="font-size:10px;cursor:help;">ⓘ</span></th><th class="num" data-sc-sort="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price Swing — government take at $125/bbl minus take at $50/bbl, in percentage points. Measures fiscal progressivity: how much more government captures at high prices vs. low prices. High swing (>20pp, red) = regime is highly price-progressive — contractor upside is capped. Low swing (<10pp, green) = stable fiscal terms across the price cycle. Useful for stress-testing IOC economics in oil price scenarios.">Swing (pp)</th><th data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Fiscal tier: classification of fiscal regime by government take level at $75/bbl. IF = Investor-Friendly (≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = NOC-dominated (>75%). Used for portfolio-level screening when comparing across diverse geographies.">Tier</th>
         </tr>
       </thead>
       <tbody id="tbody-screener"></tbody>
@@ -25471,9 +25484,88 @@ function _frontierMarketsUniverse() {
 // production above the 163 whose economics are regional proxies. Nothing is filtered out —
 // only the order changes, and a labelled divider row marks the boundary.
 let _screenerEvidenceFirst = true;
+
+// ── v587 (T1): Screener column sort ──────────────────────────────────────────
+// #tbl-screener had no sort control at all. Fiscal Compare has .fc-sort-btn buttons and
+// #tbl-explorer has clickable data-sort-key headers; the Screener -- the tool T1 is asked
+// of -- had neither, yet inherited cursor:pointer and a hover-darken on all 12 headers from
+// the global `thead th` rule. So the analyst who loaded IOC Capital Screen, got 15 countries
+// and wanted them ranked by take clicked "Govt Take", saw the hand cursor, and nothing moved.
+// There was no other way to reorder the result: the only ordering was npv DESC inside the
+// evidence-first grouping, fixed.
+//
+// _scSortKey === null reproduces that default ordering byte for byte, so nothing about the
+// cold load, the presets or the v507 grouping changes until the analyst actually clicks.
+var _scSortKey = null;   // null = default (evidence-first / NPV desc), untouched
+var _scSortDir = null;   // 1 = ascending, -1 = descending
+
+// First click sends each column the way an analyst wants to read it: lowest take first
+// (most contractor-favourable), highest NPV first, strongest evidence first, lowest swing
+// first (most price-stable). Matches the directions Fiscal Compare's sort buttons already use.
+var _SC_SORT_DEFAULT_DIR = { country:1, region:1, take:1, evidence:-1, npv:-1, npv50:-1, prodcov:-1, swing:1 };
+var _SC_SORT_LABEL = {
+  country:  ['Country A–Z', 'Country Z–A'],
+  region:   ['Region A–Z', 'Region Z–A'],
+  take:     ['Govt Take low→high', 'Govt Take high→low'],
+  evidence: ['Evidence weakest first', 'Evidence strongest first'],
+  npv:      ['Contractor NPV low→high', 'Contractor NPV high→low'],
+  npv50:    ['NPV @$50 low→high', 'NPV @$50 high→low'],
+  prodcov:  ['Production coverage low→high', 'Production coverage high→low'],
+  swing:    ['Price swing low→high (most stable first)', 'Price swing high→low']
+};
+
+// Missing values sort last in BOTH directions rather than being coerced to 0 -- the v537/v568
+// lesson from the breakeven ceiling, which classified every un-modelled country as passing.
+function _scSortVal(d, key, takeKey, npvKey) {
+  switch (key) {
+    case 'country':  return d.country || '';
+    case 'region':   return d.region || '';
+    case 'take':     return d[takeKey];
+    case 'evidence': return (typeof _evidenceSortVal === 'function') ? _evidenceSortVal(d) : null;
+    case 'npv':      return d[npvKey];
+    case 'npv50':    return d.npv_50;
+    case 'prodcov':  return d.prod_coverage_pct;
+    case 'swing':    return d.swing;
+    default:         return null;
+  }
+}
+function _scSortCmp(takeKey, npvKey) {
+  var key = _scSortKey, dir = _scSortDir;
+  return function (a, b) {
+    var va = _scSortVal(a, key, takeKey, npvKey), vb = _scSortVal(b, key, takeKey, npvKey);
+    var na = (va === null || va === undefined || va !== va), nb = (vb === null || vb === undefined || vb !== vb);
+    if (na && nb) return (a.country || '').localeCompare(b.country || '');
+    if (na) return 1;            // no value -> bottom, whichever way the column points
+    if (nb) return -1;
+    var c = (typeof va === 'string') ? va.localeCompare(vb) : (va < vb ? -1 : va > vb ? 1 : 0);
+    // Ties broken alphabetically so the order is stable and reproducible in an export.
+    return c !== 0 ? c * dir : (a.country || '').localeCompare(b.country || '');
+  };
+}
+
+// asc -> desc -> off. The third click is the way back to the default ranking, which is why
+// the header indicator clears rather than sticking on a column.
+function setScreenerSort(key) {
+  if (!key || !_SC_SORT_DEFAULT_DIR.hasOwnProperty(key)) return;
+  if (_scSortKey !== key) { _scSortKey = key; _scSortDir = _SC_SORT_DEFAULT_DIR[key]; }
+  else if (_scSortDir === _SC_SORT_DEFAULT_DIR[key]) { _scSortDir = -_scSortDir; }
+  else { _scSortKey = null; _scSortDir = null; }
+  if (typeof runScreener === 'function') runScreener();
+}
+window.setScreenerSort = setScreenerSort;
+function clearScreenerSort() {
+  _scSortKey = null; _scSortDir = null;
+  if (typeof runScreener === 'function') runScreener();
+}
+window.clearScreenerSort = clearScreenerSort;
+
 let _activePresetName = null; // tracks which preset is currently applied
 
 function applyScreenerPreset(preset) {
+  // v587 (T1): a preset defines the whole screen, ranking included — R-factor PSC ranks by price
+  // sensitivity, the rest by the v507 evidence-first order. So loading one clears any column sort
+  // the analyst had clicked, rather than letting a stale sort silently override the preset's own.
+  _scSortKey = null; _scSortDir = null;
   const setSlider = (id, val) => {
     const el = document.getElementById(id);
     const lbl = document.getElementById('sv-' + id.replace('sl-',''));
@@ -25776,6 +25868,9 @@ function resetScreenerAll() {
   _screenerEvidenceFirst = true;
   var _evFirstBox = document.getElementById('sc-evidence-first');
   if (_evFirstBox) _evFirstBox.checked = true;
+  // v587: a column sort survived "Reset All" otherwise — every filter went back to default and
+  // the table stayed in whatever order the analyst had clicked it into.
+  _scSortKey = null; _scSortDir = null;
   applyScreenerPreset('reset');
   showCopyToast('All filters reset');
 }
@@ -26023,7 +26118,15 @@ function runScreener() {
   // Countries with verified production now sort first, proxies after, NPV DESC within each
   // group. Nothing is removed — all 185 stay in the table, the export and the count.
   const _dqRank = d => (_dqTier(d).hasProduction ? 0 : 1);
-  if (_screenerRfactorOnly) {
+  // v587 (T1): an explicit column sort takes precedence over both the R-factor swing sort and the
+  // v507 evidence-first grouping -- the analyst asked for this order, so they get it. Critically it
+  // is NOT layered on top of the grouping: an explicit sort ungroups, which drops _grouped to false
+  // and fires the v543 _mixedUngrouped banner. That is the honest outcome, not a regression -- the
+  // v507 divider genuinely cannot be drawn once rows are ordered by something else, and going
+  // silent about data basis in that state is exactly the defect v543 was written to fix.
+  if (_scSortKey) {
+    data.sort(_scSortCmp(takeKey, npvKey));
+  } else if (_screenerRfactorOnly) {
     data.sort((a,b) => (b.swing||0) - (a.swing||0));
   } else if (_screenerEvidenceFirst) {
     data.sort((a,b) => (_dqRank(a) - _dqRank(b)) || ((b[npvKey]||0) - (a[npvKey]||0)));
@@ -26032,7 +26135,7 @@ function runScreener() {
   }
   const _nVerified = data.filter(d => _dqTier(d).hasProduction).length;
   const _nProxy    = data.length - _nVerified;
-  const _grouped   = _screenerEvidenceFirst && !_screenerRfactorOnly && _nVerified > 0 && _nProxy > 0;
+  const _grouped   = _screenerEvidenceFirst && !_screenerRfactorOnly && !_scSortKey && _nVerified > 0 && _nProxy > 0;
   // v543 (cycle 442, T1) — _grouped was the single gate on ALL THREE proxy safeguards: the basis
   // sentence in the count line, the amber divider in the table, and the verified-production
   // handoff into Side-by-Side. It is false in two states where the analyst needs them MOST, and
@@ -26091,7 +26194,11 @@ function runScreener() {
 
   // Results count with active price label and preset name
   const priceLabel = `$${price}/bbl`;
-  const sortNote = _screenerRfactorOnly ? ' · sorted by price sensitivity (swing ↓)' : '';
+  // v587 (T1): the count line names the active column sort and offers the way back to the default
+  // ranking, so an analyst who reordered the table can see that they did and undo it in one click.
+  const sortNote = _scSortKey
+    ? ` · sorted by <strong style="color:var(--accent);">${(_SC_SORT_LABEL[_scSortKey] || [_scSortKey, _scSortKey])[_scSortDir === 1 ? 0 : 1]}</strong> <button onclick="event.stopPropagation();clearScreenerSort();" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;font-size:10px;padding:0 5px;margin-left:3px;" title="Return to the default ranking — verified field production first, contractor NPV descending within each group">&#x21ba; default order</button>`
+    : (_screenerRfactorOnly ? ' · sorted by price sensitivity (swing ↓)' : '');
   const presetPrefix = _activePresetName ? `${_activePresetName} · ` : '';
   // v456: "click any row" hint now accent-colored and bold — matches v455 FC status hint fix
   // v469: Added Deepwater profile context to screener count — analysts need to know the profile basis before using results in IC memo
@@ -26176,8 +26283,13 @@ function runScreener() {
   // named for what it is, and the fact-depth leg reports its own size.
   const _evidNote = (minEvid <= 0 && _screenerMinFacts <= 0) ? ''
     : ` <span style="color:var(--accent);font-weight:600;">\u2014 ${data.length} with \u2265${minEvid}% of fiscal facts read from the primary legal instrument (tier A)${_screenerMinFacts > 0 ? ` on \u2265${_screenerMinFacts} facts on file` : ''}; the EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward this</span>`;
+  // v587 (T1): sortNote was only concatenated into the FILTERED branch, so an analyst who sorted
+  // the unfiltered 185-country universe -- the commonest T1 entry point, and the state the page
+  // cold-loads into -- reordered the table and the count line said nothing about it and offered no
+  // way back. Sorting is not filtering, so the "no filters applied yet" lead is still correct; it
+  // now carries the sort alongside it.
   const _universeLead = (activeCount === 0 && !_activePresetName)
-    ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${_basisNote}`
+    ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${sortNote}${_basisNote}`
     : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}`;
   document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_takeBasisNote}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}${_beCatNote} <span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:6px;">→ click any row to open Country Profile</span><span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
@@ -26211,6 +26323,13 @@ function runScreener() {
     if (depCat !== 'all') crit.push('Water depth: ' + depCat);
     if (checkedMechs.length < totalMechBoxes) crit.push('Fiscal mechanics: ' + checkedMechs.join(', ') + ' only');
     if (!crit.length) crit.push('None — this is the full ORCA universe, not a screen result');
+    // v587: an exported shortlist now states its own ordering. The rows were always written in
+    // screen order; the file never said what that order was.
+    crit.push('Ranked by: ' + (_scSortKey
+      ? ((_SC_SORT_LABEL[_scSortKey] || [_scSortKey, _scSortKey])[_scSortDir === 1 ? 0 : 1])
+      : (_screenerRfactorOnly ? 'price sensitivity (swing, high to low)'
+        : (_grouped ? 'verified field production first, then contractor NPV descending within each group'
+          : 'contractor NPV descending'))));
     return {
       price: price,
       matched: data.length,
@@ -26280,7 +26399,7 @@ function runScreener() {
             + `This screen returned no production-backed regime. Fiscal terms are regional proxy estimates and the NPV / breakeven shown are indicative only. `
             + `Usable for fiscal comparison; not defensible as a screening shortlist on their own. Widen the screen, or load the IOC Capital Screen preset for the production-backed set.`
           : `<strong style="color:var(--accent);letter-spacing:.04em;">MIXED DATA BASIS &mdash; ${_nVerified} PRODUCTION-BACKED, ${_nProxy} PROXY, INTERLEAVED BY THIS SORT</strong><br>`
-            + `This ranking is by price sensitivity, so the two bases are not separated into blocks. `
+            + `This ranking is by ${_scSortKey ? (_SC_SORT_LABEL[_scSortKey] ? _SC_SORT_LABEL[_scSortKey][_scSortDir === 1 ? 0 : 1] : _scSortKey) : 'price sensitivity'}, so the two bases are not separated into blocks. `
             + `Rows badged PROXY have no verified field production &mdash; their fiscal terms are regional estimates and their NPV / breakeven are indicative only.`)
       + `</td></tr>`
     : '';
@@ -26329,6 +26448,21 @@ function runScreener() {
     </tr>`;
   }).join('');
   window._screenerData = data;
+
+  // v587 (T1): sort indicator on the Screener headers. The ▲/▼ CSS (thead th.sort-asc/.sort-desc)
+  // has existed since the Explorer table was built; #tbl-screener simply never set the class,
+  // because it had no sort. aria-sort is set alongside so a screen reader announces the change.
+  document.querySelectorAll('#tbl-screener thead th[data-sc-sort]').forEach(function (th) {
+    th.classList.remove('sort-asc', 'sort-desc');
+    // Tier and Govt Take share data-sc-sort="take"; both light up, which is correct — the tier
+    // IS the take bucket, so sorting either produces the same order.
+    if (_scSortKey && th.getAttribute('data-sc-sort') === _scSortKey) {
+      th.classList.add(_scSortDir === 1 ? 'sort-asc' : 'sort-desc');
+      th.setAttribute('aria-sort', _scSortDir === 1 ? 'ascending' : 'descending');
+    } else {
+      th.setAttribute('aria-sort', 'none');
+    }
+  });
 
   // M1.3: Inject "Load top N in Side-by-Side" button after results render
   // v501: 4 -> 5 to match SbS capacity and the Fiscal Compare door, and clearCompare()
@@ -38252,6 +38386,23 @@ document.addEventListener('DOMContentLoaded', function() {
   if (scEvFirst) scEvFirst.addEventListener('change', function() {
     _screenerEvidenceFirst = scEvFirst.checked;
     if (typeof runScreener === 'function') runScreener();
+  });
+});
+
+// v587 (T1): Screener column header sort — same delegation pattern as the v107 Explorer listener.
+document.addEventListener('DOMContentLoaded', function () {
+  var scThead = document.querySelector('#tbl-screener thead');
+  if (!scThead) return;
+  function fire(e) {
+    var th = e.target.closest('th[data-sc-sort]');
+    if (!th) return;
+    e.preventDefault();
+    if (typeof setScreenerSort === 'function') setScreenerSort(th.getAttribute('data-sc-sort'));
+  }
+  scThead.addEventListener('click', fire);
+  scThead.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    fire(e);
   });
 });
 
