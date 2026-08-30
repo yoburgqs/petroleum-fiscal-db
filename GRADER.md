@@ -21528,3 +21528,124 @@ sites, done silently at the end; it is **not** the deliverable.
 **Task:** T6 — "Where did this number come from and how solid is the evidence?" (stalest; last walked cycle 486).
 
 **Friction:** Walked cold into Explorer with storage cleared. Every Explorer and Screener row carries a coloured pill on the country name reading **FACTS**, **EVIDENCE** or **PROXY**. It's the only word in the row that answers "how solid is the evidence?" in plain English — and it doesn't answer it. `_dqTier()` (index.html:23023) comp
+
+---
+## Cycle 498 Log — 2026-08-30 (T3 / v593)
+
+**Task:** T3 — "How do these three countries compare side by side?" (least-recently-used;
+497 was T6, 496 T1, 495 T4, 494 T2 — the last T3 was cycle 461.)
+
+## Friction
+
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — into
+**Side-by-Side**, took the auto-seeded North Sea Trio, then built the analyst's own set
+(Guyana / Angola / Brazil) the way the task describes.
+
+The four **Govt Take** rows are the rows this tab tells the analyst to rank on. The v531
+inversion box directly under the grid says in bold *"Rank these countries on Govt Take,
+which is the production-weighted figure this platform publishes"*, and the v562 note says
+the same. Those four rows rendered as twelve bare percentages
+(`renderCompare` → `_cmpTakeCell`, `index.html:25095-25098`) with **no ordering shown on
+any of them** — and the ordering they carry is not the same at every price.
+
+On the tab's **own flagship quickstart preset**, *Atlantic Frontier Quartet*, all three
+pairs among Guyana / Angola / Brazil reverse across the published band:
+
+| price | order |
+|---|---|
+| $50 | Guyana 39.9 < Angola 42.3 < Brazil 49.5 |
+| $75 | Angola 53.0 < Guyana 54.1 < Brazil 55.6 |
+| $100 | Brazil 58.7 < Angola 60.2 < Guyana 61.7 |
+| $125 | **Brazil 60.6 < Angola 64.1 < Guyana 65.9** — exactly inverted from $50 |
+
+The failure is specific. The analyst reads the **$75 row** — the base case, the row
+everyone reads — sees **53.0 / 54.1 / 55.6**, a 2.6pp spread, and writes *"three broadly
+equivalent regimes"* into the memo. They are equivalent **only at $75**, and unambiguous
+in **opposite directions** at both ends of a normal screening band. Guyana is the
+lowest-take column of the set at $50 and the highest at $125.
+
+Measured over `country_data.json`: **716 of 16,471 comparable country pairs (4.3%)**
+reverse between $50 and $125, and one of the four shipped quickstart presets is such a set.
+
+Nothing on the tab said so. The **Price Swing ($50→$125)** row gives each column's
+progressivity in isolation (+26.0 / +21.8 / +11.1pp) and never states that the order
+changes. The **Govt Take vs Oil Price** chart does show the lines crossing — but it sits
+~1,300px below the grid, beneath three prose blocks and the whole button row, and the
+crossing is visually tight.
+
+## Change
+
+1. **Each of the four Govt Take rows now marks its own extremes, in place.** A green
+   `lowest of N` sub-line under the minimum column and a red `highest of N` under the
+   maximum (the `highest` marker only at 3+ comparable columns, where it is not redundant).
+   Reading straight down a column now shows the flip with no prose at all —
+   Guyana reads `lowest / — / highest / highest`, Brazil reads `highest / highest /
+   lowest / lowest`. The words *lowest* and *highest* are used rather than a bare `#1`,
+   so the direction is never ambiguous — the defect v542 fixed on the rank row.
+2. **Ranked on the COMPARABLE take, not the headline**, per `MECHANIC_COMPARABILITY.md`
+   and v549/v552. A fee-blended column is ranked on its Group-1 PSC/Concession subset (the
+   figure already printed under its headline — Iraq ranks on 34.1%, not 84.8%); a
+   PRRT-only cash-flow column is **skipped** rather than carried across the band, since it
+   is comparable at one price only; a state monopoly is skipped exactly as `fmtTake`
+   already drops it. Ties inside 0.05pp are left unmarked rather than broken arbitrarily.
+   No threshold invented — the exclusions reuse `_cmpMixStat()` and `isStateMonopoly()`.
+3. **When the lowest-take column at $50 is not the lowest-take column at $125**, a callout
+   under the grid names the reversal, the adjacent price interval it first happens in, and
+   the $75 gap between the two columns that actually swap — **1.5pp** for Guyana/Brazil.
+   The gap is measured **between those two columns, not across the whole set**: Atlantic
+   Frontier carries Nigeria at 81.1%, so a full-set spread of 28.1pp would have made the
+   "the base-case row does not separate them" sentence false. **Nothing renders when the
+   order holds** — the cold default set and North Sea Trio show markers and no callout.
+4. The markers ride the shared `rows` array, so they travel into `#cmp-data-table` and
+   **both clipboard flavours**. The pasted IC-memo table now reads
+   `Govt Take ($50/bbl)  39.9% · lowest of 3   42.3%   49.5% · highest of 3`.
+
+## Result
+
+An analyst comparing three countries can now see, **without leaving the grid**, that the
+answer depends on the price deck: which column is lowest-take at $50, which is lowest at
+$125, and that these are not the same column. They can no longer take a ranking off the
+$75 row and carry it into an IC memo as *the* ranking, because the row itself now shows
+the order changing two rows further down — and the pasted table carries the same marks.
+
+## Verified cold in Playwright, storage cleared, against the local build
+
+| set | markers | callout |
+|---|---|---|
+| cold default (Norway/UK/Netherlands) | NL `lowest of 3` ×4 · Norway `highest of 3` ×4 | none — order holds |
+| Atlantic Frontier Quartet | lowest moves Guyana→Angola→Brazil→Brazil; Nigeria `highest` ×4 | fires, 1.5pp gap, "$50 and $75" |
+| Guyana / Angola / Brazil | full lowest↔highest reversal on both | fires, "the highest at $125/bbl" |
+| USA vs Iraq (fee-blended) | USA `lowest of 2`; Iraq ranked on PSC/Conc 28.6–39.7% | none |
+| North Sea Trio | as cold default | none |
+| Australia / Saudi Arabia / Ghana / Malaysia / Denmark | `of 3` — PRRT column and state monopoly correctly unranked | none |
+
+Clipboard payload read back and confirmed. **0 page errors on every walk.**
+JS syntax gate **PASS** (10 blocks / 0 errors). `runtime_comprehensive.js` **ran this
+cycle** against the local build: **135 PASS / 0 FAIL / 1 WARN** — the WARN is the known
+local-harness artifact (`sw.js` registers the GitHub Pages subpath, which 404s on a
+root-served local server).
+
+### Known, not fixed, stated rather than hidden
+
+The **Contractor NPV vs Oil Price** chart at the foot of the tab still renders the NPV
+ordering as a full-width bar chart with no marker, while the v531 box above it says in
+bold *"do not present the NPV ordering as the fiscal ranking."* On the Atlantic set that
+chart shows Brazil towering over Guyana and Angola at every price. That is a separate
+moment from this cycle's, and taking it properly means either marking the chart or
+production-weighting `npv_*` in `rebuild_country_data.py` — a data-pipeline call, not a
+UI edit.
+
+### STILL LOCKED — nothing touched
+
+No new FAQ (still **974**). **No new tooltip on a control whose behaviour is unchanged** —
+the only `title` attributes added belong to the two new markers themselves. No page-sub
+paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card
+wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets
+still a dropdown; Home "More tools" still collapsed. **No tab added, removed or
+reordered.** No changelog entry added; the in-page changelog's newest entry remains v581.
+v371/v373 declutter, v430 sessionStorage logic, v449 tier colours + Screener row-click
+hint, v451 two-zone CP headline + Govt NPV removal, v452 rank + vs-median pill, v489
+Reform Risk in the primary Home grid, v507, v518, v531, v542, v549, v551, v552, v555,
+v557, v562, v565, v571, v577, v589, v590, v591, v592 — all intact. Version sweep
+**v592 → v593** across 5 structural sites, done silently at the end; it is **not** the
+deliverable.
