@@ -23006,3 +23006,151 @@ it is **not** the deliverable.
 **Friction.** I walked Side-by-Side cold and clicked the tab's own shipped quickstart button, **`USA vs Iraq`**.
 
 The table has been corrected five separate times for one thing: v549 put `PSC/Conc 34.1%` under Iraq's `84.8%` headline, because 415 of Iraq's 610 contracts are fee-basis
+
+---
+## Cycle 512 — T2 / v607 — 2026-08-30
+
+**Task — T2:** "Is this one country attractive at $75/bbl, and can I defend that?" — stalest of the
+six (511=T3, 510=T6, 509=T4, 508=T1, 507=T5, **506=T2**).
+
+**Friction.** Walked T2 cold — fresh context, no sessionStorage, no localStorage — on the Country
+Profile tab. The page's own prescribed next step for T2 is the Scenario Builder: the Fiscal
+character line ends *"Run Scenario Builder to test at your actual project parameters before IC
+submission"*, the IRR field is literally `→ Model in Scenario Builder`, and there are four separate
+controls on the tab that call `ddOpenScenarioBuilder(country)`. So I pressed it.
+
+On **Saudi Arabia** the Country Profile reads, in this order:
+
+> govt take **—** · #185 of 185 · **state monopoly — not a contractor regime** · **— · no contractor
+> position** · Breakeven **$/bbl n/a**
+
+Clicking that same page's `🔧 Scenario` button opened the modal under a banner reading
+**"Parameters pre-filled for Saudi Arabia"** and auto-ran a DCF reporting:
+
+| | |
+|---|---|
+| GOVT TAKE | **22.2%** |
+| CONTRACTOR IRR | **138.4%** |
+| CONTRACTOR NPV | **$4.3B** |
+| hurdle verdict | **✔ Clears a 15% IOC hurdle** |
+| IC line | copy-ready, `govt take 22.2%, contractor NPV +$4.3B @10% WACC … (clears)` |
+| benchmark | "29% of countries have lower take" — i.e. among the most contractor-friendly on earth |
+
+None of that is Saudi Arabian. `getDCFParams('Saudi Arabia', 'Concession')` returns
+`_basis='default'` — the generic Concession fallback, 10% royalty / 25% CIT — for a jurisdiction
+ORCA itself declares closed to contractors. The analyst's exact question was "is this country
+attractive at $75 and can I defend it", and the tool answered "yes, spectacularly, here is the line
+for your memo," for a country it reports as having no contractor position on the screen behind the
+modal.
+
+**Measured across the whole set, not inferred** (`ddOpenScenarioBuilder` driven for all 185
+countries, reading `window._lastScenario.result.take` against `d.take_75`):
+
+- **120 of 185** countries load **pure generic mechanic defaults** under a banner claiming country
+  pre-fill. Only 9 have a hard-coded country override; 56 more read anything at all from the DB.
+- **95 of 185** land **>5pp** from their own published Country Profile take — **48 >10pp**,
+  **19 >20pp**, **10 >30pp**. Median absolute gap **5.3pp**.
+- Norway **68.0% → 49.9%** (−18.1pp). Brazil **55.6% → 22.2%** (−33.4pp). Nigeria **81.1% → 47.3%**.
+  Bahrain / Kuwait / Saudi Arabia **"—" → 22.2%**.
+- Nothing on screen at that moment bridged the two numbers. The modal's `page-sub` paragraph does
+  contain the phrase "checking how project-specific terms diverge from ORCA's statutory take" —
+  buried mid-wall-of-text, above the fold, naming no number and no country.
+
+**A second defect in the same box.** The `vs 185-Country Database` panel computes the rank as
+`takes.length - below` — i.e. **1 = highest take** — and labelled it **"(1=lowest)"**. Norway's
+49.9% scenario rendered `#64 of 185 by govt take (1=lowest)` immediately beside `+21.5pp vs median`
+and `65% of countries have lower take` **in the same row**. The percentile and the median delta were
+already correct; only the direction label was wrong, and it inverted the one span an analyst reads
+fastest.
+
+**Change.** A provenance strip renders directly under the Scenario Builder result header whenever
+the modal was opened from a country (Country Profile, or the Fiscal Compare drilldown). Three
+states, driven by `params._basis` — which **v505 already computed for exactly this purpose**, and
+which the Fiscal Compare Quality column already reads, but this path never did:
+
+| state | n | on screen |
+|---|---|---|
+| **state monopoly** | 3 | red — names the missing contractor regime, quotes the profile's own "—/no contractor position", states the loaded terms are the generic Concession default, **draws no take comparison** (there is no published take to compare to), and the IC line gains `HYPOTHETICAL REGIME — ORCA holds no contractor terms for X (state monopoly, no contractor position)` |
+| **generic default** | 117 | amber — names the actual default terms via `describeDefaultTerms()`, prints the country's published take and contract count, and the IC line gains `terms are the generic X default, not <country>-specific` |
+| **own terms** | 65 | accent — states this is one synthetic project run on the country's own ORCA terms, names which terms are overrides, and contrasts it with the contract-average figure |
+
+Below the text, for the 182 non-monopoly countries, a three-figure row: **This scenario X%** ·
+**<Country> published @$75 Y%** · **±Zpp**, the gap reddened at ≥5pp.
+
+The pre-fill **banner** takes the matching three states (text, border, background) instead of
+unconditionally asserting country pre-fill. The country claim is **dropped on every path that
+invalidates it** — `openScenarioBuilder()` (header open) clears `_sbOrigin`, and `loadPreset()`
+clears it and its banner, so a preset can no longer inherit a stale country's provenance. Editing a
+field after load is detected by input fingerprint and reported rather than silently re-attributed.
+Rank label corrected to **"(1=highest)"**.
+
+**No published figure, tier colour, rank, pill or threshold was altered.** The strip prints
+`d.take_75` and `result.take` — both already rendered on screen — and the ≥5pp emphasis bar is the
+one `_cpCmpLine552` and the CP regime-split block already use.
+
+**Result.** An analyst asking "is Saudi Arabia attractive at $75?" is no longer handed a 22.2% take
+and a $4.3B NPV as though they were Saudi Arabian, and the **IC line — the one Scenario Builder
+artifact that leaves the tool** — carries that qualification in writing into the memo. On the 95
+countries where the two figures fork, both are on screen with the gap and the reason, so the analyst
+knows which number they are quoting instead of choosing blind between two unexplained ones.
+
+**Verification.** `testSBProvenance` — **26 assertions** in `tests/runtime_comprehensive.js`: the
+three states and their exact text; their numbers checked against the live engine and the country
+table; the IC-line clauses (present where required, **absent** where not — the own-terms Norway line
+must stay unqualified); the header-open, preset-overwrite and field-edit drop paths; the rank
+direction label and its agreement with both the percentile and the median spans; and a **185-country
+sweep** — 0 missing strips, 0 number mismatches, branch split exactly 3 / 117 / 65.
+**Verified to FAIL on the pre-change build — 19 FAIL**, every one a case named above. The 7 passes
+there are controls asserting things that were already correct (fixture state, the divergence still
+existing, the own-terms IC line correctly carrying no warning, the two already-correct rank spans).
+
+Full suite against a local server: **261 PASS / 0 FAIL / 1 WARN**. **JS syntax gate PASS** (10
+blocks / 0 errors). The 1 WARN is a 404 on an **external** script fetch — the local server logged
+**zero** 404s and no service-worker code was touched; cycle 511 recorded the same WARN on the
+unmodified baseline.
+
+**The loop's own reported test numbers are still wrong.** This cycle's prompt opened with
+"CURRENT TEST RESULTS: 0 PASS / 0 FAIL / 0 WARN", as did cycles 506–511. The harness runs correctly
+— 261 PASS here. The failure is in the wrapper that invokes it and parses the total, not in the
+suite. Not fixed; it is loop infrastructure, not `index.html`.
+
+**Found on the same walk, not fixed — stated rather than hidden.**
+
+1. **`#cp-run-fc-btn` is dead.** The Country Profile carries a `▶ Run FC at this price` button whose
+   handler reads `#cp-price-select || #fc-price` and writes to `#price`. **`#cp-price-select` does
+   not exist**, `#fc-price` is not visible, and **`#price` is null** — so the write is a no-op. The
+   button itself renders with `offsetParent === null`, so no user can reach it either. Dead code on
+   both ends; left alone because deleting it is not a T2 fix and I did not trace who else reads
+   those ids.
+2. **The Scenario Builder's `north_sea` / `deepwater` / `onshore_me` profile choice is inferred from
+   a substring test on `d.region`** (`region.includes('Europe')`, `includes('Africa')`,
+   `includes('Middle')`). Everything not matching falls to `deepwater`, which is why Brazil,
+   Venezuela and Russia are all modelled deepwater. The strip now names the profile, but whether the
+   mapping is right per country was not audited.
+3. **The 22.2% figure recurs on 8 of the 10 worst gaps** — it is the generic Concession default
+   output, i.e. those countries were never modelled at all. The strip now says so; **filling in
+   real terms for the 120 default-basis countries is a harvesting job, not a UX one**, and is the
+   larger finding behind this cycle.
+4. Items carried from cycles 504–511, untouched and still open: the SbS Contractor NPV chart mapping
+   `selected` rather than `chartCountries` (draws a bar for a state monopoly the take chart above it
+   excludes); `⬇ Chart PNG` carrying the legend but not the notices; the FC / CP / Breakeven Map /
+   Explorer / IOC charts never audited for the v606 basis defect; the FC profile strip's
+   `Life: 30yr` project-life fiction; `exportFCResults()` writing only `Contractor NPV_50/75` while
+   ranking on the selected price; `exportFCResults()` / `exportCountryXLSX()` writing a column headed
+   "Evidence Quality A/B (%)" on a scale the on-screen badge no longer uses; `exportReformRiskCSV()`
+   writing empty **Mechanic** and **Source** columns on all 83 rows; `renderIOCExposure()` filtering
+   `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows pinning `take_75` to the country
+   value; `nocExcludedCount` always 0; the 2-country `_cmpOrderMark` asymmetry; the Top Contracts
+   per-row `IRR%` column; `window._activePresetName` as a dead global; and the hand-maintained
+   version-sweep site list.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip.** No page-sub
+paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home
+"More tools" still collapsed. **No tab added, removed or reordered. No row or column added or
+removed from any table. No published country take, NPV, rank, score, tier colour or pill value was
+altered, and no threshold was introduced.** The Scenario Builder's own three result cards, waterfall,
+hurdle line and saved-scenario table are unchanged; the strip is added above them and the rank label
+corrected. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v505 `_basis`
+semantics, v549, v552, v570, v594, v601, v606 and all other locks intact. Version sweep
+**v606 → v607** across 6 structural sites, done silently at the end; it is **not** the deliverable.
