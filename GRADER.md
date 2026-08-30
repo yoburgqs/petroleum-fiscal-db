@@ -21207,3 +21207,18 @@ verdict — all intact and unmodified. Tab order unchanged. No changelog entry a
 in-page changelog's newest entry remains v581 and cycles 487–494 added none, the directive
 treating changelog catch-up as bookkeeping. Version sweep **v589 → v590** across 5 structural
 sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 495 Log — 2026-08-30 01:47
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 495 complete — v590 pushed to both repos.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (stalest; the last six version commits ran T2, T6, T6, T1, T3, T5)
+
+## Friction
+Section 3 of the Reform Risk tab is the tab's verdict section — two cards, **Quiet Since 2010** and **Actively Reforming**. Their filters are `since2010 <= 1` and `since2010 >= 3`. **Nothing rendered the band between them.**
+
+Six of the 21 jurisdictions ORCA actually holds a reform log for have ex
