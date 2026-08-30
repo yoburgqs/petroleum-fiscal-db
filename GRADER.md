@@ -21517,3 +21517,14 @@ primary Home grid, v507 single-source `_dqTier`, v518, v551 two-legged evidence 
 changelog entry added; the in-page changelog's newest entry remains v581, the directive
 treating changelog catch-up as bookkeeping. Version sweep **v591 → v592** across 5 structural
 sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 497 Log — 2026-08-30 03:28
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 497 complete — v592 pushed to both repos.
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?" (stalest; last walked cycle 486).
+
+**Friction:** Walked cold into Explorer with storage cleared. Every Explorer and Screener row carries a coloured pill on the country name reading **FACTS**, **EVIDENCE** or **PROXY**. It's the only word in the row that answers "how solid is the evidence?" in plain English — and it doesn't answer it. `_dqTier()` (index.html:23023) comp
