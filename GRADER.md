@@ -23284,3 +23284,122 @@ deliverable.
 **Friction.** I walked cold — storage cleared — and read back what every export actually produces rather than trusting button labels. The clipboard paths are in good shape; the *downloaded CSVs* have never had that treatment, and the Breakeven Map's is the worst.
 
 That tab's screen text is emphatic and co
+
+---
+## Cycle 514 — T1 / v609
+
+**Task — T1:** "Which countries should even be on my screening list?" (rotation: 513=T5, 512=T2, 511=T3, 510=T6, 509=T4, 508=T1 — T1 was stalest)
+
+**Friction.** Walked cold with `sessionStorage` and `localStorage` cleared, in via the Screener
+nav button. The unfiltered landing state is correct and has been since v507: 185 rows ranked
+Canada / USA / Azerbaijan / Mexico / Argentina, with the amber `BELOW THIS LINE` divider at row 22
+separating the 22 production-backed countries from the 163 whose economics are regional proxies.
+
+Then I did the one thing T1 most directly asks for: clicked the **Govt Take** column header to rank
+by the headline fiscal axis. The table returned:
+
+| # | country | take | facts on file | verified production |
+|---|---|---|---|---|
+| 1 | Vanuatu | 5.0% | 14 | none |
+| 2 | Bahamas | 10.0% | 8 | none |
+| 3 | Montenegro | 10.5% | 30 | none |
+| 4 | Greenland | 11.6% | 62 | none |
+| 5 | Faroe Islands | 11.9% | 98 | none |
+| … | … | … | … | … |
+| 16 | Belgium | 16.6% | **6** | none |
+
+**All 20 of the top 20 have zero verified field production, and 16 of the 20 have fewer than 150
+facts on file.** Belgium rests on 6 facts, Bosnia on 9, Sweden on 12. The Contractor NPV column
+*agrees* with the ranking — NPV is a near-monotone inverse of take on the standardized cost
+profile — so the analyst gets two columns corroborating a shortlist of jurisdictions nobody would
+screen, while Norway, Indonesia, Iraq and Nigeria sit far below the fold.
+
+This is the identical failure **v507** was written to eliminate, reproduced on a sort path built
+after it. v507's own comment says the per-row `PROXY` badge cannot carry the warning "because
+every row above it was badged PROXY too and it read as decoration" — which describes these 20 rows
+exactly. v587, which added the column sorts, saw the conflict and decided an explicit sort should
+ungroup, with the v543 mixed-basis banner as the safeguard. That banner is prose sitting above a
+table whose rank column reads 1, 2, 3 — and rank position is what gets read.
+
+**The deciding detail:** `#screener-evidence-first-wrap` — the first-class count-bar toggle
+*"Rank verified-production countries first"* — stayed **checked**, and `_screenerEvidenceFirst`
+stayed **true**, while the sort ignored both. A control the analyst had deliberately left ON was
+silently not applied. Honouring it is not overriding the analyst's request; it is obeying the one
+they had already made.
+
+**Change.** A column sort now orders rows **within each data-basis block** rather than across both,
+whenever that toggle is ticked.
+
+- `renderScreener()` sort path: when `_scSortKey` is set and `_screenerEvidenceFirst` is true, rows
+  sort by `_dqRank` first, then by the column comparator.
+- `_grouped` lost its `!_scSortKey` gate. Grouping is now decided by the toggle the analyst
+  controls, not by whether they happened to click a header. It also now applies on the R-factor
+  preset once an explicit sort has overridden its swing order.
+- The count line, the divider row ("Ranked among themselves by …") and the exported
+  **Ranked by:** criteria line all name the active sort *and* the grouping, so neither the screen
+  nor the file can be read as a flat cross-database ranking when it is not one.
+
+Clicking **Govt Take** now returns **USA 23.4% · Argentina 31.0% · Mexico 32.2% · Canada 32.7% ·
+Colombia 33.5%** — the lowest-take regimes *anyone has actually drilled* — with the divider still at
+row 22 and the proxy block take-sorted beneath it. The exported CSV's first row changes from
+`1,Vanuatu,…,Verified_Production=No` to `1,USA,…,Verified_Production=Yes`.
+
+**The escape hatch already existed and is untouched.** Unticking the toggle restores the pure
+cross-database ranking exactly — Vanuatu returns to #1 — and the v543 `MIXED DATA BASIS` banner
+fires, because in that state the bases genuinely are interleaved. That is what v507 built the
+toggle for.
+
+**Verified cold in Playwright** against a local server, storage cleared, ten states:
+
+| state | result |
+|---|---|
+| A cold default | unchanged — Canada/USA/Azerbaijan, one `BELOW` divider at row 22 |
+| B take-asc, toggle ON | grouped — USA/Argentina/Mexico/Canada/Colombia, divider kept |
+| C take-asc, toggle OFF | ungrouped — Vanuatu #1 restored, `MIXED` banner fires |
+| D toggle back ON | grouped again |
+| E third click clears sort | identical to A |
+| F NPV-desc, toggle ON | grouped, divider at 22 |
+| G R-factor preset, no sort | `MIXED` banner, unchanged from before |
+| H R-factor + take sort | now groups — Angola/Brazil/Malaysia/Indonesia/Azerbaijan, divider at 11 |
+| I Deepwater (all proxy) | `ALLPROXY` banner, unchanged |
+| J Deepwater + sort | still `ALLPROXY`, no divider drawn — correct, nothing to divide |
+
+**0 page errors** across all ten. JS syntax gate **PASS** (10 blocks / 0 errors).
+
+**Result.** An analyst who clicks a column header on the Screener to rank a screening list is no
+longer handed Vanuatu, Bahamas and Belgium at ranks 1–3. Ranking by any column now answers T1 with
+the production-backed regimes first — the countries whose take figures are defensible in an IC
+memo — and the proxy universe stays visible, labelled, and ranked below the line rather than
+removed. The pure global ranking remains one click away for anyone who wants it.
+
+**Found on the same walk, not fixed.** Three Screener presets are near no-ops on this data and
+still present themselves as screens: **Sweet Spot** returns **143 of 185**, **Low-Risk Stable**
+**141 of 185**, **Two-Price Return Screen** **153 of 185**. The cause is measured, not assumed —
+median `take_75` across the 185 is **28.4%**, so a "Take ≤55%" ceiling passes 142 countries, and
+`npv_75 > 0` holds for 182 of 185. A preset named "Sweet Spot" that returns 77% of the database
+teaches the analyst the tool does not discriminate. Same class as the v517 IRR slider and the v568
+breakeven ceiling; its own cycle. Related: the **Min Contractor NPV @$75** slider tops out at
+$2,000M against a median of $3,110M, so its strictest setting still passes 114 of 185 and 501 of
+its 2,501 positions remove nothing at all.
+
+Also still open from cycles 504–513, untouched: `exportReformRiskCSV()` writing Mechanic and Source
+empty on all 83 rows (`reform_history.json` has no `source` field — a harvesting decision, not a UX
+one); the dead `#cp-run-fc-btn`; the Scenario Builder's region-substring profile inference; the SbS
+Contractor NPV chart mapping `selected` rather than `chartCountries`; `⬇ Chart PNG` dropping the
+notices; `exportFCResults()` writing only `Contractor NPV_50/75` while ranking on the selected
+price; the "Evidence Quality A/B (%)" header on a scale the badge no longer uses;
+`renderIOCExposure()` filtering on `d.operator`; the 92 USA rows pinning `take_75`;
+`nocExcludedCount` always 0. Noted this cycle: six of the 22 "verified field production" countries
+have `prod_coverage_pct` under 1% and render as **0%** in the Prod Cov column (USA 0.2%, Australia
+0.3%, Malaysia 0.3%, Saudi Arabia 0.3%, Oman 0.5%, Libya 0.7%) — a column reading 0% inside a block
+labelled "verified field production".
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip.** No page-sub
+paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown;
+Home "More tools" still collapsed. **No tab added, removed or reordered.** **No row or column added
+or removed from any on-screen table, and no published country take, NPV, rank, score, tier colour
+or pill value was altered** — only the order rows appear in, and only when the analyst has ticked
+the toggle that asks for it. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452,
+v489, v505, v507, v543, v573, v591, v606, v607 and v608 all intact. Version sweep **v608 → v609**
+across 6 structural sites, done silently at the end; it is **not** the deliverable.

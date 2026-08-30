@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v608.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v609.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v608</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v609</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v608</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v609</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v608</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v609</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v608';
+  return m ? m[0] : 'v609';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v608');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v609');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -26615,14 +26615,37 @@ function runScreener() {
   // Countries with verified production now sort first, proxies after, NPV DESC within each
   // group. Nothing is removed — all 185 stay in the table, the export and the count.
   const _dqRank = d => (_dqTier(d).hasProduction ? 0 : 1);
-  // v587 (T1): an explicit column sort takes precedence over both the R-factor swing sort and the
-  // v507 evidence-first grouping -- the analyst asked for this order, so they get it. Critically it
-  // is NOT layered on top of the grouping: an explicit sort ungroups, which drops _grouped to false
-  // and fires the v543 _mixedUngrouped banner. That is the honest outcome, not a regression -- the
-  // v507 divider genuinely cannot be drawn once rows are ordered by something else, and going
-  // silent about data basis in that state is exactly the defect v543 was written to fix.
+  // v609 (T1): a column sort now orders rows WITHIN each data-basis block instead of across
+  // both of them, whenever "Rank verified-production countries first" is ticked.
+  //
+  // v587 added these sorts and decided that an explicit sort should ungroup, on the reasoning
+  // that "the analyst asked for this order, so they get it", with the v543 mixed-basis banner
+  // as the safeguard. Walking T1 cold shows what that costs. Clicking "Govt Take" -- the most
+  // direct expression of "which countries should be on my screening list?" -- returned:
+  //   1 Vanuatu 5.0% (14 facts)      6 Moldova 12.4% (24)     11 Bosnia 15.6% (9)
+  //   2 Bahamas 10.0% (8 facts)      7 Romania 13.6% (294)    12 Serbia 15.9% (110)
+  //   3 Montenegro 10.5% (30)        8 Sweden 13.7% (12)      ... 16 Belgium 16.6% (6)
+  // ALL 20 of the top 20 have zero verified field production and 16 of them fewer than 150
+  // facts on file. The Contractor NPV column agrees with the ranking -- NPV is a near-monotone
+  // inverse of take on the standardized cost profile -- so the analyst gets two columns
+  // corroborating a list of jurisdictions nobody would screen.
+  //
+  // That is the exact failure v507 was written to fix, reproduced on a different sort path.
+  // v507's own note: "the PROXY badge could not carry the warning, because all 20 rows above
+  // the fold carried it too, so it read as decoration". The v543 banner is prose above a table
+  // whose rank column says 1, 2, 3 -- and rank position is what gets read.
+  //
+  // The deciding detail is that #screener-evidence-first-wrap ("Rank verified-production
+  // countries first") stayed CHECKED, and _screenerEvidenceFirst stayed true, while the sort
+  // ignored both. A first-class control the analyst had left ON was silently not applied.
+  // Honouring it is not overriding the analyst's request -- it is obeying the one they already
+  // made. The pure cross-database ranking is still one click away: untick the box, which is
+  // what v507 built it for.
   if (_scSortKey) {
-    data.sort(_scSortCmp(takeKey, npvKey));
+    const _colCmp = _scSortCmp(takeKey, npvKey);
+    data.sort(_screenerEvidenceFirst
+      ? function (a, b) { return (_dqRank(a) - _dqRank(b)) || _colCmp(a, b); }
+      : _colCmp);
   } else if (_screenerRfactorOnly) {
     data.sort((a,b) => (b.swing||0) - (a.swing||0));
   } else if (_screenerEvidenceFirst) {
@@ -26632,7 +26655,11 @@ function runScreener() {
   }
   const _nVerified = data.filter(d => _dqTier(d).hasProduction).length;
   const _nProxy    = data.length - _nVerified;
-  const _grouped   = _screenerEvidenceFirst && !_screenerRfactorOnly && !_scSortKey && _nVerified > 0 && _nProxy > 0;
+  // v609 — `!_scSortKey` removed. Grouping is now decided by the toggle the analyst controls,
+  // not by whether they happen to have clicked a column header. An explicit sort also overrides
+  // the R-factor swing order, so it can group there too. With the toggle OFF and a sort active
+  // the rows genuinely are interleaved, _grouped is false, and the v543 banner still fires.
+  const _grouped   = _screenerEvidenceFirst && (!!_scSortKey || !_screenerRfactorOnly) && _nVerified > 0 && _nProxy > 0;
   // v543 (cycle 442, T1) — _grouped was the single gate on ALL THREE proxy safeguards: the basis
   // sentence in the count line, the amber divider in the table, and the verified-production
   // handoff into Side-by-Side. It is false in two states where the analyst needs them MOST, and
@@ -26704,8 +26731,10 @@ function runScreener() {
   // v507: the lead sentence now states the data-basis split, because that is the fact that
   // decides whether the top of the list is usable. "185 countries" was never the analyst's
   // problem; "which of these has anyone actually drilled" is.
+  // v609 — when a column sort is active the grouped note says the sort runs INSIDE each block,
+  // so the analyst is not left thinking their click was ignored.
   const _basisNote = _grouped
-    ? ` \u2014 ranked by data basis: ${_nVerified} with verified field production first, then ${_nProxy} whose economics are regional proxies`
+    ? ` \u2014 ranked by data basis: ${_nVerified} with verified field production first, then ${_nProxy} whose economics are regional proxies${_scSortKey ? `, ${(_SC_SORT_LABEL[_scSortKey] || [_scSortKey, _scSortKey])[_scSortDir === 1 ? 0 : 1].toLowerCase()} within each block` : ''}`
     : _allProxy
       ? ` <span style="color:var(--accent);font-weight:600;">\u2014 none of these ${data.length} countries has verified field production. Every take, NPV and breakeven below is a regional proxy estimate, indicative only, and not defensible as a screening shortlist on its own.</span>`
       : _mixedUngrouped
@@ -26822,8 +26851,11 @@ function runScreener() {
     if (!crit.length) crit.push('None — this is the full ORCA universe, not a screen result');
     // v587: an exported shortlist now states its own ordering. The rows were always written in
     // screen order; the file never said what that order was.
+    // v609 — a grouped sort states BOTH halves of its ordering, so the exported file cannot be
+    // read as a flat cross-database ranking when it is not one.
     crit.push('Ranked by: ' + (_scSortKey
       ? ((_SC_SORT_LABEL[_scSortKey] || [_scSortKey, _scSortKey])[_scSortDir === 1 ? 0 : 1])
+          + (_grouped ? ', within data basis (verified field production first, then proxy economics)' : '')
       : (_screenerRfactorOnly ? 'price sensitivity (swing, high to low)'
         : (_grouped ? 'verified field production first, then contractor NPV descending within each group'
           : 'contractor NPV descending'))));
@@ -26924,7 +26956,7 @@ function runScreener() {
       ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
         + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nProxy} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
         + `Fiscal terms are regional proxy estimates and the NPV / IRR / breakeven shown are indicative only. `
-        + `Ranked among themselves by NPV. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
+        + `Ranked among themselves by ${_scSortKey ? (_SC_SORT_LABEL[_scSortKey] ? _SC_SORT_LABEL[_scSortKey][_scSortDir === 1 ? 0 : 1].toLowerCase() : _scSortKey) : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
         + `</td></tr>`
       : '';
     // Bug 3 fix: click row to navigate to country profile
