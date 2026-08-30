@@ -22261,3 +22261,16 @@ or reordered.** **No published country take, NPV, rank, score, tier colour or pi
 altered, and no threshold was introduced.** v371/v373 declutter, v430 sessionStorage logic,
 v449, v451, v452, v489 and all later locks intact. Version sweep **v598 → v599** across 5 sites,
 done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 504 Log — 2026-08-30 09:40
+- Test before: 136 PASS / 0 FAIL
+- Test after: 136 PASS / 2 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle 504 complete. Local servers on :8080/:8081 left running (cleanup command was denied).
+
+## Cycle 504 — T6 / v599
+
+**Task — T6:** *"Where did this number come from and how solid is the evidence?"* — the stalest task; last run at v592, seven version commits ago.
+
+**Friction.** Walked cold into **IOC Portfolio** with storage cleared. The tab seeds itself: `switchTab('t5')` calls `loadIOC('Shell')`, which is an **exact operator-string match**. `IOC_DATA` contains an operator 
