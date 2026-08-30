@@ -21913,3 +21913,18 @@ what the pasted artifact *says about the basis of* the take. v371/v373 declutter
 sessionStorage logic, v449, v451, v452, v489 and all later locks intact. Version sweep
 **v595 → v596** across 5 structural sites, done silently at the end; it is **not** the
 deliverable.
+
+---
+## Cycle 501 Log — 2026-08-30 07:02
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 501 complete — shipped, verified, pushed to both repos.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (Rotated off T2, which cycle 499 ran.)
+
+## Friction
+Country Profile prints **`⚠ PROXY — statutory model`** in its headline for Greenland. The Fiscal Compare reading guide states the rule outright: *"never cite a PROXY country's take as definitive; always state 'statutory model basis (ORCA PROXY)' in the IC memo."*
+
+I read the **clipboard back** from every past
