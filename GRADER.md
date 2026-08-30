@@ -22384,3 +22384,16 @@ end; it is **not** the deliverable.
 - Test after: 142 PASS / 0 FAIL / 1 WARN
 - JS errors: 1 — pre-existing local-harness `sw.js` 404, identical on the unchanged build
 - Summary: T3 / v600. Order marker moved onto the figure it ranks on fee-blended columns.
+
+---
+## Cycle 505 Log — 2026-08-30 11:03
+- Test before: 138 PASS / 0 FAIL
+- Test after: 138 PASS / 2 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle 505 complete.
+
+## Cycle 505 — T3 / v600
+
+**Task — T3:** "How do these three countries compare side by side?" (stalest task; last run cycle 483. Cycles 502/503/504 were T1/T4/T6.)
+
+**Friction.** Walked cold into Side-by-Side with storage cleared, cleared the seeded North Sea Trio, and built a normal screening trio by hand: Norway, Iraq, Guyana. The four Govt Take rows carry a lowest/highest order marker (`_cmpOrderMark`, `index.html:24999`) that correctly ranks on the *co
