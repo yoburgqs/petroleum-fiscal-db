@@ -1,8 +1,8 @@
 {
-  "cycle_number": 509,
-  "cycle_start_unix": 1788117214,
-  "cycle_start_human": "2026-08-30 14:13",
-  "cycle_complete_human": "2026-08-30 13:43",
+  "cycle_number": 510,
+  "cycle_start_unix": 1788120730,
+  "cycle_start_human": "2026-08-30 15:12",
+  "cycle_complete_human": "2026-08-30 14:42",
   "cycle_interval_seconds": 1800,
   "last_test_pass": 0,
   "last_test_fail": 0,
@@ -48,7 +48,7 @@
     "Professional credibility: provenance statement + benchmark attribution"
   ],
   "notes_cycle_4": "Cycle 4: Floor B+ across all 15 categories. 7 upgrades. 117/0 clean.",
-  "current_version": "v603",
+  "current_version": "v604",
   "faq_count": 965,
   "notes_cycle_341": "Cycle 341: v425 shipped. 9 analyst UX improvements. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_342": "Cycle 342: v426 shipped. 9 analyst UX improvements + FAQs A957-A959. JS syntax gate PASS. 136 PASS / 0 FAIL.",

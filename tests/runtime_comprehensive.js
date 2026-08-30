@@ -1473,6 +1473,134 @@ async function testHomeICScreenAgreement(page) {
   } catch(e) { f(S, 'exception', e.message); }
 }
 
+// ─── v605 (T6): the sourcing tier that leaves the tool ──────────────────────────────────────
+// copyICCitation(), copyICSummary() and the Fiscal Compare drilldown "Src" badge each carried a
+// private copy of the `ab_pct >= 80 ? 'A' : >= 60 ? 'B' : 'C'` grader that v551 replaced and v557
+// deleted. Measured on the shipped country_data.json the pasted tier disagreed with the letter
+// the page displays on 158 of 185 countries, 156 of them overstatements — Russia and Tuvalu
+// pasted "A-tier sourcing" against a displayed D. These cases FAIL on the pre-change build.
+async function testICSourcingTier(page) {
+  const S = 'ICSourcing';
+  try {
+    await page.evaluate(() => { if (typeof switchTab === 'function') switchTab('t7', null); });
+    await page.waitForTimeout(600);
+
+    // Refuted cases: the letter the page displays, which the old formula contradicted.
+    const EXPECT = { Russia: 'D', Tuvalu: 'D', Kazakhstan: 'C', Senegal: 'A', Norway: 'A', Nigeria: 'C' };
+
+    for (const country of Object.keys(EXPECT)) {
+      const r = await page.evaluate(async (c) => {
+        const sel = document.getElementById('dd-country-select');
+        if (!sel) return { err: 'no country select' };
+        sel.value = c; sel.dispatchEvent(new Event('change', { bubbles: true }));
+        await new Promise(res => setTimeout(res, 1200));
+        const d = (window.COUNTRY_DATA || []).find(x => x.country === c);
+        if (!d) return { err: 'no COUNTRY_DATA row for ' + c };
+        const grade = window._evidenceGrade(d).letter;
+        // Capture the clipboard payload without needing clipboard permissions.
+        const cap = [];
+        const orig = navigator.clipboard && navigator.clipboard.writeText;
+        try {
+          Object.defineProperty(navigator, 'clipboard', {
+            configurable: true,
+            value: { writeText: t => { cap.push(t); return Promise.resolve(); } }
+          });
+          if (typeof copyICCitation === 'function') copyICCitation();
+          if (typeof copyICSummary === 'function') copyICSummary();
+        } finally {
+          if (orig) Object.defineProperty(navigator, 'clipboard', {
+            configurable: true, value: { writeText: orig.bind(null) } });
+        }
+        const pick = t => { const m = /([A-D])-tier sourcing/.exec(t || ''); return m ? m[1] : null; };
+        // The old rule, kept here so the test states what it is refuting.
+        const ab = d.ab_pct == null ? null : (d.ab_pct >= 80 ? 'A' : d.ab_pct >= 60 ? 'B' : 'C');
+        return { grade, cite: cap[0] || '', summ: cap[1] || '',
+                 citeTier: pick(cap[0]), summTier: pick(cap[1]), oldTier: ab };
+      }, country);
+
+      if (r.err) { f(S, 'setup ' + country, r.err); continue; }
+
+      if (r.grade !== EXPECT[country]) {
+        f(S, 'displayed grade ' + country, `expected ${EXPECT[country]}, page grades ${r.grade}`);
+      } else {
+        p(S, 'displayed grade ' + country, r.grade);
+      }
+      if (r.citeTier === r.grade) p(S, 'citation tier agrees ' + country, `${r.citeTier}-tier`);
+      else f(S, 'citation tier agrees ' + country,
+             `Country Profile badge reads ${r.grade}; IC citation pastes ${r.citeTier}-tier (old ab_pct rule says ${r.oldTier})`);
+      if (r.summTier === r.grade) p(S, 'summary tier agrees ' + country, `${r.summTier}-tier`);
+      else f(S, 'summary tier agrees ' + country,
+             `Country Profile badge reads ${r.grade}; IC summary pastes ${r.summTier}-tier (old ab_pct rule says ${r.oldTier})`);
+    }
+
+    // The pasted tier must carry both legs, so an IC reader can see WHY it is that letter.
+    const legs = await page.evaluate(() => {
+      if (typeof window._icSourcingTier !== 'function') return '(no _icSourcingTier on this build)';
+      const d = (window.COUNTRY_DATA || []).find(x => x.country === 'Russia');
+      return window._icSourcingTier(d);
+    });
+    if (/3\.8% primary law on 3,929 facts/.test(legs)) p(S, 'tier states both legs', legs);
+    else f(S, 'tier states both legs', 'got: ' + legs);
+
+    // Whole-dataset agreement: one grader, no per-call-site copy.
+    const sweep = await page.evaluate(() => {
+      let mismatch = 0, differsFromOld = 0, overstated = 0;
+      const ORD = ['D', 'C', 'B', 'A'];
+      const tierOf = window._icSourcingTier;
+      (window.COUNTRY_DATA || []).forEach(d => {
+        const g = window._evidenceGrade(d).letter;
+        const m = (typeof tierOf === 'function') ? /([A-D])-tier sourcing/.exec(tierOf(d)) : null;
+        if (!m || m[1] !== g) mismatch++;
+        const ab = d.ab_pct == null ? 'C' : (d.ab_pct >= 80 ? 'A' : d.ab_pct >= 60 ? 'B' : 'C');
+        if (ab !== g) { differsFromOld++; if (ORD.indexOf(ab) > ORD.indexOf(g)) overstated++; }
+      });
+      return { mismatch, differsFromOld, overstated, n: (window.COUNTRY_DATA || []).length };
+    });
+    if (sweep.mismatch === 0) p(S, 'all countries agree', `${sweep.n} countries, 0 mismatches vs _evidenceGrade`);
+    else f(S, 'all countries agree', `${sweep.mismatch} of ${sweep.n} countries paste a tier the badge contradicts`);
+    if (sweep.differsFromOld >= 150 && sweep.overstated >= 150)
+      p(S, 'old rule was wrong at scale', `${sweep.differsFromOld}/${sweep.n} differ from ab_pct rule, ${sweep.overstated} were overstatements`);
+    else w(S, 'old rule delta', `${sweep.differsFromOld} differ, ${sweep.overstated} overstated — dataset may have moved`);
+
+    // ── Fiscal Compare drilldown: the Src badge and the source-quality warning ──
+    await page.evaluate(() => { if (typeof switchTab === 'function') switchTab('t0', null); });
+    await page.waitForTimeout(400);
+    await page.evaluate(() => { if (typeof runFiscalCompare === 'function') runFiscalCompare(); });
+    await page.waitForTimeout(3500);
+
+    for (const country of ['Kazakhstan', 'Norway', 'Nigeria']) {
+      const r = await page.evaluate(async (c) => {
+        if (typeof openFCDrilldown !== 'function') return { err: 'no openFCDrilldown' };
+        openFCDrilldown(c);
+        await new Promise(res => setTimeout(res, 700));
+        const dr = document.querySelector('.fc-drawer.open');
+        if (!dr) return { err: 'drawer did not open for ' + c };
+        const txt = dr.innerText.replace(/\s+/g, ' ');
+        const badge = [...dr.querySelectorAll('span')].map(x => x.textContent.trim())
+                        .find(x => /^Src /.test(x)) || '';
+        const d = (window.COUNTRY_DATA || []).find(x => x.country === c);
+        return { badge, grade: window._evidenceGrade(d).letter, txt,
+                 icReady: /IC-ready/.test(dr.innerHTML), generic: /Generic terms/.test(txt) };
+      }, country);
+      if (r.err) { f(S, 'FC drawer ' + country, r.err); continue; }
+      const m = /^Src ([A-D])\b/.exec(r.badge);
+      if (m && m[1] === r.grade) p(S, 'FC drawer Src badge ' + country, r.badge);
+      else f(S, 'FC drawer Src badge ' + country,
+             `badge "${r.badge}" does not lead with the page grade ${r.grade}`);
+      if (!r.icReady) p(S, 'FC drawer drops IC-ready gate ' + country, 'no ">=80% A/B = IC-ready" claim');
+      else f(S, 'FC drawer drops IC-ready gate ' + country,
+             'drawer still prescribes the >=80% A/B IC-ready gate v518 removed');
+      // A C/D-graded, own-terms country must carry the source-quality warning.
+      if (!r.generic && (r.grade === 'C' || r.grade === 'D')) {
+        if (/Source quality: grade [CD]/.test(r.txt)) p(S, 'FC drawer warns ' + country, 'grade ' + r.grade + ' warning shown');
+        else f(S, 'FC drawer warns ' + country, `grade ${r.grade} on own terms but no source-quality warning`);
+      }
+    }
+  } catch (e) {
+    f(S, 'exception', e.message);
+  }
+}
+
 async function testRouting(page) {
   const S = 'Routing';
   try {
@@ -1647,6 +1775,7 @@ async function testConsoleErrors() {
     await testExplorer(page);
     await testScreener(page);
     await testHomeICScreenAgreement(page);
+    await testICSourcingTier(page);
     await testIOC(page);
     await testComparison(page);
     await testVintage(page);
