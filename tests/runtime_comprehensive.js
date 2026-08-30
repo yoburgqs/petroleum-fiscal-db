@@ -1285,6 +1285,96 @@ async function testSearch(page) {
 }
 
 // ─── SECTION 15: URL Routing ──────────────────────────────────────────────
+// ─── v603 (T1): Home IC-capital-screen headline must equal the screen it links to ──────────
+// v524 built #home-hurdle-stat so "the number and its destination cannot drift apart". v554
+// then moved runScreener()'s take ceiling onto the comparable (Group-1) take and left the Home
+// headline gating on the published blended headline. Home said 14; the linked preset returned
+// 15; the country in the gap was Iraq (published 84.8%, comparable 34.1%). Nothing on either
+// surface could contradict the other, so it survived 49 cycles.
+//
+// The expected set is recomputed HERE from _scFeeCmpAt() -- the call runScreener()'s _scPass()
+// makes -- rather than from any helper the page happens to expose, so these cases are a real
+// external check on both surfaces and fail on a build where either one drifts.
+async function testHomeICScreenAgreement(page) {
+  const S = 'HomeICScreen';
+  try {
+    await page.evaluate(() => { if (typeof switchTab === 'function') switchTab('thome', null); });
+    await page.waitForTimeout(500);
+
+    const home = await page.evaluate(() => {
+      const CEIL = 65;
+      const verified = COUNTRY_DATA.filter(c => _dqTier(c).hasProduction);
+      const pass = [], admitted = [], excluded = [];
+      verified.forEach(c => {
+        if (!(c.npv_75 != null && c.npv_75 >= 0 && c.npv_50 != null && c.npv_50 >= 0)) return;
+        const fc = _scFeeCmpAt(c, '75');
+        const head = c.take_75;
+        const cmp = (fc && fc.diverges) ? fc.cmp : head;
+        if (cmp == null) return;
+        if (cmp <= CEIL) { pass.push(c.country); if (head != null && head > CEIL) admitted.push(c.country); }
+        else if (head != null && head <= CEIL) excluded.push(c.country);
+      });
+      const naive = verified.filter(c => c.take_75 != null && c.take_75 <= CEIL
+        && c.npv_75 != null && c.npv_75 >= 0 && c.npv_50 != null && c.npv_50 >= 0).length;
+      const el = document.getElementById('home-hurdle-stat');
+      const txt = el ? el.innerText : '';
+      const m = txt.match(/(\d+)\s+countries pass the IOC capital screen/) || [];
+      return {
+        expected: pass.length, naive: naive, admitted: admitted, excluded: excluded,
+        rendered: m[1] ? +m[1] : null,
+        qs: (document.getElementById('qs-ic-count') || {}).textContent || null,
+        text: txt
+      };
+    });
+
+    if (home.rendered === null) { f(S, 'headline renders', '#home-hurdle-stat has no count'); return; }
+
+    // The whole point of the cycle: the number on the front page is the comparable-take screen.
+    if (home.rendered === home.expected) p(S, 'headline equals the comparable-take screen', `${home.rendered}`);
+    else f(S, 'headline equals the comparable-take screen', `Home renders ${home.rendered}, the comparable-take screen is ${home.expected} (published-blend basis gives ${home.naive}) — the headline is gating on a basis MECHANIC_COMPARABILITY.md does not permit`);
+
+    // The Quick Start literal was stale from v554 to v603.
+    if (home.qs === null) f(S, 'Quick Start count is live', '#qs-ic-count missing — the count is a hardcoded literal and cannot track the screen');
+    else if (parseInt(home.qs, 10) === home.expected) p(S, 'Quick Start count tracks the screen', home.qs);
+    else f(S, 'Quick Start count tracks the screen', `qs="${home.qs}", screen ${home.expected}`);
+
+    // Any country admitted on the comparable take shows a published take ABOVE the stated
+    // ceiling in the result table, so it reads as a filter bug. Home must name it up front.
+    for (const c of home.admitted) {
+      if (home.text.indexOf(c) !== -1) p(S, `basis note names admitted country ${c}`, 'named');
+      else f(S, `basis note names admitted country ${c}`, `${c} is in the screen on its comparable take but its published take is above the ceiling, and Home does not say so`);
+    }
+    for (const c of home.excluded) {
+      if (home.text.indexOf(c) !== -1) p(S, `basis note names excluded country ${c}`, 'named');
+      else f(S, `basis note names excluded country ${c}`, `${c} is excluded by the comparable take though its published take clears the ceiling, and Home does not say so`);
+    }
+
+    // The click target must land on the Screener with the preset applied, and that screen must
+    // return exactly the number Home quoted. This is the assertion that binds the two surfaces.
+    await page.evaluate(() => _homeOpenICScreen());
+    await page.waitForTimeout(1400);
+    // Read the preset off the count line, not off window._activePresetName. The real binding is
+    // a script-scoped `let` (index.html:25910) and is not a window property; the window global of
+    // that name (index.html:39898) is written null once and never tracks it. Asserting on the
+    // rendered label also tests the thing the analyst actually sees.
+    const sc = await page.evaluate(() => ({
+      tab: window._activeTab,
+      last: window._screenerLastCount,
+      rows: document.querySelectorAll('#tbody-screener tr:not(.screener-basis-divider)').length,
+      countLine: (document.getElementById('screener-count') || {}).innerText || ''
+    }));
+    if (sc.tab === 'texplorer') p(S, 'link lands on Explorer/Screener', sc.tab);
+    else f(S, 'link lands on Explorer/Screener', `activeTab=${sc.tab}`);
+    if (sc.countLine.indexOf('IOC Capital Screen') === 0) p(S, 'preset applied and named on the count line', 'IOC Capital Screen');
+    else f(S, 'preset applied and named on the count line', `count line starts "${sc.countLine.slice(0, 60)}"`);
+    if (sc.last === home.rendered) p(S, 'Screener result equals the Home headline', `${sc.last} = ${home.rendered}`);
+    else f(S, 'Screener result equals the Home headline', `Screener returns ${sc.last}, Home quoted ${home.rendered} — the analyst is given one number and shown another`);
+    if (sc.rows === home.rendered) p(S, 'rendered rows equal the Home headline', `${sc.rows}`);
+    else f(S, 'rendered rows equal the Home headline', `${sc.rows} rows vs Home ${home.rendered}`);
+
+  } catch(e) { f(S, 'exception', e.message); }
+}
+
 async function testRouting(page) {
   const S = 'Routing';
   try {
@@ -1458,6 +1548,7 @@ async function testConsoleErrors() {
     await testCountryProfile(page);
     await testExplorer(page);
     await testScreener(page);
+    await testHomeICScreenAgreement(page);
     await testIOC(page);
     await testComparison(page);
     await testVintage(page);

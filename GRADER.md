@@ -22602,3 +22602,45 @@ Second defect on the same sheet: `Project life (yr)` printed 15 for Marginal and
 **Task — T5:** "Give me something I can paste straight into an IC memo." Stalest of the six (506=T2, 505=T3, 504=T6, 503=T4, 502=T1, 501=T5).
 
 **Friction.** Walked it cold: Home → Fiscal Compare → pick a profile → Run Compare → **Export XLSX**, the button the Quick Start calls "Export XLSX for IC attachment." The workbook's second sheet is **Methodo
+
+## Cycle 508 — T1 / v603
+
+**Task — T1:** "Which countries should even be on my screening list?" Stalest of the six (507=T5, 506=T2, 505=T3, 504=T6, 503=T4, 502=T1).
+
+**Friction.** Walked it cold — fresh context, `sessionStorage` and `localStorage` cleared. The page loads on Home. One line on that page answers T1 directly, `#home-hurdle-stat`, and it read:
+
+> ✓ **14 countries** pass the IOC capital screen — verified field production · take ≤65% · contractor NPV positive at $75 *and* at the $50/bbl downside — **open the screen →**
+
+Clicked "open the screen →". The Screener returned **15 rows**, and row 15 was **Iraq at 84.8% take**, inside a screen captioned "take ≤65%".
+
+Two things wrong at once, and the second is worse than the arithmetic. The analyst is quoted a shortlist size on the front page and shown a different one, which puts every other number on the page in doubt. Then the row that differs is the one that looks like a broken filter.
+
+Cause: `#home-hurdle-stat` (index.html:39424) tested `c.take_75 != null && c.take_75 <= 65` — the **published blended headline**. `runScreener()`'s `_scPass()` tests `_scFeeCmpAt(d, price)` — the **comparable (Group-1) take**. Iraq: published 84.8%, comparable **34.1%** on its 195 PSC/Concession contracts; 68% of its contract count is TSC fee-basis, where the contractor takes a fixed $/bbl remuneration fee and keeps no price upside. `MECHANIC_COMPARABILITY.md` (2026-08-26) says that blend may not be compared across countries, which is why **v554 moved the Screener's ceiling off it**. v554 changed `runScreener()` and did not change this headline.
+
+So the front page was dropping the second-largest producer in OPEC out of the answer to T1, on a basis the platform's own rule prohibits, and then linking to a table that included it. **v524 built this element specifically so "the number and its destination cannot drift apart."** It drifted at v554 and stayed drifted for 49 cycles because nothing on either surface could contradict the other.
+
+Third defect on the same walk: the Quick Start guide's step 3 carried the literal string **"— 14 countries"** in static HTML (index.html:1503). It was written at v524 and has been wrong since v554 for the same reason, on the one card that tells a first-time analyst where to start.
+
+**Change.**
+
+1. **One definition.** New `_icCapitalScreenSet()` next to `_homeOpenICScreen()`. Its take leg calls `_scFeeCmpAt(c, '75')` — the same call `_scPass()` makes. Home reads it. The headline is now **15**, equal to the screen it links to.
+2. **The basis is stated where the surprise is created, not after it.** A third muted line on the Home element names the correction and the country it admits: *"The take ceiling is tested on the comparable take, not the published blended headline … So the list below includes **Iraq (published 84.8%, comparable 34.1% on 195 PSC/Concession contracts)** — the Screener shows the published figure first and the screened figure beneath it."* The rule is symmetric and the code says so in both directions: any country whose comparable take pushes it *out* while its headline clears the ceiling is named too (none at 65%; India straddles at 61.9%/63.2% and would be named at a ceiling between the two).
+3. **The Quick Start literals are live.** `#qs-ic-count` and `#qs-dr-count` are filled from the same computation. No count on that card is a hardcoded string any more.
+
+**Regression tests — 7 new cases** (`testHomeICScreenAgreement`), added to both harness copies. The expected set is recomputed *inside the test* from `_scFeeCmpAt()` rather than from any helper the page exposes, so the cases are an external check on both surfaces and fail on a build where either drifts. They assert: the headline equals the comparable-take screen; the Quick Start count tracks it; every admitted/excluded fee-blended country is named on Home; the link lands on the Screener with the preset named on the count line; and `_screenerLastCount` and the rendered row count both equal the Home headline.
+
+**Verified to FAIL on the pre-change build** (HEAD `index.html` served standalone on :8097) — **5 FAIL**, including *"Home renders 14, the comparable-take screen is 15"* and *"Screener returns 15, Home quoted 14 — the analyst is given one number and shown another"*.
+
+- Test before (pre-change build, :8097): **167 PASS / 5 FAIL / 5 WARN**
+- Test after (this build, :8090): **176 PASS / 0 FAIL / 1 WARN**
+- JS errors: 1 — the known local-harness `sw.js` 404, present on both builds
+- JS syntax gate: **PASS, 10/10 blocks**, re-run after the version sweep
+- Playwright **ran this cycle**, both builds, full suite.
+
+**Found on the same walk, not fixed — stated rather than hidden.**
+
+1. `window._activePresetName = null` (index.html:39898) is a dead global. The real binding is a script-scoped `let` at index.html:25910 and is never mirrored onto `window`, so the global is written null once and read by nothing. Harmless today; it is a trap for anything that assumes it tracks the preset — the first version of this cycle's test did, and failed on a correct build. The test now reads the rendered count line instead. Deleting the global is a separate change.
+2. The visible `orca-cite-ver` span on the Home masthead read **v574** against a v602 build — a display site the version sweep has been missing for 28 versions. Refreshed to v603 as part of the sweep, but the sweep's site list should be audited rather than patched one span at a time.
+3. Items carried from cycles 504–507, all untouched and still open: the FC profile strip's `Life: 30yr` project-life fiction (index.html:36048) — the on-screen twin of the v602 export defect; `exportFCResults()` writing only `Contractor NPV_50/75` while ranking on the selected price; `renderIOCExposure()` filtering `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows pinning `take_75` to the country value; `nocExcludedCount` always 0; the 2-country `_cmpOrderMark` asymmetry; the Top Contracts per-row `IRR%` column; Norway's `76 · HIGH` predictability against a `≥29.6pp obs` chip.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** **No published country take, NPV, rank, score, tier colour or pill value was altered, and no threshold was introduced** — the 65% ceiling is unchanged; what changed is which of two already-computed figures it is tested against on Home, brought into line with the Screener that has tested it that way since v554. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v554, v569, v588, v601, v602 and all other locks intact. Version sweep **v602 → v603** across 5 display sites plus the stale `orca-cite-ver` span, done silently at the end; it is **not** the deliverable.
