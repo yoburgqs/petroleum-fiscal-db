@@ -22720,3 +22720,18 @@ The refutation is evidence-driven, not blanket: **Ghana** and **Iraq** (measured
 3. The version sweep's site list is still maintained by hand — cycle 508 found an `orca-cite-ver` span 28 versions stale. It should be audited, not patched one span at a time.
 
 **STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** — two existing basis strings were corrected because the evidence refutes what they asserted. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** **No row or column added or removed from any table.** **No published country take, NPV, rank, score, tier colour or pill value was altered, and no threshold was introduced.** v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v554, v559, v569, v572, v583, v585, v588, v598, v601, v602, v603 and all other locks intact. Version sweep **v603 → v604** across 5 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 509 Log — 2026-08-30 14:42
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Both repos pushed.
+
+## Cycle 509 — T4 / v604
+
+**Task — T4:** "What is my fiscal-stability and reform exposure here?" (stalest; 508 ran T1, 507 T5, 506 T2, 505 T3, 504 T6, 503 T4)
+
+**Friction.** Walked cold into the Reform Risk tab — where every T4 route ends (the Fiscal Compare Stability cell, the Country Profile sidebar button, and the Home *Check Reform Risk* card all land there).
+
+ORCA has a sourced reform log for 21 of 185 countries. For the other **164** the card has no refo
