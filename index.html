@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v594</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v595</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v594</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v595</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v594</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v595</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v594';
+  return m ? m[0] : 'v595';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v594');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v595');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -28513,6 +28513,118 @@ function cpFloorBase() {
 }
 window.cpFloorBase = cpFloorBase;
 
+// v594 (T2) — the Profit Oil Tier Schedule was the most citable-looking artifact on this tab and
+// the only numeric block on it carrying no provenance at all. It renders for 70 countries. Every
+// one of the 32,404 r_factor tier rows behind it is confidence B, none carries a source_quote, and
+// 63 of the 70 are explicitly a MODEL / standard template rather than the signed contract's terms
+// — Guyana's says "Guyana PPCom EPE Model PSC", Cuba's says "R-factor (West Africa proxy)". The
+// same ladder is shared verbatim by up to 22 countries. This matters more than a sourcing nicety
+// because _resolve_tier_govt_share() in petroleum_dcf.py uses these tiers for PSC contracts, so
+// they drive the headline take that the panel below tells the analyst to "CITE THIS" — while the
+// Evidence Chain four sections down lists a flat Profit Oil (Govt) that, for 38 of the 70,
+// matches no tier in the ladder printed here. Treatment follows the v518/v569 BULK-chip idiom:
+// the block states its own basis instead of being silently trusted.
+function _cpTierSchedule594(d) {
+  if (!(d && d.has_r_factor_tiers && d.tier_schedule && d.tier_schedule.length > 0)) return '';
+  var ts = d.tier_schedule;
+  var isProd = d.tier_basis === 'production_rate';
+  var rangeHdr = isProd ? 'Production-rate range' : 'R-factor range';
+  var titleTxt = isProd
+    ? 'Production Oil Tier Schedule (production-rate tiers)'
+    : 'Profit Oil Tier Schedule (R-factor)';
+
+  var chips = '';
+  if (d.tier_conf) {
+    chips += '<span class="tier-badge tier-' + d.tier_conf + '" style="margin-left:6px;vertical-align:middle;" title="Source confidence ' + d.tier_conf
+      + '. Every profit-oil tier row in this database is tier B — none is read from a primary legal instrument, and none carries a source quote.">' + d.tier_conf + '</span>';
+  }
+  if (d.tier_model) {
+    chips += '<span style="margin-left:6px;font-size:9px;font-weight:800;letter-spacing:.06em;color:var(--orange);border:1px solid var(--orange);border-radius:3px;padding:0 4px;vertical-align:middle;" title="This ladder is a model / standard contract template applied to every PSC contract in the country. It is not read from the signed agreement.">MODEL</span>';
+  }
+  if (d.tier_proxy) {
+    chips += '<span style="margin-left:6px;font-size:9px;font-weight:800;letter-spacing:.06em;color:var(--red);border:1px solid var(--red);border-radius:3px;padding:0 4px;vertical-align:middle;" title="The template on file for this country was borrowed from a different region.">PROXY</span>';
+  }
+
+  var rowsHtml = ts.map(function(t, i) {
+    return '<tr style="background:' + (i % 2 ? 'rgba(0,0,0,0.018)' : 'transparent') + '">'
+      + '<td style="padding:3px 6px;">' + (isProd ? '' : 'R ') + (t.lo !== null && t.lo !== undefined ? t.lo.toFixed(1) : '0.0')
+      + ' – ' + (t.hi !== null && t.hi !== undefined ? t.hi.toFixed(1) : '∞') + '</td>'
+      + '<td style="text-align:right;padding:3px 6px;color:#15803D;">' + t.cont.toFixed(0) + '%</td>'
+      + '<td style="text-align:right;padding:3px 6px;color:#B91C1C;">' + t.govt.toFixed(0) + '%</td></tr>';
+  }).join('');
+
+  // How many other countries carry a byte-identical ladder. This is the fact that stops an
+  // analyst pasting the ladder into an IC memo as a country-specific negotiated term.
+  var shared = [];
+  try {
+    var sig = JSON.stringify(ts.map(function(t) { return [t.lo, t.hi, t.cont, t.govt]; }));
+    if (Array.isArray(COUNTRY_DATA)) {
+      COUNTRY_DATA.forEach(function(p) {
+        if (!p || p.country === d.country || !p.tier_schedule || !p.tier_schedule.length) return;
+        var s = JSON.stringify(p.tier_schedule.map(function(t) { return [t.lo, t.hi, t.cont, t.govt]; }));
+        if (s === sig) shared.push(p.country);
+      });
+    }
+  } catch (e) { shared = []; }
+
+  var notes = [];
+
+  if (d.tier_src) {
+    notes.push('<strong style="color:var(--text);">Schedule as filed:</strong> ' + _esc594(d.tier_src)
+      + (d.tier_nc ? ' — applied to all ' + Number(d.tier_nc).toLocaleString() + ' PSC contracts in ' + _esc594(d.country) : '')
+      + '. Tier ' + (d.tier_conf || 'B') + (d.tier_nosrc ? ', with no source record linked' : '') + ', and no source quote on file.');
+  }
+
+  if (d.tier_model) {
+    notes.push('This is a <strong style="color:var(--orange);">model contract template</strong>, not the terms of any signed agreement'
+      + (d.tier_proxy ? ', and the template on file was <strong style="color:var(--red);">borrowed from another region</strong>' : '') + '.');
+  }
+
+  if (shared.length) {
+    var show = shared.slice(0, 4).join(', ');
+    notes.push('The <strong>identical ladder</strong> is on file for <strong>' + shared.length + '</strong> other '
+      + (shared.length === 1 ? 'country' : 'countries') + ' — ' + _esc594(show)
+      + (shared.length > 4 ? ' and ' + (shared.length - 4) + ' more' : '')
+      + '. Do not cite these thresholds as a term negotiated for ' + _esc594(d.country) + '.');
+  }
+
+  // The Evidence Chain further down this same page prints a flat Profit Oil (Govt). For 38 of the
+  // 70 countries that render this table it matches no tier in the ladder above it, and nothing on
+  // the page reconciled the two. The DCF uses the ladder, so the headline take follows the ladder.
+  if (d.profit_oil_govt !== null && d.profit_oil_govt !== undefined) {
+    var gs = ts.map(function(t) { return t.govt; });
+    var matches = gs.some(function(g) { return Math.abs(d.profit_oil_govt - g) <= 0.05; });
+    if (!matches) {
+      var lo = Math.min.apply(null, gs), hi = Math.max.apply(null, gs);
+      var outside = (d.profit_oil_govt < lo || d.profit_oil_govt > hi);
+      notes.push('<span style="color:var(--orange);">⚠</span> <strong style="color:var(--text);">This page prints two different government profit-oil shares.</strong> '
+        + 'The Evidence Chain below lists a flat <strong>' + d.profit_oil_govt.toFixed(1) + '%</strong>, sourced separately; this ladder runs <strong>'
+        + lo.toFixed(0) + '–' + hi.toFixed(0) + '%</strong>'
+        + (outside ? ' and <strong style="color:var(--red);">never reaches ' + d.profit_oil_govt.toFixed(1) + '% at any tier</strong>' : '')
+        + '. The DCF resolves PSC contracts on <strong>this ladder</strong>, so the headline take on this page is computed from the tiers, not from the flat figure. '
+        + 'Reconcile both against the country’s own petroleum act before either goes in an IC memo.');
+    }
+  }
+
+  var notesHtml = notes.length
+    ? '<div style="font-size:10px;color:var(--muted);line-height:1.6;margin-top:6px;border-left:2px solid rgba(176,104,0,.4);padding-left:8px;">'
+      + notes.map(function(n) { return '<div style="margin-bottom:3px;">' + n + '</div>'; }).join('') + '</div>'
+    : '';
+
+  return '<div id="cp-tier-schedule" style="margin-top:10px;">'
+    + '<div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">'
+    + titleTxt + chips + '</div>'
+    + '<table style="width:100%;border-collapse:collapse;font-size:10px;"><thead><tr style="color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">'
+    + '<th style="text-align:left;padding:2px 6px;border-bottom:1px solid var(--border);">' + rangeHdr + '</th>'
+    + '<th style="text-align:right;padding:2px 6px;border-bottom:1px solid var(--border);">Contractor</th>'
+    + '<th style="text-align:right;padding:2px 6px;border-bottom:1px solid var(--border);">Government</th>'
+    + '</tr></thead><tbody>' + rowsHtml + '</tbody></table>'
+    + notesHtml + '</div>';
+}
+function _esc594(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
 function loadCountryProfile(country) {
   const content = document.getElementById('dd-content');
   const cpEmpty = document.getElementById('cp-empty-state');
@@ -29554,7 +29666,7 @@ function loadCountryProfile(country) {
     </div>
     ${d.has_r_factor_tiers ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(124,58,237,.4);padding-left:8px;">&#x2731; <strong style="color:var(--purple)">R-factor profit oil tiers active</strong> — government share rises as project profitability increases (R = cumulative revenue / cumulative cost). Price sensitivity in the take chart above reflects this standard PSC mechanic.</p>' : ''}
     ${(country === 'Ireland' && d.swing != null && d.swing > 20) ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(176,104,0,.4);padding-left:8px;">&#x26A0; <strong style="color:#96570A">Progressive PPT (R-factor sliding scale)</strong> — Ireland\'s Petroleum Production Tax is additive to the 25% CIT and rises from 10% to 40% based on field profitability (R-factor: cumulative revenue / cumulative investment). Total government take therefore spans 35%–65% across low-to-high price scenarios. The wide $50→$125 swing (+' + d.swing.toFixed(1) + 'pp) reflects this progressive PPT mechanic, not royalty or profit-oil variability.</p>' : ''}
-    ${(d.has_r_factor_tiers && d.tier_schedule && d.tier_schedule.length > 0) ? `<div style="margin-top:10px;"><div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Profit Oil Tier Schedule (R-factor)</div><table style="width:100%;border-collapse:collapse;font-size:10px;"><thead><tr style="color:var(--muted);text-transform:uppercase;letter-spacing:.04em;"><th style="text-align:left;padding:2px 6px;border-bottom:1px solid var(--border);">R-factor Range</th><th style="text-align:right;padding:2px 6px;border-bottom:1px solid var(--border);">Contractor</th><th style="text-align:right;padding:2px 6px;border-bottom:1px solid var(--border);">Government</th></tr></thead><tbody>${d.tier_schedule.map((t,i)=>`<tr style="background:${i%2?'rgba(0,0,0,0.018)':'transparent'}"><td style="padding:3px 6px;">R ${t.lo !== null ? t.lo.toFixed(1) : '0.0'} – ${t.hi !== null ? t.hi.toFixed(1) : '∞'}</td><td style="text-align:right;padding:3px 6px;color:#15803D;">${t.cont.toFixed(0)}%</td><td style="text-align:right;padding:3px 6px;color:#B91C1C;">${t.govt.toFixed(0)}%</td></tr>`).join('')}</tbody></table></div>` : ''}
+    ${_cpTierSchedule594(d)}
   </div>
   ${(function(){
     // Regional Peers section — top 5 peers in same region (excluding self), sorted by take@$75
