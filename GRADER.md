@@ -20568,3 +20568,16 @@ v581 `_dqTier`, the v582 `switchTab` guard, the v583 reform fiscal/context split
 and the v584 Explorer Excel scope are all intact. Tab order unchanged.
 Version bump v584→v585 across 5 structural sites, done silently at the end; it
 is **not** the deliverable.
+
+---
+## Cycle 490 Log — 2026-08-29 21:00
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps executed and pushed. Cycle 490, shipped as **v585**.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (489 was T5.) This clears the finding carried forward from cycles 488 and 489.
+
+## Friction
+Reform Direction was computed by one rule in six places: `take_change` starts `+` → tightened, `-` → liberalized, **everything else → neutral**. But 46 of the 83 sourced events (55%) carry no `take_change`, so more than half the record fell into a bucket whose column hea
