@@ -718,6 +718,180 @@ async function testComparison(page) {
   } catch(e) { f(S, 'exception', e.message); }
 }
 
+// ── v606 (T3) ───────────────────────────────────────────────────────────────────
+// The Side-by-Side "Govt Take vs Oil Price" chart plotted the raw blended take_*, while the
+// table directly above it ranks on the Group-1 (PSC/Conc) take that v549/v552/v571/v593/v600
+// established. On the shipped "USA vs Iraq" quickstart the chart drew Iraq at 81.5→88.1 against
+// the USA's 19.9→26.1 — its comparable take is 28.6→39.7, BELOW the USA at every price. The
+// chart now reads cpCmpTakeOf(), the same function Country Profile uses.
+// Assert: (1) the chart series equals the comparable take, not the headline, for every drawn
+// column across all 185 countries; (2) the chart and the table's rank row agree in direction on
+// the shipped preset; (3) PRRT-only columns are excluded from the price band and named in a
+// notice; (4) state-monopoly exclusion still works and stacks with the others; (5) an all-Group-1
+// set is completely unchanged — no rebasing label, no notice, original title.
+async function testSbSChartBasis(page) {
+  const S = 'SbSChartBasis';
+  try {
+    await switchTab(page, 't2');
+    await page.waitForTimeout(300);
+
+    const setCmp = async (arr) => {
+      await page.evaluate(a => { clearCompare(); a.forEach(c => addCompare(c)); }, arr);
+      await page.waitForTimeout(500);
+    };
+    const readChart = () => page.evaluate(() => {
+      const c = Chart.getChart(document.getElementById('cmp-chart'));
+      return {
+        title: c ? c.options.plugins.title.text : null,
+        labels: c ? c.data.datasets.map(d => d.label) : [],
+        data: c ? c.data.datasets.map(d => d.data) : [],
+        tips: c ? c.data.datasets.map((d, i) =>
+          c.options.plugins.tooltip.callbacks.label({ datasetIndex: i, dataIndex: 1, parsed: { y: d.data[1] } })) : [],
+        notice: (document.getElementById('cmp-monopoly-notice') || {}).innerText || '',
+        display: document.getElementById('cmp-chart-wrap').style.display,
+      };
+    });
+
+    // (1) shipped quickstart — the exhibit
+    await page.evaluate(() => clearCompare());
+    await page.click('button.cmp-quickstart-btn[data-countries="USA|Iraq"]');
+    await page.waitForTimeout(800);
+    const q = await readChart();
+
+    const iraqIdx = q.labels.findIndex(l => l.indexOf('Iraq') === 0);
+    const usaIdx  = q.labels.findIndex(l => l.indexOf('USA') === 0);
+    if (iraqIdx < 0 || usaIdx < 0) { f(S, 'quickstart loads 2 columns', 'labels=' + JSON.stringify(q.labels)); }
+    else {
+      const iraq = q.data[iraqIdx], usa = q.data[usaIdx];
+      // Iraq must be drawn on its comparable take (28.6/34.1/37.8/39.7), NOT the headline
+      // (81.5/84.8/86.9/88.1). The headline value at $75 is the pre-change failure.
+      if (Math.abs(iraq[1] - 34.1) < 0.15) p(S, 'Iraq plotted on comparable take', `$75 point = ${iraq[1]} (comparable 34.1, headline 84.8)`);
+      else f(S, 'Iraq plotted on comparable take', `$75 point = ${iraq[1]}, expected ~34.1 not the blended 84.8`);
+      if (iraq.every(v => v < 45)) p(S, 'Iraq comparable across full band', JSON.stringify(iraq));
+      else f(S, 'Iraq comparable across full band', 'headline values still plotted: ' + JSON.stringify(iraq));
+      // Magnitude, not ordering. The USA is the lowest-take country in the dataset, so Iraq sits
+      // above it on BOTH bases — this pair never reversed. What the headline did was inflate the
+      // gap: 84.8 vs 23.4 is 3.6x, the comparable 34.1 vs 23.4 is 1.5x. That is the error on the
+      // shipped preset. The ORDERING reversals are against the other 111 countries, asserted next.
+      const ratioNow = iraq[1] / usa[1];
+      if (ratioNow < 2.0) p(S, 'quickstart gap no longer inflated', `Iraq/USA at $75 = ${ratioNow.toFixed(2)}x on the comparable take (was 3.62x on the blended headline)`);
+      else f(S, 'quickstart gap no longer inflated', `Iraq/USA at $75 still ${ratioNow.toFixed(2)}x — headline basis still plotted`);
+      if (q.labels[iraqIdx].indexOf('(PSC/Conc)') >= 0) p(S, 'rebased series labelled', q.labels[iraqIdx]);
+      else f(S, 'rebased series labelled', 'legend does not say the line is the PSC/Conc subset: ' + q.labels[iraqIdx]);
+      if (/84\.8/.test(q.tips[iraqIdx]) && /PSC\/Conc/.test(q.tips[iraqIdx])) p(S, 'tooltip carries both figures', q.tips[iraqIdx]);
+      else f(S, 'tooltip carries both figures', q.tips[iraqIdx]);
+    }
+    if (Array.isArray(q.title) && /Comparable Govt Take/.test(q.title[0])) p(S, 'chart title states basis', JSON.stringify(q.title[0]));
+    else f(S, 'chart title states basis', 'title=' + JSON.stringify(q.title));
+    if (/comparable take/i.test(q.notice) && /415/.test(q.notice)) p(S, 'rebasing notice shown', 'names the 415 fee-basis contracts');
+    else f(S, 'rebasing notice shown', 'notice=' + JSON.stringify(q.notice.slice(0, 160)));
+
+    // (1b) a genuine ordering reversal. Iraq's headline (81.5→88.1) sits ABOVE Angola's
+    // (42.3→64.1) at every price; its comparable take (28.6→39.7) sits BELOW Angola at every
+    // price. 111 of the 16,471 chartable pairs reverse like this. The chart must now draw the
+    // same order the Govt Take rows and the producer-rank row already state.
+    await setCmp(['Iraq', 'Angola']);
+    const rev = await readChart();
+    const ri = rev.labels.findIndex(l => l.indexOf('Iraq') === 0);
+    const ra = rev.labels.findIndex(l => l.indexOf('Angola') === 0);
+    if (ri >= 0 && ra >= 0 && rev.data[ri].every((v, i) => v < rev.data[ra][i]))
+      p(S, 'ordering reversal corrected', `Iraq ${JSON.stringify(rev.data[ri])} now drawn BELOW Angola ${JSON.stringify(rev.data[ra])} at every price, matching the rank row`);
+    else f(S, 'ordering reversal corrected', `Iraq ${JSON.stringify(rev.data[ri])} vs Angola ${JSON.stringify(rev.data[ra])} — chart still contradicts the table`);
+
+    // (2) whole-dataset sweep: every drawn series must equal cpCmpTakeOf() at all four prices
+    const sweep = await page.evaluate(() => {
+      const cmp = (d, p) => (d && d.g1 && d.g1['t' + p] != null) ? d.g1['t' + p] : d['take_' + p];
+      let checked = 0, mismatch = 0, rebased = 0, headlineDiff = 0;
+      const bad = [];
+      COUNTRY_DATA.forEach(d => {
+        if (d.take_75 != null && d.take_75 >= 99.5) return;           // monopoly: not drawn
+        const mx = d.mech_mix || [];
+        const tot = mx.reduce((s, x) => s + (x.n || 0), 0);
+        const n2 = mx.filter(x => x.g === 2).reduce((s, x) => s + (x.n || 0), 0);
+        const n3 = mx.filter(x => x.g === 3).reduce((s, x) => s + (x.n || 0), 0);
+        if (n3 > 0 && n2 === 0 && tot - n2 - n3 === 0) return;        // PRRT-only: not drawn
+        checked++;
+        let diff = false;
+        [50, 75, 100, 125].forEach(pr => {
+          const c = cmp(d, pr), h = d['take_' + pr];
+          if (c != null && h != null && Math.abs(c - h) >= 0.05) diff = true;
+        });
+        if (diff) { rebased++; headlineDiff++; }
+      });
+      return { checked, rebased };
+    });
+    if (sweep.checked > 175) p(S, 'sweep covers the drawn set', `${sweep.checked} chartable countries`);
+    else f(S, 'sweep covers the drawn set', `only ${sweep.checked} chartable countries`);
+    // 11, not 10: Russia blends exactly ONE fee-basis contract of 1,247 and its two figures
+    // agree to 0.0pp at $75 but differ by 0.1pp at $125, so it is rebased on the all-price rule
+    // the chart uses and not on a $75-only rule.
+    if (sweep.rebased === 11) p(S, 'rebased-column count pinned', `${sweep.rebased} of ${sweep.checked} columns are drawn on a comparable take that differs from the headline at one or more of the four prices`);
+    else w(S, 'rebased-column count pinned', `expected 11, got ${sweep.rebased} — country_data.json changed`);
+
+    // Verify the live chart matches cpCmpTakeOf for each rebased country, 5 at a time
+    // Same all-price rule as _cmpChartRebased in index.html, so the two counts cannot drift.
+    const rebasedNames = await page.evaluate(() => COUNTRY_DATA
+      .filter(d => d.g1 && d.g1.t75 != null && [50, 75, 100, 125].some(p =>
+        d['take_' + p] != null && d.g1['t' + p] != null && Math.abs(d.g1['t' + p] - d['take_' + p]) >= 0.05))
+      .map(d => d.country));
+    let seriesOk = 0, seriesBad = [];
+    for (let i = 0; i < rebasedNames.length; i += 4) {
+      const batch = rebasedNames.slice(i, i + 4);
+      await setCmp(batch);
+      const r = await readChart();
+      for (const name of batch) {
+        const idx = r.labels.findIndex(l => l.indexOf(name) === 0);
+        if (idx < 0) { seriesBad.push(name + ':not drawn'); continue; }
+        const expect = await page.evaluate(n => {
+          const d = COUNTRY_DATA.find(x => x.country === n);
+          return [50, 75, 100, 125].map(p => cpCmpTakeOf(d, String(p)));
+        }, name);
+        const got = r.data[idx];
+        const ok = expect.every((v, k) => (v == null && got[k] == null) || Math.abs(v - got[k]) < 0.001);
+        if (ok) seriesOk++; else seriesBad.push(name + ': got ' + JSON.stringify(got) + ' want ' + JSON.stringify(expect));
+      }
+    }
+    if (seriesBad.length === 0) p(S, 'all fee-blended series plot the comparable take', `${seriesOk}/${rebasedNames.length} verified against cpCmpTakeOf()`);
+    else f(S, 'all fee-blended series plot the comparable take', seriesBad.slice(0, 4).join(' | '));
+
+    // (3) PRRT-only column excluded from the price band, named in a notice, peer still drawn
+    await setCmp(['Australia', 'Norway']);
+    const au = await readChart();
+    if (!au.labels.some(l => l.indexOf('Australia') === 0)) p(S, 'PRRT column excluded from price band', 'Australia not drawn as a line across $50–$125');
+    else f(S, 'PRRT column excluded from price band', 'Australia still plotted across the band: ' + JSON.stringify(au.labels));
+    if (/Cash-flow basis/.test(au.notice) && /Australia/.test(au.notice)) p(S, 'PRRT exclusion named', 'notice names Australia and the cash-flow basis');
+    else f(S, 'PRRT exclusion named', 'notice=' + JSON.stringify(au.notice.slice(0, 160)));
+    if (au.labels.some(l => l.indexOf('Norway') === 0) && au.display !== 'none') p(S, 'PRRT exclusion spares peers', 'Norway still drawn');
+    else f(S, 'PRRT exclusion spares peers', 'peer column lost: ' + JSON.stringify(au.labels));
+
+    // (4) monopoly exclusion still works and stacks with the rebasing notice
+    await setCmp(['Saudi Arabia', 'Iraq', 'Angola']);
+    const sa = await readChart();
+    if (!sa.labels.some(l => l.indexOf('Saudi Arabia') === 0) && /State monopoly/.test(sa.notice)) p(S, 'monopoly exclusion intact', 'Saudi Arabia excluded and named');
+    else f(S, 'monopoly exclusion intact', 'labels=' + JSON.stringify(sa.labels));
+    if (/State monopoly/.test(sa.notice) && /comparable take/i.test(sa.notice)) p(S, 'notices stack', 'monopoly + rebasing notices both present');
+    else f(S, 'notices stack', 'notice=' + JSON.stringify(sa.notice.slice(0, 200)));
+
+    // (5) CONTROL — an all-Group-1 set must be byte-identical to the pre-change render
+    await setCmp(['Norway', 'United Kingdom', 'Netherlands']);
+    const ns = await readChart();
+    const ctlExpect = await page.evaluate(() => ['Norway', 'United Kingdom', 'Netherlands'].map(n => {
+      const d = COUNTRY_DATA.find(x => x.country === n);
+      return [d.take_50, d.take_75, d.take_100, d.take_125];
+    }));
+    const ctlOk = ctlExpect.every((row, i) => row.every((v, k) => Math.abs(v - ns.data[i][k]) < 0.001));
+    if (ctlOk) p(S, 'control set unchanged (values)', 'North Sea Trio still plots its published headline take');
+    else f(S, 'control set unchanged (values)', 'got ' + JSON.stringify(ns.data) + ' want ' + JSON.stringify(ctlExpect));
+    if (ns.title === 'Govt Take vs Oil Price') p(S, 'control set unchanged (title)', 'original single-line title retained');
+    else f(S, 'control set unchanged (title)', 'title=' + JSON.stringify(ns.title));
+    if (ns.notice === '') p(S, 'control set unchanged (no notice)', 'no basis notice on an all-Group-1 set');
+    else f(S, 'control set unchanged (no notice)', 'unexpected notice: ' + JSON.stringify(ns.notice.slice(0, 120)));
+    if (ns.labels.every(l => l.indexOf('(PSC/Conc)') < 0)) p(S, 'control set unchanged (labels)', JSON.stringify(ns.labels));
+    else f(S, 'control set unchanged (labels)', JSON.stringify(ns.labels));
+
+  } catch(e) { f(S, 'exception', e.message); }
+}
+
 // ─── SECTION 7: DCF Engine Tests ──────────────────────────────────────────
 // ── v602 (T5) ───────────────────────────────────────────────────────────────────
 // The Export XLSX "Methodology" sheet is the workbook's traceability page — the one an IC
@@ -1778,6 +1952,7 @@ async function testConsoleErrors() {
     await testICSourcingTier(page);
     await testIOC(page);
     await testComparison(page);
+    await testSbSChartBasis(page);
     await testVintage(page);
     await testReformRisk(page);
     await testBreakevenMap(page);

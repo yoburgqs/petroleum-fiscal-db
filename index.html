@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v605.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v606.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v605</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v606</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v605</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v606</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v605</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v606</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v605';
+  return m ? m[0] : 'v606';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v605');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v606');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2469,7 +2469,7 @@ window.copyPlatformCitation = function(btn) {
     <div style="position:absolute;top:8px;right:8px;z-index:10;">
       <button class="btn btn-outline btn-sm" id="cmp-chart-png-btn" aria-label="Download Side-by-Side comparison chart as PNG image" title="Download chart as PNG">⬇ PNG</button>
     </div>
-    <canvas id="cmp-chart" aria-label="Side-by-side bar chart comparing government take percentage across selected countries at 4 price points" role="img"></canvas>
+    <canvas id="cmp-chart" aria-label="Line chart comparing comparable government take percentage across selected countries at 4 price points. Fee-basis and cash-flow columns are re-based or excluded; see the notices above the chart." role="img"></canvas>
   </div>
   <div id="cmp-npv-chart-wrap" class="chart-wrap" style="display:none;margin-top:8px;">
     <canvas id="cmp-npv-chart" aria-label="Side-by-side bar chart comparing contractor NPV across selected countries at 4 price points" role="img"></canvas>
@@ -25724,18 +25724,71 @@ function renderCompare() {
 
   // Chart
   const chartWrap = document.getElementById('cmp-chart-wrap');
-  // Feature 1: separate monopoly countries — excluded from chart, shown as notice
+  // v606 (T3): the chart plotted the raw blended `take_*` — the exact comparison the table
+  // directly above it spends five revisions forbidding. v549 put "PSC/Conc 34.1%" under Iraq's
+  // 84.8% headline, v552 re-based the producer rank on it, v571 fixed the half-converted rank
+  // cell, v593 ranked the four Govt Take rows on it and v600 moved the order marker onto it.
+  // Every one of those corrections stopped at the table. Then "Govt Take vs Oil Price" drew the
+  // uncorrected headline as a line, in the largest visual on the tab, on the artifact the
+  // ⬇ Chart PNG button exports.
+  //
+  // The tab's own shipped quickstart is the exhibit. Click "USA vs Iraq" cold and the chart draws
+  //     Iraq   81.5 → 84.8 → 86.9 → 88.1        USA   19.9 → 23.4 → 25.1 → 26.1
+  // Iraq's line sits at the top of the plot, ~3.6x the USA. Its comparable take — the figure
+  // printed in the cell six inches above and the figure the rank row is computed on — is
+  // 28.6 → 34.1 → 37.8 → 39.7, BELOW the USA at every price. A 50.7pp error at $75 that inverts
+  // the verdict, on a preset button, in a picture.
+  //
+  // Measured over country_data.json: of the 16,471 chartable country pairs, 292 (1.8%) are drawn
+  // in an ordering the table refuses to endorse, and 111 are outright reversals — Iraq against
+  // India, Angola, Brazil, Algeria, Bolivia, China and 105 others, drawn highest-take when its
+  // comparable take is lowest-take. Australia is the other class: PRRT is a cash-flow base and
+  // the table states it "may not be carried across price points at all", which is precisely and
+  // only what a line across a $50–$125 x-axis does.
+  //
+  // The chart now plots cpCmpTakeOf() — the same function Country Profile uses and the same basis
+  // the table ranks on — so the picture and the grid cannot disagree. No figure is invented: the
+  // g1 values already ship in country_data.json and are already printed in the Govt Take cells.
   const monopolyCountries = selected.filter(d => isStateMonopoly(d.take_75));
-  const chartCountries = selected.filter(d => !isStateMonopoly(d.take_75));
+  const _cmpBandExcluded = selected.filter(d => !isStateMonopoly(d.take_75) && _cmpMixStat(d).prrt);
+  const chartCountries = selected.filter(d => !isStateMonopoly(d.take_75) && !_cmpMixStat(d).prrt);
+  // Columns whose plotted line is the Group-1 subset rather than the published headline, and where
+  // that actually moves the line at the precision the axis prints. Russia blends exactly ONE
+  // fee-basis contract out of 1,247 and its two figures agree to 0.0pp — do not label it corrected.
+  const _cmpChartRebased = chartCountries.filter(d => PRICES.some(p =>
+    d['take_' + p] != null && cpCmpTakeOf(d, String(p)) != null
+    && Math.abs(cpCmpTakeOf(d, String(p)) - d['take_' + p]) >= 0.05));
   let _monopolyNoticeEl = document.getElementById('cmp-monopoly-notice');
   if (!_monopolyNoticeEl) {
     _monopolyNoticeEl = document.createElement('div');
     _monopolyNoticeEl.id = 'cmp-monopoly-notice';
     chartWrap.parentNode.insertBefore(_monopolyNoticeEl, chartWrap);
   }
-  _monopolyNoticeEl.innerHTML = monopolyCountries.length
-    ? '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--accent);">⚠ State monopoly — excluded from chart: ' + monopolyCountries.map(d=>d.country).join(', ') + '. No contractor access; fiscal comparison not applicable.</div>'
-    : '';
+  const _cmpNotices = [];
+  if (monopolyCountries.length) _cmpNotices.push(
+    '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--accent);">⚠ State monopoly — excluded from chart: '
+    + monopolyCountries.map(d=>_cmpEsc(d.country)).join(', ')
+    + '. No contractor access; fiscal comparison not applicable.</div>');
+  if (_cmpBandExcluded.length) _cmpNotices.push(
+    '<div style="background:rgba(180,150,0,.07);border:1px solid rgba(180,150,0,.28);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--yellow);">⚠ Cash-flow basis — excluded from the price-band chart: '
+    + _cmpBandExcluded.map(d=>_cmpEsc(d.country)).join(', ')
+    + '. PRRT only triggers once project cash flow clears an uplift threshold, so its take% is not a rate that can be carried across a price band — a line here would read as a fiscal trend it does not have. '
+    + (_cmpBandExcluded.length === 1 ? 'Its' : 'Their')
+    + ' take at each of the four prices is in the <strong>Govt Take</strong> rows above; read it against another column at ONE price at a time.</div>');
+  if (_cmpChartRebased.length) _cmpNotices.push(
+    '<div style="background:rgba(21,128,61,.06);border:1px solid rgba(21,128,61,.28);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--text);"><span style="color:var(--green);font-weight:700;">Chart plots the comparable take.</span> '
+    + _cmpChartRebased.map(function(d){
+        const st = _cmpMixStat(d);
+        return '<strong>' + _cmpEsc(d.country) + '</strong> is drawn on its '
+          + Number(st.g1 && st.g1.n != null ? st.g1.n : st.n1).toLocaleString()
+          + ' production-sharing and concession contracts ('
+          + (cpCmpTakeOf(d,'75') != null ? cpCmpTakeOf(d,'75').toFixed(1) + '% at $75' : 'PSC/Conc basis')
+          + '), not on its published headline of '
+          + (d.take_75 != null ? d.take_75.toFixed(1) + '%' : 'n/a') + ', which blends in '
+          + Number(st.n2).toLocaleString() + ' fee-basis contracts (' + _cmpEsc(_cmpMechBare(st, 2)) + ')';
+      }).join('; ')
+    + '. A fee-basis contractor is paid a fixed $/bbl remuneration and keeps no price upside, so its take% climbs toward 97–99% because of the mechanic, not because the terms are hard — plotting it against a PSC line would rank the two on different questions. Both figures are in the <strong>Govt Take</strong> rows above.</div>');
+  _monopolyNoticeEl.innerHTML = _cmpNotices.join('');
   if (cmpChart) cmpChart.destroy();
   // v501: 5th colour added with the 5-country cap. The NPV chart indexed colors[i]
   // without a modulo, so a 5th series rendered with backgroundColor "undefined88".
@@ -25746,13 +25799,17 @@ function renderCompare() {
     chartWrap.style.display='block';
     const ctx = document.getElementById('cmp-chart').getContext('2d');
     const hasRFactor = chartCountries.some(d => d.has_r_factor_tiers);
+    // v606 (T3): _cmpChartRebased holds the columns whose plotted line is the Group-1 subset. The
+    // legend must say so, because the legend is the only key that travels with the exported PNG.
+    const _cmpRebasedSet = {};
+    _cmpChartRebased.forEach(function(d){ _cmpRebasedSet[d.country] = true; });
     cmpChart = new Chart(ctx, {
       type:'line',
       data:{
         labels:['$50','$75','$100','$125'],
         datasets: chartCountries.map((d,i) => ({
-          label: d.country + (d.has_r_factor_tiers ? ' ◆' : ''),
-          data: [d.take_50, d.take_75, d.take_100, d.take_125],
+          label: d.country + (_cmpRebasedSet[d.country] ? ' (PSC/Conc)' : '') + (d.has_r_factor_tiers ? ' ◆' : ''),
+          data: PRICES.map(p => cpCmpTakeOf(d, String(p))),
           borderColor: colors[i % colors.length],
           backgroundColor: colors[i % colors.length]+'22',
           borderWidth: d.has_r_factor_tiers ? 3 : 2,
@@ -25767,8 +25824,21 @@ function renderCompare() {
         responsive:true,
         plugins:{
           legend:{labels:{color:'#6B6560',font:{size:12}}},
-          title:{display:true,text:hasRFactor ? 'Govt Take vs Oil Price  ◆ = R-factor PSC' : 'Govt Take vs Oil Price',color:'#1C1A17',font:{size:14,weight:'bold'}},
-          tooltip:{callbacks:{label:ctx=>{const d2=chartCountries[ctx.datasetIndex];return ` ${d2.country}: ${ctx.parsed.y!=null?ctx.parsed.y.toFixed(1)+'%':'—'}${d2.has_r_factor_tiers?' (R-factor PSC)':''}`;}}}
+          title:{display:true,
+            text: _cmpChartRebased.length
+              ? ['Comparable Govt Take vs Oil Price' + (hasRFactor ? '  ◆ = R-factor PSC' : ''),
+                 '(PSC/Conc) = drawn on production-sharing & concession contracts only, not the blended headline']
+              : (hasRFactor ? 'Govt Take vs Oil Price  ◆ = R-factor PSC' : 'Govt Take vs Oil Price'),
+            color:'#1C1A17',font:{size:14,weight:'bold'}},
+          tooltip:{callbacks:{label:ctx=>{
+            const d2=chartCountries[ctx.datasetIndex];
+            const p = PRICES[ctx.dataIndex];
+            const head = d2['take_' + p];
+            const reb = _cmpRebasedSet[d2.country] && head != null;
+            return ' ' + d2.country + ': ' + (ctx.parsed.y!=null?ctx.parsed.y.toFixed(1)+'%':'—')
+              + (reb ? ' on PSC/Conc contracts only \u2014 published headline ' + head.toFixed(1) + '% blends fee-basis contracts' : '')
+              + (d2.has_r_factor_tiers?' (R-factor PSC)':'');
+          }}}
         },
         scales:{
           x:{ticks:{color:'#6B6560'},grid:{color:'#D0CAC0'},title:{display:true,text:'Oil Price ($/bbl)',color:'#6B6560'}},

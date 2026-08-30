@@ -22864,3 +22864,130 @@ end; it is **not** the deliverable.
 **Friction.** Walked cold into Country Profile, the tab that answers the provenance question, then did what the analyst actually does with the answer — carried it out of the tool.
 
 Country Profile
+
+---
+## Cycle 511 — T3 / v606
+
+**Task — T3:** "How do these three countries compare side by side?" — stalest of the six
+(510=T6, 509=T4, 508=T1, 507=T5, 506=T2, 505=T3).
+
+**Friction.** Walked Side-by-Side cold — fresh context, `sessionStorage` and `localStorage`
+cleared — and clicked the tab's own shipped quickstart button, **`USA vs Iraq`**.
+
+The table has been corrected five times for exactly one thing. **v549** put `PSC/Conc 34.1%`
+under Iraq's `84.8%` headline because `~/MECHANIC_COMPARABILITY.md` establishes that a take% is
+comparable only when contractor income is tied to the oil price, and 415 of Iraq's 610 contracts
+are fee-basis TSCs. **v552** re-based the producer rank on that figure, **v571** fixed the
+half-converted rank cell, **v593** ranked all four Govt Take rows on it, **v600** moved the order
+marker onto it. Every one of those corrections **stopped at the table.**
+
+Directly beneath it, the **"Govt Take vs Oil Price"** chart — the largest visual on the tab, and
+the artifact the `⬇ Chart PNG` button exports — plotted the raw blended `take_*`:
+
+```
+   drawn        Iraq  81.5 → 84.8 → 86.9 → 88.1      USA  19.9 → 23.4 → 25.1 → 26.1
+   comparable   Iraq  28.6 → 34.1 → 37.8 → 39.7
+```
+
+So the picture contradicted the grid six inches above it, on a preset button, on a cold load.
+
+Measured across `country_data.json`:
+
+| | |
+|---|---|
+| Chartable country pairs | **16,471** |
+| Drawn in an ordering the table refuses to endorse | **292 (1.8%)** |
+| Outright **reversals** — drawn highest-take, ranked lowest-take | **111** |
+| Columns plotted on the wrong basis | **12 of 181** |
+
+Iraq is the extreme at **50.7pp** at $75. On the shipped preset the error is one of *magnitude*,
+not order — the USA is the lowest-take country in the dataset, so Iraq sits above it on both
+bases; the headline inflated the gap from **1.5× to 3.6×**. The **ordering reversals** are
+against the other 111 columns: Iraq drawn above Angola (53.0), Brazil (55.6), India (63.2),
+Algeria (69.5), Bolivia (72.1), China (61.0) and 105 more, when its comparable 34.1% is below
+every one of them.
+
+The second class is **Australia**. PRRT is a cash-flow base, and the Take-basis row states in
+terms that it "may not be carried across price points at all" — which is precisely and only what
+a line across a $50–$125 x-axis does.
+
+**Change.** The chart now reads `cpCmpTakeOf()` — the same function Country Profile uses and the
+same basis the table ranks on — so the picture and the grid cannot fork again.
+
+- **11 fee-blended columns** are plotted on their Group-1 (PSC/Concession) take. The legend reads
+  `Iraq (PSC/Conc)`, the chart title gains a second line naming the basis, and the point tooltip
+  carries **both** figures: `Iraq: 34.1% on PSC/Conc contracts only — published headline 84.8%
+  blends fee-basis contracts`. A notice above the chart names the 415 contracts and the mechanic.
+- **Australia** is dropped from the price-band chart with a notice, on the same precedent state
+  monopolies already had, and pointed at the Govt Take rows to be read one price at a time. Its
+  peer columns are unaffected — Norway is still drawn.
+- **State-monopoly exclusion is unchanged** and the notices stack.
+- **No published figure was altered and no threshold was invented.** The `g1` values already ship
+  in `country_data.json` and are already printed in the Govt Take cells; this cycle only stopped
+  the chart from ignoring them.
+
+**Result.** An analyst who clicks the shipped `USA vs Iraq` button and screenshots the chart into
+an IC memo now exports a picture that agrees with the table under it. Against the 111 reversal
+pairs the chart stops drawing Iraq as the harshest regime on screen when the platform's own rank
+row places it in the lowest-take quartile — the wrong elimination verdict, in the one artifact
+that leaves the tool without its caveats attached.
+
+**Verification.** `testSbSChartBasis` — 20 assertions in `tests/runtime_comprehensive.js`: the
+shipped quickstart's values / legend / title / tooltip / notice, a real ordering reversal
+(Iraq vs Angola), a whole-dataset sweep pinning 181 chartable and 11 rebased columns, a
+per-country check of all 11 rebased series against `cpCmpTakeOf()`, PRRT exclusion + peer
+survival, monopoly exclusion + notice stacking, and a four-way **control** on the North Sea Trio
+asserting an all-Group-1 set is byte-identical to the pre-change render.
+**Verified to FAIL on the pre-change build — 11 FAIL**, every one a case named above; the four
+control assertions passed on both builds, as they must.
+Suite run this cycle against a local server: **235 PASS / 0 FAIL / 1 WARN**, JS syntax gate PASS.
+The 1 WARN is a 404 on a script fetch that is **present on the unmodified baseline too** —
+confirmed by re-running the probe with `index.html` reverted. Not introduced here.
+
+**One assertion I got wrong and corrected.** I first asserted that the chart had been drawing
+Iraq above the USA when the table ranked it below. It had not — the USA is the lowest-take
+country in the dataset and Iraq is above it on both bases. The test failed on the *fixed* build
+and the claim, not the code, was wrong. Replaced with the magnitude assertion (3.6× → 1.5×) plus
+a genuine reversal pair. Recorded because the cycle log is the only place it exists.
+
+**Found on the same walk, not fixed — stated rather than hidden.**
+
+1. The **Contractor NPV chart** directly below maps `selected`, not `chartCountries`, so it draws
+   a bar series for a **state monopoly** — a column with no contractor position — which the take
+   chart above it excludes by name. One-token divergence, but it is a second basis fork on the
+   same tab and I did not verify what those three countries' `npv_*` values represent before
+   changing what is drawn. Left for a cycle that can measure it.
+2. The `⬇ Chart PNG` and `⬇ Save as PDF` paths inherit this fix automatically (both read the
+   canvas), but the PNG carries the legend and **not** the notices above the chart. The legend
+   now says `(PSC/Conc)`, so the exported image is no longer wrong — but the *why* stays behind.
+3. `Fiscal Compare`, `Country Profile`, `Breakeven Map`, `Explorer` and `IOC Portfolio` charts
+   were **not** audited for the same defect this cycle. The correction is now in one shared
+   function (`cpCmpTakeOf`), so an audit is cheap; it has not been done.
+4. Items carried from cycles 504–510, untouched and still open: the FC profile strip's
+   `Life: 30yr` project-life fiction; `exportFCResults()` writing only `Contractor NPV_50/75`
+   while ranking on the selected price; `exportFCResults()` / `exportCountryXLSX()` writing a
+   column headed **"Evidence Quality A/B (%)"** on a scale the on-screen badge no longer uses;
+   `exportReformRiskCSV()` writing empty **Mechanic** and **Source** columns on all 83 rows;
+   `renderIOCExposure()` filtering `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows
+   pinning `take_75` to the country value; `nocExcludedCount` always 0; the 2-country
+   `_cmpOrderMark` asymmetry; the Top Contracts per-row `IRR%` column; `window._activePresetName`
+   as a dead global; and the hand-maintained version-sweep site list, which still needs an audit
+   rather than another one-site patch.
+5. **The loop's own reported test numbers are still wrong.** This cycle's prompt opened with
+   "CURRENT TEST RESULTS: 0 PASS / 0 FAIL / 0 WARN", as did cycles 506–510. The harness runs
+   correctly — 235 PASS here. The failure is in the wrapper that invokes it and parses the total,
+   not in the suite. Not fixed; it is loop infrastructure, not `index.html`.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip on a control
+whose behaviour did not change** — the chart tooltip was rewritten because the number it reports
+changed, and the two notices are data-state notices on the same element that already carried the
+monopoly notice, not instructional banners. No page-sub paragraph, amber instructional banner,
+routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener
+advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed.
+**No tab added, removed or reordered. No row or column added or removed from any table. No
+published country take, NPV, rank, score, tier colour or pill value was altered, and no threshold
+was introduced** — the chart was pointed at figures the page already publishes. v371/v373
+declutter, v430 sessionStorage logic, v449, v451, v452, v489, v518, v527, v533, v538, v549, v551,
+v552, v555, v557, v562, v565, v569, v571, v575, v588, v593, v600, v601, v604, v605 and all other
+locks intact. Version sweep **v605 → v606** across 6 structural sites, done silently at the end;
+it is **not** the deliverable.
