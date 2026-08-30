@@ -23154,3 +23154,16 @@ hurdle line and saved-scenario table are unchanged; the strip is added above the
 corrected. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v505 `_basis`
 semantics, v549, v552, v570, v594, v601, v606 and all other locks intact. Version sweep
 **v606 → v607** across 6 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 512 Log — 2026-08-30 17:20
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle complete.
+
+## Cycle 512 — T2 / v607
+
+**Task — T2:** "Is this one country attractive at $75/bbl, and can I defend that?" — the stalest of the six (511=T3, 510=T6, 509=T4, 508=T1, 507=T5, 506=T2).
+
+**Friction.** The Country Profile's own prescribed next step for T2 is the Scenario Builder — the Fiscal-character line says "Run Scenario Builder to test at your actual project parameters before IC submission", the IRR field is literally `→ Model in Scenario Builder`, and four 
