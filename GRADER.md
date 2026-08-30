@@ -21649,3 +21649,14 @@ Reform Risk in the primary Home grid, v507, v518, v531, v542, v549, v551, v552, 
 v557, v562, v565, v571, v577, v589, v590, v591, v592 — all intact. Version sweep
 **v592 → v593** across 5 structural sites, done silently at the end; it is **not** the
 deliverable.
+
+---
+## Cycle 498 Log — 2026-08-30 04:21
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 498 complete — v593 pushed to both repos.
+
+**Task:** T3 — "How do these three countries compare side by side?" (stalest; last walked cycle 461).
+
+**Friction:** Walked cold into Side-by-Side with storage cleared and built the analyst's own three-country set. The four **Govt Take** rows are the rows this tab explicitly tells you to rank on — the box under the grid says in bold *"Rank these countries on Govt Take."* Those four rows rendered as twelve bare percentages with **no ordering marked
