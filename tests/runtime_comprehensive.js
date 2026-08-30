@@ -1915,6 +1915,209 @@ async function testMethodology(page) {
 }
 
 // ─── SECTION 19: Console Errors ────────────────────────────────────────────
+
+// ─────────────────────────────────────────────────────────────────────────────
+// v607 (T2) — Scenario Builder provenance when opened from a country.
+// Regression guard for: a Country Profile that says "state monopoly — not a
+// contractor regime, no contractor position" whose own "🔧 Scenario" button
+// returned 22.2% take / $4.3B contractor NPV / "✔ Clears a 15% IOC hurdle" and a
+// copy-ready IC line, under a banner reading "Parameters pre-filled for Saudi Arabia".
+// Asserts the three provenance states, that they carry the right numbers, that the
+// claim is dropped on every path that invalidates it, and that the rank direction
+// label matches the rank the code actually computes.
+// ─────────────────────────────────────────────────────────────────────────────
+async function testSBProvenance(page) {
+  const S = 'SB-PROVENANCE';
+  try {
+    // ---- 1. the shipped worst case: Saudi Arabia -----------------------------
+    const saudi = await page.evaluate(async () => {
+      ddOpenScenarioBuilder('Saudi Arabia');
+      await new Promise(r => setTimeout(r, 700));
+      const el = document.getElementById('sb-origin-note');
+      const d = COUNTRY_DATA.find(x => x.country === 'Saudi Arabia');
+      return {
+        strip:  el ? el.innerText : null,
+        banner: document.getElementById('sb-prefill-text').innerText,
+        ic:     window._sbICLine,
+        mono:   isStateMonopoly(d.take_75),
+        basis:  getDCFParams('Saudi Arabia', fcResolveMechanic(d))._basis
+      };
+    });
+    if (saudi.mono && saudi.basis === 'default') p(S, 'Saudi fixture', 'still a state monopoly on generic defaults — the case under test is live');
+    else f(S, 'Saudi fixture', 'fixture drifted: mono=' + saudi.mono + ' basis=' + saudi.basis);
+
+    if (saudi.strip && /has no contractor regime in ORCA/.test(saudi.strip)) p(S, 'Saudi strip', 'names the missing contractor regime');
+    else f(S, 'Saudi strip', 'monopoly strip absent or wrong: ' + String(saudi.strip).slice(0, 120));
+
+    if (saudi.strip && /generic Concession default/.test(saudi.strip)) p(S, 'Saudi strip terms', 'states the loaded terms are the generic Concession default');
+    else f(S, 'Saudi strip terms', 'does not name the generic default');
+
+    if (saudi.strip && !/This scenario/.test(saudi.strip)) p(S, 'Saudi no take gap', 'no take comparison drawn against a country with no published take');
+    else f(S, 'Saudi no take gap', 'drew a take gap for a state monopoly');
+
+    if (/state monopoly/i.test(saudi.banner)) p(S, 'Saudi banner', 'banner no longer claims plain country pre-fill');
+    else f(S, 'Saudi banner', 'banner still reads: ' + saudi.banner);
+
+    if (/HYPOTHETICAL REGIME/.test(saudi.ic)) p(S, 'Saudi IC line', 'IC line carries the hypothetical-regime clause');
+    else f(S, 'Saudi IC line', 'IC line leaves the tool unqualified: ' + String(saudi.ic).slice(0, 140));
+
+    // ---- 2. default-basis country: Brazil ------------------------------------
+    const brazil = await page.evaluate(async () => {
+      ddOpenScenarioBuilder('Brazil');
+      await new Promise(r => setTimeout(r, 700));
+      const el = document.getElementById('sb-origin-note');
+      const t = el ? el.innerText : '';
+      const m = t.match(/This scenario ([\d.]+)%[\s\S]*?published @\$75 ([\d.]+)%[\s\S]*?([+−])([\d.]+)pp/);
+      const d = COUNTRY_DATA.find(x => x.country === 'Brazil');
+      return { txt: t, ic: window._sbICLine, shownSb: m ? +m[1] : null, shownCp: m ? +m[2] : null,
+               shownGap: m ? +m[4] : null, realSb: window._lastScenario.result.take, realCp: d.take_75 };
+    });
+    if (/generic Concession default loaded/.test(brazil.txt)) p(S, 'Brazil strip', 'flags the absence of Brazil-specific terms');
+    else f(S, 'Brazil strip', 'no default-basis warning: ' + brazil.txt.slice(0, 120));
+
+    if (brazil.shownSb !== null && Math.abs(brazil.shownSb - brazil.realSb) < 0.06 && Math.abs(brazil.shownCp - brazil.realCp) < 0.06)
+      p(S, 'Brazil numbers', 'strip prints the engine take ' + brazil.shownSb + '% against the published ' + brazil.shownCp + '%');
+    else f(S, 'Brazil numbers', 'strip numbers disagree with engine/DB: ' + JSON.stringify(brazil));
+
+    if (brazil.shownGap !== null && Math.abs(brazil.shownGap - Math.abs(brazil.realSb - brazil.realCp)) < 0.11)
+      p(S, 'Brazil gap', 'gap ' + brazil.shownGap + 'pp matches the two figures shown');
+    else f(S, 'Brazil gap', 'gap arithmetic wrong: ' + JSON.stringify(brazil));
+
+    if (/terms are the generic .* default, not Brazil-specific/.test(brazil.ic)) p(S, 'Brazil IC line', 'IC line names the generic basis');
+    else f(S, 'Brazil IC line', 'IC line unqualified: ' + String(brazil.ic).slice(0, 140));
+
+    // ---- 3. own-terms country: Norway ----------------------------------------
+    const norway = await page.evaluate(async () => {
+      ddOpenScenarioBuilder('Norway');
+      await new Promise(r => setTimeout(r, 700));
+      const el = document.getElementById('sb-origin-note');
+      const t = el ? el.innerText : '';
+      const m = t.match(/This scenario ([\d.]+)%[\s\S]*?published @\$75 ([\d.]+)%/);
+      const rank = document.getElementById('sb-output').innerText.match(/Ranked #(\d+) of (\d+) by govt take \(1=(\w+)\)/);
+      const pct  = document.getElementById('sb-output').innerText.match(/(\d+)% of countries have lower take/);
+      const med  = document.getElementById('sb-output').innerText.match(/This regime: ([+\-][\d.]+)pp vs median/);
+      return { txt: t, before: t, ic: window._sbICLine, shownSb: m ? +m[1] : null, shownCp: m ? +m[2] : null,
+               realSb: window._lastScenario.result.take, realCp: COUNTRY_DATA.find(x => x.country === 'Norway').take_75,
+               rank: rank ? +rank[1] : null, rankOf: rank ? +rank[2] : null, rankDir: rank ? rank[3] : null,
+               pctLower: pct ? +pct[1] : null, vsMed: med ? parseFloat(med[1]) : null };
+    });
+    if (/this is one project, not Norway/.test(norway.txt)) p(S, 'Norway strip', 'separates the single-project scenario from the published country take');
+    else f(S, 'Norway strip', 'own-terms strip missing: ' + norway.txt.slice(0, 120));
+
+    if (norway.shownSb !== null && Math.abs(norway.shownSb - norway.realSb) < 0.06 && Math.abs(norway.shownCp - norway.realCp) < 0.06)
+      p(S, 'Norway numbers', 'shows ' + norway.shownSb + '% scenario vs ' + norway.shownCp + '% published');
+    else f(S, 'Norway numbers', 'strip numbers wrong: ' + JSON.stringify(norway));
+
+    if (Math.abs(norway.realSb - norway.realCp) > 10)
+      p(S, 'Norway divergence live', 'the ' + Math.abs(norway.realSb - norway.realCp).toFixed(1) + 'pp fork this strip exists to explain is still present');
+    else w(S, 'Norway divergence live', 'divergence narrowed to ' + Math.abs(norway.realSb - norway.realCp).toFixed(1) + 'pp — re-check whether the strip is still needed');
+
+    if (!/generic .* default, not Norway/.test(norway.ic) && !/HYPOTHETICAL/.test(norway.ic))
+      p(S, 'Norway IC line', 'own-terms IC line carries no basis warning, correctly');
+    else f(S, 'Norway IC line', 'own-terms IC line wrongly warned: ' + String(norway.ic).slice(0, 140));
+
+    // ---- 4. rank direction label must match the rank the code computes -------
+    // pctLower is the share BELOW; a rank counted from the bottom would satisfy
+    // rank-1 === pctLower% of n. The code computes (n - below), i.e. 1 = highest.
+    if (norway.rankDir === 'highest') p(S, 'Rank label', 'benchmark rank labelled 1=highest, matching (n - below)');
+    else f(S, 'Rank label', 'rank labelled 1=' + norway.rankDir + ' while the code ranks from the top');
+
+    if (norway.rank !== null && norway.pctLower !== null &&
+        Math.abs((norway.rankOf - norway.rank) / norway.rankOf * 100 - norway.pctLower) <= 1)
+      p(S, 'Rank vs pct', '#' + norway.rank + ' of ' + norway.rankOf + ' from the top is consistent with ' + norway.pctLower + '% lower');
+    else f(S, 'Rank vs pct', 'rank and percentile still contradict: ' + JSON.stringify(norway));
+
+    if (norway.vsMed !== null && ((norway.vsMed > 0) === (norway.pctLower > 50)))
+      p(S, 'Rank vs median', 'above-median regime reads as above-median in all three spans');
+    else f(S, 'Rank vs median', 'median delta and percentile disagree: ' + JSON.stringify(norway));
+
+    // ---- 5. the claim is dropped on every path that invalidates it -----------
+    const drops = await page.evaluate(async () => {
+      const out = {};
+      // header-opened scenario carries no country claim
+      openScenarioBuilder(); runCustomScenario();
+      await new Promise(r => setTimeout(r, 250));
+      out.headerOrigin = window._sbOrigin;
+      out.headerStrip  = !!document.getElementById('sb-origin-note');
+      out.headerIc     = window._sbICLine;
+      // a preset replaces the form, so a prior country claim must go
+      ddOpenScenarioBuilder('Norway'); await new Promise(r => setTimeout(r, 400));
+      out.armed = !!window._sbOrigin;
+      loadPreset('angola'); runCustomScenario(); await new Promise(r => setTimeout(r, 250));
+      out.presetOrigin = window._sbOrigin;
+      out.presetStrip  = !!document.getElementById('sb-origin-note');
+      out.presetBanner = document.getElementById('sb-prefill-banner').style.display;
+      // editing a field is reported rather than silently re-attributed
+      ddOpenScenarioBuilder('Norway'); await new Promise(r => setTimeout(r, 400));
+      var _cs = document.getElementById('sb-origin-note');
+      out.cleanStrip = _cs ? _cs.innerText : '';
+      document.getElementById('sb-cit').value = '40';
+      runCustomScenario(); await new Promise(r => setTimeout(r, 250));
+      var _es = document.getElementById('sb-origin-note');
+      out.editedStrip = _es ? _es.innerText : '';
+      document.getElementById('scenario-modal').classList.remove('open');
+      return out;
+    });
+    if (drops.headerOrigin === null && drops.headerStrip === false) p(S, 'Header open', 'a scenario opened from the header claims no country');
+    else f(S, 'Header open', 'header-opened scenario carried a country claim');
+
+    if (!/HYPOTHETICAL|default, not /.test(String(drops.headerIc))) p(S, 'Header IC line', 'header-opened IC line carries no basis clause');
+    else f(S, 'Header IC line', 'header-opened IC line wrongly qualified');
+
+    if (drops.armed === true && drops.presetOrigin === null && drops.presetStrip === false && drops.presetBanner === 'none')
+      p(S, 'Preset overwrite', 'loading a preset drops the prior country provenance and its banner');
+    else f(S, 'Preset overwrite', 'stale provenance survived a preset: ' + JSON.stringify(drops));
+
+    if (!/edited since load/.test(drops.cleanStrip) && /edited since load/.test(drops.editedStrip))
+      p(S, 'Edit detection', 'an edited form is reported as edited, an untouched one is not');
+    else f(S, 'Edit detection', 'edit state wrong');
+
+    // ---- 6. whole-set sweep: every country gets a strip, and it agrees -------
+    const sweep = await page.evaluate(async () => {
+      const names = COUNTRY_DATA.filter(d => d.take_75 != null).map(d => d.country);
+      const t = { n: 0, missing: 0, mono: 0, dflt: 0, own: 0, mismatch: 0, bad: [] };
+      for (const cn of names) {
+        // Wait for THIS country's auto-run to land. ddOpenScenarioBuilder defers
+        // runCustomScenario() by 100ms; a fixed sleep shorter than that reads the
+        // previous country's strip and reports a false mismatch on the first row.
+        window._lastScenario = null;
+        ddOpenScenarioBuilder(cn);
+        for (let k = 0; k < 40 && !window._lastScenario; k++) await new Promise(r => setTimeout(r, 25));
+        t.n++;
+        const el = document.getElementById('sb-origin-note');
+        if (!el) { t.missing++; t.bad.push(cn + ':no-strip'); continue; }
+        const o = window._sbOrigin, ls = window._lastScenario;
+        const d = COUNTRY_DATA.find(x => x.country === cn);
+        if (o.monopoly) t.mono++; else if (o.basis === 'default') t.dflt++; else t.own++;
+        const m = el.innerText.match(/This scenario ([\d.]+)%[\s\S]*?published @\$75 ([\d.]+)%/);
+        if (m && (Math.abs(+m[1] - ls.result.take) > 0.06 || Math.abs(+m[2] - d.take_75) > 0.06)) {
+          t.mismatch++; t.bad.push(cn + ':numbers');
+        }
+        if (o.monopoly && m) { t.mismatch++; t.bad.push(cn + ':monopoly-gap'); }
+        document.getElementById('scenario-modal').classList.remove('open');
+      }
+      return t;
+    });
+    if (sweep.missing === 0) p(S, 'Sweep coverage', 'all ' + sweep.n + ' countries render a provenance strip');
+    else f(S, 'Sweep coverage', sweep.missing + ' countries render none: ' + sweep.bad.slice(0, 6).join(', '));
+
+    if (sweep.mismatch === 0) p(S, 'Sweep numbers', '0 strips disagree with the engine or the country table across ' + sweep.n + ' countries');
+    else f(S, 'Sweep numbers', sweep.mismatch + ' mismatches: ' + sweep.bad.slice(0, 6).join(', '));
+
+    if (sweep.mono === 3) p(S, 'Sweep monopolies', 'the 3 state monopolies (Bahrain, Kuwait, Saudi Arabia) take the monopoly branch');
+    else f(S, 'Sweep monopolies', 'monopoly branch fired ' + sweep.mono + ' times, expected 3');
+
+    if (sweep.dflt >= 100) p(S, 'Sweep defaults', sweep.dflt + ' countries correctly declare generic-default terms');
+    else f(S, 'Sweep defaults', 'default branch fired only ' + sweep.dflt + ' times — expected >=100');
+
+    if (sweep.own >= 50) p(S, 'Sweep own terms', sweep.own + ' countries load their own ORCA terms and say so');
+    else f(S, 'Sweep own terms', 'own-terms branch fired only ' + sweep.own + ' times');
+
+  } catch (e) {
+    f(S, 'exception', e.message);
+  }
+}
+
 async function testConsoleErrors() {
   const S = 'ConsoleErrors';
   if (consoleErrors.length === 0) {
@@ -1945,6 +2148,7 @@ async function testConsoleErrors() {
     await testFCExportMethodology(page);
     await testDCF(page);         // run DCF tests early while on t0
     await testScenarioBuilder(page);
+    await testSBProvenance(page);
     await testCountryProfile(page);
     await testExplorer(page);
     await testScreener(page);

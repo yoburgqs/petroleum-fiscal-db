@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v606.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v607.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v606</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v607</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v606</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v607</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v606</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v607</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v606';
+  return m ? m[0] : 'v607';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v606');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v607');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -34203,6 +34203,27 @@ function _sbReturnReading(res) {
 
 // The one-line hurdle verdict that is available for 100% of runs, including every run where
 // no IRR exists. NPV > 0 discounted at the hurdle rate IS the hurdle test.
+// v607 (T2): the IC line is the one Scenario Builder artifact that LEAVES the tool. Opened from
+// Saudi Arabia's Country Profile it read "govt take 22.2%, contractor NPV +$4.3B @10% WACC ...
+// (clears)" with nothing saying those are generic Concession defaults for a jurisdiction ORCA
+// reports as a state monopoly with no contractor position. It names no country, so an analyst
+// pasting it under a Saudi Arabia heading was not contradicted by anything in the string.
+// Fires only when the modal was opened from a country AND the terms are not that country's own.
+function _sbICBasisClause() {
+  var o = window._sbOrigin;
+  if (!o) return '';
+  if (o.monopoly) {
+    return '; HYPOTHETICAL REGIME — ORCA holds no contractor terms for ' + o.country
+         + ' (state monopoly, no contractor position); the terms above are the generic '
+         + o.mech + ' default, not ' + o.country + "'s";
+  }
+  if (o.basis === 'default') {
+    return '; terms are the generic ' + o.mech + ' default, not ' + o.country + '-specific'
+         + (o.cpTake != null ? ' (' + o.country + " published take @$75 is " + o.cpTake.toFixed(1) + '%)' : '');
+  }
+  return '';
+}
+
 function _sbHurdleLine(res, profile, price, mech) {
   var R = _sbReturnReading(res);
   if (R.npv15 === null) return '';
@@ -34223,6 +34244,7 @@ function _sbHurdleLine(res, profile, price, mech) {
           + (R.state === 'inflated' || R.state === 'unbounded'
               ? '; IRR not quoted — first oil lands in the same year as first capex on this profile, so the rate is not a project return'
               : (R.irr != null ? '; IRR ' + R.irr.toFixed(1) + '%' : '')))
+    + _sbICBasisClause()
     + '. Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow()
     + ' — yoburgqs.github.io/petroleum-fiscal-db/';
   var riskTxt;
@@ -34985,6 +35007,12 @@ const SB_PRESETS = {
 function loadPreset(name) {
   const p = SB_PRESETS[name];
   if (!p) return;
+  // v607 (T2): a preset replaces the whole form, so any Country Profile provenance recorded by
+  // ddOpenScenarioBuilder() no longer describes what is loaded. Drop it, and drop the pre-fill
+  // banner with it, so the results panel cannot claim terms came from a country it did not.
+  window._sbOrigin = null;
+  var _sbPfB = document.getElementById('sb-prefill-banner');
+  if (_sbPfB) _sbPfB.style.display = 'none';
   document.getElementById('sb-mechanic').value = p.mechanic;
   document.getElementById('sb-profile').value = p.profile;
   document.getElementById('sb-price').value = p.price;
@@ -35179,6 +35207,7 @@ function runCustomScenario() {
 
   document.getElementById('sb-output').innerHTML = `
 ${takeClampWarning}<div class="sb-result-header">${mech} · ${DCF_PROFILES[profileKey].name} · $${price}/bbl</div>
+${_sbOriginNote(result)}
 <div class="sb-results-3">
   <div class="sb-result-card">
     <div class="sb-result-label">Govt Take</div>
@@ -35215,7 +35244,11 @@ ${(function() {
   return '<div style="margin-top:14px;padding:10px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;font-size:11px;color:var(--muted);">'
     + '<span style="font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:10px;">vs 185-Country Database</span>'
     + '<div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:14px;">'
-    + '<span>Ranked <strong style="color:' + rankColor + ';">#' + (takes.length - below) + ' of ' + takes.length + '</strong> by govt take (1=lowest)</span>'
+    // v607 (T2): the rank is computed as (n - below), i.e. 1 = HIGHEST take, but the label read
+    // "(1=lowest)". Norway's scenario sat at 49.9% — stated as "+21.5pp vs median" in the very
+    // next span — and was labelled "#64 of 185 (1=lowest)", which reads as a low-take regime.
+    // The adjacent "% of countries have lower take" was already correct; only the label was wrong.
+    + '<span>Ranked <strong style="color:' + rankColor + ';">#' + (takes.length - below) + ' of ' + takes.length + '</strong> by govt take (1=highest)</span>'
     + '<span>Median: <strong style="color:var(--muted);">' + med.toFixed(1) + '%</strong> &nbsp; This regime: <strong style="color:' + rankColor + ';">' + diffSign + diffFromMed + 'pp</strong> vs median</span>'
     + '<span>' + pctRank + '% of countries have <em>lower</em> take at $75/bbl</span>'
     + '</div></div>';
@@ -35475,18 +35508,128 @@ function renderProductionChart(country, profileKey) {
   });
 }
 
+// ─── v607 (T2): the Scenario Builder opened from a Country Profile ───────────────────────────
+// Walked T2 cold on Saudi Arabia. Its Country Profile reads: govt take "—", #185 of 185,
+// "state monopoly — not a contractor regime", "no contractor position", "Breakeven $/bbl n/a".
+// Clicking that page's own "🔧 Scenario" button returned GOVT TAKE 22.2%, CONTRACTOR IRR 138.4%,
+// CONTRACTOR NPV $4.3B, "✔ Clears a 15% IOC hurdle" and a copy-ready IC line — under a banner
+// reading "Parameters pre-filled for Saudi Arabia". None of it is Saudi Arabian: getDCFParams()
+// returns _basis='default' there, the generic Concession fallback (10% royalty / 25% CIT), for a
+// jurisdiction ORCA itself declares closed to contractors.
+// Measured across the whole set, not inferred:
+//   • 120 of 185 countries load PURE generic defaults under a banner claiming country pre-fill.
+//   • 95 of 185 land >5pp from their own published Country Profile take (48 >10pp, 19 >20pp,
+//     10 >30pp). Norway: profile 68.0%, scenario 49.9%. Bahrain/Kuwait/Saudi: profile —, all 22.2%.
+// v505 already computed params._basis ('country' | 'db' | 'default') for exactly this purpose and
+// the Fiscal Compare Quality column already reads it. This path never did.
+// No published figure is altered and no threshold is invented: the strip prints d.take_75 and
+// result.take, both already on screen, and the >=5pp emphasis bar is the one _cpCmpLine552 and
+// the CP regime-split block already use.
+window._sbOrigin = null;
+
+// Fingerprint of every Scenario Builder input, so the strip can tell "as loaded" from "edited".
+function _sbFormFingerprint() {
+  var ids = ['sb-mechanic','sb-profile','sb-price','sb-royalty','sb-cit','sb-spt','sb-state-eq',
+    'sb-windfall','sb-severance','sb-cr-cap','sb-ftp','sb-po-govt','sb-psc-cit','sb-psc-royalty',
+    'sb-fee','sb-tsc-cit','sb-ept','sb-prrt-rate','sb-prrt-cit','sb-prrt-royalty','sb-prrt-uplift',
+    'sb-bb-fee','sb-bb-cap','sb-bb-term','sb-bb-cit','sb-rs-govt','sb-rs-cit','sb-rs-royalty',
+    'sb-gs-cont','sb-gs-dmo','sb-gs-dmo-price','sb-gs-cit'];
+  return ids.map(function(i){ var e = document.getElementById(i); return e ? String(e.value) : ''; }).join('|');
+}
+
+// The provenance strip rendered directly under the Scenario Builder result header whenever the
+// modal was opened from a country (Country Profile or the Fiscal Compare drilldown).
+function _sbOriginNote(result) {
+  var o = window._sbOrigin;
+  if (!o) return '';
+  var sbTake = (result && result.take != null && isFinite(result.take)) ? Number(result.take) : null;
+  var edited = (o.fingerprint !== _sbFormFingerprint());
+  var cn = _esc594(o.country);
+  var col, head, body;
+
+  if (o.monopoly) {
+    col  = 'var(--red)';
+    head = '⚠ ' + cn + ' has no contractor regime in ORCA';
+    body = 'Its Country Profile reports government take “—”, <strong>state monopoly — not a contractor regime</strong>, '
+         + 'no contractor position, breakeven n/a. Nothing below is ' + cn + '’s terms: the form is loaded with the generic '
+         + _esc594(o.mech) + ' default (' + _esc594(describeDefaultTerms(o.mech)) + '). '
+         + 'Read the take, NPV, IRR, hurdle verdict and IC line below as a hypothetical regime you are building — '
+         + 'not an entry into ' + cn + ' that ORCA can evidence.';
+  } else if (o.basis === 'default') {
+    col  = 'var(--yellow)';
+    head = '⚠ No ' + cn + '-specific fiscal terms in ORCA — generic ' + _esc594(o.mech) + ' default loaded';
+    body = 'The form holds ' + _esc594(describeDefaultTerms(o.mech)) + ' — the mechanic fallback, not ' + cn + '’s own terms. '
+         + (o.cpTake != null
+             ? cn + '’s published Country Profile take at $75 is <strong>' + o.cpTake.toFixed(1) + '%</strong>'
+               + (o.n != null ? ' across ' + Number(o.n).toLocaleString() + ' contracts' : '') + '. '
+             : '')
+         + 'Edit the fields to ' + cn + '’s actual terms before quoting anything below as ' + cn + '.';
+  } else {
+    col  = 'var(--accent)';
+    head = 'Loaded from ' + cn + '’s terms — this is one project, not ' + cn + '’s published take';
+    body = 'Fiscal terms are ' + (o.basis === 'country'
+             ? cn + '’s ORCA country override' + (o.overrideKeys && o.overrideKeys.length ? ' (' + _esc594(o.overrideKeys.join(', ')) + ')' : '')
+             : 'read from ORCA’s ' + cn + ' record')
+         + ', run on a single synthetic ' + _esc594(o.profileName) + ' project. '
+         + (o.cpTake != null
+             ? 'The <strong>' + o.cpTake.toFixed(1) + '%</strong> on ' + cn + '’s Country Profile is the average across '
+               + (o.n != null ? Number(o.n).toLocaleString() + ' actual ' + cn + ' contracts' : 'that country’s actual contracts') + '. '
+             : '')
+         + 'Both are true and they answer different questions — quote whichever you mean.';
+  }
+
+  var cmpRow = '';
+  if (!o.monopoly && o.cpTake != null && sbTake != null) {
+    var diff    = sbTake - o.cpTake;
+    var diffCol = Math.abs(diff) >= 5 ? 'var(--red)' : 'var(--muted)';
+    cmpRow = '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:18px;align-items:baseline;">'
+      + '<span style="font-size:11px;color:var(--muted);">This scenario <strong style="color:var(--text);font-size:15px;font-family:\'IBM Plex Mono\',monospace;">' + sbTake.toFixed(1) + '%</strong></span>'
+      + '<span style="font-size:11px;color:var(--muted);">' + cn + ' published @$75 <strong style="color:var(--text);font-size:15px;font-family:\'IBM Plex Mono\',monospace;">' + o.cpTake.toFixed(1) + '%</strong></span>'
+      + '<span style="font-size:12px;font-weight:800;color:' + diffCol + ';">' + (diff >= 0 ? '+' : '−') + Math.abs(diff).toFixed(1) + 'pp</span>'
+      + '</div>';
+  }
+
+  var editedNote = edited
+    ? '<div style="margin-top:6px;font-size:11px;color:var(--muted);">Fields have been edited since load — the terms above describe what was loaded, not what just ran.</div>'
+    : '';
+
+  return '<div id="sb-origin-note" style="margin:10px 0 12px 0;padding:9px 13px;background:var(--surface2);'
+    + 'border:1px solid var(--border);border-left:3px solid ' + col + ';border-radius:6px;line-height:1.6;">'
+    + '<div style="font-size:12px;font-weight:800;color:' + col + ';">' + head + '</div>'
+    + '<div style="margin-top:4px;font-size:11px;color:var(--muted);">' + body + '</div>'
+    + cmpRow + editedNote + '</div>';
+}
+
 function ddOpenScenarioBuilder(country) {
   const d = COUNTRY_DATA.find(x => x.country === country);
   if (!d) return;
   const mechanic = fcResolveMechanic(d);  // v548 (T1) — keeps this run on the same regime as the Live DCF panel and Fiscal Compare
 
-  // Open scenario modal
+  // Open scenario modal (this clears any previous origin record)
   openScenarioBuilder();
-  // v363: show pre-fill context banner with country name
+
+  // v607 (T2): the banner asserted country pre-fill unconditionally. On 120 of 185 countries
+  // nothing country-specific is loaded at all, and on Bahrain/Kuwait/Saudi Arabia the country
+  // has no contractor regime for terms to come from. Resolve the basis FIRST, then say what is
+  // actually true. `_probeParams` is the same object the pre-fill below writes into the form.
+  const _probeParams = getDCFParams(country, mechanic);
+  const _sbBasis = _probeParams._basis || 'default';
+  const _sbMono  = isStateMonopoly(d.take_75);
   var _sbBanner = document.getElementById('sb-prefill-banner');
   var _sbBannerText = document.getElementById('sb-prefill-text');
   if (_sbBanner && _sbBannerText) {
-    _sbBannerText.textContent = 'Parameters pre-filled for ' + country + ' — edit any field and click Run DCF to customize.';  // v582 (T2): no longer says "from Country Profile" — this path is now reachable from the Fiscal Compare drilldown too.
+    // v582 (T2): no longer says "from Country Profile" — this path is reachable from the
+    // Fiscal Compare drilldown too.
+    _sbBannerText.textContent = _sbMono
+      ? country + ' is a state monopoly — ORCA holds no contractor terms for it. Loaded the generic '
+        + mechanic + ' default so you can build a hypothetical regime.'
+      : _sbBasis === 'default'
+      ? 'No ' + country + '-specific terms in ORCA — loaded the generic ' + mechanic
+        + ' default. Edit the fields before quoting this as ' + country + '.'
+      : 'Parameters pre-filled for ' + country + ' — edit any field and click Run DCF to customize.';
+    _sbBanner.style.borderColor = _sbMono ? 'var(--red)' : _sbBasis === 'default' ? 'var(--yellow)' : 'rgba(176,104,0,0.25)';
+    _sbBanner.style.background  = _sbMono ? 'rgba(185,28,28,0.07)' : _sbBasis === 'default' ? 'rgba(161,98,7,0.07)' : 'rgba(176,104,0,0.07)';
+    _sbBanner.style.color       = _sbMono ? 'var(--red)' : 'var(--accent-dim)';
     _sbBanner.style.display = 'flex';
   }
 
@@ -35536,6 +35679,21 @@ function ddOpenScenarioBuilder(country) {
     if (el('sb-tsc-cit')) el('sb-tsc-cit').value = Math.round((params.cit_rate || 0) * 100);
     if (el('sb-ept')) el('sb-ept').value = Math.round((params.ept_rate || 0) * 100);
   }
+
+  // v607 (T2): record where this scenario came from, so runCustomScenario() can print the
+  // country's own published take beside the one it just computed. Fingerprint is taken AFTER
+  // pre-fill so a later re-run can tell "as loaded" from "edited".
+  window._sbOrigin = {
+    country:      country,
+    mech:         (mechEl ? mechEl.value : mechanic),
+    basis:        _sbBasis,
+    overrideKeys: _probeParams._overrideKeys || [],
+    monopoly:     _sbMono,
+    cpTake:       _sbMono ? null : (d.take_75 != null ? Number(d.take_75) : null),
+    n:            (d.n != null ? d.n : null),
+    profileName:  (DCF_PROFILES[profile] && DCF_PROFILES[profile].name) || profile,
+    fingerprint:  _sbFormFingerprint()
+  };
 
   // Auto-run the DCF
   setTimeout(() => runCustomScenario(), 100);
@@ -38990,6 +39148,9 @@ function openScenarioBuilder() {
   // v363: hide pre-fill banner when opening fresh from header (not from Country Profile)
   var banner = document.getElementById('sb-prefill-banner');
   if (banner) banner.style.display = 'none';
+  // v607 (T2): and drop the country provenance with it. ddOpenScenarioBuilder() calls this
+  // first and re-arms _sbOrigin afterwards, so a header-opened scenario carries no country claim.
+  window._sbOrigin = null;
   // Focus trap: move focus to first focusable element inside modal
   var focusable = modal.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
   if (focusable.length) focusable[0].focus();
