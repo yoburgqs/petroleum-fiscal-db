@@ -22149,3 +22149,115 @@ the end; it is **not** the deliverable.
 **Task — T4:** "What is my fiscal-stability and reform exposure here?" — the stalest task; it last ran at v590, seven version commits ago.
 
 **Friction.** I walked T4 cold with storage cleared into the Reform Risk per-country lookup, the only control on the platform that takes one country and returns a reform verdict. Those verdicts exist to say the Reform Frequency Score is a *count* and never a *magnitude* — so each one ends by p
+
+---
+## Cycle 504 — T6 / v599 — 2026-08-30
+
+**Task — T6:** "Where did this number come from and how solid is the evidence?" — the stalest
+task; it last ran at v592, seven version commits ago (v593 T3, v594 T5, v595 T2, v596 T5,
+v597 T1, v598 T4).
+
+**Friction.** Walked T6 cold in Chromium, `sessionStorage` and `localStorage` cleared, into
+**IOC Portfolio**. The tab seeds itself: `switchTab('t5')` calls `loadIOC('Shell')`, which is an
+**exact operator-string match** (`IOC_DATA.filter(d => d.operator === operator)`). `IOC_DATA`
+holds an operator literally named `"Shell"`, so the match **succeeded** — the failure was silent
+— and the tab opened under the heading **Shell**, the banner *"Example loaded: Shell — major IOC
+benchmark"*, and the stat cards **112 CONTRACTS / 14 COUNTRIES / 39.0% WTD AVG TAKE @$75**.
+
+Not in that number: **Shell Offshore Inc.** (474 contracts, USA — the group's single largest
+position), **Shell Petroleum Development Company (SPDC)** (Nigeria), **A/S Norske Shell**
+(Norway), **SHELL U.K. LIMITED**, and 44 further entities. **884 of the group's 1,036 contracts
+— 87% — were absent**, and no surface on the tab named one legal entity that was present.
+
+The `#ioc-quick-btns` "Quick:" row three inches above, built from the same 16 brand names, called
+`loadIOCAggregated()` and returned the group. So **two identically-labelled buttons on one tab
+returned different portfolios**, and the analyst had no way to tell which. Measured:
+
+| brand | seed / empty-state button `loadIOC()` | "Quick:" row `loadIOCAggregated()` |
+|---|---|---|
+| Shell | 112 contracts · 14 countries · 39.0% | 884 · 31 · 39.1% |
+| Equinor | **22** · 7 · **39.1%** | **901** · 11 · **61.3%** |
+| BP | 66 · 11 · 39.3% | 1,207 · 23 · 48.4% |
+| ExxonMobil | 40 · 12 · 46.3% | 163 · 26 · 46.6% |
+| TotalEnergies | 97 · 27 · 50.4% | 219 · 47 · 49.9% |
+
+Equinor is the exhibit: **22.2pp** between two buttons with the same word on them, because
+Norway — 785 contracts under `Equinor Energy AS` and 200 more under `Statoil Petroleum AS` — is
+not spelled `Equinor`.
+
+The working path was wrong in the other direction. Brand matching was a naked substring test,
+which is not a company test:
+
+- `"Eni"` matched **China National Petroleum Corp Turkm-eni-stan**, **Marub-eni Oil & Gas (USA)
+  LLC**, **Ph-oeni-x Óleo & Gás**, **Z-eni-th Aran Oil** — 5 entities, 12 contracts.
+- `"BP"` matched **Al-bp-etrol Sh.A.** (Albania's state company) and **A-BP Norway AS**.
+- `"BP"` also matched **Aker BP ASA** at a genuine word boundary — a separate Oslo-listed
+  company. Its 625 Norwegian concession contracts at ~66% take are the largest block matching
+  the string, and counting them moves the BP group's weighted take from **30.4% to 48.5%**.
+
+**Change.** One resolver, `_iocBrandEntities()`, matching on word boundaries, called by **every**
+brand entry point: the cold-load seed, the five benchmark buttons in the empty state, the 16
+"Quick:" buttons, and Enter in the search box. Entities that match at a boundary but are a
+different company are excluded **by name** and printed on screen with the reason — not dropped
+silently, because the exclusion moves the headline 18.1pp. Selecting one named legal entity from
+the suggestion list under the search box still loads that entity alone; that is what the list is
+for.
+
+Every roll-up now carries a collapsed provenance block — **"Rolled up from N legal entities ·
+X contracts counted · Y folded as duplicate · Z excluded by name"** — expanding to a table of
+each legal entity as it appears in the contract record, the contracts it brought, the contracts
+**folded** because another group entity already covers that country × mechanic, and its country
+count. Folding rather than summing is stated, with its reason on the row: `Statoil Petroleum AS`
+(200 Norwegian concessions) and `Equinor Energy AS` (785) are the same company either side of
+its 2018 rename.
+
+**Result.** Cold load reads **Shell — 884 contracts / 31 countries / 39.1%**, and one click on
+the roll-up header answers *where did this come from*, entity by entity. Equinor **901 / 61.3%**.
+BP **589 / 30.4%**, with Aker BP ASA named on screen as excluded and why. Eni **175 / 50.9%**,
+with Turkmenistan and Marubeni gone.
+
+### Verification — cold, Playwright, local build, storage cleared
+
+| check | result |
+|---|---|
+| cold load t5 | `Shell Portfolio` · group roll-up — 48 legal entities across 31 countries · **884 contracts** · 39.1% |
+| provenance block | present, collapsed; top entities Shell Offshore Inc. 474 · SHELL U.K. LIMITED · A/S Norske Shell |
+| Quick: Equinor | 20 entities · **901 contracts** · 61.3% · Equinor Energy AS 785 named first |
+| Quick: BP | 27 entities · **589 contracts** · 30.4% · "1 excluded by name"; Aker BP ASA named with reason; Albpetrol **not** matched |
+| Quick: Eni | 43 entities · **175 contracts** · 50.9% · Turkmenistan and Marubeni **not** matched |
+| type "Shell" + Enter | group roll-up, 884 contracts |
+| type "Shell Offshore Inc." + Enter | single entity, 474 contracts, **no** provenance block — single-entity path intact |
+| Page errors | **0 on every walk** |
+
+**Tests ran this cycle.** `runtime_comprehensive.js` gains two `IOC` cases — brand roll-up, and
+brand boundary + named exclusions. Both harness copies updated (`petroleum-fiscal-db/tests/`
+and `office/tools/petroleum/tests/`). Against the pre-change backup served on :8081 **both
+FAIL** — `"Shell" -> 112 contracts, provenance=false` — and against this build **both PASS**.
+Local suite **138 PASS / 2 FAIL → 140 PASS / 0 FAIL / 1 WARN**. The 1 WARN and the 1 captured
+JS error are the pre-existing local-harness `sw.js` 404, identical on the unchanged backup.
+JS syntax gate **PASS, 10/10 blocks**.
+
+**Found on the same walk, not fixed — stated rather than hidden.**
+
+1. The **Take Distribution & Peer Comparison** section lower on the same tab
+   (`renderIOCExposure()`, `#exposure-ioc-select`) still filters `IOC_DATA` on
+   `d.operator === operatorName`. Selecting "Shell" there gives the 1-entity answer the table
+   above it no longer gives. It is a second mechanism on a second data source (`IOC_PRESENCE`)
+   and is its own cycle.
+2. On the 92 USA rows, `take_75` is pinned at the country value 23.8% while `take_50`,
+   `take_100` and `take_125` are operator-specific. 50 rows across the file therefore dip at
+   $75 — Chevron U.S.A. reads 25.8 / **23.8** / 29.1 / 29.8. The `@$50 / @$100 / @$125` columns
+   are hidden unless the Explorer 4-Price toggle is on, so this is not on screen by default,
+   but `Swing` is computed off the operator series while `Govt Take` is not.
+3. `nocExcludedCount` in `loadIOC()` is always 0 — `IOC_DATA.filter(...).length - rows.length`
+   subtracts a filter from itself. Dead, and its footnote "N operator entries shown" counts
+   country rows, not entities.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip on any
+pre-existing control. No page-sub paragraph, amber instructional banner, routing hint or "How to
+read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still
+collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed
+or reordered.** **No published country take, NPV, rank, score, tier colour or pill value was
+altered, and no threshold was introduced.** v371/v373 declutter, v430 sessionStorage logic,
+v449, v451, v452, v489 and all later locks intact. Version sweep **v598 → v599** across 5 sites,
+done silently at the end; it is **not** the deliverable.
