@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v582</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v583</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1393,7 +1393,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v582</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v583</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1463,7 +1463,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v582</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v583</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1805,7 +1805,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v582';
+  return m ? m[0] : 'v583';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1880,7 +1880,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v582');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v583');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -22182,6 +22182,26 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
 <script>
 let REFORM_HISTORY = {}; // loaded async from reform_history.json
+
+// ── v583 (T4): what the Reform Frequency Score is allowed to count ──────────
+// The score is documented on this tab, in the Fiscal Compare Stability cell, in the
+// Country Profile sidebar and in the IC citation as a count of FISCAL LAW CHANGES since
+// 2010, and the tab converts that count straight into a WACC premium (3+ changes ->
+// add 3-5pp). The sourced event log is broader than that: alongside law changes it
+// carries discoveries, first-oil dates, armed conflict, a terms review that concluded
+// without renegotiation, and one non-petroleum minerals tax that its own note says left
+// PRRT unaffected. Counting those as law changes told an analyst to discount Guyana by
+// 3-5pp of WACC because ExxonMobil found Liza-1 in 2015 and started producing in 2020 --
+// on a PSC whose terms have not been reopened since 1999. Events carrying
+// fiscal_change:false stay in the log, stay on screen and stay labelled; they do not score.
+function _rrIsFiscalChange(e) { return !!e && e.fiscal_change !== false; }
+function _rrScores(e) { return !!e && (e.year || 0) >= 2010 && _rrIsFiscalChange(e); }
+function _rrCountScored(events) { return (events || []).filter(_rrScores).length; }
+function _rrContextInWindow(events) {
+  return (events || []).filter(function(e){ return (e.year || 0) >= 2010 && !_rrIsFiscalChange(e); });
+}
+window._rrScores = _rrScores;
+window._rrCountScored = _rrCountScored;
 const IOC_PRESENCE = {
   'ExxonMobil':     ['USA','Norway','Angola','Nigeria','Guyana','Australia','Qatar','Chad','Indonesia','Iraq','Papua New Guinea','Equatorial Guinea','Canada','Malaysia','Azerbaijan'],
   'Shell':          ['Norway','Nigeria','Brunei','Australia','Oman','Malaysia','United Kingdom','Netherlands','Brazil','Kazakhstan','Egypt','Iraq','Trinidad and Tobago'],
@@ -26223,6 +26243,8 @@ function initPlatform() {
                  : 'neutral',
         notes: ev.notes,
         mechanic_to: ev.mechanic_to || '',
+        fiscal_change: ev.fiscal_change,
+        context_kind: ev.context_kind || '',
         source: null,  // enriched async from API
         source_url: null,
       });
@@ -26278,8 +26300,19 @@ function renderReformTable() {
     return true;
   });
 
+  // v583 (T4): the log mixes fiscal law changes with context events (discoveries, first oil,
+  // conflict, a review that changed nothing, one non-petroleum tax). Only the first kind feeds
+  // the Reform Frequency Score, so the count line has to name the split rather than print one
+  // undifferentiated total.
   const countEl = document.getElementById('reform-count');
-  if (countEl) countEl.textContent = data.length + ' events';
+  if (countEl) {
+    const _ctxN = data.filter(function(r){ return r.fiscal_change === false; }).length;
+    countEl.innerHTML = data.length + ' events'
+      + (_ctxN
+          ? ' \u2014 <strong>' + (data.length - _ctxN) + '</strong> fiscal law changes, <span style="color:var(--orange);font-weight:700;">'
+            + _ctxN + '</span> context ' + (_ctxN === 1 ? 'event' : 'events') + ' that changed no terms and do not score'
+          : '');
+  }
 
   const tbody = document.getElementById('tbody-reforms');
   if (!tbody) return;
@@ -26321,7 +26354,9 @@ function renderReformTable() {
     return `<tr title="${notesTooltip}" style="cursor:default;">
       <td style="font-family:'IBM Plex Mono',monospace;font-weight:700;">${r.year}</td>
       <td><button onclick="document.getElementById('dd-country-select').value='${r.country.replace(/'/g,"\\'")}';loadCountryProfile('${r.country.replace(/'/g,"\\'")}');switchTab('t7',document.getElementById('tab-btn-t7'));" style="background:transparent;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${r.country}</button></td>
-      <td style="max-width:280px;font-size:12px;">${r.event}</td>
+      <td style="max-width:280px;font-size:12px;">${r.event}${r.fiscal_change === false
+        ? `<div style="font-size:10px;color:var(--orange);font-weight:700;line-height:1.4;margin-top:2px;">context — ${r.context_kind || 'not a fiscal-terms change'} · not counted in the Reform Frequency Score</div>`
+        : ''}</td>
       <td class="num">${tcCell}</td>
       <td><span style="color:${dirCol};font-size:11px;font-weight:700;">${dirLbl}</span></td>
       <td style="max-width:200px;">${srcCell}</td>
@@ -26882,7 +26917,8 @@ function _rrClassify(c) {
   var events = Array.isArray(rh[c]) ? rh[c] : [];
   if (!events.length) return null;
   // ── Case 2: covered. Give the score, the rank, the direction split and the IC action. ──
-  var since2010 = events.filter(function(e){ return (e.year || 0) >= 2010; }).length;
+  var since2010 = _rrCountScored(events);
+  var contextIn = _rrContextInWindow(events);
   var score = Math.max(0, 100 - since2010 * 15);
   var tightened = 0, liberalized = 0, neutral = 0;
   events.forEach(function(e) {
@@ -26893,7 +26929,7 @@ function _rrClassify(c) {
   var scored = Object.keys(rh)
     .filter(function(k){ return Array.isArray(rh[k]) && rh[k].length; })
     .map(function(k) {
-      var n = rh[k].filter(function(e){ return (e.year || 0) >= 2010; }).length;
+      var n = _rrCountScored(rh[k]);
       return { country: k, score: Math.max(0, 100 - n * 15) };
     })
     .sort(function(a,b){ return b.score - a.score; });
@@ -26931,7 +26967,7 @@ function _rrClassify(c) {
   var risesInWindow = _hostile.filter(function(e){ return (e.year || 0) >= 2010; });
   var cumInWindow = risesInWindow.reduce(function(s2,e){ return s2 + (parseFloat(String(e.take_change).replace('+','')) || 0); }, 0);
   var inWindowRise = !activelyReforming && risesInWindow.length > 0;
-  var reformYears = events.filter(function(e){ return (e.year||0) >= 2010; })
+  var reformYears = events.filter(_rrScores)
     .map(function(e){ return e.year; }).sort(function(a,b){ return a - b; }).join(', ');
 
   var icRule, icColor, icLabel, scoreNote;
@@ -26971,6 +27007,31 @@ function _rrClassify(c) {
       + '. That falls outside the 2010 scoring window, so the score of ' + score + ' records where the window starts, not a clean record. '
       + '<strong>Do not carry a zero reform premium on this basis.</strong> Size the premium against the rupture in the event log, not against the count.';
     scoreNote = 'rank ' + rank + ' of ' + scored.length + ' &middot; pre-2010 rise unscored';
+  } else if (contextIn.length && since2010 === 0) {
+    // v583 (T4): every post-2010 event this jurisdiction has is a context event, so the score
+    // of 100 is produced by exclusion, not by a clean legislative record. It must not render in
+    // the same green as Algeria, whose 100 comes from having no post-2010 event of any kind.
+    var _lastFiscal = events.filter(_rrIsFiscalChange)
+      .sort(function(a,b){ return (b.year||0) - (a.year||0); })[0] || null;
+    icColor = 'var(--orange)';
+    icLabel = 'IC action \u2014 nothing in the post-2010 record is a fiscal change';
+    icRule = (contextIn.length === 1 ? 'The one sourced event' : contextIn.length === 2 ? 'Both sourced events' : 'All <strong>' + contextIn.length + '</strong> sourced events')
+      + ' dated 2010 or later '
+      + (contextIn.length === 1 ? 'is' : 'are') + ' context, not a change to fiscal terms \u2014 '
+      + contextIn.slice().sort(function(a,b){ return (a.year||0)-(b.year||0); })
+          .map(function(e){ return '<strong>' + _rrEsc(e.year) + '</strong> ' + _rrEsc(e.event)
+            + ' <em style="color:var(--muted);">(' + _rrEsc(e.context_kind || 'not a fiscal change') + ')</em>'; })
+          .join('; ')
+      + '. None of them scores, which is why the score reads ' + score + '. '
+      + (_lastFiscal
+          ? 'The terms in force here were last changed in <strong>' + _rrEsc(_lastFiscal.year) + '</strong> \u2014 '
+            + _rrEsc(_lastFiscal.event) + '.'
+          : '<strong>ORCA holds no fiscal law change for this jurisdiction at any date</strong>, so the score is '
+            + 'carried entirely by events that never touched the terms.')
+      + ' <strong>Do not read ' + score + ' as a legislative track record.</strong> The count measures law changes only; '
+      + 'renegotiation pressure, contract disputes and political risk are not in it. Read the event log below before '
+      + 'carrying a zero reform premium.';
+    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' \u00b7 no post-2010 fiscal change on file';
   } else {
     icColor = 'var(--green)';
     icLabel = 'IC action';
@@ -26990,7 +27051,14 @@ function _rrClassify(c) {
                : liberalized > tightened ? 'net-liberalizing toward the contractor'
                : 'balanced';
   var tiltColor = tightened > liberalized ? 'var(--red)' : liberalized > tightened ? 'var(--green)' : 'var(--muted)';
-  return { events: events, since2010: since2010, score: score, tightened: tightened,
+  // v583 (T4): every surface that prints the count must also print what the count left out.
+  var contextNote = contextIn.length
+    ? ('+ ' + contextIn.length + ' in-window event' + (contextIn.length === 1 ? '' : 's') + ' not scored \u2014 '
+       + contextIn.slice().sort(function(a,b){ return (a.year||0)-(b.year||0); })
+           .map(function(e){ return _rrEsc(e.year) + ' ' + _rrEsc(String(e.context_kind || 'not a fiscal change').split('\u2014')[0].trim()); })
+           .join(', '))
+    : '';
+  return { events: events, since2010: since2010, contextIn: contextIn, contextNote: contextNote, score: score, tightened: tightened,
            liberalized: liberalized, neutral: neutral, scored: scored, rank: rank,
            latest: latest, icRule: icRule, icColor: icColor, icLabel: icLabel,
            scoreNote: scoreNote, scoreColor: scoreColor, tiltWord: tiltWord, tiltColor: tiltColor };
@@ -27326,7 +27394,9 @@ function renderReformTimeline(country) {
       + '<div style="font-size:10px;color:var(--muted);">' + _vcp.scoreNote + '</div></div>'
       + '<div><div style="' + _lbl + '">Since 2010</div>'
       + '<div style="font-size:17px;font-weight:800;color:' + (_vcp.since2010 > 2 ? 'var(--red)' : _vcp.since2010 > 0 ? 'var(--orange)' : 'var(--green)') + ';">' + _vcp.since2010 + '</div>'
-      + '<div style="font-size:10px;color:var(--muted);">law changes</div></div>'
+      + '<div style="font-size:10px;color:var(--muted);">law changes</div>'
+      + (_vcp.contextNote ? '<div style="font-size:10px;color:var(--orange);font-weight:700;max-width:200px;line-height:1.4;">' + _vcp.contextNote + '</div>' : '')
+      + '</div>'
       + '<div><div style="' + _lbl + '">Direction</div>'
       + '<div style="font-size:13px;font-weight:800;"><span style="color:var(--red);">&uarr;' + _vcp.tightened + '</span>'
       + ' <span style="color:var(--muted);font-size:10px;">/</span> <span style="color:var(--green);">&darr;' + _vcp.liberalized + '</span>'
@@ -27398,9 +27468,9 @@ function renderReformTimeline(country) {
     var _rh = (typeof REFORM_HISTORY !== 'undefined') ? REFORM_HISTORY : {};
     var _n2010 = function(c) {
       var ev = (_rh && Array.isArray(_rh[c])) ? _rh[c] : [];
-      return ev.filter(function(e){ return (e.year||0) >= 2010; }).length;
+      return _rrCountScored(ev);
     };
-    var _thisCount = reforms.filter(function(e){ return (e.year||0) >= 2010; }).length;
+    var _thisCount = _rrCountScored(reforms);
     var _regionCountries = (typeof COUNTRY_DATA !== 'undefined')
       ? COUNTRY_DATA.filter(function(x){ return x.region === _region; }) : [];
     if (!_regionCountries.length) return;
@@ -27905,7 +27975,7 @@ function loadCountryProfile(country) {
   })() : '';
   // v346: Headline strip — mechanic tag, take@$75, stability dots, reform count
   const _rh344 = (typeof REFORM_HISTORY !== 'undefined') ? (REFORM_HISTORY[d.country] || []) : [];
-  const _reforms344 = _rh344.filter(function(e){ return (e.year||0) >= 2010; }).length;
+  const _reforms344 = _rrCountScored(_rh344);
   const _stab344 = Math.max(0, 5 - _reforms344);
   var _stabDots344 = '';
   for(var _i344=0;_i344<5;_i344++){_stabDots344 += (_i344 < _stab344 ? '\u25C6' : '\u25C7');}
@@ -27916,18 +27986,40 @@ function loadCountryProfile(country) {
   // section further down this same page tells the analyst not to take, and the opposite of the
   // "n/c" Fiscal Compare has printed for those countries since v520. Absence is now its own state.
   const _rrCovered344 = _rh344.length > 0;
+  // v583 (T4): the diamond count is 5 minus FISCAL law changes since 2010. Where a country
+  // also has in-window events that are context rather than law changes, the diamonds are
+  // silent about them — Guyana would print five green diamonds, the top of the scale, on a
+  // log whose three post-2010 entries are a discovery, first oil and a review that changed
+  // nothing. Same muting rule Fiscal Compare's Stability cell already applies: where the
+  // count is not the whole verdict, it does not get the green ramp.
+  const _rrCtxIn344 = (typeof _rrContextInWindow === 'function') ? _rrContextInWindow(_rh344) : [];
   const _rrCovN344 = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY)
     ? Object.keys(REFORM_HISTORY).filter(function(k){ return Array.isArray(REFORM_HISTORY[k]) && REFORM_HISTORY[k].length; }).length
     : 0;
   const _rrTotN344 = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length) ? COUNTRY_DATA.length : 185;
   const _stabGlyph344 = _rrCovered344
-    ? '<span style="color:' + _stabColor344 + ';font-size:13px;letter-spacing:1px;">' + _stabDots344 + '</span>'
+    ? '<span style="color:' + (_rrCtxIn344.length ? 'var(--muted)' : _stabColor344) + ';font-size:13px;letter-spacing:1px;">' + _stabDots344 + '</span>'
+      + (_rrCtxIn344.length ? '<span style="color:var(--negative);font-weight:800;font-size:12px;margin-left:3px;">!</span>' : '')
     : '<span style="color:var(--muted);font-size:11px;font-weight:700;border:1px dashed var(--border);border-radius:4px;padding:1px 6px;">n/c</span>';
   const _stabSub344 = _rrCovered344
-    ? '(' + _reforms344 + ' reform' + (_reforms344 !== 1 ? 's' : '') + ' since 2010 \u00b7 <span class="rr-link" style="color:var(--accent);">Reform Risk \u2192</span>)'
+    ? '(' + _reforms344 + ' fiscal law change' + (_reforms344 !== 1 ? 's' : '') + ' since 2010'
+      + (_rrCtxIn344.length
+          ? ' \u00b7 <span style="color:var(--orange);font-weight:700;">+ ' + _rrCtxIn344.length + ' in-window event'
+            + (_rrCtxIn344.length === 1 ? '' : 's') + ' that changed no terms</span>'
+          : '')
+      + ' \u00b7 <span class="rr-link" style="color:var(--accent);">Reform Risk \u2192</span>)'
     : '(no sourced reform log \u00b7 ' + _rrCovN344 + ' of ' + _rrTotN344 + ' jurisdictions covered \u00b7 <span class="rr-link" style="color:var(--accent);">Reform Risk \u2192</span>)';
   const _stabTip344 = _rrCovered344
-    ? 'Click to open Reform Risk tab for full reform history and stability ranking. IC rule: 0 diamonds \u2192 probability-weighted NPV required; 1\u20132 diamonds \u2192 add 3\u20135pp WACC premium; 3\u20134 diamonds \u2192 note 1\u20132 reforms, 1\u20132pp premium; 5 diamonds \u2192 no discount warranted.'
+    ? 'Diamonds = 5 minus the number of sourced FISCAL LAW CHANGES since 2010. IC rule: 0 diamonds \u2192 probability-weighted NPV required; 1\u20132 diamonds \u2192 add 3\u20135pp WACC premium; 3\u20134 diamonds \u2192 note 1\u20132 reforms, 1\u20132pp premium; 5 diamonds \u2192 no discount warranted.'
+      + (_rrCtxIn344.length
+          ? ' MUTED WITH A RED ! \u2014 the count is not the whole record here. '
+            + _rrCtxIn344.length + ' sourced event' + (_rrCtxIn344.length === 1 ? ' dated 2010 or later is' : 's dated 2010 or later are')
+            + ' context rather than a change to fiscal terms ('
+            + _rrCtxIn344.slice().sort(function(a,b){ return (a.year||0)-(b.year||0); })
+                .map(function(e){ return e.year + ' ' + String(e.context_kind || 'not a fiscal change').split('\u2014')[0].trim(); }).join(', ')
+            + '), so they do not move the diamonds. Read the IC action in the Fiscal Reform History section below before applying the premium ladder.'
+          : '')
+      + ' Click to open Reform Risk tab for the full event log and stability ranking.'
     : 'NOT SCORED for ' + (d.country || 'this country') + '. ORCA holds a sourced fiscal-law change log for ' + _rrCovN344 + ' of ' + _rrTotN344 + ' jurisdictions and this is not one of them, so there is no reform count to place on the diamond scale. This is missing coverage, not a clean record \u2014 it is not five diamonds, it is not a Reform Frequency Score of 100, and it carries no reform premium of zero into an IC memo. It carries no reading at all. Fiscal Compare prints n/c in its Stability column for the same reason. The Fiscal Reform History section below states what you can defend instead; for reform exposure specifically this jurisdiction needs an external check \u2014 national petroleum law, IMF Article IV, or operator annual reports \u2014 before it goes to an IC. Click to open the Reform Risk tab.';
   // v468: Recent reform inline tag — if country had a reform event in 2024–2026, show ⚠ tag in Zone B so
   // analysts see it immediately without needing to click through to Reform Risk tab
@@ -30264,7 +30356,7 @@ function renderSampleAnalyses() {
   const reformCounts = {};
   if (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) {
     Object.entries(REFORM_HISTORY).forEach(([country, events]) => {
-      const since2010 = (events || []).filter(e => e.year >= 2010).length;
+      const since2010 = _rrCountScored(events);
       reformCounts[country] = since2010;
     });
   }
@@ -30725,7 +30817,9 @@ function renderReformCountryVerdict() {
     + '<div style="font-size:10px;color:var(--muted);">' + scoreNote + '</div></div>'
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reforms since 2010</div>'
     + '<div style="font-size:18px;font-weight:800;color:' + (since2010 > 2 ? 'var(--red)' : since2010 > 0 ? 'var(--orange)' : 'var(--green)') + ';">' + since2010 + '</div>'
-    + '<div style="font-size:10px;color:var(--muted);">' + events.length + ' on record since ' + (events.reduce(function(m,e){ return Math.min(m, e.year || 9999); }, 9999)) + '</div></div>'
+    + '<div style="font-size:10px;color:var(--muted);">' + events.length + ' on record since ' + (events.reduce(function(m,e){ return Math.min(m, e.year || 9999); }, 9999)) + '</div>'
+    + (_v.contextNote ? '<div style="font-size:10px;color:var(--orange);font-weight:700;max-width:210px;line-height:1.4;">' + _v.contextNote + '</div>' : '')
+    + '</div>'
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Direction</div>'
     + '<div style="font-size:14px;font-weight:800;"><span style="color:var(--red);">&uarr;' + tightened + '</span> <span style="color:var(--muted);font-size:11px;">/</span> <span style="color:var(--green);">&darr;' + liberalized + '</span> <span style="color:var(--muted);font-size:11px;">/</span> <span style="color:var(--muted);">&rarr;' + neutral + '</span></div>'
     + '<div style="font-size:10px;color:' + tiltColor + ';font-weight:700;">' + tiltWord + '</div></div>'
@@ -30776,7 +30870,7 @@ function renderReformRisk() {
   // Build reform counts per country
   const reformCounts = countries.map(c => {
     const events = Array.isArray(rh[c]) ? rh[c] : [];
-    const since2010 = events.filter(e => (e.year || 0) >= 2010).length;
+    const since2010 = _rrCountScored(events);
     const total = events.length;
     const byDecade = {};
     events.forEach(e => {
@@ -30794,7 +30888,7 @@ function renderReformRisk() {
       else neutral++;
     });
     const cd = (COUNTRY_DATA || []).find(d => d.country === c);
-    return { country: c, total, since2010, byDecade, take75: cd ? cd.take_75 : null, events, tightened, liberalized, neutral };
+    return { country: c, total, since2010, contextIn: _rrContextInWindow(events), byDecade, take75: cd ? cd.take_75 : null, events, tightened, liberalized, neutral };
   }).sort((a,b) => b.total - a.total);
 
   // Stability score: 100 - (since2010 * 15), min 0
@@ -30888,7 +30982,7 @@ function renderReformRisk() {
 
   const topTable = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Most Frequently Reformed Regimes</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Countries ranked by total fiscal law change events in the database. High count = active reform environment = regime risk for long-horizon IOC investments. <strong style="color:var(--text);">The Reform Frequency column only counts changes dated 2010 or later.</strong> Rows with a take-raising event on record show that event beneath the number and are printed in grey, never green \u2014 the score cannot be read as a stability finding for them.</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Countries ranked by total fiscal law change events in the database. High count = active reform environment = regime risk for long-horizon IOC investments. <strong style="color:var(--text);">The Reform Frequency column only counts fiscal law changes dated 2010 or later.</strong> Sourced events that changed no fiscal terms \u2014 discoveries, first-oil dates, armed conflict, a terms review that concluded without renegotiation, one non-petroleum minerals tax \u2014 stay in the Total Events column and in the event log, but do not score; the Since 2010 column names them where a country has any. Rows with a take-raising event on record show that event beneath the number and are printed in grey, never green \u2014 the score cannot be read as a stability finding for them.</div>'
     + '<table style="width:100%;border-collapse:collapse;">'
     + '<thead><tr>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Country</th>'
@@ -30908,7 +31002,12 @@ function renderReformRisk() {
         return '<tr style="cursor:pointer;" onclick="document.getElementById(\'dd-country-select\').value=\'' + escapedC + '\';loadCountryProfile(\'' + escapedC + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" title="Click to open ' + r.country + ' Country Profile" onmouseover="this.style.background=\'rgba(176,104,0,.04)\'" onmouseout="this.style.background=\'\'">'
           + '<td style="padding:5px 8px;font-size:12px;color:var(--text);"><strong>' + r.country + '</strong> <span style="font-size:10px;color:var(--accent);">↗</span></td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--accent);font-weight:600;">' + r.total + '</td>'
-          + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + (r.since2010>2?'var(--red)':r.since2010>0?'var(--orange)':'var(--green)') + ';">' + r.since2010 + '</td>'
+          + '<td style="padding:5px 8px;font-size:12px;text-align:right;vertical-align:top;color:' + (r.since2010>2?'var(--red)':r.since2010>0?'var(--orange)':'var(--green)') + ';">' + r.since2010
+          + (r.contextIn && r.contextIn.length
+              ? '<div style="font-size:10px;color:var(--orange);font-weight:700;line-height:1.4;margin-top:2px;max-width:150px;margin-left:auto;">+ ' + r.contextIn.length
+                + ' context event' + (r.contextIn.length === 1 ? '' : 's') + ' not scored</div>'
+              : '')
+          + '</td>'
           + scoreCell(r)
           + '<td style="padding:5px 8px;font-size:12px;text-align:center;">' + dirHtml + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + takeColor(r.take75) + ';font-weight:' + (r.take75!=null?'600':'400') + ';">' + (r.take75!=null?r.take75.toFixed(1)+'%':'—') + '</td>'
@@ -30989,7 +31088,18 @@ function renderReformRisk() {
     var demoted = (mode === 'artefact');
     var note;
     if (!lh) {
-      note = '<span style="color:var(--muted);">no take-raising change on record</span>';
+      // v583 (T4): Ghana and Guyana reach this card with a clean count only because every one of
+      // their post-2010 events is context -- a discovery, first oil, a review that changed nothing.
+      // "no take-raising change on record" is true and, on its own, the wrong thing to read.
+      note = (r.contextIn && r.contextIn.length)
+        ? '<span style="color:var(--orange);font-weight:700;">no fiscal law change since 2010</span>'
+          + '<span style="color:var(--muted);"> \u00b7 '
+          + (r.contextIn.length === 1 ? 'its one in-window event is context \u2014 '
+             : 'all ' + r.contextIn.length + ' in-window events are context \u2014 ')
+          + r.contextIn.slice().sort(function(a,b){ return (a.year||0)-(b.year||0); })
+              .map(function(e){ return e.year + ' ' + _rrEsc(String(e.context_kind || 'not a fiscal change').split('\u2014')[0].trim()); }).join(', ')
+          + ' \u00b7 terms never reopened here, not terms held steady</span>'
+        : '<span style="color:var(--muted);">no take-raising change on record</span>';
     } else if (mode === 'inwindow') {
       // v540: the rise is inside the scoring window. Lead with it, in the same weight the
       // Below-the-line rows use, and say the size is not in the score.
@@ -31052,7 +31162,7 @@ function renderReformRisk() {
     + (activeList.length
         ? activeList.map(function(r) {
             var ec = r.country.replace(/'/g,"\\'");
-            var yrs = (r.events || []).filter(function(e){ return (e.year||0) >= 2010; })
+            var yrs = (r.events || []).filter(_rrScores)
                         .map(function(e){ return e.year; }).sort(function(a,b){ return a-b; });
             return '<div style="padding:6px 0;border-bottom:1px solid var(--border);">'
               + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">'
@@ -31181,6 +31291,12 @@ function renderReformRisk() {
   var summaryBar = '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.22);border-radius:8px;padding:12px 18px;margin-bottom:18px;font-size:12px;color:var(--text);line-height:1.7;">'
     + '<strong style="font-size:13px;">Reform Risk Snapshot:</strong> '
     + '<strong>' + countries.length + '</strong> of <strong>' + ((COUNTRY_DATA || []).length || 185) + '</strong> jurisdictions carry a sourced reform history — the rankings below are drawn from those ' + countries.length + ' only. Of them, <strong>' + activeReformers + '</strong> had 2+ fiscal law changes since 2010, and <strong>' + highFreq + '</strong> had 4+. '
+    + (function(){
+        var _ctx = withScore.reduce(function(a, r){ return a + (r.contextIn ? r.contextIn.length : 0); }, 0);
+        return _ctx
+          ? '<strong style="color:var(--orange);">' + _ctx + '</strong> sourced events dated 2010 or later are context \u2014 discoveries, first oil, conflict, a review that changed no terms \u2014 and are excluded from every score on this tab. '
+          : '';
+      })()
     + 'Direction across <strong>' + totalEvents + '</strong> total events: '
     + '<span style="color:var(--negative);font-weight:600;">' + totalTightened + ' tightened</span> / '
     + '<span style="color:var(--green);font-weight:600;">' + totalLiberalized + ' liberalized</span> / '
@@ -31194,7 +31310,9 @@ window.renderReformRisk = renderReformRisk;
 
 function exportReformRiskCSV() {
   var rh = typeof REFORM_HISTORY !== 'undefined' ? REFORM_HISTORY : {};
-  var rows = [['Country','Year','Event','Mechanic','Take Change','Direction','Source','Notes']];
+  // v583 (T4): the workbook must carry the same fiscal/context split the screen now shows,
+  // or an analyst filtering the CSV rebuilds the old count offline.
+  var rows = [['Country','Year','Event','Mechanic','Take Change','Direction','Counts In Reform Frequency Score','Context Kind','Source','Notes']];
   Object.keys(rh).sort().forEach(function(c) {
     var events = Array.isArray(rh[c]) ? rh[c] : [];
     events.forEach(function(e) {
@@ -31205,6 +31323,8 @@ function exportReformRiskCSV() {
         e.mechanic || '',
         e.take_change || '',
         e.direction || '',
+        (e.fiscal_change === false ? 'No' : 'Yes'),
+        e.context_kind || '',
         e.source || '',
         e.notes || ''
       ]);
@@ -33915,7 +34035,7 @@ function renderFCResults(results, price) {
       var events = Array.isArray(rh[c]) ? rh[c] : [];
       if (!events.length) return;
       stabCoveredN++;
-      var n = events.filter(function(e) { return (e.year || 0) >= 2010; }).length;
+      var n = _rrCountScored(events);
       var hostile = events.filter(function(e) {
         return e.take_change && String(e.take_change).charAt(0) === '+';
       }).sort(function(a, b) { return (b.year || 0) - (a.year || 0); });
@@ -35179,7 +35299,7 @@ function openFCDrilldown(country) {
       if (typeof REFORM_HISTORY === 'undefined') return null;
       var rh = REFORM_HISTORY[country];
       if (!Array.isArray(rh)) return 5;
-      var n = rh.filter(function(e) { return (e.year || 0) >= 2010; }).length;
+      var n = _rrCountScored(rh);
       return Math.max(0, 5 - n);
     })();
     var _icLines = [];
@@ -35258,7 +35378,7 @@ function openFCDrilldown(country) {
               + 'carry a zero reform premium into the memo on this basis.');
             return;
           }
-          var _n10 = _rhArr.filter(function(e){ return (e.year || 0) >= 2010; }).length;
+          var _n10 = _rrCountScored(_rhArr);
           _icLines.push('Reform exposure: <strong>' + _n10 + ' sourced fiscal law change'
             + (_n10 === 1 ? '' : 's') + ' since 2010</strong> (' + _rhArr.length + ' on record). '
             + 'Open the Reform Risk tab for the event log before finalising.');
