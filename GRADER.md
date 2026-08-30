@@ -20337,3 +20337,103 @@ end; it is **not** the deliverable.
 **Friction.** Walked cold with storage cleared: Home → Reform Risk → the per-country lookup, then the same countries on Country Profile and in the Fiscal Compare Stability column.
 
 The Reform Frequency Score is documented on all three surfaces as a count of *fiscal law changes* since 2010, and the tab converts th
+
+---
+## Cycle 489 Log — 2026-08-29
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL / 1 WARN (known local-harness sw.js 404) — suite RAN this cycle
+- JS errors: 0 (syntax gate PASS, 10 blocks / 0 errors)
+- Shipped as v584
+
+## Cycle 489 — T5, shipped as v584
+
+**Task.** T5 — "Give me something I can paste straight into an IC memo."
+(488 was T4, 487 T2, 486 T6, 485 T5, 484 T1, 483 T3.)
+
+**Friction.** Walked Explorer cold in Chromium over http, `sessionStorage` and
+`localStorage` cleared. The paste artifact of the screening tab is the `⬇ Excel`
+button. `exportExplorer()` was a **second, independent query over
+`COUNTRY_DATA`** — it read only `flt-mech`, the `flt-region` *dropdown* and
+`flt-search`, then sorted by take DESC unconditionally.
+
+It matched the table in **none** of seven states walked, including the **cold
+default with no filter touched at all**:
+
+| state | screen (first five) | file (first five) |
+|---|---|---|
+| cold default, 185 rows | USA, Argentina, Mexico, Canada, Colombia | Bahrain, Kuwait, Saudi Arabia, Turkmenistan, Uzbekistan |
+| Prod Data Only, 22 rows | USA, Argentina, Mexico, Canada, Colombia | *185 rows* — Bahrain, Kuwait, Saudi Arabia … |
+| Prod + sort NPV, 22 rows | Canada, USA, Azerbaijan, Mexico, Argentina | *185 rows* — identical to above |
+| IRR only, 118 rows | USA, Argentina, Mexico, Canada, Colombia | *185 rows* — identical to above |
+| IRR + BE, 26 rows | Argentina, Australia, Botswana, Netherlands, Italy | *185 rows* — identical to above |
+| region chip Africa, 49 rows | Angola, Libya, Nigeria, South Africa, Mayotte | *185 rows* — identical to above |
+| sort A–Z, 185 rows | Afghanistan, Albania, Algeria, Angola, Argentina | *185 rows* — identical to above |
+
+The button emitted the same fixed file every time. It ignored **Prod Data Only,
+IRR only, BE only, the R-factor filter and the region chip** entirely; it ignored
+`flt-sort`; and it carried a **`Rank` column asserting an ordering that appears
+nowhere in the product** — not the v578 evidence-first ranking on screen, not any
+sort the analyst can select. `NPV` and `IRR` were hardcoded to `$75` while the
+table rendered the active price radio, so at the $100 radio the file disagreed
+with the screen *and labelled the disagreement "$75"*.
+
+The v578 comment block sitting directly above the sort reads: *"all 185 stay in
+the table, the count **and the export**; only the order changes."* The export
+never followed. Carried forward unfixed from cycles 486, 487 and 488.
+
+**Change.**
+1. `renderExplorer()` publishes `_explorerRendered` — the exact array it put on
+   screen, plus price, sort, grouping and the filter set. One source of truth,
+   the same shape of fix as the v581 `_dqTier()` reconciliation.
+2. `exportExplorer()` **has no query at all.** It writes `_explorerRendered.rows`
+   in screen order with the screen's rank.
+3. Take / NPV / IRR columns track the price radio and are labelled with it.
+4. New **`Data Basis`** column (FACTS / EVIDENCE / PROXY, from `_dqTier`) — the
+   workbook equivalent of the v578 on-screen divider, so a pasted rank list
+   cannot silently mix production-backed and proxy countries.
+5. New **`Filters & Assumptions`** sheet: rows exported, filters applied,
+   ranked-by, price assumption, a ranking-basis caveat naming the rank at which
+   the production-backed group ends (`ranks 1–22 … ranks 23–185 …`), the Data
+   Basis key, and the citation. It adapts to the all-verified, all-proxy and A–Z
+   cases rather than asserting a boundary that is not there.
+6. An empty result no longer writes a 185-row file — it refuses with a toast.
+7. The button now reads **`⬇ Excel (22)`** and states its own scope. The
+   divergence was invisible precisely because the button said nothing about what
+   it wrote.
+
+**Result.** An analyst who filters the Explorer to a shortlist and clicks Excel
+gets **that shortlist, in that order, with that rank, at that price** — plus a
+sheet stating the filters and the evidence boundary, so the table is defensible
+once it is pasted into an IC memo away from the screen that produced it.
+
+**Verification.** Cold Playwright, storage cleared, **12 states**: cold default;
+Prod Data Only; Prod + sort NPV; IRR only; IRR + BE; region chip Africa; sort
+A–Z; R-factor only; mech PSC + region dropdown Europe; Prod ON with grouping
+OFF; no-match empty state; cleared back to cold. **11 MATCH** on row count,
+order, first five and last row; **1 correctly refused**; **0 mismatches**;
+**0 page errors**. Price radio checked at $50 / $75 / $100 against the
+on-screen cells for USA: 19.9% / $1.4B, 23.4% / $3.3B, 25.1% / $5.2B — file
+equals screen at each. JS syntax gate **PASS** (10 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle** against the local build:
+**135 PASS / 0 FAIL / 1 WARN** (known local-harness `sw.js` 404).
+
+**Found on this walk, not fixed.** Two, each its own cycle:
+1. Carried from 488 — reform *Direction* is derived from `take_change` alone, so
+   all 46 unquantified events render `→ Neutral`, printing *"Nigeria —
+   net-liberalizing toward the contractor"* for a country at 81.1% take.
+2. Carried from 488 — the Sourced Event Log opens oldest-first, leading with the
+   1938 PEMEX nationalization and burying the 2024 UK EPL repeal at row 83.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still 974). **No new tooltip on
+a pre-existing control** — the Excel button's own tooltip was rewritten because
+it described a scope this cycle changed. No page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row; Screener advanced filters still
+collapsed, presets still a dropdown. **No row and no column added or removed
+from any table on screen** — the `Data Basis` column and the second sheet exist
+in the workbook only. v430 sessionStorage logic, v449/v451/v452 CP headline, the
+v451 Govt NPV removal, v489 Reform Risk placement, v578 Explorer grouping, v580
+FC citable ranking, v581 `_dqTier` reconciliation, the v582 `switchTab` guard and
+the v583 reform fiscal/context split are all intact. Tab order unchanged.
+Version bump v583→v584 across 5 structural sites, done silently at the end; it is
+**not** the deliverable.
