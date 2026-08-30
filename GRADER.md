@@ -22274,3 +22274,113 @@ done silently at the end; it is **not** the deliverable.
 **Task — T6:** *"Where did this number come from and how solid is the evidence?"* — the stalest task; last run at v592, seven version commits ago.
 
 **Friction.** Walked cold into **IOC Portfolio** with storage cleared. The tab seeds itself: `switchTab('t5')` calls `loadIOC('Shell')`, which is an **exact operator-string match**. `IOC_DATA` contains an operator 
+
+---
+## Cycle 505 — T3 / v600 — 2026-08-30
+
+**Task — T3:** *"How do these three countries compare side by side?"* — the stalest of the six
+(last run at cycle 483 / v577); cycles 502/503/504 were T1 / T4 / T6.
+
+**Friction.** Walked cold into **Side-by-Side** (`t2`) with `sessionStorage` and `localStorage`
+cleared. The tab seeds itself with the North Sea Trio, so I cleared it and built a normal
+screening trio by hand through `#cmp-search`: **Norway, Iraq, Guyana**. The four **Govt Take**
+rows carry a lowest/highest order marker — `_cmpOrderMark()`, `index.html` ~L24999 — which ranks
+on the **comparable** take, not the headline. That is correct and deliberate: v549/v552
+established from `~/MECHANIC_COMPARABILITY.md` that a fee-blended column must be ranked on its
+Group-1 (PSC/Concession) subset, because a TSC contractor is paid a fixed $/bbl remuneration fee
+and government take% climbs toward 97–99% as an artefact of the mechanic rather than a measure of
+the terms.
+
+But `_cmpTakeCell()` emitted the marker **between** the headline take and the PSC/Conc figure, so
+the word landed on the number it does not describe. At $75/bbl the row read, left to right:
+
+| Norway | Iraq | Guyana |
+|---|---|---|
+| **68.0%** · `highest of 3` | **84.8%** · `lowest of 3`<br>PSC/Conc 34.1% | **54.1%** |
+
+The largest number in the row is labelled **lowest**, three inches from a smaller number labelled
+**highest**. Both markers are arithmetically right on the comparable series {68.0, 34.1, 54.1} and
+both are visibly wrong against what is printed. This is the moment the analyst stops: either they
+decide the tool is broken and leave, or they carry "Iraq — lowest government take of the three"
+into the memo.
+
+**Scale, measured over `country_data.json`, not asserted.** 11 of 185 countries blend Group-2
+fee-basis contracts and carry a `g1` block: Azerbaijan, Ecuador, India, Iran, Iraq, Malaysia,
+Mexico, Oman, Qatar, Russia, South Sudan. Of the **159,885** three-country sets pairing one of
+those 11 with two Group-1 columns, **6,240 (3.9%)** render a marker whose word contradicts the
+number immediately above it — Iraq 2,555, South Sudan 1,137, Ecuador 724, Iran 673, Mexico 530,
+India 327, Malaysia 105, Azerbaijan 103, Russia 62, Qatar 18, Oman 6. For Iraq alone that is
+**2,555 of 16,653 sets, 15.3%**, and Iraq sits on the tab's own `USA vs Iraq` quickstart button.
+
+**Change — on screen.** `_cmpOrderMark(d, p, onG1)`.
+
+- On a fee-blended column the marker now renders **below** the PSC/Conc figure, indented behind a
+  2px green rule, and reads `lowest of 3 · on PSC/Conc`. It sits on the number it ranks.
+- Where **any** column in the set is fee-blended, the markers on the other columns are tagged
+  `· comparable basis`, so the ordering basis is stated in the cell rather than only in a tooltip
+  nobody hovers.
+- Where **no** column is fee-blended — 174 of 185 countries, including the shipped cold default
+  North Sea Trio — the output is byte identical to what shipped. The headline *is* the comparable
+  figure there, so there was nothing to say.
+- The `onG1` tooltip now states explicitly that the marker ranks the PSC/Conc figure above it and
+  **not** the headline, naming the headline value.
+
+**Result.** The row now reads:
+
+| Norway | Iraq | Guyana |
+|---|---|---|
+| **68.0%**<br>`highest of 3 · comparable basis` | **84.8%**<br>PSC/Conc 34.1%<br>`lowest of 3 · on PSC/Conc` | **54.1%** |
+
+The analyst can rank the Govt Take rows off what is printed, without hovering anything and without
+reading the incommensurability paragraph below the grid first. **Copy for IC Memo** carries the
+corrected order too: the pasted row is now
+`84.8% · PSC/Conc 34.1% · lowest of 3 · on PSC/Conc` instead of a memo asserting 84.8% was the
+lowest of the three.
+
+### Verification — cold, Playwright, local build, storage cleared
+
+| check | result |
+|---|---|
+| cold default trio (Norway/UK/Netherlands, no blended column) | labels unchanged: `59.3% highest of 3` … `17.6% lowest of 3` |
+| Norway / Iraq / Guyana | marker under PSC/Conc on all four price rows, tagged `on PSC/Conc` |
+| Norway / Ecuador / Guyana | same, 7.2pp gap column |
+| Brazil / South Sudan / Angola | ordering flips at $100 — Angola takes `highest`, South Sudan keeps `lowest · on PSC/Conc` |
+| USA / Iraq (quickstart) | `19.9% lowest of 2 · comparable basis`; Iraq correctly unmarked |
+| Norway/Iraq/Guyana/Brazil/Saudi Arabia | `of 4` — state-monopoly column excluded, marker placement correct |
+| clipboard TSV | all four Govt Take rows carry the corrected order |
+| sweep: 11 blended countries × 4 partner pairs | **44 sets, 352 markers, 0 misplaced, 0 page errors** |
+
+**Tests ran this cycle.** Two new `Comparison` cases — marker placement, and marker basis tag —
+added to both harness copies (`petroleum-fiscal-db/tests/` and
+`office/tools/petroleum/tests/`). Against the pre-change build served on **:8082** both **FAIL**
+(`4 marker(s) render above the PSC/Conc figure they rank … Iraq cell: 84.8% | lowest of 3 |
+PSC/Conc 34.1%`) — **136 PASS / 2 FAIL**. Against this build **142 PASS / 0 FAIL / 1 WARN**. The
+1 WARN and the 1 captured JS error are the pre-existing local-harness `sw.js` 404. JS syntax gate
+**PASS, 10/10 blocks**, re-run after the version sweep.
+
+**Found on the same walk, not fixed — stated rather than hidden.**
+
+1. `_cmpOrderMark` awards `hi` only when `vals.length >= 3`, so a **two-country** set can show a
+   `lowest of 2` and never a `highest of 2`. On `USA vs Iraq` — the tab's own quickstart — USA
+   gets the marker and Iraq gets nothing, which reads as an incomplete ranking rather than a
+   deliberate one. It is a separate decision about 2-column sets and is its own cycle.
+2. The three carried-forward items from cycle 504 are untouched and still open: `renderIOCExposure()`
+   still filters `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows pin `take_75` to the
+   country value while the other three prices are operator-specific; `nocExcludedCount` in
+   `loadIOC()` is always 0.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip on any pre-existing
+control — the two tooltips changed here are the *existing* order-marker tooltip and nothing else.
+No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS
+card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets
+still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** **No
+published country take, NPV, rank, score, tier colour or pill value was altered, and no threshold
+was introduced.** v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489 and all
+later locks intact. Version sweep **v599 → v600** across 5 display sites, done silently at the
+end; it is **not** the deliverable.
+
+## Cycle 505 Log — 2026-08-30
+- Test before (this build, pre-change): 136 PASS / 2 FAIL (the two new cases)
+- Test after: 142 PASS / 0 FAIL / 1 WARN
+- JS errors: 1 — pre-existing local-harness `sw.js` 404, identical on the unchanged build
+- Summary: T3 / v600. Order marker moved onto the figure it ranks on fee-blended columns.
