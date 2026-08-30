@@ -23269,3 +23269,18 @@ pill value was altered** — the change is confined to the exported artifact. v3
 v430 sessionStorage logic, v449, v451, v452, v489, v505, v573, v591, v606 and v607 all intact.
 Version sweep **v607 → v608** across 6 structural sites, done silently at the end; it is **not** the
 deliverable.
+
+---
+## Cycle 513 Log — 2026-08-30 18:07
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle complete.
+
+## Cycle 513 — T5 / v608
+
+**Task — T5:** "Give me something I can paste straight into an IC memo." (stalest: 512=T2, 511=T3, 510=T6, 509=T4, 508=T1, 507=T5)
+
+**Friction.** I walked cold — storage cleared — and read back what every export actually produces rather than trusting button labels. The clipboard paths are in good shape; the *downloaded CSVs* have never had that treatment, and the Breakeven Map's is the worst.
+
+That tab's screen text is emphatic and co
