@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v589</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v590</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1399,7 +1399,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v589</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v590</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1469,7 +1469,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v589</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v590</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1811,7 +1811,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v589';
+  return m ? m[0] : 'v590';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1886,7 +1886,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v589');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v590');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -31846,6 +31846,24 @@ function renderReformRisk() {
   var activeList = withScore.filter(function(r){ return r.since2010 >= 3; })
     .sort(function(a,b){ return (b.since2010 - a.since2010) || (b.total - a.total); });
 
+  // v590 (T4): Section 3 asked "quiet or actively reforming?" with two filters, `since2010 <= 1`
+  // and `since2010 >= 3`. Nothing rendered the band between them. Six of the 21 sourced
+  // jurisdictions -- Norway, Nigeria, Angola, Indonesia, Australia, Mexico -- have exactly 2
+  // scored changes since 2010 and therefore appeared in NEITHER card. Norway is the platform's
+  // default Country Profile and Nigeria is its most-cited PSC jurisdiction; an analyst scanning
+  // this section for either of them found nothing and could not tell a coverage gap from a
+  // classification gap. This is the same defect class v508 fixed at the >=3 boundary and left
+  // open at the ==2 one. The band now has its own card, and the three cards are asserted to
+  // cover every sourced jurisdiction.
+  var midList = withScore.filter(function(r){ return r.since2010 === 2; })
+    .map(function(r){ return Object.assign({}, r, { lastHostile: _rrLastHostile(r) }); })
+    .sort(function(a,b){
+      var ay = (a.lastHostile && a.lastHostile.year >= 2010) ? a.lastHostile.year : -1;
+      var by = (b.lastHostile && b.lastHostile.year >= 2010) ? b.lastHostile.year : -1;
+      return (by - ay) || a.country.localeCompare(b.country);
+    });
+  var midRaisedInWindow = midList.filter(function(r){ return r.lastHostile && r.lastHostile.year >= 2010; }).length;
+
   function _rrRowBtn(ec, name) {
     return '<button onclick="document.getElementById(\'dd-country-select\').value=\'' + ec + '\';loadCountryProfile(\'' + ec + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" style="background:none;border:none;color:var(--text);font-size:12px;cursor:pointer;padding:0;text-align:left;font-weight:600;" title="Open Country Profile">' + name + ' ›</button>';
   }
@@ -31912,7 +31930,64 @@ function renderReformRisk() {
       + '</div>'
     : '';
 
-  var stabVol = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px;">'
+  // v590 (T4): one row of the middle band. Leads with the count, then states the distance to the
+  // Actively Reforming bar in the tab's own vocabulary, then names the take-raising event so the
+  // count-vs-magnitude trap is visible on the row rather than only in the intro strip.
+  function _midRow(r) {
+    var ec = r.country.replace(/'/g,"\\'");
+    var lh = r.lastHostile;
+    var yrs = (r.events || []).filter(_rrScores)
+                .map(function(e){ return e.year; }).sort(function(a,b){ return a-b; });
+    var ev;
+    if (lh && lh.year >= 2010) {
+      ev = '<span style="color:var(--orange);font-weight:700;">raised take ' + lh.year + '</span>'
+         + '<span style="color:var(--muted);"> \u00b7 ' + _rrEsc(lh.event) + ' </span>'
+         + '<span style="font-family:IBM Plex Mono,monospace;color:var(--red);font-weight:700;">' + _rrEsc(lh.change) + '</span>'
+         + '<span style="color:var(--muted);"> \u00b7 size not in the score</span>';
+    } else if (lh) {
+      ev = '<span style="color:var(--red);font-weight:700;">last take rise ' + lh.year + '</span>'
+         + '<span style="color:var(--muted);"> \u00b7 ' + _rrEsc(lh.event) + ' </span>'
+         + '<span style="font-family:IBM Plex Mono,monospace;color:var(--red);font-weight:700;">' + _rrEsc(lh.change) + '</span>'
+         + '<span style="color:var(--muted);"> \u00b7 before the window, not counted</span>';
+    } else {
+      ev = '<span style="color:var(--muted);">no take-raising change on record \u2014 both in-window changes are of unrecorded size</span>';
+    }
+    return '<div style="padding:6px 0;border-bottom:1px solid var(--border);">'
+      + '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">'
+      + _rrRowBtn(ec, r.country)
+      + '<span style="font-size:12px;color:' + takeColor(r.take75) + ';font-weight:600;white-space:nowrap;">' + (r.take75!=null?r.take75.toFixed(1)+'%':'\u2014') + '</span>'
+      + '</div>'
+      + '<div style="font-size:10px;line-height:1.5;margin-top:2px;">'
+      + '<span style="color:var(--orange);font-weight:700;">2 changes since 2010</span>'
+      + '<span style="color:var(--muted);"> \u00b7 ' + yrs.join(', ') + ' \u00b7 score ' + r.score + ' \u00b7 one short of the bar of 3</span>'
+      + '</div>'
+      + '<div style="font-size:10px;line-height:1.5;margin-top:2px;">' + ev + '</div>'
+      + '</div>';
+  }
+
+  var midCard = '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:10px;padding:16px;">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Reformed Twice Since 2010 <span style="color:var(--muted);">(' + midList.length + ')</span></div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Exactly 2 sourced fiscal law changes since 2010 \u2014 one below the Actively Reforming bar of 3, so this tab\u2019s IC rule indicates no frequency premium for them. '
+    + (midRaisedInWindow
+        ? '<strong style="color:var(--text);">' + midRaisedInWindow + ' of these ' + midList.length + ' raised government take inside the window anyway.</strong> What falls short is the count, not the size.'
+        : 'What falls short is the count, not the size.')
+    + '</div>'
+    + (midList.length
+        ? midList.map(_midRow).join('')
+        : '<div style="font-size:11px;color:var(--muted);padding:6px 0;">No jurisdiction on file sits in this band.</div>')
+    + '</div>';
+
+  // v590 (T4): the three cards partition the sourced set. State that, so a country absent from
+  // this section is unambiguously a country with no reform log rather than one that fell through.
+  var stabCovered = quiet.length + midList.length + activeList.length;
+  var stabFoot = '<div style="font-size:10px;color:var(--muted);line-height:1.6;margin:-6px 0 20px;">'
+    + 'These three cards partition all <strong style="color:var(--text);">' + stabCovered + '</strong> jurisdictions with a sourced reform log '
+    + '(' + quiet.length + ' + ' + midList.length + ' + ' + activeList.length + '), every one of them exactly once. '
+    + 'A country you do not find here has no sourced reform log at all \u2014 use the lookup at the top of the tab, which covers all '
+    + ((typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA ? COUNTRY_DATA.length : 185)) + ' countries and says so explicitly.'
+    + '</div>';
+
+  var stabVol = '<div style="display:grid;grid-template-columns:1.15fr 1fr .8fr;gap:16px;margin-bottom:20px;align-items:start;">'
     + '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--green);border-radius:10px;padding:16px;">'
     + '<div style="font-size:11px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Quiet Since 2010 <span style="color:var(--muted);">(' + quiet.length + ')</span></div>'
     + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">0–1 sourced fiscal law changes since 2010. This measures recent legislative activity only — it is not a judgement that the regime is safe. Each row shows its most recent take-raising event so the window cut-off is visible.</div>'
@@ -31924,6 +31999,7 @@ function renderReformRisk() {
     + quietDivider
     + quietArtefact.map(function(r){ return _quietRow(r, 'artefact'); }).join('')
     + '</div>'
+    + midCard
     + '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:10px;padding:16px;">'
     + '<div style="font-size:11px;font-weight:700;color:var(--red);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Actively Reforming <span style="color:var(--muted);">(' + activeList.length + ')</span></div>'
     + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">3+ sourced fiscal law changes since 2010. Terms are being rewritten inside a normal project sanction-to-first-oil window — assume renegotiation risk over a 25-year life.</div>'
@@ -31943,7 +32019,7 @@ function renderReformRisk() {
               + '</div>';
           }).join('')
         : '<div style="font-size:11px;color:var(--muted);padding:6px 0;">No jurisdiction on file has 3+ changes since 2010.</div>')
-    + '</div></div>';
+    + '</div></div>' + stabFoot;
 
   // Section 4: Reform Type Distribution
   // v585 (T4): this panel read "46 neutral (55%)" and drew 55% of the bar in flat grey. More
