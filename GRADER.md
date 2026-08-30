@@ -20207,3 +20207,118 @@ the deliverable.
 **Task.** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (486 was T6, 485 T5, 484 T1, 483 T3.)
 
 **Friction.** Walked Country Profile cold in Chromium with storage cleared. The page reads fine down to the **4-Price Sensitivity table** — the exact spot where the analyst settles the $75/bbl question. Right under it the platform gives its own instruction: 
+
+---
+## Cycle 488 Log — 2026-08-29 (T4 / v583)
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?"
+(487 was T2, 486 T6, 485 T5, 484 T1, 483 T3.)
+
+**Friction.** Walked cold in Chromium with `sessionStorage` and `localStorage`
+cleared: Home → **Reform Risk** → the per-country lookup, then the same countries
+on **Country Profile** and in the **Fiscal Compare Stability** column.
+
+The **Reform Frequency Score** is documented on every one of those surfaces as a
+count of *fiscal law changes* since 2010 — the tab intro says "Every sourced
+fiscal law change"; the FC Stability tooltip prints "N sourced fiscal law changes
+since 2010"; and the tab converts the count straight into a discount rate:
+**3+ changes → add a 3–5pp WACC premium.**
+
+The sourced event log is broader than that. 46 of its 83 events carry no
+`take_change`, and **11 of those are not law changes at all** — discoveries,
+first-oil dates, armed conflict, a blockade being lifted, an export/revenue
+dispute, a terms review whose own note records *"No renegotiation occurred"*, and
+one non-petroleum minerals tax whose own note records *"PRRT unaffected"*.
+`_rrClassify()` and **thirteen other sites** each recomputed the count as
+`events.filter(e => e.year >= 2010).length`, so all eleven scored:
+
+| country | counted "law changes since 2010" | what they actually were | score |
+|---|---|---|---|
+| **Guyana** | 3 → **"Actively Reforming — add 3–5pp WACC"** | 2015 Liza-1 discovery, 2020 first oil, 2022 review that changed nothing | 55 |
+| **Ghana** | 2 | 2011 first oil, 2016 TEN start + ITLOS boundary ruling | 70 |
+| **Libya** | 2 | 2011 civil war, 2020 blockade lifted | 70 |
+| **Iraq** | 2 | one is the 2014 KRG export dispute | 70 |
+| **Australia** | 3 → **"Actively Reforming"** | one is the 2012 MRRT (minerals) | 55 |
+
+ORCA holds **no fiscal law change for Guyana at any date** — the Stabroek PSA
+terms date from 1999 and have not been reopened. The platform was telling an IC
+analyst to discount the single hottest IOC entry in the world by 3–5pp of WACC
+because ExxonMobil made a discovery there and started producing.
+
+**Change.**
+
+1. **One predicate decides what may score.** `_rrScores(e)` — `year >= 2010 &&
+   fiscal_change !== false` — replaces the year-only filter at **all 14 sites**
+   (lookup, CP sidebar, CP headline diamonds, CP regional peer line, FC Stability
+   cell, IC citation, IC memo line, Home reform-trajectory card, Reform Risk
+   Section 1/3, the rank table, the reform-years list). Eleven events carry
+   `fiscal_change:false` in `reform_history.json`; they stay in the log, on
+   screen and in the export — they no longer score. Scores move **Guyana
+   55→100, Ghana 70→100, Libya 70→100, Iraq 70→85, Australia 55→70**; Guyana and
+   Australia leave the *Actively Reforming* card, now **UK and Brazil**.
+
+2. **A clean count is not allowed to become a clean verdict.** `_rrClassify()`
+   gained a fifth case. Where *every* post-2010 event is context, the verdict is
+   **orange, not green**, and names the events, their kind, and the date terms
+   were last actually changed. Libya keeps its stronger pre-2010 window-artefact
+   verdict (1971 nationalization, +35pp). Guyana now reads: *"nothing in the
+   post-2010 record is a fiscal change … ORCA holds no fiscal law change for this
+   jurisdiction at any date … Do not read 100 as a legislative track record."*
+
+3. **Every surface that prints the count now prints what the count excluded.**
+   The lookup tile and CP sidebar tile carry `+ N in-window events not scored —
+   2015 discovery, 2020 production milestone, 2022 terms review`. The CP headline
+   diamond strip is **muted with a red `!`** where context events exist, and its
+   sub-line reads *"0 fiscal law changes since 2010 · + 3 in-window events that
+   changed no terms"* instead of five green diamonds. Section 1's Since-2010 cell,
+   the *Quiet Since 2010* rows, the Snapshot line, the event-log rows and count
+   line all name the split; the reform CSV gained two columns
+   (`Counts In Reform Frequency Score`, `Context Kind`).
+
+**Result.** An analyst asking what their reform exposure is in Guyana is no
+longer told to add 3–5pp of WACC because of a discovery. They are told the terms
+have never been reopened, shown the three events that are not law changes, and
+warned in orange that a score of 100 built that way is not a legislative track
+record. And the three surfaces that answer this question — Reform Risk, Country
+Profile and the Fiscal Compare Stability column — give the same count for the
+same reason.
+
+**Verification.** Cold Playwright, storage cleared:
+
+| walk | result |
+|---|---|
+| RR lookup × 9 (Guyana, Ghana, Libya, Iraq, Australia, Brazil, Norway, UK, Algeria) | correct verdict + context note on each |
+| CP × 8 | `◆◆◆◆◆!` Guyana/Ghana/Libya, `◆◆◆◆◇!` Iraq, `◆◆◆◇◇!` Australia, unchanged Brazil/Norway, `n/c` Malaysia |
+| FC Stability cells × 6 | all muted + red `!`, tooltips read "0 sourced fiscal law changes since 2010" |
+| Event log, 3 filter states | `83 events — 72 fiscal law changes, 11 context events that changed no terms and do not score`; Ghana `3 events — 0 fiscal law changes, 3 context`; UK `9 events` (unchanged) |
+| 10-tab sweep | every tab still switches, content intact |
+
+**0 page errors on every walk.** JS syntax gate **PASS** (10 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle** against the local build:
+**135 PASS / 0 FAIL / 1 WARN** — the WARN is the known local-harness `sw.js` 404.
+
+**Found on this walk, not fixed.** Three, each its own cycle:
+1. **Direction is derived from `take_change` alone**, so all 46 unquantified
+   events render `→ Neutral` under a header tooltip defining Neutral as
+   *"structural change without material economics shift"*. That is false for
+   Nigeria's 1969 PPTA, its 2021 PIA and Mexico's 2013 Energy Reform. It makes
+   the lookup print **"Nigeria — net-liberalizing toward the contractor"** for a
+   country at 81.1% take.
+2. **The Sourced Event Log opens oldest-first** (`_ALL_REFORMS.sort(a.year -
+   b.year)`), so a cold load leads with the 1938 PEMEX nationalization and buries
+   the 2024 UK EPL repeal at row 83.
+3. `exportExplorer()` still ignores *Prod Data Only*, *IRR only*, *BE only* and
+   the R-factor filter — carried forward from cycles 486 and 487.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still 974). **No new tooltip on a
+pre-existing control** — two existing tooltips were *corrected* because they
+asserted a basis this cycle changed. No page-sub paragraph, no amber
+instructional banner, no routing hint, no "How to read" block, no SbS card
+wrapper, no visible Explorer chip row; Screener advanced filters still collapsed,
+presets still a dropdown. **No row and no column added or removed from any table
+on screen** (the two additions are CSV columns). v430 sessionStorage logic,
+v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk
+placement, v578 Explorer grouping, v580 FC citable ranking, v581 Explorer
+`_dqTier` reconciliation and the v582 `switchTab` guard are all intact. Tab order
+unchanged. Version bump v582→v583 across 5 structural sites, done silently at the
+end; it is **not** the deliverable.
