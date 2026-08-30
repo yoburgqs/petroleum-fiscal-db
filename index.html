@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v607.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v608.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v607</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v608</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v607</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v608</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v607</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v608</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v607';
+  return m ? m[0] : 'v608';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v607');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v608');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -39721,31 +39721,95 @@ async function renderBreakevenMap() {
 
 function exportBreakevenCSV() {
   if (!COUNTRY_DATA) { showCopyToast('Data not loaded yet.'); return; }
-  var rows = [['Country','Region','Mechanic','Breakeven ($/bbl)','Govt Take @$75 (%)','IRR @$75 (%)']];
+  // v608 (T5): this file is the Breakeven Map's only export, and it contradicted the tab it
+  // came from. The screen states plainly that breakeven "does not rank them" -- 65 countries
+  // across 8 distinct values, 43 of them on two integers -- and routes downside screening to
+  // NPV retention at $50. The CSV shipped a breakeven-ascending list with no caption, no basis,
+  // no source line and no retention column, so in a spreadsheet row 1 read as "cheapest barrel
+  // on earth" and none of the screen's correction travelled with it. Three fixes below:
+  // the caveat block, the retention columns the screen names as the axis that DOES separate,
+  // and the Mechanic column -- which read d.mechanic against a field named d.mechanics and has
+  // therefore been exporting empty on all 65 rows since the column was added.
+  var head = ['Country','Region','Mechanic','Breakeven ($/bbl)','Govt Take @$75 (%)',
+              'Contractor NPV @$75 ($M)','Contractor NPV @$50 ($M)',
+              'NPV Retention $50 vs $75 (%)','IRR @$75 (%)'];
+  var rows = [head];
   // v591: the $1.0 state-monopoly floor artifact is not exported — in a spreadsheet it reads
   // as the cheapest barrel on earth with nothing on screen to contradict it.
   var _csvOK = (typeof _beIsTested === 'function') ? _beIsTested
              : function(v) { return v != null && (v <= 0 || v > 1); };
+  // v608 (T5): ties broken by country name so the row order inside the two integers that hold
+  // 43 of the 65 is visibly alphabetical, not an arbitrary array order an IC reader could
+  // mistake for a placing.
   var sorted = COUNTRY_DATA.filter(function(d) { return _csvOK(d.be_75); })
-    .sort(function(a,b) { return a.be_75 - b.be_75; });
+    .sort(function(a,b) {
+      if (a.be_75 !== b.be_75) return a.be_75 - b.be_75;
+      return String(a.country).localeCompare(String(b.country));
+    });
+  var beVals = {}, nRet = 0, retVals = {}, retLo = null, retHi = null;
   sorted.forEach(function(d) {
+    beVals[d.be_75] = 1;
+    var ret = (typeof _npvRetention === 'function') ? _npvRetention(d) : null;
+    if (ret !== null && ret !== undefined) {
+      nRet++;
+      var rp = Math.round(ret * 100);
+      retVals[rp] = 1;
+      if (retLo === null || rp < retLo) retLo = rp;
+      if (retHi === null || rp > retHi) retHi = rp;
+    }
     rows.push([
       d.country,
       d.region || '',
-      d.mechanic || '',
+      // v608 (T5): was d.mechanic — no such field on COUNTRY_DATA. Empty on every row until now.
+      d.mechanics || '',
       d.be_75 != null ? d.be_75.toFixed(1) : '',
       d.take_75 != null ? d.take_75.toFixed(1) : '',
+      d.npv_75 != null ? d.npv_75.toFixed(0) : '',
+      d.npv_50 != null ? d.npv_50.toFixed(0) : '',
+      (ret === null || ret === undefined) ? '' : (ret * 100).toFixed(0),
       (d.irr_75 != null && d.irr_75 < 500) ? d.irr_75.toFixed(1) : ''
     ]);
   });
-  var csv = rows.map(function(r) { return r.map(function(v) { return '"' + String(v).replace(/"/g,'""') + '"'; }).join(','); }).join('\r\n');
+  if (rows.length <= 1) { showCopyToast('No breakeven data to export.'); return; }
+  var N = rows.length - 1;
+  var nDistinct = Object.keys(beVals).length;
+  var lo = sorted[0].be_75, hi = sorted[sorted.length - 1].be_75;
+  var nBlank = (COUNTRY_DATA.length || 185) - N;
+
+  // v608 (T5): the same caveat the tab carries on screen, prepended so it travels into the
+  // memo with the numbers rather than staying behind on the page.
+  var pre = [
+    'ORCA Breakeven Map — ' + N + ' of ' + (COUNTRY_DATA.length || 185) + ' countries with a modelled breakeven',
+    'ROW ORDER IS NOT A RANKING. Breakeven does not separate these countries: all ' + N + ' fall between $'
+      + lo.toFixed(0) + ' and $' + hi.toFixed(0) + '/bbl across only ' + nDistinct + ' distinct values, so most rows are tied. '
+      + 'A country appearing here means ORCA has modelled a cost structure for it — not that it survives a low-price world. '
+      + 'Rows are sorted by breakeven ascending, then country name A–Z. Do not cite a row position as a placing.',
+    // v608 (T5): measured off the exported rows, not asserted from the database. Within this
+    // subset retention is nearly as flat as breakeven is, and claiming a wide spread here would
+    // repeat the exact error this block exists to correct.
+    'NEITHER DOES THE RETENTION COLUMN, ON THIS SUBSET. "NPV Retention $50 vs $75" is the share of $75/bbl contractor NPV '
+      + 'surviving a break to $50/bbl. It is populated for ' + nRet + ' of these ' + N + ' rows, but across them it spans only '
+      + retLo + '% to ' + retHi + '% over ' + Object.keys(retVals).length + ' distinct values. Across all 182 countries where it is defined it runs '
+      + '-14% to +75%, so the axis does separate — these ' + N + ' are simply a self-similar cluster of low-take regimes on near-identical modelled '
+      + 'cost structures. TO RANK COUNTRIES ON DOWNSIDE, EXPORT THE FULL SET FROM THE SCREENER: it carries the same retention column for all 185 '
+      + 'and is the basis the Downside Resilience preset screens on. This file is a coverage list, not a shortlist.',
+    'The ' + nBlank + ' countries absent from this file have no modelled cost structure. That is absence of data, not a low or high breakeven.',
+    'Basis: standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex), 10% WACC, 100% working interest — scale NPV by your WI. '
+      + 'Government take is the ORCA contract-database figure. IRR is blank where the country-level figure exceeds 500% (an arithmetic mean of per-contract IRRs, not a project return).',
+    'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/'
+  ];
+
+  var q = function(v) { return '"' + String(v).replace(/"/g,'""') + '"'; };
+  var body = rows.map(function(r) { return r.map(q).join(','); }).join('\r\n');
+  var csv = pre.map(q).join('\r\n') + '\r\n\r\n' + body
+    + '\r\n\r\n' + q(pre[pre.length - 1]);
   var blob = _csvBlob(csv);
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url; a.download = 'orca_breakeven_' + new Date().toISOString().slice(0,10) + '.csv';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showCopyToast('Breakeven data exported (' + sorted.length + ' countries)');
+  showCopyToast(N + ' countries exported — the file carries the retention column and the "not a ranking" note.');
 }
 window.exportBreakevenCSV = exportBreakevenCSV;
 
