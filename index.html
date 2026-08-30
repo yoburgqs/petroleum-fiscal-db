@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v593</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v594</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v593</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v594</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v593</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v594</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v593';
+  return m ? m[0] : 'v594';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v593');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v594');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -4579,7 +4579,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         </ul>
         <em>Rule of thumb: for the platform's reference deepwater project at $75/bbl, Norway and Australia produce similar headline takes (~68% vs. ~53%) but for different structural reasons — Norway's high take is a fixed-rate system on mature production; Australia's lower take reflects PRRT back-end loading that has not yet triggered at the reference economics. At $100/bbl+, Australia's effective take rises materially (PRRT triggers earlier), narrowing the gap with Norway. For transition-era capital allocation, Norway's lower Swing makes it more fiscally predictable; Australia's PRRT is more price-dependent, which is a risk in scenarios where price volatility increases.</em>
       </div>
-    
+    </div>
 
     <div class="meth-faq-item" style="border-top:1px solid var(--border);padding-top:14px;margin-top:14px;">
       <div class="meth-faq-q" role="button" tabindex="0" aria-expanded="false" aria-controls="faq-a39-body" style="font-size:13px;font-weight:700;color:var(--text);cursor:pointer;line-height:1.4;">
@@ -11411,7 +11411,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           &bull; <strong>PRRT / SPT regimes</strong> (Australia, Norway): PRRT/SPT is a profit-based supplement with its own deductibility rules. In Norway, SPT is computed on net income after straight-line deduction of uplift allowance — and SPT itself is deductible for ordinary CIT purposes. ORCA models this correctly via the DCF engine; the interaction is opaque in ETR disclosures because SPT timing differs from CIT timing.<br><br>
           <em>Source: ORCA v333 (Aug 2026). Johnston, D. (2003) <em>International Petroleum Fiscal Systems and Production Sharing Contracts</em>, Chapter 4 (royalty deductibility and CIT interaction); KPMG Oil and Gas Tax Guide (2024 edition); IEA Upstream Oil and Gas Investment (2025); Norway Petroleum Tax Act Section 3(c) (SPT deductibility from ordinary income tax); UK Finance Act 2023 (RFCT and EPL interaction); Australia PRRT Act 1987, Section 22 (deductibility of PRRT from corporate income tax). Cross-references: FAQ A38 (PRRT vs. SPT methodology); FAQ A86 (depreciation and capital allowance timing and IRR); FAQ A87 (country risk premium and WACC adjustment); FAQ A97 (reconciling ORCA take vs. third-party source discrepancies).</em></div>
         </div>
-    <div style="text-align:right;margin-top:16px;padding-top:10px;border-top:1px solid var(--border);">
+    <!-- v594 (T5): the right-aligned "Back to top" wrapper that used to open here was 10,418 lines from its own content; it is now beside the link at the foot of the FAQ list. -->
         <!-- v333: FAQ A374 — PSC profit oil tier ladder and production-decline effective take -->
         <div class="faq-item" id="faq-A374">
           <div class="faq-q">A374. In a PSC with a production-based profit oil tier ladder, how does asset decline change the effective government take — and when does the platform&rsquo;s mid-tier approximation require IC adjustment?</div>
@@ -21317,7 +21317,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <p><strong>IOC NPV10 before WHT and LIR (in-country):</strong> $247.2M &times; 9.180 (18yr, 10% WACC) &minus; 40% &times; $1,200M capex = $2,269M &minus; $480M = <strong>$1,789M NPV10 before WHT/LIR.</strong></p>
         <p><strong>(b) NPV10 impact of 20% WHT on repatriated dividends:</strong> WHT applies to all dividends repatriated from IOC local subsidiary to parent. WHT 20% on after-CIT income: $247.2M &times; 20% = $49.4M/yr WHT. NPV10 of WHT over 18yr: $49.4M &times; 9.180 = <strong>&minus;$453.5M NPV10 WHT burden.</strong> IOC parent receives $247.2M &minus; $49.4M = $197.8M/yr (before LIR). WHT alone reduces IOC NPV10 by 25% relative to in-country economics.</p>
         <p><strong>(c) NPV10 cost of 5-year LIR lock-up:</strong> LIR: 15% of after-CIT income ($247.2M) = $37.1M/yr must be reinvested in-country for 5 years (Years 1&ndash;5). This capital cannot be repatriated for 5 years. Opportunity cost: IOC loses the time value of $37.1M/yr for 5 years (held in-country at assumed 0% net return vs. 10% WACC). NPV10 cost of 5-year lock-up: $37.1M/yr &times; [PV factor Years 1&ndash;5 at 10% (3.791) &minus; PV factor receiving same funds Years 6+ (i.e., repatriated at Year 5, then discounted back)]. Simplified: annual opportunity cost of 5-year lock-up on each year&apos;s $37.1M = $37.1M &times; (1 &minus; 1/1.10&sup5;) &times; WACC = $37.1M &times; 0.379 = $14.1M NPV10 cost per year &times; 5yr = <strong>&minus;$70.5M NPV10 LIR cost.</strong> LIR adds $70.5M burden (smaller than WHT, but still material on a marginal project).</p>
-        <p><strong>(d) Effective all-in take including WHT and LIR:</strong> In-country take (royalty + CIT): $38.3M + $133.1M = $171.4M/yr out of $547.5M gross &rarr; in-country take ~31% (IOC&apos;s 40% WI basis). Parent-level all-in: WHT $49.4M + LIR cost $14.1M/yr additional drag. Total government/host take per year: $171.4M + $49.4M + $14.1M = $234.9M out of $547.5M IOC gross &rarr; <strong>effective all-in take ~43%</strong> vs. in-country stated take ~31%. WHT and LIR together add <strong>~12pp effective take** at the IOC parent level. ORCA stated country take would not include this overlay — IC must add it manually.</p>
+        <p><strong>(d) Effective all-in take including WHT and LIR:</strong> In-country take (royalty + CIT): $38.3M + $133.1M = $171.4M/yr out of $547.5M gross &rarr; in-country take ~31% (IOC&apos;s 40% WI basis). Parent-level all-in: WHT $49.4M + LIR cost $14.1M/yr additional drag. Total government/host take per year: $171.4M + $49.4M + $14.1M = $234.9M out of $547.5M IOC gross &rarr; <strong>effective all-in take ~43%</strong> vs. in-country stated take ~31%. WHT and LIR together add <strong>~12pp effective take</strong> at the IOC parent level. ORCA stated country take would not include this overlay — IC must add it manually.</p>
         <p><strong>(e) IC memo with risk-adjusted sensitivity:</strong> &ldquo;Concession Sub-Saharan Africa: 40% WI. In-country economics: NPV10 $1,789M@$75, take 31%. Parent-level all-in: NPV10 $1,265M (after WHT $453M + LIR $70M drag). Effective all-in take 43%. Sensitivity: at $50/bbl, WHT drag is proportionally larger (project thinner margins, WHT same 20% rate) &rarr; parent NPV10 ~$480M; in-country breakeven $58/bbl vs. parent breakeven $72/bbl (LIR/WHT add $14/bbl to parent breakeven). Risk register: (1) WHT treaty mitigation: confirm whether home country has double tax treaty with host reducing WHT to 10% (typical treaty rate) &rarr; saves $226M NPV10; (2) LIR reinvestment vehicle: negotiate productive in-country reinvestment (local equity position, JV infrastructure) to convert LIR from drag to option value; (3) price risk: parent breakeven $72/bbl is above the $75 base deck by $3/bbl &mdash; insufficient margin; recommend bid only if WHT treaty applies. Source: ORCA v420 FAQ A940.&rdquo;</p>
         <p><strong>Rule of thumb:</strong> WHT at 20% reduces IOC parent NPV10 by approximately 20&ndash;25% vs. in-country economics. Every 5pp WHT = ~5&ndash;6pp effective take uplift at parent level. Always compute parent-level breakeven separately from in-country breakeven for cross-border repatriation-constrained jurisdictions.</p>
         <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v420 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/. WHT and repatriation mechanics (OECD Model Tax Convention Art. 10 dividends; Nigeria WHT 10% under treaty; Angola 15% WHT CITA; Kenya 10% WHT; IMF Fiscal Affairs Dept. withholding taxes in extractives 2015; FAQ A894 fiscal stability CIT-only partial coverage; FAQ A930 stabilization clause gap analysis). Cross-references: FAQ A894 (fiscal stability), FAQ A930 (stabilization clause gap), FAQ A940.</em></p>
@@ -21828,7 +21828,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform <span class="orca-cite-ver">v574</span> (Aug 2026). Norwegian Petroleum Tax Act (Petroleumsskatteloven) Section 5 (special tax rate and uplift). Cross-references: FAQ A945 (Norway RFCT/SC/PRT stack for UK comparison), FAQ A973 (PRRT Uplift Rate), FAQ A28 (ORCA vs. Wood Mac reconciliation for high-take jurisdictions).</em></p>
       </div>
     </div>
-
+    <div style="text-align:right;margin-top:16px;padding-top:10px;border-top:1px solid var(--border);">
       <a href="#tab-btn-tmeth" onclick="document.getElementById('tab-btn-tmeth')&&document.getElementById('tab-btn-tmeth').scrollIntoView({behavior:'smooth'});return false;" style="font-size:11px;color:var(--muted);text-decoration:none;border:1px solid var(--border);border-radius:4px;padding:3px 10px;transition:.15s;" title="Return to Methodology top">&#8679; Back to top</a>
     </div>
 
@@ -21846,7 +21846,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       </div>
     </div>
   </div>
-
+  </div><!-- /#meth-analyst-faq — v594 (T5): this closer was missing, so #tmethodology never closed and swallowed #reference-overlay, #reference-panel and #scenario-modal -->
 </div>
 
 
@@ -33044,6 +33044,11 @@ function dcfConcession(params, price, profile) {
     take: Math.max(0, Math.min(100, take)),
     irr,
     npv,
+    // v594 (T5): the contractor cash flow leaves the engine in $M, as dcfPRRT and dcfBuyback
+    // already return it. Without it the Scenario Builder could not tell an IRR that is null
+    // because the contractor never funds a negative year from one that is null because the
+    // project loses money at every rate -- it rendered both as the same grey "n/a".
+    cashflows: contractorCF.map(function(v){ return v / 1e6; }),
     waterfall: {
       royalty:   totalRev > 0 ? (totalRoyalty / totalRev) * 100 : 0,
       cit:       totalRev > 0 ? (totalCIT / totalRev) * 100 : 0,
@@ -33123,6 +33128,11 @@ function dcfPSC(params, price, profile) {
     take: Math.max(0, Math.min(100, take)),
     irr,
     npv,
+    // v594 (T5): the contractor cash flow leaves the engine in $M, as dcfPRRT and dcfBuyback
+    // already return it. Without it the Scenario Builder could not tell an IRR that is null
+    // because the contractor never funds a negative year from one that is null because the
+    // project loses money at every rate -- it rendered both as the same grey "n/a".
+    cashflows: contractorCF.map(function(v){ return v / 1e6; }),
     waterfall: {
       royalty:    totalRev > 0 ? (totalRoyalty / totalRev) * 100 : 0,
       ftp:        totalRev > 0 ? (totalFTP / totalRev) * 100 : 0,
@@ -33184,6 +33194,11 @@ function dcfTSC(params, price, profile) {
     take: Math.max(0, Math.min(100, take)),
     irr,
     npv,
+    // v594 (T5): the contractor cash flow leaves the engine in $M, as dcfPRRT and dcfBuyback
+    // already return it. Without it the Scenario Builder could not tell an IRR that is null
+    // because the contractor never funds a negative year from one that is null because the
+    // project loses money at every rate -- it rendered both as the same grey "n/a".
+    cashflows: contractorCF.map(function(v){ return v / 1e6; }),
     waterfall: {
       base_govt: totalRevenue > 0 ? ((totalRevenue - totalCostsReimbursed - totalFee) / totalRevenue) * 100 : 0,
       cost_reimb: totalRevenue > 0 ? (totalCostsReimbursed / totalRevenue) * 100 : 0,
@@ -33214,6 +33229,130 @@ function calcIRR(cashflows, initialCapexMM) {
 
 // Alias for PRRT/Buyback compatibility
 function solveIRR(cashflows) { return calcIRR(cashflows, 0); }
+
+
+// ── v594 (T5): what the Scenario Builder's "Contractor IRR" card is allowed to claim ─────
+// calcIRR() returns null for three structurally different reasons and the card rendered all
+// of them as the same grey "n/a" with the sub-note "25yr project":
+//   * the contractor never funds a negative year, so there is no investment to earn a return
+//     on and no IRR exists (7 of the 13 shipped presets, 4 of the 6 project profiles);
+//   * the cash flow never turns positive at any rate;
+//   * the solver's own >=500% guard fires.
+// The card's only explanation lived in a `result.irr >= 500` branch that is unreachable --
+// calcIRR converts that case to null before it returns -- so no reason was ever shown.
+// This reads the cash flow the engine just produced and reports which case it is, plus the
+// two figures that decide the question IRR was standing in for and that exist for EVERY run:
+// contractor capital at risk, and NPV at a 15% IOC hurdle.
+function _sbReturnReading(res) {
+  var cf = (res && res.cashflows) || [];       // $M
+  var R = { irr: (res && res.irr != null) ? res.irr : null,
+            atRisk: 0, payback: null, npv15: null, undisc: null,
+            state: 'unknown', value: 'n/a', note: '', color: 'var(--muted)' };
+  if (!cf.length) { R.note = 'cash flow not published by this mechanic'; return R; }
+
+  var i, cum = 0;
+  for (i = 0; i < cf.length; i++) if (cf[i] < 0) R.atRisk += -cf[i];
+  for (i = 0; i < cf.length; i++) { cum += cf[i]; if (R.payback === null && cum > 0) R.payback = i + 1; }
+  R.undisc = cf.reduce(function(a, v){ return a + v; }, 0);
+  R.npv15  = calcNPV(cf, 0.15);
+  // A payback year is only a fact where capital was exposed to begin with, and where the flow
+  // does not go back under water later -- Iran's buy-back crosses zero in year 1 and ends
+  // 	$847M down, so "payback yr 1" would have been the opposite of the finding.
+  if (R.atRisk < 0.5 || R.undisc <= 0) R.payback = null;
+
+  var risk = R.atRisk >= 1000 ? '$' + (R.atRisk / 1000).toFixed(1) + 'B' : '$' + Math.round(R.atRisk) + 'M';
+  var pay  = R.payback === null ? 'never repaid' : 'payback yr ' + R.payback;
+
+  if (R.atRisk < 0.5) {
+    // The defining case. In a cost-recovery regime with first oil in the same year as first
+    // capex, the contractor is reimbursed as it spends and no year is ever net negative.
+    R.state = 'no-capital-at-risk';
+    R.value = 'no IRR';
+    R.color = 'var(--muted)';
+    R.note  = 'contractor funds no negative year';
+  } else if (R.undisc <= 0) {
+    R.state = 'uneconomic';
+    R.value = 'no IRR';
+    R.color = 'var(--red)';
+    R.note  = risk + ' at risk · never repaid';
+  } else if (R.irr === null) {
+    R.state = 'unbounded';
+    R.value = '>500%';
+    R.color = 'var(--muted)';
+    R.note  = risk + ' at risk · ' + pay;
+  } else {
+    R.state = R.irr >= 100 ? 'inflated' : 'computed';
+    R.value = R.irr.toFixed(1) + '%';
+    R.color = R.irr < 10 ? 'var(--red)' : R.irr < 20 ? 'var(--orange)' : 'var(--green)';
+    R.note  = risk + ' at risk · ' + pay;
+  }
+  return R;
+}
+
+// The one-line hurdle verdict that is available for 100% of runs, including every run where
+// no IRR exists. NPV > 0 discounted at the hurdle rate IS the hurdle test.
+function _sbHurdleLine(res, profile, price, mech) {
+  var R = _sbReturnReading(res);
+  if (R.npv15 === null) return '';
+  var f = function(v) {
+    var a = Math.abs(v), sgn = v < 0 ? '−' : '+';
+    return sgn + (a >= 1000 ? '$' + (a / 1000).toFixed(1) + 'B' : '$' + Math.round(a) + 'M');
+  };
+  var clears = R.npv15 > 0;
+  var capexMM = (profile && profile.capexMM) || null;
+  // The plain-text artifact. Built here so the on-screen line and the clipboard cannot drift.
+  window._sbICLine = mech + ', ' + ((profile && profile.name) || '') + ' profile, $' + price + '/bbl — govt take '
+    + res.take.toFixed(1) + '%, contractor NPV ' + f(res.npv) + ' @10% WACC and ' + f(R.npv15) + ' @15% IOC hurdle ('
+    + (clears ? 'clears' : 'fails') + '), '
+    + (R.state === 'no-capital-at-risk'
+        ? 'no contractor capital at risk — cost recovery reimburses capex in the year it is spent, so no IRR exists on this profile'
+        : 'capital at risk ' + (R.atRisk >= 1000 ? '$' + (R.atRisk/1000).toFixed(1) + 'B' : '$' + Math.round(R.atRisk) + 'M')
+          + (R.payback ? ', payback year ' + R.payback : ', never repaid')
+          + (R.state === 'inflated' || R.state === 'unbounded'
+              ? '; IRR not quoted — first oil lands in the same year as first capex on this profile, so the rate is not a project return'
+              : (R.irr != null ? '; IRR ' + R.irr.toFixed(1) + '%' : '')))
+    + '. Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow()
+    + ' — yoburgqs.github.io/petroleum-fiscal-db/';
+  var riskTxt;
+  if (R.state === 'no-capital-at-risk') {
+    riskTxt = 'The contractor funds <strong>no negative year</strong> on this profile'
+      + (capexMM ? ' — cost recovery reimburses the $' + (capexMM >= 1000 ? (capexMM/1000).toFixed(1) + 'B' : capexMM + 'M') + ' capex in the year it is spent' : '')
+      + ', so there is no capital base for an IRR. Read the hurdle test, not a rate of return.';
+  } else {
+    var riskStr = R.atRisk >= 1000 ? '$' + (R.atRisk/1000).toFixed(1) + 'B' : '$' + Math.round(R.atRisk) + 'M';
+    riskTxt = 'Contractor capital at risk <strong>' + riskStr + '</strong>'
+      + ((capexMM && R.atRisk <= capexMM) ? ' of $' + (capexMM >= 1000 ? (capexMM/1000).toFixed(1) + 'B' : capexMM + 'M') + ' project capex' : '')
+      + (R.payback ? ' · payback year <strong>' + R.payback + '</strong>' : ' · never repaid')
+      + (R.state === 'inflated' ? '. The IRR above is high because the profile takes first oil in the same year as first capex, so the exposure is small and brief — quote the hurdle test, not the rate.' : '.');
+  }
+  return '<div style="margin-top:12px;padding:10px 14px;border:1px solid ' + (clears ? 'rgba(21,128,61,.45)' : 'rgba(185,28,28,.45)')
+    + ';border-left:3px solid ' + (clears ? 'var(--green)' : 'var(--red)')
+    + ';border-radius:6px;background:var(--surface2);font-size:12px;line-height:1.65;color:var(--muted);">'
+    + '<span style="font-weight:800;color:' + (clears ? 'var(--green)' : 'var(--red)') + ';">'
+    + (clears ? '✔ Clears a 15% IOC hurdle' : '✗ Fails a 15% IOC hurdle') + '</span> '
+    + '— contractor NPV <strong style="color:var(--text);">' + f(R.npv15) + ' at 15%</strong>'
+    + (res.npv != null ? ' (' + f(res.npv) + ' at the 10% WACC above)' : '') + '. '
+    + riskTxt
+    + '<div style="margin-top:6px;display:flex;align-items:flex-start;gap:10px;">'
+    + '<div style="font-size:11px;opacity:.85;flex:1;">IC line: <em>' + _esc594(window._sbICLine) + '</em></div>'
+    + '<button onclick="_sbCopyICLine(this)" title="Copy this line as plain text" '
+    + 'style="flex:none;background:var(--accent);border:none;border-radius:4px;color:#fff;font-size:10px;font-weight:700;padding:4px 10px;cursor:pointer;white-space:nowrap;">&#x2398; Copy IC line</button>'
+    + '</div></div>';
+}
+
+function _esc594(x){ return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// v594 (T5): the Scenario Builder had no clipboard control of any kind. The tab the whole
+// product routes to for a project-specific number produced one that could only be read on
+// screen or re-keyed by hand.
+function _sbCopyICLine(btn) {
+  var t = window._sbICLine;
+  if (!t) { showCopyToast('Run a DCF first.'); return; }
+  navigator.clipboard.writeText(t).then(function(){
+    if (btn) { var o = btn.innerHTML; btn.innerHTML = '\u2713 Copied'; setTimeout(function(){ btn.innerHTML = o; }, 2000); }
+    showCopyToast('IC line copied — paste into your IC memo.');
+  }).catch(function(){ showCopyToast('Clipboard unavailable — select the line and copy manually.'); });
+}
 
 
 // Get fiscal params for a country from API JSON or fallback to COUNTRY_DATA
@@ -34103,14 +34242,16 @@ function runCustomScenario() {
     </div>`;
   }
 
-  // Use fmtIrr for consistent display (handles ≥500% exclusion with tooltip)
-  const irrHtml = result.irr !== null ? (result.irr >= 500
-    ? '<span style="color:var(--green);font-size:11px" title="IRR ≥500% — unbounded return excluded per platform methodology. Common at low-royalty concession regimes with high price. Use government take for comparison instead.">n/a*</span>'
-    : result.irr.toFixed(1) + '%') : 'n/a';
-  const irrDisplay = result.irr !== null && result.irr < 500 ? result.irr.toFixed(1) + '%' : (result.irr !== null ? 'n/a*' : 'n/a');
+  // v594 (T5): the IRR card no longer prints a bare "n/a". _sbReturnReading() reads the
+  // contractor cash flow the engine just produced and reports WHICH of the three null cases
+  // this is, with the exposure the rate would have been measured against. The old
+  // `result.irr >= 500` tooltip branch was unreachable -- calcIRR() nulls that case before
+  // it returns -- so it was deleted rather than left as a dead explanation.
+  const reading = _sbReturnReading(result);
+  const irrHtml = reading.value;
   const npvDisplay = result.npv !== null ? fmtNpvShared(result.npv) : 'n/a';
   const takeColor = result.take > 75 ? 'var(--red)' : result.take > 60 ? 'var(--orange)' : result.take > 40 ? 'var(--yellow)' : 'var(--green)';
-  const irrColor = result.irr === null || result.irr >= 500 ? 'var(--muted)' : result.irr < 10 ? 'var(--red)' : result.irr < 20 ? 'var(--orange)' : 'var(--green)';
+  const irrColor = reading.color;
   const npvColor = result.npv === null ? 'var(--muted)' : result.npv < 0 ? 'var(--red)' : 'var(--green)';
 
   const takeClampWarning = result.take >= 99.5
@@ -34129,8 +34270,8 @@ ${takeClampWarning}<div class="sb-result-header">${mech} · ${DCF_PROFILES[profi
   </div>
   <div class="sb-result-card">
     <div class="sb-result-label">Contractor IRR</div>
-    <div class="sb-result-value" style="color:${irrColor}">${irrHtml}</div>
-    <div class="sb-result-note">25yr project</div>
+    <div class="sb-result-value" style="color:${irrColor};${reading.value.length > 6 ? 'font-size:19px;' : ''}">${irrHtml}</div>
+    <div class="sb-result-note">${reading.note}</div>
   </div>
   <div class="sb-result-card">
     <div class="sb-result-label">Contractor NPV</div>
@@ -34138,6 +34279,7 @@ ${takeClampWarning}<div class="sb-result-header">${mech} · ${DCF_PROFILES[profi
     <div class="sb-result-note">10% disc. rate</div>
   </div>
 </div>
+${_sbHurdleLine(result, DCF_PROFILES[profileKey], price, mech)}
 <div class="dcf-waterfall-title">Fiscal Breakdown (% of Revenue)</div>
 ${wfHtml}
 ${(function() {
@@ -34164,7 +34306,7 @@ ${(function() {
 `;
 
   // Store last result for saving
-  window._lastScenario = { mech, profileKey, price, params, result };
+  window._lastScenario = { mech, profileKey, price, params, result, reading };
   _refreshSavedTable();
 
   // Scroll results into view
@@ -34199,7 +34341,14 @@ function saveCustomScenario() {
     if (!name) { inp.focus(); return; }
     modal.remove();
     var saved2 = JSON.parse(localStorage.getItem('customScenarios') || '[]');
-    saved2.push({ name: name, ...window._lastScenario, savedAt: new Date().toISOString() });
+    // v594 (T5): store the derived return reading, not the 25-element cash flow. The reading
+    // is what the saved table and the XLSX need; the raw array would bloat localStorage for
+    // nothing and the 5-scenario cap makes it unrecoverable once trimmed.
+    var _ls = window._lastScenario;
+    var _res = { take: _ls.result.take, irr: _ls.result.irr, npv: _ls.result.npv, waterfall: _ls.result.waterfall };
+    saved2.push({ name: name, mech: _ls.mech, profileKey: _ls.profileKey, price: _ls.price,
+                  params: _ls.params, result: _res, reading: _ls.reading,
+                  savedAt: new Date().toISOString() });
     localStorage.setItem('customScenarios', JSON.stringify(saved2));
     _refreshSavedTable();
     showCopyToast('Scenario "' + name + '" saved.');
@@ -34228,13 +34377,27 @@ function _exportScenariosXLSX() {
   if (!saved.length) { showCopyToast('No saved scenarios to export.'); return; }
   if (typeof XLSX === 'undefined') { showCopyToast('XLSX library not loaded — check your connection.'); return; }
   // Build worksheet rows
+  // v594 (T5): the IRR column shipped an EMPTY cell for every scenario where no IRR exists --
+  // 7 of the 13 presets -- under a Methodology sheet whose only stated exclusion was ">=500%",
+  // which applied to none of them. The blank now travels with its reason, and beside the two
+  // figures that decide the hurdle question for 100% of runs.
   var rows = [['Scenario Name', 'Mechanic', 'Profile', 'Price ($/bbl)',
-    'Govt Take (%)', 'Contractor IRR (%)', 'Contractor NPV ($M)',
+    'Govt Take (%)', 'Contractor IRR (%)', 'IRR Basis', 'Contractor NPV @10% ($M)',
+    'Contractor NPV @15% ($M)', 'Clears 15% Hurdle', 'Capital at Risk ($M)', 'Payback Year',
     'Royalty (%)', 'CIT (%)', 'Profit Oil (Govt %)', 'Profit Oil (Ctct %)',
     'Cost Recovery (%)', 'FTP (%)', 'State Equity (%)']];
+  var _irrBasis = {
+    'no-capital-at-risk': 'No IRR — contractor funds no negative year on this profile; cost recovery reimburses capex in the year it is spent, so there is no capital base to return. Use NPV @15%.',
+    'uneconomic':         'No IRR — contractor cash flow never turns positive at any discount rate.',
+    'unbounded':          'IRR exceeds the 500% solver bound — exposure too small and too brief to express as a rate. Use NPV @15%.',
+    'inflated':           'Computed, but the profile takes first oil in the same year as first capex, so exposure is small and brief and the rate is not a project return. Use NPV @15%.',
+    'computed':           'Computed from the contractor cash flow at 100% WI, pre-tax, unlevered.',
+    'unknown':            'Not determinable — this mechanic did not publish a contractor cash flow.'
+  };
   for (const s of saved) {
     const r = s.result;
     const p = s.params || {};
+    const rd = s.reading || { state: 'unknown', npv15: null, atRisk: null, payback: null };
     rows.push([
       s.name,
       s.mech,
@@ -34242,7 +34405,12 @@ function _exportScenariosXLSX() {
       s.price,
       r.take != null ? +r.take.toFixed(2) : '',
       (r.irr != null && r.irr < 500) ? +r.irr.toFixed(2) : '',
+      _irrBasis[rd.state] || _irrBasis.unknown,
       r.npv != null ? +r.npv.toFixed(1) : '',
+      rd.npv15 != null ? +rd.npv15.toFixed(1) : '',
+      rd.npv15 == null ? '' : (rd.npv15 > 0 ? 'Yes' : 'No'),
+      rd.atRisk != null ? +rd.atRisk.toFixed(1) : '',
+      rd.payback != null ? rd.payback : (rd.npv15 == null ? '' : rd.state === 'no-capital-at-risk' ? 'n/a — no capital at risk' : 'never repaid'),
       p.royalty != null ? p.royalty : '',
       p.cit != null ? p.cit : '',
       p.govtProfitOil != null ? p.govtProfitOil : '',
@@ -34260,9 +34428,14 @@ function _exportScenariosXLSX() {
     [],
     ['Column definitions:'],
     ['Govt Take (%)', 'Government share of project economics: royalties + taxes + profit oil at the stated price'],
-    ['Contractor IRR (%)', 'Pre-tax, unlevered IRR at 100% WI. IRR ≥500% excluded as unbounded.'],
-    ['Contractor NPV ($M)', 'NPV at 10% discount rate, 100% WI basis'],
-    ['Profile', 'Standard production profile used in DCF (capex, opex, peak rate)'],
+    ['Contractor IRR (%)', 'Pre-tax, unlevered IRR at 100% WI. BLANK does not mean missing data — read the IRR Basis cell beside it. An IRR does not exist wherever the contractor funds no negative year, which is the usual outcome for a cost-recovery regime on these profiles.'],
+    ['IRR Basis', 'Why the IRR cell reads what it reads, derived from the contractor cash flow for that scenario. Do not quote an IRR into an IC memo without this cell.'],
+    ['Contractor NPV @10% ($M)', 'NPV at the profile discount rate (10%), 100% WI basis'],
+    ['Contractor NPV @15% ($M)', 'NPV at a 15% IOC hurdle rate, same cash flow. Positive = clears the hurdle. This is the test the IRR column was standing in for, and unlike IRR it is populated for every scenario.'],
+    ['Clears 15% Hurdle', 'Yes where NPV @15% > 0.'],
+    ['Capital at Risk ($M)', 'Sum of the contractor negative cash-flow years — the money actually exposed, which is far below project capex wherever cost recovery reimburses capex as it is spent. 0 means no contractor capital is exposed at any point.'],
+    ['Payback Year', 'First year cumulative contractor cash flow turns positive.'],
+    ['Profile', 'Standard production profile. NOTE: these profiles take first oil in year 1, the same year as the first capex tranche, with no development lag. That compresses contractor exposure and is the reason IRR is either undefined or implausibly high on most runs. NPV is unaffected in sign.'],
     ['Fiscal parameters', 'Input parameters as set in Scenario Builder — may be 0/blank if not applicable to mechanic'],
     [],
     ['Cite as:', 'ORCA Petroleum Fiscal Intelligence Platform, ' + new Date().toISOString().slice(0,7) + '. yoburgqs.github.io/petroleum-fiscal-db/']
@@ -34271,7 +34444,7 @@ function _exportScenariosXLSX() {
   var ws = XLSX.utils.aoa_to_sheet(rows);
   var wsMeth = XLSX.utils.aoa_to_sheet(methRows);
   // Column widths
-  ws['!cols'] = [{wch:24},{wch:14},{wch:18},{wch:12},{wch:13},{wch:16},{wch:16},{wch:10},{wch:8},{wch:18},{wch:18},{wch:16},{wch:8},{wch:14}];
+  ws['!cols'] = [{wch:24},{wch:14},{wch:18},{wch:12},{wch:13},{wch:16},{wch:64},{wch:20},{wch:20},{wch:16},{wch:18},{wch:14},{wch:10},{wch:8},{wch:18},{wch:18},{wch:16},{wch:8},{wch:14}];
   XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Scenarios');
   XLSX.utils.book_append_sheet(wb, wsMeth, 'Methodology');
   XLSX.writeFile(wb, 'ORCA_scenarios_' + new Date().toISOString().slice(0,10) + '.xlsx');
@@ -34290,7 +34463,7 @@ function _refreshSavedTable() {
     + '</div>';
   html += `<table class="sb-saved-table"><thead><tr>
     <th>Name</th><th>Mechanic</th><th>Profile</th><th>Price</th>
-    <th>Govt Take</th><th>IRR</th><th>NPV ($M)</th><th>Key Parameters</th>
+    <th>Govt Take</th><th title="Blank or 'no IRR' is a finding, not missing data — hover the cell for the reason.">IRR</th><th>NPV @10%</th><th title="NPV at a 15% IOC hurdle rate. Positive clears the hurdle. Populated for every scenario, including those where no IRR exists.">NPV @15%</th><th>Key Parameters</th>
   </tr></thead><tbody>`;
   for (const s of saved) {
     const r = s.result;
@@ -34309,8 +34482,9 @@ function _refreshSavedTable() {
       <td>${(DCF_PROFILES[s.profileKey] && DCF_PROFILES[s.profileKey].name) || s.profileKey}</td>
       <td>$${s.price}</td>
       <td style="color:${r.take>70?'var(--negative)':r.take>50?'var(--orange)':'var(--positive)'};font-weight:700;">${r.take.toFixed(1)}%</td>
-      <td>${(r.irr !== null && r.irr < 500) ? r.irr.toFixed(1)+'%' : '—'}</td>
+      <td title="${((s.reading && ({'no-capital-at-risk':'No IRR — the contractor funds no negative year on this profile, so there is no capital base to return. Read NPV @15%.','uneconomic':'No IRR — cash flow never turns positive.','unbounded':'IRR exceeds the 500% solver bound.','inflated':'Computed, but first oil lands in the same year as first capex, so this is not a project return.','computed':'Computed from the contractor cash flow.'})[s.reading.state]) || '').replace(/"/g,'&quot;')}">${(s.reading && s.reading.state === 'no-capital-at-risk') ? '<span style="color:var(--muted);font-size:11px;">no IRR</span>' : (s.reading && s.reading.state === 'unbounded') ? '<span style="color:var(--muted);font-size:11px;">&gt;500%</span>' : (r.irr !== null && r.irr < 500) ? r.irr.toFixed(1)+'%' : '—'}</td>
       <td>${r.npv !== null ? fmtNpvShared(r.npv) : '—'}</td>
+      <td style="${(s.reading && s.reading.npv15 != null && s.reading.npv15 <= 0) ? 'color:var(--red);' : 'color:var(--green);'}font-weight:700;">${(s.reading && s.reading.npv15 != null) ? fmtNpvShared(s.reading.npv15) : '—'}</td>
       <td style="font-size:10px;color:var(--muted);">${paramStr}</td>
     </tr>`;
   }
