@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v592</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v593</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v592</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v593</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v592</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v593</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v592';
+  return m ? m[0] : 'v593';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v592');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v593');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -24892,13 +24892,45 @@ function renderCompare() {
   // it is the platform's published figure -- and the Group-1-only take is printed
   // directly beneath it, on the same row, because this row is where the eye lands
   // and where the wrong elimination gets made.
+  // v593 (T3): the four Govt Take rows are the rows an analyst ranks these columns on, and the
+  // ordering they carry is NOT the same at every price. On the tab's own flagship quickstart --
+  // Atlantic Frontier Quartet -- all three of Guyana / Angola / Brazil reverse against each other
+  // between $50 and $125: at $50 the order is Guyana 39.9 < Angola 42.3 < Brazil 49.5, and at $125
+  // it is exactly inverted, Brazil 60.6 < Angola 64.1 < Guyana 65.9. The four rows sat stacked with
+  // no per-row ordering shown, so the analyst reads the $75 row (53.0 / 54.1 / 55.6, a 2.6pp spread)
+  // and concludes the three regimes are equivalent -- when they are equivalent only at $75 and
+  // unambiguous, in opposite directions, at both ends of a normal screening band. Measured across
+  // country_data.json: 716 of 16,471 comparable country pairs (4.3%) reverse between $50 and $125.
+  //
+  // _cmpPriceRank is filled once `selected` exists, below, and read back here at render time.
+  // It ranks on the COMPARABLE take, not the headline: v549/v552 established that a fee-blended
+  // column must be ranked on its Group-1 (PSC/Concession) subset, that a PRRT column is a
+  // cash-flow base and may not be carried across price points at all, and that a state monopoly
+  // has no contractor position to rank. Those columns are skipped rather than given a placement.
+  const _cmpPriceRank = {};
+  const _cmpOrderMark = (d, p) => {
+    const r = _cmpPriceRank[p];
+    if (!r) return '';
+    const lo = r.lo === d.country, hi = r.hi === d.country;
+    if (!lo && !hi) return '';
+    return '<span style="display:block;font-size:10px;font-weight:700;color:var('
+      + (lo ? '--green' : '--red') + ');cursor:help;" title="'
+      + _cmpEsc(d.country + ' has the ' + (lo ? 'lowest' : 'highest') + ' government take of the '
+        + r.n + ' comparable columns in this set at $' + p + '/bbl'
+        + (r.basis ? ', measured on ' + r.basis : '') + '. '
+        + 'Read the same marker on the other three Govt Take rows before ranking: the order is not '
+        + 'the same at every price, and on this set it '
+        + (r.flips ? 'does change between $50 and $125.' : 'does not change between $50 and $125.'))
+      + '">' + (lo ? 'lowest' : 'highest') + ' of ' + r.n + '</span>';
+  };
   const _cmpTakeCell = (d, p) => {
     const v = d['take_' + p];
     const base = fmtTake(v);
     const st = _cmpMixStat(d);
-    if (!st.blended || !st.g1 || st.g1['t' + p] == null || v == null || isStateMonopoly(v)) return base;
+    const mk = _cmpOrderMark(d, p);
+    if (!st.blended || !st.g1 || st.g1['t' + p] == null || v == null || isStateMonopoly(v)) return base + mk;
     const g1v = st.g1['t' + p];
-    return base + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
+    return base + mk + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
       + _cmpEsc(d.country + ': ' + g1v.toFixed(1) + '% is the government take at $' + p
         + '/bbl across its ' + Number(st.g1.n).toLocaleString()
         + ' production-sharing and concession contracts only. The headline '
@@ -25233,6 +25265,42 @@ function renderCompare() {
 
   const selected = compareList.map(c => COUNTRY_DATA.find(d => d.country === c));
 
+  // v593 (T3): fill the per-price ordering map declared above. One pass per published price.
+  // A column is rankable only if it has a like-for-like take at that price:
+  //   - state monopoly (take >= 99.5%)   -> no contractor position, skipped, exactly as fmtTake drops it
+  //   - PRRT-only (cash-flow base)       -> comparable at one price only, never across the band, skipped
+  //   - fee-blended (TSC/RSC/Buy-back)   -> ranked on its Group-1 PSC/Concession take, the figure v549
+  //                                         already prints under the headline and tells the analyst to use
+  // A tie inside 0.05pp is left unmarked rather than broken arbitrarily.
+  const _cmpRankTake = (d, p) => {
+    const v = d['take_' + p];
+    if (v == null || isStateMonopoly(v)) return null;
+    const st = _cmpMixStat(d);
+    if (st.prrt) return null;
+    if (st.blended) return (st.g1 && st.g1['t' + p] != null) ? st.g1['t' + p] : null;
+    return v;
+  };
+  const _CMP_PRICES = [50, 75, 100, 125];
+  const _cmpAnyBlended = selected.some(d => _cmpMixStat(d).blended);
+  _CMP_PRICES.forEach(p => {
+    const vals = selected.map(d => ({ c: d.country, v: _cmpRankTake(d, p) })).filter(x => x.v != null);
+    if (vals.length < 2) { _cmpPriceRank[p] = null; return; }
+    const srt = vals.slice().sort((a, b) => a.v - b.v);
+    const last = srt.length - 1;
+    _cmpPriceRank[p] = {
+      n: vals.length,
+      lo: (srt[1].v - srt[0].v) >= 0.05 ? srt[0].c : null,
+      hi: (vals.length >= 3 && (srt[last].v - srt[last - 1].v) >= 0.05) ? srt[last].c : null,
+      loV: srt[0].v, hiV: srt[last].v,
+      basis: _cmpAnyBlended ? 'the PSC/Concession take where a column blends fee-basis contracts' : '',
+      flips: false
+    };
+  });
+  // The reversal itself: does the lowest-take column at $50 stay the lowest-take column at $125?
+  const _r50 = _cmpPriceRank[50], _r125 = _cmpPriceRank[125];
+  const _cmpFlip = (_r50 && _r125 && _r50.lo && _r125.lo && _r50.lo !== _r125.lo) ? { a: _r50.lo, b: _r125.lo } : null;
+  if (_cmpFlip) _CMP_PRICES.forEach(p => { if (_cmpPriceRank[p]) _cmpPriceRank[p].flips = true; });
+
   // v501: --cmp-n drives the responsive overrides too — the ≤768px and ≤600px rules
   // used to force repeat(4)/repeat(2) with !important regardless of how many countries
   // were loaded, which shifted every row out of alignment at any other count.
@@ -25258,6 +25326,48 @@ function renderCompare() {
     html += `</div>`;
   });
   html += `</div>`;
+  // v593 (T3): when the take ordering is not the same at $50 as it is at $125, say so in words
+  // immediately under the grid. The per-row 'lowest of N' / 'highest of N' markers make the flip
+  // visible; this names it, gives the interval it happens in, and gives the $75 spread -- because
+  // the failure mode is an analyst reading the $75 row alone, seeing 2.6pp between three columns,
+  // and writing "broadly equivalent" into the memo. Nothing renders when the order holds.
+  if (_cmpFlip) {
+    const _flipAt = (nm, pr) => { const d = selected.find(x => x.country === nm); const v = _cmpRankTake(d, pr); return v == null ? '—' : v.toFixed(1) + '%'; };
+    let _cross = '';
+    for (let _k = 1; _k < _CMP_PRICES.length; _k++) {
+      const _pa = _cmpPriceRank[_CMP_PRICES[_k - 1]], _pb = _cmpPriceRank[_CMP_PRICES[_k]];
+      if (_pa && _pb && _pa.lo && _pb.lo && _pa.lo !== _pb.lo) {
+        _cross = ' The order first changes between <strong style="color:var(--text);">$' + _CMP_PRICES[_k - 1]
+          + ' and $' + _CMP_PRICES[_k] + '/bbl</strong>.';
+        break;
+      }
+    }
+    // The gap is measured between the TWO COLUMNS THAT SWAP, not across the whole set. On a set
+    // carrying an outlier -- Atlantic Frontier Quartet holds Nigeria at 81.1% -- the full-set
+    // spread is 28.1pp and saying "the columns sit within 28.1pp, so the base case does not
+    // separate them" would be false. Guyana and Brazil are 1.5pp apart at $75, which is the
+    // number that makes the point.
+    const _dA75 = selected.find(x => x.country === _cmpFlip.a), _dB75 = selected.find(x => x.country === _cmpFlip.b);
+    const _vA75 = _cmpRankTake(_dA75, 75), _vB75 = _cmpRankTake(_dB75, 75);
+    const _gap = (_vA75 != null && _vB75 != null) ? Math.abs(_vA75 - _vB75) : null;
+    const _tie = _gap == null ? ''
+      : ' At <strong style="color:var(--text);">$75/bbl</strong> the two are <strong style="color:var(--text);">'
+        + _gap.toFixed(1) + 'pp</strong> apart (' + _vA75.toFixed(1) + '% vs ' + _vB75.toFixed(1) + '%)'
+        + (_gap < 5 ? ', so the base-case row on its own does not separate them.' : '.');
+    // Only claim the full lowest-to-highest reversal where the column actually ends up highest.
+    const _aEndsHigh = _r125 && _r125.hi === _cmpFlip.a;
+    html += '<div style="margin-top:10px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.30);border-left:3px solid var(--accent);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
+      + '<strong style="color:var(--text);">\u26a0 These columns do not rank the same way at every price.</strong> '
+      + '<strong style="color:var(--text);">' + _cmpEsc(_cmpFlip.a) + '</strong> has the lowest government take of the set at $50/bbl ('
+      + _flipAt(_cmpFlip.a, 50) + ') and '
+      + (_aEndsHigh ? 'the <strong style="color:var(--text);">highest</strong> at $125/bbl (' : 'no longer does at $125/bbl (')
+      + _flipAt(_cmpFlip.a, 125) + '); at $125/bbl the lowest is '
+      + '<strong style="color:var(--text);">' + _cmpEsc(_cmpFlip.b) + '</strong> (' + _flipAt(_cmpFlip.b, 125) + '), which was '
+      + _flipAt(_cmpFlip.b, 50) + ' at $50.' + _cross + _tie
+      + ' The <em>Price Swing</em> row below gives each column\u2019s progressivity, which is what drives this. '
+      + '<strong style="color:var(--text);">Screen this set at the price deck you will actually defend</strong> \u2014 a ranking taken off one price row is not the ranking at another.'
+      + '</div>';
+  }
   // v511: the Data Basis rows tell the analyst what each column is. This says what it means for
   // the comparison, and it fires hardest in the case that actually costs money — the column
   // that WINS on take / NPV / IRR being the one with no production behind it. That is the cold
