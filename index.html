@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v603</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v604</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v603</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v604</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v603</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v604</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v603';
+  return m ? m[0] : 'v604';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v603');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v604');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -32313,6 +32313,104 @@ function _rrInjectSources(c) {
     .catch(function() {});
 }
 
+// ── v604 (T4): the Reform Risk verdict card asserted a basis the platform had withdrawn ──
+// This tab is where every T4 route ends: the Fiscal Compare Stability cell, the Country
+// Profile sidebar button and the Home "Check Reform Risk" card all land here. For the 164
+// jurisdictions with no sourced reform log, the Fiscal Predictability Score IS the answer,
+// and the card introduces it with "What you can defend instead".
+//
+// It defended it on a claim that is universal — "every one of this country's contracts
+// prices to the same take at $75/bbl" — read off COUNTRY_DATA.p25_take === p75_take.
+// v559 established that ORCA's own contract table refutes that equality on 42 countries,
+// and Country Profile has withdrawn the claim there since. The Reform Risk card kept
+// asserting it, so the two surfaces printed opposite bases for the SAME score:
+//   Norway      Country Profile "≥29.6pp obs" (orange)  ·  Reform Risk "one statutory term"
+//   Uzbekistan  89 HIGH on "every contract prices the same" — 50 contracts span 55.8pp
+//   Thailand    80 HIGH — 36.6pp    Netherlands 84 HIGH — 30.8pp    Georgia 40.3pp
+// 33 of the 42 have no reform log at all, so the refuted sentence was the whole T4 answer.
+//
+// The score is NOT recomputed — a top-50-by-production sample is not a population IQR, the
+// same reason v559 gave. What changes is that the claim is withdrawn where the evidence
+// contradicts it, the measured floor replaces it, and the card states the bound the
+// platform's own published formula puts on the number at that dispersion.
+function _rrPaintObsSpread(c, d, obs) {
+  var sel = document.getElementById('rr-country-lookup');
+  if (!sel || sel.value !== c) return;                       // analyst moved on mid-fetch
+  if (typeof cpSpreadConflict !== 'function' || !cpSpreadConflict(d, obs)) return;
+  var out = document.getElementById('rr-country-verdict');
+  if (!out || out.dataset.obsPainted === c) return;
+  out.dataset.obsPainted = c;
+
+  var fp = (typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
+  var cost = Math.min(40, obs.spread * 0.8);
+  var bound = (fp == null) ? null : Math.max(0, Math.round(fp - cost));
+  var bLabel = bound == null ? '' : (bound >= 75 ? 'HIGH' : bound >= 60 ? 'MODERATE' : bound >= 45 ? 'LOW' : 'VERY LOW');
+  var nAll = (d.n != null) ? Number(d.n).toLocaleString() : 'its';
+  var range = obs.min.toFixed(1) + '–' + obs.max.toFixed(1) + '%';
+
+  var basis = document.getElementById('rr-fp-basis');
+  if (basis) {
+    basis.innerHTML = '<span style="color:var(--orange);font-weight:700;">&ge;' + obs.spread.toFixed(1)
+      + 'pp observed</span> across ' + obs.n + ' contracts &mdash; the one-term basis this score was '
+      + 'built on is refuted by ORCA&rsquo;s own contract table';
+    basis.title = 'The Fiscal Predictability Score charged this country a ZERO interquartile-range '
+      + 'penalty — its largest component, worth up to −40 — because the bundled p25 and p75 take are '
+      + 'identical. ORCA’s own contract file for ' + c + ' lists the ' + obs.n + ' largest producing '
+      + 'contracts running ' + range + ' government take at $75/bbl, across ' + obs.distinct
+      + ' distinct values. One counterexample refutes a universal claim, so the claim is withdrawn. '
+      + 'The score is not recomputed here — a top-' + obs.n + '-by-production sample cannot establish a '
+      + 'population IQR across all ' + nAll + ' contracts — but at the observed dispersion the IQR term '
+      + 'alone would cost ' + cost.toFixed(0) + ' points'
+      + (bound == null ? '.' : ', putting this country at about ' + bound + ' · ' + bLabel + '.')
+      + ' Treat the printed score as the best case, not the finding.';
+  }
+
+  var score = document.getElementById('rr-fp-score');
+  if (score && !score.dataset.obsMarked) {
+    score.dataset.obsMarked = '1';
+    score.insertAdjacentHTML('beforeend',
+      '<span style="font-size:10px;font-weight:800;color:var(--orange);margin-left:5px;" '
+      + 'title="Upper bound — the zero take spread that produced this grade is contradicted by this country’s own contract table.">'
+      + '&#9650; best case</span>');
+  }
+
+  var claim = document.getElementById('rr-fp-claim');
+  if (claim) {
+    claim.innerHTML = '<strong style="color:var(--orange);">Do not defend it as a uniform-terms finding here.</strong> '
+      + 'The score charged the take-spread component &mdash; its largest, worth up to &minus;40 points &mdash; '
+      + 'nothing at all, because the bundled quartiles for ' + _rrEsc(c) + ' are identical. ORCA&rsquo;s own contract '
+      + 'file contradicts that: the ' + obs.n + ' largest producing contracts run <strong>' + range + '</strong> take at $75/bbl ('
+      + obs.spread.toFixed(1) + 'pp, ' + obs.distinct + ' distinct values). Block selection does change the fiscal outcome here. '
+      + 'The score is not recomputed &mdash; a top-' + obs.n + ' sample is not a population spread across all ' + nAll
+      + ' contracts &mdash; but at that dispersion the spread term alone would cost ' + cost.toFixed(0) + ' points'
+      + (bound == null ? '' : ', putting ' + _rrEsc(c) + ' near <strong>' + bound + ' &middot; ' + bLabel + '</strong> rather than ' + fp)
+      + '. Carry the contract range into the IC memo, not the grade. ';
+  }
+}
+
+// Reuses the v559 cache, so a country already opened on Country Profile costs no fetch, and a
+// country first seen here populates the cache Country Profile reads later.
+function _rrApplyObsSpread(c) {
+  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
+  var d = cd.filter(function(x){ return x.country === c; })[0];
+  if (!d || typeof cpSpreadConflict !== 'function') return;
+  // Only the one-term basis can be refuted; a measured or absent distribution has nothing to withdraw.
+  var disp = (typeof _fpDispersion === 'function') ? _fpDispersion(d) : null;
+  if (!disp || disp.state !== 'single') return;
+  var cached = (typeof cpObsSpread === 'function') ? cpObsSpread(c) : null;
+  if (cached) { _rrPaintObsSpread(c, d, cached); return; }
+  var slug = String(c).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  fetch('api/v1/country/' + slug + '.json')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(j) {
+      if (!j || !j.top_contracts || !j.top_contracts.length) return;
+      var obs = (typeof cpRecordObsSpread === 'function') ? cpRecordObsSpread(c, j.top_contracts) : null;
+      if (obs) _rrPaintObsSpread(c, d, obs);
+    })
+    .catch(function() {});
+}
+window._rrApplyObsSpread = _rrApplyObsSpread;
+
 function renderReformCountryVerdict() {
   var sel = document.getElementById('rr-country-lookup');
   var out = document.getElementById('rr-country-verdict');
@@ -32327,6 +32425,7 @@ function renderReformCountryVerdict() {
   }
   if (clr) clr.style.display = '';
   out.style.display = 'block';
+  delete out.dataset.obsPainted;   // v604: re-arm the refutation for the newly selected country
 
   var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
   var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
@@ -32369,8 +32468,8 @@ function renderReformCountryVerdict() {
       + '<div style="font-size:10px;color:var(--muted);">not sourced</div></div>'
       + (fp != null
           ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability Score</div>'
-            + '<div style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
-            + '<div style="font-size:10px;color:var(--muted);">' + fpNote + '</div></div>'
+            + '<div id="rr-fp-score" style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
+            + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;"><span id="rr-fp-basis">' + fpNote + '</span></div></div>'
           : '')
       + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
       + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
@@ -32385,9 +32484,9 @@ function renderReformCountryVerdict() {
           : fp != null
           ? '<strong>What you can defend instead:</strong> the <strong>Fiscal Predictability Score</strong> above is derived from this country&rsquo;s own contract set &mdash; '
             + 'within-country take spread (IQR), take movement between $50 and $125/bbl, and number of fiscal mechanics in force. It measures how consistent the terms are, not how often the law changed. '
-            + (fpDisp.state === 'single'
+            + '<span id="rr-fp-claim">' + (fpDisp.state === 'single'
                 ? 'Read it with its basis attached: every one of this country&rsquo;s contracts prices to the same take at $75/bbl, so the IQR component contributed nothing and the number reflects price swing and mechanic count only. '
-                : 'Its IQR component is exercised here &mdash; a measured ' + fpDisp.iqr.toFixed(1) + 'pp spread across its own contracts. ')
+                : 'Its IQR component is exercised here &mdash; a measured ' + fpDisp.iqr.toFixed(1) + 'pp spread across its own contracts. ') + '</span>'
           : '<strong>Neither signal is available for this country.</strong> There is no sourced reform log, and the <strong>Fiscal Predictability Score</strong> is also not scored &mdash; ORCA holds no p25/p75 take distribution across its contracts, so the score&rsquo;s largest component has no input and no number is produced rather than one built on an assumed spread of zero. ')
       // v536 (T3): this used to assert the Predictability Score "exists for all 185 countries".
       // It does not: 22 of the 185 carry no contract-level take distribution and are now not scored.
@@ -32396,6 +32495,7 @@ function renderReformCountryVerdict() {
       + '</div>'
       + cpBtn
       + '</div>';
+    _rrApplyObsSpread(c);
     return;
   }
 
@@ -32426,8 +32526,8 @@ function renderReformCountryVerdict() {
     + '<div style="font-size:10px;color:var(--muted);line-height:1.45;">' + _v.tiltBasis + '</div></div>'
     + (fp != null
         ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability</div>'
-          + '<div style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
-          + '<div style="font-size:10px;color:var(--muted);">separate signal &mdash; ' + fpNote + '</div></div>'
+          + '<div id="rr-fp-score" style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
+          + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;">separate signal &mdash; <span id="rr-fp-basis">' + fpNote + '</span></div></div>'
         : '')
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
     + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
@@ -32447,6 +32547,7 @@ function renderReformCountryVerdict() {
     + '<div style="margin-top:12px;">' + cpBtn + '</div>'
     + '</div>';
   _rrInjectSources(c);
+  _rrApplyObsSpread(c);
 }
 window.renderReformCountryVerdict = renderReformCountryVerdict;
 

@@ -22661,3 +22661,62 @@ Third defect on the same walk: the Quick Start guide's step 3 carried the litera
 > ✓ **14 countries** pass the IOC capital screen — verified field production · take ≤65% · contractor NPV positive at $75 *and* at the $50 downside — **open the screen →**
 
 Clicking
+
+---
+## Cycle 509 — T4 / v604 — 2026-08-30
+
+**Task — T4:** "What is my fiscal-stability and reform exposure here?" (stalest — 508 ran T1, 507 T5, 506 T2, 505 T3, 504 T6, 503 T4)
+
+**Friction.** Walked cold in Chromium, `sessionStorage` and `localStorage` cleared, into the Reform Risk tab — the tab every T4 route ends at. The Fiscal Compare **Stability** cell (`openReformRiskFor()`, index.html:32196), the Country Profile sidebar button and the Home *Check Reform Risk* card all land here.
+
+ORCA holds a sourced reform log for **21 of 185** jurisdictions. For the other **164** the card has no Reform Frequency Score to give, so it hands the analyst the **Fiscal Predictability Score** instead, under the heading *"What you can defend instead"* — and states its basis:
+
+> **89 HIGH** — one statutory term — spread component not exercised
+> *Read it with its basis attached: **every one of this country's contracts prices to the same take at $75/bbl**, so the IQR component contributed nothing…*
+
+That basis is read off `COUNTRY_DATA.p25_take === p75_take` via `_fpDispersion()` (index.html:23624). **v559 (cycle 458) established that ORCA's own `api/v1/country/<slug>.json` refutes that equality**, and Country Profile has withdrawn the claim there ever since — `_cpApplyObsSpread()` repaints the basis chip orange as `≥29.6pp obs`. That patch is scoped to `#dd-content`. The Reform Risk card was never in scope, so the two surfaces printed **opposite bases for the same score**:
+
+| | Country Profile | Reform Risk |
+|---|---|---|
+| Norway (76 · HIGH) | `≥29.6pp obs` (orange, claim withdrawn) | `one statutory term — spread component not exercised` |
+
+Read back across all 185, the bundled quartiles are refuted on **42 countries**, and **33 of the 42 have no reform log at all** — so on those the withdrawn sentence was the *entire* T4 answer. The worst of them:
+
+| Country | Card read | Contract file holds |
+|---|---|---|
+| Uzbekistan | **89 · HIGH**, "every contract prices the same" | 50 contracts, **26.6–82.4%** (55.8pp) |
+| Georgia | 82 · HIGH | 40.3pp |
+| Lebanon | HIGH | 39.6pp |
+| Thailand | **80 · HIGH** | 50 contracts, **17.3–53.9%** (36.6pp) |
+| Netherlands | 84 · HIGH | 30.8pp |
+| Norway | 76 · HIGH | 29.6pp |
+
+The score charges the take-spread term — its largest, worth up to −40 — **zero** on these, which is the only reason they grade HIGH. An analyst on T4 was being told, in green, in the sentence that promises defensibility, that block selection does not change the fiscal outcome in Uzbekistan, while ORCA's own file shows its contracts 55.8pp apart.
+
+**Change.** `_rrApplyObsSpread()` / `_rrPaintObsSpread()` (index.html:32316) fetch the same country file `_rrInjectSources()` already fetches, reuse the v559 `_cpObsSpread` cache, and apply the **same** `cpSpreadConflict()` test Country Profile uses. Where the contract table refutes the one-term basis, on screen:
+
+1. The basis line under the score becomes **`≥55.8pp observed across 50 contracts — the one-term basis this score was built on is refuted by ORCA's own contract table`**, in orange.
+2. The score gains an orange **`▲ best case`** marker.
+3. The *"every one of this country's contracts prices to the same take"* sentence is replaced by the measured range and the bound: *"the 50 largest producing contracts run **26.6–82.4%** take at $75/bbl (55.8pp, 2 distinct values). Block selection does change the fiscal outcome here… at that dispersion the spread term alone would cost 40 points, putting Uzbekistan near **49 · LOW** rather than 89. Carry the contract range into the IC memo, not the grade."*
+
+**No score is recomputed and no published number, tier colour or threshold changed.** A top-50-by-production sample cannot *establish* a population IQR — the same reason v559 gave — but one counterexample *refutes* a universal claim, so the claim is withdrawn and the measured floor stated in its place. The bound quoted is arithmetic on the platform's own published formula (IQR penalty = min(40, spread × 0.8)), not a new threshold; the refutation trigger is v559's existing `CP_OBS_REFUTE_PP = 1.0`.
+
+The refutation is evidence-driven, not blanket: **Ghana** and **Iraq** (measured spread — nothing to withdraw), **Guyana** and **Bahamas** (one-term basis *corroborated* by their own contract table) and **Saudi Arabia** (state monopoly — no score at all) are all untouched.
+
+**Result.** An analyst asking T4 for any of the 164 uncovered jurisdictions is no longer handed a green HIGH grade defended on a claim the platform contradicts four surfaces away. For the 42 affected they now read the measured contract range, are told the grade is a best case, and are given the bound the platform's own formula puts on it. Norway now reads `≥29.6pp` on **both** Reform Risk and Country Profile — the two surfaces can no longer state opposite bases for one number.
+
+**Verification.** 15 assertions added to `tests/runtime_comprehensive.js` §ReformRisk: 4 refuted countries, 4 must-not-touch countries, a re-arm case (Uzbekistan → Ghana → Uzbekistan), and a cross-surface agreement check that reads the basis off Reform Risk *and* off the Country Profile chip and requires them equal.
+
+- Test **before** (HEAD `index.html` served standalone on :8188): **176 PASS / 10 FAIL / 1 WARN** — including *"FP basis agrees across surfaces: Reform Risk=\"\" vs Country Profile=[\"≥29.6pp obs\",\"≥29.6pp obs\"]"*
+- Test **after** (this build, :8091): **186 PASS / 0 FAIL / 1 WARN**
+- JS errors: 1 on both builds — the known local-harness `sw.js` 404 (the service worker registers the GitHub Pages subpath)
+- JS syntax gate: **PASS, 10/10 blocks**, re-run after the version sweep
+- Playwright **ran this cycle**, both builds, full suite.
+
+**Found on the same walk, not fixed — stated rather than hidden.**
+
+1. `exportReformRiskCSV()` (index.html:33046) writes a **Mechanic** column from `e.mechanic` and a **Source** column from `e.source`. Neither field exists on a `reform_history.json` record — the fields are `mechanic_to`, and source lives only in the per-country API files. **Both columns export empty on all 83 rows.** This is the identical defect class v585 fixed for the Direction column in the same function, two columns away.
+2. Items carried from cycles 504–508, untouched and still open: the FC profile strip's `Life: 30yr` project-life fiction (index.html:36048); `exportFCResults()` writing only `Contractor NPV_50/75` while ranking on the selected price; `renderIOCExposure()` filtering `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows pinning `take_75` to the country value; `nocExcludedCount` always 0; the 2-country `_cmpOrderMark` asymmetry; the Top Contracts per-row `IRR%` column; `window._activePresetName` being a dead global.
+3. The version sweep's site list is still maintained by hand — cycle 508 found an `orca-cite-ver` span 28 versions stale. It should be audited, not patched one span at a time.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** — two existing basis strings were corrected because the evidence refutes what they asserted. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** **No row or column added or removed from any table.** **No published country take, NPV, rank, score, tier colour or pill value was altered, and no threshold was introduced.** v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v554, v559, v569, v572, v583, v585, v588, v598, v601, v602, v603 and all other locks intact. Version sweep **v603 → v604** across 5 structural sites, done silently at the end; it is **not** the deliverable.

@@ -1059,6 +1059,104 @@ async function testReformRisk(page) {
       if (sa.rows === 0 && sa.nocov) p(S, 'lookup event log (uncovered)', 'Saudi Arabia: 0 event rows, no-coverage verdict intact');
       else f(S, 'lookup event log (uncovered)', `Uncovered case wrong: ${JSON.stringify(sa)}`);
 
+      // ── v604 (T4): the verdict card must not assert a basis the platform has withdrawn ──
+      // For the 164 jurisdictions with no sourced reform log, the Fiscal Predictability
+      // Score IS this card's answer, introduced as "What you can defend instead". Its basis
+      // line was read off COUNTRY_DATA p25/p75 and said "one statutory term — spread
+      // component not exercised". ORCA's own api/v1/country/<slug>.json refutes that on 42
+      // countries, and Country Profile has withdrawn the claim there since v559. The two
+      // surfaces must not print opposite bases for the same score.
+      const CONFLICT = [
+        { c: 'Uzbekistan', pp: 55.8, covered: false },
+        { c: 'Thailand',   pp: 36.6, covered: false },
+        { c: 'Georgia',    pp: 40.3, covered: false },
+        { c: 'Norway',     pp: 29.6, covered: true  }
+      ];
+      for (const t of CONFLICT) {
+        await page.selectOption('#rr-country-lookup', t.c);
+        await page.waitForTimeout(1200);
+        const r = await page.evaluate(() => {
+          const basis = document.getElementById('rr-fp-basis');
+          const score = document.getElementById('rr-fp-score');
+          const claim = document.getElementById('rr-fp-claim');
+          return {
+            basis: basis ? basis.innerText : '(missing)',
+            marked: score ? /best case/i.test(score.innerText) : false,
+            claim: claim ? claim.innerText : ''
+          };
+        });
+        const statesFloor = r.basis.indexOf('≥' + t.pp.toFixed(1) + 'pp') > -1;
+        const withdrawn = !/one statutory term/i.test(r.basis)
+                       && !/every one of this country/i.test(r.claim);
+        if (statesFloor && withdrawn && r.marked)
+          p(S, `FP basis refuted (${t.c})`, `basis states ≥${t.pp.toFixed(1)}pp observed, one-term claim withdrawn, score marked best case`);
+        else
+          f(S, `FP basis refuted (${t.c})`,
+            `expected the one-term basis withdrawn and ≥${t.pp.toFixed(1)}pp stated; got basis="${r.basis.slice(0,110)}" marked=${r.marked} claim="${r.claim.slice(0,80)}"`);
+      }
+
+      // The refutation must be evidence-driven, not blanket: a country whose IQR component IS
+      // exercised, and a one-term country its own contract table corroborates, stay untouched.
+      const KEEP = [
+        { c: 'Ghana',   want: /measured spread 14\.6pp/i,                    why: 'measured spread, nothing to withdraw' },
+        { c: 'Iraq',    want: /measured spread 33\.5pp/i,                    why: 'measured spread, nothing to withdraw' },
+        { c: 'Guyana',  want: /one statutory term/i,                          why: 'one-term basis corroborated by its own contract table' },
+        { c: 'Bahamas', want: /one statutory term/i,                          why: 'one-term basis corroborated by its own contract table' }
+      ];
+      for (const t of KEEP) {
+        await page.selectOption('#rr-country-lookup', t.c);
+        await page.waitForTimeout(1200);
+        const r = await page.evaluate(() => {
+          const basis = document.getElementById('rr-fp-basis');
+          const score = document.getElementById('rr-fp-score');
+          return { basis: basis ? basis.innerText : '(missing)',
+                   marked: score ? /best case/i.test(score.innerText) : false };
+        });
+        if (t.want.test(r.basis) && !r.marked) p(S, `FP basis unchanged (${t.c})`, t.why);
+        else f(S, `FP basis unchanged (${t.c})`, `expected ${t.why}; got basis="${r.basis.slice(0,110)}" marked=${r.marked}`);
+      }
+
+      // Re-arm: the refutation must clear when the analyst moves to a clean country and
+      // re-apply on return, or a stale verdict is read against the wrong jurisdiction.
+      await page.selectOption('#rr-country-lookup', 'Uzbekistan');
+      await page.waitForTimeout(1200);
+      const rearm = await page.evaluate(() => {
+        const b = document.getElementById('rr-fp-basis');
+        return b ? b.innerText : '(missing)';
+      });
+      if (rearm.indexOf('≥55.8pp') > -1) p(S, 'FP basis re-arms on reselect', 'Uzbekistan repaints ≥55.8pp after an intervening clean country');
+      else f(S, 'FP basis re-arms on reselect', `expected ≥55.8pp on return; got "${rearm.slice(0,110)}"`);
+
+      // Cross-surface: Reform Risk and Country Profile must state the SAME basis for Norway.
+      await page.selectOption('#rr-country-lookup', 'Norway');
+      await page.waitForTimeout(1200);
+      const rrNorway = await page.evaluate(() => {
+        const b = document.getElementById('rr-fp-basis');
+        return b ? b.innerText : '';
+      });
+      await switchTab(page, 't7');
+      // Earlier sections leave some other country loaded on this tab, so load Norway explicitly.
+      // Country Profile patches its own chip only once fetchCountryContracts() lands, so wait on
+      // the contract sample rather than a fixed timeout.
+      await page.evaluate(() => { if (typeof loadCountryProfile === 'function') loadCountryProfile('Norway'); });
+      try {
+        await page.waitForFunction(
+          () => !!(window._cpObsSpread && window._cpObsSpread['Norway'])
+                && document.querySelectorAll('#dd-content .orca-fp-basis').length > 0,
+          { timeout: 20000 });
+      } catch (e) {}
+      await page.waitForTimeout(1500);
+      const cpNorway = await page.evaluate(() => {
+        const chips = document.querySelectorAll('#dd-content .orca-fp-basis');
+        return Array.from(chips).map(c => c.textContent.trim());
+      });
+      const cpFloor = cpNorway.some(t => t.indexOf('≥29.6pp') > -1);
+      const rrFloor = rrNorway.indexOf('≥29.6pp') > -1;
+      if (cpFloor && rrFloor) p(S, 'FP basis agrees across surfaces', 'Norway reads ≥29.6pp on both Reform Risk and Country Profile');
+      else f(S, 'FP basis agrees across surfaces', `Reform Risk="${rrNorway.slice(0,70)}" vs Country Profile=${JSON.stringify(cpNorway)}`);
+      await switchTab(page, 'treformrisk');
+      await page.waitForTimeout(500);
+
       await page.selectOption('#rr-country-lookup', '');
       await page.waitForTimeout(200);
     } else w(S, 'lookup event log', '#rr-country-lookup not found');
