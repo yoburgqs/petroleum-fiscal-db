@@ -21222,3 +21222,168 @@ sites, done silently at the end; it is **not** the deliverable.
 Section 3 of the Reform Risk tab is the tab's verdict section — two cards, **Quiet Since 2010** and **Actively Reforming**. Their filters are `since2010 <= 1` and `since2010 >= 3`. **Nothing rendered the band between them.**
 
 Six of the 21 jurisdictions ORCA actually holds a reform log for have ex
+
+---
+## Cycle 496 Log — 2026-08-30 02:40
+
+- Test before: 135 PASS / 0 FAIL / 0 WARN (reported)
+- Test after: **135 PASS / 0 FAIL / 1 WARN** — `runtime_comprehensive.js` **RAN this cycle**
+  against the local build at `http://localhost:8899/index.html`, storage cleared. The WARN is
+  the pre-existing local-harness `/petroleum-fiscal-db/sw.js` 404 (the service worker
+  registers the GitHub Pages subpath, which 404s on a root-served local server; correct in
+  production). It is the same WARN v568 and v513 recorded.
+- JS errors: **0 page errors.** 1 console error, the same `sw.js` 404.
+- JS syntax gate: **PASS** (10 blocks / 0 errors).
+- Version: v590 → **v591**, pushed to both repos.
+
+## Task
+
+**T1** — "Which countries should even be on my screening list?"
+
+Rotation: the last seven version commits ran T5, T3, T1, T6, T6, T2, T4. T1 was chosen over
+the staler T5/T3 because the **Breakeven Map** was the one tab this loop had never walked —
+carried as an explicit open item since v568 ("a whole surface built on this axis and was not
+walked this cycle") — and it is a screening surface, which is T1's question.
+
+## Friction
+
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared — from Home
+into the **Breakeven Map**. Home advertises it as *"price resilience by country"*; the
+Reference panel as *"Drag the price slider to see which countries remain economic."*
+
+The tab's verdict is the two cards under the map. The left one was headed
+**"Lowest Breakeven (Most Resilient)"** and its first three rows, read off the live DOM, were:
+
+| | |
+|---|---|
+| Bahrain | **$1.0** |
+| Kuwait | **$1.0** |
+| Saudi Arabia | **$1.0** |
+
+**The three 100%-government-take state monopolies, ranked the three most price-resilient
+countries on earth.** That $1.00 is the DCF floor artifact for a regime in which the
+contractor receives none of the barrel. The platform already knows this and says so
+everywhere else:
+
+- `formatBreakeven()`: `if (val <= 1) return '—'; // sentinel for state-monopoly
+  (Bahrain/Kuwait/Saudi Arabia): no investor perspective`
+- `_beIsTested()` (v513): `return val > 1; // 0 < val <= 1 is the floor artifact, not a
+  breakeven`
+
+Both have been in the file since v513, 83 versions. **The Breakeven Map was the last surface
+still treating $1.00 as a breakeven — and it is the tab whose entire subject is breakeven.**
+The artifact was not confined to the card: `beLookup` fed it to the map fill (green, lowest
+band), the hover tooltip (*"Breakeven: $1.0/bbl"*), the SVG `<title>`, the `data-be` stroke
+logic, the legend counts, the below/above counter, and `exportBreakevenCSV()` — so it left
+the tool, into a spreadsheet, as the cheapest barrel in the database with nothing on screen
+to contradict it.
+
+Beneath the artifacts, the ranking had nothing left to rank. Counted off
+`country_data.json`: **65 countries hold a real modelled breakeven and they occupy 8
+distinct integers, $27 to $34. Forty-three of the 65 are $29 or $30.** The right-hand card,
+**"Highest Breakeven (Most Price-Sensitive)"**, was therefore ranking France ($34) against
+Belgium ($27) — a **$7 spread presented as a resilience verdict**, sitting beside a card
+claiming $1. Two cards, one axis, and between them they asserted a 34× range across a
+dataset whose true range is 1.26×.
+
+Supporting text repeated the same misreading. The intro strip explained the metric with
+*"A country breakeven of $55/bbl means…"* — above every value in the database — and
+instructed the analyst to *"stress-test your portfolio"* with a slider no country can fail.
+
+## Change
+
+**1. `_beIsTested()` now gates the whole tab.** One line at `beLookup` (`_beOK(d.be_75) ?
+d.be_75 : null`) propagates the platform-wide definition to fill, stroke, tooltip, `<title>`,
+`data-be` and the map caption at once; the legend counter, the threshold counter and the CSV
+export were each repointed to it as well. Bahrain, Kuwait and Saudi Arabia now render grey /
+*"No breakeven data"*, exactly as `formatBreakeven()` prints `—` for them on Fiscal Compare
+and Country Profile. Coverage strings **68 → 65** in four places; **No data 117 → 120**.
+
+A second-order gain, unplanned: v579's quintile bands are now derived from **65 real values
+instead of 68 with three outliers at the bottom**, so the cut points move from `[29, 30]` to
+`[29, 30, 31]` and the map paints **four bands (5 / 6 / 9 / 7 countries) where it painted
+three**.
+
+**2. The left card is no longer a leaderboard.** It is the distribution — one row per
+distinct value, with a proportional bar and a live count, built from the data at render so
+it cannot drift. It closes on the fact that kills the leaderboard:
+
+> **65 countries, 8 distinct values, $27–$34/bbl.** The widest gap between any two of them is
+> $7/bbl and 43 of the 65 sit on just two integers ($29 and $30). Breakeven tells you ORCA
+> has modelled a cost structure for these 65 — it does not rank them. The other 120 are
+> blank, which is absence of data, not a low breakeven.
+
+**3. The right card carries the downside axis that is actually measured.** Contractor
+`npv_50 / npv_75` — modelled for **182 of 185** with no untested rows, spanning **−14%
+(Yemen) to +75% (Turkmenistan)**, median 45%. Top 5 and bottom 5, each row clickable and
+keyboard-operable into Country Profile. This is the same axis **v568** rebuilt the Screener's
+*Downside Resilience* preset on after deleting the breakeven ceiling; the two surfaces now
+screen downside on one basis instead of two.
+
+**4. The intro strip** is repointed to the real range and routes downside screening to
+NPV @$50 and the Screener preset. (Text, and stated as such — it accompanies the change
+above rather than being it.)
+
+## Result
+
+An analyst who opens the Breakeven Map to build a low-price-resilient screening list is no
+longer handed **Saudi Arabia, Kuwait and Bahrain** as the answer, and can no longer export
+them to a spreadsheet at $1.00/bbl. The tab now states plainly that breakeven cannot rank
+this database, shows the distribution that proves it, and puts a **measured** downside
+ranking in the slot the false one occupied: Yemen (−14%) and Malaysia (−5%) destroy
+contractor value through a $75 → $50 break; Turkmenistan (75%) and Uzbekistan (74%) keep
+three quarters of it. One click from either card opens the country.
+
+### Verified cold in Playwright, storage cleared
+
+- Saudi Arabia and Kuwait: `fill = var(--border)`, `data-be = ""`, `<title>` carries no
+  breakeven. (Bahrain has no path at 110m resolution — pre-existing.)
+- France: `fill = var(--orange)`, `data-be = 34` — the top band is now reachable.
+- Legend: `<$29 (9) · $29–$30 (26) · $30–$31 (17) · ≥$31 (13) · No data (120)` — **9 + 26 +
+  17 + 13 = 65** ✓, **65 + 120 = 185** ✓.
+- Map caption: **"65 countries with breakeven data"** (was 68).
+- Distribution card renders all **8** buckets; retention card renders **10** rows.
+- Row affordance exercised: clicking Turkmenistan switches to Country Profile with
+  `dd-country-select = Turkmenistan`.
+- `document.scrollWidth == window.innerWidth`; **0** occurrences of `undefined`, `NaN` or
+  `[object` anywhere in the tab's rendered text.
+
+### Found on this walk, not fixed
+
+- **The price marker slider is inert across 18 of its 19 positions.** `min=30 max=120
+  step=5`, and no value exceeds $34. Measured at every position: **$30 → 52 below / 13
+  above; $35 through $120 → 65 below / 0 above, identically.** The tab instructed the
+  analyst to stress-test a portfolio with it. Same defect class v568 removed from the
+  Screener's Max Breakeven ceiling; removing this one, and the `#be-threshold-summary` that
+  exists only to report it, is its own cycle. Left because the honest fix is a removal that
+  should stand alone.
+- **`ISO_MAP` paints 27 of the 65.** It is a hand-maintained ~150-entry id→name lookup and
+  **38 of the countries with a modelled breakeven are absent from it** — Israel, Slovakia,
+  Serbia, Taiwan, Lithuania, Moldova, Malta, Czech Republic, "UAE — Abu Dhabi" among them —
+  so they are grey on the map while the cards below count them. The two surfaces on this tab
+  disagree by 38 countries.
+- Carried and still open: CP **Regional Peers** printing "30 countries in region" then 3 rows
+  then "24 more"; Norway's peer-set mismatch (#30 of 30 vs #17 of 21); the Reform Risk intro
+  strip claiming 185 jurisdictions where the Snapshot beneath it says 21; the Home Reform
+  Risk card repeating that conflation; `Most Frequently Reformed Regimes` sorted on lifetime
+  events against an IC rule keyed to 2010; the Screener Region filter/column vocabulary
+  split; SbS `# Contracts` printing `d.n` raw; the Vintage Sourced Event Log opening
+  oldest-first; CP Evidence Chain printing raw tokens (`EY_IHS_BulkHarvest_2025`).
+
+### STILL LOCKED — nothing touched
+
+**No new FAQ** (still 974). No page-sub paragraph, no amber instructional banner, no routing
+hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener
+advanced filters still collapsed, presets still a dropdown; Home "More tools" still
+collapsed. **No tab added, removed or reordered.** The card grid keeps its two-column shape
+and both element ids (`be-lowest-list`, `be-highest-list`), so the suite's `lowest list`
+assertion holds unchanged. New tooltips appear only on the two cards whose behaviour changed
+this cycle and on the distribution rows that did not previously exist; **no control whose
+behaviour is unchanged gained one**. v430 sessionStorage logic, v449 tier colours + Screener
+row-click hint, v451 two-zone CP headline + Govt NPV removal, v452 rank + vs-median pill,
+v489 Reform Risk in the primary Home grid, v568 breakeven-ceiling removal, v573 retention
+sub-line, v579 quintile bands + CSV BOM + autofilter, v589 CP verdict, v590 Reform Risk
+middle band — all intact. No changelog entry added; the in-page changelog's newest entry
+remains v581, cycles 487–496 having added none, the directive treating changelog catch-up as
+bookkeeping. Version sweep **v590 → v591** across 5 structural sites, done silently at the
+end; it is **not** the deliverable.
