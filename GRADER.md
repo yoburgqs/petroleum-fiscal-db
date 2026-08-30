@@ -20924,3 +20924,134 @@ No new FAQ (still **974**). No new tooltip on any control this cycle did not cha
 **Task: T6** — "Where did this number come from and how solid is the evidence?" (stalest; the last six version commits ran T1, T3, T4, T5, T4, T2)
 
 **Friction.** Walked cold into the two surfaces that exist to answer T6. On **Tuvalu**, the platform answers with every superlative it has: a green pill reading **`100.0% primary law (tier A)`**, a legend reading **`D Default estimate 0.0%`**, and the verdict **`✓ All 2 independently source
+
+## Cycle 494 Log — 2026-08-30 00:52 — v589
+
+- Test before: 135 PASS / 0 FAIL / 1 WARN (known local-harness `sw.js` 404)
+- Test after: 135 PASS / 0 FAIL / 1 WARN — `runtime_comprehensive.js` **ran this
+  cycle** against the local build (`TEST_URL=http://localhost:8099`). The same
+  suite was also run against the **pre-change HEAD** on a second local server
+  (`:8098`) and returned the **identical 135 / 0 / 1**, so the change is
+  regression-free rather than assumed to be.
+- JS errors: 0 on every cold walk. JS syntax gate **PASS** (10 blocks / 0 errors).
+- Shipped as **v589**.
+
+### Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+(493 was T6, 492 T1, 491 T3, 490 T4, 489 T5, 488 T4, 487 T2 — T2 was the stalest
+by six cycles.)
+
+### Friction
+`_quickIcVerdict497` renders directly above the headline strip and is the first
+line an analyst reads on the tab that exists to answer T2. Cold walk, storage
+cleared, Home → Country Profile. It opened with a green ✔ and:
+
+> "Clears the 10% WACC across the price band — contractor NPV $2.7B @$75 and
+> still $1.2B at the $50/bbl downside, at 37.0% govt take."
+
+**Two separate defects in that one line, both measured off live
+`country_data.json`, not inferred.**
+
+**(1) The test has a 98.9% pass rate.** `npv_75 > 0 && npv_50 > 0` is passed by
+**180 of the 182** non-monopoly countries. Only **Malaysia and Yemen** fail.
+**141** of the 180 got the *green* branch, whose only input is `take <= 55`.
+**v516 removed the previous verdict for exactly this property**, and wrote the
+reason into its own code comment: *"that cleared for essentially every country
+and so carried no information."* The replacement reproduced it.
+
+**(2) The two figures cited as corroboration are not independent of the take
+cited beside them.** Contractor NPV is computed on **one fixed standardized
+Deepwater profile** ($1.2B capex / 50k bbl/d / $15/bbl opex) that is identical
+for all 185 countries, so gross revenue is a constant and NPV is close to the
+residual left after government take. Measured: `npv_75` regresses on `take_75`
+at **r² 0.887, slope −$60.6M per point of take**. The analyst read a
+profitability test, a downside stress test and a fiscal-burden reading agreeing
+with one another. They were reading **one number three times**.
+
+The dollar figures then invite a comparison the profile cannot support. Top of
+contractor NPV: **Vanuatu $5.1B · Bahamas $4.7B · Montenegro $4.6B · Greenland
+$4.5B · Faroe Islands $4.5B** — against **Norway $826M** and **Nigeria $302M**.
+The same five jurisdictions **v578** pushed off the Explorer ranking and
+**v580** kept out of Fiscal Compare were still being handed to the analyst, in
+dollars, on the single line that answers T2.
+
+### Change
+1. The line **leads with government take and its tier** — the figure that
+   actually varies — in the platform's own band vocabulary, taken from the
+   Fiscal Compare *Tier* column legend (investor-friendly ≤40% / moderate
+   41–60% / high-take 61–75% / NOC-dominated >75%). **No new threshold.**
+2. **Icon and strip are coloured on that take tier, not on pass/fail**, so the
+   line agrees with the v449 tier-coloured take% cell 40px beneath it instead of
+   asserting an independent green over it. On **Iraq** it correctly colours the
+   *comparable* 34.1% the sentence quotes, with the v552 fee-basis note intact
+   naming the 84.8% headline.
+3. The floor check is **kept, but carries its own base rate**: *"— but so do 180
+   of 182 non-monopoly regimes here"*.
+4. The non-independence is **stated outright**: *"on ORCA's single fixed
+   Deepwater profile contractor NPV tracks govt take at r² 0.89 (≈−$61M per
+   point of take), so these two figures restate the take rather than test it"*,
+   closing **"Defend on the take and its evidence tier (n=… contracts), not on
+   the NPV."** The contract count makes that instruction self-calibrating —
+   Norway **n=7,643**, Vanuatu **n=7** — and is the same figure the headline
+   strip already prints as a chip.
+5. New **`cpFloorBase()`** computes every number at render time off
+   `COUNTRY_DATA`; nothing is written into the prose, so it cannot go stale the
+   way **v575** found the Fiscal Compare mix line had after 42 cycles.
+6. The **rare branch is now worth reading**: Malaysia and Yemen state *"Only 2
+   of 182 non-monopoly regimes in ORCA fail this (Malaysia, Yemen), so unlike
+   the take reading it is genuinely discriminating"*, and gained the take figure
+   and the v552 basis note they had been missing.
+7. The **wrapper tooltip**, which still described the removed test, now says the
+   NPV pair is a floor check rather than a ranking and names Vanuatu, the
+   Bahamas and Montenegro as the head of that ranking.
+
+### Result
+An analyst opening a country at $75/bbl is **no longer told it passed a test
+that 98.9% of the database passes**, and is **no longer invited to read a bigger
+NPV as a better country**. They are given the discriminating figure, its tier,
+how many contracts stand behind it, and an explicit statement of which number
+survives an IC challenge.
+
+### Verification
+Cold Playwright, `sessionStorage` and `localStorage` cleared, viewport 1440×900.
+- `cpFloorBase()` → `n 182 / pass 180 / fail 2 (Malaysia, Yemen) / r² 0.8869 /
+  slope −60.58`.
+- **Sweep of all 185 countries:** 180 tier-glyph lines, 2 price-dependent lines,
+  **3 state monopolies correctly suppressed**; **0** occurrences of `undefined`,
+  `NaN` or `[object`; **0 page errors**.
+- Branch coverage exercised individually on Namibia, Norway, Iraq, Malaysia,
+  Yemen, Vanuatu, Nigeria, USA, Australia, Saudi Arabia.
+- **Layout cost measured, not estimated:** verdict block **33px → 43px**;
+  everything below shifts down **10px** on every country tested.
+
+### Found on this walk, not fixed
+- CP **Regional Peers** prints *"30 countries in region"*, renders 3 rows, then
+  *"24 more countries in region"* — 3 + 24 = 27, not 30.
+- Norway's **Regional Peer Comparison** footer says *"Take rank #30 of 30 in
+  region"* while the headline strip says *"#17 of 21 producers"*. Both are
+  labelled, but the two peer sets are never reconciled on the page.
+- The **headline strip** still shows the raw NPV figure with no indication that
+  it tracks take — only the verdict line above it now says so.
+- Carried and still open: `formatBreakeven()` collapsing all 65 populated values
+  ($27–$34) to `<$50`; the Screener **Region filter vs Region column** vocabulary
+  split; Side-by-Side `# Contracts` printing `d.n` raw; the Vintage Sourced Event
+  Log opening oldest-first; the **Breakeven Map** tab remains unwalked.
+
+### STILL LOCKED — nothing touched
+**No new FAQ** (still 974). **No new tooltip on any control** — one *existing*
+tooltip was corrected because it described a test this cycle changed. No
+page-sub paragraph, no amber instructional banner, no routing hint, no "How to
+read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown; Home "More tools" still
+collapsed; Evidence Quality panel still collapsed by default. **No row and no
+column added or removed from any table.** The v449 headline take% cell, its tier
+colours and the 26px figure are untouched. v430 sessionStorage logic, v451
+two-zone headline + Govt NPV removal, v452 rank + vs-median pill, v489 Reform
+Risk placement, v507/v578 grouping, v552 fee-basis correction, v580 citable
+ranking, v587 Screener sort — all intact. **v550's reform-CTA gate keeps its own
+`take <= 55` threshold**: the new tier bands are a display scale and were
+deliberately not allowed to widen which countries get a reform callout. Tab order
+unchanged. No changelog entry added — the in-page changelog's newest entry is
+v581 and cycles 487–493 also added none; the directive treats changelog catch-up
+as bookkeeping. Version sweep **v588→v589** across 5 structural sites, done
+silently at the end; it is **not** the deliverable.
