@@ -20860,3 +20860,54 @@ silently at the end; it is **not** the deliverable.
 **Task: T1** — "Which countries should even be on my screening list?" (least recent; 491 was T3, 484 was the last T1)
 
 **Friction.** The Screener table is the tool T1 is asked of, and it could not be reordered at all. No clickable header, no button row, no select — its only ordering was NPV-descending inside the evidence-first grouping, decided entirely by which preset you loaded. Meanwhile the global CSS at `index.html:177` gave *ever
+
+---
+## Cycle 493 — v588
+
+**Task: T6** — "Where did this number come from and how solid is the evidence?" (stalest: the last six version commits ran T1, T3, T4, T5, T4, T2.)
+
+**Friction.** Walked cold, `sessionStorage` and `localStorage` cleared, into the two surfaces that exist to answer T6: the *Evidence Quality* panel and *Key Fiscal Parameters — Evidence Chain*. On **Tuvalu** the platform answers the question with **every superlative it has**:
+
+- Pill: **`100.0% primary law (tier A)`**, in green.
+- Legend: **`D Default estimate 0.0%`**.
+- Verdict: **`✓ All 2 independently sourced parameters match the rate stated in the cited source.`**
+
+All three are false, and they are false about the same two facts. Tuvalu's entire fiscal record is **2 facts** (`api/v1/country/tuvalu.json`, `evidence_summary.n_facts = 2`), and both are `confidence: "A"` from one document: **"Pacific Island States Model Petroleum Act CIT 20pct Royalty 8pct (SOPAC Framework)"**. That is a **model act** — a drafting template — and it is the cited source for **nine** jurisdictions: Cook Islands, Kiribati, Marshall Islands, Micronesia, Nauru, Palau, Samoa, Tonga, Tuvalu. Nothing in it was read off Tuvalu's statute book or any Tuvalu contract. By this page's own Methodology definition (`index.html:1548`), tier **D** is "no source found, **mechanic or regional default**" — which is exactly what this is — while tier **A** is "the primary legal instrument itself." It is graded A.
+
+Worse, and this is the part that fails an analyst rather than merely flattering the data: on the Evidence Chain the **ORCA Value** column and the **Statutory (cited source)** column are *the same record printed twice*. The fact IS the citation. Royalty renders `8%` against `8%`, Income Tax `20%` against `20%`, and the tick underneath certifies that they agree. It is confirming nothing. This is precisely the failure **v569** identified for the two EY/IHS bulk harvests — "the same datum printed twice" — one tier up, wearing the best grade instead of the second-worst, and therefore invisible to the exclusion v569 built.
+
+**Measured on the shipped `api/v1/country/*.json`, not inferred:** **17 countries** have *every* sourced parameter coming from a document shared with 1–8 other jurisdictions, and **15 of them display `100.0% primary law (tier A)` with `D 0.0%`**. Nine are the SOPAC template; six are one *France Code Minier 2011 — Overseas Territories* line standing in for French Guiana, French Polynesia, Guadeloupe, Mayotte, New Caledonia and Reunion; two are a single UK Overseas Territory line for Ascension Island and Saint Helena. These are not obscure corners of the ranking — Tuvalu presents as **#38 of 185** on govt take with the verdict *"Highly contractor-favorable — low government take places this in the top tier for IOC capital allocation."* A T1 screen surfaces it; a T6 check was supposed to catch it and instead endorsed it.
+
+**Change.** The v518/v569 bulk treatment is extended to its missing case, using the same vocabulary so the two surfaces cannot drift:
+
+**(a)** `_sharedSourceIndex()` / `_sharedSource()` / `_sharedPct()` are computed **from `COUNTRY_DATA` at runtime**, not hardcoded, so the set tracks the data instead of aging out of it. Like `_bulkPct` it reads only each country's top three sources, so it is a **floor** and is never presented as exact.
+
+**(b)** *Evidence Quality* gains an orange **`N%+ multi-jurisdiction source`** pill beside the existing bulk pill, and the source row carries a **`9 JURISDICTIONS`** chip, muted styling and a muted link — the same visual grammar as `BULK`, so the green `A` beside it can no longer be read as proof the instrument is country-specific.
+
+**(c)** Where a country's *whole* fact base is one shared document, the panel says so outright rather than implying it through a chip: *"All 2 of this country's fiscal facts come from one document that is also the cited source for 8 other jurisdictions… Nothing on this profile was read off a contract or a statute specific to Tuvalu, so the tier letter above grades that regional document, not how well it fits here. Treat the take%, NPV and breakeven on this profile as a regional placeholder."* Gated strictly — exactly one shared source **and** its fact count accounting for the country's entire total — so it cannot fire on a country with real independent evidence.
+
+**(d)** On the Evidence Chain, shared-instrument rows are **excluded from `sourcedCount` and `divergentCount`**, exactly as bulk rows are, and carry their own note naming the instrument and every jurisdiction it stands in for. Tuvalu's verdict goes from **`✓ All 2 independently sourced parameters match`** to **`⚠ No parameter on this table is independently sourced.`**
+
+**No take, NPV, IRR, breakeven, rank or score was altered, no row was removed, and no data file was regenerated.** Every number still renders; what changed is what the screen claims about it.
+
+**Result.** An analyst who asks where Tuvalu's 19.7% government take comes from is now told that its two supporting facts are a Pacific-wide model act shared with eight other states and that nothing on the profile is independently sourced — instead of being shown `100% primary law`, `D 0.0%` and a tick certifying a number against itself.
+
+### Verification
+Cold Playwright, `sessionStorage` and `localStorage` cleared, 1440×900, against the local build. **All 185 profiles swept before and after**, the "before" being a **full repo mirror with only `index.html` swapped** — a partial mirror was tried first and silently fell into a different, collapsed render path, which would have produced a fabricated 184-country diff. Corrected before use; the numbers below come from the full mirror.
+
+- **17 countries changed. 168 byte-identical.** The 17 match the API measurement exactly, by name.
+- All 17 flipped `✓ All 2 independently sourced parameters match` → `⚠ No parameter on this table is independently sourced`, and all 17 gained the pill. **No country was flagged without its verdict changing, and none changed without being flagged.**
+- **Chain row-count drift across all 185: 0.** No parameter row was added, removed or reordered.
+- Controls re-read in full and unchanged: **Norway** (`✓ All 3`), **Guyana** (`✓ All 5`), **Nigeria** (`⚠ 3 of 4` + the v569 bulk note on FTP Rate and Special Tax), **Suriname** (`✓ All 3` + bulk note on State Participation).
+- **0 page errors** on both builds across all 185.
+- JS syntax gate **PASS** (10 blocks / 0 errors).
+- JS syntax gate **PASS** (10 blocks / 0 errors).
+- `runtime_comprehensive.js` **ran this cycle** against the local build (`TEST_URL=http://localhost:8099`, not the production default): **135 PASS / 0 FAIL / 1 WARN**. The WARN is the `sw.js` 404 and was traced to source rather than carried forward from a prior log: `index.html:49` registers the service worker at the hardcoded Pages path `/petroleum-fiscal-db/sw.js`, which does not resolve under a localhost document root — `sw.js` itself returns **200** at `/sw.js`. It is a harness path artifact, independent of this change and absent on the deployed site.
+
+### Found on this walk, not fixed
+- **Iraq-Kurdistan cites a federal Iraq source.** *State Participation 15%* is sourced to *"Iraq Technical Service Contracts (TSC) — Federal Government (Ministry of Oil)"*, shared with Iraq — and the KRG does not operate under federal TSCs. This cycle's detector **did not catch it**, because that source is not in Iraq-Kurdistan's top three and the index only reads the top three. The floor is documented in the code, but this is the first case where it demonstrably matters.
+- `api/v1/country/tuvalu.json` carries `"region": "Unknown"` in `meta` while `COUNTRY_DATA` files it under a real region — the two disagree.
+- Carried and still open: the Screener **Region filter and Region column use different vocabularies** (Kazakhstan and Azerbaijan reachable only under "Other"); Side-by-Side `# Contracts` prints `d.n` raw while every other count is `toLocaleString()`d; the Vintage Sourced Event Log still opens oldest-first; `formatBreakeven()` still collapses populated values to `<$50`; the **Breakeven Map** tab remains unwalked.
+
+### STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on any control this cycle did not change — every tooltip added here belongs to a chip or cell this cycle created. No page-sub paragraph, no amber instructional banner, no routing hint, no "How to read" block, no SbS card wrapper, no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. The Evidence Quality panel **still renders collapsed by default** — v371/v373 declutter intact. v430 sessionStorage logic, v449/v451/v452 CP headline, the v451 Govt NPV removal, v489 Reform Risk placement, v507 Screener grouping, v587 Screener sort — all intact. Tab order unchanged. Version sweep v587→v588 across 5 structural sites, done silently at the end; it is **not** the deliverable.

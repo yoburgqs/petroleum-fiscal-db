@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v587</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v588</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1399,7 +1399,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v587</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v588</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1469,7 +1469,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v587</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v588</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1811,7 +1811,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v587';
+  return m ? m[0] : 'v588';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1886,7 +1886,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v587');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v588');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -22843,6 +22843,56 @@ function _bulkPct(entry) {
 }
 window._bulkPct = _bulkPct;
 
+// v588 (T6) — a source cited for MORE THAN ONE jurisdiction is a country-level assignment, not a
+// citation read off this country's own law. v518/v569 established this for the two EY/IHS bulk
+// harvests; the same failure exists one tier up, wearing the platform's BEST grade. Measured on
+// the shipped api/v1/country files: 17 countries have EVERY sourced parameter coming from a
+// document shared with 1-8 other jurisdictions, and 15 of them display "100.0% primary law
+// (tier A) / D 0.0%". Nine Pacific states (Cook Islands, Kiribati, Marshall Islands, Micronesia,
+// Nauru, Palau, Samoa, Tonga, Tuvalu) all cite one "Pacific Island States MODEL Petroleum Act
+// (SOPAC Framework)" — a template, not any of their enacted statutes; six French territories all
+// cite one Code Minier line. For those countries the fact IS the citation: Tuvalu holds 2 facts
+// total, both from that model act, so the Evidence Chain's ORCA Value and Statutory columns are
+// one record printed twice and the tick confirming they match is confirming nothing.
+// The index is computed from COUNTRY_DATA at runtime rather than hardcoded, so it tracks the data
+// instead of drifting from it. It counts only sources that appear in a country's top three, so
+// like _bulkPct it is a FLOOR and is never presented as exact.
+let _sharedSrcIdx = null;
+function _sharedSourceIndex() {
+  if (_sharedSrcIdx) return _sharedSrcIdx;
+  if (typeof COUNTRY_DATA === 'undefined' || !Array.isArray(COUNTRY_DATA) || !COUNTRY_DATA.length) return {};
+  const idx = {};
+  COUNTRY_DATA.forEach(c => (c.top_sources || []).forEach(sc => {
+    if (!sc || !sc.name || _isBulkSource(sc.name)) return;
+    if (!idx[sc.name]) idx[sc.name] = [];
+    if (idx[sc.name].indexOf(c.country) === -1) idx[sc.name].push(c.country);
+  }));
+  Object.keys(idx).forEach(k => { if (idx[k].length < 2) { delete idx[k]; } else { idx[k].sort(); } });
+  _sharedSrcIdx = idx;
+  return idx;
+}
+// Returns the sorted list of jurisdictions citing this source, or null when it is this country's own.
+function _sharedSource(name) {
+  const idx = _sharedSourceIndex();
+  return (name && idx[name]) ? idx[name] : null;
+}
+// Share of a country's facts traceable to a multi-jurisdiction source. Floor, not a total.
+function _sharedPct(entry) {
+  const nf = entry && entry.n_facts;
+  if (!nf) return 0;
+  const sh = (entry.top_sources || []).reduce((t, sc) => t + (_sharedSource(sc.name) ? (sc.n || 0) : 0), 0);
+  return Math.min(100, sh / nf * 100);
+}
+window._sharedPct = _sharedPct;
+// v588 (T6): source names and jurisdiction lists are free text out of the data files and land in
+// title="" attributes on both evidence surfaces. Escaped once, in one place.
+function _cpEsc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+window._sharedSource = _sharedSource;
+
 function buildEvidenceTooltip(entry) {
   const a = (entry.a_pct || 0).toFixed(1);
   const b = (entry.b_pct || 0).toFixed(1);
@@ -22875,7 +22925,18 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
   // rendered "3.8% primary law (tier A)" in full green. Coloured by the grade it is reporting.
   const color = _evidenceGrade(entry).color;
   const _bulk = _bulkPct(entry);
+  const _shared = _sharedPct(entry);
   const srcs = (entry.top_sources || []);
+  // v588 (T6): the case that has to be stated outright, not implied by a chip - the country's
+  // ENTIRE fact base is one document that also stands in for other jurisdictions. 15 countries
+  // are in this state while rendering "100.0% primary law (tier A)" and "D 0.0%".
+  const _soleShared = (function() {
+    const cand = srcs.filter(sc => !_isBulkSource(sc.name) && _sharedSource(sc.name));
+    if (cand.length !== 1 || !entry.n_facts) return null;
+    if ((cand[0].n || 0) < entry.n_facts) return null;
+    const others = _sharedSource(cand[0].name).filter(c => c !== entry.country);
+    return others.length ? { src: cand[0], others: others } : null;
+  })();
   // v518 (T6) — a source row was rendered identically whether it was Norway's Petroleumsskatteloven
   // or the EY/IHS bulk harvest: same styling, and the same link title, "Open primary source". Both
   // bulk entries point at https://taxsummaries.pwc.com/allcountries — a third firm's index of every
@@ -22886,16 +22947,27 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
   // Country Profile per-parameter Evidence Chain table.
   const srcHtml = srcs.map(s => {
     const isBulk  = _isBulkSource(s.name);
+    // v588 (T6): the same document cited for several jurisdictions is a regional assignment, not
+    // this country's law. Labelled here so the tier letter beside it cannot be read as proof the
+    // instrument is country-specific.
+    const shareList = isBulk ? null : _sharedSource(s.name);
     const display = _BULK_LABEL[s.name] || s.name;
+    const shareTip = shareList
+      ? _cpEsc('This document is the cited source for ' + shareList.length + ' jurisdictions \u2014 '
+        + shareList.join(', ') + '. It is a regional instrument applied across all of them, not a text '
+        + 'read off this country\u2019s own statute book or its individual contracts, so its tier letter '
+        + 'describes the document, not how specific it is to this country.')
+      : '';
     const linkTitle = isBulk
       ? 'Country-level bulk harvest — this link opens the PwC Worldwide Tax Summaries country index, not a citation for any single parameter. Verify the specific rate against the country\u2019s own petroleum act before an IC memo.'
-      : 'Open the cited source document';
+      : (shareList ? shareTip : 'Open the cited source document');
     const nameEl = s.url
-      ? `<a href="${s.url}" target="_blank" rel="noopener" style="font-size:11px;color:${isBulk ? 'var(--muted)' : 'var(--accent)'};text-decoration:none;" title="${linkTitle}">${display} \u2197</a>`
+      ? `<a href="${s.url}" target="_blank" rel="noopener" style="font-size:11px;color:${(isBulk || shareList) ? 'var(--muted)' : 'var(--accent)'};text-decoration:none;" title="${linkTitle}">${display} \u2197</a>`
       : `<span style="font-size:11px;color:var(--text);">${display}</span>`;
-    return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);${isBulk ? 'opacity:.82;' : ''}">
+    return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);${(isBulk || shareList) ? 'opacity:.82;' : ''}">
       <span style="background:${s.tier==='A'?'var(--green)':s.tier==='B'?'rgba(21,128,61,0.68)':'var(--orange)'};color:#fff;font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;">${s.tier||'?'}</span>
       ${isBulk ? '<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;" title="Assigned at country level, not verified against this country\u2019s individual contracts.">BULK</span>' : ''}
+      ${shareList ? `<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;" title="${shareTip}">${shareList.length} JURISDICTIONS</span>` : ''}
       ${nameEl}
       <span style="font-size:10px;color:var(--muted);margin-left:auto;">${s.n} facts</span>
     </div>`;
@@ -22907,6 +22979,7 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
       <span style="font-size:12px;font-weight:700;color:var(--text);">Evidence Quality</span>
       <span style="background:${color}22;border:1px solid ${color};color:${color};font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="Share of this country's fiscal facts read out of the primary legal instrument — petroleum act, gazette, finance act or PSC text.">${a}% primary law (tier A)</span>
       ${_bulk > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts came from the EY / IHS / KPMG bulk harvest, which is assigned at country level rather than verified against each individual contract. Counted from the top sources listed below, so the true figure may be higher.">${_bulk.toFixed(0)}%+ bulk-harvested</span>` : ''}
+      ${_shared > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts trace to a document that is also the cited source for other jurisdictions - a regional instrument applied across a group, not a text read off this country's own statute or its individual contracts. Counted from the top sources listed below, so the true figure may be higher.">${_shared.toFixed(0)}%+ multi-jurisdiction source</span>` : ''}
       <span style="margin-left:auto;font-size:10px;color:var(--muted);">sources ▸</span>
     </summary>
     <div style="padding:0 12px 12px;">
@@ -22922,7 +22995,9 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
         <span title="Industry reference, cross-checked: IOC annual reports, sector research, OPEC Annual Statistical Bulletin."><span style="color:var(--yellow);font-weight:700;">C</span> Industry ref. ${c}%</span>
         <span title="No source found — value derived from a regional average or a mechanic default."><span style="color:var(--orange);font-weight:700;">D</span> Default estimate ${d}%</span>
       </div>
-      ${dqBadgeHtml ? `<div class="dq-info-banner" style="margin-bottom:8px;">${dqBadgeHtml}<span style="font-size:11px;color:var(--muted);">${dqExplain||''}</span></div>` : ''}      ${srcs.length ? `<div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-weight:600;">Key sources:</div>${srcHtml}` : ''}
+      ${dqBadgeHtml ? `<div class="dq-info-banner" style="margin-bottom:8px;">${dqBadgeHtml}<span style="font-size:11px;color:var(--muted);">${dqExplain||''}</span></div>` : ''}
+      ${_soleShared ? `<div style="margin-bottom:8px;background:rgba(194,65,12,.05);border:1px solid rgba(194,65,12,.22);border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;"><strong style="color:var(--text);">All ${(entry.n_facts||0).toLocaleString()} of this country&rsquo;s fiscal facts come from one document that is also the cited source for ${_soleShared.others.length} other jurisdiction${_soleShared.others.length===1?'':'s'}.</strong> ${_cpEsc(_BULK_LABEL[_soleShared.src.name] || _soleShared.src.name)} &mdash; also cited for ${_cpEsc(_soleShared.others.join(', '))}. Nothing on this profile was read off a contract or a statute specific to ${_cpEsc(entry.country || 'this country')}, so the tier letter above grades that regional document, not how well it fits here. <strong style="color:var(--text);">Treat the take%, NPV and breakeven on this profile as a regional placeholder and verify against ${_cpEsc(entry.country || 'the country')}&rsquo;s own petroleum act before an IC memo.</strong></div>` : ''}
+      ${srcs.length ? `<div style="font-size:10px;color:var(--muted);margin-bottom:4px;font-weight:600;">Key sources:</div>${srcHtml}` : ''}
     </div>
   </details>`;
 }
@@ -27588,6 +27663,10 @@ function renderReformTimeline(country) {
     let sourcedCount = 0;     // v500: rows that carry an INDEPENDENT statutory value (v569: bulk excluded)
     let bulkCount = 0;        // v569: rows whose only "source" is the country-level bulk harvest
     let bulkLabels = [];      // v569: which parameters those are, named on screen
+    let sharedCount = 0;      // v588: rows sourced to a document shared with other jurisdictions
+    let sharedLabels = [];    // v588: which parameters those are, named on screen
+    let sharedSrcName = '';   // v588: the instrument itself
+    let sharedOthers = [];    // v588: the other jurisdictions it also stands in for
 
     // v500: API source strings are free text — escape before they reach title="" or innerHTML
     const _esc = function(s) {
@@ -27630,10 +27709,22 @@ function renderReformTimeline(country) {
           // Evidence Quality panel above has applied since v518.
           const isBulk = (conf !== 'd') && (typeof _isBulkSource === 'function')
                           && _isBulkSource(String(srcMeta.source || ''));
+          // v588 (T6): same argument as the bulk exclusion, one tier up. A document cited for
+          // several jurisdictions populated BOTH columns of this row, so their agreement is the
+          // same record printed twice. Tuvalu holds 2 facts, both from the SOPAC model act, and
+          // this table ticked "All 2 independently sourced parameters match".
+          const _shareOf = (conf !== 'd' && !isBulk && typeof _sharedSource === 'function')
+                          ? _sharedSource(String(srcMeta.source || '')) : null;
+          const isShared = !!_shareOf;
           const srcLabel = conf === 'd'
             ? 'Estimated default'
             : (isBulk ? (_BULK_LABEL[srcMeta.source] || srcMeta.source)
                       : (srcMeta.source ? srcMeta.source : 'Primary Law'));
+          const _sharedChip = function(n, tip) {
+            return '<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);'
+              + 'color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
+              + 'letter-spacing:.04em;cursor:help;" title="' + tip + '">' + n + ' JURISDICTIONS</span>';
+          };
           const _bulkChip = function(tip) {
             return '<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);'
               + 'color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
@@ -27673,6 +27764,19 @@ function renderReformTimeline(country) {
               + ' Verify this rate against the country\u2019s own petroleum act before an IC memo.');
             statHtml = '<span style="' + _mono + 'color:var(--muted);" title="' + bTip + '">'
               + _fmtPct(srcVal) + '</span> ' + _bulkChip(bTip);
+          } else if (srcVal != null && isShared) {
+            sharedCount++;
+            sharedLabels.push(label);
+            sharedSrcName = String(srcMeta.source || '');
+            sharedOthers = _shareOf.slice();
+            const sTip = _esc(label + ': this is a regional instrument, not a citation specific to '
+              + 'this country. The same document \u2014 ' + sharedSrcName + ' \u2014 is the cited source for '
+              + _shareOf.length + ' jurisdictions (' + _shareOf.join(', ') + '). It is the record that '
+              + 'populated the ORCA Value as well, so agreement between these two columns is self-agreement, '
+              + 'not independent corroboration, and it is excluded from the match count below. '
+              + 'Verify this rate against this country\u2019s own petroleum act before an IC memo.');
+            statHtml = '<span style="' + _mono + 'color:var(--muted);" title="' + sTip + '">'
+              + _fmtPct(srcVal) + '</span> ' + _sharedChip(_shareOf.length, sTip);
           } else if (srcVal != null) {
             sourcedCount++;
             isDivergent = numVal != null &&
@@ -27697,9 +27801,20 @@ function renderReformTimeline(country) {
             + 'the PwC Worldwide Tax Summaries index, a third firm\u2019s list of every country on earth, '
             + 'not a citation for this parameter. Verify the rate against this country\u2019s own petroleum '
             + 'act before you cite it in an IC memo.');
-          const badgeTip = isBulk ? bulkBadgeTip : (_esc(srcLabel) + ' &middot; ' + confTierExplain);
-          const bulkPre = isBulk ? _bulkChip(bulkBadgeTip) + ' ' : '';
-          const bulkSty = isBulk ? 'opacity:.85;' : '';
+          // v588 (T6): a shared regional instrument keeps its (real) name and its (real) tier, but
+          // the badge now says on its face how many jurisdictions it stands in for.
+          const sharedBadgeTip = isShared
+            ? _esc('Regional instrument \u2014 this same document is the cited source for '
+                + _shareOf.length + ' jurisdictions (' + _shareOf.join(', ') + '), not a text read off '
+                + 'this country\u2019s own statute book or its individual contracts. Its tier letter grades '
+                + 'the document; it does not mean the rate was verified for this country. Verify against '
+                + 'this country\u2019s own petroleum act before you cite it in an IC memo.')
+            : '';
+          const badgeTip = isBulk ? bulkBadgeTip
+            : (isShared ? sharedBadgeTip : (_esc(srcLabel) + ' &middot; ' + confTierExplain));
+          const bulkPre = isBulk ? _bulkChip(bulkBadgeTip) + ' '
+            : (isShared ? _sharedChip(_shareOf.length, sharedBadgeTip) + ' ' : '');
+          const bulkSty = (isBulk || isShared) ? 'opacity:.85;' : '';
           // D-confidence: never link to the circular self-referential URL
           if (conf === 'd') {
             badgeHtml = `<span class="source-badge conf-d" title="${dTooltip}">${dIcon}Estimated default · D</span>`;
@@ -27757,6 +27872,20 @@ function renderReformTimeline(country) {
         + (bulkCount === 1 ? 'it' : 'them') + ' in an IC memo.</strong>'
         + '</div>'
       : '';
+    // v588 (T6): the shared-instrument counterpart of the v569 bulk note.
+    const _sharedNote = sharedCount > 0
+      ? '<div style="margin-top:8px;background:rgba(194,65,12,.05);border:1px solid rgba(194,65,12,.22);border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
+        + '<strong style="color:var(--text);">' + sharedCount + ' parameter' + _pl(sharedCount)
+        + ' (' + sharedLabels.join(', ') + ') ' + (sharedCount === 1 ? 'is' : 'are') + ' sourced to a document shared with '
+        + (sharedOthers.length - 1) + ' other jurisdiction' + _pl(sharedOthers.length - 1) + '.</strong> '
+        + _esc(sharedSrcName) + ' is the cited source for ' + sharedOthers.length + ' jurisdictions ('
+        + _esc(sharedOthers.join(', ')) + '), so it is a regional instrument rather than a text read off this '
+        + 'country\u2019s own statute book. It is also the record that populated the ORCA Value column, which makes '
+        + 'the two columns agreeing self-agreement rather than corroboration, and it is excluded from the count above. '
+        + '<strong style="color:var(--text);">Verify against this country\u2019s own petroleum act before quoting '
+        + (sharedCount === 1 ? 'it' : 'them') + ' in an IC memo.</strong>'
+        + '</div>'
+      : '';
     const _mainNote = divergentCount > 0
       ? '<div style="margin-top:8px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
         + '<strong style="color:var(--text);">⚠ ' + divergentCount + ' of ' + sourcedCount + ' independently sourced parameter' + _pl(sourcedCount) + ' differ from the statutory rate.</strong> '
@@ -27766,10 +27895,10 @@ function renderReformTimeline(country) {
         + '</div>'
       : (sourcedCount > 0
         ? '<div style="margin-top:8px;font-size:11px;color:var(--muted);">✓ ' + (sourcedCount === 1 ? 'The 1 independently sourced parameter matches' : 'All ' + sourcedCount + ' independently sourced parameters match') + ' the rate stated in the cited source.</div>'
-        : (bulkCount > 0
+        : ((bulkCount > 0 || sharedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
-    const reconNote = _mainNote + _bulkNote;
+    const reconNote = _mainNote + _bulkNote + _sharedNote;
 
     // v500: Parameter | ORCA Value | Statutory (cited source) | Source
     // Previously the Source badge sat next to the contract average and read as though the primary
