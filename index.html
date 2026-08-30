@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v585</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v586</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1393,7 +1393,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v585</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v586</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1463,7 +1463,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v585</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v586</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1805,7 +1805,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v585';
+  return m ? m[0] : 'v586';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1880,7 +1880,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v585');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v586');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2428,13 +2428,13 @@ window.copyPlatformCitation = function(btn) {
     <span style="margin-left:auto;font-size:10px;color:var(--muted);font-style:italic;">Same basis as Fiscal Compare — values are directly comparable</span>
   </div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;position:relative;">
-      <input type="text" class="search-input" id="cmp-search" placeholder="Type to search countries…" aria-label="Search countries to compare side-by-side" autocomplete="off" inputmode="search" spellcheck="false" style="width:260px;">
+      <input type="text" class="search-input" id="cmp-search" placeholder="Type a country, press Enter…" aria-label="Search countries to compare side-by-side" autocomplete="off" inputmode="search" spellcheck="false" style="width:260px;">
       <div id="cmp-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       <button class="btn btn-outline btn-sm" id="cmp-clear-btn" aria-label="Clear all selected countries from side-by-side comparison">Clear</button>
       <button class="btn btn-outline btn-sm" id="cmp-print-btn" title="Print/export comparison as PDF" aria-label="Export comparison as PDF via browser print">⬇ Export PDF</button>
       <button class="btn btn-outline btn-sm" id="cmp-share-btn" title="Copy shareable link to this comparison">⎘ Share Link</button>
       <button class="btn btn-outline btn-sm" id="cmp-copy-table-btn" title="Copy this comparison to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Includes the profile/price assumptions and the ORCA source line. Identical to the button under the grid." aria-label="Copy comparison table for IC memo">&#9112; Copy for IC Memo</button>
-      <div id="cmp-dropdown" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:220px;overflow-y:auto;width:260px;z-index:100;margin-top:4px;top:100%;left:0;"></div>
+      <div id="cmp-dropdown" role="listbox" aria-label="Country search results" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow-y:auto;width:340px;z-index:100;margin-top:4px;top:100%;left:0;box-shadow:0 6px 20px rgba(0,0,0,.12);"></div>
   </div>
 
   <div id="cmp-output" class="empty-state">
@@ -24315,21 +24315,237 @@ let cmpChart = null;
 const cmpSearch = document.getElementById('cmp-search');
 const cmpDrop   = document.getElementById('cmp-dropdown');
 
-cmpSearch.addEventListener('input', () => {
-  const q = cmpSearch.value.toLowerCase().trim();
-  if (!q) { cmpDrop.style.display='none'; return; }
-  const matches = COUNTRY_DATA.filter(d => d.country.toLowerCase().includes(q)).slice(0,12);
-  if (!matches.length) { cmpDrop.style.display='none'; return; }
-  cmpDrop.innerHTML = matches.map(d =>
-    `<div onclick="addCompare('${d.country.replace(/'/g,"\\'")}');cmpSearch.value='';cmpDrop.style.display='none';"
-      style="padding:8px 14px;cursor:pointer;border-bottom:1px solid var(--border);"
-      onmouseover="this.style.background='rgba(79,142,247,.1)'" onmouseout="this.style.background=''">${d.country}</div>`
-  ).join('');
-  cmpDrop.style.display='block';
+/* v586 (T3) — "how do these three countries compare side by side?"
+   ─────────────────────────────────────────────────────────────────────────────
+   This box is the only way an analyst puts THEIR OWN three countries on this tab.
+   The cold load seeds Norway / United Kingdom / Netherlands as an example; anyone
+   who came to compare a different set has to type here, three times. It was a bare
+   `includes(q)` substring filter with a single `input` listener and nothing else:
+
+     1. NO KEYBOARD. There was no keydown handler at all, and the option <div>s had
+        no tabindex and no role. Typing "Guyana" narrowed the list to exactly one
+        row and Enter did nothing — no add, no close, the text still sitting in the
+        box. ArrowDown did nothing. Escape did nothing. Tab skipped the list. The
+        only way to add a country was to leave the keyboard and click, on a control
+        whose entire purpose is to be typed into, three times in a row. Focus was
+        also dropped on the click, so the next country meant clicking back first.
+
+     2. "UK" RETURNED UKRAINE — AND ONLY UKRAINE. Substring matching on the
+        canonical name means the commonest abbreviation in North Sea work resolves
+        to the wrong country and hides the right one: "united kingdom" does not
+        contain the letters "uk". The single row on screen was a real country with
+        a real fiscal regime, so nothing looked broken. Measured against
+        country_data.json, these all returned ZERO rows: ksa, png, holland,
+        ivory coast, drc, emirates, united states, persian gulf, burma, turkiye,
+        and every ordinary typo (nigera, norwya).
+
+     3. NO-MATCH WAS SILENT. On zero matches the handler ran
+        `cmpDrop.style.display='none'` and returned. The dropdown simply vanished —
+        visually identical to the box being idle — so "Holland" and "Nigera" both
+        read as "this country is not in ORCA's 185." Both are.
+
+   The platform already solves all three ~2,500 lines away in the Ctrl+K global
+   search (renderSearchResults): an alias map, a Levenshtein "Did you mean?"
+   fallback, an explicit no-results panel and arrow-key focus. Side-by-Side — the
+   tab where the comparison is actually built — had none of it. Rather than write a
+   second alias table that will drift from the first, ORCA_ALIASES is defined once
+   here and read by both. Its canonical values are checked against COUNTRY_DATA at
+   render time, so an alias pointing at a name this database does not use is
+   ignored instead of silently emptying the list — which is what the global map's
+   'usa' -> 'united states' entry did (COUNTRY_DATA calls it "USA"; that lookup has
+   matched nothing since it was added, and only the raw-substring leg saved it).
+
+   Every alias below is a name for a country in this dataset — no basin, operator
+   or business-logic mapping is invented. */
+window.ORCA_ALIASES = {
+  'uk':'united kingdom', 'u.k.':'united kingdom', 'gb':'united kingdom',
+  'britain':'united kingdom', 'great britain':'united kingdom', 'england':'united kingdom',
+  'scotland':'united kingdom',
+  'us':'usa', 'u.s.':'usa', 'united states':'usa', 'united states of america':'usa',
+  'america':'usa',
+  'uae':'uae', 'emirates':'uae', 'united arab emirates':'uae',
+  'ksa':'saudi arabia', 'saudi':'saudi arabia',
+  'drc':'democratic republic of the congo', 'congo-kinshasa':'democratic republic of the congo',
+  'congo kinshasa':'democratic republic of the congo',
+  'congo-brazzaville':'republic of the congo', 'congo brazzaville':'republic of the congo',
+  'png':'papua new guinea',
+  'holland':'netherlands', 'dutch':'netherlands',
+  'ivory coast':"cote d'ivoire", 'cote divoire':"cote d'ivoire",
+  "côte d'ivoire":"cote d'ivoire", "côte d’ivoire":"cote d'ivoire",
+  'trinidad':'trinidad and tobago', 't&t':'trinidad and tobago',
+  'burma':'myanmar',
+  'turkiye':'turkey', 'türkiye':'turkey',
+  'krg':'iraq-kurdistan', 'kurdistan':'iraq-kurdistan',
+  'czechia':'czech republic',
+  'korea':'south korea', 'rok':'south korea',
+  'kz':'kazakhstan'
+};
+/* Resolve an alias only if it names a country this database actually holds. */
+function _cmpExpand(q) {
+  var a = window.ORCA_ALIASES[q];
+  if (!a) return null;
+  if (!window.COUNTRY_DATA) return null;
+  for (var i = 0; i < COUNTRY_DATA.length; i++) {
+    if (COUNTRY_DATA[i].country.toLowerCase().indexOf(a) === 0
+     || COUNTRY_DATA[i].country.toLowerCase() === a) return a;
+  }
+  return null;
+}
+function _cmpLev(a, b) {
+  var m = a.length, n = b.length, i, j, dp = [];
+  for (i = 0; i <= m; i++) dp[i] = [i];
+  for (j = 0; j <= n; j++) dp[0][j] = j;
+  for (i = 1; i <= m; i++) for (j = 1; j <= n; j++)
+    dp[i][j] = (a[i-1] === b[j-1]) ? dp[i-1][j-1]
+             : 1 + Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]);
+  return dp[m][n];
+}
+/* Same 0.55 threshold and same 4-result cap the Ctrl+K "Did you mean?" already uses. */
+function _cmpFuzzy(q) {
+  return COUNTRY_DATA.map(function(d) {
+      var s = d.country.toLowerCase();
+      return { d: d, score: 1 - _cmpLev(q, s) / Math.max(q.length, s.length) };
+    }).filter(function(x) { return x.score >= 0.55; })
+      .sort(function(a, b) { return b.score - a.score; })
+      .slice(0, 4);
+}
+var _cmpOpts = [];      // country names currently rendered, in order
+var _cmpFocus = -1;     // index of the highlighted option; Enter adds this one
+
+function _cmpPaintFocus() {
+  var els = cmpDrop.querySelectorAll('.cmp-opt');
+  for (var i = 0; i < els.length; i++) {
+    var on = (i === _cmpFocus);
+    els[i].style.background = on ? 'rgba(176,104,0,.14)' : '';
+    els[i].setAttribute('aria-selected', on ? 'true' : 'false');
+    if (on) {
+      cmpSearch.setAttribute('aria-activedescendant', els[i].id);
+      if (els[i].scrollIntoView) els[i].scrollIntoView({ block: 'nearest' });
+    }
+  }
+  if (_cmpFocus < 0) cmpSearch.removeAttribute('aria-activedescendant');
+}
+function _cmpCloseDrop() {
+  cmpDrop.style.display = 'none';
+  cmpDrop.innerHTML = '';
+  _cmpOpts = []; _cmpFocus = -1;
+  cmpSearch.removeAttribute('aria-activedescendant');
+  cmpSearch.setAttribute('aria-expanded', 'false');
+}
+/* Adds and leaves the caret in the box, so three countries is three typed names
+   rather than type-click-click-type-click-click. */
+function _cmpPick(name) {
+  addCompare(name);
+  cmpSearch.value = '';
+  _cmpCloseDrop();
+  cmpSearch.focus();
+}
+function _cmpOptHTML(d, i, hint) {
+  var already = compareList.indexOf(d.country) !== -1;
+  var take = (d.take_75 != null && typeof isStateMonopoly === 'function' && !isStateMonopoly(d.take_75))
+    ? d.take_75.toFixed(1) + '% take' : (d.take_75 != null ? 'state monopoly' : '');
+  return '<div class="cmp-opt" id="cmp-opt-' + i + '" role="option" aria-selected="false"'
+    + ' data-country="' + d.country.replace(/"/g, '&quot;') + '"'
+    + ' style="padding:7px 12px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;'
+    + 'align-items:baseline;gap:8px;' + (already ? 'opacity:.55;' : '') + '">'
+    + '<span style="font-size:12px;color:var(--text);font-weight:600;">' + d.country + '</span>'
+    + '<span style="font-size:10px;color:var(--muted);">' + (d.region || '') + '</span>'
+    + '<span style="margin-left:auto;font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;">'
+    + (already ? 'in comparison' : take) + '</span>'
+    + (hint ? '<span style="font-size:10px;color:var(--accent);">' + hint + '</span>' : '')
+    + '</div>';
+}
+cmpSearch.setAttribute('role', 'combobox');
+cmpSearch.setAttribute('aria-autocomplete', 'list');
+cmpSearch.setAttribute('aria-controls', 'cmp-dropdown');
+cmpSearch.setAttribute('aria-expanded', 'false');
+
+function _cmpRenderDrop() {
+  var raw = cmpSearch.value.toLowerCase().trim();
+  if (!raw) { _cmpCloseDrop(); return; }
+  var exp = _cmpExpand(raw);
+  var seen = {}, matches = [];
+  COUNTRY_DATA.forEach(function(d) {
+    var s = d.country.toLowerCase();
+    if ((exp && s.indexOf(exp) !== -1) || s.indexOf(raw) !== -1) {
+      if (!seen[d.country]) { seen[d.country] = 1; matches.push(d); }
+    }
+  });
+  // An expanded alias is the analyst's actual intent — "uk" must not rank Ukraine
+  // above United Kingdom just because Ukraine also contains the raw letters.
+  if (exp) matches.sort(function(a, b) {
+    var A = a.country.toLowerCase().indexOf(exp) !== -1 ? 0 : 1;
+    var B = b.country.toLowerCase().indexOf(exp) !== -1 ? 0 : 1;
+    return A - B;
+  });
+  matches = matches.slice(0, 12);
+
+  var html = '', hdr = '';
+  if (matches.length) {
+    if (exp && exp !== raw) hdr = '<div style="padding:5px 12px;font-size:10px;color:var(--muted);'
+      + 'border-bottom:1px solid var(--border);background:var(--surface2);">Showing results for <strong style="color:var(--text);">'
+      + exp.replace(/</g, '&lt;') + '</strong></div>';
+    html = hdr + matches.map(function(d, i) { return _cmpOptHTML(d, i, ''); }).join('');
+    _cmpOpts = matches.map(function(d) { return d.country; });
+  } else {
+    var fz = _cmpFuzzy(raw);
+    if (fz.length) {
+      html = '<div style="padding:5px 12px;font-size:10px;font-weight:700;color:var(--accent);'
+        + 'border-bottom:1px solid var(--border);background:var(--surface2);">Did you mean?</div>'
+        + fz.map(function(x, i) { return _cmpOptHTML(x.d, i, ''); }).join('');
+      _cmpOpts = fz.map(function(x) { return x.d.country; });
+    } else {
+      // Was `display:none` — indistinguishable from an idle box. Say it out loud.
+      html = '<div style="padding:10px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
+        + '<strong style="color:var(--text);">No country matches &ldquo;'
+        + raw.replace(/</g, '&lt;').replace(/&/g, '&amp;') + '&rdquo;</strong><br>'
+        + 'ORCA holds 185 countries under their full names &mdash; try more letters, or press '
+        + '<kbd style="background:var(--surface2);border:1px solid var(--border);border-radius:3px;'
+        + 'padding:0 3px;font-family:monospace;">Ctrl+K</kbd> to search the whole platform.</div>';
+      _cmpOpts = [];
+    }
+  }
+  cmpDrop.innerHTML = html;
+  cmpDrop.setAttribute('role', 'listbox');
+  cmpDrop.style.display = 'block';
+  cmpSearch.setAttribute('aria-expanded', 'true');
+  // Pre-highlight the top row so the analyst can SEE what Enter is about to add.
+  _cmpFocus = _cmpOpts.length ? 0 : -1;
+  _cmpPaintFocus();
+}
+cmpSearch.addEventListener('input', _cmpRenderDrop);
+cmpSearch.addEventListener('focus', function() { if (cmpSearch.value.trim()) _cmpRenderDrop(); });
+cmpSearch.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    if (!_cmpOpts.length) { if (cmpSearch.value.trim()) _cmpRenderDrop(); return; }
+    e.preventDefault();
+    _cmpFocus = (_cmpFocus + (e.key === 'ArrowDown' ? 1 : -1) + _cmpOpts.length) % _cmpOpts.length;
+    _cmpPaintFocus();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (_cmpFocus >= 0 && _cmpOpts[_cmpFocus]) { _cmpPick(_cmpOpts[_cmpFocus]); }
+    else if (cmpSearch.value.trim() && typeof showCopyToast === 'function') {
+      showCopyToast('No country matches “' + cmpSearch.value.trim() + '” — nothing was added.');
+    }
+  } else if (e.key === 'Escape') {
+    _cmpCloseDrop();
+  }
+});
+cmpDrop.addEventListener('mousedown', function(e) {
+  var el = e.target.closest ? e.target.closest('.cmp-opt') : null;
+  if (!el) return;
+  e.preventDefault();                       // keep focus in the input
+  _cmpPick(el.getAttribute('data-country'));
+});
+cmpDrop.addEventListener('mouseover', function(e) {
+  var el = e.target.closest ? e.target.closest('.cmp-opt') : null;
+  if (!el) return;
+  var i = _cmpOpts.indexOf(el.getAttribute('data-country'));
+  if (i >= 0) { _cmpFocus = i; _cmpPaintFocus(); }
 });
 
 document.addEventListener('click', e => {
-  if (!cmpSearch.contains(e.target) && !cmpDrop.contains(e.target)) cmpDrop.style.display='none';
+  if (!cmpSearch.contains(e.target) && !cmpDrop.contains(e.target)) _cmpCloseDrop();
 });
 
 // v501: SbS capacity is 5 (was 4). "Load Top 5 in Side-by-Side" called addCompare five
@@ -26898,7 +27114,10 @@ function renderSearchResults() {
   }
 
   // search COUNTRY_DATA — aliases expand short forms to canonical names
-  const _ALIASES = {'uk':'united kingdom','uae':'united arab emirates','drc':'democratic republic of the congo','usa':'united states','ksa':'saudi arabia','png':'papua new guinea','trinidad':'trinidad and tobago'};
+  // v586: one alias table for the whole platform (defined with the Side-by-Side search).
+  // The private copy this replaced mapped 'usa' -> 'united states', a name COUNTRY_DATA does
+  // not use, so that entry had never matched anything.
+  const _ALIASES = window.ORCA_ALIASES || {};
   const qExp = _ALIASES[q] || q;
   const countryMatches = COUNTRY_DATA.filter(d =>
     d.country.toLowerCase().includes(qExp) || d.country.toLowerCase().includes(q) ||

@@ -20581,3 +20581,122 @@ is **not** the deliverable.
 
 ## Friction
 Reform Direction was computed by one rule in six places: `take_change` starts `+` → tightened, `-` → liberalized, **everything else → neutral**. But 46 of the 83 sourced events (55%) carry no `take_change`, so more than half the record fell into a bucket whose column hea
+
+---
+## Cycle 491 Log — 2026-08-29 21:30 — v586
+
+### Task
+**T3** — "How do these three countries compare side by side?" (490 was T4, 489 T5,
+488 T4, 487 T2, 486 T6, 485 T5, 484 T1, 483 T3 — T3 least recent.)
+
+### Friction
+Walked cold — fresh browser context, `sessionStorage` and `localStorage` cleared —
+from Home into **Side-by-Side**, which auto-seeds Norway / United Kingdom /
+Netherlands as an **example**. Anyone who came to compare a different three has to
+put their own countries in, and the only control that does that is `#cmp-search`
+(`index.html:2431`). Its handler was 12 lines: one `input` listener doing
+`COUNTRY_DATA.filter(d => d.country.toLowerCase().includes(q))`, and nothing else.
+
+**1. The box could not be operated from the keyboard at all.** No `keydown` handler
+existed. The option `<div>`s carried no `tabindex` and no `role`. Typing *Guyana*
+narrowed the list to exactly one row; **Enter did nothing** — no add, no close, the
+text still in the box, `compareList` unchanged. ArrowDown did nothing. Escape did
+nothing. Tab skipped the list. The only way to add a country was to leave the
+keyboard and click — on a control whose sole purpose is to be typed into, three
+times in a row. The click also dropped focus out of the input, so each of the three
+countries cost a click back into the box first.
+
+**2. `uk` returned Ukraine, and only Ukraine.** Substring matching on the canonical
+name means the commonest abbreviation in North Sea work resolves to the wrong
+country and hides the right one — *"united kingdom"* does not contain the letters
+*"uk"*. The one row on screen was a real country with a real fiscal regime (16.1%
+take), so nothing looked broken; with Enter dead, the next action available was to
+click it. Measured against `country_data.json`, all of these returned **zero** rows:
+`ksa`, `png`, `holland`, `ivory coast`, `drc`, `emirates`, `united states`,
+`persian gulf`, `burma`, `turkiye` — and every ordinary typo (`nigera`, `norwya`).
+
+**3. Zero matches was silent.** The handler ran `cmpDrop.style.display='none'` and
+returned, so the dropdown simply vanished — visually identical to an idle box.
+"Holland" and "Nigera" both read as *this country is not in ORCA's 185*. Both are.
+
+The platform already solves all three ~2,500 lines away in the **Ctrl+K** global
+search (`renderSearchResults`, `index.html:26901`): an alias map, a Levenshtein
+*"Did you mean?"* fallback, an explicit no-results panel, arrow-key focus.
+Side-by-Side — the tab where the comparison is actually built — had none of it.
+
+### Change
+`#cmp-search` rebuilt (`index.html:24318`). On screen and in behaviour:
+
+1. **Enter adds.** The top match is pre-highlighted in amber on every keystroke, so
+   the analyst can *see* what Enter will add before pressing it. ↓/↑ move the
+   highlight, Esc closes, hover moves it too. `role="combobox"` /
+   `role="listbox"` / `role="option"` + `aria-activedescendant`.
+2. **Focus stays in the box after an add**, and the box self-clears — three
+   countries is now three typed names, no mouse at all. Mouse click still works
+   (`mousedown` + `preventDefault`, so it no longer steals focus either).
+3. **One alias table for the platform**, `window.ORCA_ALIASES`, defined here and
+   read by the Ctrl+K search too, so the two cannot drift. `uk` → United Kingdom,
+   plus `us / united states / america`, `ksa / saudi`, `png`, `drc`,
+   `congo-kinshasa` / `congo-brazzaville`, `holland / dutch`, `ivory coast`,
+   `emirates`, `krg / kurdistan` → Iraq-Kurdistan, `burma`, `turkiye`, `t&t`,
+   `britain / england / scotland / gb`, `czechia`, `korea`, `kz`. When an alias
+   fires the list is headed **"Showing results for united kingdom"** and the aliased
+   country is sorted above raw substring hits, so `uk` puts United Kingdom above
+   Ukraine instead of hiding it. Every alias is a name for a country in this
+   dataset — no basin, operator or business-logic mapping is invented.
+   Each alias is checked against `COUNTRY_DATA` before it resolves, which is what
+   the old global map's `'usa' -> 'united states'` entry needed: `COUNTRY_DATA`
+   calls it **"USA"**, so that lookup had matched nothing since it was written.
+4. **Typos get "Did you mean?"** — the same Levenshtein at the same 0.55 threshold
+   and 4-result cap the Ctrl+K search uses. `nigera` → Nigeria, Niger, Algeria,
+   Liberia. `norwya` → Norway.
+5. **A genuine no-match says so** instead of disappearing: *"No country matches
+   "zzqqx" — ORCA holds 185 countries under their full names; try more letters, or
+   press Ctrl+K."*
+6. **Each row now carries region and take@$75**, and a country already loaded reads
+   **"in comparison"** and is dimmed — so Ukraine (Europe, 16.1%) and United
+   Kingdom (Europe, 49.2%) are told apart in the list, not after the add. Dropdown
+   widened 260px → 340px to fit the line.
+
+### Result
+An analyst who came to compare **their** three countries types three names and
+presses Enter three times. Cold walk, keyboard only, zero mouse events:
+`guyana`↵ `brazil`↵ `angola`↵ → Guyana / Brazil / Angola on screen, Govt Take @$75
+54.1% / 55.6% / 53.0%. Before this cycle that sequence added **nothing** — Enter was
+a no-op three times over. And typing `uk` returns **United Kingdom** rather than
+Ukraine alone, on the tab that ships a North Sea preset.
+
+### Verification
+Cold Playwright against the local build, storage cleared, 1440×900. Keyboard-only
+three-country build verified end to end. `uk` → `["United Kingdom","Ukraine"]` with
+United Kingdom first and focus on it; `uk`+Enter from an empty comparison →
+`["United Kingdom"]`. Aliases resolved individually: ksa→Saudi Arabia,
+png→Papua New Guinea, drc→Democratic Republic of the Congo,
+ivory coast→Cote d'Ivoire, usa→USA, emirates→UAE (3), krg→Iraq-Kurdistan,
+burma→Myanmar, turkiye→Turkey, t&t→Trinidad and Tobago. ArrowDown moves focus
+0→1; Escape closes and clears focus; `zzqqx` renders the no-match panel and Enter
+adds nothing. Mouse click path still adds (Brazil). The 5-country cap still refuses
+and announces. Grid renders 24 rows, **0 elements right-overflow 1440px**,
+**0 page errors** on every walk. Ctrl+K re-checked on the shared map: `uk`, `usa`,
+`holland` all resolve. JS syntax gate **PASS** (10 blocks / 0 errors).
+`runtime_comprehensive.js` **ran this cycle**: **135 PASS / 0 FAIL / 1 WARN**
+(the known local-harness service-worker 404).
+
+### Found on this walk, not fixed
+- The `# Contracts` row prints `d.n` raw — **7643**, **4211** — while every other
+  count in the same table is `toLocaleString()`d (63,848; Concession (7,643)).
+  Cosmetic, one row, not worth a cycle on its own.
+- Carried from 488/489/490 and still open: the Sourced Event Log on Vintage opens
+  oldest-first, leading with the 1938 PEMEX nationalization.
+
+### STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip on a control this cycle did not change.
+No page-sub paragraph, no amber instructional banner, no routing hint, no
+"How to read" block, **no SbS card wrapper**, no visible Explorer chip row; Screener
+advanced filters still collapsed, presets still a dropdown; Home "More tools" still
+collapsed. No take, NPV, IRR, breakeven, rank or score value was altered and no data
+file was regenerated. v430 sessionStorage logic, v449/v451/v452 CP headline, the
+v451 Govt NPV removal, v489 Reform Risk placement, v549/v552/v565/v571 SbS
+comparability work, v555/v562 row removals — all intact. Tab order unchanged.
+Version bump v585→v586 across 5 structural sites, done silently at the end; it is
+**not** the deliverable.
