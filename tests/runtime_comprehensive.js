@@ -604,6 +604,47 @@ async function testComparison(page) {
     if (listLen3 === 0) p(S, 'clearCompare', 'clearCompare empties list');
     else f(S, 'clearCompare', `List has ${listLen3} items after clear`);
 
+    // ── v600 (T3) regression: the lowest/highest marker must sit on the number it ranks ──
+    // _cmpPriceRank ranks on the COMPARABLE take, so on a fee-blended column (11 of 185 hold
+    // Group-2 TSC/RSC/Buy-back contracts) it describes the PSC/Conc figure, not the headline.
+    // Before v600 the marker rendered directly under the headline, so Norway / Iraq / Guyana at
+    // $75 read 68.0% "highest of 3" | 84.8% "lowest of 3" | 54.1% -- the largest number in the
+    // row labelled lowest. Against the pre-change build this case FAILS on both assertions.
+    await page.evaluate(() => { clearCompare(); addCompare('Norway'); addCompare('Iraq'); addCompare('Guyana'); });
+    await page.waitForTimeout(900);
+    const mkOrder = await page.evaluate(() => {
+      const out = { cells: 0, markers: 0, misplaced: 0, untagged: 0, iraq: '' };
+      document.querySelectorAll('#cmp-output .cmp-row').forEach(row => {
+        const lbl = row.querySelector('.cmp-cell.lbl');
+        if (!lbl || !/Govt Take/.test(lbl.innerText)) return;
+        [].slice.call(row.querySelectorAll('.cmp-cell')).slice(1).forEach(c => {
+          out.cells++;
+          const sp = [].slice.call(c.querySelectorAll('span'));
+          const mi = sp.findIndex(s => /^(lowest|highest) of \d/.test(s.textContent.trim()));
+          if (mi < 0) return;
+          out.markers++;
+          const gi = sp.findIndex(s => /^PSC\/Conc/.test(s.textContent.trim()));
+          if (gi < 0) return;
+          if (mi < gi) out.misplaced++;                                   // marker above the figure it ranks
+          if (!/on PSC\/Conc/.test(sp[mi].textContent)) out.untagged++;    // basis not named
+          if (/34\.1|84\.8/.test(c.innerText)) out.iraq = c.innerText.replace(/\n/g, ' | ');
+        });
+      });
+      return out;
+    });
+    if (mkOrder.markers > 0 && mkOrder.misplaced === 0)
+      p(S, 'take marker sits on ranked figure', `${mkOrder.markers} markers across ${mkOrder.cells} Govt Take cells, 0 above the PSC/Conc figure they rank`);
+    else
+      f(S, 'take marker sits on ranked figure', `${mkOrder.misplaced} marker(s) render above the PSC/Conc figure they rank (markers=${mkOrder.markers}) — Iraq cell: ${mkOrder.iraq}`);
+
+    if (mkOrder.markers > 0 && mkOrder.untagged === 0)
+      p(S, 'take marker names its basis', 'every marker on a fee-blended column is tagged "on PSC/Conc"');
+    else
+      f(S, 'take marker names its basis', `${mkOrder.untagged} marker(s) on a fee-blended column do not name the basis — Iraq cell: ${mkOrder.iraq}`);
+
+    await page.evaluate(() => clearCompare());
+    await page.waitForTimeout(200);
+
     // Hash navigation compare
     await page.evaluate(() => { window.location.hash = '#/compare/norway+iraq+indonesia'; });
     await page.waitForTimeout(800);
