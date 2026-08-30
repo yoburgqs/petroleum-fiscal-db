@@ -21784,3 +21784,16 @@ dropdown; Home "More tools" still collapsed. **No tab added, removed or reordere
 what the page *claims about* the tier table. v371/v373 declutter, v430 sessionStorage
 logic, v449, v451, v452, v489 and all later locks intact. Version sweep **v594 → v595**
 across 5 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 500 Log — 2026-08-30 06:16
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 499 complete — v595 pushed to both repos.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest task; last walked 13 cycles ago).
+
+## Friction
+Walked cold into Country Profile on **Guyana** and drilled into the mechanic to defend the 54.1% headline. The most citable-looking thing on the tab is the **Profit Oil Tier Schedule (R-factor)** table — a precise four-row ladder, 60/40 rising to 15/85. On a tab built entirely around evidence badging, it was 
