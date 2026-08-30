@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v596</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v597</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v596</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v597</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v596</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v597</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v596';
+  return m ? m[0] : 'v597';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v596');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v597');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -32830,14 +32830,34 @@ function parseAndNavigate(hash) {
       setTimeout(function(){ loadCountryProfile(country); }, 50);
     }
   } else if (section === 'compare') {
-    var cmpBtn = _tabBtnFor('t0');
-    if (cmpBtn) switchTab('t0', cmpBtn);
+    // v597 (T1) — "#/compare" is TWO routes wearing one name, and only one of them worked.
+    //   * switchTab()'s tabHashMap maps t0 -> 'compare', so clicking the Fiscal Compare tab
+    //     writes the bare "#/compare". That is a tab bookmark and carries no payload.
+    //   * Every producer of "#/compare/<a>+<b>+<c>" is SIDE-BY-SIDE's: _updateCompareHash(),
+    //     shareComparison() (the SbS "Share Link" button), and launchCompare() (the floating
+    //     compare basket's "Compare" button). Its payload is `compareList`, which is rendered
+    //     ONLY by renderCompare(), and renderCompare() writes only into #t2.
+    // This branch sent BOTH to t0. So the analyst who screened 185 countries down to a
+    // shortlist, pressed + on their picks and then pressed the one button labelled Compare
+    // landed on Fiscal Compare's all-185 ranking with #t2 still display:none — the shortlist
+    // had rendered correctly on a tab they were never taken to, and nothing on screen said so.
+    // A shared comparison link did the same thing to the recipient, on a cold load.
+    // Route on the param: a country list goes where country lists are rendered.
     if (param) {
+      // Populate BEFORE switching. The t2 activation seed (Norway/UK/Netherlands) is guarded
+      // by `if (compareList.length > 0) return;`, so filling the list first is what stops a
+      // shared link from being spliced with the example trio — the v509 guard, relied on in
+      // the order it was written for.
       compareList = [];
       param.split('+').forEach(function(s){
         var c = fromSlug(s);
         if (c) addCompare(c);
       });
+      var sbsBtn = _tabBtnFor('t2');
+      if (sbsBtn) switchTab('t2', sbsBtn);
+    } else {
+      var cmpBtn = _tabBtnFor('t0');
+      if (cmpBtn) switchTab('t0', cmpBtn);
     }
   } else if (section === 'explorer') {
     var exBtn = _tabBtnFor('texplorer');

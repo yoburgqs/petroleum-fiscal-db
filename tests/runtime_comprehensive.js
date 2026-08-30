@@ -1035,7 +1035,15 @@ async function testRouting(page) {
       { hash: '#/profile/angola', expectedTab: 't7' },
       { hash: '#/explorer', expectedTab: 'texplorer' },
       { hash: '#/ioc', expectedTab: 't5' },
-      { hash: '#/compare/norway+iraq', expectedTab: 't0' }, // compare routes to t0 first (per code)
+      // v597: "#/compare" is two routes. The BARE form is the Fiscal Compare tab bookmark
+      // that switchTab()'s tabHashMap writes (t0). The form carrying a country list is
+      // Side-by-Side's — its payload is compareList, which only renderCompare() draws, and
+      // only into #t2. This case asserted t0 for the country-list form with the comment
+      // "per code", i.e. it was written from the implementation rather than the requirement,
+      // and so it locked in the defect: the compare basket's Compare button and every shared
+      // comparison link landed the analyst on a tab where their shortlist was invisible.
+      { hash: '#/compare', expectedTab: 't0' },
+      { hash: '#/compare/norway+iraq', expectedTab: 't2' },
     ];
     for (const r of routes) {
       await page.evaluate(h => { window.location.hash = h; }, r.hash);
