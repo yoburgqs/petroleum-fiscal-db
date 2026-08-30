@@ -23403,3 +23403,19 @@ or pill value was altered** — only the order rows appear in, and only when the
 the toggle that asks for it. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452,
 v489, v505, v507, v543, v573, v591, v606, v607 and v608 all intact. Version sweep **v608 → v609**
 across 6 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 514 Log — 2026-08-30 18:55
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both servers stopped. Cycle complete.
+
+## Cycle 514 — T1 / v609
+
+**Task — T1:** "Which countries should even be on my screening list?" (T1 was stalest: 513=T5, 512=T2, 511=T3, 510=T6, 509=T4, 508=T1)
+
+**Friction.** Walked cold with storage cleared into the Screener. The unfiltered landing state is fine. Then I did the one thing T1 most directly asks for — clicked the **Govt Take** column header to rank by the headline fiscal axis. It returned:
+
+| # | country | take | facts on file |
+|---|---|---
