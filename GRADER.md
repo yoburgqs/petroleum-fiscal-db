@@ -20322,3 +20322,18 @@ placement, v578 Explorer grouping, v580 FC citable ranking, v581 Explorer
 `_dqTier` reconciliation and the v582 `switchTab` guard are all intact. Tab order
 unchanged. Version bump v582→v583 across 5 structural sites, done silently at the
 end; it is **not** the deliverable.
+
+---
+## Cycle 488 Log — 2026-08-29 19:18
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 488 complete and pushed.
+
+## Cycle 488 — T4, shipped as v583
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?" (487 was T2, 486 T6, 485 T5, 484 T1, 483 T3.)
+
+**Friction.** Walked cold with storage cleared: Home → Reform Risk → the per-country lookup, then the same countries on Country Profile and in the Fiscal Compare Stability column.
+
+The Reform Frequency Score is documented on all three surfaces as a count of *fiscal law changes* since 2010, and the tab converts th
