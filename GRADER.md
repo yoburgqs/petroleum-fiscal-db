@@ -20437,3 +20437,18 @@ FC citable ranking, v581 `_dqTier` reconciliation, the v582 `switchTab` guard an
 the v583 reform fiscal/context split are all intact. Tab order unchanged.
 Version bump v583→v584 across 5 structural sites, done silently at the end; it is
 **not** the deliverable.
+
+---
+## Cycle 489 Log — 2026-08-29 20:07
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps executed and pushed. Cycle 489, shipped as v584.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (488 was T4, 487 T2, 486 T6, 485 T5, 484 T1, 483 T3.)
+
+## Friction
+The paste artifact of the screening tab is the Explorer's **⬇ Excel** button. `exportExplorer()` was a second, independent query over `COUNTRY_DATA` — it read only the mechanic dropdown, the region *dropdown* and the search box, then sorted by take DESC unconditionally.
+
+Walked cold with storage c
