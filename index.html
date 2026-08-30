@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v584</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v585</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1393,7 +1393,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v584</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v585</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1463,7 +1463,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v584</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v585</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1805,7 +1805,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v584';
+  return m ? m[0] : 'v585';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1880,7 +1880,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v584');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v585');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2515,7 +2515,8 @@ window.copyPlatformCitation = function(btn) {
         <option value="">All Directions</option>
         <option value="hostile">Hostile (↑ take)</option>
         <option value="friendly">Friendly (↓ take)</option>
-        <option value="neutral">Neutral</option>
+        <option value="unmeasured">Fiscal change, size not recorded (?)</option>
+        <option value="context">Changed no fiscal terms (·)</option>
       </select>
       <select id="reform-filter-decade" aria-label="Filter by decade" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
         <option value="">All Decades</option>
@@ -22202,6 +22203,90 @@ function _rrContextInWindow(events) {
 }
 window._rrScores = _rrScores;
 window._rrCountScored = _rrCountScored;
+
+// ── v585 (T4): what the "neutral" direction bucket was hiding ────────────────
+// Direction was computed as: take_change starts '+' -> tightened, '-' -> liberalized,
+// EVERYTHING ELSE -> neutral. 46 of the 83 sourced events (55%) carry no take_change, so
+// more than half the record landed in a bucket the column header called "structural".
+// It is not one bucket. It is two, and they mean opposite things:
+//   context     - fiscal_change:false. A discovery, a first-oil date, a conflict, a review
+//                 that concluded without renegotiation. Genuinely no fiscal direction.
+//                 11 events. Already a first-class concept since v583, for the SCORE only.
+//   unmeasured  - a sourced fiscal law change whose take impact ORCA has not quantified.
+//                 35 events, and they are the largest ones on file: Nigeria's 2021
+//                 Petroleum Industry Act, Norway's 1972 Petroleum Tax Act (78% marginal),
+//                 Mexico's 1938 PEMEX nationalization, Nigeria's 1993 Deep Offshore PSC Act.
+// Folding those 35 into "neutral" then taking a majority of what was left produced, on a
+// cold load, in green, on the country lookup card:
+//   Nigeria - "net-liberalizing toward the contractor"   take 81.1%, from ONE 2003 event
+//   Iraq    - "balanced"                                 take 84.8%, from ZERO measured
+//   Mexico  - "balanced"                                 1938 nationalization, 2013 Energy
+//                                                        Reform, 2018 licensing suspension
+// A tilt is now asserted only when the unmeasured fiscal changes could not overturn it -
+// that is |tightened - liberalized| > unmeasured. It is not a new threshold; it is the
+// arithmetic of the claim itself. Where the margin does not survive that test the direction
+// word is withheld and the count is printed instead, so the analyst reads the evidence
+// rather than a verdict built on a minority of it.
+function _rrEventDir(e) {
+  var tc = (e && e.take_change) ? String(e.take_change) : '';
+  if (tc.charAt(0) === '+') return 'hostile';
+  if (tc.charAt(0) === '-') return 'friendly';
+  return _rrIsFiscalChange(e) ? 'unmeasured' : 'context';
+}
+function _rrSplit(events) {
+  var o = { hostile: 0, friendly: 0, unmeasured: 0, context: 0 };
+  (events || []).forEach(function(e) { o[_rrEventDir(e)]++; });
+  o.total      = o.hostile + o.friendly + o.unmeasured + o.context;
+  o.measured   = o.hostile + o.friendly;
+  o.fiscal     = o.measured + o.unmeasured;
+  o.margin     = o.hostile - o.friendly;
+  o.determined = o.measured > 0 && Math.abs(o.margin) > o.unmeasured;
+  return o;
+}
+// The verdict line under the split. Four states, and only the first two carry a direction word.
+function _rrTilt(o) {
+  var mAbs = Math.abs(o.margin);
+  var mTxt = o.margin === 0 ? 'they cancel out' : (o.margin > 0 ? '+' : '−') + mAbs;
+  if (o.determined) {
+    return { word: o.margin > 0 ? 'net-tightening against the contractor'
+                                : 'net-liberalizing toward the contractor',
+             color: o.margin > 0 ? 'var(--red)' : 'var(--green)',
+             state: 'firm',
+             basis: mTxt + ' across ' + o.measured + ' of ' + o.fiscal + ' fiscal changes'
+                    + (o.unmeasured ? ' — holds even if all ' + o.unmeasured + ' unmeasured went the other way' : ' — all measured') };
+  }
+  if (o.measured > 0) {
+    return { word: 'direction not established',
+             color: 'var(--orange)', state: 'unresolved',
+             basis: 'only ' + o.measured + ' of ' + o.fiscal + ' fiscal changes '
+                    + (o.measured === 1 ? 'carries' : 'carry') + ' a quantified take move ('
+                    + (o.margin === 0 ? mTxt : mTxt + ' on ' + (o.measured === 1 ? 'it' : 'those'))
+                    + '); the ' + o.unmeasured + ' unmeasured could level or reverse it' };
+  }
+  if (o.fiscal > 0) {
+    return { word: 'direction not measured',
+             color: 'var(--orange)', state: 'unmeasured',
+             basis: 'none of the ' + o.fiscal + ' sourced fiscal change' + (o.fiscal === 1 ? '' : 's')
+                    + ' on record carries a quantified take move' };
+  }
+  return { word: 'no fiscal change on record',
+           color: 'var(--muted)', state: 'context',
+           basis: o.context + ' sourced event' + (o.context === 1 ? '' : 's') + ', none of which changed fiscal terms' };
+}
+// One renderer for the numeric split, so the lookup card, the Country Profile sidebar and
+// the ranked table cannot print different glyphs for the same country.
+function _rrDirCells(o, size) {
+  var sep = ' <span style="color:var(--muted);font-size:' + (size === 'sm' ? '10' : '11') + 'px;">/</span> ';
+  var out = '<span style="color:var(--red);font-weight:600;" title="' + o.hostile + ' sourced change' + (o.hostile === 1 ? '' : 's') + ' that raised government take">&uarr;' + o.hostile + '</span>'
+          + sep + '<span style="color:var(--green);font-weight:600;" title="' + o.friendly + ' sourced change' + (o.friendly === 1 ? '' : 's') + ' that cut government take">&darr;' + o.friendly + '</span>';
+  if (o.unmeasured) out += sep + '<span style="color:var(--orange);font-weight:700;" title="' + o.unmeasured + ' sourced fiscal law change' + (o.unmeasured === 1 ? '' : 's') + ' whose take impact ORCA has not quantified — direction unknown, not neutral">?' + o.unmeasured + '</span>';
+  if (o.context)    out += sep + '<span style="color:var(--muted);font-weight:600;" title="' + o.context + ' sourced event' + (o.context === 1 ? '' : 's') + ' that changed no fiscal terms — discovery, first oil, conflict, a review that concluded without renegotiation">&middot;' + o.context + '</span>';
+  return out;
+}
+window._rrEventDir = _rrEventDir;
+window._rrSplit = _rrSplit;
+window._rrTilt = _rrTilt;
+window._rrDirCells = _rrDirCells;
 const IOC_PRESENCE = {
   'ExxonMobil':     ['USA','Norway','Angola','Nigeria','Guyana','Australia','Qatar','Chad','Indonesia','Iraq','Papua New Guinea','Equatorial Guinea','Canada','Malaysia','Azerbaijan'],
   'Shell':          ['Norway','Nigeria','Brunei','Australia','Oman','Malaysia','United Kingdom','Netherlands','Brazil','Kazakhstan','Egypt','Iraq','Trinidad and Tobago'],
@@ -26278,9 +26363,10 @@ function initPlatform() {
         year: ev.year,
         event: ev.event,
         take_change: ev.take_change,
-        direction: ev.take_change && ev.take_change.startsWith('+') ? 'hostile'
-                 : ev.take_change && ev.take_change.startsWith('-') ? 'friendly'
-                 : 'neutral',
+        // v585 (T4): 'neutral' merged a fiscal law change of unrecorded size with an event
+        // that changed no fiscal terms. The log labelled Nigeria's 2021 Petroleum Industry Act
+        // "→ Neutral", one row from Guyana's Liza-1 discovery wearing the same badge.
+        direction: _rrEventDir(ev),
         notes: ev.notes,
         mechanic_to: ev.mechanic_to || '',
         fiscal_change: ev.fiscal_change,
@@ -26369,8 +26455,9 @@ function renderReformTable() {
     return;
   }
 
-  const dirColors = {hostile:'#B91C1C', friendly:'#15803D', neutral:'#6B6560'};
-  const dirLabels = {hostile:'↑ Hostile', friendly:'↓ Friendly', neutral:'→ Neutral'};
+  const dirColors = {hostile:'#B91C1C', friendly:'#15803D', unmeasured:'#B06800', context:'#6B6560', neutral:'#6B6560'};
+  const dirLabels = {hostile:'↑ Hostile', friendly:'↓ Friendly',
+                     unmeasured:'? Size not recorded', context:'· No fiscal change', neutral:'→ Neutral'};
 
   tbody.innerHTML = data.map(r => {
     const dirCol = dirColors[r.direction] || '#6B6560';
@@ -26960,12 +27047,11 @@ function _rrClassify(c) {
   var since2010 = _rrCountScored(events);
   var contextIn = _rrContextInWindow(events);
   var score = Math.max(0, 100 - since2010 * 15);
-  var tightened = 0, liberalized = 0, neutral = 0;
-  events.forEach(function(e) {
-    if (e.take_change && e.take_change.charAt(0) === '+') tightened++;
-    else if (e.take_change && e.take_change.charAt(0) === '-') liberalized++;
-    else neutral++;
-  });
+  // v585 (T4): the third bucket split into unmeasured-fiscal vs context. `neutral` is kept
+  // as their sum only so no downstream reader breaks; nothing renders it as a bucket now.
+  var _split = _rrSplit(events);
+  var tightened = _split.hostile, liberalized = _split.friendly;
+  var neutral = _split.unmeasured + _split.context;
   var scored = Object.keys(rh)
     .filter(function(k){ return Array.isArray(rh[k]) && rh[k].length; })
     .map(function(k) {
@@ -27087,10 +27173,12 @@ function _rrClassify(c) {
     ? (score > 70 ? 'var(--green)' : score > 40 ? 'var(--yellow)' : 'var(--red)')
     : icColor;
 
-  var tiltWord = tightened > liberalized ? 'net-tightening against the contractor'
-               : liberalized > tightened ? 'net-liberalizing toward the contractor'
-               : 'balanced';
-  var tiltColor = tightened > liberalized ? 'var(--red)' : liberalized > tightened ? 'var(--green)' : 'var(--muted)';
+  // v585 (T4): the tilt used to be a bare majority of tightened vs liberalized, with every
+  // unmeasured fiscal change silently counted as agreement. It is now asserted only where the
+  // unmeasured events could not overturn it; otherwise the count is printed in place of the word.
+  var _tilt = _rrTilt(_split);
+  var tiltWord = _tilt.word, tiltColor = _tilt.color, tiltBasis = _tilt.basis;
+  var dirHtml = _rrDirCells(_split);
   // v583 (T4): every surface that prints the count must also print what the count left out.
   var contextNote = contextIn.length
     ? ('+ ' + contextIn.length + ' in-window event' + (contextIn.length === 1 ? '' : 's') + ' not scored \u2014 '
@@ -27099,7 +27187,8 @@ function _rrClassify(c) {
            .join(', '))
     : '';
   return { events: events, since2010: since2010, contextIn: contextIn, contextNote: contextNote, score: score, tightened: tightened,
-           liberalized: liberalized, neutral: neutral, scored: scored, rank: rank,
+           liberalized: liberalized, neutral: neutral, split: _split, dirHtml: dirHtml,
+           tiltBasis: tiltBasis, tiltState: _tilt.state, scored: scored, rank: rank,
            latest: latest, icRule: icRule, icColor: icColor, icLabel: icLabel,
            scoreNote: scoreNote, scoreColor: scoreColor, tiltWord: tiltWord, tiltColor: tiltColor };
 }
@@ -27437,11 +27526,10 @@ function renderReformTimeline(country) {
       + '<div style="font-size:10px;color:var(--muted);">law changes</div>'
       + (_vcp.contextNote ? '<div style="font-size:10px;color:var(--orange);font-weight:700;max-width:200px;line-height:1.4;">' + _vcp.contextNote + '</div>' : '')
       + '</div>'
-      + '<div><div style="' + _lbl + '">Direction</div>'
-      + '<div style="font-size:13px;font-weight:800;"><span style="color:var(--red);">&uarr;' + _vcp.tightened + '</span>'
-      + ' <span style="color:var(--muted);font-size:10px;">/</span> <span style="color:var(--green);">&darr;' + _vcp.liberalized + '</span>'
-      + ' <span style="color:var(--muted);font-size:10px;">/</span> <span style="color:var(--muted);">=' + _vcp.neutral + '</span></div>'
-      + '<div style="font-size:10px;color:' + _vcp.tiltColor + ';font-weight:700;">' + _vcp.tiltWord + '</div></div>'
+      + '<div style="max-width:230px;"><div style="' + _lbl + '">Direction</div>'
+      + '<div style="font-size:13px;font-weight:800;">' + _vcp.dirHtml + '</div>'
+      + '<div style="font-size:10px;color:' + _vcp.tiltColor + ';font-weight:700;">' + _vcp.tiltWord + '</div>'
+      + '<div style="font-size:10px;color:var(--muted);line-height:1.45;">' + _vcp.tiltBasis + '</div></div>'
       + '</div>'
       + '<div style="font-size:11px;color:var(--text);line-height:1.6;padding:7px 10px;background:var(--card);'
       + 'border-left:3px solid ' + _vcp.icColor + ';border-radius:4px;">'
@@ -30906,9 +30994,10 @@ function renderReformCountryVerdict() {
     + '<div style="font-size:10px;color:var(--muted);">' + events.length + ' on record since ' + (events.reduce(function(m,e){ return Math.min(m, e.year || 9999); }, 9999)) + '</div>'
     + (_v.contextNote ? '<div style="font-size:10px;color:var(--orange);font-weight:700;max-width:210px;line-height:1.4;">' + _v.contextNote + '</div>' : '')
     + '</div>'
-    + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Direction</div>'
-    + '<div style="font-size:14px;font-weight:800;"><span style="color:var(--red);">&uarr;' + tightened + '</span> <span style="color:var(--muted);font-size:11px;">/</span> <span style="color:var(--green);">&darr;' + liberalized + '</span> <span style="color:var(--muted);font-size:11px;">/</span> <span style="color:var(--muted);">&rarr;' + neutral + '</span></div>'
-    + '<div style="font-size:10px;color:' + tiltColor + ';font-weight:700;">' + tiltWord + '</div></div>'
+    + '<div style="max-width:250px;"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Direction</div>'
+    + '<div style="font-size:14px;font-weight:800;">' + _v.dirHtml + '</div>'
+    + '<div style="font-size:10px;color:' + tiltColor + ';font-weight:700;">' + tiltWord + '</div>'
+    + '<div style="font-size:10px;color:var(--muted);line-height:1.45;">' + _v.tiltBasis + '</div></div>'
     + (fp != null
         ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability</div>'
           + '<div style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
@@ -30966,15 +31055,14 @@ function renderReformRisk() {
         byDecade[dec] = (byDecade[dec] || 0) + 1;
       }
     });
-    // Count direction from take_change field
-    let tightened = 0, liberalized = 0, neutral = 0;
-    events.forEach(e => {
-      if (e.take_change && e.take_change.startsWith('+')) tightened++;
-      else if (e.take_change && e.take_change.startsWith('-')) liberalized++;
-      else neutral++;
-    });
+    // v585 (T4): one direction split, shared with _rrClassify(). `neutral` was two different
+    // things wearing one label — a fiscal law change of unrecorded size, and an event that
+    // changed no fiscal terms at all. They are counted separately now.
+    const split = _rrSplit(events);
+    const tightened = split.hostile, liberalized = split.friendly;
+    const neutral = split.unmeasured + split.context;
     const cd = (COUNTRY_DATA || []).find(d => d.country === c);
-    return { country: c, total, since2010, contextIn: _rrContextInWindow(events), byDecade, take75: cd ? cd.take_75 : null, events, tightened, liberalized, neutral };
+    return { country: c, total, since2010, contextIn: _rrContextInWindow(events), byDecade, take75: cd ? cd.take_75 : null, events, tightened, liberalized, neutral, split };
   }).sort((a,b) => b.total - a.total);
 
   // Stability score: 100 - (since2010 * 15), min 0
@@ -31004,7 +31092,16 @@ function renderReformRisk() {
   const totalTightened = withScore.reduce((s,r) => s + r.tightened, 0);
   const totalLiberalized = withScore.reduce((s,r) => s + r.liberalized, 0);
   const totalNeutral = withScore.reduce((s,r) => s + r.neutral, 0);
+  // v585 (T4): the aggregate carried the same merged bucket. Split it.
+  const totalUnmeasured = withScore.reduce((s,r) => s + r.split.unmeasured, 0);
+  const totalContext    = withScore.reduce((s,r) => s + r.split.context, 0);
   const totalEvents = totalTightened + totalLiberalized + totalNeutral;
+  const globalSplit = { hostile: totalTightened, friendly: totalLiberalized,
+                        unmeasured: totalUnmeasured, context: totalContext,
+                        total: totalEvents, measured: totalTightened + totalLiberalized,
+                        fiscal: totalTightened + totalLiberalized + totalUnmeasured,
+                        margin: totalTightened - totalLiberalized };
+  globalSplit.determined = globalSplit.measured > 0 && Math.abs(globalSplit.margin) > globalSplit.unmeasured;
 
   // v561 (T4): hoisted out of Section 3. Section 1's ranked table needs the same
   // take-raising-event lookup to decide whether its Stability Score may be shown in green.
@@ -31075,15 +31172,19 @@ function renderReformRisk() {
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Total Events</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Since 2010</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Reform Frequency Score (0\u2013100). Formula: 100 \u2212 (reforms since 2010 \xd7 15). Score 100 = no reforms since 2010 (most stable); 70 = 2 reforms; 55 = 3 reforms; 40 = 4 reforms; 0 = 7+ reforms (most volatile). This measures reform frequency only. Note: the Fiscal Predictability Score in Country Profile is different \u2014 it additionally factors price swing and within-country fiscal term consistency (IQR across contracts). Use both signals together for IC analysis.">Reform Frequency<br><span style="font-weight:400;text-transform:none;letter-spacing:0;">since 2010</span> \u24d8</th>'
-    + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Reform direction: hostile=take raised, friendly=take cut, neutral=structural">Direction</th>'
+    + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);cursor:help;" title="Direction of each sourced event. &#8593; take raised &#183; &#8595; take cut &#183; ? a sourced fiscal law change whose take impact ORCA has not quantified (direction unknown, NOT neutral) &#183; &#183;N events that changed no fiscal terms. The verdict beneath the counts is asserted only where the unmeasured changes could not overturn it.">Direction</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Take @$75</th>'
     + '</tr></thead>'
     + '<tbody>'
     + withScore.slice(0,15).map(function(r) {
         var escapedC = r.country.replace(/'/g,"\'");
-        var total = r.tightened + r.liberalized + r.neutral;
-        var dirHtml = total > 0
-          ? '<span style="color:var(--red);font-weight:600;" title="' + r.tightened + ' hostile reforms (take raised)">↑' + r.tightened + '</span> <span style="color:var(--muted);font-size:10px;">/</span> <span style="color:var(--green);font-weight:600;" title="' + r.liberalized + ' friendly reforms (take cut)">↓' + r.liberalized + '</span> <span style="color:var(--muted);font-size:10px;">/</span> <span style="color:var(--muted);" title="' + r.neutral + ' neutral">' + r.neutral + '</span>'
+        // v585 (T4): this cell printed a bare 3-number split whose third figure merged
+        // unmeasured fiscal changes with non-fiscal context. The verdict line beneath it is the
+        // same one the lookup card and the Country Profile sidebar now show, from _rrTilt().
+        var _t = _rrTilt(r.split);
+        var dirHtml = r.split.total > 0
+          ? _rrDirCells(r.split, 'sm')
+            + '<div style="font-size:9px;font-weight:700;color:' + _t.color + ';line-height:1.35;margin-top:2px;">' + _t.word + '</div>'
           : '—';
         return '<tr style="cursor:pointer;" onclick="document.getElementById(\'dd-country-select\').value=\'' + escapedC + '\';loadCountryProfile(\'' + escapedC + '\');switchTab(\'t7\',document.getElementById(\'tab-btn-t7\'));" title="Click to open ' + r.country + ' Country Profile" onmouseover="this.style.background=\'rgba(176,104,0,.04)\'" onmouseout="this.style.background=\'\'">'
           + '<td style="padding:5px 8px;font-size:12px;color:var(--text);"><strong>' + r.country + '</strong> <span style="font-size:10px;color:var(--accent);">↗</span></td>'
@@ -31095,7 +31196,7 @@ function renderReformRisk() {
               : '')
           + '</td>'
           + scoreCell(r)
-          + '<td style="padding:5px 8px;font-size:12px;text-align:center;">' + dirHtml + '</td>'
+          + '<td style="padding:5px 8px;font-size:12px;text-align:center;vertical-align:top;max-width:140px;">' + dirHtml + '</td>'
           + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + takeColor(r.take75) + ';font-weight:' + (r.take75!=null?'600':'400') + ';">' + (r.take75!=null?r.take75.toFixed(1)+'%':'—') + '</td>'
           + '</tr>';
       }).join('')
@@ -31264,22 +31365,36 @@ function renderReformRisk() {
     + '</div></div>';
 
   // Section 4: Reform Type Distribution
+  // v585 (T4): this panel read "46 neutral (55%)" and drew 55% of the bar in flat grey. More
+  // than half of what it called neutral was a fiscal law change ORCA simply has not sized —
+  // including the four largest events in the file. Grey now means "changed no fiscal terms";
+  // unmeasured fiscal changes get their own amber segment and their own count.
   var pctT = totalEvents ? (totalTightened/totalEvents*100).toFixed(0) : 0;
   var pctL = totalEvents ? (totalLiberalized/totalEvents*100).toFixed(0) : 0;
-  var pctN = totalEvents ? (totalNeutral/totalEvents*100).toFixed(0) : 0;
+  var pctU = totalEvents ? (totalUnmeasured/totalEvents*100).toFixed(0) : 0;
+  var pctC = totalEvents ? (totalContext/totalEvents*100).toFixed(0) : 0;
+  var _gTilt = _rrTilt(globalSplit);
 
   var distrib = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px 18px;margin-bottom:20px;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:6px;">Reform Direction</div>'
     + '<div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:10px;">'
     + '<span style="font-size:12px;color:var(--muted);">Of ' + totalEvents + ' total reform events:</span>'
-    + '<span style="font-size:12px;font-weight:600;color:var(--red);">' + totalTightened + ' tightened (' + pctT + '%)</span>'
-    + '<span style="font-size:12px;font-weight:600;color:var(--green);">' + totalLiberalized + ' liberalized (' + pctL + '%)</span>'
-    + '<span style="font-size:12px;color:var(--muted);">' + totalNeutral + ' neutral (' + pctN + '%)</span>'
+    + '<span style="font-size:12px;font-weight:600;color:var(--red);">&uarr; ' + totalTightened + ' raised take (' + pctT + '%)</span>'
+    + '<span style="font-size:12px;font-weight:600;color:var(--green);">&darr; ' + totalLiberalized + ' cut take (' + pctL + '%)</span>'
+    + '<span style="font-size:12px;font-weight:700;color:var(--orange);">? ' + totalUnmeasured + ' fiscal change, size not recorded (' + pctU + '%)</span>'
+    + '<span style="font-size:12px;color:var(--muted);">&middot; ' + totalContext + ' changed no fiscal terms (' + pctC + '%)</span>'
     + '</div>'
     + '<div style="height:8px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;overflow:hidden;display:flex;">'
     + '<div style="width:' + pctT + '%;height:100%;background:var(--red);"></div>'
     + '<div style="width:' + pctL + '%;height:100%;background:var(--green);"></div>'
-    + '<div style="width:' + pctN + '%;height:100%;background:var(--muted);opacity:.4;"></div>'
+    + '<div style="width:' + pctU + '%;height:100%;background:var(--orange);opacity:.75;"></div>'
+    + '<div style="width:' + pctC + '%;height:100%;background:var(--muted);opacity:.4;"></div>'
+    + '</div>'
+    + '<div style="font-size:11px;color:var(--text);line-height:1.6;margin-top:9px;">'
+    + '<strong style="color:' + _gTilt.color + ';">' + _gTilt.word + '</strong> across the sourced record &mdash; ' + _gTilt.basis + '. '
+    + 'The amber segment is not a group of small or neutral reforms: it holds Nigeria&rsquo;s 2021 Petroleum Industry Act, '
+    + 'Norway&rsquo;s 1972 Petroleum Tax Act, Mexico&rsquo;s 1938 nationalization and Nigeria&rsquo;s 1993 Deep Offshore PSC Act. '
+    + 'ORCA has not quantified their take impact, so they are shown as unknown rather than folded into a majority.'
     + '</div></div>';
 
   var exportBar = '<div style="text-align:right;margin-top:14px;">'
@@ -31320,21 +31435,42 @@ function renderReformRisk() {
     var members = regionDefs[region];
     if (!members.length) return null;
     _rrShown += members.length;
-    var totalT = members.reduce(function(s,r){return s+r.tightened;},0);
-    var totalL = members.reduce(function(s,r){return s+r.liberalized;},0);
-    var totalN2 = members.reduce(function(s,r){return s+r.neutral;},0);
-    var total = totalT + totalL + totalN2;
+    // v585 (T4): every region on this table read "Tightening" — including Middle East, whose
+    // margin is 0 and whose entire record is 2 unmeasured changes and 1 context event. The
+    // regional tilt now runs the same test as the country verdict: a direction is named only
+    // where the unmeasured fiscal changes could not overturn it. On the current data that is
+    // Europe alone; the other seven print their measured margin with the unmeasured count
+    // beside it, which is what the analyst needs in order not to quote the row.
+    var _rSplit = { hostile: 0, friendly: 0, unmeasured: 0, context: 0 };
+    members.forEach(function(m){
+      _rSplit.hostile += m.split.hostile; _rSplit.friendly += m.split.friendly;
+      _rSplit.unmeasured += m.split.unmeasured; _rSplit.context += m.split.context;
+    });
+    var totalT = _rSplit.hostile, totalL = _rSplit.friendly;
+    var totalU = _rSplit.unmeasured, totalC = _rSplit.context;
+    var total = totalT + totalL + totalU + totalC;
+    _rSplit.total = total;
+    _rSplit.measured = totalT + totalL;
+    _rSplit.fiscal = _rSplit.measured + totalU;
+    _rSplit.margin = totalT - totalL;
+    _rSplit.determined = _rSplit.measured > 0 && Math.abs(_rSplit.margin) > totalU;
     var avgScore = members.reduce(function(s,r){return s+r.score;},0)/members.length;
-    var margin = totalT - totalL;
-    var tiltColor = margin > 0 ? 'var(--red)' : margin < 0 ? 'var(--green)' : 'var(--muted)';
-    var tiltLabel = margin > 0 ? '&#8593; Tightening' : margin < 0 ? '&#8595; Liberalizing' : 'Neutral';
-    // The margin is printed next to the label because the label alone gave Africa (4 vs 3, a
-    // one-event margin over 23 events) the same weight on screen as Latin America (9 vs 1).
-    var marginTxt = margin === 0 ? '' : ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;">' + (margin > 0 ? '+' : '−') + Math.abs(margin) + '</span>';
+    var margin = _rSplit.margin;
+    var _rTilt = _rrTilt(_rSplit);
+    var tiltColor = _rTilt.color;
+    var tiltLabel = _rSplit.determined
+      ? (margin > 0 ? '&#8593; Tightening' : '&#8595; Liberalizing')
+      : (_rSplit.measured > 0 ? 'Not established' : 'Not measured');
+    var marginTxt = (_rSplit.measured === 0)
+      ? ''
+      : ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;">' + (margin > 0 ? '+' : margin < 0 ? '−' : '±') + Math.abs(margin) + '</span>'
+        + (totalU ? '<div style="font-size:10px;font-weight:600;color:var(--orange);">' + totalU + ' unmeasured</div>' : '');
+    if (_rSplit.measured === 0 && totalU) marginTxt = '<div style="font-size:10px;font-weight:600;color:var(--orange);">' + totalU + ' unmeasured</div>';
     var barWidth = total > 0 ? Math.round(totalT/total*100) : 0;
-    var bar = '<div style="display:flex;height:8px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;overflow:hidden;width:100px;" title="' + total + ' events on record for the ' + members.length + ' scored ' + _rrEsc(region) + ' jurisdiction' + (members.length === 1 ? '' : 's') + ': ' + totalT + ' tightening, ' + totalL + ' liberalizing, ' + totalN2 + ' neutral/structural.">'
+    var bar = '<div style="display:flex;height:8px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;overflow:hidden;width:100px;" title="' + total + ' events on record for the ' + members.length + ' scored ' + _rrEsc(region) + ' jurisdiction' + (members.length === 1 ? '' : 's') + ': ' + totalT + ' raised take, ' + totalL + ' cut take, ' + totalU + ' fiscal changes of unrecorded size, ' + totalC + ' that changed no fiscal terms.">'
       + '<div style="width:' + barWidth + '%;background:var(--red);"></div>'
       + '<div style="width:' + (total > 0 ? Math.round(totalL/total*100) : 0) + '%;background:var(--green);"></div>'
+      + '<div style="width:' + (total > 0 ? Math.round(totalU/total*100) : 0) + '%;background:var(--orange);opacity:.75;"></div>'
       + '</div>';
     // A region row is an average over the jurisdictions ORCA actually sourced, not over the
     // region. Europe reads 2 of 30. Naming the countries where there are few of them stops
@@ -31346,34 +31482,39 @@ function renderReformRisk() {
       + '<div style="font-size:10px;font-weight:400;color:var(--muted);">' + basis + '</div></td>'
       + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--red);">' + totalT + '</td>'
       + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--green);">' + totalL + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--muted);">' + totalN2 + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--orange);font-weight:700;">' + totalU + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--muted);">' + totalC + '</td>'
       + '<td style="padding:5px 8px;font-size:12px;text-align:center;">' + bar + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;color:' + tiltColor + ';font-weight:700;white-space:nowrap;">' + tiltLabel + marginTxt + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;color:' + tiltColor + ';font-weight:700;vertical-align:top;">' + tiltLabel + marginTxt + '</td>'
       + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + (avgScore>70?'var(--green)':avgScore>40?'var(--yellow)':'var(--red)') + ';">' + avgScore.toFixed(0) + '</td>'
       + '</tr>';
   }).filter(Boolean).join('');
 
   var regionalTilt = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Regional Reform Tilt Since 2010</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Have regions been net-tightening (capturing more) or net-liberalizing (attracting IOC capital)? Tilt = tightening events minus liberalizing events, with the margin printed beside it. Bar: red = tightened share, green = liberalized share, grey = neutral/structural. Avg Stability = mean reform-frequency score of the sourced jurisdictions in that row (100 = zero reforms since 2010).</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Have regions been net-tightening (capturing more) or net-liberalizing (attracting IOC capital)? Tilt = take-raising events minus take-cutting events. A direction is <strong>named only where the unmeasured fiscal changes could not overturn it</strong>; otherwise the row reads <em>Not established</em> and prints the measured margin with the unmeasured count beneath, so the margin is never quoted without its denominator. Bar: red = raised take, green = cut take, amber = fiscal change of unrecorded size. Avg Stability = mean reform-frequency score of the sourced jurisdictions in that row (100 = zero reforms since 2010).</div>'
     + '<table style="width:100%;border-collapse:collapse;">'
     + '<thead><tr>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Region</th>'
     + '<th style="text-align:center;color:var(--red);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Tightened</th>'
     + '<th style="text-align:center;color:var(--green);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Liberalized</th>'
-    + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Sourced fiscal law changes with no recorded take_change direction — licensing-round, structural and administrative reforms. Counted in the bar and in the event totals, excluded from the tilt margin.">Neutral</th>'
+    + '<th style="text-align:center;color:var(--orange);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Sourced fiscal law changes whose take impact ORCA has not quantified. Direction unknown — not neutral. Where these outnumber the tilt margin, the region&#39;s tilt is reported as not established rather than named.">Unmeasured</th>'
+    + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Sourced events that changed no fiscal terms — discoveries, first oil, conflict, a review that concluded without renegotiation. Excluded from every score and from the tilt.">No fiscal change</th>'
     + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Mix</th>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Tilt</th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Avg Stability</th>'
     + '</tr></thead>'
     + '<tbody>' + regionTiltRows + '</tbody></table>'
-    + '<div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;">Rows cover all <strong>' + _rrShown + '</strong> of the ' + withScore.length + ' jurisdictions with a sourced reform log, across ' + Object.keys(regionDefs).length + ' regions. A row is an average over those jurisdictions only, never over the region — read the <em>n of N sourced</em> line before treating a row as a regional finding. Neutral/structural events are excluded from the tilt margin. Use the country lookup above for a single-jurisdiction read.</div>'
+    + '<div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;">Rows cover all <strong>' + _rrShown + '</strong> of the ' + withScore.length + ' jurisdictions with a sourced reform log, across ' + Object.keys(regionDefs).length + ' regions. A row is an average over those jurisdictions only, never over the region — read the <em>n of N sourced</em> line before treating a row as a regional finding. Unmeasured and no-fiscal-change events are excluded from the tilt margin, and the Unmeasured column is what decides whether a tilt may be named at all. Use the country lookup above for a single-jurisdiction read.</div>'
     + '</div>';
 
   // v467: Global reform summary sentence — headline context before the section blocks
   var activeReformers = withScore.filter(r => r.since2010 >= 2).length;
   var highFreq = withScore.filter(r => r.since2010 >= 4).length;
-  var tiltLabel = totalTightened > totalLiberalized ? '<span style="color:var(--negative);font-weight:700;">net-tightening</span>' : totalTightened < totalLiberalized ? '<span style="color:var(--green);font-weight:700;">net-liberalizing</span>' : '<span style="color:var(--muted);font-weight:700;">balanced</span>';
+  // v585 (T4): "net-tightening overall" was a majority of 27 vs 10 taken while 35 fiscal
+  // changes sat unmeasured in the third bucket. The claim is now made only if it survives them.
+  var _sTilt = _rrTilt(globalSplit);
+  var tiltLabel = '<span style="color:' + (_sTilt.color === 'var(--red)' ? 'var(--negative)' : _sTilt.color) + ';font-weight:700;">' + _sTilt.word + '</span>';
   var summaryBar = '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.22);border-radius:8px;padding:12px 18px;margin-bottom:18px;font-size:12px;color:var(--text);line-height:1.7;">'
     + '<strong style="font-size:13px;">Reform Risk Snapshot:</strong> '
     + '<strong>' + countries.length + '</strong> of <strong>' + ((COUNTRY_DATA || []).length || 185) + '</strong> jurisdictions carry a sourced reform history — the rankings below are drawn from those ' + countries.length + ' only. Of them, <strong>' + activeReformers + '</strong> had 2+ fiscal law changes since 2010, and <strong>' + highFreq + '</strong> had 4+. '
@@ -31384,10 +31525,11 @@ function renderReformRisk() {
           : '';
       })()
     + 'Direction across <strong>' + totalEvents + '</strong> total events: '
-    + '<span style="color:var(--negative);font-weight:600;">' + totalTightened + ' tightened</span> / '
-    + '<span style="color:var(--green);font-weight:600;">' + totalLiberalized + ' liberalized</span> / '
-    + '<span style="color:var(--muted);font-weight:600;">' + totalNeutral + ' neutral</span> — '
-    + tiltLabel + ' overall. High-frequency reformers represent elevated regime risk for 20+ year project IRR models.'
+    + '<span style="color:var(--negative);font-weight:600;">' + totalTightened + ' raised take</span> / '
+    + '<span style="color:var(--green);font-weight:600;">' + totalLiberalized + ' cut take</span> / '
+    + '<span style="color:var(--orange);font-weight:700;">' + totalUnmeasured + ' fiscal changes of unrecorded size</span> / '
+    + '<span style="color:var(--muted);font-weight:600;">' + totalContext + ' changed no fiscal terms</span> — '
+    + tiltLabel + ' overall (' + _sTilt.basis + '). High-frequency reformers represent elevated regime risk for 20+ year project IRR models.'
     + '</div>';
 
   container.innerHTML = summaryBar + regionalTilt + topTable + heatmap + stabVol + distrib + exportBar;
@@ -31408,7 +31550,12 @@ function exportReformRiskCSV() {
         e.event || e.name || '',
         e.mechanic || '',
         e.take_change || '',
-        e.direction || '',
+        // v585 (T4): this read e.direction off the raw REFORM_HISTORY record, which has no such
+        // field — the Direction column has been exporting empty on every row since it was added.
+        // It now carries the same four-state split the screen shows.
+        ({ hostile: 'Raised take', friendly: 'Cut take',
+           unmeasured: 'Fiscal change, size not recorded',
+           context: 'Changed no fiscal terms' })[_rrEventDir(e)],
         (e.fiscal_change === false ? 'No' : 'Yes'),
         e.context_kind || '',
         e.source || '',
