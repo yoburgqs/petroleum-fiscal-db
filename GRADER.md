@@ -22041,3 +22041,98 @@ catch-up (directive-banned bookkeeping) — the record lives in the code comment
 **Friction.** I walked T1 cold with storage cleared: Screener tab → IOC Capital Screen preset (15 of 185) → `+` on the top three → `Compare` on the floating basket. That button is the only "now do something with my shortlist" affordance on the page, pinned to the bottom of the viewport.
 
 It landed 
+
+---
+## Cycle 503 — T4 / v598 — 2026-08-30
+
+**Task — T4:** "What is my fiscal-stability and reform exposure here?" (stalest — last run at
+v590; the seven version commits since were T1, T6, T3, T5, T2, T5, T1).
+
+**Friction.** Walked T4 cold, `sessionStorage` and `localStorage` cleared, into the Reform Risk
+per-country lookup — the only control on the platform that takes a single country and returns a
+reform verdict. The verdicts it returns exist to say that the Reform Frequency Score is a *count*
+and never a *magnitude*, so every one of them ends by pointing at the events:
+
+| country | IC action ends |
+|---|---|
+| Venezuela | "size the premium against the rupture **in the event log**" |
+| Norway | "size the premium against the **+12pp already taken** since 2010" |
+| Guyana | "Read the **event log below** before carrying a zero reform premium." |
+
+There was no event log below. Measured on the walk: `#reform-risk-content` is 11,316 characters
+of Regional Reform Tilt, the top-15 ranked table, the top-20 decade heatmap, the three partition
+cards and a CSV button — all global aggregates. With Guyana selected, the string "Guyana"
+appeared **twice** in the entire tab, both times as a one-line row inside an aggregate.
+Venezuela's 1975 nationalization (+30pp), 2001 Hydrocarbons Law (+10pp) and 2007 Orinoco
+expropriation (+15pp) — the whole basis of the verdict that calls its 85/100 a window artefact —
+were on a different tab.
+
+Two other surfaces route here and name the missing thing:
+
+- **Country Profile sidebar** (v550) — button *"Full reform detail for X ›"*, `title="…full
+  event log, regional tilt and peer ranking"*. It sends the analyst *away from* the page that
+  has the timeline, to one that did not.
+- **Fiscal Compare Stability cell** (v520) — *"Click to open the per-country Reform Risk panel —
+  the full event log for a scored jurisdiction."*
+
+This is the v550 defect class exactly: an instruction on screen with no destination. v550 fixed
+it in the Country Profile direction and left the return leg open.
+
+**Change.** `_rrEventLogHtml()` renders the selected country's own sourced events inside the
+verdict card, between the IC action and the profile button, split at the **2010 boundary the
+score is defined on** — because three of the four verdict types turn on exactly that split:
+
+- `In the 2010 scoring window — N fiscal law changes scored, M context events not scored`
+- `Before the window — not counted in the score — K events`
+- where the window is empty (Algeria, Colombia, USA): an explicit state saying a 100 is what the
+  formula returns for an empty window, not a finding about the terms.
+
+Each event carries year, name, mechanic and a direction tag that preserves the v585 four-way
+split — a ±pp take badge, `fiscal change · take move not quantified` for a sourced change ORCA
+has not sized, or the `context_kind` for one that changed no terms. A/B source badges are
+injected from `api/v1/country/<slug>.json` under an `rr-src-` id namespace so this log and the
+Country Profile timeline can be on the page simultaneously without colliding.
+
+**Result.** An analyst arriving from Country Profile, from a Fiscal Compare Stability cell, or
+from the picker now reads **the score, the IC action and the evidence in one card**. Venezuela
+shows 4 events — 1 in-window, 3 pre-window — with the 2007 and 1975 ruptures on screen beside
+the 85/100 the verdict calls an artefact, which is the number they would otherwise have carried
+into a memo. The United Kingdom shows 9, split 5/4. Guyana's instruction to read the log before
+carrying a zero premium now has a log under it.
+
+### Verification — cold, Playwright, local build, storage cleared
+
+| check | result |
+|---|---|
+| Venezuela | 4 events, 4 source badges, both group headings, 1975 + 2007 on screen |
+| Algeria | 4 events, "In the 2010 scoring window — nothing on file" empty state |
+| United Kingdom | 9 events, 5 in-window / 4 pre-window |
+| Guyana | 3 events, all tagged context, 0 scored |
+| Saudi Arabia, `Cote d'Ivoire` | uncovered verdict unchanged, 0 event rows |
+| CP "Full reform detail" → | `treformrisk`, Venezuela selected, 4 rows |
+| FC Stability cell → | lookup set, log rendered |
+| Clear button | card hidden; CP timeline still 4 events |
+| Duplicate element ids | 1 before, 1 after — pre-existing `faq-a733-body` |
+| Page errors | **0 on every walk** |
+
+**Tests ran this cycle.** `runtime_comprehensive.js` gains two `ReformRisk` cases (covered and
+uncovered). Both harness copies updated. Against the pre-change backup the covered case
+**FAILS** (`rows:0`); against this build it **PASSES**. **133 → 135 PASS / 0 FAIL.** The 2 WARN
+and 1 JS error are the pre-existing local-harness `sw.js` 404 — confirmed identical on the
+unchanged backup. JS syntax gate **PASS, 10/10 blocks**.
+
+**Found on the same walk, not fixed — stated rather than hidden.** The Reform Risk tab button
+`title` (index.html:1428) and the Home card (line 1591) both advertise reform history "across
+185 jurisdictions"; coverage is 21. The tab body is honest about this in four places — the
+snapshot strip, the picker optgroups, the regional tilt "N of M sourced" labels and the
+no-coverage verdict — so this is an entry-point promise the destination corrects, not a data
+error. Fixing it is a text-only edit, which the directive bans as a cycle.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip on any
+pre-existing control. No page-sub paragraph, amber instructional banner, routing hint or "How to
+read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still
+collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed
+or reordered.** **No published take, NPV, rank, score, tier colour or pill value was altered, and
+no threshold was introduced.** v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452,
+v489 and all later locks intact. Version sweep **v597 → v598** across 5 sites, done silently at
+the end; it is **not** the deliverable.
