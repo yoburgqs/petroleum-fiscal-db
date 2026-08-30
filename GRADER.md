@@ -22026,3 +22026,18 @@ colour or pill value was altered.** v371/v373 declutter, v430 sessionStorage log
 v451, v452, v489 and all later locks intact. Version sweep **v596 → v597** across 5
 structural sites, done silently at the end; it is **not** the deliverable. No changelog
 catch-up (directive-banned bookkeeping) — the record lives in the code comment and here.
+
+---
+## Cycle 502 Log — 2026-08-30 07:52
+- Test before: 135 PASS / 0 FAIL
+- Test after: 135 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Both repos pushed.
+
+## Cycle 502 — T1 / v597
+
+**Task — T1:** "Which countries should even be on my screening list?" (stalest; the last six version commits ran T6, T4, T6, T3, T2, T5).
+
+**Friction.** I walked T1 cold with storage cleared: Screener tab → IOC Capital Screen preset (15 of 185) → `+` on the top three → `Compare` on the floating basket. That button is the only "now do something with my shortlist" affordance on the page, pinned to the bottom of the viewport.
+
+It landed 
