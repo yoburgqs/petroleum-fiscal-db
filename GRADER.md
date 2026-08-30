@@ -22589,3 +22589,16 @@ Second defect on the same sheet: `Project life (yr)` printed 15 for Marginal and
 3. The items carried from cycles 504/505/506 are untouched and still open: `renderIOCExposure()` filtering `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows pinning `take_75` to the country value; `nocExcludedCount` in `loadIOC()` always 0; the 2-country `_cmpOrderMark` asymmetry; the Top Contracts per-row `IRR%` column the platform disowned in aggregate at v516; Norway's `76 · HIGH` predictability against a `≥29.6pp obs` chip.
 
 **STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** **No published country take, NPV, rank, score, tier colour or pill value was altered, and no threshold was introduced** — every figure changed here is a stated assumption in an exported workbook, corrected to match the engine that was already running. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v569, v588, v601 and all later locks intact. Version sweep **v601 → v602** across 5 display sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 507 Log — 2026-08-30 12:52
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos clean and pushed. (I left the two local test servers on :8090/:8093 running — the cleanup command was denied.)
+
+## Cycle 507 — T5 / v602
+
+**Task — T5:** "Give me something I can paste straight into an IC memo." Stalest of the six (506=T2, 505=T3, 504=T6, 503=T4, 502=T1, 501=T5).
+
+**Friction.** Walked it cold: Home → Fiscal Compare → pick a profile → Run Compare → **Export XLSX**, the button the Quick Start calls "Export XLSX for IC attachment." The workbook's second sheet is **Methodo
