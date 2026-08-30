@@ -21405,3 +21405,115 @@ Cold walk (fresh context, storage cleared) into the Breakeven Map. The tab's ver
 
 | | |
 
+
+---
+## Cycle 497 Log — 2026-08-30 (T6 / v592)
+
+- Test before: 135 PASS / 0 FAIL / 0 WARN
+- Test after: **135 PASS / 0 FAIL / 1 WARN** — `runtime_comprehensive.js` **RAN this cycle**
+  against the local build (`TEST_URL=http://localhost:8901`). The WARN is the pre-existing
+  local-harness service-worker 404, absent on GitHub Pages.
+- JS syntax gate: **PASS** (10 blocks / 0 errors). JS runtime errors on every walk: **0**.
+
+## Task
+
+**T6** — "Where did this number come from and how solid is the evidence?"
+
+Stalest of the six: the last eleven version commits ran T1, T4, T2, T1, T3, T3, T4, T5, T4,
+T2, T6 — T6 was last walked at cycle 486.
+
+## Friction
+
+Walked cold in Chromium, `sessionStorage` and `localStorage` cleared, into **Explorer**.
+
+Every Explorer and Screener row carries a coloured pill on the country name: **FACTS**,
+**EVIDENCE** or **PROXY**. It is the only word in the row that answers T6 in plain English,
+it is coloured, and it sits on the country name where the eye lands first.
+
+**It does not answer T6.** `_dqTier()` (`index.html:23023`) computes it entirely from
+`prod_coverage_pct` and `weighting` — how much of the take is weighted by verified field
+output — and carries no source-quality information whatsoever. Three columns to its right
+sits a column headed **EVIDENCE** grading the other axis (primary-law share × fact depth,
+`_evidenceGrade()`, v551).
+
+Measured against the shipped `country_data.json`, the two are not merely different — in the
+cases that matter they are **anti-correlated**:
+
+| badge | n | of which evidence C or D |
+|---|---|---|
+| FACTS (top rung, green) | 10 | **4** — Iraq **D** (11.8% primary law), Nigeria **C**, Kazakhstan **C**, Colombia **C** |
+| EVIDENCE (middle rung, amber) | 12 | 1 country runs the other way: **Brazil**, evidence grade **A** |
+| PROXY | 163 | — |
+
+So the **Iraq** row rendered a green pill reading **FACTS** beside an Evidence column reading
+**D**. And the ladder is inverted on its face: in an evidence-grading tool, a rung labelled
+FACTS outranking a rung labelled EVIDENCE has no reading that is correct.
+
+Hovering made it worse rather than better. `getDQBadge()` handed the badge
+`buildEvidenceTooltip()`, whose first line is *"Primary legal instrument (tier A): 11.8% of
+facts"* — a sourcing sentence on a production-basis badge. The analyst hovers a pill labelled
+FACTS, gets source-tier percentages back, and reads it as confirmation.
+
+The worst instance is not on Explorer at all. The same badge is embedded inside the **Country
+Profile** panel headed **"Evidence Quality"** (`index.html:29153`), where on Iraq it printed
+**FACTS** directly beneath the headline *"11.8% primary law (tier A)"*.
+
+Also found on this walk, not fixed: the Fiscal Compare **NPV ($M) MODEL** column-header
+tooltip prints the literal string `(undefined)` — *"on the profile selected above
+(undefined)"*. A dead interpolation in a tooltip; its own small cycle.
+
+## Change
+
+- **The ladder is relabelled onto the axis it actually measures: `PROD-WTD` / `PART-PROD` /
+  `PROXY`.** No rung is a sourcing word any more, and all three name one continuum.
+- **CSS classes renamed with the labels** — `.dq-facts` → `.dq-prodwtd`, `.dq-evidence` →
+  `.dq-partprod` — so a future surface cannot regrow the collision off the stylesheet.
+- **`getDQBadge()` no longer calls `buildEvidenceTooltip()`.** It states the production basis
+  in its own terms (coverage %, contract count, weighting method), then names that country's
+  *actual* evidence grade, label, primary-law share and fact count, and says in one sentence
+  that the two are independent — "a country can be production-weighted on thinly sourced
+  terms, or proxy-modelled on primary law."
+- **The Explorer count line** stopped calling production depth *"the deepest evidence basis in
+  the database"* and now points at the Evidence column for source quality.
+- `_cmpBasisTip()` (Side-by-Side) and the Explorer grouping/count logic repointed to the new
+  labels; the XLSX **Data Basis** column now exports the same three words the badge shows.
+
+## Result
+
+An analyst asking "how solid is the evidence?" on Iraq no longer reads a green **FACTS** pill
+as the answer. The row now reads **PROD-WTD** (production basis) and **D** (evidence); the
+badge tooltip names both figures and states they are independent; and the Country Profile
+*Evidence Quality* panel no longer prints a production badge in sourcing vocabulary under an
+11.8%-primary-law headline. The two questions ORCA answers — *is this take built on real
+output?* and *is it built on real law?* — are now asked in two different vocabularies on the
+same row.
+
+### Verified cold in Playwright, storage cleared, against the local build
+
+| country | badge | Evidence col |
+|---|---|---|
+| Iraq | PROD-WTD | **D** — 11.8% primary law / 3,577 facts |
+| Brazil | PART-PROD | **A** — 65.1% / 3,591 |
+| Canada | PROD-WTD | A — 92.7% / 1,758 |
+| Norway | PROD-WTD | A — 66.1% / 63,848 |
+| USA | PART-PROD | B — 40.6% / 125,336 |
+| Iraq-Kurdistan | PROXY | D — 0.0% / 166 |
+
+Badge distribution per table: **PROD-WTD 20 · PART-PROD 24 · PROXY 141**. Country Profile
+renders the single badge as `PROD-WTD [dq-badge dq-prodwtd]`. Screener distribution identical
+to Explorer. **0 JS errors on every walk.**
+
+### STILL LOCKED — nothing touched
+
+No new FAQ (still **974**). **No new tooltip on a control whose behaviour is unchanged** — the
+only tooltip rewritten is the one on the badge whose meaning was wrong. No page-sub paragraph,
+amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** v371/v373
+declutter, v430 sessionStorage logic, v449 tier colours + Screener row-click hint, v451
+two-zone CP headline + Govt NPV removal, v452 rank + vs-median pill, v489 Reform Risk in the
+primary Home grid, v507 single-source `_dqTier`, v518, v551 two-legged evidence grade, v557
+`getEvidenceColor` deletion, v568, v573, v579, v580, v581, v589, v590, v591 — all intact. No
+changelog entry added; the in-page changelog's newest entry remains v581, the directive
+treating changelog catch-up as bookkeeping. Version sweep **v591 → v592** across 5 structural
+sites, done silently at the end; it is **not** the deliverable.
