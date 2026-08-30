@@ -22735,3 +22735,117 @@ The refutation is evidence-driven, not blanket: **Ghana** and **Iraq** (measured
 **Friction.** Walked cold into the Reform Risk tab — where every T4 route ends (the Fiscal Compare Stability cell, the Country Profile sidebar button, and the Home *Check Reform Risk* card all land there).
 
 ORCA has a sourced reform log for 21 of 185 countries. For the other **164** the card has no refo
+
+---
+## Cycle 510 Log — 2026-08-30 15:35
+- Test before (HEAD build, :8111): 195 PASS / 20 FAIL / 1 WARN
+- Test after (this build, :8110): 215 PASS / 0 FAIL / 1 WARN
+- Baseline before any edit: 186 PASS / 0 FAIL / 1 WARN
+- JS syntax gate: PASS, 10/10 blocks (re-run after the version sweep)
+- Playwright RAN this cycle, three builds, full suite
+- WARN both builds: known local-harness `sw.js` 404
+
+## Cycle 510 — T6 / v605
+
+**Task — T6:** "Where did this number come from and how solid is the evidence?"
+Stalest of the six (509=T4, 508=T1, 507=T5, 506=T2, 505=T3, 504=T6).
+
+**Friction.** Walked cold, `sessionStorage` and `localStorage` cleared, into Country Profile —
+the tab that answers the provenance question — then did what the analyst actually does with
+the answer: carried it out of the tool.
+
+Country Profile for **Russia** renders the evidence badge **D**, *"thin or unsourced"*, 3.8%
+primary law. Two inches away is `⎘ IC Citation`, the button built to put that provenance in the
+memo. Read back off the clipboard:
+
+> Russia: Govt Take 46.4% @$75/bbl […] — Deepwater profile, 10% WACC, 100% WI, Concession
+> regime, **A-tier sourcing**.
+
+The badge is visible only while the analyst is on the page. The citation is what survives into
+the IC memo, and it reversed the letter.
+
+**Cause.** Three surviving private copies of `ab_pct >= 80 ? 'A' : >= 60 ? 'B' : 'C'` — the
+grader **v551** replaced as broken (171 of 185 countries scored A; Russia at 3.8% primary law
+outranked Senegal at 67.2%) and **v557** deleted outright, writing into `index.html` that *"a
+fifth surface cannot regrow off ab_pct: `_evidenceGrade()` is the only evidence grader left."*
+**That sentence was false when it was written.** v551, v557 and v575 all fixed things drawn on
+screen. The three copies that survived were `copyICCitation()`, `copyICSummary()` and the Fiscal
+Compare drilldown **Src** badge — the three that reach an IC memo. Deleting a function does not
+delete an inlined threshold, and the claim was never measured against the clipboard.
+
+Measured against the shipped `country_data.json`:
+
+| | |
+|---|---|
+| Countries whose pasted tier contradicts the displayed badge | **158 of 185** |
+| Of those, **overstatements** | **156** |
+| Paste "A-tier sourcing" against a displayed **D** | **30** — Russia, Tuvalu, Ascension Island, Vanuatu, Bahamas |
+| Paste "A-tier" against a displayed **C** | **37** — incl. Kazakhstan, Nigeria, Ghana, Saudi Arabia |
+| Paste "B-tier" against a displayed **A** | **2** — Senegal and Liberia, the 2nd and 3rd best primary-law-sourced countries in the dataset |
+
+Tuvalu is the worst case: **2 facts total**, both from the SOPAC model petroleum act that
+**v588** established stands in for 8 other jurisdictions — pasted as `A-tier sourcing`.
+
+The FC drilldown carried the same rule twice: a green `Src 98% A/B` badge whose tooltip
+prescribed `>=80% A/B = IC-ready` (the gate **v518** removed from the Screener), and a
+source-quality warning gated at `ab_pct < 60` — which fired on **two** countries in the entire
+dataset and stayed silent on Russia.
+
+**Change.** One function, `_icSourcingTier()`, reading `_evidenceGrade()`. All four sites call
+it, so the clipboard and the drawer cannot fork from the page again.
+
+- The pasted tier carries **both legs**: `D-tier sourcing (3.8% primary law on 3,929 facts)`.
+- FC drilldown Src badge reads `Src C · 31% primary law · 3,700 facts`, coloured by the grade.
+  The IC-ready gate is gone.
+- The source-quality warning fires on grade **C or D** and names the binding leg (thin fact base
+  vs secondary sourcing) instead of an A/B percentage.
+- The false v557 comment is corrected in place rather than quietly dropped.
+
+**Result.** An analyst who reads *evidence: D* on screen and clicks Copy IC Citation now pastes
+`D-tier sourcing (3.8% primary law on 3,929 facts)` into the memo instead of `A-tier sourcing`.
+For the 30 D-graded and 37 C-graded countries the memo carries the platform's real read on its
+own evidence; for Senegal and Liberia it stops understating the two best-sourced regimes in the
+dataset.
+
+**Verification.** 29 assertions added to `tests/runtime_comprehensive.js` (`testICSourcingTier`):
+per-country badge-vs-clipboard agreement on 6 countries across both copy functions, a
+whole-dataset sweep asserting 0 mismatches and pinning the 158/156 measurement, and FC drawer
+badge / IC-ready / warning checks. **Verified to FAIL on the pre-change build — 20 FAIL**, every
+one of them a case named above. Both harness copies updated.
+
+**Found on the same walk, not fixed — stated rather than hidden.**
+
+1. `exportFCResults()` / `exportCountryXLSX()` still write a column literally headed
+   **"Evidence Quality A/B (%)"** carrying raw `ab_pct`. The label is honest about what it holds,
+   so it is not the same defect — but a workbook column and an on-screen badge now answer
+   "how solid" on two different scales.
+2. Items carried from cycles 504–509, untouched and still open: the FC profile strip's
+   `Life: 30yr` project-life fiction (index.html:36048); `exportFCResults()` writing only
+   `Contractor NPV_50/75` while ranking on the selected price; `exportReformRiskCSV()` writing
+   empty **Mechanic** and **Source** columns on all 83 rows; `renderIOCExposure()` filtering
+   `IOC_DATA` on `d.operator === operatorName`; the 92 USA rows pinning `take_75` to the country
+   value; `nocExcludedCount` always 0; the 2-country `_cmpOrderMark` asymmetry; the Top Contracts
+   per-row `IRR%` column; `window._activePresetName` as a dead global.
+3. The version sweep's site list is still hand-maintained. This cycle found the **meta
+   description frozen at v575 — 29 versions stale** — and swept it. Cycle 508 found an
+   `orca-cite-ver` span 28 versions stale. It needs an audit, not another one-site patch.
+4. **The loop's own reported test numbers are still wrong.** This cycle's prompt opened with
+   "CURRENT TEST RESULTS: 0 PASS / 0 FAIL / 0 WARN", and cycles 506–509 emailed the same. The
+   harness itself runs correctly — 215 PASS here, and the office copy's `REPO_ROOT` prober added
+   in cycle 507 is intact and its syntax checks clean. The failure is in the wrapper that invokes
+   it and parses the total, not in the suite. Not fixed this cycle; it is loop infrastructure,
+   not `index.html`.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** on a control
+whose behaviour did not change — the two tooltips rewritten belong to the Src badge and the
+source-quality warning, both of whose grading changed, and both previously stated a rule the
+platform had disowned. No page-sub paragraph, amber instructional banner, routing hint or
+"How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters
+still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added,
+removed or reordered.** **No row or column added or removed from any table.** **No published
+country take, NPV, rank, score, tier colour or pill value was altered, and no threshold was
+introduced** — the thresholds here are v551's, applied to three call sites that were bypassing
+them. v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v518, v527, v533,
+v538, v551, v557, v569, v575, v588, v601, v604 and all other locks intact. Version sweep
+**v604 → v605** across 5 structural sites plus the stale meta description, done silently at the
+end; it is **not** the deliverable.
