@@ -23858,3 +23858,16 @@ rather than replaces), v503, v505, v515, v517, v529, v535, v537, v549, v552, v55
 v568, v577, v588, v593, v596, v600, v602, v605, v606, v611, v612, v613, v614, v615 and v616 all
 intact. Version sweep **v616 → v617** across 5 structural sites, done silently at the end; it is
 **not** the deliverable.
+
+---
+## Cycle 521 Log — 2026-08-31 01:50
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 521 complete and pushed as **v617**.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest of the six (520 was T5, 519 T2, 518 T3, 517/516 T6, 515 T4, 514 T1).
+
+## Friction
+The Screener's **Min Contractor NPV** slider is a *price-following filter on a fixed range*. `runScreener()` has always tested it against ``d[`npv_${price}`]`` — following the price radios — but those radios live inside `#explorer-browse-mode`, which is `display:none` while the Screener is ope
