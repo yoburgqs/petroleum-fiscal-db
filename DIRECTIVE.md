@@ -56,6 +56,21 @@ happening.
 If you cannot write Step 5 without vague words like "improved", "enhanced",
 "clarity", or "polish", you have not made a real change. Go back to Step 3.
 
+**Step 5b — Check it on a phone.** Set by Zach 2026-08-30: *"make sure we stay on
+course for finalization of oil gas expertise fiscal ux including mobile defaults."*
+
+Every cycle now verifies its own change at **390 x 844 with `hasTouch: true`**, not
+only at desktop width. Two numbers, both cheap to measure:
+
+  - `document.documentElement.scrollWidth` must not exceed `clientWidth`. If your
+    change made the page scroll sideways on a phone, it is not done.
+  - No control you added or touched may render under 24px tall under
+    `pointer: coarse`.
+
+This is in the directive because the loop has already broken it once: v579 left
+mobile clean, and by v611 four screens scrolled sideways again and Reform Risk alone
+had 15 overflowing elements. Nothing in the cycle was looking, so nothing caught it.
+
 **Step 6 — Verify.** JS syntax gate must PASS. Playwright must actually RUN —
 do not record a number "based on prior clean baseline". If the test did not run
 this cycle, say so in the log.
@@ -111,7 +126,37 @@ Notice: all four came from walking a flow, not from reading a rubric.
 - **v452:** CP headline Zone A keeps global rank + vs-median pill, computed
   before the headline strip to avoid the TDZ error.
 - **v489:** Reform Risk stays in the primary Home card grid.
+- **v612 mobile layer — do not remove, weaken or narrow its scope.** The block
+  headed `v612 — MOBILE LAYER` and the `translateX` state on `#reference-panel`.
+  It is deliberately scoped to `pointer: coarse` and `max-width: 720px`, so it
+  changes nothing on a desktop: Fiscal Compare still measures 382 of 601 controls
+  under 24px with a mouse, and 3 with a thumb. If a cycle finds it in the way, the
+  answer is to narrow the selector, never to delete the rule.
+  - `#reference-panel` must never go back to a negative `right` offset. A fixed
+    element parked off-canvas that way extends the document's scroll width, which
+    is what made all twelve screens scroll 390px sideways on a phone.
+  - Rows that must scroll rather than wrap opt out with `min-width: max-content`.
+    That marker is load-bearing — the wrap rule keys off its absence.
 - Tab order is not to be restructured without Zach's explicit approval.
+
+## WHAT "FINISHED" MEANS
+
+Set by Zach 2026-08-30. The course is **finalization of the oil & gas expertise
+fiscal UX**, and nothing else. Career is on hold — if a cycle finds itself doing
+career work, something has misrouted and the cycle should stop and say so.
+
+Finalization is these five, all measured against the deployed build, none of them
+self-assessed:
+
+  1. Runtime suite green, and the number actually read from the suite's own report
+     rather than assumed. (Cycles 506-516 shipped while the gate read nothing.)
+  2. Zero horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390.
+  3. Zero controls under 24px under `pointer: coarse`.
+  4. Zero console and page errors across every tab.
+  5. Every export opens, parses, and carries the assumptions behind its numbers.
+
+When all five hold, a cycle that finds nothing should say so and stop, rather than
+invent work. That is a finished product, not a failed cycle.
 
 ## IF YOU FIND NOTHING
 
