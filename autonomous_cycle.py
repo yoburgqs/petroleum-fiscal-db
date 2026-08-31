@@ -90,6 +90,11 @@ def run_playwright():
     import os as _os
     env = _os.environ.copy()
     env["NODE_PATH"] = str(REPO / "node_modules")
+    # v612: tell the suite where to write, instead of trusting two constants in two
+    # languages to stay equal. They did not: the suite wrote /tmp/runtime_test_report.txt
+    # while this file read office/data/runtime_test_report.txt, so cycles 513-516 scored
+    # 236 PASS in the suite's own output and recorded 0 PASS / 0 FAIL here.
+    env["ORCA_REPORT_FILE"] = str(REPORT_FILE)
 
     # Delete the report BEFORE running. Without this, a suite that stalls and
     # hits the 300s timeout leaves the PREVIOUS run's report in place, and the
