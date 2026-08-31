@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v612</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v613</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1080,6 +1080,15 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 }
 
 
+/* v613 — Sample Analyses card overflow, at EVERY width.
+   Two of the sample cards hold tables whose intrinsic width is 716px and 646px, inside a grid
+   track that is 610px at 1280 and 482px at 1024. The tables simply spilled out of their card and
+   took the document with them: Sample Analyses measured scrollWidth 1467/1440, 1387/1280 and
+   1259/1024 — the whole page scrolled sideways on three of the six widths the finish line names,
+   and the row an analyst was reading ran off under the window edge. The scroll belongs to the
+   card, not the document. min-width:0 stops a max-content child re-floring the grid track. */
+[id^="samples-grid"] > * { min-width: 0; overflow-x: auto; }
+
 /* ══════════════════════════════════════════════════════════════════════════
    v612 — MOBILE LAYER
    Zach, by email 2026-08-30: "Make THIS more mobile friendly.."
@@ -1220,6 +1229,13 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 
   /* Reform Risk cards: headline + counts + verdict on one nowrap line. */
   .rr-card, .rr-headline, .rr-row, [id^="rr-"] > div[style*="display:flex"] { flex-wrap: wrap; }
+
+  /* v613: the v612 layer wrapped inline FLEX rows and missed inline GRID tracks. The seven
+     Sample Analyses grids are declared inline as repeat(auto-fit, minmax(460px, 1fr)); a
+     460px track cannot shrink to fit a 390px phone, so auto-fit kept one column at 460px and
+     the tab measured scrollWidth 474 against clientWidth 390 — the only screen of the ten
+     still scrolling sideways after v612. One column on a phone, and the track floor goes. */
+  [id^="samples-grid"] { grid-template-columns: minmax(0, 1fr) !important; }
 }
 
 @media (max-width: 390px) {
@@ -1552,7 +1568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v612</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v613</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1622,7 +1638,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v612</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v613</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1964,7 +1980,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v612';
+  return m ? m[0] : 'v613';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2039,7 +2055,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v612');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v613');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -33552,41 +33568,143 @@ function renderReformRisk() {
 window.renderReformRisk = renderReformRisk;
 
 function exportReformRiskCSV() {
-  var rh = typeof REFORM_HISTORY !== 'undefined' ? REFORM_HISTORY : {};
+  // ── v613 (T5) ────────────────────────────────────────────────────────────────
+  // This file is the Reform Risk tab's only export, and it is the artifact whose entire
+  // subject is "has this government changed the fiscal terms before, and how do you know."
+  // It shipped with the "how do you know" stripped out.
+  //
+  // The function iterated REFORM_HISTORY — the inline literal — while the SCREEN renders from
+  // window._ALL_REFORMS: the same records, enriched asynchronously from the per-country API
+  // JSONs with `source`, `source_url` and `confidence`. REFORM_HISTORY holds none of those three
+  // keys, so the column literally headed "Source" exported EMPTY on all 83 rows, while the reform
+  // table four inches above showed a named citation and an A/B badge for every one of them
+  // ("Libya Petroleum Law 1955", "IIAPCO-Pertamina PSC 1966; Johnston International Petroleum
+  // Fiscal Systems 2003", …). In an IC memo an empty Source column is worse than no column:
+  // it reads as a positive claim that the row is unsourced.
+  //
+  // "Mechanic" was the same class of miss v608 fixed in the Breakeven CSV — the field is
+  // `mechanic_to`, not `mechanic`, so that column was empty on 83 of 83 rows too.
+  //
+  // And unlike every other export on this platform (Breakeven v608, Screener, Fiscal Compare),
+  // the file carried no caption, no basis note and no ORCA source stamp, so nothing inside it
+  // said which tool, which build or which dataset produced it.
+  var _all = (window._ALL_REFORMS && window._ALL_REFORMS.length) ? window._ALL_REFORMS : null;
+  var recs = [];
+  if (_all) {
+    recs = _all.slice();
+  } else {
+    // Fallback only if the Reform tab has never initialised. Sources are not available on this
+    // path and the preamble says so rather than shipping a silently blank column.
+    var rh = typeof REFORM_HISTORY !== 'undefined' ? REFORM_HISTORY : {};
+    Object.keys(rh).forEach(function(c) {
+      (Array.isArray(rh[c]) ? rh[c] : []).forEach(function(e) {
+        var o = {}; for (var k in e) { if (Object.prototype.hasOwnProperty.call(e, k)) o[k] = e[k]; }
+        o.country = c; o.direction = (typeof _rrEventDir === 'function') ? _rrEventDir(e) : '';
+        recs.push(o);
+      });
+    });
+  }
+  if (!recs.length) { showCopyToast('No reform data to export.'); return; }
+
+  // Country A–Z then year ascending — the layout this file has always had. _ALL_REFORMS is
+  // sorted globally by year for the on-screen log, which is not the order a spreadsheet wants.
+  recs.sort(function(a, b) {
+    if (a.country !== b.country) return String(a.country).localeCompare(String(b.country));
+    return (a.year || 0) - (b.year || 0);
+  });
+
+  var NOSRC = 'NOT RECORDED — no citation held for this event';
   // v583 (T4): the workbook must carry the same fiscal/context split the screen now shows,
   // or an analyst filtering the CSV rebuilds the old count offline.
-  var rows = [['Country','Year','Event','Mechanic','Take Change','Direction','Counts In Reform Frequency Score','Context Kind','Source','Notes']];
-  Object.keys(rh).sort().forEach(function(c) {
-    var events = Array.isArray(rh[c]) ? rh[c] : [];
-    events.forEach(function(e) {
-      rows.push([
-        c,
-        e.year || '',
-        e.event || e.name || '',
-        e.mechanic || '',
-        e.take_change || '',
-        // v585 (T4): this read e.direction off the raw REFORM_HISTORY record, which has no such
-        // field — the Direction column has been exporting empty on every row since it was added.
-        // It now carries the same four-state split the screen shows.
-        ({ hostile: 'Raised take', friendly: 'Cut take',
-           unmeasured: 'Fiscal change, size not recorded',
-           context: 'Changed no fiscal terms' })[_rrEventDir(e)],
-        (e.fiscal_change === false ? 'No' : 'Yes'),
-        e.context_kind || '',
-        e.source || '',
-        e.notes || ''
-      ]);
-    });
+  var rows = [['Country','Year','Event','Mechanic After Reform','Take Change','Direction',
+               'Counts In Reform Frequency Score','Context Kind',
+               'Source','Source Confidence','Source URL','Notes']];
+  var nSourced = 0, nUrl = 0, nTake = 0, nCtx = 0, confN = { A: 0, B: 0 };
+  var yrLo = null, yrHi = null;
+  var countries = {};
+  recs.forEach(function(e) {
+    countries[e.country] = 1;
+    var y = parseInt(e.year, 10);
+    if (!isNaN(y)) { if (yrLo === null || y < yrLo) yrLo = y; if (yrHi === null || y > yrHi) yrHi = y; }
+    if (e.source) nSourced++;
+    if (e.source_url) nUrl++;
+    if (e.take_change) nTake++;
+    if (e.fiscal_change === false) nCtx++;
+    var conf = e.source ? String(e.confidence || 'B').toUpperCase() : '';
+    if (conf === 'A' || conf === 'B') confN[conf]++;
+    rows.push([
+      e.country,
+      e.year || '',
+      e.event || e.name || '',
+      // v613 (T5): was e.mechanic — no such field on a reform record. Empty on every row until now.
+      e.mechanic_to || '',
+      e.take_change || '',
+      // v585 (T4): this read e.direction off the raw REFORM_HISTORY record, which has no such
+      // field — the Direction column has been exporting empty on every row since it was added.
+      // It now carries the same four-state split the screen shows.
+      ({ hostile: 'Raised take', friendly: 'Cut take',
+         unmeasured: 'Fiscal change, size not recorded',
+         context: 'Changed no fiscal terms' })[e.direction || ((typeof _rrEventDir === 'function') ? _rrEventDir(e) : '')] || '',
+      (e.fiscal_change === false ? 'No' : 'Yes'),
+      e.context_kind || '',
+      e.source || NOSRC,
+      conf,
+      e.source_url || '',
+      e.notes || ''
+    ]);
   });
-  if (rows.length <= 1) { showCopyToast('No reform data to export.'); return; }
-  var csv = rows.map(function(r) { return r.map(function(v) { return '"' + String(v).replace(/"/g,'""') + '"'; }).join(','); }).join('\r\n');
+  var N = rows.length - 1;
+  var nC = Object.keys(countries).length;
+
+  // v613 (T5): every figure in this block is counted off the rows actually written above, not
+  // asserted from the database. The Breakeven CSV (v608) sets the house rule.
+  var pre = [
+    'ORCA Reform History — ' + N + ' events across ' + nC + ' countries, ' + yrLo + '–' + yrHi,
+    'THIS IS THE FULL LOG, NOT THE FILTERED VIEW. The country / direction / decade filters on the '
+      + 'Reform Risk tab do not narrow this file — it always exports every event ORCA holds, so a '
+      + 'filtered screen and this file will not agree on a count. Rows are country A–Z, then year '
+      + 'ascending. Row order is not a ranking.',
+    (nCtx
+      ? 'ONLY ' + (N - nCtx) + ' OF THESE ' + N + ' ROWS SCORE. ' + nCtx + ' are context events — discoveries, '
+        + 'first oil, conflict, a terms review that concluded without renegotiation, one non-petroleum tax — '
+        + 'that changed no fiscal terms and do NOT feed the Reform Frequency Score. Filter on '
+        + '"Counts In Reform Frequency Score" = Yes before counting reforms, or you will overstate '
+        + 'this government’s record against the contractor.'
+      : 'All ' + N + ' rows are fiscal law changes that feed the Reform Frequency Score.'),
+    '"Take Change" is populated on ' + nTake + ' of ' + N + ' rows. A blank means the size of the fiscal '
+      + 'change was not recorded — it does NOT mean zero, and must not be summed or averaged as if it were. '
+      + 'The Direction column still states which way the change went on those rows.',
+    (nSourced
+      ? 'SOURCING: ' + nSourced + ' of ' + N + ' rows carry a named citation'
+        + ((confN.A || confN.B) ? ' (' + confN.A + ' at confidence A, ' + confN.B + ' at B)' : '')
+        + ', and ' + nUrl + ' of those carry a resolvable URL. Confidence A = primary official source '
+        + '(legislation, decree, or concession agreement). Confidence B = country-level secondary guide '
+        + '(EY / KPMG / IHS bulk harvest), assigned to the whole country and never read off an individual '
+        + 'contract — it is NOT an operator filing. Rows marked "' + NOSRC + '" are exactly that: verify '
+        + 'against the country’s own petroleum act before citing them.'
+      : 'SOURCING UNAVAILABLE IN THIS FILE. The per-event citations are fetched from the country API '
+        + 'files after the Reform Risk tab opens, and that fetch had not completed when this export ran. '
+        + 'Every row therefore reads "' + NOSRC + '" whether or not ORCA holds a citation for it. Reopen '
+        + 'the Reform Risk tab, wait for the Source column in the on-screen log to populate, and export '
+        + 'again before citing anything here.'),
+    'Reform history is a record of what a government has already done to fiscal terms. It is not a '
+      + 'forecast, and it carries no take, NPV or breakeven — for those, export from Fiscal Compare or the Screener.',
+    'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/'
+  ];
+
+  var q = function(v) { return '"' + String(v).replace(/"/g,'""') + '"'; };
+  var body = rows.map(function(r) { return r.map(q).join(','); }).join('\r\n');
+  var csv = pre.map(q).join('\r\n') + '\r\n\r\n' + body
+    + '\r\n\r\n' + q(pre[pre.length - 1]);
   var blob = _csvBlob(csv);
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url; a.download = 'orca_reform_history_' + new Date().toISOString().slice(0,10) + '.csv';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showCopyToast('Reform history exported (' + (rows.length - 1) + ' events)');
+  showCopyToast(nSourced
+    ? N + ' events exported — ' + nSourced + ' with their citation, and the file states which rows score.'
+    : N + ' events exported — WITHOUT citations: the source fetch had not finished. Reopen the tab and export again.');
 }
 window.exportReformRiskCSV = exportReformRiskCSV;
 
