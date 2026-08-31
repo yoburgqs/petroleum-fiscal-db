@@ -23758,3 +23758,103 @@ across 5 structural sites, done silently at the end; it is **not** the deliverab
 **Task —** T5, *"Give me something I can paste straight into an IC memo."* Stalest of the six (519 was T2, 518 T3, 516/517 T6, 515 T4, 514 T1, 513 T5).
 
 **Friction —** I walked Fiscal Compare cold, set the price selector to **$125/bbl**, hit Export XLSX, and then read the workbook instead of the code. The file came out named `ORCA_fiscal_compare_$125_deepwater_2
+
+---
+## Cycle 521 Log — 2026-08-31 06:50
+- Test before: 236 PASS / 0 FAIL (deployed-URL baseline carried in)
+- Test after: 261 PASS / 0 FAIL / 1 WARN — RAN this cycle against a local server, number read from /tmp/runtime_test_report.txt, not assumed
+- JS errors: 1 — the pre-existing service-worker 404 (`/petroleum-fiscal-db/sw.js` against a root-served local server), the same WARN v500 recorded. 0 page errors in all four hand walks.
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop cycle 521) | **Task:** Cycle 521 — T1 screening list
+
+## Cycle 521 — shipped as v617
+
+**Task —** T1, *"Which countries should even be on my screening list?"* Stalest of the six
+(520 was T5, 519 T2, 518 T3, 517/516 T6, 515 T4, 514 T1).
+
+**Friction —** `#sl-npv` ("Min Contractor NPV") is a **price-following filter on a fixed range**.
+`runScreener()` has always tested it against ``d[`npv_${price}`]`` following the price radios — but
+those radios sit inside `#explorer-browse-mode`, which is `display:none` while the Screener is open,
+and the slider itself was hardcoded `min="-500" max="2000"`. Measured live in Playwright, dragging
+the floor to its absolute maximum left:
+
+| deck | countries still passing at full right |
+|---|---|
+| $50 | 8 of 185 |
+| $75 | 114 of 185 |
+| $100 | 130 of 185 |
+| **$125** | **163 of 185** |
+
+So on the deck an IC screens upside at, the strictest NPV floor the analyst could set removed
+**22 countries**, and the label read `@$75` throughout. The band that actually shortens a shortlist
+— $2,000M to $4,500M at $75, where the count falls **114 → 5** — was entirely off the end of the
+control and unreachable at any slider position. This is the same failure class as v517 (IRR) and
+v568 (breakeven): a criterion that names a property but cannot screen on it. The difference is that
+here the underlying data is sound — `npv_75` is 185/185 coverage on the same standardized Deepwater
+profile v517 already blessed as the replacement criterion — so the axis is **re-ranged, not deleted**.
+
+**Change —**
+- The `#sl-npv` upper bound is derived from the **active deck's own distribution**: the 5th-largest
+  value floored to the nearest $100M, giving **2000 / 4500 / 6800 / 9200** at $50 / $75 / $100 / $125.
+  Full-right now lands on a 5–8 country shortlist at every deck. The rule reproduces **exactly 2000
+  at $50** — which is the evidence that the original bound was a $50 bound that was never re-tuned.
+- The hardcoded `@$75` caption is now `#sv-npv-deck` and names the deck actually in force.
+- The price radios now **re-run the Screener**. Previously only `renderExplorer()` was bound to them,
+  so a deck switch left both a stale axis bound and a stale caption.
+- Both NPV sliders carry a live per-axis count — **"· N of 185 clear this"** — amber
+  (`.sc-axis-inert`) when a floor passes ≥90%. The result-count bar reports only the *combined*
+  screen, so an axis doing nothing was indistinguishable from an axis doing another's work.
+- `min` stays **-500 at every deck**: it is the neutral sentinel that both `_scUpdateNeutralFlags()`
+  and `runScreener()` test for. Only the top end moves.
+- `#sl-npv50` is genuinely fixed to `npv_50` and its range already spans that distribution
+  (max 2371, bound 2000 ≈ p96), so it is **not** re-ranged — it gets the count only.
+
+**Result —** The analyst can set a contractor-NPV floor that produces a real shortlist at **every**
+price deck: $125 full-right went from **163 countries to 6**. They can also see, per axis, how many
+countries each floor is actually removing, instead of inferring it from a combined count.
+
+**Verified, not assumed.** Re-walked cold in Playwright at all four decks after the change: slider
+max 2000/4500/6800/9200, captions `@$50/@$75/@$100/@$125`, axis counts 8/5/6/6 — matching the
+`country_data.json` precomputation exactly. Neutral position (-500) correctly clears the count and
+restores "· no floor". All **12 presets** re-run clean with 0 page errors. **Mobile 390 × 844
+`hasTouch: true`**: all **10 tabs** report `scrollWidth == clientWidth == 390`; all four Screener
+sliders measure **44px** tall. JS syntax gate **PASS** (10 blocks / 0 errors).
+
+## Found on the same walk, not fixed
+**The Screener has no price control of its own.** The radios that drive its take ceiling *and* its
+NPV floor are in Browse mode and invisible while screening. v617 makes the deck legible on the NPV
+axis (`@$100`) and keeps it in sync, but the analyst still cannot *change* the deck without leaving
+the Screener. Whether the price selector should be lifted out of Browse into a shared Explorer-level
+control is a layout question that touches both modes, and belongs in its own cycle.
+
+**Three presets set an NPV floor that 185 of 185 countries clear.** The new axis count exposed this
+immediately: `IOC Capital Screen`, `Sweet Spot` and `Frontier Markets` all set `sl-npv` to `$0M`,
+which every country in the database passes — the criterion is carried in the preset's own
+description ("NPV positive at $75") but removes nothing. `downsidereturns` at $100M removes 3. These
+are published, named screens; silently re-tuning what they assert is a judgement about what the
+presets claim, not a mechanical fix, so they are left alone and recorded here.
+
+**Still open from cycles 504–520, untouched:** the Fiscal Predictability Score's inert −40 IQR
+penalty; the 42 countries where the contract table refutes `p25 == p75`; Guyana's headline take
+contradicting two grade-A sourced events on its own page; the Min Contractor NPV slider's *lower*
+half (−500 to 0) still spanning a region only 2 countries occupy; the dead `#cp-run-fc-btn`; the
+Scenario Builder's region-substring profile inference; `⬇ Chart PNG` dropping the notices; the
+"Evidence Quality A/B (%)" header on a retired scale; `renderIOCExposure()` filtering on
+`d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0; six "verified field
+production" countries rendering 0% in Prod Cov; the Evidence Chain's bulk-row `SOURCE` links
+resolving to the PwC index; the Side-by-Side take chart's `borderDash` keyed to
+`has_r_factor_tiers`; and the XLSX still ranking generic-default rows that `copyFCForIC()` excludes.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** — the two label
+`title` strings that changed are corrections of statements that had become false (`@$75` on a
+price-following filter, "(-500 to 2000)" on a re-ranged slider), not additions. No page-sub
+paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no
+visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home
+"More tools" still collapsed. **No tab added, removed or reordered.** No published take, NPV, rank,
+score, band, tier colour or pill value was altered — this cycle changes only which floors an analyst
+can reach and what the control tells them. The **v612 MOBILE LAYER** and the `#reference-panel`
+`translateX` state are untouched; no `min-width: max-content` marker was added or removed.
+v371/v373, v430, v449, v451, v452, v489, v500 (whose neutral-flag sentinel this cycle preserves
+rather than replaces), v503, v505, v515, v517, v529, v535, v537, v549, v552, v554, v555, v557, v562,
+v568, v577, v588, v593, v596, v600, v602, v605, v606, v611, v612, v613, v614, v615 and v616 all
+intact. Version sweep **v616 → v617** across 5 structural sites, done silently at the end; it is
+**not** the deliverable.
