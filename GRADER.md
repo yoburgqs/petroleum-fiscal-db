@@ -23419,3 +23419,50 @@ across 6 structural sites, done silently at the end; it is **not** the deliverab
 
 | # | country | take | facts on file |
 |---|---|---
+
+---
+## Cycle 515 — T4 / v610 — 2026-08-30
+
+**Task — T4:** "What is my fiscal-stability and reform exposure here?" (T4 was stalest: 514=T1, 513=T5, 512=T2, 511=T3, 510=T6, 509=T4.)
+
+**Friction.** Walked cold — fresh context, `sessionStorage` and `localStorage` cleared — into **Reform Risk** and used the per-country lookup at the top of the tab, the only control on it that takes a country as input. The tab body itself is in good shape: the snapshot, the regional tilt, the three partition cards and the event log all carry their own denominators, and the covered-country verdicts (Norway, Nigeria, Guyana, Iraq) are specific and honest.
+
+The failure is on the other 89%. ORCA carries a sourced reform log for **21 of 185** jurisdictions. For the remaining **164** the card says so plainly and then hands the analyst the **Fiscal Predictability Score** under the heading *"What you can defend instead"* — so for almost every country in the picker, that score **is** the entire T4 answer. It was printed as a bare band and tier colour. Two consecutive picks from the same dropdown:
+
+| pick | printed | basis line |
+|---|---|---|
+| Iraq-Kurdistan | **70 · MODERATE** (yellow) | "one statutory term — spread component not exercised" |
+| Egypt | **53 · LOW** (orange) | "measured spread 27.1pp across its contracts" |
+
+Read as a scale that says Kurdistan is the steadier jurisdiction. Measured against `country_data.json`, it says the opposite of what it looks like. The band is a ranking of how little dispersion ORCA can see:
+
+| dispersion basis | n | HIGH | MODERATE | LOW | VERY LOW |
+|---|---|---|---|---|---|
+| one statutory term | 132 | **86** | 43 | 3 | 0 |
+| measured spread | 28 | **0** | 11 | 14 | 3 |
+| no distribution held | 22 | — not scored — |||
+| state monopoly | 3 | — withheld (v572) — |||
+
+Every one of the **86** HIGH grades belongs to a country whose IQR penalty — the largest of the score's three components, worth up to **−40** — was never charged, because `p25_take === p75_take`. **Not one** of the 28 countries ORCA holds enough contracts to see disagree with itself can reach HIGH; the ceiling among them is **Turkmenistan at 74**. Kurdistan outranks Egypt because ORCA sees one term there, not because its terms move less. 132 + 28 + 22 + 3 = 185, asserted in the browser.
+
+This was already true and already written down — inside a `title=` attribute on `renderStabilityBadge()`, in numbers (**89** HIGH, **135** one-term) that no longer matched the file. A tooltip carrying a stale copy of the one fact that decides whether the number may be quoted is not a control. Same class as v561, where the Reform Frequency score was printed in a green ramp above the very column that contradicted it.
+
+**Change.** The Fiscal Predictability tile on the Reform Risk verdict card now prints, beneath the basis line and inside the same tile, the country's **rank within the cohort that shares its dispersion basis** — the only comparison this score supports — plus the cross-cohort bar. Both branches of `renderReformCountryVerdict()`: the 164 no-reform-log countries and the 21 scored ones.
+
+- **Egypt** — "17th of 28 countries ORCA can measure — **not 17th of 185**. The spread penalty is charged in this cohort and nowhere else, so nothing in it reaches HIGH — ceiling 74, Turkmenistan. **Do not rank this band against the 86 HIGH grades** — every one of them is a one-term regime charged nothing for spread."
+- **Iraq-Kurdistan** — "96th of 132 one-term regimes — a cohort the spread penalty never touches. All 86 HIGH grades on this platform sit in it, while the 28 countries with a measured spread top out at 74 (Turkmenistan). **A one-term score above a measured one is not the steadier regime** — it is the one ORCA holds less contract evidence against."
+- **Turkmenistan** — "Top of the 28 countries ORCA can measure … this 74 is the cohort ceiling."
+
+New `_fpCohortStats()` (cached, built from `COUNTRY_DATA`), `_fpCohortLine()`, `_fpOrd()`. **No published score, band, tier colour or take figure was altered** — the number and its band are unchanged; what is added is the cohort it may be compared inside. State-monopoly jurisdictions render no cohort line (v572 already withholds the score there); so do the 22 with no distribution.
+
+Also fixed on the same score: `renderStabilityBadge()`'s two basis tooltips had **89 HIGH**, **135 one-term** and **ceiling 74** typed in against a file that says **86 / 132 / 74**. Those counts now come from the data through `_fpCnt()` instead of being retyped, so they cannot drift again.
+
+**Result.** An analyst who lands on Reform Risk for one of the 164 uncovered jurisdictions — the overwhelmingly likely case, and the case the tab explicitly routes to this score — can no longer carry *"Egypt: LOW fiscal predictability"* into an IC memo against *"Kurdistan: MODERATE"* without being told, on screen at the point of reading, that the two grades come from different cohorts and that Egypt's is the one built on evidence. **LOW now reads as 17th of 28 measurable, not 150th of 185.**
+
+**Verification.** Cold Playwright walk, storage cleared, against the local build: all four dispersion states exercised (measured / one-term / not scored / state monopoly); cohort totals asserted to 185 in the browser; no horizontal overflow at 1440px; **0 page errors**. JS syntax gate **PASS** (10 blocks / 0 errors). `runtime_comprehensive.js` **ran this cycle**: **235 PASS / 0 FAIL / 1 WARN** — the WARN is the pre-existing local-harness `sw.js` 404, not this change.
+
+**Found on the same walk, not fixed.** The cohort split is the symptom of a scoring defect, not the cause: the Fiscal Predictability Score charges a **−40** IQR penalty that is inert for 132 of 160 scoreable countries, so the score is not one scale but two, and the fix here labels them rather than reconciling them. Reconciling would mean either scoring the one-term cohort on a stated assumption or refusing to grade it — a decision with published-number consequences, and its own cycle. Related and still open: the 42 countries where the contract table refutes the `p25 == p75` equality outright (v559/v604 handle the display, the score is still not recomputed).
+
+**Still open from cycles 504–514, untouched:** `exportReformRiskCSV()` writing Source empty where `reform_history.json` has no `source` field (a harvesting decision); the three near-no-op Screener presets (Sweet Spot returns 143 of 185); the Min Contractor NPV slider topping out below the median; the dead `#cp-run-fc-btn`; the Scenario Builder's region-substring profile inference; the SbS Contractor NPV chart mapping `selected` rather than `chartCountries`; `⬇ Chart PNG` dropping the notices; `exportFCResults()` writing only `Contractor NPV_50/75`; the "Evidence Quality A/B (%)" header on a retired scale; `renderIOCExposure()` filtering on `d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0; six "verified field production" countries rendering **0%** in Prod Cov.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** — the one fact that was in a tooltip was moved onto the page, and the two stale ones were corrected in place. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered. No row or column added or removed from any on-screen table, and no published country take, NPV, rank, score, band, tier colour or pill value was altered.** v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v505, v507, v543, v559, v572, v573, v591, v604, v606, v607, v608 and v609 all intact. Version sweep **v609 → v610** across 6 structural sites, done silently at the end; it is **not** the deliverable.
