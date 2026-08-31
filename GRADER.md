@@ -23537,3 +23537,16 @@ The Evidence Chain table below this panel is in good shape and was left alone �
 **Still open from cycles 504–515, untouched:** the Fiscal Predictability Score's inert −40 IQR penalty splitting one published scale into two cohorts; the 42 countries where the contract table refutes `p25 == p75`; `exportReformRiskCSV()` writing Source empty; the three near-no-op Screener presets (Sweet Spot returns 143 of 185); the Min Contractor NPV slider topping out below the median; the dead `#cp-run-fc-btn`; the Scenario Builder's region-substring profile inference; the SbS Contractor NPV chart mapping `selected` rather than `chartCountries`; `⬇ Chart PNG` dropping the notices; `exportFCResults()` writing only `Contractor NPV_50/75`; the "Evidence Quality A/B (%)" header on a retired scale; `renderIOCExposure()` filtering on `d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0; six "verified field production" countries rendering 0% in Prod Cov.
 
 **STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** — the fact that was only ever reachable in a tooltip is now printed on the page; the two `title=""` strings added sit on the new chips and replace the one they displaced. The panel still renders **COLLAPSED by default** (v371/v373 declutter) and `_homeOpenEvidence()`'s v527 open-on-arrival path is intact. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered. No row or column added or removed from any on-screen table, and no published country take, NPV, rank, score, band, tier colour or pill value was altered.** v371/v373, v430, v449, v451, v452, v489, v505, v507, v543, v557, v559, v572, v573, v588, v591, v592, v604, v605, v606, v607, v608, v609 and v610 all intact. Version sweep **v610 → v611** across 6 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 516 Log — 2026-08-30 20:27
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 516 complete — shipped v611.
+
+**Task — T6:** "Where did this number come from and how solid is the evidence?" (T6 was the stalest; 515 was T4.)
+
+**Friction.** Walked Country Profile cold with storage cleared and read the panel literally headed **"Evidence Quality"** (`buildEvidencePanel()`, `index.html:22969`). Its collapsed summary is the only evidence signal on the tab above the fold, and it rendered one pill: `{a_pct}% primary law (tier A)`.
+
+The words "tier A" printed on **all 185 coun
