@@ -23745,3 +23745,16 @@ v452, v489, v503, v505, v515, v529 (whose citable-block-first ordering this cycl
 rather than replaces), v535, v549, v552, v555, v557, v562, v568, v577, v588, v593, v596, v600,
 v602, v605, v606, v611, v612, v613, v614 and v615 all intact. Version sweep **v615 → v616**
 across 5 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 520 Log — 2026-08-31 01:01
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop cycle 520) | **Task:** Cycle 520 — T5 IC-memo artifact
+
+## Cycle 520 — shipped as v616
+
+**Task —** T5, *"Give me something I can paste straight into an IC memo."* Stalest of the six (519 was T2, 518 T3, 516/517 T6, 515 T4, 514 T1, 513 T5).
+
+**Friction —** I walked Fiscal Compare cold, set the price selector to **$125/bbl**, hit Export XLSX, and then read the workbook instead of the code. The file came out named `ORCA_fiscal_compare_$125_deepwater_2
