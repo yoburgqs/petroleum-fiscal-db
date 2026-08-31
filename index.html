@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v610.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v611.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v610</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v611</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v610</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v611</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v610</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v611</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v610';
+  return m ? m[0] : 'v611';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v610');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v611');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -22975,7 +22975,40 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
   const ab = (entry.ab_pct || 0).toFixed(1);
   // v557 (T6): the "X% primary law" pill was coloured by getEvidenceColor(ab_pct), so Russia
   // rendered "3.8% primary law (tier A)" in full green. Coloured by the grade it is reporting.
-  const color = _evidenceGrade(entry).color;
+  // ── v611 (T6): the box headed "Evidence Quality" never showed the evidence grade ──────
+  // The collapsed summary is the ONLY evidence signal on Country Profile above the fold, and it
+  // rendered one pill: `{a_pct}% primary law (tier A)`. Two failures, both in that one string.
+  //   1. The literal words "tier A" print on all 185 countries. They label what the percentage
+  //      measures, but they sit inside a box called Evidence Quality, so they read as the grade.
+  //      Tuvalu renders "100.0% primary law (tier A)" over a fact base of TWO facts, both from a
+  //      regional model act; the platform grades it D. Measured on the shipped country_data.json,
+  //      52 of 185 countries render a_pct >= 60 ("tier A" plus a strong-looking number) while
+  //      _evidenceGrade() rates them C or D, and 15 of those read exactly "100.0% primary law".
+  //   2. The DEPTH leg is absent. _evidenceGrade() is the WORSE of primary-law share and fact
+  //      count, and depth is the binding leg in all 52 of those cases — so the panel omitted the
+  //      one number that explains the grade, and nothing on the summary could reconcile it.
+  // Every other surface already leads with the letter: the Explorer/Screener Evidence column
+  // (v557), the Fiscal Compare Quality column (v551), the Side-by-Side Evidence tier row, and
+  // the IC citation (v605). Country Profile — the single-country tab an analyst lands on to ask
+  // exactly this question — was the one that did not. The letter did exist on the page, as a bare
+  // glyph wedged into the "Govt Take by Price Scenario" <h3> two sections below, beside the
+  // vs-median pills, where it reads as decoration on a take heading rather than an evidence grade.
+  // The summary now leads with the same letter and label the other four surfaces show, and states
+  // BOTH legs with the binding one coloured on _evidenceGrade()'s own thresholds. No tooltip was
+  // added: the fact that was only ever reachable in a tooltip is now on the page.
+  const _g    = _evidenceGrade(entry);
+  const color = _g.color;
+  const _nf   = Number(_g.nFacts || 0);
+  // Per-leg colour: red where that leg alone would grade D, orange where it would grade C.
+  const _aCol  = _g.byA === 'd' ? 'var(--red)' : _g.byA === 'c' ? 'var(--orange)' : 'var(--muted)';
+  const _nfCol = _g.byN === 'd' ? 'var(--red)' : _g.byN === 'c' ? 'var(--orange)' : 'var(--muted)';
+  const _nfTxt = (_g.byN === 'd' ? 'only ' : '') + _nf.toLocaleString() + ' fact' + (_nf === 1 ? '' : 's');
+  const _gWhy  = _cpEsc(_evidenceGradeWhy(entry));
+  const _legsTip = _cpEsc('The grade is the WORSE of these two legs, not an average of them. '
+    + 'Primary-law share: A \u2265 60% / B \u2265 40% / C \u2265 20%. Fact depth: A \u2265 150 / B \u2265 50 '
+    + '/ C \u2265 15 facts. The leg shown in red or orange is the one holding this country down. '
+    + 'A high primary-law share on a handful of facts is not a well-evidenced regime \u2014 it is a '
+    + 'small number of documents with nothing to cross-check them against.');
   const _bulk = _bulkPct(entry);
   const _shared = _sharedPct(entry);
   const srcs = (entry.top_sources || []);
@@ -23029,7 +23062,8 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
   return `<details id="cp-evidence-panel" style="background:var(--card);border:1px solid var(--border);border-radius:8px;margin:8px 0;">
     <summary style="padding:10px 12px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;user-select:none;">
       <span style="font-size:12px;font-weight:700;color:var(--text);">Evidence Quality</span>
-      <span style="background:${color}22;border:1px solid ${color};color:${color};font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="Share of this country's fiscal facts read out of the primary legal instrument — petroleum act, gazette, finance act or PSC text.">${a}% primary law (tier A)</span>
+      <span style="background:${color}22;border:1px solid ${color};color:${color};font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;letter-spacing:.02em;cursor:help;" title="${_gWhy}">${_g.letter} \u2014 ${_g.label}</span>
+      <span style="background:var(--surface2, rgba(148,163,184,.10));border:1px solid var(--border);font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;cursor:help;white-space:nowrap;" title="${_legsTip}"><span style="color:${_aCol};font-weight:700;">${a}% primary law</span><span style="color:var(--muted);"> \u00b7 </span><span style="color:${_nfCol};font-weight:700;">${_nfTxt}</span></span>
       ${_bulk > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts came from the EY / IHS / KPMG bulk harvest, which is assigned at country level rather than verified against each individual contract. Counted from the top sources listed below, so the true figure may be higher.">${_bulk.toFixed(0)}%+ bulk-harvested</span>` : ''}
       ${_shared > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts trace to a document that is also the cited source for other jurisdictions - a regional instrument applied across a group, not a text read off this country's own statute or its individual contracts. Counted from the top sources listed below, so the true figure may be higher.">${_shared.toFixed(0)}%+ multi-jurisdiction source</span>` : ''}
       <span style="margin-left:auto;font-size:10px;color:var(--muted);">sources ▸</span>
