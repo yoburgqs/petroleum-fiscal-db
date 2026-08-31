@@ -23466,3 +23466,18 @@ Also fixed on the same score: `renderStabilityBadge()`'s two basis tooltips had 
 **Still open from cycles 504–514, untouched:** `exportReformRiskCSV()` writing Source empty where `reform_history.json` has no `source` field (a harvesting decision); the three near-no-op Screener presets (Sweet Spot returns 143 of 185); the Min Contractor NPV slider topping out below the median; the dead `#cp-run-fc-btn`; the Scenario Builder's region-substring profile inference; the SbS Contractor NPV chart mapping `selected` rather than `chartCountries`; `⬇ Chart PNG` dropping the notices; `exportFCResults()` writing only `Contractor NPV_50/75`; the "Evidence Quality A/B (%)" header on a retired scale; `renderIOCExposure()` filtering on `d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0; six "verified field production" countries rendering **0%** in Prod Cov.
 
 **STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** — the one fact that was in a tooltip was moved onto the page, and the two stale ones were corrected in place. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered. No row or column added or removed from any on-screen table, and no published country take, NPV, rank, score, band, tier colour or pill value was altered.** v371/v373 declutter, v430 sessionStorage logic, v449, v451, v452, v489, v505, v507, v543, v559, v572, v573, v591, v604, v606, v607, v608 and v609 all intact. Version sweep **v609 → v610** across 6 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 515 Log — 2026-08-30 19:42
+- Test before: 0 PASS / 0 FAIL
+- Test after: 0 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 515 complete — shipped v610.
+
+## Task — T4
+"What is my fiscal-stability and reform exposure here?" (stalest: 514=T1, 513=T5, 512=T2, 511=T3, 510=T6, 509=T4)
+
+## Friction
+Walked cold with storage cleared into **Reform Risk** and used the per-country lookup — the only control on the tab that takes a country as input. The tab body is in good shape. The failure is on the other 89%.
+
+ORCA has a sourced reform log for 21 of 185 jurisdictions. For the other **164** the card says so honestly, then
