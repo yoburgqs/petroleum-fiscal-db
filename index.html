@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v613</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v614</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1568,7 +1568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v613</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v614</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1638,7 +1638,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v613</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v614</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1980,7 +1980,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v613';
+  return m ? m[0] : 'v614';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2055,7 +2055,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v613');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v614');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -25295,6 +25295,27 @@ function renderCompare() {
   const _cmpJoin = (a) => a.length < 2 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
   const _cmpSubLine = (txt, col) => '<span style="display:block;font-size:10px;font-weight:600;color:'
     + col + ';">' + txt + '</span>';
+  // v614 (T3): the three Contractor NPV cells on a state-monopoly column. They rendered "$0M"
+  // three times, in the same visual weight as Norway's $826M and Guyana's $1.1B, on a column
+  // whose Rank cell already reads "not ranked / state monopoly", whose Predictability cell reads
+  // "no contractor position", and whose four Govt Take cells are already an em dash. Read down
+  // the Economics block that put Saudi Arabia last on contractor value -- which is a category
+  // error, not a fiscal finding: $0 here means a contractor cannot take a position at all, not
+  // that it takes one and earns nothing. This is the v529 rule ("state monopolies carry no rank,
+  // no contractor NPV, no breakeven and no tier"), which was applied to Fiscal Compare and its
+  // workbook and never reached this grid. The dash rides the shared `rows` array into
+  // #cmp-data-table and both clipboard flavours, so the pasted IC table stops asserting it too.
+  const _cmpNpvCell = (d, v, price) => {
+    if (isStateMonopoly(d.take_75)) {
+      return '<span style="color:var(--muted);cursor:help;" title="' + _cmpEsc(d.country
+        + ': government take is ' + (d.take_75 != null ? d.take_75.toFixed(1) + '%' : '\u2265 99.5%')
+        + ' — a state monopoly with no contractor access. The DCF returns $0M at $' + price
+        + '/bbl because a 100% take leaves nothing, but that is the arithmetic of the take, not a '
+        + 'contractor result: there is no position here to value. Compare the contract count, '
+        + 'mechanics and evidence rows instead.') + '">—</span>';
+    }
+    return fmtNpvShared(v);
+  };
   // The four Govt Take cells. On a fee-blended column the headline take is kept --
   // it is the platform's published figure -- and the Group-1-only take is printed
   // directly beneath it, on the same row, because this row is where the eye lands
@@ -25584,9 +25605,9 @@ function renderCompare() {
           + _cmpEsc(d.country + ': contractor NPV is an unweighted mean across all ' + nc + ' contracts. Its Govt Take rows are ' + tw + '.'
             + (differs ? ' The two blocks are averaged over the same contracts with DIFFERENT weights, so they need not rank countries the same way.' : ' Both blocks use the same basis for this country.'))
           + '">Equal-weighted · all ' + nc + (differs ? ' <span style="font-weight:400;">(≠ take basis)</span>' : '') + '</span>'; }},
-    {label:'Contractor NPV @$50 (downside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $50/bbl on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI). This is the low-price stress case — the row an IC asks for first. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>fmtNpvShared(d.npv_50)},
-    {label:'Contractor NPV @$75 (base)',  key:(d)=>fmtNpvShared(d.npv_75)},
-    {label:'Contractor NPV @$125 (upside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $125/bbl on the same standardized profile. Read against the $50 row: the gap is how much of the upside this regime lets the contractor keep, and it is the contractor-side mirror of the Price Swing row above.">\u24d8</span>', key:(d)=>fmtNpvShared(d.npv_125)},
+    {label:'Contractor NPV @$50 (downside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $50/bbl on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI). This is the low-price stress case — the row an IC asks for first. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_50, '50')},
+    {label:'Contractor NPV @$75 (base)',  key:(d)=>_cmpNpvCell(d, d.npv_75, '75')},
+    {label:'Contractor NPV @$125 (upside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $125/bbl on the same standardized profile. Read against the $50 row: the gap is how much of the upside this regime lets the contractor keep, and it is the contractor-side mirror of the Price Swing row above.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_125, '125')},
     // v555 (T3): the 'Govt NPV @$75 (est.)' row is REMOVED. It was Contractor NPV x take/(1-take),
     // computed here in the browser, and it is the one row on this tab that contradicted the
     // correction printed four rows above it.
@@ -26053,10 +26074,16 @@ function renderCompare() {
     chartWrap.parentNode.insertBefore(_monopolyNoticeEl, chartWrap);
   }
   const _cmpNotices = [];
+  // v614 (T3): the notice said "excluded from chart", singular, while the column was in fact
+  // excluded from the Govt Take chart and PRESENT in the Contractor NPV chart directly below it,
+  // drawn as four zero-height bars. Both charts now drop it, and the notice says so and says
+  // what the analyst should read instead of the $0 it used to plot.
   if (monopolyCountries.length) _cmpNotices.push(
-    '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--accent);">⚠ State monopoly — excluded from chart: '
+    '<div style="background:rgba(176,104,0,.06);border:1px solid rgba(176,104,0,.2);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--accent);">⚠ State monopoly — excluded from <strong>both charts</strong>: '
     + monopolyCountries.map(d=>_cmpEsc(d.country)).join(', ')
-    + '. No contractor access; fiscal comparison not applicable.</div>');
+    + '. No contractor access, so there is no take to plot and no contractor NPV to plot: a contractor cannot enter this regime, which is not the same finding as a regime it can enter and lose money in. '
+    + (monopolyCountries.length === 1 ? 'Its column is' : 'Their columns are')
+    + ' kept in the grid above for the contract counts, mechanics and evidence rows, which are real.</div>');
   if (_cmpBandExcluded.length) _cmpNotices.push(
     '<div style="background:rgba(180,150,0,.07);border:1px solid rgba(180,150,0,.28);border-radius:6px;padding:8px 12px;margin-bottom:8px;font-size:12px;color:var(--yellow);">⚠ Cash-flow basis — excluded from the price-band chart: '
     + _cmpBandExcluded.map(d=>_cmpEsc(d.country)).join(', ')
@@ -26081,6 +26108,21 @@ function renderCompare() {
   // v501: 5th colour added with the 5-country cap. The NPV chart indexed colors[i]
   // without a modulo, so a 5th series rendered with backgroundColor "undefined88".
   const colors = ['#96570A','#7C3AED','#C2410C','#15803D','#1D4ED8'];
+  // v614 (T3): ONE colour per country, keyed off `selected` -- the grid's own left-to-right
+  // addition order, which the Reading line already tells the analyst the columns are sorted by --
+  // and read by BOTH charts. They previously indexed this same 5-colour palette off their own
+  // dataset arrays: the Govt Take chart off `chartCountries` (state monopolies and cash-flow
+  // columns removed) and the NPV chart off `selected` (nothing removed). So any set containing
+  // one of the 4 chart-excluded countries -- Saudi Arabia, Kuwait, Bahrain, Australia -- shifted
+  // every colour by one between two charts stacked 8px apart, with no shared key between them.
+  // Measured off the live DOM on Saudi Arabia + Norway + Guyana: Norway drew #96570A in the take
+  // chart and #7C3AED in the NPV chart, and #7C3AED in the take chart was Guyana. An analyst
+  // carrying the colour down from the first chart reads Norway's $826M as Guyana's $1,068M.
+  // 10.4% of all 2-5 country sets contain at least one of the four. Where nothing is excluded --
+  // the other 89.6% -- this reproduces the previous assignment byte for byte.
+  const _cmpColorMap = {};
+  selected.forEach(function(d, i){ _cmpColorMap[d.country] = colors[i % colors.length]; });
+  const _cmpColorOf = function(d){ return _cmpColorMap[d.country] || colors[0]; };
   if (chartCountries.length === 0) {
     chartWrap.style.display = 'none';
   } else {
@@ -26098,8 +26140,8 @@ function renderCompare() {
         datasets: chartCountries.map((d,i) => ({
           label: d.country + (_cmpRebasedSet[d.country] ? ' (PSC/Conc)' : '') + (d.has_r_factor_tiers ? ' ◆' : ''),
           data: PRICES.map(p => cpCmpTakeOf(d, String(p))),
-          borderColor: colors[i % colors.length],
-          backgroundColor: colors[i % colors.length]+'22',
+          borderColor: _cmpColorOf(d),
+          backgroundColor: _cmpColorOf(d)+'22',
           borderWidth: d.has_r_factor_tiers ? 3 : 2,
           pointRadius: 5,
           pointStyle: d.has_r_factor_tiers ? 'rectRot' : 'circle',
@@ -26139,7 +26181,15 @@ function renderCompare() {
 
   // NPV vs Price chart
   const npvChartWrap = document.getElementById('cmp-npv-chart-wrap');
-  const hasNpv = selected.some(d => d.npv_50 != null || d.npv_75 != null);
+  // v614 (T3): a state monopoly is dropped from this chart too. The tab already states, four
+  // times on the same column, that there is no contractor position here -- the Rank row reads
+  // "not ranked / state monopoly", the Predictability cell reads "no contractor position", all
+  // four Govt Take cells read an em dash, and the notice above the take chart says "fiscal
+  // comparison not applicable". Its series drew four ZERO-HEIGHT bars, so the only thing it
+  // contributed to the plot was a legend swatch for a colour that appeared nowhere in it --
+  // while occupying the palette slot that desynced every other column from the chart above.
+  const npvCountries = selected.filter(d => !isStateMonopoly(d.take_75));
+  const hasNpv = npvCountries.some(d => d.npv_50 != null || d.npv_75 != null);
   if (hasNpv && npvChartWrap) {
     npvChartWrap.style.display = 'block';
     if (window._cmpNpvChart) window._cmpNpvChart.destroy();
@@ -26148,11 +26198,11 @@ function renderCompare() {
       type: 'bar',
       data: {
         labels: ['$50/bbl','$75/bbl','$100/bbl','$125/bbl'],
-        datasets: selected.map((d, i) => ({
+        datasets: npvCountries.map((d, i) => ({
           label: d.country,
           data: [d.npv_50, d.npv_75, d.npv_100, d.npv_125],
-          backgroundColor: colors[i % colors.length] + '88',
-          borderColor: colors[i % colors.length],
+          backgroundColor: _cmpColorOf(d) + '88',
+          borderColor: _cmpColorOf(d),
           borderWidth: 1.5,
           borderRadius: 3,
         }))
