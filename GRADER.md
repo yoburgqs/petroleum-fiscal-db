@@ -23481,3 +23481,59 @@ Also fixed on the same score: `renderStabilityBadge()`'s two basis tooltips had 
 Walked cold with storage cleared into **Reform Risk** and used the per-country lookup — the only control on the tab that takes a country as input. The tab body is in good shape. The failure is on the other 89%.
 
 ORCA has a sourced reform log for 21 of 185 jurisdictions. For the other **164** the card says so honestly, then
+
+---
+## Cycle 516 Log — 2026-08-30 20:2x
+- Test before: 0 PASS / 0 FAIL (the 0/0 reported for cycles 506–515 is the validation gate not running, not a clean suite)
+- Test after: 261 PASS / 0 FAIL / 1 WARN — `tests/runtime_comprehensive.js` RAN this cycle against the local build
+- JS errors: 0 page errors on the cold walk; JS syntax gate PASS (10 blocks / 0 errors)
+- Summary: Cycle 516 complete — shipped v611.
+
+## Task — T6
+"Where did this number come from and how solid is the evidence?" (stalest: 515=T4, 514=T1, 513=T5, 512=T2, 511=T3, **510=T6**)
+
+## Friction
+Walked cold with `sessionStorage` and `localStorage` cleared into **Country Profile** — the single-country tab an analyst opens to ask exactly this question — and read the panel literally headed **"Evidence Quality"** (`buildEvidencePanel()`, `index.html:22969`). Its collapsed `<summary>` is the **only** evidence signal on the tab above the fold. It rendered one pill: `` `${a_pct}% primary law (tier A)` ``.
+
+Two failures, both inside that one string.
+
+1. **The literal words "tier A" print on all 185 countries.** They are a label for *what the percentage measures* — but they sit inside a box called Evidence Quality, so they read as *the grade*. Tuvalu rendered **"100.0% primary law (tier A)"**. Tuvalu's entire fact base is **two facts**, both from a Pacific Island States *model* petroleum act that is also the cited source for 8 other jurisdictions. The platform's own `_evidenceGrade()` rates Tuvalu **D**.
+
+2. **The depth leg was absent entirely.** `_evidenceGrade()` is the **worse** of primary-law share and fact depth. The panel showed only the first leg — so it omitted the one number that explains the grade, and there was nothing on the summary an analyst could use to reconcile "100.0% primary law" with a D.
+
+Measured against the shipped `country_data.json`:
+
+| | |
+|---|---|
+| Countries rendering `a_pct >= 60` (strong number + the words "tier A") while `_evidenceGrade()` rates them **C or D** | **52 of 185** |
+| Of those, rendering exactly **"100.0% primary law (tier A)"** | **15** — Ascension Island, Bahamas, Cook Islands, Fiji, French Polynesia, Guadeloupe, Haiti, Kiribati, Marshall Islands, Mayotte, Micronesia, Nauru, New Caledonia, Palau, Puerto Rico, Saint Helena, Samoa, Tuvalu (2–8 facts each) |
+| Of those 52, the binding leg is **depth** — the leg the panel did not show | **52 of 52** |
+| Grade distribution the panel was hiding | A 28 · B 79 · C 43 · D 35 |
+
+**Every other surface already leads with the letter** — the Explorer/Screener Evidence column (v557), the Fiscal Compare Quality column (v551), the Side-by-Side Evidence tier row, and the IC citation (v605). Country Profile was the one that did not. The letter *did* exist on the page: as a bare glyph wedged into the **"Govt Take by Price Scenario"** `<h3>` two sections below, jammed against the vs-median pills, where it reads as decoration on a take heading rather than an evidence grade. Confirmed off the live DOM — Tuvalu's rendered `.tier-badge` is `D`, two sections below a summary saying `100.0% primary law (tier A)`.
+
+## Change
+The collapsed summary now **leads with the same grade the other four surfaces show**, in the grade colour, and follows it with **both legs in one chip**, each coloured on `_evidenceGrade()`'s own thresholds — red where that leg alone would grade D, orange where it would grade C. The `(tier A)` string is deleted.
+
+```
+Tuvalu   before:  Evidence Quality | 100.0% primary law (tier A) | 100%+ multi-jurisdiction source
+         after:   Evidence Quality | D — thin or unsourced | 100.0% primary law · only 2 facts | 100%+ multi-jurisdiction source
+
+Russia   after:   Evidence Quality | D — thin or unsourced | 3.8% primary law · 3,929 facts | 35%+ bulk-harvested
+                  (here the 3.8% is the red leg — sourcing binds, not depth)
+
+Norway   after:   Evidence Quality | A — primary-law backed | 66.1% primary law · 63,848 facts | 12%+ bulk-harvested
+```
+
+## Result
+An analyst who opens Country Profile on any of the **52 countries whose strong-looking primary-law percentage sits on a fact base too thin to generalise a national fiscal regime from** now reads the grade *and the reason for it* on the collapsed panel — no click, no hover. **Tuvalu can no longer be carried into an IC memo as "100% primary law, tier A": it reads D — thin or unsourced, on only 2 facts, and the 2 is red.** The summary and the IC citation (`_icSourcingTier`, v605) now state the same letter for the same country, which they previously did not.
+
+## Verification
+Cold Playwright walk at 1440×900, storage cleared, against the local build: seven countries exercised across all three limiter states — depth-bound (Tuvalu, Ascension Island), sourcing-bound (Russia, Iraq, Nigeria), clean (Norway, Senegal). Per-leg colours asserted off `getComputedStyle` (Tuvalu red on the fact count, Russia red on the percentage, Norway muted on both). No `<summary>` overflow, no page horizontal overflow, **0 page errors**. JS syntax gate **PASS** (10 blocks / 0 errors). `tests/runtime_comprehensive.js` **ran this cycle**: **261 PASS / 0 FAIL / 1 WARN** — the WARN is the pre-existing local-harness `sw.js` 404, not this change.
+
+## Found on the same walk, not fixed
+The Evidence Chain table below this panel is in good shape and was left alone — it already flags `NO SOURCE`, `BULK`, `N JURISDICTIONS` and ORCA-vs-statute divergence per parameter, and states self-agreement where the citing document is also the record that populated the ORCA Value. The remaining T6 gap is one tier up and is a **data** problem, not a display one: the Evidence Chain's `SOURCE` links for bulk rows still resolve to the PwC Worldwide Tax Summaries **index**, so "verify against the country's own petroleum act" has no link to click. That needs a harvesting pass, not a UX pass.
+
+**Still open from cycles 504–515, untouched:** the Fiscal Predictability Score's inert −40 IQR penalty splitting one published scale into two cohorts; the 42 countries where the contract table refutes `p25 == p75`; `exportReformRiskCSV()` writing Source empty; the three near-no-op Screener presets (Sweet Spot returns 143 of 185); the Min Contractor NPV slider topping out below the median; the dead `#cp-run-fc-btn`; the Scenario Builder's region-substring profile inference; the SbS Contractor NPV chart mapping `selected` rather than `chartCountries`; `⬇ Chart PNG` dropping the notices; `exportFCResults()` writing only `Contractor NPV_50/75`; the "Evidence Quality A/B (%)" header on a retired scale; `renderIOCExposure()` filtering on `d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0; six "verified field production" countries rendering 0% in Prod Cov.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** — the fact that was only ever reachable in a tooltip is now printed on the page; the two `title=""` strings added sit on the new chips and replace the one they displaced. The panel still renders **COLLAPSED by default** (v371/v373 declutter) and `_homeOpenEvidence()`'s v527 open-on-arrival path is intact. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered. No row or column added or removed from any on-screen table, and no published country take, NPV, rank, score, band, tier colour or pill value was altered.** v371/v373, v430, v449, v451, v452, v489, v505, v507, v543, v557, v559, v572, v573, v588, v591, v592, v604, v605, v606, v607, v608, v609 and v610 all intact. Version sweep **v610 → v611** across 6 structural sites, done silently at the end; it is **not** the deliverable.
