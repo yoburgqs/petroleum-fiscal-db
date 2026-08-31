@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v616</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v617</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -219,6 +219,11 @@ tbody td { padding: 6px 10px; white-space: nowrap; }
 .slider-group .val { color: var(--accent); font-weight: 700; }
 /* v500: neutral-position flag — tells the analyst a slider is applying no constraint. Shown only while the slider sits at its unfiltered extreme; hidden by _scUpdateNeutralFlags(). */
 .sc-nolimit { color: var(--muted); font-size: 10px; font-weight: 400; letter-spacing: .01em; }
+/* v617: per-axis pass count — how many of the 185 clear THIS floor alone. The result-count bar
+   reports the combined screen, so an axis that was doing nothing was indistinguishable from an
+   axis doing the work of another. Rendered by _scSyncNpvAxis(). */
+.sc-axis-n { color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .01em; margin-left: 6px; white-space: nowrap; }
+.sc-axis-n.sc-axis-inert { color: #b45309; }
 .slider-group input[type=range] { width: 100%; accent-color: var(--accent); }
 
 /* ── vintage bars ── */
@@ -1568,7 +1573,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v616</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v617</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1638,7 +1643,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v616</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v617</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1980,7 +1985,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v616';
+  return m ? m[0] : 'v617';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2055,7 +2060,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v616');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v617');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2419,8 +2424,8 @@ window.copyPlatformCitation = function(btn) {
            left untouched; the Advanced "measured breakeven only" data-coverage filter stays, since
            it is honestly labelled as a coverage filter and not as a price test. -->
       <div class="slider-group">
-        <label title="Filter by minimum contractor NPV at $75/bbl. 0 = NPV-positive only. Negative = allow negative-NPV (loss-making at $75). All values in $M.">Min Contractor NPV: $<span class="val" id="sv-npv">-500</span>M <span style="font-size:10px;color:var(--muted);">@$75</span><span class="sc-nolimit" id="sn-npv"> · no floor</span></label>
-        <input type="range" id="sl-npv" min="-500" max="2000" value="-500" aria-label="Minimum contractor NPV in millions of dollars at $75/bbl (-500 to 2000). Starts at -500 — no floor applied, loss-making regimes are shown.">
+        <label title="Filter by minimum contractor NPV at the price deck currently selected (the &quot;@$&quot; tag names it). runScreener() has always tested this floor against npv_50/75/100/125 following the price selector, so the slider&#39;s travel is re-scaled to that deck&#39;s own distribution rather than to a fixed $50-era range. 0 = NPV-positive only. Negative = allow negative-NPV (loss-making). All values in $M.">Min Contractor NPV: $<span class="val" id="sv-npv">-500</span>M <span style="font-size:10px;color:var(--muted);">@$<span id="sv-npv-deck">75</span></span><span class="sc-nolimit" id="sn-npv"> · no floor</span><span class="sc-axis-n" id="sc-npv-n"></span></label>
+        <input type="range" id="sl-npv" min="-500" max="4500" value="-500" aria-label="Minimum contractor NPV in millions of dollars at the selected price deck. Upper bound re-scales with the deck. Starts at -500 — no floor applied, loss-making regimes are shown.">
       </div>
       <div class="slider-group">
         <!-- v517 (cycle 416, T1): the Min IRR slider is gone. It screened on `irr_75`, which is
@@ -2434,7 +2439,7 @@ window.copyPlatformCitation = function(btn) {
              downside leg of contractor NPV: 185/185 coverage, so a missing value cannot be confused
              with a passing one, and real dynamic range (median $1,361M; a $1,000M floor cuts
              185 -> 110). NPV>0 discounted at 10% WACC IS the hurdle test; the $50 leg is the stress. -->
-        <label title="Filter by minimum contractor NPV at the $50/bbl downside price, on the same standardized Deepwater profile as the $75 column. This is the price-break survival test: a regime that is NPV-positive at $75 but negative at $50 does not survive a downturn. Modelled for all 185 countries &mdash; unlike breakeven or IRR there is no missing-data gap, so every row in the result set was actually tested against this floor. At &minus;$500M no floor is applied. All values in $M." style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">Min NPV @$50: $<span class="val" id="sv-npv50">-500</span>M <span style="font-size:10px;color:var(--muted);">downside</span><span class="sc-nolimit" id="sn-npv50"> &middot; no floor</span> <button onclick="(function(){var s=document.getElementById('sl-npv50');s.value=0;document.getElementById('sv-npv50').textContent='0';s.dispatchEvent(new Event('input'));s.dispatchEvent(new Event('change'));})()" style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);border-radius:4px;color:var(--accent);cursor:pointer;font-size:10px;font-weight:700;padding:2px 7px;line-height:1.4;white-space:nowrap;" title="Set the downside floor to $0M &mdash; keep only regimes still value-creating if oil falls to $50/bbl" aria-label="Set minimum contractor NPV at 50 dollars per barrel to zero">Set $0 &#10229; survives $50/bbl</button></label>
+        <label title="Filter by minimum contractor NPV at the $50/bbl downside price, on the same standardized Deepwater profile as the $75 column. This is the price-break survival test: a regime that is NPV-positive at $75 but negative at $50 does not survive a downturn. Modelled for all 185 countries &mdash; unlike breakeven or IRR there is no missing-data gap, so every row in the result set was actually tested against this floor. At &minus;$500M no floor is applied. All values in $M." style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">Min NPV @$50: $<span class="val" id="sv-npv50">-500</span>M <span style="font-size:10px;color:var(--muted);">downside</span><span class="sc-nolimit" id="sn-npv50"> &middot; no floor</span><span class="sc-axis-n" id="sc-npv50-n"></span> <button onclick="(function(){var s=document.getElementById('sl-npv50');s.value=0;document.getElementById('sv-npv50').textContent='0';s.dispatchEvent(new Event('input'));s.dispatchEvent(new Event('change'));})()" style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);border-radius:4px;color:var(--accent);cursor:pointer;font-size:10px;font-weight:700;padding:2px 7px;line-height:1.4;white-space:nowrap;" title="Set the downside floor to $0M &mdash; keep only regimes still value-creating if oil falls to $50/bbl" aria-label="Set minimum contractor NPV at 50 dollars per barrel to zero">Set $0 &#10229; survives $50/bbl</button></label>
         <input type="range" id="sl-npv50" min="-500" max="2000" value="-500" aria-label="Minimum contractor NPV in millions of dollars at the 50 dollar per barrel downside price (-500 to 2000). Starts at -500 - no floor applied.">
       </div>
       <div class="slider-group">
@@ -24392,6 +24397,15 @@ function renderExplorer() {
 }
 
 document.querySelectorAll('input[name="price"]').forEach(r => r.addEventListener('change', renderExplorer));
+// v617: the price radios also drive the Screener — runScreener() filters take and NPV on
+// d[`take_${price}`] / d[`npv_${price}`] — but only renderExplorer() was ever re-run on change,
+// so the Screener kept a stale NPV axis bound and a stale "@$" caption after a deck switch.
+document.querySelectorAll('input[name="price"]').forEach(r => r.addEventListener('change', function(){
+  if (typeof runScreener === 'function' &&
+      document.getElementById('explorer-screen-mode') &&
+      document.getElementById('explorer-screen-mode').style.display !== 'none') runScreener();
+  else if (typeof _scSyncNpvAxis === 'function') _scSyncNpvAxis();
+}));
 document.getElementById('flt-mech').addEventListener('change', renderExplorer);
 document.getElementById('flt-region').addEventListener('change', renderExplorer);
 document.getElementById('flt-sort').addEventListener('change', renderExplorer);
@@ -26776,8 +26790,86 @@ function _scUpdateNeutralFlags() {
   // v568: the v513 breakeven-nulls control retired with the breakeven ceiling it disclosed.
 }
 
+// v617 (T1) — the Min Contractor NPV floor is a PRICE-FOLLOWING filter on a FIXED range.
+// runScreener() has always tested it against d[`npv_${price}`], following the price radios — but
+// those radios live inside #explorer-browse-mode and are display:none while the Screener is open,
+// and the slider's range was hardcoded min=-500 max=2000. Measured against country_data.json,
+// dragging the floor to its absolute maximum left:
+//     $50   ->   8 of 185 pass     (the deck the 2000 bound was evidently tuned for)
+//     $75   -> 114 of 185 pass
+//     $100  -> 130 of 185 pass
+//     $125  -> 163 of 185 pass
+// So on the deck an IC screens upside at, the strictest available NPV floor removed 22 countries
+// and the label still read "@$75". The whole band that shortens a shortlist — $2,000M to $4,500M
+// at $75, where the count falls 114 -> 5 — sat off the end of the control and could not be reached.
+// The bound is now derived from the active deck's own distribution: the 5th-largest value floored
+// to the nearest $100M, so full-right always lands on a five-or-six country shortlist. That rule
+// reproduces exactly 2000 at $50, which is the evidence the original bound was a $50 bound.
+// Deliberately NOT touched: min stays -500 at every deck, because -500 is the neutral sentinel that
+// _scUpdateNeutralFlags() and runScreener() both test for ("no floor"). Only the top end moves.
+// #sl-npv50 is genuinely fixed to npv_50 regardless of deck and its range already spans that
+// distribution (max 2371, bound 2000 ~ p96), so its range is left alone — it gets the count only.
+function _scNpvAxisMax(key) {
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA.length) return 2000;
+  var v = COUNTRY_DATA.map(function(d){ return d[key]; })
+                      .filter(function(x){ return x !== null && x !== undefined && isFinite(x); })
+                      .sort(function(a,b){ return b - a; });
+  if (v.length < 5) return 2000;
+  var m = Math.floor(v[4] / 100) * 100;
+  return m > 0 ? m : 2000;
+}
+
+function _scSyncNpvAxis() {
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA.length) return;
+  var price = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
+  var key = 'npv_' + price;
+  var sl = document.getElementById('sl-npv');
+
+  // Name the deck the floor is actually applied at, instead of a hardcoded "@$75".
+  var deck = document.getElementById('sv-npv-deck');
+  if (deck) deck.textContent = price;
+
+  if (sl) {
+    var newMax = _scNpvAxisMax(key);
+    if (+sl.max !== newMax) {
+      var wasAtMax = (+sl.value >= +sl.max);
+      sl.max = String(newMax);
+      // Re-scaling must not silently tighten a screen the analyst already set. If they had the
+      // floor pinned at the old top, keep it pinned at the new top; otherwise just clamp.
+      var nv = wasAtMax ? newMax : Math.min(+sl.value, newMax);
+      if (nv !== +sl.value) {
+        sl.value = String(nv);
+        var disp = document.getElementById('sv-npv');
+        if (disp) disp.textContent = String(nv);
+      }
+      sl.setAttribute('aria-label',
+        'Minimum contractor NPV in millions of dollars at $' + price + '/bbl (-500 to ' + newMax
+        + '). Starts at -500 - no floor applied.');
+    }
+  }
+
+  // Per-axis pass counts: how many of the 185 clear THIS floor on its own.
+  function paint(spanId, sliderId, dataKey) {
+    var sp = document.getElementById(spanId), s2 = document.getElementById(sliderId);
+    if (!sp || !s2) return;
+    var floor = +s2.value;
+    if (floor <= -500) { sp.textContent = ''; sp.className = 'sc-axis-n'; return; }
+    var pass = COUNTRY_DATA.filter(function(d){
+      var x = d[dataKey];
+      return !(x !== null && x !== undefined && x < floor);
+    }).length;
+    sp.textContent = '\u00b7 ' + pass + ' of ' + COUNTRY_DATA.length + ' clear this';
+    // Flag a floor that is barely screening, so an inert axis reads as inert.
+    sp.className = 'sc-axis-n' + (pass >= COUNTRY_DATA.length * 0.9 ? ' sc-axis-inert' : '');
+  }
+  paint('sc-npv-n',   'sl-npv',   key);
+  paint('sc-npv50-n', 'sl-npv50', 'npv_50');
+}
+window._scSyncNpvAxis = _scSyncNpvAxis;
+
 function runScreener() {
   _scUpdateNeutralFlags();
+  _scSyncNpvAxis();   // v617: re-scale the NPV axis to the active deck BEFORE its value is read
   // Bug 4 fix: use active price point, not hardcoded $75
   const price   = getPriceKey();   // '50' | '75' | '100' | '125'
   const takeKey = `take_${price}`;
