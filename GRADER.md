@@ -23601,3 +23601,16 @@ Cold Playwright at 1440×900, storage cleared, against the local build: six sets
 **Still open from cycles 504–516, untouched:** the Fiscal Predictability Score's inert −40 IQR penalty; the 42 countries where the contract table refutes `p25 == p75`; the three near-no-op Screener presets (Sweet Spot returns 143 of 185); the Min Contractor NPV slider topping out below the median; the dead `#cp-run-fc-btn`; the Scenario Builder's region-substring profile inference; `⬇ Chart PNG` dropping the notices; `exportFCResults()` writing only `Contractor NPV_50/75`; the "Evidence Quality A/B (%)" header on a retired scale; `renderIOCExposure()` filtering on `d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0; six "verified field production" countries rendering 0% in Prod Cov; the Evidence Chain's bulk-row `SOURCE` links resolving to the PwC index.
 
 **STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip on any pre-existing control** — the two `title=""` strings added replace text that was already printed on screen (`$0M`) with an explanation of its absence. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered. No row or column added or removed from the grid.** No published country take, NPV, rank, score, band, tier colour or pill value was altered — the only cells that changed are three Contractor NPV cells on the 3 state-monopoly columns, from a modelled `$0M` to an explained em dash. The **v612 MOBILE LAYER** and the `#reference-panel` `translateX` state are untouched. v371/v373, v430, v449, v451, v452, v489, v503, v515, v529, v535, v549, v552, v555, v557, v562, v577, v588, v593, v600, v605, v606, v611, v612 and v613 all intact. Version sweep **v613 → v614** across 5 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 518 Log — 2026-08-30 23:10
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 517 complete — shipped **v614**.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (T3 was the stalest; the last cycle was T5.)
+
+## Friction
+Side-by-Side's entire visual payload is two charts stacked 8px apart: **Govt Take vs Oil Price** over **Contractor NPV vs Oil Price ($M)**. They indexed the *same* five-colour palette off *different* arrays — the take chart off `chartCountries` (state monopolies and pure-PRRT columns removed, `index.html:26042`), the NPV chart off
