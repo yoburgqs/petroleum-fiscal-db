@@ -23651,3 +23651,14 @@ JS syntax gate **PASS** (10 blocks / 0 errors). `tests/runtime_comprehensive.js`
 **Still open from cycles 504–518, untouched:** the Fiscal Predictability Score's inert −40 IQR penalty; the 42 countries where the contract table refutes `p25 == p75` (Guyana is one — P25 and P75 both read 57.0% while the headline is 54.1%); the three near-no-op Screener presets; the Min Contractor NPV slider topping out below the median; the dead `#cp-run-fc-btn`; the Scenario Builder's region-substring profile inference; `⬇ Chart PNG` dropping the notices; `exportFCResults()` writing only `Contractor NPV_50/75`; the "Evidence Quality A/B (%)" header on a retired scale; `renderIOCExposure()` filtering on `d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0; six "verified field production" countries rendering 0% in Prod Cov; the Evidence Chain's bulk-row `SOURCE` links resolving to the PwC index; the Side-by-Side take chart's `borderDash` keyed to `has_r_factor_tiers`, which draws grade-A Norway dashed and PROXY Guyana solid.
 
 **STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip.** No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** No published take, NPV, rank, score, band, tier colour or pill value was altered — this cycle changed the lifetime of one label and added no content of its own. The **v612 MOBILE LAYER** and the `#reference-panel` `translateX` state are untouched. v371/v373, v430, v449, v451, v452, v489, v503, v515 (whose `_sbsDropExample` pattern this cycle extends rather than replaces), v529, v535, v549, v552, v555, v557, v562, v577, v588, v593, v600, v605, v606, v611, v612, v613 and v614 all intact. Version sweep **v614 → v615** across 5 structural sites, done silently at the end; it is **not** the deliverable.
+
+---
+## Cycle 519 Log — 2026-08-30 23:55
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 519 shipped as **v615**.
+
+**Task** — T2, "Is this one country attractive at $75/bbl, and can I defend that?" (stalest; last run seven cycles back at v607).
+
+**Friction** — Country Profile kept telling the analyst they were looking at Norway after they had loaded something else. Opening the tab cold auto-loads Norway and injects `#cp-example-banner` — *"Example loaded: Norway — a North Sea Concession benchmark"* — directly above the headline (`index.html:22616`). Nothing ever removed it. `l
