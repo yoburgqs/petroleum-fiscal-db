@@ -25,7 +25,7 @@
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" crossorigin></noscript>
 <!-- v252: viewport-fit=cover — extends layout under iPhone notch/Dynamic Island; safe-area-inset padding applied in CSS -->
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
-<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v609.">
+<meta name="description" content="ORCA — Professional global petroleum fiscal database covering 71,576 contracts across 185 countries. Compare government take, NPV, and IRR across 8 fiscal mechanics: Concession, PSC, TSC, PRRT, RSC, Buy-back, Revenue Share, and Gross Split. Built for IOC economists and upstream analysts. v610.">
 <meta name="robots" content="index, follow">
 <meta property="og:title" content="ORCA — Petroleum Fiscal Intelligence Platform">
 <meta property="og:description" content="Global petroleum fiscal database: 71,576 contracts, 185 countries, 8 fiscal mechanics. Compare regimes, screen by take/IRR, model custom DCF scenarios.">
@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v609</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v610</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1404,7 +1404,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v609</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v610</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1474,7 +1474,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v609</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v610</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1816,7 +1816,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v609';
+  return m ? m[0] : 'v610';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -1891,7 +1891,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v609');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v610');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -23671,6 +23671,95 @@ function getFiscalPredictabilityScore(d) {
   const mechPenalty  = Math.max(0, (nMechs - 1) * 8);
   return Math.max(0, Math.min(100, Math.round(100 - iqrPenalty - swingPenalty - mechPenalty)));
 }
+
+// ── v610 (T4): the Fiscal Predictability band is not a cross-country scale ────────────────
+// For 164 of 185 jurisdictions ORCA holds no sourced reform log, so this score IS the whole
+// T4 answer — the Reform Risk verdict card introduces it with "What you can defend instead".
+// It was printed there as a bare band and tier colour. Cold walk, lookup only:
+//     Iraq-Kurdistan  70 · MODERATE (yellow)   "one statutory term — spread component not exercised"
+//     Egypt           53 · LOW      (orange)   "measured spread 27.1pp across its contracts"
+// Read left to right that says Kurdistan is the steadier jurisdiction. Measured against the
+// live country_data.json it says the opposite of what it looks like — the band is a ranking of
+// how little dispersion ORCA can see:
+//     one statutory term (132 countries)   86 HIGH / 43 MODERATE /  3 LOW /  0 VERY LOW
+//     measured spread    ( 28 countries)    0 HIGH / 11 MODERATE / 14 LOW /  3 VERY LOW
+// Every one of the 86 HIGH grades belongs to a country whose IQR penalty — the largest of the
+// three components, worth up to −40 — was never charged, because p25_take === p75_take. Not one
+// of the 28 countries ORCA holds enough contracts to see disagree with itself can reach HIGH;
+// the ceiling among them is Turkmenistan at 74. Kurdistan outranks Egypt because ORCA sees one
+// term there, not because its terms move less.
+// This was already true and already written down — inside a title= attribute on the badge, in
+// numbers (89 HIGH, 135 one-term) that no longer match the file. A tooltip carrying a stale
+// version of the one fact that decides whether the number may be quoted is not a control. The
+// card now prints the rank inside the cohort that shares the basis, which is the only
+// comparison this score actually supports, and the cohort counts are computed, not typed.
+var _FP_COHORT_CACHE = null;
+function _fpCohortStats() {
+  if (_FP_COHORT_CACHE) return _FP_COHORT_CACHE;
+  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
+  if (!cd.length) return null;                       // don't cache a pre-load empty
+  var band = function(v) { return v >= 75 ? 'HIGH' : v >= 60 ? 'MODERATE' : v >= 45 ? 'LOW' : 'VERY LOW'; };
+  var g = { single: [], measured: [] };
+  cd.forEach(function(d) {
+    var v = getFiscalPredictabilityScore(d);
+    if (v == null) return;                           // 'none' and 'monopoly' are not scored at all
+    var st = _fpDispersion(d).state;
+    if (g[st]) g[st].push({ c: d.country, s: v });
+  });
+  Object.keys(g).forEach(function(k) {
+    g[k].sort(function(a, b) { return b.s - a.s || a.c.localeCompare(b.c); });
+  });
+  var highIn = function(list) { return list.filter(function(x) { return band(x.s) === 'HIGH'; }).length; };
+  _FP_COHORT_CACHE = {
+    single: g.single, measured: g.measured,
+    highSingle: highIn(g.single), highMeasured: highIn(g.measured),
+    highTotal: highIn(g.single) + highIn(g.measured),
+    measuredTop: g.measured.length ? g.measured[0] : null
+  };
+  return _FP_COHORT_CACHE;
+}
+// v610: the badge tooltip typed "89 HIGH / 135 one-term / ceiling 74" against a file that now
+// says 86 / 132 / 74. Counts are read from the data instead of retyped.
+function _fpCnt() {
+  var k = _fpCohortStats();
+  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
+  if (!k) return { nMeas: 28, nSingle: 132, nNone: 22, nHigh: 86, ceil: 74 };
+  // 'none' only — the 3 state-monopoly jurisdictions are withheld for a different reason
+  var nNone = cd.filter(function(d) { return _fpDispersion(d).state === 'none'; }).length;
+  return { nMeas: k.measured.length, nSingle: k.single.length, nNone: nNone,
+           nHigh: k.highTotal, ceil: k.measuredTop ? k.measuredTop.s : 74 };
+}
+function _fpOrd(n) { var t = ['th','st','nd','rd'], v = n % 100; return n + (t[(v - 20) % 10] || t[v] || t[0]); }
+// Rank of `d` within the cohort that shares its dispersion basis, plus the cross-cohort bar.
+// Returns '' where there is no cohort to rank in (not scored, or state monopoly).
+function _fpCohortLine(d) {
+  if (!d) return '';
+  var st = _fpDispersion(d).state;
+  if (st !== 'single' && st !== 'measured') return '';
+  var k = _fpCohortStats();
+  if (!k) return '';
+  var list = k[st], i = -1;
+  for (var j = 0; j < list.length; j++) { if (list[j].c === d.country) { i = j; break; } }
+  if (i < 0) return '';
+  var rank = _fpOrd(i + 1) + ' of ' + list.length;
+  var top = k.measuredTop;
+  var isTop = !!(top && top.c === d.country);
+  var msg = (st === 'measured')
+    ? '<strong style="color:var(--text);">' + (isTop ? 'Top of the ' + list.length : rank) + ' countries ORCA can measure</strong>'
+      + (isTop ? '' : ' — not ' + _fpOrd(i + 1) + ' of 185') + '. '
+      + 'The spread penalty is charged in this cohort and nowhere else, so nothing in it reaches HIGH'
+      + (top ? ' — ' + (isTop ? 'this ' + top.s + ' is the cohort ceiling' : 'ceiling ' + top.s + ', ' + _rrEsc(top.c)) : '') + '. '
+      + '<strong style="color:var(--orange);">Do not rank this band against the ' + k.highTotal + ' HIGH grades</strong> — every one of them is a '
+      + 'one-term regime charged nothing for spread.'
+    : '<strong style="color:var(--text);">' + rank + ' one-term regimes</strong> — a cohort the spread penalty never touches. '
+      + 'All ' + k.highTotal + ' HIGH grades on this platform sit in it'
+      + (top ? ', while the ' + k.measured.length + ' countries with a measured spread top out at ' + top.s + ' (' + _rrEsc(top.c) + ')' : '') + '. '
+      + '<strong style="color:var(--orange);">A one-term score above a measured one is not the steadier regime</strong> — it is the one ORCA holds '
+      + 'less contract evidence against.';
+  return '<div style="font-size:10px;line-height:1.5;color:var(--muted);margin-top:5px;padding-top:5px;'
+    + 'border-top:1px dotted var(--border);max-width:230px;">' + msg + '</div>';
+}
+
 function renderStabilityBadge(score, d) {
   // v536 (T3): the badge now names the dispersion basis the score was built on, because the
   // IQR term is the score's largest component and it is inert for 111 of 185 countries.
@@ -23693,8 +23782,8 @@ function renderStabilityBadge(score, d) {
   const nC     = (d && d.n != null) ? Number(d.n).toLocaleString() : '?';
   const nm     = (d && d.country) ? d.country : 'This country';
   const basisTip = single
-    ? `The IQR component contributed NOTHING to this ${score}: all ${nC} of ${nm}'s contracts price to the same government take at $75/bbl, so the measured spread is zero. That is a one-term statutory regime, not demonstrated consistency between blocks — the same finding the 'Take spread across contracts' row reports as 'single term'. The number above is therefore price swing and mechanic count only. Across the dataset only 28 of 185 countries have a measured spread at all; 135 price to one term and 22 hold no distribution. All 89 HIGH grades belong to one-term regimes, and NOT ONE of the 28 with a measured spread reaches HIGH -- the ceiling among them is 74.`
-    : `Measured across ${nm}'s own contracts: the middle half spans ${disp.iqr.toFixed(1)}pp of government take at $75/bbl, costing ${Math.min(40, disp.iqr * 0.8).toFixed(1)} of the ${score}. This is the only one of the three dispersion bases in which the IQR component is actually exercised. Just 28 of 185 countries are in it, and none of them reaches HIGH — the ceiling among them is 74 — while all 89 HIGH grades belong to one-term regimes that are not scored down at all. A lower score here is therefore not the worse regime; it is the one ORCA holds enough contracts to see disagree with itself.`;
+    ? `The IQR component contributed NOTHING to this ${score}: all ${nC} of ${nm}'s contracts price to the same government take at $75/bbl, so the measured spread is zero. That is a one-term statutory regime, not demonstrated consistency between blocks — the same finding the 'Take spread across contracts' row reports as 'single term'. The number above is therefore price swing and mechanic count only. Across the dataset only ${_fpCnt().nMeas} of 185 countries have a measured spread at all; ${_fpCnt().nSingle} price to one term and ${_fpCnt().nNone} hold no distribution. All ${_fpCnt().nHigh} HIGH grades belong to one-term regimes, and NOT ONE of the ${_fpCnt().nMeas} with a measured spread reaches HIGH -- the ceiling among them is ${_fpCnt().ceil}.`
+    : `Measured across ${nm}'s own contracts: the middle half spans ${disp.iqr.toFixed(1)}pp of government take at $75/bbl, costing ${Math.min(40, disp.iqr * 0.8).toFixed(1)} of the ${score}. This is the only one of the three dispersion bases in which the IQR component is actually exercised. Just ${_fpCnt().nMeas} of 185 countries are in it, and none of them reaches HIGH — the ceiling among them is ${_fpCnt().ceil} — while all ${_fpCnt().nHigh} HIGH grades belong to one-term regimes that are not scored down at all. A lower score here is therefore not the worse regime; it is the one ORCA holds enough contracts to see disagree with itself.`;
   // v559 (T2): two hookable classes, no rendering change. _cpApplyObsSpread() marks the basis chip
   // on Country Profile where the page's own contract table refutes the "one term" basis this score
   // was built on. Classes, not ids -- the badge renders twice on CP and also on SbS, Explorer and FC.
@@ -32602,7 +32691,8 @@ function renderReformCountryVerdict() {
       + (fp != null
           ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability Score</div>'
             + '<div id="rr-fp-score" style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
-            + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;"><span id="rr-fp-basis">' + fpNote + '</span></div></div>'
+            + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;"><span id="rr-fp-basis">' + fpNote + '</span></div>'
+            + _fpCohortLine(d) + '</div>'
           : '')
       + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
       + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
@@ -32660,7 +32750,8 @@ function renderReformCountryVerdict() {
     + (fp != null
         ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability</div>'
           + '<div id="rr-fp-score" style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
-          + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;">separate signal &mdash; <span id="rr-fp-basis">' + fpNote + '</span></div></div>'
+          + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;">separate signal &mdash; <span id="rr-fp-basis">' + fpNote + '</span></div>'
+          + _fpCohortLine(d) + '</div>'
         : '')
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
     + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
