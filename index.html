@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v614</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v615</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1568,7 +1568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v614</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v615</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1638,7 +1638,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v614</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v615</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1980,7 +1980,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v614';
+  return m ? m[0] : 'v615';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2055,7 +2055,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v614');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v615');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -22621,9 +22621,16 @@ function switchTab(id, btn) {
           var content = document.getElementById('dd-content'); // v450: corrected from dd-profile-content (element doesn't exist)
           if (sel && (!sel.value || !content || content.innerHTML.trim() === '')) {
             sel.value = 'Norway';
+            // v615 (T2): _cpSeeding marks THIS load as the auto-example. Any later call to
+            // loadCountryProfile() is the analyst's own pick and clears the banner.
+            window._cpSeeding = true;
             if (typeof loadCountryProfile === 'function') loadCountryProfile('Norway');
+            window._cpSeeding = false;
             // v450: show example-loaded banner so first-time users know Norway is an auto-loaded example
             setTimeout(function() {
+              // v615: the analyst can select a country inside this 400ms window. If they did,
+              // do not inject a banner that names Norway over someone else's profile.
+              if (window._cpUserChose) return;
               var ddContent = document.getElementById('dd-content');
               if (ddContent && !document.getElementById('cp-example-banner')) {
                 var cpBanner = document.createElement('div');
@@ -22646,8 +22653,10 @@ function switchTab(id, btn) {
           // v599 (T6): was loadIOC('Shell') — an exact operator-string match that opened the
           // tab on 112 of the Shell group's 1,036 contracts, without Shell Offshore Inc. (USA),
           // SPDC (Nigeria) or A/S Norske Shell. Same resolver as every other brand entry point.
+          window._iocSeeding = true;   // v615: same seed marker as CP
           if (typeof loadIOCBrand === 'function') loadIOCBrand('Shell');
           else if (typeof loadIOC === 'function') loadIOC('Shell');
+          window._iocSeeding = false;
           // v477: also pre-select Shell in the exposure dropdown so Take Distribution is populated on first load
           // v478: also highlight Shell quick button in the exposure section
           var expSel = document.getElementById('exposure-ioc-select');
@@ -22662,7 +22671,7 @@ function switchTab(id, btn) {
           }
           // v476: show example-loaded banner — same pattern as CP (v450) and SbS (v430)
           var iocOut = document.getElementById('ioc-output');
-          if (iocOut && !document.getElementById('ioc-example-banner')) {
+          if (iocOut && !window._iocUserChose && !document.getElementById('ioc-example-banner')) {
             var banner = document.createElement('div');
             banner.id = 'ioc-example-banner';
             banner.className = 'no-print';   // v535: screen-only example banner — keep it out of printed/PDF output
@@ -27812,6 +27821,12 @@ document.getElementById('ioc-search').addEventListener('keydown', e => {
 });
 
 window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
+  // v615 (T2): "Example loaded: Shell" survived every later operator load — same defect as CP.
+  if (!window._iocSeeding) {
+    window._iocUserChose = true;
+    var _iocEx = document.getElementById('ioc-example-banner');
+    if (_iocEx && _iocEx.parentNode) _iocEx.parentNode.removeChild(_iocEx);
+  }
   const statsDiv = document.getElementById('ioc-stats');
   const outDiv   = document.getElementById('ioc-output');
   // Collect all rows for all matching operators
@@ -27945,6 +27960,12 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
 };
 
 window.loadIOC = function(operator) {
+  // v615 (T2): see loadIOCAggregated — a named single entity clears the seed banner too.
+  if (!window._iocSeeding) {
+    window._iocUserChose = true;
+    var _iocEx1 = document.getElementById('ioc-example-banner');
+    if (_iocEx1 && _iocEx1.parentNode) _iocEx1.parentNode.removeChild(_iocEx1);
+  }
   const statsDiv = document.getElementById('ioc-stats');
   const outDiv   = document.getElementById('ioc-output');
   // v41: NOC exclusion — redirect if searching for a state-owned company
@@ -29522,6 +29543,16 @@ function _esc594(s) {
 }
 
 function loadCountryProfile(country) {
+  // v615 (T2): the "Example loaded: Norway — a North Sea Concession benchmark" banner was
+  // injected once and never removed, so it stayed above the headline while the page showed
+  // whatever country the analyst had since loaded — dropdown, peer row, regional-peer row or
+  // deep link. Side-by-Side already clears its seed banner (_sbsDropExample); CP did not.
+  // Every entry point into a profile routes through here, so this is the one place to clear it.
+  if (!window._cpSeeding) {
+    window._cpUserChose = true;
+    var _cpEx = document.getElementById('cp-example-banner');
+    if (_cpEx && _cpEx.parentNode) _cpEx.parentNode.removeChild(_cpEx);
+  }
   const content = document.getElementById('dd-content');
   const cpEmpty = document.getElementById('cp-empty-state');
   if (!country) {
