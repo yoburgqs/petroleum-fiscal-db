@@ -23550,3 +23550,54 @@ The Evidence Chain table below this panel is in good shape and was left alone �
 **Friction.** Walked Country Profile cold with storage cleared and read the panel literally headed **"Evidence Quality"** (`buildEvidencePanel()`, `index.html:22969`). Its collapsed summary is the only evidence signal on the tab above the fold, and it rendered one pill: `{a_pct}% primary law (tier A)`.
 
 The words "tier A" printed on **all 185 coun
+
+---
+## Cycle 517 Log — 2026-08-30 23:06
+- Test before: 261 PASS / 0 FAIL / 1 WARN
+- Test after: 261 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 page errors (1 console WARN = pre-existing local-harness `sw.js` 404)
+- JS syntax gate: PASS (10 blocks / 0 errors)
+- Summary: Cycle 517 complete — shipped **v614**.
+
+**Task — T3:** "How do these three countries compare side by side?" (T3 was the stalest: 516=T6, v613 cycle=T5, 515=T4, 514=T1, 513=T5, 512=T2, **511=T3**.)
+
+## Friction
+Walked Side-by-Side cold at 1440×900 with `sessionStorage` and `localStorage` cleared. The tab seeds the North Sea Trio and its entire visual payload is two charts stacked **8px apart** (`margin-top:8px` on `#cmp-npv-chart-wrap`): **Govt Take vs Oil Price** over **Contractor NPV vs Oil Price ($M)**.
+
+They indexed the **same five-colour palette off different arrays** — the take chart off `chartCountries` (state monopolies and pure-PRRT columns removed, `index.html:26042`) and the NPV chart off `selected` (nothing removed, `index.html:26166`). So any set containing one of the 4 chart-excluded countries shifted every colour by one between the two charts, and there is no shared key anywhere on the page.
+
+Measured off the live DOM, **Saudi Arabia + Norway + Guyana**:
+
+| | amber `#96570A` | purple `#7C3AED` | orange `#C2410C` |
+|---|---|---|---|
+| Govt Take chart | **Norway** | **Guyana** | — |
+| Contractor NPV chart, 8px below | **Saudi Arabia** | **Norway** | **Guyana** |
+
+Norway was amber above and purple below; purple above was Guyana. An analyst who carries the colour down eight pixels reads **Norway's $826M as Guyana's $1,068M** — a 29% error in the wrong country's name. And Saudi Arabia's amber swatch drew **four zero-height bars**, so the legend advertised a colour that appeared nowhere in the plot, while consuming the palette slot that caused the shift.
+
+| | |
+|---|---|
+| Countries that trigger the desync | **4 of 185** — Saudi Arabia, Kuwait, Bahrain (monopoly), Australia (pure PRRT) |
+| Share of all 2–5 country comparison sets containing at least one | **10.4%** (182,961,146 of 1,758,346,412) |
+| Sets where nothing is excluded and the assignment was already correct | 89.6% |
+
+Underneath it, the same column read **`$0M`** in all three Contractor NPV grid rows, in the same visual weight as Norway's `$826M` and Guyana's `$1.1B` — on a column whose Rank cell already reads *"not ranked · state monopoly"*, whose Predictability cell reads *"— · no contractor position"*, whose four Govt Take cells are already an em dash, and whose own notice says *"fiscal comparison not applicable"*. Read down the Economics block, that put Saudi Arabia **last on contractor value**, which is a category error rather than a fiscal finding: $0 here means a contractor cannot take a position at all, not that it takes one and earns nothing. The `$0M` rode the shared `rows` array into `#cmp-data-table` and both clipboard flavours, so it left the page in the pasted IC table as well.
+
+## Change
+1. **One colour per country**, keyed off `selected` — the grid's own left-to-right addition order, which the *Reading* line already names — and read by **both** charts (`_cmpColorMap` / `_cmpColorOf`). Where nothing is excluded this reproduces the previous assignment byte for byte.
+2. **State monopolies drop out of the Contractor NPV chart too** (`npvCountries`). Their series was four zero-height bars and a legend entry. If every selected column is a monopoly, both charts now hide rather than plotting flat zeros.
+3. The notice now reads **"excluded from both charts"** — it said "chart", singular, while the column was in fact present in the second one — and states what to read instead of the $0 it used to plot.
+4. The three **Contractor NPV grid cells render an em dash with a hover** on a monopoly column (`_cmpNpvCell`), matching the Govt Take cells on that same column. This is the **v529** rule ("state monopolies carry no rank, no contractor NPV, no breakeven and no tier"), which reached Fiscal Compare and its workbook and had never reached this grid. The dash carries into `#cmp-data-table` and both clipboard flavours.
+
+## Result
+The two charts share one key. On Saudi Arabia + Norway + Guyana, **Norway is `#7C3AED` in both and Guyana `#C2410C` in both, and Saudi Arabia is in neither.** An analyst can read a colour off the take chart and follow it into the NPV chart without re-reading the legend, on **every** comparison set rather than 89.6% of them — and can no longer paste *"Saudi Arabia contractor NPV $0M"* into an IC memo from a tab that says four other times that there is no contractor position there.
+
+## Verification
+Cold Playwright at 1440×900, storage cleared, against the local build: six sets exercised — cold default (North Sea Trio), monopoly-mixed, PRRT-mixed, all-monopoly, fee-blended (Iraq) and a clean 5-country set. **Cross-chart colour collisions asserted programmatically off `borderColor`: NONE in all six.** All-monopoly hides both chart wraps (`display:none`/`none`). Mirror table `#cmp-data-table` exports the dash on all three NPV rows. **0 page errors.** Mobile **390×844 `hasTouch:true`**: all ten tabs `scrollWidth == clientWidth == 390`, the lengthened notice measures 362px; no control was added or resized, so the 24px floor is unaffected. JS syntax gate **PASS** (10 blocks / 0 errors). `tests/runtime_comprehensive.js` **ran this cycle**: **261 PASS / 0 FAIL / 1 WARN**, matching the pre-change baseline exactly — the WARN is the pre-existing local-harness `sw.js` 404.
+
+## Found on the same walk, not fixed
+**The take chart's line style inverts the page's own evidence signal.** `borderDash` is keyed to `has_r_factor_tiers`, so **Norway** (PROD-WTD, evidence grade **A**, 63,848 facts) draws **DASHED** and **Guyana** (PROXY, grade B, 1,051 facts) draws **SOLID** — roughly 100px under a red banner reading *"The column that wins this comparison is a proxy."* Dashed conventionally means modelled or projected. **70 of 185** countries carry the flag, so **90.1%** of 2–5 country sets show a mix and the encoding is on screen. The R-factor fact is already carried twice over by the `rectRot` point style and the ◆ label glyph, so the dash is redundant as well as misread. Re-pointing it at the proxy/non-proxy split is a design change rather than a bug fix, and is its own cycle.
+
+**Still open from cycles 504–516, untouched:** the Fiscal Predictability Score's inert −40 IQR penalty; the 42 countries where the contract table refutes `p25 == p75`; the three near-no-op Screener presets (Sweet Spot returns 143 of 185); the Min Contractor NPV slider topping out below the median; the dead `#cp-run-fc-btn`; the Scenario Builder's region-substring profile inference; `⬇ Chart PNG` dropping the notices; `exportFCResults()` writing only `Contractor NPV_50/75`; the "Evidence Quality A/B (%)" header on a retired scale; `renderIOCExposure()` filtering on `d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0; six "verified field production" countries rendering 0% in Prod Cov; the Evidence Chain's bulk-row `SOURCE` links resolving to the PwC index.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip on any pre-existing control** — the two `title=""` strings added replace text that was already printed on screen (`$0M`) with an explanation of its absence. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered. No row or column added or removed from the grid.** No published country take, NPV, rank, score, band, tier colour or pill value was altered — the only cells that changed are three Contractor NPV cells on the 3 state-monopoly columns, from a modelled `$0M` to an explained em dash. The **v612 MOBILE LAYER** and the `#reference-panel` `translateX` state are untouched. v371/v373, v430, v449, v451, v452, v489, v503, v515, v529, v535, v549, v552, v555, v557, v562, v577, v588, v593, v600, v605, v606, v611, v612 and v613 all intact. Version sweep **v613 → v614** across 5 structural sites, done silently at the end; it is **not** the deliverable.
