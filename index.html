@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v615</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v616</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1568,7 +1568,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v615</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v616</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1638,7 +1638,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v615</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v616</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1980,7 +1980,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v615';
+  return m ? m[0] : 'v616';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2055,7 +2055,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v615');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v616');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -39294,14 +39294,32 @@ function exportFCResults() {
     if (_xlFirst[k] === undefined) _xlFirst[k] = xi;
     _xlCount[k] = (_xlCount[k] || 0) + 1;
   });
+  // ── v616 (T5) ────────────────────────────────────────────────────────────────
+  // The citable government-take block spanned all four prices; the citable contractor-NPV block
+  // stopped at $75. Measured on the live build with the price selector on $125: the workbook is
+  // named ORCA_fiscal_compare_$125_..., its first column reads 'Rank (database take @$125)', its
+  // Methodology sheet prints 'Oil price ($/bbl)  125' and then instructs 'CITE: the
+  // GovtTake_<price> (database), Contractor NPV_<price> (database) ...' — naming a column that
+  // was not in the file. At $100 and at $125 there was no citable contractor NPV anywhere in the
+  // artifact the Quick Start calls "Export XLSX for IC attachment". The analyst's two exits were
+  // both bad: quote Contractor NPV_75 next to GovtTake_125 in the same memo row — two prices in
+  // one line, the exact mixing the single-price ranking exists to prevent — or abandon the
+  // workbook and re-read 185 numbers off the screen one country at a time.
+  // Nothing was missing but the columns: COUNTRY_DATA carries npv_100 and npv_125 for all 185
+  // countries (verified: 185/185 non-null on each), and the Country Profile IC summary has
+  // pasted the $125 figure since v516. The NPV block now matches the take block, four prices to
+  // four prices, and the pair the rank and the filename were built on says so in its own header.
+  const _xlSel = function(label, price) { return label + (price === _xlPP ? ' \u25c4 SELECTED PRICE' : ''); };
   const data = [
     // v506: 'Take%' (compare-model DCF at the selected price) and 'GovtTake_75' (database
     // contract average) are different figures and sat here unlabelled, up to 57.7pp apart.
     // v529: citable database block FIRST -- an analyst reads left to right and the leftmost
     // numbers are the ones that end up in the memo. The compare-model block follows, labelled.
     ['Rank (database take @$' + _xlPP + ')', 'Tied_With', 'Country', 'Region', 'Mechanic', 'Terms_Basis', 'R_factor_Tiers',
-     'GovtTake_50 (database)', 'GovtTake_75 (database)', 'GovtTake_100 (database)', 'GovtTake_125 (database)',
-     'Contractor NPV_50 (database, $M)', 'Contractor NPV_75 (database, $M)',
+     _xlSel('GovtTake_50 (database)', 50), _xlSel('GovtTake_75 (database)', 75),
+     _xlSel('GovtTake_100 (database)', 100), _xlSel('GovtTake_125 (database)', 125),
+     _xlSel('Contractor NPV_50 (database, $M)', 50), _xlSel('Contractor NPV_75 (database, $M)', 75),
+     _xlSel('Contractor NPV_100 (database, $M)', 100), _xlSel('Contractor NPV_125 (database, $M)', 125),
      'Swing_pp', 'Breakeven', 'Tier (database take)', 'Evidence A/B (%)',
      'Take% (model, selected price)', 'Model_vs_DB_pp', 'Govt NPV (model, $M est)', 'Contractor NPV (model, $M)'],
     ..._xlSorted.map(function(r, i) {
@@ -39337,6 +39355,8 @@ function exportFCResults() {
         r.take_125 != null ? +r.take_125.toFixed(1) : null,
         _mono ? null : _xlDbNpv(r, 'npv_50'),
         _mono ? null : _xlDbNpv(r, 'npv_75'),
+        _mono ? null : _xlDbNpv(r, 'npv_100'),   // v616 (T5)
+        _mono ? null : _xlDbNpv(r, 'npv_125'),   // v616 (T5)
         r.swing != null ? +r.swing.toFixed(1) : null,
         // v529: a 100%-take regime has no breakeven. Bahrain, Kuwait and Saudi Arabia were
         // exporting "1" ($1/bbl) into the breakeven column of an IC attachment.
@@ -39401,10 +39421,19 @@ function exportFCResults() {
     ['  B-tier: Verified secondary source (EY/Wood Mac/Rystad)'],
     ['  C-tier: Directional estimate — verify before IC submission'],
     [''],
-    ['Which columns to cite (v529):'],
-    ['  CITE: the GovtTake_<price> (database), Contractor NPV_<price> (database), Breakeven and'],
-    ['    Tier columns. These are the ORCA contract-database averages — the same figures the'],
-    ['    Country Profile "Copy for IC Memo" string, the Screener CSV and the public API carry.'],
+    ['Which columns to cite (v529, columns named v616):'],
+    // v616 (T5): the two column names are now written out at the price that was selected,
+    // instead of the placeholder "<price>" that pointed at a column the sheet did not contain
+    // whenever the selector was on $100 or $125.
+    ['  CITE, for the $' + _xlPP + '/bbl case this sheet was exported on, these two columns:'],
+    ['    GovtTake_' + _xlPP + ' (database)   and   Contractor NPV_' + _xlPP + ' (database, $M)'],
+    ['    Both carry a ◄ SELECTED PRICE marker in their header so they can be found in one look.'],
+    ['    Government take and contractor NPV are both held at $50 / $75 / $100 / $125 — all eight'],
+    ['    columns are citable, but read a take and an NPV from the SAME price or the memo row'],
+    ['    mixes two price cases.'],
+    ['  Also citable: Breakeven and Tier (database take). These are the ORCA contract-database'],
+    ['    averages — the same figures the Country Profile "Copy for IC Memo" string, the Screener'],
+    ['    CSV and the public API carry.'],
     ['  Rank and row order are computed from GovtTake_$' + _xlPP + ' (database), ascending.'],
     ['  DO NOT CITE: the three "(model...)" columns at the right of the sheet. Those are one'],
     // v602 (T5): printed the raw lowercase select key ("north_sea", "lng"). Use the profile name.
