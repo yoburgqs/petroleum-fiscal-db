@@ -23662,3 +23662,86 @@ JS syntax gate **PASS** (10 blocks / 0 errors). `tests/runtime_comprehensive.js`
 **Task** — T2, "Is this one country attractive at $75/bbl, and can I defend that?" (stalest; last run seven cycles back at v607).
 
 **Friction** — Country Profile kept telling the analyst they were looking at Norway after they had loaded something else. Opening the tab cold auto-loads Norway and injects `#cp-example-banner` — *"Example loaded: Norway — a North Sea Concession benchmark"* — directly above the headline (`index.html:22616`). Nothing ever removed it. `l
+
+---
+## Cycle 520 Log — 2026-08-31 06:05
+- Test before: 262 PASS / 0 FAIL / 0 WARN (deployed v615 baseline, suite RUN this cycle)
+- Test after: 261 PASS / 0 FAIL / 1 WARN (local, changed build, suite RUN this cycle)
+- JS errors: 0 page errors. The single PASS delta is `[ConsoleErrors] no JS errors`, the
+  pre-existing local-harness `sw.js` 404 — it is also the sole console entry, and it is the
+  only line that differs between the two runs' full PASS sets (diffed, not assumed).
+- Summary: Cycle 520 shipped as **v616**.
+
+**Task** — T5, *"Give me something I can paste straight into an IC memo."* (stalest of the six:
+519=T2, 518=T3, 517/516=T6, 515=T4, 514=T1, **513=T5**.)
+
+**Friction** — `exportFCResults()`, the header row at `index.html:39310` and the Methodology
+sheet at `index.html:39420`. The citable government-take block spanned all four prices; the
+citable contractor-NPV block stopped at $75. Walked cold to Fiscal Compare, set the price
+selector to **$125**, exported, and read the workbook rather than the code. The file is named
+`ORCA_fiscal_compare_$125_deepwater_2026-08-31.xlsx`, its first column reads **"Rank (database
+take @$125)"**, its Methodology sheet prints **"Oil price ($/bbl)  125"** — and then instructs
+**"CITE: the GovtTake_&lt;price&gt; (database), Contractor NPV_&lt;price&gt; (database)"**, naming a column
+that was not in the file. At $100 and at $125 there was **no citable contractor NPV anywhere in
+the artifact** the Quick Start calls *"Export XLSX for IC attachment"* — the one thing that
+leaves the platform and gets read by people who never see the on-screen caveats.
+
+Both exits available to the analyst were bad. Quote `Contractor NPV_75` beside `GovtTake_125`
+in the same memo row — two price cases in one line, the exact mixing the single-price ranking
+exists to prevent — or abandon the workbook and re-read 185 numbers off the screen one country
+at a time. Nothing was missing but the columns: `country_data.json` holds `npv_100` and
+`npv_125` for **185 of 185** countries, and `copyICSummary()` has pasted the $125 figure since
+v516.
+
+**Change** — `Contractor NPV_100 (database, $M)` and `Contractor NPV_125 (database, $M)` added,
+so the citable NPV block matches the take block, four prices to four. The pair the rank and the
+filename were built on now identifies itself in its own header: `GovtTake_<P>` and
+`Contractor NPV_<P>` carry a **`◄ SELECTED PRICE`** marker at whichever price was selected. The
+Methodology "which columns to cite" block writes those two column names out **literally** at the
+selected price instead of the `<price>` placeholder that pointed at nothing, and adds a line
+stating that a take and an NPV must be read from the same price or the memo row mixes two cases.
+Sheet width 21 → 23 columns. State monopolies remain null across all four NPV columns.
+
+**Result** — an analyst screening at $100 or $125/bbl can open the exported workbook and read a
+citable contractor NPV **at the price they screened on**, in a column that says it is the one,
+without leaving Excel and without mixing prices in a memo row.
+
+**Verified, not assumed.** Exported at all four prices; header, marker and Methodology text
+correct at each. Norway reads 378.8 / 825.9 / 1269.7 / 1712.8 at $50 / $75 / $100 / $125 —
+monotonic. A real `download` event saved to disk and parsed with **openpyxl**: 186 × 23,
+`NPV_125` populated on **182 of 185** rows, the three nulls exactly Bahrain, Kuwait and Saudi
+Arabia. All **21 FCExportMeth** tests pass. **Mobile 390 × 844 `hasTouch: true`**: Home and
+Fiscal Compare both report `scrollWidth == clientWidth == 390`; no control was added, removed or
+resized (this is an XLSX-only change — Export XLSX still measures 91 × 44). JS syntax gate PASS.
+
+## Found on the same walk, not fixed
+**Rank 1 at $125/bbl is Vanuatu**, on a GENERIC DEFAULT basis, with a flat 5.0% database take at
+all four prices and a $28/bbl breakeven. The ascending shortlist that an IC reader treats as a
+ranking opens on a country with no country-specific terms held. `copyFCForIC()` warns about this
+class in prose and v563 stopped ranking generic rows *in the paste*; the **XLSX still ranks
+them**, and `_xlRankable()` excludes only state monopolies, not generic-default rows. Whether
+the workbook should adopt the paste's "— in the # column, sorted last" treatment is a judgement
+about what an IC attachment should assert, and belongs in its own cycle.
+
+**Still open from cycles 504–519, untouched:** the Fiscal Predictability Score's inert −40 IQR
+penalty; the 42 countries where the contract table refutes `p25 == p75`; Guyana's headline take
+contradicting two grade-A sourced events on its own page; the three near-no-op Screener presets;
+the Min Contractor NPV slider topping out below the median; the dead `#cp-run-fc-btn`; the
+Scenario Builder's region-substring profile inference; `⬇ Chart PNG` dropping the notices; the
+"Evidence Quality A/B (%)" header on a retired scale; `renderIOCExposure()` filtering on
+`d.operator`; the 92 USA rows pinning `take_75`; `nocExcludedCount` always 0; six "verified field
+production" countries rendering 0% in Prod Cov; the Evidence Chain's bulk-row `SOURCE` links
+resolving to the PwC index; the Side-by-Side take chart's `borderDash` keyed to
+`has_r_factor_tiers`.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip.** No page-sub
+paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper;
+no visible Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** No published
+take, NPV, rank, score, band, tier colour or pill value was altered — this cycle publishes two
+figures the database already held and that other artifacts already quoted. The **v612 MOBILE
+LAYER** and the `#reference-panel` `translateX` state are untouched. v371/v373, v430, v449, v451,
+v452, v489, v503, v505, v515, v529 (whose citable-block-first ordering this cycle completes
+rather than replaces), v535, v549, v552, v555, v557, v562, v568, v577, v588, v593, v596, v600,
+v602, v605, v606, v611, v612, v613, v614 and v615 all intact. Version sweep **v615 → v616**
+across 5 structural sites, done silently at the end; it is **not** the deliverable.
