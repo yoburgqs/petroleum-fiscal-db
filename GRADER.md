@@ -23871,3 +23871,55 @@ intact. Version sweep **v616 → v617** across 5 structural sites, done silently
 
 ## Friction
 The Screener's **Min Contractor NPV** slider is a *price-following filter on a fixed range*. `runScreener()` has always tested it against ``d[`npv_${price}`]`` — following the price radios — but those radios live inside `#explorer-browse-mode`, which is `display:none` while the Screener is ope
+
+---
+## Cycle 522 Log — 2026-09-01
+- Test before: 236 PASS / 0 FAIL (reported by harness)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite RAN this cycle against the build, number read from `/tmp/runtime_test_report.txt`, not assumed
+- JS syntax gate: **PASS** (10 blocks / 0 errors)
+- JS errors: 0 page errors, 0 console errors
+- Shipped as **v618**
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest of the six (521 was T1, 520 T5, 519 T2, 518 T3, 517/516 T6, 515 T4).
+
+## Friction
+The word in T4 is **"here"** — the analyst is already on a country and wants the reform read for *that* country. `openReformRiskFor(country)` has existed since **v550** and six surfaces call it correctly, including Fiscal Compare's Stability cell (`index.html:36981`) and the Country Profile sidebar's own `Full reform detail for X ›` button (`index.html:29128/29189`).
+
+**Two country-scoped affordances in the Country Profile Zone B headline did not.** Both called `switchTab('treformrisk', ...)` bare:
+
+| Site | Element | Its own tooltip |
+|---|---|---|
+| `index.html:30389` | IC-snapshot row `Stability: ◆◆◆◇◇ (2 fiscal law changes since 2010 · Reform Risk →)` | "…Click to open Reform Risk tab for the full event log and stability ranking." — and for the 164 uncovered jurisdictions, `NOT SCORED for Qatar.` |
+| `index.html:30071` | v468 recent-reform `⚠` tag | `Fiscal reform in {year} — {description}` for THIS country |
+
+These are the canonical T4 elements: the one row literally labelled **Stability**, and the one red alert about this country's own reform. Both dropped the country — measured cold, `rr-country-lookup` = `""` and `rr-country-verdict` = `display:none` on arrival.
+
+Severity is worst for the **164 of 185 jurisdictions with no sourced log**. Clicking a control reading *"NOT SCORED for Qatar"* landed on the global 21-jurisdiction snapshot where **"Qatar" appeared exactly once — inside a 185-option dropdown**. The analyst must recall which country they were reading and re-select it from a list where the 164 sit in a second optgroup. Meanwhile the card that answers them already existed and was one function call away.
+
+## Change
+Both now call `openReformRiskFor('<country>')`, using a new `_rrJs344` binding (JS-escaped `d.country`, declared beside the existing v344 reform vars at `index.html:30033`). Both gained `role="button"`, `tabindex="0"` and Enter/Space activation, matching the v550 pattern at `index.html:29871`. No tooltip text was added or reworded.
+
+## Result
+Clicking **Stability** or the **reform tag** from any country profile now lands on that country's own verdict card, selected and rendered. Verified cold at 1440px and by **tap at 390px**:
+
+- **Nigeria** → `Nigeria — reform exposure` — 70/100, 2 scored changes, direction split, full sourced event log
+- **Guyana** → `Guyana — reform exposure` — 100/100 with the "do not read 100 as a legislative track record" IC action
+- **Qatar / Saudi Arabia** → `no Reform Frequency Score` — *"This is not a score of 100 … do not carry a reform-frequency premium of zero into an IC memo on this basis"*
+
+The last row is the point: 164 of 185 countries could not reach that explanation from the control that raised the question.
+
+## Mobile (Step 5b)
+- Horizontal scroll: **zero on all 9 tabs at 1920 / 1440 / 1280 / 1024 / 768 / 390** — `scrollWidth == clientWidth` at every width
+- Controls touched by this cycle under `pointer: coarse`: **44px / 36px / 28px** — all ≥ 24px
+- Tap-through works on a phone: `lookup="Nigeria"` after tap, no overflow introduced
+
+## Note on the 1 WARN
+`serviceWorker.register('/petroleum-fiscal-db/sw.js')` 404s when the suite runs against a **localhost root** rather than the Pages sub-path. Harness artifact, pre-existing, unrelated to this change. Recorded rather than suppressed.
+
+## Found on the same walk, not fixed
+**The Reform Risk tab's own dropdown does not preselect from any bare tab click.** Fixed for the two CP links above, but arriving via the top nav `Reform Risk` button still opens the global view with no country — correct for a cold nav, and lifting a "last country you looked at" memory into the tab is a cross-tab state question, not a link-routing one. Left alone deliberately.
+
+**`index.html:1757`, `1812`, `2695` and `32601`** also call `switchTab('treformrisk')` bare, but all four are genuinely global entry points (Home card, Home hint, Vintage tab CTA, a methodology button) with no country in scope. Correct as written — recorded so a later cycle does not "fix" them.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** — the two `title` strings are unchanged text on re-pointed controls. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** No published take, NPV, rank, score, band, tier colour or pill value was altered — this cycle changes only *where two existing links go*. The **v612 MOBILE LAYER** and the `#reference-panel` `translateX` state are untouched; no `min-width: max-content` marker was added or removed. v371/v373, v430, v449, v451, v452, v489, v500, v503, v505, v515, v517, v529, v535, v537, v549, v550, v552, v554, v555, v557, v562, v568, v577, v583, v585, v588, v593, v596, v598, v600, v602, v605, v606, v611, v612, v613, v614, v615, v616 and v617 all intact. Version sweep **v617 → v618** across the 5 display sites, done silently at the end; the 4 remaining `v617` strings are historical code comments and are left alone. It is **not** the deliverable.
