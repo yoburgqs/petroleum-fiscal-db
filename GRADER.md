@@ -23923,3 +23923,18 @@ The last row is the point: 164 of 185 countries could not reach that explanation
 **`index.html:1757`, `1812`, `2695` and `32601`** also call `switchTab('treformrisk')` bare, but all four are genuinely global entry points (Home card, Home hint, Vintage tab CTA, a methodology button) with no country in scope. Correct as written — recorded so a later cycle does not "fix" them.
 
 **STILL LOCKED — nothing touched.** No new FAQ (still **974**). **No new tooltip** — the two `title` strings are unchanged text on re-pointed controls. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** No published take, NPV, rank, score, band, tier colour or pill value was altered — this cycle changes only *where two existing links go*. The **v612 MOBILE LAYER** and the `#reference-panel` `translateX` state are untouched; no `min-width: max-content` marker was added or removed. v371/v373, v430, v449, v451, v452, v489, v500, v503, v505, v515, v517, v529, v535, v537, v549, v550, v552, v554, v555, v557, v562, v568, v577, v583, v585, v588, v593, v596, v598, v600, v602, v605, v606, v611, v612, v613, v614, v615, v616 and v617 all intact. Version sweep **v617 → v618** across the 5 display sites, done silently at the end; the 4 remaining `v617` strings are historical code comments and are left alone. It is **not** the deliverable.
+
+---
+## Cycle 522 Log — 2026-09-01 16:08
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 522 complete and pushed as **v618**.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest of the six (521 was T1, 520 T5, 519 T2, 518 T3, 517/516 T6, 515 T4).
+
+## Friction
+The operative word in T4 is **"here"** — the analyst is already on a country. The helper `openReformRiskFor(country)` has existed since v550, and six surfaces call it correctly, including Fiscal Compare's Stability cell and Country Profile's own sidebar button.
+
+Two country-scoped controls in
