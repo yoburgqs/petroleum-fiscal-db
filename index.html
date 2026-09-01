@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v617</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v618</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1573,7 +1573,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v617</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v618</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1643,7 +1643,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v617</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v618</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1985,7 +1985,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v617';
+  return m ? m[0] : 'v618';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2060,7 +2060,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v617');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v618');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -30030,6 +30030,12 @@ function loadCountryProfile(country) {
   // nothing. Same muting rule Fiscal Compare's Stability cell already applies: where the
   // count is not the whole verdict, it does not get the green ramp.
   const _rrCtxIn344 = (typeof _rrContextInWindow === 'function') ? _rrContextInWindow(_rh344) : [];
+  // ── v618 (T4): the country the two Zone-B reform affordances must carry ──────────
+  // Both the Stability row and the recent-reform tag below called switchTab('treformrisk')
+  // bare, landing the analyst on the global 21-jurisdiction view with the country they were
+  // reading dropped. openReformRiskFor() has existed since v550 and six other surfaces use
+  // it; these two were the only country-scoped links that did not.
+  const _rrJs344 = String(d.country || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
   const _rrCovN344 = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY)
     ? Object.keys(REFORM_HISTORY).filter(function(k){ return Array.isArray(REFORM_HISTORY[k]) && REFORM_HISTORY[k].length; }).length
     : 0;
@@ -30062,7 +30068,7 @@ function loadCountryProfile(country) {
   // analysts see it immediately without needing to click through to Reform Risk tab
   const _recentReform344 = _rh344.find(function(e){ return (e.year||0) >= 2024; });
   const _recentReformTag344 = _recentReform344
-    ? `<span style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:var(--negative);background:rgba(185,28,28,.07);border:1px solid rgba(185,28,28,.3);border-radius:4px;padding:2px 7px;white-space:nowrap;cursor:pointer;gap:4px;" onclick="switchTab('treformrisk',document.getElementById('tab-btn-treformrisk'))" title="Fiscal reform in ${_recentReform344.year} — ${(_recentReform344.description||'reform event').replace(/"/g,'&quot;').slice(0,100)}. Click to open Reform Risk tab for full timeline and IC WACC premium guidance.">⚠ ${_recentReform344.year} reform — see Reform Risk →</span>`
+    ? `<span style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:var(--negative);background:rgba(185,28,28,.07);border:1px solid rgba(185,28,28,.3);border-radius:4px;padding:2px 7px;white-space:nowrap;cursor:pointer;gap:4px;" role="button" tabindex="0" onclick="openReformRiskFor('${_rrJs344}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openReformRiskFor('${_rrJs344}');}" title="Fiscal reform in ${_recentReform344.year} — ${(_recentReform344.description||'reform event').replace(/"/g,'&quot;').slice(0,100)}. Click to open Reform Risk tab for full timeline and IC WACC premium guidance.">⚠ ${_recentReform344.year} reform — see Reform Risk →</span>`
     : '';
   const _takeDisplay344 = (!isStateMonopoly(d.take_75) && d.take_75 != null) ? d.take_75.toFixed(1) + '%' : '—';
   // v449: color-code take% by tier (green≤40 / yellow≤60 / orange≤75 / red>75) — matches FC row and tier legend
@@ -30380,7 +30386,7 @@ function loadCountryProfile(country) {
       ${_be344Display}
       ${_irrRoute516}
       ${_swing344Html}
-      <span style="margin-left:auto;font-size:12px;color:var(--muted);cursor:pointer;" onclick="switchTab('treformrisk',document.getElementById('tab-btn-treformrisk'))" title="${_stabTip344}" onmouseover="this.querySelector('.rr-link').style.textDecoration='underline'" onmouseout="this.querySelector('.rr-link').style.textDecoration='none'">Stability: ${_stabGlyph344} <span style="opacity:.7;font-size:11px;">${_stabSub344}</span></span>
+      <span role="button" tabindex="0" style="margin-left:auto;font-size:12px;color:var(--muted);cursor:pointer;" onclick="openReformRiskFor('${_rrJs344}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openReformRiskFor('${_rrJs344}');}" title="${_stabTip344}" onmouseover="this.querySelector('.rr-link').style.textDecoration='underline'" onmouseout="this.querySelector('.rr-link').style.textDecoration='none'">Stability: ${_stabGlyph344} <span style="opacity:.7;font-size:11px;">${_stabSub344}</span></span>
     </div>
     ${_recentReformTag344}
     ${_cpIcMemo454}
