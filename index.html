@@ -1842,10 +1842,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   <h2 class="page-title">Fiscal Compare</h2>
 
   <!-- v365: IC Analyst Quick Reference — collapsible interpretation guide for senior analysts seeing the platform for the first time -->
-  <details id="fc-ic-ref" open style="margin-bottom:12px;">
+  <details id="fc-ic-ref" style="margin-bottom:12px;">
     <summary style="cursor:pointer;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:6px;list-style:none;display:flex;align-items:center;gap:6px;user-select:none;" title="Collapse IC analyst interpretation guide for take tiers, Swing, and Stability">
-      <span id="fc-ic-ref-arrow" style="color:var(--accent);font-size:12px;">&#9660;</span> IC Analyst Interpretation Guide
-      <span id="fc-ic-ref-hint" style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">collapse — stays collapsed this session</span>
+      <span id="fc-ic-ref-arrow" style="color:var(--accent);font-size:12px;">&#9656;</span> IC Analyst Interpretation Guide
+      <span id="fc-ic-ref-hint" style="margin-left:auto;font-size:10px;font-weight:400;color:var(--muted);text-transform:none;letter-spacing:0;">expand — take tiers, Swing, Stability, IC memo rules</span>
     </summary>
     <div style="padding:10px 14px;border:1px solid var(--border);border-top:none;border-radius:0 0 6px 6px;background:var(--surface);">
     <!-- v455: Quick workflow row — tells a first-time analyst the 3 steps to get an answer, not just what the columns mean -->
@@ -2143,7 +2143,9 @@ window.copyPlatformCitation = function(btn) {
   </div>
 
   <!-- v423: Reading guide — always visible before and after results; dismissible per session -->
-  <div id="fc-reading-guide" style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:10px;font-size:11px;color:var(--muted);line-height:1.6;display:flex;gap:8px;align-items:flex-start;">
+  <details id="fc-reading-guide" style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:10px;font-size:11px;color:var(--muted);line-height:1.6;">
+    <summary style="cursor:pointer;font-weight:700;color:var(--accent);font-size:11px;letter-spacing:.04em;">Reading this table &mdash; column definitions</summary>
+    
     <div style="flex:1;">
       <strong style="color:var(--accent);">Reading this table:</strong>
       <strong style="color:var(--text);">Govt Take</strong> = share of project economics captured by the state (royalties + taxes + profit oil) at the selected price &amp; profile — lower is better for the investor. Take% cells are tier-colored: <span style="color:var(--green);font-weight:600;">&le;40% = Investible</span> · <span style="color:var(--yellow);font-weight:600;">41&ndash;60% = Moderate</span> · <span style="color:var(--orange);font-weight:600;">61&ndash;75% = High</span> · <span style="color:var(--red);font-weight:600;">&gt;75% = Very High</span>.
@@ -2160,10 +2162,11 @@ window.copyPlatformCitation = function(btn) {
       Click any row to open the 4-price matrix (Take &middot; Contractor NPV at $50–$125/bbl) and fiscal waterfall. In the drilldown: click <strong>⎘ IC Citation</strong> to copy a ready-to-paste cite string (take, contractor NPV at the selected price and at the $50 downside, breakeven), or click <strong>Full Profile →</strong> to open the Country Profile with sourced fiscal parameters.
     </div>
     <div style="flex-shrink:0;display:flex;flex-direction:column;gap:4px;align-items:flex-end;">
-      <button onclick="document.getElementById('fc-reading-guide').style.display='none';sessionStorage.setItem('fc-reading-guide-dismissed','1');" title="Dismiss for this session only" aria-label="Dismiss reading guide for this session" style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-size:12px;padding:2px 7px;line-height:1.4;transition:.15s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">&#10005; Dismiss</button>
-      <button onclick="document.getElementById('fc-reading-guide').style.display='none';sessionStorage.setItem('fc-reading-guide-dismissed','1');try{localStorage.setItem('fc-reading-guide-hidden','1');}catch(e){}" title="Hide permanently across all sessions (stored in browser localStorage). Use the keyboard shortcuts panel on the Home tab to re-enable." aria-label="Permanently hide reading guide across all sessions" style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-size:10px;padding:2px 7px;line-height:1.4;transition:.15s;white-space:nowrap;" onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">&#8734; Never show again</button>
+      
+      
     </div>
-  </div>
+  
+  </details>
   <script>
   (function() {
     // v466: also check localStorage for permanent "don't show again" preference
@@ -22176,8 +22179,8 @@ function switchTab(id, btn) {
                 var cpBanner = document.createElement('div');
                 cpBanner.id = 'cp-example-banner';
                 cpBanner.className = 'no-print';   // v535: screen-only example banner — keep it out of printed/PDF output
-                cpBanner.style.cssText = 'background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:7px 14px;margin-bottom:10px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;';
-                cpBanner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> Indonesia — a PSC benchmark (644 of 648 contracts on their own terms). Use the dropdown above to load any country. <span onclick="this.parentNode.remove()" style="margin-left:auto;cursor:pointer;opacity:.5;font-size:13px;" title="Dismiss">&#10005;</span>';
+                cpBanner.style.cssText = 'padding:2px 0 8px;margin-bottom:6px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;';
+                cpBanner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> Indonesia — a PSC benchmark (644 of 648 contracts on their own terms). Use the dropdown above to load any country. ';
                 ddContent.parentNode.insertBefore(cpBanner, ddContent);
               }
             }, 400);
@@ -22216,7 +22219,7 @@ function switchTab(id, btn) {
             banner.id = 'ioc-example-banner';
             banner.className = 'no-print';   // v535: screen-only example banner — keep it out of printed/PDF output
             banner.style.cssText = 'background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:7px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;';
-            banner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> Shell — major IOC benchmark. Search above for any operator. <span onclick="this.parentNode.remove()" style="margin-left:auto;cursor:pointer;opacity:.5;font-size:13px;" title="Dismiss">&#10005;</span>';
+            banner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> Shell — major IOC benchmark. Search above for any operator. ';
             iocOut.parentNode.insertBefore(banner, iocOut);
           }
         }
@@ -22244,7 +22247,7 @@ function switchTab(id, btn) {
             banner.id = 'sbs-example-banner';
             banner.className = 'no-print';   // v535: screen-only example banner — keep it out of printed/PDF output
             banner.style.cssText = 'background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:7px 14px;margin-bottom:12px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;';
-            banner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> North Sea Trio — Norway, UK, Netherlands. <strong style="color:var(--text);">Search for any country above and this example clears itself</strong> — your comparison starts fresh, with all 5 slots free. <span onclick="this.parentNode.remove()" style="margin-left:auto;cursor:pointer;opacity:.5;font-size:13px;" title="Dismiss">&#10005;</span>';
+            banner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> North Sea Trio — Norway, UK, Netherlands. <strong style="color:var(--text);">Search for any country above and this example clears itself</strong> — your comparison starts fresh, with all 5 slots free. ';
             cmpOut.parentNode.insertBefore(banner, cmpOut);
           }
         }
