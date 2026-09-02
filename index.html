@@ -1746,34 +1746,26 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <!-- v450: Fiscal Compare card has amber top border + "Start here" badge to signal primary entry point -->
     <div class="card" style="cursor:pointer;transition:border-color .15s;border-top:3px solid var(--accent);" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)';this.style.borderTopColor='var(--accent)'" onclick="switchTab('t0',document.getElementById('tab-btn-t0'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
-        <span style="font-size:22px;line-height:1;">&#x25A6;</span>
-        <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Fiscal Compare <span style="background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:2px 7px;border-radius:3px;margin-left:6px;vertical-align:middle;letter-spacing:.04em;text-transform:uppercase;">Start here</span></div><div style="font-size:11px;color:var(--muted);">Run any production profile through 185 countries simultaneously</div></div>
-        <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
+        <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Fiscal Compare</div><div style="font-size:11px;color:var(--muted);">Run any production profile through 185 countries simultaneously</div></div>
       </div>
       <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a ranked table of every country by government take, NPV, IRR, and breakeven price — <strong>results auto-load</strong> on tab click. Sortable, exportable to Excel, with one-click drill-down to any country.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t7',document.getElementById('tab-btn-t7'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
-        <span style="font-size:22px;line-height:1;">&#x25CE;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Country Profile</div><div style="font-size:11px;color:var(--muted);">Full fiscal deep-dive for any single country</div></div>
-        <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: every sourced fiscal parameter (royalty, CIT, profit oil splits), price sensitivity curve, IRR, breakeven, reform history timeline, and regional peer comparison. <strong>Norway auto-loads on first visit</strong> — use the dropdown to switch country.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: every sourced fiscal parameter (royalty, CIT, profit oil splits), price sensitivity curve, IRR, breakeven, reform history timeline, and regional peer comparison. <strong>Indonesia auto-loads on first visit</strong> — use the dropdown to switch country.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('texplorer',document.getElementById('tab-btn-tscreener'));setTimeout(function(){if(typeof switchExplorerMode==='function')switchExplorerMode('screen');},80);" title="Open Screener — filter 185 countries by take, IRR, NPV, breakeven, mechanic, and region. Opens in Screener mode.">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
-        <span style="font-size:22px;line-height:1;">&#x2605;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Screener</div><div style="font-size:11px;color:var(--muted);">Ranked shortlist with presets: IOC Capital Screen, Sweet Spot, Frontier, Downside Resilience</div></div>
-        <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a filtered, ranked shortlist of investable regimes — set max take %, min contractor NPV at $75, min NPV at the $50 downside, breakeven, mechanic, or region. One-click presets: IOC Capital Screen (verified production · Take ≤65% · NPV positive at $75 and at $50), Sweet Spot (Take ≤55% · NPV positive), Downside Resilience (keeps ≥50% of its $75 contractor NPV at $50/bbl), Deepwater, Low-Risk Stable. Export shortlist to Excel.</div>
     </div>
     <!-- v491: Reform Risk promoted from More tools to card 4 — primary IOC screening criterion -->
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('treformrisk',document.getElementById('tab-btn-treformrisk'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
-        <span style="font-size:22px;line-height:1;">&#x26A0;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Reform Risk</div><div style="font-size:11px;color:var(--muted);">Fiscal stability scores + law change history across 185 countries</div></div>
-        <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a per-country lookup that returns one IC action, a Reform Frequency Score (0–100), the reform heatmap by decade, and the direction split — and it says plainly when a jurisdiction has no sourced reform log rather than scoring it as clean.</div>
     </div>
@@ -1784,33 +1776,25 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-top:10px;">
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t5',document.getElementById('tab-btn-t5'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-        <span style="font-size:22px;line-height:1;">&#x25B3;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">IOC Portfolio</div><div style="font-size:11px;color:var(--muted);">Operator exposure by take tier across all jurisdictions</div></div>
-        <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Search any major operator to see their full global contract portfolio ranked by take. Take Distribution &amp; Peer Comparison shows take-tier distribution vs IOC peer group.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('tbreakevenmap',document.getElementById('tab-btn-tbreakevenmap'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-        <span style="font-size:22px;line-height:1;">&#x25CF;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Breakeven Map</div><div style="font-size:11px;color:var(--muted);">Interactive world map of oil price breakeven by country</div></div>
-        <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Drag a price slider to see which countries are above or below your target threshold. Top-10 most resilient and most vulnerable lists update live.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('t2',document.getElementById('tab-btn-t2'))">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-        <span style="font-size:22px;line-height:1;">&#x229E;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Side-by-Side</div><div style="font-size:11px;color:var(--muted);">Compare up to 4 countries in parallel</div></div>
-        <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Column-by-column fiscal comparison of shortlisted countries — take at 4 prices, contractor NPV at 3 prices, breakeven, evidence basis, mechanic.</div>
     </div>
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="openScenarioBuilder()">
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:10px;">
-        <span style="font-size:22px;line-height:1;">&#x2692;</span>
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Scenario Builder</div><div style="font-size:11px;color:var(--muted);">Model custom fiscal terms &mdash; set royalty, CIT, profit oil split</div></div>
-        <span style="color:var(--accent);font-size:16px;font-weight:700;">&#8594;</span>
       </div>
       <div style="font-size:12px;color:var(--muted);line-height:1.65;margin-bottom:10px;">Define any combination of fiscal instruments and run a full DCF. Compare your custom regime against 185 countries. Essential for bid calibration and IC scenario analysis.</div>
     </div>
@@ -2415,7 +2399,7 @@ window.copyPlatformCitation = function(btn) {
              nothing to test); revealed by _scUpdateNeutralFlags() the moment a ceiling is set.
              Same pattern as the v513 sc-be-nulls control, applied to the axis that silently
              removed the largest TSC jurisdiction on earth from the flagship IC screen. -->
-        <label id="sc-fee-cmp-wrap" style="display:none;margin-top:7px;font-size:10px;font-weight:400;color:var(--muted);cursor:pointer;line-height:1.5;align-items:flex-start;gap:5px;" title="Some countries' published take blends PSC/Concession contracts with fee-basis contracts (TSC, RSC, Buy-back) where the contractor is paid a fixed $/bbl remuneration fee and keeps no price upside. On those, the headline take% measures contract structure, not how hard the terms are, and MECHANIC_COMPARABILITY.md does not permit comparing it across countries. CHECKED (default): the ceiling is tested against the take on each country's PSC/Concession contracts alone — Iraq is screened at 34.1%, not 84.8%. The published headline is still what the table shows, colours, tiers and exports. UNCHECKED: the ceiling is tested against the published blend, which is what this Screener did before v554; the count line then names any country that basis excludes."><input type="checkbox" id="sc-fee-cmp" checked style="cursor:pointer;vertical-align:-1px;"> Test the ceiling on <span style="font-weight:700;">comparable</span> take for the <span id="sc-fee-cmp-n" style="font-weight:700;">10</span> fee-basis countries <span style="opacity:.8;">(published headline still shown and exported)</span></label>
+        <label id="sc-fee-cmp-wrap" style="display:none;margin-top:7px;font-size:10px;font-weight:400;color:var(--muted);cursor:pointer;line-height:1.5;align-items:flex-start;gap:5px;" title="Some countries' published take blends PSC/Concession contracts with fee-basis contracts (TSC, RSC, Buy-back) where the contractor is paid a fixed $/bbl remuneration fee and keeps no price upside. On those, the headline take% measures contract structure, not how hard the terms are, and it is not comparable across countries. CHECKED (default): the ceiling is tested against the take on each country's PSC/Concession contracts alone — Iraq is screened at 34.1%, not 84.8%. The published headline is still what the table shows, colours, tiers and exports. UNCHECKED: the ceiling is tested against the published blend, which is what this Screener did before v554; the count line then names any country that basis excludes."><input type="checkbox" id="sc-fee-cmp" checked style="cursor:pointer;vertical-align:-1px;"> Test the ceiling on <span style="font-weight:700;">comparable</span> take for the <span id="sc-fee-cmp-n" style="font-weight:700;">10</span> fee-basis countries <span style="opacity:.8;">(published headline still shown and exported)</span></label>
       </div>
       <!-- v568 (T1): the "Max Breakeven" ceiling slider is REMOVED, along with its sc-be-nulls
            coverage checkbox. It ranged $20-$120, and in country_data.json every one of the 65
@@ -23066,7 +23050,7 @@ function getProducerContext(countryName) {
   };
 }
 
-// ── v552 (T2): the COMPARABLE take. ~/MECHANIC_COMPARABILITY.md, 2026-08-26 ──
+// ── v552 (T2): the COMPARABLE take. ~/the platform comparability rules, 2026-08-26 ──
 // A government take% may only be ranked against another take% when contractor income is tied
 // to the oil price. Group 1 (Concession, PSC, Gross Split, Revenue Share) qualifies. Group 2
 // (TSC, RSC, India RSC, Buy-back) does not: the contractor is paid a fixed $/bbl remuneration
@@ -23144,7 +23128,7 @@ function cpNBlendedProducers() {
 // all-contract figure, 68% of which is TSC fee-basis contracts where the contractor is paid a
 // fixed $/bbl remuneration fee and keeps no price upside.
 //
-// MECHANIC_COMPARABILITY.md (2026-08-26) says that blended number may not be compared across
+// the platform comparability rules (2026-08-26) says that blended number may not be compared across
 // countries, and v549 (Side-by-Side), v552 (Country Profile) and v553 (the IC-memo clipboard)
 // have each already put the correction on screen. The Screener — the one surface that ACTS on
 // the number instead of displaying it — was still gating on the raw blend, and said nothing at
@@ -23188,7 +23172,7 @@ function _scFeeCmpCount(price) {
 // d.mechanics.split(',')[0] that v548 replaced everywhere else -- this was the one call site
 // it missed -- so the largest TSC jurisdiction on earth was pasted into an IC memo as a
 // CONCESSION, along with 52 other countries. (2) The take and the NPV are the blended
-// all-contract figures, which MECHANIC_COMPARABILITY.md says may not be ranked across
+// all-contract figures, which the platform comparability rules says may not be ranked across
 // countries. The screen carries the correction; the pasted paragraph carried none of it, and
 // the pasted paragraph is the one that outlives the session.
 //
@@ -23239,7 +23223,7 @@ function _icFeeBasisNote(d) {
     + '. Rank ' + d.country + ' against production-sharing countries on ' + pr('t75')
     + ', not ' + (d.take_75 != null ? d.take_75.toFixed(1) + '%' : 'the headline')
     + ' — the headline is the correct all-contract average and is the figure the ORCA database '
-    + 'and JSON API publish. Rule: MECHANIC_COMPARABILITY.md (2026-08-26).';
+    + 'and JSON API publish. Rule: the platform comparability rules (2026-08-26).';
   return note;
 }
 // Placement inside the pasted paragraph: on its own line, immediately after the metrics and
@@ -24856,7 +24840,7 @@ function renderCompare() {
       + 'NPV / IRR / breakeven come from the standardized deepwater profile, not from this '
       + 'country’s fields. Describes the legal regime — directional only, not realised economics.');
   };
-  // v549 (T3): mechanic-basis comparability. ~/MECHANIC_COMPARABILITY.md, written
+  // v549 (T3): mechanic-basis comparability. ~/the platform comparability rules, written
   // 2026-08-26, establishes that a government take% is only comparable to another
   // take% when contractor income is tied to the oil price.
   //   Group 1 -- Concession, PSC, Gross Split, Revenue Share -- qualifies.
@@ -25097,7 +25081,7 @@ function renderCompare() {
       // because rank 6 came off the comparable 34.1% while the label came off the headline
       // 84.8% against a comparable median of 55.6%. The two halves of one cell disagreed, and
       // the tooltip settled it the wrong way: 'Producer median take @$75/bbl is 55.6% and this
-      // country is at 84.8%' -- exactly the cross-basis comparison MECHANIC_COMPARABILITY.md
+      // country is at 84.8%' -- exactly the cross-basis comparison the platform comparability rules
       // forbids, printed on the one row that exists to prevent it. Iraq is the only one of the
       // 21 producers the mislabel reaches, and it is the largest gap in the set (50.7pp); the
       // other six blended producers (Mexico 2.5, Ecuador 7.2, Oman 2.0, Malaysia 1.1,
@@ -25218,7 +25202,7 @@ function renderCompare() {
     //
     // Walked cold on the shipped 'USA vs Iraq' quickstart. The Govt Take row read
     // '84.8%  PSC/Conc 34.1%' -- v549 put that correction in the cell precisely because
-    // MECHANIC_COMPARABILITY.md says Iraq's blended figure may not be compared across countries,
+    // the platform comparability rules says Iraq's blended figure may not be compared across countries,
     // 415 of its 610 contracts being fee-basis TSCs. Four rows lower this row then took the
     // UNCORRECTED 84.8%, turned it into a 5.58x multiplier, and printed:
     //     Govt NPV @$75 (est.)     USA $1.0B     Iraq $3.6B
@@ -25608,10 +25592,7 @@ function renderCompare() {
   // v515 was right that a silent absence would be its own confusion, so the absence and the
   // one-line reason stay on screen and the reasoning stays one click away -- it is collapsed,
   // not deleted, and it still opens for print.
-  html += `<details id="cmp-absent-note" style="margin-top:8px;background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--muted);border-radius:5px;padding:8px 12px;font-size:11px;color:var(--muted);line-height:1.55;">
-    <summary style="cursor:pointer;list-style:none;user-select:none;display:block;"><strong style="color:var(--text);">IRR, Government NPV, Breakeven and Monte Carlo percentiles are deliberately not in this table.</strong> Each was removed because it could not be compared between countries. Rank on <strong style="color:var(--text);">Govt Take</strong> and the <strong style="color:var(--text);">three contractor NPV rows</strong> above; for a genuine IRR or breakeven on your own field and terms, run it in <span style="color:var(--accent);font-weight:600;">Scenario Builder</span>. <span class="cmp-absent-toggle" style="color:var(--accent);font-weight:600;white-space:nowrap;">Why each was removed &#9656;</span></summary>
-    <div class="cmp-absent-body" style="margin-top:8px;">ORCA&rsquo;s stored IRR is the arithmetic mean of every per-contract IRR in a country, which a handful of near-zero-net-investment contracts dominate: the median across the 124 countries that carry one is <strong style="color:var(--text);">239.8%</strong>, and only one of the 124 lands in a plausible 5&ndash;60% band. It is also not monotonic in price for 29 countries, because a different set of contracts is excluded at each price point. It is not a project return and two columns of it are not comparable. Rank these countries on <strong style="color:var(--text);">Govt Take</strong> and on the <strong style="color:var(--text);">three contractor NPV rows</strong> above &mdash; same standardized profile, 185 of 185 countries covered, so directly comparable. For a genuine IRR on your own field, run the profile through <span style="color:var(--accent);font-weight:600;">Scenario Builder</span>. <br><br>The <strong style="color:var(--text);">&ldquo;MC Uncertainty&rdquo;</strong> block that used to close this table has been removed for the same reason: it was not a Monte Carlo. It aliased P10 to take at $50, P50 to take at $75 and P90 to take at $125 &mdash; the identical three figures the <strong style="color:var(--text);">Govt Take</strong> block prints above, relabelled as distribution percentiles. ORCA holds no simulation output on government take, so quoting a &ldquo;P90 take&rdquo; asserted a 10% exceedance probability that was never computed. The dispersion this platform can actually evidence is the <strong style="color:var(--text);">Take spread across contracts</strong> row, measured across each country&rsquo;s own contract set.<br><br>The <strong style="color:var(--text);">&ldquo;Govt NPV @$75 (est.)&rdquo;</strong> row that used to sit under the contractor NPV rows has been removed. It was not a modelled figure &mdash; ORCA stores government <em>take</em> and contractor NPV and no government NPV anywhere, so the row was computed in the browser as <em>Contractor NPV &times; take &divide; (100 &minus; take)</em>. That multiplies a <strong style="color:var(--text);">production-weighted</strong> take by an <strong style="color:var(--text);">unweighted-mean</strong> contractor NPV &mdash; the two bases the <em>NPV weighting</em> row above marks as different &mdash; and scales an <strong style="color:var(--text);">undiscounted</strong> revenue share onto a <strong style="color:var(--text);">10%-discounted</strong> NPV, so it was not a present value of anything. It also read off the published headline take rather than the comparable one: on <strong style="color:var(--text);">USA vs Iraq</strong> it printed Iraq at <strong style="color:var(--text);">$3.6B against the USA&rsquo;s $1.0B</strong>, where Iraq&rsquo;s comparable 34.1% gives <strong style="color:var(--text);">$332M</strong> &mdash; below the USA, not three times above it. To size the government&rsquo;s position, read the <strong style="color:var(--text);">Govt Take</strong> rows, which is the figure this platform actually publishes; for a government cash-flow NPV on your own field and terms, build it in <span style="color:var(--accent);font-weight:600;">Scenario Builder</span>.<br><br>The <strong style="color:var(--text);">&ldquo;Breakeven ($/bbl)&rdquo;</strong> row that used to close the Economics block has been removed, because it could not tell any two countries apart. <code style="font-size:10px;">formatBreakeven()</code> renders every value under 50 as the literal string <strong style="color:var(--text);">&ldquo;&lt;$50&rdquo;</strong>, and all <strong style="color:var(--text);">65</strong> populated breakevens in this dataset fall between <strong style="color:var(--text);">$27 and $34</strong> &mdash; so the row had exactly two possible outputs across 185 countries: <em>&lt;$50</em> for 65 of them and <em>&mdash;</em> for the other 120. Its own tooltip offered &ldquo;$50&ndash;$80 = viable at base case&rdquo; and &ldquo;&gt;$80 = requires elevated price&rdquo;, two bands <strong style="color:var(--text);">no country here could ever display</strong>. The dash was mislabelled too: it read &ldquo;insufficient cost data&rdquo;, but the figure is built as an average over breakevens inside a (0, 999) band, so a dash means every contract returned a value <em>outside</em> that band &mdash; Norway&rsquo;s 7,643 contracts and the UK&rsquo;s 4,211 are not missing cost data. And the numbers are stale: at $75/bbl the DCF engine now returns a usable breakeven for <strong style="color:var(--text);">44 of 71,576 contract rows</strong>, covering five countries (Malaysia $51, Angola $58, Egypt $60, Saudi Arabia $62, Indonesia $88) &mdash; <strong style="color:var(--text);">none of which is among the 65 this row printed</strong>. On the North Sea Trio the net effect was to print Norway &mdash;, United Kingdom &mdash;, Netherlands &lt;$50, handing an apparent low-price win to the one column with no verified production behind it. For the downside test, read <strong style="color:var(--text);">Contractor NPV @$50</strong> above: it asks the same question, on the same profile, and it is populated for all 185 countries. For a true breakeven on your own field and terms, run it in <span style="color:var(--accent);font-weight:600;">Scenario Builder</span>. <em>Fiscal Compare, Country Profile and the Breakeven Map still show this figure &mdash; they are not corrected by this change.</em></div>
-  </details>`;
+  
   // v468: Reading direction note when 3+ countries loaded — helps first-time users understand the column layout
   if (compareList.length >= 3) {
     html += `<div style="margin-top:8px;margin-bottom:4px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;">
@@ -26171,7 +26152,7 @@ function applyScreenerPreset(preset) {
 // ── v603 (T1): the Home headline and the screen it links to, on ONE definition ──────────
 // v524 built #home-hurdle-stat specifically so "the number and its destination cannot drift
 // apart". They drifted at v554. That cycle moved the Screener's take ceiling off the published
-// blended headline and onto the COMPARABLE (Group-1) take, because MECHANIC_COMPARABILITY.md
+// blended headline and onto the COMPARABLE (Group-1) take, because the platform comparability rules
 // says a headline blending fee-basis TSC/RSC/Buy-back contracts may not be compared across
 // countries. It changed runScreener() and left this headline gating on the raw blend.
 //
@@ -26798,7 +26779,7 @@ function runScreener() {
         + ((!_basisGained.length && !_basisLost.length) ? ' — no country changes side at this ceiling' : '')
         + `</span>`
       : ` <span style="color:var(--accent);font-weight:600;">— take ceiling ≤${maxTake}% tested on the published blended headline`
-        + (_basisLost.length ? `: ${_fmtBasisList(_basisLost)} — excluded on a figure MECHANIC_COMPARABILITY.md does not permit comparing across countries. Re-check the box under Max Govt Take to screen ${_basisLost.length > 1 ? 'them' : 'it'} on the comparable take.` : '')
+        + (_basisLost.length ? `: ${_fmtBasisList(_basisLost)} — excluded on a figure the comparability rules do not permit comparing across countries. Re-check the box under Max Govt Take to screen ${_basisLost.length > 1 ? 'them' : 'it'} on the comparable take.` : '')
         + (_basisGained.length ? `${_basisLost.length ? ' ' : ': '}${_fmtBasisList(_basisGained)} — kept, the comparable take would have excluded ${_basisGained.length > 1 ? 'them' : 'it'}.` : '')
         + ((!_basisGained.length && !_basisLost.length) ? ' — no fee-basis country changes side at this ceiling' : '')
         + `</span>`;
@@ -26837,7 +26818,7 @@ function runScreener() {
   const _universeLead = (activeCount === 0 && !_activePresetName)
     ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${sortNote}${_basisNote}`
     : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}`;
-  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_takeBasisNote}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}${_beCatNote} <span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:6px;">→ click any row to open Country Profile</span><span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
+  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_takeBasisNote}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}${_beCatNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
   // Friction this removes: an exported shortlist is the thing that reaches the investment
   // committee, and it left the tool carrying nothing but rows. Every sentence that makes the
@@ -26960,7 +26941,7 @@ function runScreener() {
     if (!takeCeilingActive) return '';
     const fc = _scFeeCmpAt(d, price);
     if (!fc.diverges) return '';
-    const tip = `${d.country}: ${fc.n2.toLocaleString()} of its contracts are fee-basis (fixed $/bbl remuneration, no price upside), so the published ${fc.head.toFixed(1)}% blends contract structure into the take figure. On its ${fc.n1 != null ? Number(fc.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts government take is ${fc.cmp.toFixed(1)}% at $${price}/bbl — the figure MECHANIC_COMPARABILITY.md permits comparing against other countries. `
+    const tip = `${d.country}: ${fc.n2.toLocaleString()} of its contracts are fee-basis (fixed $/bbl remuneration, no price upside), so the published ${fc.head.toFixed(1)}% blends contract structure into the take figure. On its ${fc.n1 != null ? Number(fc.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts government take is ${fc.cmp.toFixed(1)}% at $${price}/bbl — the figure the platform comparability rules permits comparing against other countries. `
       + (feeCmpOn
           ? `The ≤${maxTake}% ceiling was tested against ${fc.cmp.toFixed(1)}%.`
           : `The ≤${maxTake}% ceiling was tested against the published ${fc.head.toFixed(1)}% — tick the box under Max Govt Take to screen on ${fc.cmp.toFixed(1)}% instead.`);
@@ -27073,7 +27054,7 @@ function _scExportBasisLines() {
       L.push('  GovtTake_75 is the published blended headline. GovtTake_75_Comparable excludes '
         + 'fee-basis contracts (TSC / RSC / Buy-back), whose ~99% take is a structural artefact '
         + 'of a per-barrel fee with no price upside, not a fiscal measure. Per '
-        + 'MECHANIC_COMPARABILITY.md the published figure may NOT be compared across countries.');
+        + 'the platform comparability rules the published figure may NOT be compared across countries.');
       b.feeBasis.forEach(function(f) { L.push('  - ' + f); });
     }
   } else {
@@ -29813,7 +29794,7 @@ function loadCountryProfile(country) {
       + 'contracts alone, take at $75/bbl is ' + _cpFee552.cmpTake.toFixed(1) + '%'
       + (_cpFee552.g1.v75 != null ? ' with ' + fmtNpvShared(_cpFee552.g1.v75) + ' contractor NPV' : '')
       + ' — that is the figure to rank against other countries and to put in the memo. '
-      + 'The rank and the median pill below are computed on it. Rule: ~/MECHANIC_COMPARABILITY.md.';
+      + 'The rank and the median pill below are computed on it. Rule: ~/the platform comparability rules.';
     return '<div style="display:inline-flex;align-items:center;gap:7px;font-size:11px;padding:3px 10px;'
       + 'background:' + bg + ';border:1px solid ' + bd + ';border-radius:5px;cursor:help;max-width:340px;line-height:1.45;" title="'
       + tip.replace(/"/g, '&quot;') + '">'
@@ -29856,7 +29837,7 @@ function loadCountryProfile(country) {
   // Numbers come from MECHANIC_BREAKDOWN, which is what the breakdown table itself renders, so
   // the headline and the table cannot disagree. Group membership comes from mech_mix's existing
   // `g` field. Group-2 fee-basis rows (TSC / RSC / Buy-back) are excluded here because v552
-  // already handles them and MECHANIC_COMPARABILITY.md forbids ranking their take against
+  // already handles them and the platform comparability rules forbids ranking their take against
   // Group 1; on Iraq both lines render and each says a different true thing.
   //
   // No threshold is invented: it prints where two Group-1 regimes differ by >= 5pp, which is the
@@ -30371,7 +30352,7 @@ function loadCountryProfile(country) {
     }).join('');
     return '<div class="dd-section">'
       + '<h3>Regional Peers <span style="font-weight:400;font-size:11px;color:var(--muted);">'+region+' · govt take @ $75/bbl</span></h3>'
-      + '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;">'+allRegional.length+' countries in region · Click any peer to load their profile</div>'
+      + '<div style="font-size:10px;color:var(--muted);margin-bottom:10px;">'+allRegional.length+' countries in region</div>'
       + '<div style="margin:0 -4px;">'
       + '<div style="display:grid;grid-template-columns:130px 1fr 60px;gap:8px;padding:3px 8px;margin-bottom:4px;">'
       + '<span style="font-size:10px;color:var(--muted);letter-spacing:.04em;font-weight:700;">COUNTRY</span>'
@@ -30990,7 +30971,7 @@ function loadCountryProfile(country) {
 
     _peerSection = '<div class="dd-section" id="dd-peers-' + ddSlugPeer + '">'
       + '<div style="font-size:14px;font-weight:700;margin-bottom:4px;">Peer Comparison \u2014 Similar Fiscal Terms</div>'
-      + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Countries with closest government take at $75/bbl. Click any country to load its profile.</div>'
+      + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Countries with closest government take at $75/bbl.</div>'
       + '<div style="overflow-x:auto;border-radius:8px;border:1px solid var(--border);">'
       + '<table style="width:100%;border-collapse:collapse;">'
       + '<thead><tr>'
@@ -36287,7 +36268,7 @@ function runFiscalCompare() {
     // whether two rows in this table are distinguishable at all.
     var _ownTermsCount = results.filter(function(r) { return r.termsBasis !== 'default'; }).length;
     var _hurdleStr = ' <span style="color:var(--muted);font-size:11px;font-weight:600;margin-left:8px;" title="' + _ownTermsCount + ' of these ' + results.length + " countries are modelled on their OWN fiscal terms as held in ORCA. The remaining " + (results.length - _ownTermsCount) + " have no country-specific terms in the compare engine, so each is computed from the standard default for its mechanic -- they land on identical numbers and their order relative to each other is not a ranking. Check the Quality column: G = generic default.\">" + _ownTermsCount + ' of ' + results.length + ' on own terms <span style="opacity:.7;font-weight:400;">(rest = generic default)</span></span>';
-    status.innerHTML = results.length + ' countries ranked <span style="opacity:.6;font-size:10px;">(' + elapsed + 's)</span>' + _hurdleStr + ' <span style="color:var(--accent);font-size:11px;font-weight:600;margin-left:8px;">↓ Click any row to drill in</span>';
+    status.innerHTML = results.length + ' countries ranked <span style="opacity:.6;font-size:10px;">(' + elapsed + 's)</span>' + _hurdleStr + '';
     window._fcResults = results;
     window._fcLastResults = results;
     window._fcLastPrice = price;
@@ -36772,7 +36753,7 @@ function renderFCResults(results, price) {
     + '<button onclick="openScenarioBuilder()" style="background:none;border:none;color:var(--accent);font-size:11px;font-weight:600;cursor:pointer;padding:0;" title="Open Scenario Builder to model custom fiscal terms (capex, opex, production profile) and compute contractor NPV, IRR, and take at 4 prices">+ Scenario</button>'
     + _screenerBtn
     + '</span>';
-  var _rowHint = '<span style="font-size:11px;color:var(--accent);font-weight:600;margin-left:8px;white-space:nowrap;" title="Click any row to open the 4-price drilldown: Take / NPV / IRR at $50–$125/bbl, fiscal waterfall, and ⎘ IC Citation copy button">&#8595; Click any row to drill in</span>';
+  var _rowHint = '';   // removed: row-click affordance is the cursor and hover, not a sentence
   // v491: "Showing N countries" count — makes filter scope immediately visible. Shows region context when filtered.
   var _countLabel = _activeRegionForNudge
     ? '<span style="font-size:11px;color:var(--muted);white-space:nowrap;font-family:\'IBM Plex Mono\',monospace;" title="Region filter active: showing only ' + _activeRegionForNudge + ' countries. Click \'All (185)\' region chip above to clear filter."><strong style="color:var(--text);">' + sorted.length + '</strong> of 185 · ' + _activeRegionForNudge + '</span>'
@@ -36988,7 +36969,7 @@ function renderFCResults(results, price) {
       html += '<tr style="pointer-events:none;"><td colspan="' + _gdCols + '" style="padding:0;">'
         + '<div style="background:rgba(176,104,0,.08);border-top:2px solid rgba(176,104,0,.55);border-bottom:2px solid rgba(176,104,0,.55);padding:6px 12px;line-height:1.5;">'
         + '<div style="font-size:10px;font-weight:800;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;text-align:center;">'
-        + '&#8212; End of the ranking (' + _fcRankedN + ' countries modelled on their own terms) &#8212; ' + _gdN + ' generic-default rows below &#8212;'
+        + 'Ranked: ' + _fcRankedN + ' on own terms &middot; ' + _gdN + ' generic-default rows below, unranked'
         + '</div>'
         + '<div style="font-size:11px;color:var(--muted);text-align:center;margin-top:3px;">'
         + 'ORCA holds no country-specific fiscal terms for these in the compare engine, so each is modelled on the standard '
@@ -37008,7 +36989,7 @@ function renderFCResults(results, price) {
       var prevNpv = i > 0 ? sorted[i-1].liveNPV : null;
       if ((r.liveNPV == null || r.liveNPV < 0) && (i === 0 || (prevNpv != null && prevNpv >= 0))) {
         var _nColspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
-        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _nColspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.06);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:#B91C1C;letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; NPV = $0 threshold &#8212; countries below this line do not return positive contractor value at this price &amp; profile</div></td></tr>';
+        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _nColspan + '" style="padding:0;"><div style="border-top:1px solid rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:#B91C1C;letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Contractor NPV below $0</div></td></tr>';
         _npvZeroDividerInserted = true;
       }
     }
@@ -37026,24 +37007,24 @@ function renderFCResults(results, price) {
     if (sortField === 'take' && _rDbTake != null && !_rowIsGeneric) {
       if (!_take40DividerInserted && _rDbTake > 40) {
         var _t40Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
-        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _t40Colspan + '" style="padding:0;"><div style="background:rgba(21,128,61,.07);border-top:2px dashed rgba(21,128,61,.4);border-bottom:2px dashed rgba(21,128,61,.4);text-align:center;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Investible tier ends (≤40%) &mdash; Moderate tier begins below &#8212;</div></td></tr>';
+        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _t40Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(21,128,61,.4);text-align:center;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Moderate &middot; take &gt;40%</div></td></tr>';
         _take40DividerInserted = true;
       }
       // v481: Global median take divider — inserted between the tier boundaries, only when sorted by take and median is in range (40–75%)
       if (!_takeMedianDividerInserted && _fcGlobalMedianTake != null && _rDbTake > _fcGlobalMedianTake && _fcGlobalMedianTake > 40 && _fcGlobalMedianTake < 75) {
         var _tmColspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
         var _tmLabel = _fcGlobalMedianTake.toFixed(1);
-        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _tmColspan + '" style="padding:0;"><div style="background:rgba(100,100,100,.05);border-top:2px dashed rgba(100,100,100,.3);border-bottom:2px dashed rgba(100,100,100,.3);text-align:center;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Below-median regimes end (global median take: ' + _tmLabel + '%) &mdash; Above-median regimes begin below &#8212;</div></td></tr>';
+        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _tmColspan + '" style="padding:0;"><div style="border-top:1px solid rgba(100,100,100,.3);text-align:center;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Global median &middot; ' + _tmLabel + '%</div></td></tr>';
         _takeMedianDividerInserted = true;
       }
       if (!_take60DividerInserted && _rDbTake > 60) {
         var _t60Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
-        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _t60Colspan + '" style="padding:0;"><div style="background:rgba(176,104,0,.07);border-top:2px dashed rgba(176,104,0,.4);border-bottom:2px dashed rgba(176,104,0,.4);text-align:center;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Moderate tier ends (41–60%) &mdash; High Take tier begins below &#8212;</div></td></tr>';
+        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _t60Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(176,104,0,.4);text-align:center;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">High take &middot; take &gt;60%</div></td></tr>';
         _take60DividerInserted = true;
       }
       if (!_take75DividerInserted && _rDbTake > 75) {
         var _t75Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
-        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _t75Colspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.07);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; High Take tier ends (61–75%) &mdash; NOC-dominated tier begins below &#8212;</div></td></tr>';
+        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _t75Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">NOC-dominated &middot; take &gt;75%</div></td></tr>';
         _take75DividerInserted = true;
       }
     }
@@ -37051,12 +37032,12 @@ function renderFCResults(results, price) {
     if (sortField === 'breakeven' && r.be_75 != null && !_rowIsGeneric) {
       if (!_be50DividerInserted && r.be_75 > 50) {
         var _b50Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
-        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _b50Colspan + '" style="padding:0;"><div style="background:rgba(21,128,61,.07);border-top:2px dashed rgba(21,128,61,.4);border-bottom:2px dashed rgba(21,128,61,.4);text-align:center;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Resilient tier ends (&lt;$50/bbl) &mdash; Base-case viable tier begins below &#8212;</div></td></tr>';
+        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _b50Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(21,128,61,.4);text-align:center;font-size:10px;font-weight:700;color:var(--green);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Breakeven &gt;$50/bbl</div></td></tr>';
         _be50DividerInserted = true;
       }
       if (!_be80DividerInserted && r.be_75 > 80) {
         var _b80Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
-        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _b80Colspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.06);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Base-case tier ends ($50&ndash;$80) &mdash; Elevated price required (&gt;$80) below &#8212;</div></td></tr>';
+        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _b80Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Breakeven &gt;$80/bbl</div></td></tr>';
         _be80DividerInserted = true;
       }
     }
@@ -37064,12 +37045,12 @@ function renderFCResults(results, price) {
     if (sortField === 'swing' && r.liveSwing != null && !_rowIsGeneric) {
       if (!_swing10DividerInserted && r.liveSwing > 10) {
         var _s10Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
-        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _s10Colspan + '" style="padding:0;"><div style="background:rgba(176,104,0,.07);border-top:2px dashed rgba(176,104,0,.4);border-bottom:2px dashed rgba(176,104,0,.4);text-align:center;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Low swing ends (&lt;10pp, royalty-dominant) &mdash; Moderate swing begins below &#8212;</div></td></tr>';
+        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _s10Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(176,104,0,.4);text-align:center;font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Price swing &gt;10pp</div></td></tr>';
         _swing10DividerInserted = true;
       }
       if (!_swing20DividerInserted && r.liveSwing > 20) {
         var _s20Colspan = showStability ? 13 : 12;   // v568 (T5): +1 for the citable database NPV column
-        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _s20Colspan + '" style="padding:0;"><div style="background:rgba(185,28,28,.06);border-top:2px dashed rgba(185,28,28,.4);border-bottom:2px dashed rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">&#8212; Moderate swing ends (10&ndash;20pp) &mdash; Progressive regime begins (&gt;20pp, multi-price table required in IC memo) &#8212;</div></td></tr>';
+        if (i > 0) html += '<tr style="pointer-events:none;"><td colspan="' + _s20Colspan + '" style="padding:0;"><div style="border-top:1px solid rgba(185,28,28,.4);text-align:center;font-size:10px;font-weight:700;color:var(--negative);letter-spacing:.06em;padding:3px 0;text-transform:uppercase;">Price swing &gt;20pp</div></td></tr>';
         _swing20DividerInserted = true;
       }
     }
@@ -37214,18 +37195,6 @@ function renderFCResults(results, price) {
     html += '<tfoot><tr><td colspan="' + _beCovCols + '" style="padding:6px 10px;font-size:10px;color:var(--muted);border-top:1px solid var(--border);background:var(--surface2);text-align:center;">Breakeven data: 68 of 185 countries (requires verified per-contract royalty + cost data). Remaining 117 countries show — and sort to the bottom. Use the <strong>Breakeven only</strong> filter above to hide them.</td></tr></tfoot>';
   }
   html += '</table></div>';
-  // v525 (T3): an analyst who used this table before this build will look for the IRR column and
-  // the IOC-hurdle line. Say where they went, once, under the table -- and say what to rank on now.
-  html += '<div style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:8px;padding:8px 12px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);">'
-    + '<strong style="color:var(--text);">There is no IRR column in this table, and no 15% IOC hurdle line.</strong> '
-    + 'Both were removed because they did not separate anything. On the standardized profile this engine runs, contractor IRR at $75/bbl has a '
-    + '<strong style="color:var(--text);">median of 138.4%</strong> and a <strong style="color:var(--text);">minimum of 39.5%</strong> across the 185 countries \u2014 so '
-    + '<strong style="color:var(--text);">180 of 185 cleared a 15% hurdle</strong>, and the counter that reported it was passing everything. '
-    + 'More than half the table also shared one identical IRR, because those countries carry no country-specific terms and fall to the same mechanic default, so the ranking ordered an artifact. '
-    + 'Rank instead on <strong style="color:var(--text);">Take%</strong>, on <strong style="color:var(--text);">NPV ($M)</strong> \u2014 every row is run on the same profile, so those columns are directly comparable \u2014 and on '
-    + '<strong style="color:var(--text);">BE ($/bbl)</strong> where it is populated. For a real rate of return on your own field, put your capex, opex and production profile through <strong style="color:var(--text);">Scenario Builder</strong>. '
-    + 'Side-by-Side and Country Profile dropped the same metric for the same reason.'
-    + '</div>';
   document.getElementById('fc-results').innerHTML = html;
   // Announce result count to screen readers
   (function() {
@@ -40148,7 +40117,7 @@ async function loadPlatformData() {
               _basis = '<div style="margin-top:3px;font-size:11px;font-weight:400;color:var(--muted);">'
                 + 'The take ceiling is tested on the comparable take, not the published blended headline '
                 + '\u2014 a headline that blends fee-basis contracts measures structure, not terms, and '
-                + 'MECHANIC_COMPARABILITY.md does not permit ranking it across countries. '
+                + 'it is not rankable across countries. '
                 + (_ic.admitted.length
                     ? 'So the list below includes <strong style="color:var(--text);">'
                       + _ic.admitted.map(_fmt).join(', ') + '</strong> \u2014 the Screener shows the published '
