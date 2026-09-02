@@ -24034,3 +24034,72 @@ An analyst asking "how solid is this?" on any of **80 countries** now reads the 
 Walked cold at 1440px with storage cleared into **Country Profile** and opened the section named for the question: **Evidence Quality** (`buildEvidencePanel()`, `index.html:23268`). On **Namibia** the panel prints two things six words apart:
 
 > `B — mixed sourcing`  `97.6% primary 
+
+---
+## Cycle 524 Log — 2026-09-02 15:15
+- Test before: **261 PASS / 0 FAIL / 1 WARN** — read from `/tmp/runtime_test_report.txt`, suite RAN this cycle (the "236 PASS" in the cycle harness header is the wrapper's stale carry-forward, not a reading of the suite)
+- Test after: **261 PASS / 0 FAIL / 1 WARN**, read from the suite's own report, run against the final build **after** the version bump
+- JS errors: 1 — the pre-existing service-worker 404 (harness serves a localhost root, not the Pages sub-path). Recorded, not suppressed. **0 page errors** on every Playwright walk.
+- Summary: Cycle 524 complete and pushed as **v620**.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest of the six (523 was T6, 522 T4, 521 T1, 520 T5, 519 T2, 518 T3).
+
+## Friction
+Walked cold at 1440px with `sessionStorage` and `localStorage` cleared into **Side-by-Side**. The tab loads with an example trio already selected — Norway / United Kingdom / Netherlands — so the first thing any analyst with their own countries in mind must do is get rid of it.
+
+`renderCompare()` (`index.html:25221`) has an early return at `compareList.length < 2`. It tore down **one** of the three elements in the chart region and left the other two rendering the **previous** comparison:
+
+| element | shown at | hidden at `<2` | |
+|---|---|---|---|
+| `#cmp-chart-wrap` (take chart) | `26178` | yes — `25257` | correct |
+| `#cmp-npv-chart-wrap` (NPV chart) | `26243` | **no** | else-branch exists at the `>=2` path (v614, `26273`) but nothing on this one |
+| `#cmp-monopoly-notice` (comparability caveat) | written `26155` | **no** | only ever written on the `>=2` path, so it could never clear |
+
+The reproduction is the tab's own shipped quickstart. Cold-load, click **USA vs Iraq**, click **Clear**:
+
+- The grid correctly collapses to *"Compare up to 5 countries side-by-side across 4 price scenarios. Search above or start with a standard IOC benchmark set"* with the four preset buttons and **nothing selected**.
+- Directly beneath it the page still draws a full-size **360px "Contractor NPV vs Oil Price ($M)" bar chart of USA and Iraq**, legend and axes intact.
+- Above that, a **54px green caveat**: *"Chart plots the comparable take. **Iraq** is drawn on its 195 production-sharing and concession contracts (34.1% at $75), not on its published headline of 84.8%…"*
+
+Zero countries are selected and a two-country chart is the **largest thing on the screen**, sitting under an empty state that says so.
+
+Measured, not asserted — every path into the branch leaked:
+
+| path | `#cmp-npv-chart-wrap` | `#cmp-monopoly-notice` |
+|---|---|---|
+| **Clear** → 0 countries | `block`, 360px, series `["USA","Iraq"]` | 54px, names Iraq |
+| chip **✕** ✕ → 1 country | `block`, 360px, stale series | stale |
+| **typing your first country** → 1 country | `block`, 360px, stale series | stale |
+
+That third row is the common case: typing a country deliberately clears the example set (the tab raises a toast saying so), which drops the list to 1 — so the page reads **"Guyana added — add 1–4 more countries to begin comparison"** with a Norway / UK / Netherlands NPV chart underneath it.
+
+This is not an edge case. Both routes out of the example trio pass through this branch, so **every** analyst who wants their own countries hit it. The take chart *was* handled at this branch, which is precisely what made the two survivors look intentional rather than forgotten.
+
+## Change
+The early return now clears the whole chart region rather than a third of it — it hides `#cmp-npv-chart-wrap` and empties `#cmp-monopoly-notice` alongside the take chart it already hid. Four lines, both guarded, because the notice element is created lazily on the `>=2` path and does not exist on a cold load.
+
+No text was added, no control was added, nothing was restyled. The cycle's entire effect is that two existing elements stop rendering state that is no longer true.
+
+## Result
+Clearing the example set now leaves an **empty tab**. An analyst starting their own three-country comparison can no longer read contractor NPV bars — or a mechanic-comparability caveat naming a specific country — for countries they just removed and that appear nowhere else on the page. The failure it prevents is concrete: reading a $/bbl NPV curve off a chart and attributing it to the country named in the text above it, when the chart belongs to two different countries.
+
+Regression checked in the same walk: at `>=2` both charts and the notice come back, and the NPV series correctly rebuilds to the new set (`["Guyana","Brazil"]`).
+
+## Mobile (Step 5b)
+- Horizontal scroll: **zero on all 9 tabs at 1920 / 1440 / 1280 / 1024 / 768 / 390** — `scrollWidth == clientWidth` at every width
+- 390 × 844 with `hasTouch: true`, `pointer: coarse` confirmed `true`: the Clear → 0 path verified on the phone (notice 0px, NPV wrap `none`, 0px). `#cmp-clear-btn` measures **44px** tall
+- **No control was added, removed or resized**, so the 24px floor is untouched by construction
+- 0 page errors at every width
+
+## Verification
+- JS syntax gate **PASS** — 10 inline blocks, 0 errors
+- `runtime_comprehensive.js` **ran this cycle**, twice: a baseline before the edit and a final run against the shipped file after the version bump. Both **261 PASS / 0 FAIL / 1 WARN**
+- Cold Playwright walks: the default trio, USA vs Iraq, two state monopolies (Saudi Arabia + Kuwait), 4- and 5-country sets, and the 6th-country rejection
+
+## Found on the same walk, not fixed
+- **`hasNpv === false` is already handled** — selecting two state monopolies (Saudi Arabia + Kuwait) correctly hides the NPV chart via the v614 else-branch. Verified rather than assumed, and recorded so a later cycle does not "fix" a path that works.
+- **Contractor NPV rows skip $100/bbl** while the four Govt Take rows include it, so the two blocks are read at different price grids. Minor, and adding a row is a table-shape decision rather than a stale-state bug.
+- **The order markers repeat "highest of 3" / "lowest of 3" on all four Govt Take rows** when no reversal occurs across the price deck — 12 markers carrying 2 facts on the cold default trio. The v593 machinery is correct and earns its place on sets that *do* reverse; whether it should stay silent when the ordering is constant is a separate question.
+
+**STILL LOCKED — nothing touched.** **No new FAQ** (still **974**). **No new tooltip.** No new text of any kind. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** No take, NPV, rank, score, band, tier colour or pill value was altered. The **v612 MOBILE LAYER** and the `#reference-panel` `translateX` state are untouched; no `min-width: max-content` marker was added or removed. v371/v373, v430, v449, v451, v452, v489, v593, v600, v606, v612, v614 and every locked item through v619 intact. Version sweep **v619 → v620** across the 5 display sites, done silently at the end; the 2 remaining `v619` strings are historical code comments and are left alone. It is **not** the deliverable.
