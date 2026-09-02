@@ -24019,3 +24019,18 @@ An analyst asking "how solid is this?" on any of **80 countries** now reads the 
 - **Countries whose legs disagree by two full grades** (Tuvalu: A-sourcing, D-depth) still get a single letter. Whether a 2-leg spread deserves its own treatment is a design question, not a labelling one.
 
 **STILL LOCKED — nothing touched.** **No new FAQ** (still **974**). **No new tooltip** — one existing `title` was corrected, none added; the change moves a fact *out* of a tooltip onto the page. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** No take, NPV, rank, score, band, tier colour or pill value was altered — no grade letter changes for any country; this cycle changes only *the words describing a letter that was already correct*, and which of two numbers is bold. The **v612 MOBILE LAYER** and the `#reference-panel` `translateX` state are untouched; no `min-width: max-content` marker was added or removed. v371/v373, v430, v449, v451, v452, v489 and every locked item through v618 intact. Version sweep **v618 → v619** across the 5 display sites, done silently at the end; the 1 remaining `v618` string is a historical code comment and is left alone. It is **not** the deliverable.
+
+---
+## Cycle 523 Log — 2026-09-02 00:21
+- Test before: 236 PASS / 0 FAIL
+- Test after: 232 PASS / 4 FAIL
+- JS errors: 0
+- Summary: Cycle 523 complete and pushed as **v619**.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** — the stalest of the six (522 was T4, 521 T1, 520 T5, 519 T2, 518 T3, 517 T6).
+
+## Friction
+Walked cold at 1440px with storage cleared into **Country Profile** and opened the section named for the question: **Evidence Quality** (`buildEvidencePanel()`, `index.html:23268`). On **Namibia** the panel prints two things six words apart:
+
+> `B — mixed sourcing`  `97.6% primary 
