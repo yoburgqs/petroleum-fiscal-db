@@ -23938,3 +23938,84 @@ The last row is the point: 164 of 185 countries could not reach that explanation
 The operative word in T4 is **"here"** — the analyst is already on a country. The helper `openReformRiskFor(country)` has existed since v550, and six surfaces call it correctly, including Fiscal Compare's Stability cell and Country Profile's own sidebar button.
 
 Two country-scoped controls in
+
+---
+## Cycle 523 Log — 2026-09-01 21:35
+- Test before: 236 PASS / 0 FAIL (carried from cycle 522)
+- Test after: **261 PASS / 0 FAIL / 1 WARN**, read from `/tmp/runtime_test_report.txt`, suite RAN this cycle against the final build
+- JS errors: 1 — the pre-existing service-worker 404 (harness serves a localhost root, not the Pages sub-path). Recorded, not suppressed.
+- Summary: Cycle 523 complete and pushed as **v619**.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest of the six (522 was T4, 521 T1, 520 T5, 519 T2, 518 T3, 517/516 T6).
+
+## Friction
+Walked cold at 1440px, `sessionStorage` and `localStorage` cleared, into **Country Profile** — the tab an analyst opens to ask this question — and expanded the section named for it: **Evidence Quality** (`buildEvidencePanel()`, `index.html:23268`).
+
+The panel's summary row prints two things side by side, six words apart: a grade pill and a legs chip. On **Namibia** they read:
+
+> `B — mixed sourcing`   `97.6% primary law · 125 facts`
+
+**The label contradicts the number printed beside it.** 97.6% primary law is not mixed sourcing — it is the third-highest primary-law share in the dataset. The B is set by the *other* leg: 125 facts. Those two diagnoses call for **opposite IC actions** — "the sourcing is secondary, go read the statute yourself" versus "the statute is right, but this is 125 facts standing in for a national fiscal regime, so do not over-extend it."
+
+Cause: `_evidenceGrade()` (`index.html:22974`) graded on the **worse** of two legs since v551 — primary-law share (A ≥ 60% / B ≥ 40% / C ≥ 20%) and fact depth (A ≥ 150 / B ≥ 50 / C ≥ 15) — but its `LABEL` map stayed keyed on the **letter alone**, with wording that names only the sourcing leg. So every B read "mixed sourcing" and every D read "thin or unsourced" whatever was actually binding.
+
+Measured against the shipped `country_data.json`, not asserted:
+
+| | |
+|---|---|
+| Countries graded by the **depth** leg | **80 of 185 (43%)** — every one mislabelled |
+| At a **full 100.0% primary law**, labelled "thin or unsourced" or "secondary-led" | **27** |
+| Worst near-misses | Denmark 98.2% → "mixed sourcing" · Namibia 97.6% → "mixed sourcing" · Sierra Leone 96.2% → "mixed sourcing" · Faroe Islands 100.0% → "mixed sourcing" · Solomon Islands 100.0% → "secondary-led" |
+
+Second, nothing on screen said which leg was binding. The legs chip colours a leg red or orange only when that leg would grade **C or D on its own** — so across the entire grade-**B** band both legs render muted grey, **and both render bold**. On Namibia neither number was marked and the analyst had no way to tell which of the two produced the B.
+
+The correct reading already existed in `_evidenceGradeWhy()` — "The grade is set by the DEPTH leg" — but only inside a `title` attribute. Per the directive, a tooltip is what you add when you cannot fix the underlying confusion; the fix is to put it on the face of the badge.
+
+## Change
+**(1)** `LABEL` is now keyed on **(grade, limiter)** rather than on the letter, inside `_evidenceGrade()` — one function, so all three consumers correct together and cannot fork:
+
+| grade | limiter = sourcing | limiter = depth | limiter = both |
+|---|---|---|---|
+| A | primary-law backed | primary-law backed | primary-law backed |
+| B | mixed sourcing | **thin fact base** | mixed sourcing, thin base |
+| C | secondary-led | **very thin fact base** | secondary-led, thin base |
+| D | **almost no primary law** | **too few facts to grade** | unsourced and very thin |
+
+Grade A always has both legs at A, so A's wording is unchanged by construction.
+
+**(2)** In the legs chip, **only the leg that set the grade renders bold**; the leg that did not is stepped back (`font-weight:500; opacity:.62`). No text was added, so the chip does not get wider on a phone.
+
+**(3)** `_legsTip` claimed "the leg shown in red or orange is the one holding this country down" — true only at C/D. Corrected to describe the bold marker, with red/orange demoted to what it actually means. Existing tooltip, corrected; **no new tooltip.**
+
+Rendered, cold, verified in Playwright:
+
+| country | before | after |
+|---|---|---|
+| Namibia | `B — mixed sourcing` · **97.6%** · **125 facts** | `B — thin fact base` · 97.6% dimmed · **125 facts** |
+| Denmark | `B — mixed sourcing` | `B — thin fact base` |
+| Tuvalu | `D — thin or unsourced` (100% primary law) | `D — too few facts to grade` |
+| Solomon Islands | `C — secondary-led` (100% primary law) | `C — very thin fact base` |
+| Russia | `D — thin or unsourced` | `D — almost no primary law` · **3.8%** bold, 3,929 facts dimmed |
+| Nigeria | `C — secondary-led` | `C — secondary-led` (unchanged — genuinely sourcing-bound) |
+| Norway / Canada / Senegal | `A — primary-law backed` | unchanged, both legs bold |
+
+## Result
+An analyst asking "how solid is this?" on any of **80 countries** now reads the *actual* weakness instead of one that isn't there, and can see at a glance which of the two numbers produced the letter. On Namibia the answer flips from "ORCA leaned on secondary guides here" — false — to "the statute is right, there just isn't much of it," which is the caveat that belongs in the memo. The 27 countries sitting at a full 100.0% primary law no longer describe themselves as unsourced.
+
+## Mobile (Step 5b)
+- Horizontal scroll: **zero on all 9 tabs at 1920 / 1440 / 1280 / 1024 / 768 / 390** — `scrollWidth == clientWidth` at every width
+- 390 × 844 with `hasTouch: true`, `pointer: coarse` confirmed true: Namibia's Evidence Quality summary is the only control touched and measures **74px** tall, well over 24px. The pill is **124px** wide — narrower than the string it replaced, so nothing was pushed
+- 0 page errors at every width
+
+## Verification
+- JS syntax gate **PASS** — 10 inline blocks, 0 errors
+- `runtime_comprehensive.js` **ran this cycle** against the final build (after the version bump, not before): **261 PASS / 0 FAIL / 1 WARN**. An earlier run was killed and discarded because the version bump landed mid-run and would not have tested the shipped file.
+- Cold Playwright walk across 18 countries spanning all four grades and all three limiter states
+
+## Found on the same walk, not fixed
+- **The `▸` in "sources ▸" never flips to `▾` when the panel opens.** Cosmetic, one glyph, on a `<details>` that visibly expands anyway. Left alone deliberately rather than spent a cycle on.
+- **The Fiscal Compare Quality column and drilldown Src badge** carry the same letter but render no label at all, so this defect never reached them. They are correct as-is; recorded so a later cycle does not "fix" them.
+- **Countries whose legs disagree by two full grades** (Tuvalu: A-sourcing, D-depth) still get a single letter. Whether a 2-leg spread deserves its own treatment is a design question, not a labelling one.
+
+**STILL LOCKED — nothing touched.** **No new FAQ** (still **974**). **No new tooltip** — one existing `title` was corrected, none added; the change moves a fact *out* of a tooltip onto the page. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** No take, NPV, rank, score, band, tier colour or pill value was altered — no grade letter changes for any country; this cycle changes only *the words describing a letter that was already correct*, and which of two numbers is bold. The **v612 MOBILE LAYER** and the `#reference-panel` `translateX` state are untouched; no `min-width: max-content` marker was added or removed. v371/v373, v430, v449, v451, v452, v489 and every locked item through v618 intact. Version sweep **v618 → v619** across the 5 display sites, done silently at the end; the 1 remaining `v618` string is a historical code comment and is left alone. It is **not** the deliverable.

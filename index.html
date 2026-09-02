@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v618</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v619</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1573,7 +1573,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v618</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v619</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1643,7 +1643,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v618</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v619</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1985,7 +1985,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v618';
+  return m ? m[0] : 'v619';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2060,7 +2060,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v618');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v619');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -22978,17 +22978,34 @@ function _evidenceGrade(entry) {
   const byA  = aPct >= 60 ? 'a' : aPct >= 40 ? 'b' : aPct >= 20 ? 'c' : 'd';
   const byN  = nf >= 150  ? 'a' : nf >= 50   ? 'b' : nf >= 15   ? 'c' : 'd';
   const grade = _EV_ORDER.indexOf(byA) <= _EV_ORDER.indexOf(byN) ? byA : byN;
-  const LABEL = { a: 'primary-law backed', b: 'mixed sourcing',
-                  c: 'secondary-led', d: 'thin or unsourced' };
+  // Which leg set the grade -- the actionable part. "C because the sourcing is secondary" and
+  // "C because there are only 30 facts on file" are different problems with different fixes.
+  const limiter = _EV_ORDER.indexOf(byA) < _EV_ORDER.indexOf(byN) ? 'sourcing'
+                : _EV_ORDER.indexOf(byN) < _EV_ORDER.indexOf(byA) ? 'depth' : 'both';
+  // v619 (T6): LABEL was keyed on the LETTER alone, so every B read "mixed sourcing" and every D
+  // read "thin or unsourced" -- wording that names the SOURCING leg whatever is actually holding
+  // the country down. Measured against the shipped country_data.json, 80 of 185 countries are
+  // graded by the DEPTH leg, and for those the label contradicted the numbers printed beside it
+  // in the same chip: Namibia rendered "B - mixed sourcing" against 97.6% primary law, Denmark
+  // "B - mixed sourcing" against 98.2%, and 27 countries at a FULL 100.0% primary law rendered
+  // "thin or unsourced" or "secondary-led". The two diagnoses call for opposite IC actions --
+  // "go read the statute yourself" versus "the statute is right, but this is 125 facts standing
+  // in for a national regime" -- so the label is now keyed on (grade, limiter). The correct
+  // reading already existed in _evidenceGradeWhy(), i.e. only in a tooltip; it is now on the
+  // face of the badge. Grade A always has both legs at A, so its wording is unchanged.
+  const LABEL = {
+    sourcing: { a: 'primary-law backed',  b: 'mixed sourcing',
+                c: 'secondary-led',       d: 'almost no primary law' },
+    depth:    { a: 'primary-law backed',  b: 'thin fact base',
+                c: 'very thin fact base', d: 'too few facts to grade' },
+    both:     { a: 'primary-law backed',  b: 'mixed sourcing, thin base',
+                c: 'secondary-led, thin base', d: 'unsourced and very thin' }
+  };
   // v579: b was #5A9F6E — 3.17 / 2.91 / 2.62 against surface, bg and surface2. It is 11px type
   // stating how well-sourced a country is. #1F6F3C returns 5.11 on the darkest ground.
   // A/B hue separation narrows as a result; the badge letter, not the hue, carries the grade.
   const COLOR = { a: '#15803D', b: '#1F6F3C', c: '#A16207', d: '#B91C1C' };
-  // Which leg set the grade — the actionable part. "C because the sourcing is secondary" and
-  // "C because there are only 30 facts on file" are different problems with different fixes.
-  const limiter = _EV_ORDER.indexOf(byA) < _EV_ORDER.indexOf(byN) ? 'sourcing'
-                : _EV_ORDER.indexOf(byN) < _EV_ORDER.indexOf(byA) ? 'depth' : 'both';
-  return { grade: grade, letter: grade.toUpperCase(), label: LABEL[grade], color: COLOR[grade],
+  return { grade: grade, letter: grade.toUpperCase(), label: LABEL[limiter][grade], color: COLOR[grade],
            aPct: aPct, nFacts: nf, byA: byA, byN: byN, limiter: limiter };
 }
 window._evidenceGrade = _evidenceGrade;
@@ -23182,10 +23199,19 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
   const _aCol  = _g.byA === 'd' ? 'var(--red)' : _g.byA === 'c' ? 'var(--orange)' : 'var(--muted)';
   const _nfCol = _g.byN === 'd' ? 'var(--red)' : _g.byN === 'c' ? 'var(--orange)' : 'var(--muted)';
   const _nfTxt = (_g.byN === 'd' ? 'only ' : '') + _nf.toLocaleString() + ' fact' + (_nf === 1 ? '' : 's');
+  // v619 (T6): both legs used to render bold, and across the whole grade-B band both also render
+  // muted grey (the red/orange escalation only fires at C or D), so on Namibia -- 97.6% primary
+  // law, 125 facts, graded B -- nothing on screen said which of the two numbers produced the B.
+  // Now only the leg that SET the grade carries weight; the leg that did not is stepped back.
+  // No text is added, so the chip does not get wider on a phone.
+  const _aEmph  = (_g.limiter === 'depth')    ? 'font-weight:500;opacity:.62;' : 'font-weight:700;';
+  const _nfEmph = (_g.limiter === 'sourcing') ? 'font-weight:500;opacity:.62;' : 'font-weight:700;';
   const _gWhy  = _cpEsc(_evidenceGradeWhy(entry));
   const _legsTip = _cpEsc('The grade is the WORSE of these two legs, not an average of them. '
     + 'Primary-law share: A \u2265 60% / B \u2265 40% / C \u2265 20%. Fact depth: A \u2265 150 / B \u2265 50 '
-    + '/ C \u2265 15 facts. The leg shown in red or orange is the one holding this country down. '
+    + '/ C \u2265 15 facts. The leg shown in BOLD is the one that set the letter; the other leg is '
+    + 'stepped back because it is not what is holding this country down. Red or orange marks a leg '
+    + 'that would grade C or D on its own. '
     + 'A high primary-law share on a handful of facts is not a well-evidenced regime \u2014 it is a '
     + 'small number of documents with nothing to cross-check them against.');
   const _bulk = _bulkPct(entry);
@@ -23242,7 +23268,7 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
     <summary style="padding:10px 12px;cursor:pointer;list-style:none;display:flex;align-items:center;gap:10px;user-select:none;">
       <span style="font-size:12px;font-weight:700;color:var(--text);">Evidence Quality</span>
       <span style="background:${color}22;border:1px solid ${color};color:${color};font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;letter-spacing:.02em;cursor:help;" title="${_gWhy}">${_g.letter} \u2014 ${_g.label}</span>
-      <span style="background:var(--surface2, rgba(148,163,184,.10));border:1px solid var(--border);font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;cursor:help;white-space:nowrap;" title="${_legsTip}"><span style="color:${_aCol};font-weight:700;">${a}% primary law</span><span style="color:var(--muted);"> \u00b7 </span><span style="color:${_nfCol};font-weight:700;">${_nfTxt}</span></span>
+      <span style="background:var(--surface2, rgba(148,163,184,.10));border:1px solid var(--border);font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;cursor:help;white-space:nowrap;" title="${_legsTip}"><span style="color:${_aCol};${_aEmph}">${a}% primary law</span><span style="color:var(--muted);"> \u00b7 </span><span style="color:${_nfCol};${_nfEmph}">${_nfTxt}</span></span>
       ${_bulk > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts came from the EY / IHS / KPMG bulk harvest, which is assigned at country level rather than verified against each individual contract. Counted from the top sources listed below, so the true figure may be higher.">${_bulk.toFixed(0)}%+ bulk-harvested</span>` : ''}
       ${_shared > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts trace to a document that is also the cited source for other jurisdictions - a regional instrument applied across a group, not a text read off this country's own statute or its individual contracts. Counted from the top sources listed below, so the true figure may be higher.">${_shared.toFixed(0)}%+ multi-jurisdiction source</span>` : ''}
       <span style="margin-left:auto;font-size:10px;color:var(--muted);">sources ▸</span>
