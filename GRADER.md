@@ -24103,3 +24103,16 @@ Regression checked in the same walk: at `>=2` both charts and the notice come ba
 - **The order markers repeat "highest of 3" / "lowest of 3" on all four Govt Take rows** when no reversal occurs across the price deck — 12 markers carrying 2 facts on the cold default trio. The v593 machinery is correct and earns its place on sets that *do* reverse; whether it should stay silent when the ordering is constant is a separate question.
 
 **STILL LOCKED — nothing touched.** **No new FAQ** (still **974**). **No new tooltip.** No new text of any kind. No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.** No take, NPV, rank, score, band, tier colour or pill value was altered. The **v612 MOBILE LAYER** and the `#reference-panel` `translateX` state are untouched; no `min-width: max-content` marker was added or removed. v371/v373, v430, v449, v451, v452, v489, v593, v600, v606, v612, v614 and every locked item through v619 intact. Version sweep **v619 → v620** across the 5 display sites, done silently at the end; the 2 remaining `v619` strings are historical code comments and are left alone. It is **not** the deliverable.
+
+---
+## Cycle 524 Log — 2026-09-02 15:19
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 524 complete, pushed as **v620**. Working tree clean.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** — the stalest of the six (523 was T6, 522 T4, 521 T1, 520 T5, 519 T2, 518 T3).
+
+## Friction
+Side-by-Side loads with an example trio already selected (Norway / UK / Netherlands), so the first thing any analyst with their own countries in mind must do is get rid of it. `renderCompare()` has an early return at `compareList.length < 2` — and it tore down **one** of the t
