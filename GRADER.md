@@ -24868,3 +24868,128 @@ deliverable.
 Fiscal Compare's drill drawer and the Country Profile evidence chain are both strong on provenance. **Side-by-Side is not** — and it's the one tab whose entire job is ranking countries against each other.
 
 Its **Evidence tier** row (`renderCompare()`, index.html:25197) led with the primary-law *percenta
+
+---
+## Cycle 531 Log — 2026-09-03 23:0x
+- Test before: 235 PASS / 0 FAIL / 1 WARN (local tree, measured — see Verify)
+- Test after: 235 PASS / 0 FAIL / 1 WARN — report byte-identical to baseline apart from timestamp
+- JS errors: 0 page errors at all six widths
+- Shipped: v626
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest of the six
+(530 was T6, 528 T4, 527 T1, 526 T5, 525 T2, 524 T3).
+
+## Friction
+The four Govt Take rows on Side-by-Side carry a highest/lowest ordering marker
+(`_cmpOrderMark`). `_cmpRankTake` (index.html:25396) gated that ordering on
+**MECHANIC only** — it drops state monopolies, PRRT and fee-blended columns per
+v593 / v549 / v552 — and then ranked whatever survived at full confidence,
+**including columns for which ORCA holds no verified field production at all.**
+
+The cold-load default set is the exhibit, and it is the first thing a first-time
+analyst sees before touching anything. Norway / United Kingdom / Netherlands:
+
+| row | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| Data basis | PROD-WTD | PROD-WTD | **PROXY** |
+| Rank among producers | #17 of 21 producers | #9 of 21 producers | **not ranked · no production data** |
+| Govt Take ($75/bbl) | 68.0% *highest of 3* | 49.2% | **23.4% · _lowest of 3_ (GREEN)** |
+
+The Rank row refuses the Netherlands a placement and says why in its own tooltip —
+*"a fiscal-terms figure, not realised economics ... it has no honest position in a
+producer ranking."* **Two rows later the same grid hands it a placement anyway,
+and the placement is the winning one, in green, on all four price rows.** 278
+facts at 0% production coverage beat Norway's 63,848 facts at 18.2% coverage,
+directly above **Copy for IC Memo** — and because the marker rides the shared
+`rows` array, it travelled into the clipboard export uncaveated.
+
+This is **not a Netherlands quirk. It is a systematic bias in the sign the marker
+reports.** Measured over the shipped `country_data.json`:
+
+- **163 of 185** countries carry no verified production.
+- Their **median take is 26.9%** against **59.5%** for the 22 that do — a **32.6pp**
+  gap that is an artefact of averaging statutory terms instead of weighting output.
+- Across all **3,586** producer-vs-non-producer column pairs the non-producer reads
+  lower, and so takes the green "lowest of N", in **2,860 of them — 79.8%**.
+- **All 20** of the lowest-take countries in the database are non-producer columns
+  (Vanuatu 5.0%, Bahamas 10.0%, Montenegro 10.5%, Greenland 11.6% …).
+
+Same defect class **v507** found in `runScreener()`, which ranked all 185 countries
+by modelled NPV with no reference to the basis and put 20 consecutive PROXY rows at
+the top of the shortlist. Side-by-Side still carried it.
+
+## Change
+A **data-basis gate** on the ordering, reusing **`getProducerContext().inSet`** —
+the *same* set the Rank row is built on — so the two rows cannot disagree again by
+construction. No new threshold is invented.
+
+- A gated column prints **`not ranked · statutory terms`** in muted grey **in place
+  of** the marker, rather than going silently blank (a blank would leave the lowest
+  number in the row unlabelled while a larger one reads "lowest of 2" — a worse
+  read than the bug). Tooltip states its production coverage, its contract count,
+  and the 33pp basis gap.
+- Surviving columns read **`lowest of 2 · of the producers`**; the marker tooltip
+  now states how many columns were excluded and why.
+- **Scope is deliberately narrow.** The gate fires ONLY where a set **mixes** the
+  two bases. All-producer sets and all-statutory sets are internally like-for-like
+  and render exactly as they shipped. Where the gate leaves fewer than two rankable
+  columns, no ordering is shown at all, so no notes are emitted either.
+
+Five set shapes walked in the browser, all confirmed:
+`mixed` (cold default) · `all-producer` (Norway/UK/Malaysia, unchanged) ·
+`all-statutory` (Netherlands/Romania/Bulgaria, unchanged) ·
+`fee-blended + statutory` (USA/Iraq/Vanuatu — composes with the v549 mechanic gate) ·
+`one producer + two statutory` (no ordering, no notes).
+
+## Result
+The analyst who opens Side-by-Side cold **no longer reads a green "lowest of 3" on
+the one column the table has just declared unrankable.** They rank Norway against
+the UK on the two columns that are like-for-like, see the Netherlands number with
+its basis attached to it, and — because `copyComparisonTable()` reads the cells
+child-by-child — carry **`23.4% · not ranked · statutory terms`** into the IC memo
+instead of a bare `23.4%`.
+
+## Verify
+- **JS syntax gate:** PASS (all 11 inline script blocks, `node --check`).
+- **Runtime suite: RAN this cycle**, against the local tree
+  (`TEST_URL=http://localhost:8899/index.html`). **235 PASS / 0 FAIL / 1 WARN.**
+  The pre-change build was re-run under **identical** conditions and scored the
+  same; the two reports are byte-identical apart from the timestamp, so this change
+  has **zero test delta**. The 1 WARN and the 1 missing PASS versus the deployed
+  build's 236/0/0 are the local server's `sw.js` 404, **pre-existing and not from
+  this change** — verified by the baseline re-run, not assumed.
+- **Pixel gate:** PASS — "no surface got worse than baseline", run with `TEST_URL`
+  set to the local tree per the cycle 530 finding that a bare invocation audits the
+  deployed build against a local baseline.
+- **Step 5b mobile:** zero horizontal scroll across 8 tabs at **1920 / 1440 / 1280 /
+  1024 / 768 / 390**, `scrollWidth == clientWidth` at every width, **0 page errors at
+  every width**. The change adds **two non-interactive text spans and 0 controls**,
+  so the 24px floor at `pointer: coarse` is unchanged.
+
+## Found on the same walk, not fixed
+- **The Economics block has the same blind spot and no marker to gate.** Contractor
+  NPV @$75 reads Netherlands **$3.6B** against Norway **$826M** — 4.4x, on 135
+  contracts against 7,643 — and the Data basis tooltip already states in terms that
+  *"a PROXY column is not comparable to a FACTS column on NPV or IRR."* The NPV rows
+  carry no superlative, so nothing on screen actively asserts a rank; but nothing
+  marks the cross-basis read either. This is the next cycle's T3 or T5 candidate.
+- **The North Sea Trio quickstart button's own tooltip claims "Netherlands (~48%
+  take)"** while the grid it loads renders **23.4%**. Norway (~68% vs 68.0%) and the
+  UK (~49% vs 49.2%) match to a tenth; only the Netherlands is off, by 24.6pp. Either
+  the tooltip is stale or the Netherlands figure is wrong. Not touched this cycle —
+  it is a data question, not a UX one, and the directive is UX finalization.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip element** — the two added spans carry
+`title` attributes on text that previously had no cell of its own. No page-sub
+paragraph, amber instructional banner, routing hint or "How to read" block; no SbS
+card wrapper; no visible Explorer chip row. Screener advanced filters still
+collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab
+added, removed or reordered.** No take, NPV, rank, reform diamond, band or tier
+colour altered. The **v612 MOBILE LAYER** was not touched, narrowed or deleted;
+`#reference-panel` `translateX` untouched; no `min-width: max-content` marker added
+or removed. v371/v373, v430, v449, v451, v452, v489 and every locked item through
+v625 intact. Version sweep **v625 → v626** across the 5 display sites, done silently
+at the end; historical `v625` references in code comments deliberately left alone.
+It is **not** the deliverable.
