@@ -24993,3 +24993,16 @@ or removed. v371/v373, v430, v449, v451, v452, v489 and every locked item throug
 v625 intact. Version sweep **v625 → v626** across the 5 display sites, done silently
 at the end; historical `v625` references in code comments deliberately left alone.
 It is **not** the deliverable.
+
+---
+## Cycle 531 Log — 2026-09-03 18:05
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 531 complete and pushed (v626).
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (stalest: 530 was T6, 528 T4, 527 T1, 526 T5, 525 T2, 524 T3)
+
+## Friction
+The four Govt Take rows carry a highest/lowest ordering marker. `_cmpRankTake` (`index.html:25396`) gated that ordering on **mechanic only** — it drops state monopolies, PRRT and fee-blended columns — and then ranked whatever survived at full confidence, including columns for which ORCA holds **no verified field pr
