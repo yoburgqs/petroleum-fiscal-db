@@ -24636,3 +24636,18 @@ added or removed. v371/v373, v430, v449, v451, v452, v489, v561, v563, v580,
 v583, v585, v593, v600, v602, v606, v612, v614, v616 and every locked item
 through v623 intact. Version sweep **v623 → v624** across the 5 display sites,
 done silently at the end. It is **not** the deliverable.
+
+---
+## Cycle 528 Log — 2026-09-03 15:08
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 528 complete and pushed (v624).
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest; 527 was T1, 526 T5, 525 T2, 524 T3, 523 T6, 522 T4)
+
+## Friction
+The Reform Risk tab itself is in good shape — for the 164 of 185 jurisdictions with no sourced reform log it says plainly "no coverage, don't carry a zero premium" rather than scoring them 100.
+
+The analyst loses one row up, on the **Fiscal Predictability Score** — the only stability number that exists for all 1
