@@ -24853,3 +24853,18 @@ v452, v489 and every locked item through v624 intact. Version sweep
 **v624 → v625** across the 5 display sites, done silently at the end; historical
 `v624` references in code comments deliberately left alone. It is **not** the
 deliverable.
+
+---
+## Cycle 530 Log — 2026-09-03 17:13
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 530 complete and pushed (v625).
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (528 was T4; T6 was stalest with a completed cycle behind it)
+
+## Friction
+Fiscal Compare's drill drawer and the Country Profile evidence chain are both strong on provenance. **Side-by-Side is not** — and it's the one tab whose entire job is ranking countries against each other.
+
+Its **Evidence tier** row (`renderCompare()`, index.html:25197) led with the primary-law *percenta
