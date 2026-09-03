@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v620</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v621</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1145,6 +1145,12 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     padding-top: 6px;
     padding-bottom: 6px;
   }
+  /* v621 (T2): the Country Profile breakeven footnote ends in a "run Scenario Builder"
+     link. It sits in running text, so it inherited the paragraph's 10px line box and
+     measured 11px tall with a thumb. Given its own rule rather than widening the shared
+     `td a` selector above, which works where it is already applied. */
+  .cp-be-cta { display: inline-block; min-height: 36px; line-height: 36px; }
+
   /* Hover-only affordances never resolve on touch; make them always-on. */
   .fc-row-hint, .screener-row-hint { opacity: 1 !important; }
 }
@@ -1586,7 +1592,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v620</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v621</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1656,7 +1662,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v620</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v621</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1984,7 +1990,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v620';
+  return m ? m[0] : 'v621';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2059,7 +2065,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v620');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v621');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -38456,6 +38462,102 @@ function _cpApplyObsSpread(country) {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// v621 (T2): terminal states for the 4-price BREAKEVEN column.
+//
+// The column renders four `…` placeholders and the footnote below it reads
+// "Breakeven = price at which contractor NPV = 0. Loading from database…".
+// Both were only ever cleared on two paths: a real solved breakeven, and the
+// three state-monopoly floor artifacts handled at v564. There was no path for
+// the ordinary case — the fetch succeeds, four_price_table is present, and
+// every avg_breakeven_usd in it is null. That is 116 of the 185 countries,
+// including the cold-load default (Indonesia) and 7 of the 9 quick-load
+// benchmark buttons. On all of them the page sat on "Loading from database…"
+// indefinitely, next to a Fiscal Mechanics card on the SAME page already
+// reporting the absence as settled. A finished fetch must not keep announcing
+// itself as pending.
+//
+// Deliberately NOT asserted here: a cause. The card next to it says "no prod
+// data", and the data refutes that — breakeven is on file for 67 countries whose
+// median take is 21.3% and which are mostly non-producers (Nauru, Tuvalu, Palau),
+// and it is absent for Indonesia, Iraq, Angola, Nigeria, Brazil, Canada and the
+// USA, which carry MORE production coverage (15.4% vs 7.1%). The driver is not
+// recorded anywhere this page can read, so the footnote states the absence and
+// stops.
+//
+// What it does state is a bound the analyst can defend, because it is read off
+// the same four rows already on screen: contractor NPV at $50/$75/$100/$125. If
+// NPV is positive at every modelled price, breakeven is below $50 on this
+// profile; if it is negative at every price, above $125; if it changes sign, it
+// is bracketed by the two prices it changes sign between. That is arithmetic on
+// displayed figures, not a new model output.
+function _cpBeSettle(safe, state, country, fpt) {
+  var CELL = {
+    none:  ['—', 'No breakeven solved for this country. The lookup completed — this is an absence in the data, not a pending fetch.'],
+    fail:  ['?',      'Breakeven lookup did not return. This is unknown, not zero and not absent.']
+  }[state];
+  if (CELL) {
+    ['50','75','100','125'].forEach(function(pk) {
+      var el = document.getElementById('dd-be-' + safe + '-' + pk);
+      if (!el) return;
+      if (!/^\s*(…|)\s*$/.test(el.textContent)) return;   // never overwrite a solved value
+      el.innerHTML = '<span style="color:var(--muted);" title="' + CELL[1] + '">' + CELL[0] + '</span>';
+      el.style.color = 'var(--muted)';
+    });
+  }
+  var fn = document.getElementById('dd-be-footnote-' + safe);
+  if (!fn) return;
+  var cty = String(country == null ? 'this country' : country)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+  if (state === 'fail') {
+    fn.innerHTML = '<strong style="color:var(--text);">Breakeven unavailable — the lookup for ' + cty
+      + ' did not return.</strong> Treat this as unknown. It is not a statement that ' + cty
+      + ' has no breakeven, and the blank must not be read as $0. Reload the tab to retry; the take and NPV rows above are bundled with the page and are unaffected.';
+    return;
+  }
+
+  // state === 'none' — derive the defensible bracket from the NPV column.
+  var order = [50, 75, 100, 125], npv = {};
+  (fpt || []).forEach(function(r) { npv[r.price_usd_bbl] = r.avg_npv_mm; });
+  var have = order.filter(function(p) { return npv[p] != null; });
+  var bracket = '';
+  if (have.length === order.length) {
+    var pos = order.map(function(p) { return npv[p] > 0; });
+    var fmt = function(v) {
+      var a = Math.abs(v);
+      return (v < 0 ? '-$' : '$') + (a >= 1000 ? (a/1000).toFixed(1) + 'B' : Math.round(a) + 'M');
+    };
+    if (pos.every(Boolean)) {
+      bracket = ' What the four rows above <em>do</em> support: contractor NPV is positive at every modelled price, including '
+        + fmt(npv[50]) + ' at the $50/bbl downside — so on this standardized Deepwater profile breakeven sits '
+        + '<strong style="color:var(--green);">below $50/bbl</strong>.';
+    } else if (!pos.some(Boolean)) {
+      bracket = ' What the four rows above <em>do</em> support: contractor NPV is negative at every modelled price, including '
+        + fmt(npv[125]) + ' at $125/bbl — so on this standardized Deepwater profile breakeven sits '
+        + '<strong style="color:var(--red);">above $125/bbl</strong>.';
+    } else {
+      var i = 0;
+      while (i < 3 && pos[i] === pos[i + 1]) i++;
+      var lo = order[i], hi = order[i + 1];
+      bracket = ' What the four rows above <em>do</em> support: contractor NPV changes sign between $' + lo
+        + ' and $' + hi + '/bbl (' + fmt(npv[lo]) + ' → ' + fmt(npv[hi]) + ') — so on this standardized '
+        + 'Deepwater profile breakeven is bracketed <strong style="color:var(--yellow);">between $' + lo + ' and $' + hi + '/bbl</strong>.';
+    }
+  }
+
+  fn.innerHTML = '<strong style="color:var(--text);">No breakeven on file for ' + cty + '.</strong> '
+    + 'ORCA carries a solved breakeven for 67 of 185 countries and this is not one of them. The lookup finished — '
+    + 'nothing further is loading, and the blank is an absence in the data, not $0 and not an uneconomic regime. '
+    + 'The reason is not recorded, so do not repeat the "no production data" explanation given elsewhere on this page: '
+    + 'breakeven is on file for fewer producers than non-producers.'
+    + bracket
+    + ' For a breakeven on your own capex, opex and production profile, '
+    + '<a href="#" onclick="ddOpenScenarioBuilder(' + JSON.stringify(String(country || '')).replace(/"/g,'&quot;')
+    + ');return false;" class="cp-be-cta" style="color:var(--accent);font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;" '
+    + 'title="Open Scenario Builder pre-filled with this country’s fiscal terms and solve a breakeven from your own inputs">run Scenario Builder →</a>';
+}
+
 // v42: Production time series chart + breakeven population — fetches from api/v1/country/{slug}.json
 if (!window._prodTsCharts) window._prodTsCharts = {};
 function fetchCountryProductionChart(country) {
@@ -38471,17 +38573,33 @@ function fetchCountryProductionChart(country) {
   const apiSlug = slug.replace(/_/g, '-');
   const safe = country.replace(/[^a-z0-9]/gi,'_').toLowerCase();
   const _getJson = function(sl) { return fetch('api/v1/country/' + sl + '.json').then(r => r.ok ? r.json() : null).catch(function(){ return null; }); };
+  // v621 (T2): watchdog. Every branch below now settles the footnote, but a fetch that never
+  // settles at all (offline, hung proxy, service worker stall) would still leave the spinner text
+  // on screen with nothing coming. 12s after render, if the footnote is still the literal loading
+  // string, say so as UNKNOWN. _cpBeSettle only overwrites `…` cells, so a slow-but-successful
+  // response arriving later still wins.
+  if (window._cpBeWatchdog) clearTimeout(window._cpBeWatchdog);
+  window._cpBeWatchdog = setTimeout(function() {
+    var fn = document.getElementById('dd-be-footnote-' + safe);
+    if (fn && /Loading from database/.test(fn.textContent)) _cpBeSettle(safe, 'fail', country, null);
+  }, 12000);
   (apiSlug === slug
       ? _getJson(slug)
       : _getJson(apiSlug).then(function(d) { return (d && d.four_price_table) ? d : _getJson(slug); }))
     .then(data => {
-      if (!data) return;
+      // v621 (T2): both of these used to leave the BREAKEVEN column on `…` and the footnote on
+      // "Loading from database…" forever. A failed lookup is UNKNOWN and says so; a payload with
+      // no breakeven in it is a settled ABSENCE and says that instead. The two are not the same
+      // claim and the footnote no longer collapses them into a spinner.
+      if (!data) { _cpBeSettle(safe, 'fail', country, null); return; }
+      if (!data.four_price_table) { _cpBeSettle(safe, 'fail', country, null); }
 
       // ── Populate 4-price breakeven cells from four_price_table ──────────
       if (data.four_price_table) {
         const priceMap = {50:'50', 75:'75', 100:'100', 125:'125'};
         let be75 = null;
         let beFloorOnly = false;   // v564 (T2): payload carried only the DCF solver floor
+        let beAnyReal = false;     // v621 (T2): did ANY row resolve to a real solved breakeven?
         data.four_price_table.forEach(function(row) {
           const priceKey = priceMap[row.price_usd_bbl];
           if (!priceKey) return;
@@ -38505,6 +38623,7 @@ function fetchCountryProductionChart(country) {
               else str = '$' + bv.toFixed(0) + '/bbl';
               el.textContent = str;
               el.style.color = bv < 50 ? 'var(--green)' : bv < 80 ? 'var(--yellow)' : 'var(--red)';
+              beAnyReal = true;   // v621 (T2)
               if (priceKey === '75') be75 = bv;
             }
           }
@@ -38538,6 +38657,10 @@ function fetchCountryProductionChart(country) {
         }
         if (footnote && be75 != null && be75 > 1) {
           footnote.textContent = 'Breakeven $' + be75.toFixed(0) + '/bbl — contractor achieves positive NPV above this price.';
+        } else if (footnote && !beFloorOnly && !beAnyReal && be75 == null) {
+          // v621 (T2): the ordinary no-breakeven case — 116 of 185 countries. Previously fell
+          // through every branch and left the spinner text in place permanently.
+          _cpBeSettle(safe, 'none', country, data.four_price_table);
         } else if (footnote && beFloorOnly) {
           // v564 (T2): without this the footnote sat on "Loading from database…" forever, which
           // reads as a pending fetch rather than a settled answer. The fetch succeeded; there is
