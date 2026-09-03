@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v625</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v626</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1601,7 +1601,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v625</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v626</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1671,7 +1671,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v625</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v626</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1999,7 +1999,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v625';
+  return m ? m[0] : 'v626';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2074,7 +2074,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v625');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v626');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -24974,6 +24974,68 @@ function renderCompare() {
   // cash-flow base and may not be carried across price points at all, and that a state monopoly
   // has no contractor position to rank. Those columns are skipped rather than given a placement.
   const _cmpPriceRank = {};
+  // v626 (T3): the DATA-BASIS gate on the four Govt Take ordering markers. _cmpRankTake had a
+  // MECHANIC gate and no basis gate: it dropped state monopolies, PRRT and fee-blended columns
+  // (v593 / v549 / v552) and then ranked whatever was left at full confidence — including columns
+  // for which ORCA holds no verified field production at all, whose take is a simple average of
+  // statutory terms rather than a weighting of barrels.
+  //
+  // The cold-load default set is the exhibit, and it is what a first-time analyst sees before
+  // touching anything. Norway / United Kingdom / Netherlands, as shipped:
+  //     Rank among producers   #17 of 21 producers   #9 of 21 producers   not ranked
+  //                                                                       "no production data"
+  //     Govt Take ($75/bbl)    68.0%                 49.2%                23.4%
+  //                            "highest of 3" (red)                       "lowest of 3" (GREEN)
+  // The Rank row refuses the Netherlands a placement and says why in its own tooltip — "a
+  // fiscal-terms figure, not realised economics ... it has no honest position in a producer
+  // ranking". Two rows later the same grid hands it a placement anyway, and the placement is the
+  // winning one, in green, on all four price rows. 278 facts at 0% production coverage beat
+  // Norway's 63,848 facts at 18.2% coverage, directly above Copy for IC Memo.
+  //
+  // This is not a Netherlands quirk. It is a systematic bias in the sign the marker reports.
+  // Measured over the shipped country_data.json: 163 of 185 countries carry no verified
+  // production. Their median take is 26.9% against 59.5% for the 22 that do — a 32.6pp gap that
+  // is an artefact of averaging statutory terms instead of weighting output. Across all 3,586
+  // producer-vs-non-producer column pairs the non-producer reads lower, and so takes the green
+  // "lowest of N", in 2,860 of them — 79.8%. All 20 of the lowest-take countries in the database
+  // are non-producer columns.
+  //
+  // Same defect class v507 found in runScreener(), which ranked all 185 countries by modelled NPV
+  // with no reference to the basis and put 20 consecutive PROXY rows at the top of the shortlist.
+  // The gate reuses getProducerContext().inSet — the SAME set the Rank row is built on — so the
+  // two rows cannot disagree again by construction. No threshold is invented here.
+  //
+  // Scope: the gate fires ONLY on a set that MIXES the two bases. Three frontier columns with no
+  // production are like-for-like with each other and rank exactly as they shipped today.
+  const _cmpHasProd = (d) => {
+    const c = (d && typeof getProducerContext === 'function') ? getProducerContext(d.country) : null;
+    return !!(c && c.inSet);
+  };
+  let _cmpBasisGate = false;   // assigned below, once `selected` exists — no TDZ in the closures
+  // A column the gate dropped says so in place of the marker, rather than going silently blank:
+  // otherwise the lowest number in the row carries no label while a larger one is tagged "lowest
+  // of 2", which is a worse read than the bug. Monopoly columns keep their existing blank cell.
+  const _cmpBasisNote = (d, p) => {
+    if (!_cmpBasisGate || _cmpHasProd(d)) return '';
+    // Only where an ordering is actually ON SCREEN. If the gate left fewer than two rankable
+    // columns there is no highest/lowest anywhere in the row, so there is nothing to explain
+    // an exclusion from and the note would be noise.
+    if (!_cmpPriceRank[p]) return '';
+    const v = d['take_' + p];
+    if (v == null || isStateMonopoly(v)) return '';
+    const nc = d.n != null ? Number(d.n).toLocaleString() : '?';
+    return '<span style="display:block;font-size:10px;font-weight:600;color:var(--muted);cursor:help;" title="'
+      + _cmpEsc(d.country + ': not given a highest/lowest placement on this row. ORCA holds no verified '
+        + 'field production for it (prod_coverage_pct = ' + (d.prod_coverage_pct || 0).toFixed(0)
+        + '), so this ' + Number(v).toFixed(1) + '% is a simple average of statutory terms across its '
+        + nc + ' contracts — not output-weighted economics. The other columns in this set ARE weighted '
+        + 'by verified production, and across the database that difference alone is worth about 33 '
+        + 'percentage points: the 163 countries with no production average 26.9% take against 59.5% '
+        + 'for the 22 that have it. Ranking the two against each other reports the basis, not the '
+        + 'regime. This is the same exclusion the Rank among producers row above already applies. '
+        + 'Read the number, and compare it against other statutory-basis columns.')
+      + '">not ranked \u00b7 statutory terms</span>';
+  };
   // v600 (T3): the marker has to sit on the number it actually ranks. _cmpPriceRank ranks on the
   // COMPARABLE take (v549/v552), so on a fee-blended column it describes the PSC/Conc figure -- not
   // the headline take printed above it. It was rendered directly under the headline, which put the
@@ -24994,13 +25056,22 @@ function renderCompare() {
     const word = lo ? 'lowest' : 'highest';
     // r.basis is non-empty exactly when some column in the set blends fee-basis contracts, i.e.
     // exactly when 'of N' is measured on something other than the headline figures on screen.
-    const tag = onG1 ? ' \u00b7 on PSC/Conc' : (r.basis ? ' \u00b7 comparable basis' : '');
+    const tag = onG1 ? ' \u00b7 on PSC/Conc'
+              : r.basis ? ' \u00b7 comparable basis'
+              : r.gated ? ' \u00b7 of the producers' : '';
     return '<span style="display:block;font-size:10px;font-weight:700;color:var('
       + (lo ? '--green' : '--red') + ');cursor:help;'
       + (onG1 ? 'padding-left:8px;border-left:2px solid var(--green);margin-top:1px;' : '') + '" title="'
       + _cmpEsc(d.country + ' has the ' + word + ' government take of the '
         + r.n + ' comparable columns in this set at $' + p + '/bbl'
         + (r.basis ? ', measured on ' + r.basis : '') + '. '
+        + (r.gated
+            ? 'It is \u201cof ' + r.n + '\u201d and not of ' + r.nCols + ' because ' + (r.nCols - r.n)
+              + ' column' + ((r.nCols - r.n) === 1 ? ' in this set carries' : 's in this set carry')
+              + ' no verified field production, so its take is a simple average of statutory terms and is '
+              + 'not on the same basis as this figure. Those columns are marked \u201cnot ranked \u00b7 statutory '
+              + 'terms\u201d on this row, the same exclusion the Rank among producers row applies. '
+            : '')
         + (onG1
             ? 'This marker ranks the PSC/Conc figure directly above it, NOT the headline '
               + (d['take_' + p] == null ? '' : Number(d['take_' + p]).toFixed(1) + '% ') + 'take at the top of the cell \u2014 that headline '
@@ -25019,6 +25090,8 @@ function renderCompare() {
     const v = d['take_' + p];
     const base = fmtTake(v);
     const st = _cmpMixStat(d);
+    const gated = _cmpBasisNote(d, p);
+    if (gated) return base + gated;   // v626: no ordering marker on a column the basis gate dropped
     if (!st.blended || !st.g1 || st.g1['t' + p] == null || v == null || isStateMonopoly(v)) return base + _cmpOrderMark(d, p, false);
     const g1v = st.g1['t' + p];
     return base + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
@@ -25396,12 +25469,17 @@ function renderCompare() {
   const _cmpRankTake = (d, p) => {
     const v = d['take_' + p];
     if (v == null || isStateMonopoly(v)) return null;
+    if (_cmpBasisGate && !_cmpHasProd(d)) return null;   // v626 (T3): the data-basis gate
     const st = _cmpMixStat(d);
     if (st.prrt) return null;
     if (st.blended) return (st.g1 && st.g1['t' + p] != null) ? st.g1['t' + p] : null;
     return v;
   };
   const _CMP_PRICES = [50, 75, 100, 125];
+  // v626 (T3): fires only where the set MIXES production-weighted columns with statutory-terms
+  // columns. All-producer sets and all-statutory sets are internally like-for-like and unchanged.
+  const _cmpNProd = selected.filter(d => d && _cmpHasProd(d)).length;
+  _cmpBasisGate = _cmpNProd > 0 && _cmpNProd < selected.filter(d => !!d).length;
   const _cmpAnyBlended = selected.some(d => _cmpMixStat(d).blended);
   _CMP_PRICES.forEach(p => {
     const vals = selected.map(d => ({ c: d.country, v: _cmpRankTake(d, p) })).filter(x => x.v != null);
@@ -25414,6 +25492,8 @@ function renderCompare() {
       hi: (vals.length >= 3 && (srt[last].v - srt[last - 1].v) >= 0.05) ? srt[last].c : null,
       loV: srt[0].v, hiV: srt[last].v,
       basis: _cmpAnyBlended ? 'the PSC/Concession take where a column blends fee-basis contracts' : '',
+      gated: _cmpBasisGate,
+      nCols: selected.filter(d => !!d).length,
       flips: false
     };
   });
