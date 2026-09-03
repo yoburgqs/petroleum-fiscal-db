@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v624</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v625</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1248,6 +1248,18 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   /* The evidence strip on the Country Profile: a flex summary whose badges ran 49px off. */
   #cp-evidence-panel summary { flex-wrap: wrap; row-gap: 6px; }
 
+  /* v625: the Fiscal Predictability badge is inline-flex / nowrap and sizes to its own
+     content -- 122px once v624 added the UNGRADED label beside the basis chip. In the
+     Side-by-Side compare grid a cell measures 87px at 390, so the badge ran 35px past its
+     own cell and .compare-grid's overflow-x:hidden cut the grade off the screen. Caught by
+     pixel_audit as phone-390::5-t2 viewport-overflow; it reproduces on the pre-v625 build,
+     so it shipped with v624. Wrap inside the cell rather than overflow it. The basis
+     divider is a left border, which reads as a stray rule once the chip is on its own
+     line, so it is dropped at this width only. Narrowing, not weakening: nothing in the
+     v612 layer is removed and no desktop rendering changes. */
+  .orca-fp-badge { flex-wrap: wrap; max-width: 100%; row-gap: 2px; }
+  .orca-fp-badge .orca-fp-basis { border-left: 0; padding-left: 0; margin-left: 0; }
+
   /* Reform Risk cards: headline + counts + verdict on one nowrap line. */
   .rr-card, .rr-headline, .rr-row, [id^="rr-"] > div[style*="display:flex"] { flex-wrap: wrap; }
 
@@ -1589,7 +1601,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v624</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v625</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1659,7 +1671,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v624</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v625</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1987,7 +1999,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v624';
+  return m ? m[0] : 'v625';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2062,7 +2074,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v624');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v625');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -25181,8 +25193,38 @@ function renderCompare() {
     // Senegal at 74% A/B · B on 67.2%. Now shows the primary-law share and the v551 two-legged
     // grade — the same letter Fiscal Compare and Country Profile show, so the three cannot disagree.
     {label:'Evidence tier <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How much of this country’s fiscal record was read out of the primary legal instrument — petroleum act, gazette, finance act, PSC text — rather than a secondary tax guide, industry reference or a default estimate. The grade letter takes the WORSE of two legs: primary-law share (A ≥60% / B ≥40% / C ≥20%) and fact depth (A ≥150 / B ≥50 / C ≥15), because a 100% primary-law record built on 2 facts is not strong evidence. The EY / IHS / KPMG bulk harvest does not count toward the primary-law leg. Country Profile → Evidence Quality lists the actual documents.">ⓘ</span>',
+      // v625 (T6): this cell led with the primary-law PERCENTAGE, and Side-by-Side is the one tab
+      // whose entire job is ranking columns against each other. Measured against the shipped
+      // country_data.json: 80 of 185 countries are graded by the DEPTH leg, 52 print a primary-law
+      // share of 60%+ while grading C or D, and 27 print a FULL 100.0% of which 25 are not grade A
+      // — 20 of those are D on 2–8 facts. So an analyst comparing Norway, Nigeria and Samoa read
+      // "66% primary law · A", "31% primary law · C", "100% primary law · D": the biggest number
+      // in the row sat on the weakest column, in identical type, on the row that is supposed to say
+      // how much each column can be trusted. The denominator was one row further down and the v619
+      // diagnosis label ("too few facts to grade") was computed here and then thrown away.
+      // The cell now leads with the letter and that label — not rankable as a number — and the
+      // percentage never renders without the fact count it is a percentage OF. The limiting leg is
+      // emphasised and the other stepped back, the same treatment the Country Profile evidence
+      // panel already applies via _aEmph / _nfEmph. No grade, letter, colour or threshold changed.
       key:(d)=>{ const g=_evidenceGrade(d);
-        return '<span style="color:' + g.color + ';font-weight:700;" title="' + _cmpEsc(d.country + ' — ' + _evidenceGradeWhy(d)) + '">' + g.aPct.toFixed(0) + '% primary law · ' + g.letter + '</span>'; }},
+        const _dep = (g.limiter === 'depth');
+        const _src = (g.limiter === 'sourcing');
+        const _nf  = Number(g.nFacts || 0);
+        const _aSt = 'color:' + (_dep ? 'var(--muted)' : g.color) + ';' + (_dep ? 'font-weight:400;opacity:.7;' : 'font-weight:700;');
+        const _nSt = 'color:' + (_dep ? 'var(--orange)' : 'var(--muted)') + ';' + (_dep ? 'font-weight:700;' : 'font-weight:400;opacity:.7;');
+        return '<span style="display:block;color:' + g.color + ';font-weight:700;font-size:11px;line-height:1.35;" title="'
+          + _cmpEsc(d.country + ' — ' + _evidenceGradeWhy(d)) + '">' + g.letter + ' · ' + _cmpEsc(g.label) + '</span>'
+          + '<span style="display:block;font-size:10px;line-height:1.35;margin-top:1px;" title="'
+          + _cmpEsc('The primary-law share is a percentage OF this country\u2019s ' + _nf.toLocaleString() + ' fiscal fact'
+              + (_nf === 1 ? '' : 's') + ', so the two figures must be read together. '
+              + (_dep ? 'Fact depth is what set this grade, not the sourcing — the share is high because the record is small, and it is shown stepped back for that reason. A percentage over ' + _nf.toLocaleString() + ' facts does not rank against one over a national contract set.'
+                      : _src ? 'Sourcing is what set this grade, not the depth — the record is deep enough, but not enough of it was read out of the primary legal instrument.'
+                             : 'Both legs grade the same here, so neither is singled out.'))
+          + '">'
+          + '<span style="' + _aSt + '">' + g.aPct.toFixed(0) + '% primary law</span>'
+          + '<span style="color:var(--muted);opacity:.55;"> of </span>'
+          + '<span style="' + _nSt + '">' + _nf.toLocaleString() + ' fact' + (_nf === 1 ? '' : 's') + '</span>'
+          + '</span>'; }},
     {label:'Fiscal facts held <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How many verified fiscal facts ORCA holds for this country. Read it against the tier above: a high A/B percentage over a small fact base is a thin sample. 278 facts and 63,848 facts are not the same evidence even at the same tier.">ⓘ</span>',
       key:(d)=>{ const nf=d.n_facts; if(nf==null) return '—';
         const thin = nf < 1000;
@@ -28548,6 +28590,171 @@ function renderReformTimeline(country) {
     // include the country-level bulk harvest, so "✓ All 3 sourced parameters match" was true of
     // the United Kingdom while one of the three was a row agreeing with itself.
     const _pl = function(n) { return n === 1 ? '' : 's'; };
+
+    // ── v625 (T6): the verdict line had no denominator for the REGIME ────────────────
+    // Every number under this table -- the tick, the divergence count, the v601 coverage clause
+    // -- is computed over `rows`, and `rows` is built by walking rowDefs and SKIPPING every key
+    // the API holds no value for (`if (rawVal == null) return;`). A term ORCA does not hold is
+    // therefore not rendered as missing. It is not rendered at all, and no line beneath the table
+    // mentions it. The table reports on what it has and calls that a verdict.
+    // Measured live across all 185 profiles against this page's own resolveLiveDCFMechanic() and
+    // getDCFParams(): 166 countries are missing at least one term the platform's model for their
+    // OWN mechanic uses, and 102 of them print a clean green "All N independently sourced
+    // parameters match" with no caveat of any kind. Mongolia is the sharpest: resolved PSC,
+    // government take 52.5% at the top of the page, and the Evidence Chain is two rows -- Royalty
+    // 5% and Income Tax 25%, both A-tier primary law, both matching, ticked. The three terms that
+    // make a PSC a PSC -- cost recovery cap, FTP, profit-oil split -- are absent from the table
+    // and from every note under it. Mali, Trinidad and Tobago and Ecuador are the same shape.
+    // An analyst asking "how solid is the evidence behind this take?" reads a verified chain over
+    // two inputs that between them cannot produce the number they are standing on.
+    // Fix: a term the model uses and the fact base does not hold now gets a ROW saying so, naming
+    // what is substituted in its place and where that substitute came from, and the verdict line
+    // is scoped to the terms it actually covers. No value, tier, take or grade is altered.
+    const _heldRows = rows.length;
+    let _missTerms = [];
+    let _termsTotal = _heldRows;
+    if (fk) {
+      // The model terms this table can speak to. Terms getDCFParams carries that are not a rate
+      // on a regime -- spt_threshold, capex_recovery_years, windfall_price_trigger, uplift_rate,
+      // tier_schedule -- are deliberately absent.
+      const _TERM_LABEL = {
+        royalty_rate: 'Royalty Rate', cit_rate: 'Income Tax Rate', ftp_rate: 'FTP Rate',
+        cost_recovery_cap: 'Cost Recovery Cap', profit_oil_govt_pct: 'Profit Oil (Govt)',
+        state_equity_pct: 'State Participation', spt_rate: 'Special Tax',
+        prrt_rate: 'PRRT Rate', windfall_rate: 'Windfall Levy', severance_rate: 'Severance Tax',
+        fee_per_bbl: 'Service Fee', ept_rate: 'Excess Petroleum Tax',
+        return_on_capex: 'Capex Remuneration Rate'
+      };
+      // The same fiscal_facts keys rowDefs above already reads, indexed by model term.
+      const _TERM_FACTS = {
+        royalty_rate: ['levy_royalty_rate'],
+        cit_rate: ['levy_income_tax_rate', 'income_tax_rate_pct'],
+        ftp_rate: ['levy_ftp_rate'],
+        cost_recovery_cap: ['levy_cost_recovery_limit', 'levy_cost_recovery_rate', 'cost_recovery_cap_pct'],
+        profit_oil_govt_pct: ['levy_profit_oil_govt_pct', 'levy_profit_oil_rate'],
+        state_equity_pct: ['state_participation'],
+        spt_rate: ['special_petroleum_tax_rate', 'levy_special_tax_rate']
+      };
+      // The COUNTRY_DATA fields getDCFParams enriches PSC-family params from. A substitute that
+      // came from here is an UNCITED CONTRACT AVERAGE, not a generic default. Ecuador's 50%
+      // profit-oil split is one of these; calling it an invented default would be wrong.
+      const _TERM_CD = { ftp_rate: 'ftp', cost_recovery_cap: 'cr_cap',
+                         profit_oil_govt_pct: 'profit_oil_govt', royalty_rate: 'royalty' };
+      try {
+        const _mech = (typeof resolveLiveDCFMechanic === 'function') ? resolveLiveDCFMechanic(country) : null;
+        const _pr   = (_mech && typeof getDCFParams === 'function') ? getDCFParams(country, _mech) : null;
+        if (_pr) {
+          const _ovk = Array.isArray(_pr._overrideKeys) ? _pr._overrideKeys : [];
+          const _cdr = (typeof COUNTRY_DATA !== 'undefined')
+            ? COUNTRY_DATA.find(function(x) { return x.country === country; }) : null;
+          _termsTotal = 0;
+          Object.keys(_TERM_LABEL).forEach(function(k) {
+            if (!(k in _pr)) return;                                  // this regime does not use it
+            _termsTotal++;
+            const fkeys = _TERM_FACTS[k] || [];
+            if (fkeys.some(function(x) { return fk[x] != null; })) return;   // held -- already a row
+            const v   = _pr[k];
+            const num = (typeof v === 'number' && isFinite(v)) ? v : null;
+            const cdf = _TERM_CD[k];
+            const origin = (_ovk.indexOf(k) !== -1) ? 'override'
+              : ((cdf && _cdr && _cdr[cdf] != null) ? 'contract' : 'default');
+            _missTerms.push({
+              key: k, label: _TERM_LABEL[k], mech: _mech, origin: origin,
+              sub: num == null ? null
+                : (k === 'fee_per_bbl' ? '$' + num.toFixed(2) + '/bbl' : _fmtPct(num * 100)),
+              // The dangerous case: a NON-ZERO rate that came from nowhere in this country's own
+              // data -- a generic mechanic default or a hard-coded engine override. A substituted
+              // zero assumes the term is absent; a substituted 60% asserts a split nobody signed.
+              // A contract average is uncited but IS derived from this country's records, so it is
+              // reported separately rather than lumped in here.
+              invented: (origin === 'default' || origin === 'override')
+                        && num != null && Math.abs(num) > 1e-9
+            });
+          });
+        }
+      } catch (e) { _missTerms = []; _termsTotal = _heldRows; }
+      _missTerms.forEach(function(t) {
+        const where = t.origin === 'override'
+          ? 'a hard-coded ' + country + ' override inside the DCF engine, which is not a citation'
+          : (t.origin === 'contract'
+              ? 'the average across this country’s own contract records, which carries no citation'
+              : 'the generic ' + t.mech + ' default — one figure applied to every ' + t.mech
+                + ' country on the platform, describing none of them');
+        // The absence claimed here is an absence of SOURCING, not of any number at all: for
+        // origin 'contract' a figure does exist, it just carries no citation. Saying "not a
+        // contract average either" and then naming one would contradict itself in one sentence.
+        const tip = _esc(t.label + ': ORCA holds no sourced fact for this term — not primary law, '
+          + 'not a secondary guide, not the bulk harvest. Nothing on record cites it for ' + country
+          + '. This platform’s ' + t.mech + ' model needs the term, so where this page runs the regime '
+          + 'it substitutes ' + (t.sub || 'a value') + ', which is ' + where + '. Establish it from '
+          + country + '’s own petroleum act before an IC memo.');
+        const chip = '<span style="cursor:help;background:'
+          + (t.invented ? 'rgba(194,65,12,.10)' : 'rgba(107,101,96,.08)') + ';border:1px dashed '
+          + (t.invented ? 'rgba(194,65,12,.55)' : 'var(--border)') + ';color:'
+          + (t.invented ? 'var(--orange)' : 'var(--muted)')
+          + ';font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.04em;'
+          + 'white-space:nowrap;" title="' + tip + '">NOT HELD</span>';
+        const badge = '<span class="source-badge conf-db" style="opacity:.85;cursor:help;" title="'
+          + tip + '">' + (t.invented ? '⚠ ' : '') + 'No value on record'
+          + (t.sub ? ' · ' + (t.origin === 'override' ? 'engine override '
+                                 : t.origin === 'contract' ? 'contract avg '
+                                 : _esc(t.mech) + ' default ') + _esc(t.sub) : '')
+          + '</span>';
+        rows.push(['<span style="opacity:.75;">' + _esc(t.label) + '</span>',
+                   '<span style="color:var(--muted);">—</span>', chip, badge]);
+      });
+    }
+    const _missInvented = _missTerms.filter(function(t) { return t.invented; });
+    const _regimeMech   = _missTerms.length ? _missTerms[0].mech : null;
+    // Scopes the tick sentence itself, which is the string that misleads: "All 2 independently
+    // sourced parameters match" is true and reads as a whole-regime pass.
+    const _scope625 = _missTerms.length
+      ? ' That is a verdict on ' + (_termsTotal - _missTerms.length) + ' of the ' + _termsTotal
+        + ' terms this ' + _esc(_regimeMech) + ' model needs.'
+      : '';
+    // Every substitute is named, grouped by where it actually came from. Four origins, four
+    // different things to say about them -- collapsing any two would put a false sentence on the
+    // page (Iraq's Service Fee substitutes a $6.00/bbl engine override, not zero).
+    const _subGroup625 = function(pred) {
+      return _missTerms.filter(pred).map(function(t) {
+        return t.label + (t.sub ? ' (' + t.sub + ')' : '');
+      });
+    };
+    const _gDefNZ = _subGroup625(function(t) { return t.origin === 'default' && t.invented; });
+    const _gDef0  = _subGroup625(function(t) { return t.origin === 'default' && !t.invented; });
+    const _gOvr   = _subGroup625(function(t) { return t.origin === 'override'; });
+    const _gCon   = _subGroup625(function(t) { return t.origin === 'contract'; });
+    const _subParts625 = [];
+    if (_gDefNZ.length) _subParts625.push('the generic ' + _esc(_regimeMech) + ' default for '
+      + _esc(_gDefNZ.join(', ')) + ' — one figure applied to every ' + _esc(_regimeMech)
+      + ' country on the platform, which is not ' + _esc(country) + '’s term');
+    if (_gDef0.length) _subParts625.push('zero for ' + _esc(_subGroup625(function(t) {
+      return t.origin === 'default' && !t.invented; }).map(function(x) { return x.split(' (')[0]; }).join(', '))
+      + ', which assumes the term is absent rather than finding that it is');
+    if (_gOvr.length) _subParts625.push('a hard-coded ' + _esc(country) + ' override inside the DCF engine for '
+      + _esc(_gOvr.join(', ')) + ', which is a number the engine carries, not a citation');
+    if (_gCon.length) _subParts625.push('this country’s own uncited contract average for '
+      + _esc(_gCon.join(', ')));
+    const _subSentence625 = 'Where this page runs the regime it substitutes '
+      + _subParts625.join('; ') + '. ';
+    const _regimeNote625 = _missTerms.length
+      ? '<div style="margin-top:8px;background:'
+        + (_missInvented.length ? 'rgba(194,65,12,.07)' : 'rgba(107,101,96,.05)') + ';border:1px solid '
+        + (_missInvented.length ? 'rgba(194,65,12,.28)' : 'var(--border)') + ';border-left:3px solid '
+        + (_missInvented.length ? 'var(--orange)' : 'var(--muted)')
+        + ';border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
+        + '<strong style="color:var(--text);">' + (_missInvented.length ? '⚠ ' : '')
+        + 'ORCA has a sourced value for ' + (_termsTotal - _missTerms.length) + ' of the ' + _termsTotal
+        + ' fiscal terms its ' + _esc(_regimeMech) + ' model needs for ' + _esc(country) + '.</strong> '
+        + _esc(_missTerms.map(function(t) { return t.label; }).join(', ')) + ' '
+        + (_missTerms.length === 1 ? 'carries' : 'carry') + ' no sourced value on record — no statute, '
+        + 'no guide, no bulk harvest. '
+        + _subSentence625
+        + 'The tick above covers the ' + _heldRows + ' row' + _pl(_heldRows)
+        + ' ORCA happens to hold, not the regime. '
+        + '<strong style="color:var(--text);">Establish ' + (_missTerms.length === 1 ? 'it' : 'these')
+        + ' from ' + _esc(country) + '’s own petroleum act before an IC memo.</strong></div>'
+      : '';
     const _bulkNote = bulkCount > 0
       ? '<div style="margin-top:8px;background:rgba(194,65,12,.05);border:1px solid rgba(194,65,12,.22);border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
         + '<strong style="color:var(--text);">' + bulkCount + ' further parameter' + _pl(bulkCount)
@@ -28578,7 +28785,7 @@ function renderReformTimeline(country) {
     // parameters match" -- with no denominator, under a five-row table. Three of five reads as a
     // whole-table pass when three is the only number on screen. The denominator is now on the line.
     const _coverage601 = unsourcedCount > 0
-      ? ' <strong style="color:var(--orange);">' + sourcedCount + ' of the ' + rows.length
+      ? ' <strong style="color:var(--orange);">' + sourcedCount + ' of the ' + _heldRows
         + ' rows above ' + (sourcedCount === 1 ? 'is' : 'are') + ' independently sourced; '
         + unsourcedCount + ' ' + (unsourcedCount === 1 ? 'is' : 'are') + ' not sourced at all.</strong> '
       : '';
@@ -28608,7 +28815,7 @@ function renderReformTimeline(country) {
     // N JURISDICTIONS (v588), Estimated default D. "No source at all" had none.
     const _unsourcedNote601 = unsourcedCount > 0
       ? '<div style="margin-top:8px;background:rgba(107,101,96,.05);border:1px solid var(--border);border-left:3px solid var(--muted);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
-        + '<strong style="color:var(--text);">' + unsourcedCount + ' of the ' + rows.length + ' rows above ('
+        + '<strong style="color:var(--text);">' + unsourcedCount + ' of the ' + _heldRows + ' rows above ('
         + _esc(unsourcedLabels.join(', ')) + ') carr' + (unsourcedCount === 1 ? 'ies' : 'y')
         + ' no source at all.</strong> Not primary law, not a secondary guide, not the bulk harvest \u2014 nothing. '
         + 'The value shown is the average across this country\u2019s contract records and nothing corroborates it.'
@@ -28628,13 +28835,17 @@ function renderReformTimeline(country) {
         + 'ORCA’s take%, NPV and IRR are built from the contract terms in the ORCA Value column, not from the statute. '
         + 'The gap is normally real — grandfathered licence rounds, block-specific terms and sliding scales. '
         + 'In an IC memo, cite the statutory figure against the linked source and the ORCA figure as a contract-weighted average.'
+        + _scope625
         + '</div>'
       : (sourcedCount > 0
-        ? '<div style="margin-top:8px;font-size:11px;color:var(--muted);">✓ ' + (sourcedCount === 1 ? 'The 1 independently sourced parameter matches' : 'All ' + sourcedCount + ' independently sourced parameters match') + ' the rate stated in the cited source.' + _coverage601 + '</div>'
+        ? '<div style="margin-top:8px;font-size:11px;color:' + (_missInvented.length ? 'var(--orange)' : 'var(--muted)') + ';">'
+          + (_missInvented.length ? '\u26a0 ' : '\u2713 ')
+          + (sourcedCount === 1 ? 'The 1 independently sourced parameter matches' : 'All ' + sourcedCount + ' independently sourced parameters match')
+          + ' the rate stated in the cited source.' + _coverage601 + _scope625 + '</div>'
         : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
-    const reconNote = _mainNote + _conflictNote601 + _unsourcedNote601 + _bulkNote + _sharedNote;
+    const reconNote = _mainNote + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _bulkNote + _sharedNote;
 
     // v500: Parameter | ORCA Value | Statutory (cited source) | Source
     // Previously the Source badge sat next to the contract average and read as though the primary
