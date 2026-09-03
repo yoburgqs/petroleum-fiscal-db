@@ -24116,3 +24116,131 @@ Regression checked in the same walk: at `>=2` both charts and the notice come ba
 
 ## Friction
 Side-by-Side loads with an example trio already selected (Norway / UK / Netherlands), so the first thing any analyst with their own countries in mind must do is get rid of it. `renderCompare()` has an early return at `compareList.length < 2` — and it tore down **one** of the t
+
+---
+## Cycle 525 Log — 2026-09-03 15:58
+- Test before: 262 PASS / 0 FAIL / 0 WARN (suite's own report, run this cycle)
+- Test after: 262 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- JS syntax gate: PASS (11 inline blocks, 0 errors) · Pixel gate: PASS
+- Shipped as **v621**, pushed (cb3cf56).
+
+> Note on the "236 PASS" carried in the cycle prompt: `runtime_comprehensive.js`
+> reports **262** when actually executed. 236 is a stale figure being handed
+> forward. The number above is read from `/tmp/runtime_test_report.txt`
+> (2026-09-03T15:54:47Z), not assumed — per the directive's finalization item 1.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** —
+the stalest of the six (524 was T3, 523 T6, 522 T4, 521 T1, 520 T5, 519 T2).
+
+## Friction
+Cold load, no sessionStorage, Country Profile tab. Indonesia auto-loads. Scroll to
+the **4-Price Sensitivity table** — the artifact sitting directly above the
+"Copy as IC table" button, i.e. the thing that becomes the IC memo.
+
+Its **BREAKEVEN column showed `…` in all four rows**, and the footnote beneath it
+read *"Breakeven = price at which contractor NPV = 0. Loading from database…"*.
+Measured at 2s, 8s and 20s: unchanged, with zero JS errors. It never resolves.
+
+`fetchCountryProductionChart()` (`index.html:38557`) cleared that text on exactly
+two paths — a solved breakeven, and the three state-monopoly floor artifacts
+added at v564. There was no path for the ordinary case: the fetch **succeeds**,
+`four_price_table` is present, and every `avg_breakeven_usd` in it is `null`.
+`be75` stays null, `beFloorOnly` stays false, neither branch fires, and the
+spinner text stands.
+
+Scale, measured against the payloads on disk rather than assumed:
+
+| state | countries (of 185) |
+|---|---|
+| solved breakeven | 67 |
+| floor artifact (handled at v564) | 3 |
+| **null — stuck on "Loading…"** | **116** |
+
+That includes the cold-load default (**Indonesia**) and **7 of the 9** quick-load
+benchmark buttons: Iraq, Angola, USA, UAE, Iran, Nigeria, Libya.
+
+Worst part: the **same page already knew**. The Fiscal Mechanics card prints
+"BREAKEVEN — no prod data" and the headline strip prints "BE: n/a". Two elements
+reported the absence as settled while a third announced a fetch that had already
+finished. Classic *stable but wrong* — exit code clean, no error, permanently
+untrue.
+
+## Change
+Every path now reaches a terminal state, and **absence and unknown are kept
+apart** instead of collapsing into one spinner:
+
+- **Fetch succeeded, nothing solved** → cells `—`, footnote *"No breakeven on file
+  for {country}"*, saying the lookup is finished and the blank is not $0 and not
+  an uneconomic regime.
+- **Fetch failed / no payload** → cells `?`, footnote *"Breakeven unavailable …
+  treat this as unknown"*. It never reports an absence it did not observe.
+- **12s watchdog** so a fetch that never settles at all still resolves the text.
+- Solved values and the v564 floor path are untouched — the settle helper only
+  overwrites cells still holding the `…` placeholder.
+
+The no-breakeven footnote additionally states a **bound the analyst can defend**,
+read off the four NPV figures already on screen: NPV positive at every modelled
+price → breakeven **below $50/bbl**; negative at every price → **above $125**;
+sign change → **bracketed** by those two prices. Arithmetic on displayed numbers,
+not a new model output. Where the NPV column is incomplete the bracket is omitted
+rather than guessed.
+
+**It deliberately does not repeat the "no prod data" cause** the Fiscal Mechanics
+card gives, because the data refutes it. Breakeven is on file for 67 countries
+whose median take is **21.3%** and which are mostly non-producers (Nauru, Tuvalu,
+Palau, Micronesia); it is absent for Indonesia, Iraq, Angola, Nigeria, Brazil,
+Canada and the USA, which carry **more** production coverage (15.4% vs 7.1%).
+The real driver is not recorded anywhere this page can read, so the footnote
+states the absence and stops rather than inventing a defensible-sounding reason.
+
+## Result
+An analyst screening Indonesia at $75 now reads *"No breakeven on file for
+Indonesia … contractor NPV is positive at every modelled price, including $334M
+at the $50/bbl downside — so breakeven sits **below $50/bbl**"* and can put a
+defensible downside bound into the IC memo. Before, they sat in front of a
+spinner waiting for a number that was never coming — on the country the tab loads
+by default, next to the button that copies the table into their memo.
+
+## Mobile (Step 5b)
+- **Zero horizontal scroll on all 9 tabs at 1920 / 1440 / 1280 / 1024 / 768 / 390**;
+  `scrollWidth == clientWidth` at every width. 0 page errors at every width.
+- One control added — the "run Scenario Builder →" link in the footnote. It
+  measured **11px** at `pointer: coarse`, failing the 24px floor. Given **its own
+  rule** inside the v612 MOBILE LAYER (`.cp-be-cta`, 36px) rather than widening
+  the shared `td a` selector, which already works where it is applied. Desktop
+  still measures 11px, confirming the rule is coarse-scoped and changes nothing
+  with a mouse.
+
+## Verification
+- JS syntax gate **PASS** — 11 inline blocks, 0 errors
+- `runtime_comprehensive.js` **ran this cycle** — 262 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Pixel gate **PASS** — no surface worse than baseline
+- Cold Playwright walks: Indonesia, Iraq, Guyana (absent state), **Norway
+  ($29/bbl, solved value preserved)**, **Saudi Arabia (v564 floor text
+  preserved)**; plus forced sign-change, all-negative, partial-NPV and
+  aborted-API branches, and an HTML-escaping check on the country name.
+- The console 404 (service-worker registration) was confirmed **pre-existing** by
+  replaying the unmodified file — not introduced here.
+
+## Found on the same walk, not fixed
+- **The BREAKEVEN column header says "COMPUTED AT $75 ONLY", yet Norway, Australia
+  and the UK print the same value in all four rows** ($29/$29/$29/$29). One number
+  repeated four times reads as four measurements. Collapsing it to a single cell
+  is a table-shape decision, not a stuck-state bug.
+- **"no prod data" in the Fiscal Mechanics card is not supported** by the payloads
+  (see above). Left alone this cycle — correcting it is a separate change to a
+  different element, and the footnote now warns the analyst off it.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip.
+No page-sub paragraph, amber instructional banner, routing hint or "How to read"
+block; no SbS card wrapper; no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown; Home "More tools" still
+collapsed. **No tab added, removed or reordered.** No take, NPV, rank, score,
+band, tier colour or pill value altered. The **v612 MOBILE LAYER** was extended,
+never narrowed or deleted; `#reference-panel` `translateX` untouched; no
+`min-width: max-content` marker added or removed. v371/v373, v430, v449, v451,
+v452, v489, v593, v600, v606, v612, v614 and every locked item through v620
+intact. Version sweep **v620 → v621** across the 5 display sites, done silently
+at the end; the 1 remaining `v620` string is a historical code comment and is
+left alone. It is **not** the deliverable.
