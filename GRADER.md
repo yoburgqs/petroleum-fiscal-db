@@ -24394,3 +24394,99 @@ display sites, done silently at the end. It is **not** the deliverable.
 
 ## Friction
 Cold load → Fiscal Compare, which auto-runs at $75/bbl deepwater. The screen ranks **#1 USA, #2 Somalia, #3 Australia**, and prints "—" for the 117 `GENERIC DEFAULT` rows, parking them below the ranked block — v563 did that deliberately, because their take is the mechanic's placeholder constant and came from n
+
+---
+## Cycle 527 Log — 2026-09-03 — v623
+
+**Task:** **T1 — "Which countries should even be on my screening list?"**
+(rotation: 526 was T5, 525 T2, 524 T3, 523 T6, 522 T4, 521 T1 — T1 was stalest
+after T4/T1; picked T1, not repeated from the previous cycle.)
+
+**Friction.** Walked the Screener cold at 1440 — no sessionStorage, no
+localStorage, straight to `#tab-btn-tscreener`. The default view is good: 185
+rows, verified-production 22 first, a labelled divider, an honest count line.
+The worst moment is two surfaces that both answer the T1 question backwards.
+
+1. **The `Breakeven ($/bbl)` column** (`<th>` in `#tbl-screener` thead; cell in
+   `renderScreener()`). `formatBreakeven()` collapses every value under $50 to
+   the literal `'<$50'`, and all 65 modelled breakevens in `country_data.json`
+   fall between **$27 and $34**. So across 185 rows the column had exactly
+   **two** rendered states: `<$50` (65 rows) and `—` (120 rows). Measured on the
+   live page: **63 of those 65 are PROXY countries with no verified field
+   production** — Vanuatu, Bahamas, Montenegro, Faroe Islands, Moldova, Sweden,
+   Bulgaria, Belgium, Paraguay — while **20 of the 22 countries that DO have
+   verified production printed a blank**: USA, Canada, Norway, UK, Brazil,
+   Angola, Nigeria, Iraq, Indonesia, Malaysia, Kazakhstan, Azerbaijan,
+   Colombia, Mexico, India, Oman, Libya, Ecuador, China, Saudi Arabia.
+
+2. **Advanced Filters → "Breakeven Coverage → Measured breakeven only."**
+   Selecting it returned 65 countries headed by Argentina, Australia, **Vanuatu,
+   Bahamas, Montenegro, Faroe Islands, Moldova, Sweden**. Its own tooltip said a
+   shortlist built with it "can be defended on cost."
+
+The two contradicted each other on screen: the cell tooltip asserted "it is not
+screened on" while the radio screened on it. Three prior cycles each noticed the
+column was inert and answered with more prose — v537 rewrote the legend around
+it, v568 removed the Max Breakeven slider and rewrote the legend again, v587
+exempted it from sorting *because* the legend says it "cannot rank two rows."
+
+**Change.**
+- Breakeven column **removed** from `#tbl-screener` — header and cell. 12 → 11
+  columns; all three Screener `colspan="12"` → `"11"`.
+- "Breakeven Coverage" radio group **removed** from Advanced Filters, together
+  with the `beCat` read, the filter test, its `activeCount` entry, its count-line
+  note, its export-criteria line, its zero-result diagnostic hint, its live size
+  captions, its reset handler, its change listener and its now-dead CSS.
+- The legend under the table now **leads with the axis that works** — Contractor
+  NPV @$50, modelled 185/185, % kept (−14% to +75%, median 45%), the axis
+  Downside Resilience screens on — then states in one line why breakeven is
+  neither a column nor a filter here and where it still lives.
+- `formatBreakeven()` and `_beIsTested()` untouched. Fiscal Compare, Country
+  Profile and the Breakeven Map still render breakeven; the Screener export still
+  carries `Breakeven_bbl` beside an explicit `Breakeven_Tested` flag.
+
+**Result.** An analyst building a screening list can no longer read a low-price
+endorsement off a column with two states, and can no longer reach for a filter
+that returns Vanuatu and the Bahamas while deleting the USA and Norway. Downside
+is answered by the one column measured for all 185.
+
+**Verification.**
+- JS syntax gate **PASS** — 11 inline blocks, 0 errors.
+- `runtime_comprehensive.js` **RAN this cycle** against the local tree —
+  **261 PASS / 0 FAIL / 1 WARN**. The WARN is the known environment-only `sw.js`
+  404 (registered at the GitHub-Pages path, absent under a local server root).
+- Pixel gate **PASS** — no surface worse than baseline, 10 tabs × 5 viewports.
+- Screener re-walked: 11 headers / 11 cells / divider colspan 11. All 11 presets
+  return the same counts as before the change (iochurdle 15, sweetspot 143,
+  pscafrica 31, deepwater 11, lowrisk 141, downsidereturns 153, highevidence 35,
+  rfactor 70, atlanticfrontier 6, frontiermarkets 56, downsideresilience 24).
+  All 8 sortable headers still sort; Reset All still resets; the zero-result
+  state renders at colspan 11 with its diagnostic list; `_scExportRows()` still
+  returns 185 × 20 with `Breakeven_bbl` and `Breakeven_Tested` intact.
+- **Mobile (Step 5b):** zero horizontal scroll on all 10 tabs at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**, `scrollWidth == clientWidth` at every
+  width, **0 page errors at every width**. No control added; two removed. No
+  control touched, so the 24px `pointer: coarse` floor is unchanged this cycle.
+
+**Found on the same walk, not fixed.**
+- `Two-Price Return Screen` is labelled "NPV ≥$100M @$75 · NPV ≥$500M @$50" —
+  a **higher** floor at the lower price, which makes the $75 leg redundant. It
+  returns 153 of 185. Whether that asymmetry is intended is a design call on a
+  named preset, not a bug fix.
+- `Low Take · Positive NPV` (143/185), `Low-Risk Stable` (141/185) and
+  `Two-Price Return Screen` (153/185) each keep 77–83% of the universe. The count
+  line discloses it and the proxy split is stated, but three of eleven "screens"
+  do not narrow much.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip;
+two were deleted with their controls. No page-sub paragraph, amber instructional
+banner, routing hint or "How to read" block; no SbS card wrapper; no visible
+Explorer chip row. Screener advanced filters still collapsed, presets still a
+dropdown; Home "More tools" still collapsed. **No tab added, removed or
+reordered.** No take, NPV, rank value, score, band, tier colour or pill altered
+anywhere on screen. The **v612 MOBILE LAYER** was not touched, narrowed or
+deleted; `#reference-panel` `translateX` untouched; no `min-width: max-content`
+marker added or removed. v371/v373, v430, v449, v451, v452, v489, v563, v580,
+v593, v600, v602, v606, v612, v614, v616 and every locked item through v622
+intact. Version sweep **v622 → v623** across the 5 display sites, done silently
+at the end. It is **not** the deliverable.
