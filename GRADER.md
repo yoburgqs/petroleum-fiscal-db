@@ -24381,3 +24381,16 @@ touched, narrowed or deleted; `#reference-panel` `translateX` untouched; no
 v452, v489, v563, v580, v593, v600, v602, v606, v612, v614, v616 and every
 locked item through v621 intact. Version sweep **v621 → v622** across the 5
 display sites, done silently at the end. It is **not** the deliverable.
+
+---
+## Cycle 526 Log — 2026-09-03 11:56
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 526 complete and pushed (v622).
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (stalest; 525 was T2, 524 T3, 523 T6, 522 T4, 521 T1, 520 T5)
+
+## Friction
+Cold load → Fiscal Compare, which auto-runs at $75/bbl deepwater. The screen ranks **#1 USA, #2 Somalia, #3 Australia**, and prints "—" for the 117 `GENERIC DEFAULT` rows, parking them below the ranked block — v563 did that deliberately, because their take is the mechanic's placeholder constant and came from n
