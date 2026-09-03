@@ -25006,3 +25006,138 @@ It is **not** the deliverable.
 
 ## Friction
 The four Govt Take rows carry a highest/lowest ordering marker. `_cmpRankTake` (`index.html:25396`) gated that ordering on **mechanic only** — it drops state monopolies, PRRT and fee-blended columns — and then ranked whatever survived at full confidence, including columns for which ORCA holds **no verified field pr
+
+---
+## Cycle 532 Log — 2026-09-03 23:55
+- Test before: 235 PASS / 0 FAIL / 1 WARN (local tree; 236/0/0 deployed)
+- Test after: 235 PASS / 0 FAIL / 1 WARN — RAN this cycle, zero delta
+- JS errors: 0
+- Summary: Cycle 532 complete and pushed (v627).
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(stalest: 531 was T3, 530 T6, 528 T4, 527 T1, 526 T5, 525 T2)
+
+## Friction
+Walked cold — no sessionStorage, no localStorage — into Country Profile, which
+auto-loads Indonesia, then through USA, Norway, Colombia, Cyprus, Iraq, Saudi
+Arabia and six others.
+
+The "attractive" half of T2 is answered well. The **"can I defend that"** half
+ends at one place: `fetchCountryContracts()` (`index.html:38379`), which renders
+**TOP CONTRACTS RANKED BY PRODUCTION · ALL DCF @ $75/BBL** — the only
+contract-level evidence anywhere on the page, and the section the headline points
+at when it says *"Defend on the take and its evidence tier, not on the NPV."*
+
+Two of its seven columns contradicted that headline on the same screen.
+
+**NPV.** Every NPV this platform reports is one standardized Deepwater project
+($1.2B capex · 294 MMbbl · $15/bbl opex) run through a country's terms — one
+profile for all 185 countries, which is the whole reason they are comparable. The
+per-contract column was **not on that profile and declared no basis of its own**,
+under a header that reads "ALL DCF @ $75/BBL". Three findings, each checked
+against the API payloads rather than inferred:
+
+  - It moves with each block's field size, so inside one table it ranks how big a
+    block is, not how hard its terms are. Colombia: **8.0% take → −$731M** and
+    **47.4% take → +$1,528M** — backwards against the axis the page asks the
+    analyst to screen on. Indonesia: 42.5% → −$28M, 76.4% → +$2,586M.
+  - On **128 of the 541 rows** platform-wide that carry both production and NPV,
+    it is not on the block's own field either: the stated NPV **exceeds that
+    block's entire gross revenue at $75/bbl**.
+  - **The USA is 50 of 50 such rows.** 47 blocks of 0.1–0.44 MMbbl each show
+    −$607M to −$758M — about **30x their own gross revenue** — at a **12.5%**
+    government take, printed directly beneath *"23.4% govt take @$75 —
+    investor-friendly tier … Highly contractor-favorable … top tier for IOC
+    capital allocation"* and *"Clears the 10% WACC at $75 ($3.3B)"*.
+
+    That is the worst moment in the T2 walk. An analyst who reaches it either
+    stops trusting the DCF and leaves, or misses it and pastes **$3.3B** into an
+    IC memo that the evidence table beneath it puts at **−$700M a block**.
+
+**IRR.** The same per-contract IRRs **v516 already removed from every other slot
+on this page** (mean-of-contract, median 333% platform-wide). Indonesia printed
+**100.2%** and **106.8%**; Cyprus printed **−100.0%** on 25 rows. The headline
+three sections above answers IRR with *"→ Model in Scenario Builder"*; this table
+answered it with 106.8%.
+
+## Change
+Both columns are **removed** from the Country Profile contract table — header
+cells and row cells. In their place, `cpContractColNote()` renders a note under
+the table that is computed per country, not written:
+
+  - it names the standardized profile behind the headline NPV **using this
+    country's own two figures** ("The $3.3B at $75 and $1.4B at $50 …");
+  - it says why the per-contract numbers were not on it;
+  - where it applies, it **counts this country's impossible rows** — USA reads
+    *"50 of the 50 rows here that carry production stated an NPV larger than that
+    block's entire gross revenue at $75/bbl"*; Colombia reads 28 of 41; Norway
+    and Cyprus, which have none, get no such clause;
+  - the IRR clause fires only for the **63 countries** that carried an IRR;
+  - it routes: Take% is the column on one stated basis across all rows and is
+    what the headline says to defend on; for a project NPV or IRR at your own
+    capex and opex, **run Scenario Builder →**.
+
+Same rule as **v451** (Govt NPV off Fiscal Compare), **v515/v517** (country IRR)
+and **v568** (breakeven ceiling): a column that cannot state its own basis is
+removed, and where the question IS answered is stated in its place. Take%,
+operator, mechanic, production and key rate stay — every one a fact about the
+contract, on one basis across all rows.
+
+## Result
+The analyst who opens USA — one of the nine quick-load benchmarks on this tab's
+own empty state — no longer scrolls from *"Highly contractor-favorable"* into 47
+rows of −$700M with nothing on the page reconciling them. The contract table now
+carries only columns that mean the same thing in every row, so it can be read as
+the evidence the headline says to defend on; the NPV question is routed to the
+headline pair with its profile stated; and the project question is routed to
+Scenario Builder, where the analyst supplies the capex and opex that make an NPV
+mean something.
+
+## Verify
+- **JS syntax gate:** PASS — all 11 inline script blocks, `node --check`, re-run
+  after the version sweep.
+- **Runtime suite: RAN this cycle** against the local tree
+  (`TEST_URL=http://localhost:8899/index.html`). **235 PASS / 0 FAIL / 1 WARN.**
+  The pre-change build was re-run under identical conditions and scored the same
+  — **zero test delta**. The 1 WARN is the local server's `sw.js` 404,
+  pre-existing and verified by the baseline re-run, not assumed.
+- **Pixel gate:** PASS — "no surface got worse than baseline", run with
+  `TEST_URL` pointed at the local tree.
+- **Step 5b mobile:** zero horizontal scroll across 8 tabs at **1920 / 1440 /
+  1280 / 1024 / 768 / 390**, `scrollWidth == clientWidth` at every width, **0
+  page errors at every width**. The new inline link first measured **12px** under
+  `pointer: coarse` — a Step 5b violation — and was given the page's existing
+  `.cp-be-cta` tap target. Re-measured: **3 controls under 24px before the
+  change, 3 after**, the same three, all pre-existing (two empty anchors and a
+  source badge). The change adds **0 controls under 24px**.
+
+## Found on the same walk, not fixed
+- **Saudi Arabia's contract table never resolves** — it sits at "Loading from
+  API…" indefinitely. Confirmed **pre-existing**: identical on a re-run of the
+  pre-change build at the same URL, so not from this change. `saudi-arabia.json`
+  and `saudi_arabia.json` both exist on disk, so this is not a missing payload.
+  Next cycle's T2 or T6 candidate.
+- **Indonesia's contract table lists the same asset many times over.** Of the top
+  30 rows, 13 are "Rokan" variants at an identical 42.5% / −$28M, and 7 more at
+  an identical 59.6%. The dedupe is upstream in the harvest, not in the UX.
+- **The Evidence Chain and the R-factor ladder still print three different
+  government profit-oil shares for Indonesia** — 64.39% in the table, "a flat
+  71.2%" in the ladder's own warning text, and 71 pre-filled into Scenario
+  Builder. The page already warns that two of them disagree; it does not know
+  about the third.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip element. No page-sub paragraph, amber
+instructional banner, routing hint or "How to read" block; no SbS card wrapper;
+no visible Explorer chip row. Screener advanced filters still collapsed, presets
+still a dropdown; Home "More tools" still collapsed. **No tab added, removed or
+reordered.** No take, rank, reform diamond, band or tier colour altered; the
+headline NPV figures are untouched — only the per-contract column was removed.
+The **v612 MOBILE LAYER** was not touched, narrowed or deleted; `#reference-panel`
+`translateX` untouched; no `min-width: max-content` marker added or removed.
+v371/v373, v430, v449, v451, v452, v489 and every locked item through v626 intact.
+`cpRecordObsSpread()` reads only `take`, so the v559 dispersion reconciliation is
+unaffected. Version sweep **v626 → v627** across the 4 display sites, done
+silently at the end; historical `v626` references in code comments deliberately
+left alone. It is **not** the deliverable.
