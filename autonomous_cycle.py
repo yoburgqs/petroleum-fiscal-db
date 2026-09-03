@@ -23,6 +23,7 @@ STATE_FILE = REPO / "CYCLE_STATE.json"
 GRADER_FILE = REPO / "GRADER.md"
 DIRECTIVE_FILE = REPO / "DIRECTIVE.md"   # small, read IN FULL — the actual steering doc
 TEST_FILE = OFFICE / "tools" / "petroleum" / "tests" / "runtime_comprehensive.js"
+PIXEL_FILE = OFFICE / "tools" / "petroleum" / "tests" / "pixel_audit.js"
 LOG_FILE = REPO / "cycle_log.txt"
 INTERVAL = 1800  # 30 minutes
 
@@ -243,6 +244,85 @@ def update_cycle_log(state, test_before, test_after, summary):
 
 # ─── Step 9: Git push ─────────────────────────────────────────────────────────
 
+# ─── Step 7b: the pixel gate ──────────────────────────────────────────────────
+# runtime_comprehensive asserts the DOM at ONE viewport and against the LIVE
+# url. Two consequences it cannot escape: it cannot see a layout that renders
+# off-screen or under something else, and it can only ever judge what has
+# ALREADY shipped. Both gaps are load-bearing here — v579 left mobile clean and
+# by v611 four screens scrolled sideways with 15 overflowing elements on Reform
+# Risk alone, green the whole way.
+#
+# So this runs pixel_audit.js against the LOCAL working tree over a throwaway
+# http server, BEFORE git_push(). A cycle that moves a control off-screen, under
+# another element, or below 24px on a phone does not reach the client-facing URL.
+#
+# file:// will not do: the page fetches country_data.json and reform_history.json,
+# and a file:// origin fails those, so the load wait never resolves.
+#
+# The gate is regression-relative (see pixel_audit.js header) — flat counts pass,
+# so ordinary cycle work is not blocked. PIXEL_GATE=off disables it.
+
+def run_pixel_gate():
+    log("Step 7b: Pixel audit against the local tree (pre-push gate)...")
+    if os.environ.get("PIXEL_GATE") == "off":
+        log("  SKIPPED — PIXEL_GATE=off")
+        return {"ok": True, "skipped": True, "summary": "skipped by PIXEL_GATE=off"}
+    if not PIXEL_FILE.exists():
+        # Never report a pass it cannot prove.
+        log(f"  UNKNOWN — {PIXEL_FILE} missing; cannot judge pixels this cycle")
+        return {"ok": False, "summary": f"pixel_audit.js missing at {PIXEL_FILE}"}
+
+    port = 8877
+    srv = None
+    try:
+        srv = subprocess.Popen(
+            [sys.executable, "-m", "http.server", str(port), "--bind", "127.0.0.1"],
+            cwd=str(REPO), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        time.sleep(2.5)
+        if srv.poll() is not None:
+            log(f"  UNKNOWN — local http server exited immediately (port {port} busy?)")
+            return {"ok": False, "summary": f"could not serve the tree on port {port}"}
+
+        env = os.environ.copy()
+        env["NODE_PATH"] = str(REPO / "node_modules")
+        env["TEST_URL"] = f"http://127.0.0.1:{port}/index.html"
+        out = run(f"node {PIXEL_FILE}", cwd=REPO, timeout=900, env=env)
+    finally:
+        if srv and srv.poll() is None:
+            srv.terminate()
+            try:
+                srv.wait(timeout=10)
+            except Exception:
+                srv.kill()
+
+    if out.startswith("TIMEOUT") or out.startswith("ERROR:"):
+        log(f"  UNKNOWN — audit did not complete: {out[:120]}")
+        return {"ok": False, "summary": f"audit did not complete: {out[:200]}"}
+
+    hard = [l.strip() for l in out.splitlines() if "never acceptable" in l]
+    regr = [l.strip() for l in out.splitlines() if " -> " in l and "::" in l]
+    first = "No baseline existed" in out
+    ok = "PIXEL GATE PASS" in out or (first and not hard)
+
+    if ok:
+        # A first run compares against nothing. Reporting that as "PASS vs
+        # baseline" would be the same lie as cycles 404/405 reporting the
+        # previous run's numbers as their own.
+        if first:
+            log("  PIXEL BASELINE CREATED — nothing to compare against yet; "
+                "the next cycle is the first one actually gated")
+            return {"ok": True, "summary": "pixel baseline created (first run, not yet a gate)"}
+        log("  PIXEL GATE PASS — no surface got worse than baseline")
+        return {"ok": True, "summary": "pixel gate PASS"}
+
+    log(f"  PIXEL GATE FAIL — {len(hard)} hard-rule, {len(regr)} regression(s)")
+    for l in (hard + regr)[:10]:
+        log(f"    {l}")
+    return {"ok": False, "hard": hard, "regr": regr,
+            "summary": f"{len(hard)} hard-rule failure(s), {len(regr)} regression(s): "
+                       + "; ".join((hard + regr)[:6])}
+
+
 def git_push():
     log("Step 9: Pushing to GitHub Pages...")
     out = run("git push origin main", cwd=REPO)
@@ -372,13 +452,31 @@ def main():
     # Step 7
     test_after = rerun_playwright()
 
+    # Step 7b — pixel gate on the LOCAL tree, before anything reaches the client
+    # URL. A layout regression is the one class of defect this loop has shipped
+    # repeatedly while every suite stayed green, so it gets a gate rather than a
+    # report: on failure the cycle does NOT push.
+    pixel = run_pixel_gate()
+    claude_summary = f"{claude_summary}\n\nPixel gate: {pixel['summary']}"
+
     # Step 8
     update_cycle_log(state, test_before, test_after, claude_summary)
 
     # Step 9
-    git_push()
+    if pixel["ok"]:
+        git_push()
+    else:
+        log("Step 9: PUSH BLOCKED — pixel gate failed. The work is committed "
+            "locally and is NOT live; the next cycle re-runs the gate.")
+        claude_summary += (
+            "\n\n*** PUSH BLOCKED — this cycle's work is NOT live. ***\n"
+            "The commit is in the local tree only. Fix the layout regression, or "
+            "if the change is intended re-baseline with\n"
+            "  node ~/office/tools/petroleum/tests/pixel_audit.js --update-baseline\n"
+            "then the next cycle pushes it.")
 
-    # Step 10
+    # Step 10 — one email either way. Two sends for one cycle is how a mailbox
+    # stops being read.
     send_email(cycle_n, test_before, test_after, claude_summary)
 
     # Update state
