@@ -24259,3 +24259,125 @@ left alone. It is **not** the deliverable.
 **Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* (stalest of the six; 524 was T3, 523 T6, 522 T4, 521 T1, 520 T5, 519 T2)
 
 **Friction.** Cold load → Country Profile → Indonesia auto-loads. Scroll to the **4-Price Sensitivity table** — the artifact sitting directly above the "Copy as IC table" button, i.e. the thing that becomes the memo. Its BREAKEVEN column showed `…` in all four 
+
+---
+
+## Cycle 526 — v622
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."*
+(stalest of the six; 525 was T2, 524 T3, 523 T6, 522 T4, 521 T1, 520 T5)
+
+### Friction
+Cold load, no sessionStorage, no localStorage → **Fiscal Compare**, which
+auto-runs at $75/bbl deepwater with no filters. The screen ranks **#1 USA
+(23.4%), #2 Somalia (36.9%), #3 Australia (38.5%)** and prints `—` in the `#`
+column for the 117 `GENERIC DEFAULT` rows, partitioning them below the ranked
+block. That is v563, and it is deliberate: their take is the standard constant
+for the mechanic and came from no country's fiscal record. The **⎘ Copy for IC
+Memo** button in the same toolbar reproduces that order faithfully.
+
+The button an inch to its left does not. **Export XLSX** — the artifact the
+Quick Start calls *"Export XLSX for IC attachment"*, the one thing here that
+leaves the platform and is read by people who never see an on-screen caveat —
+ranked them anyway. `exportFCResults()`'s `_xlRankable()` (index.html:39073)
+excluded only state monopolies:
+
+```js
+const _xlRankable = function(x) { var v = _xlDbTake(x); return v != null && !isStateMonopoly(v); };
+```
+
+so every generic-default row was ranked on its placeholder take and sorted to
+the top of the sheet. Measured on the live build, cold, $75, deepwater, no
+filters:
+
+| | #1 | #2 | #3 | … | USA |
+|---|---|---|---|---|---|
+| screen / Copy for IC Memo | USA 23.4 | Somalia 36.9 | Australia 38.5 | | **#1** |
+| Export XLSX | Vanuatu 5.0 | Bahamas 10.0 | Montenegro 10.5 | | **#61 of 185** |
+
+**All 30 of the workbook's top 30 rows were `GENERIC DEFAULT`** — Vanuatu, the
+Bahamas, Montenegro, Greenland, the Faroe Islands, Moldova, Romania, Sweden …
+each carrying the standard 10%-royalty / 25%-CIT Concession placeholder, under
+a column header reading `Rank (database take @$75)`, with an autofilter over
+the top and nothing in the row itself to say the number was not a placing. The
+`Terms_Basis` column six columns to the right said `GENERIC DEFAULT … not
+citable`, but rank and row position are what an IC reader looks at first, and
+they said the opposite.
+
+Two artifacts produced by two adjacent buttons on the same toolbar disagreed
+about which countries screen best. The analyst reads the screen, exports the
+workbook, and attaches an appendix whose shortlist he never saw.
+
+### Change
+- `_xlRankable()` now also excludes `termsBasis === 'default'` — the same
+  exclusion `_tieVal()` has applied on screen since v563.
+- The sort is a three-tier partition: **tier 0** rows modelled on their own
+  terms (ranked, database take ascending) → **tier 1** generic defaults
+  (unranked, still ordered on database take) → **tier 2** state monopolies. The
+  ranked block is a strict prefix of the sheet.
+- A generic row's `Rank` cell reads **`— not ranked (generic mechanic default,
+  not this country's terms)`** instead of a number. Monopolies keep their
+  existing `n/c` string; the two states are no longer conflated.
+- Its **database take, breakeven and tier are still exported and still
+  citable** — nothing was removed. Only the claim that it placed 1st is
+  withdrawn.
+- The **Methodology** sheet gained a paragraph under "Which columns to cite"
+  stating the rank convention, and stating plainly that the sheet always orders
+  the ranked block on database take whatever sort the screen was on — so the
+  workbook does not over-claim agreement it only has on the default sort.
+
+### Result
+The analyst who reads Fiscal Compare, clicks Export XLSX and drops the file
+into the IC appendix now hands over a shortlist headed by **USA, Somalia,
+Australia, Madagascar, Egypt** — the same 65 countries, in the same order, that
+were on the screen he read it from — instead of one headed by **Vanuatu, the
+Bahamas, Montenegro, Greenland and the Faroe Islands**, five rows with no
+country-specific fiscal terms in the database at all.
+
+### Verification
+- **JS syntax gate PASS** — 11 inline blocks, 0 errors.
+- **`runtime_comprehensive.js` RAN this cycle** against the local tree —
+  **261 PASS / 0 FAIL / 1 WARN**. The single WARN/JS error is the service-worker
+  registration 404: `sw.js` is registered at the GitHub-Pages path
+  `/petroleum-fiscal-db/sw.js`, which does not exist under a local server root.
+  Confirmed environment-only — `curl http://127.0.0.1:8899/sw.js` returns 200.
+- **Pixel gate PASS** — no surface worse than baseline, 10 tabs × 5 viewports.
+- **Export re-parsed with openpyxl** under four conditions. Ranked block is a
+  strict prefix in all four; the ranked set equals the screen's own-terms set in
+  all four:
+
+  | condition | sheet ranks | screen ranked | same set | same order |
+  |---|---|---|---|---|
+  | cold default $75 | 1…65 | 65 | yes | **yes** |
+  | $125 | 1…65 | 65 | yes | **yes** |
+  | Africa + NPV sort | 1…29 | 29 | yes | no — sheet ranks on take by design (v529), stated in the header and now in Methodology |
+  | A–Z sort | 1…65 | 182 positional | n/a | no — A–Z numbers rows sequentially; it is an index, not a ranking |
+
+- **Mobile (Step 5b):** zero horizontal scroll on all 10 tabs at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**, `scrollWidth == clientWidth` at
+  every width, **0 page errors at every width**. No control added. The control
+  touched, `#fc-export-btn`, measures **44px** at `pointer: coarse` — above the
+  24px floor and unchanged by this cycle.
+
+### Found on the same walk, not fixed
+- The **`Copy for IC Memo` clipboard header is a single ~1,800-character
+  paragraph.** Every sentence in it is load-bearing and correct, but pasted into
+  Word it lands as one unbroken block above the table. Breaking it into labelled
+  lines is a formatting decision about a locked artifact, not a stuck state.
+- **Export XLSX ignores the on-screen sort.** Deliberate since v529 and now
+  documented, but an analyst who sorts by NPV, exports, and expects the sheet in
+  that order will be surprised. Changing it would overturn v529's ranking basis
+  and is a design call, not a bug fix.
+
+**STILL LOCKED — nothing touched.** No new FAQ (still **974**). No new tooltip.
+No page-sub paragraph, amber instructional banner, routing hint or "How to read"
+block; no SbS card wrapper; no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown; Home "More tools" still
+collapsed. **No tab added, removed or reordered.** No take, NPV, rank value,
+score, band, tier colour or pill altered anywhere on screen — the entire
+index.html diff is inside `exportFCResults()`. The **v612 MOBILE LAYER** was not
+touched, narrowed or deleted; `#reference-panel` `translateX` untouched; no
+`min-width: max-content` marker added or removed. v371/v373, v430, v449, v451,
+v452, v489, v563, v580, v593, v600, v602, v606, v612, v614, v616 and every
+locked item through v621 intact. Version sweep **v621 → v622** across the 5
+display sites, done silently at the end. It is **not** the deliverable.
