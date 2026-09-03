@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v622</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v623</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -311,10 +311,7 @@ tbody td { padding: 6px 10px; white-space: nowrap; }
 .screener-extra { display:flex; flex-wrap:wrap; gap:18px; margin-top:14px; padding-top:14px; border-top:1px solid var(--border); }
 .screener-filter-block { display:flex; flex-direction:column; gap:8px; }
 .screener-filter-block .filter-lbl { color:var(--muted); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; }
-.be-radio-group { display:flex; gap:6px; flex-wrap:wrap; }
-.be-radio-group input[type=radio] { display:none; }
-.be-radio-group label { background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; font-size:12px; font-weight:600; padding:4px 10px; transition:.15s; }
-.be-radio-group input[type=radio]:checked + label { background:rgba(176,104,0,.15); border-color:var(--accent); color:var(--accent); }
+/* v623 (T1): .be-radio-group removed with the Breakeven Coverage control it styled. */
 .screener-count-bar { align-items:center; display:flex; flex-wrap:wrap; gap:12px; margin-bottom:10px; }
 .ioc-checkbox-grid { display:grid; grid-template-columns:1fr 1fr; gap:5px; }
 .ioc-checkbox-grid label { align-items:center; background:var(--surface); border:1px solid var(--border); border-radius:6px; cursor:pointer; display:flex; font-size:12px; font-weight:600; gap:5px; padding:4px 10px; transition:.15s; }
@@ -1592,7 +1589,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v622</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v623</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1662,7 +1659,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v622</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v623</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1990,7 +1987,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v622';
+  return m ? m[0] : 'v623';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2065,7 +2062,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v622');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v623');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2472,21 +2469,16 @@ window.copyPlatformCitation = function(btn) {
           <label><input type="checkbox" value="Revenue Share" checked> Revenue Share</label>
         </div>
       </div>
-      <div class="screener-filter-block">
-        <!-- v537 (T1): was "Breakeven Category" — a four-way cost-band radio (All / Sub-$50 /
-             $50–$75 / $75–$100) in which none of the three real options worked. "Sub-$50"
-             returned 185 of 185 because runScreener() coerced a NULL breakeven to 0 before
-             bucketing it, so every country ORCA has never modelled a breakeven for was
-             affirmatively classified as breaking even below $50. The two upper bands returned
-             zero and structurally always will: all 65 measured breakevens in the database fall
-             between $27 and $34/bbl. Replaced by the distinction the data actually supports. -->
-        <div class="filter-lbl">Breakeven Coverage</div>
-        <div class="be-radio-group">
-          <input type="radio" id="be-all" name="be-cat" value="all" checked><label for="be-all" title="Keep all 185 countries. Those with no modelled breakeven show — in the Breakeven column; a blank is not a low breakeven.">All <span id="be-cnt-all" style="opacity:.65;font-weight:400;"></span></label>
-          <input type="radio" id="be-measured" name="be-cat" value="measured"><label for="be-measured" title="Keep only countries for which ORCA has modelled a breakeven on the standardized Deepwater profile. Everything else is removed rather than carried as a blank — so a shortlist built here can be defended on cost.">Measured breakeven only <span id="be-cnt-measured" style="opacity:.65;font-weight:400;"></span></label>
-        </div>
-        <div id="be-range-note" style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:5px;max-width:330px;"></div>
-      </div>
+      <!-- v623 (T1): the "Breakeven Coverage" radio group is REMOVED. It was presented among the
+           screening criteria and its own tooltip claimed a shortlist built with it "can be defended
+           on cost". Selecting "Measured breakeven only" returned 65 countries of which 63 hold NO
+           verified field production — Vanuatu, the Bahamas, Montenegro, the Faroe Islands, Moldova,
+           Belgium — and it removed 20 of the 22 countries that DO have verified production,
+           including the USA, Canada, Norway, the UK, Brazil, Angola, Nigeria, Iraq, Indonesia and
+           Kazakhstan. It was a data-coverage flag wearing a screening control's clothes, and on the
+           one tab whose whole job is "which countries belong on my list" it answered backwards.
+           _beIsTested() and formatBreakeven() are untouched; Fiscal Compare, Country Profile, the
+           Breakeven Map and the Screener export still use them. -->
       <div class="screener-filter-block">
         <span id="sc-ioc-label" class="filter-lbl">IOC Operator Presence</span>
         <div class="ioc-checkbox-grid" id="sc-ioc-checks" role="group" aria-labelledby="sc-ioc-label">
@@ -2553,12 +2545,14 @@ window.copyPlatformCitation = function(btn) {
                headers rendered cursor:pointer and darkened on hover. Ranking the result of a screen
                is the second half of T1 and it could not be done. Mechanics and Breakeven are left
                unsortable on purpose: Mechanics is a multi-value tag list with no order, and the
-               legend under this table states that Breakeven "cannot rank two rows" -- all 65 modelled
-               values fall in $27-$34 and the other 120 are blank. Neither carries the hand cursor now. -->
+               header. Mechanics is left unsortable on purpose: it is a multi-value tag list with no
+               order, and it does not carry the hand cursor.
+               v623 (T1): the Breakeven column this comment used to also exempt is GONE from this
+               table -- see the note under it. -->
           <th>#</th><th data-sc-sort="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z. Click again for Z–A, a third time to return to the default ranking.">Country</th><th data-sc-sort="region" tabindex="0" role="columnheader" aria-sort="none" title="Group the result set by region, A–Z. Click again to reverse, a third time to return to the default ranking.">Region</th><th>Mechanics</th>
           <th class="num" data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take</th><th class="num" data-sc-sort="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
           <th class="num" data-sc-sort="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV</th>
-          <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the $75 contractor NPV still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). Observed range &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th><th class="num">Breakeven ($/bbl)</th>
+          <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the $75 contractor NPV still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). Observed range &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th>
           <th class="num" data-sc-sort="prodcov" tabindex="0" role="columnheader" aria-sort="none" title="Production Coverage — percentage of a country's contracts that have verified field-level production data. High Prod Cov (≥30%, green) means government take is production-weighted by actual output. Low coverage means equal-weighting across contracts, which can over-represent small or inactive blocks. Click 'Prod Data Only' in Explorer to filter to high-coverage countries only.">Prod Cov <span style="font-size:10px;cursor:help;">ⓘ</span></th><th class="num" data-sc-sort="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price Swing — government take at $125/bbl minus take at $50/bbl, in percentage points. Measures fiscal progressivity: how much more government captures at high prices vs. low prices. High swing (>20pp, red) = regime is highly price-progressive — contractor upside is capped. Low swing (<10pp, green) = stable fiscal terms across the price cycle. Useful for stress-testing IOC economics in oil price scenarios.">Swing (pp)</th><th data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Fiscal tier: classification of fiscal regime by government take level at $75/bbl. IF = Investor-Friendly (≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = NOC-dominated (>75%). Used for portfolio-level screening when comparing across diverse geographies.">Tier</th>
         </tr>
       </thead>
@@ -2572,7 +2566,7 @@ window.copyPlatformCitation = function(btn) {
 <!-- v568 (T1): this legend pointed the analyst at the "Max Breakeven" slider, which this cycle
      removed — the same defect v537 fixed here, a legend advertising a control that is gone. It now
      states what the Breakeven column can and cannot do, and names the axis that does the downside job. -->
-<strong>Breakeven is reference only — it is not a screening axis.</strong> ORCA models it for <span id="be-legend-n">65</span> of 185 countries, and every one of those values falls between <strong>$27 and $34/bbl</strong>, so the column renders just two states: a figure under $50, or <strong>—</strong>. A <strong>—</strong> means no modelled breakeven, which is <em>not</em> evidence of a low one. Because no country in the database reaches $50, a breakeven ceiling could not separate any two rows; the slider that offered one was removed in v568. To see only the measured rows use <strong>Breakeven Coverage → Measured breakeven only</strong> under Advanced Filters. <strong>For downside screening use Min NPV @$50</strong> — modelled for all 185 countries with no blanks, so a value there was always measured, and a regime positive at $75 but negative at $50 does not survive a price break.</div>
+<strong>Downside is screened on Contractor NPV @$50</strong> — the column beside Contractor NPV, modelled for all 185 countries with no blanks, so a value there was always measured. Its second line is the share of the $75 NPV still standing at $50 (observed −14% to +75%, median 45%), which is the axis the <strong>Downside Resilience</strong> preset screens on. <strong>Breakeven is not a column on this table and not a filter.</strong> ORCA models one for <span id="be-legend-n">65</span> of 185 countries, every value between $27 and $34/bbl, so it could render only two states and could not rank any two rows — and 63 of those 65 countries hold no verified field production, so the column read as a low-price endorsement of Vanuatu and the Bahamas while the USA, Norway, Canada and Brazil showed a blank. The per-country figure is still on <strong>Country Profile</strong> and the <strong>Breakeven Map</strong>, and the export still carries <em>Breakeven_bbl</em> with a <em>Breakeven_Tested</em> flag beside it.</div>
   </div>
 
   </div><!-- end screen mode -->
@@ -25957,10 +25951,6 @@ function applyScreenerPreset(preset) {
     const dep = document.querySelector('input[name="dep-cat"][value="' + val + '"]');
     if (dep) dep.checked = true;
   };
-  const setBeCat = (val) => {
-    const be = document.querySelector('input[name="be-cat"][value="' + val + '"]');
-    if (be) be.checked = true;
-  };
 
   // Reset all to defaults first
   _screenerRfactorOnly = false;
@@ -25970,7 +25960,7 @@ function applyScreenerPreset(preset) {
   _screenerSetLabel = null;     // v560
   _activePresetName = null;
   setSlider('sl-take', 100); setSlider('sl-npv', -500); setSlider('sl-npv50', -500); setSlider('sl-evid', 0);
-  setChecks('sc-mech-checks', 'all'); setDepth('all'); setBeCat('all');
+  setChecks('sc-mech-checks', 'all'); setDepth('all');
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
   const feeCmp = document.getElementById('sc-fee-cmp');
   if (feeCmp) feeCmp.checked = true;   // v554
@@ -26315,31 +26305,14 @@ function _scUpdateNeutralFlags() {
     const sl = document.getElementById(sliderId);
     if (flag && sl) flag.style.display = isNeutral(+sl.value) ? 'inline' : 'none';
   });
-  // v537: the Breakeven Coverage option labels carry their own live size, and the block states
-  // the observed range of the measured set. Both are read off COUNTRY_DATA rather than written
-  // into the HTML, because the previous control's captions ("Sub-$50", "$50–$75", "$75–$100")
-  // described bands the data has never contained and nothing on screen could contradict them.
+  // v623: the Breakeven Coverage radios and their live size captions are gone with the control.
+  // What survives is the one number the note under the table still states — how many of the 185
+  // countries ORCA has ever modelled a breakeven for — read off COUNTRY_DATA, never hard-coded.
   if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA.length) {
     const _beVals = COUNTRY_DATA.filter(d => _beIsTested(d.be_75)).map(d => d.be_75);
     const _nBeMeas = _beVals.length;
-    const _cAll = document.getElementById('be-cnt-all');
-    const _cMeas = document.getElementById('be-cnt-measured');
-    if (_cAll)  _cAll.textContent  = '(' + COUNTRY_DATA.length + ')';
-    if (_cMeas) _cMeas.textContent = '(' + _nBeMeas + ')';
-    // v568: the legend sentence flipped from "no breakeven for N" to "modelled for N of 185",
-    // so this now writes the MEASURED count, not the complement.
     const _lg = document.getElementById('be-legend-n');
     if (_lg) _lg.textContent = _nBeMeas;
-    const _rn = document.getElementById('be-range-note');
-    if (_rn) {
-      const _pos = _beVals.filter(v => v > 0);
-      _rn.innerHTML = 'ORCA models a breakeven for <strong>' + _nBeMeas + ' of ' + COUNTRY_DATA.length
-        + '</strong> countries'
-        + (_pos.length ? ', every one between <strong>$' + Math.min.apply(null,_pos).toFixed(0)
-             + '</strong> and <strong>$' + Math.max.apply(null,_pos).toFixed(0) + '/bbl</strong>' : '')
-        + '. The other ' + (COUNTRY_DATA.length - _nBeMeas)
-        + ' are blank \u2014 not low. Cost <em>bands</em> are not a screen this data supports.';
-    }
   }
 
   // v554: the take-comparability control only has meaning once a take ceiling is set, and it
@@ -26442,7 +26415,6 @@ function runScreener() {
   const price   = getPriceKey();   // '50' | '75' | '100' | '125'
   const takeKey = `take_${price}`;
   const npvKey  = `npv_${price}`;
-  const beKey   = 'be_75'; // breakeven is only computed at $75 — always use be_75
 
   const maxTake = +document.getElementById('sl-take').value;
   const minNPV  = +document.getElementById('sl-npv').value;
@@ -26461,9 +26433,6 @@ function runScreener() {
 
   // mechanic checkbox filter
   const checkedMechs = [...document.querySelectorAll('#sc-mech-checks input[type=checkbox]:checked')].map(cb => cb.value);
-
-  // breakeven category radio
-  const beCat = document.querySelector('input[name="be-cat"]:checked')?.value || 'all';
 
   // IOC operator filter — any checked operators (data-driven from IOC_DATA)
   const checkedIOCs = [...document.querySelectorAll('#sc-ioc-checks input[type=checkbox]:checked')].map(cb => cb.value);
@@ -26493,7 +26462,6 @@ function runScreener() {
   const _scPass = (d, useCmp) => {
     const take = d[takeKey];
     const npv  = d[npvKey];
-    const be   = d[beKey];
 
     if (take === null || take === undefined) return false;
     // v554 — test the ceiling against the comparable (Group-1) take where the published figure is
@@ -26561,10 +26529,11 @@ function runScreener() {
     //                 can land in either band, and the empty result read as "ORCA has no
     //                 mid-cost countries" rather than "ORCA has no breakeven above $34".
     //
-    // The surviving distinction is the one the data supports: measured vs not measured, 65/120.
-    // Semantics match _beIsTested() (v513) so the row cell, the export column and this filter
-    // cannot disagree about what "measured" means.
-    if (beCat === 'measured' && !_beIsTested(be)) return false;
+    // v623 (T1): and the last surviving option — "measured vs not measured" — went too. It was
+    // not a screen, it was the coverage flag, and 63 of the 65 rows it kept are proxy-economics
+    // countries. Nothing in this function tests breakeven any more. `be` is still read above and
+    // is still exported per row (Breakeven_bbl + Breakeven_Tested), where a modeller has the raw
+    // value and an explicit coverage flag beside it instead of a two-state glyph.
 
     // Evidence quality filter.
     // v518 (T6): was `(d.ab_pct || 0) < minEvid`. ab_pct = a_pct + b_pct, and tier B is the
@@ -26703,7 +26672,6 @@ function runScreener() {
   if (+document.getElementById('sl-npv').value > -500) activeCount++; // NPV min above default
   if (checkedIOCs.length > 0) activeCount++;
   if (depCat !== 'all') activeCount++;
-  if (beCat !== 'all') activeCount++;
   if (scRegionActive) activeCount++;
   if (!includeProxy) activeCount++; // v517: excluding proxy-economics countries is a filter
   if (takeCeilingActive && !feeCmpOn && _nFeeDivForBadge > 0) activeCount++; // v554: screening the ceiling on the blended headline is a choice that removes countries
@@ -26764,11 +26732,6 @@ function runScreener() {
   // equivalent statement here is unambiguous, and the data-basis filter states its own size.
   const _npv50Note = (minNPV50 <= -500) ? ''
     : ` <span style="color:var(--accent);font-weight:600;">\u2014 all ${data.length} tested at the $50/bbl downside and clearing $${minNPV50}M (npv_50 modelled for 185/185 \u2014 no untested rows)</span>`;
-  // v537 — the coverage filter states what it removed and why, in the same voice as the v513
-  // ceiling note. Without this the analyst sees the row count drop from 185 to 65 with nothing
-  // on screen saying that the 120 removed were removed for absence of data, not for failing a test.
-  const _beCatNote = (beCat !== 'measured') ? ''
-    : ` <span style="color:var(--accent);font-weight:600;">\u2014 ${data.length} with a modelled breakeven; ${COUNTRY_DATA.length - COUNTRY_DATA.filter(x => _beIsTested(x.be_75)).length} countries removed for having none (absence of data, not a failed test)</span>`;
   // v554 — the take basis states BOTH directions, by name and with both numbers, so the analyst
   // can see exactly which countries the ceiling treats differently and check the claim.
   const _fmtBasisList = arr => arr.map(d => {
@@ -26824,7 +26787,7 @@ function runScreener() {
   const _universeLead = (activeCount === 0 && !_activePresetName)
     ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${sortNote}${_basisNote}`
     : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}`;
-  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_takeBasisNote}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}${_beCatNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
+  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_takeBasisNote}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
   // Friction this removes: an exported shortlist is the thing that reaches the investment
   // committee, and it left the tool carrying nothing but rows. Every sentence that makes the
@@ -26846,7 +26809,7 @@ function runScreener() {
     if (minNPV50 > -500) crit.push('Min contractor NPV at the $50/bbl downside: ≥$' + minNPV50 + 'M');
     if (minNPV > -500) crit.push('Min contractor NPV at $' + price + '/bbl: ≥$' + minNPV + 'M');
     // v568: the 'Max breakeven' criterion is no longer offered, so it is no longer claimed here.
-    if (beCat === 'measured') crit.push('Modelled breakeven required (countries with none removed for absence of data, not a failed test)');
+    // v623: neither is the coverage radio. No breakeven criterion is claimed because none exists.
     if (!includeProxy) crit.push('Verified field production only — '
       + (COUNTRY_DATA.length - COUNTRY_DATA.filter(function(x){ return _dqTier(x).hasProduction; }).length) + ' proxy-economics countries excluded');
     if (minEvid > 0) crit.push('Min primary-source evidence: ≥' + minEvid + '% of fiscal facts read from the primary legal instrument (tier A); the EY/IHS/KPMG bulk harvest (tier B) does not count toward this');
@@ -26912,11 +26875,10 @@ function runScreener() {
     if (_checkedMechsCount < _totalMechs && _checkedMechsCount > 0) _diagHints.push('Only ' + _checkedMechsCount + ' of ' + _totalMechs + ' fiscal mechanics selected');
     if (minEvid > 0) _diagHints.push('Min primary-source evidence &ge;' + minEvid + '% (tier A) — only ' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid;}).length + ' of ' + COUNTRY_DATA.length + ' countries hold that share of their facts from the primary legal instrument');
     if (_screenerMinFacts > 0) _diagHints.push('At least ' + _screenerMinFacts + ' facts on file — that is ' + COUNTRY_DATA.filter(function(x){return (x.n_facts||0)>=_screenerMinFacts;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
-    if (beCat === 'measured') _diagHints.push('Measured breakeven only \u2014 that is ' + COUNTRY_DATA.filter(function(x){return _beIsTested(x.be_75);}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     if (_screenerMinRetention !== null) _diagHints.push('Downside retention \u2265' + Math.round(_screenerMinRetention*100) + '% of $75 NPV at $50/bbl \u2014 that is ' + COUNTRY_DATA.filter(function(x){var r=_npvRetention(x);return r!==null&&r>=_screenerMinRetention;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     if (scRegionActive) _diagHints.push('Region filter: ' + scRegionActive + ' only');
     var _diagStr = _diagHints.length > 0 ? '<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:left;max-width:420px;margin-left:auto;margin-right:auto;"><strong style="color:var(--text);">Likely causes:</strong><ul style="margin:4px 0 0 16px;padding:0;">' + _diagHints.map(function(h){return '<li>' + h + '</li>';}).join('') + '</ul></div>' : '';
-    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;">'
+    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;">'
       + '<div style="font-size:20px;margin-bottom:8px;opacity:.5;">&#8960;</div>'
       + '<strong style="color:var(--text);display:block;margin-bottom:6px;">No countries match your current filters</strong>'
       + 'Try relaxing your criteria — reduce the IRR minimum, raise the government take ceiling, or uncheck some mechanic filters.'
@@ -26929,7 +26891,7 @@ function runScreener() {
   // same amber voice as the v507 divider. The count line above the table is easy to skip past; the
   // first row of the grid is not.
   const _topBanner = (_allProxy || _mixedUngrouped)
-    ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+    ? `<tr class="screener-basis-divider"><td colspan="11" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
       + (_allProxy
           ? `<strong style="color:var(--accent);letter-spacing:.04em;">EVERY ROW BELOW &mdash; ${data.length} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
             + `This screen returned no production-backed regime. Fiscal terms are regional proxy estimates and the NPV / breakeven shown are indicative only. `
@@ -26960,7 +26922,7 @@ function runScreener() {
     // the analyst reads row 23 with the same authority as row 1 — the PROXY badge alone did not
     // carry that, because every row above it was badged PROXY too and it read as decoration.
     const _divider = (_grouped && i > 0 && _dqTier(data[i-1]).hasProduction && !_dqTier(d).hasProduction)
-      ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+      ? `<tr class="screener-basis-divider"><td colspan="11" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
         + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nProxy} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
         + `Fiscal terms are regional proxy estimates and the NPV / IRR / breakeven shown are indicative only. `
         + `Ranked among themselves by ${_scSortKey ? (_SC_SORT_LABEL[_scSortKey] ? _SC_SORT_LABEL[_scSortKey][_scSortDir === 1 ? 0 : 1].toLowerCase() : _scSortKey) : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
@@ -26977,7 +26939,6 @@ function runScreener() {
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}</td>
       <td class="num">${fmtNpvShared(d[npvKey])}</td>
       <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the $75 column to the left: a regime that is positive at $75 and negative here does not survive a price break. The second line is the share of the $75 value retained — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
-      <td class="num" title="Modelled breakeven for 65 of 185 countries, all of which fall between $27 and $34/bbl — so this column reports either a value under $50 or no value at all. It is reference only: it is not screened on, and it cannot rank two rows. Use Contractor NPV @$50 to the left for downside.">${formatBreakeven(d[beKey])}</td>
       <td class="num" title="Production coverage: % of contracts with verified production data. Higher = take number is more production-weighted." style="color:${(d.prod_coverage_pct||0)>30?'#15803D':(d.prod_coverage_pct||0)>=10?'#A16207':'var(--muted)'}">${(d.prod_coverage_pct||0)>0?(d.prod_coverage_pct).toFixed(0)+'%':'—'}</td>
       <td class="num" style="color:${d.swing!=null?(d.swing>=20?'var(--red)':d.swing>=10?'var(--orange)':'var(--muted)'):'var(--muted)'};font-weight:${d.swing!=null&&d.swing>=15?'700':'400'}">${d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'}</td>
       <td><span class="tier ${tc}">${tierLabel(d[takeKey])}</span></td>
@@ -40739,9 +40700,6 @@ document.addEventListener('DOMContentLoaded', function() {
   if (mechChecks) mechChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   var iocChecks = document.getElementById('sc-ioc-checks');
   if (iocChecks) iocChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
-  // Breakeven category radios — delegate on parent
-  var beCatParent = document.querySelector('.be-radio-group');
-  if (beCatParent) beCatParent.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   // Depth radios — delegate on parent
   var depParent = document.querySelector('.depth-radio-group');
   if (depParent) depParent.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
