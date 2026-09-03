@@ -1601,7 +1601,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v626</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v627</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1671,7 +1671,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v626</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v627</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1999,7 +1999,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v626';
+  return m ? m[0] : 'v627';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2074,7 +2074,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v626');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v627');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -38396,7 +38396,6 @@ function fetchCountryContracts(country) {
       const hasProd = contracts.some(c => c.prod_mmbbl != null);
       let html = '<div class="tbl-wrap"><table style="font-size:12px;"><thead><tr>'
         + '<th>#</th><th>Block / Contract</th><th>Operator</th><th>Type</th><th class="num">Take%</th>'
-        + '<th class="num">NPV</th><th class="num">IRR%</th>'
         + (hasProd ? '<th class="num">Prod (MMbbl)</th>' : '')
         + '<th class="num" title="Primary fiscal rate: royalty for Concessions, profit oil for PSCs">Key Rate</th>'
         + '</tr></thead><tbody>';
@@ -38412,8 +38411,6 @@ function fetchCountryContracts(country) {
           + '<td style="color:var(--muted);font-size:11px;">' + (c.operator || '—') + '</td>'
           + '<td><span class="' + getMechTagClass(c.mechanic || c.type || '') + '" style="font-size:10px;">' + (c.mechanic || c.type || '—') + '</span></td>'
           + '<td class="num" style="' + takeCol + ';font-weight:700;">' + (c.take != null ? c.take.toFixed(1) + '%' : '—') + '</td>'
-          + '<td class="num">' + (c.npv != null ? fmtNpvShared(c.npv) : '—') + '</td>'
-          + '<td class="num">' + (c.irr != null ? c.irr.toFixed(1) + '%' : '—') + '</td>'
           + (hasProd ? '<td class="num" style="color:var(--accent);">' + (c.prod_mmbbl != null ? c.prod_mmbbl.toFixed(1) : '—') + '</td>' : '')
           + '<td class="num" style="color:var(--muted);font-size:11px;">' + keyRate + '</td>'
           + '</tr>';
@@ -38422,6 +38419,7 @@ function fetchCountryContracts(country) {
       if (contracts.length > 30) {
         html += '<div style="font-size:11px;color:var(--muted);margin-top:6px;">Showing top 30 of ' + contracts.length + ' contracts (ranked by production volume, then fiscal dispersion)</div>';
       }
+      html += cpContractColNote(country, contracts);
       el.innerHTML = html;
     })
     .catch(function() {
@@ -38552,6 +38550,84 @@ function _cpApplyBe(country, be75) {
 // withdrawn wherever the page's own evidence contradicts it, the measured floor is stated in its
 // place, and where the sample AGREES the claim is marked as corroborated rather than asserted.
 window._cpObsSpread = window._cpObsSpread || {};
+// v627 (T2): the Country Profile contract table no longer prints per-contract NPV or IRR.
+// This table is the only contract-level evidence on the page, and it sits under a headline that
+// tells the analyst to defend the country on its take. Both removed columns contradicted that
+// headline on the same screen:
+//   - NPV. The headline NPV ($3.3B for the USA) is ONE standardized Deepwater project -- $1.2B
+//     capex, 294 MMbbl, $15/bbl opex -- run through the country's terms, which is what makes 185
+//     countries comparable. The per-contract column was not on that profile and was not labelled
+//     as anything else, under a header reading "ALL DCF @ $75/BBL". It scales with each block's
+//     own field, so within one table it ranks field size, not fiscal terms: Colombia runs 8.0%
+//     take -> -$731M and 47.4% take -> +$1,528M, the sign backwards against the axis the page
+//     asks the analyst to screen on. And on 128 of the 541 rows platform-wide that carry both
+//     production and NPV it is not on the block's field either -- the stated NPV exceeds that
+//     block's ENTIRE gross revenue at $75/bbl. The USA is 50 of 50 such rows: 47 blocks of
+//     0.1-0.44 MMbbl each showing -$607M to -$758M, about 30x their own gross revenue, at a
+//     12.5% government take, directly beneath "Highly contractor-favorable ... top tier for IOC
+//     capital allocation". An analyst who reads that either stops trusting the DCF or pastes
+//     $3.3B into a memo the evidence table under it contradicts.
+//   - IRR. These are the same per-contract IRRs v516 removed from every other slot on this page
+//     (median 333% across the 165 countries carrying one; Indonesia prints 100.2% and 106.8%
+//     here). The headline three sections above says "IRR: -> Model in Scenario Builder"; this
+//     table answered it with 106.8%.
+// Same rule as v451 (Govt NPV off Fiscal Compare), v515/v517 (country IRR) and v568 (breakeven
+// ceiling): a column that cannot state its own basis is removed, and where the question IS
+// answered is stated in its place. Take%, operator, mechanic, production and key rate stay --
+// every one of them a fact about the contract, on one basis across all rows.
+function cpContractColNote(country, contracts) {
+  if (!contracts || !contracts.length) return '';
+  var d = COUNTRY_DATA.find(function(x){ return x.country === country; });
+  var nNpv = 0, nIrr = 0, nProd = 0, imp = 0;
+  for (var i = 0; i < contracts.length; i++) {
+    var c = contracts[i]; if (!c) continue;
+    var n = c.npv, r = c.irr, p = c.prod_mmbbl;
+    if (typeof n === 'number' && isFinite(n)) {
+      nNpv++;
+      if (typeof p === 'number' && p > 0) { nProd++; if (Math.abs(n) > p * 75) imp++; }
+    }
+    if (typeof r === 'number' && isFinite(r)) nIrr++;
+  }
+  if (!nNpv && !nIrr) return '';
+
+  var hdr = '';
+  if (d && d.npv_75 != null) {
+    hdr = 'The <strong>' + fmtNpvShared(d.npv_75) + '</strong> at $75'
+        + (d.npv_50 != null ? ' and <strong>' + fmtNpvShared(d.npv_50) + '</strong> at $50' : '')
+        + ' in the headline strip are one standardized Deepwater project ($1.2B capex · 294 MMbbl '
+        + '· $15/bbl opex) run through ' + country + '’s terms — one profile for all 185 '
+        + 'countries, which is what makes them comparable.';
+  } else {
+    hdr = 'Every NPV this platform reports is one standardized Deepwater project ($1.2B capex · '
+        + '294 MMbbl · $15/bbl opex) run through a country’s terms — one profile for all '
+        + '185 countries, which is what makes them comparable.';
+  }
+
+  var why = ' The per-contract figures were not on that profile and stated no basis of their own: '
+          + 'they move with each block’s field size, so they rank how big a block is rather than '
+          + 'how hard its terms are, and they cannot be read against the headline, against each '
+          + 'other, or against another country.';
+  if (imp) {
+    why += ' In ' + country + ' they are not on the block’s own field either — <strong>'
+         + imp + ' of the ' + nProd + '</strong> rows here that carry production stated an NPV '
+         + 'larger than that block’s entire gross revenue at $75/bbl.';
+  }
+  if (nIrr) {
+    why += ' The IRR column carried the same per-contract IRRs (mean-of-contract, median 333% '
+         + 'platform-wide) this page already refuses to report at country level.';
+  }
+
+  var cSafe = encodeURIComponent(country);
+  var route = ' <strong style="color:var(--text);">Take% is the column on one stated basis across '
+            + 'all ' + contracts.length + ' rows</strong>, and it is what the headline says to defend '
+            + 'on. For an NPV or IRR at your own capex, opex and profile, '
+            + '<a href="#" class="cp-be-cta" onclick="ddOpenScenarioBuilder(decodeURIComponent(\'' + cSafe + '\'));return false;" '
+            + 'style="color:var(--accent);font-weight:600;">run Scenario Builder →</a>.';
+
+  return '<div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.65;border-top:1px solid var(--border);padding-top:8px;">'
+       + '<strong style="color:var(--orange);">Contractor NPV and IRR are deliberately not columns in this table.</strong> '
+       + hdr + why + route + '</div>';
+}
 function cpRecordObsSpread(country, contracts) {
   if (!country || !contracts || !contracts.length) return null;
   var t = [];
