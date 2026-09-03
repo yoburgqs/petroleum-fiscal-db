@@ -24244,3 +24244,18 @@ v452, v489, v593, v600, v606, v612, v614 and every locked item through v620
 intact. Version sweep **v620 → v621** across the 5 display sites, done silently
 at the end; the 1 remaining `v620` string is a historical code comment and is
 left alone. It is **not** the deliverable.
+
+---
+## Cycle 525 Log — 2026-09-03 11:01
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Mirror is byte-identical.
+
+---
+
+## Cycle 525 — v621
+
+**Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* (stalest of the six; 524 was T3, 523 T6, 522 T4, 521 T1, 520 T5, 519 T2)
+
+**Friction.** Cold load → Country Profile → Indonesia auto-loads. Scroll to the **4-Price Sensitivity table** — the artifact sitting directly above the "Copy as IC table" button, i.e. the thing that becomes the memo. Its BREAKEVEN column showed `…` in all four 
