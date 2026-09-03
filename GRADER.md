@@ -24490,3 +24490,18 @@ marker added or removed. v371/v373, v430, v449, v451, v452, v489, v563, v580,
 v593, v600, v602, v606, v612, v614, v616 and every locked item through v622
 intact. Version sweep **v622 → v623** across the 5 display sites, done silently
 at the end. It is **not** the deliverable.
+
+---
+## Cycle 527 Log — 2026-09-03 12:48
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 527 complete and pushed (v623).
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (526 was T5, so T1 was the stalest unrepeated task.)
+
+## Friction
+Walked the Screener cold — no sessionStorage, no localStorage — at 1440. The default view is genuinely good. The worst moment is two surfaces on that tab that answer the T1 question **backwards**:
+
+**The Breakeven ($/bbl) column.** `formatBreakeven()` collapses every value under $50 to the literal `<$50`, and all 65 model
