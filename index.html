@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v621</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v622</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1592,7 +1592,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v621</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v622</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1662,7 +1662,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v621</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v622</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1990,7 +1990,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v621';
+  return m ? m[0] : 'v622';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2065,7 +2065,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v621');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v622');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -39050,12 +39050,42 @@ function exportFCResults() {
   };
   // Rank on the database take, ascending. State monopolies and rows with no database take are not
   // ranked at all -- there is no contractor position to place in an investible ordering.
-  const _xlRankable = function(x) { var v = _xlDbTake(x); return v != null && !isStateMonopoly(v); };
+  // ── v622 (T5) ─────────────────────────────────────────────────────────
+  // v563 stopped the SCREEN ranking generic-default rows: they print “—” in the # column and are
+  // partitioned below the countries ORCA models on their own terms, because their take is the
+  // mechanic constant and came from no country's fiscal record. This workbook -- the artifact the
+  // Quick Start calls “Export XLSX for IC attachment”, the one that leaves the platform -- never
+  // followed. It ranked every row with a non-null database take, so the two artifacts produced on
+  // the same screen by two adjacent buttons disagreed about which countries screen best.
+  // Measured on the live build, cold, $75 deepwater, no filters:
+  //   screen / “Copy for IC Memo”   #1 USA 23.4   #2 Somalia 36.9   #3 Australia 38.5
+  //   Export XLSX                    #1 Vanuatu 5.0  #2 Bahamas 10.0  #3 Montenegro 10.5
+  // All 30 of the sheet's top 30 were GENERIC DEFAULT rows; USA, the screen's #1, sat at rank 61
+  // of 185. An analyst who read the screen, attached the workbook and let the IC open the
+  // appendix was handing over a shortlist headed by Vanuatu, the Bahamas, Montenegro, Greenland
+  // and the Faroe Islands -- five rows carrying the standard 10%-royalty Concession placeholder,
+  // presented under a column header reading “Rank (database take @$75)”, with an autofilter on
+  // top and nothing in the row itself to say the number was not a placing.
+  // A generic row is now unranked and sits below the ranked block, exactly as on screen. Its
+  // database take, breakeven and tier are still exported and still citable -- only the claim
+  // that it placed 1st is withdrawn.
+  const _xlRankable = function(x) {
+    var v = _xlDbTake(x);
+    return v != null && !isStateMonopoly(v) && x.termsBasis !== 'default';
+  };
+  // 0 = modelled on its own terms and ranked · 1 = generic default, not ranked · 2 = state monopoly
+  const _xlTier = function(x) { return _xlMono(x) ? 2 : (_xlRankable(x) ? 0 : 1); };
   const _xlSorted = rows.slice().sort(function(a, b) {
-    var ar = _xlRankable(a), br = _xlRankable(b);
-    if (ar !== br) return ar ? -1 : 1;
-    if (!ar) return a.country < b.country ? -1 : a.country > b.country ? 1 : 0;
-    return _xlDbTake(a) - _xlDbTake(b);
+    var at = _xlTier(a), bt = _xlTier(b);
+    if (at !== bt) return at - bt;
+    if (at === 2) return a.country < b.country ? -1 : a.country > b.country ? 1 : 0;
+    // Within both the ranked block and the unranked generic block, order on the citable database
+    // take. Array.prototype.sort is stable, so equal takes keep the order the screen handed over.
+    var av = _xlDbTake(a), bv = _xlDbTake(b);
+    if (av == null && bv == null) return 0;
+    if (av == null) return 1;
+    if (bv == null) return -1;
+    return av - bv;
   });
   const _xlVal = function(x) { return _xlRankable(x) ? Number(_xlDbTake(x)).toFixed(6) : null; };
   const _xlFirst = {};
@@ -39107,7 +39137,11 @@ function exportFCResults() {
       const npv  = _modelUsable ? r.liveNPV  : null;
       const govtNpv = (npv != null && take != null && take > 0 && take < 100) ? +(npv * (take/100) / (1 - take/100)).toFixed(1) : null;
       const _k = _xlVal(r);
-      const _rank = (_k !== null && _xlFirst[_k] !== undefined) ? _xlFirst[_k] + 1 : 'n/c — state monopoly, no contractor position';
+      // v622 (T5): three states, not two. A generic-default row is not a monopoly and is not
+      // ranked either, and used to fall through to the monopoly string's else-branch as a number.
+      const _rank = (_k !== null && _xlFirst[_k] !== undefined) ? _xlFirst[_k] + 1
+                  : _mono ? 'n/c — state monopoly, no contractor position'
+                  : '— not ranked (generic mechanic default, not this country\u2019s terms)';
       const _tiedWith = (_k !== null && _xlCount[_k] > 1) ? _xlCount[_k] - 1 : 0;
       const _basis = r.termsBasis === 'country' ? 'Country-specific terms'
                    : r.termsBasis === 'db'      ? 'ORCA contract database terms'
@@ -39206,6 +39240,17 @@ function exportFCResults() {
     ['    averages — the same figures the Country Profile "Copy for IC Memo" string, the Screener'],
     ['    CSV and the public API carry.'],
     ['  Rank and row order are computed from GovtTake_$' + _xlPP + ' (database), ascending.'],
+    // v622 (T5): the sheet ranked generic-default rows and put them on top; the screen has not
+    // ranked them since v563. Say what the rank column now means, in the file that carries it.
+    ['  ONLY countries ORCA models on their own fiscal terms are ranked. A GENERIC DEFAULT row'],
+    ['    (see Terms_Basis) carries "— not ranked" in the Rank column and sorts BELOW the whole'],
+    ['    ranked block, because its take is the standard constant for the mechanic and placing it'],
+    ['    against a country would be comparing a real regime with a placeholder. This is the same'],
+    ['    treatment the on-screen table and the "Copy for IC Memo" table give those rows, so the'],
+    ['    set of countries this sheet ranks is exactly the set the screen ranks. Note the sheet'],
+    ['    always orders the ranked block on database take ascending, whatever sort the screen was'],
+    ['    on: with the screen on its default take sort the two orders match row for row, and on a'],
+    ['    NPV / Breakeven / Swing / A-Z sort the sheet still ranks on take, as this column says.'],
     ['  DO NOT CITE: the three "(model...)" columns at the right of the sheet. Those are one'],
     // v602 (T5): printed the raw lowercase select key ("north_sea", "lng"). Use the profile name.
     ['    hypothetical ' + profileName + ' project run through the compare engine, and on a GENERIC'],
