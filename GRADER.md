@@ -24651,3 +24651,205 @@ done silently at the end. It is **not** the deliverable.
 The Reform Risk tab itself is in good shape — for the 164 of 185 jurisdictions with no sourced reform log it says plainly "no coverage, don't carry a zero premium" rather than scoring them 100.
 
 The analyst loses one row up, on the **Fiscal Predictability Score** — the only stability number that exists for all 1
+
+---
+## Cycle 530 Log — 2026-09-03 17:08
+
+- Test before: 236 PASS / 0 FAIL (live URL, v624 deployed)
+- Test after: 235 PASS / 0 FAIL / 1 WARN (local tree) — see Verification
+- JS errors: 0 real (1 captured = local-only `sw.js` 404)
+- Version: v624 → v625
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"**
+Rotation: 529 was killed mid-run, 528 was T4, 527 T1, 526 T5, 525 T2, 524 T3,
+523 T6. T6 was the stalest task with a completed cycle behind it.
+
+## FIRST — an inherited-work finding that matters more than the UX change
+
+**Cycle 529 was killed by the harness and its work was left uncommitted.**
+`cycle_log.txt` records `subprocess.TimeoutExpired ... timed out after 1800
+seconds` at 16:11. `autonomous_cycle.py:212` runs `claude -p` under a 1800s
+timeout with no completion handshake, so when the model is still working at the
+30-minute mark the process is killed **after it has written to the working tree
+but before it commits**. Cycle 529 had:
+
+- written a complete, coherent v625 T6 feature into `renderReformTimeline()`
+  (Evidence Chain "NOT HELD" rows — below),
+- written a `.orca-fp-badge` mobile fix for a v624 regression,
+- bumped nothing, committed nothing, pushed nothing, and logged nothing.
+
+Cycle 530 found this only because `git diff` showed hunks it had not authored.
+Nothing in the loop detects it. `assert_overnight_ran.py` judges the chain and
+the cycle loop, not whether a cycle's *edits* were committed. Had cycle 530
+picked a different file, or run `git checkout --`, 529's work would have been
+silently destroyed — and had it committed without looking, it would have
+claimed 529's feature as its own.
+
+**This is the "stable but wrong" class:** every job reported healthy. The cycle
+that died left the tree dirty and the next cycle inherited it invisibly.
+
+**Not fixed this cycle** — it is a change to `autonomous_cycle.py`, i.e. the
+loop's own control surface, not to the UX, and `DIRECTIVE.md`/`ROLE.md` put that
+in Zach's hands. Recommended: have `autonomous_cycle.py` check `git status
+--porcelain` before spawning and refuse to start (or commit-as-WIP and report)
+when the tree is dirty, and raise the timeout above the observed cycle length.
+
+## Friction (the UX moment this cycle fixed)
+
+Walked T6 cold at 1440 and at 390, no sessionStorage, no localStorage:
+Home → Fiscal Compare → row drill → Country Profile → Side-by-Side.
+
+Fiscal Compare's drill drawer and the Country Profile Evidence Chain are both
+strong on provenance. **Side-by-Side is not**, and Side-by-Side is the one tab
+whose entire purpose is ranking columns against each other.
+
+`renderCompare()`'s **Evidence tier** row (index.html:25197) rendered
+`g.aPct.toFixed(0) + '% primary law · ' + g.letter` — the primary-law
+**percentage** as the lead token, in the grade colour, at font-weight 700.
+
+Measured live against the shipped `country_data.json` via the page's own
+`_evidenceGrade()`:
+
+| | |
+|---|---|
+| graded by the DEPTH leg, not sourcing | **80 of 185** |
+| print ≥60% primary law yet grade C or D | **52 of 185** |
+| print a full **100.0%** primary law | **27**, of which **25 are not grade A** |
+| of those, grade D on 2–8 facts | **20** |
+
+So an analyst comparing Norway, Nigeria and Samoa read:
+
+    66% primary law · A      31% primary law · C      100% primary law · D
+
+The **largest number in the row sat on the weakest column**, in identical type,
+on the row that exists to say how far each column can be trusted. Samoa's 100%
+is 100% of **4 facts**, from a Pacific Island States *model* act that is also
+the cited source for 8 other jurisdictions — it is not Samoa's law.
+`denmark+greenland+nauru` was worse still: 98% / 100% / 100%, three columns
+reading as near-perfect sourcing on 114 / 62 / **2** facts.
+
+The denominator was one row further down (`Fiscal facts held`), and the v619
+diagnosis label — `too few facts to grade` — was **computed in this very cell
+and then thrown away**. The Country Profile evidence panel already steps the
+non-binding leg back via `_aEmph` / `_nfEmph`; Side-by-Side never got it.
+
+## Change
+
+`renderCompare()` Evidence tier cell, index.html:25197. Two lines, no new
+control, no new tooltip element:
+
+- **Line 1 leads with the diagnosis, which cannot be ranked as a number:**
+  `A · primary-law backed` / `C · secondary-led` / `D · too few facts to grade`.
+- **Line 2: the percentage never renders without the fact count it is a
+  percentage OF** — `100% primary law of 4 facts`.
+- The **limiting leg is emphasised and the other stepped back**: where depth set
+  the grade, the share goes muted/400/70% and the fact count goes orange/700;
+  where sourcing set it, the reverse. Same treatment the CP panel already uses.
+
+Rendered result, same three columns:
+
+    A · primary-law backed        C · secondary-led          D · too few facts to grade
+    66% primary law of 63,848 f   31% primary law of 8,203 f 100% primary law of 4 facts
+
+No grade, letter, colour, threshold, take, NPV or rank was altered.
+
+## Result
+
+The analyst comparing columns on Side-by-Side can no longer read Samoa's 100%
+as better-sourced than Norway's 66%. The first thing the row says is what is
+wrong with each column, in words; the percentage arrives second and arrives
+attached to its denominator, so `100% of 4 facts` and `66% of 63,848 facts`
+cannot be scanned as the same kind of number. For the 80 depth-limited
+jurisdictions — 43% of the platform — the number that used to look strongest is
+now visibly the thinnest.
+
+## Also committed, authored by cycle 529, not by this cycle
+
+Verified rendering and gated, but **not this cycle's work**:
+
+1. **Evidence Chain "NOT HELD" rows** (`renderReformTimeline()`). A term the DCF
+   model uses and the fact base does not hold now gets its own row naming the
+   substitute and its origin (engine override / contract average / generic
+   mechanic default), and the verdict line is scoped — "That is a verdict on 2
+   of the 4 terms this Concession model needs." 529's own measurement: 166 of
+   185 countries are missing at least one term their own mechanic's model uses,
+   and 102 printed a clean green tick with no caveat. Confirmed live on Fiji,
+   Samoa and Tonga.
+2. **`.orca-fp-badge` mobile wrap** at `max-width:720px` — fixes a v624
+   regression where the 122px Predictability badge overflowed an 87px
+   Side-by-Side grid cell at 390. Confirmed fixed: all three badges now 59px,
+   right ≤361 < 390.
+
+## Verification — all run this cycle, none assumed
+
+- **JS syntax gate PASS** — 11 inline blocks, 0 errors.
+- **`runtime_comprehensive.js` RAN twice.** Live URL (v624 as deployed):
+  **236 PASS / 0 FAIL / 0 WARN**. Local tree with all changes
+  (`TEST_URL=http://localhost:8899/index.html`): **235 PASS / 0 FAIL / 1 WARN**.
+  The single WARN and the single captured JS error are the same known
+  environment-only `sw.js` 404 — the service worker is registered at the
+  GitHub-Pages path and is absent under a local server root. It accounts for
+  exactly the 236→235 difference. **0 FAIL either way.**
+- **Pixel gate PASS** — no surface worse than baseline, 10 tabs x 5 viewports.
+  `phone-390::5-t2` matches baseline exactly (`small-touch-target 2`,
+  `viewport-overflow 0`). desktop-1920 / laptop-1440 / laptop-1280 fully clean on
+  every tab.
+- **Pixel gate footgun found and worked around — worth fixing properly.**
+  The first two gate runs reported
+  `REGRESSIONS vs baseline (1): phone-390::5-t2 viewport-overflow 0 -> 1`,
+  offender `span.orca-fp-badge "84 · UNGRADEDone term" — right 425 > 390
+  (width 122)`. It was NOT this cycle's Evidence tier row, and it was not real.
+  `pixel_audit.js:61` defaults to
+  `process.env.TEST_URL || 'https://yoburgqs.github.io/petroleum-fiscal-db/'`
+  — the **live** site — while `baseline.json` records
+  `url: http://127.0.0.1:8877/index.html`, captured 15:18 today. Invoked without
+  `TEST_URL`, the gate compares the **deployed** build against a **local**
+  baseline. The 122px badge is real on live v624 and absent locally, because the
+  `.orca-fp-badge` wrap fix that repairs it is cycle 529's uncommitted work.
+  Re-run with `TEST_URL=http://localhost:8899/index.html` it is a clean PASS.
+  Confirmed by direct measurement at 390/coarse: all three badges render 59px at
+  right 188 / 274 / 361, `flex-wrap: wrap`, page `scrollWidth == clientWidth`.
+  `~/CLAUDE.md` states the gate "Runs as step 7b of the cycle, against the LOCAL
+  tree" — true only because the cycle sets `TEST_URL`. Any direct invocation
+  silently audits the wrong build and reports a regression that does not exist.
+  **Recommend defaulting `URL` to the local tree, or refusing to run when
+  `baseline.json`'s `url` origin differs from the target's.**
+- **Step 5b mobile:** zero horizontal scroll across 8 tabs at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**, `scrollWidth == clientWidth` at
+  every width, **0 page errors at every width**. The 20 sub-24px items in `#t2`
+  at 390/coarse are pre-existing `ⓘ` help spans and mechanic tags; this cycle
+  added **no control** — two text spans only — so the 24px floor is unchanged.
+- Evidence tier cell re-walked on all three limiter branches:
+  `depth` (denmark+greenland+nauru), `sourcing` (usa+iraq+turkmenistan),
+  `both` (norway+nigeria+samoa). 0 page errors on every one.
+
+## Found on the same walk, not fixed
+
+- **The Breakeven Map carries no evidence signal at all** — 0 occurrences of
+  tier / evidence / source / quality / primary-law across the whole tab. It is
+  honest about coverage ("The other 120 are blank, which is absence of data, not
+  a low breakeven") and pivots to Downside Resilience, so it is not wrong; but
+  it is the one tab where "where did this number come from" has no answer.
+- **224 of 884 Evidence Chain rows carry a tier letter with no clickable
+  source.** The document is named but cannot be opened.
+- The bulk-harvest rows are labelled **EY / IHS Markit** and **EY / KPMG** and
+  their links resolve to **PwC** Worldwide Tax Summaries — three firms. v518
+  put this in the link's `title`, so it is disclosed on hover but the label and
+  the href still name different publishers on the face. 34 countries.
+
+## STILL LOCKED — nothing touched
+
+No new FAQ (still **974**). **No new tooltip element** — the two `title`
+attributes in the rewritten cell replace the one that was already there. No
+page-sub paragraph, amber instructional banner, routing hint or "How to read"
+block; no SbS card wrapper; no visible Explorer chip row. Screener advanced
+filters still collapsed, presets still a dropdown; Home "More tools" still
+collapsed. **No tab added, removed or reordered.** No take, NPV, rank, reform
+diamond, band or tier colour altered. The **v612 MOBILE LAYER** was not touched,
+narrowed or deleted; `#reference-panel` `translateX` untouched; no
+`min-width: max-content` marker added or removed. v371/v373, v430, v449, v451,
+v452, v489 and every locked item through v624 intact. Version sweep
+**v624 → v625** across the 5 display sites, done silently at the end; historical
+`v624` references in code comments deliberately left alone. It is **not** the
+deliverable.
