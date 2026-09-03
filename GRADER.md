@@ -24505,3 +24505,134 @@ at the end. It is **not** the deliverable.
 Walked the Screener cold — no sessionStorage, no localStorage — at 1440. The default view is genuinely good. The worst moment is two surfaces on that tab that answer the T1 question **backwards**:
 
 **The Breakeven ($/bbl) column.** `formatBreakeven()` collapses every value under $50 to the literal `<$50`, and all 65 model
+
+---
+## Cycle 528 Log — 2026-09-03 — v624
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest of the
+six (527 was T1, 526 T5, 525 T2, 524 T3, 523 T6, 522 T4).
+
+## Friction
+Walked T4 cold — no sessionStorage, no localStorage — at 1440. The Reform Risk
+tab itself is in good shape: the per-country lookup names which of three cases
+applies, and for the 164 of 185 jurisdictions with no sourced reform log it says
+so plainly rather than scoring them 100. Country Profile's FISCAL REFORM HISTORY
+section says the same. That is not where the analyst loses.
+
+They lose one row up, on the **Fiscal Predictability Score** — the only
+stability number that exists for all 185, and therefore the only one available
+for the 164 the reform log does not cover. Recomputed live against
+`COUNTRY_DATA`, not read from a comment:
+
+| dispersion basis | n | scores in the HIGH band | ceiling |
+|---|---|---|---|
+| one term (IQR penalty never charged) | 132 | **86** | 100 |
+| measured spread across own contracts | 28 | **0** | **74** (Turkmenistan) |
+| no distribution held | 22 | not scored | — |
+| state monopoly | 3 | not scored | — |
+
+Every HIGH on this platform belongs to a regime ORCA never measured a spread
+for, and no regime it did measure can ever reach HIGH. So `HIGH` was not a
+finding about stability. It was a synonym for *not measured* — which is why
+Bahamas and Vanuatu sit at the top of the ladder on 100.
+
+The band word and the colour ramp were nonetheless absolute. On Country
+Profile:
+
+    Oman      green   83 · HIGH   one term      <- no measured spread
+    Malaysia  orange  54 · LOW    13.8pp obs    <- spread measured across contracts
+
+Under the ≥70 green rule, **100 of the 132 one-term regimes painted green
+against 5 of the 28 measured ones**. The analyst reads the country there is less
+evidence about as the steadier one, in colour, at a glance, on the tab they are
+already on. The cohort arithmetic that refutes this existed only in the badge's
+hover text and on the Reform Risk lookup card — `_fpCohortLine()`, rendered at
+two call sites, neither of them Country Profile.
+
+Two independent renderers had it. `renderStabilityBadge()` (line 23524) feeds
+Country Profile ×2, Side-by-Side, the FC drill drawer and the country page.
+Explorer's Stability column (line ~23913) **bypasses it entirely** with its own
+60px bar on the same absolute ≥70-green ramp — USA drew a long green bar on 91
+(one term) directly above Mexico's short yellow bar on 51 (20.5pp measured).
+
+## Change
+- **A band and a colour are awarded only where the spread penalty was actually
+  charged.** A one-term score renders `83 · UNGRADED` in muted grey with a
+  *solid* border — deliberately distinct from the *dashed* `— · not scored`
+  badge used where ORCA holds no distribution at all. The number and the basis
+  chip are unchanged; the exports and the IC citation still read the score.
+- **Explorer's own bar renderer fixed to match.** One-term rows draw a muted
+  bar; only the 28 measured countries are coloured. Verified on screen: USA /
+  Argentina / Canada / Colombia / Australia / Ecuador muted, Mexico (20.5pp) and
+  United Kingdom (15.0pp) amber.
+- **Country Profile prints the cohort standing under the badge**, on screen
+  rather than on hover — the existing `_fpCohortLine()`, the same renderer the
+  Reform Risk card already uses, not a second wording of it. The Predictability
+  row spans the grid to fit it. Oman now reads: *"76th of 132 one-term regimes —
+  a cohort the spread penalty never touches, which is why this score is shown
+  UNGRADED rather than banded… the 28 countries with a measured spread top out
+  at 74 (Turkmenistan)."*
+- Four existing tooltips (Explorer header, Side-by-Side row, both badge basis
+  branches) restated the removed bands as reachable. Corrected to describe what
+  now renders. **No tooltip was added.**
+- `_fpCohortLine()`'s two messages rewritten so the on-screen sentence matches
+  the new rendering instead of asserting "All 86 HIGH grades sit in this cohort"
+  about a grade the platform no longer awards.
+
+## Result
+The highest grade rendered anywhere on this platform is now **MODERATE** —
+Turkmenistan at 74. No regime here has earned a HIGH on a spread anyone
+measured, and the page no longer says one has.
+
+An analyst reading Predictability on Country Profile, Side-by-Side, Explorer or
+the Fiscal Compare drill drawer can no longer take a green HIGH off a
+jurisdiction ORCA never measured, can no longer rank Oman above Malaysia from
+the colour, and is told on screen — not on hover — which cohort the number
+belongs to and that a graded MODERATE outranks any UNGRADED score however high
+its number. For the 164 jurisdictions with no reform log, the one stability
+signal that remains now states the limits of its own evidence at the point of
+reading.
+
+## Verification — all run this cycle, none assumed
+- **JS syntax gate PASS** — 11 inline blocks, 0 errors.
+- **`runtime_comprehensive.js` RAN** against the local tree —
+  **261 PASS / 0 FAIL / 1 WARN**. The WARN is the known environment-only `sw.js`
+  404 (registered at the GitHub-Pages path, absent under a local server root).
+- **Pixel gate PASS** — no surface worse than baseline, 10 tabs × 5 viewports.
+- **Step 5b mobile:** zero horizontal scroll on all 10 tabs at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**, `scrollWidth == clientWidth` at
+  every width, **0 page errors at every width**. No control added or touched, so
+  the 24px `pointer: coarse` floor is unchanged this cycle.
+- Cohort split recomputed live: 132 single / 28 measured / 22 none / 3 monopoly;
+  86 HIGH all single; measured ceiling 74. `_cpApplyObsSpread()` still fires —
+  the `.orca-fp-basis` chip text `one term` is preserved as its hook, confirmed
+  by Malaysia and Norway still repainting to `≥13.8pp obs` / `≥29.6pp obs`.
+- Re-walked all five badge call sites after the change: CP header + CP param
+  row, Side-by-Side (`#/compare/oman+malaysia+turkmenistan`), FC drill drawer
+  (USA `91 · UNGRADED`), Explorer column. 0 page errors on every one.
+
+## Found on the same walk, not fixed
+- The 22 `none` and the 132 `single` badges are both grey, distinguished only by
+  dashed vs solid border and by `—` vs a number. They mean different things —
+  no distribution held, versus a distribution held and degenerate — and the
+  border weight may be too quiet a signal to carry that.
+- `_fpCohortLine()` gives a rank within cohort (Oman "76th of 132"). Rank is not
+  risk, and a 132-deep ordinal on a score whose spread component was never
+  exercised may invite a comparison that is no more defensible than the band
+  word just removed. Worth a later look.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip** — four existing ones corrected to
+stop describing a rendering that no longer exists. No page-sub paragraph, amber
+instructional banner, routing hint or "How to read" block; no SbS card wrapper;
+no visible Explorer chip row. Screener advanced filters still collapsed, presets
+still a dropdown; Home "More tools" still collapsed. **No tab added, removed or
+reordered.** No take, NPV, rank value, reform diamond, band or tier colour
+altered. Fiscal Compare's Stability column is the reform-frequency diamonds and
+is untouched. The **v612 MOBILE LAYER** was not touched, narrowed or deleted;
+`#reference-panel` `translateX` untouched; no `min-width: max-content` marker
+added or removed. v371/v373, v430, v449, v451, v452, v489, v561, v563, v580,
+v583, v585, v593, v600, v602, v606, v612, v614, v616 and every locked item
+through v623 intact. Version sweep **v623 → v624** across the 5 display sites,
+done silently at the end. It is **not** the deliverable.
