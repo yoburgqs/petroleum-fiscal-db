@@ -26265,3 +26265,16 @@ Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; the FC A
 sessionStorage logic untouched. v371/v373, v430, v449, v451, v452, v489, **v612** and every locked
 item through v634 intact. The v632 shortlist selection and the v633 reform filter both untouched
 and both still compose.
+
+---
+## Cycle 541 Log — 2026-09-04 03:35
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 541 complete and pushed (v635). `CYCLE_STATE.json` / `cycle_log.txt` are left dirty as the loop wrapper owns them.
+
+## Cycle 541 — T1
+
+**Task** — T1, *"Which countries should even be on my screening list?"* — stalest of the six (540=T6, 539 shipped nothing, 538=T4, 537=T5, 536=T3, 535=T2, 534=T1).
+
+**Friction.** Walked it cold — no sessionStorage, no localStorage — Home → Screener → IOC Capital Screen. Most of that path is genuinely healthy and I left it alone: all 11 presets return exactl
