@@ -1678,7 +1678,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v642</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v643</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1748,7 +1748,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v642</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v643</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2081,7 +2081,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v642';
+  return m ? m[0] : 'v643';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2156,7 +2156,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v642');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v643');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -33750,11 +33750,65 @@ function renderReformCountryVerdict() {
   var jsC = c.replace(/\\/g,'\\\\').replace(/'/g,"\\'");
   var take = (d && d.take_75 != null) ? d.take_75.toFixed(1) + '%' : '—';
   var fp = (d && typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
-  var fpLabel = fp == null ? '' : (fp >= 75 ? 'HIGH' : fp >= 60 ? 'MODERATE' : fp >= 45 ? 'LOW' : 'VERY LOW');
-  var fpColor = fp == null ? 'var(--muted)' : (fp >= 75 ? 'var(--green)' : fp >= 60 ? 'var(--yellow)' : fp >= 45 ? 'var(--orange)' : 'var(--red)');
   // v536 (T3): this tab offers the Fiscal Predictability Score as the fallback signal where no
   // reform log exists, so it must state the same basis caveat the score carries everywhere else.
   var fpDisp = (typeof _fpDispersion === 'function') ? _fpDispersion(d) : { state: 'none', iqr: null };
+
+  // ── v643 (T4): this card was the last surface still awarding a pre-v624 band ──────────────
+  // v624 established the rule everywhere else on the platform: the Fiscal Predictability band
+  // and its colour are awarded ONLY where the IQR component was actually charged, i.e. where
+  // ORCA measured a spread across the country's own contracts. A one-term score renders
+  // UNGRADED and uncoloured however high its number, because the band it would fall in was
+  // earned by a penalty that was never applied. renderStabilityBadge() implements that rule and
+  // Fiscal Compare, Country Profile, Side-by-Side and Explorer all render through it.
+  // This function did not. It recomputed the band straight off the raw number, so on the one
+  // tab the whole product routes a T4 analyst to, the SAME score printed the opposite grade:
+  //   Russia    Reform Risk "75 HIGH"  green   ·  Country Profile "75 · UNGRADED one term" grey
+  //   Oman      Reform Risk "83 HIGH"  green   ·  Country Profile "83 · UNGRADED one term" grey
+  //   Bahamas   Reform Risk "100 HIGH" green   ·  Country Profile "100 · UNGRADED one term" grey
+  // Measured live against COUNTRY_DATA, not assumed: 160 countries carry a score, 132 of them
+  // are one-term, and all 132 were printed with a graded band and a colour here. 86 printed
+  // green HIGH -- the top grade on the platform -- directly above _fpCohortLine()'s own sentence
+  // saying the score "is shown UNGRADED rather than banded" and that "MODERATE here outranks any
+  // UNGRADED score, however high its number". The card contradicted itself in two adjacent lines,
+  // and the green won, because a colour is read before a paragraph.
+  // This matters most in the branch where it was worst: for the 164 jurisdictions with no sourced
+  // reform log, this score is explicitly offered as the only thing the analyst "can defend
+  // instead", so the false grade WAS the entire T4 answer for them.
+  // v604 already caught this class of defect on the same card and repaired the BASIS line; its
+  // own comment lists "Uzbekistan 89 HIGH", "Thailand 80 HIGH", "Netherlands 84 HIGH" and left
+  // the HIGH standing. This is that residual. The score itself is unchanged and nothing is
+  // recomputed -- only the grade slot now tells the truth the rest of the platform tells.
+  var fpSingle = (fpDisp.state === 'single');
+  var fpLabel = fp == null ? '' : fpSingle ? 'UNGRADED'
+              : (fp >= 75 ? 'HIGH' : fp >= 60 ? 'MODERATE' : fp >= 45 ? 'LOW' : 'VERY LOW');
+  var fpColor = (fp == null || fpSingle) ? 'var(--muted)'
+              : (fp >= 75 ? 'var(--green)' : fp >= 60 ? 'var(--yellow)' : fp >= 45 ? 'var(--orange)' : 'var(--red)');
+  // The grade slot is built once here so the no-log branch and the reform-log branch below
+  // cannot print different grades for the same country. UNGRADED renders as a bordered muted
+  // marker rather than bare text, matching renderStabilityBadge()'s solid-border treatment, so
+  // it reads as a deliberate withholding and not as a value that failed to load.
+  var fpGradeTip = fp == null ? ''
+    : fpSingle
+      ? 'UNGRADED, NOT HIGH. This score is not banded and not coloured, and that is the finding, not a gap. '
+        + 'The band would have been earned by the within-country take-spread penalty — the largest of the score’s '
+        + 'three components, worth up to −40 points — and that penalty was never charged here, because every one of '
+        + 'this country’s contracts prices to the same government take at $75/bbl. The number above is price swing and '
+        + 'mechanic count only. Across the dataset every score that would fall in the HIGH band belongs to a one-term '
+        + 'regime like this one, and not one of the 28 countries whose spread ORCA actually measured reaches HIGH — their '
+        + 'ceiling is 74. A graded MODERATE therefore outranks this, however high the number. Do not carry it into an IC '
+        + 'memo as a stability grade; carry the number with its basis attached. Same rule and same wording as the Fiscal '
+        + 'Compare Stability column and the Country Profile badge.'
+      : 'Graded on a measured spread: ORCA holds a real take distribution across this country’s own contracts ('
+        + (fpDisp.iqr != null ? fpDisp.iqr.toFixed(1) + 'pp' : 'measured') + '), so the interquartile-range penalty was '
+        + 'actually charged and the band is earned. This is the only dispersion basis on the platform that carries a '
+        + 'graded band at all.';
+  var fpGradeHtml = fp == null ? ''
+    : '<div id="rr-fp-score" style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp
+      + (fpSingle
+          ? ' <span style="font-size:9px;font-weight:800;letter-spacing:.05em;border:1px solid var(--muted);border-radius:3px;padding:1px 5px;vertical-align:2px;cursor:help;" title="' + _rrEsc(fpGradeTip) + '">UNGRADED</span>'
+          : ' <span style="font-size:11px;font-weight:700;cursor:help;" title="' + _rrEsc(fpGradeTip) + '">' + fpLabel + '</span>')
+      + '</div>';
   var fpNote = (fpDisp.state === 'monopoly')
     ? 'not scored \u2014 state monopoly, no contractor position'
     : fp == null
@@ -33783,7 +33837,7 @@ function renderReformCountryVerdict() {
       + '<div style="font-size:10px;color:var(--muted);">not sourced</div></div>'
       + (fp != null
           ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability Score</div>'
-            + '<div id="rr-fp-score" style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
+            + fpGradeHtml
             + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;"><span id="rr-fp-basis">' + fpNote + '</span></div>'
             + _fpCohortLine(d) + '</div>'
           : '')
@@ -33842,7 +33896,7 @@ function renderReformCountryVerdict() {
     + '<div style="font-size:10px;color:var(--muted);line-height:1.45;">' + _v.tiltBasis + '</div></div>'
     + (fp != null
         ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability</div>'
-          + '<div id="rr-fp-score" style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp + ' <span style="font-size:11px;font-weight:700;">' + fpLabel + '</span></div>'
+          + fpGradeHtml
           + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;">separate signal &mdash; <span id="rr-fp-basis">' + fpNote + '</span></div>'
           + _fpCohortLine(d) + '</div>'
         : '')
