@@ -25688,3 +25688,128 @@ end. It is **not** the deliverable.
 **Task — T3:** "How do these three countries compare side by side?" (rotated off T2 from cycle 535)
 
 **Friction:** Cold load, Side-by-Side tab. The search box is the only way an analyst puts their own countries on this tab. Its placeholder says *"Type a country, press Enter…"*, and v586 deliberately pre-highlights row 1 so you can see what Enter will add. But the match list was never ranked — a bare `indexOf` filter sliced to 12 in raw data-file order, so r
+
+---
+## Cycle 537 Log — 2026-09-04 04:30
+- Test before: 236 PASS / 0 FAIL (reported by the cycle harness)
+- Test after: **262 PASS / 0 FAIL / 0 WARN**, read from the suite's own run on the changed local build
+- JS errors: 0
+- Summary: Cycle 537 complete and pushed (v632).
+
+**Task — T5:** "Give me something I can paste straight into an IC memo."
+(rotated off T3 in cycle 536, T2 in cycle 535)
+
+## Friction
+Walked cold at 1440x900, `sessionStorage` and `localStorage` cleared before the load.
+Open **Fiscal Compare** — it auto-runs, so the table is already there and
+`#fc-copy-ic-btn` is already enabled. Press **⎘ Copy for IC Memo** (`copyFCForIC`,
+~line 39460). The clipboard receives **185 rows and 49,251 characters**.
+
+An IC screening shortlist is five to twelve countries. So the tool's flagship paste
+artifact was unusable for the job its own label names: the analyst pastes six pages of
+table into Word and then deletes ~175 rows by hand, or gives up on the button and
+attaches the XLSX. The two ways to narrow it were a region chip and "Breakeven only" —
+neither is a shortlist, **because a shortlist is not a region**. An analyst screening
+Norway / Guyana / Indonesia / Brazil / Angola spans four regions and no filter expresses that.
+
+Carried unfixed from cycles **533, 534, 535 and 536**, each time logged as "found on the
+same walk, not fixed". This cycle fixed it.
+
+## Change
+The rows are now tickable.
+
+- New leftmost select column in `#tbl-fc`. Header box ticks or clears every row currently
+  shown; per-row boxes `stopPropagation()` on both cell and input, so ticking a country
+  does **not** also open the drilldown drawer (verified: `drilldownOpen: false`).
+- Selection is held by country name in `window._fcSelected`, re-asserted by
+  `_fcSyncSelUI()` at the end of `renderFCResults`, so it survives a re-sort, a region
+  filter and a price or profile change. The analyst can build a cross-region shortlist and
+  it does not evaporate when the table re-renders.
+- With rows ticked, **both** export affordances narrow to them — the clipboard
+  (`copyFCForIC`) and the workbook (`exportFCResults`). They sit two inches apart on the
+  same toolbar; if only one honoured the ticks, the shortlist would silently mean two
+  different things depending which the analyst pressed.
+- The button reads **"⎘ Copy 5 selected"**, Export reads **"Export XLSX (5)"**, a
+  `5 selected · Clear` pill appears, and ticked rows are tinted. **With nothing ticked both
+  behave exactly as before** — no existing path changes.
+
+Correctness held across both artifacts, which is where this could have gone "stable but wrong":
+
+- The **# column keeps each country's placing among all 185**, not 1..N within the
+  shortlist. In the clipboard it is read from the row's own `#` cell; in the XLSX the rank
+  map is now built from a pre-selection `_xlRankPool` rather than the narrowed row set.
+  Measured: the 5-row workbook reads **18 / 27 / 46 / 56 / "— not ranked"**. Before this
+  fix the same export read **1 / 2 / 3 / 4** — "Rank 1" printed beside a country placing
+  18th of 185, under an autofilter, in the artifact the Quick Start calls
+  "Export XLSX for IC attachment".
+- Paste caption becomes `ORCA Fiscal Compare — IC shortlist, N selected countries…`; the
+  region name is dropped from a shortlist caption because it becomes a lie the moment the
+  analyst ticks across two regions.
+- The assumptions sentence states which population `#` is measured against, and a ticked
+  country hidden by the active region filter keeps its place with `—` and is counted:
+  *"4 of them are outside the region filter that was active on screen."*
+- The workbook's **Methodology** sheet gains a Scope block, and the filename gains
+  `_shortlist-N` — a 5-row and a 185-row export can no longer land in Downloads under an
+  identical name.
+
+Two things found in the same code and fixed because they were in the way:
+
+- `flash()` restored the button label from a **snapshot taken at click time**. Tick or
+  untick inside the 2-second window and the button then advertised a count it would not
+  copy. It now re-reads live selection state.
+- `#fc-stability-check` and `#fc-filter-be` measured **13x13 under `pointer: coarse`** —
+  flagged by `pixel_audit` since it was built. Left alone they would sit beside a 24px box
+  doing the same kind of job at half the size. Same rule, same tab, same control type.
+
+## Result
+The analyst ticks their five screening countries and pastes **five rows** into the memo —
+**3,382 characters instead of 49,251** — with each country's true rank among 185 intact,
+and gets the matching five-row workbook from the button beside it. Previously the only
+route to a five-country memo table was to paste six pages and delete 175 rows by hand, or
+open five drilldowns one at a time.
+
+## Verify
+- **JS syntax gate:** PASS — 11 inline blocks, `node --check`, re-run after the version sweep.
+- **Runtime suite: RAN this cycle** against the changed build at `:8899` —
+  **262 PASS / 0 FAIL / 0 WARN / 0 JS errors**. Re-run after the version sweep, same result.
+- **Pixel gate: PASS — and note the trap.** A bare `node pixel_audit.js` defaults to
+  `https://yoburgqs.github.io/petroleum-fiscal-db/`, i.e. it grades the **deployed** build,
+  not the change. Two runs passed that way and told me nothing; they also still reported the
+  13x13 checkboxes I had just fixed, which is what exposed it. Re-run with
+  `TEST_URL=http://localhost:8899/index.html` — report line 2 confirms the local URL —
+  **PASS, "no surface got worse than baseline"**, and **zero** findings against
+  `fc-sel`, `fc-sel-all`, `fc-stability-check` or `fc-filter-be`.
+- **Step 5b mobile:** **0** horizontal-scroll violations across 9 tabs at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**, `scrollWidth == clientWidth` at every width,
+  including after ticking a row. **0 page errors** at every width. New controls measure
+  **24x24** (both checkboxes) and **45x24** (Clear) at `pointer: coarse` — **0 under 24px**.
+- **No-selection regression, measured not assumed:** copy still returns 49,251 chars / 192
+  lines and the XLSX still 185 data rows + 2 sheets, with the original caption.
+
+## Found on the same walk, not fixed
+- **Netherlands 23.4% govt take at $75/bbl** in Side-by-Side against the North Sea Trio
+  button's own tooltip claiming "~48% take" — 25pp disagreement on the same country. Data
+  question, not UX. Carried from 536.
+- **Regional Benchmarks card** (~32064) groups on the *fine* DB region but iterates a
+  `regionOrder` of *coarse* labels, so Asia, Oceania, Latin America, North America and
+  CIS/FSU never display. Carried from 534, 535, 536.
+- **UAE — Dubai** still the one country filed under region `Unknown`. Carried from 534.
+- **`pixel_audit.js` defaults to the live URL.** `CLAUDE.md` states it runs "against the
+  LOCAL tree", which is true only because the cycle runner sets `TEST_URL`. Run by hand it
+  silently grades production. That is a monitor that reports a pass it cannot prove for the
+  change in front of it — the exact failure class of `OUTAGE_2026-08-29.md`. Worth a
+  default-to-local flip or a loud banner; not changed here without Zach's call.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**), no new tooltip element, no text-only edit. Chip rows stay
+`display:none`. No page-sub paragraph, amber instructional banner, routing hint or
+"How to read" block; no SbS card wrapper. Screener advanced filters still collapsed,
+presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or
+reordered.** No take, rank, reform diamond, band or tier colour altered — the shortlist
+changes which rows an artifact carries, never what any number says. The **v612 MOBILE
+LAYER** was not touched, narrowed or deleted; `#reference-panel` `translateX` untouched;
+no `min-width: max-content` marker added or removed; the new `pointer: coarse` rules are
+additive and scoped to `#tbl-fc` and two existing ids. v371/v373, v430, v449, v451, v452,
+v489 and every locked item through v631 intact. Govt NPV stays REMOVED from FC; the FC
+Analyst Guide sessionStorage logic untouched. Version sweep **v631 -> v632** across the 4
+display sites, done silently at the end. It is **not** the deliverable.
