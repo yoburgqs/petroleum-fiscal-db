@@ -25828,3 +25828,127 @@ display sites, done silently at the end. It is **not** the deliverable.
 Walked cold at 1440×900 with sessionStorage and localStorage cleared. Fiscal Compare auto-runs, so the table and the copy button are live immediately. Pressing **⎘ Copy for IC Memo** (`copyFCForIC`, ~line 39460) put **185 rows and 49,251 characters** on the clipboard.
 
 An IC screening shortlist is five to twelve countries. So the tool'
+
+---
+## Cycle 538 Log — 2026-09-04 05:35
+- Test before: 235 PASS / 0 FAIL / 1 WARN — read from the suite's own report, run this
+  cycle against the **pre-change** build (`git show HEAD:index.html`, served on :8913
+  with the working tree's assets symlinked in). Not assumed, not carried forward.
+- Test after: 235 PASS / 0 FAIL / 1 WARN — suite RAN against the changed build on :8912,
+  and again after the version sweep. **Zero delta.**
+- JS errors: 0 page errors at 1920 / 1440 / 1280 / 1024 / 768 / 390. The suite's 1 WARN is
+  the `sw.js` 404 that a plain `python -m http.server` produces, and it is present on the
+  pre-change build too.
+- Version: v632 -> v633
+
+## Task — T4
+**"What is my fiscal-stability and reform exposure here?"** — stalest in the rotation
+(537 was T5, 536 T3, 535 T2, 534 T1, 533 T5, 532 T2, 531 T3, 530 T6, **528 T4**).
+
+## Friction
+Walked cold at 1440x900 with sessionStorage and localStorage cleared. Fiscal Compare
+auto-runs, so the ranked table and the Stability column are live immediately.
+
+Measured off the live DOM, not from the changelog: **164 of the 185 rows render `n/c`
+and 21 render a diamond ramp.** Those 21 sit wherever their government take places them
+— rows 1, 3, 6, 8, 10, 16, 18, and so on down a 185-row table. An analyst asking "which
+of these carry reform risk" had to eyeball every row to find them.
+
+**Stability is not one of the five sort dimensions** — `#fc-sort-row` offers Govt Take,
+NPV, Breakeven, Swing and A-Z — **and it had no filter.** Breakeven has exactly the same
+shape of problem, 68 of 185 covered, and got **both** a sort button (labelled `(68/185)`)
+**and** a `△ Breakeven only` toggle sitting in that very control row. Stability got
+neither. That asymmetry, two inches apart on the same toolbar, is the worst moment on the
+T4 walk: the column is well-built and honest per-cell, and unusable in aggregate.
+
+Second, smaller, found on the same walk and fixed with it: the **FC reading guide** — the
+`<details>` block whose summary reads "Reading this table — column definitions" — still
+carried the premium ladder v520/v556 retracted:
+
+> `Stability (◇ diamonds) = ... IC rule: ◆◆◆◆◆ = no WACC premium; ◆◆◆◇◇ = add 1–2pp WACC ...`
+
+It never mentioned `n/c`, which is 87% of the column, and never explained the red `!`.
+So the one surface labelled "column definitions" instructed the analyst to do precisely
+what every cell tooltip on that column forbids.
+
+## Change
+- **New `◆ Reform-scored only (21 of 185)` checkbox** in the FC data-filter row, beside
+  `△ Breakeven only`. Applied in `renderFCResults()` immediately after the breakeven
+  filter and **before** ranking and before `window._fcFilteredResults` is set — so the
+  `⎘ Copy for IC Memo` clipboard, the XLSX workbook and the Country Profile prev/next
+  nav all inherit the restriction with no further plumbing.
+- **The count is read off `REFORM_HISTORY` at load**, never hardcoded, so it cannot drift
+  from the number the cells actually render. (The Breakeven button's `(68/185)` is a
+  literal and can.)
+- **Ticking it switches the Stability column on** if it was off. A table narrowed to the
+  reform-scored set with the reform column hidden explains nothing about why those 21
+  rows are the ones left.
+- **New shared predicate `_fcHasReformLog()`** — the same test `stabCell()` uses to choose
+  between a diamond ramp and `n/c`, so the filtered set and the rendered column cannot
+  disagree. Three independent copies of this test is how Fiscal Compare and Reform Risk
+  came to disagree on 10 of 21 jurisdictions before v556.
+- Reset button clears the new toggle; the zero-results message names it and says why
+  pairing it with a region filter empties the table (most regions hold one or two
+  sourced jurisdictions).
+- Reading-guide Stability definition rewritten: `n/c` defined as *not scored, not a clean
+  record, not a 5*; the `!` marker explained with the Russia-2022 (+15pp on a 4-diamond
+  row) example; the retracted WACC ladder removed and replaced with "hover the cell for
+  the IC action, click it for the event log"; the new filter named.
+
+## Result
+An analyst screening for reform exposure ticks one box and gets **21 rows, every diamond
+visible at once**, instead of scanning 185. Verified on the changed build: 21 rows, **0**
+of them `n/c`, `_fcFilteredResults` = 21, the summary strip recomputes to "15 of 21
+countries ranked · 21 countries", and the screen-reader announcer says "21 countries
+found". Unticking restores 185/185. The 164 rows that carry no reform reading are gone
+from the ranking rather than sitting in it as though a reading existed.
+
+## Verification — all run this cycle, none assumed
+- **Runtime suite RAN.** Changed build (:8912): **235 PASS / 0 FAIL / 1 WARN**, read from
+  `/tmp/runtime_test_report.txt`. Pre-change build (:8913, same harness): **235 / 0 / 1**.
+  Zero delta. Re-run after the version sweep, same result.
+- **Pixel gate PASS** — *"no surface got worse than baseline"* — with
+  `TEST_URL=http://localhost:8912/index.html`; **report line 2 confirms the local URL**.
+  **Zero** findings naming `fc-filter-reform` or the new label.
+- **Step 5b mobile:** **0** horizontal-scroll violations across all 10 tabs at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**; `scrollWidth == clientWidth` at every width,
+  and again at 390 **with the filter applied**. **0** page errors at every width. The new
+  checkbox measures **24x24** under `pointer: coarse` (13x13 with a mouse, matching its two
+  neighbours), and its label **206x24** — **0 under 24px**.
+
+## Found on this walk — and one trap worth more than the fix
+- **`port 8901` was held by a leftover `python -m http.server` from an earlier cycle whose
+  cwd was `/private/tmp/t6/orig`**, serving a build last modified 2026-09-03 21:00 — before
+  cycle 537 shipped. My first browser walk graded that stale tree and reported the new
+  control "MISSING" when it was present on disk. Caught by diffing `Content-Length` against
+  `wc -c index.html`. This is the same failure class as the `pixel_audit.js` default-to-live
+  trap carried from 537, and worse, because nothing in the URL tells you: `localhost:8901`
+  looks local and is local, it is just the **wrong local tree**. **Every cycle that starts a
+  server should confirm `Last-Modified` / `Content-Length` against the file on disk before
+  believing a single thing the browser says.** Worth a `lsof -ti:<port>` guard in the cycle
+  runner; not added here without Zach's call.
+- **`pixel_audit.js` still defaults to the live URL.** Carried unfixed from 537.
+- **Netherlands 23.4% govt take at $75/bbl** vs the North Sea Trio button's "~48% take"
+  tooltip — 25pp disagreement on one country. Data question. Carried from 536, 537.
+- **Regional Benchmarks card** groups on the fine DB region but iterates a `regionOrder` of
+  coarse labels, so Asia, Oceania, Latin America, North America and CIS/FSU never display.
+  Carried from 534-537.
+- **UAE — Dubai** still the one country filed under region `Unknown`. Carried from 534-537.
+- **Stability still has no *sort* button**, only this filter. With 21 rows on screen the
+  diamonds are readable at a glance, so the filter answers the T4 question; a sort would
+  need a defined order for 164 unscored rows and was deliberately not invented here.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**), no new tooltip element, no text-only-as-deliverable edit — the
+reading-guide correction rides along with a behavioural change, it is not the cycle. Chip
+rows stay `display:none`. No page-sub paragraph, amber instructional banner, routing hint or
+"How to read" block; no SbS card wrapper. Screener advanced filters still collapsed, presets
+still a dropdown; Home "More tools" still collapsed. **No tab added, removed or reordered.**
+No take, rank, reform diamond, band or tier colour altered — the filter changes which rows
+are on screen, never what any number says. The **v612 MOBILE LAYER** was not touched,
+narrowed or deleted; `#reference-panel` `translateX` untouched and its `right` offset never
+made negative; no `min-width: max-content` marker added or removed. The one `pointer: coarse`
+edit is additive: `#fc-filter-reform` joined the existing `#fc-stability-check, #fc-filter-be`
+24px rule. v371/v373, v430, v449, v451, v452, v489 and every locked item through v632 intact.
+Govt NPV stays REMOVED from FC; the FC Analyst Guide sessionStorage logic untouched; the v632
+shortlist selection untouched and still composes with the new filter.
