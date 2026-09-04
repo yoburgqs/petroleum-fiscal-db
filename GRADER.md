@@ -26990,3 +26990,129 @@ and every locked item through v639 intact.
 I walked T1 cold: Home → Screener. Home answers T1 well, and the Screener's preset dropdown is genuinely strong — eleven options each carrying a live count off the real filter path. I checked the region filter end to end and it's clean: the seven options sum exactly to the unfiltered count.
 
 The worst mo
+
+---
+## Cycle 547 Log — 2026-09-04
+- Test before: 236 PASS / 0 FAIL (live URL, cycle 546)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite ACTUALLY RUN this cycle against the local
+  tree (`TEST_URL=http://localhost:8099`), not carried forward. The single WARN is the
+  pre-existing service-worker 404: `index.html:49` registers `/petroleum-fiscal-db/sw.js`, the
+  GitHub Pages path, which does not exist at a localhost document root. Verified pre-existing by
+  running the same probe against stashed HEAD, and verified environment-only by curl
+  (`/sw.js` → 200, `/petroleum-fiscal-db/sw.js` → 404 locally). Not caused by this cycle.
+- JS errors: 0 page errors. JS syntax gate: PASS.
+- Shipped as **v641**.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (rotated off T1/546,
+T3/545, T4/544, T5/543, T2/542)
+
+## Friction
+Walked T6 cold, no sessionStorage: Home → Fiscal Compare → row drilldown → "Full Profile →" →
+Country Profile → **Key Fiscal Parameters — Evidence Chain** (`renderSourcedFacts()`,
+`index.html:28574`). That table is the end of the T6 road and it is well built — v500 split ORCA
+Value from Statutory, v569 unmasked the bulk harvest, v588 the shared regional instruments, v601
+the unsourced rows, v625 the terms the model needs and the fact base does not hold.
+
+Every one of those improvements is about **what ORCA holds**. Not one of them checks the thing the
+Source cell actually offers: a document name, a confidence letter, and a **↗** that means *click to
+read the clause*. That arrow is the only control on this platform that offers to PROVE a number,
+and nothing had ever checked that the address behind it resolves.
+
+I checked. All 225 distinct citation URLs in `api/v1/country/*.json`, full GET with a browser UA,
+**two independent passes** (the second with three retries on any connection error, to rule out
+transient failure — one URL recovered and was excluded):
+
+| result | URLs |
+|---|---|
+| returned the document (200/202) | **75** |
+| **404** — host alive, document not at this address | **69** |
+| **hostname does not resolve** (NXDOMAIN) | **60** |
+| refused the automated request (403 / dropped) — live host bot-blocking a script | 21 |
+
+The 60 NXDOMAIN hosts were confirmed against `dig` while control domains (`example.com`,
+`lovdata.no`) resolved from the same shell — `www.minerals.af`, `snhonline.cm`,
+`www.naturaloil.gy`, `ict.sopac.org`, `www.mmd.gov.zm` and 57 other hosts simply do not exist.
+
+In row terms: **272 of the 502 sourced rows across the API cite an address that returns nothing,
+and 249 of those 272 wear tier A — "primary official source."** 119 countries have at least one.
+**79 countries have NO retrievable citation at all** — Guyana, Egypt, Ecuador, Japan, Iran, Kuwait,
+Morocco, Mongolia, South Africa, Sweden, Uganda among them — and every one of them printed the
+green **"✓ All N independently sourced parameters match the rate stated in the cited source"** tick
+with a live-looking ↗ on every row.
+
+Guyana is the sharpest case, and it is a ★ starred country: five A/C-tier rows, all matching, all
+ticked, all five citations dead. An analyst verifying the Stabroek 2% royalty before an IC memo
+clicked ↗ and landed on a 404 — with nothing on the page having warned them, and no way to tell
+that row apart from Norway's, whose links all resolve.
+
+The 21 bot-blocked URLs are deliberately **not** marked: a human browser very likely reaches them,
+and marking them would put a false accusation on a live document.
+
+## Change
+Nothing on screen changes for a row whose citation resolves — Norway's Evidence Chain is
+byte-identical. For a row measured dead:
+
+1. **The ↗ comes off.** The promise is withdrawn rather than kept and broken.
+2. **A red `LINK DEAD` chip goes on**, in the same visual grammar as the existing `BULK` (v569),
+   `N JURISDICTIONS` (v588) and `NOT HELD` (v625) chips, at 70% opacity. The anchor stays live so
+   the analyst can still try it.
+3. **The tier letter is untouched.** Whether a document is authoritative and whether ORCA can hand
+   you a copy of it are two different questions; the A badge answers only the first. No value, no
+   tier, no take, no NPV, no grade was altered anywhere.
+4. **The tick line is scoped**, in the same place and voice as v625's `_scope625`: "✓ All 5
+   independently sourced parameters match the rate stated in the cited source. **None of those 5
+   citations can be opened from here.**"
+5. **A new note block** under the table names which parameters, states the measurement date on its
+   face, and separates the all-dead case — because that is where the tick misleads most.
+
+Measurement is baked in as `_CITE_DEAD` / `_citeLinkDead()` beside `_isBulkSource`, with the full
+method and counts in the comment, and is presented on screen as what it is: a dated point-in-time
+network check, not a verdict on the law.
+
+**Mobile (Step 5b):** the new chip measured **17px** under `pointer: coarse` — a real violation
+caught by the gate, not waved through. Given `.cite-dead-chip` (`min-height: 24px`, inline-flex)
+inside the **v612 MOBILE LAYER**, in the additive form v621/v640 used — the layer is not narrowed,
+weakened or overridden. Re-measured: **all LINK DEAD chips ≥ 24px**. Horizontal scroll checked at
+**1920 / 1440 / 1280 / 1024 / 768 / 390 — zero at every width.**
+
+## Result
+An analyst can now tell, **before clicking**, whether ORCA can actually produce the document behind
+a number — and on 79 countries they learn that it cannot before they have staked an IC memo on it.
+The 272 rows that were indistinguishable from verifiable ones are now distinguishable. On Guyana
+the page stops saying "5 of 5 sourced parameters verified" and starts saying "5 of 5 agree with a
+source none of us can currently open," which is the true statement and the one that changes what
+the analyst does next.
+
+## Open / carried
+- **The dead links themselves are a data-repair job, not a UX one.** 129 URLs, 62 dead hosts. This
+  cycle makes the breakage visible and honest; it does not fix the citations, and re-harvesting
+  them is a sourcing decision for Zach, not the loop.
+- The measurement is a static snapshot dated 4 Sep 2026 and will drift. A periodic re-check
+  (a step in the overnight chain regenerating `_CITE_DEAD`) is the durable form — **not added
+  without Zach's call**, since it adds a network dependency to the 02:00 chain.
+- Two pre-existing `.source-badge` elements in the Evidence Chain still measure **22.5px** under a
+  thumb. Not touched this cycle (the directive scopes the 24px rule to controls added or touched);
+  flagged for a future mobile pass.
+- **`renderSampleAnalyses()` hardcoded `regionOrder`** — still the strongest open T1 candidate.
+  Carried from 534–546.
+- **`IOC_PRESENCE` entity-to-parent alias map** — strongest open T4 candidate. Carried from 544.
+- **Netherlands 23.4% govt take** vs the North Sea Trio "~48% take" tooltip. Carried from 536–546.
+- **Three Screener presets self-labelled "(barely narrows)"**, one (Two-Price Return Screen)
+  structurally inverted. Business-logic call, flagged for Zach. Carried from 546.
+- Cycle 539's empty Summary line in GRADER still reads as a completed cycle. Carried from 540–546.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip as the fix — the LINK DEAD chip is a new rendered state
+with a new layout box, not a tooltip on an unchanged control. Not a text-only change: seven flex
+items changed, the ↗ affordance is removed on 272 rows, and a new note block renders. **No take,
+NPV, breakeven, IRR, rank, reform diamond, band, tier letter or evidence grade was altered
+anywhere.** Chip rows stay `display:none`; no page-sub paragraph, amber instructional banner,
+routing hint or "How to read" block; no SbS card wrapper. Screener advanced filters still
+collapsed, presets still a dropdown; Home "More tools" still collapsed; Explorer analytics still
+collapsed. **No tab added, removed or reordered.** Govt NPV stays REMOVED from FC; Contractor NPV
+header stays "NPV ($M)"; FC Analyst Guide sessionStorage logic untouched. v632 FC shortlist
+selector, v637 IOC export controls, v639 chart-fill rule, v640 Screener checkbox sizing all
+untouched. The **v612 MOBILE LAYER** block and the `#reference-panel` `translateX` state are
+untouched — this cycle's rule is an addition inside that layer in the same form v621 and v640
+used. v371/v373, v430, v449, v451, v452, v489, v612 and every locked item through v640 intact.

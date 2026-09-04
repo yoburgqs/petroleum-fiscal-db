@@ -1200,6 +1200,19 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      checkbox in the Screener's collapsed mechanic/IOC grids. */
   #sc-fee-cmp { width: 24px; height: 24px; margin-top: 0; }
 
+  /* v641 (T6): the LINK DEAD chip added this cycle carries its whole explanation in a
+     title="" and is the tap target for it, but it is a 10px span inside a table cell and
+     measured 17px with a thumb. Given its own class rather than widening the `td a` rule
+     above, which would also grow every source badge in the Evidence Chain and push the
+     table taller on a phone for rows this cycle did not touch. */
+  .cite-dead-chip {
+    display: inline-flex;
+    align-items: center;
+    min-height: 24px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+  }
+
   /* Hover-only affordances never resolve on touch; make them always-on. */
   .fc-row-hint, .screener-row-hint { opacity: 1 !important; }
 }
@@ -1665,7 +1678,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v640</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v641</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1735,7 +1748,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v640</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v641</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2068,7 +2081,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v640';
+  return m ? m[0] : 'v641';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2143,7 +2156,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v640');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v641');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -22703,6 +22716,44 @@ function getTierBadge(entry, tooltip) {
 // country level rather than verified per individual contract"; until now no country surface said
 // which countries that applied to. This is a floor, not a total: it counts only what appears in
 // the country's top three sources, so the real figure can be higher. It is never presented as exact.
+
+// ── v641 (T6) — MEASURED CITATION-LINK REACHABILITY ────────────────────────────
+// The Evidence Chain's Source cell is the only control on this platform that offers to PROVE a
+// number. It renders the instrument's name, a confidence letter, and a "↗" that means "click to
+// read the clause". Nothing had ever checked that the address behind that arrow resolves.
+// Measured 2026-09-04, twice independently, from the build host, over all 225 distinct citation
+// URLs in api/v1/country/*.json — full GET, browser UA, three retries on any connection error:
+//
+//     75 of 225 returned the document (200/202)
+//     69 returned 404 — the host is alive and says the document is not at this address
+//     60 did not resolve at all — NXDOMAIN on the hostname. www.minerals.af, snhonline.cm,
+//        www.naturaloil.gy, ict.sopac.org and www.mmd.gov.zm are among 62 hosts that do not exist.
+//     21 refused the automated request (403 / dropped connection) — a live host bot-blocking a
+//        script. A human browser very likely reaches these, so they are NOT marked and render
+//        exactly as before. Only a 404 or a dead hostname counts here.
+//
+// In row terms: 272 of the 502 sourced rows across the API cite an address that returns nothing,
+// and 249 of those 272 wear tier A — "primary official source". 119 countries have at least one.
+// 79 countries — Guyana, Egypt, Ecuador, Japan, Iran, Kuwait, Morocco, Mongolia among them — have
+// NO retrievable citation at all, and every one of them still printed the green "✓ All N
+// independently sourced parameters match the rate stated in the cited source" tick with a
+// live-looking ↗ on every row. An analyst verifying a figure before an IC memo clicked it and
+// landed on a 404, with nothing on the page having warned them.
+//
+// This changes no value, no tier letter, no take and no grade. Whether a document is
+// authoritative and whether ORCA can hand you a copy of it are two different questions; the A
+// badge answers only the first. Recorded here is the second, and it is a point-in-time network
+// measurement — stated as such, with its date, everywhere it appears on screen.
+const _CITE_DEAD_CHECKED = '4 Sep 2026';
+const _CITE_DEAD = (function() {
+  const s = new Set();
+  'http://www.asambleanacional.gob.ve/uploads/documentos/doc_2440.pdf\nhttp://www.inp.gov.mz/en/Content/Download/Petroleum-Law-21-2014.pdf\nhttps://anpm.tl/en/petroleum-act\nhttps://dda.gov.ae/en/laws-and-decrees\nhttps://egas.com.eg/en/Regulations\nhttps://en.parliran.ir/eng/en/Tax%20affairs%20law.pdf\nhttps://ens.dk/sites/ens.dk/files/OlieGas/undergrundsloven_english.pdf\nhttps://govmin.gl/wp-content/uploads/2019/08/Mineral-Resources-Act.pdf\nhttps://ict.sopac.org/model-petroleum-act\nhttps://law.e-gov.go.jp/htmldata/S38/S38HO098.html\nhttps://laws.justice.gov.ng/admin/statutes/PIA2021.pdf\nhttps://laws.parliament.na/cms_documents/2-2017-a819a88e5e.pdf\nhttps://leganet.cd/Legislation/Droit%20Economique/Mines/DRC-MiningCode2002-MiningRegulations2003.pdf\nhttps://legislation.tn/fr/legislation/code-des-hydrocarbures\nhttps://lex.uz/ru/docs/4674890\nhttps://minpet.gov.ao/legislacao\nhttps://mmk.tj/ru/laws/taxation\nhttps://mop.gov.ss/petroleum-act-2012/\nhttps://nioc.ir/Portal/Home/Default.aspx\nhttps://nocal.com.lr/petroleum-act-2002/\nhttps://petroleum.gouv.sn/media/doc/CODE_PETROLIER_2019.pdf\nhttps://resourcecontracts.org/contract/ocds-591adf-2523812803/view\nhttps://resourcecontracts.org/contract/ocds-591adf-6297613798/view#/pdf\nhttps://snhonline.cm\nhttps://taxsummaries.pwc.com/allcountries\nhttps://tda.gov.om/en/regulations/income-tax-law\nhttps://www.adnoc.ae/en/working-with-us/our-operating-model\nhttps://www.afip.gob.ar/genericos/novedadesModelo/documentos/Ley_27430.pdf\nhttps://www.agc.gov.bn/agc/index.html\nhttps://www.albanian-petroleum.com/al/legjislacioni\nhttps://www.alberta.ca/mines-minerals-act\nhttps://www.ancap.com.uy/innovaportal/file/44/1/regimen_fiscal_actividades_upstream.pdf\nhttps://www.andi.dz/index.php/fr/lois-et-textes/code-des-investissements\nhttps://www.ane.cv/images/lei_n2006.pdf\nhttps://www.anepa.gw/documents/petroleum-code\nhttps://www.anh.gov.co/es/marco-legal/acuerdos-anh/acuerdo-4-de-2012/\nhttps://www.anpg.ao/en/upstream-petroleum/legislation/\nhttps://www.anpi-gabon.com/legislation/\nhttps://www.anrm.ro/ro/cadrul-legal\nhttps://www.asamblea.go.cr/Centro_de_informacion/Consultas_SIL/Pginas/Detalle%20Leyes.aspx?Numero_Ley=7399\nhttps://www.asamblea.gob.ni/assets/dpto-biblioteca/coleccion/leyes/Ley%20316,%20Ley%20especial%20de%20exploracion%20y%20explotacion%20de%20hidrocarburos.pdf\nhttps://www.asamblea.gob.pa/APPS/SEG_LEGIS/PDF_SEG/PDF_SEG_2000/PDF_SEG_2009/\nhttps://www.asamblea.gob.sv/leyes/ley-de-hidrocarburos\nhttps://www.belizelaw.org/web/lawadmin/PDF%20files/cap225.pdf\nhttps://www.boe.es/boe/dias/1998/10/08/pdfs/A33517-33588.pdf\nhttps://www.boem.gov/oil-gas-energy/leasing/royalties\nhttps://www.camboilgas.com/en/regulatory-framework\nhttps://www.cohydro.cd/\nhttps://www.commerce.gov.fj/petroleum-act\nhttps://www.dian.gov.co/normatividad/Normas/Ley_2277_de_2022.pdf\nhttps://www.diputados.gob.mx/LeyesBiblio/pdf/LHidro.pdf\nhttps://www.diputados.gob.mx/LeyesBiblio/pdf/LHidrocarburos.pdf\nhttps://www.enerji.gov.tr/tr-TR/Sayfalar/Petrol\nhttps://www.eritrea.be/petroleum-law-1995.html\nhttps://www.esdm.go.id/assets/media/content/content-peraturan-pemerintah-53-2017.pdf\nhttps://www.falklands.gov.fk/falkland-islands-hydrocarbons-licensing-ordinance-1996\nhttps://www.gacetaoficial.cu/sites/default/files/go/2019/10/gaceta_oficial_no._90_2019.pdf\nhttps://www.gnm.am/en/legal-framework\nhttps://www.gob.ec/sites/default/files/regulations/2018-11/Documento_Ley-Hidrocarburos.pdf\nhttps://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/tributos/irpj\nhttps://www.gov.cn/flfg/2007-03/19/content_554415.htm\nhttps://www.gov.za/documents/petroleum-resources-royalty-act\nhttps://www.guatemalalatina.com/leyes/Ley_de_Hidrocarburos.pdf\nhttps://www.hydrocarbons.gr/legislation/\nhttps://www.hydrocarbures.td/cadre-juridique\nhttps://www.inbo-news.org/IMG/pdf/Offshore-Law_Continental-Shelf-Belgium.pdf\nhttps://www.iraq-business-news.com/wp-content/uploads/2010/03/Law19.pdf\nhttps://www.irc.gov.pr/en/tax-information/corporate-income-tax\nhttps://www.itie.bf/wp-content/uploads/2020/03/loi-036-2015.pdf\nhttps://www.jardfeingi.fo/media/1108/petroleum_act.pdf\nhttps://www.lawcap.gov.bb/images/pdf/petroleum_act.pdf\nhttps://www.me.gov.me/en/legislation\nhttps://www.mem.gov.ma/Lists/Lst_Textes_juridiques/Attachments/6/Dahir%201-91-118.pdf\nhttps://www.minenergia.gov.co/en/sector/regulatory-framework/laws/hydrocarbons-law\nhttps://www.minerals.af/uploads/Hydrocarbon_Law.pdf\nhttps://www.mines.gov.bw/legislation\nhttps://www.mines.gov.sb/legislation.html\nhttps://www.mining.gov.mw/legislation\nhttps://www.minpet.gov.sd/Laws/Sudan_Petroleum_Act.pdf\nhttps://www.mlss.gov.jm/files/Petroleum%20Act.pdf\nhttps://www.mmd.gov.zm/legislation\nhttps://www.mmh.gov.gq/index.php/en/legal-framework\nhttps://www.mof.gov.cy/mof/gesy/gesy.nsf/All/91E2C6F0CB1F8F56C22581C5003F23C3/$file/HYDROCARBONS%20LAW%2042007.pdf\nhttps://www.mof.gov.kw/LawsRegulations/Pages/IncomeTaxLaw.aspx\nhttps://www.mofe.gov.np/petroleum-act\nhttps://www.mopic.gov.ye/file/law/Petroleum_Law.pdf\nhttps://www.mrpam.gov.mn/en/petroleum-law\nhttps://www.mype.gov.mm/petroleum-resources-law\nhttps://www.naturaloil.gy/legislation-regulations/\nhttps://www.nocal.com.lr/regulatory-framework\nhttps://www.noga.gov.bh/en/regulatoryframework/legislation\nhttps://www.npc.gov.cn/npc/c30834/202204/5c31b9e6ce2e4dfda0a7df2d9d53a0c7.shtml\nhttps://www.nra.gov.jo/en/petroleum-laws\nhttps://www.nuprc.gov.ng/deep-offshore-psc/\nhttps://www.nuprc.gov.ng/laws-regulations/deep-offshore-inland-basin-psc-act/\nhttps://www.nuprc.gov.ng/wp-content/uploads/2021/08/PETROLEUM-INDUSTRY-ACT-2021.pdf\nhttps://www.ogero.gov.lb/en/regulatory-framework\nhttps://www.onhym.ma/en/legal-framework/\nhttps://www.paragraf.rs/propisi/zakon_o_rudarstvu_i_geoloskim_istrazivanjima.html\nhttps://www.parliament.gh/document/53\nhttps://www.parliament.sl/wp-content/uploads/Petroleum-Exploration-and-Production-Act-2011.pdf\nhttps://www.perupetro.com.pe/wps/portal/perupetro/site/contratos/modelocontrato\nhttps://www.perupetro.com.pe/wps/wcm/connect/perupetro/site/Informacion+Legal/Ley+Organica+de+Hidrocarburos\nhttps://www.petrobangla.org.bd/legislation/\nhttps://www.petrolao.com.la/en/petroleum-law\nhttps://www.petroleum.gov.lk/web/\nhttps://www.petroleumauthority.go.ug/regulation/petroleum-laws/\nhttps://www.petronas.com/sites/default/files/2021-08/pda1974.pdf\nhttps://www.petrosen.sn/en/legal-framework/\nhttps://www.qp.com.qa/en/legal/petroleum-law\nhttps://www.rcpc.kz/en/normativebase\nhttps://www.recursosyenergia.gob.ec/ley-de-hidrocarburos/\nhttps://www.retsinformation.dk/eli/lta/1982/946\nhttps://www.riksdagen.se/sv/dokument-lagar/dokument/svensk-forfattningssamling\nhttps://www.ris.bka.gv.at/GeltendeFassung.wxe?Abfrage=Bundesnormen&Gesetzesnummer=10011975\nhttps://www.sao-tome.net/legislation-petroliere/\nhttps://www.seniat.gob.ve/portal/page/portal/MANEJADOR_CONTENIDO_SENIAT/LEGISLACION/ISLR.pdf\nhttps://www.serna.gob.hn/PDF/Leyes_ambientales/Ley_General_Mineria.pdf\nhttps://www.sgg.gouv.ht/wp-content/uploads/2016/01/Loi-Cadre-Hydrocarbure.pdf\nhttps://www.smin.gov.mr/fr/code-petrolier\nhttps://www.snh.cm/index1.php/en/legal-texts\nhttps://www.socar.az/socar/az/company/about-socar/legal-documents\nhttps://www.sonatrach.com/en/regulations\nhttps://www.staatsolie.com/en/operations/exploration/exploration-blocks/\nhttps://www.statehouse.gm/petroleum-act-2007\nhttps://www.tpdc.co.tz/petroleum-act-2015/\nhttps://www.ttparliament.org/wp-content/uploads/2019/09/Petroleum-Taxes-Act.pdf\nhttps://www.vanuatu.gov.vu/petroleum-act-2010\nhttps://www.ypfb.gob.bo/marco-legal.html'.split('\n').forEach(function(u) { if (u) s.add(u); });
+  return s;
+})();
+// True only for a URL measured as a 404 or an unresolvable host. An unmeasured URL, or one that
+// answered, or one that merely bot-blocked the checker, returns false and is left completely alone.
+function _citeLinkDead(url) { return !!(url && _CITE_DEAD.has(String(url))); }
+
 const _BULK_SOURCES = ['EY_KPMG_CIT_Guide_2025', 'EY_IHS_BulkHarvest_2025'];
 function _isBulkSource(name) { return _BULK_SOURCES.indexOf(name) !== -1; }
 // v569 (T6): promoted out of buildEvidencePanel() so the per-parameter Evidence Chain table
@@ -28604,6 +28655,12 @@ function renderReformTimeline(country) {
     let sharedLabels = [];    // v588: which parameters those are, named on screen
     let sharedSrcName = '';   // v588: the instrument itself
     let sharedOthers = [];    // v588: the other jurisdictions it also stands in for
+    // v641 (T6): rows whose cited document could not be retrieved at the address on record.
+    // Counted separately from every existing bucket because it is orthogonal to all of them --
+    // a row can be A-tier, independently sourced, matching the statute, and still unverifiable.
+    let deadLinkCount = 0;
+    let deadLinkLabels = [];
+    let citedLinkCount = 0;   // rows that render a clickable citation at all -- the denominator
     // v601 (T2): rows that carry NO source of any kind. Until now they rendered a bare numeric
     // value, an em-dash in the Statutory column, and a badge reading "Contract DB average" -- a
     // phrase that names a method, not an absence -- at exactly the same visual weight as an A-tier
@@ -28801,7 +28858,30 @@ function renderReformTimeline(country) {
           if (conf === 'd') {
             badgeHtml = `<span class="source-badge conf-d" title="${dTooltip}">${dIcon}Estimated default · D</span>`;
           } else if (srcMeta.url) {
-            badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="max-width:340px;${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} ↗</a>`;
+            citedLinkCount++;
+            // v641 (T6): the arrow is a promise that a click reaches the clause. Where the
+            // measurement says it does not, the promise is withdrawn rather than kept and broken:
+            // the ↗ comes off, a LINK DEAD chip goes on, and the tier letter is left untouched --
+            // the document may well be authoritative, ORCA just cannot hand you a copy of it.
+            // The anchor stays live so the analyst can still try, and the tip says exactly what
+            // was measured, when, and what it does and does not mean.
+            if (_citeLinkDead(srcMeta.url)) {
+              deadLinkCount++;
+              deadLinkLabels.push(label);
+              const _dTip = _esc(label + ': ORCA cannot retrieve this document. The address on record — '
+                + srcMeta.url + ' — returned no document when checked on ' + _CITE_DEAD_CHECKED
+                + ' (either a 404, or a hostname that does not resolve). This says nothing about whether '
+                + srcLabel + ' is authoritative, and the tier letter beside it is unchanged; it means the '
+                + 'citation cannot be opened and checked from here. The rate in the Statutory column was '
+                + 'taken from this source when it was harvested and has not been re-read since. '
+                + 'Find the instrument yourself before this figure goes in an IC memo.');
+              const _deadChip = '<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
+                + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
+                + 'letter-spacing:.04em;cursor:help;" title="' + _dTip + '">LINK DEAD</span> ';
+              badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="max-width:340px;opacity:.7;" title="${_dTip}">${_deadChip}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</a>`;
+            } else {
+              badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="max-width:340px;${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} ↗</a>`;
+            }
           } else {
             badgeHtml = `<span class="source-badge ${confClass}" style="max-width:340px;${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</span>`;
           }
@@ -29126,6 +29206,49 @@ function renderReformTimeline(country) {
         + ' from ' + _esc(country) + '\u2019s own petroleum act before an IC memo.</strong>'
         + '</div>'
       : '';
+    // ── v641 (T6): the citation-retrievability note ────────────────────────────────
+    // Every other absence under this table already has a named state on screen: BULK (v569),
+    // N JURISDICTIONS (v588), NO SOURCE / NOT RECORDED (v601), NOT HELD (v625). "The source
+    // exists, is graded A, agrees with the value, and cannot be opened" had none, and it is the
+    // one an analyst only discovers by clicking -- at which point they are on a 404 with a memo
+    // to write. The all-dead case is called out separately because that is where the green tick
+    // above is most misleading: it is a true statement about two columns agreeing, made about a
+    // document nobody on this platform can currently produce.
+    const _allDead = citedLinkCount > 0 && deadLinkCount === citedLinkCount;
+    const _deadNote641 = deadLinkCount > 0
+      ? '<div style="margin-top:8px;background:rgba(185,28,28,.06);border:1px solid rgba(185,28,28,.28);'
+        + 'border-left:3px solid var(--red);border-radius:5px;padding:8px 11px;font-size:11px;'
+        + 'color:var(--muted);line-height:1.5;">'
+        + '<strong style="color:var(--text);">\u26a0 '
+        + (_allDead
+            ? 'Not one of the ' + citedLinkCount + ' cited source' + _pl(citedLinkCount) + ' above can be retrieved'
+            : deadLinkCount + ' of the ' + citedLinkCount + ' cited sources above cannot be retrieved')
+        + ' at the address on record.</strong> '
+        + _esc(deadLinkLabels.join(', ')) + ' link' + (deadLinkCount === 1 ? 's' : '')
+        + ' to a page that returned a 404, or to a hostname that no longer resolves, when every '
+        + 'citation URL on the platform was checked on ' + _CITE_DEAD_CHECKED + '. '
+        + '<strong style="color:var(--text);">This is not a judgement on the instrument.</strong> '
+        + 'The tier letter is unchanged and the statute may be perfectly good \u2014 the rate in the '
+        + 'Statutory column was read off it at harvest time. What it means is that the one step that '
+        + 'would let you check that rate yourself is currently broken'
+        + (_allDead
+            ? ', so the tick above confirms two columns agreeing about a document this platform cannot '
+              + 'presently produce.'
+            : '.')
+        + ' <strong style="color:var(--text);">Locate the instrument by name before '
+        + (deadLinkCount === 1 ? 'this figure goes' : 'these figures go') + ' in an IC memo.</strong>'
+        + '</div>'
+      : '';
+    // Scopes the tick sentence itself, in the same place and the same voice as v625's _scope625.
+    // "All 3 independently sourced parameters match the rate stated in the cited source" is the
+    // string that misleads when the cited source is a dead address.
+    const _citeScope641 = deadLinkCount > 0
+      ? ' <strong style="color:var(--red);">'
+        + (_allDead
+            ? 'None of those ' + citedLinkCount + ' citation' + _pl(citedLinkCount) + ' can be opened from here.'
+            : deadLinkCount + ' of those ' + citedLinkCount + ' citations cannot be opened from here.')
+        + '</strong>'
+      : '';
     const _mainNote = divergentCount > 0
       ? '<div style="margin-top:8px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
         + '<strong style="color:var(--text);">⚠ ' + divergentCount + ' of ' + sourcedCount + ' independently sourced parameter' + _pl(sourcedCount) + ' differ from the statutory rate.</strong> '
@@ -29133,17 +29256,18 @@ function renderReformTimeline(country) {
         + 'ORCA’s take%, NPV and IRR are built from the contract terms in the ORCA Value column, not from the statute. '
         + 'The gap is normally real — grandfathered licence rounds, block-specific terms and sliding scales. '
         + 'In an IC memo, cite the statutory figure against the linked source and the ORCA figure as a contract-weighted average.'
+        + _citeScope641
         + _scope625
         + '</div>'
       : (sourcedCount > 0
         ? '<div style="margin-top:8px;font-size:11px;color:' + (_missInvented.length ? 'var(--orange)' : 'var(--muted)') + ';">'
           + (_missInvented.length ? '\u26a0 ' : '\u2713 ')
           + (sourcedCount === 1 ? 'The 1 independently sourced parameter matches' : 'All ' + sourcedCount + ' independently sourced parameters match')
-          + ' the rate stated in the cited source.' + _coverage601 + _scope625 + '</div>'
+          + ' the rate stated in the cited source.' + _citeScope641 + _coverage601 + _scope625 + '</div>'
         : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
-    const reconNote = _mainNote + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _bulkNote + _sharedNote;
+    const reconNote = _mainNote + _deadNote641 + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _bulkNote + _sharedNote;
 
     // v500: Parameter | ORCA Value | Statutory (cited source) | Source
     // Previously the Source badge sat next to the contract average and read as though the primary
