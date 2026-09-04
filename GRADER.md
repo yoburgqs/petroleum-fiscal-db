@@ -27564,3 +27564,137 @@ v612, v621, v632, v637, v639, v640, v641, v642, v643 and every locked item throu
 **Task:** T5 — "Give me something I can paste straight into an IC memo." (rotated off T4/549, T2/548, T6/547, T1/546, T3/545)
 
 **Friction:** I walked T5 cold at 1440px with no storage and read the actual clipboard from all five artifacts that leave the tool. Four were right. The fifth — Country Profile → **Copy for IC Memo**, the flagship one, the paragraph that ends up in a committee document — carried a private stability scale (`
+
+---
+## Cycle 551 Log — 2026-09-04 14:07
+- Test before: 236 PASS / 0 FAIL (deployed baseline) · 261 PASS / 0 FAIL / 1 WARN (local, this build)
+- Test after: 261 PASS / 0 FAIL / 1 WARN — suite ACTUALLY RAN this cycle against
+  `http://localhost:8099/index.html`, report at `/tmp/runtime_test_report.txt`. The single WARN is
+  the local server's `sw.js` 404; it was present in the cold pre-edit walk too, so it is harness
+  noise and not this build.
+- JS errors: 0
+- Summary: Cycle 551 complete — shipped as **v645**, pushed to both repos.
+
+**Task:** T1 — "Which countries should even be on my screening list?" (rotated off T5/550, T4/549,
+T2/548, T6/547)
+
+**Friction.** I walked T1 cold at 1440px with no sessionStorage or localStorage: Home → Screener →
+IOC Capital Screen (15 countries, count matches the `#qs-ic-count` claim on Home) → drill a row →
+ask for its regional peers. That last step is where it breaks.
+
+Fiscal Compare hands off to the Screener in two places, and both had the same defect:
+
+| handoff | where |
+|---|---|
+| `Peers in <region> →` | FC drilldown action row, built at the `v428` block |
+| `⋮ Screener (<region>) →` | under the FC table, built from `_activeRegionForNudge` |
+
+Both did `var sel=document.getElementById('sc-region'); sel.value = '<raw region>';` and then called
+`runScreener()`. The database files countries under **Asia, Europe, Africa, Latin America, CIS/FSU,
+Oceania, Middle East, Other, North America, Unknown** — but `#sc-region` carried only the rolled-up
+`Asia Pacific` and `Americas`. Assigning a `<select>` a value with no matching `<option>` is a
+**silent no-op**: `sel.value` stays `""`, the region filter never applies, and the Screener runs over
+all 185 countries with the control reading "All Regions". No console error, no empty state, no
+divergence between the button's label and what it delivered — the analyst just gets a "shortlist"
+that is the entire database.
+
+Measured live, before the fix:
+
+```
+FC->SCREENER "Latin America"  btn="⋮ Screener (Latin America) →"  sel=""  rows=186
+FC->SCREENER "Asia"           btn="⋮ Screener (Asia) →"           sel=""  rows=186
+FC->SCREENER "Oceania"        btn="⋮ Screener (Oceania) →"        sel=""  rows=186
+FC->SCREENER "North America"  btn="⋮ Screener (North America) →"  sel=""  rows=186
+FC->SCREENER "Africa"         btn="⋮ Screener (Africa) →"         sel="Africa"  rows=50   <- worked
+PEERS Brazil     "Peers in Latin America →"  sel=""  rows=186
+PEERS Canada     "Peers in North America →"  sel=""  rows=186
+PEERS China      "Peers in Asia →"           sel=""  rows=186
+PEERS Australia  "Peers in Oceania →"        sel=""  rows=186
+PEERS Angola     "Peers in Africa →"         sel="Africa"  rows=50   <- worked
+```
+
+Four of the nine FC region chips and **70 of the 185 countries** (Asia 26, Latin America 26,
+Oceania 15, North America 2, Unknown 1) routed into the broken path. The damage lands squarely on
+the T1 answer itself: **12 of the 15 rows the IOC Capital Screen returns** — Canada, USA, Mexico,
+Argentina, Colombia, Ecuador, Brazil, China, India, Indonesia, Australia — sit in a region whose
+peer button silently returned the whole world. The five that happened to work (Africa, Europe,
+Middle East, CIS/FSU, Other) are the five whose database name coincides with an option label, which
+is why this survived 550 cycles: whoever spot-checked it checked Africa.
+
+**Change.**
+1. `#sc-region` now carries the granular region names alongside the roll-ups, grouped in
+   `<optgroup>`s with counts read off the shipped `country_data.json`:
+   `Asia Pacific — all (41) / Asia (26) / Oceania (15)` and
+   `Americas — all (28) / Latin America (26) / North America (2)`.
+   The Screener can now express the same regions Fiscal Compare's chip row has always shown, so the
+   handoff resolves by exact match and the two surfaces stop disagreeing about what a region is.
+2. New `_setScreenerRegion(rawRegion)` next to `_regionMatch()`, and both handoffs route through it.
+   It assigns, **verifies the assignment actually took**, and on failure falls back to the roll-up
+   that `_regionMatch()` says CONTAINS that region — never to "no filter at all". `Unknown` resolves
+   to `Other` by that route. It returns the option value applied, or `''`, so a future caller can
+   tell that it did not get the filter it asked for. This is the part that makes the class of bug
+   non-recurring, not just the four instances of it.
+
+No preset writes an unmappable region (`applyScreenerPreset` only ever sets `''` or `'Africa'`), and
+the runtime suite's region checks target `#flt-region` in the Explorer, not `#sc-region`.
+
+**Result.** After the fix, every one of the ten database regions and both roll-ups resolve exactly:
+
+```
+Asia -> Asia (26)              Latin America -> Latin America (26)
+Oceania -> Oceania (15)        North America -> North America (2)
+Africa (49)  Europe (30)  Middle East (14)  CIS/FSU (5)  Other (18)
+Unknown -> Other (18)          Asia Pacific (41)   Americas (28)
+```
+
+Every count matches the label on the corresponding Fiscal Compare chip. An analyst who finds Brazil
+attractive in the IOC Capital Screen and clicks "Peers in Latin America →" now lands on 26 Latin
+American countries ranked by NPV, which is a screening shortlist. Before this cycle they landed on
+all 185 and had no way to know the filter had not fired.
+
+## Mobile (Step 5b) — 390 x 844, `hasTouch: true`
+Nine visible screens all `scrollWidth == clientWidth` (390/390): Home, Fiscal Compare, Country
+Profile, Explorer, Screener, Side-by-Side, IOC Portfolio, Breakeven Map, Reform Risk. The touched
+control `#sc-region` measures **44px** tall under `pointer: coarse` and the fix was exercised on the
+phone viewport (`_setScreenerRegion('Latin America')` → 26 rows, 390/390, 0 errors). Adding
+`<optgroup>`s does not widen the control — the select is 213px of a 390px viewport.
+
+## Open / carried
+- `renderSampleAnalyses()` hardcodes `regionOrder = ['Middle East','Africa','Asia Pacific',
+  'Americas','Europe','Other']` and groups on the RAW `d.region`, so its Regional Benchmarks table
+  renders only 4 rows and silently omits Asia, Latin America, Oceania, CIS/FSU and North America —
+  72 countries. Same root cause as this cycle's bug, different surface. **Downgraded from "strongest
+  open T1 candidate": `#tab-btn-tsamples` is `aria-hidden` and `display:none` in the nav, so the
+  card is not on a first-time analyst's path.** Still worth a cycle, now that the helper exists.
+  Carried 534–551.
+- Norway's stored `p25/p75` say one term while its own contract sample spans 29.6pp; the score is
+  still computed off the stored pair. Needs a `country_data.json` build change, not UX.
+  **Strongest open T2/T6 candidate.** Carried from 550.
+- The Screener table prints the RAW region on each row ("North America", "Latin America") while the
+  filter above it now offers both raw and rolled-up names. That is consistent as of this cycle, but
+  the Explorer's `#flt-region` still offers only the roll-ups. Minor; new, carried from 551.
+- `IOC_PRESENCE` entity-to-parent alias map — open T4 candidate. Carried from 544.
+- Netherlands 23.4% govt take vs the North Sea Trio "~48% take" tooltip. Carried 536–551.
+- 272 dead evidence citations (129 URLs, 62 dead hosts) — flagged by v641, still unrepaired.
+- Two `.source-badge` elements in the Evidence Chain still measure 22.5px under a thumb. Carried
+  from 547.
+- Three Screener presets self-labelled "(barely narrows)", one structurally inverted. Carried 546.
+- The breakeven bound resolution is still limited to the four prices `country_data.json` carries.
+- Why the DCF solver ran for 68 mostly-non-producing countries and not for the largest producers is
+  still not recorded anywhere the page can read. Carried from 548.
+- Cycle 539's empty Summary line in GRADER still reads as a completed cycle. Carried 540–551.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip as the fix** — the fix is that a button now filters;
+the one `title` added is on the `<select>` whose option set changed. **Not a text-only change**: two
+buttons that returned 185 rows now return 26, 26, 15 and 2. No take, NPV, IRR, breakeven, rank,
+reform diamond, Reform Frequency Score, evidence grade or Fiscal Predictability number was altered
+anywhere; no country's data changed. Chip rows stay `display:none`; no page-sub paragraph, amber
+instructional banner, routing hint or "How to read" block; no SbS card wrapper. Screener advanced
+filters still collapsed, presets still a dropdown; Home "More tools" still collapsed; Explorer
+analytics still collapsed. **No tab added, removed or reordered.** Govt NPV stays REMOVED from FC;
+Contractor NPV header stays "NPV ($M)"; FC Analyst Guide sessionStorage logic untouched. CP headline
+stays two-zone with global rank and vs-median pill; take% stays tier-coloured; Reform Risk stays in
+the primary Home card grid. The **v612 MOBILE LAYER** block and the `#reference-panel` `translateX`
+state are untouched — this cycle adds no CSS rule at all. v371/v373, v430, v449, v451, v452, v489,
+v612, v621, v632, v637, v639, v640, v641, v642, v643, v644 and every locked item through v644 intact.
