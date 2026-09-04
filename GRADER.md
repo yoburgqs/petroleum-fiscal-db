@@ -25141,3 +25141,18 @@ v371/v373, v430, v449, v451, v452, v489 and every locked item through v626 intac
 unaffected. Version sweep **v626 → v627** across the 4 display sites, done
 silently at the end; historical `v626` references in code comments deliberately
 left alone. It is **not** the deliverable.
+
+---
+## Cycle 532 Log — 2026-09-03 19:02
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 532 complete and pushed (v627).
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (stalest — 531 was T3, 530 T6, 528 T4, 527 T1, 526 T5, 525 T2)
+
+## Friction
+Walked cold into Country Profile — no sessionStorage, no localStorage — through Indonesia (the auto-load), then USA, Norway, Colombia, Cyprus, Iraq, Saudi Arabia and six more.
+
+The "attractive" half is answered well. The **"can I defend that"** half ends at one place: the **TOP CONTRACTS RANKED BY P
