@@ -1601,7 +1601,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v627</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v628</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1671,7 +1671,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v627</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v628</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1999,7 +1999,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v627';
+  return m ? m[0] : 'v628';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2074,7 +2074,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v627');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v628');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2837,7 +2837,7 @@ window.copyPlatformCitation = function(btn) {
             style="display:none;margin-left:14px;background:transparent;border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--muted);font-size:11px;align-items:center;gap:4px;">
       <span style="font-size:12px;vertical-align:middle;">&#10697;</span> Copy link
     </button>
-    <button id="dd-export-btn" title="Export this country profile to Excel" aria-label="Export country profile to Excel XLSX"
+    <button id="dd-export-btn" title="Export this country profile to Excel — 3 sheets: the 4-price fiscal summary, the regional peer ranking, and a Basis &amp; Assumptions sheet naming the standardized project behind every NPV, the production-data basis behind every take, and whether this country's take may be ranked against another's" aria-label="Export country profile to Excel XLSX, including a basis and assumptions sheet"
             style="display:none;margin-left:8px;background:transparent;border:1px solid var(--border);border-radius:4px;padding:4px 8px;cursor:pointer;color:var(--muted);font-size:11px;">
       ⬇ XLSX
     </button>
@@ -31441,6 +31441,89 @@ if (_wcEl) _wcEl.textContent = _totalContracts.toLocaleString();
 renderExplorer();
 runScreener();
 
+// v628 (T5): wrap a paragraph onto sheet-width lines so a long basis note is readable in a
+// cell column rather than running off the edge of the sheet as one 600-character string.
+function _cpWrap(text, width, indent) {
+  if (!text) return [];
+  var w = width || 94, pad = indent || '  ', out = [], line = '';
+  String(text).split(/\s+/).forEach(function(word) {
+    if (line && (line.length + 1 + word.length) > w) { out.push([pad + line]); line = word; }
+    else { line = line ? (line + ' ' + word) : word; }
+  });
+  if (line) out.push([pad + line]);
+  return out;
+}
+
+// The Basis & Assumptions sheet. Every paragraph is the SAME helper the on-screen "Copy for
+// IC Memo" paragraph uses, so the workbook and the clipboard state one basis, not two.
+function _cpBasisSheet(d, country, region, prof, npvBasis, cmpNote) {
+  var ver = (typeof _orcaVerNow === 'function') ? _orcaVerNow() : '';
+  var R = [];
+  R.push(['ORCA Petroleum Fiscal Intelligence Platform — ' + country]);
+  R.push(['Version', ver + '  |  yoburgqs.github.io/petroleum-fiscal-db/']);
+  R.push(['Exported', new Date().toISOString().slice(0, 10)]);
+  R.push(['']);
+
+  R.push(['WHAT THE CONTRACTOR NPV FIGURES ARE ON']);
+  R = R.concat(_cpWrap('Every "Contractor NPV" number in this workbook — on the Country Profile sheet '
+    + 'and in the Regional Peers table — is ONE standardized project run through each country\u2019s '
+    + 'fiscal terms. It is a fiscal comparison basis. It is not a valuation of any asset in '
+    + country + ', and it does not use ' + country + '\u2019s own field costs or production.'));
+  if (prof) {
+    R.push(['  Profile', prof.name]);
+    R.push(['  Peak rate (bopd)', prof.peakBblDay]);
+    R.push(['  Capex ($M)', prof.capexMM]);
+    R.push(['  Opex ($/bbl)', prof.opexBbl]);
+    R.push(['  Ramp-up (yr)', prof.rampYears]);
+    R.push(['  Plateau (yr)', prof.plateauYears]);
+    R.push(['  Decline rate (%/yr, post-plateau)', +(prof.declineRate * 100).toFixed(1)]);
+    R.push(['  Discount rate / WACC (%)', +(prof.discountRate * 100).toFixed(0)]);
+  }
+  R.push(['  Modelled horizon (yr)', 25]);
+  R.push(['  Working interest', '100% — scale every contractor NPV in this workbook by your actual WI']);
+  R = R.concat(_cpWrap('The horizon is fixed at 25 years for all ORCA profiles; profiles differ by ramp, '
+    + 'plateau and decline inside that window, not by its length. A profile still producing in year 25 '
+    + 'is truncated at the horizon, not depleted. For an NPV on YOUR capex, opex and production '
+    + 'profile, use the Scenario Builder tab — that is the only figure that is a project NPV.'));
+  R.push(['']);
+
+  R.push(['DATA BASIS OF THE GOVERNMENT TAKE FIGURES']);
+  R = R.concat(_cpWrap((typeof _icProdBasisNote === 'function') ? _icProdBasisNote(d) : ''));
+  R.push(['']);
+
+  R.push(['TAKE COMPARABILITY — whether this take may be ranked against another country']);
+  var feeNote = (typeof _icFeeBasisNote === 'function') ? _icFeeBasisNote(d) : '';
+  R = R.concat(_cpWrap(feeNote || cmpNote));
+  R.push(['']);
+
+  R.push(['EVIDENCE']);
+  R.push(['  Sourcing tier', (typeof _icSourcingTier === 'function') ? _icSourcingTier(d) : '']);
+  R.push(['  Evidence A/B (%)', d.ab_pct != null ? +d.ab_pct.toFixed(1) : null]);
+  R.push(['  Verified facts', d.n_facts != null ? d.n_facts : null]);
+  R.push(['  A-tier', 'Primary legislation or signed PSA text']);
+  R.push(['  B-tier', 'Verified secondary source (EY / Wood Mackenzie / Rystad)']);
+  R.push(['  C-tier', 'Directional estimate — verify before IC submission']);
+  R.push(['']);
+
+  R.push(['IRR']);
+  R = R.concat(_cpWrap(typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : ''));
+  R.push(['']);
+
+  R.push(['READING THE REGIONAL PEERS SHEET']);
+  R = R.concat(_cpWrap('That sheet ranks every ' + (region || 'regional') + ' country ORCA publishes on '
+    + 'database government take at $75/bbl, ascending. Each row carries its own Take Comparability and '
+    + 'Data Basis, because a fee-basis blend or a PROXY row is not rankable against a '
+    + 'production-weighted PSC row even though the sort puts them in one column. Read those two '
+    + 'columns before quoting a placing.'));
+  R.push(['']);
+
+  R.push(['CITATION']);
+  R = R.concat(_cpWrap('ORCA Petroleum Fiscal Intelligence Platform (2026), ' + ver
+    + '. ' + country + ' fiscal profile, exported ' + new Date().toISOString().slice(0, 10)
+    + '. https://yoburgqs.github.io/petroleum-fiscal-db/'));
+  return R;
+}
+
 // ─── EXPORT: Country Profile → Excel ─────────────────────────────────────────
 function exportCountryProfile() {
   if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
@@ -31450,14 +31533,61 @@ function exportCountryProfile() {
   const d = COUNTRY_DATA.find(x => x.country === country);
   if (!d) { showCopyToast('Country data not found.'); return; }
 
+  // ── v628 (T5): the workbook is the artifact that LEAVES the tool. It becomes the fiscal annex
+  // of an IC memo and is read weeks later by people who never saw this screen. It carried four
+  // government takes and four contractor NPVs and said nothing about what produced them. Three
+  // consequences, all measured on the live build against the clipboard buttons two inches away:
+  //   - NO PROJECT. Indonesia exported $333.6M / $744.6M / $1,087.8M / $1,477M with no capex, no
+  //     opex, no peak rate, no horizon, no discount rate and no working interest anywhere in the
+  //     file. "⎘ IC Citation" on the same panel opens "Deepwater profile, 10% WACC, 100% WI";
+  //     Fiscal Compare's workbook carries a 62-row Methodology sheet saying the same. This one
+  //     was the only export on the platform with no basis at all.
+  //   - NO COMPARABILITY CAVEAT. Iraq exported "Govt Take @$75 = 84.8" next to a Regional Peers
+  //     sheet of 26 countries sorted ascending on that same column — the cross-country ranking
+  //     MECHANIC_COMPARABILITY.md forbids for a fee-basis blend. The clipboard cite for the same
+  //     country says 68% of its 610 contracts are fee-basis and 34.1% is the figure to rank on.
+  //   - NO PROXY FLAG. Somalia exported a 36.9% take built from zero verified block-level
+  //     production. The reader had to join "Weighting Method: simple_avg" to "Prod Coverage: 0"
+  //     to find that out; the clipboard says outright "not to be cited as definitive".
+  // Every value below is read from the helpers the on-screen artifacts already use, so the
+  // workbook cannot fork from the clipboard the way v553 forked the mechanic name — which it
+  // still had: this sheet printed Indonesia as "Concession,PSC" while the cite said "PSC".
+  const _cpProf   = (typeof FC_PROFILES !== 'undefined' && FC_PROFILES.deepwater) ? FC_PROFILES.deepwater : null;
+  const _cpMech   = (typeof fcResolveMechanic === 'function') ? fcResolveMechanic(d) : (d.mechanics || '');
+  const _cpBasis  = (typeof _icProdBasisCell === 'function') ? _icProdBasisCell(d) : '';
+  const _cpFb     = (typeof cpFeeBasis === 'function') ? cpFeeBasis(d) : null;
+  const _cpMono   = (typeof _fpNoContractorPosition === 'function') && _fpNoContractorPosition(d);
+  const _cpCmp    = (_cpFb && _cpFb.diverges)
+      ? 'NOT comparable as published — ' + Number(_cpFb.n2).toLocaleString() + ' of '
+        + Number(_cpFb.tot).toLocaleString() + ' contracts (' + _cpFb.feePct.toFixed(0)
+        + '%) are fee-basis (' + _cpFb.names + '), where the contractor is paid a fixed $/bbl fee '
+        + 'and keeps no price upside, so take% measures contract structure, not how hard the terms '
+        + 'are. Rank this country on ' + _cpFb.cmpTake.toFixed(1) + '% — the take on its '
+        + Number(_cpFb.n1).toLocaleString() + ' PSC/Concession contracts.'
+      : _cpMono
+        ? 'State monopoly — ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0')
+          + '% government take at $50, $75, $100 and $125/bbl alike, contractor NPV $0. There is no '
+          + 'contractor position; not comparable with contractor-participation regimes.'
+        : 'Comparable — this country\u2019s contracts are profit-split mechanics (PSC / Concession / '
+          + 'Gross Split / Revenue Share), which share one take definition.';
+  const _cpNpvBasis = 'Standardized ORCA '
+      + (_cpProf ? _cpProf.name : 'Deepwater') + ' project'
+      + (_cpProf ? ' — $' + (_cpProf.capexMM / 1000).toFixed(1) + 'B capex, '
+          + (_cpProf.peakBblDay / 1000).toFixed(0) + 'k bbl/d peak, $' + _cpProf.opexBbl + '/bbl opex, '
+          + (_cpProf.discountRate * 100).toFixed(0) + '% discount rate' : '')
+      + ', 25-yr modelled horizon, 100% working interest. A fiscal comparison basis, NOT the field '
+      + 'economics of any asset in ' + country + ' — see the Basis & Assumptions sheet.';
+
   // Sheet 1: 4-Price Summary
   const summaryRows = [
     { Metric: 'Country', Value: country },
     { Metric: 'Region', Value: d.region || '' },
-    { Metric: 'Fiscal Mechanics', Value: d.mechanics || '' },
+    { Metric: 'Fiscal Mechanic', Value: _cpMech },
+    { Metric: 'Mechanic Mix (all contracts in DB)', Value: d.mechanics || '' },
     { Metric: 'R-factor Profit Oil Tiers', Value: d.has_r_factor_tiers ? 'Active — govt share rises with project R-factor (cumul.revenue/cost)' : 'Not applicable' },
     { Metric: 'Contracts in DB', Value: d.n },
     { Metric: 'Weighting Method', Value: d.weighting || '' },
+    { Metric: 'Data Basis', Value: _cpBasis },
     { Metric: 'Prod Coverage (%)', Value: d.prod_coverage_pct != null ? +d.prod_coverage_pct.toFixed(1) : null },
     { Metric: 'Predictability Score', Value: (function(){ const v = getFiscalPredictabilityScore(d); return v == null ? 'not scored — no contract-level take distribution held' : v; })() },
     // v536 (T3): the score's largest component is inert for 157 of 185 countries, so the exported
@@ -31465,6 +31595,7 @@ function exportCountryProfile() {
     // for the reader to assume the spread was measured.
     { Metric: 'Predictability Basis', Value: (function(){ const b = _fpDispersion(d); return b.state === 'monopoly' ? 'not scored — state monopoly: ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% government take at every modelled price, contractor NPV $0 / IRR −100%. No contractor position to score.' : b.state === 'none' ? 'not scored — no p25/p75 distribution' : b.state === 'single' ? 'one statutory term — IQR component not exercised (score is price swing + mechanic count only)' : 'measured spread ' + b.iqr.toFixed(1) + 'pp across contracts'; })() },
     { Metric: '', Value: '' },
+    { Metric: 'Take Comparability', Value: _cpCmp },
     { Metric: 'Govt Take @$50 (%)', Value: d.take_50 != null ? +d.take_50.toFixed(1) : null },
     { Metric: 'Govt Take @$75 (%)', Value: d.take_75 != null ? +d.take_75.toFixed(1) : null },
     { Metric: 'Govt Take @$100 (%)', Value: d.take_100 != null ? +d.take_100.toFixed(1) : null },
@@ -31473,6 +31604,7 @@ function exportCountryProfile() {
     { Metric: 'Take P25 @$75 (%)', Value: d.p25_take != null ? +d.p25_take.toFixed(1) : null },
     { Metric: 'Take P75 @$75 (%)', Value: d.p75_take != null ? +d.p75_take.toFixed(1) : null },
     { Metric: '', Value: '' },
+    { Metric: 'Contractor NPV basis', Value: _cpNpvBasis },
     { Metric: 'Contractor NPV @$50 ($M)', Value: d.npv_50 != null ? +d.npv_50.toFixed(1) : null },
     { Metric: 'Contractor NPV @$75 ($M)', Value: d.npv_75 != null ? +d.npv_75.toFixed(1) : null },
     { Metric: 'Contractor NPV @$100 ($M)', Value: d.npv_100 != null ? +d.npv_100.toFixed(1) : null },
@@ -31512,6 +31644,19 @@ function exportCountryProfile() {
     .map(p => ({
       Country: p.country,
       'Govt Take @$75 (%)': p.take_75 != null ? +p.take_75.toFixed(1) : null,
+      'Take Comparability': (function(){
+        var fb = (typeof cpFeeBasis === 'function') ? cpFeeBasis(p) : null;
+        if (fb && fb.diverges) return 'FEE-BASIS BLEND — not rankable as published; rank on ' + fb.cmpTake.toFixed(1) + '%';
+        if ((typeof _fpNoContractorPosition === 'function') && _fpNoContractorPosition(p)) return 'STATE MONOPOLY — no contractor position';
+        return 'Comparable';
+      })(),
+      'Data Basis': (function(){
+        var b = (typeof _icProdBasis === 'function') ? _icProdBasis(p) : null;
+        if (!b) return '';
+        return b.label === 'PROXY'
+          ? 'PROXY — no verified production; directional, not citable as definitive'
+          : b.label + ' — production-weighted on ' + b.cov.toFixed(1) + '% of contracts';
+      })(),
       'Contractor NPV @$75 ($M)': p.npv_75 != null ? +p.npv_75.toFixed(1) : null,
       'Swing (pp)': p.swing != null ? +p.swing.toFixed(1) : null,
       'Predictability': (function(){ const v = getFiscalPredictabilityScore(p); return v == null ? 'not scored' : v; })(),
@@ -31527,9 +31672,14 @@ function exportCountryProfile() {
   XLSX.utils.book_append_sheet(wb, _finishSheet(ws1), 'Country Profile');
   if (peerRows.length > 0) {
     const ws2 = XLSX.utils.json_to_sheet(peerRows);
-    ws2['!cols'] = [{wch:28},{wch:18},{wch:20},{wch:12},{wch:14},{wch:20},{wch:12}];
+    ws2['!cols'] = [{wch:28},{wch:18},{wch:52},{wch:48},{wch:20},{wch:12},{wch:14},{wch:34},{wch:22},{wch:12},{wch:12}];
     XLSX.utils.book_append_sheet(wb, _finishSheet(ws2), 'Regional Peers');
   }
+  // v628 (T5): the basis sheet. Fiscal Compare has carried one since v329; the single-country
+  // workbook — the one an analyst exports when they are writing about ONE country — had none.
+  const ws3 = XLSX.utils.aoa_to_sheet(_cpBasisSheet(d, country, region, _cpProf, _cpNpvBasis, _cpCmp));
+  ws3['!cols'] = [{wch:30},{wch:96}];
+  XLSX.utils.book_append_sheet(wb, ws3, 'Basis & Assumptions');
   const slug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   XLSX.writeFile(wb, `orca_${slug}_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
