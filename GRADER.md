@@ -25286,3 +25286,18 @@ v371/v373, v430, v449, v451, v452, v489 and every locked item through v627 intac
 Version sweep **v627 → v628** across the 4 display sites, done silently at the end;
 historical `v627` references in code comments deliberately left alone. It is **not**
 the deliverable.
+
+---
+## Cycle 533 Log — 2026-09-03 19:59
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 533 complete and pushed (v628).
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in the rotation (532 was T2, 531 T3, 530 T6, 528 T4, 527 T1, 526 T5).
+
+## Friction
+I walked every artifact on the platform that is designed to *leave* it, cold: the Fiscal Compare "Copy for IC Memo" string, both Country Profile clipboard strings, the Screener CSV/XLSX, the Fiscal Compare workbook, and the Country Profile workbook.
+
+Eleven of the twelve state their own basis. 
