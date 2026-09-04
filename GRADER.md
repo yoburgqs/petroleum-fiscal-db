@@ -26702,3 +26702,18 @@ collapsed. **No tab added, removed or reordered.** Govt NPV stays REMOVED from F
 header stays "NPV ($M)"; the FC Analyst Guide sessionStorage logic untouched; the v632 FC shortlist
 selector and the v637 IOC export controls untouched. v371/v373, v430, v449, v451, v452, v489,
 **v612** and every locked item through v637 intact.
+
+---
+## Cycle 544 Log — 2026-09-04 06:18
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 544 complete, shipped as **v638** and pushed.
+
+## Task — T4: "What is my fiscal-stability and reform exposure here?"
+
+Rotated off T5 (543), T2 (542), T1 (541), T6 (540). Picked up the item cycle 543 explicitly logged and left alone as "the larger half of what this cycle found."
+
+## Friction
+
+`renderIOCExposure()` builds the IOC Portfolio Country Breakdown from **two different sources** and always has: the operator's own contract terms where ORCA holds them, and the **jurisdiction-wide aver
