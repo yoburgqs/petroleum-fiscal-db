@@ -284,6 +284,20 @@ tbody td { padding: 6px 10px; white-space: nowrap; }
 /* ── chart container ── */
 .chart-wrap { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-top: 16px; max-height: 360px; }
 
+/* v639 (T3) — Side-by-Side's two charts were the only Chart.js instances on the platform left on
+   the library default maintainAspectRatio:true. .chart-wrap clamps height (max-height:360px), so
+   Chart.js resolved the locked 2:1 ratio by shrinking the WIDTH to match the clamped height: the
+   canvas measured 652 x 326 at every desktop width from 768px to 1920px, regardless of how wide
+   the card was. On a 1920 monitor that is 35% of a 1880px card — 1228px of blank white card to
+   the right of a plot in which three take lines cross inside ~400px. Every other chart on the
+   platform (dd-price-chart, irr-scatter, vintage-trend, tornado, prod) fills 98-100% of its
+   container because all eight of them pass maintainAspectRatio:false against a container with a
+   determinate height. These two get the same treatment; the wraps need a real height, not a
+   max-height, for Chart.js to have something to fill. Height is unchanged at desktop (the wrap
+   already measured exactly 360px) so nothing below the charts moves. */
+#cmp-chart-wrap, #cmp-npv-chart-wrap { height: 360px; position: relative; }
+@media (max-width: 720px) { #cmp-chart-wrap, #cmp-npv-chart-wrap { height: 250px; } }
+
 /* ── misc ── */
 .empty-state { color: var(--muted); font-size: 14px; padding: 40px; text-align: center; }
 .tag { background: var(--surface); border: 1px solid var(--border); border-radius: 5px; color: var(--muted); display: inline-block; font-size: 11px; margin: 2px; padding: 2px 7px; }
@@ -1644,7 +1658,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v638</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v639</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1714,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v638</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v639</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2047,7 +2061,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v638';
+  return m ? m[0] : 'v639';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2122,7 +2136,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v638');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v639');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -26043,6 +26057,7 @@ function renderCompare() {
       },
       options:{
         responsive:true,
+        maintainAspectRatio:false,   // v639 (T3): fill the card, not 652px of it
         plugins:{
           legend:{labels:{color:'#6B6560',font:{size:12}}},
           title:{display:true,
@@ -26100,6 +26115,7 @@ function renderCompare() {
       },
       options: {
         responsive: true,
+        maintainAspectRatio: false,   // v639 (T3): fill the card, not 652px of it
         plugins: {
           legend: { labels: { color: '#6B6560', font: { size: 11 } } },
           title: { display: true, text: 'Contractor NPV vs Oil Price ($M)', color: '#1C1A17', font: { size: 13, weight: 'bold' } },
@@ -32153,7 +32169,7 @@ function renderIOCExposure(operatorName) {
     };
   }).filter(d => d.take75 != null).sort((a,b) => b.take75 - a.take75);
 
-  // v638 (T4): how many of these rows are actually this operator.
+  // v639 (T4): how many of these rows are actually this operator.
   // renderIOCExposure builds `portfolio` from two different sources and has done since it was
   // written: IOC_DATA where ORCA holds the operator's own contract terms, and the COUNTRY-WIDE
   // average from COUNTRY_DATA where it does not. `source` recorded which, the v637 exports
@@ -32315,7 +32331,7 @@ function renderIOCExposure(operatorName) {
   }
 
   // Country table
-  // v638 (T4): rows sourced from the country average are marked, and the table gained a
+  // v639 (T4): rows sourced from the country average are marked, and the table gained a
   // horizontal-scroll wrapper so the extra marker cannot push the Contracts column off a phone.
   document.getElementById('exposure-country-table').innerHTML = `
     <div class="table-scroll" style="overflow-x:auto;">

@@ -26717,3 +26717,115 @@ Rotated off T5 (543), T2 (542), T1 (541), T6 (540). Picked up the item cycle 543
 ## Friction
 
 `renderIOCExposure()` builds the IOC Portfolio Country Breakdown from **two different sources** and always has: the operator's own contract terms where ORCA holds them, and the **jurisdiction-wide aver
+
+---
+## Cycle 545 Log — 2026-09-04
+- Test before: 236 PASS / 0 FAIL (last reported)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite RAN this cycle against the local build
+  (`TEST_URL=http://localhost:8199/index.html`), number read from the suite's own output, not assumed.
+  The single WARN/JS-error is the service-worker registration 404 from `python3 -m http.server`,
+  present on the cold load before any edit this cycle. Pixel audit: **PIXEL GATE PASS**.
+- JS syntax gate: PASS (11 inline blocks, `node --check`)
+- Shipped as **v639** and pushed.
+
+## Task — T3: "How do these three countries compare side by side?"
+
+Rotated off T4 (544), T5 (543), T2 (542), T1 (541), T6 (540).
+
+## Friction
+
+Walked Side-by-Side cold — no sessionStorage, no localStorage — took the default North Sea Trio,
+cleared it, and typed in an analyst's own set (Guyana / Angola / Brazil) through `#cmp-search`.
+
+The grid itself is ground smooth; twenty cycles have been through it. The worst moment is below it,
+in the two charts — and specifically in the **Govt Take vs Oil Price** chart, which is the only
+place on the tab where the crossover the grid warns about in words is actually *visible*.
+
+`#cmp-chart` and `#cmp-npv-chart` (created at `renderCompare()`, index.html:26027 and :26088) were
+the only two Chart.js instances left on the platform running the library default
+`maintainAspectRatio: true`. All eight others — `dd-price-chart`, `irr-scatter-canvas`,
+`vintage-trend-chart`, the tornado and production canvases — pass `maintainAspectRatio: false`.
+`.chart-wrap` (index.html:285) clamps the container with `max-height: 360px`, so Chart.js honoured
+the locked 2:1 ratio by shrinking the **width** to match the clamped height. Measured off the live
+DOM, cold, with three countries loaded:
+
+| viewport | card width | canvas | fill |
+|---|---|---|---|
+| 1920 | 1880px | **652 x 326** | **35%** |
+| 1440 | 1400px | **652 x 326** | **47%** |
+| 1280 | 1240px | 652 x 326 | 53% |
+| 1024 | 984px | 652 x 326 | 66% |
+| 768 | 748px | 652 x 326 | 87% |
+| 390 | 362px | 328 x 164 | 91% |
+
+652px at every desktop width from 768 to 1920, regardless of how wide the card was. On a 1920
+monitor that is 1228px of blank white card to the right of the plot. The comparison this tab exists
+to make — Guyana / Angola / Brazil reversing between $75 and $100/bbl, which the grid's own amber
+notice tells the analyst to go look at — happened inside roughly 150px of x-axis. The tab's other
+nine charts' worth of container went unused.
+
+It also travelled: `downloadCmpChart()` (index.html:34518) exports `#cmp-chart` straight off the
+canvas, so **⬇ Chart PNG produced a 652px-wide image at every desktop width** — that is the picture
+that goes into the IC memo.
+
+## Change
+
+- `#cmp-chart-wrap` and `#cmp-npv-chart-wrap` get a determinate `height` (360px desktop,
+  250px under `max-width: 720px`) and `position: relative`, which is the container contract
+  Chart.js needs in order to fill. Scoped to the two Side-by-Side ids — the shared `.chart-wrap`
+  rule is untouched, so the Vintage Analysis chart that also uses that class is unaffected.
+- Both chart configs pass `maintainAspectRatio: false`, matching the other eight on the platform.
+
+Desktop wrap height is unchanged (the wrap already measured exactly 360px), so nothing below the
+charts moved. After:
+
+| viewport | canvas | fill | PNG export width |
+|---|---|---|---|
+| 1920 | **1846 x 326** | **98%** | 652 → **1846** |
+| 1440 | **1366 x 326** | **98%** | 652 → **1366** |
+| 1280 | 1206 x 326 | 97% | 652 → 1206 |
+| 1024 | 950 x 326 | 97% | 652 → 950 |
+| 768 | 714 x 326 | 95% | 652 → 714 |
+| 390 | 328 x 216 | 91% | unchanged 328 |
+
+Horizontal scroll re-measured across all ten tabs at 1920 / 1440 / 1280 / 1024 / 768 / 390:
+**none**. No control in either chart wrap under 24px at `pointer: coarse`. Page errors: 0.
+
+## Result
+
+The analyst comparing three countries can now read the crossover instead of inferring it from the
+notice. Guyana / Angola / Brazil cross between $75 and $100/bbl across ~430px of x-axis at 1440
+instead of ~150px, and the exported PNG they paste into the IC memo is 1366px wide rather than a
+652px thumbnail — legible at memo width instead of needing to be enlarged past its own resolution.
+
+## Carried forward — not fixed this cycle
+- **The XLSX export still writes `d.profit_oil_govt`** (`Profit Oil (Govt) (%)` in the CP workbook)
+  — the summary figure, not the table's. Carried from 542–544.
+- **Both test harnesses still default to the live URL** (`tests/runtime_comprehensive.js:13`,
+  `tools/petroleum/tests/pixel_audit.js:61`). Both accept `TEST_URL`; this cycle used it.
+  Carried from 537–544.
+- **`IOC_PRESENCE` entity-to-parent alias map** — still the strongest open T4/T6 candidate.
+  Carried from 544.
+- **Regional Benchmarks card** iterates a coarse `regionOrder` against fine DB regions; Asia,
+  Oceania, Latin America, North America and CIS/FSU — 74 countries — never display. Carried from 534–544.
+- **Republic of the Congo / Sao Tome and Principe render region `Other`**; **UAE — Dubai** `Unknown`;
+  **UAE — Abu Dhabi** empty `top_sources`. Carried from 534–544.
+- **Netherlands 23.4% govt take at $75** vs the North Sea Trio button's "~48% take" tooltip.
+  Data question. Carried from 536–544.
+- **Cycle 539 shipped nothing** and its GRADER entry has an empty Summary line, which reads as a
+  completed cycle. A non-empty failure marker in `autonomous_cycle.py` when Claude returns 0 chars
+  is still worth adding; not added without Zach's call. Carried from 540–544.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip element.** Not a text-only change — the rendered
+layout is measurably different at five of six viewports and the exported PNG changes resolution.
+**No take, NPV, breakeven, IRR, rank, reform diamond, band or tier value was altered anywhere**, and
+no notice, caveat or label text was re-worded. Chip rows stay `display:none`; no page-sub paragraph,
+amber instructional banner, routing hint or "How to read" block; no SbS card wrapper. Screener
+advanced filters still collapsed, presets still a dropdown; Home "More tools" still collapsed;
+Explorer analytics still collapsed. **No tab added, removed or reordered.** Govt NPV stays REMOVED
+from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst Guide sessionStorage logic untouched;
+v632 FC shortlist selector and v637 IOC export controls untouched. The **v612 MOBILE LAYER** block
+and the `#reference-panel` `translateX` state are untouched — the new rule is a scoped `height` on
+two ids and does not narrow or override it. v371/v373, v430, v449, v451, v452, v489, v612 and every
+locked item through v638 intact.
