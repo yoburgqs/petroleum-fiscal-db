@@ -1678,7 +1678,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v646</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v647</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1748,7 +1748,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v646</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v647</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2081,7 +2081,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v646';
+  return m ? m[0] : 'v647';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2156,7 +2156,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v646');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v647');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -22929,6 +22929,27 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
   const _bulk = _bulkPct(entry);
   const _shared = _sharedPct(entry);
   const srcs = (entry.top_sources || []);
+  // ── v647 (T6): citation retrievability on the FIRST evidence surface, not only the last ─────
+  // v641 measured every citation URL on the platform and marked the dead ones — but only inside
+  // the per-parameter Evidence Chain table, which renders ~2,750px down the Country Profile.
+  // This panel is the one an analyst reaches first: it sits directly under the profile header,
+  // it is what _homeOpenEvidence() opens on arrival, it is titled "Evidence Quality", and its
+  // "Key sources" rows were the platform's most direct offer to prove a number — a tier letter,
+  // the instrument's name, an accent-coloured link, and title="Open the cited source document".
+  // Measured against the shipped country_data.json using v641's own _CITE_DEAD set: 256 of the
+  // 426 linked source rows here point at an address that returned a 404 or an unresolvable
+  // hostname on 4 Sep 2026, 114 of them wearing tier A. 171 of 185 countries have at least one;
+  // 55 have NO retrievable source row at all. Namibia is the clean case — one source row, the
+  // Petroleum Exploration and Production Act 2 of 2017, tier A, panel graded B, and the only
+  // link on it is dead. The page already knew that (_citeLinkDead returns true for it) and said
+  // nothing here.
+  // Same treatment as the Evidence Chain, deliberately: the ↗ comes off because it promises a
+  // click reaches the clause, a LINK DEAD chip goes on, the name drops to muted, and the row's
+  // title says what was measured and when. No tier letter, percentage or grade changes — whether
+  // a document is authoritative and whether ORCA can hand you a copy are different questions.
+  const _srcDeadN = srcs.filter(s => s.url && _citeLinkDead(s.url)).length;
+  const _srcCitedN = srcs.filter(s => s.url).length;
+  const _srcNoneOpen = _srcCitedN > 0 && _srcDeadN === _srcCitedN;
   // v588 (T6): the case that has to be stated outright, not implied by a chip - the country's
   // ENTIRE fact base is one document that also stands in for other jurisdictions. 15 countries
   // are in this state while rendering "100.0% primary law (tier A)" and "D 0.0%".
@@ -22960,14 +22981,28 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
         + 'read off this country\u2019s own statute book or its individual contracts, so its tier letter '
         + 'describes the document, not how specific it is to this country.')
       : '';
-    const linkTitle = isBulk
-      ? 'Country-level bulk harvest — this link opens the PwC Worldwide Tax Summaries country index, not a citation for any single parameter. Verify the specific rate against the country\u2019s own petroleum act before an IC memo.'
-      : (shareList ? shareTip : 'Open the cited source document');
+    // v647 (T6): a row measured unretrievable loses the arrow and the accent colour and says so.
+    const isDead = !!(s.url && _citeLinkDead(s.url));
+    const deadTip = isDead
+      ? _cpEsc(display + ': ORCA cannot retrieve this document. The address on record \u2014 ' + s.url
+        + ' \u2014 returned no document when checked on ' + _CITE_DEAD_CHECKED + ' (either a 404, or a '
+        + 'hostname that does not resolve). This is not a judgement on the instrument: the tier letter '
+        + 'beside it is unchanged, and the ' + (s.n || 0) + ' facts attributed to it were read off it at '
+        + 'harvest time. What it means is that the one step that would let you check those facts '
+        + 'yourself is currently broken. Locate the instrument by name before anything on this profile '
+        + 'goes in an IC memo.')
+      : '';
+    const linkTitle = isDead
+      ? deadTip
+      : (isBulk
+      ? 'Country-level bulk harvest \u2014 this link opens the PwC Worldwide Tax Summaries country index, not a citation for any single parameter. Verify the specific rate against the country\u2019s own petroleum act before an IC memo.'
+      : (shareList ? shareTip : 'Open the cited source document'));
     const nameEl = s.url
-      ? `<a href="${s.url}" target="_blank" rel="noopener" style="font-size:11px;color:${(isBulk || shareList) ? 'var(--muted)' : 'var(--accent)'};text-decoration:none;" title="${linkTitle}">${display} \u2197</a>`
+      ? `<a href="${s.url}" target="_blank" rel="noopener" style="font-size:11px;color:${(isDead || isBulk || shareList) ? 'var(--muted)' : 'var(--accent)'};text-decoration:none;" title="${linkTitle}">${display}${isDead ? '' : ' \u2197'}</a>`
       : `<span style="font-size:11px;color:var(--text);">${display}</span>`;
-    return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);${(isBulk || shareList) ? 'opacity:.82;' : ''}">
+    return `<div style="display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid var(--border);${(isDead || isBulk || shareList) ? 'opacity:.82;' : ''}">
       <span style="background:${s.tier==='A'?'var(--green)':s.tier==='B'?'rgba(21,128,61,0.68)':'var(--orange)'};color:#fff;font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;">${s.tier||'?'}</span>
+      ${isDead ? `<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;white-space:nowrap;" title="${deadTip}">LINK DEAD</span>` : ''}
       ${isBulk ? '<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;" title="Assigned at country level, not verified against this country\u2019s individual contracts.">BULK</span>' : ''}
       ${shareList ? `<span style="background:rgba(194,65,12,.14);border:1px solid rgba(194,65,12,.4);color:var(--orange);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;letter-spacing:.04em;cursor:help;" title="${shareTip}">${shareList.length} JURISDICTIONS</span>` : ''}
       ${nameEl}
@@ -22983,6 +23018,7 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
       <span style="background:var(--surface2, rgba(148,163,184,.10));border:1px solid var(--border);font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;cursor:help;white-space:nowrap;" title="${_legsTip}"><span style="color:${_aCol};${_aEmph}">${a}% primary law</span><span style="color:var(--muted);"> \u00b7 </span><span style="color:${_nfCol};${_nfEmph}">${_nfTxt}</span></span>
       ${_bulk > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts came from the EY / IHS / KPMG bulk harvest, which is assigned at country level rather than verified against each individual contract. Counted from the top sources listed below, so the true figure may be higher.">${_bulk.toFixed(0)}%+ bulk-harvested</span>` : ''}
       ${_shared > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts trace to a document that is also the cited source for other jurisdictions - a regional instrument applied across a group, not a text read off this country's own statute or its individual contracts. Counted from the top sources listed below, so the true figure may be higher.">${_shared.toFixed(0)}%+ multi-jurisdiction source</span>` : ''}
+      ${_srcDeadN > 0 ? `<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;cursor:help;white-space:nowrap;" title="${_cpEsc(_srcNoneOpen ? 'Not one of the documents this profile cites can be opened from here. Every citation URL on the platform was fetched on ' + _CITE_DEAD_CHECKED + '; all of this country\u2019s returned a 404, or named a hostname that does not resolve. The tier letters and the evidence grade are unchanged - whether an instrument is authoritative and whether ORCA can hand you a copy of it are different questions. This is the second. There is currently no citation on this profile you can click through to before an IC memo; locate the instruments by name.' : 'At least one of the documents this profile cites cannot be opened from here. Every citation URL on the platform was fetched on ' + _CITE_DEAD_CHECKED + '; the ones marked LINK DEAD in the source list below returned a 404, or named a hostname that does not resolve. The tier letters and the evidence grade are unchanged - whether an instrument is authoritative and whether ORCA can hand you a copy of it are different questions. This is the second.')}">${_srcNoneOpen ? 'no cited source opens' : _srcDeadN + ' of ' + _srcCitedN + ' source links dead'}</span>` : ''}
       <span style="margin-left:auto;font-size:10px;color:var(--muted);">sources ▸</span>
     </summary>
     <div style="padding:0 12px 12px;">
@@ -25210,7 +25246,7 @@ function addCompare(country) {
   if (_sbsExampleUntouched && !_sbsSeeding) {
     var _cleared = compareList.slice();
     compareList = [];
-    cmpAddSeq = [];   // v646
+    cmpAddSeq = [];   // v647
     _sbsDropExample();
     if (typeof showCopyToast === 'function' && _cleared.length) showCopyToast('Cleared the ' + _cleared.length + '-country example (' + _cleared.join(', ') + ') — building your comparison from ' + country + '.');
   }
@@ -25218,9 +25254,9 @@ function addCompare(country) {
     if (typeof showCopyToast === 'function') showCopyToast('Comparison is full at ' + CMP_MAX + ' countries — ' + country + ' was not added. Remove one (\u2715 on a chip) to make room.');
     return false;
   }
-  cmpAddSeq = _sbsAddSeq().concat([country]);   // v646: resync BEFORE the push, so the
+  cmpAddSeq = _sbsAddSeq().concat([country]);   // v647: resync BEFORE the push, so the
   compareList.push(country);                     // membership check still sees the old set
-  _sbsApplyOrder();   // v646: a chosen order survives the next add — it is not addition order again
+  _sbsApplyOrder();   // v647: a chosen order survives the next add — it is not addition order again
   renderCompare();
   _updateCompareHash();
   return true;
@@ -25228,7 +25264,7 @@ function addCompare(country) {
 function removeCompare(country) {
   _sbsDropExample();   // editing the example makes what is left the analyst's own selection
   compareList = compareList.filter(c => c !== country);
-  cmpAddSeq = cmpAddSeq.filter(c => c !== country);   // v646
+  cmpAddSeq = cmpAddSeq.filter(c => c !== country);   // v647
   renderCompare();
   _updateCompareHash();
 }
