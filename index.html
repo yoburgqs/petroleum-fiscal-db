@@ -1631,7 +1631,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v636</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v637</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1701,7 +1701,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v636</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v637</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2034,7 +2034,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v636';
+  return m ? m[0] : 'v637';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2109,7 +2109,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v636');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v637');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2852,7 +2852,18 @@ window.copyPlatformCitation = function(btn) {
       <div id="exposure-peer-comparison"></div>
     </div>
     <div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:16px;">
-      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px;">Country Breakdown</div>
+      <!-- v637 (T5): IOC Portfolio was the only data tab in the tool with no way to get its table
+           off the screen — no XLSX, no CSV, no copy — while the Methodology tab told the analyst
+           twice to press a "\u2193 XLSX" button here and attach the result to an IC memo as the
+           fiscal exposure annex. The button did not exist. These two carry the rows actually
+           rendered, plus the basis each row is on. -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;">Country Breakdown</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn btn-sm btn-outline" id="ioc-copy-ic-btn" title="Copy this operator's country breakdown to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the per-row basis (this operator's own contracts vs. the country average used where ORCA holds none for them), the NPV profile, and the fee-basis comparability warning." aria-label="Copy IOC portfolio breakdown for IC memo">&#9112; Copy for IC Memo</button>
+          <button class="btn btn-sm btn-outline" id="ioc-export-btn" title="Download this operator's country breakdown as an Excel workbook &mdash; one Portfolio sheet plus a Basis &amp; Assumptions sheet naming the profile behind every NPV, which rows are the operator's own contracts, and which take figures may not be ranked against the others." aria-label="Export IOC portfolio breakdown to Excel XLSX">&#11015; XLSX</button>
+        </div>
+      </div>
       <div id="exposure-country-table"></div>
     </div>
   </div>
@@ -32278,13 +32289,221 @@ function renderIOCExposure(operatorName) {
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.region}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:600;">${d.take75.toFixed(1)}%</td>
-          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};">${d.npv75!=null?'$'+Math.round(d.npv75)+'M':'\u2014'}</td>
+          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};">${_iocNpvFmt(d.npv75)}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--muted);">${d.n||'\u2014'}</td>
         </tr>`).join('')}
       </tbody>
     </table>`;
+
+  // v637 (T5): stash exactly what was rendered, so the two export controls above the table
+  // cannot fork from it the way the FC model/database NPV columns once did. Everything the
+  // exports print is read from here or from the helpers the screen itself used.
+  window._iocExp = {
+    operator: operatorName,
+    rows: portfolio,
+    avgTake: avgTake,
+    medianTake: medianTake,
+    nFromOperator: portfolio.filter(function(d){ return d.source === 'IOC_DATA'; }).length,
+    nFromCountry:  portfolio.filter(function(d){ return d.source !== 'IOC_DATA'; }).length
+  };
 }
 window.renderIOCExposure = renderIOCExposure;
+
+// ── v637 (T5) — IOC Portfolio export ────────────────────────────────────────────
+// Two things an IC reader needs that the on-screen table does not say, and that therefore have
+// to travel inside the artifact:
+//   1. Not every row is this operator. Where ORCA holds no operator-level contract data the
+//      table falls back to the COUNTRY average and prints it in the same column, same colour.
+//      On Kosmos Energy that is 5 rows out of 5; on Chevron, 8 of 13. An annex headed
+//      "Chevron fiscal exposure" that is 8/13 country averages has to say so.
+//   2. Fee-basis rows are not rankable against the rest. Shell's Oman (RSC, 85.0%) and Iraq
+//      (blended TSC, 84.8%) top this table because of contract STRUCTURE, not because the terms
+//      are hard — the same correction Country Profile and Side-by-Side already carry.
+// v637 (T5): one formatter for the NPV cell. The screen printed Oman's negative NPV as
+// "$-1797M"; a minus sign wedged between the currency symbol and the digits reads as a typo
+// in a Word table. The screen cell and both export flavours now share this.
+function _iocNpvFmt(v) {
+  if (v == null) return '\u2014';
+  var n = Math.round(v);
+  return (n < 0 ? '-$' : '$') + Math.abs(n).toLocaleString('en-US') + 'M';
+}
+
+function _iocExpRows() {
+  var st = window._iocExp;
+  if (!st || !st.rows || !st.rows.length) return [];
+  return st.rows.map(function(d) {
+    var cd = (COUNTRY_DATA || []).find(function(c){ return c.country === d.country; });
+    var fb = (typeof cpFeeBasis === 'function' && cd) ? cpFeeBasis(cd) : null;
+    return {
+      Country: d.country,
+      Region: d.region,
+      Mechanic: d.mechanic,
+      'Govt Take @$75 (%)': d.take75 != null ? +d.take75.toFixed(1) : null,
+      'Contractor NPV @$75 ($M)': d.npv75 != null ? Math.round(d.npv75) : null,
+      Contracts: d.n != null ? d.n : null,
+      'Take basis': d.source === 'IOC_DATA'
+        ? "this operator's own contracts in ORCA"
+        : 'COUNTRY AVERAGE — ORCA holds no ' + st.operator + ' contract terms for ' + d.country,
+      'Take comparability': (fb && fb.diverges)
+        ? 'NOT rankable as published — ' + Number(fb.n2).toLocaleString() + ' of '
+          + Number(fb.tot).toLocaleString() + ' contracts (' + fb.feePct.toFixed(0) + '%) are fee-basis ('
+          + fb.names + '), where the contractor is paid a fixed $/bbl fee and keeps no price upside. '
+          + 'Rank on ' + fb.cmpTake.toFixed(1) + '% — the take on its '
+          + Number(fb.n1).toLocaleString() + ' PSC/Concession contracts.'
+        : (d.take75 != null && d.take75 >= 99.5)
+          ? 'State monopoly at 100% take — no contractor position; not comparable with contractor-participation regimes.'
+          : 'comparable'
+    };
+  });
+}
+
+function _iocExpBasisLines() {
+  var st = window._iocExp;
+  if (!st) return [];
+  var rows = _iocExpRows();
+  var nFee = rows.filter(function(r){ return /^NOT rankable/.test(r['Take comparability']); }).length;
+  var L = [];
+  L.push('ORCA IOC Portfolio — fiscal exposure annex: ' + st.operator);
+  L.push('Export date: ' + new Date().toISOString().slice(0,10));
+  L.push('');
+  L.push('WHAT THIS TABLE IS');
+  L.push(st.rows.length + ' countries in which ORCA holds fiscal terms relevant to ' + st.operator
+         + '. Rows are ordered by government take at $75/bbl, highest first — the same order as the screen.');
+  L.push('Portfolio average take @$75: ' + st.avgTake.toFixed(1) + '%. Median: ' + st.medianTake.toFixed(1)
+         + '%. Both are unweighted country averages: each country counts once regardless of how many '
+         + 'contracts, barrels or working interest ' + st.operator + ' holds there. They are NOT a '
+         + 'production-weighted portfolio take. Weight by your own WI and volumes before citing a single figure.');
+  L.push('');
+  L.push('BASIS OF THE TAKE COLUMN — read before citing any row');
+  L.push(st.nFromOperator + ' of ' + st.rows.length + ' rows are ' + st.operator
+         + "'s own contracts as held in ORCA.");
+  if (st.nFromCountry > 0) {
+    L.push(st.nFromCountry + ' of ' + st.rows.length + ' rows are the COUNTRY average, not ' + st.operator
+           + ': ORCA holds no operator-level contract terms for them, so the country-wide figure is '
+           + 'substituted. Those rows describe the jurisdiction, not this operator\u2019s position in it. '
+           + 'They are named in the "Take basis" column.');
+  } else {
+    L.push('No row falls back to a country average.');
+  }
+  L.push('');
+  L.push('COMPARABILITY');
+  L.push(nFee > 0
+    ? nFee + ' row(s) blend fee-basis contracts (TSC / RSC / Buy-back) into the take. On those the '
+      + 'contractor is paid a fixed $/bbl fee and keeps no price upside, so take% climbs toward 97-99% '
+      + 'because of the contract structure, not because the terms are hard — a country can show 98% take '
+      + 'and a positive contractor NPV at the same time. The "Take comparability" column gives the '
+      + 'PSC/Concession-only take to rank on instead. Do not rank those rows against the others as published.'
+    : 'No row blends fee-basis (TSC / RSC / Buy-back) contracts. All take figures on this sheet are price-linked and mutually rankable.');
+  L.push('');
+  L.push('NPV BASIS');
+  L.push('Contractor NPV is on the standardized Deepwater profile: $1.2B capex, 50k bbl/d, $15/bbl opex, '
+         + '25yr life, 10% WACC, 100% working interest. It is a jurisdiction comparison, not a valuation of '
+         + st.operator + "'s actual position — scale by your working interest and substitute your own "
+         + 'capex/opex before it goes near a valuation.');
+  L.push('IRR and breakeven are not reported at this level: the underlying country figures are arithmetic '
+         + 'means of per-contract values and are not project returns. Use Scenario Builder with project '
+         + 'capex/opex for a project IRR.');
+  L.push('');
+  L.push('Source: ORCA Petroleum Fiscal Intelligence Platform (2026), '
+         + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '')
+         + ' — https://yoburgqs.github.io/petroleum-fiscal-db/');
+  return L;
+}
+
+function exportIOCPortfolio() {
+  if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
+  var rows = _iocExpRows();
+  if (!rows.length) { showCopyToast('Select an operator first — there is nothing to export.'); return; }
+  var st = window._iocExp;
+  var wb = XLSX.utils.book_new();
+  var ws = XLSX.utils.json_to_sheet(rows);
+  XLSX.utils.book_append_sheet(wb, (typeof _finishSheet === 'function' ? _finishSheet(ws) : ws), 'Portfolio');
+  XLSX.utils.book_append_sheet(wb,
+    XLSX.utils.aoa_to_sheet(_iocExpBasisLines().map(function(l){ return [l]; })), 'Basis & Assumptions');
+  var slug = String(st.operator).toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+  XLSX.writeFile(wb, 'ORCA_ioc_portfolio_' + slug + '_' + new Date().toISOString().slice(0,10) + '.xlsx');
+  showCopyToast(st.operator + ' portfolio exported — ' + rows.length + ' countries, plus a Basis & Assumptions sheet.');
+}
+
+function copyIOCPortfolio() {
+  var btn = document.getElementById('ioc-copy-ic-btn');
+  var rows = _iocExpRows();
+  if (!rows.length) { showCopyToast('Select an operator first — there is nothing to copy.'); return; }
+  var st = window._iocExp;
+
+  var caption = 'ORCA fiscal exposure — ' + st.operator + ', ' + rows.length
+              + ' countries at $75/bbl, ranked by government take (highest first)';
+  var assump = 'Portfolio average take ' + st.avgTake.toFixed(1) + '%, median ' + st.medianTake.toFixed(1)
+    + '% — unweighted country averages, each country counted once regardless of contract count, volumes or working interest; not a production-weighted portfolio take. '
+    + st.nFromOperator + ' of ' + rows.length + ' rows are ' + st.operator + "'s own contracts in ORCA"
+    + (st.nFromCountry > 0
+        ? '; the other ' + st.nFromCountry + ' are the COUNTRY average, substituted because ORCA holds no operator-level terms there — the Take basis column names them, and those rows describe the jurisdiction, not this operator\u2019s position in it. '
+        : '. ')
+    + 'Contractor NPV is on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI) — scale by your working interest. '
+    + 'IRR and breakeven are not reported at this level: the underlying country figures are arithmetic means of per-contract values, not project returns.';
+  var feeRows = rows.filter(function(r){ return /^NOT rankable/.test(r['Take comparability']); });
+  if (feeRows.length) {
+    assump += ' ' + feeRows.length + ' row(s) — ' + feeRows.map(function(r){ return r.Country; }).join(', ')
+      + ' — blend fee-basis contracts (TSC / RSC / Buy-back), where the contractor is paid a fixed $/bbl fee and keeps no price upside, so take% measures contract structure rather than how hard the terms are. Do not rank them against the other rows as published; the Take comparability column carries the PSC/Concession-only take to use instead.';
+  }
+  var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), '
+              + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '')
+              + ' — yoburgqs.github.io/petroleum-fiscal-db/';
+
+  var cols = ['Country','Region','Mechanic','Govt Take @$75 (%)','Contractor NPV @$75 ($M)','Contracts','Take basis','Take comparability'];
+  var matrix = [cols].concat(rows.map(function(r){
+    return cols.map(function(c){
+      var v = r[c];
+      if (v == null) return '\u2014';
+      if (c === 'Govt Take @$75 (%)') return v.toFixed(1) + '%';
+      if (c === 'Contractor NPV @$75 ($M)') return _iocNpvFmt(v);
+      return String(v);
+    });
+  }));
+
+  var tsv = caption + '\n' + assump + '\n\n'
+    + matrix.map(function(r){ return r.join('\t'); }).join('\n')
+    + '\n\n' + srcLine;
+
+  function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var th  = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;text-align:left;';
+  var td  = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:10pt;';
+  var tdL = td + 'font-weight:bold;';
+  var html = '<div style="font-family:Calibri,Arial,sans-serif;">'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 2px;">' + esc(caption) + '</p>'
+    + '<p style="font-size:9pt;color:#555;margin:0 0 6px;">' + esc(assump) + '</p>'
+    + '<table style="border-collapse:collapse;">'
+    + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + th + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
+    + '<tbody>' + matrix.slice(1).map(function(r){
+        return '<tr>' + r.map(function(c, ci){ return '<td style="' + (ci === 0 ? tdL : td) + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
+      }).join('') + '</tbody></table>'
+    + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + esc(srcLine) + '</p>'
+    + '</div>';
+
+  function flash(msg) {
+    if (btn) { var o = btn.innerHTML; btn.innerHTML = '\u2713 Copied'; setTimeout(function(){ btn.innerHTML = o; }, 2000); }
+    showCopyToast(msg);
+  }
+  var okMsg = st.operator + ' exposure copied as a table (' + rows.length
+            + ' countries) — paste into your IC memo or Excel.';
+
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html':  new Blob([html], {type:'text/html'}),
+      'text/plain': new Blob([tsv],  {type:'text/plain'})
+    })]).then(function(){ flash(okMsg); }).catch(function(){
+      navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
+        .catch(function(){ showCopyToast('Clipboard unavailable — use \u2b07 XLSX instead.'); });
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
+      .catch(function(){ showCopyToast('Clipboard unavailable — use \u2b07 XLSX instead.'); });
+  } else {
+    showCopyToast('Clipboard unavailable — use \u2b07 XLSX instead.');
+  }
+}
+window.exportIOCPortfolio = exportIOCPortfolio;
+window.copyIOCPortfolio  = copyIOCPortfolio;
 
 // ── Sample Analyses ──────────────────────────────────────────────────────────
 function renderSampleAnalyses() {
@@ -41598,6 +41817,11 @@ document.addEventListener('DOMContentLoaded', function() {
   if (ddCountry) ddCountry.addEventListener('change', function() { loadCountryProfile(this.value); });
   var iocExpSelect = document.getElementById('exposure-ioc-select');
   if (iocExpSelect) iocExpSelect.addEventListener('change', function() { renderIOCExposure(this.value); });
+  // v637 (T5): IOC Portfolio export controls
+  var iocCopy = document.getElementById('ioc-copy-ic-btn');
+  if (iocCopy) iocCopy.addEventListener('click', function() { copyIOCPortfolio(); });
+  var iocExport = document.getElementById('ioc-export-btn');
+  if (iocExport) iocExport.addEventListener('click', function() { exportIOCPortfolio(); });
   var apiCountry = document.getElementById('api-country-select');
   if (apiCountry) apiCountry.addEventListener('change', function() { loadAPIJson(this.value); });
 });

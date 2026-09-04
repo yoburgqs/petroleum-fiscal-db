@@ -26419,3 +26419,143 @@ item through v635 intact — including the v635 Screener take sort, which is unr
 **Task** — T2, *"Is this one country attractive at $75/bbl, and can I defend that?"* Stalest of the six (541=T1, 540=T6, 539 shipped nothing, 538=T4, 537=T5, 536=T3, 535=T2).
 
 **Friction.** Walked cold — no sessionStorage, no localStorage — into Country Profile, which auto-loads Indonesia. The "is it attractive" half is genuinely strong. The "can I defend it" h
+
+## Cycle 543 — T5
+
+**Task** — T5, *"Give me something I can paste straight into an IC memo."* Rotation: 542=T2, 541=T1,
+540=T6, 539 shipped nothing, 538=T4, 537=T5, 536=T3.
+
+**Friction.** Walked cold — no sessionStorage, no localStorage — and inventoried every export and
+copy control the analyst can actually reach, tab by tab, at 1440x900:
+
+| Tab | Controls found |
+|---|---|
+| Fiscal Compare | `Export XLSX`, `⎘ Copy for IC Memo` |
+| Country Profile | `⬇ XLSX`, `⬇ PDF`, `⎘ IC Citation`, `Copy for IC Memo`, `Copy as IC table` |
+| Side-by-Side | `⬇ Export PDF`, `⎘ Copy for IC Memo`, `⬇ Chart PNG`, `⎘ Share Link` |
+| Screener | `⬇ CSV`, `⬇ Excel` |
+| Explorer | `⬇ Excel (185)` |
+| Breakeven Map | `⇓ Export CSV` |
+| Reform Risk | `⇓ Export Reform Data (CSV)` |
+| **IOC Portfolio** | **none** |
+
+**IOC Portfolio had no way to get its table off the screen.** No XLSX, no CSV, no copy — confirmed
+by DOM inventory, not by reading the changelog: the only ids under `#t5` are
+`exposure-country-table`, `exposure-metrics`, `exposure-donut-chart`, `exposure-peer-comparison`,
+`exposure-ioc-quick`, `exposure-ioc-select`. There is no button element of any kind.
+
+That tab is not a dead end the analyst wanders into. The tool sends them there and tells them the
+button exists:
+
+- Methodology (`index.html:5090`): *"**Export portfolio summary to XLSX.** The '↓ XLSX' button in
+  the IOC Portfolio tab exports the full country-level table including take tier, Stability Score,
+  and NPV — **suitable for attaching to an IC memo as the fiscal exposure annex.**"*
+- FAQ (`index.html:7101`): *"The IOC Portfolio tab exports to XLSX (↓ XLSX button) — use this to
+  build the concentration audit table in Excel."*
+
+So the worst moment on a T5 walk is not a number that is hard to read. It is an analyst following
+the platform's own written instruction to a named button that has never existed, on the one tab
+that produces the exact artifact an IC memo's fiscal-exposure annex needs. Shell renders 23 rows
+there. The options were to retype 23 rows by hand or abandon the annex.
+
+**Change.** Two controls in the Country Breakdown card header, populated from a
+`window._iocExp` stash written by `renderIOCExposure()` so they carry exactly the rows rendered and
+cannot fork from the screen:
+
+- **`⎘ Copy for IC Memo`** (`copyIOCPortfolio()`) — writes `text/html` *and* `text/plain` via
+  `ClipboardItem`, the same two-flavour pattern Side-by-Side uses, so it pastes as a formatted
+  table into Word/Docs/Outlook and as columns into Excel. Shell: 5,211 characters, 23 rows,
+  8 columns.
+- **`⬇ XLSX`** (`exportIOCPortfolio()`) — two sheets: `Portfolio` (a clean rectangle to model off)
+  and `Basis & Assumptions`.
+
+Both carry two disclosures that were **not on screen and not in the data as displayed**:
+
+1. **Which rows are actually this operator.** `renderIOCExposure()` falls back to the COUNTRY
+   average wherever ORCA holds no operator-level terms, and prints it in the same column, same
+   colour, with no marker. Shell is 14 operator rows / 9 country averages. **Kosmos Energy is 0 of
+   5** — every row in an annex headed "Kosmos Energy fiscal exposure" is a country average. Both
+   artifacts now name this per row in a `Take basis` column and total it in the header.
+2. **Which take figures may not be ranked.** Reuses the existing `cpFeeBasis()` helper, so the
+   fee-basis correction Country Profile and Side-by-Side already carry now reaches this tab's
+   exports. On Shell, 6 rows are flagged — Oman, Iraq, Qatar, India, Malaysia, Mexico — each with
+   the PSC/Concession-only take to rank on instead (Iraq: rank on 34.1%, not the 84.8% that puts it
+   3rd from the top of the table). This is `MECHANIC_COMPARABILITY.md` Group 2, enforced in an
+   export for the first time.
+
+Also unified: `_iocNpvFmt()` is now shared by the screen cell and both export flavours. Oman's
+negative NPV printed as `$-1797M` — a minus wedged between the currency symbol and the digits,
+which reads as a typo in a Word table. It is `-$1,797M` in all three places now, and the screen and
+the paste cannot drift apart.
+
+**Result.** An analyst can select any operator on IOC Portfolio and get its fiscal-exposure annex
+into a memo in one click — as a formatted table, or as a workbook whose second sheet states the
+profile behind every NPV, that the portfolio average is unweighted rather than production-weighted,
+how many rows are the operator versus the jurisdiction, and which rows must not be ranked as
+published. Previously there was no way to get the table off that tab at all, and the two places
+that told the analyst there was were wrong.
+
+## Verification this cycle
+- JS syntax gate: **PASS** (11 inline `<script>` blocks extracted, `node --check`)
+- Runtime suite: **RAN** this cycle, `TEST_URL` on the built file served over HTTP —
+  **261 PASS / 0 FAIL / 1 WARN**, read from `/tmp/runtime_test_report.txt`, not assumed. Identical
+  to the same-method baseline. The 1 WARN / 1 "JS error" is a `sw.js` 404 from serving on
+  localhost; it was present in the pre-change cold walk and is not caused by this change.
+  `[IOC] exposure selector`, `[IOC] Shell quick button`, `[IOC] IOC Enter search` and
+  `[IOC] brand boundary + exclusions` all still PASS with the new controls in the card header.
+- Viewports 1920 / 1440 / 1280 / 1024 / 768 and **390 x 844 `hasTouch:true`**, all 10 tabs each:
+  `scrollWidth == clientWidth` everywhere, **0 page errors at all six**.
+- Touch targets: the two new controls measure 25px at desktop widths, 36px at 768, and
+  **44 x 129 / 44 x 65 at 390 under `pointer: coarse`** — the existing v612 mobile layer picks them
+  up, no new rule needed, well above the 24px floor.
+- Exports opened and parsed, not just downloaded: `ORCA_ioc_portfolio_shell_2026-09-04.xlsx` read
+  back with the `xlsx` library — 2 sheets, `Portfolio` 23 rows x 8 columns, `Basis & Assumptions`
+  20 lines. Clipboard read back through `navigator.clipboard`: Shell 5,211 chars with both
+  `text/html` and `text/plain` flavours; Kosmos Energy 1,761 chars, header reading
+  "0 of 5 rows are Kosmos Energy's own contracts".
+
+## Found on this walk — carried forward
+- **Two places in the tool document a button that does not exist** — `index.html:5090` and
+  `index.html:7101` both name a "↓ XLSX" button on IOC Portfolio. This cycle built the export they
+  describe, so the promise is now kept in substance, but the prose still says "↓ XLSX" where the
+  control is labelled "⬇ XLSX" and sits beside a "⎘ Copy for IC Memo". Left as-is: rewriting FAQ
+  and Methodology prose is a text-only change, which the directive bans as a cycle.
+- **The on-screen IOC table still does not distinguish operator rows from country-average rows.**
+  The exports do now. But an analyst reading the screen still sees Shell's Nigeria, Norway and
+  Iraq figures in the same column and the same colour as its UK and Brazil figures, with nothing
+  to say the first three are the jurisdiction average and the last two are Shell's own contracts.
+  Kosmos Energy is 0 of 5. **This is a strong T4/T6 candidate for a future cycle** and is the
+  larger half of what this cycle found; it was left alone to keep the fix to one moment.
+- **The IOC "Portfolio Avg Take" stat is an unweighted country average** blending Group 1 and
+  Group 2 mechanics (`MECHANIC_COMPARABILITY.md`). Shell reads 56.2% with Iraq's 84.8% and Oman's
+  85.0% pulling it up, both of which are structural artefacts. The exports now say so; the metric
+  tile on screen does not.
+- **The XLSX export still writes `d.profit_oil_govt`** (`Profit Oil (Govt) (%)` in the CP
+  workbook) — the summary figure, not the table's. Carried from 542.
+- **Both test harnesses still default to the live URL** (`tests/runtime_comprehensive.js:13`,
+  `tools/petroleum/tests/pixel_audit.js:61`). Both accept `TEST_URL`. Carried from 537, 538, 540,
+  541, 542.
+- **Regional Benchmarks card** iterates a coarse `regionOrder` against fine DB regions, so Asia,
+  Oceania, Latin America, North America and CIS/FSU — 74 countries — never display. On the hidden
+  Sample Analyses tab. Carried from 534–542.
+- **Republic of the Congo and Sao Tome and Principe still render region `Other`**; **UAE — Dubai**
+  still `Unknown`; **UAE — Abu Dhabi** still has an empty `top_sources`. Carried from 534–542.
+- **Netherlands 23.4% govt take at $75** vs the North Sea Trio button's "~48% take" tooltip. Data
+  question, seen again in this cycle's Side-by-Side walk. Carried from 536–542.
+- **Cycle 539 shipped nothing** and its GRADER entry has an empty Summary line, which reads as a
+  completed cycle. A non-empty failure marker in `autonomous_cycle.py` when Claude returns 0 chars
+  is still worth adding; not added without Zach's call. Carried from 540, 541, 542.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip element** — the two new controls carry `title`
+attributes as every button on the page does, but no tooltip was added to any existing element.
+Not a text-only change: two interactive controls now exist on a tab that had none, with new
+clipboard, XLSX and state-stash behaviour, and one screen cell changes its rendered string.
+Chip rows stay `display:none`; no page-sub paragraph, amber instructional banner, routing hint or
+"How to read" block; no SbS card wrapper. Screener advanced filters still collapsed, presets still
+a dropdown; Home "More tools" still collapsed; Explorer analytics still collapsed. **No tab added,
+removed or reordered.** No take, NPV, breakeven, IRR, rank, reform diamond, band or tier *value*
+altered anywhere — `_iocNpvFmt()` changes how one NPV cell is punctuated, not what it computes.
+Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; the FC Analyst Guide
+sessionStorage logic untouched; the v632 FC shortlist selector untouched. v371/v373, v430, v449,
+v451, v452, v489, **v612** and every locked item through v636 intact.
