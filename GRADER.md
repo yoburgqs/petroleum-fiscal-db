@@ -27820,3 +27820,14 @@ The **v612 MOBILE LAYER** block and the `#reference-panel` `translateX` state ar
 cycle adds no CSS rule at all, only one selector name to the existing print-hidden list. v371/v373,
 v430, v449, v451, v452, v489, v612, v621, v632, v637, v639, v640, v641, v642, v643, v644, v645 and
 every locked item through v645 intact.
+
+---
+## Cycle 552 Log — 2026-09-04 15:07
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 552 complete — shipped as **v646**, pushed to both repos.
+
+**Task:** T3 — "How do these three countries compare side by side?" (rotated off T1/551)
+
+**Friction:** The Side-by-Side grid's own closing notice tells the analyst, in bold, *"Rank these countries on Govt Take, which is the production-weighted figure this platform publishes."* The grid then gave them no way to do it. `renderCompare()` lays the columns out in the order the chips were typed. The four Govt Take rows mark only the hig
