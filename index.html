@@ -1619,7 +1619,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v633</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v634</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1689,7 +1689,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v633</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v634</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1918,7 +1918,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
           IRR shown for 124/185 countries; use Take + Swing as proxy for unlisted countries<br>
           Take &gt;65% + IRR not shown &rarr; do not assume the project clears hurdle — run Scenario Builder at your specific profile to test commerciality before IC submission<br>
           &ldquo;&mdash;&rdquo; in any cell = data not yet verified to Evidence A/B standard; do not cite in IC memo<br>
-          Export XLSX &rarr; includes Evidence A/B% tier for auditable IC sourcing
+          Export XLSX &rarr; carries the Evidence <strong>grade</strong> (A/B/C/D) with both legs that set it &mdash; primary-law share and fact count. It no longer exports a combined A/B%: that number reads 80%+ on 67 countries graded C or D here.
         </div>
       </div>
     </div>
@@ -2022,7 +2022,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v633';
+  return m ? m[0] : 'v634';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2097,7 +2097,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v633');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v634');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -31613,7 +31613,9 @@ function _cpBasisSheet(d, country, region, prof, npvBasis, cmpNote) {
 
   R.push(['EVIDENCE']);
   R.push(['  Sourcing tier', (typeof _icSourcingTier === 'function') ? _icSourcingTier(d) : '']);
-  R.push(['  Evidence A/B (%)', d.ab_pct != null ? +d.ab_pct.toFixed(1) : null]);
+  // v634 (T6): was 'Evidence A/B (%)' off ab_pct, printed one line under the correct answer
+  // _icSourcingTier() already gives. The two disagreed in the same block on 67 countries.
+  R.push(['  Primary law (tier A, %)', d.a_pct != null ? +d.a_pct.toFixed(1) : null]);
   R.push(['  Verified facts', d.n_facts != null ? d.n_facts : null]);
   R.push(['  A-tier', 'Primary legislation or signed PSA text']);
   R.push(['  B-tier', 'Verified secondary source (EY / Wood Mackenzie / Rystad)']);
@@ -31740,7 +31742,11 @@ function exportCountryProfile() {
     { Metric: 'Rev Share Min (%)', Value: d.rev_share_min != null ? +d.rev_share_min.toFixed(1) : null },
     { Metric: 'Rev Share Max (%)', Value: d.rev_share_max != null ? +d.rev_share_max.toFixed(1) : null },
     { Metric: '', Value: '' },
-    { Metric: 'Evidence Quality A/B (%)', Value: d.ab_pct != null ? +d.ab_pct.toFixed(1) : null },
+    // v634 (T6): was 'Evidence Quality A/B (%)' off ab_pct. 'Total Verified Facts' two rows
+    // below is the other leg of the grade, so the workbook now states the letter and both
+    // legs that set it instead of a share the platform stopped grading on at v551.
+    { Metric: 'Evidence Grade (worse of primary-law share and fact depth)', Value: _evidenceGrade(d).letter + ' — ' + _evidenceGrade(d).label },
+    { Metric: 'Primary Law Share (tier A, %)', Value: d.a_pct != null ? +d.a_pct.toFixed(1) : null },
     { Metric: 'Production Coverage (%)', Value: d.prod_coverage_pct != null ? +d.prod_coverage_pct.toFixed(1) : null },
     { Metric: 'Total Verified Facts', Value: d.n_facts != null ? d.n_facts : null },
     { Metric: '', Value: '' },
@@ -31834,7 +31840,11 @@ function exportExplorer() {
     'Breakeven @$75 ($/bbl)': (d.be_75 && d.be_75 > 1 && d.be_75 < 999) ? d.be_75 : null,
     'Swing $50→$125 (pp)': d.swing !== null ? +d.swing.toFixed(1) : null,
     'Stability Score': d.swing !== null ? Math.max(0, Math.min(100, Math.round(100 - d.swing * 3))) : null,
-    'Evidence A/B (%)': d.ab_pct != null ? +d.ab_pct.toFixed(1) : null,
+    // v634 (T6): was 'Evidence A/B (%)': d.ab_pct — the deleted grader. Same three columns
+    // the Fiscal Compare workbook now carries, so two exports of the same country agree.
+    'Evidence Grade': _evidenceGrade(d).letter + ' — ' + _evidenceGrade(d).label,
+    'Primary Law (tier A, %)': d.a_pct != null ? +d.a_pct.toFixed(1) : null,
+    'Facts On File': d.n_facts != null ? d.n_facts : null,
     'Prod Coverage (%)': d.prod_coverage_pct != null ? +d.prod_coverage_pct.toFixed(1) : null,
     'R-factor Tiers': d.has_r_factor_tiers ? 'Yes' : 'No',
   }));
@@ -39986,6 +39996,29 @@ function exportFCResults() {
   // countries (verified: 185/185 non-null on each), and the Country Profile IC summary has
   // pasted the $125 figure since v516. The NPV block now matches the take block, four prices to
   // four prices, and the pair the rank and the filename were built on says so in its own header.
+  // ── v634 (T6) — the evidence figure that LEAVES the tool ────────────────────────────────
+  // Every EXPORT still published `Evidence A/B (%)` off `ab_pct` — the grader v551 replaced,
+  // v557 deleted outright ("a fifth surface cannot regrow off ab_pct"), v575 repointed and v605
+  // chased out of the two clipboard citations. All five of those fixes were to things drawn on
+  // SCREEN. The four export payloads kept the deleted rule, and an export is the one artifact
+  // the analyst cannot check against the page, because by then they have left it.
+  // Measured against the shipped country_data.json: on 67 of 185 countries the file writes an
+  // A/B share of 80% or better while the page grades that country C or D. 30 of those read D on
+  // screen, and 53 export a flat 100.0 — Ascension Island and French Polynesia at 100.0% on TWO
+  // facts each, Cook Islands on four, Bahamas on eight. The Home evidence card tells the analyst
+  // in as many words that "a combined A/B% does not mean primary-law or operator-verified — read
+  // the A share on its own"; the workbook then handed them the combined number and called the
+  // column auditable IC sourcing.
+  // The number is not re-worded, it is REMOVED, and the grade the page actually shows takes its
+  // place — as three sortable columns, so a spreadsheet can filter on the letter and still see
+  // both legs that produced it.
+  const _fcXlEvidence = function(r) {
+    if (r.termsBasis === 'default') return ['n/a — generic terms', null, null];
+    var g = _evidenceGrade(r);
+    return [g.letter + ' — ' + g.label,
+            g.aPct != null ? +Number(g.aPct).toFixed(1) : null,
+            g.nFacts != null ? Number(g.nFacts) : null];
+  };
   const _xlSel = function(label, price) { return label + (price === _xlPP ? ' \u25c4 SELECTED PRICE' : ''); };
   const data = [
     // v506: 'Take%' (compare-model DCF at the selected price) and 'GovtTake_75' (database
@@ -39997,7 +40030,10 @@ function exportFCResults() {
      _xlSel('GovtTake_100 (database)', 100), _xlSel('GovtTake_125 (database)', 125),
      _xlSel('Contractor NPV_50 (database, $M)', 50), _xlSel('Contractor NPV_75 (database, $M)', 75),
      _xlSel('Contractor NPV_100 (database, $M)', 100), _xlSel('Contractor NPV_125 (database, $M)', 125),
-     'Swing_pp', 'Breakeven', 'Tier (database take)', 'Evidence A/B (%)',
+     'Swing_pp', 'Breakeven', 'Tier (database take)',
+     // v634 (T6): 'Evidence A/B (%)' is GONE from every export, replaced by the grade the
+     // screen shows. See the block above _fcXlEvidence().
+     'Evidence Grade', 'Primary Law (tier A, %)', 'Facts On File',
      'Take% (model, selected price)', 'Model_vs_DB_pp', 'Govt NPV (model, $M est)', 'Contractor NPV (model, $M)'],
     ..._xlSorted.map(function(r, i) {
       const _mono = _xlMono(r);
@@ -40043,10 +40079,9 @@ function exportFCResults() {
         // exporting "1" ($1/bbl) into the breakeven column of an IC attachment.
         (!_mono && r.be_75 != null && r.be_75 > 0 && r.be_75 < 999) ? +r.be_75.toFixed(1) : null,
         tier ? tier.label : (_mono ? 'n/c — state monopoly' : null),
-        // Evidence % describes the country's fiscal facts. On a generic-default row those
-        // facts were not used, so publishing a number here would be a false credential.
-        (r.termsBasis === 'default') ? 'n/a — generic terms'
-          : (r.ab_pct != null ? +r.ab_pct.toFixed(1) : null),
+        // Evidence describes the country's fiscal facts. On a generic-default row those
+        // facts were not used, so publishing a grade here would be a false credential.
+        ..._fcXlEvidence(r),
         take != null ? +take.toFixed(2) : null,
         (take != null && _dbTake != null && !isStateMonopoly(_dbTake)) ? +(take - _dbTake).toFixed(1) : null,
         govtNpv,
@@ -40152,8 +40187,18 @@ function exportFCResults() {
     ['  GENERIC DEFAULT: no country-specific terms held — the standard default for the'],
     ['    mechanic was substituted, so the model columns are blank on these rows.'],
     ['    The database columns are unaffected and remain citable.'],
-    ['  Evidence A/B (%) is reported as "n/a — generic terms" on GENERIC DEFAULT rows because'],
-    ['    the sourced facts it measures were not used to produce that row\'s Take% (model).'],
+    ['  Evidence Grade is reported as "n/a — generic terms" on GENERIC DEFAULT rows because'],
+    ['    the sourced facts it grades were not used to produce that row\'s Take% (model).'],
+    [''],
+    ['Evidence Grade / Primary Law (tier A, %) / Facts On File (v634):'],
+    ['  The grade is the WORSE of two legs, not an average: primary-law share (A >=60% / B >=40%'],
+    ['  / C >=20%) and fact depth (A >=150 / B >=50 / C >=15 facts). Both legs are in the sheet.'],
+    ['  It is the same letter the Country Profile badge, the Fiscal Compare Quality column and'],
+    ['  the IC citation show. This replaces the old "Evidence A/B (%)" column, which combined'],
+    ['  tier A with tier B — and tier B is 45.2% of the database and largely the EY / IHS / KPMG'],
+    ['  country-level bulk harvest, not an operator filing. That column read 80%+ on 67 countries'],
+    ['  this platform grades C or D, and a flat 100.0 on 53 of them, including countries holding'],
+    ['  two fiscal facts. Do not carry an A/B share into an IC memo as a sourcing credential.'],
     [''],
     ['Citation: ORCA (2026), ' + _orcaVer + '. yoburgqs.github.io/petroleum-fiscal-db/']
   ]);
