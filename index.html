@@ -1601,7 +1601,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v628</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v629</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1671,7 +1671,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v628</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v629</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1999,7 +1999,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v628';
+  return m ? m[0] : 'v629';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2074,7 +2074,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v628');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v629');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2229,7 +2229,8 @@ window.copyPlatformCitation = function(btn) {
     <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Asia Pacific">Asia</button>
     <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Americas">Americas</button>
     <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Europe">Europe</button>
-    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Other" title="FSU &amp; Other — includes Former Soviet Union states (Kazakhstan, Azerbaijan, Turkmenistan, Uzbekistan), Central Asia, Caribbean (Trinidad &amp; Tobago, Suriname), Pacific Island nations, Oceania (Papua New Guinea, Timor-Leste), and other jurisdictions not classified in the primary 5 regions">Other ⓘ</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="CIS/FSU" title="CIS/FSU — the 5 former-Soviet producing jurisdictions filed under that region in the database: Armenia, Azerbaijan, Georgia, Kazakhstan and Russia. Until v629 these were reachable only through the Other chip, and the Country Profile&#x27;s View-all-in-Explorer button sent them to Asia Pacific, which contains none of them.">CIS/FSU</button>
+    <button class="chip" role="button" aria-pressed="false" data-filter="region" data-value="Other" title="Other — 18 jurisdictions not in the primary regional groupings: Iraq-Kurdistan, UAE — Abu Dhabi, UAE — Dubai, Republic of the Congo, Cote d&#x27;Ivoire, Ireland, Faroe Islands, Greenland, Falkland Islands, French Guiana, Barbados, Dominican Republic, Haiti, Gambia, Montenegro, Sao Tome and Principe, Central African Republic and Vanuatu. CIS/FSU has its own chip since v629; Oceania sits under Asia.">Other ⓘ</button>
   </div>
   <!-- v41: World map container (hidden by default) -->
   <div id="world-map-container" style="display:none;position:relative;margin-bottom:16px;"></div>
@@ -2259,6 +2260,7 @@ window.copyPlatformCitation = function(btn) {
         <option value="">All Regions</option>
         <option>Africa</option><option>Asia Pacific</option><option>Middle East</option>
         <option>Europe</option><option>Americas</option>
+        <option value="CIS/FSU">CIS/FSU</option>
         <option>Other</option>
       </select>
     </div>
@@ -2522,6 +2524,7 @@ window.copyPlatformCitation = function(btn) {
           <option value="Asia Pacific">Asia Pacific</option>
           <option value="Americas">Americas</option>
           <option value="Europe">Europe</option>
+          <option value="CIS/FSU">CIS/FSU</option>
           <option value="Other">Other</option>
         </select>
       </div>
@@ -21334,7 +21337,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div class="faq-q" style="font-weight:600;font-size:13px;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="this.parentElement.classList.toggle('open');this.querySelector('.faq-chev').textContent=this.parentElement.classList.contains('open')?'▲':'▼';" aria-expanded="false" aria-controls="faq-A963-body">A963. Why does the Screener return 0 results when I select "Asia Pacific" or "Americas" as the region? <span class="faq-chev" aria-hidden="true">▼</span></div>
       <div id="faq-A963-body" class="faq-a" style="display:none;font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.7;">
         <p>This was a known bug in versions prior to v429. The Screener region dropdown uses grouped labels ("Asia Pacific", "Americas") that are logical conveniences — they do not exist as literal values in the underlying database. The database stores countries under granular region codes: <em>Asia</em>, <em>Oceania</em>, <em>Latin America</em>, <em>North America</em>, <em>CIS/FSU</em>, etc. Before v429, the Screener matched the dropdown value against the database region field using an exact string comparison. "Asia Pacific" never equaled "Asia" or "Oceania," so every country failed the filter and the result set was empty.</p>
-        <p><strong>Fix applied in v429:</strong> The Screener now routes region filtering through <code>_regionMatch()</code> — the same function used by Fiscal Compare's region chips. "Asia Pacific" expands to ["Asia", "Oceania"]; "Americas" expands to ["Latin America", "North America"]; "Other" expands to ["Other", "CIS/FSU", "Unknown"]. Named single regions (Africa, Europe, Middle East) continue to match directly. If you experienced 0 results in a prior session, re-run your screen — the results are now correct.</p>
+        <p><strong>Fix applied in v429:</strong> The Screener now routes region filtering through <code>_regionMatch()</code> — the same function used by Fiscal Compare's region chips. "Asia Pacific" expands to ["Asia", "Oceania"]; "Americas" expands to ["Latin America", "North America"]; "Other" expands to ["Other", "Unknown"]. <strong>Changed in v629:</strong> "CIS/FSU" was removed from the "Other" expansion and is now its own option in the Screener and Explorer region controls (Armenia, Azerbaijan, Georgia, Kazakhstan, Russia), matching the CIS/FSU chip Fiscal Compare has always had. Screener "Other" therefore returns 18, not 23. Named single regions (Africa, Europe, Middle East) continue to match directly. If you experienced 0 results in a prior session, re-run your screen — the results are now correct.</p>
         <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v430 (Aug 2026). Cross-references: FAQ A964 (Ctct NPV&gt;0 interpretation), FAQ A965 (Other region chip).</em></p>
       </div>
     </div>
@@ -21351,7 +21354,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     <div id="faq-A965" class="faq-item" style="margin-bottom:12px;padding:10px 14px;background:var(--surface2);border-radius:6px;border:1px solid var(--border);">
       <div class="faq-q" style="font-weight:600;font-size:13px;color:var(--text);cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="this.parentElement.classList.toggle('open');this.querySelector('.faq-chev').textContent=this.parentElement.classList.contains('open')?'▲':'▼';" aria-expanded="false" aria-controls="faq-A965-body">A965. Which countries are included in the "Other (17)" region chip in Fiscal Compare? <span class="faq-chev" aria-hidden="true">▼</span></div>
       <div id="faq-A965-body" class="faq-a" style="display:none;font-size:12.5px;color:var(--muted);margin-top:8px;line-height:1.7;">
-        <p>The <strong>Other (17)</strong> chip in Fiscal Compare captures countries that do not cleanly map to the five primary regional groupings (Africa, Middle East, Asia Pacific, Americas, Europe). It includes three database categories: <em>Other</em>, <em>CIS/FSU</em> (countries in the former Soviet sphere not included in Europe), and <em>Unknown</em>.</p>
+        <p>The <strong>Other (17)</strong> chip in Fiscal Compare captures countries that do not cleanly map to the five primary regional groupings (Africa, Middle East, Asia Pacific, Americas, Europe). It matches the database's <em>Other</em> category exactly &mdash; the 17 countries listed below. <strong>Note (v629):</strong> the <em>CIS/FSU</em> countries (Armenia, Azerbaijan, Georgia, Kazakhstan, Russia) are <em>not</em> in this chip; they have their own <strong>CIS/FSU (5)</strong> chip, and since v629 they also have their own option in the Screener and Explorer region controls. One country, <em>UAE &mdash; Dubai</em>, is filed under <em>Unknown</em> in the database and is reachable through the Screener/Explorer "Other" option but not through any Fiscal Compare chip.</p>
         <p><strong>Countries in Other (17):</strong> Barbados, Central African Republic, Cote d'Ivoire, Dominican Republic, Falkland Islands, Faroe Islands, French Guiana, Gambia, Greenland, Haiti, Iraq-Kurdistan, Ireland, Montenegro, Republic of the Congo, Sao Tome and Principe, UAE — Abu Dhabi, Vanuatu.</p>
         <p><strong>Why these are grouped together:</strong> These jurisdictions share one characteristic — they do not fit neatly into any single continental region by either geography or fiscal tradition. Iraq-Kurdistan is a semi-autonomous region with its own PSC framework distinct from federal Iraq. UAE — Abu Dhabi is tracked separately from the UAE federal regime. Faroe Islands and Greenland are self-governing territories with distinct upstream fiscal regimes. The Others chip allows analysts to filter to this group for completeness rather than leaving 17 jurisdictions permanently hidden by the regional filters.</p>
         <p><strong>Before v429:</strong> These 17 countries had no dedicated filter chip in Fiscal Compare — they were unreachable by any region chip. The Other (17) chip was added in Cycle 345.</p>
@@ -23723,9 +23726,14 @@ function _mechMatch(d, mechVal) {
 // Helper: match region chip against DB region strings (chip labels differ from DB values)
 function _regionMatch(dRegion, chipVal) {
   if (!chipVal || chipVal === 'all') return true;
+  // v629 (T1): 'CIS/FSU' dropped from the 'Other' expansion. It is now its own selectable
+  // region (5 countries: Armenia, Azerbaijan, Georgia, Kazakhstan, Russia) on every surface,
+  // which is what Fiscal Compare's chip row has always offered. Leaving it in 'Other' as well
+  // would list those 5 twice and keep Screener 'Other' (23) disagreeing with FC 'Other' (17).
+  // 'CIS/FSU' needs no entry -- the [chipVal] fallback below matches the DB value exactly.
   const m = {'Americas':['Latin America','North America'],
              'Asia Pacific':['Asia','Oceania'],
-             'Other':['Other','CIS/FSU','Unknown']};
+             'Other':['Other','Unknown']};
   return (m[chipVal] || [chipVal]).includes(dRegion);
 }
 
@@ -24232,7 +24240,12 @@ function setExplorerChip(filterType, value, btn) {
 // "peers in region" button would have found nothing and silently done nothing. Normalise.
 const _REGION_TO_CHIP = {
   'Africa': 'Africa', 'Middle East': 'Middle East',
-  'Asia': 'Asia Pacific', 'Oceania': 'Asia Pacific', 'CIS/FSU': 'Asia Pacific',
+  // v629 (T1): 'CIS/FSU' used to resolve to 'Asia Pacific' here while _regionMatch()
+  // expanded 'Asia Pacific' to ['Asia','Oceania'] -- a set that contains no CIS/FSU country.
+  // The Country Profile 'View all in Explorer' button reads this map, so on Azerbaijan,
+  // Kazakhstan, Russia, Georgia and Armenia it navigated to a region holding neither the
+  // country the analyst came from nor any of the peers the panel had just listed.
+  'Asia': 'Asia Pacific', 'Oceania': 'Asia Pacific', 'CIS/FSU': 'CIS/FSU',
   'Latin America': 'Americas', 'North America': 'Americas', 'Europe': 'Europe'
 };
 function getRegion(country) {
