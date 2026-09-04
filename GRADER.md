@@ -28091,3 +28091,18 @@ LAYER** block and the `#reference-panel` `translateX` state are intact — this 
 rule inside the existing `pointer: coarse` block (`.cp-pos-pill { min-height: 24px }`) and
 narrows, weakens or removes nothing. v371/v373, v430, v449, v451, v452, v489, v612, v621, v632,
 v637, v639–v647 and every locked item through v647 intact.
+
+---
+## Cycle 554 Log — 2026-09-04 18:09
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 554 complete — shipped as **v648**, pushed to both repos.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (stalest; 553 was T6, 552 T3, 551 T1, 550 T5, 549 T4 — T2 last walked at 548.)
+
+## Friction
+Cold load at 1440×900, no sessionStorage/localStorage: Home → Country Profile → Guyana. Two elements three lines apart contradict each other at the point of decision.
+
+The headline paragraph says, in as many words: *"Clears the 10% WACC at $75 and at the $50
