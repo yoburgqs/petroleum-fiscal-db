@@ -27272,3 +27272,16 @@ pill; take% stays tier-coloured; Reform Risk stays in the primary Home card grid
 LAYER** block and the `#reference-panel` `translateX` state are untouched — this cycle adds no CSS
 rule at all. v371/v373, v430, v449, v451, v452, v489, v612, v621, v632, v637, v639, v640, v641 and
 every locked item through v641 intact.
+
+---
+## Cycle 548 Log — 2026-09-04 10:17
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 548 complete — shipped as **v642**, pushed to both repos.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (rotated off T6/547, T1/546, T3/545, T4/544, T5/543)
+
+## Friction
+Walked T2 cold at 1440px, no storage: Home → Country Profile → the default Indonesia load. Of the four metrics an IC screens on, the page hands the analyst exactly one usable figure. NPV is disavowed in its own headline ("tracks govt take at r² 0.89 — defend on the take, not the NPV"
