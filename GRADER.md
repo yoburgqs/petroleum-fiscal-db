@@ -27831,3 +27831,120 @@ every locked item through v645 intact.
 **Task:** T3 — "How do these three countries compare side by side?" (rotated off T1/551)
 
 **Friction:** The Side-by-Side grid's own closing notice tells the analyst, in bold, *"Rank these countries on Govt Take, which is the production-weighted figure this platform publishes."* The grid then gave them no way to do it. `renderCompare()` lays the columns out in the order the chips were typed. The four Govt Take rows mark only the hig
+
+---
+## Cycle 553 Log — 2026-09-04 17:05
+- Test before: 236 PASS / 0 FAIL (deployed-URL baseline carried in)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite ACTUALLY RUN this cycle against the local
+  tree at `http://localhost:8899/index.html`, number read from `/tmp/runtime_test_report.txt`.
+  The single WARN is a localhost artefact: `index.html:49` registers the service worker at
+  `/petroleum-fiscal-db/sw.js`, the GitHub Pages path, which 404s on a root-served local server.
+  Not present on the deployed site and not caused by this change.
+- JS errors: 0 (the SW 404 above is the only console entry)
+- JS syntax gate: PASS (`node --check` over all 11 inline `<script>` blocks, 2.05 MB)
+- Summary: Cycle 553 complete — shipped as **v647**, pushed to both repos.
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?" (stalest; rotated
+off T3/552, T1/551, T5/550, T4/549, T2/548 — T6 last walked at 547)
+
+**Friction:** Walked cold at 1440x900 with no sessionStorage or localStorage: Home → Country
+Profile → Namibia. `buildEvidencePanel()` (`index.html:22877`, called from the profile render at
+`index.html:31031`) draws the Evidence Quality panel **directly under the profile header** — the
+first evidence surface on the page, measured at scroll y≈601 against the Evidence Chain's y≈3358,
+a gap of ~2,750px — and it is the panel `_homeOpenEvidence()` opens on arrival. Its "Key sources"
+rows are the platform's most direct offer to prove a number: a tier letter, the instrument's name,
+an accent-coloured link, and `title="Open the cited source document"`.
+
+v641 measured every citation URL on the platform and marked the unreachable ones — but wired
+`_citeLinkDead()` into the per-parameter Evidence Chain table **only**. Re-measured this cycle
+against the shipped `country_data.json` using v641's own `_CITE_DEAD` set:
+
+| | |
+|---|---|
+| linked source rows in this panel | 426 |
+| pointing at a 404 or an unresolvable host (checked 4 Sep 2026) | **256** |
+| of those, wearing tier A "primary official source" | **114** |
+| countries with ≥1 dead link in this panel | **171 of 185** |
+| countries where **no** source row is retrievable | **55** |
+
+Namibia is the clean case and was confirmed on screen: one source row, *Petroleum Exploration and
+Production Act 2 of 2017*, tier A, panel graded B — and its only link is dead. `_citeLinkDead()`
+already returned true for that URL. This panel never asked. The analyst learns it by clicking,
+landing on a 404, with a memo to write.
+
+**Change:** the panel now applies the same treatment the Evidence Chain already does, and only
+that — nothing is re-worded and no tooltip is the fix.
+- **Collapsed summary** carries a red chip beside the grade, in the same slot and visual language
+  as the existing `%+ bulk-harvested` and `%+ multi-jurisdiction source` chips: **"no cited source
+  opens"** where nothing is retrievable, **"N of M source links dead"** otherwise. The state is now
+  legible *without opening the panel*.
+- **Each unretrievable row** loses its `↗` (the arrow promises a click reaches the clause; the
+  promise is withdrawn rather than kept and broken), drops from `var(--accent)` to `var(--muted)`,
+  takes the row-level `opacity:.82` already used for BULK and N JURISDICTIONS rows, and wears a
+  **LINK DEAD** chip. Its tip names the address, the check date, and the fact count read off that
+  document at harvest, and states outright that the tier letter is unchanged.
+- The anchor stays live so the analyst can still try.
+
+Verified on screen, cold, all four probes: Namibia `no cited source opens`; Japan `no cited source
+opens` (both rows dead); Guyana `2 of 3 source links dead`; **Norway `1 of 3 source links dead` —
+it keeps the accent colour and the arrow on both lovdata.no statutes and flags only its
+bulk-harvest row.** The marking discriminates rather than blanketing.
+
+**Result:** an analyst verifying a figure before an IC memo can see which citations they can
+actually open *before* they click, on the panel they reach first — and on the 55 countries where
+the answer is "none of them", the panel says so above the fold.
+
+**Mobile (390 x 844, hasTouch):** `scrollWidth === clientWidth` (390 = 390) on all nine visible
+tabs. The summary chip measures **24.0px** and the row chip **24.0px** under `pointer: coarse`
+(both inherit v641's existing `.cite-dead-chip` rule); the source-row anchor measures 33.0px.
+Panel 362px wide inside 390. The pre-existing `#cp-evidence-panel summary { flex-wrap: wrap; }`
+rule absorbs the extra chip, so the summary wraps rather than overflowing.
+
+## Open / carried
+- The Explorer, Screener and Fiscal Compare Evidence columns still render a tier letter with no
+  retrievability signal at all; only Country Profile now carries one on both of its evidence
+  surfaces. **New, this cycle** — the natural next T6.
+- `_cmpOrderMark`'s `hi` marker requires `vals.length >= 3`, so a set with exactly two rankable
+  columns shows "lowest of 2" on one and nothing on the other. Carried from 552.
+- The Side-by-Side grid shows Contractor NPV at $50/$75/$125 but the Govt Take rows and the NPV
+  **chart** carry all four prices — the $100 NPV is plotted but not tabulated. Carried from 552.
+- The proxy/basis notice text refers to "these NPV and IRR columns"; there is no IRR row and no
+  breakeven row anywhere on Side-by-Side. Carried from 552.
+- Norway's stored `p25/p75` say one term while its own contract sample spans 29.6pp; the score is
+  still computed off the stored pair. Needs a `country_data.json` build change, not UX.
+  **Strongest open T2 candidate.** Carried 550–553.
+- `renderSampleAnalyses()` hardcodes `regionOrder` and groups on the RAW `d.region`, omitting 72
+  countries. `#tab-btn-tsamples` is `aria-hidden`/`display:none`, so it is off a first-time
+  analyst's path. Carried 534–553.
+- The Explorer's `#flt-region` still offers only the roll-up region names while the Screener now
+  offers both. Carried from 551.
+- `IOC_PRESENCE` entity-to-parent alias map — open T4 candidate. Carried from 544.
+- Netherlands 23.4% govt take vs the North Sea Trio "~48% take" tooltip. Carried 536–553.
+- The 272 dead citations are now *disclosed* on both Country Profile evidence surfaces but still
+  **unrepaired** — no URL was corrected. Repair needs a harvest-side pass, not a UX change.
+- Two `.source-badge` elements in the Evidence Chain still measure 22.5px under a thumb. Carried
+  from 547.
+- Three Screener presets self-labelled "(barely narrows)", one structurally inverted. Carried 546.
+- The breakeven bound resolution is still limited to the four prices `country_data.json` carries.
+- Why the DCF solver ran for 68 mostly-non-producing countries and not for the largest producers is
+  still not recorded anywhere the page can read. Carried from 548.
+- Cycle 539's empty Summary line in GRADER still reads as a completed cycle. Carried 540–553.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip as the fix** — the fix is a chip and a link-state
+change that alter what renders when nothing is hovered; the tips attached to them describe the new
+state. **Not a text-only change**: two chips did not exist before, three anchors change colour, and
+the `↗` is removed from every unretrievable row. No take, NPV, IRR, breakeven, rank, reform
+diamond, Reform Frequency Score, evidence grade, tier letter or primary-law percentage was altered
+anywhere; no country's data changed; no source row was added or removed. Chip rows stay
+`display:none`; no page-sub paragraph, amber instructional banner, routing hint or "How to read"
+block; no SbS card wrapper. Screener advanced filters still collapsed, presets still a dropdown;
+Home "More tools" still collapsed; Explorer analytics still collapsed. **No tab added, removed or
+reordered.** The Evidence Quality panel still renders **COLLAPSED** by default on every path except
+`_homeOpenEvidence()` — v371/v373 declutter untouched. Govt NPV stays REMOVED from FC; Contractor
+NPV header stays "NPV ($M)"; FC Analyst Guide sessionStorage logic untouched. CP headline stays
+two-zone with global rank and vs-median pill; take% stays tier-coloured; Reform Risk stays in the
+primary Home card grid. The **v612 MOBILE LAYER** block and the `#reference-panel` `translateX`
+state are untouched — this cycle adds **no CSS rule at all** and reuses v641's existing
+`.cite-dead-chip` class. v371/v373, v430, v449, v451, v452, v489, v612, v621, v632, v637, v639,
+v640, v641, v642, v643, v644, v645, v646 and every locked item through v646 intact.
