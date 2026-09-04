@@ -1371,7 +1371,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   /* v535: screen-only controls on the tabs that can now print. Listed explicitly rather than
      hiding every <button> — country names inside the ranked tables are rendered as unclassed
      <button>s, and a blanket rule would blank them out of the printed table. */
-  .btn, .search-input, #cmp-dropdown, #cmp-print-btn, #cmp-share-btn, #cmp-copy-table-btn,
+  .btn, .search-input, #cmp-dropdown, #cmp-print-btn, #cmp-share-btn, #cmp-copy-table-btn, #cmp-order-wrap,
   .cmp-quickstart-btn, .expl-mode-btn, .explorer-mode-toggle,
   #fc-export-btn, #fc-copy-ic-btn, #breakeven-csv-btn { display: none !important; }
   /* chip remove-glyphs are a screen control, not data */
@@ -1678,7 +1678,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v645</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v646</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1748,7 +1748,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v645</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v646</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2081,7 +2081,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v645';
+  return m ? m[0] : 'v646';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2156,7 +2156,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v645');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v646');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2747,6 +2747,20 @@ window.copyPlatformCitation = function(btn) {
       <input type="text" class="search-input" id="cmp-search" placeholder="Type a country, press Enter…" aria-label="Search countries to compare side-by-side" autocomplete="off" inputmode="search" spellcheck="false" style="width:260px;">
       <div id="cmp-chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
       <button class="btn btn-outline btn-sm" id="cmp-clear-btn" aria-label="Clear all selected countries from side-by-side comparison">Clear</button>
+      <!-- v646 (T3): the grid told the analyst to "rank these countries on Govt Take" and then
+           left the columns in whatever order they happened to be typed in, with "To change order:
+           remove and re-add" as the only remedy. This reorders them. -->
+      <label id="cmp-order-wrap" style="display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);white-space:nowrap;">
+        <span>Order columns</span>
+        <select id="cmp-order" aria-label="Order the comparison columns left to right"
+                title="Reorders the columns of the grid, both charts, the PDF, the share link and the IC-memo clipboard copy. The take orders sort on the COMPARABLE take — a country that blends fee-basis contracts (TSC / RSC / Buy-back) is placed on its PSC/Concession figure, not on its headline take, and a state monopoly or a cash-flow-basis (PRRT) column has no comparable take and is placed last. Where the set mixes production-weighted countries with countries ORCA holds no production for, the two are ordered as separate blocks — producers first — because they are not on one scale."
+                style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:4px 8px;border-radius:4px;font-size:11px;">
+          <option value="add">Addition order</option>
+          <option value="take_asc">Govt take $75 — low → high</option>
+          <option value="take_desc">Govt take $75 — high → low</option>
+          <option value="name">Country A–Z</option>
+        </select>
+      </label>
       <button class="btn btn-outline btn-sm" id="cmp-print-btn" title="Print/export comparison as PDF" aria-label="Export comparison as PDF via browser print">⬇ Export PDF</button>
       <button class="btn btn-outline btn-sm" id="cmp-share-btn" title="Copy shareable link to this comparison">⎘ Share Link</button>
       <button class="btn btn-outline btn-sm" id="cmp-copy-table-btn" title="Copy this comparison to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Includes the profile/price assumptions and the ORCA source line. Identical to the button under the grid." aria-label="Copy comparison table for IC memo">&#9112; Copy for IC Memo</button>
@@ -24744,6 +24758,120 @@ async function renderWorldMap() {
 let compareList = [];
 let cmpChart = null;
 
+/* v646 (T3) — COLUMN ORDER
+   ─────────────────────────────────────────────────────────────────────────────
+   The grid's own closing notice instructs the analyst: "Rank these countries on
+   Govt Take, which is the production-weighted figure this platform publishes."
+   The grid then gave them no way to do it. Columns sat in the order the chips were
+   typed, the four Govt Take rows carry a marker on the highest and the lowest column
+   only (and `hi` needs three rankable columns, so a two-producer set gets one marker
+   in total), every column in between is unlabelled, and the Reading line's remedy was
+   "To change order: remove and re-add" — which requires the analyst to already know
+   the ranking they came here to read.
+
+   Walked cold at 1440: Guyana / Angola / Brazil / Nigeria / Iraq reads, at $75,
+   54.1  53.0  55.6  81.1  84.8(PSC/Conc 34.1) — no order in either direction, five
+   columns, four price rows, one marker at each end. Re-typing five chips in a
+   hand-computed sequence is where an IC analyst with 20 minutes stops.
+
+   The ordering obeys the comparability rules the ranking markers already obey, so a
+   sorted set cannot assert something the markers refuse to:
+     - it sorts on the COMPARABLE take, not the headline — a fee-blended column
+       (TSC / RSC / Buy-back, Group 2) is placed on its Group-1 PSC/Concession
+       figure, the same figure _cmpRankTake ranks it on (v549 / v600);
+     - a state monopoly and a PRRT-only (cash-flow basis) column have no comparable
+       take at all and are placed last, in addition order, rather than given a
+       position (v552 / v614);
+     - where the set MIXES production-weighted columns with columns ORCA holds no
+       verified production for, the two are ordered as separate blocks, producers
+       first. Interleaving them into one sequence is exactly the cross-basis ranking
+       v626's gate exists to refuse, and the 32.6pp basis gap would put the
+       statutory-terms columns at the low-take end of every set.
+   Reordering `compareList` itself means the grid, both charts, the PDF, the share
+   link and both clipboard flavours all follow with no extra plumbing.
+*/
+let cmpOrder = 'add';
+const CMP_ORDER_LABEL = {
+  add:       'addition order',
+  take_asc:  'government take at $75/bbl, lowest first',
+  take_desc: 'government take at $75/bbl, highest first',
+  name:      'country name, A–Z'
+};
+function _sbsMechGroups(d) {
+  const mx  = Array.isArray(d && d.mech_mix) ? d.mech_mix : [];
+  const tot = mx.reduce((s, x) => s + (x.n || 0), 0);
+  const n2  = mx.filter(x => x.g === 2).reduce((s, x) => s + (x.n || 0), 0);
+  const n3  = mx.filter(x => x.g === 3).reduce((s, x) => s + (x.n || 0), 0);
+  return { blended: n2 > 0, prrt: n3 > 0 && n2 === 0 && (tot - n2 - n3) === 0 };
+}
+// The same figure _cmpRankTake ranks on, minus the set-dependent basis gate (handled
+// by the bucketing in _sbsApplyOrder). null = this column has no comparable take.
+function _sbsCmpTake(d, p) {
+  if (!d) return null;
+  const v = d['take_' + p];
+  if (v == null) return null;
+  if (typeof isStateMonopoly === 'function' && isStateMonopoly(v)) return null;
+  const st = _sbsMechGroups(d);
+  if (st.prrt) return null;
+  if (st.blended) return (d.g1 && d.g1['t' + p] != null) ? d.g1['t' + p] : null;
+  return v;
+}
+function _sbsHasProd(d) {
+  const c = (d && typeof getProducerContext === 'function') ? getProducerContext(d.country) : null;
+  return !!(c && c.inSet);
+}
+// True when the active order splits the set into two basis blocks — read back by the
+// Reading line so the analyst is told why the blocks are where they are.
+let _sbsOrderSplit = false;
+// The order the analyst actually added the countries in, kept separately because sorting is
+// destructive: without it "Addition order" would be a dead option after the first sort — it
+// would have nothing left to restore. Resynced from compareList whenever the two disagree on
+// membership, which covers the two hash-restore paths that assign compareList directly.
+let cmpAddSeq = [];
+function _sbsAddSeq() {
+  const cur = compareList.slice();
+  if (cmpAddSeq.length !== cur.length || cur.some(c => cmpAddSeq.indexOf(c) === -1)) {
+    cmpAddSeq = cur;
+  }
+  return cmpAddSeq;
+}
+function _sbsApplyOrder() {
+  _sbsOrderSplit = false;
+  const seq = _sbsAddSeq();
+  if (compareList.length < 2) return;
+  if (cmpOrder === 'add') { compareList = seq.slice(); return; }
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return;
+  const rec = seq.map(c => COUNTRY_DATA.find(d => d.country === c));
+  if (rec.some(d => !d)) return;   // never reorder a set that does not fully resolve
+  const idx = {}; seq.forEach((c, i) => { idx[c] = i; });
+  if (cmpOrder === 'name') {
+    compareList = rec.map(d => d.country).sort((a, b) => a.localeCompare(b));
+    return;
+  }
+  const dir    = cmpOrder === 'take_desc' ? -1 : 1;
+  const nProd  = rec.filter(_sbsHasProd).length;
+  const mixed  = nProd > 0 && nProd < rec.length;
+  const bucket = (d) => {
+    if (_sbsCmpTake(d, 75) == null) return 2;                 // no comparable take — last
+    return (mixed && !_sbsHasProd(d)) ? 1 : 0;                // statutory-terms block
+  };
+  compareList = rec.slice().sort((a, b) => {
+    const ba = bucket(a), bb = bucket(b);
+    if (ba !== bb) return ba - bb;
+    if (ba === 2) return idx[a.country] - idx[b.country];
+    const va = _sbsCmpTake(a, 75), vb = _sbsCmpTake(b, 75);
+    if (va !== vb) return (va - vb) * dir;
+    return idx[a.country] - idx[b.country];
+  }).map(d => d.country);
+  _sbsOrderSplit = mixed || rec.some(d => _sbsCmpTake(d, 75) == null);
+}
+function setCompareOrder(mode) {
+  cmpOrder = CMP_ORDER_LABEL[mode] ? mode : 'add';
+  _sbsApplyOrder();
+  renderCompare();
+  _updateCompareHash();
+}
+
 const cmpSearch = document.getElementById('cmp-search');
 const cmpDrop   = document.getElementById('cmp-dropdown');
 
@@ -25082,6 +25210,7 @@ function addCompare(country) {
   if (_sbsExampleUntouched && !_sbsSeeding) {
     var _cleared = compareList.slice();
     compareList = [];
+    cmpAddSeq = [];   // v646
     _sbsDropExample();
     if (typeof showCopyToast === 'function' && _cleared.length) showCopyToast('Cleared the ' + _cleared.length + '-country example (' + _cleared.join(', ') + ') — building your comparison from ' + country + '.');
   }
@@ -25089,7 +25218,9 @@ function addCompare(country) {
     if (typeof showCopyToast === 'function') showCopyToast('Comparison is full at ' + CMP_MAX + ' countries — ' + country + ' was not added. Remove one (\u2715 on a chip) to make room.');
     return false;
   }
-  compareList.push(country);
+  cmpAddSeq = _sbsAddSeq().concat([country]);   // v646: resync BEFORE the push, so the
+  compareList.push(country);                     // membership check still sees the old set
+  _sbsApplyOrder();   // v646: a chosen order survives the next add — it is not addition order again
   renderCompare();
   _updateCompareHash();
   return true;
@@ -25097,10 +25228,11 @@ function addCompare(country) {
 function removeCompare(country) {
   _sbsDropExample();   // editing the example makes what is left the analyst's own selection
   compareList = compareList.filter(c => c !== country);
+  cmpAddSeq = cmpAddSeq.filter(c => c !== country);   // v646
   renderCompare();
   _updateCompareHash();
 }
-function clearCompare() { _sbsDropExample(); compareList = []; renderCompare(); _updateCompareHash(); }
+function clearCompare() { _sbsDropExample(); compareList = []; cmpAddSeq = []; renderCompare(); _updateCompareHash(); }
 function _updateCompareHash() {
   if (window._activeTab === 't0' || window._activeTab === 't2') {
     if (compareList.length > 0) {
@@ -26083,9 +26215,31 @@ function renderCompare() {
   
   // v468: Reading direction note when 3+ countries loaded — helps first-time users understand the column layout
   if (compareList.length >= 3) {
-    html += `<div style="margin-top:8px;margin-bottom:4px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:6px;">
+    // v646 (T3): this line used to end "Sorted left→right by addition order. To change order:
+    // remove and re-add." It now names the order that is actually in force and, when a take
+    // order splits the set into basis blocks, says where the split is and why — otherwise a
+    // sorted grid would read as one sequence when it is two.
+    let _ordTxt;
+    if (cmpOrder === 'add') {
+      _ordTxt = 'Sorted left→right by <strong style="color:var(--text);">addition order</strong> — change it with <strong style="color:var(--text);">Order columns</strong> above.';
+    } else {
+      _ordTxt = 'Sorted left→right by <strong style="color:var(--text);">' + CMP_ORDER_LABEL[cmpOrder] + '</strong>';
+      if (cmpOrder !== 'name' && _sbsOrderSplit) {
+        const _statCols = selected.filter(d => _cmpBasisGate && !_cmpHasProd(d) && _sbsCmpTake(d, 75) != null).map(d => d.country);
+        const _noneCols = selected.filter(d => _sbsCmpTake(d, 75) == null).map(d => d.country);
+        const _bits = [];
+        if (_statCols.length) _bits.push('<strong style="color:var(--text);">' + _cmpEsc(_cmpJoin(_statCols)) + '</strong> ' + (_statCols.length === 1 ? 'is' : 'are') + ' ordered as a separate block after the production-weighted columns — ORCA holds no verified field production for ' + (_statCols.length === 1 ? 'it' : 'them') + ', so ' + (_statCols.length === 1 ? 'its take is' : 'their takes are') + ' a simple average of statutory terms and not on the same scale');
+        if (_noneCols.length) _bits.push('<strong style="color:var(--text);">' + _cmpEsc(_cmpJoin(_noneCols)) + '</strong> ' + (_noneCols.length === 1 ? 'has' : 'have') + ' no comparable take (state monopoly or cash-flow basis) and ' + (_noneCols.length === 1 ? 'is' : 'are') + ' placed last rather than ranked');
+        if (_bits.length) _ordTxt += '. ' + _bits.join('; ');
+      }
+      if (cmpOrder !== 'name' && _cmpAnyBlended) {
+        _ordTxt += '. A fee-blended column is placed on its <strong style="color:var(--text);">PSC/Conc</strong> figure, not its headline take';
+      }
+      _ordTxt += '.';
+    }
+    html += `<div style="margin-top:8px;margin-bottom:4px;font-size:11px;color:var(--muted);display:flex;align-items:baseline;gap:6px;flex-wrap:wrap;">
       <span style="color:var(--accent);font-weight:700;">Reading:</span>
-      Columns = countries · Rows = metrics · Sorted left→right by addition order. To change order: remove and re-add. Color shows tier: <span style="color:var(--green);font-weight:700;">green</span> ≤40% · <span style="color:var(--yellow);font-weight:700;">amber</span> 41–60% · <span style="color:var(--orange);font-weight:700;">orange</span> 61–75% · <span style="color:var(--red);font-weight:700;">red</span> &gt;75%.
+      <span>Columns = countries · Rows = metrics · ${_ordTxt} Color shows tier: <span style="color:var(--green);font-weight:700;">green</span> ≤40% · <span style="color:var(--yellow);font-weight:700;">amber</span> 41–60% · <span style="color:var(--orange);font-weight:700;">orange</span> 61–75% · <span style="color:var(--red);font-weight:700;">red</span> &gt;75%.</span>
     </div>`;
   }
   // Add export/share actions directly below the comparison grid
@@ -42606,6 +42760,11 @@ document.addEventListener('DOMContentLoaded', function() {
   // Side-by-Side control buttons
   var cmpClear = document.getElementById('cmp-clear-btn');
   if (cmpClear) cmpClear.addEventListener('click', function() { if (typeof clearCompare === 'function') clearCompare(); });
+  // v646 (T3): column order control
+  var cmpOrderSel = document.getElementById('cmp-order');
+  if (cmpOrderSel) cmpOrderSel.addEventListener('change', function() {
+    if (typeof setCompareOrder === 'function') setCompareOrder(cmpOrderSel.value);
+  });
   var cmpPrint = document.getElementById('cmp-print-btn');
   if (cmpPrint) cmpPrint.addEventListener('click', function() { window.print(); });
   var cmpShare = document.getElementById('cmp-share-btn');
