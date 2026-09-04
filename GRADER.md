@@ -26829,3 +26829,20 @@ v632 FC shortlist selector and v637 IOC export controls untouched. The **v612 MO
 and the `#reference-panel` `translateX` state are untouched — the new rule is a scoped `height` on
 two ids and does not narrow or override it. v371/v373, v430, v449, v451, v452, v489, v612 and every
 locked item through v638 intact.
+
+---
+## Cycle 545 Log — 2026-09-04 07:09
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 545 complete, shipped as **v639** and pushed to both repos.
+
+## Task — T3: "How do these three countries compare side by side?"
+
+Rotated off T4 (544), T5 (543), T2 (542), T1 (541), T6 (540).
+
+## Friction
+
+I walked Side-by-Side cold — no sessionStorage, no localStorage — took the default North Sea Trio, cleared it, and typed in an analyst's own set (Guyana / Angola / Brazil) through the search box.
+
+The grid itself is ground smooth; twenty cycles have been through it. The worst moment is be
