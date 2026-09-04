@@ -1601,7 +1601,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v630</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v631</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1671,7 +1671,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v630</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v631</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1999,7 +1999,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v630';
+  return m ? m[0] : 'v631';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2074,7 +2074,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v630');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v631');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -24588,6 +24588,71 @@ function _cmpFuzzy(q) {
       .sort(function(a, b) { return b.score - a.score; })
       .slice(0, 4);
 }
+/* v631 (T3) — MATCH RANKING. Walked "compare three countries" cold. The search box
+   under Side-by-Side pre-highlights row 1 so "the analyst can SEE what Enter is about
+   to add" (v586), and the placeholder instructs "Type a country, press Enter…". But
+   the match list was never ranked: it was raw COUNTRY_DATA array order filtered by a
+   bare indexOf, so row 1 was whichever matching country happened to sit earliest in
+   the file — a substring buried mid-word beat an exact prefix.
+
+   Measured against all 185 countries, 93 of 896 name prefixes highlighted the WRONG
+   country. The ones that matter to this dataset:
+
+       sau   -> Guinea-Bissau   (Saudi Arabia was row 2)
+       rus   -> Belarus         (Russia was row 3)
+       gha   -> Afghanistan     (Ghana was row 2)
+       mala  -> Guatemala       (Malaysia was row 3)
+       ger   -> Algeria         (Germany was row 2)
+       sudan -> South Sudan     (Sudan, an exact match, was row 2)
+       tri   -> Austria         (Trinidad and Tobago was row 2)
+
+   Typing three letters and pressing Enter is the documented way to use this box, and
+   the add path has no failure state — it is a success toast either way. So an analyst
+   building a Middle East screen types "sau", hits Enter, and Guinea-Bissau lands in an
+   IC comparison column next to Norway. Nothing on screen says otherwise.
+
+   Ranked now, best match first:
+     0  the whole name IS the query          "iraq"  -> Iraq before Iraq-Kurdistan
+     1  the name starts with the query       "sau"   -> Saudi Arabia
+     2  a word inside the name starts with it "kurdistan" -> Iraq-Kurdistan
+     3  the query is buried inside a word    "sau"   -> Guinea-Bissau, now last
+   Ties break to the shorter name, then alphabetically, so the order is stable and
+   predictable rather than an artefact of the data file's ordering. */
+function orcaMatchRank(name, q) {
+  if (!name || !q) return 9;
+  var s = String(name).toLowerCase();
+  if (s === q) return 0;
+  var i = s.indexOf(q);
+  if (i === -1) return 9;
+  if (i === 0) return 1;
+  while (i > 0) {
+    if (!/[a-z0-9]/.test(s.charAt(i - 1))) return 2;
+    i = s.indexOf(q, i + 1);
+  }
+  return 3;
+}
+/* q2 is the alias expansion when one resolved ("uk" -> "united kingdom"); a country is
+   scored on whichever of the two it matches better, so the alias target outranks a
+   country that merely contains the raw letters. Entries that match on something other
+   than the name (mechanic, region) score 9 and keep their incoming order. */
+function orcaRankCountryMatches(list, q, q2) {
+  var rank = function (d) {
+    var n = d && d.country != null ? d.country : d;
+    var r = orcaMatchRank(n, q);
+    if (q2 && q2 !== q) r = Math.min(r, orcaMatchRank(n, q2));
+    return r;
+  };
+  return list.slice().sort(function (a, b) {
+    var ra = rank(a), rb = rank(b);
+    if (ra !== rb) return ra - rb;
+    if (ra === 9) return 0;
+    var A = String(a && a.country != null ? a.country : a);
+    var B = String(b && b.country != null ? b.country : b);
+    if (A.length !== B.length) return A.length - B.length;
+    return A.localeCompare(B);
+  });
+}
+
 var _cmpOpts = [];      // country names currently rendered, in order
 var _cmpFocus = -1;     // index of the highlighted option; Enter adds this one
 
@@ -24650,14 +24715,11 @@ function _cmpRenderDrop() {
       if (!seen[d.country]) { seen[d.country] = 1; matches.push(d); }
     }
   });
-  // An expanded alias is the analyst's actual intent — "uk" must not rank Ukraine
-  // above United Kingdom just because Ukraine also contains the raw letters.
-  if (exp) matches.sort(function(a, b) {
-    var A = a.country.toLowerCase().indexOf(exp) !== -1 ? 0 : 1;
-    var B = b.country.toLowerCase().indexOf(exp) !== -1 ? 0 : 1;
-    return A - B;
-  });
-  matches = matches.slice(0, 12);
+  // v631: rank BEFORE the cap, so the best match is row 1 (the row Enter adds) and a
+  // strong match can never be truncated off the end of the list. Supersedes the v586
+  // alias-only sort, which fixed "uk" -> Ukraine but left every plain typed prefix —
+  // "sau", "rus", "gha", "ger" — landing on the wrong country.
+  matches = orcaRankCountryMatches(matches, raw, exp).slice(0, 12);
 
   var html = '', hdr = '';
   if (matches.length) {
@@ -28053,11 +28115,16 @@ function renderSearchResults() {
   // not use, so that entry had never matched anything.
   const _ALIASES = window.ORCA_ALIASES || {};
   const qExp = _ALIASES[q] || q;
-  const countryMatches = COUNTRY_DATA.filter(d =>
+  // v631: same unranked-list defect the Side-by-Side box had, and worse here because the
+  // cap is 8 and the filter also matches on mechanic and region — the country the analyst
+  // typed could be pushed off the end entirely by countries that merely share its mechanic.
+  // Rank by name-match quality first, then cap. Mechanic/region-only hits score last and
+  // keep their existing order, so a "psc" or "africa" search is unchanged.
+  const countryMatches = orcaRankCountryMatches(COUNTRY_DATA.filter(d =>
     d.country.toLowerCase().includes(qExp) || d.country.toLowerCase().includes(q) ||
     d.mechanics.toLowerCase().includes(qExp) || d.mechanics.toLowerCase().includes(q) ||
     (d.region && d.region.toLowerCase().includes(qExp)) || (d.region && d.region.toLowerCase().includes(q))
-  ).slice(0, 8);
+  ), q, qExp).slice(0, 8);
 
   if (!countryMatches.length) {
     // Fuzzy fallback: Levenshtein edit distance — handles transpositions, insertions, deletions
