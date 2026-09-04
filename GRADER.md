@@ -26846,3 +26846,132 @@ Rotated off T4 (544), T5 (543), T2 (542), T1 (541), T6 (540).
 I walked Side-by-Side cold — no sessionStorage, no localStorage — took the default North Sea Trio, cleared it, and typed in an analyst's own set (Guyana / Angola / Brazil) through the search box.
 
 The grid itself is ground smooth; twenty cycles have been through it. The worst moment is be
+
+---
+## Cycle 546 Log — 2026-09-04 07:5x
+
+- Test before: 236 PASS / 0 FAIL (harness, live URL)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite ACTUALLY RAN this cycle against the local
+  build via `TEST_URL=http://127.0.0.1:8899/index.html`. The 1 WARN / 1 console error is
+  `/petroleum-fiscal-db/sw.js` 404, an artifact of serving the repo at `/` with
+  `python -m http.server`; the registration path resolves on Pages. Not from this change.
+- JS syntax gate: PASS (16 blocks). Pixel gate: PASS — no surface worse than baseline.
+- Page errors: 0. Horizontal scroll, 10 tabs x 1920/1440/1280/1024/768/390: none.
+- Shipped as **v640**, pushed to both repos.
+
+## Task — T1: "Which countries should even be on my screening list?"
+
+Rotated off T3 (545), T4 (544), T5 (543), T2 (542).
+
+## Friction
+
+Walked T1 cold — fresh context, no sessionStorage, no localStorage — Home → Screener.
+
+Home is clean and answers T1 directly ("15 countries pass the IOC capital screen — open the
+screen →"). The Screener's preset dropdown is genuinely strong: eleven options, each carrying a
+live count computed off the real filter path, three of them honestly annotated "(barely narrows)".
+The region filter is complete and consistent — `_regionMatch()` reaches every DB region, and the
+seven named options sum exactly to the unfiltered count (39+7+35+25+28+4+15 = 153 = All). Nothing
+wrong there.
+
+The worst moment is the **first thing the analyst touches**.
+
+`#sc-fee-cmp-wrap` (`index.html:2493`) is `display:none` until a take ceiling exists, and
+`renderScreener()` reveals it with `_tkWrap.style.display = 'inline-flex'` (`index.html:26680`) the
+instant the Max Govt Take slider moves below 100 or any preset loads. Its children are a checkbox,
+**three bare text nodes and three `<span>`s** — seven flex items, `flex-wrap: nowrap`, in a 327.5px
+slider column. Each item shrank to min-content and wrapped inside itself. Measured in the browser:
+
+| flex item | width | lines |
+|---|---|---|
+| `<input type=checkbox>` | 13px | 1 |
+| "Test the ceiling on" | 35.3px | **3** |
+| **comparable** | 61.1px | 1 |
+| "take for the" | 18.7px | **3** |
+| **10** | 11.9px | 1 |
+| "fee-basis countries" | 41.2px | 2 |
+| "(published headline still shown and exported)" | 102.9px | **3** |
+
+Seven narrow columns of stacked words. "take for the" was an 18.7px column with *take / for / the*
+one above the other. The sentence had to be read column-by-column, and the two bold words —
+`comparable` and the live count `10` — sat on single lines vertically offset from the words they
+modify, so they read as labels on nothing.
+
+This is not a cosmetic corner. It is the control that decides whether **Iraq — published take
+84.8%** — is admitted into a screen the analyst just labelled "Take ≤65%", by testing the ceiling
+against Iraq's comparable 34.1% on its 195 PSC/Concession contracts instead. It is checked by
+default. So the analyst's IC shortlist contains a row reading `84.8% → screened at 34.1%` under a
+65% ceiling, and the one control that explains why is an unreadable jumble.
+
+## Change
+
+The text run after the checkbox is wrapped in a single
+`<span style="flex:1 1 auto;min-width:0;">`. The label is now **two** flex items instead of seven,
+so it sets as one 309.5px text block that reads left to right.
+
+| | before | after |
+|---|---|---|
+| flex items | 7 | **2** |
+| widest text column | 102.9px | **309.5px** |
+| label box height | 45px | **30px** |
+| reading order | 7 columns, top-to-bottom each | one sentence, left-to-right |
+
+The checkbox also picked up a `pointer: coarse` size — **13x13 → 24x24** — added *inside* the v612
+MOBILE LAYER exactly as v621's `.cp-be-cta` rule was. `input[type=checkbox]` is not named in that
+layer's 44px selector list, and widening that selector would grow every checkbox in the Screener's
+collapsed mechanic and IOC grids, so the rule is keyed to `#sc-fee-cmp` alone. **Nothing in the
+v612 layer is removed, weakened or narrowed**, and `#reference-panel` is untouched.
+
+## Result
+
+The analyst who drags Max Govt Take can now read, in one line, that the ceiling is being tested on
+comparable take for 10 fee-basis countries and that the published headline is still what the table
+shows and exports — so when Iraq appears at `84.8% → screened at 34.1%` inside a 65% screen, they
+can decide whether to keep it or uncheck the box. Before, the explanation was there but could not
+be read, so the choice was made for them by a default they had no way to evaluate.
+
+## Carried forward — not fixed this cycle
+- **The XLSX export still writes `d.profit_oil_govt`** (`Profit Oil (Govt) (%)` in the CP workbook)
+  — the summary figure, not the table's. Carried from 542–545.
+- **Both test harnesses still default to the live URL** (`tests/runtime_comprehensive.js:13`,
+  `tools/petroleum/tests/pixel_audit.js:61`). Both accept `TEST_URL`; this cycle used it on both.
+  Carried from 537–545.
+- **Regional Benchmarks card** (`renderSampleAnalyses()`, `index.html:32601`) is the last surface
+  still iterating a hardcoded coarse `regionOrder` — `['Middle East','Africa','Asia Pacific',
+  'Americas','Europe','Other']` — instead of routing through `_regionMatch()`. Verified against
+  `country_data.json` this cycle: the DB's regions are Africa 49, Europe 30, **Asia 26**,
+  **Latin America 26**, Other 17, **Oceania 15**, Middle East 14, **CIS/FSU 5**,
+  **North America 2**. So "Asia Pacific" and "Americas" match zero rows and the card answers "where
+  does state capture differ most by geography?" using 4 regions out of 9, silently omitting **74
+  countries**. It is on the `tsamples` tab, whose tab button is `display:none` and which is reached
+  only through the Reference panel — low traffic, which is why it lost to the Screener control this
+  cycle. Still the strongest open T1 candidate. Carried from 534–545.
+- **`IOC_PRESENCE` entity-to-parent alias map** — strongest open T4/T6 candidate. Carried from 544.
+- **Republic of the Congo / Sao Tome and Principe render region `Other`**; **UAE — Dubai** `Unknown`;
+  **UAE — Abu Dhabi** empty `top_sources`. Carried from 534–545.
+- **Netherlands 23.4% govt take at $75** vs the North Sea Trio button's "~48% take" tooltip.
+  Data question. Carried from 536–545.
+- **Three of eleven Screener presets are self-labelled "(barely narrows)"** — Low Take · Positive
+  NPV (143 of 185), Low-Risk Stable (141), Two-Price Return Screen (153). The last is structurally
+  inverted: `setSlider('sl-npv', 100); setSlider('sl-npv50', 500)` requires **more** NPV at \$50
+  than at \$75, so the \$75 leg can never bind. Re-thresholding a screen is a business-logic call
+  and is **not** being made by the loop — flagged for Zach. New this cycle.
+- **Cycle 539 shipped nothing** and its GRADER entry has an empty Summary line, which reads as a
+  completed cycle. A non-empty failure marker in `autonomous_cycle.py` when Claude returns 0 chars
+  is still worth adding; not added without Zach's call. Carried from 540–545.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip element** — the label's existing `title` is unchanged.
+Not a text-only change: not one character of copy was altered, only the box the copy lays out in,
+and the rendered geometry is measurably different (7 flex items → 2, 45px → 30px, and 13px → 24px
+under a thumb). **No take, NPV, breakeven, IRR, rank, reform diamond, band or tier value was
+altered anywhere**, and no notice, caveat or label text was re-worded. Chip rows stay
+`display:none`; no page-sub paragraph, amber instructional banner, routing hint or "How to read"
+block; no SbS card wrapper. Screener advanced filters still collapsed, presets still a dropdown;
+Home "More tools" still collapsed; Explorer analytics still collapsed. **No tab added, removed or
+reordered.** Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst
+Guide sessionStorage logic untouched; v632 FC shortlist selector, v637 IOC export controls and the
+v639 chart-fill rule untouched. The **v612 MOBILE LAYER** block and the `#reference-panel`
+`translateX` state are untouched — this cycle's rule is an addition inside that layer, in the same
+form v621 used, and does not narrow or override it. v371/v373, v430, v449, v451, v452, v489, v612
+and every locked item through v639 intact.
