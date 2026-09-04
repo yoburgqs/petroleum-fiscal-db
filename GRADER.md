@@ -28106,3 +28106,148 @@ v637, v639–v647 and every locked item through v647 intact.
 Cold load at 1440×900, no sessionStorage/localStorage: Home → Country Profile → Guyana. Two elements three lines apart contradict each other at the point of decision.
 
 The headline paragraph says, in as many words: *"Clears the 10% WACC at $75 and at the $50
+
+---
+## Cycle 555 Log — 2026-09-04 18:55
+- Test before: 236 PASS / 0 FAIL (deployed baseline, as reported at cycle start)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — the suite ACTUALLY RAN this cycle, twice, against
+  the local tree at `http://localhost:8099/index.html`. The single WARN is a console 404 from
+  `navigator.serviceWorker.register('/petroleum-fiscal-db/sw.js', …)` at index.html:49 — the path
+  is hardcoded to the GitHub Pages scope and cannot resolve under a localhost root, so it is a
+  property of the harness URL, not of this change. No 4xx was logged by the network listener for
+  any resource the page itself requests.
+- JS errors: 0 page errors across all 9 visible tabs at 1920 / 1440 / 1280 / 1024 / 768 / 390.
+- Summary: Cycle 555 complete — shipped as **v649**.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest: 554 was T2, 553 T6,
+552 T3, 551 T1, 550 T5 — T4 last walked at 549.)
+
+## Friction
+Cold load at 1440×900, no sessionStorage/localStorage. The per-country T4 surfaces are mature and
+were walked first without finding anything worse: the Reform Risk lookup card
+(`renderReformCountryVerdict()`) is honest on all four branches — Guyana's context-only 100,
+the UK's 25/actively-reforming, Angola's unestablished direction, Saudi Arabia's monopoly
+withholding — the lookup `<select>` is already split into "Sourced reform history — scoreable (21)"
+and "No sourced reform history (164)" optgroups, and Fiscal Compare already carries a
+`Reform-scored only` filter whose count is read off the data.
+
+The friction is on **Explorer**, the one table where the analyst screens all 185 rows at once for
+this question, in the **`Stability` column** (`index.html`, the Explorer row template, the
+`<td class="num">` immediately after `Swing (pp)`).
+
+The cell drew a bar of width `${score}%`. **v624 fixed this cell's COLOUR and left its LENGTH.**
+Its own comment names the pair it left standing — "USA drew a long GREEN bar on 91 (one term)
+directly above Mexico's short yellow bar on 51 (20.5pp measured)" — and muted the colour without
+shortening the bar. Length is the pre-attentive signal in a bar column: it is read before a
+colour and long before a hover.
+
+Counted live against `COUNTRY_DATA` this cycle, not asserted: **28** countries have a spread ORCA
+actually measured, and their ceiling is **Turkmenistan at 74**. **86 of the 132 one-term regimes
+score above 74**, so 86 rows drew a bar physically longer than the longest bar any measured regime
+can draw — Bahamas and Vanuatu at 100 drew a full-width one. On the tab the analyst uses to rank
+185 jurisdictions by stability, the column ranked the regimes ORCA never measured **above** every
+one of the regimes it did. The header tooltip on that same column says, verbatim, "A graded
+MODERATE therefore outranks any UNGRADED score on this column" — and the bar next to it said the
+opposite, at a glance, on every row.
+
+Two smaller defects in the same cell, both real: the **score number never rendered on screen at
+all** (the column showed 185 bars and no values; the number lived only in the hover), and the cell
+used a **private 70/40 colour ramp** rather than the platform's 75/60/45 bands, so Turkmenistan 74,
+Kazakhstan 73, Nigeria 73, China 72 and Sao Tome 70 painted GREEN here while `renderStabilityBadge()`
+calls the identical scores MODERATE on Fiscal Compare, Country Profile and Side-by-Side.
+
+## Change
+1. **A one-term row no longer draws a bar.** It renders its number with the same bordered
+   `UNGRADED` marker `renderStabilityBadge()` already uses on the three other surfaces —
+   `91 UNGRADED one term` — so the four surfaces now state one grade for one score. The absence of
+   a bar *is* the finding: no length is asserted where no spread was measured.
+2. **The bar is now reserved for the 28 countries whose IQR penalty was actually charged**, and
+   carries its score beside it (`[bar] 51 20.5pp`).
+3. **The colour ramp moves to the platform bands** (75 / 60 / 45), so no measured regime renders
+   green — which is the rule v624 established and the consequence it named.
+4. Both hover texts rewritten to state the new basis; the column header tooltip no longer says the
+   score is "shown as bar" for every row, because it is not.
+5. Version bumped to v649 in the 4 display locations, silently, at the end.
+
+## Result
+Scanning the Explorer Stability column, the analyst now sees **28 bars — one for each country ORCA
+holds a measured take spread for — and nothing bar-shaped anywhere else**. USA (91, one term) no
+longer draws a bar three-quarters longer than Mexico (51, 20.5pp measured) directly above it; USA
+now shows `91 UNGRADED one term` and Mexico shows the only thing on the column with a length. The
+86 rows that outranked every measured regime on bar length rank on nothing. And the score itself is
+legible for the first time without hovering 185 cells.
+
+## Verification
+Measured live, not assumed. Full table audit across all 185 rendered rows: **28 cells contain a bar,
+132 render `UNGRADED`, 0 mismatches** (no bar on a one-term row, no missing bar on a measured row).
+Runtime suite run twice: **261 PASS / 0 FAIL**. Zero horizontal scroll at 1920 / 1440 / 1280 / 1024
+/ 768 and at **390×844 `hasTouch`** (`scrollWidth == clientWidth == 390`) across all 9 visible tabs;
+0 page errors at every one. No control was added or made interactive — the cell is a static
+`<td>` with a hover title and no handler, so the 24px coarse-pointer rule does not apply to it and
+its element heights (13px flex rows) are unchanged in kind from the bar layout it replaces.
+
+## Open / carried
+- **New, this cycle.** The `@media (max-width: 768px)` block for `#tbl-explorer` hides
+  `td:nth-child(7), (8), (9)` and comments them as "Breakeven, Swing, Stability". The table now has
+  19 columns and those three positions are Mechanics / Govt Take / Evidence — so on a phone the
+  Explorer hides three of its most load-bearing columns and keeps the ones the rule meant to drop.
+  Pure index drift; no page error, which is why nothing caught it. Strong next T1 or T4.
+- **New, this cycle.** Two FAQ passages (index.html:4172 and :4730) instruct the analyst to "apply
+  the Stability Score filter at ≥4 in the Screener" and to "filter to Stability Score ≤1". **The
+  Screener has no stability filter** — its controls are `sl-take`, `sl-npv`, `sl-npv50`, `sl-evid`.
+  A documented workflow that routes to a control that does not exist. Fixing it means adding the
+  filter, not editing the sentence.
+- **New, this cycle.** FAQ A40 (index.html:4761) describes the Reform Risk score as "1–5 in the
+  Screener, shown in the Stability column of Explorer". The Explorer Stability column is the Fiscal
+  Predictability Score, not the Reform Frequency Score — the two are explicitly distinguished
+  everywhere else on the platform, and this text conflates them.
+- The all-185 rank in the CP headline strip (`#138 of 185`) and the verdict's position pill
+  (`10 / 21 producers`) sit ~130px apart on two different universes. Carried from 554.
+- Guyana shows `-1.5pp vs producer median @$75` while its rank line reads `#138 of 185 · not
+  production-weighted` — measured against a median it is excluded from. Carried from 554.
+- Guyana's header carries `54.1% govt take @$75` and, two rows down, `Contract take: single term ·
+  57.0% ✓` — two figures both called "take", 2.9pp apart, unreconciled. Carried from 554.
+- `_cmpOrderMark`'s `hi` marker requires `vals.length >= 3`, so a two-column set shows "lowest of 2"
+  on one column and nothing on the other. Carried from 552.
+- Side-by-Side shows Contractor NPV at $50/$75/$125 but the Govt Take rows and the NPV chart carry
+  all four prices — the $100 NPV is plotted but not tabulated. Carried from 552.
+- The Side-by-Side proxy/basis notice refers to "these NPV and IRR columns"; there is no IRR row and
+  no breakeven row on that tab. Carried from 552.
+- Norway's stored `p25/p75` say one term while its own contract sample spans 29.6pp. Needs a
+  `country_data.json` build change, not UX. Carried 550–555.
+- `renderSampleAnalyses()` hardcodes `regionOrder` and groups on the RAW `d.region`, omitting 72
+  countries. `#tab-btn-tsamples` is `aria-hidden`/`display:none`. Carried 534–555.
+- The Explorer's `#flt-region` still offers only the roll-up region names while the Screener offers
+  both. Carried from 551.
+- The Explorer, Screener and Fiscal Compare Evidence columns render a tier letter with no
+  retrievability signal; only Country Profile carries one. Carried from 553.
+- `IOC_PRESENCE` entity-to-parent alias map — open T4 candidate. Carried from 544.
+- Netherlands 23.4% govt take vs the North Sea Trio "~48% take" tooltip. Carried 536–555.
+- The 272 dead citations are disclosed on both Country Profile evidence surfaces but still
+  unrepaired. Needs a harvest-side pass.
+- Two `.source-badge` elements in the Evidence Chain still measure 22.5px under a thumb. Carried
+  from 547.
+- Three Screener presets self-labelled "(barely narrows)", one structurally inverted. Carried 546.
+- The breakeven bound resolution is still limited to the four prices `country_data.json` carries.
+- Why the DCF solver ran for 68 mostly-non-producing countries and not for the largest producers is
+  still not recorded anywhere the page can read. Carried from 548.
+- Cycle 539's empty Summary line in GRADER still reads as a completed cycle. Carried 540–555.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip as the fix** — the fix removes a rendered element from
+132 rows and adds a rendered number to all 160 scored rows; the hover text was rewritten to describe
+the new state, not to substitute for it. **Not a text-only change**: 132 cells lost a bar, 160 cells
+gained a visible number, and 5 cells changed colour band. No score was recomputed — `getFiscalPredictabilityScore()`
+and `_fpDispersion()` are untouched. No take, NPV, IRR, breakeven, rank, reform diamond, Reform
+Frequency Score, evidence grade, tier letter or primary-law percentage was altered; no country's data
+changed; no source row added or removed; `country_data.json`, `reform_history.json` untouched. Chip
+rows stay `display:none`; no page-sub paragraph, amber instructional banner, routing hint or "How to
+read" block; no SbS card wrapper. Screener advanced filters still collapsed, presets still a
+dropdown; Home "More tools" still collapsed; Explorer analytics still collapsed. **No tab added,
+removed or reordered.** Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC
+Analyst Guide sessionStorage logic untouched. CP headline stays two-zone with global rank and
+vs-median pill; take% stays tier-coloured; Reform Risk stays in the primary Home card grid. The
+**v612 MOBILE LAYER** block and the `#reference-panel` `translateX` state are intact — this cycle
+adds no CSS rule at all and narrows, weakens or removes nothing. v371/v373, v430, v449, v451, v452,
+v489, v612, v621, v632, v637, v639–v648 and every locked item through v648 intact.

@@ -1683,7 +1683,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v648</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v649</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1753,7 +1753,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v648</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v649</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2086,7 +2086,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v648';
+  return m ? m[0] : 'v649';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2161,7 +2161,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v648');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v649');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2415,7 +2415,7 @@ window.copyPlatformCitation = function(btn) {
           <th class="num" data-sort-key="irr" tabindex="0" role="columnheader" aria-sort="none" title="Contractor IRR at $75/bbl base case — available for 124 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(124/185 countries)</span></th>
           <th class="num" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
           <th class="num" data-sort-key="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price sensitivity: govt take@$125/bbl minus take@$50/bbl in percentage points. High swing = fiscal terms are price-sensitive (government captures more of oil price upside). Color: green &lt;10pp (stable), amber 10&ndash;20pp (moderate), red &gt;20pp (highly responsive). Sort: low to high.">Swing (pp)</th>
-          <th class="num" style="cursor:help;" title="Fiscal Predictability Score (0–100, shown as bar). Composite measure of how consistent and predictable this country's fiscal terms are. Three components: (1) Within-country IQR penalty — wide spread of take across contracts means inconsistent terms between blocks (up to −40 pts). (2) Price swing penalty — highly progressive regimes are less predictable across price cycles (up to −30 pts). (3) Regime complexity penalty — multiple fiscal mechanics within one country reduce uniformity (−8 pts per additional mechanic). Score ≥75 = HIGH (green); 60–74 = MODERATE (amber); 45–59 = LOW (orange); &lt;45 = VERY LOW (red) — but since v624 a band and a colour are awarded ONLY where ORCA measured a spread across the country's own contracts. A one-term score renders UNGRADED and uncoloured however high its number, because the band it would fall in was earned by an IQR penalty that was never charged. Each bar carries its dispersion basis beside it: 'one term' = every contract in that country prices identically, so the IQR component contributed nothing and the score reflects price swing and mechanic count only; a figure such as '15.0pp' = a measured spread the score IS penalised for; 'n/c' = no contract-level take distribution is held, so the score is not computed rather than assuming a spread of zero. Only 28 of 185 countries have a measured spread; every score that would fall in HIGH belongs to a one-term regime and none of the 28 reaches it (ceiling 74, Turkmenistan). A graded MODERATE therefore outranks any UNGRADED score on this column. Do not read a lower score as the worse regime without checking the basis. Note: distinct from the Reform Frequency Score (0–100) on the Reform Risk tab, which measures number of legislative changes since 2010.">Stability ⓘ</th>
+          <th class="num" style="cursor:help;" title="Fiscal Predictability Score (0–100). A bar is drawn ONLY for the 28 countries where ORCA measured a take spread across their own contracts; the other rows show the number with an UNGRADED marker and no bar, because bar LENGTH asserts a ranking and these scores were never charged the penalty that would shorten them. Composite measure of how consistent and predictable this country's fiscal terms are. Three components: (1) Within-country IQR penalty — wide spread of take across contracts means inconsistent terms between blocks (up to −40 pts). (2) Price swing penalty — highly progressive regimes are less predictable across price cycles (up to −30 pts). (3) Regime complexity penalty — multiple fiscal mechanics within one country reduce uniformity (−8 pts per additional mechanic). Score ≥75 = HIGH (green); 60–74 = MODERATE (amber); 45–59 = LOW (orange); &lt;45 = VERY LOW (red) — but since v624 a band and a colour are awarded ONLY where ORCA measured a spread across the country's own contracts. A one-term score renders UNGRADED and uncoloured however high its number, because the band it would fall in was earned by an IQR penalty that was never charged. Each row carries its dispersion basis beside the number: 'one term' = every contract in that country prices identically, so the IQR component contributed nothing and the score reflects price swing and mechanic count only; a figure such as '15.0pp' = a measured spread the score IS penalised for; 'n/c' = no contract-level take distribution is held, so the score is not computed rather than assuming a spread of zero. Only 28 of 185 countries have a measured spread; every score that would fall in HIGH belongs to a one-term regime and none of the 28 reaches it (ceiling 74, Turkmenistan). A graded MODERATE therefore outranks any UNGRADED score on this column. Do not read a lower score as the worse regime without checking the basis. Note: distinct from the Reform Frequency Score (0–100) on the Reform Risk tab, which measures number of legislative changes since 2010.">Stability ⓘ</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
           <th title="Fiscal tier classification based on government take at $75/bbl. IF = Investor-Friendly (≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = NOC-dominated (&gt;75%). Color coding matches the take% column. Use as a quick portfolio filter — most IOC mandates screen in MOD + selected HI regimes with compensating reservoir quality.">Tier</th>
         </tr>
@@ -24246,13 +24246,37 @@ function renderExplorer() {
         // yellow bar on 51 (20.5pp measured across its own contracts). Green is now reserved for
         // the 28 countries where the spread penalty was actually charged; a one-term bar is muted,
         // and its basis chip -- already beside it -- says why.
-        const barCol = _fpD.state === 'single' ? 'var(--muted)'
-                     : score >= 70 ? 'var(--green)' : score >= 40 ? 'var(--yellow)' : 'var(--red)';
-        const _fpBasis = _fpD.state === 'single' ? 'one term' : _fpD.iqr.toFixed(1) + 'pp';
-        const _fpTip = _fpD.state === 'single'
-          ? `Fiscal Predictability ${score}/100 — but the IQR component contributed nothing: every one of ${d.country}'s contracts prices to the same take at $75/bbl, so the measured spread is zero. Score reflects price swing and mechanic count only. The bar is drawn muted, not green, for that reason: only the ${_fpCnt().nMeas} countries with a measured spread are coloured on this column.`
-          : `Fiscal Predictability ${score}/100 — measured spread across ${d.country}'s own contracts is ${_fpD.iqr.toFixed(1)}pp, which costs ${Math.min(40, _fpD.iqr * 0.8).toFixed(1)} points.`;
-        return `<div style="display:flex;align-items:center;gap:5px;" title="${_fpTip}"><div style="width:60px;background:var(--surface);border-radius:3px;overflow:hidden;"><div style="height:8px;width:${score}%;background:${barCol};border-radius:3px;"></div></div><span style="font-size:10px;color:var(--muted);white-space:nowrap;">${_fpBasis}</span></div>`;
+        // ── v649 (T4): v624 fixed this cell's COLOUR and left its LENGTH ────────────
+        // The bar's width is `score%`, and it was drawn for every scored country regardless of
+        // whether the score's largest component was ever charged. Length is the only pre-attentive
+        // signal in a bar column — it is read before a colour and long before a hover — so on the
+        // one table an analyst scans all 185 rows in, the column still ranked the regimes ORCA
+        // never measured ABOVE the ones it did.
+        // Counted live against COUNTRY_DATA this cycle, not assumed: 28 countries have a measured
+        // spread and their ceiling is Turkmenistan at 74. 86 of the 132 one-term regimes score
+        // HIGHER than 74, so 86 rows drew a bar physically longer than the longest bar any
+        // measured regime can draw — Bahamas and Vanuatu at 100 drew a full-width one. v624's own
+        // comment names the pair it left standing: USA 91 (one term) above Mexico 51 (20.5pp
+        // measured). Muting the colour did not shorten the bar.
+        // A one-term row therefore no longer draws a bar at all. It renders its number with the
+        // same UNGRADED marker renderStabilityBadge() uses on Fiscal Compare, Country Profile and
+        // Side-by-Side, so the four surfaces finally state one grade for one score. Absence of a
+        // bar is the finding: no length is asserted where no spread was measured.
+        // Two further alignments, same cell: the score NUMBER now renders on screen (it was in the
+        // hover only, so the column showed 185 bars and no values), and the colour ramp moves from
+        // this cell's private 70/40 thresholds to the platform bands (75/60/45) that
+        // _fpBandLabel() and every other surface use — under which no measured regime reaches
+        // green, which is the point v624 established.
+        const _fpSingle = _fpD.state === 'single';
+        const barCol = score >= 75 ? 'var(--green)' : score >= 60 ? 'var(--yellow)' : score >= 45 ? 'var(--orange)' : 'var(--red)';
+        const _fpBasis = _fpSingle ? 'one term' : _fpD.iqr.toFixed(1) + 'pp';
+        const _fpTip = _fpSingle
+          ? `Fiscal Predictability ${score}/100 — UNGRADED, and NOT drawn as a bar. The IQR component contributed nothing to this number: every one of ${d.country}'s ${d.n != null ? Number(d.n).toLocaleString() : '?'} contracts prices to the same take at $75/bbl, so the measured spread is zero and the largest of the score's three penalties (up to −40 pts) was never charged. The number reflects price swing and mechanic count only. No bar is drawn because a bar asserts a length, and ${score} is not comparable to a score that was penalised: ${_fpCnt().nMeas} countries have a measured spread, their ceiling is ${_fpCnt().ceil} (Turkmenistan), and ${_fpCnt().nHigh} one-term scores sit above it. A graded MODERATE on this column outranks this, however high the number.`
+          : `Fiscal Predictability ${score}/100 — ${_fpBandLabel(score)}, and the only kind of score on this column that is graded and drawn as a bar. Measured across ${d.country}'s own contracts: the middle half spans ${_fpD.iqr.toFixed(1)}pp of government take at $75/bbl, costing ${Math.min(40, _fpD.iqr * 0.8).toFixed(1)} of the ${score}. Just ${_fpCnt().nMeas} of 185 countries are in this cohort. Rows showing a number with no bar are one-term regimes whose IQR penalty was never charged — do not read their higher numbers as the steadier regimes.`;
+        if (_fpSingle) {
+          return `<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;" title="${_fpTip}"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:var(--muted);">${score}</span><span style="font-size:9px;font-weight:800;letter-spacing:.04em;color:var(--muted);border:1px solid var(--muted);border-radius:3px;padding:0 4px;line-height:1.5;">UNGRADED</span><span style="font-size:10px;color:var(--muted);white-space:nowrap;">one term</span></div>`;
+        }
+        return `<div style="display:flex;align-items:center;gap:5px;justify-content:flex-end;" title="${_fpTip}"><div style="width:48px;flex:0 0 48px;background:var(--surface);border-radius:3px;overflow:hidden;"><div style="height:8px;width:${score}%;background:${barCol};border-radius:3px;"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;color:${barCol};">${score}</span><span style="font-size:10px;color:var(--muted);white-space:nowrap;">${_fpBasis}</span></div>`;
       })()}</td>
       <td class="num" style="font-size:11px;" title="Physical take rate. PSC: approx oil vol% govt receives (FTP + profit oil portion after cost recovery). Concession: royalty rate as % of gross production.">${(function(){
         const mechList = d.mechanics ? d.mechanics.split(',') : [];
