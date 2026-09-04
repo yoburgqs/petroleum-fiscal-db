@@ -26975,3 +26975,18 @@ v639 chart-fill rule untouched. The **v612 MOBILE LAYER** block and the `#refere
 `translateX` state are untouched — this cycle's rule is an addition inside that layer, in the same
 form v621 used, and does not narrow or override it. v371/v373, v430, v449, v451, v452, v489, v612
 and every locked item through v639 intact.
+
+---
+## Cycle 546 Log — 2026-09-04 08:02
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 546 complete — shipped as **v640**, pushed to both repos.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (rotated off T3/545, T4/544, T5/543, T2/542)
+
+## Friction
+I walked T1 cold: Home → Screener. Home answers T1 well, and the Screener's preset dropdown is genuinely strong — eleven options each carrying a live count off the real filter path. I checked the region filter end to end and it's clean: the seven options sum exactly to the unfiltered count.
+
+The worst mo
