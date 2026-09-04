@@ -1678,7 +1678,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v641</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v642</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1748,7 +1748,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v641</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v642</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2081,7 +2081,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v641';
+  return m ? m[0] : 'v642';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2156,7 +2156,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v641');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v642');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -30130,7 +30130,14 @@ function loadCountryProfile(country) {
   // v512: the breakeven this page will actually show — bundled value if present,
   // otherwise the api/v1 value cached by an earlier visit to this country.
   const _cpBeR = cpBeFor(d);
-  const _hdrBeCallout = (_cpBeR != null && _cpBeR < 500) ? `<span id="cp-be-meta" style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${_cpBeR.toFixed(0)} $/bbl</strong></span>` : `<span id="cp-be-meta" style="font-size:10px;color:var(--muted);margin-left:10px;opacity:.7;" title="Breakeven price requires complete capital cost data — not yet sourced for this country">Breakeven: $/bbl n/a</span>`;
+  // v642 (T2): the n/a arm now carries the NPV-bracketed bound instead of a dead "n/a" and a
+  // reason ("requires complete capital cost data") the data does not support. See cpBeBound().
+  const _cpBeB = (typeof cpBeBound === 'function') ? cpBeBound(d) : null;
+  const _hdrBeCallout = (_cpBeR != null && _cpBeR < 500)
+    ? `<span id="cp-be-meta" style="font-size:11px;color:var(--muted);margin-left:10px;" title="Breakeven oil price — minimum price for contractor NPV≥0">Breakeven: <strong style="color:var(--text);">${_cpBeR.toFixed(0)} $/bbl</strong></span>`
+    : _cpBeB
+    ? `<span id="cp-be-meta" style="font-size:11px;color:var(--muted);margin-left:10px;" title="${_esc594(_cpBeB.tip)}">Breakeven: <strong style="color:var(--text);">${_cpBeB.txt}</strong> <span style="font-size:10px;opacity:.75;border:1px solid var(--border);border-radius:3px;padding:0 4px;">bounded</span></span>`
+    : `<span id="cp-be-meta" style="font-size:10px;color:var(--muted);margin-left:10px;opacity:.7;" title="${(typeof isStateMonopoly==='function'&&isStateMonopoly(d.take_75))?'State monopoly — government take is at or above 99.5%, so no contractor cash flow is modelled and no breakeven exists. The stored $1/bbl is the DCF solver floor, not a price.':'No solved breakeven on file for this country, and contractor NPV is not present at all four modelled prices, so no bound can be read off this page either. Use Scenario Builder with project capex and opex.'}">Breakeven: $/bbl n/a</span>`;
   // v277 Issue 8: Prominent country name header above profile content
   const _countryPageHeader = `<h2 id="cp-country-name" class="country-profile-header" style="font-size:20px;font-weight:800;color:var(--text);margin:0 0 8px 0;letter-spacing:-0.01em;font-family:'Georgia',serif;">${d.country}${ddSpecBadge ? ' ' + ddSpecBadge : ''}</h2>`;
   // v550 (T4): "Check reform risk before IC." was a flat sentence on 39 of 185 profiles. It named
@@ -30393,7 +30400,10 @@ function loadCountryProfile(country) {
   const _be344Display = _isMonopoly ? '' : (!_isMonopoly && _cpBeR != null) ? (function() {
     var beCol = _cpBeR < 50 ? 'var(--green)' : _cpBeR < 80 ? 'var(--yellow)' : 'var(--red)';
     return '<span id="cp-be-head" style="font-size:11px;color:var(--muted);" title="Breakeven oil price = minimum price for Contractor NPV ≥ 0 under this regime. &lt;$50/bbl = viable in low-price environment; $50–80 = viable at base case; &gt;$80 = requires elevated price to return positive NPV. Requires complete royalty and cost data.">BE: <strong style="color:' + beCol + ';">$' + _cpBeR.toFixed(0) + '/bbl</strong></span>';
-  })() : '<span id="cp-be-head" style="font-size:11px;color:var(--muted);opacity:.65;" title="Breakeven not computed — insufficient per-contract cost data (opex/capex) for NPV=0 solution. Use Scenario Builder with field-specific inputs for a project-level estimate. See FAQ A381 for proxy approach using Take% and Price Swing.">BE: n/a</span>';
+  })() : _cpBeB ? ('<span id="cp-be-head" style="font-size:11px;color:var(--muted);" title="'
+      + _esc594(_cpBeB.tip) + '">BE: <strong style="color:var(--text);">' + _cpBeB.txt
+      + '</strong> <span style="font-size:10px;opacity:.75;border:1px solid var(--border);border-radius:3px;padding:0 4px;">bounded</span></span>')
+    : '<span id="cp-be-head" style="font-size:11px;color:var(--muted);opacity:.65;" title="No solved breakeven on file for this country, and contractor NPV is not present at all four modelled prices, so no bound can be read off this page either. Use Scenario Builder with field-specific capex and opex for a project-level estimate.">BE: n/a</span>';
   // v452: compute global rank + vs-median BEFORE _headlineStrip344 uses them
   const _grank452 = getGlobalTakeRank(country);
   // v534 (T2): rank and vs-median now read against the 21 production-weighted regimes, not
@@ -30996,7 +31006,13 @@ function loadCountryProfile(country) {
         // now prints the actual dollar figure and the size of its tie.
         if(v==null)return (typeof isStateMonopoly==='function'&&isStateMonopoly(d.take_75))
           ?'— <span style="font-size:10px;color:var(--muted)" title="State monopoly — government take at or above 99.5%, so no contractor cash flow is modelled and no breakeven exists. The stored $1/bbl is the DCF solver floor.">state monopoly</span>'
-          :'— <span style="font-size:10px;color:var(--muted)" title="Breakeven not computed — requires production profile data">no prod data</span>';
+          // v642 (T2): this tile used to read "— no prod data". Breakeven is on file for 67
+          // countries that are mostly non-producers and absent for the largest producers, so
+          // production data is not the driver and the tile stated a cause the data refutes. It
+          // now carries the bound the four NPVs on this page support, marked as a bound.
+          : _cpBeB
+          ?('<span style="color:var(--text);">'+_cpBeB.txt+'</span> <span style="font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:0 4px;" title="'+_esc594(_cpBeB.tip)+'">bounded</span>')
+          :'— <span style="font-size:10px;color:var(--muted)" title="No solved breakeven on file, and contractor NPV is not present at all four modelled prices, so no bound can be read off this page either.">not on file</span>';
         if(v>=999)return'>$125/bbl';
         return '$'+Number(v).toFixed(0)+'/bbl'+cpBeTieBadge(d.country);})(_cpBeR)}</div></div>
       <div class="dd-param"><div class="p-key">Price Swing</div><div class="p-val" title="Government take difference from $50/bbl to $125/bbl scenario">${(function(){if(d.swing===null||d.swing===undefined)return'—';var _swingContext='';var _swingCountries=COUNTRY_DATA.filter(function(x){return x.swing!=null;}).sort(function(a,b){return a.swing-b.swing;});var _swingP25=_swingCountries[Math.floor(_swingCountries.length*0.25)]&&_swingCountries[Math.floor(_swingCountries.length*0.25)].swing;var _swingP75=_swingCountries[Math.floor(_swingCountries.length*0.75)]&&_swingCountries[Math.floor(_swingCountries.length*0.75)].swing;var _swingLabel=d.swing<(_swingP25||10)?'royalty-dominated':'';_swingLabel=d.swing>(_swingP75||20)?'profit-sensitive':'';var _swingCol=d.swing>20?'var(--orange)':d.swing<8?'var(--muted)':'var(--text)';_swingContext=_swingLabel?(' <span style="font-size:10px;color:'+_swingCol+';" title="Price Swing percentiles: low&lt;'+(_swingP25||10).toFixed(0)+'pp (royalty-dominated), high&gt;'+(_swingP75||20).toFixed(0)+'pp (profit-sensitive)">'+_swingLabel+'</span>'):'';return '+'+fmt(d.swing)+'pp ($50\u2192$125)'+_swingContext+(d.has_r_factor_tiers?' <span style="font-size:10px;color:var(--purple);font-weight:700;" title="R-factor profit oil tiers active — government share of profit oil rises as project R-factor increases (R = cumulative revenue / cumulative cost). Take is price-sensitive by design.">R-factor</span>':'');})()}</div></div>
@@ -31005,7 +31021,7 @@ function loadCountryProfile(country) {
            admission that the tile should not have been on the page. It now carries the $50/bbl
            downside contractor NPV, which is computed on the same profile and covers all 185. -->
       <div class="dd-param"><div class="p-key">NPV @ $50 (downside)</div><div class="p-val">${(d.npv_50 != null) ? ('<span title="Contractor NPV at the $50/bbl downside case \u2014 same standardized Deepwater profile, 10% WACC, 100% WI. Positive = the entry still clears the cost of capital through a price break." style="cursor:help;color:' + (d.npv_50 > 0 ? 'var(--positive)' : 'var(--negative)') + ';">' + cpNpvFmt(d.npv_50) + '</span>') : '<span title="Downside NPV not computed for this country. Use Scenario Builder to run a $50/bbl case with project-specific capex and opex." style="color:var(--muted);cursor:help;">\u2014</span>'}</div></div>
-      <div class="dd-param" style="grid-column:1/-1;border-top:1px solid var(--border);margin-top:4px;padding-top:8px;"><div class="p-key" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;">Data Completeness</div><div class="p-val" style="font-size:11px;font-family:'IBM Plex Mono',monospace;">${(function(){const metrics=[{label:'Govt Take',ok:d.take_75!=null},{label:'NPV',ok:d.npv_75!=null},{label:'NPV @$50',ok:d.npv_50!=null},{label:'Breakeven',ok:_cpBeR!=null&&_cpBeR>1},{label:'Swing',ok:d.swing!=null}];return metrics.map(m=>'<span '+(m.label==='Breakeven'?'id="cp-be-complete" ':'')+'style="margin-right:10px;" title="'+m.label+(m.ok?' — available':' — not yet computed for this regime')+'">'+(m.ok?'<span style="color:#15803D;">✓</span>':'<span style="color:var(--muted);">—</span>')+' <span style="color:var(--muted);">'+m.label+'</span></span>').join('');})()}</div></div>
+      <div class="dd-param" style="grid-column:1/-1;border-top:1px solid var(--border);margin-top:4px;padding-top:8px;"><div class="p-key" style="font-size:10px;text-transform:uppercase;letter-spacing:.06em;">Data Completeness</div><div class="p-val" style="font-size:11px;font-family:'IBM Plex Mono',monospace;">${(function(){const metrics=[{label:'Govt Take',ok:d.take_75!=null},{label:'NPV',ok:d.npv_75!=null},{label:'NPV @$50',ok:d.npv_50!=null},{label:'Breakeven',ok:_cpBeR!=null&&_cpBeR>1,bound:(_cpBeR==null||_cpBeR<=1)&&_cpBeB?_cpBeB:null},{label:'Swing',ok:d.swing!=null}];/* v642 (T2): a bounded breakeven is neither present nor absent; this row said "—" beside three slots now printing a range. */return metrics.map(m=>'<span '+(m.label==='Breakeven'?'id="cp-be-complete" ':'')+'style="margin-right:10px;" title="'+(m.bound?_esc594('Breakeven — not solved, bounded '+m.bound.txt+' from the four contractor NPVs on this page. '+m.bound.tip):m.label+(m.ok?' — available':' — not yet computed for this regime'))+'">'+(m.ok?'<span style="color:#15803D;">✓</span>':m.bound?'<span style="color:var(--accent);">&#9686;</span>':'<span style="color:var(--muted);">—</span>')+' <span style="color:var(--muted);">'+m.label+(m.bound?' <span style="opacity:.75;">('+m.bound.txt+', bounded)</span>':'')+'</span></span>').join('');})()}</div></div>
       <div class="dd-param" style="grid-column:1/-1;"><div class="p-key">Predictability</div><div class="p-val">${renderStabilityBadge(getFiscalPredictabilityScore(d), d)}${(function(){var _l=_fpCohortLine(d);return _l?_l.replace('max-width:230px','max-width:640px'):'';})()}</div></div>
     </div>
     ${d.has_r_factor_tiers ? '<p style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;border-left:2px solid rgba(124,58,237,.4);padding-left:8px;">&#x2731; <strong style="color:var(--purple)">R-factor profit oil tiers active</strong> — government share rises as project profitability increases (R = cumulative revenue / cumulative cost). Price sensitivity in the take chart above reflects this standard PSC mechanic.</p>' : ''}
@@ -32039,7 +32055,17 @@ function exportCountryProfile() {
     // set -- median 333% across the 165 countries that carry one, and non-monotonic in price for 29
     // of them, because the 999 sentinel drops a different subset of contracts at each price point.
     // An analyst opening this workbook was reading four numbers computed over four different samples.
-    { Metric: 'Avg Breakeven @$75 ($/bbl)', Value: d.be_75 != null && d.be_75 > 0 && d.be_75 < 999 ? +d.be_75.toFixed(0) : null },
+    // v642 (T2): this row read d.be_75 directly, so it exported blank for Norway and the UK
+    // (whose breakeven resolves from api/v1 and is on screen), blank for the three state-monopoly
+    // solver floors, and blank for the 117 countries the profile now bounds. It reads through
+    // cpBeFor() — the page's single read point — and falls back to the same NPV-bracketed bound
+    // the profile shows, labelled as a bound so a range cannot be mistaken for a solved price.
+    { Metric: 'Breakeven @$75 ($/bbl)', Value: (function(){
+        var _r = (typeof cpBeFor === 'function') ? cpBeFor(d) : (d.be_75 != null && d.be_75 > 1 && d.be_75 < 999 ? d.be_75 : null);
+        if (_r != null) return +_r.toFixed(0);
+        var _bd = (typeof cpBeBound === 'function') ? cpBeBound(d) : null;
+        return _bd ? (_bd.txt + '  (bounded from contractor NPV at $50/$75/$100/$125 — not a solved breakeven)') : null;
+      })() },
     { Metric: '', Value: '' },
     { Metric: 'Royalty Rate (%)', Value: d.royalty != null ? +d.royalty.toFixed(1) : null },
     { Metric: 'Income Tax Rate (%)', Value: d.cit != null ? +d.cit.toFixed(1) : null },
@@ -34893,7 +34919,12 @@ function copyICCitation() {
   var npvStr = (d.npv_75 != null) ? cpNpvFmt(d.npv_75) + ' NPV @$75' : '';
   var downStr = (d.npv_50 != null) ? cpNpvFmt(d.npv_50) + ' @$50 downside' : '';
   var _beRes = cpBeFor(d);   // v512: resolved value, not the bundled-table null
-  var beStr = (_beRes != null) ? 'BE $' + _beRes.toFixed(0) + '/bbl' : '';
+  // v642 (T2): the profile now prints an NPV-bracketed breakeven bound where no solved figure
+  // exists. It travels with the cite, marked as a bound, so the pasted line cannot be read as a
+  // solved price and cannot be silently missing the one metric the page leads with.
+  var _beBnd = (typeof cpBeBound === 'function') ? cpBeBound(d) : null;
+  var beStr = (_beRes != null) ? 'BE $' + _beRes.toFixed(0) + '/bbl'
+    : _beBnd ? ('BE ' + _beBnd.txt.replace('/bbl', '/bbl (bounded from NPV at 4 modelled prices, not solved)')) : '';
   var metricsStr = [npvStr, downStr, beStr].filter(Boolean).join(', ');
   var cite = country + ': Govt Take ' + takeStr + ' @$75/bbl' + _icFeeBasisClause(d)
     + _icProdBasisClause(d)   // v596 (T5)
@@ -34934,7 +34965,12 @@ function copyICSummary() {
   var npv50Str = (d.npv_50 != null) ? cpNpvFmt(d.npv_50) : '—';
   var npv125Str = (d.npv_125 != null) ? cpNpvFmt(d.npv_125) : '—';
   var _beRes = cpBeFor(d);   // v512: resolved value, not the bundled-table null
-  var beStr = (_beRes != null) ? '$' + _beRes.toFixed(0) + '/bbl' : '—';
+  var _beBnd = (typeof cpBeBound === 'function') ? cpBeBound(d) : null;   // v642 (T2)
+  var beStr = (_beRes != null) ? '$' + _beRes.toFixed(0) + '/bbl'
+    : _beBnd ? (_beBnd.txt + ' — bounded, not solved: ORCA carries no solved breakeven for this country, '
+        + 'and this range is read off contractor NPV at $50/$75/$100/$125 on the same standardized '
+        + 'Deepwater profile. Cite it as a bound')
+    : '—';
   var stabScore = getFiscalPredictabilityScore(d);
   // v536 (T3): null means no contract-level take distribution is held, so no predictability claim
   // may be pasted into an IC memo for this country.
@@ -39490,6 +39526,73 @@ function cpBeFor(d) {
   var r = window._cpBeResolved[d.country];
   return (r != null && r > 1 && r < 999) ? r : null;
 }
+
+// v642 (T2): breakeven BOUND for the 117 countries that carry no solved breakeven.
+//
+// v621 worked out this arithmetic and put it in ONE place: the footnote under the 4-price
+// BREAKEVEN column, roughly 2,400px down the Country Profile. The three slots an analyst
+// reads first still said nothing usable, and one of them stated a cause the platform's own
+// data refutes:
+//   - headline strip            "BE: n/a"
+//   - header callout            "Breakeven: $/bbl n/a"
+//   - Fiscal Mechanics tile     "— no prod data"   (tooltip: "requires production profile data")
+// The "no production data" reason is false. Breakeven is on file for 67 countries whose median
+// take is 21.3% and which are mostly NON-producers (Nauru, Tuvalu, Palau, Ascension Island,
+// Austria, Bahamas — all 0.0% production coverage), and it is absent for Indonesia, Iraq,
+// Angola, Nigeria, Brazil, Canada and the USA, which carry MORE coverage. The driver is not
+// recorded anywhere this page can read, so nothing here asserts one.
+//
+// What IS defensible is a bound, read off four figures already printed on the same page:
+// contractor NPV at $50 / $75 / $100 / $125 on the standardized Deepwater profile. If NPV is
+// positive at every modelled price, NPV=0 is below $50. If it is negative at every price, it is
+// above $125. If it changes sign, it is bracketed by the two prices it changes sign between.
+// Across the 117: 115 bound below $50, and Malaysia (-$33M @ $50) and Yemen (-$139M @ $50)
+// bracket to $50-$75 — which is the difference between an entry that survives a price break and
+// one that does not, and it was reachable only by scrolling past the tile that said "no prod data".
+//
+// A bound is not a solved figure and must not be able to pass for one, so it renders in plain
+// text with a "bounded" marker rather than in the green/amber/red tier colour a solved breakeven
+// gets, and a solved value always wins: cpBeFor() is checked first here, and the async
+// _cpApplyBe() overwrites every slot when api/v1 returns a real one.
+function cpBeBound(d) {
+  if (!d) return null;
+  if (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75)) return null;
+  if (cpBeFor(d) != null) return null;                       // a solved breakeven wins
+  var P = [50, 75, 100, 125];
+  var v = [d.npv_50, d.npv_75, d.npv_100, d.npv_125];
+  for (var i = 0; i < 4; i++) if (typeof v[i] !== 'number' || !isFinite(v[i])) return null;
+
+  var txt, lo = null, hi = null, sense;
+  var allPos = v.every(function(x) { return x > 0; });
+  var allNeg = v.every(function(x) { return x <= 0; });
+  if (allPos)      { hi = 50;  txt = '< $50/bbl';   sense = 'below the lowest price ORCA models on this page'; }
+  else if (allNeg) { lo = 125; txt = '> $125/bbl';  sense = 'above the highest price ORCA models on this page'; }
+  else {
+    for (var j = 0; j < 3; j++) {
+      if (v[j] <= 0 && v[j + 1] > 0) { lo = P[j]; hi = P[j + 1]; break; }
+    }
+    // Sign must change exactly once, upward. Anything else is not a bracket and is not claimed.
+    if (lo == null) return null;
+    for (var k = 0; k < 4; k++) { if ((P[k] <= lo) !== (v[k] <= 0)) return null; }
+    txt = '$' + lo + '–$' + hi + '/bbl';
+    sense = 'between $' + lo + ' and $' + hi + ', the two modelled prices contractor NPV changes sign between';
+  }
+
+  var fmtN = (typeof cpNpvFmt === 'function') ? cpNpvFmt : function(x) { return '$' + Math.round(x) + 'M'; };
+  var tip = 'BOUNDED, NOT SOLVED. ORCA carries no solved breakeven for '
+    + (d.country || 'this country') + ' — 117 of 185 countries have none on file. This range is '
+    + 'arithmetic on the four contractor NPVs printed on this page (' + fmtN(v[0]) + ' @ $50 · '
+    + fmtN(v[1]) + ' @ $75 · ' + fmtN(v[2]) + ' @ $100 · ' + fmtN(v[3]) + ' @ $125), on the '
+    + 'standardized Deepwater profile ($1.2B capex · 294 MMbbl · $15/bbl opex · 10% WACC, '
+    + '100% WI). NPV = 0 therefore sits ' + sense + '. It is a bound, not a price: the exact figure '
+    + 'is not on file, and the bound is only as good as that one standardized profile. '
+    + 'Do not repeat the "no production data" reason given elsewhere on this page — it is not the '
+    + 'driver: breakeven is on file for more non-producers than producers. For a breakeven on your '
+    + 'own capex, opex and production profile, use Scenario Builder.';
+
+  return { txt: txt, lo: lo, hi: hi, tip: tip, survives50: v[0] > 0 };
+}
+window.cpBeBound = cpBeBound;
 function _cpApplyBe(country, be75) {
   if (be75 == null || be75 <= 1 || be75 >= 999) return;   // v564 (T2): floor artifact is not a breakeven
   window._cpBeResolved[country] = be75;

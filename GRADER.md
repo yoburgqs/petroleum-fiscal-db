@@ -27129,3 +27129,146 @@ used. v371/v373, v430, v449, v451, v452, v489, v612 and every locked item throug
 
 ## Friction
 Walked T6 cold: Home → Fiscal Compare → row drilldown → "Full Profile →" → Country Profile → **Key Fiscal Parameters — Evidence Chain** (`renderSourcedFacts()`, `index.html:28574`). That table is the end of the T6 road, and it's genuinely well built — earlier cycles split ORCA Value fro
+
+---
+## Cycle 548 Log — 2026-09-04
+- Test before: 261 PASS / 0 FAIL / 1 WARN (localhost, unmodified HEAD — measured this cycle, not assumed)
+- Test after: 261 PASS / 0 FAIL / 1 WARN (localhost, this build)
+- JS errors: 0 page errors. The single WARN is the service-worker registration 404 —
+  `sw.js` is registered at `/petroleum-fiscal-db/sw.js`, which does not exist when the suite runs
+  against a localhost root. Present on the unmodified baseline too; not a regression.
+- Shipped as **v642**, pushed to both repos.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(rotated off T6/547, T1/546, T3/545, T4/544, T5/543 — T2 was last used at 542.)
+
+## Friction
+Walked T2 cold at 1440px, no sessionStorage, no localStorage: Home → Country Profile → the
+default Indonesia load. Of the four metrics an IC actually screens a country on, the page hands
+the analyst exactly one usable figure at $75/bbl:
+
+| metric | what the page says | |
+|---|---|---|
+| Govt take | 59.5% @ $75, +3.9pp vs producer median | usable |
+| Contractor NPV | $745M — and the headline itself says it tracks take at r² 0.89, "defend on the take, not the NPV" | disavowed on purpose (v599) |
+| IRR | "→ Model in Scenario Builder" | routed away on purpose (v516) |
+| **Breakeven** | **"BE: n/a" · "Breakeven: $/bbl n/a" · "— no prod data"** | **the friction** |
+
+Breakeven is the one metric of the four that directly answers "does this survive a price break",
+and on 117 of 185 countries it read as absent in **three** slots in the top third of the page —
+`cp-be-head` (headline strip, `index.html:30393`), `cp-be-meta` (header callout, `:30133`) and
+`cp-be-param` (Fiscal Mechanics tile, `:31009`) — plus a `—` in the Data Completeness row.
+
+Two things were wrong with that, not one.
+
+**1. The stated reason was false.** The Fiscal Mechanics tile read `— no prod data`, tooltip
+*"Breakeven not computed — requires production profile data"*. Checked against the data: of the 68
+countries that DO carry a solved breakeven, **65 have 0.0% production coverage** — Ascension
+Island, Austria, the Bahamas, Nauru, Tuvalu, Palau. It is absent for Indonesia, Angola, Nigeria,
+Iraq, Brazil, Canada and the USA, which all carry *more* coverage. Production data is not the
+driver. v621 found this and wrote it down — *"the card next to it says 'no prod data', and the
+data refutes that"* — but deliberately fixed only the 4-price column, so the false reason stayed
+on the tile for 21 versions.
+
+**2. The answer was already computed and buried.** v621's arithmetic — contractor NPV positive at
+every modelled price ⇒ NPV=0 sits below $50 — went into the footnote under the 4-price BREAKEVEN
+column, roughly **2,400px below** the three slots that said "n/a". An analyst who reads "no prod
+data" in the Fiscal Mechanics card has no reason to keep scrolling, and every reason to conclude
+ORCA cannot answer the question at all.
+
+The sharpest case is **Malaysia**: contractor NPV is **−$33M at $50/bbl**. Its breakeven brackets
+to **$50–$75/bbl** — the difference between an entry that survives a price break and one that does
+not — and that was reachable only by scrolling past a tile reading "no prod data".
+
+## Change
+New shared builder **`cpBeBound(d)`** (beside `cpBeFor`, `index.html:39533`). It reads the four
+contractor NPVs already printed on the page ($50/$75/$100/$125, standardized Deepwater profile)
+and returns a bound: all positive → `< $50/bbl`; all negative → `> $125/bbl`; one upward sign
+change → the bracketing pair. Any other sign pattern returns null and claims nothing. A solved
+breakeven always wins — `cpBeFor()` is checked first, and the async `_cpApplyBe()` still overwrites
+every slot when `api/v1` returns a real one.
+
+Now different on screen, for the 117 countries that had no breakeven:
+
+| slot | before | after |
+|---|---|---|
+| Headline strip | `BE: n/a` (65% opacity) | `BE: **< $50/bbl** [bounded]` |
+| Header callout | `Breakeven: $/bbl n/a` | `Breakeven: **< $50/bbl** [bounded]` |
+| Fiscal Mechanics tile | `— no prod data` | `< $50/bbl` + `bounded` chip |
+| Data Completeness | `— Breakeven` | `◖ Breakeven (< $50/bbl, bounded)` |
+| IC Citation (clipboard) | breakeven omitted entirely | `BE < $50/bbl (bounded from NPV at 4 modelled prices, not solved)` |
+| Copy for IC Memo | `Breakeven: —` | `< $50/bbl — bounded, not solved: …read off contractor NPV at $50/$75/$100/$125…` |
+| XLSX `Country Profile` sheet | blank | `< $50/bbl (bounded from contractor NPV at $50/$75/$100/$125 — not a solved breakeven)` |
+
+A bound must not be able to pass for a solved figure, so it renders in plain `var(--text)` with a
+bordered `bounded` marker — never the green/amber/red tier colour a solved breakeven gets — and
+every tooltip opens "BOUNDED, NOT SOLVED", names the four NPVs it was read off, states the profile,
+and **explicitly withdraws** the "no production data" explanation rather than repeating it.
+
+Side effect, and a real one: the XLSX breakeven row read `d.be_75` directly rather than through
+`cpBeFor()`, so it exported **blank for Norway and the UK** — whose breakeven resolves from
+`api/v1` and is visible on screen — and blank for the three state-monopoly solver floors. Norway
+now exports **29**; Saudi Arabia correctly stays blank.
+
+## Result
+An analyst can now answer "at what price does this stop working" from the top of the Country
+Profile, on 117 countries where the page previously said it could not be answered — and can paste
+that answer, correctly labelled as a bound, into an IC memo without leaving the page. On **Malaysia
+and Yemen** they learn at the headline that the entry is **NPV-negative at $50/bbl** and breaks
+even somewhere in $50–$75, which is a screening decision they were previously making blind. And
+nobody carries the false "requires production data" reason into a memo, because it is gone from
+the only place that asserted it.
+
+## Verification
+- JS syntax gate: **PASS** (`node --check` on the extracted 20.5k-line script block).
+- Playwright suite **RUN this cycle**, both on the unmodified baseline and on this build:
+  **261 PASS / 0 FAIL / 1 WARN**, identical. The number is read from the suite's own output.
+- Swept all **185** countries through `cpBeBound()` in the live page: 65 solved · 3 monopoly ·
+  115 bound `< $50/bbl` · 2 bracketed (Malaysia, Yemen) · **0 falling through to "n/a"** · 0 errors.
+- XLSX opened and parsed with openpyxl for Indonesia (bound), Norway (solved, 29) and
+  Saudi Arabia (monopoly, blank). Both clipboard artifacts read back and checked.
+- **Horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390 — zero at every width.**
+- No control was added. Every element touched is a non-interactive text span (`cursor:help` at
+  most), the same kind of element it replaced, at the same height. The 24px `pointer: coarse` rule
+  is not engaged.
+
+## Open / carried
+- **The absent breakevens are a data-repair job, not a UX one.** This cycle makes the absence
+  honest and gives the analyst a defensible bound off figures already on the page; it does not
+  solve a breakeven for the 117. Why the solver ran for 68 mostly-non-producing countries and not
+  for the largest producers is **not recorded anywhere this page can read** — that is a question
+  for the DCF pipeline, and for Zach, not for the loop to guess at.
+- The bound resolution is limited to the four prices `country_data.json` carries. The DCF runs 13
+  points from $30, so a `< $50/bbl` bound could be tightened to `< $30/bbl` or bracketed inside
+  $30–$50 if those points were bundled. Not done — it needs a data-build change, not a UX one.
+- `#cp-be-head` still contradicts nothing, but the **Predictability badge does**: it prints basis
+  `≥37.2pp obs` for Indonesia while `_fpCohortLine()` four rows below calls it "118th of 132
+  **one-term** regimes — a cohort the spread penalty never touches". v559 patched the badge to read
+  the observed sample; the cohort narrative was not patched with it. Strongest open T2 candidate.
+- `renderSampleAnalyses()` hardcoded `regionOrder` — strongest open T1 candidate. Carried 534–547.
+- `IOC_PRESENCE` entity-to-parent alias map — strongest open T4 candidate. Carried from 544.
+- Netherlands 23.4% govt take vs the North Sea Trio "~48% take" tooltip. Carried 536–547.
+- 272 dead evidence citations (129 URLs, 62 dead hosts) — flagged by v641, still unrepaired; a
+  periodic re-check step in the 02:00 chain is Zach's call, not the loop's.
+- Two `.source-badge` elements in the Evidence Chain still measure 22.5px under a thumb. Carried
+  from 547.
+- Three Screener presets self-labelled "(barely narrows)", one structurally inverted. Carried 546.
+- Cycle 539's empty Summary line in GRADER still reads as a completed cycle. Carried 540–547.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). No new tooltip as the fix — the bound is a new rendered value with a
+new layout box in four slots, replacing a dead "n/a"; the tooltips carry its basis, they are not
+the change. Not a text-only change: four rendered slots, two clipboard artifacts and one XLSX cell
+now emit a value where they emitted an em-dash, a blank or nothing. **No take, NPV, IRR, rank,
+reform diamond, band, tier letter, predictability score or evidence grade was altered anywhere**,
+and no solved breakeven was changed — `cpBeFor()` is checked first and wins. Chip rows stay
+`display:none`; no page-sub paragraph, amber instructional banner, routing hint or "How to read"
+block; no SbS card wrapper. Screener advanced filters still collapsed, presets still a dropdown;
+Home "More tools" still collapsed; Explorer analytics still collapsed. **No tab added, removed or
+reordered.** Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst
+Guide sessionStorage logic untouched. CP headline stays two-zone with global rank and vs-median
+pill; take% stays tier-coloured; Reform Risk stays in the primary Home card grid. The **v612 MOBILE
+LAYER** block and the `#reference-panel` `translateX` state are untouched — this cycle adds no CSS
+rule at all. v371/v373, v430, v449, v451, v452, v489, v612, v621, v632, v637, v639, v640, v641 and
+every locked item through v641 intact.
