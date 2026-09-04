@@ -27116,3 +27116,16 @@ selector, v637 IOC export controls, v639 chart-fill rule, v640 Screener checkbox
 untouched. The **v612 MOBILE LAYER** block and the `#reference-panel` `translateX` state are
 untouched — this cycle's rule is an addition inside that layer in the same form v621 and v640
 used. v371/v373, v430, v449, v451, v452, v489, v612 and every locked item through v640 intact.
+
+---
+## Cycle 547 Log — 2026-09-04 09:17
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 547 complete — shipped as **v641**, pushed to both repos.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (rotated off T1/546, T3/545, T4/544, T5/543, T2/542)
+
+## Friction
+Walked T6 cold: Home → Fiscal Compare → row drilldown → "Full Profile →" → Country Profile → **Key Fiscal Parameters — Evidence Chain** (`renderSourcedFacts()`, `index.html:28574`). That table is the end of the T6 road, and it's genuinely well built — earlier cycles split ORCA Value fro
