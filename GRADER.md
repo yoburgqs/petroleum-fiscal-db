@@ -26572,3 +26572,133 @@ v451, v452, v489, **v612** and every locked item through v636 intact.
 **Task** — T5, *"Give me something I can paste straight into an IC memo."* (542=T2, 541=T1, 540=T6, 538=T4, 537=T5, 536=T3.)
 
 **Friction.** From a cold load I inventoried every export and copy control the analyst can actually reach, tab by tab, off the live DOM rather than the changelog. Fiscal Compare, Country Profile, Side-by-Side, Screener, Explorer, Br
+
+---
+## Cycle 544 Log — 2026-09-04 11:30
+- Test before: 236 PASS / 0 FAIL (live URL, prior cycle)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite ACTUALLY RUN this cycle, against the LOCAL
+  tree over `TEST_URL=http://localhost:8899/index.html`, not assumed from a prior baseline. The
+  higher count is the local run reaching further than the live-URL run, not new tests. The single
+  WARN is a service-worker 404 that reproduces on HEAD with this change stashed — pre-existing,
+  an artefact of serving the repo at the server root rather than the `/petroleum-fiscal-db/`
+  subpath GitHub Pages uses.
+- JS errors: 0 new. JS syntax gate 11/11 blocks clean.
+- Shipped as **v638**.
+
+## Cycle 544 — T4
+
+**Task** — T4, *"What is my fiscal-stability and reform exposure here?"* (543=T5, 542=T2, 541=T1,
+540=T6, 538=T4, 537=T5, 536=T3.) Picked up the item cycle 543 logged and deliberately left alone:
+*"The on-screen IOC table still does not distinguish operator rows from country-average rows… This
+is a strong T4/T6 candidate for a future cycle and is the larger half of what this cycle found."*
+
+**Friction.** `renderIOCExposure()` (~index.html:32130). Walked cold: Home → IOC Portfolio → quick
+button. The Country Breakdown table has always been built from two different sources —
+
+  - `IOC_DATA`, where ORCA holds that operator's own contract terms; and
+  - `COUNTRY_DATA`, the jurisdiction-wide average across *all* operators, used wherever it does not.
+
+The row object has recorded which in `source` since it was written, and v637's XLSX and Copy-for-IC
+both print it in a "Take basis" column. **The screen never has.** Both sources render in the same
+column, the same colour, the same font weight, under an `<h3>` carrying the operator's name and a
+count line that said only "23 countries in fiscal database".
+
+Measured against the live `IOC_DATA` / `country_data.json`, not the changelog:
+
+| Operator | operator rows | country-avg rows |
+|---|---|---|
+| Kosmos Energy | **0** | 5 |
+| Harbour Energy | **0** | 5 |
+| Eni | 3 | 14 |
+| Petronas | 1 | 9 |
+| CNOOC | 1 | 7 |
+| Chevron | 5 | 8 |
+| Repsol | 6 | 7 |
+| Equinor | 7 | 4 |
+| BP | 11 | 6 |
+| Shell | 14 | 9 |
+| ExxonMobil | 12 | 12 |
+| TotalEnergies | 27 | 9 |
+
+Kosmos Energy and Harbour Energy are the worst moment: a screen headed with the operator's name on
+which **not one figure is that operator's**, and nothing said so. And it is not confined to the
+table — `avgTake`, `medianTake`, the tier donut and the peer-comparison delta pill are all computed
+over the blend. The tab's own IC-application copy instructs the analyst to write *"Subject's take
+profile is 4pp above Shell's portfolio average"*; on Shell that sentence rests on 9 rows that are
+not Shell, and the analyst had no way to know.
+
+**Change.** One fact, made visible at the three places the analyst reads it:
+
+1. **Heading** (`#ioc-exposure-heading`) now states the split rather than a bare count:
+   `23 countries — 14 on Shell's own contracts | 9 on the country average, not Shell`. The
+   country-average half is in `#C2410C`. Where the operator has **no** rows, the heading says it
+   outright: *"5 countries — **none of them is Kosmos Energy.** ORCA holds no Kosmos Energy
+   contract terms, so every take, NPV and contract count below is the country-wide average across
+   all operators there. Read this as the jurisdictions Kosmos Energy works in, not as its fiscal
+   position in them."* Where every row IS the operator's, it says that too.
+2. **Per row.** Fallback rows carry a `country avg` marker (`.ioc-basis-ctry`, new class) beside the
+   country name; their Take and NPV cells drop from weight 700 to 500 at `opacity:.85`, so the
+   operator's own rows read as the primary figures. Each `<tr>` gained a `title` naming what the
+   number actually measures. A legend under the table names the count and says plainly: *do not
+   cite those rows as this operator's take.*
+3. **Avg Take tile** carries `blends 9 country avg of 23` when it does. The "Data source" sentence
+   under the metrics printed the generic *"operator-specific contract data where available"*; it
+   now prints the real counts for the operator on screen and points at the marker.
+4. The table gained a `.table-scroll` horizontal wrapper, so the added marker cannot push the
+   Contracts column off a phone — and it picks up the v612 mobile edge-gradient for free.
+
+**Result.** The analyst can tell, row by row, whether a take figure is that operator's contracts or
+the jurisdiction's average — **before** it goes into an IC memo. And when ORCA holds no contract
+data for an operator at all (Kosmos Energy, Harbour Energy), they are told so in the heading instead
+of reading five country averages as that operator's fiscal exposure.
+
+**Mobile.** 390 x 844 with `hasTouch: true`: `scrollWidth == clientWidth` (390 == 390), same at
+1440. The `country avg` marker measures 18px tall, but it is a static `<span>` — not a
+`button/select/input/textarea/[role]/summary` and not a styled anchor — so it falls outside
+`pixel_audit.js`'s `CTRL` selector (line 189) and is not a tap-target regression. It is a label, not
+a control; nothing is clickable on it.
+
+## Carried forward — not fixed this cycle
+- **The IOC "Portfolio Avg Take" is still an unweighted country average blending Group 1 and Group 2
+  mechanics** (`MECHANIC_COMPARABILITY.md`). Shell reads 56.2% with Iraq's 84.8% and Oman's 85.0%
+  pulling it up, both structural artefacts of fee-basis contracts. The v637 exports say so on the
+  Basis sheet; the tile on screen still does not carry the comparability caveat, only the new
+  provenance one. Deliberately left — this cycle fixed provenance, and folding comparability into
+  the same tile in one pass would have been two moments, not one.
+- **The XLSX export still writes `d.profit_oil_govt`** (`Profit Oil (Govt) (%)` in the CP workbook)
+  — the summary figure, not the table's. Carried from 542, 543.
+- **Both test harnesses still default to the live URL** (`tests/runtime_comprehensive.js:13`,
+  `tools/petroleum/tests/pixel_audit.js:61`). Both accept `TEST_URL`; this cycle used it. Carried
+  from 537, 538, 540, 541, 542, 543.
+- **Regional Benchmarks card** iterates a coarse `regionOrder` against fine DB regions, so Asia,
+  Oceania, Latin America, North America and CIS/FSU — 74 countries — never display. On the hidden
+  Sample Analyses tab. Carried from 534–543.
+- **Republic of the Congo and Sao Tome and Principe still render region `Other`**; **UAE — Dubai**
+  still `Unknown`; **UAE — Abu Dhabi** still has an empty `top_sources`. Carried from 534–543.
+- **Netherlands 23.4% govt take at $75** vs the North Sea Trio button's "~48% take" tooltip. Data
+  question. Carried from 536–543.
+- **`IOC_PRESENCE` is a hand-curated 16-operator map** and `IOC_DATA` holds 1,561 operator strings,
+  most of them raw legal entities (`A/S Norske Shell`, `Shell Offshore Inc.`, `ADURA OPERATIONS
+  LIMITED (16172712), …`). The exact-string match in `renderIOCExposure` is why Shell has 14
+  operator rows and not more — `A/S Norske Shell`'s 140 Norwegian contracts are in the DB but do not
+  join to `Shell`. An entity-to-parent alias map would convert country-average rows into real
+  operator rows rather than just labelling them. **Strong T4/T6 candidate for a future cycle** — and
+  it is now visible on screen, which it was not before this cycle.
+- **Cycle 539 shipped nothing** and its GRADER entry has an empty Summary line, which reads as a
+  completed cycle. A non-empty failure marker in `autonomous_cycle.py` when Claude returns 0 chars
+  is still worth adding; not added without Zach's call. Carried from 540–543.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip element** — the new marker and rows carry `title`
+attributes as every table control on the page does; no tooltip was added to any existing element.
+Not a text-only change: rows gain a marker element, take/NPV cells change weight and opacity by
+provenance, the table gains a scroll wrapper, the heading branches three ways and the Avg Take tile
+gains a conditional subline. **No take, NPV, breakeven, IRR, rank, reform diamond, band or tier
+*value* was altered anywhere** — this cycle changes what the screen SAYS about where a number came
+from, never the number. Chip rows stay `display:none`; no page-sub paragraph, amber instructional
+banner, routing hint or "How to read" block; no SbS card wrapper. Screener advanced filters still
+collapsed, presets still a dropdown; Home "More tools" still collapsed; Explorer analytics still
+collapsed. **No tab added, removed or reordered.** Govt NPV stays REMOVED from FC; Contractor NPV
+header stays "NPV ($M)"; the FC Analyst Guide sessionStorage logic untouched; the v632 FC shortlist
+selector and the v637 IOC export controls untouched. v371/v373, v430, v449, v451, v452, v489,
+**v612** and every locked item through v637 intact.
