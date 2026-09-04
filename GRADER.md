@@ -25425,3 +25425,122 @@ done silently at the end. It is **not** the deliverable.
 
 ## Friction
 Three surfaces carry three different region taxonomies, and they disagreed about CIS/FSU. Fiscal Compare's chip row has always had a `CIS/FSU (5)` chip. The Screener and Explorer use a coarse taxonomy where `Other` swallowed CIS/FSU, so the region had no name. But `_REGION_TO_CHIP` — which the Country Profile's "
+
+---
+## Cycle 535 Log — 2026-09-04 02:45
+- Test before: 261 PASS / 0 FAIL / 1 WARN (cycle 534 baseline, local)
+- Test after: 261 PASS / 0 FAIL / 1 WARN — suite RAN this cycle against the changed build
+- JS errors: 0 page errors at all six widths
+- Version: v629 -> v630
+- Summary: Cycle 535 complete and pushed (v630).
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(534 was T1, 533 T5, 532 T2, 531 T3, 530 T6, 528 T4.) Picked T2 over the staler
+T4 because the friction below was carried unfixed on cycles 532, 533 and 534 and
+is the worst moment on the list: a section that never resolves.
+
+## Friction
+`fetchCountryContracts()` (index.html:38543) built its element id with `toSlug()`,
+which joins words with `_`. Every other Country Profile fetch on the page —
+`renderReformTimeline()`, `_rrApplyObsSpread()`, `_cpApplyBe()` — uses the DASH
+slug, and so does the markup that creates the node. `loadCountryProfile()` writes
+`id="dd-contracts-content-saudi-arabia"`; the fetcher asked for
+`dd-contracts-content-saudi_arabia`, got `null`, and returned at the
+`if (!el) return;` guard **before issuing the fetch**. The section therefore sat
+on the static string `Loading from API…` for the life of the page — no spinner,
+no timeout, no console error. It reads as a request still in flight, which is
+exactly why it was seen on three consecutive cycles and never diagnosed.
+
+Measured, not inferred — all 185 profiles loaded in a real browser and the
+section polled to settle:
+
+| | before | after |
+|---|---|---|
+| Rendered contract table | 145 | **185** |
+| Stuck on "Loading from API…" | **40** | **0** |
+
+The 40 are exactly the countries whose name carries a space, hyphen, apostrophe
+or em dash: Ascension Island, Bosnia and Herzegovina, Burkina Faso, Cape Verde,
+Central African Republic, Cook Islands, Costa Rica, Cote d'Ivoire, Czech
+Republic, Democratic Republic of the Congo, Dominican Republic, El Salvador,
+Equatorial Guinea, Falkland Islands, Faroe Islands, French Guiana, French
+Polynesia, Guinea-Bissau, **Iraq-Kurdistan**, Marshall Islands, New Caledonia,
+New Zealand, Papua New Guinea, Puerto Rico, Republic of the Congo, Saint Helena,
+Sao Tome and Principe, **Saudi Arabia**, Sierra Leone, Solomon Islands, South
+Africa, South Korea, South Sudan, Sri Lanka, Timor-Leste, Trinidad and Tobago,
+UAE — Abu Dhabi, UAE — Dubai, **United Kingdom**, Western Sahara.
+
+**A second defect sat behind the first.** `api/v1/country/` publishes the dash
+filename for all 185 countries but the underscore filename for only 162. So 23 of
+those 40 would have 404'd even if the guard had passed, and reported *"No
+contract-level data in API yet. Run rebuild_api_json.py to populate."* over a file
+sitting on disk with 50 contract rows in it. Fixing only the element id would have
+moved 23 countries from a permanent spinner to a false and developer-facing denial.
+
+## Change
+- `fetchCountryContracts()` derives **one** dash slug and uses it for both the
+  element lookup and the API URL — the same slug the rest of the profile uses.
+  `toSlug()` is untouched and still used everywhere else.
+- An **8s settle timer** replaces a lingering `Loading from API…` with a stated
+  failure plus a direct link to the source JSON, and says the take/NPV figures
+  above are unaffected. This class of permanent spinner can no longer present
+  itself as a pending fetch.
+- The empty-state string stops instructing the analyst to run
+  `rebuild_api_json.py` and states what is actually true about the figures above it.
+
+## Result
+An analyst opening **Saudi Arabia** — or the UK, or Iraq-Kurdistan, this
+platform's own expansion target — now gets the Top Contracts table: 30 rows
+ranked by production, with block, operator, mechanic tag, take% at $75/bbl and
+key rate. That table is the only contract-level evidence on the Country Profile
+and it is the half of T2 that answers *"can I defend that?"*. Before this cycle,
+on 40 of 185 countries, the answer was a line of grey text that never changed.
+
+Fixing the guard also restores `cpRecordObsSpread()` / `_cpApplyObsSpread()` on
+those 40 — both ran **inside** the `.then()`, so on these countries they had never
+run at all. The observed-spread band, the basis chip and the distribution note
+were rendering as measured-and-agreed on countries where nothing had been measured.
+
+## Verify
+- **185-profile browser sweep:** before **145 OK / 40 STUCK**, after **185 OK /
+  0 STUCK**. Read from the rendered DOM, polled to settle, not inferred.
+- **JS syntax gate:** PASS — 11 inline blocks, `node --check`, re-run after the
+  version sweep.
+- **Runtime suite: RAN this cycle.** Changed build at `:8899` — **261 PASS / 0
+  FAIL / 1 WARN**, identical to the pre-change baseline recorded in cycle 534.
+  The WARN is the local server's `sw.js` 404 and appears on the baseline run.
+- **Pixel gate:** PASS — "no surface got worse than baseline."
+- **Step 5b mobile:** 0 horizontal-scroll violations across 10 tabs at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**, `scrollWidth == clientWidth` at every
+  width; **0 page errors** at every width; **0** touched controls under 24px at
+  `pointer: coarse` (768 and 390). At 1440/1280/1024 one 12px link measures inside
+  the restored section — `"run Scenario Builder →"` from `cpContractColNote()`. It
+  is pre-existing, renders identically on Norway which was never broken, and is
+  under `pointer: fine`, so it is outside the directive's rule. Recorded, not hidden.
+
+## Found on the same walk, not fixed
+- **The Regional Benchmarks card** (index.html ~32051) groups countries by the
+  *fine* DB region but iterates a `regionOrder` of *coarse* labels, so
+  `Asia Pacific` and `Americas` never match and Asia, Oceania, Latin America,
+  North America and CIS/FSU are never displayed. Carried from 534. Clean T3.
+- **UAE — Dubai** is the one country filed under region `Unknown`; no Fiscal
+  Compare region chip reaches it. Carried from 534.
+- **Fiscal Compare's "Copy for IC Memo" pastes all 185 rows** (49,251 chars) with
+  no way to copy the filtered shortlist. Carried from 533 and 534. T5.
+- **`api/v1/country/` carries 239 files for 185 countries** — duplicate dash and
+  underscore variants, plus orphans (`trinidad.json`, `trinidad___tobago.json`,
+  `bolivia__plurinational_state_of.json`). Nothing now reads the underscore set.
+  A cleanup, not a user-facing fix; noted so the next cycle does not rediscover it.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**), no new tooltip element. Chip rows stay `display:none`.
+No page-sub paragraph, amber instructional banner, routing hint or "How to read"
+block; no SbS card wrapper. Screener advanced filters still collapsed, presets
+still a dropdown; Home "More tools" still collapsed. **No tab added, removed or
+reordered.** No take, rank, reform diamond, band or tier colour altered. The
+**v612 MOBILE LAYER** was not touched, narrowed or deleted; `#reference-panel`
+`translateX` untouched; no `min-width: max-content` marker added or removed.
+v371/v373, v430, v449, v451, v452, v489 and every locked item through v629 intact.
+Version sweep **v629 → v630** across the 4 display sites, done silently at the
+end. It is **not** the deliverable.
