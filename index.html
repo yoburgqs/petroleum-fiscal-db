@@ -1193,6 +1193,13 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      `td a` selector above, which works where it is already applied. */
   .cp-be-cta { display: inline-block; min-height: 36px; line-height: 36px; }
 
+  /* v640 (T1): the take-comparability checkbox sits directly under Max Govt Take and decides
+     whether an 84.8%-headline country is admitted to a <=65% screen. It is an
+     input[type=checkbox], which the 44px rule above does not name, so it measured 13px with
+     a thumb. Sized here rather than by widening that selector, which would grow every
+     checkbox in the Screener's collapsed mechanic/IOC grids. */
+  #sc-fee-cmp { width: 24px; height: 24px; margin-top: 0; }
+
   /* Hover-only affordances never resolve on touch; make them always-on. */
   .fc-row-hint, .screener-row-hint { opacity: 1 !important; }
 }
@@ -1658,7 +1665,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v639</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v640</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1728,7 +1735,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v639</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v640</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2061,7 +2068,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v639';
+  return m ? m[0] : 'v640';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2136,7 +2143,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v639');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v640');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2490,7 +2497,7 @@ window.copyPlatformCitation = function(btn) {
              nothing to test); revealed by _scUpdateNeutralFlags() the moment a ceiling is set.
              Same pattern as the v513 sc-be-nulls control, applied to the axis that silently
              removed the largest TSC jurisdiction on earth from the flagship IC screen. -->
-        <label id="sc-fee-cmp-wrap" style="display:none;margin-top:7px;font-size:10px;font-weight:400;color:var(--muted);cursor:pointer;line-height:1.5;align-items:flex-start;gap:5px;" title="Some countries' published take blends PSC/Concession contracts with fee-basis contracts (TSC, RSC, Buy-back) where the contractor is paid a fixed $/bbl remuneration fee and keeps no price upside. On those, the headline take% measures contract structure, not how hard the terms are, and it is not comparable across countries. CHECKED (default): the ceiling is tested against the take on each country's PSC/Concession contracts alone — Iraq is screened at 34.1%, not 84.8%. The published headline is still what the table shows, colours, tiers and exports. UNCHECKED: the ceiling is tested against the published blend, which is what this Screener did before v554; the count line then names any country that basis excludes."><input type="checkbox" id="sc-fee-cmp" checked style="cursor:pointer;vertical-align:-1px;"> Test the ceiling on <span style="font-weight:700;">comparable</span> take for the <span id="sc-fee-cmp-n" style="font-weight:700;">10</span> fee-basis countries <span style="opacity:.8;">(published headline still shown and exported)</span></label>
+        <label id="sc-fee-cmp-wrap" style="display:none;margin-top:7px;font-size:10px;font-weight:400;color:var(--muted);cursor:pointer;line-height:1.5;align-items:flex-start;gap:5px;" title="Some countries' published take blends PSC/Concession contracts with fee-basis contracts (TSC, RSC, Buy-back) where the contractor is paid a fixed $/bbl remuneration fee and keeps no price upside. On those, the headline take% measures contract structure, not how hard the terms are, and it is not comparable across countries. CHECKED (default): the ceiling is tested against the take on each country's PSC/Concession contracts alone — Iraq is screened at 34.1%, not 84.8%. The published headline is still what the table shows, colours, tiers and exports. UNCHECKED: the ceiling is tested against the published blend, which is what this Screener did before v554; the count line then names any country that basis excludes."><input type="checkbox" id="sc-fee-cmp" checked style="cursor:pointer;flex:0 0 auto;margin-top:1px;"><span style="flex:1 1 auto;min-width:0;">Test the ceiling on <span style="font-weight:700;">comparable</span> take for the <span id="sc-fee-cmp-n" style="font-weight:700;">10</span> fee-basis countries <span style="opacity:.8;">(published headline still shown and exported)</span></span></label>
       </div>
       <!-- v568 (T1): the "Max Breakeven" ceiling slider is REMOVED, along with its sc-be-nulls
            coverage checkbox. It ranged $20-$120, and in country_data.json every one of the 65
