@@ -27948,3 +27948,14 @@ primary Home card grid. The **v612 MOBILE LAYER** block and the `#reference-pane
 state are untouched — this cycle adds **no CSS rule at all** and reuses v641's existing
 `.cite-dead-chip` class. v371/v373, v430, v449, v451, v452, v489, v612, v621, v632, v637, v639,
 v640, v641, v642, v643, v644, v645, v646 and every locked item through v646 intact.
+
+---
+## Cycle 553 Log — 2026-09-04 16:59
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 553 complete — shipped as **v647**, pushed to both repos.
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?" (stalest; 552 was T3, 551 T1, 550 T5, 549 T4, 548 T2 — T6 last walked at 547)
+
+**Friction:** Walked cold at 1440×900, no sessionStorage or localStorage: Home → Country Profile → Namibia. The Evidence Quality panel (`buildEvidencePanel()`, `index.html:22877`) sits directly under the profile header — I measured it at scroll y≈601 against the Evidence Chai
