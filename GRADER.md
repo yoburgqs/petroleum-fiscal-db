@@ -27553,3 +27553,14 @@ logic untouched. CP headline stays two-zone with global rank and vs-median pill;
 tier-coloured; Reform Risk stays in the primary Home card grid. The **v612 MOBILE LAYER** block and
 the `#reference-panel` `translateX` state are untouched. v371/v373, v430, v449, v451, v452, v489,
 v612, v621, v632, v637, v639, v640, v641, v642, v643 and every locked item through v643 intact.
+
+---
+## Cycle 550 Log — 2026-09-04 13:20
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 550 complete — shipped as **v644**, pushed to both repos.
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo." (rotated off T4/549, T2/548, T6/547, T1/546, T3/545)
+
+**Friction:** I walked T5 cold at 1440px with no storage and read the actual clipboard from all five artifacts that leave the tool. Four were right. The fifth — Country Profile → **Copy for IC Memo**, the flagship one, the paragraph that ends up in a committee document — carried a private stability scale (`
