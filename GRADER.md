@@ -27285,3 +27285,143 @@ every locked item through v641 intact.
 
 ## Friction
 Walked T2 cold at 1440px, no storage: Home → Country Profile → the default Indonesia load. Of the four metrics an IC screens on, the page hands the analyst exactly one usable figure. NPV is disavowed in its own headline ("tracks govt take at r² 0.89 — defend on the take, not the NPV"
+
+---
+## Cycle 549 Log — 2026-09-04 17:32
+- Test before: 261 PASS / 0 FAIL / 1 WARN (read from the suite's own report, baseline run this cycle)
+- Test after: 261 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 page errors; the 1 WARN is a pre-existing service-worker 404, present on the
+  unmodified baseline in the same run and not introduced here.
+- Summary: Cycle 549 complete — shipped as **v643**, pushed to both repos.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (rotated off T2/548, T6/547,
+T1/546, T3/545, T4/544 — T4 last ran five cycles ago)
+
+## Friction
+Walked T4 cold at 1440px, no storage: Home → Reform Risk → the per-country lookup, which is the
+control this tab exists for and which four other surfaces route the analyst to by name.
+
+The lookup card prints a **Fiscal Predictability** figure beside the Reform Frequency Score. It
+computed its own band and colour straight off the raw number, at `renderReformCountryVerdict()`
+(`index.html:33753-33754`):
+
+```js
+var fpLabel = fp == null ? '' : (fp >= 75 ? 'HIGH' : fp >= 60 ? 'MODERATE' : ...);
+var fpColor = fp == null ? 'var(--muted)' : (fp >= 75 ? 'var(--green)' : ...);
+```
+
+That is the **pre-v624 rule**. v624 established, and `renderStabilityBadge()` (`index.html:23725`)
+enforces, that a band and a colour are awarded ONLY where the within-country IQR penalty was
+actually charged — i.e. where ORCA measured a spread across the country's own contracts. A
+one-term score renders `UNGRADED` and uncoloured however high its number, because the band it
+would fall in was earned by a penalty that was never applied. Fiscal Compare, Country Profile,
+Side-by-Side and Explorer all render through that badge. **This card did not.** It was the last
+surface on the platform still awarding a pre-v624 grade.
+
+Measured live against `COUNTRY_DATA`, not assumed: **160** countries carry a score, **132** of them
+are one-term, and **all 132** were printed here with a graded band and a colour. **86 printed green
+HIGH** — the top grade on the platform. The same score, on two surfaces, in opposite directions:
+
+| country | Reform Risk lookup | Fiscal Compare / Country Profile |
+|---|---|---|
+| Russia | `75 HIGH` — green `rgb(21,128,61)` | `75 · UNGRADED one term` — grey |
+| Oman | `83 HIGH` — green | `83 · UNGRADED one term` — grey |
+| Bahamas | `100 HIGH` — green | `100 · UNGRADED one term` — grey |
+
+The card also contradicted **itself, in two adjacent lines**. `_fpCohortLine()` renders directly
+beneath the figure and says the score "is shown **UNGRADED** rather than banded", and that
+"**MODERATE here outranks any UNGRADED score, however high its number**". Above that sentence sat a
+green HIGH. A colour is read before a paragraph, so the green won.
+
+Worst in the branch where it mattered most: in the **no-sourced-reform-log** arm — **164 of 185**
+jurisdictions — the card explicitly offers this score as the only thing the analyst *"can defend
+instead"*. For those 164 the false grade **was the entire T4 answer**.
+
+Not a new class of defect on this card, which is why it is worth naming: **v604 already caught it
+here and repaired the BASIS line only.** Its own comment block lists `Uzbekistan 89 HIGH`,
+`Thailand 80 HIGH`, `Netherlands 84 HIGH` — and left every one of those HIGHs standing. This is
+that residual.
+
+## Change
+The grade slot is now **built once**, dispersion-aware, into a single `fpGradeHtml`, and consumed by
+both render branches (the no-log arm and the reform-log arm), so the two can no longer print
+different grades for the same country:
+
+| | before | after |
+|---|---|---|
+| one-term regime (132) | `75 HIGH` in green/yellow/orange/red | `75` + bordered muted **UNGRADED** marker |
+| measured spread (28) | band + colour | **unchanged** — band and colour are earned and kept |
+| not scored (25) | no slot | no slot, unchanged |
+
+`UNGRADED` renders as a bordered muted marker rather than bare text — matching
+`renderStabilityBadge()`'s solid-border treatment — so it reads as a deliberate withholding and not
+as a value that failed to load. Its tooltip opens **"UNGRADED, NOT HIGH"**, states that this is the
+finding rather than a gap, names the −40-point spread penalty that was never charged, and repeats
+that a graded MODERATE outranks it however high the number.
+
+**No score is recomputed and no number on the page changes.** The refutation path is untouched:
+`_rrPaintObsSpread()` still appends its `▲ best case` marker and still states the bound
+(`"near 55 · LOW rather than 89"`) for the one-term countries whose own contract table contradicts
+the basis — that bound is a measured-cohort figure and remains banded.
+
+## Result
+An analyst looking up fiscal-stability exposure now reads the **same grade for a country on Reform
+Risk as on Fiscal Compare and Country Profile**, and can no longer carry *"Russia — fiscal
+predictability HIGH"* out of the tab the product routes them to for exactly this question and into
+an IC memo. On the 164 jurisdictions with no reform log — where this score is the only signal
+offered — the card no longer awards a grade that the platform's own cohort arithmetic, printed one
+line below it, refutes.
+
+## Verification
+- JS syntax gate: **PASS** (`node --check` on the extracted 21.2k-line script block), run before
+  and after the version bump.
+- Playwright suite **RUN this cycle**, twice: on the **unmodified baseline** (via `git stash`) and
+  on this build — **261 PASS / 0 FAIL / 1 WARN** both times, identical. The number is read from the
+  suite's own output. The WARN is a service-worker 404 present on the baseline; not introduced here.
+- **All 185 countries swept through the live lookup**: 132 UNGRADED · 28 graded · 25 not scored ·
+  **0 conflicts against `renderStabilityBadge()`** · 0 thrown errors · 0 page errors.
+- Colour asserted numerically, not by eye: muted resolves to `rgb(107,101,96)` on both surfaces.
+- **Horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390 — zero at every width.**
+- **No control added or touched.** The marker is a non-interactive `<span>` (`cursor:help`)
+  replacing a `<span>` of identical height — measured 14px in both builds, inside a 27px row. The
+  24px `pointer: coarse` rule governs controls and is not engaged.
+
+## Open / carried
+- **The IC citation uses a third scale.** `_icCitation()` (`index.html:~34977`) maps the same score
+  through `>=70 'stable' / >=40 'moderate stability' / else 'volatile'`, so Russia pastes as
+  **"stable"** and Bahamas as **"stable"** into an IC memo. It is caveated inline (", spread
+  component not exercised — all contracts price to one statutory term"), which is why it is not
+  this cycle's worst moment, but it is the same defect class and the platform now has two scales
+  where it should have one. **Strongest open T5 candidate.**
+- `renderSampleAnalyses()` hardcoded `regionOrder` — strongest open T1 candidate. Carried 534–548.
+- `IOC_PRESENCE` entity-to-parent alias map — open T4 candidate. Carried from 544.
+- Netherlands 23.4% govt take vs the North Sea Trio "~48% take" tooltip. Carried 536–548.
+- 272 dead evidence citations (129 URLs, 62 dead hosts) — flagged by v641, still unrepaired; a
+  periodic re-check step in the 02:00 chain is Zach's call, not the loop's.
+- Two `.source-badge` elements in the Evidence Chain still measure 22.5px under a thumb. Carried
+  from 547.
+- Three Screener presets self-labelled "(barely narrows)", one structurally inverted. Carried 546.
+- The breakeven bound resolution is still limited to the four prices `country_data.json` carries;
+  tightening it needs a data-build change. Carried from 548.
+- Why the DCF solver ran for 68 mostly-non-producing countries and not for the largest producers is
+  still not recorded anywhere the page can read. Carried from 548.
+- Cycle 539's empty Summary line in GRADER still reads as a completed cycle. Carried 540–548.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip as the fix** — the change is a grade and a colour on
+132 countries across two render branches; the marker's tooltip states the basis, it is not the
+change. **Not a text-only change**: 132 countries' grade slots change label, colour and box, and
+the green HIGH is gone from 86 of them. **No take, NPV, IRR, breakeven, rank, reform diamond,
+Reform Frequency Score, evidence grade or Fiscal Predictability *number* was altered anywhere** —
+only the band awarded to the number, and only where the platform's own v624 rule already says no
+band is earned. The 28 measured-spread countries are byte-identical. Chip rows stay `display:none`;
+no page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card
+wrapper. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools"
+still collapsed; Explorer analytics still collapsed. **No tab added, removed or reordered.** Govt
+NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst Guide sessionStorage
+logic untouched. CP headline stays two-zone with global rank and vs-median pill; take% stays
+tier-coloured; Reform Risk stays in the primary Home card grid. The **v612 MOBILE LAYER** block and
+the `#reference-panel` `translateX` state are untouched — this cycle adds no CSS rule at all.
+v371/v373, v430, v449, v451, v452, v489, v612, v621, v632, v637, v639, v640, v641, v642 and every
+locked item through v642 intact.
