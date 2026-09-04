@@ -1287,6 +1287,18 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      the tab measured scrollWidth 474 against clientWidth 390 — the only screen of the ten
      still scrolling sideways after v612. One column on a phone, and the track floor goes. */
   [id^="samples-grid"] { grid-template-columns: minmax(0, 1fr) !important; }
+
+  /* v635 (T1): the v459 active-preset label carries an inline `white-space:nowrap`, and its
+     text is the preset's full criteria line -- "IOC Capital Screen: verified production ·
+     Take <=65% · NPV >=0 @$75 AND @$50". On a phone that single unbreakable line set the
+     DOCUMENT's scrollWidth to 526 against a 390 clientWidth the instant any preset loaded,
+     sliding all twelve screens 136px sideways. Loading a preset is the entire point of the
+     Screener, so every mobile T1 session hit it. Isolated by hiding the node: 526 -> 390.
+     It is NOT from this cycle -- it reproduces identically on the v634 build.
+     Wrap the line rather than scroll the page. Inside the v612 max-width:720px layer, so no
+     desktop rendering changes: nothing in that layer is removed, weakened or narrowed. */
+  #screener-preset-label { white-space: normal !important; max-width: 100%; }
+  #screener-preset-label-text { min-width: 0; overflow-wrap: anywhere; }
 }
 
 @media (max-width: 390px) {
@@ -1619,7 +1631,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v634</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v635</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1689,7 +1701,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v634</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v635</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2022,7 +2034,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v634';
+  return m ? m[0] : 'v635';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2097,7 +2109,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v634');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v635');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -26158,11 +26170,33 @@ var _SC_SORT_LABEL = {
 
 // Missing values sort last in BOTH directions rather than being coerced to 0 -- the v537/v568
 // lesson from the breakeven ceiling, which classified every un-modelled country as passing.
-function _scSortVal(d, key, takeKey, npvKey) {
+// v635 (T1) -- `cmpBasis` is true when the screen tested its take ceiling against the
+// COMPARABLE take rather than the published blended headline (ceiling active + the
+// "screen on comparable take" box ticked, which is the default and what every ceiling
+// preset loads). In that state the two figures are different numbers and the row prints
+// both -- published first, "-> screened at X%" beneath it in accent.
+//
+// v554 wrote "the published headline is unchanged everywhere it is displayed, coloured,
+// tiered, ranked and exported", and that was accurate when it was written: the Screener
+// had no take ranking at all, only NPV-descending inside the evidence-first grouping.
+// v587 added clickable column sorts 33 cycles later and inherited `d[takeKey]` without
+// revisiting it, so membership was decided on one number and the ranking built on the
+// other. Measured on the IOC Capital Screen: Iraq is admitted at a comparable 34.1% --
+// 6th lowest take of the 15 -- and then sorted to 15 of 15 on its published 84.8%, the
+// last row, which is the position an analyst reads as "cut this one". The page's own
+// count line says the published blend "measures structure, not terms, and is not
+// rankable across countries", and then ranked on it.
+//
+// The rule now is one line long: the ranking uses the number the screen used. Untick the
+// comparable-basis box and the ceiling tests the published headline again -- and this
+// sort follows it back. The two can no longer disagree.
+function _scSortVal(d, key, takeKey, npvKey, cmpBasis) {
   switch (key) {
     case 'country':  return d.country || '';
     case 'region':   return d.region || '';
-    case 'take':     return d[takeKey];
+    case 'take':     return (cmpBasis && typeof _scFeeCmpAt === 'function')
+                              ? _scFeeCmpAt(d, takeKey.slice(5)).cmp
+                              : d[takeKey];
     case 'evidence': return (typeof _evidenceSortVal === 'function') ? _evidenceSortVal(d) : null;
     case 'npv':      return d[npvKey];
     case 'npv50':    return d.npv_50;
@@ -26171,10 +26205,10 @@ function _scSortVal(d, key, takeKey, npvKey) {
     default:         return null;
   }
 }
-function _scSortCmp(takeKey, npvKey) {
+function _scSortCmp(takeKey, npvKey, cmpBasis) {
   var key = _scSortKey, dir = _scSortDir;
   return function (a, b) {
-    var va = _scSortVal(a, key, takeKey, npvKey), vb = _scSortVal(b, key, takeKey, npvKey);
+    var va = _scSortVal(a, key, takeKey, npvKey, cmpBasis), vb = _scSortVal(b, key, takeKey, npvKey, cmpBasis);
     var na = (va === null || va === undefined || va !== va), nb = (vb === null || vb === undefined || vb !== vb);
     if (na && nb) return (a.country || '').localeCompare(b.country || '');
     if (na) return 1;            // no value -> bottom, whichever way the column points
@@ -26195,6 +26229,18 @@ function setScreenerSort(key) {
   if (typeof runScreener === 'function') runScreener();
 }
 window.setScreenerSort = setScreenerSort;
+// v635 (T1) -- one definition of the sort's display name, so the count line, the grouped
+// basis note, the mixed-basis banner and the exported "Ranked by:" header cannot drift.
+// When the take ranking ran on the comparable figure it names that, because a reader of the
+// exported file has no other way to tell which of the two columns of numbers ordered it.
+var _scTakeSortOnCmp = false;
+function _scSortLabelNow() {
+  if (!_scSortKey) return '';
+  var pair = _SC_SORT_LABEL[_scSortKey] || [_scSortKey, _scSortKey];
+  var s = pair[_scSortDir === 1 ? 0 : 1];
+  if (_scSortKey === 'take' && _scTakeSortOnCmp) s += ' (comparable take \u2014 the figure this screen tested)';
+  return s;
+}
 function clearScreenerSort() {
   _scSortKey = null; _scSortDir = null;
   if (typeof runScreener === 'function') runScreener();
@@ -26887,8 +26933,11 @@ function runScreener() {
   // Honouring it is not overriding the analyst's request -- it is obeying the one they already
   // made. The pure cross-database ranking is still one click away: untick the box, which is
   // what v507 built it for.
+  // v635 (T1): _scFeeCmpCount() and not _nFeeDivForBadge -- that const is declared further
+  // down this function, so reading it here would be the v452 TDZ fault again.
+  _scTakeSortOnCmp = !!(takeCeilingActive && feeCmpOn && _scFeeCmpCount(price) > 0);
   if (_scSortKey) {
-    const _colCmp = _scSortCmp(takeKey, npvKey);
+    const _colCmp = _scSortCmp(takeKey, npvKey, takeCeilingActive && feeCmpOn);
     data.sort(_screenerEvidenceFirst
       ? function (a, b) { return (_dqRank(a) - _dqRank(b)) || _colCmp(a, b); }
       : _colCmp);
@@ -26966,7 +27015,7 @@ function runScreener() {
   // v587 (T1): the count line names the active column sort and offers the way back to the default
   // ranking, so an analyst who reordered the table can see that they did and undo it in one click.
   const sortNote = _scSortKey
-    ? ` · sorted by <strong style="color:var(--accent);">${(_SC_SORT_LABEL[_scSortKey] || [_scSortKey, _scSortKey])[_scSortDir === 1 ? 0 : 1]}</strong> <button onclick="event.stopPropagation();clearScreenerSort();" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;font-size:10px;padding:0 5px;margin-left:3px;" title="Return to the default ranking — verified field production first, contractor NPV descending within each group">&#x21ba; default order</button>`
+    ? ` · sorted by <strong style="color:var(--accent);">${_scSortLabelNow()}</strong> <button onclick="event.stopPropagation();clearScreenerSort();" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;font-size:10px;padding:0 5px;margin-left:3px;" title="Return to the default ranking — verified field production first, contractor NPV descending within each group">&#x21ba; default order</button>`
     : (_screenerRfactorOnly ? ' · sorted by price sensitivity (swing ↓)' : '');
   const presetPrefix = _activePresetName ? `${_activePresetName} · ` : '';
   // v456: "click any row" hint now accent-colored and bold — matches v455 FC status hint fix
@@ -26979,7 +27028,7 @@ function runScreener() {
   // v609 — when a column sort is active the grouped note says the sort runs INSIDE each block,
   // so the analyst is not left thinking their click was ignored.
   const _basisNote = _grouped
-    ? ` \u2014 ranked by data basis: ${_nVerified} with verified field production first, then ${_nProxy} whose economics are regional proxies${_scSortKey ? `, ${(_SC_SORT_LABEL[_scSortKey] || [_scSortKey, _scSortKey])[_scSortDir === 1 ? 0 : 1].toLowerCase()} within each block` : ''}`
+    ? ` \u2014 ranked by data basis: ${_nVerified} with verified field production first, then ${_nProxy} whose economics are regional proxies${_scSortKey ? `, ${_scSortLabelNow().toLowerCase()} within each block` : ''}`
     : _allProxy
       ? ` <span style="color:var(--accent);font-weight:600;">\u2014 none of these ${data.length} countries has verified field production. Every take, NPV and breakeven below is a regional proxy estimate, indicative only, and not defensible as a screening shortlist on its own.</span>`
       : _mixedUngrouped
@@ -27094,7 +27143,7 @@ function runScreener() {
     // v609 — a grouped sort states BOTH halves of its ordering, so the exported file cannot be
     // read as a flat cross-database ranking when it is not one.
     crit.push('Ranked by: ' + (_scSortKey
-      ? ((_SC_SORT_LABEL[_scSortKey] || [_scSortKey, _scSortKey])[_scSortDir === 1 ? 0 : 1])
+      ? (_scSortLabelNow())
           + (_grouped ? ', within data basis (verified field production first, then proxy economics)' : '')
       : (_screenerRfactorOnly ? 'price sensitivity (swing, high to low)'
         : (_grouped ? 'verified field production first, then contractor NPV descending within each group'
@@ -27167,7 +27216,7 @@ function runScreener() {
             + `This screen returned no production-backed regime. Fiscal terms are regional proxy estimates and the NPV / breakeven shown are indicative only. `
             + `Usable for fiscal comparison; not defensible as a screening shortlist on their own. Widen the screen, or load the IOC Capital Screen preset for the production-backed set.`
           : `<strong style="color:var(--accent);letter-spacing:.04em;">MIXED DATA BASIS &mdash; ${_nVerified} PRODUCTION-BACKED, ${_nProxy} PROXY, INTERLEAVED BY THIS SORT</strong><br>`
-            + `This ranking is by ${_scSortKey ? (_SC_SORT_LABEL[_scSortKey] ? _SC_SORT_LABEL[_scSortKey][_scSortDir === 1 ? 0 : 1] : _scSortKey) : 'price sensitivity'}, so the two bases are not separated into blocks. `
+            + `This ranking is by ${_scSortKey ? _scSortLabelNow() : 'price sensitivity'}, so the two bases are not separated into blocks. `
             + `Rows badged PROXY have no verified field production &mdash; their fiscal terms are regional estimates and their NPV / breakeven are indicative only.`)
       + `</td></tr>`
     : '';
@@ -27195,7 +27244,7 @@ function runScreener() {
       ? `<tr class="screener-basis-divider"><td colspan="11" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
         + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nProxy} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
         + `Fiscal terms are regional proxy estimates and the NPV / IRR / breakeven shown are indicative only. `
-        + `Ranked among themselves by ${_scSortKey ? (_SC_SORT_LABEL[_scSortKey] ? _SC_SORT_LABEL[_scSortKey][_scSortDir === 1 ? 0 : 1].toLowerCase() : _scSortKey) : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
+        + `Ranked among themselves by ${_scSortKey ? _scSortLabelNow().toLowerCase() : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
         + `</td></tr>`
       : '';
     // Bug 3 fix: click row to navigate to country profile
