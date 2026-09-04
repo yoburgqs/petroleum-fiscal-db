@@ -1601,7 +1601,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v629</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v630</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1671,7 +1671,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v629</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v630</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1999,7 +1999,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v629';
+  return m ? m[0] : 'v630';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2074,7 +2074,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v629');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v630');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -38541,14 +38541,41 @@ function fetchFCDrawerProductionChart(country, sectId, canvasId) {
 
 // Contract drill-down: fetch top_contracts from API JSON and render table in Country Profile
 function fetchCountryContracts(country) {
-  const slug = toSlug(country);
+  // ── v630 (T2): the Top Contracts section hung on 40 of 185 country profiles ──────────
+  // Both the DOM id and the API filename for this section are built with the DASH slug — the
+  // same expression loadCountryProfile() writes into `dd-contracts-content-...`, and the one
+  // renderReformTimeline() and _rrApplyObsSpread() already fetch with. This function was the
+  // last place still calling toSlug(), which joins words with '_'. Two silent consequences:
+  //   * getElementById('dd-contracts-content-saudi_arabia') returned null against a node whose
+  //     id is 'dd-contracts-content-saudi-arabia', so the function returned at the guard BEFORE
+  //     fetching anything and the section sat on "Loading from API…" for the life of the page.
+  //     Measured by loading all 185 profiles: 145 rendered, 40 hung — exactly the countries
+  //     whose name carries a space, hyphen, apostrophe or em dash. Saudi Arabia, United Kingdom,
+  //     Iraq-Kurdistan, Trinidad and Tobago, Timor-Leste, South Africa, both UAE emirates.
+  //   * api/v1/country/ publishes the dash filename for all 185 countries but the underscore
+  //     filename for only 162, so 23 of those 40 would have 404'd even past the guard and
+  //     reported "no contract-level data" over a file that is sitting on disk with 50 rows in it.
+  // Fixing the guard also restores cpRecordObsSpread()/_cpApplyObsSpread() on these 40, which
+  // ran inside the .then() and therefore never ran at all: the observed-spread band, the basis
+  // chip and the distribution note were reading as measured-and-agreed on countries where
+  // nothing had been measured.
+  const slug = String(country || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   const el = document.getElementById('dd-contracts-content-' + slug);
   if (!el) return;
+  // A section that never leaves "Loading from API…" reads as a fetch still in flight, not as a
+  // failure, which is why this survived three cycles of being seen and not reported. Settle it.
+  setTimeout(function() {
+    if (el.textContent.trim().indexOf('Loading from API') === 0) {
+      el.innerHTML = '<span style="color:var(--muted);font-size:12px;">Contract table did not load \u2014 '
+        + '<a href="api/v1/country/' + slug + '.json" target="_blank" rel="noopener" style="color:var(--accent);">open the source JSON</a>. '
+        + 'The take and NPV figures above come from the bundled contract database and are unaffected.</span>';
+    }
+  }, 8000);
   fetch('api/v1/country/' + slug + '.json')
     .then(r => r.ok ? r.json() : null)
     .then(function(data) {
       if (!data || !data.top_contracts || !data.top_contracts.length) {
-        el.innerHTML = '<span style="color:var(--muted);font-size:12px;">No contract-level data in API yet. Run rebuild_api_json.py to populate.</span>';
+        el.innerHTML = '<span style="color:var(--muted);font-size:12px;">No contract-level rows are published for this country. The take, NPV and breakeven figures above are computed from the bundled contract database; there is no per-block breakdown to show behind them.</span>';
         return;
       }
       const contracts = data.top_contracts;
