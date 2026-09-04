@@ -1631,7 +1631,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v635</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v636</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1701,7 +1701,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v635</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v636</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2034,7 +2034,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v635';
+  return m ? m[0] : 'v636';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2109,7 +2109,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v635');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v636');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -28565,6 +28565,10 @@ function renderReformTimeline(country) {
     // THIS SAME PAGE was running Norway on 33.4% state equity and reporting it as 21.7% of revenue,
     // the largest of its three Fiscal Breakdown lines. Petoro/SDFI holds 30-33.6% on the licences
     // named in this page's own top-contracts table.
+    // v636 (T2): the figure this table actually renders for Profit Oil (Govt). The tier-schedule
+    // reconciliation note is computed from THIS, not from COUNTRY_DATA.profit_oil_govt, which is a
+    // separately harvested field that disagrees with it on 39 of the 44 countries carrying both.
+    let poPrinted = null;
     let unsourcedCount = 0;
     let unsourcedLabels = [];
     let unsourcedZeroLabels = [];  // an unsourced 0 cannot be told apart from a fact never harvested
@@ -28619,6 +28623,7 @@ function renderReformTimeline(country) {
         if (rawVal == null) return;
         const val = (typeof rawVal === 'number') ? _fmtPct(rawVal) : String(rawVal);
         const numVal = (typeof rawVal === 'number') ? rawVal : null;
+        if (label === 'Profit Oil (Govt)' && numVal !== null) poPrinted = numVal;   // v636 (T2)
 
         // Check for sourced metadata
         const srcMeta = fs ? (fs[key] || (fallbackKey ? fs[fallbackKey] : null)) : null;
@@ -28808,6 +28813,7 @@ function renderReformTimeline(country) {
 
       if (!rows.length) {
         el.innerHTML = '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:10px 14px;font-size:12px;color:var(--muted);line-height:1.5;">No sourced fiscal parameters available for this country. Key parameters (royalty, CIT, profit oil split) have not yet been verified at A/B-tier confidence. The Take% and DCF metrics shown above are computed from contract averages — use the Evidence badge above for sourcing context. <strong style="color:var(--text);">Analyst note:</strong> verify fiscal terms via primary legislation or operator filings before IC memo use.</div>';
+        _cpApplyPOReconcile(slug, poPrinted);   // v636 (T2)
         return;
       }
     } else {
@@ -28825,6 +28831,7 @@ function renderReformTimeline(country) {
       }
       if (!rows.length) {
         el.innerHTML = '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:10px 14px;font-size:12px;color:var(--muted);line-height:1.5;">Sourced parameters not loaded — API JSON requires the live deployment at <a href="https://yoburgqs.github.io/petroleum-fiscal-db/" target="_blank" rel="noopener" style="color:var(--accent);">yoburgqs.github.io/petroleum-fiscal-db/</a>. When viewing locally, Take% and DCF metrics are available from the database averages shown above.</div>';
+        _cpApplyPOReconcile(slug, null);   // v636 (T2): no Profit Oil row rendered at all
         return;
       }
     }
@@ -29111,6 +29118,10 @@ function renderReformTimeline(country) {
         ).join('')
       + '</tbody></table>'
       + reconNote;
+
+    // v636 (T2): the tier-schedule note higher up this page claimed to quote this table. Now it
+    // does. Fires after the table exists so the note names the figure actually on screen.
+    _cpApplyPOReconcile(slug, poPrinted);
   }
 
   const reforms = REFORM_HISTORY[country] || [];
@@ -29544,6 +29555,81 @@ function cpFloorBase() {
 }
 window.cpFloorBase = cpFloorBase;
 
+// v636 (T2) — the reconciliation note above was the page's one instruction for defending the
+// profit-oil split, and it quoted a number that is not printed anywhere on the page. It tested
+// COUNTRY_DATA.profit_oil_govt against the ladder and then reported the result as "the Evidence
+// Chain below lists a flat X%". The Evidence Chain does not read that field: it prints
+// fiscal_facts.levy_profit_oil_rate from api/v1/country/{slug}.json, a separately harvested
+// figure. Measured across the shipped API files, the two disagree on 39 of the 44 countries that
+// carry both — Angola's note claimed 75.0% while the table below it printed 52.3% (22.7pp),
+// Mozambique 65.0% vs 85.0%, Sudan 65.0% vs 84.8%, Iraq-Kurdistan 37.6% vs 57.0%. Worse in the
+// other direction: on 11 countries the note stayed SILENT because the headline field happened to
+// land on a tier while the printed figure did not — India shows 35.09% against a 40–85% ladder,
+// Nigeria 40.0% against 60–80%, Kazakhstan 50.0% against 30–80%, and the page said nothing.
+// The check now runs against the figure the Evidence Chain actually renders, names each figure
+// with the surface it appears on, and reports three shares where there are three.
+function _cpPOReconcileHtml(st, ecVal) {
+  if (!st || !Array.isArray(st.tiers) || !st.tiers.length) return '';
+  var tiers = st.tiers;
+  var TOL = 0.5;   // pp. Below this a contract average and a tier are the same term, not a conflict.
+  var lo = Math.min.apply(null, tiers), hi = Math.max.apply(null, tiers);
+  var onLadder = function(v) {
+    return tiers.some(function(g) { return Math.abs(v - g) <= TOL; });
+  };
+  var hv = (typeof st.headline === 'number' && isFinite(st.headline)) ? st.headline : null;
+  var ev = (typeof ecVal === 'number' && isFinite(ecVal)) ? ecVal : null;
+  var pending = (ecVal === undefined);   // the Evidence Chain fetch has not resolved yet
+
+  var HEAD_WHERE = 'the profile summary and the XLSX export';
+  var EC_WHERE = 'the Key Fiscal Parameters table below';
+  var flats = [];
+  if (hv !== null && ev !== null && Math.abs(hv - ev) <= TOL) {
+    flats.push({ v: hv, where: HEAD_WHERE + ' and ' + EC_WHERE });
+  } else {
+    if (hv !== null) flats.push({ v: hv, where: HEAD_WHERE });
+    if (ev !== null) flats.push({ v: ev, where: EC_WHERE });
+  }
+  if (!flats.length) return '';
+  // Two things make this worth stopping on: a flat share the ladder cannot produce, or two flat
+  // shares that disagree with each other. Libya is the second case on its own — 65.0% and 79.73%
+  // both land on a tier, 14.7pp apart, and the old check saw neither.
+  var anyOff = flats.some(function(f) { return !onLadder(f.v); });
+  if (!anyOff && flats.length < 2) return '';
+
+  var esc = (typeof _esc594 === 'function') ? _esc594 : function(x) { return String(x == null ? '' : x); };
+  var n = flats.length + 1;   // the flat figures plus the ladder itself
+  var h = '<span style="color:var(--orange);">\u26a0</span> <strong style="color:var(--text);">This page prints '
+    + (n === 3 ? 'three' : 'two') + ' different government profit-oil shares.</strong> ';
+  h += flats.map(function(f) {
+    var edge = (f.v < lo - TOL) ? 'below every tier' : (f.v > hi + TOL) ? 'above every tier' : '';
+    return '<strong>' + f.v.toFixed(1) + '%</strong> in ' + f.where
+      + (edge ? ' \u2014 <strong style="color:var(--red);">' + edge + '</strong>' : '');
+  }).join('; ');
+  h += '; and this ladder, which runs <strong>' + lo.toFixed(0) + '\u2013' + hi.toFixed(0) + '%</strong>. ';
+  h += 'The DCF resolves PSC contracts on <strong>this ladder</strong>, so the take on this page is computed from the tiers'
+    + (flats.length > 1 ? ' \u2014 neither flat figure is an input to it. ' : ' and not from the flat figure. ');
+  h += 'Reconcile ' + (n === 3 ? 'all three' : 'both') + ' against ' + esc(st.country)
+    + '\u2019s own petroleum act before ' + (n === 3 ? 'any of them goes' : 'either goes') + ' in an IC memo.';
+  if (pending) {
+    h += ' <span style="color:var(--muted);">(Key Fiscal Parameters still loading \u2014 this note updates when that table lands.)</span>';
+  }
+  return h;
+}
+window._cpPOReconcileHtml = _cpPOReconcileHtml;
+
+// Called by renderSourcedFacts() once the Evidence Chain knows the figure it actually printed.
+// ecVal is null when that table carries no Profit Oil (Govt) row at all.
+function _cpApplyPOReconcile(slug, ecVal) {
+  var slot = document.getElementById('cp-po-reconcile');
+  var st = window._cpPOState;
+  if (!slot || !st) return;
+  // A fetch that resolves after the analyst has already switched country must not write its
+  // predecessor's figure into the new country's note.
+  if (slug && st.slug && slug !== st.slug) return;
+  slot.innerHTML = _cpPOReconcileHtml(st, (ecVal === undefined) ? null : ecVal);
+}
+window._cpApplyPOReconcile = _cpApplyPOReconcile;
+
 // v594 (T2) — the Profit Oil Tier Schedule was the most citable-looking artifact on this tab and
 // the only numeric block on it carrying no provenance at all. It renders for 70 countries. Every
 // one of the 32,404 r_factor tier rows behind it is confidence B, none carries a source_quote, and
@@ -29556,6 +29642,9 @@ window.cpFloorBase = cpFloorBase;
 // matches no tier in the ladder printed here. Treatment follows the v518/v569 BULK-chip idiom:
 // the block states its own basis instead of being silently trusted.
 function _cpTierSchedule594(d) {
+  // v636 (T2): cleared first, so a country with no ladder cannot leave the previous country's
+  // tiers behind for renderSourcedFacts() to reconcile against.
+  window._cpPOState = null;
   if (!(d && d.has_r_factor_tiers && d.tier_schedule && d.tier_schedule.length > 0)) return '';
   var ts = d.tier_schedule;
   var isProd = d.tier_basis === 'production_rate';
@@ -29619,28 +29708,28 @@ function _cpTierSchedule594(d) {
       + '. Do not cite these thresholds as a term negotiated for ' + _esc594(d.country) + '.');
   }
 
-  // The Evidence Chain further down this same page prints a flat Profit Oil (Govt). For 38 of the
-  // 70 countries that render this table it matches no tier in the ladder above it, and nothing on
-  // the page reconciled the two. The DCF uses the ladder, so the headline take follows the ladder.
-  if (d.profit_oil_govt !== null && d.profit_oil_govt !== undefined) {
-    var gs = ts.map(function(t) { return t.govt; });
-    var matches = gs.some(function(g) { return Math.abs(d.profit_oil_govt - g) <= 0.05; });
-    if (!matches) {
-      var lo = Math.min.apply(null, gs), hi = Math.max.apply(null, gs);
-      var outside = (d.profit_oil_govt < lo || d.profit_oil_govt > hi);
-      notes.push('<span style="color:var(--orange);">⚠</span> <strong style="color:var(--text);">This page prints two different government profit-oil shares.</strong> '
-        + 'The Evidence Chain below lists a flat <strong>' + d.profit_oil_govt.toFixed(1) + '%</strong>, sourced separately; this ladder runs <strong>'
-        + lo.toFixed(0) + '–' + hi.toFixed(0) + '%</strong>'
-        + (outside ? ' and <strong style="color:var(--red);">never reaches ' + d.profit_oil_govt.toFixed(1) + '% at any tier</strong>' : '')
-        + '. The DCF resolves PSC contracts on <strong>this ladder</strong>, so the headline take on this page is computed from the tiers, not from the flat figure. '
-        + 'Reconcile both against the country’s own petroleum act before either goes in an IC memo.');
-    }
-  }
+  // v636 (T2): the reconciliation is no longer computed here against d.profit_oil_govt and then
+  // described as the Evidence Chain's number. The state is stashed, a live slot is rendered, and
+  // renderSourcedFacts() fills it once it knows the figure that table actually printed. The slot
+  // is emitted unconditionally so a conflict the headline field masks (India, Nigeria,
+  // Kazakhstan, Libya and 7 others) can still be raised when the printed figure arrives.
+  window._cpPOState = {
+    country: d.country,
+    slug: String(d.country || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, ''),
+    tiers: ts.map(function(t) { return t.govt; }),
+    headline: (d.profit_oil_govt === null || d.profit_oil_govt === undefined) ? null : d.profit_oil_govt
+  };
 
-  var notesHtml = notes.length
-    ? '<div style="font-size:10px;color:var(--muted);line-height:1.6;margin-top:6px;border-left:2px solid rgba(176,104,0,.4);padding-left:8px;">'
-      + notes.map(function(n) { return '<div style="margin-bottom:3px;">' + n + '</div>'; }).join('') + '</div>'
-    : '';
+  // v636 (T2): the reconciliation slot is always in the DOM — renderSourcedFacts() fills it
+  // asynchronously — but it is rendered inside the notes rule only, and starts empty, so a
+  // ladder with nothing to reconcile does not gain a stray rule.
+  var poSlot = '<div id="cp-po-reconcile" style="margin-bottom:3px;">'
+    + _cpPOReconcileHtml(window._cpPOState, undefined) + '</div>';
+  var notesHtml = '<div style="font-size:10px;color:var(--muted);line-height:1.6;margin-top:6px;'
+      + (notes.length ? 'border-left:2px solid rgba(176,104,0,.4);padding-left:8px;' : '')
+      + '" id="cp-tier-notes">'
+      + notes.map(function(n) { return '<div style="margin-bottom:3px;">' + n + '</div>'; }).join('')
+      + poSlot + '</div>';
 
   return '<div id="cp-tier-schedule" style="margin-top:10px;">'
     + '<div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">'
