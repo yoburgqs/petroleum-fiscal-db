@@ -27440,3 +27440,116 @@ locked item through v642 intact.
 Walked T4 cold at 1440px, no storage: Home → Reform Risk → the per-country lookup, the control four other surfaces route the analyst to by name.
 
 The lookup card computed its own Fiscal Predictability band straight off the raw number — the **pre-v624 rule**. v624 established, and `renderStabilityBadge()
+
+---
+## Cycle 550 Log — 2026-09-04 18:05
+- Test before: 236 PASS / 0 FAIL (live URL, as reported into the cycle)
+- Test after: **261 PASS / 0 FAIL / 1 WARN**, run this cycle against the local build
+  (`TEST_URL=http://localhost:8123/index.html`). The single WARN is the service worker
+  registering `/petroleum-fiscal-db/sw.js`, a path that exists on Pages and not at a
+  localhost root — not introduced by this change.
+- JS errors: 0 page errors. JS syntax gate PASS (11 blocks).
+- Summary: Cycle 550 complete — shipped as **v644**, pushed to both repos.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (rotated off T4/549,
+T2/548, T6/547, T1/546, T3/545). This closes the strongest open T5 candidate, carried since 549.
+
+## Friction
+Walked T5 cold at 1440px, no storage, driving the real page: exercised every artifact that
+leaves the tool — Country Profile `⎘ IC Citation` and `Copy for IC Memo`, Fiscal Compare
+`Copy for IC Memo`, Side-by-Side `Copy for IC Memo`, IOC Portfolio `Copy for IC Memo` — and
+read the actual clipboard for each.
+
+Four of the five carry the platform's own findings correctly. `copyICSummary()`
+(`index.html:~35092`), the Country Profile paragraph — the flagship T5 artifact, the one that
+ends up inside a committee document — did not. It kept a private third stability scale that
+v624 never reached:
+
+    stabScore >= 70 ? 'stable' : stabScore >= 40 ? 'moderate stability' : 'volatile'
+
+Every rendered surface obeys v624: Country Profile, Side-by-Side, Explorer, Fiscal Compare and
+(since v643) the Reform Risk lookup all print an UNGRADED, uncoloured badge for a score built
+without its largest component. The clipboard disagreed with all of them:
+
+| country | screen badge | what pasted into the IC memo |
+|---|---|---|
+| Russia | `75 · UNGRADED · one term` | Fiscal predictability: **stable** |
+| Bahamas | `100 · UNGRADED · one term` | Fiscal predictability: **stable** |
+| Norway | `76 · UNGRADED · ≥29.6pp obs` | Fiscal predictability: **stable** |
+
+Measured live against `COUNTRY_DATA`, not assumed: **100 of the 132 one-term countries pasted
+the word "stable"** while the page they were copied from refuses to grade them at all — and the
+Side-by-Side `Copy for IC Memo` button one tab away pastes `76 · UNGRADED · one term` for the
+same country and the same score. The tool contradicted itself inside the analyst's own document,
+on the one claim they cannot walk back in the room. The cut points did not match the platform's
+either (70/40 against 75/60/45), so the 5 measured countries scoring 70–74 — graded MODERATE on
+screen — also pasted "stable".
+
+## Change
+- **`_fpBandLabel(score)` is now the single source of the band word.** `renderStabilityBadge()`
+  and the pasted paragraph both call it, so the screen and the clipboard cannot drift apart again.
+- **`_fpCiteVerdict(score, d)`** builds the pasted Fiscal Predictability sentence under the same
+  rule as the badge — a band only where the IQR component was charged. A one-term country now
+  pastes `UNGRADED (score 75/100) — ORCA does not band this number and it is not a stability
+  finding…`, carrying the reason, the cohort arithmetic (all 86 HIGH-band scores are one-term;
+  not one of the 28 measured countries reaches HIGH, ceiling 74), and `Do not cite it as evidence
+  of fiscal stability`. A measured country pastes `LOW (score 58/100, graded) — measured spread of
+  15.0pp across 4,211 contracts…`.
+- **`_fpCiteObsClause(d)`** — where Country Profile's own loaded contract sample refutes the stored
+  one-term basis (the v559 conflict marker), the paste now says so instead of repeating a claim the
+  page shows crossed out. Norway's paragraph now states its 50 listed contracts carry 14 distinct
+  take values spanning 29.6pp (51.1–80.7%).
+- The paragraph's old score/basis appendix is gone — the verdict carries both, so the line stopped
+  saying the same thing twice.
+- State-monopoly and no-distribution branches unchanged; they were already correct.
+
+## Result
+An analyst pasting Russia, Bahamas, Norway or any of the other 129 one-term countries into an IC
+memo no longer asserts a fiscal-stability grade the platform itself withholds, and no longer
+produces a paragraph that contradicts the table the next tab copies for the same country.
+Verified across all 185: **160 scored countries, 0 mismatches against the on-screen grade, 0
+pasting the bare word "stable"** (was 105).
+
+## Mobile (Step 5b) — 390 x 844, `hasTouch: true`
+All ten screens `scrollWidth == clientWidth` (390/390): Home, Fiscal Compare, Country Profile,
+Explorer, Screener, Side-by-Side, IOC Portfolio, Breakeven Map, Reform Risk, Sample Analyses.
+The touched control `#dd-ic-summary-btn` measures **44px** tall under a thumb; the copy fires and
+the mobile clipboard carries the UNGRADED verdict. This cycle adds no CSS rule at all.
+
+## Open / carried
+- Norway's stored `p25/p75` say one term while its own contract sample spans 29.6pp — the paste
+  now discloses the conflict, but the **score itself is still computed off the stored pair**, so
+  Norway's 76 is built on an IQR penalty of zero that its own data refutes. Fixing the score needs
+  a data-build change to `country_data.json`, not a UX change. **Strongest open T2/T6 candidate.**
+- `renderSampleAnalyses()` hardcoded `regionOrder` — strongest open T1 candidate. Carried 534–550.
+- `IOC_PRESENCE` entity-to-parent alias map — open T4 candidate. Carried from 544.
+- Netherlands 23.4% govt take vs the North Sea Trio "~48% take" tooltip. Carried 536–550.
+- 272 dead evidence citations (129 URLs, 62 dead hosts) — flagged by v641, still unrepaired; a
+  periodic re-check step in the 02:00 chain is Zach's call, not the loop's.
+- Two `.source-badge` elements in the Evidence Chain still measure 22.5px under a thumb. Carried
+  from 547.
+- Three Screener presets self-labelled "(barely narrows)", one structurally inverted. Carried 546.
+- The breakeven bound resolution is still limited to the four prices `country_data.json` carries.
+  Carried from 548.
+- Why the DCF solver ran for 68 mostly-non-producing countries and not for the largest producers is
+  still not recorded anywhere the page can read. Carried from 548.
+- Cycle 539's empty Summary line in GRADER still reads as a completed cycle. Carried 540–550.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip as the fix** — the change is the content of a
+clipboard artifact for 132 countries, not hover text. **Not a text-only change**: the artifact the
+tool produces is different for 160 of 185 countries, and the word "stable" is gone from 105 of them.
+**No take, NPV, IRR, breakeven, rank, reform diamond, Reform Frequency Score, evidence grade or
+Fiscal Predictability *number* was altered anywhere** — only the verdict word attached to the
+number in the pasted paragraph, and only to match what the screen already says. No rendered
+element changed: `renderStabilityBadge()` emits byte-identical HTML (the band literal moved into
+`_fpBandLabel()`, same thresholds, same order). Chip rows stay `display:none`; no page-sub
+paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card wrapper.
+Screener advanced filters still collapsed, presets still a dropdown; Home "More tools" still
+collapsed; Explorer analytics still collapsed. **No tab added, removed or reordered.** Govt NPV
+stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst Guide sessionStorage
+logic untouched. CP headline stays two-zone with global rank and vs-median pill; take% stays
+tier-coloured; Reform Risk stays in the primary Home card grid. The **v612 MOBILE LAYER** block and
+the `#reference-panel` `translateX` state are untouched. v371/v373, v430, v449, v451, v452, v489,
+v612, v621, v632, v637, v639, v640, v641, v642, v643 and every locked item through v643 intact.
