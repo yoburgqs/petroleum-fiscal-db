@@ -26559,3 +26559,16 @@ altered anywhere — `_iocNpvFmt()` changes how one NPV cell is punctuated, not 
 Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; the FC Analyst Guide
 sessionStorage logic untouched; the v632 FC shortlist selector untouched. v371/v373, v430, v449,
 v451, v452, v489, **v612** and every locked item through v636 intact.
+
+---
+## Cycle 543 Log — 2026-09-04 05:30
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 543 complete and pushed as **v637**. `CYCLE_STATE.json` / `cycle_log.txt` left dirty — the loop wrapper owns those.
+
+## Cycle 543 — T5
+
+**Task** — T5, *"Give me something I can paste straight into an IC memo."* (542=T2, 541=T1, 540=T6, 538=T4, 537=T5, 536=T3.)
+
+**Friction.** From a cold load I inventoried every export and copy control the analyst can actually reach, tab by tab, off the live DOM rather than the changelog. Fiscal Compare, Country Profile, Side-by-Side, Screener, Explorer, Br
