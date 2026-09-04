@@ -1678,7 +1678,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v644</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v645</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1748,7 +1748,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v644</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v645</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2081,7 +2081,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v644';
+  return m ? m[0] : 'v645';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2156,7 +2156,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v644');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v645');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2611,15 +2611,33 @@ window.copyPlatformCitation = function(btn) {
       </div>
       <div class="screener-filter-block">
         <div class="filter-lbl">Region</div>
-        <select id="sc-region" aria-label="Filter by region" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
+        <!-- v645 (T1): this control could not express four of the region names the rest of the
+             platform prints. The database files countries under Asia, Latin America, Oceania and
+             North America; this select offered only the rolled-up "Asia Pacific" and "Americas".
+             Fiscal Compare's chip row and the FC drilldown both hand off to this select by
+             assigning a RAW region name to it, so `sel.value = 'Latin America'` matched no option,
+             silently reset to "" and ran the Screener over all 185 countries — a button labelled
+             "Peers in Latin America" returning the entire world with no error. Both roll-ups and
+             both granular members are now selectable, so the handoff resolves exactly and the
+             Screener can express the same regions Fiscal Compare does. Counts are from the shipped
+             country_data.json. -->
+        <select id="sc-region" aria-label="Filter by region" title="Region groupings match Fiscal Compare. The two roll-ups (Asia Pacific, Americas) are the sum of the granular regions listed under them; pick the granular one when you want exactly that set." style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
           <option value="">All Regions</option>
-          <option value="Africa">Africa</option>
-          <option value="Middle East">Middle East</option>
-          <option value="Asia Pacific">Asia Pacific</option>
-          <option value="Americas">Americas</option>
-          <option value="Europe">Europe</option>
-          <option value="CIS/FSU">CIS/FSU</option>
-          <option value="Other">Other</option>
+          <option value="Africa">Africa (49)</option>
+          <option value="Middle East">Middle East (14)</option>
+          <option value="Europe">Europe (30)</option>
+          <option value="CIS/FSU">CIS/FSU (5)</option>
+          <optgroup label="Asia Pacific">
+            <option value="Asia Pacific">Asia Pacific — all (41)</option>
+            <option value="Asia">  Asia (26)</option>
+            <option value="Oceania">  Oceania (15)</option>
+          </optgroup>
+          <optgroup label="Americas">
+            <option value="Americas">Americas — all (28)</option>
+            <option value="Latin America">  Latin America (26)</option>
+            <option value="North America">  North America (2)</option>
+          </optgroup>
+          <option value="Other">Other (18)</option>
         </select>
       </div>
       <div class="screener-filter-block">
@@ -23941,6 +23959,37 @@ function _regionMatch(dRegion, chipVal) {
   return (m[chipVal] || [chipVal]).includes(dRegion);
 }
 
+// v645 (T1) — set the Screener's region control from a RAW database region name.
+//
+// Two Fiscal Compare handoffs ("Peers in <region> \u2192" on the drilldown, "\u22ee Screener
+// (<region>) \u2192" under the FC table) used to do `sel.value = d.region` directly. When the
+// database region had no matching <option> -- Asia, Latin America, Oceania, North America and
+// Unknown, which is 70 of the 185 countries -- the assignment was a no-op, value stayed "",
+// and runScreener() ran unfiltered. The analyst clicked a button naming a region and got all
+// 185 countries back with the control reading "All Regions". No error anywhere.
+//
+// The select now carries those names, so the exact match is the normal path. This function is
+// the belt-and-braces: it verifies the assignment actually took, and if a caller ever passes a
+// region the control still cannot express, it falls back to the roll-up that CONTAINS it rather
+// than to "no filter at all". Returns the option value that ended up applied, or '' if the
+// region could not be resolved -- callers can use that to avoid claiming a filter they did not get.
+function _setScreenerRegion(rawRegion) {
+  var sel = document.getElementById('sc-region');
+  if (!sel) return '';
+  if (!rawRegion) { sel.value = ''; return ''; }
+  sel.value = rawRegion;
+  if (sel.value === rawRegion) return rawRegion;          // exact option exists
+  // No exact option -- find the smallest roll-up whose expansion contains this region.
+  var opts = Array.prototype.map.call(sel.options, function(o) { return o.value; });
+  for (var i = 0; i < opts.length; i++) {
+    if (!opts[i]) continue;
+    if (opts[i] !== rawRegion && _regionMatch(rawRegion, opts[i])) { sel.value = opts[i]; return opts[i]; }
+  }
+  sel.value = '';
+  return '';
+}
+window._setScreenerRegion = _setScreenerRegion;
+
 function renderExplorer() {
   const _fourPriceActive = window._fourPriceActive || false;
   const price  = getPriceKey();
@@ -38156,7 +38205,7 @@ function renderFCResults(results, price) {
   var _screenerBtn = '<button onclick="(function(){'
     + 'switchTab(\'texplorer\',document.getElementById(\'tab-btn-tscreener\'));'
     + 'switchExplorerMode(\'screen\',document.getElementById(\'mode-btn-screen\'));'
-    + (_activeRegionForNudge ? ('setTimeout(function(){var sel=document.getElementById(\'sc-region\');if(sel){sel.value=\'' + _activeRegionForNudge.replace(/'/g,"\\'") + '\';if(typeof runScreener===\'function\')runScreener();}},150);') : 'setTimeout(function(){if(typeof runScreener===\'function\')runScreener();},150);')
+    + (_activeRegionForNudge ? ('setTimeout(function(){if(typeof _setScreenerRegion===\'function\')_setScreenerRegion(\'' + _activeRegionForNudge.replace(/'/g,"\\'") + '\');if(typeof runScreener===\'function\')runScreener();},150);') : 'setTimeout(function(){if(typeof runScreener===\'function\')runScreener();},150);')
     + '})()" style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:10px;font-weight:600;padding:3px 10px;cursor:pointer;white-space:nowrap;transition:.15s;" '
     + 'onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'" '
     + 'title="' + (_activeRegionForNudge ? ('Open Screener filtered to ' + _activeRegionForNudge + ' — rank by take, IRR, Breakeven with threshold sliders') : 'Open Screener — rank 185 countries by take, IRR, and Breakeven with threshold sliders. Low Take · Positive NPV, High-IRR, and Frontier presets available.') + '">&#x22EE; Screener' + (_activeRegionForNudge ? ' (' + _activeRegionForNudge + ')' : '') + ' &rarr;</button>';
@@ -39329,7 +39378,7 @@ function openFCDrilldown(country) {
   // v428: "Screen similar [Region]" — one-click to Screener filtered to same region
   if (r.region) {
     var rEsc = r.region.replace(/'/g,"\\'");
-    html += '<button class="btn btn-sm btn-outline" onclick="(function(){switchTab(\'texplorer\',document.getElementById(\'tab-btn-tscreener\'));switchExplorerMode(\'screen\',document.getElementById(\'mode-btn-screen\'));setTimeout(function(){var sel=document.getElementById(\'sc-region\');if(sel){sel.value=\'' + rEsc + '\';if(typeof runScreener===\'function\')runScreener();}},150);})()" title="Open Screener filtered to ' + r.region + ' — see all ' + r.region + ' countries ranked by take, IRR, and Breakeven">Peers in ' + r.region + ' &#8594;</button>';
+    html += '<button class="btn btn-sm btn-outline" onclick="(function(){switchTab(\'texplorer\',document.getElementById(\'tab-btn-tscreener\'));switchExplorerMode(\'screen\',document.getElementById(\'mode-btn-screen\'));setTimeout(function(){if(typeof _setScreenerRegion===\'function\')_setScreenerRegion(\'' + rEsc + '\');if(typeof runScreener===\'function\')runScreener();},150);})()" title="Open Screener filtered to ' + r.region + ' — see all ' + r.region + ' countries ranked by take, IRR, and Breakeven">Peers in ' + r.region + ' &#8594;</button>';
   }
   // v457/v458: Prev + Next in ranking buttons — lets analyst step through ranked list without closing/reopening drawer
   (function() {
