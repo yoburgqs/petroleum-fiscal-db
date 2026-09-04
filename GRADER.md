@@ -27959,3 +27959,135 @@ v640, v641, v642, v643, v644, v645, v646 and every locked item through v646 inta
 **Task:** T6 — "Where did this number come from and how solid is the evidence?" (stalest; 552 was T3, 551 T1, 550 T5, 549 T4, 548 T2 — T6 last walked at 547)
 
 **Friction:** Walked cold at 1440×900, no sessionStorage or localStorage: Home → Country Profile → Namibia. The Evidence Quality panel (`buildEvidencePanel()`, `index.html:22877`) sits directly under the profile header — I measured it at scroll y≈601 against the Evidence Chai
+
+---
+## Cycle 554 Log — 2026-09-04 18:10
+- Test before: 236 PASS / 0 FAIL (harness, live URL)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — Playwright ACTUALLY RAN this cycle, against the
+  local build at `http://localhost:8080` (`TEST_URL=... node tests/runtime_comprehensive.js`).
+  The single WARN is `sw.js` 404 under `python -m http.server`; `sw.js` is in the repo and is
+  served on Pages. Local count is higher than the harness's live count because the suite tests
+  the tree that was just changed rather than the deployed one.
+- JS errors: 0 (11 inline blocks pass the syntax gate; 185-country profile sweep, 0 page errors)
+- Summary: Cycle 554 complete — shipped as **v648**, pushed.
+
+**Task:** T2 — "Is this one country attractive at $75/bbl, and can I defend that?"
+(stalest: 553 was T6, 552 T3, 551 T1, 550 T5, 549 T4 — T2 last walked at 548)
+
+**Friction.** Cold at 1440×900, no sessionStorage or localStorage: Home → Country Profile →
+Guyana. Two elements, three lines apart, contradict each other at the point of decision.
+
+The headline paragraph (`_quickIcVerdict497`) says: *"Clears the 10% WACC at $75 ($1.1B) and at
+the $50/bbl downside ($511M) — but so do 180 of 182 non-monopoly regimes here … **Defend on the
+take and its evidence tier (n=143 contracts), not on the NPV.**"*
+
+The green **Fiscal character** verdict below it (`_cpFiscalVerdict470`, `index.html:30988`) — the
+only sentence anywhere on the page that answers *"attractive?"* in words — read: *"Commercially
+attractive — moderate take, **and contractor NPV stays positive through the $50/bbl downside
+case**."* That is the test the headline had just disowned, offered as the reason.
+
+Counted against the shipped `country_data.json`, `downSolid` is true for **180 of 185** published
+regimes. Only Malaysia (−$33.2M) and Yemen (−$139.1M) go negative at $50; Bahrain, Kuwait and
+Saudi Arabia are monopoly zeros the branch never reaches. So for 183 of 185 countries the
+eleven-branch verdict tree collapsed to take thresholds alone while printing a downside test as
+its justification. This is v516's defect one rung along: v516 retired the mean-IRR test *because*
+it cleared for 123 of the 124 countries that showed one, and replaced it with a test that clears
+for 180 of 185.
+
+The action beside the verdict was worse than the sentence. **"Find lower-take peers →"** loaded
+the Screener at a **hardcoded** ceiling of `sl-take = 60`. It fired on 43 countries
+(`take > 75 || swing > 20`) and for **30 of them the country's own take was already below 60** —
+Guyana 54.1%, Angola 53.0%, Indonesia 59.5%, Ireland 27.1%. Clicking it on Guyana returned **158
+regimes, 21 of which take MORE than Guyana**. A control returning the opposite of its label, at
+exactly the moment the analyst asks "attractive compared to *what*?" — the v460 class of defect.
+
+**Change.**
+1. The verdict's reason is now **position on the comparable take** against the 21
+   production-weighted producers, which separates countries by construction:
+   *"Commercially attractive — moderate take; 10 of the 21 production-weighted producers take
+   less at $75/bbl."* The downside leg is still stated, but demoted to what it is, with its
+   denominator **counted at render rather than asserted**: *"Contractor NPV also clears the 10%
+   WACC at the $50/bbl downside, but so do 180 of 185 regimes here, so that leg is not what makes
+   this one attractive."*
+2. A new `.cp-pos-pill` carries the same position on **every** non-monopoly verdict — 149 as a
+   pill, 33 embedded in the sentence, **182 of 185 countries, up from none**. The producer set is
+   used rather than all 185 because 164 hold no verified block-level production; comparable take
+   (`cpCmpTakeOf`) is used so Iraq's 415 TSCs do not rank a remuneration artefact.
+3. New top-level `cpLowerTakeProducers()` / `cpScreenLowerTake()`. **One call produces both the
+   button's count and the rows that land**, so they cannot disagree. The Screener is restricted
+   via `_screenerCountrySet` to that explicit set rather than an integer ceiling — `sl-take` steps
+   in whole percent, so a 54.1% take cannot express itself as a ceiling, and `Math.ceil(t)-1` cost
+   Azerbaijan, Mauritania and Tanzania one genuine lower-take peer each to rounding. Every other
+   filter is cleared first (`applyScreenerPreset(null)`), so the count holds whatever the analyst
+   had set. Guyana: button reads **"See the 10 producers that take less →"**, and the screen
+   returns exactly 10 with the scope named — *"the 10 production-weighted producers with a lower
+   comparable government take than Guyana at $75/bbl … every jurisdiction in scope passed."*
+4. The corrected CTA now appears on **72** countries (was 43, of which 30 were wrong). The
+   ≤40%-take **"See all investible regimes →"** branch is unchanged on the other 110 — its label
+   names a band, not a comparison, so it was never lying.
+
+**Verification.** All 185 profiles rendered in one sweep: 0 page errors, **0 mismatches** between
+any button's count and its landing set, 0 empty CTAs, 3 verdict-less countries (the 3 state
+monopolies, correct). Click-through confirmed end to end on Guyana (10→10), Norway (16→16),
+Azerbaijan (13→13, the rounding case), Malaysia (11→11) and Cote d'Ivoire (11→11, the apostrophe
+escaping case). **Mobile 390×844 `hasTouch`**: `scrollWidth == clientWidth == 390` on all nine
+visible tabs and on Country Profile with the new controls rendered; new button **44px**, new pill
+**24px** (was 19px before the one scoped rule).
+
+## Open / carried
+- **New, this cycle.** The all-185 rank in the CP headline strip (`#138 of 185`) and the verdict's
+  new position pill (`10 / 21 producers`) sit ~130px apart on two different universes. Both are
+  labelled, but an analyst reading quickly has two "ranks" for one country. The natural next T2.
+- **New, this cycle.** Guyana shows `-1.5pp vs producer median @$75` while its rank line reads
+  `#138 of 185 · not production-weighted` — it is measured against the producer set but is not a
+  member of it. Compared to a median it is excluded from.
+- **New, this cycle.** Guyana's header carries `54.1% govt take @$75` and, two rows down,
+  `Contract take: single term · 57.0% ✓`. Two figures both called "take", 2.9pp apart, unreconciled
+  on screen.
+- `_cmpOrderMark`'s `hi` marker requires `vals.length >= 3`, so a set with exactly two rankable
+  columns shows "lowest of 2" on one and nothing on the other. Carried from 552.
+- The Side-by-Side grid shows Contractor NPV at $50/$75/$125 but the Govt Take rows and the NPV
+  **chart** carry all four prices — the $100 NPV is plotted but not tabulated. Carried from 552.
+- The proxy/basis notice text refers to "these NPV and IRR columns"; there is no IRR row and no
+  breakeven row anywhere on Side-by-Side. Carried from 552.
+- Norway's stored `p25/p75` say one term while its own contract sample spans 29.6pp; the score is
+  still computed off the stored pair. Needs a `country_data.json` build change, not UX.
+  Carried 550–554.
+- `renderSampleAnalyses()` hardcodes `regionOrder` and groups on the RAW `d.region`, omitting 72
+  countries. `#tab-btn-tsamples` is `aria-hidden`/`display:none`. Carried 534–554.
+- The Explorer's `#flt-region` still offers only the roll-up region names while the Screener now
+  offers both. Carried from 551.
+- The Explorer, Screener and Fiscal Compare Evidence columns still render a tier letter with no
+  retrievability signal; only Country Profile carries one. Carried from 553.
+- `IOC_PRESENCE` entity-to-parent alias map — open T4 candidate. Carried from 544.
+- Netherlands 23.4% govt take vs the North Sea Trio "~48% take" tooltip. Carried 536–554.
+- The 272 dead citations are *disclosed* on both Country Profile evidence surfaces but still
+  **unrepaired**. Needs a harvest-side pass, not a UX change.
+- Two `.source-badge` elements in the Evidence Chain still measure 22.5px under a thumb. Carried
+  from 547. (This cycle's own pill was given a real height rather than the pseudo-element hit
+  area those badges use — the same treatment would close this.)
+- Three Screener presets self-labelled "(barely narrows)", one structurally inverted. Carried 546.
+- The breakeven bound resolution is still limited to the four prices `country_data.json` carries.
+- Why the DCF solver ran for 68 mostly-non-producing countries and not for the largest producers is
+  still not recorded anywhere the page can read. Carried from 548.
+- Cycle 539's empty Summary line in GRADER still reads as a completed cycle. Carried 540–554.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip as the fix** — the fix changes what renders with
+nothing hovered and what a button does on click; the titles attached describe the new state.
+**Not a text-only change**: a control's destination and result set changed (43 buttons repointed,
+29 added), an element that did not exist renders on 149 profiles, two new top-level functions, and
+one scoped CSS rule. No take, NPV, IRR, breakeven, rank, reform diamond, Reform Frequency Score,
+evidence grade, tier letter or primary-law percentage was altered; no country's data changed; no
+source row added or removed; `country_data.json` untouched. Chip rows stay `display:none`; no
+page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card
+wrapper. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools"
+still collapsed; Explorer analytics still collapsed. **No tab added, removed or reordered.** The
+Evidence Quality panel still renders COLLAPSED by default except via `_homeOpenEvidence()`.
+Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst Guide
+sessionStorage logic untouched. CP headline stays two-zone with global rank and vs-median pill;
+take% stays tier-coloured; Reform Risk stays in the primary Home card grid. The **v612 MOBILE
+LAYER** block and the `#reference-panel` `translateX` state are intact — this cycle **adds** one
+rule inside the existing `pointer: coarse` block (`.cp-pos-pill { min-height: 24px }`) and
+narrows, weakens or removes nothing. v371/v373, v430, v449, v451, v452, v489, v612, v621, v632,
+v637, v639–v647 and every locked item through v647 intact.
