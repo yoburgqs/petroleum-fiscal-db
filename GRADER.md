@@ -27698,3 +27698,14 @@ stays two-zone with global rank and vs-median pill; take% stays tier-coloured; R
 the primary Home card grid. The **v612 MOBILE LAYER** block and the `#reference-panel` `translateX`
 state are untouched — this cycle adds no CSS rule at all. v371/v373, v430, v449, v451, v452, v489,
 v612, v621, v632, v637, v639, v640, v641, v642, v643, v644 and every locked item through v644 intact.
+
+---
+## Cycle 551 Log — 2026-09-04 14:12
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 551 complete — shipped as **v645**, pushed to both repos.
+
+**Task:** T1 — "Which countries should even be on my screening list?" (rotated off T5/550, T4/549, T2/548, T6/547)
+
+**Friction:** Fiscal Compare hands off to the Screener in two places — the drilldown's `Peers in <region> →` button and the `⋮ Screener (<region>) →` button under the FC table. Both did `sel.value = <raw region>` on `#sc-region`. The database files countries under Asia, Latin America, Oceania, North America and Unknow
