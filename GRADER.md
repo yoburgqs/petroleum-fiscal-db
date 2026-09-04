@@ -25974,3 +25974,146 @@ Fiscal Compare auto-runs on a cold load with the Stability column on. Measured o
 - Summary: 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 540 Log — 2026-09-04
+
+- Test before: 261 PASS / 0 FAIL / 1 WARN (local tree, `TEST_URL=http://localhost:8917`)
+- Test after: 261 PASS / 0 FAIL / 1 WARN (same target). The suite **ran this cycle**, twice, and
+  a second copy of the PRE-edit tree was served on port 8918 and graded identically — so the
+  before/after numbers are the same measurement on the same target, not a carried baseline.
+  The single WARN is a service-worker registration 404 that exists only under
+  `python -m http.server` and is present on both trees. It is not the change.
+  (The harness's 236 PASS figure is the suite's default target, the LIVE GitHub Pages URL.)
+- JS errors: 0 page errors on every tab at every width tested.
+- Pixel gate: **PASS** — no surface got worse than baseline.
+- Shipped: **v634**.
+
+## Task — T6
+"Where did this number come from and how solid is the evidence?" — stalest in the rotation
+(**cycle 539 shipped nothing**: `cycle_log.txt` records "Claude cycle complete. Output length:
+0 chars" and no UX commit exists between `b638649` v633 and this one, so the live rotation is
+538 T4, 537 T5, 536 T3, 535 T2, 534 T1, 533 T5, 532 T2, 531 T3, **530 T6**).
+
+## Friction
+The platform has spent five cycles killing one broken evidence grader. v551 replaced
+`ab_pct >= 80 ? A : >= 60 ? B : C` on the Country Profile badge. v557 **deleted**
+`getEvidenceColor()` outright rather than leave it dormant, and wrote into this file that
+*"a fifth surface cannot regrow off ab_pct: `_evidenceGrade()` is the only evidence grader
+left."* v575 repointed the Fiscal Compare mix line. v605 chased the last two copies out of
+`copyICCitation()` and `copyICSummary()`.
+
+**All five of those fixes were to things drawn on screen.** Four EXPORT payloads still carried
+the deleted rule, and nothing in any cycle had opened a workbook to look:
+
+| site | payload | field |
+|---|---|---|
+| `index.html:40000` / `:40049` | Fiscal Compare XLSX | column `Evidence A/B (%)` |
+| `index.html:31837` | Explorer / Screener XLSX | key `Evidence A/B (%)` |
+| `index.html:31743` | Country Profile XLSX, metrics sheet | metric `Evidence Quality A/B (%)` |
+| `index.html:31616` | Country Profile clipboard / Basis & Assumptions | row `  Evidence A/B (%)` |
+
+This is the worst possible place for it, and that is the whole point of the finding: **an export
+is the one artifact the analyst cannot check against the page, because by the time they read it
+they have left the page.** The screen and the file disagree, and only the file reaches the IC.
+
+Measured against the shipped `country_data.json`, grading every country with the real
+`_evidenceGrade()` (worse of primary-law share and fact depth) and comparing it to what the
+exports wrote:
+
+- On-screen grade distribution: **A 28 · B 79 · C 43 · D 35**.
+- **67 of 185** countries exported an A/B share of **≥ 80** while the page grades them **C or D**.
+- **30 of those 67 read D on screen.**
+- **53 of them exported a flat 100.0.** Worst cases: **Ascension Island 100.0 on TWO fiscal
+  facts**, French Polynesia 100.0 on two, Cook Islands on four, Bahamas on eight — every one of
+  them grade **D** on the page.
+
+And the platform already knew. The Home evidence card computes and prints, live, that *"a
+combined **A/B%** does not mean primary-law or operator-verified — read the **A** share on its
+own, and check what the B half actually is."* The Fiscal Compare reading guide then finished
+with *"Export XLSX → includes Evidence A/B% tier for auditable IC sourcing."* One screen warned
+the analyst off the number; the next handed it to them and called it auditable.
+
+## Change
+The A/B number is **removed**, not re-worded — the v451 precedent, where deleting an
+untrustworthy column at the decision point was the improvement. The grade the page shows takes
+its place, as **three sortable columns** rather than one composite string, so a spreadsheet can
+filter on the letter and still see both legs that set it:
+
+    Evidence Grade   ·   Primary Law (tier A, %)   ·   Facts On File
+
+- `_fcXlEvidence(r)` is now the single accessor for the Fiscal Compare sheet, spread into the
+  row. It preserves that sheet's existing `n/a — generic terms` carve-out on the 120
+  generic-default rows, whose sourced facts were not used to produce the row's model take.
+- The Country Profile clipboard now prints the primary-law leg one line **under**
+  `_icSourcingTier()` — the correct answer, already present since v605. The two contradicted
+  each other inside the same `EVIDENCE` block on 67 countries.
+- The FC **Methodology sheet** gains the two-leg rule (A ≥60% / B ≥40% / C ≥20% primary-law
+  share; A ≥150 / B ≥50 / C ≥15 facts; grade is the WORSE, never the average) and states why
+  the old column is gone and what it did wrong, so the workbook survives being read out of
+  context. Its `n/a — generic terms` note was repointed to the new column name rather than left
+  naming a column that no longer exists.
+- The FC reading-guide caption no longer promises the removed column.
+
+## Result
+The analyst who exports a shortlist as the IC memo's fiscal annex now reads **the same letter in
+the file that they read on screen**. Ascension Island exports
+`D — too few facts to grade · 100% primary law · 2 facts` where it used to export
+`Evidence A/B (%) = 100.0`. The 100 is still true and still there — but it is now labelled as
+one leg, with the two-fact base that makes it meaningless sitting in the very next column, so it
+can no longer be read as a sourcing credential. Verified live, all four exports opened and
+parsed: Somalia **D**, Russia **D**, Mali **C**, USA **B**, Norway **A** — matching the badge on
+the page in every case. No `A/B` column remains in any export header.
+
+## Verification actually performed
+- **Server trap guard** (carried from 537/538, applied): `lsof -ti:8917` checked before starting,
+  and `Content-Length` diffed against `wc -c index.html` after every restart — 7,530,626 both
+  sides. Both the runtime suite and `pixel_audit.js` **default to the LIVE URL**; both were run
+  with an explicit `TEST_URL` at the local tree. This is still unfixed in both files.
+- **Exports opened, not assumed.** `XLSX.writeFile` was intercepted in-page so the real workbook
+  object could be parsed with the page's own SheetJS. FC sheet: **25 header columns = 25 row
+  columns**, 185 rows, 120 rows correctly `n/a — generic terms`. Explorer XLSX: 185 rows, new
+  columns present, old absent. Country Profile XLSX: grade agrees across the metrics sheet AND
+  the Basis & Assumptions sheet.
+- **Mobile, per Step 5b.** 390 x 844 with `hasTouch: true`, all ten tabs: `scrollWidth` never
+  exceeded `clientWidth` — **zero** horizontal scroll — and **0** page errors. The one edited
+  caption block renders 362px wide inside a 390px viewport, right edge 14px inside the fold.
+  Also clean at 1920 / 1440 / 1280 / 1024 / 768: zero horizontal scroll, zero page errors.
+- **Pixel gate PASS.** No control was added, so the 24px `pointer: coarse` rule has nothing new
+  to bind on; the pre-existing baseline findings are unchanged and not worsened.
+
+## Found on this walk — carried forward
+- **The rest of the T6 walk is in genuinely good shape.** Swept the Evidence Quality panel and
+  the per-parameter Evidence Chain across 20 countries spanning every grade: all render, none
+  spin, none empty. The Chain correctly flags ORCA-vs-statutory divergence (Indonesia state
+  participation 4% modelled vs 45% statutory), names unsourced parameters outright, and marks
+  bulk-harvest self-agreement. That is why this cycle went to the exports instead.
+- **`UAE — Abu Dhabi` is the one country with an empty `top_sources`.** Its Evidence Quality
+  summary still reads `sources ▸`, and opening it shows the A/B/C/D bar and legend with no
+  source rows and no line saying none exist. 1 of 185; a candidate for a future T6 cycle.
+- **Both test harnesses default to the live URL** (`tests/runtime_comprehensive.js:13`,
+  `tools/petroleum/tests/pixel_audit.js:61`). Carried unfixed from 537, 538.
+- **Cycle 539 shipped nothing** and its GRADER entry has an empty Summary line, which reads as a
+  completed cycle. Worth a non-empty failure marker in `autonomous_cycle.py` when Claude returns
+  0 chars; not added here without Zach's call.
+- **Netherlands 23.4% govt take at $75** vs the North Sea Trio button's "~48% take" tooltip.
+  Data question. Carried from 536, 537, 538.
+- **Regional Benchmarks card** groups on the fine DB region but iterates a coarse `regionOrder`,
+  so Asia, Oceania, Latin America, North America and CIS/FSU never display. Carried from 534-538.
+- **UAE — Dubai** still filed under region `Unknown`. Carried from 534-538.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip element** — the fix is the removal of a number and
+the addition of two data columns, not an explanation bolted onto a confusing one. Not a text-only
+change: four export payloads emit different fields and a different column count. The FC caption
+edit rides along with that behavioural change; it is not the cycle. Chip rows stay
+`display:none`; no page-sub paragraph, amber instructional banner, routing hint or "How to read"
+block; no SbS card wrapper. Screener advanced filters still collapsed, presets still a dropdown;
+Home "More tools" still collapsed. **No tab added, removed or reordered.** No take, NPV,
+breakeven, rank, reform diamond, band or tier colour altered — the change touches only how
+evidence is described in the file, never any computed figure. The **v612 MOBILE LAYER** was not
+touched, narrowed or deleted; `#reference-panel` `translateX` untouched and its `right` offset
+never made negative; no `min-width: max-content` marker added or removed. No `pointer: coarse`
+rule changed. v371/v373, v430, v449, v451, v452, v489 and every locked item through v633 intact.
+Govt NPV stays REMOVED from FC; the FC Analyst Guide sessionStorage logic untouched; the v632
+shortlist selection and the v633 reform filter both untouched and both still compose.
