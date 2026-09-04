@@ -1678,7 +1678,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v643</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v644</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1748,7 +1748,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v643</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v644</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2081,7 +2081,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v643';
+  return m ? m[0] : 'v644';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2156,7 +2156,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v643');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v644');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -23649,6 +23649,68 @@ function _fpCnt() {
            nHigh: k.highTotal, ceil: k.measuredTop ? k.measuredTop.s : 74 };
 }
 function _fpOrd(n) { var t = ['th','st','nd','rd'], v = n % 100; return n + (t[(v - 20) % 10] || t[v] || t[0]); }
+
+// ── v644 (T5): one predictability scale, not two ─────────────────────────────────────────
+// v624 stopped this platform awarding a band and a colour to a Fiscal Predictability score
+// built without its largest component. Every rendered surface obeys it: Country Profile,
+// Side-by-Side, Explorer, Fiscal Compare and (since v643) the Reform Risk lookup all print
+// "75 · UNGRADED · one term" for Russia and "100 · UNGRADED · one term" for Bahamas.
+//
+// copyICSummary() -- the "Copy for IC Memo" paragraph, the ONE artifact on this tab that
+// leaves the tool and lands in a committee document -- never got the rule. It kept a private
+// third scale, `score >= 70 ? 'stable' : score >= 40 ? 'moderate stability' : 'volatile'`,
+// so the clipboard read:
+//     Russia    screen "75 · UNGRADED · one term"   clipboard "Fiscal predictability: stable"
+//     Bahamas   screen "100 · UNGRADED · one term"  clipboard "Fiscal predictability: stable"
+//     Norway    screen "76 · UNGRADED · one term"   clipboard "Fiscal predictability: stable"
+// Measured live against COUNTRY_DATA: 100 of the 132 one-term countries pasted the word
+// "stable" into an IC memo while the page they were copied from refuses to grade them at all,
+// and the Side-by-Side "Copy for IC Memo" button on the next tab pastes "76 · UNGRADED · one
+// term" for the same country and the same score. The tool contradicted itself in the analyst's
+// own document, on the one claim they cannot walk back in the room.
+// Its cut points did not match the platform's either (70/40 against 75/60/45), so the five
+// measured countries scoring 70-74 -- graded MODERATE on screen -- also pasted "stable".
+//
+// _fpBandLabel() is now the single source of the band word. renderStabilityBadge() and the
+// pasted paragraph both call it, so the screen and the clipboard cannot drift apart again.
+function _fpBandLabel(score) {
+  return score >= 75 ? 'HIGH' : score >= 60 ? 'MODERATE' : score >= 45 ? 'LOW' : 'VERY LOW';
+}
+// Where Country Profile's own loaded contract sample refutes the stored one-term basis (the
+// v559 marker on the badge's basis chip), the pasted paragraph says so, instead of repeating
+// into an IC memo a claim the page it was copied from shows crossed out. Silent where the
+// sample is not loaded or does not conflict.
+function _fpCiteObsClause(d) {
+  if (!d || typeof cpObsSpread !== 'function' || typeof cpSpreadConflict !== 'function') return '';
+  var obs = null;
+  try { obs = cpObsSpread(d.country); } catch (e) { return ''; }
+  if (!cpSpreadConflict(d, obs)) return '';
+  return ' \u2014 and note ORCA\u2019s own contract sample for this country contradicts that one-term basis: '
+    + 'the ' + obs.n.toLocaleString() + ' contracts listed on its Country Profile carry '
+    + obs.distinct.toLocaleString() + ' distinct government-take values spanning '
+    + obs.spread.toFixed(1) + 'pp (' + obs.min.toFixed(1) + '\u2013' + obs.max.toFixed(1)
+    + '%) at $75/bbl, so the stored p25/p75 this score was built from understate the real spread';
+}
+// The Fiscal Predictability sentence that goes into the pasted IC paragraph. Same rule as the
+// badge: a band is stated only where the IQR component was actually charged.
+function _fpCiteVerdict(score, d) {
+  var disp = _fpDispersion(d);
+  var nC = (d && d.n != null) ? Number(d.n).toLocaleString() : 'its';
+  var k = _fpCnt();
+  if (disp.state === 'single') {
+    return 'UNGRADED (score ' + score + '/100) \u2014 ORCA does not band this number and it is not a '
+      + 'stability finding. All ' + nC + ' of this country\u2019s contracts price to one statutory term, so the '
+      + 'interquartile-range penalty \u2014 the largest of the three components, worth up to \u221240 points \u2014 was never '
+      + 'charged, and what is left is price swing and mechanic count. All ' + k.nHigh + ' scores on this platform that '
+      + 'would fall in the HIGH band belong to one-term regimes like this one, and not one of the ' + k.nMeas
+      + ' countries whose spread ORCA measured reaches HIGH (ceiling ' + k.ceil + '). A graded MODERATE outranks '
+      + 'this score however high its number. Do not cite it as evidence of fiscal stability'
+      + _fpCiteObsClause(d);
+  }
+  return _fpBandLabel(score) + ' (score ' + score + '/100, graded) \u2014 measured spread of '
+    + disp.iqr.toFixed(1) + 'pp across ' + nC + ' contracts, the only basis on which ORCA awards a band; '
+    + k.nMeas + ' of 185 countries qualify and their ceiling is ' + k.ceil;
+}
 // Rank of `d` within the cohort that shares its dispersion basis, plus the cross-cohort bar.
 // Returns '' where there is no cohort to rank in (not scored, or state monopoly).
 function _fpCohortLine(d) {
@@ -23722,8 +23784,7 @@ function renderStabilityBadge(score, d) {
   // strength of a measurement that was never taken.
   const color  = single ? 'var(--muted)'
                : score >= 75 ? 'var(--green)' : score >= 60 ? 'var(--yellow)' : score >= 45 ? 'var(--orange)' : 'var(--red)';
-  const label  = single ? 'UNGRADED'
-               : score >= 75 ? 'HIGH' : score >= 60 ? 'MODERATE' : score >= 45 ? 'LOW' : 'VERY LOW';
+  const label  = single ? 'UNGRADED' : _fpBandLabel(score);   // v644 (T5): shared with the pasted IC paragraph
   const bgRgba = single ? 'var(--surface2)'
                : score >= 75 ? 'rgba(21,128,61,0.1)' : score >= 60 ? 'rgba(161,98,7,0.1)' : score >= 45 ? 'rgba(194,65,12,0.1)' : 'rgba(185,28,28,0.1)';
   const basis  = single ? 'one term' : disp.iqr.toFixed(1) + 'pp';
@@ -35028,9 +35089,12 @@ function copyICSummary() {
   var stabScore = getFiscalPredictabilityScore(d);
   // v536 (T3): null means no contract-level take distribution is held, so no predictability claim
   // may be pasted into an IC memo for this country.
-  var stabLabel = _fpNoContractorPosition(d) ? 'predictability not scored — state monopoly, ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% government take at every modelled price and $0 contractor NPV; there is no contractor position to score'
-    : stabScore == null ? 'predictability not scored — no contract-level take distribution held'
-    : stabScore >= 70 ? 'stable' : stabScore >= 40 ? 'moderate stability' : 'volatile';
+  // v644 (T5): was a private third scale (>=70 'stable' / >=40 'moderate stability' / else
+  // 'volatile') that pasted "stable" into an IC memo for 100 of the 132 countries this platform
+  // shows UNGRADED on screen. Now reads the same verdict the badge renders.
+  var stabLabel = _fpNoContractorPosition(d) ? 'predictability not scored \u2014 state monopoly, ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% government take at every modelled price and $0 contractor NPV; there is no contractor position to score'
+    : stabScore == null ? 'predictability not scored \u2014 no contract-level take distribution held'
+    : _fpCiteVerdict(stabScore, d);
   var nStr = d.n ? d.n.toLocaleString() + ' contracts' : '';
   var summary = country + ' (' + mechStr + ', ' + nStr + ', ' + tierStr + '):\n'
     + 'Government take: ' + t50Str + ' @$50 · ' + takeStr + ' @$75 · ' + t100Str + ' @$100 · ' + t125Str + ' @$125/bbl. '
@@ -35040,7 +35104,7 @@ function copyICSummary() {
     // IC asks for, plus a one-line statement of why IRR is absent, inside the pasted artifact.
     + 'Contractor NPV (10% WACC, Deepwater, 100% WI): ' + npv50Str + ' @$50 (downside) · ' + npvStr + ' @$75 (base) · ' + npv125Str + ' @$125 (upside). '
     + 'Breakeven: ' + beStr + '. '
-    + 'Fiscal predictability: ' + (stabScore == null ? stabLabel : stabLabel + ' (score ' + stabScore + '/100' + (_fpDispersion(d).state === 'single' ? ', spread component not exercised — all contracts price to one statutory term' : ', measured spread ' + _fpDispersion(d).iqr.toFixed(1) + 'pp') + ')') + '.\n'
+    + 'Fiscal predictability: ' + stabLabel + '.\n'
     + _icProdBasisLine(d)   // v596 (T5)
     + _icBasisLine(d)
     + CP_IRR_NOTE + '\n'
