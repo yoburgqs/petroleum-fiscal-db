@@ -26278,3 +26278,131 @@ and both still compose.
 **Task** — T1, *"Which countries should even be on my screening list?"* — stalest of the six (540=T6, 539 shipped nothing, 538=T4, 537=T5, 536=T3, 535=T2, 534=T1).
 
 **Friction.** Walked it cold — no sessionStorage, no localStorage — Home → Screener → IOC Capital Screen. Most of that path is genuinely healthy and I left it alone: all 11 presets return exactl
+
+---
+## Cycle 542 Log — 2026-09-04 09:30
+
+- Test before: 261 PASS / 0 FAIL / 1 WARN (baseline re-measured this cycle on the unmodified file)
+- Test after: 261 PASS / 0 FAIL / 1 WARN — suite ACTUALLY RAN, `TEST_URL` pointed at the built file
+- JS errors: 0 page errors. The single WARN is a local-server 404 for a script, present identically
+  on the pre-change baseline; not introduced here.
+- Version: v635 → v636 (4 live strings; historical `v6xx (Tn):` code comments untouched)
+
+## Cycle 542 — T2
+
+**Task** — T2, *"Is this one country attractive at $75/bbl, and can I defend that?"* — stalest of
+the six (541=T1, 540=T6, 539 shipped nothing, 538=T4, 537=T5, 536=T3, 535=T2).
+
+**Friction.** Walked it cold — no sessionStorage, no localStorage — Home → Country Profile, which
+auto-loads Indonesia as the PSC benchmark. The page is genuinely strong on "is it attractive":
+take at four prices, rank among producers, vs-median pill, downside NPV, swing, an honest
+no-breakeven and no-IRR explanation. Where it breaks is the second half of the question.
+
+Under the Profit Oil Tier Schedule, `_cpTierSchedule594()` prints a ⚠ reconciliation note — the
+page's one instruction for defending the profit-oil split. It read:
+
+> *"The Evidence Chain below lists a flat **71.2%**, sourced separately; this ladder runs 60–88%."*
+
+The Evidence Chain does not list 71.2%. It lists **64.39%**. The note was computed from
+`COUNTRY_DATA.profit_oil_govt` and then described as a statement about a table that reads a
+different field entirely — `fiscal_facts.levy_profit_oil_rate` out of `api/v1/country/{slug}.json`.
+Measured across the shipped API files, the two disagree on **39 of the 44** countries carrying
+both:
+
+| Country | note claimed | table printed | gap |
+|---|---|---|---|
+| Angola | 75.0% | 52.3% | 22.7pp |
+| Mozambique | 65.0% | 85.0% | 20.0pp |
+| Sudan | 65.0% | 84.8% | 19.8pp |
+| South Sudan | 65.0% | 84.7% | 19.7pp |
+| Iraq-Kurdistan | 37.6% | 57.0% | 19.4pp |
+| Vietnam | 64.0% | 48.9% | 15.1pp |
+| Uganda | 65.0% | 78.9% | 13.9pp |
+| Indonesia | 71.2% | 64.4% | 6.8pp |
+
+28 countries fired with a misquote. Angola is one of the nine quick-load buttons on this tab's own
+landing screen, so it is on the cold path, not a corner.
+
+The silent failures are worse. On **11 countries the note did not fire at all**, because the
+headline field happened to land on a ladder tier while the printed figure did not — **India** shows
+a flat 35.09% against a 40–85% ladder, **Nigeria** 40.0% against 60–80%, **Kazakhstan** 50.0%
+against 30–80%, **Libya** a summary of 65.0% against a table of 79.73%. Four contradictions of
+14–35pp, on a page whose stated job is telling the analyst what they may cite, and the page said
+nothing.
+
+This is the worst moment in the T2 walk because it is the exact point where "can I defend that?"
+gets answered wrongly. The analyst is not confused — they do what the page tells them, scroll to
+reconcile, and find a number that was never named.
+
+**Change.** The reconciliation is no longer computed against a field nobody prints.
+
+- `renderSourcedFacts()` captures `poPrinted` — the Profit Oil (Govt) value that table actually
+  rendered — and calls `_cpApplyPOReconcile(slug, poPrinted)` at all three of its exits, including
+  the two early returns where no such row exists.
+- `_cpTierSchedule594()` stashes `window._cpPOState` (country, slug, ladder tiers, headline figure)
+  and emits a live `#cp-po-reconcile` slot instead of a hard-coded sentence. The slot renders
+  synchronously with what is known and is refilled when the API fetch lands. It is **slug-guarded**:
+  a fetch resolving after the analyst switches country cannot write its predecessor's figure into
+  the new country's note. State is cleared at the top of the renderer, so a country with no ladder
+  cannot inherit the last one's tiers.
+- `_cpPOReconcileHtml()` names **each distinct share with the surface it appears on**, marks any
+  that sits below or above every tier in red, and says "three" where there are three. Angola now
+  reads: *"75.0% in the profile summary and the XLSX export; 52.3% in the Key Fiscal Parameters
+  table below; and this ladder, which runs 50–80%."*
+- A **0.5pp tolerance** replaces the old 0.05. A contract average of 69.89% against a 70% tier is
+  the same term, not a conflict. Algeria and Malaysia now correctly render **nothing**, where the
+  old rule would have raised a full warning over 0.11pp and 0.36pp of rounding.
+
+Fires on 60 of the ~70 ladder countries, each one a real disagreement; falls silent where the only
+difference is rounding.
+
+**Result.** An analyst defending a PSC take can read, in one sentence, every government profit-oil
+share this page publishes, where each one appears, and which of them the DCF actually used. Before
+this cycle they were sent to look for a figure printed nowhere on 28 countries, and told nothing at
+all on 11 more.
+
+## Verification this cycle
+- JS syntax gate: **PASS** (all inline `<script>` blocks extracted, `node --check`)
+- Runtime suite: **RAN**, `TEST_URL` on the built file — 261 PASS / 0 FAIL / 1 WARN, byte-identical
+  to the pre-change baseline measured the same way on a `git stash`ed tree
+- Cold walk re-run across 12 countries (Indonesia, Angola, Mozambique, Iraq-Kurdistan, India,
+  Nigeria, Kazakhstan, Libya, Norway, Algeria, Malaysia, Vietnam): every note quotes the figure
+  visible in the table below it; **0 page errors**
+- Viewports 1920 / 1440 / 1280 / 1024 / 768 and **390 × 844 `hasTouch:true`**: `scrollWidth ==
+  clientWidth` at all six, 0 page errors at all six, no control in `#cp-tier-schedule` under 24px
+  under `pointer: coarse`
+
+## Found on this walk — carried forward
+- **`Profit Oil (Govt)` is unsourced on every country checked.** All 12 render `NO SOURCE ·
+  contract average`. The note now says which figures exist; it still cannot say which is right,
+  because none of them is backed by anything. A harvest question, not a UX one.
+- **The XLSX export still writes `d.profit_oil_govt`** (`index.html:31788`, `Profit Oil (Govt) (%)`)
+  — the summary figure, not the table's. The note now discloses this on screen; the spreadsheet
+  still leaves the page carrying one of the two without saying so. Candidate for a T5/T6 cycle.
+- **Both test harnesses still default to the live URL** (`tests/runtime_comprehensive.js:13`,
+  `tools/petroleum/tests/pixel_audit.js:61`). Both accept `TEST_URL`. Carried unfixed from 537,
+  538, 540, 541.
+- **Regional Benchmarks card** groups on the fine DB region but iterates a coarse `regionOrder`,
+  so Asia (26), Oceania (15), Latin America (26), North America (2) and CIS/FSU (5) — 74 countries
+  — never display (`index.html:32176`). On the hidden Sample Analyses tab. Carried from 534–541.
+- **Republic of the Congo and Sao Tome and Principe still render region `Other`** in the CP peer
+  tables — visible in this cycle's own Indonesia walk. **UAE — Dubai** still `Unknown`; **UAE — Abu
+  Dhabi** still has an empty `top_sources`. Carried from 534–541.
+- **Netherlands 23.4% govt take at $75** vs the North Sea Trio button's "~48% take" tooltip. Data
+  question. Carried from 536–541.
+- **Cycle 539 shipped nothing** and its GRADER entry has an empty Summary line, which reads as a
+  completed cycle. A non-empty failure marker in `autonomous_cycle.py` when Claude returns 0 chars
+  is still worth adding; not added here without Zach's call. Carried from 540, 541.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip element.** Not a text-only change: the note appears on
+11 countries where it previously did not, disappears on 2 where it fired on rounding noise, and
+changes its quoted figures on 28 more — plus new async fill, slug guard and state-clear behaviour.
+Chip rows stay `display:none`; no page-sub paragraph, amber instructional banner, routing hint or
+"How to read" block; no SbS card wrapper. Screener advanced filters still collapsed, presets still
+a dropdown; Home "More tools" still collapsed; Explorer analytics still collapsed. **No tab added,
+removed or reordered.** No take, NPV, breakeven, IRR, rank, reform diamond, band or tier *value*
+altered — the ladder rows, the headline take, its tier colour and its tier badge are untouched.
+Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; the FC Analyst Guide
+sessionStorage logic untouched. v371/v373, v430, v449, v451, v452, v489, **v612** and every locked
+item through v635 intact — including the v635 Screener take sort, which is unrelated and unchanged.
