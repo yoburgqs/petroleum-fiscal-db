@@ -25301,3 +25301,114 @@ the deliverable.
 I walked every artifact on the platform that is designed to *leave* it, cold: the Fiscal Compare "Copy for IC Memo" string, both Country Profile clipboard strings, the Screener CSV/XLSX, the Fiscal Compare workbook, and the Country Profile workbook.
 
 Eleven of the twelve state their own basis. 
+
+---
+## Cycle 534 Log — 2026-09-03 20:31
+
+- Test before: 261 PASS / 0 FAIL / 1 WARN (pre-change build, served at :8898)
+- Test after: 261 PASS / 0 FAIL / 1 WARN (changed build, :8899) — zero delta
+- JS errors: 0
+- Summary: Cycle 534 complete and pushed (v629).
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest in the
+rotation (533 was T5, 532 T2, 531 T3, 530 T6, 528 T4, 527 T1).
+
+## Friction
+Walked T1 cold — no sessionStorage, no localStorage — from the Home card into the
+Screener, through the IOC Capital Screen preset, into a Country Profile, and back
+out to the Explorer.
+
+Three surfaces carry three different region taxonomies, and they disagreed about
+CIS/FSU:
+
+| Surface | Taxonomy | CIS/FSU is… |
+|---|---|---|
+| Fiscal Compare chip row | fine DB values | its own chip, `CIS/FSU (5)` |
+| Screener `#sc-region`, Explorer chips | coarse, via `_regionMatch()` | folded into `Other` (23), unreachable by name |
+| `getRegion()` / `_REGION_TO_CHIP` (index.html:24234) | coarse | mapped to **`Asia Pacific`** |
+
+`_regionMatch()` expands `Asia Pacific` to `['Asia','Oceania']`. So the last two
+maps were **disjoint** on that value — the Country Profile's `View all in
+Explorer →` button (index.html:30662) was not merely broad, it was wrong.
+
+Reproduced in the browser before the fix: Screener → IOC Capital Screen →
+Azerbaijan, which is **#3 on the flagship screen** → Country Profile → Regional
+Peers panel reads *"CIS/FSU · 5 countries in region"* → click `View all in
+Explorer →` → lands on the **Asia Pacific** chip, 41 countries, containing
+neither Azerbaijan nor any of the five peers the panel had just named.
+`hasAzerbaijan: false`, `hasKazakhstan: false`. Identical for Kazakhstan, Russia,
+Georgia and Armenia.
+
+No error, no empty state, no console warning. The analyst clicks the one button
+whose entire job is "show me the rest of this country's region" and gets a
+plausible-looking list of the wrong region. This is the cycle-344 class of defect
+— a country invisible to the filter that should find it — surfaced by walking the
+path rather than reading the rubric.
+
+## Change
+- `_REGION_TO_CHIP`: `'CIS/FSU' → 'CIS/FSU'` (was `'Asia Pacific'`).
+- `_regionMatch()`: `'Other' → ['Other','Unknown']`; CIS/FSU removed. The
+  `[chipVal]` fallback matches the DB value exactly, so CIS/FSU needs no entry.
+- A `CIS/FSU` chip added to the still-hidden `#chip-row-region`, giving the
+  button a real destination. The row stays `display:none`.
+- `CIS/FSU` added **by name** to the Screener (`#sc-region`) and Explorer
+  (`#flt-region`) region controls.
+- Explorer `Other` tooltip corrected — it claimed to contain the FSU states and
+  Oceania, and contains neither. FAQ A965 and the v429 region FAQ corrected only
+  where this change falsifies them.
+
+## Result
+`View all in Explorer →` from any of the five CIS/FSU countries now lands on
+CIS/FSU with all five present — verified: active chip `["CIS/FSU"]`, rows
+Azerbaijan, Kazakhstan, Armenia, Russia, Georgia.
+
+An analyst screening Caspian exposure can now pick **CIS/FSU** by name in the
+Screener rather than guessing that Azerbaijan and Kazakhstan are filed under
+"Other". And the region partition is complete and non-overlapping for the first
+time — 49 + 14 + 41 + 28 + 30 + 5 + 18 = **185**, against a previous `Other` of 23
+that double-counted the five.
+
+## Verify
+- **JS syntax gate:** PASS — 11 inline blocks, `node --check` equivalent, re-run
+  after the version sweep.
+- **Runtime suite: RAN this cycle.** Changed build at `:8899` — **261 PASS / 0
+  FAIL / 1 WARN**. Pre-change build served at `:8898` under identical conditions
+  — **261 / 0 / 1, zero delta**. The WARN and the `sw.js` 404 are the local
+  server's and appear on the baseline run; verified, not assumed.
+- **Pixel gate:** PASS — "no surface got worse than baseline".
+- **Step 5b mobile:** 0 horizontal-scroll violations across 10 tabs at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**, `scrollWidth == clientWidth` at every
+  width; **0 page errors at every width**; **0** touched controls under 24px at
+  `pointer: coarse`. Identical before and after — this change alters no layout.
+- **Region partition** re-measured through the live `#sc-region` control for all
+  seven options; counts above are read from the rendered table, not computed.
+
+## Found on the same walk, not fixed
+- **The Regional Benchmarks card** (index.html ~32051) groups countries by the
+  *fine* DB region but iterates a `regionOrder` of *coarse* labels, so
+  `Asia Pacific` and `Americas` never match a group and `Asia`, `Oceania`,
+  `Latin America`, `North America` and `CIS/FSU` are silently never displayed.
+  The card only ever renders Middle East, Africa, Europe and Other. Same
+  root cause as this cycle's fix; a clean T3 candidate.
+- **UAE — Dubai** is the single country filed under region `Unknown`. No Fiscal
+  Compare region chip reaches it (FC exact-matches, and there is no Unknown
+  chip). It is reachable through the Screener/Explorer `Other` option.
+- **Saudi Arabia's contract table still never resolves** — "Loading from API…"
+  indefinitely. Carried from cycles 532 and 533. Still pre-existing, still a
+  T2/T6 candidate.
+- **Fiscal Compare's "Copy for IC Memo" pastes all 185 rows** (49,251 chars),
+  with no way to copy only the filtered shortlist. Carried from 533; T5.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**) — two existing `title` strings were corrected because
+this change falsified them; no tooltip element added. Chip rows stay
+`display:none`. No page-sub paragraph, amber instructional banner, routing hint
+or "How to read" block; no SbS card wrapper. Screener advanced filters still
+collapsed, presets still a dropdown; Home "More tools" still collapsed. **No tab
+added, removed or reordered.** No take, rank, reform diamond, band or tier colour
+altered. The **v612 MOBILE LAYER** was not touched, narrowed or deleted;
+`#reference-panel` `translateX` untouched; no `min-width: max-content` marker
+added or removed. v371/v373, v430, v449, v451, v452, v489 and every locked item
+through v628 intact. Version sweep **v628 → v629** across the 4 display sites,
+done silently at the end. It is **not** the deliverable.
