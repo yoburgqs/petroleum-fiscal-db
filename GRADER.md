@@ -25412,3 +25412,16 @@ altered. The **v612 MOBILE LAYER** was not touched, narrowed or deleted;
 added or removed. v371/v373, v430, v449, v451, v452, v489 and every locked item
 through v628 intact. Version sweep **v628 → v629** across the 4 display sites,
 done silently at the end. It is **not** the deliverable.
+
+---
+## Cycle 534 Log — 2026-09-03 20:55
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 534 complete and pushed (v629).
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (stalest: 533 was T5, 532 T2, 531 T3, 530 T6, 528 T4, 527 T1)
+
+## Friction
+Three surfaces carry three different region taxonomies, and they disagreed about CIS/FSU. Fiscal Compare's chip row has always had a `CIS/FSU (5)` chip. The Screener and Explorer use a coarse taxonomy where `Other` swallowed CIS/FSU, so the region had no name. But `_REGION_TO_CHIP` — which the Country Profile's "
