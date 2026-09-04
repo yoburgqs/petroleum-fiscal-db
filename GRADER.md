@@ -25559,3 +25559,121 @@ Picked T2 over the staler T4 because this friction had been noted-but-unfixed on
 
 ## Friction
 Open the Country Profile for **Saudi Arabia** and the "Top Contracts" section says `Loading from API…` — forever. No spinner, no timeout, no console error. It reads as a fetch still in flight, which i
+
+---
+## Cycle 536 Log — 2026-09-03 22:2x
+- Test before: 261 PASS / 0 FAIL / 1 WARN (read from the suite's own report)
+- Test after:  261 PASS / 0 FAIL / 1 WARN — suite RAN this cycle against the changed build
+- JS errors: 0 page errors, 0 console errors on the walked path
+- Version: v630 -> v631
+
+## Task
+**T3 — "How do these three countries compare side by side?"**
+Rotated off T2 (cycle 535).
+
+## Friction
+Cold load, no sessionStorage, no localStorage, Side-by-Side tab. The tab seeds a
+Norway / UK / Netherlands example and announces it in `#sbs-example-banner`, and the
+first analyst-initiated add clears it with a toast naming what was cleared — that
+part is sound and was checked, not assumed.
+
+The failure is one step later. `#cmp-search` is the only way an analyst puts their own
+countries on this tab. Its placeholder reads **"Type a country, press Enter…"**, and
+v586 deliberately pre-highlights row 1 "so the analyst can SEE what Enter is about to
+add." But `_cmpRenderDrop()` (index.html ~24645) filtered `COUNTRY_DATA` with a bare
+`s.indexOf(raw) !== -1` and **never ranked the result** — it sliced to 12 in raw data-file
+order. Row 1, the row Enter adds, was therefore whichever matching country happened to
+sit earliest in `country_data.json`, and a substring buried mid-word beat an exact prefix.
+
+Measured in-browser across all 185 countries, every name prefix of length 3-8:
+**93 of 896 prefixes highlighted the wrong country.** Confirmed live in the UI, not
+just in a re-implementation:
+
+| typed | Enter added | wanted |
+|---|---|---|
+| `sau`   | **Guinea-Bissau** | Saudi Arabia (row 2) |
+| `rus`   | **Belarus**       | Russia (row 3) |
+| `gha`   | **Afghanistan**   | Ghana (row 2) |
+| `mala`  | **Guatemala**     | Malaysia (row 3) |
+| `ger`   | **Algeria**       | Germany (row 2) |
+| `sudan` | **South Sudan**   | Sudan — an exact match, row 2 |
+| `tri`   | **Austria**       | Trinidad and Tobago (row 2) |
+
+`addCompare()` has no failure state for a valid country name — every one of those is a
+success path with a chip, a column and a toast. So an analyst building a Middle East
+screen types `sau`, presses the key the placeholder told them to press, and
+**Guinea-Bissau** — no production, statutory terms only — takes a column beside Norway
+in an IC comparison, with nothing on screen saying otherwise.
+
+The same unranked-then-sliced list was in the Ctrl+K global search
+(`renderSearchResults`, ~28118), and worse there: the cap is 8 and the filter also
+matches on mechanic and region, so the country the analyst typed could be pushed off
+the end of the list entirely by countries that merely share its mechanic. Same defect,
+same helper, fixed in both rather than shipping a fix for one search box while leaving
+a known wrong-country add in the other.
+
+## Change
+`orcaMatchRank()` / `orcaRankCountryMatches()` — matches are ranked **before** the cap:
+
+  0. the whole name is the query — `iraq` -> Iraq before Iraq-Kurdistan
+  1. the name starts with the query — `sau` -> Saudi Arabia
+  2. a word inside the name starts with it — `kurdistan` -> Iraq-Kurdistan
+  3. the query is buried inside a word — `sau` -> Guinea-Bissau, now last
+
+Ties break to the shorter name then alphabetically, so the order is deterministic
+rather than an artefact of the data file. Mechanic/region-only hits score last and keep
+their incoming order, so `psc` and `africa` searches are unchanged. This supersedes the
+v586 alias-only sort, which fixed `uk` -> Ukraine but left every plain typed prefix wrong.
+
+## Result
+Typing three letters and pressing Enter adds the country the analyst typed. Verified
+end to end in the live UI: `sau` + Enter now produces the chip **Saudi Arabia**.
+
+Wrong-top-hit prefixes **93 -> 53**, and all 53 remaining are genuine two-country
+ambiguity where *both* names start with the query — `aus` (Austria/Australia), `nig`
+(Niger/Nigeria), `ira` (Iran/Iraq), `bel` (Belarus/Belize). Those are not wrong answers;
+showing both is the correct behaviour. **Zero cases remain where a word-start match
+loses to a buried substring** — measured directly, not inferred.
+
+## Verify
+- **JS syntax gate:** PASS — 11 inline blocks, `node --check`, re-run after the version sweep.
+- **Runtime suite: RAN this cycle.** Changed build at `:8899` — **261 PASS / 0 FAIL / 1
+  WARN**, identical to the cycle-535 baseline. The WARN is the local server's `sw.js` 404
+  and is present on the baseline run.
+- **Pixel gate:** PASS — "no surface got worse than baseline."
+- **Step 5b mobile:** 0 horizontal-scroll violations across 9 tabs at
+  **1920 / 1440 / 1280 / 1024 / 768 / 390**, `scrollWidth == clientWidth` at every width;
+  **0 page errors** at every width; touched controls measure **44px** (`#cmp-search`) and
+  **33px** (`.cmp-opt` rows) at `pointer: coarse` — **0 under 24px**.
+- **Alias regression, checked live rather than assumed:** `uk` -> United Kingdom,
+  `us` -> USA, `ksa` -> Saudi Arabia, `holland` -> Netherlands, `krg` -> Iraq-Kurdistan
+  all still resolve and now rank first. `nigera` still fuzzy-matches Nigeria. `zzzz`
+  still shows the explicit no-match panel. `psc` and `africa` unchanged.
+
+## Found on the same walk, not fixed
+- **Netherlands reads 23.4% govt take at $75/bbl** in the Side-by-Side grid against
+  Norway 68.0% and UK 49.2% — while the North Sea Trio quickstart button's own tooltip
+  claims "Netherlands (~48% take)". The column is flagged `PROXY` basis, 278 facts with
+  a ⚠, and "not ranked · statutory terms", so it is annotated rather than silent. But
+  the button and the grid disagree by 25pp on the same country. Data question, not a UX
+  one; flagged for a fiscal review, not guessed at here.
+- **The Regional Benchmarks card** (~32064) groups countries by the *fine* DB region but
+  iterates a `regionOrder` of *coarse* labels, so `Asia Pacific` and `Americas` never
+  match and Asia, Oceania, Latin America, North America and CIS/FSU never display.
+  Carried from 534 and 535.
+- **UAE — Dubai** is still the one country filed under region `Unknown`. Carried from 534.
+- **Fiscal Compare's "Copy for IC Memo" still pastes all 185 rows** (49,251 chars) with no
+  way to copy the filtered shortlist. Carried from 533, 534, 535. T5.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**), no new tooltip element, no text-only edit. Chip rows stay
+`display:none`. No page-sub paragraph, amber instructional banner, routing hint or
+"How to read" block; no SbS card wrapper. Screener advanced filters still collapsed,
+presets still a dropdown; Home "More tools" still collapsed. **No tab added, removed or
+reordered.** No take, rank, reform diamond, band or tier colour altered. The **v612
+MOBILE LAYER** was not touched, narrowed or deleted; `#reference-panel` `translateX`
+untouched; no `min-width: max-content` marker added or removed. v371/v373, v430, v449,
+v451, v452, v489 and every locked item through v630 intact. The v509 example-seed
+behaviour (`_sbsExampleUntouched`, banner, clear toast) was walked and left exactly as
+it was. Version sweep **v630 -> v631** across the 4 display sites, done silently at the
+end. It is **not** the deliverable.
