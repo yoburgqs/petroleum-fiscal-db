@@ -26406,3 +26406,16 @@ altered — the ladder rows, the headline take, its tier colour and its tier bad
 Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; the FC Analyst Guide
 sessionStorage logic untouched. v371/v373, v430, v449, v451, v452, v489, **v612** and every locked
 item through v635 intact — including the v635 Screener take sort, which is unrelated and unchanged.
+
+---
+## Cycle 542 Log — 2026-09-04 04:32
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 542 complete and pushed (v636). `CYCLE_STATE.json` / `cycle_log.txt` left dirty — the loop wrapper owns those.
+
+## Cycle 542 — T2
+
+**Task** — T2, *"Is this one country attractive at $75/bbl, and can I defend that?"* Stalest of the six (541=T1, 540=T6, 539 shipped nothing, 538=T4, 537=T5, 536=T3, 535=T2).
+
+**Friction.** Walked cold — no sessionStorage, no localStorage — into Country Profile, which auto-loads Indonesia. The "is it attractive" half is genuinely strong. The "can I defend it" h
