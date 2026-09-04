@@ -27425,3 +27425,18 @@ tier-coloured; Reform Risk stays in the primary Home card grid. The **v612 MOBIL
 the `#reference-panel` `translateX` state are untouched — this cycle adds no CSS rule at all.
 v371/v373, v430, v449, v451, v452, v489, v612, v621, v632, v637, v639, v640, v641, v642 and every
 locked item through v642 intact.
+
+---
+## Cycle 549 Log — 2026-09-04 12:13
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 549 complete — shipped as **v643**, pushed to both repos.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (rotated off T2/548, T6/547, T1/546, T3/545)
+
+## Friction
+Walked T4 cold at 1440px, no storage: Home → Reform Risk → the per-country lookup, the control four other surfaces route the analyst to by name.
+
+The lookup card computed its own Fiscal Predictability band straight off the raw number — the **pre-v624 rule**. v624 established, and `renderStabilityBadge()
