@@ -25544,3 +25544,18 @@ reordered.** No take, rank, reform diamond, band or tier colour altered. The
 v371/v373, v430, v449, v451, v452, v489 and every locked item through v629 intact.
 Version sweep **v629 → v630** across the 4 display sites, done silently at the
 end. It is **not** the deliverable.
+
+---
+## Cycle 535 Log — 2026-09-03 21:47
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 535 complete and pushed (v630).
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+
+Picked T2 over the staler T4 because this friction had been noted-but-unfixed on cycles 532, 533 and 534, and it's the worst kind: a section that never resolves.
+
+## Friction
+Open the Country Profile for **Saudi Arabia** and the "Top Contracts" section says `Loading from API…` — forever. No spinner, no timeout, no console error. It reads as a fetch still in flight, which i
