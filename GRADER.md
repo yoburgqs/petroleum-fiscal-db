@@ -26130,3 +26130,138 @@ shortlist selection and the v633 reform filter both untouched and both still com
 
 ## Friction
 This platform has spent five cycles killing one broken evidence grader. v551 replaced `ab_pct >= 80 ? A : ...`; v557 *deleted* `getEvidenceColor()` rather than orphan it, writing into GRADE
+
+---
+## Cycle 541 Log — 2026-09-04 08:4x — v635
+- Test before: 236 PASS / 0 FAIL (live-URL baseline carried in)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite ACTUALLY RUN this cycle against the
+  built file over `http://localhost:8899` (`TEST_URL` override). The count is higher than the
+  carried-in 236 because both harnesses default to the LIVE url and the local run reaches
+  tests the deployed build's cache does not. Not an assumed number: read from the suite's own
+  final line and `/tmp/runtime_test_report.txt`.
+- JS errors: **0 real.** One console error and the one WARN are both `sw.js` 404 — the page
+  registers the service worker at the absolute path `/petroleum-fiscal-db/sw.js` and the local
+  server roots the tree at `/`. `curl` on the deployed site returns **200** for that path.
+- JS syntax gate: **PASS** (11 inline blocks, 0 failures), run twice — after the patch and
+  after the version bump.
+- Pixel gate: **PASS** — no surface worse than baseline.
+
+## Task — T1
+**"Which countries should even be on my screening list?"** T1 was the stalest of the six:
+540 = T6, 539 shipped nothing, 538 = T4, 537 = T5, 536 = T3, 535 = T2, **534 = T1**.
+
+## Friction
+Walked T1 cold — no sessionStorage, no localStorage — Home → Screener → IOC Capital Screen.
+Most of that path is in good shape and was left alone: all 11 presets return exactly the count
+their option label advertises; the `sc-region` filter maps its 7 coarse options onto the 10
+fine DB regions with all 185 accounted for (49+14+41+28+30+5+18); the Home hero's "15 countries
+pass the IOC capital screen" agrees with the table one click away; all 9 sortable headers
+respond and set `aria-sort`.
+
+The worst moment is one click further on, and it is the click the task is *about*.
+
+The IOC Capital Screen decides membership by testing its ≤65% ceiling against the **comparable**
+take, not the published blended headline. The page is emphatic about why: a headline blending
+fee-basis contracts "measures structure, not terms, and **it is not rankable across countries**"
+(`runScreener()` count line). Iraq is admitted on a comparable **34.1%** against a published
+**84.8%**, and the row prints both — `84.8%` with `→ screened at 34.1%` beneath it in accent.
+
+Then the analyst clicks **Govt Take** to rank the 15-country shortlist — the one action T1 is
+for — and `_scSortVal()` (index.html, `case 'take': return d[takeKey]`) sorts on the published
+blend. **Iraq lands at 15 of 15.** The bottom row. The position an analyst with 20 minutes reads
+as "cut this one" — about the jurisdiction that, on the number this very screen used to admit it,
+ranks 6th best of the 15.
+
+This is a v587 inheritance, not a v554 error. v554's note — *"the published headline is unchanged
+everywhere it is displayed, coloured, tiered, ranked and exported"* — was accurate when written:
+the Screener had **no take ranking at all**, only NPV-descending inside the evidence-first
+grouping. v587 added clickable column sorts 33 cycles later and took `d[takeKey]` as given.
+Membership has been decided on one number and the ranking built on the other ever since.
+
+Measured against the figure each screen actually tested (grouping held constant):
+
+| preset | rows | mis-ranked | worst |
+|---|---|---|---|
+| IOC Capital Screen | 15 | 5 | **Iraq 15 → 6 (+9)** |
+| Low Take · Positive NPV | 143 | 4 | South Sudan +8, Iraq +4 |
+| Low-Risk Stable | 141 | 4 | South Sudan +8, Iraq +4 |
+| Frontier Markets | 56 | 1 | South Sudan +5 |
+| PSC Africa | 31 | 1 | South Sudan +4 |
+| Deepwater / Atlantic Frontier | 11 / 6 | 0 | — |
+
+## Change
+**The ranking now uses the number the screen used.** `_scSortVal()` and `_scSortCmp()` take a
+`cmpBasis` argument, true exactly when the ceiling is live *and* "screen on comparable take" is
+ticked; in that state the `take` key reads `_scFeeCmpAt(d, price).cmp`. On screen, Iraq moves
+from row 15 to **row 6**, between Colombia 33.5% and Australia 38.5% — and the number that put
+it there is visible in its own cell, on the `→ screened at 34.1%` line.
+
+The basis is named rather than left to be inferred: one `_scSortLabelNow()` now feeds the count
+line, the grouped-basis note, the mixed-basis banner **and** the exported "Ranked by:" header, so
+a reader of the XLSX can tell which of the two columns of numbers ordered the file. The count
+line reads *"sorted by Govt Take low→high (comparable take — the figure this screen tested)"*.
+
+Symmetric both ways: untick the comparable-basis box and the ceiling tests the published headline
+again — and the sort follows it back. **Downside Resilience** sets no take ceiling, so it still
+ranks on the published figure, which is the only one its rows display. Verified both states.
+
+Also fixed, same screen and same user moment, and **explicitly not introduced by this cycle** —
+it reproduces identically on the v634 build: the v459 active-preset label carries an inline
+`white-space:nowrap`, and its text is the preset's whole criteria line. Loading **any** preset set
+the *document's* `scrollWidth` to **526** against a 390 `clientWidth`, sliding all twelve screens
+136px sideways on a phone. Loading a preset is the entire point of the Screener, so every mobile
+T1 session hit it. Isolated by hiding the node: 526 → 390. Fixed by letting the line wrap inside
+the **v612 `max-width:720px` layer** — nothing in that layer removed, weakened or narrowed, no
+`pointer: coarse` rule changed, `#reference-panel`'s `translateX` untouched and its `right` offset
+never made negative, no `min-width: max-content` marker added or removed.
+
+## Result
+An analyst who loads the IOC Capital Screen and ranks it by government take now gets an order
+built on the same figure that decided who is in the screen, with the basis named on screen and
+carried into the export — instead of an order the platform's own caption calls not rankable, in
+which the 6th-best jurisdiction sits in last place. And they can do it on a phone without the
+page sliding sideways the moment the preset loads.
+
+## Step 5b — mobile
+Re-measured at **390 × 844, `hasTouch: true`**, cold, then Screener + IOC preset + take sort:
+`scrollWidth` **390 / 390** — zero horizontal scroll, down from 526 / 390. Also clean at
+**1920 / 1440 / 1280 / 1024 / 768**: zero horizontal scroll, zero page errors. No control was
+added; every control touched or adjacent measures ≥ 24px tall under `pointer: coarse` — wrapped
+label 33px, preset clear button 44px, preset select 44px, Govt Take header 45px.
+
+## Found on this walk — carried forward
+- **The Tier badge is the same contradiction, one column right.** Iraq now sorts to row 6 on
+  34.1% while its Tier cell still reads `NOC/Concession` — the header defines NOC as >75%.
+  `tierLabel(d[takeKey])` is deliberate v554 behaviour and was left alone: this cycle fixes one
+  moment, and the tier is a label on the published figure, which is displayed beside it. A
+  candidate for a future T1 cycle, but it is a decision, not a bug.
+- **`screener-preset-clear-btn` is 12px WIDE** (44px tall, so it clears the directive's height
+  rule). Pre-existing; not touched.
+- **Both test harnesses still default to the live URL** (`tests/runtime_comprehensive.js:13`,
+  `tools/petroleum/tests/pixel_audit.js:61`). Both accept `TEST_URL`, which is how this cycle ran
+  them against the built file. Carried unfixed from 537, 538, 540.
+- **Regional Benchmarks card** groups on the fine DB region but iterates a coarse `regionOrder`
+  (`['Middle East','Africa','Asia Pacific','Americas','Europe','Other']`), so Asia (26), Oceania
+  (15), Latin America (26), North America (2) and CIS/FSU (5) — 74 countries — never display.
+  Confirmed live again this cycle at index.html:32176. It is on the hidden Sample Analyses tab,
+  which is why it keeps losing to higher-traffic friction. Carried from 534-540.
+- **UAE — Dubai** still filed under region `Unknown` (1 country). **UAE — Abu Dhabi** still has an
+  empty `top_sources`. Carried from 534-540.
+- **Netherlands 23.4% govt take at $75** vs the North Sea Trio button's "~48% take" tooltip.
+  Data question, not UX. Carried from 536-540.
+- **Cycle 539 shipped nothing** and its GRADER entry has an empty Summary line, which reads as a
+  completed cycle. Still worth a non-empty failure marker in `autonomous_cycle.py` when Claude
+  returns 0 chars; not added here without Zach's call. Carried from 540.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip element.** Not a text-only change: row order, the
+document's scroll width, and four caption/export strings all differ after the edit. Chip rows stay
+`display:none`; no page-sub paragraph, amber instructional banner, routing hint or "How to read"
+block; no SbS card wrapper. Screener advanced filters still collapsed, presets still a dropdown;
+Home "More tools" still collapsed; Explorer analytics still collapsed. **No tab added, removed or
+reordered.** No take, NPV, breakeven, rank, reform diamond, band or tier *value* altered — the
+published figure, its tier colour and its tier badge are all untouched; only the sort key changed.
+Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; the FC Analyst Guide
+sessionStorage logic untouched. v371/v373, v430, v449, v451, v452, v489, **v612** and every locked
+item through v634 intact. The v632 shortlist selection and the v633 reform filter both untouched
+and both still compose.
