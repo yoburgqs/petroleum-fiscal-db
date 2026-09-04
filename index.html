@@ -203,7 +203,7 @@ table { width: 100%; border-collapse: collapse; }
   /* The two checkboxes already on this toolbar measured 13x13 under a thumb (pixel_audit has
      flagged both since it was built). Left alone they would now sit beside a 24px box doing the
      same kind of job, at half the size. Same rule, same tab, same control type. */
-  #fc-stability-check, #fc-filter-be { width: 24px; height: 24px; }
+  #fc-stability-check, #fc-filter-be, #fc-filter-reform { width: 24px; height: 24px; }
 }
 thead th { z-index: 60; background: #EDE9E3; color: var(--muted); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; padding: 7px 10px; text-align: left; text-transform: uppercase; position: sticky; top: 0; white-space: nowrap; cursor: default; user-select: none; border-bottom: 1px solid var(--border); }
 /* v587 (T1): the hand cursor and the hover-darken are the browser's universal "this is clickable"
@@ -1619,7 +1619,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v632</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v633</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1689,7 +1689,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v632</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v633</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2022,7 +2022,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v632';
+  return m ? m[0] : 'v633';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2097,7 +2097,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v632');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v633');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2162,6 +2162,18 @@ window.copyPlatformCitation = function(btn) {
     <button class="fc-region-chip" data-region="Other" onclick="setFCRegion('Other')" title="Other — 17 countries including Iraq-Kurdistan, UAE Abu Dhabi, Republic of the Congo, Cote d&#x27;Ivoire, Faroe Islands, Greenland, Falkland Islands, Gambia, French Guiana, and Pacific island nations not in primary regional groupings." aria-pressed="false">Other (17)</button>
     <span style="margin-left:8px;width:1px;background:var(--border);align-self:stretch;"></span>
     <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 68 countries with verified breakeven price data. Auto-enabled when sorting by Breakeven."><input type="checkbox" id="fc-filter-be" style="accent-color:var(--accent);" onchange="window._fcBEManuallySet=true;renderFCResults(window._fcResults||[],window._fcLastPrice||75)"> &#9651; Breakeven only</label>
+    <!-- ── v633 (T4): the Stability column had a coverage problem and no coverage control ──
+         The column renders n/c on 164 of the 185 rows and diamonds on 21, and the 21 are
+         scattered through the ranking wherever their take happens to place them. An analyst
+         asking "what is my reform exposure across this screening list" had to eyeball 185 rows
+         to find them: Stability is not one of the five sort dimensions and had no filter.
+         Breakeven has exactly this shape -- 68 of 185 covered -- and got BOTH a sort button and
+         a "Breakeven only" toggle in this very row. Stability got neither. This is that toggle.
+         The count is read off REFORM_HISTORY at load, never hardcoded, so it cannot drift from
+         the number the cells actually render. Ticking it also turns the Stability column on if
+         it is off, because a table filtered to the reform-scored set with the reform column
+         hidden shows the analyst nothing about why those 21 rows are the ones left. -->
+    <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the countries ORCA holds a sourced fiscal-reform event log for. The other rows are not low-risk and are not a score of 5 -- they are unscored (n/c), and this toggle hides them rather than letting them sit in a ranking as though a reading existed. Ticking this also switches the Stability column on. Untick to return to all 185."><input type="checkbox" id="fc-filter-reform" style="accent-color:var(--accent);" onchange="(function(cb){if(cb.checked){var st=document.getElementById('fc-stability-check');if(st&&!st.checked)st.checked=true;}renderFCResults(window._fcResults||[],window._fcLastPrice||75);})(this)"> &#9670; Reform-scored only<span id="fc-filter-reform-n" style="font-weight:400;opacity:.7;"></span></label>
   </div>
 
   <!-- v423: Reading guide — always visible before and after results; dismissible per session -->
@@ -2179,7 +2191,7 @@ window.copyPlatformCitation = function(btn) {
       <strong style="color:var(--muted);">G</strong> = <strong>generic</strong>: ORCA holds no country-specific terms for that country in the compare engine, so the take is the standard default for its mechanic. Every G row on the same mechanic lands on the identical take, NPV and breakeven, so their order relative to each other is not a ranking. A G row is directional only &mdash; do not cite it. The country may still hold well-sourced facts in the database; this figure did not use them.
       <strong style="color:var(--text);">A / B / C / D</strong> = the row <em>was</em> modelled from that country&rsquo;s own terms, graded on the <strong>worse</strong> of two legs: <strong>primary-law share</strong> of its fiscal facts (A &ge;60% &middot; B &ge;40% &middot; C &ge;20% &middot; D below) and <strong>fact depth</strong> (A &ge;150 facts &middot; B &ge;50 &middot; C &ge;15 &middot; D below). A country needs both. Tier B does <em>not</em> count toward the letter: the EY / KPMG / IHS country-level guides are 45.2% of the database and are assigned to a whole country, never read off an individual contract, so grading on A+B graded how thoroughly the bulk tables had run &mdash; it scored 171 of 185 countries A and ranked Russia (3.8% primary law) above Senegal (67.2%). The badge tooltip names which of the two legs is holding that row down.
       Hover any badge for that row&rsquo;s basis. <em>Country Profile &rarr; Evidence Quality</em> names the actual documents.<span id="fc-quality-mix"></span>
-      <strong style="color:var(--text);">Stability</strong> (◇ diamonds) = fiscal regime predictability since 2010: ◆◆◆◆◆ = zero reforms (most stable); ◇◇◇◇◇ = 5+ reforms (most volatile). IC rule: ◆◆◆◆◆ = no WACC premium; ◆◆◆◇◇ = add 1–2pp WACC; ◆◇◇◇◇ = add 3–5pp WACC; ◇◇◇◇◇ = probability-weighted NPV required in IC memo.
+      <strong style="color:var(--text);">Stability</strong> = reform-frequency reading, and it exists for a minority of this table. <strong style="color:var(--muted);">n/c</strong> means ORCA holds <em>no sourced fiscal-reform event log</em> for that country — it is not a clean record and not a score of 5. Carry no reform premium of zero on an n/c row; it needs an external check first. Where a log does exist the cell shows ◆ out of 5 (5 minus fiscal law changes since 2010). A <strong style="color:var(--negative);">!</strong> and a greyed cell mean the diamond count is <em>not</em> the verdict there — the count never reads how large a change was, so Russia’s 2022 windfall tax (+15pp) sits on a 4-diamond row. Do not convert diamonds to a WACC premium yourself: hover any cell for that country’s IC action, which comes from the same classifier the Reform Risk tab uses, and click it for the full event log. To drop the unscored rows entirely, use <strong>◆ Reform-scored only</strong> in the filter row above.
       <strong style="color:var(--text);">PROXY</strong> badge on a country name = take is modeled from statutory fiscal parameters only (no verified block-level production data for weighting). Results are directional — PROXY regimes may diverge ±5–15pp from block-level economics. IC rule: never cite a PROXY country's take as definitive; always state "statutory model basis (ORCA PROXY)" in the IC memo and cross-check with primary concession/PSA terms before submission.
       Click any row to open the 4-price matrix (Take &middot; Contractor NPV at $50–$125/bbl) and fiscal waterfall. In the drilldown: click <strong>⎘ IC Citation</strong> to copy a ready-to-paste cite string (take, contractor NPV at the selected price and at the $50 downside, breakeven), or click <strong>Full Profile →</strong> to open the Country Profile with sourced fiscal parameters.
     </div>
@@ -36946,6 +36958,38 @@ function _fcSyncSelUI() {
   }
 }
 
+// ── v633 (T4) ────────────────────────────────────────────────────────────────────
+// One predicate for "ORCA holds a sourced reform log for this country", used by the
+// Stability cell, the Reform-scored-only filter and the control's own count. Three
+// surfaces reading three copies of this test is how Fiscal Compare and Reform Risk
+// came to disagree on 10 of 21 jurisdictions before v556.
+function _fcHasReformLog(country) {
+  if (typeof REFORM_HISTORY === 'undefined' || !REFORM_HISTORY) return false;
+  var e = REFORM_HISTORY[country];
+  return !!(Array.isArray(e) && e.length);
+}
+window._fcHasReformLog = _fcHasReformLog;
+
+// The control states its own coverage, counted off the data rather than written into the
+// label, so it cannot drift the way the Breakeven button's hardcoded "(68/185)" can.
+function _fcSyncReformFilterCount() {
+  var out = document.getElementById('fc-filter-reform-n');
+  if (!out) return false;
+  if (typeof REFORM_HISTORY === 'undefined' || !REFORM_HISTORY) return false;
+  var n = Object.keys(REFORM_HISTORY).filter(_fcHasReformLog).length;
+  if (!n) return false;
+  var total = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA.length : 185;
+  out.textContent = ' (' + n + ' of ' + total + ')';
+  return true;
+}
+(function _fcWaitForReformCount() {
+  if (_fcSyncReformFilterCount()) return;
+  var tries = 0;
+  var iv = setInterval(function() {
+    if (_fcSyncReformFilterCount() || ++tries > 40) clearInterval(iv);
+  }, 250);
+})();
+
 function renderFCResults(results, price) {
   // Sort state
   if (!window._fcSortState) window._fcSortState = 'take';
@@ -37056,6 +37100,11 @@ function renderFCResults(results, price) {
   var _fIRR = null;   // v525 (T3): 'IRR only' checkbox removed together with the IRR column
   var _fBE = document.getElementById('fc-filter-be');
   if (_fBE && _fBE.checked) sorted = sorted.filter(function(r) { return r.be_75 != null; });
+  // ── v633 (T4): reform-scored-only filter ─────────────────────────────────────
+  // Same predicate stabCell() uses to decide between a diamond ramp and n/c, so the
+  // filtered set and the rendered column can never disagree about who is scored.
+  var _fRR = document.getElementById('fc-filter-reform');
+  if (_fRR && _fRR.checked) sorted = sorted.filter(function(r) { return _fcHasReformLog(r.country); });
   // v465: Apply sort direction reversal if analyst toggled it
   if (window._fcSortDir === 'desc') sorted = sorted.slice().reverse();
   // ── v563 (T6) — generic-default rows are no longer ranked ────────────────────
@@ -37100,8 +37149,8 @@ function renderFCResults(results, price) {
       _fcResEl.innerHTML = '<div style="text-align:center;padding:48px 24px;max-width:560px;margin:0 auto;">'
         + '<div style="font-size:24px;margin-bottom:12px;opacity:.35;">\u2296</div>'
         + '<strong style="color:var(--text);font-size:14px;">No countries match your current filters</strong>'
-        + '<div style="margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6;">Your <strong>Region</strong> filter or <strong>IRR-only / Breakeven-only</strong> toggles returned 0 countries. The selected region may have limited IRR or breakeven coverage. Try clearing the region filter or unchecking the data-only toggles.</div>'
-        + '<button onclick="(function(){window._fcRegionFilter=\'\';var irr=document.getElementById(\'fc-filter-irr\');var be=document.getElementById(\'fc-filter-be\');if(irr)irr.checked=false;if(be)be.checked=false;window._fcIRRManuallySet=false;window._fcBEManuallySet=false;var chips=document.querySelectorAll(\'.fc-region-chip\');chips.forEach(function(c){c.setAttribute(\'aria-pressed\',\'false\');c.classList.remove(\'active\');});var allChip=document.querySelector(\'.fc-region-chip[data-region=\\\"\\\"]\');if(allChip){allChip.classList.add(\'active\');allChip.setAttribute(\'aria-pressed\',\'true\');}renderFCResults(window._fcResults||[],window._fcLastPrice||75);})()" style="margin-top:16px;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.3);color:var(--accent);border-radius:5px;padding:6px 18px;font-size:12px;cursor:pointer;font-weight:600;">Reset Region &amp; Data Filters</button>'
+        + '<div style="margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6;">Your <strong>Region</strong> filter or the <strong>Breakeven-only / Reform-scored-only</strong> toggles returned 0 countries. Reform-scored-only keeps just the countries ORCA holds a sourced fiscal-reform log for, and most regions hold only one or two of them, so pairing it with a region filter empties the table quickly. Try clearing the region filter or unchecking the data-only toggles.</div>'
+        + '<button onclick="(function(){window._fcRegionFilter=\'\';var irr=document.getElementById(\'fc-filter-irr\');var be=document.getElementById(\'fc-filter-be\');var rr=document.getElementById(\'fc-filter-reform\');if(irr)irr.checked=false;if(be)be.checked=false;if(rr)rr.checked=false;window._fcIRRManuallySet=false;window._fcBEManuallySet=false;var chips=document.querySelectorAll(\'.fc-region-chip\');chips.forEach(function(c){c.setAttribute(\'aria-pressed\',\'false\');c.classList.remove(\'active\');});var allChip=document.querySelector(\'.fc-region-chip[data-region=\\\"\\\"]\');if(allChip){allChip.classList.add(\'active\');allChip.setAttribute(\'aria-pressed\',\'true\');}renderFCResults(window._fcResults||[],window._fcLastPrice||75);})()" style="margin-top:16px;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.3);color:var(--accent);border-radius:5px;padding:6px 18px;font-size:12px;cursor:pointer;font-weight:600;">Reset Region &amp; Data Filters</button>'
         + '</div>';
     }
     return;
@@ -37118,6 +37167,7 @@ function renderFCResults(results, price) {
     if (hasValue) rankTotal++;
     rankMap[c.country] = idx + 1;
   });
+
 
   // ── v520 (T4): the FC Stability column defaulted every country to a perfect score ──
   // Was: `sorted.forEach(function(c){ stabilityScores[c.country] = 5; })` followed by an
