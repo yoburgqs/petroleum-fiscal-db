@@ -27709,3 +27709,114 @@ v612, v621, v632, v637, v639, v640, v641, v642, v643, v644 and every locked item
 **Task:** T1 — "Which countries should even be on my screening list?" (rotated off T5/550, T4/549, T2/548, T6/547)
 
 **Friction:** Fiscal Compare hands off to the Screener in two places — the drilldown's `Peers in <region> →` button and the `⋮ Screener (<region>) →` button under the FC table. Both did `sel.value = <raw region>` on `#sc-region`. The database files countries under Asia, Latin America, Oceania, North America and Unknow
+
+---
+## Cycle 552 Log — 2026-09-04
+- Test before: 236 PASS / 0 FAIL (harness, live URL)
+- Test after: 261 PASS / 0 FAIL / 1 WARN — suite RUN this cycle against the changed local build
+  (`TEST_URL=http://localhost:8899/index.html`). The single WARN is the service worker registering
+  at `/petroleum-fiscal-db/sw.js`, which 404s under a repo-rooted local server and does not on
+  Pages. Not a regression; no FAIL.
+- JS errors: 0 (nine tabs x six viewports)
+- Summary: Cycle 552 complete — shipped as **v646**.
+
+**Task:** T3 — "How do these three countries compare side by side?" (rotated off T1/551, T5/550,
+T4/549, T2/548, T6/547)
+
+**Friction:** The Side-by-Side grid's own closing notice instructs the analyst, in bold: *"Rank
+these countries on Govt Take, which is the production-weighted figure this platform publishes."*
+The grid then gave them no way to do it. `renderCompare()` lays the columns out in `compareList`
+order — the order the chips were typed. The four Govt Take rows carry a marker on the highest and
+the lowest column only (`_cmpOrderMark`), and `hi` is gated on `vals.length >= 3`, so a set with two
+rankable columns gets **one** marker in total; every column in between is unlabelled. The Reading
+line's only remedy was the literal string *"Sorted left→right by addition order. To change order:
+remove and re-add"* — a remedy that requires the analyst to already know the ranking they came here
+to read.
+
+Walked cold at 1440, no sessionStorage: Guyana / Angola / Brazil / Nigeria / Iraq reads, at $75,
+`54.1  53.0  55.6  81.1  84.8 (PSC/Conc 34.1)` — five columns, four price rows, no order in either
+direction, one marker at each end and a re-based figure in the middle. Re-typing five chips in a
+hand-computed sequence is where an IC analyst with 20 minutes stops.
+
+**Change:** A new **Order columns** `<select>` (`#cmp-order`) in the Side-by-Side toolbar, next to
+Clear: *Addition order* (default, behaviour unchanged) · *Govt take $75 — low → high* · *high → low*
+· *Country A–Z*. It reorders `compareList` itself, so the grid, both Chart.js charts, the PDF, the
+share link/hash and both clipboard flavours all follow with no extra plumbing.
+
+The ordering obeys the same comparability rules the ranking markers already obey, so a sorted set
+cannot assert something the markers refuse:
+- it sorts on the **comparable** take, not the headline — a fee-blended column (TSC/RSC/Buy-back,
+  Group 2) is placed on its Group-1 PSC/Concession figure, the figure `_cmpRankTake` already ranks
+  it on (v549/v600);
+- a **state monopoly** or a **PRRT-only** (cash-flow basis) column has no comparable take and is
+  placed last, in addition order, rather than given a position (v552/v614);
+- where the set **mixes** production-weighted columns with columns ORCA holds no verified production
+  for, the two are ordered as separate blocks, producers first. Interleaving them into one sequence
+  is precisely the cross-basis ranking v626's gate exists to refuse, and the 32.6pp basis gap would
+  put every statutory-terms column at the low-take end of every set.
+
+`cmpAddSeq` records the true addition sequence separately, because sorting is destructive: without
+it "Addition order" would be a dead option after the first sort. It is resynced from `compareList`
+whenever membership diverges, which covers the two `parseAndNavigate()` paths that assign
+`compareList` directly. A chosen order also survives the next add (`_sbsApplyOrder()` in
+`addCompare`) and the quickstart presets.
+
+The Reading line now names the order actually in force and, on a split set, names the columns in the
+second block and why — otherwise a sorted grid would read as one sequence when it is two.
+`#cmp-order-wrap` is added to the print-hidden list.
+
+**Result:** With Nigeria/Brazil/Angola/Iraq/Guyana loaded and "high → low" selected, the grid reads
+left to right `81.1 → 55.6 → 53.0 → Iraq (PSC/Conc 34.1) → Guyana (not ranked · statutory terms)` —
+the take ranking is now the column layout instead of something to be eyeballed across four price
+rows and reconstructed by deleting and re-typing five chips. The Iraq column sorts on 34.1 and not
+on its 84.8 headline, and the proxy column is visibly outside the ranked block rather than in the
+middle of it.
+
+**Mobile (390 x 844, hasTouch):** `scrollWidth === clientWidth` on all nine tabs and on Side-by-Side
+with five countries and a sort active. `#cmp-order` measures **44px** under `pointer: coarse`
+(inherits the v612 layer's `select { min-height: 44px }`); wrapper 318.8px wide inside 390.
+
+## Open / carried
+- `_cmpOrderMark`'s `hi` marker requires `vals.length >= 3`, so a set with exactly two rankable
+  columns shows "lowest of 2" on one and nothing on the other. Defensible (marking one implies the
+  other) but it reads as a missing label on the cold-load default trio, where the basis gate leaves
+  only Norway and the UK rankable. New, carried from 552.
+- The grid shows Contractor NPV at $50/$75/$125 but the Govt Take rows and the NPV **chart** carry
+  all four prices — the $100 NPV is plotted but not tabulated. New, carried from 552.
+- The proxy/basis notice text refers to "these NPV and IRR columns"; there is no IRR row and no
+  breakeven row anywhere on Side-by-Side. New, carried from 552.
+- Norway's stored `p25/p75` say one term while its own contract sample spans 29.6pp; the score is
+  still computed off the stored pair. Needs a `country_data.json` build change, not UX.
+  **Strongest open T2/T6 candidate.** Carried 550–552.
+- `renderSampleAnalyses()` hardcodes `regionOrder` and groups on the RAW `d.region`, omitting 72
+  countries. `#tab-btn-tsamples` is `aria-hidden`/`display:none`, so it is off a first-time
+  analyst's path. Carried 534–552.
+- The Explorer's `#flt-region` still offers only the roll-up region names while the Screener now
+  offers both. Carried from 551.
+- `IOC_PRESENCE` entity-to-parent alias map — open T4 candidate. Carried from 544.
+- Netherlands 23.4% govt take vs the North Sea Trio "~48% take" tooltip. Carried 536–552.
+- 272 dead evidence citations (129 URLs, 62 dead hosts) — flagged by v641, still unrepaired.
+- Two `.source-badge` elements in the Evidence Chain still measure 22.5px under a thumb. Carried
+  from 547.
+- Three Screener presets self-labelled "(barely narrows)", one structurally inverted. Carried 546.
+- The breakeven bound resolution is still limited to the four prices `country_data.json` carries.
+- Why the DCF solver ran for 68 mostly-non-producing countries and not for the largest producers is
+  still not recorded anywhere the page can read. Carried from 548.
+- Cycle 539's empty Summary line in GRADER still reads as a completed cycle. Carried 540–552.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip as the fix** — the fix is a control that reorders the
+grid; the one `title` added is on the `<select>` it introduces. **Not a text-only change**: the
+column sequence, both charts, the share hash and the clipboard export all change. No take, NPV, IRR,
+breakeven, rank, reform diamond, Reform Frequency Score, evidence grade or Fiscal Predictability
+number was altered anywhere; no country's data changed; no row was added to or removed from the
+grid. Chip rows stay `display:none`; no page-sub paragraph, amber instructional banner, routing hint
+or "How to read" block; no SbS card wrapper. Screener advanced filters still collapsed, presets
+still a dropdown; Home "More tools" still collapsed; Explorer analytics still collapsed. **No tab
+added, removed or reordered.** Govt NPV stays REMOVED from FC; Contractor NPV header stays
+"NPV ($M)"; FC Analyst Guide sessionStorage logic untouched. CP headline stays two-zone with global
+rank and vs-median pill; take% stays tier-coloured; Reform Risk stays in the primary Home card grid.
+The **v612 MOBILE LAYER** block and the `#reference-panel` `translateX` state are untouched — this
+cycle adds no CSS rule at all, only one selector name to the existing print-hidden list. v371/v373,
+v430, v449, v451, v452, v489, v612, v621, v632, v637, v639, v640, v641, v642, v643, v644, v645 and
+every locked item through v645 intact.
