@@ -1180,6 +1180,11 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     position: absolute;
     inset: -10px -6px;
   }
+  /* v648 (T2): the Country Profile fiscal-character position pill. Unlike the chips above it
+     carries no tap action, only a hover title, so it gets a REAL height rather than a
+     pseudo-element hit area — it measures 19px otherwise, and the directive's 24px floor is
+     measured on the box, not on the hit area. Scoped to coarse pointers; unchanged with a mouse. */
+  .cp-pos-pill { min-height: 24px; }
   /* Anything clickable that is still small gets padding rather than a height,
      so table rows do not grow. */
   td button, td a, th button, .dd-section button {
@@ -1678,7 +1683,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v647</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v648</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1748,7 +1753,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v647</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v648</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2081,7 +2086,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v647';
+  return m ? m[0] : 'v648';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2156,7 +2161,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v647');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v648');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -26507,6 +26512,48 @@ let _screenerCountrySet = null;  // null = no country-set restriction
 // can state the scope rather than dumping 57 names. Set alongside _screenerCountrySet, cleared
 // with it.
 let _screenerSetLabel = null;
+
+// ── v648 (T2) ─────────────────────────────────────────────────────────────────────────────────
+// The Country Profile "Fiscal character" CTA used to load the Screener at a HARDCODED take
+// ceiling of 60%. It fired on 43 countries and for 30 of them the country's own take was already
+// below 60 — Guyana 54.1%, Angola 53.0%, Ireland 27.1% — so a button reading "Find lower-take
+// peers" returned 158 regimes, 21 of which take MORE than the country the analyst was standing
+// on. It returned the opposite of its label at the one moment the analyst asks "attractive
+// compared to WHAT?".
+// A ceiling could not fix it: sl-take steps in whole percent, so a 54.1% country cannot express
+// itself as a ceiling and three countries (Azerbaijan, Mauritania, Tanzania) lost a genuine
+// lower-take peer to the rounding. So the set is computed once, here, and BOTH the button's count
+// and the rows that land come from this same call — they cannot disagree.
+// Basis is the production-weighted producer set, not all 185 published regimes: 164 of those hold
+// no verified block-level production, so their take is a statutory model rather than a realised
+// one, and a shortlist built from them is not an alternative an IC can choose between.
+function cpLowerTakeProducers(countryName) {
+  var self = (COUNTRY_DATA || []).filter(function(c) { return c.country === countryName; })[0];
+  var t = self ? cpCmpTakeOf(self, '75') : null;
+  if (t == null) return [];
+  var peers = (typeof getProducerPeers === 'function') ? getProducerPeers() : [];
+  return peers.filter(function(c) {
+    var v = cpCmpTakeOf(c, '75');
+    return c.country !== countryName && v != null && v < t - 0.05;
+  }).map(function(c) { return c.country; });
+}
+window.cpLowerTakeProducers = cpLowerTakeProducers;
+
+function cpScreenLowerTake(countryName) {
+  var set = cpLowerTakeProducers(countryName);
+  if (!set.length) return;
+  switchTab('texplorer', document.getElementById('tab-btn-tscreener'));
+  switchExplorerMode('screen', document.getElementById('mode-btn-screen'));
+  setTimeout(function() {
+    // Clear every other filter first, so the count on the button is the count on the screen
+    // whatever the analyst had set before.
+    if (typeof applyScreenerPreset === 'function') applyScreenerPreset(null);
+    _screenerCountrySet = set;
+    _screenerSetLabel = 'the ' + set.length + ' production-weighted producers with a lower comparable government take than ' + countryName + ' at $75/bbl';
+    if (typeof runScreener === 'function') runScreener();
+  }, 150);
+}
+window.cpScreenLowerTake = cpScreenLowerTake;
 // v560 (T1) — the Frontier Markets universe, DERIVED from COUNTRY_DATA rather than written out,
 // so it cannot drift as jurisdictions are added. Definition is UN M49, named on screen so the
 // analyst can check the boundary instead of trusting it:
@@ -31001,14 +31048,56 @@ function loadCountryProfile(country) {
     var downSolid  = hasDownC && npv75c > 0 && npv50c > 0;   // clears WACC through a price break
     var downFragile= hasDownC && npv75c > 0 && npv50c <= 0;  // clears at $75 only
     var charLabel = '', charColor = 'var(--muted)';
+    // ── v648 (T2): the verdict needed a discriminator, and the downside-NPV leg is not one ───
+    // v516 retired the mean-IRR test because it cleared for 123 of the 124 countries that showed
+    // one, and replaced it with "contractor NPV stays positive through the $50/bbl downside case".
+    // Counted against country_data.json, that clears for 180 of the 185 published regimes: only
+    // Malaysia and Yemen go negative at $50, and the three zeros are state monopolies this branch
+    // never reaches. So the reason printed under a green "Commercially attractive" was a test
+    // essentially every country passes — and the headline paragraph rendered TWO LINES ABOVE says
+    // exactly that ("but so do 180 of 182 non-monopoly regimes here … Defend on the take and its
+    // evidence tier, not on the NPV"). The page contradicted itself at the point of decision, and
+    // the half an analyst quotes into an IC memo was the half it had just disowned.
+    // The reason is now POSITION on the comparable take against the production-weighted producer
+    // set — the countries an IOC actually allocates capital across. That separates by construction.
+    var _vPeers648 = (typeof getProducerPeers === 'function') ? getProducerPeers() : [];
+    var _vLower648 = 0, _vRanked648 = 0;
+    for (var _i648 = 0; _i648 < _vPeers648.length; _i648++) {
+      if (_vPeers648[_i648].country === country) continue;
+      var _pv648 = cpCmpTakeOf(_vPeers648[_i648], '75');
+      if (_pv648 == null) continue;
+      _vRanked648++;
+      if (_pv648 < take - 0.05) _vLower648++;
+    }
+    var _hasPos648 = _vRanked648 >= 3;
+    var _posInLabel648 = false;   // set by the branches that put the position in the sentence
+    var _posClause648 = _hasPos648
+      ? _vLower648 + ' of the ' + _vRanked648 + ' production-weighted producers take less at $75/bbl'
+      : '';
+    // Counted, not asserted, so the sentence that replaces the downside leg can say why it went.
+    var _dsClear648 = 0, _dsTot648 = 0, _dsFrag648 = 0;
+    (COUNTRY_DATA || []).forEach(function(c) {
+      if (c.npv_75 == null || c.npv_50 == null) return;
+      _dsTot648++;
+      if (c.npv_75 > 0 && c.npv_50 > 0) _dsClear648++;
+      else if (c.npv_75 > 0) _dsFrag648++;
+    });
     if (take <= 40) {
       charLabel = 'Highly contractor-favorable — low government take places this in the top tier for IOC capital allocation';
       charColor = 'var(--green)';
     } else if (take <= 55 && downSolid) {
-      charLabel = 'Commercially attractive — moderate take, and contractor NPV stays positive through the $50/bbl downside case';
+      _posInLabel648 = _hasPos648;
+      charLabel = _hasPos648
+        ? 'Commercially attractive — moderate take; ' + _posClause648
+          + '. Contractor NPV also clears the 10% WACC at the $50/bbl downside, but so do '
+          + _dsClear648 + ' of ' + _dsTot648 + ' regimes here, so that leg is not what makes this one attractive'
+        : 'Commercially attractive — moderate take, and contractor NPV stays positive through the $50/bbl downside case';
       charColor = 'var(--green)';
     } else if (take <= 55 && downFragile) {
-      charLabel = 'Marginal at $75 — moderate take, but contractor NPV goes negative at $50/bbl; viability depends on the price environment';
+      _posInLabel648 = _hasPos648;
+      charLabel = 'Marginal at $75 — moderate take, but contractor NPV goes negative at $50/bbl, which only '
+        + _dsFrag648 + ' of ' + _dsTot648 + ' published regimes do; viability depends on the price environment'
+        + (_hasPos648 ? '. On terms alone, ' + _posClause648 : '');
       charColor = 'var(--yellow)';
     } else if (take > 75 && swing != null && swing > 20) {
       charLabel = 'Challenging entry — high take with strong price sensitivity; fiscal exposure rises sharply above $75/bbl';
@@ -31035,12 +31124,23 @@ function loadCountryProfile(country) {
       charLabel = 'Moderate take (' + take.toFixed(1) + '%) — within standard IOC benchmarking range; contractor NPV at the $50/bbl downside not computed for this regime. Verify with Scenario Builder using your project-specific capex/opex';
       charColor = 'var(--accent)';
     }
+    // v648 (T2): the same position, rendered on EVERY verdict rather than only the two branches
+    // that happen to name it, so no country's verdict is left with nothing behind it.
+    var _posPill648 = (_hasPos648 && !_posInLabel648)
+      ? ' <span class="cp-pos-pill" style="display:inline-flex;align-items:center;font-size:10px;font-weight:700;color:var(--text);background:rgba(0,0,0,.05);border:1px solid var(--border);border-radius:10px;padding:1px 8px;margin-left:6px;vertical-align:middle;cursor:help;" title="'
+        + _vLower648 + ' of the ' + _vRanked648 + ' production-weighted producers have a lower comparable government take at $75/bbl than this country’s '
+        + take.toFixed(1) + '%. This is the fact behind the verdict on the left. The producer set is used rather than all 185 published regimes because 164 of those hold no verified block-level production and their take is a statutory model rather than a realised one. Comparable take excludes fee-basis (TSC/RSC/buy-back) contracts, whose take% is a remuneration artefact.">'
+        + _vLower648 + ' / ' + _vRanked648 + ' producers take less</span>'
+      : '';
     var _verdictCTA = '';
     if (take <= 40) {
       // v492: investible regime — CTA to load Screener with take ≤40% to show the full investible universe
       _verdictCTA = ' <button onclick="(function(){switchTab(\'texplorer\',document.getElementById(\'tab-btn-tscreener\'));switchExplorerMode(\'screen\',document.getElementById(\'mode-btn-screen\'));setTimeout(function(){var s=document.getElementById(\'sl-take\');if(s){s.value=40;document.getElementById(\'sv-take\').textContent=\'40\';}if(typeof runScreener===\'function\')runScreener();},150);})()" style="background:none;border:1px solid var(--green);border-radius:4px;color:var(--green);cursor:pointer;font-size:10px;padding:1px 6px;margin-left:6px;white-space:nowrap;vertical-align:middle;" onmouseover="this.style.background=\'rgba(21,128,61,.08)\'" onmouseout="this.style.background=\'none\'" title="Screen all investible regimes (take ≤40%) in the Screener tab — see which countries share this low-take profile">See all investible regimes &rarr;</button>';
-    } else if (take > 75 || (swing != null && swing > 20)) {
-      _verdictCTA = ' <button onclick="(function(){switchTab(\'texplorer\',document.getElementById(\'tab-btn-tscreener\'));switchExplorerMode(\'screen\',document.getElementById(\'mode-btn-screen\'));setTimeout(function(){var s=document.getElementById(\'sl-take\');if(s){s.value=60;document.getElementById(\'sv-take\').textContent=\'60\';}if(typeof runScreener===\'function\')runScreener();},150);})()" style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-size:10px;padding:1px 6px;margin-left:6px;white-space:nowrap;vertical-align:middle;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--muted)\'" title="Screen for lower-take alternatives in the Screener tab (max take 60%)">Find lower-take peers &rarr;</button>';
+    } else if (_hasPos648 && _vLower648 > 0) {
+      // v648 (T2): count and destination come from the same call — see cpLowerTakeProducers().
+      var _lowSet648 = cpLowerTakeProducers(country);
+      var _cArg648 = _cpEsc(String(country).replace(/'/g, "\\'"));
+      _verdictCTA = ' <button onclick="cpScreenLowerTake(\'' + _cArg648 + '\')" style="background:none;border:1px solid var(--border);border-radius:4px;color:var(--muted);cursor:pointer;font-size:10px;padding:1px 6px;margin-left:6px;white-space:nowrap;vertical-align:middle;" onmouseover="this.style.borderColor=\'var(--accent)\';this.style.color=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border)\';this.style.color=\'var(--muted)\'" title="Opens the Screener restricted to exactly these ' + _lowSet648.length + ' jurisdictions — ' + _cpEsc(_lowSet648.join(', ')) + ' — with every other filter cleared. They are the production-weighted producers whose comparable government take at $75/bbl is below this country’s ' + take.toFixed(1) + '%. Comparable take excludes fee-basis (TSC/RSC/buy-back) contracts, whose take% is a remuneration artefact rather than a fiscal one.">See the ' + _lowSet648.length + ' producers that take less &rarr;</button>';
     }
     // v552 (T2): the basis travels with the sentence. Without it this line would read
     // "Highly contractor-favorable -- top tier for IOC capital allocation" for Iraq off a 34.1%
@@ -31051,7 +31151,7 @@ function loadCountryProfile(country) {
         + ' PSC/Concession contracts. ' + _cpFee552.feePct.toFixed(0) + '% of contracts here are fee-basis ('
         + _cpFee552.names + ') and are not described by this verdict.</span>'
       : '';
-    return charLabel ? '<div style="font-size:11px;color:' + charColor + ';margin-bottom:14px;padding:6px 12px;background:rgba(0,0,0,.02);border-left:3px solid ' + charColor + ';border-radius:0 4px 4px 0;line-height:1.5;"><strong style="color:var(--text);">Fiscal character:</strong> ' + charLabel + _verdictCTA + _charBasis + '</div>' : '';
+    return charLabel ? '<div style="font-size:11px;color:' + charColor + ';margin-bottom:14px;padding:6px 12px;background:rgba(0,0,0,.02);border-left:3px solid ' + charColor + ';border-radius:0 4px 4px 0;line-height:1.5;"><strong style="color:var(--text);">Fiscal character:</strong> ' + charLabel + _posPill648 + _verdictCTA + _charBasis + '</div>' : '';
   })() : '';
   let html = _countryPageHeader + _quickIcVerdict497 + _headlineStrip344 + _cpFiscalVerdict470 + _sparseDataBanner + backToExplorerBtn + `<div id="dd-profile-head" class="dd-header">
     <span class="dd-region">${d.region}</span>
