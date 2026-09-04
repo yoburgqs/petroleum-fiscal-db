@@ -25813,3 +25813,18 @@ additive and scoped to `#tbl-fc` and two existing ids. v371/v373, v430, v449, v4
 v489 and every locked item through v631 intact. Govt NPV stays REMOVED from FC; the FC
 Analyst Guide sessionStorage logic untouched. Version sweep **v631 -> v632** across the 4
 display sites, done silently at the end. It is **not** the deliverable.
+
+---
+## Cycle 537 Log — 2026-09-03 23:36
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 537 shipped and pushed — v632.
+
+## Task — T5
+"Give me something I can paste straight into an IC memo." (rotated off T3 in cycle 536, T2 in 535)
+
+## Friction
+Walked cold at 1440×900 with sessionStorage and localStorage cleared. Fiscal Compare auto-runs, so the table and the copy button are live immediately. Pressing **⎘ Copy for IC Memo** (`copyFCForIC`, ~line 39460) put **185 rows and 49,251 characters** on the clipboard.
+
+An IC screening shortlist is five to twelve countries. So the tool'
