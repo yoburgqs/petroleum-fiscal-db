@@ -25952,3 +25952,16 @@ edit is additive: `#fc-filter-reform` joined the existing `#fc-stability-check, 
 24px rule. v371/v373, v430, v449, v451, v452, v489 and every locked item through v632 intact.
 Govt NPV stays REMOVED from FC; the FC Analyst Guide sessionStorage logic untouched; the v632
 shortlist selection untouched and still composes with the new filter.
+
+---
+## Cycle 538 Log — 2026-09-04 00:38
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 538 complete and pushed (v633).
+
+## Task — T4
+"What is my fiscal-stability and reform exposure here?" — stalest in the rotation (537 was T5, 536 T3, 535 T2, 534 T1, 533 T5, 532 T2, 531 T3, 530 T6, **528 T4**).
+
+## Friction
+Fiscal Compare auto-runs on a cold load with the Stability column on. Measured off the live DOM: **164 of the 185 rows render `n/c`, 21 render a diamond ramp** — and those 21 sit wherever their government take places them in the ranking (rows 1, 3, 6, 8, 10, 16, 18…). An
