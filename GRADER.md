@@ -26117,3 +26117,16 @@ never made negative; no `min-width: max-content` marker added or removed. No `po
 rule changed. v371/v373, v430, v449, v451, v452, v489 and every locked item through v633 intact.
 Govt NPV stays REMOVED from FC; the FC Analyst Guide sessionStorage logic untouched; the v632
 shortlist selection and the v633 reform filter both untouched and both still compose.
+
+---
+## Cycle 540 Log — 2026-09-04 02:36
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 540 complete and pushed (v634).
+
+## Task — T6
+"Where did this number come from and how solid is the evidence?" — stalest in the rotation. Cycle 539 shipped nothing (`cycle_log.txt`: "Claude cycle complete. Output length: 0 chars", no UX commit), so the live rotation was 538 T4 … **530 T6**.
+
+## Friction
+This platform has spent five cycles killing one broken evidence grader. v551 replaced `ab_pct >= 80 ? A : ...`; v557 *deleted* `getEvidenceColor()` rather than orphan it, writing into GRADE
