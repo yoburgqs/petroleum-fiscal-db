@@ -25677,3 +25677,14 @@ v451, v452, v489 and every locked item through v630 intact. The v509 example-see
 behaviour (`_sbsExampleUntouched`, banner, clear toast) was walked and left exactly as
 it was. Version sweep **v630 -> v631** across the 4 display sites, done silently at the
 end. It is **not** the deliverable.
+
+---
+## Cycle 536 Log — 2026-09-03 22:37
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 536 complete and pushed (v631).
+
+**Task — T3:** "How do these three countries compare side by side?" (rotated off T2 from cycle 535)
+
+**Friction:** Cold load, Side-by-Side tab. The search box is the only way an analyst puts their own countries on this tab. Its placeholder says *"Type a country, press Enter…"*, and v586 deliberately pre-highlights row 1 so you can see what Enter will add. But the match list was never ranked — a bare `indexOf` filter sliced to 12 in raw data-file order, so r
