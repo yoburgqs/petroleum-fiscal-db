@@ -1122,6 +1122,19 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
    card, not the document. min-width:0 stops a max-content child re-floring the grid track. */
 [id^="samples-grid"] > * { min-width: 0; overflow-x: auto; }
 
+/* ── v638 (T4): IOC Portfolio row-provenance marker ────────────────────────────
+   The Country Breakdown table falls back to the COUNTRY-WIDE average wherever ORCA holds no
+   operator-level contract terms, and printed that average in the same column, same colour and
+   same weight as the operator's own rows. Chevron reads 8 of 13 rows that way; Kosmos Energy
+   and Harbour Energy read 5 of 5. This marks the fallback rows so a take figure is never
+   attributed to an operator ORCA does not hold contracts for. */
+.ioc-basis-ctry {
+  display: inline-block; margin-left: 6px; padding: 1px 5px; border-radius: 3px;
+  border: 1px solid rgba(194,65,12,.35); background: rgba(194,65,12,.08);
+  color: #C2410C; font-size: 9px; font-weight: 700; letter-spacing: .04em;
+  text-transform: uppercase; white-space: nowrap; vertical-align: middle; line-height: 1.5;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    v612 — MOBILE LAYER
    Zach, by email 2026-08-30: "Make THIS more mobile friendly.."
@@ -1631,7 +1644,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v637</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v638</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1701,7 +1714,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v637</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v638</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2034,7 +2047,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v637';
+  return m ? m[0] : 'v638';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2109,7 +2122,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v637');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v638');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -32140,13 +32153,41 @@ function renderIOCExposure(operatorName) {
     };
   }).filter(d => d.take75 != null).sort((a,b) => b.take75 - a.take75);
 
+  // v638 (T4): how many of these rows are actually this operator.
+  // renderIOCExposure builds `portfolio` from two different sources and has done since it was
+  // written: IOC_DATA where ORCA holds the operator's own contract terms, and the COUNTRY-WIDE
+  // average from COUNTRY_DATA where it does not. `source` recorded which, the v637 exports
+  // printed it, and the screen never did — so every take, NPV and contract count rendered
+  // below was attributed to the operator regardless of which one it came from. Chevron is 5
+  // operator rows and 8 country averages; Eni is 3 and 14; Kosmos Energy and Harbour Energy
+  // are 0 and 5 — a screen headed "Kosmos Energy" on which not one figure is Kosmos's.
+  const nFromOp    = portfolio.filter(function(d){ return d.source === 'IOC_DATA'; }).length;
+  const nFromCtry  = portfolio.length - nFromOp;
+  const _cy = function(n){ return n + ' countr' + (n === 1 ? 'y' : 'ies'); };
+
   // v466: inject operator heading with country count
   (function() {
     var _hd = document.getElementById('ioc-exposure-heading');
-    if (_hd) {
-      _hd.innerHTML = '<h3 style="font-size:15px;font-weight:800;margin:0 0 2px 0;">' + operatorName + '</h3>'
-        + '<span style="font-size:11px;color:var(--muted);">' + portfolio.length + ' countr' + (portfolio.length === 1 ? 'y' : 'ies') + ' in fiscal database</span>';
+    if (!_hd) return;
+    var line;
+    if (nFromCtry === 0) {
+      line = '<span style="font-size:11px;color:var(--muted);">' + _cy(portfolio.length)
+           + ' &mdash; every row is ' + operatorName + '&rsquo;s own contracts as held in ORCA.</span>';
+    } else if (nFromOp === 0) {
+      line = '<span style="font-size:11px;color:var(--muted);line-height:1.6;">' + _cy(portfolio.length)
+           + ' &mdash; <strong style="color:#C2410C;">none of them is ' + operatorName + '.</strong> '
+           + 'ORCA holds no ' + operatorName + ' contract terms, so every take, NPV and contract count '
+           + 'below is the country-wide average across all operators there. Read this as the '
+           + 'jurisdictions ' + operatorName + ' works in, not as its fiscal position in them.</span>';
+    } else {
+      line = '<span style="font-size:11px;color:var(--muted);line-height:1.6;">' + _cy(portfolio.length)
+           + ' &mdash; <strong style="color:var(--text);">' + nFromOp + ' on ' + operatorName
+           + '&rsquo;s own contracts</strong> <span style="color:var(--border);">|</span> '
+           + '<strong style="color:#C2410C;">' + nFromCtry + ' on the country average, not '
+           + operatorName + '</strong> (ORCA holds no operator-level terms there). '
+           + 'Marked row by row below.</span>';
     }
+    _hd.innerHTML = '<h3 style="font-size:15px;font-weight:800;margin:0 0 2px 0;">' + operatorName + '</h3>' + line;
   })();
 
   if (!portfolio.length) {
@@ -32204,6 +32245,7 @@ function renderIOCExposure(operatorName) {
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center;">
         <div style="font-size:22px;font-weight:700;color:${takeColor(avgTake)};">${avgTake.toFixed(1)}%</div>
         <div style="font-size:10px;color:var(--muted);text-transform:uppercase;">Portfolio Avg Take @$75</div>
+        ${nFromCtry ? `<div style="font-size:9px;color:#C2410C;font-weight:600;margin-top:3px;line-height:1.4;" title="This average is taken over all ${total} rows in the table below, ${nFromCtry} of which are the country-wide average rather than ${operatorName}'s own contracts. It is also unweighted \u2014 each country counts once regardless of working interest or volumes.">blends ${nFromCtry} country avg of ${total}</div>` : ''}
       </div>
       <div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center;">
         <div style="font-size:22px;font-weight:700;color:${takeColor(medianTake)};">${medianTake.toFixed(1)}%</div>
@@ -32221,7 +32263,7 @@ function renderIOCExposure(operatorName) {
     <div style="margin-top:12px;font-size:11px;color:var(--muted);">
       ${tierCounts[0]} countries (${Math.round(tierCounts[0]/total*100)}%) are in state-heavy regimes (>70% take).
       ${tierCounts[3]} countries (${Math.round(tierCounts[3]/total*100)}%) are IOC-friendly (<40%).
-      Data source: operator-specific contract data where available, otherwise country-level average across all contracts in that jurisdiction.
+      Data source: ${nFromOp} of ${total} countries use ${operatorName}'s own contract terms as held in ORCA; ${nFromCtry === 0 ? 'no row falls back to a country average' : `the other ${nFromCtry} fall back to the country-wide average across all operators in that jurisdiction and are marked <span class="ioc-basis-ctry">country avg</span> in the table below`}. Both averages above are unweighted \u2014 each country counts once, regardless of working interest or volumes.
     </div>
     <div style="margin-top:10px;">
       <button onclick="switchTab('texplorer',document.getElementById('tab-btn-texplorer'));setTimeout(function(){switchExplorerMode('browse');},100);" style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:11px;font-weight:600;padding:4px 12px;cursor:pointer;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.08)'" onmouseout="this.style.background='transparent'" title="Browse all countries in the Explorer table">Explore all ${operatorName} countries in the data &#8594;</button>
@@ -32273,7 +32315,10 @@ function renderIOCExposure(operatorName) {
   }
 
   // Country table
+  // v638 (T4): rows sourced from the country average are marked, and the table gained a
+  // horizontal-scroll wrapper so the extra marker cannot push the Contracts column off a phone.
   document.getElementById('exposure-country-table').innerHTML = `
+    <div class="table-scroll" style="overflow-x:auto;">
     <table style="width:100%;border-collapse:collapse;">
       <thead><tr>
         <th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Country</th>
@@ -32284,16 +32329,23 @@ function renderIOCExposure(operatorName) {
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Contracts</th>
       </tr></thead>
       <tbody>
-        ${portfolio.map(d=>`<tr>
-          <td style="padding:5px 8px;font-size:12px;"><button onclick="(function(){var ddSel=document.getElementById('dd-country-select');if(ddSel)ddSel.value='${d.country.replace(/'/g,"\\'")}';loadCountryProfile('${d.country.replace(/'/g,"\\'")}');var cpBtn=[].slice.call(document.querySelectorAll('.tab-btn')).find(function(b){return b.textContent.indexOf('Country Profile')>=0;});if(cpBtn)switchTab('t7',cpBtn);})()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${d.country}</button></td>
+        ${portfolio.map(d=>{
+          const isCtry = d.source !== 'IOC_DATA';
+          const why = isCtry
+            ? `Country average. ORCA holds no ${operatorName} contract terms for ${d.country}, so this row is the average across all ${d.n||'?'} contracts in the jurisdiction \u2014 the take, NPV and contract count describe ${d.country}, not ${operatorName}'s position in it.`
+            : `${operatorName}'s own contracts in ORCA \u2014 ${d.n||'?'} contract(s).`;
+          return `<tr title="${why.replace(/"/g,'&quot;')}">
+          <td style="padding:5px 8px;font-size:12px;"><button onclick="(function(){var ddSel=document.getElementById('dd-country-select');if(ddSel)ddSel.value='${d.country.replace(/'/g,"\\'")}';loadCountryProfile('${d.country.replace(/'/g,"\\'")}');var cpBtn=[].slice.call(document.querySelectorAll('.tab-btn')).find(function(b){return b.textContent.indexOf('Country Profile')>=0;});if(cpBtn)switchTab('t7',cpBtn);})()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${d.country}</button>${isCtry ? `<span class="ioc-basis-ctry" title="${why.replace(/"/g,'&quot;')}">country avg</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.region}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}</td>
-          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:600;">${d.take75.toFixed(1)}%</td>
-          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};">${_iocNpvFmt(d.npv75)}</td>
+          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%</td>
+          <td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};${isCtry?'opacity:.85;':''}">${_iocNpvFmt(d.npv75)}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--muted);">${d.n||'\u2014'}</td>
-        </tr>`).join('')}
+        </tr>`;}).join('')}
       </tbody>
-    </table>`;
+    </table>
+    </div>
+    ${nFromCtry ? `<div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.6;"><span class="ioc-basis-ctry" style="margin-left:0;">country avg</span> &mdash; ORCA holds no ${operatorName} contract terms for ${nFromCtry === 1 ? 'this jurisdiction' : `these ${nFromCtry} jurisdictions`}, so the row shows the average across <em>all</em> operators there. Do not cite ${nFromCtry === 1 ? 'it' : 'those rows'} as ${operatorName}'s take. The ${nFromOp === 0 ? 'table carries no operator-specific row at all' : `other ${nFromOp} ${nFromOp === 1 ? 'row is' : 'rows are'} ${operatorName}'s own contracts`}.</div>` : `<div style="font-size:10px;color:var(--muted);margin-top:10px;line-height:1.6;">All ${total} rows are ${operatorName}'s own contract terms as held in ORCA. No row falls back to a country average.</div>`}`;
 
   // v637 (T5): stash exactly what was rendered, so the two export controls above the table
   // cannot fork from it the way the FC model/database NPV columns once did. Everything the
