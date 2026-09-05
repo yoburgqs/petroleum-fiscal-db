@@ -29784,3 +29784,18 @@ could not be produced at all from this table.
   Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead citations; the two 22.5px
   `.source-badge` elements; the four-price breakeven bound limit; the unrecorded DCF solver country
   selection; and cycle 539's empty Summary line.
+
+---
+## Cycle 565 Log — 2026-09-05 06:25
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 565 complete, shipped as **v659**.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (rotated off T3/564, T1/563, T5/562; T4 last walked at 561)
+
+## Friction
+Walked cold — no sessionStorage, no localStorage, served over local HTTP so I was reading this tree, not what Pages is currently serving. Four surfaces: the Reform Risk tab and its per-country lookup, the Country Profile reform block, Fiscal Compare's Stability column, and Explorer's.
+
+The first three hold up a
