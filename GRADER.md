@@ -31003,3 +31003,117 @@ Walked cold at 1440×900 with storage cleared, into the Screener the way the pag
 **On 9 of the 11 presets the result set is majority proxy economics — and the count the Screener reports as its answer counts those rows.**
 
 | preset | reported | production-backed
+
+---
+## Cycle 574 Log — 2026-09-05
+- Test before: 236 PASS / 0 FAIL (reported at cycle start)
+- Test after: **235 PASS / 0 FAIL / 1 WARN** — suite RAN this cycle against the local build
+  (`TEST_URL=http://localhost:8099/index.html`). The WARN is a `sw.js` 404 and it was present
+  in the cold walk taken BEFORE any edit — pre-existing, not introduced here.
+- JS errors: 0 pageerrors across 1920 / 1440 / 1280 / 1024 / 768 / 390
+- Shipped as **v668**, both repos.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (stalest in rotation:
+568 T4, 569 T2, 570 T5, 571 T3, 572 T6, 573 T1 — T4 last walked at 568)
+
+## Friction
+Walked cold at 1440×900, storage cleared, into Reform Risk. The per-country lookup (v502+)
+is in good shape and the three partition cards below it are honest. The break is the panel
+above them.
+
+**The Regional Reform Tilt panel is headed "Regional Reform Tilt Since 2010" and does not
+use that window.** Its Avg Stability column IS since-2010 by construction (100 − 15 ×
+changes since 2010). Its Tightened / Liberalized / Unmeasured / No-fiscal-change counts,
+its Mix bar and its Tilt verdict aggregated `m.split` — every sourced event on record, back
+to Mexico 1938 and Libya 1955. One row carried two different windows and the heading named
+neither correctly.
+
+This is not cosmetic. Recomputed independently from `reform_history.json`:
+
+| region | shown (all-time) | actual, since 2010 |
+|---|---|---|
+| Latin America | Not established **+8** — the largest number on the panel | Not established **+1** |
+| Africa | Not established **+1** (leaning tightening) | Not established **−1** (leaning **liberalizing**) |
+| North America | Not established **+1** | **↓ Liberalizing −1** — determined, opposite sign |
+| Europe | ↑ Tightening **+3** | ↑ Tightening **+1** |
+| CIS/FSU | +2 of 7 | +1 |
+| Asia | +1 of 6 | ±0 |
+| Oceania | +1 of 4 | +1 |
+| Middle East | Not measured | Not measured |
+
+Two of eight rows had the **wrong sign**. The panel's headline figure was an 8×
+overstatement. Latin America's +8 is carried by Venezuela 2007, Colombia 2007 and Ecuador's
+pre-2010 rises; Africa's +1 by Algeria 2005, Angola 2004 and Libya 1971 — every one outside
+the stated window. FAQ "Identify reform correlation risk" sends analysts to this panel by
+name, and carried its own fabricated figure: *"Africa has historically been net-tightening
+(5–7 tightening events vs. 1–2 liberalizing per 5-year period, 2010–2023)."* Africa's entire
+sourced record is 4 up / 3 down across 60 years; in-window it is 0 up / 1 down.
+
+## Change
+- `reformCounts` now carries `splitIn` — the same `_rrSplit()` restricted to `year >= 2010` —
+  plus `yrLo`, the first year on record for that country.
+- The regional tilt aggregates `splitIn` for all four count columns, the Mix bar and the Tilt
+  verdict. The row now matches its own heading and its own Avg Stability column.
+- The full sourced record is printed as a muted second line under each Tilt — `1938–now:
+  +8/22` — so the deep history stays on screen and can never be mistaken for the window
+  figure. The bar tooltip carries both splits.
+- Column headers gained a `2010+` sub-label. The caption states both windows and names the
+  two regions where they disagree.
+- The three jurisdictions whose entire sourced record predates 2010 — **Algeria, Colombia,
+  USA** — are named on their region row (`Colombia: no post-2010 event`) instead of silently
+  vanishing from a since-2010 count. Two of the three are among the strongest tighteners in
+  the full record, so their absence is information.
+- A region with no in-window event at all renders `No in-window event` rather than a bare ±0.
+- The FAQ now states what the panel actually returns, including that no region has a named
+  in-window tilt except Europe (+1).
+
+Nothing in the STILL LOCKED list is touched. No new tooltip, no new FAQ, no citation
+re-wording, no version sweep as the deliverable (v667→v668 applied silently at the end).
+
+## Result
+An analyst pricing regional reform-correlation risk now reads a tilt computed over the window
+they were told it covers. **Africa and North America no longer point the wrong way** — both
+read liberalizing in-window where the panel previously implied tightening — Latin America is
+no longer an 8× overstatement of its headline signal, and where pre-2010 history is what
+actually drives a region the row shows both numbers side by side, labelled, instead of one
+wearing the other's label.
+
+## Verification (measured this cycle, not assumed)
+
+| check | result |
+|---|---|
+| JS syntax gate | **PASS** — 11 inline blocks, 0 failures |
+| Runtime suite, ran this cycle (local build) | **235 PASS / 0 FAIL / 1 WARN** |
+| WARN provenance | `sw.js` 404, captured in the pre-edit cold walk — pre-existing |
+| Row arithmetic vs `reform_history.json` | all 8 rows match an independent Node recomputation exactly |
+| Horizontal scroll, 10 tabs × 6 viewports | **0** violations |
+| — first attempt | **OVERFLOW 1024px, treformrisk, sw=1093 vs cw=1024 (69px), caused by this cycle's column sub-labels.** Confirmed against the pre-change backup on :8098 (sw=1024, clean), labels shortened, re-swept to 0. Recorded because the cycle broke it, not just because it ended clean. |
+| Reform Risk @390×844 `hasTouch` | scrollWidth 390 = clientWidth 390 |
+| Controls under 24px on Reform Risk @390 | **0 of 43** |
+| pageerrors, all six widths | **0** |
+
+## Carried forward — found this cycle, not fixed
+- **The country lookup card prints DIRECTION over the full record beside a score over the
+  2010 window, with no period label on either.** Nigeria reads `REFORMS SINCE 2010: 2` and
+  next to it `DIRECTION ↑0 / ↓1 / ?5` — that ↓1 is the 2003 deepwater PSC event, seven years
+  before the window opens. The adjacent "6 on record since 1969" makes it inferable but never
+  states it. Same class of defect as the one fixed this cycle, one surface over; deliberately
+  left as its own cycle rather than widened into this one.
+- **"Most Frequently Reformed Regimes" shows 15 rows of 21 sourced jurisdictions** and its
+  caption does not say so. Canada, Ghana, Guyana, India, **Russia** and USA are absent from
+  the platform's main reform ranking table. The three partition cards below do cover all 21
+  and say so, which is why this is carried rather than fixed.
+- Everything carried from cycles 560–573 is unchanged, including: `COUNTRY_DATA` and the API
+  disagreeing on `profit_oil_govt` / `state_eq` for 45 of 185 countries; the two barely-
+  screening Screener presets (143 and 153 of 185); `#screener-count` at ~570 characters of
+  unbroken prose; the `Cost Recovery Cap` source badges at 21px on Country Profile @390; the
+  Fiscal Compare XLSX emitting 25 columns with no comparable-take column; `MECHANIC_BREAKDOWN`
+  disagreeing with `country_data.json` on Iraq's mechanic split; the Side-by-Side search box
+  replacing the seeded example with no add-to-set path; the two adjacent unexplained IC
+  buttons on Country Profile; the duplicated all-185 rank in CP headline Zones A and B; the
+  non-existent `cp-price-select`; the Screener take slider's `min="30"` floor excluding the
+  USA at 23.4%; FAQ A25/A35/A40 describing a Screener "Stability Score filter" that does not
+  exist; Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror`
+  handlers on lines 54/56/57; the 272 dead citations; and `SPECULATIVE_COUNTRIES` still being
+  a hand-typed list of 7 names from v41.
