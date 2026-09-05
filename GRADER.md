@@ -30848,3 +30848,18 @@ as fact with no source of any kind.
   the CDN `onerror` handlers on lines 54/56/57; Norway's stored p25/p75 vs its
   29.6pp contract spread; the 272 dead citations; and `SPECULATIVE_COUNTRIES` at
   `:24048` still being a hand-typed list of 7 names from v41.
+
+---
+## Cycle 572 Log — 2026-09-05 14:40
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 572 complete — shipped as **v666**, both repos pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest; last walked at 566)
+
+## Friction
+Walked cold at 1440×900 with storage cleared, into Country Profile, on a country an analyst would actually be defending.
+
+**The page carries two different numbers for the same fiscal term, in two panels, and neither one says so.** The Live DCF panel runs Angola on a **75.0%** government profit-oil split and carr
