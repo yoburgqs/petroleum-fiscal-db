@@ -28578,3 +28578,142 @@ v587, v609, v612, v617, v621, v632, v637, v639–v650 and every locked item thro
 **The Screener has no oil-price control, and every number on the tab is a function of one.**
 
 `runScreener()` opens with `const price = getPriceKey()` and filters on `d['take_'+price]` / `d['npv_'+price]`. `getPriceKey()` reads `input[name="price"]` — four radios that live at `index.ht
+
+---
+## Cycle 558 Log — 2026-09-04 22:15
+- Test before: 262 PASS / 0 FAIL / 0 WARN / 0 JS errors (baseline run of unmodified HEAD, served locally at the sub-path)
+- Test after: 262 PASS / 0 FAIL / 0 WARN / 0 JS errors (read from the suite's own /tmp/runtime_test_report.txt)
+- Pixel audit: **PIXEL GATE PASS** — no surface got worse than baseline
+- JS syntax: 11/11 inline blocks clean
+- Shipped as **v652**, pushed to yoburgqs/petroleum-fiscal-db, mirrored to office.
+
+### Note on 236 vs 262
+The cycle header reported 236 PASS. Serving the tree locally at
+`/petroleum-fiscal-db/` and pointing `TEST_URL` at it yields **262** — and a run of
+**unmodified HEAD** served the identical way also yields 262. The delta is a serving-path
+artifact, not this cycle's change and not a regression. No test in
+`tests/runtime_comprehensive.js` counts Contractor NPV rows, so the added row cannot move
+the number either way. Recorded so a future cycle does not chase it.
+
+## Task
+**T3 — "How do these three countries compare side by side?"**
+(Rotation: 557 was T1, 556 T5, 555 T4, 554 T2, 553 T6, 552 T3.)
+
+## Friction
+**Side-by-Side published contractor NPV at THREE prices while everything else on the tab
+published four — and the missing one is the price the tab itself tells the analyst to look at.**
+
+Walked cold at 1440x900: no sessionStorage, no localStorage, straight to the Side-by-Side
+tab, which seeds Norway / United Kingdom / Netherlands.
+
+The `rows` array (`index.html:25913-25930`) held:
+
+| row | price |
+|---|---|
+| Govt Take | $50 · $75 · **$100** · $125 |
+| Contractor NPV | $50 (downside) · $75 (base) · — · $125 (upside) |
+
+Everything else on the tab carries $100:
+- The `Contractor NPV vs Oil Price ($M)` bar chart eight rows below plots
+  `[d.npv_50, d.npv_75, d.npv_100, d.npv_125]` — four bars, `$100/bbl` among the labels
+  (`index.html:26533`).
+- `country_data.json` carries `npv_100` for **185 of 185** countries. No coverage gap, no
+  blank-row risk — the row was simply never written.
+- Country Profile's own export already emits `Contractor NPV @$100 ($M)` (`index.html:32607`).
+
+The grid was the only place on the platform where $100 contractor NPV did not exist — which
+is to say, the only place an analyst can **read** the number rather than hover a bar.
+
+**The tab sends them there itself.** On the shipped **Atlantic Frontier Quartet** quickstart
+(Guyana / Angola / Brazil / Nigeria), the v593 crossover notice renders directly under the
+grid and reads, verbatim from the walk:
+
+> ⚠ These columns do not rank the same way at every price. Angola has the lowest government
+> take of the set at $50/bbl (42.3%) and no longer does at $125/bbl (64.1%) … **The order
+> first changes between $75 and $100/bbl.**
+
+So the analyst is told, in bold, that the government-take ranking of their shortlist flips in
+the $75–$100 interval. They scroll six rows down to see what the contractor side does across
+that same interval — and the Economics block goes `$75 → $125`, straight past it. The one
+number that would answer the question the page just raised was drawn as a bar and omitted
+from the table.
+
+It was also absent from `#cmp-data-table` (`index.html:26361`), which is what the
+**"Copy for IC Memo"** button and the PDF read. The pasted memo therefore carried a
+`Govt Take ($100/bbl)` line with no contractor figure beside it.
+
+## Change
+A fourth row — **`Contractor NPV @$100`** — inserted between the `$75 (base)` and
+`$125 (upside)` rows, so the Economics block now spans the same four prices as the Govt Take
+block above it and the NPV chart below it.
+
+- It rides the shared `rows` array, so it appears in the on-screen grid, in `#cmp-data-table`,
+  in the **Copy for IC Memo** clipboard table and in the printed PDF — all from one insertion.
+- It goes through `_cmpNpvCell(d, d.npv_100, '100')`, so a **state-monopoly** column renders
+  the same em dash with the same "no contractor position here to value" explanation as its
+  other three NPV cells. Verified live on Norway / Saudi Arabia / Iraq: all four NPV rows
+  read `$379M — $389M`, `$826M — $642M`, `$1.3B — $840M`, `$1.7B — $1.0B`.
+- Its tooltip states the profile basis, that it is the same fourth published price the take
+  rows and the chart both carry, and that it should be read against the `Govt Take ($100/bbl)`
+  row rather than interpolated between $75 and $125.
+- The `NPV weighting` tooltip said "the three Contractor NPV rows below"; it now says four.
+  A stale `v614` code comment counting three cells was corrected in place.
+
+Cold-load default set, after:
+
+```
+Contractor NPV @$50 (downside)   $379M   $494M   $1.7B
+Contractor NPV @$75 (base)       $826M   $1.2B   $3.6B
+Contractor NPV @$100             $1.3B   $1.8B   $5.4B     <- new
+Contractor NPV @$125 (upside)    $1.7B   $2.5B   $7.3B
+```
+
+## Result
+The analyst can **read** contractor NPV at $100/bbl — the price the tab's own crossover notice
+sends them to — instead of hovering four bars on a chart one series at a time to recover a
+number the page already holds. The Economics block and the Govt Take block now line up price
+for price, so a take figure at $100 can be set against a contractor figure at $100 without
+interpolating. And "Copy for IC Memo" now pastes all four prices on both sides of the split,
+ending the case where the memo carried a $100 government take with nothing beside it.
+
+## Mobile (Step 5b)
+390 x 844, `hasTouch: true`, `isMobile: true`: `documentElement.scrollWidth` **390** =
+`clientWidth` **390** — no horizontal scroll. The new row's four cells measure **73px** tall;
+zero cells under 24px under `pointer: coarse`. Pixel audit across 10 tabs x 5 viewports:
+**PIXEL GATE PASS**.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **Not a text-only change** — a new data row with new numbers on
+screen, in the hidden export table, in the clipboard paste and in the PDF. **No new tooltip as
+the fix** — the fix is the row; the tooltip merely labels it, and one existing tooltip's row
+count was corrected because the change made it wrong. No score, take, NPV, IRR, breakeven,
+rank, reform diamond, Reform Frequency Score, evidence grade, tier letter or primary-law
+percentage was altered or recomputed; `npv_100` is read as stored. No country's data changed;
+no source row added or removed; `country_data.json` and `reform_history.json` untouched.
+**The v612 MOBILE LAYER block and the `#reference-panel` `translateX` state are
+byte-identical** — no CSS was added or modified this cycle at all. `#reference-panel` keeps a
+non-negative `right` offset; rows with `min-width: max-content` untouched. Chip rows stay
+`display:none`; no page-sub paragraph, amber instructional banner, routing hint or "How to
+read" block; no SbS card wrapper. Screener advanced filters still collapsed, presets still a
+dropdown; Home "More tools" still collapsed; Explorer analytics still collapsed. **No tab
+added, removed or reordered.** Govt NPV stays REMOVED from FC; Contractor NPV header stays
+"NPV ($M)"; FC Analyst Guide sessionStorage logic untouched. CP headline stays two-zone with
+global rank and vs-median pill; take% stays tier-coloured; Reform Risk stays in the primary
+Home card grid. The v555 removal of the `Govt NPV @$75 (est.)` row from this same block stays
+removed. v371/v373, v430, v449, v451, v452, v489, v507, v517, v530, v554, v568, v587, v609,
+v612, v617, v621, v632, v637, v639-v651 and every locked item through v651 intact.
+
+## Carried, not fixed
+- The proxy notice under the grid still says a column's "NPV **and IRR** … come from the
+  standardized deepwater profile", and there is no IRR row on this tab. Carried from 556 — a
+  text-only edit, which the directive bans as a cycle's deliverable; it should ride along with
+  the next structural change to this notice.
+- Everything else carried from 557 and earlier is unchanged: the Screener take slider's
+  `min="30"` floor against USA at 23.4%, the Screener's missing clipboard control, Reform
+  Risk's export not stating that tab filters do not narrow it, the NaN-padded caveat rows in
+  all four CSV emitters, the Side-by-Side proxy notice's phantom IRR row, Norway's stored
+  p25/p75 vs its 29.6pp contract spread, `renderSampleAnalyses()` omitting 72 countries,
+  `#flt-region` roll-up-only on the Explorer, the missing retrievability signal on three
+  Evidence columns, the `IOC_PRESENCE` alias map, Netherlands 23.4% vs the North Sea Trio
+  tooltip, the 272 dead citations, the two 22.5px `.source-badge` elements, the four-price
+  breakeven bound limit, and the unrecorded DCF solver country selection.
