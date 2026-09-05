@@ -30120,3 +30120,158 @@ East median.
 
 ## Friction
 Cold load, local server. Screener → Advanced Filters → Region → **"Africa"** returned **49** countries. **Republic of the Congo was not one of them** — 220 contracts, the 5th-largest African entry in the database, ahead of Mozambique, Algeria, Ghana and Gabon. Neither was Cote d'Ivoire (144). Both ship as `region:"Othe
+
+---
+## Cycle 568 Log — 2026-09-05
+
+- Test before: 236 PASS / 0 FAIL (reported into this cycle)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — the suite was **actually run this cycle**,
+  `TEST_URL=http://localhost:8080 node tests/runtime_comprehensive.js`, against the local build
+  carrying this change. The single WARN is the `sw.js` 404 that `python3 -m http.server` returns
+  for the service worker; it was present on the cold walk taken **before** any edit, so it is not
+  from this cycle. The 261 vs 236 difference is the local URL, not new tests.
+- JS syntax gate: **PASS** — 11 inline `<script>` blocks parsed, 0 syntax errors.
+- Mobile gate: **PASS** — `scrollWidth == clientWidth` at 1920 / 1440 / 1280 / 1024 / 768 / 390.
+  `#sc-reform`, the control added here, renders **44px** under `pointer: coarse` and 29px with a
+  mouse.
+- Summary: Cycle 568 complete, shipped as **v662**, both repos pushed.
+
+## Task
+
+**T4** — "What is my fiscal-stability and reform exposure here?" (last cycle was T1; not a repeat)
+
+## Friction
+
+Cold load, local server, no sessionStorage or localStorage. The **Screener** is where a screening
+list is actually built, and the only control on the whole tab that named stability was the preset
+**"Low-Risk Stable"**. Its entire implementation, `applyScreenerPreset()` in `index.html`, was:
+
+```js
+} else if (preset === 'lowrisk') {
+  // Take ≤55% AND low swing (use take proxy) + Concession
+  setSlider('sl-take', 55);
+  setChecks('sc-mech-checks', ['Concession','PRRT']);
+  _activePresetName = 'Low-Risk Stable';
+}
+```
+
+A take ceiling and a mechanic list. **No reform, stability or predictability input of any kind** —
+and its own comment, "AND low swing (use take proxy)", describes a leg that was never written. It
+returned **141 of 185** countries, which the preset menu itself already annotated
+*"(barely narrows)"*. Among the 141:
+
+| country | take @$75 | mechanic | reform record |
+|---|---|---|---|
+| **United Kingdom** | 49.2% | Concession | **5 scored fiscal law changes since 2010; Reform Frequency Score 25/100; 6 take rises, +85pp cumulative.** The single most-reformed jurisdiction in the database. |
+| Russia | 46.4% | Concession | 1 scored change; 2022 windfall tax |
+| ~130 others | — | — | **ORCA holds no sourced reform log at all.** They rode through the stability screen as though the record were clean. |
+
+That last row is the reading the Reform Risk tab, the Fiscal Compare Stability cell and the Country
+Profile sidebar each spend a full paragraph forbidding — *"no events on file means no coverage, not
+a clean record"* — while the Screener passed 130 of them through a filter named for stability.
+
+The documentation made it worse rather than catching it. Two of this file's own answers described
+the preset as screening on **"Reform Risk Stability Score ≥ 4"** (`index.html:11564`) and
+**"Stability Score > 7"** (`index.html:12241`). Neither leg has ever existed in the code. So the
+analyst who read the platform's own guidance before using the control was actively misled, and the
+one screen reachable on T4 handed back the worst reformer on file inside 76% of the database with
+nothing on screen saying the criterion had not been applied.
+
+## Change
+
+**A real reform-record screening axis, with its own control.** New `Reform Record` select
+(`#sc-reform`) in Screener → Advanced Filters, sitting beside Mechanic / IOC Operator / Region /
+Data Basis (the summary hint names it; Advanced Filters stays collapsed by default per the v371
+lock). Four settings, each labelled with its live size at load by `_labelScreenerReform()`:
+
+```
+Any reform record — no filter (185)
+No sourced fiscal law change since 2010 (6)
+≤1 sourced fiscal law change since 2010 (13)
+Any jurisdiction with a sourced reform log (21)
+```
+
+Scored by `_scReformUniverse()`, which reads `REFORM_HISTORY` at call time through
+**`_rrCountScored()` — the Reform Risk tab's own counter** — so the Screener and that tab cannot
+report different reform counts for one country, and no copied list can drift from the data (the
+lesson v660 recorded about `DEPTH_PROFILE`).
+
+**Coverage is disclosed on every surface the screen reaches, not just the control.** Every mode
+screens *inside* the 21 scored jurisdictions; the unscored 164 are excluded by the criterion rather
+than passed through it. That is stated in:
+
+- the count line (`_reformNote`), which names how many of the 21 qualify, how many cleared the other
+  thresholds, **which in-scope countries failed and on what**, and that the other 164 are not
+  screened out on their reform record because none exists;
+- the export criteria (`window._screenerExportBasis`), so a shortlist carries the criterion and its
+  21-of-185 coverage into the IC memo;
+- the zero-result diagnosis, so an empty screen says the axis is only 21 countries wide;
+- the active-filter badge, which now counts it.
+
+The count line and the control note both state the axis's limit in the Reform Risk tab's own words:
+it counts **fiscal law changes only** — not renegotiation pressure, contract disputes, sanctions or
+political risk — and never their magnitude. A row is a steady statute book, not a safe jurisdiction.
+
+**The preset is now a caller of the control**, renamed to what it screens on:
+
+```js
+} else if (preset === 'lowrisk') {
+  setReform('stable');        // ≤1 sourced fiscal law change since 2010
+  setSlider('sl-take', 70);
+  _activePresetName = 'Stable Fiscal Record';
+}
+```
+
+The `Concession + PRRT` leg is **gone**. Mechanic was never a stability property; it excluded every
+PSC regime for a reason the preset never had. Same defect class as the IRR axis (v517), the
+breakeven ceiling (v568), the breakeven-coverage radio (v623) and the water-depth radio (v660): a
+proxy standing in for a criterion the page could not express. The page can express it now.
+
+The active-preset badge string, the Home Screener-card blurb, and the two answers at `:11564` and
+`:12241` were re-synced to the criteria that actually run — the same failure v524 recorded when
+v517 rebuilt a preset's criteria and left its caption announcing a deleted filter.
+
+## Result
+
+| | before | after |
+|---|---|---|
+| preset name | Low-Risk Stable | **Stable Fiscal Record** |
+| criteria | take ≤55% · Concession+PRRT | **≤1 sourced fiscal law change since 2010** · take ≤70% |
+| countries returned | **141 of 185** ("barely narrows") | **11** |
+| United Kingdom (worst reformer on file) | **returned** | excluded |
+| unscored jurisdictions in the result | ~130 | **0** |
+
+The 11: Canada, USA, Colombia, Ecuador, Kazakhstan, India, Iraq, Ghana, Algeria, Guyana, Russia.
+Norway, Brazil and Nigeria are correctly out on their reform counts; the count line names **Libya
+and Venezuela** as the two that were in scope and failed the 70% take ceiling, so the analyst can
+see what the thresholds cut rather than only what survived.
+
+An analyst on T4 can now narrow a screening list on the **sourced legislative record** instead of on
+a take proxy, do it by hand rather than only through a preset, and hand the IC a shortlist that
+carries both the criterion and its 21-of-185 coverage limit.
+
+## Carried forward — unchanged by this cycle
+
+- **Still open, and now the strongest remaining T4:** the Screener has a reform-frequency axis but
+  still no **Fiscal Predictability** control. FAQ A25 (`index.html:4176`) and A35 (`:4732`) route to
+  a Screener "Stability Score filter" — this cycle built the reform-frequency one, which is *not*
+  what those two answers describe; they describe the 0–100 predictability score. A40 (`:4767`) still
+  says Reform Risk is "shown in the Stability column of Explorer", which it is not. Those three
+  answers are still wrong and were not touched.
+- Every item carried from cycles 560–567 is unchanged: the Side-by-Side Predictability row returning
+  `62 · UNGRADED · one term` for Guyana / Angola / Suriname alike; `MECHANIC_BREAKDOWN` covering 20
+  of 185; `mech_mix` not reconciling to the published headline on 68 of 185; Guyana's A-tier reform
+  log contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57 firing
+  against `#cdnWarning` before it exists in the body; `IOC_DATA`'s $75 column not sharing a
+  computation with $50/$100/$125; `reform_history.json` carrying no `source` key on any of its 83
+  events; the Screener take slider's `min="30"` floor against USA at 23.4%; Reform Risk's export not
+  stating that tab filters do not narrow it; the NaN-padded caveat rows in the CSV emitters;
+  Norway's stored p25/p75 vs its 29.6pp contract spread; `renderSampleAnalyses()` omitting 72
+  countries; the missing retrievability signal on the three Evidence COLUMNS and in the exports; the
+  `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead citations;
+  the two 22.5px `.source-badge` elements; the four-price breakeven bound limit; the unrecorded DCF
+  solver country selection; and cycle 539's empty Summary line.
+- **Version discipline held.** Per cycle 567's finding that a blanket `v661→v662` regex rewrites
+  historical `vNNN (Tn)` provenance comments into false claims, only the **4** genuine display
+  strings were bumped by line number: the header badge (`:1731`), the print header (`:1801`), and
+  the two `_orcaCiteVer` fallbacks (`:2134`, `:2209`). No regex was run over the file.
