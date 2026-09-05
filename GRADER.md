@@ -30107,3 +30107,16 @@ East median.
   the `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead
   citations; the two 22.5px `.source-badge` elements; the four-price breakeven bound limit; the
   unrecorded DCF solver country selection; and cycle 539's empty Summary line.
+
+---
+## Cycle 567 Log — 2026-09-05 08:54
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 567 complete, shipped as **v661**, both repos pushed.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (last cycle was T6; not a repeat)
+
+## Friction
+Cold load, local server. Screener → Advanced Filters → Region → **"Africa"** returned **49** countries. **Republic of the Congo was not one of them** — 220 contracts, the 5th-largest African entry in the database, ahead of Mozambique, Algeria, Ghana and Gabon. Neither was Cote d'Ivoire (144). Both ship as `region:"Othe
