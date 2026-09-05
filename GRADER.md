@@ -28264,3 +28264,128 @@ v489, v612, v621, v632, v637, v639–v648 and every locked item through v648 int
 
 ## Friction
 I walked the per-country T4 surfaces first and found them genuinely solid — the Reform Risk lookup card is honest on all four branches, its country dropdown is already split into "scoreable (21)" vs "no sourced history (164)" optgroups, and Fiscal Compare already has a Reform-scored-only filte
+
+---
+## Cycle 556 Log — 2026-09-04 20:05
+- Test before: 236 PASS / 0 FAIL (reported baseline, live URL)
+- Test after: **262 PASS / 0 FAIL / 0 WARN**, read from the suite's own report at
+  `/tmp/runtime_test_report.txt`. The suite RAN this cycle — against the local tree served
+  under the GitHub Pages path prefix (`/petroleum-fiscal-db/`), which is what the deployed
+  build sees. Served without that prefix the suite reports 261 PASS / 1 WARN; the single WARN
+  is `sw.js` 404-ing because the service-worker registration path is hardcoded to
+  `/petroleum-fiscal-db/sw.js`. That is an artifact of how the file was served, not a defect,
+  and it is recorded here so a later cycle does not chase it.
+- JS errors: 0
+- JS syntax gate: PASS across all 11 inline script blocks
+- Summary: shipped as **v650**, pushed to both repos.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (stalest; 555 was T4,
+554 T2, 553 T6, 552 T3, 551 T1, 550 T5.)
+
+## Friction
+Walked T5 cold — no sessionStorage, no localStorage — by triggering every export the platform
+ships and then actually opening each downloaded file, rather than reading what the export
+functions claim. Eight artifacts fire cleanly. Six are XLSX and all six parse, each with its own
+basis/assumptions sheet. **Two of the four CSV emitters produce a file that cannot be parsed as
+CSV at all:**
+
+    orca_breakeven_2026-09-05.csv       pandas ParserError: expected 1 field in line 8, saw 9
+    orca_reform_history_2026-09-05.csv  pandas ParserError: expected 1 field in line 9, saw 12
+
+`exportBreakevenCSV()` (line ~42229) and `exportReformRiskCSV()` (line ~35069) both assembled the
+file as `pre.map(q).join() + body`, putting the caveat block ABOVE the header. So row 1 of each
+file was a single prose cell — `"ORCA Breakeven Map — 65 of 185 countries with a modelled
+breakeven"` — and the real column names (`Country`, `Region`, `Breakeven ($/bbl)`, …) sat on row
+8 and row 9 respectively.
+
+Excel, Power Query and Google Sheets do not error on this; they silently take the `ROW ORDER IS
+NOT A RANKING` paragraph as the header row and leave all 9 / all 12 columns unnamed. That is the
+worse failure of the two, because it is silent.
+
+These are the **only** export either tab ships. The Breakeven Map has one button, Reform Risk has
+one button, and neither tab has any clipboard control. So for a T5 analyst those two tabs had no
+working paste path at all — the artifact they were handed had to be hand-edited before any tool
+would load it.
+
+`v579` fixed precisely this defect on the Screener CSV, with the reasoning written into the code:
+*"the basis block used to sit ABOVE the header, which made row 1 a single cell and the file
+unparseable as CSV."* The fix was applied to one of the platform's four CSV emitters and the
+other two kept the defect for 71 cycles. (Vintage was already header-first.)
+
+## Change
+In both functions the basis block moved below the table:
+
+    var csv = body + '\r\n\r\n' + pre.map(q).join('\r\n') + '\r\n';
+
+Header is row 1; the caveats are the trailing rows, so the provenance still travels with the file
+and no longer breaks it. The redundant duplicate source line that used to be appended at the very
+bottom is gone — the whole block is down there now.
+
+Both export toasts changed too, because a caveat block silently relocating from top to bottom is
+something to state, not something to discover:
+
+- Breakeven: *"65 countries exported — column headers on row 1, opens straight into Excel or
+  pandas. The retention column and the 'not a ranking' note travel with it, as the last 6 rows."*
+- Reform: *"83 events exported — column headers on row 1, 83 rows with their citation. The 7
+  caveat lines are the last 7 rows of the file, below the data."*
+
+Counts are read off `pre.length`, not hardcoded, so they cannot drift from the file.
+
+## Result
+The analyst opens either CSV straight into Excel or pandas and gets real column names, and can
+paste a headed table into an IC memo without repairing the file first. Verified on the emitted
+files, not asserted:
+
+| file | row 1 | pandas | data rows | trailing caveats | version |
+|---|---|---|---|---|---|
+| `orca_breakeven_*.csv` | `Country,Region,Mechanic,…` (9 fields) | parses, 9 named cols | 65 | 6 | v650 |
+| `orca_reform_history_*.csv` | `Country,Year,Event,…` (12 fields) | parses, 12 named cols | 83 | 7 | v650 |
+
+This closes finalization criterion 5 ("every export opens, parses, and carries the assumptions
+behind its numbers") for the CSV class: all four CSV emitters — Screener, Breakeven, Reform
+History, Vintage — are now header-first and parseable.
+
+## Mobile (Step 5b) — 390 x 844, hasTouch
+`scrollWidth 390 = clientWidth 390` on Home, Breakeven Map, Reform Risk and Screener. The
+lengthened toast was measured rather than assumed: it wraps to 72px tall and clamps to
+`left: 0`, fully inside the viewport, well above the 24px floor. This cycle adds no CSS rule.
+
+## Carried, not fixed this cycle
+- The trailing caveat rows load as 6–7 NaN-padded phantom rows in a dataframe. This is the shape
+  `v579` established on the Screener CSV and all three now agree; diverging one export from the
+  other two would be worse than the residue. A marker prefix on those lines is the obvious next
+  step if it ever bites.
+- **The Screener has no clipboard control** — Reset / CSV / Excel only, while Fiscal Compare,
+  Country Profile, Side-by-Side, IOC Portfolio and Scenario Builder all have one. It is the tab
+  Home advertises as the ranked shortlist, i.e. the most memo-shaped output on the platform. Open
+  T5 candidate; the XLSX path does work, which is why it lost to a file that does not parse.
+- Reform Risk's export button title reads "Export full reform history dataset to CSV" and does
+  not say on screen that the tab's country/direction/decade filters do not narrow it. The file
+  says so in its own second line, but only after download.
+- Everything carried from 555 and earlier is unchanged: the $100 NPV plotted-but-not-tabulated
+  gap, the Side-by-Side proxy notice naming an IRR row that does not exist, Norway's stored
+  p25/p75 vs its 29.6pp contract spread, `renderSampleAnalyses()` omitting 72 countries,
+  `#flt-region` roll-up-only on the Explorer, the missing retrievability signal on three Evidence
+  columns, the `IOC_PRESENCE` alias map, Netherlands 23.4% vs the North Sea Trio tooltip, the 272
+  dead citations, the two 22.5px `.source-badge` elements, the three self-labelled "(barely
+  narrows)" presets, the four-price breakeven bound limit, the unrecorded DCF solver country
+  selection, and cycle 539's empty Summary line.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip as the fix** — the fix changes the bytes of two
+downloaded files and the text of two toasts that report on them. **Not a text-only change**: two
+export artifacts went from unparseable to parseable, which is a change in what the analyst can
+do with them, verified by `pandas.read_csv` succeeding where it previously raised. No score was
+recomputed. No take, NPV, IRR, breakeven, rank, reform diamond, Reform Frequency Score, evidence
+grade, tier letter or primary-law percentage was altered; no country's data changed; no source
+row added or removed; `country_data.json` and `reform_history.json` untouched. **No CSS rule was
+added, removed, narrowed or weakened this cycle** — the **v612 MOBILE LAYER** block and the
+`#reference-panel` `translateX` state are byte-identical. Chip rows stay `display:none`; no
+page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card
+wrapper. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools"
+still collapsed; Explorer analytics still collapsed. **No tab added, removed or reordered.** Govt
+NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst Guide sessionStorage
+logic untouched. CP headline stays two-zone with global rank and vs-median pill; take% stays
+tier-coloured; Reform Risk stays in the primary Home card grid. v371/v373, v430, v449, v451, v452,
+v489, v612, v621, v632, v637, v639–v649 and every locked item through v649 intact.
