@@ -30288,3 +30288,152 @@ carries both the criterion and its 21-of-185 coverage limit.
 **Task: T4** — "What is my fiscal-stability and reform exposure here?" (last cycle was T1, not a repeat)
 
 **Friction.** Walked T4 cold. The Screener is where a screening list actually gets built, and the only control on the whole tab that named stability was the preset **"Low-Risk Stable"**. Its entire implementation was a take ceiling (≤55%) plus a mechanic list (Concession + PRRT). No reform, stability or predictability input 
+
+---
+## Cycle 569 — shipped as v663
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest in the
+rotation; 563 was T1, 564 T3, 565 T4, 566 T6, 567 T1, 568 T4 — T2 had not run in over sixty cycles)
+
+## Friction
+
+Walked T2 cold — no sessionStorage, no localStorage, served over HTTP so the JSON actually loads.
+Country Profile auto-loads Indonesia, then I selected across the range: Norway, Guyana, Iraq, UAE,
+Netherlands, Brazil, Nigeria, Angola, Turkmenistan, Ghana, and then deliberately into the tail —
+Afghanistan, Belgium, Nauru, Fiji, Japan, Saudi Arabia, Kuwait, Iraq-Kurdistan.
+
+The line an analyst actually reads for the attractiveness call is the **`Fiscal character:`
+verdict**, rendered by the if-chain at `index.html:32017` inside `renderCountryDeepDive`. Its first
+branch was three lines and had no input but the take:
+
+```js
+if (take <= 40) {
+  charLabel = 'Highly contractor-favorable — low government take places this in the top tier for IOC capital allocation';
+  charColor = 'var(--green)';
+}
+```
+
+Counted against `country_data.json`, that branch fires for **108 of 185 countries**, and **102 of
+the 108 hold no verified block-level production at all** (`prod_coverage_pct = 0`). Forty of those
+carry fewer than ten contracts.
+
+| country | contracts | facts | take @$75 | headline NPV @$75 | verdict shown |
+|---|---|---|---|---|---|
+| Vanuatu | 7 | — | 5.0% | $5.1B | green — top tier |
+| Nauru | **1** | **2** | 19.7% | $3.8B | green — top tier |
+| Belgium | **2** | 6 | 16.6% | $4.1B | green — top tier |
+| Fiji | 4 | — | 21.3% | $3.7B | green — top tier |
+| — | — | — | — | — | — |
+| Norway | 7,643 | — | 68.0% | $826M | *"above the typical IOC sweet spot"* |
+| Indonesia | 667 | 5,888 | 59.5% | $745M | *"progressive regime"* |
+| Nigeria | 834 | — | 81.1% | $302M | *"high fiscal burden"* |
+
+Nauru is a 21 km² jurisdiction with one contract and a **D evidence tier ("too few facts to
+grade")**. It rendered the strongest verdict the platform can issue, beside the fourth-largest NPV
+on the platform. Every one of the 22 most "investor-friendly" jurisdictions has
+`prod_coverage_pct = 0` — **not one producing country reaches the top of that list.** In practice
+"investor-friendly tier (≤40%)" had become a label for *how little ORCA knows about the place*.
+
+**The page already held the refutation and printed it three inches to the right, in 10px grey.**
+The v648 position pill read **`0 / 21 producers take less`** on **62** of those countries — zero of
+the twenty-one production-weighted producers has a take below them. The lowest comparable take any
+real producer carries is the **USA at 23.4%**. A jurisdiction printing below the Gulf of Mexico has
+not discovered better fiscal terms; on this platform that is the shape thin evidence takes. The
+analyst reads the green sentence, not the grey pill.
+
+v648 rebuilt *every other* branch of this chain onto the production-weighted position — it is
+written into its own comment ("the same position, rendered on EVERY verdict rather than only the
+two branches that happen to name it, so no country's verdict is left with nothing behind it"). It
+skipped this one, because `take <= 40` is **first in the if-chain and returns before any counting
+happens.**
+
+The CTA under it compounded the error. **"See all investible regimes →"** (`:32070`, v492) loaded
+the Screener at `sl-take = 40` — returning the same 108 countries, 102 of them statutory model.
+The shortlist was built from the same absence that produced the number on the page.
+
+## Change
+
+**1 — The `take <= 40` verdict now resolves on the production-weighted producer set**, the same
+basis as the *Rank among producers* row and the v648 pill. Three outcomes where there was one:
+
+| condition | verdict | colour |
+|---|---|---|
+| not a producer **and** 0 producers take less | names the producing floor, the contract count, and the statutory-model basis; tells the analyst to establish terms against the jurisdiction's own petroleum act first | **amber** |
+| **is** a production-weighted producer, 0 below it (USA) | "at 23.4% this is the LOWEST comparable government take of the 21 production-weighted producers, measured against verified field production rather than statutory terms" | green |
+| anywhere else | carries `N of 20 producers take less` **in the sentence**, not only in the pill | green |
+
+**2 — New CTA on the amber case.** `cpScreenInvestibleProducers()` / `cpInvestibleProducers()`
+(inserted after `cpScreenLowerTake`, `:27007`) open the Screener restricted to the
+production-weighted producers whose *comparable* take is ≤40%. Count and destination come from one
+call, per the rule `cpLowerTakeProducers()` established.
+
+**3 — Caption reconciled to the rows.** The set is chosen on **comparable** take; the Screener's
+TAKE column prints the **headline** take. Two members differ — Iraq (84.8% headline / 34.1%
+comparable) and Ecuador (46.5% / 39.3%) — so the scope line above the table names both, with both
+numbers and the reason (fee-basis contracts, take% as remuneration artefact). This is the exact
+caption/rows disagreement cycles 524 and 568 were each logged for; it is not repeated here.
+
+## Result
+
+| | before | after |
+|---|---|---|
+| countries shown green "top tier for IOC capital allocation" | **108** | **46** |
+| of those, with zero verified production | **102** | 40 (all now stating the statutory-model basis and their position in the sentence) |
+| countries below the producing floor | green top-tier | **amber, naming USA 23.4% as the floor** |
+| Nauru (1 contract, 2 facts, tier D) | "top tier for IOC capital allocation" | "Low take (19.7%), but nothing that produces sits below it… read it as an evidence gap before reading it as fiscal terms" |
+| USA (23.4%, real, measured) | same green sentence as Nauru | "the LOWEST comparable government take of the 21 production-weighted producers, measured against verified field production" |
+| "investible regimes" shortlist | 108 countries, 102 statutory model | **8 producing regimes**, named, with the two headline/comparable splits called out |
+
+An analyst on T2 who opens Nauru, Belgium, Vanuatu, Fiji, Afghanistan or the Netherlands no longer
+reads a green capital-allocation recommendation off one to four contracts. They read the take, the
+producing floor it sits *below*, the evidence behind it, and a one-click route to the eight low-take
+regimes ORCA can evidence against verified field production. And the verdict that was always
+true — the USA's — is now defended rather than merely asserted, which it was not before.
+
+## Verification — all run this cycle, none assumed
+
+- **JS syntax gate:** PASS, 11 inline blocks.
+- **Runtime suite: RUN**, against the local build over HTTP. **235 PASS / 0 FAIL / 1 WARN.** The
+  WARN is `ConsoleErrors` picking up the local server's `sw.js` 404; it was present in the cold
+  walk *before* any edit and is a local-server artefact, not a regression. 235 + 1 = the 236
+  assertions the deployed baseline reports as PASS.
+- **Horizontal scroll:** clean at **1920 / 1440 / 1280 / 1024 / 768 / 390**, all 10 tabs — 60
+  measurements, `scrollWidth === clientWidth` at every one. Zero pageerrors at every width.
+- **Touch targets:** at 390×844 with `hasTouch: true`, zero controls under 24px in `#dd-content`.
+  The new CTA measures **44px** tall × 223px wide, right edge 278.5px of 390.
+- **Version discipline:** per cycle 567, only the **4** genuine display strings were bumped by line
+  number — header badge (`:1731`), print header (`:1801`), and the two `_orcaCiteVer` fallbacks
+  (`:2134`, `:2209`). No regex was run over the file, so no historical `vNNN (Tn)` provenance
+  comment was rewritten into a false claim.
+
+## Carried forward — not touched by this cycle
+
+- **Strongest remaining T2:** the *all-185 rank* in headline Zone A and the *"All 185 countries: #N"*
+  line in Zone B print the **identical rank** for every non-producer — Guyana reads `#138 of 185`
+  and then `All 185 countries: #138` three lines below. Only the second carries the median delta,
+  so neither is removable as written, but the duplication is real and reads as a contradiction.
+- **`cp-price-select` does not exist** (`:3139`). The "▶ Run FC at this price" button falls through
+  to `#fc-price`, which is Fiscal Compare's own selector, so "this price" is not the price on the
+  Country Profile — the CP page has no price control at all.
+- The Screener take slider's `min="30"` floor still excludes the USA at 23.4% — now sharper, since
+  the USA is the producing floor this cycle's verdict cites by name.
+- FAQ A25 (`:4176`), A35 (`:4732`) and A40 (`:4767`) still describe a Screener "Stability Score
+  filter" and a Reform Risk figure "shown in the Stability column of Explorer"; neither exists.
+- Everything carried from cycles 560–568 is unchanged: the Side-by-Side Predictability row returning
+  `62 · UNGRADED · one term` for Guyana / Angola / Suriname alike; `MECHANIC_BREAKDOWN` covering 20
+  of 185; `mech_mix` not reconciling to the published headline on 68 of 185; Guyana's A-tier reform
+  log contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57 firing
+  against `#cdnWarning` before it exists in the body; `IOC_DATA`'s $75 column not sharing a
+  computation with $50/$100/$125; `reform_history.json` carrying no `source` key on any of its 83
+  events; Reform Risk's export not stating that tab filters do not narrow it; the NaN-padded caveat
+  rows in the CSV emitters; Norway's stored p25/p75 vs its 29.6pp contract spread;
+  `renderSampleAnalyses()` omitting 72 countries; the missing retrievability signal on the three
+  Evidence COLUMNS and in the exports; the `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North
+  Sea Trio tooltip; the 272 dead citations; the two 22.5px `.source-badge` elements; the four-price
+  breakeven bound limit; the unrecorded DCF solver country selection; and cycle 539's empty Summary
+  line.
+- **`SPECULATIVE_COUNTRIES` (`:24048`) is still a hand-typed list of 7 names from v41** — Somalia,
+  South Sudan, North Korea, Afghanistan, Central African Republic, Comoros, Sao Tome and Principe.
+  `prod_coverage_pct` is a measured field on every row and 164 countries have no production. The
+  badge covers 7 of them, chosen by hand ~620 versions ago. This cycle's verdict change covers the
+  decision point the badge was failing to guard, but the badge itself was left alone.
