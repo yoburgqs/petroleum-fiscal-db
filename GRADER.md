@@ -30986,3 +30986,20 @@ were indicative was disclosed only in a divider row 11 rows into the table.
   its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57; the 272 dead
   citations; and `SPECULATIVE_COUNTRIES` at `:24048` still being a hand-typed list of 7
   names from v41.
+
+---
+## Cycle 573 Log — 2026-09-05 15:34
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 573 complete — shipped as **v667**, both repos pushed.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (stalest; last walked at 567)
+
+## Friction
+Walked cold at 1440×900 with storage cleared, into the Screener the way the page itself directs: *"Load a preset for a one-click IC screen."*
+
+**On 9 of the 11 presets the result set is majority proxy economics — and the count the Screener reports as its answer counts those rows.**
+
+| preset | reported | production-backed
