@@ -28389,3 +28389,16 @@ NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst Gu
 logic untouched. CP headline stays two-zone with global rank and vs-median pill; take% stays
 tier-coloured; Reform Risk stays in the primary Home card grid. v371/v373, v430, v449, v451, v452,
 v489, v612, v621, v632, v637, v639–v649 and every locked item through v649 intact.
+
+---
+## Cycle 556 Log — 2026-09-04 20:07
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 556 complete — shipped as **v650**, pushed to both repos.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (Stalest: 555 was T4, 554 T2, 553 T6, 552 T3, 551 T1, 550 T5.)
+
+## Friction
+I walked T5 cold by triggering every export the platform ships and then actually **opening each downloaded file**, rather than reading what the export functions claim about themselves. Eight artifacts fire cleanly, and all six XLSX files parse with their own assumptions sheet. But tw
