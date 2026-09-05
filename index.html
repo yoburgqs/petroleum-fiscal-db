@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v657</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v658</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v657</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v658</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v657';
+  return m ? m[0] : 'v658';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v657');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v658');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2528,7 +2528,7 @@ window.copyPlatformCitation = function(btn) {
         <option value="iochurdle">IOC Capital Screen — verified production · Take ≤65% · NPV positive at $75 AND at $50</option>
         <option value="sweetspot">Low Take · Positive NPV — Take ≤55% · Concession/PSC/PRRT/RSC · NPV positive</option>
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
-        <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v657 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
+        <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v658 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
         <option value="lowrisk">Low-Risk Stable — Take ≤55% · Concession + PRRT</option>
         <option value="downsidereturns">Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$50</option>
         <option value="highevidence" title="Countries where the majority of ORCA's fiscal facts were read out of the primary legal instrument (tier A), measured on a record deep enough for that share to mean something: A-share ≥ 55% AND ≥ 150 facts on file. 35 of 185 match. Replaces the old ≥80% A/B screen, which passed 171 of 185 because tier B is the EY / IHS / KPMG bulk harvest.">Primary-Source Evidence — tier-A ≥ 55% · ≥150 facts on file</option>
@@ -2675,7 +2675,7 @@ window.copyPlatformCitation = function(btn) {
           <label><input type="checkbox" value="Eni"> Eni</label>
         </div>
       </div>
-      <!-- v657 (T1): the "Water Depth" radio group is REMOVED. It read DEPTH_PROFILE, a hardcoded
+      <!-- v658 (T1): the "Water Depth" radio group is REMOVED. It read DEPTH_PROFILE, a hardcoded
            40-country editorial list, and screened 185 countries with it:
 
              onshore   16 countries      mixed  13      deepwater  11      TOTAL 40
@@ -11521,7 +11521,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <div class="faq-item" id="faq-A380">
           <div class="faq-q">A380. The Screener tab offers 8 pre-built filter presets. What are the exact filter criteria for each preset, and which IC use cases is each designed for?</div>
           <div class="faq-a">
-            <p><strong>Short answer:</strong> Each Screener preset is a named combination of government take, contractor NPV at the deck and at the $50 downside, primary-source evidence, mechanic, region, data basis and — for the basin-scoped screens — an explicit country set, calibrated for a specific capital allocation or bid screening workflow. (IRR, breakeven and water depth are no longer screening axes: see v517, v568/v623 and v657.) Understanding the exact criteria helps analysts know when to apply each preset directly vs. when to modify thresholds for a project-specific screen.</p>
+            <p><strong>Short answer:</strong> Each Screener preset is a named combination of government take, contractor NPV at the deck and at the $50 downside, primary-source evidence, mechanic, region, data basis and — for the basin-scoped screens — an explicit country set, calibrated for a specific capital allocation or bid screening workflow. (IRR, breakeven and water depth are no longer screening axes: see v517, v568/v623 and v658.) Understanding the exact criteria helps analysts know when to apply each preset directly vs. when to modify thresholds for a project-specific screen.</p>
             <p><strong>Complete criteria breakdown for all 8 Screener presets:</strong></p>
             <ul>
               <li><strong>Low Take · Positive NPV</strong> — Take ≤55% · Breakeven ≤$65/bbl · IRR ≥12% at $75/bbl. <em>Use case:</em> Initial capital allocation screen for deepwater greenfield. Identifies regimes that are simultaneously low-take, low-breakeven, and IRR-positive at the standard benchmarking price. Typical results: Guyana, UAE, USA GoM, Trinidad, Republic of the Congo shallow shelf. <em>IC application:</em> "Countries passing Low Take · Positive NPV screen are candidate anchor positions for a diversified upstream portfolio — low fiscal risk combined with commercial viability at mid-cycle prices."</li>
@@ -26504,7 +26504,8 @@ function renderCompare() {
           + (d.take_75 != null ? d.take_75.toFixed(1) + '%' : 'n/a') + ', which blends in '
           + Number(st.n2).toLocaleString() + ' fee-basis contracts (' + _cmpEsc(_cmpMechBare(st, 2)) + ')';
       }).join('; ')
-    + '. A fee-basis contractor is paid a fixed $/bbl remuneration and keeps no price upside, so its take% climbs toward 97–99% because of the mechanic, not because the terms are hard — plotting it against a PSC line would rank the two on different questions. Both figures are in the <strong>Govt Take</strong> rows above.</div>');
+    + '. A fee-basis contractor is paid a fixed $/bbl remuneration and keeps no price upside, so its take% climbs toward 97–99% because of the mechanic, not because the terms are hard — plotting it against a PSC line would rank the two on different questions. Both figures are in the <strong>Govt Take</strong> rows above. '
+    + '<strong style="color:var(--accent);">The Contractor NPV chart below is NOT re-based</strong> — ORCA holds no PSC/Conc-only NPV, so those bars are an unweighted mean across every contract, fee-basis included. Its legend marks the affected column <strong>(all contracts)</strong>. Do not read the two charts as one contract set.</div>');
   _monopolyNoticeEl.innerHTML = _cmpNotices.join('');
   if (cmpChart) cmpChart.destroy();
   // v501: 5th colour added with the 5-country cap. The NPV chart indexed colors[i]
@@ -26593,6 +26594,23 @@ function renderCompare() {
   // while occupying the palette slot that desynced every other column from the chart above.
   const npvCountries = selected.filter(d => !isStateMonopoly(d.take_75));
   const hasNpv = npvCountries.some(d => d.npv_50 != null || d.npv_75 != null);
+  // v658 (T3): basis parity with the take chart 8px above. That chart RE-BASES a fee-blended
+  // column onto its production-sharing/concession subset and says so three times -- legend
+  // "Iraq (PSC/Conc)", a second title line, and a green notice naming the 195 contracts it drew.
+  // v606 put it in the legend for an explicit reason, recorded there: "the legend is the only key
+  // that travels with the exported PNG."
+  //   None of that was ever applied to this chart, and this chart does NOT share the re-basis.
+  // npv_* is a bare unweighted mean over EVERY contract row (see the 'NPV weighting' grid row,
+  // v531), so Iraq's bar is built on all 610 of its contracts -- including the 415 fee-basis TSC
+  // contracts the line above deliberately excluded. Two stacked charts, same three countries,
+  // same four prices, same colour key, legends reading "Iraq (PSC/Conc)" and "Iraq": one plots
+  // 195 contracts and the other 610, and only one of them said so.
+  //   Nothing is re-based here -- there is no PSC/Conc-only NPV in country_data.json to re-base
+  // onto. The fix is to stop the two legends from claiming to be the same basis.
+  const _npvRebased = {};
+  _cmpChartRebased.forEach(function(d){ _npvRebased[d.country] = true; });
+  const _npvAnyRebased = npvCountries.some(d => _npvRebased[d.country]);
+  const _npvHasR = npvCountries.some(d => d.has_r_factor_tiers);
   if (hasNpv && npvChartWrap) {
     npvChartWrap.style.display = 'block';
     if (window._cmpNpvChart) window._cmpNpvChart.destroy();
@@ -26602,7 +26620,7 @@ function renderCompare() {
       data: {
         labels: ['$50/bbl','$75/bbl','$100/bbl','$125/bbl'],
         datasets: npvCountries.map((d, i) => ({
-          label: d.country,
+          label: d.country + (_npvRebased[d.country] ? ' (all contracts)' : '') + (d.has_r_factor_tiers ? ' ◆' : ''),
           data: [d.npv_50, d.npv_75, d.npv_100, d.npv_125],
           backgroundColor: _cmpColorOf(d) + '88',
           borderColor: _cmpColorOf(d),
@@ -26615,8 +26633,23 @@ function renderCompare() {
         maintainAspectRatio: false,   // v639 (T3): fill the card, not 652px of it
         plugins: {
           legend: { labels: { color: '#6B6560', font: { size: 11 } } },
-          title: { display: true, text: 'Contractor NPV vs Oil Price ($M)', color: '#1C1A17', font: { size: 13, weight: 'bold' } },
-          tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': $' + Math.round(ctx.raw).toLocaleString() + 'M' } }
+          title: { display: true,
+            text: _npvAnyRebased
+              ? ['Contractor NPV vs Oil Price ($M)' + (_npvHasR ? '  ◆ = R-factor PSC' : ''),
+                 '(all contracts) = fee-basis contracts INCLUDED — NOT the PSC/Conc basis of the take chart above']
+              : ('Contractor NPV vs Oil Price ($M)' + (_npvHasR ? '  ◆ = R-factor PSC' : '')),
+            color: '#1C1A17', font: { size: 13, weight: 'bold' } },
+          tooltip: { callbacks: { label: ctx => {
+            const d2 = npvCountries[ctx.datasetIndex];
+            const base = ' ' + d2.country + ': $' + Math.round(ctx.raw).toLocaleString() + 'M';
+            if (!_npvRebased[d2.country]) return base;
+            const st = _cmpMixStat(d2);
+            return base + ' — unweighted mean across ALL ' + Number(st.tot).toLocaleString()
+              + ' contracts, including the ' + Number(st.n2).toLocaleString() + ' fee-basis ('
+              + _cmpMechBare(st, 2) + ') the take chart above excludes. The take line for '
+              + d2.country + ' is drawn on its ' + Number(st.n1).toLocaleString()
+              + ' PSC/Concession contracts only, so the two charts are not the same contract set.';
+          } } }
         },
         scales: {
           x: { ticks: { color: '#6B6560' }, grid: { color: '#D0CAC0' }, title: { display: true, text: 'Oil Price ($/bbl)', color: '#6B6560' } },
@@ -26842,7 +26875,7 @@ function applyScreenerPreset(preset) {
     const checks = document.querySelectorAll('#' + groupId + ' input[type=checkbox]');
     checks.forEach(cb => { cb.checked = values === 'all' || values.includes(cb.value); });
   };
-  // v657: setDepth() removed with the Water Depth radio group.
+  // v658: setDepth() removed with the Water Depth radio group.
 
   // Reset all to defaults first
   _screenerRfactorOnly = false;
@@ -26852,7 +26885,7 @@ function applyScreenerPreset(preset) {
   _screenerSetLabel = null;     // v560
   _activePresetName = null;
   setSlider('sl-take', 100); setSlider('sl-npv', -500); setSlider('sl-npv50', -500); setSlider('sl-evid', 0);
-  setChecks('sc-mech-checks', 'all');   // v657: setDepth('all') removed with the radio group
+  setChecks('sc-mech-checks', 'all');   // v658: setDepth('all') removed with the radio group
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
   const feeCmp = document.getElementById('sc-fee-cmp');
   if (feeCmp) feeCmp.checked = true;   // v554
@@ -26888,7 +26921,7 @@ function applyScreenerPreset(preset) {
     if (scRgn2) scRgn2.value = 'Africa';
     _activePresetName = 'PSC Africa';
   } else if (preset === 'deepwater') {
-    // v657 (T1). Was `setDepth('deepwater')` -- DEPTH_PROFILE.deepwater, 11 countries, and it
+    // v658 (T1). Was `setDepth('deepwater')` -- DEPTH_PROFILE.deepwater, 11 countries, and it
     // returned exactly those 11: Namibia, Ghana, Mozambique, Tanzania, Gabon, Cameroon, Equatorial
     // Guinea, Sierra Leone, Senegal, Guyana, Republic of the Congo. Every one of them is badged
     // PROXY -- no verified field production anywhere in the result -- so the platform's own count
@@ -27542,7 +27575,7 @@ function runScreener() {
     // IOC operator presence filter
     if (iocCountries !== null && !iocCountries.has(d.country)) return false;
 
-    // v657 (T1): the water-depth leg is gone with its control. See the DOM note in
+    // v658 (T1): the water-depth leg is gone with its control. See the DOM note in
     // #screener-advanced-details. DEPTH_PROFILE named 40 of 185 countries, so each of its three
     // settings removed the other 145 for being unlisted, and "shallow" read the mixed bucket.
     // region filter — use _regionMatch() so "Asia Pacific" maps to Asia+Oceania, "Americas" maps to Latin America+North America (v429)
@@ -28098,7 +28131,7 @@ function exportScreenerCSV() {
   a.click();
 }
 
-/* ── v657 (T5) — "give me something I can paste straight into an IC memo." ─────────────
+/* ── v658 (T5) — "give me something I can paste straight into an IC memo." ─────────────
    The Screener is the surface that BUILDS the IC shortlist: the analyst loads a preset,
    moves the take/NPV/evidence thresholds, lands on 8-15 countries, and that row set is
    the table that goes in the memo. It was the only results table in the tool with no
@@ -43182,7 +43215,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Screener Reset/CSV/Excel buttons
   var scReset = document.getElementById('screener-reset-btn');
   if (scReset) scReset.addEventListener('click', function() { resetScreenerAll(); });
-  // v657 (T5): the Screener's clipboard path, alongside its two file exports.
+  // v658 (T5): the Screener's clipboard path, alongside its two file exports.
   var scCopy = document.getElementById('screener-copy-ic-btn');
   if (scCopy) scCopy.addEventListener('click', function() { copyScreenerTable(); });
   var scCsv = document.getElementById('screener-csv-btn');
@@ -43406,13 +43439,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-// v109: Screener mechanic checkboxes + IOC checkboxes — event delegation (v657: depth radios gone)
+// v109: Screener mechanic checkboxes + IOC checkboxes — event delegation (v658: depth radios gone)
 document.addEventListener('DOMContentLoaded', function() {
   var mechChecks = document.getElementById('sc-mech-checks');
   if (mechChecks) mechChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   var iocChecks = document.getElementById('sc-ioc-checks');
   if (iocChecks) iocChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
-  // v657: the .depth-radio-group listener is removed with the control it drove.
+  // v658: the .depth-radio-group listener is removed with the control it drove.
 });
 
 // v109: Populate print header export date
