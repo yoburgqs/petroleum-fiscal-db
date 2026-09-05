@@ -30668,3 +30668,18 @@ An analyst comparing a fee-blended country against PSC/Concession peers now read
 - **`MECHANIC_BREAKDOWN` disagrees with `country_data.json` on Iraq's own mechanic split.** The inline constant at `:22329` holds `PSC n=171, npv=1016` and `Concession n=24, npv=3552`; `country_data.json`'s `mech_mix` holds `PSC n=115, v75=2138.6` and `Concession n=80, v75=4344.1`. Both are on screen in different places. The JSON reproduces `g1.v75` exactly (weighted = $3,043M) and is the authoritative one; the inline constant is the stale copy, and it still covers only 20 of 185 countries. Not touched this cycle because reconciling it means deciding which surfaces re-point at the JSON, and that is a change with a wider blast radius than one cell.
 - **The Side-by-Side search box replaces the seeded example on the analyst's first add, with no way to keep it.** An analyst who genuinely wants Norway/UK/Netherlands **+ Denmark** types "Denmark" and loses the other three. The behaviour is deliberate (v509), announced in the banner and in a toast, and is right for the common case — but there is no "add to this set" path, so the North Sea + 1 build has to be typed out in full. Left alone because changing it reverses a considered decision.
 - Everything carried from cycles 560–570 is unchanged, including: the Fiscal Compare XLSX still emitting 25 columns with no comparable-take column while its Methodology sheet cites `GovtTake_75` unqualified; the Side-by-Side pasted Evidence tier cell reading `A · primary-law backed · 66% primary law · of · 63,848 facts`; the two adjacent unexplained IC buttons on Country Profile; the ~1,900-character CP IC paragraph of which ~1,550 is caveat prose; the duplicated all-185 rank in CP headline Zones A and B; the non-existent `cp-price-select` at `:3139`; the Screener take slider's `min="30"` floor excluding the USA at 23.4%; FAQ A25/A35/A40 describing a Screener "Stability Score filter" that does not exist; the Side-by-Side Predictability row returning `62 · UNGRADED · one term` for Guyana / Angola / Suriname alike; Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57; `reform_history.json` carrying no `source` key on any of its 83 events; Norway's stored p25/p75 vs its 29.6pp contract spread; the 272 dead citations; and `SPECULATIVE_COUNTRIES` at `:24048` still being a hand-typed list of 7 names from v41.
+
+---
+## Cycle 571 Log — 2026-09-05 13:26
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 571 complete — shipped as **v665**, both repos pushed.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest in rotation; last walked at 564)
+
+## Friction
+I walked it cold at 1440×900 with storage cleared, dropped the seeded North Sea example, and built a real mixed-mechanic set the way an analyst would: Guyana, Angola, Iraq, typed one name at a time.
+
+Every row **above** the Economics block has been taught over several cycles to correct a fee-basis blend. Take ba
