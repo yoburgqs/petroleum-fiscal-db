@@ -31132,3 +31132,104 @@ wearing the other's label.
 **Friction.** Walked Reform Risk cold at 1440×900 with storage cleared. The per-country lookup is in good shape. The break is the panel above it.
 
 The **Regional Reform Tilt** panel is headed *"Regional Reform Tilt Since 2010"*, and its Avg St
+
+---
+
+## Cycle 575 — shipped as v669, both repos pushed
+
+**Task: T3** — "How do these three countries compare side by side?" (stalest; last walked at 564)
+
+**Friction.** Walked Side-by-Side cold at 1440×900 with storage cleared, then loaded
+Guyana / Angola / Brazil — three PSC-region finalists, the canonical T3 set.
+
+`renderCompare()` computes up to four **set-specific** comparability notices and appends them to
+`#cmp-output` directly under the grid: the price-flip notice, the proxy notice, the fee-basis /
+PRRT notice, and the take-vs-NPV opposite-ordering notice. On this set three of the four fire —
+about 340 words of caveat, and the most substantive thing on the tab.
+
+`copyComparisonTable()` built its artifact from `#cmp-data-table`, which mirrors the grid **rows**
+only, plus a static `assump` line. **Every one of the four notices was dropped by the export.**
+
+Two of them address the export by name:
+
+| notice | its own closing sentence |
+|---|---|
+| proxy | "Say which is which **if this table goes into an IC memo**." |
+| take-vs-NPV inversion | "**If this table goes into an IC memo**, do not present the NPV ordering as the fiscal ranking." |
+
+The control that puts the table into the IC memo is labelled **⎘ Copy for IC Memo**, and it
+stripped both instructions. What landed in Word was the grid — including the four Contractor NPV
+rows — with nothing saying the NPV ordering is not the fiscal ranking, and nothing saying the
+Guyana column has no production behind it. The caveat did not survive the action it was written
+for. Same on the second, identically-named button 1,400px further down; both run this builder.
+
+Also found in the same code path: the price-flip banner asserted **"`<X>` has the lowest
+government take *of the set* at $50/bbl"** while `_cmpRankTake()` had already dropped every column
+the basis gate excludes. On Guyana / Angola / Brazil it read *"Angola has the lowest government
+take of the set at $50/bbl (42.3%)"* directly beneath a row printing **Guyana at 39.9%** — a lower
+number, in the row the sentence is about. One of its two claims was wrong and the other right,
+which reads as arbitrary.
+
+## Change
+- The four notice `<div>`s carry `class="cmp-notice"`.
+- `copyComparisonTable()` reads `#cmp-output .cmp-notice` and emits them into **both** clipboard
+  flavours — a numbered list in the TSV, a `<ul>` in the Word/Docs/Outlook HTML — under a
+  *"Comparability notes for this set (A / B / C) — carried from the ORCA on-screen comparison"*
+  heading, placed after the table and above the source line. A set with no notices emits nothing,
+  so the two-country all-producer export is byte-identical to before.
+- Screen-relative direction words are stripped in the export only (`the Price Swing row below` →
+  `the Price Swing row`): on screen the notes sit under the grid, in the paste they sit after it.
+- The copy toast states how many notices travelled.
+- The static `assump` line is unchanged. It covers the profile and the two absent metrics, which
+  are true of every set; the notices are true of *this* set and are recomputed every render.
+- The flip banner now says **"of the 2 ranked columns"** and names what was set aside and why
+  (`Guyana is not in this ordering — its take is not on a like-for-like basis…`). That sentence is
+  now exported, so shipping it wrong would have put a false claim into an IC memo.
+
+Nothing in STILL LOCKED is touched. No new tooltip, no new FAQ, no citation re-wording; v668→v669
+applied silently at the end across the 4 real version sites.
+
+## Result
+An analyst who presses the button named for the IC memo now pastes the caveats the platform wrote
+for that memo — that Guyana is a proxy column, that this set does not rank the same way at $50 as
+at $125, and that the NPV columns sitting in the pasted table do not give the fiscal ranking.
+Before this cycle every one of those was on screen and none of it was in the artifact.
+
+## Verification (measured this cycle, not assumed)
+
+| check | result |
+|---|---|
+| JS syntax gate | **PASS** — 11 inline blocks, 0 failures |
+| Runtime suite, **ran this cycle** (local build) | **262 PASS / 0 FAIL / 0 WARN**, 0 JS errors — read from `/tmp/runtime_test_report.txt` |
+| Notices on screen vs in clipboard — Norway/UK | 0 vs 0 (no heading emitted, export unchanged) |
+| — Guyana/Angola/Brazil | 3 vs 3 |
+| — Norway/Iraq/Angola (fee-blended) | 1 vs 1 |
+| — 5-country set | 3 vs 3 |
+| Stray screen-relative direction word in export | **none** in any of the four sets |
+| Horizontal scroll, 10 tabs × 6 viewports (1920/1440/1280/1024/768/390) | **0** violations |
+| SbS @390×844 `hasTouch` | scrollWidth 390 = clientWidth 390 |
+| Controls under 24px on SbS @390 | **0 of 15** |
+| pageerrors, all six widths | **0** |
+
+## Carried forward — found this cycle, not fixed
+- **The take chart's PNG export carries the fee-basis caveat in its title but not the proxy one.**
+  On Guyana / Angola / Brazil the title is a plain *"Govt Take vs Oil Price"* and the Guyana line
+  is drawn like any other, though the grid two screens up calls it a proxy column. The FAQ tells
+  analysts to paste that PNG straight into an IC deck. Same defect class as the one fixed this
+  cycle, one artifact over; left as its own cycle rather than widened into this one.
+- **The proxy notice still names IRR and breakeven columns that do not exist** — v515 removed the
+  IRR row and breakeven was never on this tab. Text-only, so not spent as a cycle.
+- Everything carried from cycles 560–574 is unchanged, including: the Reform Risk country lookup
+  card printing DIRECTION over the full record beside a score over the 2010 window with no period
+  label; "Most Frequently Reformed Regimes" showing 15 of 21 sourced jurisdictions without saying
+  so; `COUNTRY_DATA` and the API disagreeing on `profit_oil_govt` / `state_eq` for 45 of 185
+  countries; the two barely-screening Screener presets; `#screener-count` at ~570 characters of
+  unbroken prose; the `Cost Recovery Cap` source badges at 21px on Country Profile @390; the Fiscal
+  Compare XLSX emitting 25 columns with no comparable-take column; `MECHANIC_BREAKDOWN` disagreeing
+  with `country_data.json` on Iraq's mechanic split; the Side-by-Side search box replacing the
+  seeded example with no add-to-set path; the two adjacent unexplained IC buttons on Country
+  Profile; the duplicated all-185 rank in CP headline Zones A and B; the non-existent
+  `cp-price-select`; the Screener take slider's `min="30"` floor excluding the USA at 23.4%; FAQ
+  A25/A35/A40 describing a Screener "Stability Score filter" that does not exist; Guyana's A-tier
+  reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57; the
+  272 dead citations; and `SPECULATIVE_COUNTRIES` still being a hand-typed list of 7 names from v41.
