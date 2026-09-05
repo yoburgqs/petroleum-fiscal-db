@@ -29350,3 +29350,148 @@ v599, v609, v612, v617, v621, v632, v637, v639–v655 intact.
 **Task:** T5 — "Give me something I can paste straight into an IC memo." (Stalest; 561 was T4, 560 T2, 559 T6, 558 T3, 557 T1.)
 
 **Friction:** The Screener is the surface that *builds* the IC shortlist — load a preset, move the take/NPV/evidence thresholds, land on 8–15 countries. That row set is the table that goes in the memo. It was the only results table in the tool with no clipboard path. Fiscal Compare, Side-by-Side, IOC Port
+
+---
+## Cycle 563 Log — 2026-09-05
+
+- Test before: 236 PASS / 0 FAIL (deployed-URL figure carried from cycle 562)
+- Test after: runtime suite RAN this cycle against the LOCAL build — 261 PASS / 0 FAIL / 1 WARN.
+  The same suite run against the pre-change file gives 261 / 0 / 1, byte-identical, so the change
+  is regression-free. The single WARN is a service-worker 404 raised by the local static server and
+  is present on the baseline too. The 236 in the header is the deployed-URL count; local resolves
+  25 additional routes.
+- JS errors: 0 pageerror across all 10 tabs, desktop and mobile.
+- Shipped as **v657**, pushed to both repos.
+
+**Task:** T1 — "Which countries should even be on my screening list?" (Stalest: 562 was T5, 561 T4,
+560 T2, 559 T6, 558 T3, 557 T1.)
+
+**Friction.** Walked the Screener cold — no sessionStorage, no localStorage, straight from Home.
+Default state is honest: 185 rows, count line reads "All 185 countries — no filters applied yet."
+The failure is one click later. The tab's four Advanced Filters are Mechanic, IOC Operator,
+**Water Depth** and Region, and Water Depth is the one an analyst reaches for first, because the
+count line on this very tab names the deck as "Deepwater @$75/bbl" — the whole platform computes
+its NPV column on a standardized deepwater profile, so the page invites the depth question.
+
+`#screener-advanced-details` held a four-way radio (`name="dep-cat"`, index.html:2679) whose leg in
+`runScreener()` was:
+
+```js
+if (depCat !== 'all') {
+  const depKey2 = depCat === 'shallow' ? 'mixed' : depCat;
+  if (!(DEPTH_PROFILE[depKey2] || []).includes(d.country)) return false;
+}
+```
+
+`DEPTH_PROFILE` (index.html:22259) is a hardcoded editorial list naming **40 of 185** countries:
+
+| bucket | n | |
+|---|---|---|
+| onshore | 16 | Iraq, Kazakhstan, USA, Russia, China, Algeria, Libya, Egypt, Oman, UAE, Kuwait, Saudi Arabia, Mexico, Colombia, Argentina, Pakistan |
+| mixed | 13 | Nigeria, Angola, **Brazil**, **Norway**, UK, Australia, Malaysia, Indonesia, Vietnam, India, Ecuador, Trinidad, Peru |
+| deepwater | 11 | Guyana, Mozambique, Tanzania, Ghana, Senegal, Cameroon, Gabon, Equatorial Guinea, Rep. of the Congo, Namibia, Sierra Leone |
+| **unclassified** | **145** | everything else — including **Canada**, the #1 row of the default screen, and Azerbaijan |
+
+Three separate defects, all measured live:
+
+1. **It screened on data availability, not on depth.** Any of the three narrowing options removed
+   the 145 unlisted countries — not because they lack that setting but because nobody wrote them
+   down. Same defect class as the IRR axis (v517), the breakeven ceiling (v568) and the
+   breakeven-coverage radio (v623), all of which were deleted for exactly this.
+2. **"Shallow (&lt;500m)" was a mislabel.** It resolved to the `mixed` bucket. A control reading
+   "under 500 metres" returned **Brazil pre-salt (~2,000m)** and the Norwegian deepwater North Sea,
+   and those two countries were simultaneously unreachable under "Deepwater".
+3. **"Deepwater (&gt;500m)" excluded every major deepwater jurisdiction on earth.** Measured:
+
+```
+applyScreenerPreset('deepwater')  ->  11 countries
+Namibia, Ghana, Mozambique, Tanzania, Gabon, Cameroon, Equatorial Guinea,
+Sierra Leone, Senegal, Guyana, Republic of the Congo
+```
+
+   Every one badged **PROXY** — zero verified field production in the entire result — so the count
+   line appended, of its own accord, *"none of these 11 countries has verified field production …
+   not defensible as a screening shortlist on its own."* The platform's flagship deepwater screen
+   printed a disclaimer saying its own answer was unusable, and the analyst had no other way to ask
+   the question. Brazil, Angola, Nigeria, Norway, the UK, Malaysia and Indonesia were all absent.
+   v530 had already documented this exact list ("contains none of Angola, Brazil or Nigeria and
+   does contain Mozambique and Tanzania") and routed the *Atlantic Frontier* preset around it — but
+   left the radio and the Deepwater preset live on top of it. The platform's own preset
+   documentation (index.html:11509) advertised "Brazil pre-salt, Angola Block 15+, USA GoM, Norway
+   North Sea, Guyana, Mozambique Rovuma"; four of those six could not be returned.
+
+**Change.**
+
+- The **Water Depth radio group is removed** from `#screener-advanced-details`, along with its
+  `_scPass()` leg, its `activeCount` entry, its criteria-panel line (`'Water depth: ' + depCat`),
+  the `setDepth()` helper, the `setDepth('all')` call in the preset reset path, and the dead
+  `.depth-radio-group` change listener. The Advanced Filters summary now reads
+  "Mechanic · IOC Operator · Region · Data Basis".
+- **`DEPTH_PROFILE` itself is untouched.** `renderCountryBlocks()` still labels a country's
+  development setting from it — and already prints "Unknown (not classified)" for the 145, which is
+  the honest treatment the Screener was not giving them — and Card H's Deepwater Frontier Screen
+  still reads it. What is gone is its use as a *screening criterion*.
+- The **Deepwater preset is rebuilt on the explicit-country-set leg** (`_screenerCountrySet` /
+  `_screenerSetLabel`, the v530 mechanism), scoped to `DEPTH_PROFILE.deepwater + .mixed` and built
+  from them at call time so the two cannot drift apart. Renamed **"Offshore & Deepwater"** in the
+  dropdown, the hidden test button and the active-preset chip (which still read "Deepwater depth").
+- The count line's scope note now separates the two reasons a country is out of scope, which the
+  first draft of this cycle got wrong and the walk caught: *"Of the 161 outside it, 16 are
+  classified onshore-dominant and 145 hold no development-setting classification in ORCA at all —
+  those are out of scope here rather than screened out on their terms."*
+- Two prose passages routing the analyst at the removed control were corrected: the bid-corridor
+  workflow at :6965 ("Filter further using Screener — same water depth") and the preset-criteria
+  answer at :11524, which still listed IRR, breakeven and water depth as screening axes.
+
+**Result.** The deepwater screen now returns **22 countries, 8 of them production-backed** —
+Brazil, United Kingdom, Angola, India, Norway, Indonesia, Malaysia, Ecuador above the divider, the
+frontier margins below it — instead of **11 countries, 0 production-backed**. Australia (38.5%) and
+Nigeria (81.1%) are named on screen as cut by the ≤70% ceiling rather than silently vanishing. The
+analyst can screen the offshore universe and get an IC shortlist the tool does not immediately
+disown, and **no screening control on the Screener now removes a country for being absent from a
+hardcoded list.**
+
+**Locked-list check.** v612 MOBILE LAYER block and `#reference-panel` `translateX` untouched — not
+narrowed, not weakened, no negative `right` offset added; `min-width: max-content` markers
+untouched. Mobile verified at 390x844 `hasTouch: true`: `scrollWidth == clientWidth` on all 10 tabs,
+sub-24px control count unchanged at 23 (measured against the pre-change file), none added or touched
+here — this cycle only *removed* controls. No tab added, removed or reordered. **No new tooltip**
+(the preset's `title` is the label of an existing control, rewritten because it described behavior
+that no longer exists). **No new FAQ — still 974.** No score, take, NPV, IRR, breakeven, swing, rank,
+reform diamond, evidence grade or tier letter recomputed; `country_data.json` and
+`reform_history.json` untouched. Chip rows stay `display:none`; no page-sub paragraph, amber banner,
+routing hint or "How to read" block; no SbS card wrapper. Screener advanced filters still collapsed,
+presets still a dropdown; Home "More tools" still collapsed; Explorer analytics still collapsed.
+Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst Guide
+sessionStorage logic untouched. CP headline stays two-zone with global rank and vs-median pill;
+take% stays tier-coloured; Reform Risk stays in the primary Home card grid. v371/v373, v430, v449,
+v451, v452, v489, v507, v517, v530, v554, v568, v587, v599, v609, v612, v617, v621, v632, v637,
+v639–v656 intact.
+
+## Open / carried
+- **New, from this walk.** The `iochurdle` (IOC Capital Screen) preset is the only other one that
+  set a depth leg indirectly — it does not, but it is worth confirming the remaining ten presets
+  express their criteria through axes with full 185-country coverage. Take, NPV@deck, NPV@50 and
+  data basis do; evidence (a_pct) does; mechanic and region do. `rfactor` gates on
+  `has_r_factor_tiers`, which is a data flag — next T1 or T6 should measure whether it discriminates
+  or whether it is another coverage filter.
+- **Still unblocked and still wrong.** The two FAQ passages (`index.html:4172`, `:4730`) routing the
+  analyst to a "Stability Score filter" in the Screener — the filters are `sl-take`, `sl-npv`,
+  `sl-npv50`, `sl-evid`. Adding that control is a whole cycle. Strong next T4.
+- **Carried from 555.** FAQ A40 (`index.html:4761`) calls the Reform Risk score "shown in the
+  Stability column of Explorer". It is not — that column is Fiscal Predictability.
+- **Carried from 561.** The Explorer footer color-key's Stability entry describes the Reform
+  Frequency Score, not the Fiscal Predictability Score the column renders.
+- All items carried from 560 and earlier are unchanged: `MECHANIC_BREAKDOWN` covering 20 of 185;
+  `mech_mix` not reconciling to the published headline on 68 of 185; Guyana's A-tier reform log
+  contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57 firing against
+  `#cdnWarning` before it exists in the body; the Side-by-Side proxy notice promising an IRR row
+  that is not on the tab; `IOC_DATA`'s $75 column not sharing a computation with $50/$100/$125;
+  `reform_history.json` carrying no `source` key on any of its 83 events; the Screener take
+  slider's `min="30"` floor against USA at 23.4%; Reform Risk's export not stating that tab filters
+  do not narrow it; the NaN-padded caveat rows in the CSV emitters; Norway's stored p25/p75 vs its
+  29.6pp contract spread; `renderSampleAnalyses()` omitting 72 countries; `#flt-region`
+  roll-up-only on the Explorer; the missing retrievability signal on three Evidence columns; the
+  `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead
+  citations; the two 22.5px `.source-badge` elements; the four-price breakeven bound limit; the
+  unrecorded DCF solver country selection; and cycle 539's empty Summary line.
