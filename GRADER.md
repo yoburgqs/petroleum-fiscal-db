@@ -29037,3 +29037,158 @@ omitting 72 countries; `#flt-region` roll-up-only on the Explorer; the missing r
 signal on three Evidence columns; the `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea
 Trio tooltip; the 272 dead citations; the two 22.5px `.source-badge` elements; the four-price
 breakeven bound limit; and the unrecorded DCF solver country selection.
+
+---
+## Cycle 561 Log — 2026-09-05 06:45
+- Test before: 261 PASS / 0 FAIL / 1 WARN (local build, suite's own report file)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — Playwright RAN this cycle against
+  `http://localhost:8099/index.html`, not assumed. The WARN is the sw.js 404 the local
+  static server cannot serve at the GitHub Pages scope; present before this change.
+- JS errors: 0 page errors on all 9 visible tabs at 1920 / 1440 / 1280 / 1024 / 768 / 390.
+- Shipped as **v655**, pushed to both repos.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"**
+(Rotation: 560 was T2, 559 T6, 558 T3, 557 T1, 556 T5 — T4 last walked at 555, the stalest.)
+
+## Friction
+Cold load at 390x844 with `hasTouch`, no sessionStorage, no localStorage. The per-country T4
+surfaces — the Reform Risk lookup card, the reform diamond, the Fiscal Compare `Reform-scored only`
+filter — were walked first and are clean at that width, with no page error and no horizontal page
+scroll. The friction is on **Explorer**, the one table where the analyst screens all 185
+jurisdictions for this question at once.
+
+Cycle 555 flagged this `@media (max-width: 768px)` block (index.html:1464) as "index drift" and
+called it *"hides three of its most load-bearing columns and keeps the ones the rule meant to
+drop."* Measured live this cycle, it is **worse than that description**: the head and the body were
+hiding **different numbers of columns**, so the table was off by one from the 7th column right and
+every value on the phone Explorer was printed under the wrong label.
+
+The block hid the **headers** semantically —
+
+    #tbl-explorer th[data-sort-key="be"],
+    #tbl-explorer th[data-sort-key="swing"],
+    #tbl-explorer th.num:last-child { display: none; }
+
+— and the **body cells** positionally:
+
+    #tbl-explorer tbody td:nth-child(7), (8), (9) { display: none; }
+
+with the comment `/* Hide corresponding td cells — 7th, 8th, 9th columns */`. Those indices were
+correct for a 9-column table. The table has **19** columns, and 7/8/9 are now **Govt Take,
+Evidence and Curve**. Counted in the live DOM at 390px: **14 visible `<th>` against 13 visible
+`<td>` on every one of 185 rows.** USA, row 1:
+
+| header shown | value sitting under it | value's real column |
+|---|---|---|
+| Govt Take | `$3.3B` | Contractor NPV |
+| Evidence | `421.4%` | IRR |
+| Curve | `—` | Breakeven |
+| Contractor NPV | `+6.2pp` | Swing |
+| **IRR @ $75** | **`91 UNGRADED one term`** | **Stability** |
+| **Stability ⓘ** | **`18% royalty`** | **Key Rate** |
+| Key Rate | `Inv-Friendly` | Tier |
+| Tier | (nothing) | — |
+
+So the worst moment in a T4 walk: the analyst scrolls the 1,604px-wide table right inside its
+360px port to reach the column headed **Stability**, and reads **`18% royalty`**. The Fiscal
+Predictability Score they came for is one column left, under a header reading IRR. And the number
+the entire table ranks on — **Govt Take, 23.4%** — was hidden outright while its header stayed
+behind and captioned an NPV in dollars.
+
+Two further findings inside the same four lines. **`th.num:last-child` matched nothing at all** —
+the last `<th>` is Tier, which carries no `.num` class — so the rule's own stated intent ("Hide
+Breakeven, Swing, Stability") never applied to Stability in the first place. And nothing threw:
+this is a pure CSS index drift, invisible to the JS syntax gate, invisible to the page-error
+listener, and invisible to a `scrollWidth == clientWidth` check, which is why 555's mobile pass and
+every cycle since read the tab as healthy.
+
+## Change
+Head and body now hide the **same list**, keyed on a class each `<th>` carries together with its
+`<td>` (`.expl-sm-off`). The positional `nth-child` rule is deleted, so a column can no longer be
+dropped from one half of the table and not the other however many columns are added next.
+
+The four columns dropped on a phone are chosen on what the cell actually contains at that width,
+not on position:
+
+| dropped ≤768px | why |
+|---|---|
+| Region | duplicated by `#flt-region`, sitting directly above the table |
+| Curve | a 4-point sparkline, illegible in a phone-width cell |
+| IRR | 124/185, and unbounded (`421.4%`) where it does print |
+| Breakeven | 68/185 — 117 of 185 rows print an em dash |
+
+**Govt Take, Evidence, Swing, Stability, Key Rate and Tier all stay** — the previous rule was
+hiding the first two and had never hidden the fourth despite saying so.
+
+## Result
+On a phone the Explorer now renders **12 headers over 12 cells**, and the header count equals the
+visible-cell count on **every one of 185 rows** at every width tested. Reading down the column
+headed `Stability ⓘ` gives the Fiscal Predictability Score and its UNGRADED / measured-spread basis
+— the thing T4 is asking for — instead of a royalty rate. `Govt Take` gives `23.4%` instead of
+`$3.3B`. The table also narrowed from 1,604px to 1,476px of internal scroll while gaining back the
+two columns that matter most.
+
+Desktop is untouched: 16 visible columns at 1024 / 1280 / 1440 / 1920, identical head-to-body
+mapping before and after.
+
+## Verification
+Measured, not asserted.
+
+- **Alignment:** visible `<th>` count vs visible `<td>` count per row, across all 185 rows, at
+  1920 / 1440 / 1280 / 1024 / 768 / 390 — **one distinct cell count per viewport, equal to the
+  header count, at all six.** Before the change: 14 vs 13 at 390 and 768.
+- **Runtime suite:** RAN, twice-configured against the local tree — **261 PASS / 0 FAIL / 1 WARN**.
+- **Horizontal scroll:** `scrollWidth == clientWidth` on all 9 visible tabs at all six widths,
+  including **390x844 `hasTouch`**.
+- **Page errors:** 0 on all 9 tabs at all six widths.
+- **Coarse-pointer 24px:** 0 interactive elements under 24px in the Explorer head or first 5 rows
+  at 390 `hasTouch`. No control was added, and none was touched — the change moves only static
+  `<td>`/`<th>` visibility.
+- **JS syntax gate:** 11 inline script blocks, 0 failures.
+
+## Open / carried
+- **New, this cycle.** The Explorer footer color-key still documents **Breakeven** and **Swing**
+  bands, and the Swing entry is now the only one of the three that is visible on a phone. The
+  Stability entry in that same key describes `◆◆◆◆◆ 5 = zero reform events since 2010` — that is
+  the **Reform Frequency Score**, not the Fiscal Predictability Score the Stability column renders.
+  Same conflation FAQ A40 makes. Text-only to fix, so deliberately not spent as a cycle.
+- **Carried from 555, unfixed.** Two FAQ passages (index.html:4172, :4730) route the analyst to a
+  "Stability Score filter" in the Screener. The Screener's filters are `sl-take`, `sl-npv`,
+  `sl-npv50`, `sl-evid` — there is no stability filter. Fixing it means adding the control, which
+  is a whole cycle. Strong next T1 or T4.
+- **Carried from 555.** FAQ A40 (index.html:4761) calls the Reform Risk score "shown in the
+  Stability column of Explorer". It is not — that column is Fiscal Predictability.
+- All items carried from 560 and earlier are unchanged: `MECHANIC_BREAKDOWN` covering 20 of 185 so
+  the two-regime chip is silent on 53 more; `mech_mix` not reconciling to the published headline on
+  68 of 185; Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror`
+  handlers on lines 54/56/57 firing against `#cdnWarning` before it exists in the body; the
+  Side-by-Side proxy notice promising an IRR row that is not on the tab; `IOC_DATA`'s $75 column not
+  sharing a computation with $50/$100/$125; `reform_history.json` carrying no `source` key on any of
+  its 83 events; the Screener take slider's `min="30"` floor against USA at 23.4%; the Screener's
+  missing clipboard control; Reform Risk's export not stating that tab filters do not narrow it; the
+  NaN-padded caveat rows in all four CSV emitters; Norway's stored p25/p75 vs its 29.6pp contract
+  spread; `renderSampleAnalyses()` omitting 72 countries; `#flt-region` roll-up-only on the
+  Explorer; the missing retrievability signal on three Evidence columns; the `IOC_PRESENCE` alias
+  map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead citations; the two 22.5px
+  `.source-badge` elements; the four-price breakeven bound limit; the unrecorded DCF solver country
+  selection; and cycle 539's empty Summary line.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip** — not one tooltip string was added or edited this
+cycle; the fix is a visibility change on 4 `<th>` and 4 `<td>` positions. **Not a text-only
+change**: at ≤768px two columns (Govt Take, Evidence) that were invisible now render, four
+(Region, Curve, IRR, Breakeven) that were visible now do not, and 185 rows stop printing under the
+wrong header. No score, take, NPV, IRR, breakeven, swing, rank, reform diamond, Reform Frequency
+Score, evidence grade, tier letter or primary-law percentage was recomputed or altered.
+`country_data.json` and `reform_history.json` untouched. Chip rows stay `display:none`; no
+page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS card
+wrapper. Screener advanced filters still collapsed, presets still a dropdown; Home "More tools"
+still collapsed; Explorer analytics still collapsed. **No tab added, removed or reordered.** Govt
+NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst Guide sessionStorage
+logic untouched. CP headline stays two-zone with global rank and vs-median pill; take% stays
+tier-coloured; Reform Risk stays in the primary Home card grid. The **v612 MOBILE LAYER** block and
+the `#reference-panel` `translateX` state are intact — this cycle neither narrows, weakens nor
+removes any rule in it, and adds no negative `right` offset anywhere. The `min-width: max-content`
+opt-out markers are untouched. v371/v373, v430, v449, v451, v452, v489, v507, v517, v530, v554,
+v568, v587, v599, v609, v612, v617, v621, v632, v637, v639–v654 intact.
