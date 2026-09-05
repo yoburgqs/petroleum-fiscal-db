@@ -29799,3 +29799,138 @@ could not be produced at all from this table.
 Walked cold — no sessionStorage, no localStorage, served over local HTTP so I was reading this tree, not what Pages is currently serving. Four surfaces: the Reform Risk tab and its per-country lookup, the Country Profile reform block, Fiscal Compare's Stability column, and Explorer's.
 
 The first three hold up a
+
+---
+## Cycle 566 Log — 2026-09-05
+- Test before: 236 PASS / 0 FAIL (deployed baseline as reported at cycle start)
+- Test after: 261 PASS / 0 FAIL / 1 WARN — suite ACTUALLY RUN this cycle against the local tree
+  (`TEST_URL=http://localhost:8080 node tests/runtime_comprehensive.js`), not carried forward.
+  The single WARN is the pre-existing sw.js 404: `index.html:49` registers
+  `/petroleum-fiscal-db/sw.js`, a GitHub Pages path that cannot resolve on a local server. It was
+  present on the cold load taken BEFORE any edit this cycle.
+- JS errors: 0 (page errors and console errors both zero across the walk; the 404 above is the
+  service-worker registration, not a script error in the page)
+- Summary: Cycle 566 complete, shipped as **v660**.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (rotation: 565 was T4,
+564 T3, 563 T1, 562 T5, 561 T4, 560 T2 — T6 last walked at 559, the stalest.)
+
+## Friction
+
+Walked cold over local HTTP — no sessionStorage, no localStorage — so this tree, not what Pages is
+serving. Path: Home → Fiscal Compare → row → Country Profile, the route an analyst takes when a
+take number needs defending.
+
+Fiscal Compare's split of the take into `Take% model` and `Take% db · citable` holds up: both
+headers state which one reaches a memo, the `#` rank follows the citable column, and the Quality
+letter carries a three-part tooltip. The Country Profile Evidence Chain also holds up, and is
+better than it needs to be — NOT HELD rows (v625), BULK (v569), N JURISDICTIONS (v588), NO SOURCE
+(v601), LINK DEAD (v641/v647), and a per-country regime note that names every substituted term and
+where the substitute came from. None of those were re-opened.
+
+The break is one level above all of it, in the box titled **Evidence Quality** at the top of the
+profile — `buildEvidencePanel()`, `index.html:~23003`, the panel `_homeOpenEvidence()` opens on
+arrival and the first, and for most analysts the only, evidence surface they read.
+
+Since v611 that panel states both legs of the grade: primary-law share and fact count. **Both are
+properties of the country's whole fact base. Neither one looks at the four to six fiscal terms the
+DCF actually runs to produce the take on that page.** The letter answers a different question from
+the one a T6 analyst is asking, and nothing on it says so.
+
+Measured across all 185 shipped `api/v1/country/*.json` against the page's own
+`resolveLiveDCFMechanic()` / `getDCFParams()` term set, applying this table's own sourcing rules
+(bulk, shared-regional and D-confidence excluded — exactly as `sourcedCount` excludes them):
+
+| | |
+|---|---|
+| countries with every model term independently cited | **0 of 185.** Best on the platform is 4 of 5 |
+| A/B-graded countries with **half or fewer** model terms cited | **59 of 107** |
+| countries with **zero** model terms cited | **19** |
+| worst A-graded | **Netherlands — "A", 278 facts, 1 of 4** Concession terms cited |
+| | Brazil A over 3,591 facts, 2 of 4. Canada A, 2 of 4. Croatia, Cyprus, Germany, Greece, Italy, New Zealand, Albania, Guatemala all A at 2 of 4 |
+
+Brazil is the sharpest case: one of the two terms its model substitutes is **Special Tax** — the
+special participation levy that is most of Brazil's actual government take — and the substitute
+is zero.
+
+The page already knew every one of these numbers. The v625 regime note under the Evidence Chain
+states them per country in plain language. But that note renders **~2,750px down**, below six other
+sections, only after the API fetch resolves, on one tab, and **nothing above it hints it exists**.
+An analyst who reads "A" at the top of the profile has been answered, and stops.
+
+## Change
+
+A third leg in the Evidence Quality summary line, beside the grade letter and the two existing
+legs: **"N of M model terms cited"**.
+
+- Coloured on its own severity — red at half or below, orange short of full, green at full (a state
+  no country currently reaches).
+- Computed from the fetch **already in flight** for the Evidence Chain. No extra network request.
+  `_termsCited` is filled in the same branch of the row loop that increments `sourcedCount`, so bulk,
+  shared-regional, D-confidence and no-source rows are excluded by construction and the chip cannot
+  drift from the table it points at.
+- It is a **control, not a caption**: clicking or tapping scrolls to the Evidence Chain and flashes
+  it (`_cpScrollToEvidenceChain()`, same treatment as `_cpScrollToLiveDcf()`), with
+  `preventDefault`/`stopPropagation` so it does not toggle the `<details>` it sits inside.
+  Keyboard-reachable (`role="button"`, `tabindex="0"`, Enter/Space).
+- No tier letter, percentage, take, NPV or grade changes anywhere. How deep a fact base is and
+  whether the terms in the model are cited are different questions; this is the second.
+
+Renders: Indonesia 3 of 5 · Netherlands 1 of 4 · Brazil 2 of 4 · Norway 3 of 4 · Somalia 0 of 5 ·
+Tuvalu 0 of 4. Each agrees with the Evidence Chain note it scrolls to.
+
+## Result
+
+The analyst can see, at the top of the profile and before scrolling, that Brazil's A grade rests on
+2 of the 4 terms its model runs — and reach the term-by-term breakdown in one click instead of a
+six-section scroll hunt. Before this cycle the only way to learn that was to scroll past six
+sections on one tab and read a paragraph.
+
+## Mobile (Step 5b)
+
+Checked at **390 × 844, `hasTouch: true`**. `scrollWidth === clientWidth === 390` on all nine
+mobile-visible tabs, with the profile loaded, after tapping the chip, and with the Evidence Quality
+panel forced open. Chip is **24px** tall with a mouse and **44px** under `pointer: coarse` (v612
+mobile layer), 153px wide, right edge at 362 of 390. Desktop: no horizontal scroll at 1920 / 1440 /
+1280 / 1024 / 768.
+
+## Carried forward
+
+- **Closed this cycle.** The Evidence Quality panel answering fact-base depth when the question
+  asked was model-term sourcing.
+- **Checked and NOT a defect** (recording so a later cycle does not re-open them): Fiscal Compare's
+  `model` vs `db · citable` take split and its `#`-rank alignment with the citable column; the
+  Evidence Chain's NOT HELD / BULK / N JURISDICTIONS / NO SOURCE / LINK DEAD row states; the v625
+  regime note and the v641 retrievability note. All walked cold this cycle and all state their own
+  basis.
+- **New, surfaced by this walk, not fixed.** The `M` denominator is the term set
+  `getDCFParams()` returns, and for 98 of 185 countries that is a **4-term Concession**
+  (royalty, CIT, state participation, special tax). Brazil's real regime has a special
+  participation levy on a sliding scale by field and water depth; the model carries one flat
+  `spt_rate` and substitutes zero. The chip now reports the sourcing gap honestly, but whether a
+  4-term Concession is the right model for Brazil at all is a Fork-2 question, not a UX one.
+- **Still unblocked and still wrong.** FAQ A25 (`index.html:4176`) and A35 (`index.html:4732`) on
+  the Stability Score dot scale; A40 (`index.html:4767`) on Reform Risk being "shown in the
+  Stability column of Explorer"; both A25 and A35 route to a Screener "Stability Score filter" that
+  does not exist — the Screener's filters are `sl-take`, `sl-npv`, `sl-npv50`, `sl-evid`. Adding a
+  stability control to the Screener remains the strongest open T4.
+- **Carried from 564.** 18 of 185 countries carry no real region (17 `Other` plus UAE — Dubai
+  `Unknown`), including Republic of the Congo, Cote d'Ivoire, Ireland, Greenland, Faroe Islands,
+  Iraq-Kurdistan and Sao Tome and Principe. Same class as the cycle-344 USA finding. Strong next T1.
+- **Carried from 563.** `rfactor` preset gates on `has_r_factor_tiers`, a data flag — a future
+  T1/T6 should measure whether it discriminates or is another coverage filter.
+- All items carried from 560 and earlier are unchanged: the Side-by-Side Predictability row
+  returning `62 · UNGRADED · one term` for Guyana / Angola / Suriname alike; `MECHANIC_BREAKDOWN`
+  covering 20 of 185; `mech_mix` not reconciling to the published headline on 68 of 185; Guyana's
+  A-tier reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on lines
+  54/56/57 firing against `#cdnWarning` before it exists in the body; `IOC_DATA`'s $75 column not
+  sharing a computation with $50/$100/$125; `reform_history.json` carrying no `source` key on any of
+  its 83 events; the Screener take slider's `min="30"` floor against USA at 23.4%; Reform Risk's
+  export not stating that tab filters do not narrow it; the NaN-padded caveat rows in the CSV
+  emitters; Norway's stored p25/p75 vs its 29.6pp contract spread; `renderSampleAnalyses()` omitting
+  72 countries; the missing retrievability signal on the three Evidence COLUMNS (Explorer, Screener,
+  FC Quality) and in the exports — v647 and this cycle both landed on Country Profile only; the
+  `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead citations;
+  the two 22.5px `.source-badge` elements; the four-price breakeven bound limit; the unrecorded DCF
+  solver country selection; and cycle 539's empty Summary line.
