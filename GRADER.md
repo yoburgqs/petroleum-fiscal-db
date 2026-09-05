@@ -31117,3 +31117,18 @@ wearing the other's label.
   exist; Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror`
   handlers on lines 54/56/57; the 272 dead citations; and `SPECULATIVE_COUNTRIES` still being
   a hand-typed list of 7 names from v41.
+
+---
+## Cycle 574 Log — 2026-09-05 16:47
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cleanup denied — leaving the two local test servers and temp files in place. Cycle complete otherwise.
+
+## Cycle 574 — shipped as v668, both repos pushed
+
+**Task: T4** — "What is my fiscal-stability and reform exposure here?" (stalest; last walked at 568)
+
+**Friction.** Walked Reform Risk cold at 1440×900 with storage cleared. The per-country lookup is in good shape. The break is the panel above it.
+
+The **Regional Reform Tilt** panel is headed *"Regional Reform Tilt Since 2010"*, and its Avg St
