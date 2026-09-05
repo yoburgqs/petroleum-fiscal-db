@@ -28883,3 +28883,157 @@ tab — so a fix belongs with whoever regenerates `IOC_DATA`, not in a UX cycle.
 
 ## Friction
 IOC Portfolio was the only tab that prints a government take **without** printing the grade behind it — and it's the widest take table in the tool, up to 49 country takes at once. Fiscal Compare has a Quality column, Explorer/Screener have an Evidence column, Country Profile has the Evidence Quality panel, Si
+
+---
+## Cycle 560 Log — 2026-09-05 05:50
+- Test before: 261 PASS / 0 FAIL / 1 WARN (local build, suite's own report file)
+- Test after: 261 PASS / 0 FAIL / 1 WARN — Playwright RAN this cycle, not assumed
+- JS errors: 1 (sw.js 404 from the local static server; present before the change)
+- Shipped as **v654**, pushed to both repos.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+(Rotation: 559 was T6, 558 T3, 557 T1, 556 T5, 555 T4 — T2 last walked at 554, the stalest.)
+
+## Friction
+Walked T2 cold at 1440x900: no sessionStorage, no localStorage, straight to Country Profile.
+Indonesia auto-loads, then Guyana, Brazil, Suriname, Norway, Saudi Arabia, Qatar, Namibia,
+Mozambique, Senegal, Kazakhstan, Iraq, Colombia, Ghana, Bahrain.
+
+The headline strip tells the analyst, in its own words, **"Defend on the take and its evidence
+tier, not on the NPV."** So the walk followed the take down the page to the contract evidence.
+It does not agree with the headline, and nothing on the page said so.
+
+- **Peru** prints a **27.0%** headline. Every one of the 50 contracts in its own contract table
+  prices at **44.7%**. 17.7pp apart.
+- **Guyana** prints **54.1%**. All 50 listed contracts price at **57.0%**, and the Contract
+  Distribution panel prints `P25: 57.0% | Avg: 54.1% | P75: 57.0%` — a mean outside its own
+  quartile band, which is arithmetically impossible for a single-term set and visible on screen.
+- **Iraq** 84.8% against 98.5–99.5%; **Egypt** 45.1% against 58.8%; **Pakistan** 37.4% against
+  51.0%; **Gabon**, **Tunisia**, **Turkmenistan**, **Russia**, **Trinidad and Tobago**, **China**
+  the same shape.
+
+**Why the existing disclosure never fired.** `cpSpreadParts()` has three branches. The
+measured-band branch already handles this: it tests `hd < p25 || hd > p75`, appends an `ⓘ` and
+explains the gap. Only **3 of the 57** countries whose headline falls outside its own p25–p75
+ever reach it — Nigeria, Republic of the Congo, Sao Tome. The other **54 are single-term**
+(`p25 === p75`) and land in the branch above, which had no headline test at all: it asserted the
+term and, once the contract table loaded, appended a green **✓**.
+
+**The ✓ was a second, independent defect.** It is appended when the sample's *spread* is narrow,
+and its tooltip then reads *"CORROBORATED … consistent with a single statutory term."* Nothing
+ever checked the sample's *level*. Peru's 50 contracts do span 0.0pp — 21.6pp away from the
+23.1% the badge was ticking. **Russia** and **Canada** did the same thing.
+
+So the worst moment: the analyst reads the number the tool told them to defend, scrolls to the
+only contract-level evidence on the page, finds a different number carrying a green tick, and has
+nothing to reconcile them with.
+
+## Change
+One rule in `cpSpreadParts()`, applied **after all three branches**, using the strongest
+contract-level evidence already on the page. It always references the same evidence the badge
+text is displaying, so the badge and its warning can never point at different ranges.
+
+| condition | badge now reads |
+|---|---|
+| headline outside the range printed beside it | `Contract take: single term · 57.0% ⚠ vs headline 54.1%` |
+| headline inside the bundled band, but no listed contract reaches it | `Contract take: 65.0–98.5% (33.5pp) ⚠ none listed at headline 84.8%` |
+
+- Badge recolours **yellow** (≤5pp) / **orange** (>5pp) by gap size.
+- The **✓ is stripped** whenever the rule fires — a tick asserting corroboration cannot stand on
+  a badge simultaneously reporting the evidence does not support the headline. Trailing `ⓘ` and
+  `⚠` are stripped too, so the conflict branch does not end up with a doubled glyph.
+- Tooltip states both figures, the basis of each, the mechanic split from the record's own
+  `mech_mix` where `mech_mix` accounts for the gap (Guyana: *"9 of 143 contracts — Concession 9
+  at 18.1% — price away from 57.0% and pull the mean down to 54.1%"*), and which figure to cite
+  for terms versus for ranking.
+
+**20 countries flagged, 140 unchanged, measured across all 185 with the live builder:**
+outside-shown-range — Bangladesh, Bolivia, Cameroon, Guyana, Mozambique, Nigeria, Peru, Republic
+of the Congo, Uganda, Uzbekistan, Yemen. None-listed-at-headline — China, Egypt, Gabon, Iraq,
+Pakistan, Russia, Trinidad and Tobago, Tunisia, Turkmenistan.
+
+**No new threshold.** Materiality bar is `CP_OBS_REFUTE_PP`, the constant this same function
+already uses to judge whether a take difference is real or rounding. Nothing recomputed, no take
+overwritten, no p25/p75 rewritten, nothing rescored.
+
+**The band branch's explanation is deliberately not reused.** It attributes the gap to production
+weighting. **45 of these 57 carry `weighting: 'simple_avg'` at `prod_coverage_pct: 0.0`**, where
+that sentence would be false. Basis is read from the record: production-weighted with its coverage
+percentage where true, unweighted mean otherwise.
+
+## Result
+An analyst can no longer paste a Country Profile headline take into an IC memo believing the
+contract table beneath it agrees. On the 20 countries where it does not, they see both figures,
+which one describes the terms they would actually sign, which one every rank, median pill and
+screener filter on the platform is built on, and that the two have to be stated separately.
+
+## Step 5b — mobile
+The longest form (Iraq) measured **402px** against a 390px phone and made the whole document
+scroll sideways. `.cp-spread-badge` is `white-space: nowrap` so its take band never breaks
+mid-range on a desktop; it now wraps under `max-width: 720px` **only**.
+- All 8 primary tabs at 390x844 `hasTouch:true`: `scrollWidth 390 = clientWidth 390`.
+- All 20 flagged countries: 0 h-scroll at 390 **and** at 1440.
+- Minimum badge height under `pointer: coarse`: **24.5px** (floor is 24px).
+
+## Locked items — all intact
+`COUNTRY_DATA`, `MECHANIC_BREAKDOWN`, `IOC_DATA` untouched. **No tab added, removed or
+reordered.** Chip rows stay `display:none`; no page-sub paragraph, amber instructional banner,
+routing hint or "How to read" block; no SbS card wrapper. Screener advanced filters still
+collapsed, presets still a dropdown; Home "More tools" still collapsed; Explorer analytics still
+collapsed. Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst
+Guide sessionStorage logic untouched. CP headline stays two-zone with global rank and vs-median
+pill; take% stays tier-coloured; Reform Risk stays in the primary Home card grid. The v612 mobile
+layer is added to, never narrowed — `#reference-panel` keeps its `translateX` state and no
+negative `right` offset; `.cp-spread-badge` carries no `min-width: max-content` precisely because
+it should wrap rather than scroll. v371/v373, v430, v449, v451, v452, v489, v507, v517, v530,
+v554, v568, v587, v599, v609, v612, v617, v621, v632, v637, v639–v653 intact.
+
+## Found while walking, NOT fixed this cycle — and why
+**`MECHANIC_BREAKDOWN` covers 20 of 185 countries, so the two-regime headline chip is silent on
+53 more that meet its own gate.** `_cpRegimeSplit570` returns early on `mb.length < 2`, so a
+country absent from that hand-maintained table never gets the warning however far apart its
+regimes are. The silent set contains larger spreads than any country that gets the chip (the
+widest shown is Brazil at 54.5pp): **Cyprus 61.7pp** (Concession 46 @15.3% vs PSC 25 @77.0%),
+South Sudan 52.3, Chad 51.8, Mongolia 45.7, Georgia 45.4, Timor-Leste 42.3, Somalia 41.3,
+Cameroon 40.0, **Guyana 38.4**, and 44 more.
+
+**Generalising it from `mech_mix` was attempted this cycle and abandoned on evidence.** `mech_mix`
+carries every field the chip renders, but its count-weighted blend **does not reconcile to the
+published headline on 68 of 185 countries** — Brazil blends to 24.1 against a 55.6 headline,
+Sierra Leone 3.3 against 53.4, Namibia 9.9 against 37.0, the UK 42.6 against 49.2. Rendering it
+would have replaced a silence with a fresh on-screen contradiction, which is worse than the
+silence. `MECHANIC_BREAKDOWN` does not reconcile either on Philippines (85.0 vs 46.5), Russia
+(24.7 vs 46.4) and Bolivia (83.0 vs 72.1). Both are data-generation questions for whoever
+regenerates those fields, not a UX cycle.
+
+**Guyana's own A-tier reform log contradicts its headline take by ~20pp.** The 2020 event
+(tier A) reads *"Stabroek Block terms: 2% royalty + 75% cost recovery cap + 50/50 profit oil
+after recovery. At $75/bbl, govt take ~30-35%"*; the 2022 event (tier B) reads *"government take
+14-30% at $50-75/bbl"*. The page prints 54.1%. The mechanism is already disclosed in the tier
+block — the DCF resolves Guyana's PSCs on an R-factor ladder running 40–85% government, which the
+page itself labels a MODEL template shared with India, Iraq-Kurdistan and Sri Lanka and says not
+to cite as a Guyana term — but nothing connects that to the headline the analyst is told to
+defend. A sweep of all 21 reform-logged countries found only 6 numeric take statements, and 3 of
+the other 5 (Ecuador 99% in 2008, Russia 80% marginal barrel, Algeria 1971) are historical or
+marginal-barrel figures that *should* differ from a current average, so a blanket rule would
+misfire. Needs a judgement about which is right, not a renderer change.
+
+**Latent, pre-existing, not from this cycle:** the CDN `onerror` handlers on lines 54/56/57 run
+`document.getElementById('cdnWarning').style.display='block'` from `<head>`, before `#cdnWarning`
+exists in the body. When Chart.js fails to load, the handler itself throws
+`Cannot read properties of null`, so the intended warning never appears and the failure cascades
+into ~20 `Chart is not defined` errors. Reproduced once under a flaky network during this walk.
+
+## Carried, not fixed
+Everything carried from 559 and earlier is unchanged: the Side-by-Side proxy notice still
+promising an IRR row that is not on the tab; `IOC_DATA`'s $75 column not sharing a computation
+with its $50/$100/$125 columns (104 of 149 groups, 50 rows showing take falling then rising);
+`reform_history.json` carrying no `source` key on any of its 83 events; the Screener take
+slider's `min="30"` floor against USA at 23.4%; the Screener's missing clipboard control; Reform
+Risk's export not stating that tab filters do not narrow it; the NaN-padded caveat rows in all
+four CSV emitters; Norway's stored p25/p75 vs its 29.6pp contract spread; `renderSampleAnalyses()`
+omitting 72 countries; `#flt-region` roll-up-only on the Explorer; the missing retrievability
+signal on three Evidence columns; the `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea
+Trio tooltip; the 272 dead citations; the two 22.5px `.source-badge` elements; the four-price
+breakeven bound limit; and the unrecorded DCF solver country selection.
