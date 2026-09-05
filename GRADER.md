@@ -29495,3 +29495,20 @@ v639–v656 intact.
   `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead
   citations; the two 22.5px `.source-badge` elements; the four-price breakeven bound limit; the
   unrecorded DCF solver country selection; and cycle 539's empty Summary line.
+
+---
+## Cycle 563 Log — 2026-09-05 03:57
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 563 complete — shipped as **v657**, pushed to both repos.
+
+## Task: T1 — "Which countries should even be on my screening list?"
+
+(Stalest in the rotation: 562 was T5, 561 T4, 560 T2, 559 T6, 558 T3, 557 T1.)
+
+## Friction
+
+Walked the Screener cold. The default state is fine — 185 rows, "no filters applied yet." The failure is one click later.
+
+The tab's four Advanced Filters were Mechanic, IOC Operator, **Water Depth**, Region. Water Depth is the one an analyst reaches for first, because th
