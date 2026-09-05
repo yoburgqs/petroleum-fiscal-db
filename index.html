@@ -1462,14 +1462,37 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 /* v101: Prevent long country names from breaking table layout */
 #tbl-explorer tbody td:first-child { text-overflow: ellipsis; overflow: hidden; max-width: 180px; }
 @media (max-width: 768px) {
-  /* Hide Breakeven, Swing, Stability headers and cells */
-  #tbl-explorer th[data-sort-key="be"],
-  #tbl-explorer th[data-sort-key="swing"],
-  #tbl-explorer th.num:last-child { display: none; }
-  /* Hide corresponding td cells — 7th, 8th, 9th columns */
-  #tbl-explorer tbody td:nth-child(7),
-  #tbl-explorer tbody td:nth-child(8),
-  #tbl-explorer tbody td:nth-child(9) { display: none; }
+  /* ── v655 (T4) — the phone Explorer was reading under the wrong headers ──────
+     This block used to hide the HEADERS of Breakeven and Swing by their sort key
+     while hiding the BODY cells by position — td:nth-child(7), (8), (9). Those
+     indices were correct for a 9-column table. The table has 19 columns, and
+     positions 7/8/9 are now Govt Take, Evidence and Curve. The two lists had
+     drifted apart, so at <=768px the head showed 14 columns and the body showed
+     13, and every cell from the 7th onward sat under the wrong label:
+
+        header "Govt Take"      over  $3.3B          (Contractor NPV)
+        header "Evidence"       over  421.4%         (IRR)
+        header "Curve"          over  —              (Breakeven)
+        header "Contractor NPV" over  +6.2pp         (Swing)
+        header "IRR @ $75"      over  91 UNGRADED    (Stability)
+        header "Stability"      over  18% royalty    (Key Rate)
+        header "Key Rate"       over  Inv-Friendly   (Tier)
+
+     Govt Take — the number the whole table ranks on — was hidden outright while
+     its header stayed and captioned an NPV. Nothing threw, so nothing caught it.
+     (The third selector, th.num:last-child, matched nothing at all: the last th
+     is Tier, which has no .num class. Stability was never hidden either.)
+
+     Both lists are now the SAME list, keyed on a class carried by the th and its
+     td together, so a column can never again be dropped from one and not the
+     other. The four columns dropped on a phone are the four whose cell is either
+     empty or unreadable at that width: Region (duplicated by the region filter
+     directly above the table), Curve (a 4-point sparkline), IRR (124/185, and
+     unbounded where it does print) and Breakeven (68/185 — 117 rows print an
+     em dash). Govt Take, Evidence, Swing, Stability, Key Rate and Tier — every
+     column a screening or stability read depends on — now stay. */
+  #tbl-explorer th.expl-sm-off,
+  #tbl-explorer tbody td.expl-sm-off { display: none; }
   /* Disable 4-Price button on mobile — it adds 3 more columns */
   #four-price-toggle {
     display: none !important;
@@ -1705,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v654</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v655</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1775,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v654</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v655</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2108,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v654';
+  return m ? m[0] : 'v655';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2183,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v654');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v655');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2424,18 +2447,18 @@ window.copyPlatformCitation = function(btn) {
           <th>#</th>
           <th style="width:36px"></th>
           <th data-sort-key="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z">Country</th>
-          <th>Region</th>
+          <th class="expl-sm-off">Region</th>
           <th class="num">Contracts</th>
           <th>Mechanics</th>
           <th class="num" data-sort-key="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take as % of gross revenue at $75/bbl (royalties + taxes + profit oil — all instruments). Lower = better for investor. Sort: low→high.">Govt Take</th>
           <th class="num" data-sort-key="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts the country&#39;s regime was built from. The grade is the worse of two legs: primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15) &mdash; so 100% primary law on 4 facts grades D, not A. Same grade as Fiscal Compare&#39;s Quality column. Sort: weakest grade first.">Evidence</th>
-          <th class="num" title="Price sensitivity sparkline — mini line chart showing government take at $50, $75, $100, and $125/bbl (left to right). A steep upward slope = progressive regime (take rises sharply with price — common in profit-based PSCs and PRRT). A flat line = royalty-dominant (take barely changes with price). The highlighted dot marks the currently selected price scenario. Use 'Swing (pp)' column for the precise numeric value of this sensitivity.">Curve</th>
+          <th class="num expl-sm-off" title="Price sensitivity sparkline — mini line chart showing government take at $50, $75, $100, and $125/bbl (left to right). A steep upward slope = progressive regime (take rises sharply with price — common in profit-based PSCs and PRRT). A flat line = royalty-dominant (take barely changes with price). The highlighted dot marks the currently selected price scenario. Use 'Swing (pp)' column for the precise numeric value of this sensitivity.">Curve</th>
           <th class="num expl-mp-col" style="display:none">@$50</th>
           <th class="num expl-mp-col" style="display:none">@$100</th>
           <th class="num expl-mp-col" style="display:none">@$125</th>
           <th class="num" data-sort-key="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV — net present value of contractor cash flows at $75/bbl. 100% WI gross (before state participation). Values shown in $M or $B. Sort: high→low">Contractor NPV</th>
-          <th class="num" data-sort-key="irr" tabindex="0" role="columnheader" aria-sort="none" title="Contractor IRR at $75/bbl base case — available for 124 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(124/185 countries)</span></th>
-          <th class="num" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
+          <th class="num expl-sm-off" data-sort-key="irr" tabindex="0" role="columnheader" aria-sort="none" title="Contractor IRR at $75/bbl base case — available for 124 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(124/185 countries)</span></th>
+          <th class="num expl-sm-off" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
           <th class="num" data-sort-key="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price sensitivity: govt take@$125/bbl minus take@$50/bbl in percentage points. High swing = fiscal terms are price-sensitive (government captures more of oil price upside). Color: green &lt;10pp (stable), amber 10&ndash;20pp (moderate), red &gt;20pp (highly responsive). Sort: low to high.">Swing (pp)</th>
           <th class="num" style="cursor:help;" title="Fiscal Predictability Score (0–100). A bar is drawn ONLY for the 28 countries where ORCA measured a take spread across their own contracts; the other rows show the number with an UNGRADED marker and no bar, because bar LENGTH asserts a ranking and these scores were never charged the penalty that would shorten them. Composite measure of how consistent and predictable this country's fiscal terms are. Three components: (1) Within-country IQR penalty — wide spread of take across contracts means inconsistent terms between blocks (up to −40 pts). (2) Price swing penalty — highly progressive regimes are less predictable across price cycles (up to −30 pts). (3) Regime complexity penalty — multiple fiscal mechanics within one country reduce uniformity (−8 pts per additional mechanic). Score ≥75 = HIGH (green); 60–74 = MODERATE (amber); 45–59 = LOW (orange); &lt;45 = VERY LOW (red) — but since v624 a band and a colour are awarded ONLY where ORCA measured a spread across the country's own contracts. A one-term score renders UNGRADED and uncoloured however high its number, because the band it would fall in was earned by an IQR penalty that was never charged. Each row carries its dispersion basis beside the number: 'one term' = every contract in that country prices identically, so the IQR component contributed nothing and the score reflects price swing and mechanic count only; a figure such as '15.0pp' = a measured spread the score IS penalised for; 'n/c' = no contract-level take distribution is held, so the score is not computed rather than assuming a spread of zero. Only 28 of 185 countries have a measured spread; every score that would fall in HIGH belongs to a one-term regime and none of the 28 reaches it (ceiling 74, Turkmenistan). A graded MODERATE therefore outranks any UNGRADED score on this column. Do not read a lower score as the worse regime without checking the basis. Note: distinct from the Reform Frequency Score (0–100) on the Reform Risk tab, which measures number of legislative changes since 2010.">Stability ⓘ</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
@@ -24243,7 +24266,7 @@ function renderExplorer() {
       <td class="num" style="color:var(--muted)">${i+1}</td>
       <td><button onclick="addToBasket('${d.country.replace(/'/g,"\\'")}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;">+</button></td>
       <td><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''}${prodBadge} ${getDQBadge(d)}</td>
-      <td style="color:var(--muted)">${d.region}</td>
+      <td class="expl-sm-off" style="color:var(--muted)">${d.region}</td>
       <td class="num" style="cursor:pointer;color:var(--accent);" onclick="event.stopPropagation();openContractDrilldown('${d.country.replace(/'/g,"\\'")}')" title="Click to open Country Profile with contract details">${(function(){
         const _mechKeyMap={'buy-back':'buyback','revenue share':'rev_share'};
         const _mk='n_'+(_mechKeyMap[mech.toLowerCase()]||mech.toLowerCase().replace(/ /g,'_').replace(/-/g,'_'));
@@ -24254,13 +24277,13 @@ function renderExplorer() {
       <td>${mechs}</td>
       ${makeTakeCellWithEvidence(take, d)}
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}</td>
-      <td class="num">${makeTakeSparkline(d, price)}</td>
+      <td class="num expl-sm-off">${makeTakeSparkline(d, price)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_50)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_100)}</td>
       <td class="num expl-mp-col" style="display:${_fourPriceActive?'':'none'}">${fmtTake(d.take_125)}</td>
       <td class="num">${fmtNpvShared(npv)}</td>
-      <td class="num">${fmtIrr(irr)}</td>
-      <td class="num" style="${(function(){
+      <td class="num expl-sm-off">${fmtIrr(irr)}</td>
+      <td class="num expl-sm-off" style="${(function(){
         if (!d.be_75 || d.be_75 <= 1 || d.be_75 >= 999) return ''; // <=1 is state-monopoly sentinel
         if (d.be_75 < 50) return 'border-left:3px solid #15803D;padding-left:5px;';
         if (d.be_75 <= 75) return 'border-left:3px solid #A16207;padding-left:5px;';
