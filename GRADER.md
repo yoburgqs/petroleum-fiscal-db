@@ -28870,3 +28870,16 @@ tab — so a fix belongs with whoever regenerates `IOC_DATA`, not in a UX cycle.
 - New, not fixed: `reform_history.json` carries no `source` key on any of its 83 events across 21
   countries. The Reform Risk tab renders a citation and a tier letter per event regardless, so
   those strings come from somewhere other than that file — worth tracing before anyone edits it.
+
+---
+## Cycle 559 Log — 2026-09-04 23:31
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 559 complete — shipped as **v653**, pushed to both repos.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (stalest; last walked at 553)
+
+## Friction
+IOC Portfolio was the only tab that prints a government take **without** printing the grade behind it — and it's the widest take table in the tool, up to 49 country takes at once. Fiscal Compare has a Quality column, Explorer/Screener have an Evidence column, Country Profile has the Evidence Quality panel, Si
