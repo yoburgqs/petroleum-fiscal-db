@@ -29339,3 +29339,14 @@ v599, v609, v612, v617, v621, v632, v637, v639–v655 intact.
   columns; the `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272
   dead citations; the two 22.5px `.source-badge` elements; the four-price breakeven bound limit;
   the unrecorded DCF solver country selection; and cycle 539's empty Summary line.
+
+---
+## Cycle 562 Log — 2026-09-05 03:04
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 562 complete — shipped as **v656**, pushed to both repos.
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo." (Stalest; 561 was T4, 560 T2, 559 T6, 558 T3, 557 T1.)
+
+**Friction:** The Screener is the surface that *builds* the IC shortlist — load a preset, move the take/NPV/evidence thresholds, land on 8–15 countries. That row set is the table that goes in the memo. It was the only results table in the tool with no clipboard path. Fiscal Compare, Side-by-Side, IOC Port
