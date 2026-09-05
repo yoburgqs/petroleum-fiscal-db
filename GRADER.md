@@ -28251,3 +28251,16 @@ vs-median pill; take% stays tier-coloured; Reform Risk stays in the primary Home
 **v612 MOBILE LAYER** block and the `#reference-panel` `translateX` state are intact — this cycle
 adds no CSS rule at all and narrows, weakens or removes nothing. v371/v373, v430, v449, v451, v452,
 v489, v612, v621, v632, v637, v639–v648 and every locked item through v648 intact.
+
+---
+## Cycle 555 Log — 2026-09-04 19:15
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 555 complete — shipped as **v649**, pushed to both repos.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest; 554 was T2, 553 T6, 552 T3, 551 T1, 550 T5.)
+
+## Friction
+I walked the per-country T4 surfaces first and found them genuinely solid — the Reform Risk lookup card is honest on all four branches, its country dropdown is already split into "scoreable (21)" vs "no sourced history (164)" optgroups, and Fiscal Compare already has a Reform-scored-only filte
