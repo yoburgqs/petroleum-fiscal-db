@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v660</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v661</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v660</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v661</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v660';
+  return m ? m[0] : 'v661';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v660');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v661');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2260,15 +2260,21 @@ window.copyPlatformCitation = function(btn) {
   <div id="fc-region-row" style="display:none;margin-bottom:8px;flex-wrap:wrap;gap:6px;align-items:center;">
     <span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-right:2px;">Region:</span>
     <button class="fc-region-chip active" data-region="" onclick="setFCRegion('')" title="Show all 185 countries" aria-pressed="true">All (185)</button>
-    <button class="fc-region-chip" data-region="Africa" onclick="setFCRegion('Africa')" title="49 African producing countries" aria-pressed="false">Africa (49)</button>
-    <button class="fc-region-chip" data-region="Middle East" onclick="setFCRegion('Middle East')" title="14 Middle East producing countries" aria-pressed="false">Middle East (14)</button>
+    <button class="fc-region-chip" data-region="Africa" onclick="setFCRegion('Africa')" title="54 African producing countries. Includes Republic of the Congo, Cote d&#x27;Ivoire, Gambia, Central African Republic and Sao Tome and Principe, which the database files under &quot;Other&quot; and this platform screens under UN M49 Africa." aria-pressed="false">Africa (54)</button>
+    <button class="fc-region-chip" data-region="Middle East" onclick="setFCRegion('Middle East')" title="17 Middle East producing countries. Includes Iraq-Kurdistan and the two UAE emirate entries, which the database files under &quot;Other&quot;/&quot;Unknown&quot;." aria-pressed="false">Middle East (17)</button>
     <button class="fc-region-chip" data-region="Asia" onclick="setFCRegion('Asia')" title="26 Asian producing countries" aria-pressed="false">Asia (26)</button>
-    <button class="fc-region-chip" data-region="Latin America" onclick="setFCRegion('Latin America')" title="26 Latin American producing countries" aria-pressed="false">Latin Am. (26)</button>
-    <button class="fc-region-chip" data-region="Europe" onclick="setFCRegion('Europe')" title="30 European producing countries" aria-pressed="false">Europe (30)</button>
+    <button class="fc-region-chip" data-region="Latin America" onclick="setFCRegion('Latin America')" title="31 Latin American producing countries. Includes Barbados, Dominican Republic, Haiti, French Guiana and the Falkland Islands, which the database files under &quot;Other&quot;." aria-pressed="false">Latin Am. (31)</button>
+    <button class="fc-region-chip" data-region="Europe" onclick="setFCRegion('Europe')" title="33 European producing countries. Includes Ireland, the Faroe Islands and Montenegro, which the database files under &quot;Other&quot;. Greenland is NOT here — UN M49 places it in Northern America." aria-pressed="false">Europe (33)</button>
     <button class="fc-region-chip" data-region="CIS/FSU" onclick="setFCRegion('CIS/FSU')" title="5 CIS/FSU producing countries" aria-pressed="false">CIS/FSU (5)</button>
-    <button class="fc-region-chip" data-region="Oceania" onclick="setFCRegion('Oceania')" title="15 Oceania producing countries" aria-pressed="false">Oceania (15)</button>
-    <button class="fc-region-chip" data-region="North America" onclick="setFCRegion('North America')" title="North America — USA and Canada. USA: 37,222 contracts, lowest take in database (23% @$75, Concession-only)." aria-pressed="false">N. America (2)</button>
-    <button class="fc-region-chip" data-region="Other" onclick="setFCRegion('Other')" title="Other — 17 countries including Iraq-Kurdistan, UAE Abu Dhabi, Republic of the Congo, Cote d&#x27;Ivoire, Faroe Islands, Greenland, Falkland Islands, Gambia, French Guiana, and Pacific island nations not in primary regional groupings." aria-pressed="false">Other (17)</button>
+    <button class="fc-region-chip" data-region="Oceania" onclick="setFCRegion('Oceania')" title="16 Oceania producing countries. Includes Vanuatu, which the database files under &quot;Other&quot;." aria-pressed="false">Oceania (16)</button>
+    <button class="fc-region-chip" data-region="North America" onclick="setFCRegion('North America')" title="North America — USA, Canada and Greenland. Greenland is UN M49 Northern America (021), not Europe; the database files it under &quot;Other&quot;. USA: 37,222 contracts, lowest take in database (23% @$75, Concession-only)." aria-pressed="false">N. America (3)</button>
+    <!-- v661 (T1): "Other" held 17 countries + Unknown held 1, and all 18 have an unambiguous
+         UN M49 region. They are re-filed at load (_normalizeRegions), so this chip now returns
+         nothing and starts hidden. It is not deleted: _labelRegionControls() re-shows it with a
+         live count if a future country_data.json ever ships a row this platform cannot place,
+         which is better than that row being unreachable from every region control. -->
+    <button class="fc-region-chip" data-region="Other" style="display:none" aria-hidden="true" onclick="setFCRegion('Other')" title="Countries the database files under &quot;Other&quot;/&quot;Unknown&quot; that this platform cannot place in a UN M49 region. Currently none." aria-pressed="false">Other (0)</button>
+    <span id="fc-region-refiled-mount" style="flex:1 1 100%;"></span>
     <span style="margin-left:8px;width:1px;background:var(--border);align-self:stretch;"></span>
     <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the 68 countries with verified breakeven price data. Auto-enabled when sorting by Breakeven."><input type="checkbox" id="fc-filter-be" style="accent-color:var(--accent);" onchange="window._fcBEManuallySet=true;renderFCResults(window._fcResults||[],window._fcLastPrice||75)"> &#9651; Breakeven only</label>
     <!-- ── v633 (T4): the Stability column had a coverage problem and no coverage control ──
@@ -2405,7 +2411,9 @@ window.copyPlatformCitation = function(btn) {
         <option>Africa</option><option>Asia Pacific</option><option>Middle East</option>
         <option>Europe</option><option>Americas</option>
         <option value="CIS/FSU">CIS/FSU</option>
-        <option>Other</option>
+        <!-- v661 (T1): re-filed to UN M49 regions at load. _labelRegionControls() drops this
+             option when it would return zero rows and adds live counts to the rest. -->
+        <option value="Other">Other</option>
       </select>
     </div>
     <div class="ctrl-group">
@@ -2725,22 +2733,25 @@ window.copyPlatformCitation = function(btn) {
              country_data.json. -->
         <select id="sc-region" aria-label="Filter by region" title="Region groupings match Fiscal Compare. The two roll-ups (Asia Pacific, Americas) are the sum of the granular regions listed under them; pick the granular one when you want exactly that set." style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
           <option value="">All Regions</option>
-          <option value="Africa">Africa (49)</option>
-          <option value="Middle East">Middle East (14)</option>
-          <option value="Europe">Europe (30)</option>
+          <option value="Africa">Africa (54)</option>
+          <option value="Middle East">Middle East (17)</option>
+          <option value="Europe">Europe (33)</option>
           <option value="CIS/FSU">CIS/FSU (5)</option>
           <optgroup label="Asia Pacific">
-            <option value="Asia Pacific">Asia Pacific — all (41)</option>
+            <option value="Asia Pacific">Asia Pacific — all (42)</option>
             <option value="Asia">  Asia (26)</option>
-            <option value="Oceania">  Oceania (15)</option>
+            <option value="Oceania">  Oceania (16)</option>
           </optgroup>
           <optgroup label="Americas">
-            <option value="Americas">Americas — all (28)</option>
-            <option value="Latin America">  Latin America (26)</option>
-            <option value="North America">  North America (2)</option>
+            <option value="Americas">Americas — all (34)</option>
+            <option value="Latin America">  Latin America (31)</option>
+            <option value="North America">  North America (3)</option>
           </optgroup>
-          <option value="Other">Other (18)</option>
+          <!-- v661 (T1): empty by construction once the 18 are re-filed; _labelRegionControls()
+               removes it at load and restores it only if a data load actually populates it. -->
+          <option value="Other">Other (0)</option>
         </select>
+        <div id="sc-region-refiled-mount"></div>
       </div>
       <div class="screener-filter-block">
         <div class="filter-lbl">Data Basis</div>
@@ -24123,6 +24134,134 @@ function _mechMatch(d, mechVal) {
   return k ? (d[k] || 0) > 0 : d.mechanics.split(',').map(s=>s.trim()).includes(mechVal);
 }
 // Helper: match region chip against DB region strings (chip labels differ from DB values)
+// ── v661 (T1) — the 18 rows country_data.json files under "Other"/"Unknown" ──
+// Every one of them has an unambiguous UN M49 home. See the long note at the COUNTRY_DATA
+// fetch for why this exists and what it fixes. Keys are verified against country_data.json
+// at load: _normalizeRegions() reports any key that matched no row, so a country rename in
+// the harvest pipeline surfaces as a console warning instead of silently un-fixing a region.
+const _REGION_M49_FIX = {
+  "Central African Republic": "Africa",
+  "Cote d'Ivoire": "Africa",
+  "Gambia": "Africa",
+  "Republic of the Congo": "Africa",
+  "Sao Tome and Principe": "Africa",
+  "Faroe Islands": "Europe",
+  "Ireland": "Europe",
+  "Montenegro": "Europe",
+  "Barbados": "Latin America",
+  "Dominican Republic": "Latin America",
+  "Falkland Islands": "Latin America",
+  "French Guiana": "Latin America",
+  "Haiti": "Latin America",
+  "Iraq-Kurdistan": "Middle East",
+  "UAE \u2014 Abu Dhabi": "Middle East",
+  "UAE \u2014 Dubai": "Middle East",
+  "Greenland": "North America",
+  "Vanuatu": "Oceania"
+};
+// Rows actually moved this load, in DB order. Drives the on-screen disclosure; never a
+// hardcoded 18, so if the pipeline fixes a row upstream the count here drops by itself.
+let _regionsRefiled = [];
+
+function _normalizeRegions(rows) {
+  if (!Array.isArray(rows)) return [];
+  const moved = [], seen = Object.create(null);
+  rows.forEach(function(d) {
+    if (!d || !d.country) return;
+    const fix = _REGION_M49_FIX[d.country];
+    if (!fix) return;
+    seen[d.country] = 1;
+    if (d.region === fix) return;      // pipeline fixed it upstream — nothing to do
+    d.region_filed = d.region || 'Unknown';
+    d.region = fix;
+    moved.push(d);
+  });
+  const stale = Object.keys(_REGION_M49_FIX).filter(function(k) { return !seen[k]; });
+  if (stale.length) console.warn('_normalizeRegions: no row matched', stale);
+  return moved;
+}
+
+// Region control labels, counted off COUNTRY_DATA rather than typed into the markup, so a
+// count on a chip cannot disagree with the number of rows that chip returns. Any option or
+// chip that would return zero rows is taken off the control instead of being left there to
+// hand the analyst an empty table — which is what "Other" becomes once the 18 are re-filed.
+function _labelRegionControls() {
+  if (!Array.isArray(COUNTRY_DATA) || !COUNTRY_DATA.length) return;
+  const n = Object.create(null);
+  COUNTRY_DATA.forEach(function(d) { n[d.region] = (n[d.region] || 0) + 1; });
+  const ROLL = {'Asia Pacific': ['Asia','Oceania'], 'Americas': ['Latin America','North America'],
+                'Other': ['Other','Unknown']};
+  const cnt = function(v) {
+    if (!v) return COUNTRY_DATA.length;
+    return (ROLL[v] || [v]).reduce(function(a, r) { return a + (n[r] || 0); }, 0);
+  };
+  const relabel = function(el, v) {
+    el.textContent = el.textContent.replace(/\s*\(\d+\)\s*$/, '') + ' (' + cnt(v) + ')';
+  };
+  // Fiscal Compare chip row
+  Array.prototype.forEach.call(document.querySelectorAll('.fc-region-chip'), function(b) {
+    const v = b.getAttribute('data-region');
+    if (v && cnt(v) === 0) { b.style.display = 'none'; b.setAttribute('aria-hidden','true'); return; }
+    b.style.display = ''; b.removeAttribute('aria-hidden');
+    relabel(b, v);
+  });
+  // Screener + Explorer selects. Explorer's options carry no value attribute, so .value falls
+  // back to the label — pin the value BEFORE touching the text or the option stops matching.
+  ['sc-region', 'flt-region'].forEach(function(id) {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    Array.prototype.slice.call(sel.querySelectorAll('option')).forEach(function(o) {
+      const v = o.value;
+      if (!v) return;
+      o.setAttribute('value', v);
+      if (cnt(v) === 0) { o.parentNode.removeChild(o); return; }
+      relabel(o, v);
+    });
+    Array.prototype.forEach.call(sel.querySelectorAll('optgroup'), function(g) {
+      if (!g.querySelector('option')) g.parentNode.removeChild(g);
+    });
+  });
+  _mountRefiledDisclosure();
+}
+
+// The re-filing is a judgement about someone else's data, so it is shown, not buried. One
+// <details>, collapsed (v371 declutter), mounted on both surfaces whose counts it changed.
+// Not a tooltip: it is keyboard-reachable, it names every country, and it prints the region
+// the database shipped beside the region the screen now uses.
+function _mountRefiledDisclosure() {
+  if (!_regionsRefiled.length) return;
+  const rows = _regionsRefiled.slice().sort(function(a, b) {
+    return a.region === b.region ? a.country.localeCompare(b.country)
+                                 : a.region.localeCompare(b.region);
+  });
+  const body = rows.map(function(d) {
+    return '<span style="display:inline-block;margin:0 10px 3px 0;white-space:nowrap;">'
+      + '<span style="color:var(--text);">' + d.country + '</span>'
+      + ' <span style="opacity:.6;">' + (d.region_filed || 'Unknown') + ' \u2192</span> '
+      + '<span style="color:var(--accent);font-weight:600;">' + d.region + '</span></span>';
+  }).join('');
+  const mounts = [
+    document.getElementById('sc-region-refiled-mount'),
+    document.getElementById('fc-region-refiled-mount')
+  ];
+  mounts.forEach(function(m, i) {
+    if (!m || m.getAttribute('data-mounted') === '1') return;
+    m.setAttribute('data-mounted', '1');
+    m.innerHTML =
+      '<details style="margin-top:6px;">'
+      + '<summary style="display:inline-flex;align-items:center;min-height:24px;font-size:10px;'
+      + 'font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);'
+      + 'cursor:pointer;list-style:none;user-select:none;">'
+      + rows.length + ' countries re-filed from &ldquo;Other&rdquo; \u00b7 UN M49 \u25b8</summary>'
+      + '<div style="font-size:11px;line-height:1.8;color:var(--muted);padding:6px 0 2px;">'
+      + 'These rows ship from the database under <em>Other</em> or <em>Unknown</em>, which is not a '
+      + 'region. They are screened, ranked and peer-compared under their <strong>UN M49</strong> '
+      + 'region instead, so an Africa screen returns Republic of the Congo and an Africa peer median '
+      + 'is taken against African countries. Greenland is M49 Northern America, not Europe.'
+      + '<div style="margin-top:6px;">' + body + '</div></div></details>';
+  });
+}
+
 function _regionMatch(dRegion, chipVal) {
   if (!chipVal || chipVal === 'all') return true;
   // v629 (T1): 'CIS/FSU' dropped from the 'Other' expansion. It is now its own selectable
@@ -24719,9 +24858,12 @@ const _REGION_TO_CHIP = {
 };
 function getRegion(country) {
   // Primary: look up region from COUNTRY_DATA (authoritative), mapped to the chip taxonomy.
-  // 'Other' and 'Unknown' deliberately fall through: 17 countries are filed there in the DB
-  // and several are plainly misfiled (Cote d'Ivoire, Republic of the Congo, Ireland,
-  // Iraq-Kurdistan, UAE — Abu Dhabi), so the hardcoded lists below classify them better.
+  // v661 (T1): this used to read "'Other' and 'Unknown' deliberately fall through ... several
+  // are plainly misfiled ... so the hardcoded lists below classify them better." That was a
+  // workaround on ONE path -- the region controls themselves still filtered on the raw field
+  // and under-returned. _normalizeRegions() now re-files all 18 at load under UN M49, so
+  // COUNTRY_DATA.region is authoritative here and the hardcoded lists below are dead-letter
+  // fallback for a country missing from COUNTRY_DATA entirely.
   if (window.COUNTRY_DATA) {
     const cd = COUNTRY_DATA.find(function(d) { return d.country === country; });
     if (cd && cd.region && _REGION_TO_CHIP[cd.region]) return _REGION_TO_CHIP[cd.region];
@@ -43057,6 +43199,40 @@ async function loadPlatformData() {
     if (!cdRes.ok) throw new Error('country_data.json: ' + cdRes.status);
     if (!rhRes.ok) throw new Error('reform_history.json: ' + rhRes.status);
     COUNTRY_DATA = await cdRes.json();
+    // ── v661 (T1) — UN M49 region normalisation, applied ONCE at load ──────────
+    // Walking T1 cold: Screener -> Advanced Filters -> Region -> "Africa" returns 49 countries.
+    // Republic of the Congo (220 contracts, which is 5th-largest African entry in the database,
+    // above Mozambique, Algeria, Ghana and Gabon) is not one of them. Neither is Cote d'Ivoire
+    // (144). Both are filed region:"Other" in country_data.json, and the FC chip row, the
+    // Screener select and the Explorer select all filter on that raw field through
+    // _regionMatch(), so all three silently under-return. Nothing on screen says a country is
+    // missing; the analyst builds an Africa shortlist that is wrong and has no way to notice.
+    //
+    // The platform had ALREADY decided these rows are misfiled and worked around it twice,
+    // without fixing the field the filters read:
+    //   * getRegion()'s own comment says "several are plainly misfiled (Cote d'Ivoire,
+    //     Republic of the Congo, Ireland, Iraq-Kurdistan, UAE - Abu Dhabi)" and falls through
+    //     to a hardcoded list -- but getRegion() only drives the "peers in region" handoff.
+    //   * _M49_SSA_FILED_ELSEWHERE hardcodes five of them into the Frontier Markets preset.
+    // Two workarounds, neither on the path the region controls take. This is the fix at source.
+    //
+    // Same class of defect as cycle 344 (USA filed under "Other", invisible to every region
+    // filter), and it is not only a filter problem: the Country Profile regional-context line
+    // and the peer strip take the median of `p.region === d.region`, so for these 18 the peer
+    // set was the Other grab bag -- Vanuatu, Greenland, Barbados and Abu Dhabi in one "region",
+    // median take 26.0%. Iraq-Kurdistan (63.0%) was therefore reported +37.0pp ABOVE its
+    // regional peers when against the real Middle East median (74.6%) it is 11.6pp BELOW. The
+    // sign was wrong, not just the magnitude. Republic of the Congo read +34.2pp; it is +7.5pp.
+    //
+    // Boundary standard is UN M49, which this file already declares as its authority in the
+    // Frontier Markets option. That is why Greenland resolves to North America (M49 021
+    // Northern America) rather than to Europe -- an unusual call for a petroleum audience, so
+    // it is stated on screen in the re-filed disclosure rather than made silently.
+    //
+    // region_filed keeps what the database shipped, so the change is auditable and every
+    // surface can show it. COUNTRY_DATA is normalised BEFORE window.COUNTRY_DATA is mirrored
+    // and before initPlatform(), so no consumer ever sees the raw value.
+    try { _regionsRefiled = _normalizeRegions(COUNTRY_DATA); } catch (e) { _regionsRefiled = []; }
     // v510: mirror onto window. COUNTRY_DATA is declared `let` at script top level, which
     // does NOT create a window property, so every `window.COUNTRY_DATA` read in this file
     // was permanently undefined. That silently disabled four shipped features:
@@ -43075,6 +43251,7 @@ async function loadPlatformData() {
     initPlatform();
     // v530: label the Screener preset menu with each screen's live hit count. Runs once,
     // before the Screener is ever opened, and restores the default unfiltered state.
+    try { _labelRegionControls(); } catch(e) { /* non-critical */ }
     try { _labelScreenerPresets(); } catch(e) { /* non-critical */ }
     // v465: Populate live hurdle stat on Home tab after data loads
     // v524 (cycle 423, T1): this line used to read "N of 185 countries clear the IOC hurdle
