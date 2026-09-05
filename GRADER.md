@@ -29203,3 +29203,139 @@ v568, v587, v599, v609, v612, v617, v621, v632, v637, v639–v654 intact.
 **Task:** T4 — "What is my fiscal-stability and reform exposure here?" (stalest; 560 was T2, 559 T6, 558 T3, 557 T1, 556 T5 — T4 last walked at 555.)
 
 **Friction:** On the Explorer tab at 390×844, the mobile CSS block at `index.html:1464` hid column *headers* semantically (`th[data-sort-key="be"]`, `="swing"`) but hid *body cells* by position (`td:nth-child(7), (8), (9)`). Those indices fit a 9-column table. The table has 19, and 7
+
+---
+## Cycle 562 Log — 2026-09-05
+- Test before: 236 PASS / 0 FAIL (deployed harness figure)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite RAN this cycle against the local tree, number read from `/tmp/runtime_test_report.txt`, not assumed
+- JS errors: 0
+- Summary: shipped as **v656**, pushed (`dad8217`).
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo." (Stalest: 561 was T4, 560 T2, 559 T6, 558 T3, 557 T1 — T5 last walked at 556.)
+
+## Friction
+The Screener is the surface that **builds** the IC shortlist: the analyst loads a preset, moves
+the take / NPV / evidence thresholds, and lands on 8–15 countries. That row set *is* the table
+that goes in the memo. It was the only results table in the tool with no clipboard path.
+
+| surface | paste in one click? |
+|---|---|
+| Fiscal Compare (`#fc-copy-ic-btn`) | yes |
+| Side-by-Side (`#cmp-copy-table-btn`) | yes |
+| IOC Portfolio (`#ioc-copy-ic-btn`) | yes |
+| Country Profile (`#dd-ic-summary-btn`) | yes |
+| **Screener** (toolbar, `index.html:2737`) | **no — `⬇ CSV` and `⬇ Excel` only** |
+
+So the shortest route from a finished screen to a memo table was download → open Excel → select →
+copy → paste: five steps and a context switch out of the browser and back. The inversion is the
+point — the **185-row** Fiscal Compare table, the one an analyst is least likely to want whole,
+had the paste button; the **11-row** shortlist did not. This was carried unfixed since cycle 555
+("the Screener's missing clipboard control").
+
+Walked cold at 1440x900 over `http://localhost:8899` (the `file://` path never clears
+`#loading-overlay`, so it cannot be walked). Confirmed by enumerating every visible button in the
+`texplorer` panel in Screener mode: `Reset All`, `⬇ CSV`, `⬇ Excel` — no clipboard control.
+
+Ruled out as worse on the same walk, by executing each: FC copy (49,251 chars, but v632's row
+checkboxes make the shortlist a shortlist), the Country Profile IC summary (Indonesia pasted
+correct and fully caveated), the IOC portfolio copy (7,052 chars, correct), and both Screener file
+exports (CSV and XLSX both fire and download). None was broken.
+
+## Change
+A `⎘ Copy for IC Memo` button on the Screener toolbar, with `copyScreenerTable()` and
+`_scCopyColumns()` behind it. Same two-flavour write as the other three surfaces — `text/html` so
+Word / Google Docs / Outlook / PowerPoint render a real table, `text/plain` TSV so Excel splits
+into columns, with a `writeText` fallback and a toast that names `⬇ Excel` when the clipboard is
+unavailable.
+
+It reuses the existing `_scExportRows()` and `_scExportBasisLines()`, so the paste and the two
+file exports cannot drift into disagreeing about what was screened — the defect v558 fixed
+between CSV and XLSX.
+
+The criteria block travels **above** the table deliberately: a pasted shortlist whose screen is
+not stated is a list, not a screen, and the IC reader cannot otherwise tell whether 11 countries
+survived a take ceiling or are simply the first 11. Standing assumptions and the source trail
+follow the table, so row 1 of a TSV paste is still the header.
+
+Columns are chosen on what the rows actually carry, not fixed:
+- the **comparable take** column appears only when some row's headline blends fee-basis
+  (TSC / RSC / Buy-back) contracts — otherwise it would duplicate the column before it on every row;
+- the **breakeven** column only when some row has one (65 of 185 do).
+
+Two defects were found in this cycle's *own* output and fixed before shipping: the predictability
+cell pasted `not scored — not scored — state monopoly …` on the 3 monopoly rows (the basis string
+already opens "not scored"), and the comparable-take header did not say its figure is computed at
+$75 regardless of the screened price.
+
+## Result
+From a finished screen the analyst gets, in one click, a formatted table of exactly the countries
+that survived it. The Deepwater preset now pastes as 11 rows headed by:
+
+```
+ORCA petroleum fiscal screening shortlist — 11 of 185 countries, screened at $75/bbl
+SCREEN APPLIED — these criteria produced this row set:
+  1. Preset: Deepwater
+  2. Max government take: ≤70% at $75/bbl, tested on the comparable take (fee-basis excluded)
+  3. Water depth: deepwater
+  4. Fiscal mechanics: Concession, PSC, EPSA only
+  5. Ranked by: contractor NPV descending
+WARNING: none of these 11 countries has verified field production …
+```
+
+with the breakeven and comparable-take columns correctly absent (no row in that set carries
+either). On the full universe Iraq pastes `84.8%` published beside `34.1% ← cite this`, so the
+comparability rule reaches the clipboard, not just the screen.
+
+## Verification
+Measured, not asserted.
+
+- **Runtime suite:** RAN against the local tree — **261 PASS / 0 FAIL / 1 WARN**. The WARN is the
+  localhost `sw.js` 404, present before this change and unchanged by it.
+- **Horizontal scroll:** `scrollWidth == clientWidth` on all 9 tabs **plus Screener mode** at
+  1920 / 1440 / 1280 / 1024 / 768 / **390x844 `hasTouch`**. 0 overflow screens.
+- **Page errors:** 0 at every one of those six widths.
+- **Coarse-pointer 24px:** the new button measures **129x44** under `pointer: coarse`, alongside
+  `Reset All` 70x44, `⬇ CSV` 58x44, `⬇ Excel` 62x44. It was tapped on the phone context and
+  copied 27,820 chars.
+- **JS syntax gate:** 11 inline script blocks, **0 failures**, re-run after the version bump.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip** — the button's `title` is its own control label,
+not an added explanation of an existing one. **Not a text-only change**: a control that did not
+exist now exists, is wired to a handler, and writes two MIME flavours to the clipboard. No score,
+take, NPV, IRR, breakeven, swing, rank, reform diamond, evidence grade or tier letter was
+recomputed or altered; `country_data.json` and `reform_history.json` untouched. Chip rows stay
+`display:none`; no page-sub paragraph, amber banner, routing hint or "How to read" block; no SbS
+card wrapper. Screener advanced filters still collapsed, presets still a dropdown; Home "More
+tools" still collapsed; Explorer analytics still collapsed. **No tab added, removed or
+reordered.** Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst
+Guide sessionStorage logic untouched. CP headline stays two-zone with global rank and vs-median
+pill; take% stays tier-coloured; Reform Risk stays in the primary Home card grid. The **v612
+MOBILE LAYER** block and the `#reference-panel` `translateX` state are intact — neither narrowed,
+weakened nor removed, and no negative `right` offset was added. `min-width: max-content` opt-out
+markers untouched. v371/v373, v430, v449, v451, v452, v489, v507, v517, v530, v554, v568, v587,
+v599, v609, v612, v617, v621, v632, v637, v639–v655 intact.
+
+## Open / carried
+- **Now unblocked.** The two FAQ passages (`index.html:4172`, `:4730`) routing the analyst to a
+  "Stability Score filter" in the Screener are still wrong — the filters are `sl-take`, `sl-npv`,
+  `sl-npv50`, `sl-evid`. Adding that control is still a whole cycle. Strong next T1 or T4.
+- **Carried from 555.** FAQ A40 (`index.html:4761`) calls the Reform Risk score "shown in the
+  Stability column of Explorer". It is not — that column is Fiscal Predictability. Same conflation
+  as the Explorer footer color-key noted at 561.
+- **Carried from 561.** The Explorer footer color-key documents Breakeven and Swing bands, and its
+  Stability entry describes the Reform Frequency Score, not the Fiscal Predictability Score the
+  column renders.
+- All items carried from 560 and earlier are unchanged: `MECHANIC_BREAKDOWN` covering 20 of 185;
+  `mech_mix` not reconciling to the published headline on 68 of 185; Guyana's A-tier reform log
+  contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57 firing against
+  `#cdnWarning` before it exists in the body; the Side-by-Side proxy notice promising an IRR row
+  that is not on the tab; `IOC_DATA`'s $75 column not sharing a computation with $50/$100/$125;
+  `reform_history.json` carrying no `source` key on any of its 83 events; the Screener take
+  slider's `min="30"` floor against USA at 23.4%; Reform Risk's export not stating that tab
+  filters do not narrow it; the NaN-padded caveat rows in the CSV emitters; Norway's stored
+  p25/p75 vs its 29.6pp contract spread; `renderSampleAnalyses()` omitting 72 countries;
+  `#flt-region` roll-up-only on the Explorer; the missing retrievability signal on three Evidence
+  columns; the `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272
+  dead citations; the two 22.5px `.source-badge` elements; the four-price breakeven bound limit;
+  the unrecorded DCF solver country selection; and cycle 539's empty Summary line.
