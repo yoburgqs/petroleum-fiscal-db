@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v666</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v667</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v666</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v667</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v666';
+  return m ? m[0] : 'v667';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v666');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v667');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2787,6 +2787,23 @@ window.copyPlatformCitation = function(btn) {
       <span id="screener-count" aria-live="polite" aria-atomic="true" style="color:var(--muted);font-size:13px;"></span>
       <span id="screener-result-count" style="color:var(--muted);font-size:12px;margin-left:4px;"></span>
       <span id="screener-active-filters" class="screener-active-badge" style="display:none;"></span>
+      <!-- v667 (T1) — the data-basis switch, ON the count bar.
+           Walking T1 cold: the analyst loads a preset because the intro strip tells them to, and
+           on 9 of the 11 presets the result set is MAJORITY proxy economics — Low Take · Positive
+           NPV returns 143 countries of which 133 have no verified field production, Two-Price
+           Return Screen 153 of which 141, Frontier Markets 56 of which 53. The page's own divider
+           row calls those rows "not defensible as a screening shortlist on their own", and the
+           mode button meanwhile advertises "Screener (143)". So the number the tool reports as the
+           answer to "which countries should be on my screening list" counts the rows the tool says
+           cannot be one.
+           The control that fixes it — #sc-proxy-keep — already existed, but it lives inside
+           #screener-advanced-details, which is collapsed by default (v371/v373, locked) behind a
+           summary reading "Advanced Filters - Mechanic · IOC Operator · Region · Reform Record ·
+           Data Basis". An analyst looking at 143 rows has no reason to read "Data Basis" as "the
+           133 estimates in my shortlist".
+           This drives the SAME checkbox rather than a second copy of the state, so the advanced
+           panel and the count bar can never disagree, and the details block stays collapsed. -->
+      <span id="screener-basis-action" style="display:none;"></span>
       <label id="screener-evidence-first-wrap" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): countries with verified field production are ranked above those whose economics are regional proxy estimates, NPV-descending within each group. Nothing is filtered out — a labelled divider marks the boundary. OFF: rank all 185 by modelled NPV alone, which puts the lowest-take proxy regimes (Vanuatu, Bahamas, Montenegro) at the top."><input type="checkbox" id="sc-evidence-first" checked style="cursor:pointer;">Rank verified-production countries first</label>
       <button id="screener-reset-btn" class="btn btn-sm btn-outline" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-copy-ic-btn" class="btn btn-sm btn-outline" title="Copy this shortlist to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the screen that produced it (preset, thresholds, ordering), the standardized NPV profile, and the fee-basis comparability correction where the published take blends TSC/RSC/Buy-back contracts." aria-label="Copy screening shortlist for IC memo">&#9112; Copy for IC Memo</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">⬇ CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">⬇ Excel</button>
     </div>
@@ -27722,6 +27739,27 @@ function resetScreenerAll() {
 }
 window.resetScreenerAll = resetScreenerAll;
 
+// v667 (T1) — drive the data-basis filter from the count bar.
+// Deliberately writes #sc-proxy-keep rather than holding its own flag: runScreener() reads that
+// checkbox (`includeProxy`), the active-filter badge counts it, resetScreenerAll() restores it and
+// the export basis line reports it. A parallel piece of state would have had to be kept in step
+// with all four. The Advanced Filters block is NOT opened — the v371/v373 declutter keeps it
+// collapsed by default — but the box inside it now shows the state the analyst just set, so
+// opening it later shows the truth.
+function _scSetBasis(keepProxy) {
+  var box = document.getElementById('sc-proxy-keep');
+  if (!box) return;
+  if (box.checked === !!keepProxy) return;
+  box.checked = !!keepProxy;
+  if (typeof runScreener === 'function') runScreener();
+  if (typeof showCopyToast === 'function') {
+    showCopyToast(keepProxy
+      ? 'Proxy-economics countries back in the screen'
+      : 'Screening on verified field production only');
+  }
+}
+window._scSetBasis = _scSetBasis;
+
 // v500: show/hide the " · no ceiling" / " · no floor" flags next to each slider label so the analyst
 // can see at a glance which sliders are actually constraining the result set and which are inert.
 function _scUpdateNeutralFlags() {
@@ -28127,6 +28165,47 @@ function runScreener() {
     badgeEl.style.display = 'none';
     badgeEl.innerHTML = '';
   }
+
+  // v667 (T1) — the data-basis switch, rendered next to the count it qualifies.
+  // Rules, in the order they are tested:
+  //   proxy in, some production-backed  -> offer the cut, and say what it leaves. Styled solid
+  //                                        (accent fill) when proxy rows are the MAJORITY of the
+  //                                        result set, because that is when the headline count is
+  //                                        actively misleading; outline otherwise.
+  //   proxy in, none production-backed  -> no button. Cutting would empty the table, and the
+  //                                        _allProxy top banner already carries that fact.
+  //   proxy out                         -> offer the way back, from the same place. Otherwise the
+  //                                        analyst who took the cut has to hunt the Advanced
+  //                                        Filters block to undo it, which is the friction moved
+  //                                        rather than removed.
+  (function () {
+    const el = document.getElementById('screener-basis-action');
+    if (!el) return;
+    if (data.length === 0) { el.style.display = 'none'; el.innerHTML = ''; return; }
+    const _btnBase = 'display:inline-flex;align-items:center;gap:5px;min-height:24px;border-radius:4px;'
+      + 'padding:2px 9px;font-size:11px;font-weight:700;cursor:pointer;line-height:1.3;white-space:nowrap;';
+    let html = '';
+    if (includeProxy && _nProxy > 0 && _nVerified > 0) {
+      const _dominant = _nProxy > _nVerified;
+      const _tip = `${_nProxy} of these ${data.length} rows have no verified field production: their fiscal terms are `
+        + `regional proxy estimates and their NPV and breakeven are indicative only. This screen keeps them. `
+        + `Click to screen on the ${_nVerified} production-backed ${_nVerified === 1 ? 'country' : 'countries'} alone — `
+        + `the same control as "Include the ... countries with no verified field production" under Advanced Filters. Reversible from here.`;
+      html = `<button type="button" onclick="_scSetBasis(false)" title="${_tip.replace(/"/g, '&quot;')}" `
+        + `style="${_btnBase}`
+        + (_dominant
+            ? 'background:rgba(176,104,0,.14);border:1px solid rgba(176,104,0,.5);color:var(--accent);'
+            : 'background:none;border:1px solid var(--border);color:var(--muted);')
+        + `">${_dominant ? `&#9888; ${_nProxy} of ${data.length} are proxy &mdash; ` : ''}`
+        + `Production-backed only (${_nVerified})</button>`;
+    } else if (!includeProxy) {
+      html = `<button type="button" onclick="_scSetBasis(true)" title="Put the proxy-economics countries back into this screen. Their fiscal terms are regional estimates and their NPV and breakeven are indicative only; they are ranked below a labelled divider." `
+        + `style="${_btnBase}background:none;border:1px solid var(--border);color:var(--muted);">`
+        + `&#43; Include proxy-economics countries</button>`;
+    }
+    el.innerHTML = html;
+    el.style.display = html ? 'inline-flex' : 'none';
+  })();
 
   // Results count with active price label and preset name
   const priceLabel = `$${price}/bbl`;
