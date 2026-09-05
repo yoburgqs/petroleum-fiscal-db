@@ -30863,3 +30863,126 @@ as fact with no source of any kind.
 Walked cold at 1440×900 with storage cleared, into Country Profile, on a country an analyst would actually be defending.
 
 **The page carries two different numbers for the same fiscal term, in two panels, and neither one says so.** The Live DCF panel runs Angola on a **75.0%** government profit-oil split and carr
+
+---
+## Cycle 573 Log — 2026-09-05 15:35
+- Test before: 236 PASS / 0 FAIL (deployed suite, per cycle 572)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite RAN this cycle against the local
+  build, number read from `/tmp/runtime_test_report.txt`, not assumed. Same suite on the
+  pre-change backup served side by side on :8098 returned **261 / 0 / 1** — identical, no
+  regression. The 1 WARN is a `sw.js` 404 under the local `python3 -m http.server`, present
+  on both runs and absent from the deployed build.
+- JS errors: 0 page errors at every width.
+- Shipped as **v667**, both repos pushed.
+
+## Task
+**T1** — "Which countries should even be on my screening list?"
+(Rotation: 572 T6, 571 T3, 570 T5, 569 T2, 568 T4, 567 T1 — T1 the stalest.)
+
+## Friction
+Walked cold at 1440×900, storage cleared, into the Screener the way the page tells the
+analyst to: the intro strip says *"Load a **preset** for a one-click IC screen."*
+
+**On 9 of the 11 presets the result set is majority proxy economics, and the count the
+Screener reports as the answer counts them.**
+
+| preset | reported | production-backed | proxy |
+|---|---|---|---|
+| Low Take · Positive NPV | 143 | 10 | **133** |
+| Two-Price Return Screen | 153 | 12 | **141** |
+| R-factor PSC | 70 | 11 | **59** |
+| Frontier Markets | 56 | 3 | **53** |
+| PSC Africa | 34 | 2 | **32** |
+| Primary-Source Evidence | 35 | 5 | **30** |
+| Downside Resilience | 24 | 7 | **17** |
+| Offshore & Deepwater | 22 | 8 | **14** |
+| Atlantic Frontier | 6 | 3 | 3 |
+| IOC Capital Screen | 15 | 15 | 0 |
+| cold, no filters | 185 | 22 | **163** |
+
+The platform's own words for those rows, in the divider `renderScreener()` draws at the
+boundary: *"Fiscal terms are regional proxy estimates and the NPV / IRR / breakeven shown
+are indicative only. … **not defensible as a screening shortlist on their own.**"*
+
+Meanwhile the Screener mode button renders `Screener (143)` and `#screener-result-count`
+renders `(42 filtered out of 185)`. So the two numbers the analyst carries away from a T1
+screen — the badge and the count — are both the number the page says is not a shortlist,
+and getting to the defensible number requires subtracting one figure out of the middle of
+a ~570-character prose count line.
+
+The control that fixes it, **`#sc-proxy-keep`, already existed** — and that is the point.
+It lives inside `#screener-advanced-details`, collapsed by default under the locked
+v371/v373 declutter, behind a summary reading *"Advanced Filters ▸ Mechanic · IOC Operator
+· Region · Reform Record · **Data Basis**"*. An analyst staring at 143 rows has no reason
+to read "Data Basis" as "the 133 estimates in my shortlist". Measured: `details.open ===
+false`, `details` height 28.5px, the checkbox 869px down the page.
+
+## Change
+New `#screener-basis-action` control in `.screener-count-bar`, rendered immediately after
+the active-filters badge — next to the count it qualifies, not three sections below it.
+
+- **Proxy rows in the majority** → solid amber button stating the split:
+  `⚠ 133 of 143 are proxy — Production-backed only (10)`. One click re-runs the screen on
+  the 10.
+- **Production-backed in the majority** (e.g. Atlantic Frontier 3/6) → same action, quiet
+  outline styling. The warning voice is reserved for when the headline count is actively
+  misleading.
+- **Already production-only** (IOC Capital Screen) → inverts to
+  `+ Include proxy-economics countries`, so the cut is reversible from the same place
+  rather than sending the analyst back into Advanced Filters to undo it.
+- **No production-backed row at all** (e.g. Africa · take ≤45% → 24 rows, 0 verified) →
+  renders nothing. Cutting would empty the table, and the `_allProxy` top banner already
+  carries that fact.
+
+`_scSetBasis()` writes `#sc-proxy-keep` rather than holding a parallel flag, so
+`runScreener()`'s `includeProxy`, the active-filter count, `resetScreenerAll()` and
+`window._screenerExportBasis` all stay in step, and the two surfaces can never disagree.
+The Advanced Filters block is **not** opened — the v371/v373 declutter is untouched — but
+the checkbox inside it now shows the state the analyst set from the count bar.
+
+## Result
+The analyst can see, without scrolling and without opening Advanced Filters, how much of
+the shortlist in front of them is regional estimate rather than production-backed
+economics — and cut it to the defensible set in one click, then put it back. Before this
+cycle "Low Take · Positive NPV" handed them 143 countries and the fact that 133 of them
+were indicative was disclosed only in a divider row 11 rows into the table.
+
+## Verification (measured this cycle, not assumed)
+
+| check | result |
+|---|---|
+| JS syntax gate | **PASS** — 11 inline blocks, 0 failures |
+| Runtime suite, ran this cycle (local build) | **261 PASS / 0 FAIL / 1 WARN** |
+| Same suite, pre-change backup on :8098 | **261 PASS / 0 FAIL / 1 WARN** — identical |
+| Click-through, Low Take · Positive NPV | 143 → **10** → 143, mode button and `sc-proxy-keep` follow |
+| Button state, all 11 presets + cold | correct on all 12 (table above) |
+| All-proxy screen (Africa ≤45%) | button correctly absent; top banner carries it |
+| Horizontal scroll, 10 tabs × 1920/1440/1280/1024/768/390 | **0** violations |
+| Screener @390×844 `hasTouch` | scrollWidth 390 = clientWidth 390 |
+| New button height, every width incl. 390 touch | **24px** |
+| pageerrors, all widths | **0** |
+
+## Carried forward — found this cycle, not fixed
+- **Two presets barely screen at all.** "Low Take · Positive NPV" returns 143 of 185 (77%
+  of the universe) and "Two-Price Return Screen" 153 of 185 (83%). This cycle made the
+  composition of those sets legible and one-click correctable; it did not re-cut the
+  preset thresholds, which is a judgement about what those screens are *for* and should
+  not be made silently inside a loop cycle.
+- **`#screener-count` is now ~570 characters of unbroken 13px muted prose** on the IOC
+  Capital Screen — every clause in it is load-bearing (v507 basis, v513/v517 downside,
+  v554 fee-basis, v560 scope, v662 reform), but it is past the length an analyst reads.
+  Not addressed this cycle; a text-only rewrite is banned by the directive, so the fix is
+  structural and is a cycle of its own.
+- Everything carried from cycles 560–572 is unchanged, including: `COUNTRY_DATA` and the
+  API disagreeing on `profit_oil_govt` / `state_eq` for 45 of 185 countries; the
+  `Cost Recovery Cap` source badges at 21px on Country Profile @390; the Fiscal Compare
+  XLSX emitting 25 columns with no comparable-take column; `MECHANIC_BREAKDOWN` at
+  `:22329` disagreeing with `country_data.json` on Iraq's mechanic split; the Side-by-Side
+  search box replacing the seeded example with no add-to-set path; the two adjacent
+  unexplained IC buttons on Country Profile; the duplicated all-185 rank in CP headline
+  Zones A and B; the non-existent `cp-price-select` at `:3139`; the Screener take slider's
+  `min="30"` floor excluding the USA at 23.4%; FAQ A25/A35/A40 describing a Screener
+  "Stability Score filter" that does not exist; Guyana's A-tier reform log contradicting
+  its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57; the 272 dead
+  citations; and `SPECULATIVE_COUNTRIES` at `:24048` still being a hand-typed list of 7
+  names from v41.
