@@ -29659,3 +29659,128 @@ look like one.
 **Task:** T3 — "How do these three countries compare side by side?" (stalest in the rotation; 563 was T1, 558 was the last T3)
 
 **Friction.** Side-by-Side stacks two charts 8px apart. The Govt Take chart re-bases a fee-blended country onto its production-sharing/concession contracts and says so three times — legend `Iraq (PSC/Conc)`, a second title line, and a green notice naming the 195 contracts. The comment that added it 
+
+---
+## Cycle 565 Log — 2026-09-05
+- Test before: 261 PASS / 0 FAIL / 1 WARN / 1 JS error (suite RUN against the pre-change tree
+  on the same local server via `git stash push -- index.html`, then popped)
+- Test after: 261 PASS / 0 FAIL / 1 WARN / 1 JS error (suite RUN against this build)
+- JS syntax gate: PASS, 11 blocks
+- Viewports 1920 / 1440 / 1280 / 1024 / 768 / 390(touch): zero horizontal scroll, zero page
+  errors, nothing touched under 24px
+- Summary: shipped as v659. Both repos pushed, mirror copied.
+
+## Cycle 565 — shipped as v659
+
+**Task:** T4 — "What is my fiscal-stability and reform exposure here?" (rotated off T3/564,
+T1/563, T5/562 — T4 last walked at 561.)
+
+**Walk.** Cold load, no sessionStorage or localStorage, over a local HTTP server rather than the
+deployed build, so what was read is this tree and not what Pages is currently serving. Four
+surfaces, in the order an analyst actually meets them: the Reform Risk tab and its per-country
+lookup (Norway / Namibia / Ghana / Guyana), the Country Profile headline strip and its Fiscal
+Reform History block (Nigeria / Namibia / Suriname / Mozambique / Norway), the Fiscal Compare
+Stability column across all 185 rows, and the Explorer Stability column.
+
+The first three are in good shape and are recorded here so a later cycle does not re-open them.
+The Reform Risk lookup names the case and the premium, distinguishes "no sourced log" from a
+clean record, and hands over to Fiscal Predictability with a "what you can defend instead"
+paragraph. The Country Profile headline reads `Stability: n/c (no sourced reform log · 21 of 185
+jurisdictions covered · Reform Risk →)` for the 164 uncovered countries and a diamond scale with
+the change count for the 21. Fiscal Compare's Stability column renders `n/c` on 164 of 185 rows —
+measured live, not assumed — with a header tooltip that names all three states and says they are
+not interchangeable.
+
+**Friction — Explorer.** The Stability column has rendered a Fiscal Predictability Score on all
+185 rows since v649, and it was the **only numeric column in `#tbl-explorer` with no way to order
+it**. No `data-sort-key` on the `<th>` (`index.html:2463`), no `<option>` in `#flt-sort`, no case
+in `_explMetricCmp()` (`index.html:24185`). Country, Govt Take, Evidence, Contractor NPV, IRR,
+Breakeven and Swing all sort — by header click through the v107 delegation on
+`#tbl-explorer thead`, or from the dropdown. The one column a T4 analyst opens this table to rank
+did not, and clicking its header did nothing at all: the delegated handler matches
+`th[data-sort-key]`, so the event was not even received. Same class as v557, where the Evidence
+header carried the sort attributes but the `<select>` had no matching option and the sort
+silently failed.
+
+Second half of the same moment, eight rows below the table: the color key read
+`Stability: ◆◆◆◆◆ 5 = zero reform events since 2010 (most stable) → ◇◇◇◇◇ 0 = 5+ events`. Those
+diamonds are the Reform Frequency Score on the Reform Risk tab. This column renders neither
+diamonds nor reform counts — it renders `91 UNGRADED one term`, `51 20.5pp`. So the analyst who
+could not sort the column and fell back to reading it was reading it as a different score. This
+is the item carried from cycle 561, now closed.
+
+**Change.** The `<th>` carries `data-sort-key="stability"`, `tabindex="0"`, `role="columnheader"`
+and `aria-sort`, and `#flt-sort` carries a matching `<option>`, so header click and dropdown drive
+one sort key — the select stays the single source of truth, per v557.
+
+The order is deliberately **not** the bare number. `_fpSortVal()` sorts basis before score, three
+blocks, weakest-first inside each:
+
+| block | cohort | n | note |
+|---|---|---|---|
+| 0 | measured take spread | 28 | the only cohort the IQR penalty (up to −40, the score's largest component) was charged against, and the only one this column grades |
+| 1 | one term — UNGRADED | 132 | IQR contributed nothing; price swing and mechanic count only |
+| 2 | not scored / state monopoly | 22 | no dispersion input, or no contractor position to score |
+
+A plain descending sort would have opened the ranking with Bahamas and Vanuatu at 100 — one-term
+regimes ORCA never measured a spread for — above a measured ceiling of 74 (Turkmenistan), with 86
+one-term scores sitting above that ceiling. That is the exact misreading the header tooltip spends
+a paragraph warning against ("a graded MODERATE outranks any UNGRADED score, however high its
+number"), the same inversion v624 and v649 removed from this cell's colour and its bar length, and
+the same trap the "Verified production first" toggle exists to keep off the top of this table.
+
+The count line under the result set now states the order it produced and the cohort sizes, and
+says "inside each data-basis block above" when the v578 verified-production grouping is on — it is
+on by default, and with it on the 20 measured-spread PROXY countries sit in the second block, so
+the unqualified claim would have been false on the default screen. Checked in both grouping
+states. The color key now describes the score the column actually renders, with the platform bands
+and the UNGRADED case, and points reform-event counts at the Reform Risk tab.
+
+**Result.** The analyst can rank all 185 countries by fiscal predictability from the Explorer
+table — header click or Sort dropdown, both verified — and the top of that ranking is the
+production-backed regimes ORCA measured a real contract spread for, worst first: Iraq 47 / 33.5pp,
+Mexico 51 / 20.5pp, India 52 / 13.3pp, United Kingdom 58 / 15.0pp, Brazil 61 / 17.8pp. With the
+data-basis grouping off, the global weakest-first head is Uruguay 37 / 31.3pp, Somalia 41 / 40.4pp,
+Guatemala 44 / 32.0pp — matching an independent recomputation of the score from the shipped
+`country_data.json`, so the comparator and the cell renderer agree. Before this cycle that ranking
+could not be produced at all from this table.
+
+### Carried forward
+
+- **Closed this cycle.** The Explorer footer color-key's Stability entry describing the Reform
+  Frequency Score rather than the Fiscal Predictability Score the column renders (carried from
+  561).
+- **Checked and NOT a defect** (recording so a later cycle does not re-open them): the Reform Risk
+  per-country lookup for covered and uncovered countries; the Country Profile `Stability: n/c`
+  headline state and its "No sourced reform log / What you can defend instead" block; Fiscal
+  Compare's Stability column rendering `n/c` on 164 of 185 with a three-state header tooltip. All
+  four were walked cold this cycle and state their own basis.
+- **Still unblocked and still wrong.** FAQ A25 (`index.html:4176`) calls the Stability Score
+  "1–5 dots in Explorer" and A35 (`index.html:4732`) calls it "0–5 dots in Country Profile". The
+  dot scale is Fiscal Compare's; Explorer renders a 0–100 Fiscal Predictability Score, and Country
+  Profile's headline diamonds are the reform count. Both passages also route to a Screener
+  "Stability Score filter" — the Screener's filters are `sl-take`, `sl-npv`, `sl-npv50`, `sl-evid`
+  and there is no stability control on it at all. Adding that control is its own cycle and is now
+  the strongest remaining T4: this cycle gave Explorer the ordering, the Screener still cannot
+  filter on it.
+- **Carried from 555.** FAQ A40 (`index.html:4767`) calls the Reform Risk score "shown in the
+  Stability column of Explorer". It is not — that column is Fiscal Predictability.
+- **Carried from 563.** `rfactor` preset gates on `has_r_factor_tiers`, a data flag — a future
+  T1/T6 should measure whether it discriminates or is another coverage filter.
+- **Carried from 564.** 18 of 185 countries carry no real region (17 `Other` plus UAE — Dubai
+  `Unknown`), including Republic of the Congo, Cote d'Ivoire, Ireland, Greenland, Faroe Islands,
+  Iraq-Kurdistan and Sao Tome and Principe. Same class as the cycle-344 USA finding. Strong next
+  T1. Also carried: the Predictability Score row on Side-by-Side returning `62 · UNGRADED · one
+  term` for Guyana / Angola / Suriname alike.
+- All items carried from 560 and earlier are unchanged: `MECHANIC_BREAKDOWN` covering 20 of 185;
+  `mech_mix` not reconciling to the published headline on 68 of 185; Guyana's A-tier reform log
+  contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57 firing against
+  `#cdnWarning` before it exists in the body; `IOC_DATA`'s $75 column not sharing a computation
+  with $50/$100/$125; `reform_history.json` carrying no `source` key on any of its 83 events; the
+  Screener take slider's `min="30"` floor against USA at 23.4%; Reform Risk's export not stating
+  that tab filters do not narrow it; the NaN-padded caveat rows in the CSV emitters; Norway's
+  stored p25/p75 vs its 29.6pp contract spread; `renderSampleAnalyses()` omitting 72 countries; the
+  missing retrievability signal on three Evidence columns; the `IOC_PRESENCE` alias map;
+  Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead citations; the two 22.5px
+  `.source-badge` elements; the four-price breakeven bound limit; the unrecorded DCF solver country
+  selection; and cycle 539's empty Summary line.
