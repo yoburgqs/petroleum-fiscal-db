@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v662</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v663</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v662</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v663</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v662';
+  return m ? m[0] : 'v663';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v662');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v663');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -27006,6 +27006,56 @@ function cpScreenLowerTake(countryName) {
   }, 150);
 }
 window.cpScreenLowerTake = cpScreenLowerTake;
+
+// ── v663 (T2): the destination for a country whose take sits below the producing floor ──
+// The Country Profile's "See all investible regimes" CTA loaded the Screener at take <= 40%.
+// Counted against country_data.json that returns 108 of 185 countries, and 102 of them hold
+// NO verified block-level production (prod_coverage_pct = 0) -- 40 of those on fewer than ten
+// contracts. A shortlist that is 94% statutory model is not a set an IC can choose between.
+// These two functions return, and screen, the production-weighted producers whose COMPARABLE
+// take (fee-basis contracts excluded, same basis as the Rank among producers row) is at or
+// below 40%. Count and destination come from the same call, so the button's number and the
+// rows that land cannot disagree -- the rule established in cpLowerTakeProducers().
+function cpInvestibleProducers() {
+  var peers = (typeof getProducerPeers === 'function') ? getProducerPeers() : [];
+  return peers.filter(function(c) {
+    var v = cpCmpTakeOf(c, '75');
+    return v != null && v <= 40;
+  }).sort(function(a, b) {
+    return cpCmpTakeOf(a, '75') - cpCmpTakeOf(b, '75');
+  }).map(function(c) { return c.country; });
+}
+window.cpInvestibleProducers = cpInvestibleProducers;
+
+function cpScreenInvestibleProducers() {
+  var set = cpInvestibleProducers();
+  if (!set.length) return;
+  switchTab('texplorer', document.getElementById('tab-btn-tscreener'));
+  switchExplorerMode('screen', document.getElementById('mode-btn-screen'));
+  setTimeout(function() {
+    if (typeof applyScreenerPreset === 'function') applyScreenerPreset(null);
+    _screenerCountrySet = set;
+    // v663 (T2): the set is chosen on COMPARABLE take (fee-basis TSC/RSC/buy-back contracts
+    // excluded, the same basis as the Rank among producers row), but the Screener's TAKE column
+    // prints the HEADLINE take. For Iraq and Ecuador those differ by 50.7pp and 7.2pp, so without
+    // this the caption would announce "under 40%" over rows reading 84.8% and 46.5% — the exact
+    // caption/rows disagreement v524 and v568 were both logged for. Named here, on screen.
+    var _hi663 = set.filter(function(n) {
+      var c = (COUNTRY_DATA || []).filter(function(x) { return x.country === n; })[0];
+      return c && c.take_75 != null && c.take_75 > 40;
+    }).map(function(n) {
+      var c = (COUNTRY_DATA || []).filter(function(x) { return x.country === n; })[0];
+      return n + ' (headline ' + c.take_75.toFixed(1) + '%, comparable ' + cpCmpTakeOf(c, '75').toFixed(1) + '%)';
+    });
+    _screenerSetLabel = 'the ' + set.length + ' production-weighted producers whose COMPARABLE government take at $75/bbl is 40% or lower'
+      + (_hi663.length
+          ? ' \u2014 the TAKE column below prints the headline take, which is higher for ' + _hi663.join(' and ')
+            + ', because a large share of those contracts are fee-basis and their take% is a remuneration artefact rather than a fiscal one'
+          : '');
+    if (typeof runScreener === 'function') runScreener();
+  }, 150);
+}
+window.cpScreenInvestibleProducers = cpScreenInvestibleProducers;
 // v560 (T1) — the Frontier Markets universe, DERIVED from COUNTRY_DATA rather than written out,
 // so it cannot drift as jurisdictions are added. Definition is UN M49, named on screen so the
 // analyst can check the boundary instead of trusting it:
@@ -32015,9 +32065,62 @@ function loadCountryProfile(country) {
       if (c.npv_75 > 0 && c.npv_50 > 0) _dsClear648++;
       else if (c.npv_75 > 0) _dsFrag648++;
     });
+    // ── v663 (T2): the one verdict in this chain with nothing behind it ─────────────
+    // "Highly contractor-favorable — top tier for IOC capital allocation", in green, fired on
+    // take <= 40 alone. Counted against country_data.json that is 108 of 185 countries, and 102
+    // of the 108 hold NO verified block-level production (prod_coverage_pct = 0); 40 of those
+    // carry fewer than ten contracts. Nauru gets it on ONE contract and two facts, at a $3.8B
+    // headline NPV. Belgium on two contracts. Meanwhile the 10px grey pill rendered immediately
+    // to the right of that sentence reads "0 / 21 producers take less" on 62 of them — the page
+    // refuting its own verdict, in the smallest type on the line.
+    // The lowest comparable take any production-weighted producer actually carries is the USA at
+    // 23.4%. A jurisdiction printing below that has not found better terms than the Gulf of
+    // Mexico; on this platform that is the shape thin evidence takes. v648 rebuilt every other
+    // branch of this chain onto the production-weighted position and skipped this one, because
+    // it is first in the if-chain and returns before any counting happens.
+    var _isProd663 = false, _pFloor663 = null, _pFloorC663 = '';
+    for (var _j663 = 0; _j663 < _vPeers648.length; _j663++) {
+      var _pc663 = _vPeers648[_j663].country;
+      if (_pc663 === country) { _isProd663 = true; continue; }
+      var _fv663 = cpCmpTakeOf(_vPeers648[_j663], '75');
+      if (_fv663 == null) continue;
+      if (_pFloor663 == null || _fv663 < _pFloor663) { _pFloor663 = _fv663; _pFloorC663 = _pc663; }
+    }
+    var _noProd663 = !(d.prod_coverage_pct > 0);
+    var _nStr663 = Number(d.n || 0).toLocaleString() + ' contract' + ((d.n === 1) ? '' : 's');
     if (take <= 40) {
-      charLabel = 'Highly contractor-favorable — low government take places this in the top tier for IOC capital allocation';
-      charColor = 'var(--green)';
+      _posInLabel648 = _hasPos648;
+      if (_hasPos648 && _vLower648 === 0 && !_isProd663) {
+        charLabel = 'Low take (' + take.toFixed(1) + '%), but nothing that produces sits below it — all '
+          + _vRanked648 + ' production-weighted producers take MORE, the lowest being ' + _pFloorC663
+          + ' at ' + _pFloor663.toFixed(1) + '%'
+          + (_noProd663
+              ? ', and ORCA holds no verified block-level production here, so this figure is a statutory model over '
+                + _nStr663 + ' rather than realised economics'
+              : '')
+          + '. Read it as an evidence gap before reading it as fiscal terms: 102 of the 108 regimes '
+          + 'under 40% on this platform carry no production at all. Establish the terms against this '
+          + 'jurisdiction\u2019s own petroleum act before it goes on a capital-allocation list.';
+        charColor = 'var(--yellow)';
+      } else if (_isProd663 && _vLower648 === 0) {
+        charLabel = 'Highly contractor-favorable — at ' + take.toFixed(1) + '% this is the LOWEST comparable '
+          + 'government take of the ' + (_vRanked648 + 1) + ' production-weighted producers, measured against '
+          + 'verified field production rather than statutory terms. Top tier for IOC capital allocation, '
+          + 'and defensible as such.';
+        charColor = 'var(--green)';
+      } else if (_hasPos648) {
+        charLabel = 'Contractor-favorable — low government take, and ' + _posClause648
+          + ', so this sits inside the band an IOC actually allocates capital across'
+          + (_noProd663
+              ? '. No verified block-level production is held here, so the take is a statutory model over '
+                + _nStr663 + ' — directional, not realised'
+              : '') + '.';
+        charColor = 'var(--green)';
+      } else {
+        _posInLabel648 = false;
+        charLabel = 'Highly contractor-favorable — low government take places this in the top tier for IOC capital allocation';
+        charColor = 'var(--green)';
+      }
     } else if (take <= 55 && downSolid) {
       _posInLabel648 = _hasPos648;
       charLabel = _hasPos648
@@ -32066,7 +32169,19 @@ function loadCountryProfile(country) {
         + _vLower648 + ' / ' + _vRanked648 + ' producers take less</span>'
       : '';
     var _verdictCTA = '';
-    if (take <= 40) {
+    if (take <= 40 && _hasPos648 && _vLower648 === 0 && !_isProd663) {
+      // v663 (T2): the country sits below the entire producing floor, so "See all investible
+      // regimes" — which loads the Screener at take ≤40% and returns 108 countries, 102 of them
+      // with no verified production — hands the analyst a shortlist built from the same absence
+      // that produced this page's number. Route to the producing regimes under 40% instead.
+      var _invSet663 = (typeof cpInvestibleProducers === 'function') ? cpInvestibleProducers() : [];
+      _verdictCTA = _invSet663.length
+        ? ' <button onclick="cpScreenInvestibleProducers()" style="background:none;border:1px solid var(--accent);border-radius:4px;color:var(--accent);cursor:pointer;font-size:10px;padding:1px 6px;margin-left:6px;white-space:nowrap;vertical-align:middle;" onmouseover="this.style.background=\'rgba(176,104,0,.08)\'" onmouseout="this.style.background=\'none\'" title="Opens the Screener restricted to exactly these '
+            + _invSet663.length + ' jurisdictions — ' + _cpEsc(_invSet663.join(', '))
+            + ' — with every other filter cleared. They are the production-weighted producers whose COMPARABLE government take at $75/bbl is 40% or lower: the low-take regimes ORCA can evidence against verified field production, rather than the 102 statutory-model jurisdictions a plain take ≤40% screen also returns. Comparable take excludes fee-basis (TSC/RSC/buy-back) contracts, so two of these print a higher headline in the Screener TAKE column — the scope line above the table names which and why.">See the '
+            + _invSet663.length + ' PRODUCING regimes under 40% &rarr;</button>'
+        : '';
+    } else if (take <= 40) {
       // v492: investible regime — CTA to load Screener with take ≤40% to show the full investible universe
       _verdictCTA = ' <button onclick="(function(){switchTab(\'texplorer\',document.getElementById(\'tab-btn-tscreener\'));switchExplorerMode(\'screen\',document.getElementById(\'mode-btn-screen\'));setTimeout(function(){var s=document.getElementById(\'sl-take\');if(s){s.value=40;document.getElementById(\'sv-take\').textContent=\'40\';}if(typeof runScreener===\'function\')runScreener();},150);})()" style="background:none;border:1px solid var(--green);border-radius:4px;color:var(--green);cursor:pointer;font-size:10px;padding:1px 6px;margin-left:6px;white-space:nowrap;vertical-align:middle;" onmouseover="this.style.background=\'rgba(21,128,61,.08)\'" onmouseout="this.style.background=\'none\'" title="Screen all investible regimes (take ≤40%) in the Screener tab — see which countries share this low-take profile">See all investible regimes &rarr;</button>';
     } else if (_hasPos648 && _vLower648 > 0) {
