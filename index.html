@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v659</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v660</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v659</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v660</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v659';
+  return m ? m[0] : 'v660';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v659');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v660');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2426,7 +2426,7 @@ window.copyPlatformCitation = function(btn) {
              row order unchanged. The one control built to answer "how solid is the evidence?"
              had been silently failing. Adding the option is the fix -- the select is the single
              source of truth for the sort key, so header click and dropdown now agree. -->
-        <!-- v659 (T4): the Stability column has rendered a Fiscal Predictability Score on all 185
+        <!-- v660 (T4): the Stability column has rendered a Fiscal Predictability Score on all 185
              rows since v649, and it was the ONLY numeric column in this table with no way to order
              it: no data-sort-key on the <th>, no option here, no case in _explMetricCmp(). Govt
              Take, Evidence, NPV, IRR, Breakeven and Swing all sort; the one column a T4 analyst
@@ -2535,7 +2535,7 @@ window.copyPlatformCitation = function(btn) {
         <option value="iochurdle">IOC Capital Screen — verified production · Take ≤65% · NPV positive at $75 AND at $50</option>
         <option value="sweetspot">Low Take · Positive NPV — Take ≤55% · Concession/PSC/PRRT/RSC · NPV positive</option>
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
-        <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v659 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
+        <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v660 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
         <option value="lowrisk">Low-Risk Stable — Take ≤55% · Concession + PRRT</option>
         <option value="downsidereturns">Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$50</option>
         <option value="highevidence" title="Countries where the majority of ORCA's fiscal facts were read out of the primary legal instrument (tier A), measured on a record deep enough for that share to mean something: A-share ≥ 55% AND ≥ 150 facts on file. 35 of 185 match. Replaces the old ≥80% A/B screen, which passed 171 of 185 because tier B is the EY / IHS / KPMG bulk harvest.">Primary-Source Evidence — tier-A ≥ 55% · ≥150 facts on file</option>
@@ -2682,7 +2682,7 @@ window.copyPlatformCitation = function(btn) {
           <label><input type="checkbox" value="Eni"> Eni</label>
         </div>
       </div>
-      <!-- v659 (T1): the "Water Depth" radio group is REMOVED. It read DEPTH_PROFILE, a hardcoded
+      <!-- v660 (T1): the "Water Depth" radio group is REMOVED. It read DEPTH_PROFILE, a hardcoded
            40-country editorial list, and screened 185 countries with it:
 
              onshore   16 countries      mixed  13      deepwater  11      TOTAL 40
@@ -11528,7 +11528,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <div class="faq-item" id="faq-A380">
           <div class="faq-q">A380. The Screener tab offers 8 pre-built filter presets. What are the exact filter criteria for each preset, and which IC use cases is each designed for?</div>
           <div class="faq-a">
-            <p><strong>Short answer:</strong> Each Screener preset is a named combination of government take, contractor NPV at the deck and at the $50 downside, primary-source evidence, mechanic, region, data basis and — for the basin-scoped screens — an explicit country set, calibrated for a specific capital allocation or bid screening workflow. (IRR, breakeven and water depth are no longer screening axes: see v517, v568/v623 and v659.) Understanding the exact criteria helps analysts know when to apply each preset directly vs. when to modify thresholds for a project-specific screen.</p>
+            <p><strong>Short answer:</strong> Each Screener preset is a named combination of government take, contractor NPV at the deck and at the $50 downside, primary-source evidence, mechanic, region, data basis and — for the basin-scoped screens — an explicit country set, calibrated for a specific capital allocation or bid screening workflow. (IRR, breakeven and water depth are no longer screening axes: see v517, v568/v623 and v660.) Understanding the exact criteria helps analysts know when to apply each preset directly vs. when to modify thresholds for a project-specific screen.</p>
             <p><strong>Complete criteria breakdown for all 8 Screener presets:</strong></p>
             <ul>
               <li><strong>Low Take · Positive NPV</strong> — Take ≤55% · Breakeven ≤$65/bbl · IRR ≥12% at $75/bbl. <em>Use case:</em> Initial capital allocation screen for deepwater greenfield. Identifies regimes that are simultaneously low-take, low-breakeven, and IRR-positive at the standard benchmarking price. Typical results: Guyana, UAE, USA GoM, Trinidad, Republic of the Congo shallow shelf. <em>IC application:</em> "Countries passing Low Take · Positive NPV screen are candidate anchor positions for a diversified upstream portfolio — low fiscal risk combined with commercial viability at mid-cycle prices."</li>
@@ -22727,7 +22727,7 @@ function _evidenceSortVal(entry) {
 }
 window._evidenceSortVal = _evidenceSortVal;
 
-// ── v659 (T4): ordering for the Explorer Stability column ────────────────────────────────
+// ── v660 (T4): ordering for the Explorer Stability column ────────────────────────────────
 // The column renders a Fiscal Predictability Score for all 185 rows and could not be sorted at
 // all until this cycle. The order is NOT the bare number, for the reason this column's own cell
 // renderer (v649), its header tooltip and renderStabilityBadge() have all stated since v624:
@@ -23142,6 +23142,7 @@ function buildEvidencePanel(entry, dqBadgeHtml, dqExplain) {
       <span style="font-size:12px;font-weight:700;color:var(--text);">Evidence Quality</span>
       <span style="background:${color}22;border:1px solid ${color};color:${color};font-size:11px;font-weight:800;padding:2px 9px;border-radius:12px;letter-spacing:.02em;cursor:help;" title="${_gWhy}">${_g.letter} \u2014 ${_g.label}</span>
       <span style="background:var(--surface2, rgba(148,163,184,.10));border:1px solid var(--border);font-size:10px;font-weight:600;padding:2px 8px;border-radius:12px;cursor:help;white-space:nowrap;" title="${_legsTip}"><span style="color:${_aCol};${_aEmph}">${a}% primary law</span><span style="color:var(--muted);"> \u00b7 </span><span style="color:${_nfCol};${_nfEmph}">${_nfTxt}</span></span>
+      <span id="cp-terms-chip"></span>
       ${_bulk > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts came from the EY / IHS / KPMG bulk harvest, which is assigned at country level rather than verified against each individual contract. Counted from the top sources listed below, so the true figure may be higher.">${_bulk.toFixed(0)}%+ bulk-harvested</span>` : ''}
       ${_shared > 0 ? `<span style="background:rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;" title="At least this share of the country's facts trace to a document that is also the cited source for other jurisdictions - a regional instrument applied across a group, not a text read off this country's own statute or its individual contracts. Counted from the top sources listed below, so the true figure may be higher.">${_shared.toFixed(0)}%+ multi-jurisdiction source</span>` : ''}
       ${_srcDeadN > 0 ? `<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);color:var(--red);font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;cursor:help;white-space:nowrap;" title="${_cpEsc(_srcNoneOpen ? 'Not one of the documents this profile cites can be opened from here. Every citation URL on the platform was fetched on ' + _CITE_DEAD_CHECKED + '; all of this country\u2019s returned a 404, or named a hostname that does not resolve. The tier letters and the evidence grade are unchanged - whether an instrument is authoritative and whether ORCA can hand you a copy of it are different questions. This is the second. There is currently no citation on this profile you can click through to before an IC memo; locate the instruments by name.' : 'At least one of the documents this profile cites cannot be opened from here. Every citation URL on the platform was fetched on ' + _CITE_DEAD_CHECKED + '; the ones marked LINK DEAD in the source list below returned a 404, or named a hostname that does not resolve. The tier letters and the evidence grade are unchanged - whether an instrument is authoritative and whether ORCA can hand you a copy of it are different questions. This is the second.')}">${_srcNoneOpen ? 'no cited source opens' : _srcDeadN + ' of ' + _srcCitedN + ' source links dead'}</span>` : ''}
@@ -24443,7 +24444,7 @@ function renderExplorer() {
                     ? ` — every country here has verified field production, but not to the same depth: ${_explFacts} production-weighted on more than 5% of their contracts (PROD-WTD), ${data.length - _explFacts} on a partial match ${_explThin < 1 ? `as thin as ${_explThin.toFixed(1)}%` : `below that`} (PART-PROD). Read the badge on each row before ranking them against each other. Production basis is not source quality — that is the Evidence column.`
                     : ` — all ${data.length} are production-weighted on more than 5% of their contracts (PROD-WTD) — the deepest production basis in the database. That is separate from source quality; read the Evidence column for that.`)
                 : '')));
-  // v659 (T4): when the analyst ranks ON Stability, the order this table returns is not the order
+  // v660 (T4): when the analyst ranks ON Stability, the order this table returns is not the order
   // the numbers alone would give, and the reason lives in a header tooltip they have already
   // stopped reading by the time they see the rows. State it under the result set instead.
   const _fpK = (typeof _fpCnt === 'function') ? _fpCnt() : null;
@@ -26634,7 +26635,7 @@ function renderCompare() {
   // while occupying the palette slot that desynced every other column from the chart above.
   const npvCountries = selected.filter(d => !isStateMonopoly(d.take_75));
   const hasNpv = npvCountries.some(d => d.npv_50 != null || d.npv_75 != null);
-  // v659 (T3): basis parity with the take chart 8px above. That chart RE-BASES a fee-blended
+  // v660 (T3): basis parity with the take chart 8px above. That chart RE-BASES a fee-blended
   // column onto its production-sharing/concession subset and says so three times -- legend
   // "Iraq (PSC/Conc)", a second title line, and a green notice naming the 195 contracts it drew.
   // v606 put it in the legend for an explicit reason, recorded there: "the legend is the only key
@@ -26915,7 +26916,7 @@ function applyScreenerPreset(preset) {
     const checks = document.querySelectorAll('#' + groupId + ' input[type=checkbox]');
     checks.forEach(cb => { cb.checked = values === 'all' || values.includes(cb.value); });
   };
-  // v659: setDepth() removed with the Water Depth radio group.
+  // v660: setDepth() removed with the Water Depth radio group.
 
   // Reset all to defaults first
   _screenerRfactorOnly = false;
@@ -26925,7 +26926,7 @@ function applyScreenerPreset(preset) {
   _screenerSetLabel = null;     // v560
   _activePresetName = null;
   setSlider('sl-take', 100); setSlider('sl-npv', -500); setSlider('sl-npv50', -500); setSlider('sl-evid', 0);
-  setChecks('sc-mech-checks', 'all');   // v659: setDepth('all') removed with the radio group
+  setChecks('sc-mech-checks', 'all');   // v660: setDepth('all') removed with the radio group
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
   const feeCmp = document.getElementById('sc-fee-cmp');
   if (feeCmp) feeCmp.checked = true;   // v554
@@ -26961,7 +26962,7 @@ function applyScreenerPreset(preset) {
     if (scRgn2) scRgn2.value = 'Africa';
     _activePresetName = 'PSC Africa';
   } else if (preset === 'deepwater') {
-    // v659 (T1). Was `setDepth('deepwater')` -- DEPTH_PROFILE.deepwater, 11 countries, and it
+    // v660 (T1). Was `setDepth('deepwater')` -- DEPTH_PROFILE.deepwater, 11 countries, and it
     // returned exactly those 11: Namibia, Ghana, Mozambique, Tanzania, Gabon, Cameroon, Equatorial
     // Guinea, Sierra Leone, Senegal, Guyana, Republic of the Congo. Every one of them is badged
     // PROXY -- no verified field production anywhere in the result -- so the platform's own count
@@ -27615,7 +27616,7 @@ function runScreener() {
     // IOC operator presence filter
     if (iocCountries !== null && !iocCountries.has(d.country)) return false;
 
-    // v659 (T1): the water-depth leg is gone with its control. See the DOM note in
+    // v660 (T1): the water-depth leg is gone with its control. See the DOM note in
     // #screener-advanced-details. DEPTH_PROFILE named 40 of 185 countries, so each of its three
     // settings removed the other 145 for being unlisted, and "shallow" read the mixed bucket.
     // region filter — use _regionMatch() so "Asia Pacific" maps to Asia+Oceania, "Americas" maps to Latin America+North America (v429)
@@ -28171,7 +28172,7 @@ function exportScreenerCSV() {
   a.click();
 }
 
-/* ── v659 (T5) — "give me something I can paste straight into an IC memo." ─────────────
+/* ── v660 (T5) — "give me something I can paste straight into an IC memo." ─────────────
    The Screener is the surface that BUILDS the IC shortlist: the analyst loads a preset,
    moves the take/NPV/evidence thresholds, lands on 8-15 countries, and that row set is
    the table that goes in the memo. It was the only results table in the tool with no
@@ -29489,6 +29490,20 @@ function _cpScrollToLiveDcf() {
 }
 window._cpScrollToLiveDcf = _cpScrollToLiveDcf;
 
+// v660 (T6): the Evidence Quality chip at the top of a profile is a control, not a caption --
+// clicking "N of M model terms cited" lands on the term-by-term Evidence Chain that says which
+// M they are. Same flash treatment as _cpScrollToLiveDcf so the destination is unambiguous.
+function _cpScrollToEvidenceChain(slug) {
+  var el = document.getElementById('dd-facts-' + slug) || document.getElementById('dd-facts-content-' + slug);
+  if (!el) return;
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) { el.scrollIntoView(); }
+  var prev = el.style.boxShadow;
+  el.style.transition = 'box-shadow .3s';
+  el.style.boxShadow = '0 0 0 3px rgba(194,65,12,.45)';
+  setTimeout(function() { el.style.boxShadow = prev || ''; }, 1800);
+}
+window._cpScrollToEvidenceChain = _cpScrollToEvidenceChain;
+
 function renderReformTimeline(country) {
   // Fiscal facts from API JSON
   const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -29599,6 +29614,13 @@ function renderReformTimeline(country) {
       } catch (e) { return null; }
     };
 
+    // ── v660 (T6): which of the terms that PRODUCE the take carry a citation ──────────────
+    // Filled in the sourced branch of the row loop below (the same branch that increments
+    // sourcedCount, so bulk, shared-regional, D-confidence and no-source rows are excluded by
+    // construction). Read back after the table renders to build the third leg of the Evidence
+    // Quality chip at the top of this profile.
+    const _termsCited = new Set();
+
     if (fk) {
       // API data available — build rows with source badges
       rowDefs.forEach(([label, key, fallbackKey]) => {
@@ -29697,6 +29719,7 @@ function renderReformTimeline(country) {
               + _fmtPct(srcVal) + '</span> ' + _sharedChip(_shareOf.length, sTip);
           } else if (srcVal != null) {
             sourcedCount++;
+            if (_MODEL_KEY[label]) _termsCited.add(_MODEL_KEY[label]);   // v660 (T6)
             isDivergent = numVal != null &&
               Math.abs(numVal - srcVal) > Math.max(0.5, 0.02 * Math.max(Math.abs(srcVal), 1));
             if (isDivergent) {
@@ -29870,6 +29893,9 @@ function renderReformTimeline(country) {
     const _heldRows = rows.length;
     let _missTerms = [];
     let _termsTotal = _heldRows;
+    let _termKeys = [];        // v660 (T6): the model term keys this regime actually uses
+    let _termsMech = null;     // v660 (T6)
+    let _termLabels = {};      // v660 (T6): _TERM_LABEL is block-scoped below; mirror it out
     if (fk) {
       // The model terms this table can speak to. Terms getDCFParams carries that are not a rate
       // on a regime -- spt_threshold, capex_recovery_years, windfall_price_trigger, uplift_rate,
@@ -29882,6 +29908,7 @@ function renderReformTimeline(country) {
         fee_per_bbl: 'Service Fee', ept_rate: 'Excess Petroleum Tax',
         return_on_capex: 'Capex Remuneration Rate'
       };
+      _termLabels = _TERM_LABEL;   // v660 (T6)
       // The same fiscal_facts keys rowDefs above already reads, indexed by model term.
       const _TERM_FACTS = {
         royalty_rate: ['levy_royalty_rate'],
@@ -29905,9 +29932,12 @@ function renderReformTimeline(country) {
           const _cdr = (typeof COUNTRY_DATA !== 'undefined')
             ? COUNTRY_DATA.find(function(x) { return x.country === country; }) : null;
           _termsTotal = 0;
+          _termKeys = [];
+          _termsMech = _mech;
           Object.keys(_TERM_LABEL).forEach(function(k) {
             if (!(k in _pr)) return;                                  // this regime does not use it
             _termsTotal++;
+            _termKeys.push(k);
             const fkeys = _TERM_FACTS[k] || [];
             if (fkeys.some(function(x) { return fk[x] != null; })) return;   // held -- already a row
             const v   = _pr[k];
@@ -29929,7 +29959,7 @@ function renderReformTimeline(country) {
             });
           });
         }
-      } catch (e) { _missTerms = []; _termsTotal = _heldRows; }
+      } catch (e) { _missTerms = []; _termsTotal = _heldRows; _termKeys = []; _termsMech = null; }
       _missTerms.forEach(function(t) {
         const where = t.origin === 'override'
           ? 'a hard-coded ' + country + ' override inside the DCF engine, which is not a citation'
@@ -30168,6 +30198,72 @@ function renderReformTimeline(country) {
         ).join('')
       + '</tbody></table>'
       + reconNote;
+
+    // ── v660 (T6): the evidence grade does not measure the numbers that produced the take ──
+    // The Evidence Quality panel at the top of this profile is the first, and for most analysts
+    // the only, evidence surface. Since v611 it states both legs of the grade: primary-law share
+    // and fact count. Both are properties of the country's WHOLE fact base -- hundreds of rows,
+    // most of them contract metadata -- and neither one looks at the four to six fiscal terms the
+    // DCF actually runs. So the letter answers a different question from the one a T6 analyst is
+    // asking, and nothing on it says so.
+    //
+    // Measured across all 185 shipped api/v1/country files, against getDCFParams()'s own term set
+    // and this table's own sourcing rules (bulk, shared-regional and D-confidence rows excluded,
+    // exactly as sourcedCount excludes them):
+    //   - NOT ONE country has every model term independently cited. The best on the platform is
+    //     4 of 5.
+    //   - 59 of the 107 countries graded A or B have HALF OR FEWER of their model terms cited.
+    //   - 19 countries have zero.
+    //   - Netherlands renders "A -- 278 facts" over 1 of 4 Concession terms cited. Brazil renders
+    //     A over 3,591 facts and 2 of 4; Canada the same. Brazil's Special Tax -- the special
+    //     participation levy that is most of Brazil's government take -- is one of the two the
+    //     model substitutes, and it substitutes zero.
+    //
+    // The page already knows all of this: the regime note under the Evidence Chain has said it
+    // per country since v625. But that note renders ~2,750px down, below six other sections, only
+    // after this fetch resolves, and only on this one tab -- and nothing above it hints that it
+    // exists. An analyst who reads "A" at the top has been answered, and stops.
+    //
+    // The chip goes in the summary line beside the other two legs, reuses this fetch (no extra
+    // request), and is a control, not a caption: clicking it scrolls to the Evidence Chain and
+    // flashes it, so the term-by-term breakdown is one click from the grade instead of a scroll
+    // hunt. No tier letter, percentage or grade changes -- how deep a fact base is and whether
+    // the terms in the model are cited are different questions, and this is the second.
+    try {
+      const _tcEl = document.getElementById('cp-terms-chip');
+      if (_tcEl && _termKeys.length) {
+        const _tcTot   = _termKeys.length;
+        const _tcCited = _termKeys.filter(function(k) { return _termsCited.has(k); }).length;
+        const _tcAbs   = _missTerms.map(function(t) { return t.key; });
+        const _unNamed = _termKeys.filter(function(k) { return !_termsCited.has(k) && _tcAbs.indexOf(k) === -1; })
+                                  .map(function(k) { return _termLabels[k] || k; });
+        const _absNamed = _missTerms.map(function(t) { return t.label; });
+        const _tcRatio = _tcCited / _tcTot;
+        const _tcCol = _tcRatio <= 0.5 ? 'var(--red)' : (_tcRatio < 1 ? 'var(--orange)' : 'var(--green)');
+        const _tcBg  = _tcRatio <= 0.5 ? 'rgba(185,28,28,.12)' : (_tcRatio < 1 ? 'rgba(194,65,12,.12)' : 'rgba(21,128,61,.12)');
+        const _tcBd  = _tcRatio <= 0.5 ? 'rgba(185,28,28,.45)' : (_tcRatio < 1 ? 'rgba(194,65,12,.45)' : 'rgba(21,128,61,.45)');
+        const _tcTip = _esc('This counts something different from the grade beside it. The letter, the '
+          + 'primary-law share and the fact count all describe ' + country + '’s whole fact base. This '
+          + 'counts only the ' + _tcTot + ' fiscal terms the ' + (_termsMech || 'DCF') + ' model runs to produce the '
+          + 'take, NPV and IRR on this page, and asks of each one whether a citation stands behind it — '
+          + 'the bulk harvest, a regional instrument shared across jurisdictions, and an uncited contract '
+          + 'average do not count, on the same rule the Evidence Chain uses. '
+          + _tcCited + ' of ' + _tcTot + ' clear that bar.'
+          + (_absNamed.length ? ' ORCA holds no value at all for ' + _absNamed.join(', ')
+              + ', so the model substitutes ' + (_absNamed.length === 1 ? 'it' : 'them') + '.' : '')
+          + (_unNamed.length ? ' ' + _unNamed.join(', ') + ' '
+              + (_unNamed.length === 1 ? 'has a value but no citation ORCA can name.' : 'have values but no citation ORCA can name.') : '')
+          + ' A deep, heavily primary-sourced fact base can sit over a thinly cited model — no country '
+          + 'on this platform cites every term. Click to jump to the term-by-term Evidence Chain.');
+        _tcEl.outerHTML = '<span id="cp-terms-chip" role="button" tabindex="0"'
+          + ' onclick="event.preventDefault();event.stopPropagation();_cpScrollToEvidenceChain(\'' + slug + '\');"'
+          + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();_cpScrollToEvidenceChain(\'' + slug + '\');}"'
+          + ' style="background:' + _tcBg + ';border:1px solid ' + _tcBd + ';color:' + _tcCol
+          + ';font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;cursor:pointer;'
+          + 'white-space:nowrap;min-height:24px;display:inline-flex;align-items:center;"'
+          + ' title="' + _tcTip + '">' + _tcCited + ' of ' + _tcTot + ' model terms cited &rarr;</span>';
+      }
+    } catch (e) { /* the chip is additive; never let it take the table down */ }
 
     // v636 (T2): the tier-schedule note higher up this page claimed to quote this table. Now it
     // does. Fires after the table exists so the note names the figure actually on screen.
@@ -43255,7 +43351,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Screener Reset/CSV/Excel buttons
   var scReset = document.getElementById('screener-reset-btn');
   if (scReset) scReset.addEventListener('click', function() { resetScreenerAll(); });
-  // v659 (T5): the Screener's clipboard path, alongside its two file exports.
+  // v660 (T5): the Screener's clipboard path, alongside its two file exports.
   var scCopy = document.getElementById('screener-copy-ic-btn');
   if (scCopy) scCopy.addEventListener('click', function() { copyScreenerTable(); });
   var scCsv = document.getElementById('screener-csv-btn');
@@ -43479,13 +43575,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-// v109: Screener mechanic checkboxes + IOC checkboxes — event delegation (v659: depth radios gone)
+// v109: Screener mechanic checkboxes + IOC checkboxes — event delegation (v660: depth radios gone)
 document.addEventListener('DOMContentLoaded', function() {
   var mechChecks = document.getElementById('sc-mech-checks');
   if (mechChecks) mechChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   var iocChecks = document.getElementById('sc-ioc-checks');
   if (iocChecks) iocChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
-  // v659: the .depth-radio-group listener is removed with the control it drove.
+  // v660: the .depth-radio-group listener is removed with the control it drove.
 });
 
 // v109: Populate print header export date
