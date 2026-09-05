@@ -28737,3 +28737,136 @@ Side-by-Side published contractor NPV at **three** prices while everything else 
 | Contractor NPV | $50 (downside) · $75 (base) · — · $125 (upside) |
 
 The bar chart eight rows below plots `[npv_50, npv_75, npv_100, npv_
+
+---
+## Cycle 559 Log — 2026-09-04 23:26
+- Test before: 262 PASS / 0 FAIL / 0 WARN / 0 JS errors (HEAD, served locally at the sub-path)
+- Test after: **262 PASS / 0 FAIL / 0 WARN / 0 JS errors** — Playwright ACTUALLY RAN, twice, the
+  second time against the final tree including the export edits. Number read from the suite's own
+  `/tmp/runtime_test_report.txt`, not assumed.
+- Pixel audit: **PIXEL GATE PASS** — 10 tabs x 5 viewports, no surface worse than baseline
+- JS syntax: 11/11 inline blocks clean (re-run after every edit)
+- Shipped as **v653**, pushed to yoburgqs/petroleum-fiscal-db, mirrored to office.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"**
+(Rotation: 558 was T3, 557 T1, 556 T5, 555 T4, 554 T2 — T6 last walked at 553, the stalest.)
+
+## Friction
+**IOC Portfolio was the only tab on the platform that prints a government take without printing
+the grade behind it — and it is the widest take table in the tool.**
+
+Walked cold at 1440x900, no sessionStorage or localStorage: Home → IOC Portfolio. The tab seeds
+Shell and renders 37 rows of country x mechanic government take, NPV, IRR and breakeven. Every
+other surface that prints a take prints its evidence grade beside it:
+
+| surface | evidence signal |
+|---|---|
+| Fiscal Compare | `QUALITY` column, `getTierBadge()` (v551) |
+| Explorer / Screener | `Evidence` column, `getEvidenceBar()` (v557) |
+| Country Profile | Evidence Quality panel + per-parameter Evidence Chain |
+| Side-by-Side | Evidence tier row |
+| **IOC Portfolio** | **none** |
+
+v599 (T6) added the entity provenance block to this tab — "which legal entities were rolled into
+this number?" It never answered the other half of the same question: *how solid is the fiscal
+record the number was computed from?* That is the half that decides whether a row is citable.
+
+Measured against the shipped `country_data.json` and `IOC_DATA`, using `_evidenceGrade()`
+unchanged:
+
+- **362 of the 1,772** operator x country x mechanic rows sit on a country graded **C or D**.
+- **321 of the 1,561** operators have at least one such row.
+- **28 of the 120** countries reachable on this tab are C or D.
+
+On the tab's own seeded example, Shell's table carried **Iraq at 98.5% take, grade D** (11.8%
+primary law) and **Russia at 22.9%, grade D** (3.8% primary law) in the same column as **Norway
+at 67.3%, grade A** (66.1% primary law, 63,848 facts), with nothing distinguishing them — and
+**Nigeria at 83.5%, grade C**, on 62 contracts, the group's fourth-largest position.
+TotalEnergies is worse: **12 of its 49 countries are C or D**. The only route to the grade was
+clicking through to the Country Profile one country at a time — 49 round trips.
+
+## Change
+An **Evidence** column on all three IOC take tables — the single-entity table (`loadIOC`), the
+group roll-up (`loadIOCAggregated`) and the exposure breakdown (`renderIOCExposure`) — rendered
+by **`getEvidenceBar()`**, the same function the Explorer and Screener columns already call, so
+the letter, the A/B/C/D composition bar, the fact count and the tooltip are identical to what the
+analyst has read on those tabs. Nothing is recomputed and nothing is filtered.
+
+A **`C/D-graded exposure`** stat tile in the header strip carries the portfolio-level roll-up:
+the share of the operator's contracts sitting in a C- or D-graded country (red at ≥25%, orange
+above zero, green at `none`), with every weak country, its contract count, its primary-law share
+and its fact count named in the tooltip. Shell reads **7%**; Tullow Oil reads **33%**.
+
+The grade is carried into the **XLSX Portfolio sheet** (`Evidence grade` + `Evidence basis`
+columns), the **Basis & Assumptions sheet** (a new `EVIDENCE` block that states the two-legged
+test and names every directional row) and the **Copy-for-IC clipboard**. A badge visible only
+while the analyst is on the page is not evidence in an IC memo — the same failure v605 fixed for
+the Country Profile citation, not repeated here.
+
+## Result
+An analyst sizing an operator's fiscal exposure can now see, at a glance and without leaving the
+tab, what share of the portfolio rests on a weakly-evidenced record, exactly which rows those
+are, and which rows are citable as published. Shell: Iraq and Russia read **D**, Nigeria, Mexico,
+Colombia, Bolivia and Oman read **C**, Norway and Brazil read **A** — in the same column as the
+take. Previously that required opening up to 49 Country Profiles one at a time, and nothing on
+the tab told them which ones were worth opening.
+
+## Mobile (Step 5b)
+390 x 844, `hasTouch: true`, `isMobile: true`. Both IOC paths and the exposure table:
+`documentElement.scrollWidth` **390** = `clientWidth` **390** — **no horizontal page scroll**. The
+new column's cells measure **44px** tall (single-entity and roll-up) and **55px** (exposure); the
+header **30px / 28px**; the new stat tile **78px x 186px**. Zero elements under 24px under
+`pointer: coarse`. The wider table scrolls inside its own `.tbl-wrap` (904 vs 360) and
+`.table-scroll`, which is the existing pattern, not a new one. Pixel audit: **PIXEL GATE PASS**.
+
+## STILL LOCKED — nothing touched
+**No CSS was added or modified this cycle.** The **v612 MOBILE LAYER block and the
+`#reference-panel` `translateX` state are byte-identical**; `#reference-panel` keeps a
+non-negative `right` offset; rows with `min-width: max-content` untouched. **Not a text-only
+change** — a new column with new content on three tables, a new stat tile, and two new columns in
+the export. **No new tooltip as the fix** — the fix is the column; the tooltips are the existing
+`getEvidenceBar()` strings plus header labels for the new columns. No new FAQ (still **974**). No
+citation-string micro-edit. No take, NPV, IRR, breakeven, swing, contract count, rank, mechanic
+mix, R-factor share, weighted average take, reform diamond, Reform Frequency Score, evidence
+grade, tier letter or primary-law percentage was altered or recomputed. No country's data
+changed; `country_data.json`, `reform_history.json` and `IOC_DATA` are untouched. **No tab added,
+removed or reordered.** Chip rows stay `display:none`; no page-sub paragraph, amber instructional
+banner, routing hint or "How to read" block; no SbS card wrapper. Screener advanced filters still
+collapsed, presets still a dropdown; Home "More tools" still collapsed; Explorer analytics still
+collapsed. Govt NPV stays REMOVED from FC; Contractor NPV header stays "NPV ($M)"; FC Analyst
+Guide sessionStorage logic untouched. CP headline stays two-zone with global rank and vs-median
+pill; take% stays tier-coloured; Reform Risk stays in the primary Home card grid. v371/v373,
+v430, v449, v451, v452, v489, v507, v517, v530, v554, v568, v587, v599, v609, v612, v617, v621,
+v632, v637, v639-v652 and every locked item through v652 intact.
+
+## Found while walking, NOT fixed this cycle — recorded so it is not lost
+**`IOC_DATA`'s $75 column and its $50 / $100 / $125 columns do not come from the same
+computation.** For 104 of the 149 country x mechanic groups that carry more than one operator,
+`take_75`, `npv_75`, `irr_75` and `be_75` are **identical across every operator in the group**,
+while `take_50`, `take_100` and `take_125` **vary per operator**. USA Concession is the clear
+case: Shell, Chevron, BP, ExxonMobil, Anadarko and Hess all read `take_75` 23.8% / `npv_75`
+$3,492.5M / `irr_75` 425.9% / `be_75` 31.2, but their `take_50` values are 23.2 / 25.8 / 23.9 /
+20.9 / 25.4 / 26.4. The consequence is visible: **50 of the 1,772 rows show take FALLING from $50
+to $75 and then rising to $100**, which no mechanic in the engine produces. The `Swing` column is
+computed off the operator-specific ends, so it disagrees with the base-case cell between them.
+This is a data-generation defect in the harvest that built `IOC_DATA`, not a rendering one, and
+the three price columns are `display:none` by default with the only toggle living on the Explorer
+tab — so a fix belongs with whoever regenerates `IOC_DATA`, not in a UX cycle. Not touched.
+
+## Carried, not fixed
+- The Side-by-Side proxy notice under the grid still says a column's "NPV **and IRR** … come from
+  the standardized deepwater profile" with no IRR row on the tab. Carried from 556/558 — a
+  text-only edit, which the directive bans as a cycle's deliverable; it should ride along with the
+  next structural change to that notice.
+- Everything carried from 558 and earlier is unchanged: the Screener take slider's `min="30"`
+  floor against USA at 23.4%, the Screener's missing clipboard control, Reform Risk's export not
+  stating that tab filters do not narrow it, the NaN-padded caveat rows in all four CSV emitters,
+  Norway's stored p25/p75 vs its 29.6pp contract spread, `renderSampleAnalyses()` omitting 72
+  countries, `#flt-region` roll-up-only on the Explorer, the missing retrievability signal on
+  three Evidence columns, the `IOC_PRESENCE` alias map, Netherlands 23.4% vs the North Sea Trio
+  tooltip, the 272 dead citations, the two 22.5px `.source-badge` elements, the four-price
+  breakeven bound limit, and the unrecorded DCF solver country selection.
+- New, not fixed: `reform_history.json` carries no `source` key on any of its 83 events across 21
+  countries. The Reform Risk tab renders a citation and a tier letter per event regardless, so
+  those strings come from somewhere other than that file — worth tracing before anyone edits it.
