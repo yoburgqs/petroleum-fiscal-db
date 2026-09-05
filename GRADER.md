@@ -28563,3 +28563,18 @@ header stays "NPV ($M)"; FC Analyst Guide sessionStorage logic untouched. CP hea
 two-zone with global rank and vs-median pill; take% stays tier-coloured; Reform Risk stays in the
 primary Home card grid. v371/v373, v430, v449, v451, v452, v489, v507, v517, v530, v554, v568,
 v587, v609, v612, v617, v621, v632, v637, v639–v650 and every locked item through v650 intact.
+
+---
+## Cycle 557 Log — 2026-09-04 21:10
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 557 complete — shipped as **v651**, pushed to both repos.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (Rotation: 556 was T5, 555 T4, 554 T2, 553 T6, 552 T3, 551 T1.)
+
+## Friction
+**The Screener has no oil-price control, and every number on the tab is a function of one.**
+
+`runScreener()` opens with `const price = getPriceKey()` and filters on `d['take_'+price]` / `d['npv_'+price]`. `getPriceKey()` reads `input[name="price"]` — four radios that live at `index.ht
