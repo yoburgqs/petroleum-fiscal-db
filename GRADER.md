@@ -30275,3 +30275,16 @@ carries both the criterion and its 21-of-185 coverage limit.
   historical `vNNN (Tn)` provenance comments into false claims, only the **4** genuine display
   strings were bumped by line number: the header badge (`:1731`), the print header (`:1801`), and
   the two `_orcaCiteVer` fallbacks (`:2134`, `:2209`). No regex was run over the file.
+
+---
+## Cycle 568 Log — 2026-09-05 09:44
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both repos pushed. Cycle complete.
+
+## Cycle 568 — shipped as v662
+
+**Task: T4** — "What is my fiscal-stability and reform exposure here?" (last cycle was T1, not a repeat)
+
+**Friction.** Walked T4 cold. The Screener is where a screening list actually gets built, and the only control on the whole tab that named stability was the preset **"Low-Risk Stable"**. Its entire implementation was a take ceiling (≤55%) plus a mechanic list (Concession + PRRT). No reform, stability or predictability input 
