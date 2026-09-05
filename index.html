@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v668</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v669</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v668</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v669</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v668';
+  return m ? m[0] : 'v669';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v668');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v669');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2909,7 +2909,7 @@ window.copyPlatformCitation = function(btn) {
       </label>
       <button class="btn btn-outline btn-sm" id="cmp-print-btn" title="Print/export comparison as PDF" aria-label="Export comparison as PDF via browser print">⬇ Export PDF</button>
       <button class="btn btn-outline btn-sm" id="cmp-share-btn" title="Copy shareable link to this comparison">⎘ Share Link</button>
-      <button class="btn btn-outline btn-sm" id="cmp-copy-table-btn" title="Copy this comparison to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Includes the profile/price assumptions and the ORCA source line. Identical to the button under the grid." aria-label="Copy comparison table for IC memo">&#9112; Copy for IC Memo</button>
+      <button class="btn btn-outline btn-sm" id="cmp-copy-table-btn" title="Copy this comparison to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Includes the profile/price assumptions, every comparability notice shown under the grid for this particular set, and the ORCA source line. Identical to the button under the grid." aria-label="Copy comparison table for IC memo">&#9112; Copy for IC Memo</button>
       <div id="cmp-dropdown" role="listbox" aria-label="Country search results" style="display:none;position:absolute;background:var(--card);border:1px solid var(--border);border-radius:8px;max-height:260px;overflow-y:auto;width:340px;z-index:100;margin-top:4px;top:100%;left:0;box-shadow:0 6px 20px rgba(0,0,0,.12);"></div>
   </div>
 
@@ -26457,14 +26457,31 @@ function renderCompare() {
         + (_gap < 5 ? ', so the base-case row on its own does not separate them.' : '.');
     // Only claim the full lowest-to-highest reversal where the column actually ends up highest.
     const _aEndsHigh = _r125 && _r125.hi === _cmpFlip.a;
-    html += '<div style="margin-top:10px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.30);border-left:3px solid var(--accent);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
+    // v669 (T3): this banner said "the lowest government take of the set" while _cmpRankTake()
+    // had already dropped every column the basis gate excludes -- proxy columns, state monopolies,
+    // PRRT. On Guyana / Angola / Brazil it therefore read "Angola has the lowest government take
+    // of the set at $50/bbl (42.3%)" directly under a row printing Guyana at 39.9%. The analyst
+    // reads a lower number in the row the sentence is about. Say how many columns were ranked,
+    // and name the ones that were set aside, in the sentence that makes the claim.
+    const _flipSkipped = selected.filter(d => d && _cmpRankTake(d, 50) == null).map(d => d.country);
+    const _flipScope = _flipSkipped.length
+      ? ' of the ' + (selected.length - _flipSkipped.length) + ' ranked columns'
+      : ' of the set';
+    const _flipAside = _flipSkipped.length
+      ? ' <strong style="color:var(--text);">' + _flipSkipped.map(_cmpEsc).join(' and ')
+        + (_flipSkipped.length === 1 ? ' is' : ' are') + ' not in this ordering</strong> \u2014 '
+        + (_flipSkipped.length === 1 ? 'its take is' : 'their takes are')
+        + ' not on a like-for-like basis with the rest of the set, so the printed take may be lower than the figures named here without changing the ranking.'
+      : '';
+    html += '<div class="cmp-notice" style="margin-top:10px;background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.30);border-left:3px solid var(--accent);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
       + '<strong style="color:var(--text);">\u26a0 These columns do not rank the same way at every price.</strong> '
-      + '<strong style="color:var(--text);">' + _cmpEsc(_cmpFlip.a) + '</strong> has the lowest government take of the set at $50/bbl ('
+      + '<strong style="color:var(--text);">' + _cmpEsc(_cmpFlip.a) + '</strong> has the lowest government take' + _flipScope + ' at $50/bbl ('
       + _flipAt(_cmpFlip.a, 50) + ') and '
       + (_aEndsHigh ? 'the <strong style="color:var(--text);">highest</strong> at $125/bbl (' : 'no longer does at $125/bbl (')
       + _flipAt(_cmpFlip.a, 125) + '); at $125/bbl the lowest is '
       + '<strong style="color:var(--text);">' + _cmpEsc(_cmpFlip.b) + '</strong> (' + _flipAt(_cmpFlip.b, 125) + '), which was '
       + _flipAt(_cmpFlip.b, 50) + ' at $50.' + _cross + _tie
+      + _flipAside
       + ' The <em>Price Swing</em> row below gives each column\u2019s progressivity, which is what drives this. '
       + '<strong style="color:var(--text);">Screen this set at the price deck you will actually defend</strong> \u2014 a ranking taken off one price row is not the ranking at another.'
       + '</div>';
@@ -26512,7 +26529,7 @@ function renderCompare() {
             : 'The other ' + _backed.length + ' columns are backed by production data.')
         + ' Say which is which if this table goes into an IC memo.';
     }
-    html += `<div style="margin-top:10px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">${msg}</div>`;
+    html += `<div class="cmp-notice" style="margin-top:10px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">${msg}</div>`;
   }
   // v549 (T3): the comparability caveat. This is the block the whole cycle exists for.
   // Cold walk, USA vs Iraq: Iraq rendered 84.8% take, "#21 of 21 producers", "highest-take
@@ -26593,7 +26610,7 @@ function renderCompare() {
     }
     // Every blended column may have been dropped as a zero-correction case, and the PRRT
     // arm may not apply -- in which case there is nothing to say and no empty box is drawn.
-    if (_mb) html += '<div style="margin-top:10px;background:rgba(185,28,28,.07);border:1px solid rgba(185,28,28,.30);border-left:3px solid var(--red);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
+    if (_mb) html += '<div class="cmp-notice" style="margin-top:10px;background:rgba(185,28,28,.07);border:1px solid rgba(185,28,28,.30);border-left:3px solid var(--red);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
       + _mb + '</div>';
   }
   // v531 (T3): the Govt Take block and the Economics block can rank the SAME columns in
@@ -26624,7 +26641,7 @@ function renderCompare() {
       + fmtNpvShared(pr[1].npv_75) + ').';
     const _shown = _cmpInv.slice(0, 2).map(_pair).join(' ');
     const _more = _cmpInv.length > 2 ? ' (' + (_cmpInv.length - 2) + ' further inverted pair' + (_cmpInv.length - 2 > 1 ? 's' : '') + ' in this set.)' : '';
-    html += '<div style="margin-top:10px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
+    html += '<div class="cmp-notice" style="margin-top:10px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
       + '<strong style="color:var(--text);">⚠ Govt Take and Contractor NPV rank these columns in opposite orders.</strong> '
       + _shown + _more
       + ' Both rows are on the same standardized Deepwater profile at the same price, so this is not a profile difference — <strong style="color:var(--text);">the two blocks are not averaged the same way.</strong> '
@@ -26690,7 +26707,7 @@ function renderCompare() {
   // v474: "Run Fiscal Compare for all 185 countries" shortcut — lets analyst widen view from SbS to global ranking
   var _sbsCountriesStr = compareList.join(' / ');
   html += `<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
-    <button class="cmp-inline-copy-btn" style="background:var(--accent);border:1px solid var(--accent);border-radius:6px;color:#fff;font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;" title="Copy this comparison to the clipboard as a real table \u2014 pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Includes the profile/price assumptions and the ORCA source line.">\u2398 Copy Table for IC Memo</button>
+    <button class="cmp-inline-copy-btn" style="background:var(--accent);border:1px solid var(--accent);border-radius:6px;color:#fff;font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;" title="Copy this comparison to the clipboard as a real table \u2014 pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Includes the profile/price assumptions, every comparability notice shown under the grid for this particular set, and the ORCA source line.">\u2398 Copy Table for IC Memo</button>
     <button class="cmp-inline-print-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Print or Save as PDF via browser print dialog — comparison table and chart included">⬇ Save as PDF</button>
     <button class="cmp-inline-png-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Download chart as PNG image">⬇ Chart PNG</button>
     <button class="cmp-inline-share-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Copy shareable link to this comparison">⎘ Share Link</button>
@@ -36970,9 +36987,49 @@ function copyComparisonTable(btn) {
   // so the pasted comparison table carried a hard-coded version that drifts every cycle.
   var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/';
 
+  // v669 (T3): the comparability notices now travel with the table.
+  //
+  // renderCompare() computes up to four set-specific notices and appends them to #cmp-output
+  // directly under the grid: the price-flip notice (this set does not rank the same way at
+  // every price), the proxy notice, the fee-basis / PRRT notice, and the take-vs-NPV
+  // opposite-ordering notice. copyComparisonTable() built its artifact from #cmp-data-table,
+  // which mirrors the grid ROWS only, plus a static assumption line -- so every one of those
+  // notices was dropped by the export.
+  //
+  // Two of them address the export by name. The proxy notice ends "Say which is which if this
+  // table goes into an IC memo." The inversion notice ends "If this table goes into an IC memo,
+  // do not present the NPV ordering as the fiscal ranking." The control that puts the table into
+  // the IC memo is labelled "Copy for IC Memo" and it stripped both instructions. On
+  // Guyana / Angola / Brazil that is three notices and ~340 words of set-specific caveat on
+  // screen, none of it in what the analyst pastes -- including the one saying the NPV ordering
+  // is not the fiscal ranking, pasted next to the NPV columns it is about.
+  //
+  // The static `assump` line above stays: it covers the profile and the two absent metrics,
+  // which are true of every set. These are true of THIS set and are recomputed every render.
+  var _notes = [];
+  try {
+    var _nodes = document.querySelectorAll('#cmp-output .cmp-notice');
+    for (var _n = 0; _n < _nodes.length; _n++) {
+      var _t = (_nodes[_n].innerText || _nodes[_n].textContent || '')
+        .replace(/[\u24D8\u2139\u24BE\u200A]/g, '')
+        .replace(/\s+/g, ' ')
+        // On screen these notices sit under the grid, so they say "the Price Swing row below".
+        // In the pasted artifact the notes come AFTER the table, so "below" points the wrong way.
+        // Drop the direction word rather than reverse it -- the row name alone is unambiguous.
+        .replace(/\b(rows?) (?:below|above)\b/g, '$1')
+        .trim();
+      if (_t) _notes.push(_t);
+    }
+  } catch (e) { _notes = []; }
+  var _notesHead = 'Comparability notes for this set (' + countries.join(' / ') + ') \u2014 carried from the ORCA on-screen comparison:';
+
   // --- plain-text / TSV flavour (Excel-friendly) ---
   var tsv = caption + '\n' + assump + '\n\n'
     + matrix.map(function(r){ return r.join('\t'); }).join('\n')
+    + (_notes.length
+        ? '\n\n' + _notesHead + '\n'
+          + _notes.map(function(t, i){ return (i + 1) + '. ' + t; }).join('\n')
+        : '')
     + '\n\n' + srcLine;
 
   // --- rich HTML flavour (Word / Docs / Outlook) ---
@@ -36988,6 +37045,12 @@ function copyComparisonTable(btn) {
     + '<tbody>' + matrix.slice(1).map(function(r){
         return '<tr>' + r.map(function(c, ci){ return '<td style="' + (ci === 0 ? tdL : td) + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
       }).join('') + '</tbody></table>'
+    + (_notes.length
+        ? '<p style="font-size:9pt;font-weight:bold;margin:8px 0 2px;">' + esc(_notesHead) + '</p>'
+          + '<ul style="font-size:9pt;color:#333;margin:0 0 4px;padding-left:18px;">'
+          + _notes.map(function(t){ return '<li style="margin-bottom:3px;">' + esc(t) + '</li>'; }).join('')
+          + '</ul>'
+        : '')
     + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + esc(srcLine) + '</p>'
     + '</div>';
 
@@ -36995,7 +37058,9 @@ function copyComparisonTable(btn) {
     if (btn) { var o = btn.innerHTML; btn.innerHTML = '✓ Copied'; setTimeout(function(){ btn.innerHTML = o; }, 2000); }
     showCopyToast(msg);
   }
-  var okMsg = 'Comparison copied as a table (' + countries.length + ' countries × ' + (matrix.length - 1) + ' metrics) — paste into your IC memo or Excel.';
+  var okMsg = 'Comparison copied as a table (' + countries.length + ' countries × ' + (matrix.length - 1) + ' metrics'
+    + (_notes.length ? ', plus ' + _notes.length + ' comparability note' + (_notes.length > 1 ? 's' : '') : '')
+    + ') — paste into your IC memo or Excel.';
 
   if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
     navigator.clipboard.write([new ClipboardItem({
