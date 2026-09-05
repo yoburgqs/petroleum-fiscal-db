@@ -29512,3 +29512,137 @@ v639–v656 intact.
 Walked the Screener cold. The default state is fine — 185 rows, "no filters applied yet." The failure is one click later.
 
 The tab's four Advanced Filters were Mechanic, IOC Operator, **Water Depth**, Region. Water Depth is the one an analyst reaches for first, because th
+
+---
+## Cycle 564 Log — 2026-09-05 05:03
+- Test before: 261 PASS / 0 FAIL / 1 WARN (local server)
+- Test after: 261 PASS / 0 FAIL / 1 WARN (local server) — suite RAN this cycle, not assumed
+- JS errors: 0 page errors. The 1 WARN is `sw.js` 404: index.html:49 registers the service
+  worker at `/petroleum-fiscal-db/sw.js`, which does not exist at a local server root. Measured
+  on the pre-change file by `git stash` — byte-identical 261/0/1. Not introduced here.
+- Summary: Cycle 564 complete — shipped as **v658**, pushed to both repos.
+
+## Task: T3 — "How do these three countries compare side by side?"
+
+(Stalest in the rotation: 563 was T1, 562 T5, 561 T4, 560 T2, 559 T6, 558 T3.)
+
+## Friction
+
+Walked Side-by-Side cold over HTTP (`file://` cannot be walked — the loading overlay never
+clears and intercepts every click). Cold load seeds the North Sea Trio with its example banner;
+typing the analyst's own first country correctly clears the seed. Search is strong: `UAE`,
+`Emirates`, `Ivory Coast`, `Holland`, `Burma`, `America`, `Kurdistan` all resolve through the
+alias map, and `Zzz` returns a real no-match message. `Order columns` works, and its
+producer/non-producer split-block explanation does render in the Reading line. None of those
+was the problem.
+
+The problem is the two charts under the grid.
+
+The **Govt Take** chart re-bases a fee-blended column onto its production-sharing/concession
+subset and says so three times — legend `Iraq (PSC/Conc)`, a second title line, and a green
+notice naming the 195 contracts. v606 put it in the legend for a reason recorded in its own
+comment: *"the legend is the only key that travels with the exported PNG."*
+
+None of that was ever applied to the **Contractor NPV** chart 8px below, and that chart does not
+share the re-basis. `npv_*` is a bare unweighted mean over every contract row — the grid's own
+`NPV weighting` row already says so (v531) — so Iraq's bar is built on all **610** of its
+contracts, including the **415 fee-basis TSC** contracts the line above deliberately excluded.
+
+Measured on the live DOM, Norway / Iraq / Guyana:
+
+| | take chart legend | NPV chart legend | contracts plotted |
+|---|---|---|---|
+| Iraq | `Iraq (PSC/Conc) ◆` | `Iraq` | 195 vs **610** |
+
+Two stacked charts, same three countries, same four prices, same colour key (`_cmpColorMap`,
+shared since v614) — and only one of them declared its contract set. The analyst reads the take
+line on the PSC subset, carries the colour straight down to the bar, and exports both PNGs into
+the IC memo.
+
+## Change
+
+`renderCompare()`, the NPV chart block. Nothing is re-based and no number moved — there is no
+PSC/Conc-only NPV in `country_data.json` to re-base onto. The change stops two legends from
+claiming one basis:
+
+- Legend marks the affected column **`Iraq (all contracts)`**, against `Iraq (PSC/Conc)` above.
+- Second title line, rendered **only** when a fee-blended column is in the set:
+  *"(all contracts) = fee-basis contracts INCLUDED — NOT the PSC/Conc basis of the take chart above"*.
+- Tooltip names the split: *"unweighted mean across ALL 610 contracts, including the 415
+  fee-basis (TSC) the take chart above excludes."*
+- `◆` R-factor marker now on **both** legends, so the two series lists line up column for column.
+- The existing green re-basis notice now states the NPV chart is not re-based, and why.
+
+A set with **no** fee-blended column renders exactly as it shipped, apart from `◆` parity —
+verified on Norway / United Kingdom / Brazil: single-line title, bare legends.
+
+## Result
+
+An analyst comparing three countries can tell which contract set each chart is built on, at the
+moment they read them and in the PNGs they export. Iraq's 84.8% headline, 34.1% comparable take
+and all-610-contract NPV are now three separately labelled things rather than two charts that
+look like one.
+
+## Verification
+- JS syntax gate: 11/11 inline blocks PASS.
+- Playwright runtime suite: RAN, 261 PASS / 0 FAIL, before and after.
+- Phone 390x844 `hasTouch:true`: `scrollWidth == clientWidth == 390` on all 8 primary tabs;
+  Side-by-Side has **0** controls under 24px. (4 pre-existing under-24 controls remain on Home
+  and Explorer — `expl-evidence-first`, `expl-irr-check`, `expl-be-check`, and one Home inline
+  link. Not touched this cycle; logged as carried.)
+- Locked items intact: no new FAQ (974), no new tooltip on a control that lacked one, no
+  citation re-wording, chip rows still `display:none`, Screener advanced filters still
+  collapsed, presets still a dropdown, Home "More tools" collapsed, Explorer analytics
+  collapsed, Govt NPV still REMOVED from FC, Contractor NPV header still "NPV ($M)", FC Analyst
+  Guide sessionStorage untouched, CP headline still two-zone with rank + vs-median pill, take%
+  still tier-coloured, Reform Risk still in the primary Home card grid, v612 mobile layer and
+  `#reference-panel` `translateX` untouched, tab order unchanged. `country_data.json` and
+  `reform_history.json` untouched.
+
+## Open / carried
+- **New, from this walk.** `be_75` (breakeven) is present for only **68 of 185** countries and
+  `irr_100`/`irr_125` for 68 and 40 — and the IRR values that do exist are not decision-usable on
+  the standardized profile (`irr_75` max 996.5%, USA 421%, Guyana 238%, because $1.2B capex against
+  ~$1.1B/yr net at 50k bbl/d pays back inside two years with no ramp or decline modelled). This is
+  why Side-by-Side carries neither row, and it should stay that way until the profile is fixed.
+  **But three separate passages promise them anyway** and are now wrong on screen: the live proxy
+  notice ("their take, NPV **and IRR** describe the legal regime"; "its NPV, IRR and breakeven come
+  from the standardized deepwater profile"), `index.html:21655` ("compare all fiscal metrics (take,
+  NPV, IRR, Breakeven, Swing) at four price points"), and `index.html:15817`. Removing a promise the
+  data cannot keep is the v451 move; a good next T3 or T6.
+- **New, from this walk.** 18 of 185 countries carry no real region — 17 `Other` plus UAE — Dubai
+  `Unknown`. They include real producers: Republic of the Congo, Cote d'Ivoire, Ireland, Greenland,
+  Faroe Islands, Iraq-Kurdistan, Sao Tome and Principe. Same class as the cycle-344 USA finding, and
+  it feeds the carried `#flt-region` roll-up item. Strong next T1.
+- **New, from this walk.** The Predictability Score row does not discriminate on progressive PSC
+  sets — Guyana / Angola / Suriname all render `62 · UNGRADED · one term`, because all three hit the
+  −30 price-swing cap with a zero IQR penalty and −8 for two mechanics. Honest, but a comparison row
+  that returns one value for every column is not carrying information. Worth a T6 measurement of how
+  often it is degenerate before adding anything to it.
+- **Checked and NOT a defect** (recording so a later cycle does not re-open them): the
+  "lowest of N · of the producers" marker sitting on a number visibly larger than an unranked
+  neighbour is the deliberate v593/v549/v552 basis gate, and the excluded column does say
+  "not ranked · statutory terms" rather than going blank; the take-order split putting a
+  lower-take proxy column to the RIGHT of a higher-take producer is the documented block
+  ordering and the Reading line explains it in full.
+- **Still unblocked and still wrong.** The two FAQ passages (`index.html:4172`, `:4730`) routing
+  the analyst to a "Stability Score filter" in the Screener — the filters are `sl-take`,
+  `sl-npv`, `sl-npv50`, `sl-evid`. Adding that control is a whole cycle. Strong next T4.
+- **Carried from 555.** FAQ A40 (`index.html:4761`) calls the Reform Risk score "shown in the
+  Stability column of Explorer". It is not — that column is Fiscal Predictability.
+- **Carried from 561.** The Explorer footer color-key's Stability entry describes the Reform
+  Frequency Score, not the Fiscal Predictability Score the column renders.
+- **Carried from 563.** `rfactor` preset gates on `has_r_factor_tiers`, a data flag — a future
+  T1/T6 should measure whether it discriminates or is another coverage filter.
+- All items carried from 560 and earlier are unchanged: `MECHANIC_BREAKDOWN` covering 20 of 185;
+  `mech_mix` not reconciling to the published headline on 68 of 185; Guyana's A-tier reform log
+  contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57 firing
+  against `#cdnWarning` before it exists in the body; `IOC_DATA`'s $75 column not sharing a
+  computation with $50/$100/$125; `reform_history.json` carrying no `source` key on any of its 83
+  events; the Screener take slider's `min="30"` floor against USA at 23.4%; Reform Risk's export
+  not stating that tab filters do not narrow it; the NaN-padded caveat rows in the CSV emitters;
+  Norway's stored p25/p75 vs its 29.6pp contract spread; `renderSampleAnalyses()` omitting 72
+  countries; the missing retrievability signal on three Evidence columns; the `IOC_PRESENCE`
+  alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead citations; the two
+  22.5px `.source-badge` elements; the four-price breakeven bound limit; the unrecorded DCF
+  solver country selection; and cycle 539's empty Summary line.
