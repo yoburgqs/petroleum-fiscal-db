@@ -30377,9 +30377,9 @@ caption/rows disagreement cycles 524 and 568 were each logged for; it is not rep
 
 | | before | after |
 |---|---|---|
-| countries shown green "top tier for IOC capital allocation" | **108** | **46** |
-| of those, with zero verified production | **102** | 40 (all now stating the statutory-model basis and their position in the sentence) |
-| countries below the producing floor | green top-tier | **amber, naming USA 23.4% as the floor** |
+| countries shown a green top-tier verdict | **108** | **47** |
+| of those, with zero verified production | **102** | 41 — all now stating the statutory-model basis, the contract count, and their position among producers **in the sentence** |
+| countries below the producing floor | green top-tier | **61, now amber**, each naming USA at 23.4% as the floor. All 61 have `prod_coverage_pct = 0`; the filter did not catch a single real producer |
 | Nauru (1 contract, 2 facts, tier D) | "top tier for IOC capital allocation" | "Low take (19.7%), but nothing that produces sits below it… read it as an evidence gap before reading it as fiscal terms" |
 | USA (23.4%, real, measured) | same green sentence as Nauru | "the LOWEST comparable government take of the 21 production-weighted producers, measured against verified field production" |
 | "investible regimes" shortlist | 108 countries, 102 statutory model | **8 producing regimes**, named, with the two headline/comparable splits called out |
