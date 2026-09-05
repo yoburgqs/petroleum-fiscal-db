@@ -29934,3 +29934,16 @@ mobile layer), 153px wide, right edge at 362 of 390. Desktop: no horizontal scro
   `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead citations;
   the two 22.5px `.source-badge` elements; the four-price breakeven bound limit; the unrecorded DCF
   solver country selection; and cycle 539's empty Summary line.
+
+---
+## Cycle 566 Log — 2026-09-05 07:41
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Shipped as **v660**.
+
+## Cycle 566 — T6
+
+**Task:** T6 — *"Where did this number come from and how solid is the evidence?"* (stalest; last walked at 559)
+
+**Friction:** The box titled **Evidence Quality** at the top of Country Profile (`buildEvidencePanel()`, `index.html:~23003`) is the first evidence surface an analyst reaches and the one `_homeOpenEvidence()` opens on arrival. It states two legs of the grade — primary-law share and fact count. Both describe the country's *wh
