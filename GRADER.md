@@ -28402,3 +28402,164 @@ v489, v612, v621, v632, v637, v639–v649 and every locked item through v649 int
 
 ## Friction
 I walked T5 cold by triggering every export the platform ships and then actually **opening each downloaded file**, rather than reading what the export functions claim about themselves. Eight artifacts fire cleanly, and all six XLSX files parse with their own assumptions sheet. But tw
+
+---
+## Cycle 557 Log — 2026-09-04 20:41
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL / 0 WARN / 0 JS errors — suite ACTUALLY RUN this cycle against the
+  local tree at `http://localhost:8898/petroleum-fiscal-db/index.html`, number read out of
+  `office/data/runtime_test_report.txt`, not assumed from a prior baseline.
+- JS syntax gate: PASS (11 script blocks, `node --check` each)
+- Pixel gate: **PASS** — no surface got worse than `~/logs/pixel_audit/baseline.json`
+- Summary: Cycle 557 complete — shipped as **v651**, pushed to both repos.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (Stalest: 556 was T5, 555 T4,
+554 T2, 553 T6, 552 T3, 551 T1.)
+
+## Friction
+I walked T1 cold — no sessionStorage, no localStorage — through the path Home actually routes it
+down: Home card → Screener → load a preset → read the shortlist. Then I enumerated every visible
+control on the tab rather than reading what the changelog says is there.
+
+**There is no oil-price control on the Screener, and every number on the tab is a function of it.**
+
+`runScreener()` opens with `const price = getPriceKey()` and filters on `d['take_'+price]` and
+`d['npv_'+price]`. `getPriceKey()` reads `input[name="price"]:checked`. Those four radios are at
+index.html ~line 2340, **inside `#explorer-browse-mode`** — and `switchExplorerMode('screen')`
+sets that block to `display:none`. Measured, not inferred:
+
+| mode | `#p50` `.ctrl-group` visible | parent chain |
+|---|---|---|
+| Browse | **yes**, 287 x 40 | `p50 < DIV < DIV < DIV < explorer-browse-mode < texplorer` |
+| Screener | **no**, 0 x 0 | `… < explorer-browse-mode[display:none] < texplorer` |
+
+So the single most consequential assumption in a fiscal screen was set on a different mode of the
+same tab, with nothing on the Screener saying where. The page kept *telling* the analyst the price
+mattered — the count line ends `· Deepwater @$75/bbl · 10% WACC`, the Min Contractor NPV label
+carries an `@$75` tag, one preset is literally named *Two-Price Return Screen* — while offering no
+way to act on it. The analyst loads **IOC Capital Screen**, gets 15 countries "at $75/bbl", and the
+obvious next question for a screening list — *who is still on it at $50?* — had no control to ask
+with. This is the v568 finding restated: a screen whose headline axis the analyst cannot reach.
+
+**And the preset menu's hit counts were frozen at the boot deck.** `_labelScreenerPresets()` (v530)
+derives each option's count by actually loading the preset, which is what makes the number true —
+but it guarded on `sel.dataset.counted === '1'`, so it ran exactly once, at whatever deck was live
+when `country_data.json` resolved. Measured across all four decks:
+
+| preset | menu said | @$50 | @$75 | @$100 | @$125 |
+|---|---|---|---|---|---|
+| IOC Capital Screen | 15 | **18** | 15 | **12** | **11** |
+| Low Take · Positive NPV | 143 *(barely narrows)* | **164** | 143 | **122** | **118** |
+| Low-Risk Stable | 141 *(barely narrows)* | **159** | 141 | **121** | **118** |
+| Frontier Markets | 56 | **55** | 56 | **55** | **52** |
+| PSC Africa | 31 | **32** | 31 | 31 | **29** |
+| Deepwater | 11 | 11 | 11 | **10** | **10** |
+
+Two failures, not one. The counts overstate by up to **25 countries**; and the `(barely narrows)`
+marker — which fires at ≥75% of the database — is *stuck on* for Low Take · Positive NPV and
+Low-Risk Stable at $100 and $125, where they return 64–66% and narrow perfectly well. That is a
+label steering the analyst **away** from the preset that would have worked at their deck.
+
+## Change
+1. **A Price deck control on the Screener** — `$50 / $75 / $100 / $125` segmented buttons in the
+   preset row, right-aligned, `id="sc-deck-wrap"`. `_scSetDeck()` sets the **canonical**
+   `input[name="price"]` radio and dispatches `change`; it does not hold a second copy of the deck,
+   so Fiscal Compare, Explorer and the Screener still cannot disagree about what price is live.
+   The existing v617 change listener already re-runs `runScreener()`; this adds button state and
+   the preset re-count on top. `_scSyncDeckButtons()` also fires on entry to Screener mode, so a
+   deck set on Fiscal Compare is reflected rather than showing $75 over a $50 screen.
+2. **`_labelScreenerPresets()` is now deck-keyed and non-destructive.** The guard became
+   `sel.dataset.countedDeck === deck`. Because a re-count loads all eleven presets in turn, it is
+   bracketed by new `_scSnapshotState()` / `_scRestoreState()` — every input, select, `sv-*`/`sn-*`
+   read-out span and module-scope screener global (`_screenerRfactorOnly`, `_screenerMinFacts`,
+   `_screenerMinRetention`, `_screenerCountrySet`, `_screenerSetLabel`, `_activePresetName`,
+   `_screenerEvidenceFirst`, `_scSortKey`, `_scSortDir`, `_scTakeSortOnCmp`) plus the preset-label
+   chip is captured and put back. Options keep their shipped caption in `dataset.baseText`, so a
+   re-count replaces the suffix instead of appending a second one.
+3. Each count now names the deck it was measured at: `→ 18 of 185 @$50`.
+
+## Result
+Verified in the browser, not asserted — load IOC Capital Screen, then click **$50** on the Screener:
+
+| | before click | after click |
+|---|---|---|
+| deck | 75 | **50** |
+| rows | 15 | **18** |
+| preset label | `◆ IOC Capital Screen: verified production · Take ≤65% · NPV ≥0 @$75 AND @$50` | **unchanged — survives the re-count** |
+| `sl-take` / `sv-take` | 65 / 65 | **65 / 65 — slider state intact** |
+| menu, line 1 | `→ 15 of 185 @$75` | `→ 18 of 185 @$50` |
+| menu, Low Take | `143 of 185 @$75 (barely narrows)` | `164 of 185 @$50 (barely narrows)` |
+
+At $125 the same two presets read `118 of 185 @$125` with **no** `(barely narrows)` marker — the
+warning now tracks the truth instead of a $75 snapshot. `Reset All` still clears to 185/185.
+Round trip Screener → Fiscal Compare ($100) → Screener: buttons and counts both follow.
+
+The analyst can now stress an entire shortlist at the downside deck without leaving the tab, and
+chooses a preset from counts that are true at their own price rather than at $75.
+
+## Mobile (Step 5b) — 390 x 844, `hasTouch: true`
+`scrollWidth 390 = clientWidth 390` on **all seven** screens (Home, Fiscal Compare, Explorer,
+Screener, Side-by-Side, Breakeven Map, Reform Risk). New controls measured under `pointer: coarse`:
+
+| element | size | verdict |
+|---|---|---|
+| `$50` / `$75` buttons | 42 x **44** | ok |
+| `$100` / `$125` buttons | 49 x **44** | ok |
+| "PRICE DECK" label | 81 x **24** | ok |
+| `#sc-deck-wrap` box | 292 x 44, left 71 → right 363 | inside the viewport |
+
+The buttons are `<button>` elements precisely so they inherit the v612
+`@media (pointer: coarse) { button { min-height: 44px } }` rule without a new mobile-layer
+selector. The label needed a floor and got `min-height:24px` **inline**, not a rule inside the
+v612 block — the row already holds a 26px `<select>` on desktop, so the floor is inert with a
+mouse. Tapping `$50` with a thumb switches the deck and leaves `scrollWidth 390`.
+
+## Carried, not fixed this cycle
+- **The zero-result empty state names a control that was deleted 130 cycles ago.** With PSC Africa
+  loaded and take pulled to ≤30%, the Screener renders *"Try relaxing your criteria — reduce the
+  IRR minimum, raise the government take ceiling, or uncheck some mechanic filters."* The Min IRR
+  slider was removed at **v517**. The `Likely causes` list beneath it is data-driven and correct
+  (`Max take ≤30%`, `Only 2 of 9 fiscal mechanics selected`, `Region filter: Africa only`); it is
+  only the static sentence that is stale. Strong T1 candidate for the next cycle — it is the sole
+  guidance shown at the exact moment the analyst has hit a dead end.
+- The Screener take slider bottoms out at `min="30"`, but USA sits at 23.4%. "Take ≤25%" is not
+  expressible.
+- **The Screener still has no clipboard control** — Reset / CSV / Excel only, while six other tabs
+  have one. Carried from 556; open T5 candidate.
+- Reform Risk's export button does not say on screen that the tab's filters do not narrow it.
+- The trailing caveat rows still load as NaN-padded phantom rows in a dataframe (v579 shape, all
+  four CSV emitters agree).
+- Everything carried from 556 and earlier is unchanged: the $100 NPV plotted-but-not-tabulated gap,
+  the Side-by-Side proxy notice naming an IRR row that does not exist, Norway's stored p25/p75 vs
+  its 29.6pp contract spread, `renderSampleAnalyses()` omitting 72 countries, `#flt-region`
+  roll-up-only on the Explorer, the missing retrievability signal on three Evidence columns, the
+  `IOC_PRESENCE` alias map, Netherlands 23.4% vs the North Sea Trio tooltip, the 272 dead citations,
+  the two 22.5px `.source-badge` elements, the four-price breakeven bound limit, and the unrecorded
+  DCF solver country selection.
+
+## Note on the local test harness
+Serving the repo at `/` produces one WARN — `A bad HTTP response code (404) was received when
+fetching the script` — because `index.html:49` registers the service worker at
+`/petroleum-fiscal-db/sw.js`. It is a **serving-path artifact, not a defect**: confirmed present on
+unmodified HEAD, and it disappears (236 PASS / 0 FAIL / **0 WARN**) when the tree is served at the
+sub-path GitHub Pages actually uses. Recorded so a future cycle does not chase it.
+
+## STILL LOCKED — nothing touched
+No new FAQ (still **974**). **No new tooltip as the fix** — the fix adds a control that did not
+exist and makes a stale label recompute. **Not a text-only change**: a new interactive control, a
+new render path on deck change, and eleven menu strings that now move with the price. No score was
+recomputed. No take, NPV, IRR, breakeven, rank, reform diamond, Reform Frequency Score, evidence
+grade, tier letter or primary-law percentage was altered; no country's data changed; no source row
+added or removed; `country_data.json` and `reform_history.json` untouched. **The v612 MOBILE LAYER
+block and the `#reference-panel` `translateX` state are byte-identical** — the one new CSS rule
+(`.sc-deck-btn`) sits beside `.price-radio` at line ~163, outside every media query, and narrows
+nothing. `#reference-panel` keeps a non-negative `right` offset. Rows with `min-width: max-content`
+untouched. Chip rows stay `display:none`; no page-sub paragraph, amber instructional banner,
+routing hint or "How to read" block; no SbS card wrapper. Screener advanced filters still
+collapsed, presets still a dropdown; Home "More tools" still collapsed; Explorer analytics still
+collapsed. **No tab added, removed or reordered.** Govt NPV stays REMOVED from FC; Contractor NPV
+header stays "NPV ($M)"; FC Analyst Guide sessionStorage logic untouched. CP headline stays
+two-zone with global rank and vs-median pill; take% stays tier-coloured; Reform Risk stays in the
+primary Home card grid. v371/v373, v430, v449, v451, v452, v489, v507, v517, v530, v554, v568,
+v587, v609, v612, v617, v621, v632, v637, v639–v650 and every locked item through v650 intact.
