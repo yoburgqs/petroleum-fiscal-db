@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v665</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v666</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v665</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v666</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v665';
+  return m ? m[0] : 'v666';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v665');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v666');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -25773,7 +25773,7 @@ function renderCompare() {
         + 'contractor result: there is no position here to value. Compare the contract count, '
         + 'mechanics and evidence rows instead.') + '">—</span>';
     }
-    // v665 (T3): the COMPARABLE-BASIS contractor NPV on a fee-blended column.
+    // v666 (T3): the COMPARABLE-BASIS contractor NPV on a fee-blended column.
     //
     // Walked "compare three countries" cold and built Guyana / Angola / Iraq. Every row above the
     // Economics block has been taught to correct a fee-basis blend: the Take basis row flags Iraq
@@ -26561,7 +26561,7 @@ function renderCompare() {
         + ' In a <strong style="color:var(--text);">fee-basis</strong> contract (TSC, RSC, Buy-back) the contractor is paid a fixed $/bbl remuneration and keeps no share of the oil price, so government take% rises toward <strong style="color:var(--text);">97–99% because of the contract structure</strong> — not because the terms are hard. Iraq’s technical service contracts average <strong style="color:var(--text);">98.5% take and +$319M contractor NPV at the same time</strong>, so a high take% on such a column is not evidence of an unattractive regime.'
         + _rankTxt
         + ' <strong style="color:var(--text);">Rank on the PSC/Conc figure printed under each Govt Take row</strong>, and state in the memo which basis you used.'
-        // v665 (T3): the same correction now exists on the contractor side, so this instruction
+        // v666 (T3): the same correction now exists on the contractor side, so this instruction
         // names it. Without the pointer the analyst applies the basis to take and not to value --
         // which is the ranking inversion the Economics block used to publish.
         + ' The <strong style="color:var(--text);">Contractor NPV @$75</strong> row carries the matching PSC/Conc figure where it differs; on the fee-blended columns it is the larger number, and ranking the blended one can reverse the order the take rows just gave you. ORCA holds that contractor-side split at $75/bbl only, so the $50, $100 and $125 NPV rows are still blended.';
@@ -30008,17 +30008,47 @@ function renderReformTimeline(country) {
       'FTP Rate': 'ftp_rate',
       'Profit Oil (Govt)': 'profit_oil_govt_pct'
     };
+    // ── v666 (T6): the DCF-vs-table disagreement was only ever reported for 9 countries ───
+    // This returned null unless getDCFParams() resolved through the hard-coded country override
+    // table (_basis === 'country'). v601's reasoning for that gate was right about a GENERIC
+    // mechanic default — one figure applied to every PSC country on the platform is not a second
+    // opinion about this one. But the same gate also silenced _basis === 'db', and that is not a
+    // default: getDCFParams enriches the PSC family from COUNTRY_DATA's own ftp / cr_cap /
+    // profit_oil_govt / royalty fields, which are this country's separately harvested figures and
+    // are exactly what the Live DCF panel higher up this page runs on.
+    // Measured on the shipped build: 38 countries carry a material db-basis disagreement between
+    // the figure this table prints (fiscal_facts in api/v1/country/{slug}.json) and the figure the
+    // panel above it used — India 35.09% vs 70.0% (34.9pp), Kazakhstan 50.0% vs 80.0%, Angola
+    // 52.3% vs 75.0%, Sudan 84.76% vs 65.0%, Iraq-Kurdistan 57.0% vs 37.6% — and the page said
+    // nothing on any of them. 36 of the 38 land on rows this table already marks NO SOURCE, so
+    // they flow into v601's existing machinery unchanged. The other 2 (Azerbaijan and Malaysia,
+    // both cost recovery) sit on SOURCED rows that v538 already separates into a distinct
+    // contractual-ceiling row, and are deliberately left alone rather than re-flagged.
+    // The origin is reported as what it is: an engine override and a second harvest of the same
+    // term are different failures and the analyst is told which one they are looking at.
+    const _MODEL_CD = { ftp_rate: 'ftp', cost_recovery_cap: 'cr_cap',
+                        profit_oil_govt_pct: 'profit_oil_govt', royalty_rate: 'royalty' };
     const _modelParam = function(label) {
       try {
         if (typeof getDCFParams !== 'function' || typeof resolveLiveDCFMechanic !== 'function') return null;
         const mk = _MODEL_KEY[label];
         if (!mk) return null;
         const pr = getDCFParams(country, resolveLiveDCFMechanic(country));
-        if (!pr || pr._basis !== 'country') return null;
-        // The key itself must come from the country override, not from defaults[mechanic].
-        if (!Array.isArray(pr._overrideKeys) || pr._overrideKeys.indexOf(mk) === -1) return null;
+        if (!pr) return null;
+        let origin = null;
+        if (pr._basis === 'country') {
+          // The key itself must come from the country override, not from defaults[mechanic].
+          if (Array.isArray(pr._overrideKeys) && pr._overrideKeys.indexOf(mk) !== -1) origin = 'override';
+        } else if (pr._basis === 'db') {
+          // …and here it must have been enriched from THIS country's own COUNTRY_DATA field.
+          const cdf = _MODEL_CD[mk];
+          const cdr = (typeof COUNTRY_DATA !== 'undefined')
+            ? COUNTRY_DATA.find(function(x) { return x.country === country; }) : null;
+          if (cdf && cdr && cdr[cdf] != null) origin = 'contract';
+        }
+        if (!origin) return null;
         const v = pr[mk];
-        return (typeof v === 'number' && isFinite(v)) ? v * 100 : null;
+        return (typeof v === 'number' && isFinite(v)) ? { v: v * 100, origin: origin } : null;
       } catch (e) { return null; }
     };
 
@@ -30205,18 +30235,34 @@ function renderReformTimeline(country) {
           unsourcedLabels.push(label);
           const _uZero = (numVal != null && Math.abs(numVal) < 1e-9);
           if (_uZero) unsourcedZeroLabels.push(label);
-          const _mv601 = _modelParam(label);
+          const _mp601 = _modelParam(label);
+          const _mv601 = _mp601 ? _mp601.v : null;
+          const _mo601 = _mp601 ? _mp601.origin : null;      // v666 (T6): 'override' | 'contract'
           const _conf601 = (_mv601 != null && numVal != null &&
             Math.abs(_mv601 - numVal) > Math.max(0.5, 0.02 * Math.max(Math.abs(_mv601), 1)));
           let _badgeTip601;
           if (_conf601) {
             isUnsourcedConflict = true;
-            modelConflicts.push({ label: label, shown: val, modelled: _fmtPct(_mv601) });
+            modelConflicts.push({ label: label, shown: val, modelled: _fmtPct(_mv601),
+                                  // v666 (T6): the raw number too — the workbook column is headed
+                                  // "(%)" and a spreadsheet cell reading "75%" as text cannot be
+                                  // sorted, filtered or subtracted by whoever receives the annex.
+                                  modelledNum: Math.round(_mv601 * 100) / 100,
+                                  origin: _mo601, gap: Math.abs(_mv601 - numVal) });
+            // v666 (T6): name the OTHER figure for what it is. A hard-coded engine override and a
+            // second harvest of the same term are different failures; conflating them would tell
+            // 36 of the 38 affected countries something untrue about where their number came from.
+            const _what666 = (_mo601 === 'override')
+              ? 'That figure is a hard-coded country override inside the DCF engine \u2014 also not a citation.'
+              : 'That figure is this country\u2019s separately harvested country-level field \u2014 a second '
+                + 'harvest of the same term, ' + (Math.abs(_mv601 - numVal)).toFixed(1) + 'pp from the '
+                + 'contract average beside it, and no more cited than it is. Nothing on record says which '
+                + 'of the two is right.';
             const cTip = _esc(label + ': this page carries two different answers. The table shows '
               + val + ', which is the average across this country\u2019s contract records and carries no '
               + 'citation of any kind. The Live DCF panel further up this same page runs ' + country
-              + ' on ' + _fmtPct(_mv601) + ' and reports the result in its Fiscal Breakdown. That figure is a '
-              + 'hard-coded country override inside the DCF engine \u2014 also not a citation. Establish this '
+              + ' on ' + _fmtPct(_mv601) + ' and reports the result in its Fiscal Breakdown. ' + _what666
+              + ' Establish this '
               + 'rate from ' + country + '\u2019s own petroleum act before either number goes in an IC memo.');
             statHtml = '<span style="cursor:help;background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
               + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;'
@@ -30495,10 +30541,22 @@ function renderReformTimeline(country) {
             return 'The table above shows <strong style="color:var(--text);">' + _esc(c.shown)
               + '</strong> with no citation behind it. The Live DCF panel further up this same page runs '
               + _esc(country) + ' on <strong style="color:var(--text);">' + _esc(c.modelled)
-              + '</strong> and carries that through to its Fiscal Breakdown.';
+              + '</strong> and carries that through to its Fiscal Breakdown'
+              // v666 (T6): the gap is the thing an analyst has to size, and it is cheap to state.
+              + (c.gap != null ? ' \u2014 a gap of <strong style="color:var(--text);">'
+                  + c.gap.toFixed(1) + 'pp</strong>' : '') + '.';
           }).join(' ')
-        + ' Neither figure is a source \u2014 one is an unsourced contract average, the other a hard-coded '
-        + 'engine override. <strong style="color:var(--text);">Do not quote either until you have the rate from '
+        // v666 (T6): this sentence asserted the second figure is a hard-coded engine override. On
+        // the 36 db-basis countries it is not — it is a separately harvested country-level field.
+        // Stating the wrong provenance in the note that exists to fix provenance is worse than
+        // saying nothing, so the clause is now built from the origins actually present.
+        + ' Neither figure is a source \u2014 one is an unsourced contract average, the other '
+        + (modelConflicts.every(function(c) { return c.origin === 'override'; })
+            ? 'a hard-coded engine override'
+            : modelConflicts.every(function(c) { return c.origin === 'contract'; })
+              ? 'a separately harvested country-level field that carries no citation either'
+              : 'a hard-coded engine override or a second, equally uncited harvest of the same term')
+        + '. <strong style="color:var(--text);">Do not quote either until you have the rate from '
         + _esc(country) + '\u2019s own petroleum act.</strong> '
         + '<button type="button" onclick="_cpScrollToLiveDcf()" style="margin-top:6px;background:rgba(185,28,28,.10);'
         + 'border:1px solid rgba(185,28,28,.40);border-radius:4px;color:var(--red);font-size:11px;font-weight:700;'
@@ -30606,6 +30664,46 @@ function renderReformTimeline(country) {
         ).join('')
       + '</tbody></table>'
       + reconNote;
+
+    // ── v666 (T6): the workbook that leaves the tool carried none of this ─────────────────
+    // exportCountryProfile() builds its six fiscal-term rows from COUNTRY_DATA — royalty, cit,
+    // state_eq, profit_oil_govt, cost_recovery, ftp — as bare numbers with no source, no tier and
+    // no note. That is a different harvest from the one this table prints, and on the shipped
+    // build the two disagree on 45 of 185 countries:
+    //   - Profit Oil (Govt): 39 of the 57 countries carrying both. India exports 70.0 against
+    //     35.09 here (34.9pp); Kazakhstan 80.0 vs 50.0; Angola 75.0 vs 52.3.
+    //   - State Participation: 13 of 42 — and all 13 match NEITHER this table's ORCA value NOR
+    //     the statutory rate it cites. Bahrain exports 100 against 58.89 / 50. Oman exports 60
+    //     against 10 / 10. Cameroon exports 25 where the platform's own A-tier record says 5.
+    // So an analyst whose annex is challenged on Angola's 75% split opens this page to defend it,
+    // reads 52.3%, and has nothing telling them the two figures are different harvests of the same
+    // term. The workbook is stashed from THIS render rather than re-derived, for the reason v553
+    // gave: a second emitter that computes its own answer is how the mechanic name forked.
+    try {
+      var _prov666 = [];
+      rowDefs.forEach(function(rd) {
+        var _lbl = rd[0], _k = rd[1], _fb = rd[2];
+        var _rv = (fk && fk[_k] != null) ? fk[_k] : ((_fb && fk && fk[_fb] != null) ? fk[_fb] : null);
+        if (_rv == null) return;
+        var _sm = fs ? (fs[_k] || (_fb ? fs[_fb] : null)) : null;
+        var _cf = modelConflicts.filter(function(c) { return c.label === _lbl; })[0] || null;
+        _prov666.push({
+          label: _lbl,
+          orca: (typeof _rv === 'number') ? Math.round(_rv * 100) / 100 : _rv,
+          statutory: (_sm && typeof _sm.value === 'number') ? _sm.value : null,
+          source: _sm ? String(_sm.source || '') : '',
+          tier: _sm ? String(_sm.confidence || 'C').toUpperCase() : '',
+          bulk: !!(_sm && typeof _isBulkSource === 'function' && _isBulkSource(String(_sm.source || ''))),
+          url: (_sm && _sm.url) ? String(_sm.url) : '',
+          dead: !!(_sm && _sm.url && typeof _citeLinkDead === 'function' && _citeLinkDead(_sm.url)),
+          modelled: (_cf && _cf.modelledNum != null) ? _cf.modelledNum : null,
+          gap: (_cf && _cf.gap != null) ? Math.round(_cf.gap * 10) / 10 : null,
+          origin: _cf ? _cf.origin : null
+        });
+      });
+      window._cpTermProv = { country: country, slug: slug, terms: _prov666,
+        checked: (typeof _CITE_DEAD_CHECKED !== 'undefined') ? _CITE_DEAD_CHECKED : '' };
+    } catch (e) { window._cpTermProv = null; }
 
     // ── v660 (T6): the evidence grade does not measure the numbers that produced the take ──
     // The Evidence Quality panel at the top of this profile is the first, and for most analysts
@@ -33623,6 +33721,47 @@ function exportCountryProfile() {
       'Contracts': p.n,
     }));
 
+  // ── v666 (T6): the six fiscal-term rows above come from COUNTRY_DATA. The Evidence Chain on
+  // the Country Profile screen prints a SEPARATELY HARVESTED figure for the same terms, and on
+  // 45 of 185 countries they disagree — Profit Oil (Govt) on 39 of 57, State Participation on 13
+  // of 42, by up to 34.9pp (India). Until now the workbook stated one of the two as fact and the
+  // screen stated the other, with nothing on either surface acknowledging the other existed.
+  // The exported value is KEPT: it is what the ORCA DCF engine ran to produce the NPVs on this
+  // same sheet, so replacing it would leave the workbook disagreeing with its own numbers. Same
+  // treatment v553 gave the fee-basis case — publish the headline, and put the second figure and
+  // the gap beside it rather than silently picking a winner.
+  const _prov666 = (typeof window !== 'undefined' && window._cpTermProv
+                    && window._cpTermProv.country === country) ? window._cpTermProv : null;
+  if (_prov666) {
+    const _XL_TERM = { 'Royalty Rate (%)': 'Royalty Rate', 'Income Tax Rate (%)': 'Income Tax Rate',
+      'State Participation (%)': 'State Participation', 'Profit Oil (Govt) (%)': 'Profit Oil (Govt)',
+      'Cost Recovery Cap (%)': 'Cost Recovery Cap', 'FTP Rate (%)': 'FTP Rate',
+      'Special Petroleum Tax (%)': 'Special Tax' };
+    for (let i = summaryRows.length - 1; i >= 0; i--) {
+      const _tl = _XL_TERM[summaryRows[i].Metric];
+      if (!_tl) continue;
+      const _xv = summaryRows[i].Value;
+      if (typeof _xv !== 'number') continue;
+      const _t = _prov666.terms.filter(t => t.label === _tl)[0];
+      if (!_t || typeof _t.orca !== 'number') continue;
+      if (Math.abs(_t.orca - _xv) <= 0.1) continue;
+      summaryRows.splice(i + 1, 0, { Metric: '   \u26a0 ' + _tl + ' — second harvest disagrees',
+        Value: 'The Evidence Chain on the ORCA Country Profile screen prints ' + _t.orca
+          + '% for this term, a gap of ' + Math.abs(_t.orca - _xv).toFixed(1) + 'pp from the '
+          + _xv + '% exported above. The exported figure is the COUNTRY_DATA contract field the '
+          + 'ORCA DCF engine used to produce the NPVs on this sheet; the screen figure is a '
+          + 'separate harvest of the same term. '
+          + (_t.statutory != null
+              ? 'The rate cited from ' + (_t.source || 'the source on record') + ' (tier ' + (_t.tier || '?')
+                + ') is ' + _t.statutory + '%'
+                + ((Math.abs(_t.statutory - _xv) > 0.1 && Math.abs(_t.statutory - _t.orca) > 0.1)
+                    ? ' — which matches NEITHER figure.' : '.')
+              : 'No statutory rate is cited for this term on either surface.')
+          + ' Establish the rate from ' + country + '\u2019s own petroleum act before quoting either. '
+          + 'See the Fiscal Terms & Sources sheet.' });
+    }
+  }
+
   const wb = XLSX.utils.book_new();
   const ws1 = XLSX.utils.json_to_sheet(summaryRows);
   ws1['!cols'] = [{wch:36},{wch:20}];
@@ -33637,6 +33776,54 @@ function exportCountryProfile() {
   const ws3 = XLSX.utils.aoa_to_sheet(_cpBasisSheet(d, country, region, _cpProf, _cpNpvBasis, _cpCmp));
   ws3['!cols'] = [{wch:30},{wch:96}];
   XLSX.utils.book_append_sheet(wb, ws3, 'Basis & Assumptions');
+  // ── v666 (T6): the workbook named not one document. It carried "Primary Law Share (tier A, %)
+  // = 52.4" and no instrument, no tier per term, and no indication that 256 of the 426 linked
+  // source rows on this platform cannot be retrieved at the address on record (measured 4 Sep
+  // 2026, v641/v647). Every one of those facts was already on the screen this file was exported
+  // from; none of it travelled with the file. This sheet is built from the stash the Evidence
+  // Chain wrote when it rendered, so the workbook cannot fork from the screen.
+  if (_prov666 && _prov666.terms.length) {
+    const _srcAoa = [
+      ['FISCAL TERMS & SOURCES — ' + country],
+      ['Exported from the ORCA Petroleum Fiscal Intelligence Platform, ' + new Date().toISOString().slice(0,10)],
+      [''],
+      ['This sheet is the provenance behind the fiscal terms on the Country Profile sheet. Read it before citing any of them.'],
+      ['ORCA value  = the contract-weighted average across this country\u2019s contracts in the ORCA database. This is what the Evidence Chain on the Country Profile screen prints.'],
+      ['Statutory   = the rate stated in the cited instrument itself. Cite THIS figure when you quote the legislation, not the ORCA average.'],
+      ['DCF engine  = the figure the platform\u2019s own DCF ran for this term, where it differs from the ORCA value. The NPV, IRR and take on the Country Profile sheet were produced with it.'],
+      ['Retrievable = whether ORCA could fetch the cited document at the address on record when every citation URL on the platform was checked on ' + (_prov666.checked || 'the date on record') + '. A dead link is not a judgement on the instrument — the tier letter is unchanged and the rate was read off it at harvest time. It means the one step that would let you check it yourself is currently broken.'],
+      [''],
+      ['Term', 'ORCA value (%)', 'Statutory (%)', 'DCF engine (%)', 'Gap (pp)', 'Cited source', 'Tier', 'Retrievable', 'Note']
+    ];
+    _prov666.terms.forEach(t => {
+      const _noSrc = !t.source;
+      _srcAoa.push([
+        t.label,
+        (typeof t.orca === 'number') ? t.orca : String(t.orca),
+        (t.statutory != null) ? t.statutory : 'not captured',
+        t.modelled != null ? t.modelled : '',
+        t.gap != null ? t.gap : '',
+        _noSrc ? 'NO SOURCE ON RECORD' : (t.bulk ? t.source + '  [country-level bulk harvest — assigned to every contract in this country, not read off any one of them]' : t.source),
+        _noSrc ? '' : (t.tier || '?'),
+        _noSrc ? '' : (!t.url ? 'no URL on record' : (t.dead ? 'NO — link dead as at ' + (_prov666.checked || '') : 'yes')),
+        _noSrc
+          ? 'Not primary law, not a secondary guide, not the bulk harvest — nothing cites this term for ' + country + '. The value is a contract average and nothing corroborates it.'
+          : (t.gap != null
+              ? 'The DCF engine ran ' + t.modelled + '% for this term, ' + t.gap + 'pp from the ORCA value beside it. Two harvests of the same term; neither is cited. Establish it from ' + country + '\u2019s own petroleum act.'
+              : '')
+      ]);
+    });
+    const _deadN = _prov666.terms.filter(t => t.dead).length;
+    const _noSrcN = _prov666.terms.filter(t => !t.source).length;
+    const _confN = _prov666.terms.filter(t => t.gap != null).length;
+    _srcAoa.push(['']);
+    _srcAoa.push(['SUMMARY', _prov666.terms.length + ' fiscal terms carried on the Country Profile sheet. '
+      + _noSrcN + ' carry no source of any kind. ' + _deadN + ' cite a document ORCA could not retrieve. '
+      + _confN + ' are a term for which this platform holds two different numbers.']);
+    const ws4 = XLSX.utils.aoa_to_sheet(_srcAoa);
+    ws4['!cols'] = [{wch:34},{wch:15},{wch:14},{wch:15},{wch:10},{wch:64},{wch:6},{wch:26},{wch:96}];
+    XLSX.utils.book_append_sheet(wb, ws4, 'Fiscal Terms & Sources');
+  }
   const slug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
   XLSX.writeFile(wb, `orca_${slug}_${new Date().toISOString().slice(0,10)}.xlsx`);
 }
