@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v669</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v670</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v669</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v670</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v669';
+  return m ? m[0] : 'v670';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v669');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v670');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -32048,6 +32048,25 @@ function loadCountryProfile(country) {
     return '<span style="font-size:10px;color:var(--muted);opacity:.8;cursor:help;" title="Shown because it is the figure the profile quoted until v534, and it is still what the Explorer and Screener rank against. It mixes ' + _prodCtx534.n + ' production-weighted regimes with ' + _prodCtx534.nEqualWeighted + ' equal-weighted averages built on as few as 2 contracts, so it is a weaker basis for an IC claim.">All 185 countries: #' + _grank452.rank + ' \u00b7 ' + (diffAll >= 0 ? '+' : '') + diffAll.toFixed(1) + 'pp vs the all-country median (' + _globalMedian452.toFixed(1) + '%), which includes ' + _prodCtx534.nEqualWeighted + ' countries with no production data</span>';
   })() : '';
   // v454: IC Memo implication for CP headline strip — distills take+swing+stability into a specific IC memo rule
+  // v670 (T2): this box is the page's ONE instruction on what to put in the memo, and it was
+  // telling the analyst to defend on the NPV — 8px below the v589 verdict sentence that says, in
+  // bold, "these two figures restate the take rather than test it. Defend on the take and its
+  // evidence tier, not on the NPV." Two adjacent instructions in direct contradiction, and the
+  // one an analyst obeys is the one inside the box stamped IC MEMO.
+  //   Measured over the shipped country_data.json at render time: 42 of the 182 non-monopoly
+  // countries got an NPV instruction. 7 read "show NPV sensitivity at $100+" (Iran, Iraq,
+  // Nigeria, Oman, Qatar, Uzbekistan, Venezuela) and 35 put the NPV pair straight into the
+  // recommended citation string — "take@$75 · NPV $302M · $161M @$50 downside" (Algeria,
+  // Azerbaijan, Brazil, Kazakhstan among them). Those are the rows an IOC actually screens.
+  //   The NPV pair is not independent of the take it would corroborate: cpFloorBase() measures
+  // r² 0.89 of contractor NPV on govt take across all 182, because ORCA runs ONE fixed Deepwater
+  // profile, so gross revenue is constant and NPV is close to the residual after government take.
+  // Pasting both into a memo is citing the same number twice and calling the second one support.
+  //   So: the NPV is offered only where cpFloorBase() cannot show it is collinear, or where it is
+  // genuinely discriminating — the $50/bbl downside failure, which 2 of 182 regimes reach. And
+  // the strip now carries the thing the verdict tells the analyst to defend on and which was
+  // nowhere in this box: the country's own evidence grade, its primary-law share and its fact
+  // count, as a second segment. No new threshold — _evidenceGrade() is the page's own grader.
   const _cpIcMemo454 = (!_isMonopoly && d.take_75 != null) ? (function() {
     // v552 (T2): reads the comparable take, so this sentence cannot contradict the rank and the
     // pill three lines above it. Iraq fell into the take>75 branch on the blended 84.8% and told
@@ -32056,28 +32075,75 @@ function loadCountryProfile(country) {
     var take = _verdictTake552;
     var swing = _swing344;
     var stab = _stab344;
+    var _fb670 = (typeof cpFloorBase === 'function') ? cpFloorBase() : null;
+    // If the collinearity cannot be measured this cycle, the NPV instruction is left exactly as
+    // it was rather than guessed away. Absence of a measurement is not evidence of independence.
+    var _r2_670 = (_fb670 && _fb670.r2 != null) ? _fb670.r2 : null;
+    var _npvRestates670 = (_r2_670 != null && _r2_670 >= 0.7);
+    var _restateClause670 = _npvRestates670
+      ? ' Not the NPV pair — it tracks take at r² ' + _r2_670.toFixed(2)
+        + ' on ORCA’s one fixed Deepwater profile, so it restates the take rather than supporting it.'
+      : '';
+    // The one branch where the NPV IS the finding: contractor NPV goes negative at $50/bbl.
+    var _downFails670 = (d.npv_50 != null && d.npv_50 <= 0 && d.npv_75 != null);
     var msg = '', col = 'var(--muted)', bg = 'rgba(107,101,96,.07)', border = 'rgba(107,101,96,.2)';
-    if (take > 75 && swing != null && swing > 20) {
+    if (_downFails670) {
+      msg = 'IC: cite the NPV here — contractor NPV goes negative at the $50/bbl downside ('
+          + cpNpvFmt(d.npv_50) + ' vs ' + cpNpvFmt(d.npv_75) + ' @$75)'
+          + ((_fb670 && _fb670.nFail) ? ', which ' + _fb670.nFail + ' of ' + _fb670.n
+             + ' non-monopoly regimes reach. On the other ' + (_fb670.n - _fb670.nFail)
+             + ' the NPV restates the take; here it does not.' : '.');
+      col = 'var(--red)'; bg = 'rgba(185,28,28,.06)'; border = 'rgba(185,28,28,.2)';
+    } else if (take > 75 && swing != null && swing > 20) {
       msg = 'IC: price range table required ($50/$75/$100/$125) — high take + progressive';
       col = 'var(--red)'; bg = 'rgba(185,28,28,.06)'; border = 'rgba(185,28,28,.2)';
     } else if (take > 75) {
-      msg = 'IC: high take — cite with profile basis; show NPV sensitivity at $100+';
+      msg = 'IC: NOC-dominated take — cite take@$75 on the profile basis, with the evidence grade on this strip.'
+          + (_npvRestates670 ? _restateClause670
+             : ' Show NPV sensitivity at $100+.');
       col = 'var(--orange)'; bg = 'rgba(194,65,12,.06)'; border = 'rgba(194,65,12,.2)';
     } else if (swing != null && swing > 20) {
       msg = 'IC: progressive regime — show multi-price sensitivity; take varies ' + swing.toFixed(0) + 'pp across price range';
       col = 'var(--orange)'; bg = 'rgba(194,65,12,.06)'; border = 'rgba(194,65,12,.2)';
     } else if (take <= 40) {
-      msg = 'IC: favorable regime — single-price cite acceptable; note evidence tier';
+      msg = 'IC: favorable regime — single-price cite acceptable; cite it with the evidence grade on this strip.';
       col = 'var(--green)'; bg = 'rgba(21,128,61,.06)'; border = 'rgba(21,128,61,.2)';
     } else {
       // v516: was ' · IRR 105.0%' off the bundled mean, and a hard-coded 'ORCA v500' that drifted every cycle.
-      msg = 'IC: standard citation — take@$75' + (d.npv_75!=null?' · NPV '+cpNpvFmt(d.npv_75):'') + (d.npv_50!=null?' · '+cpNpvFmt(d.npv_50)+' @$50 downside':'') + ', profile, evidence tier, ORCA ' + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '');
+      // v670: the NPV pair leaves the recommended citation wherever it is measurably collinear.
+      msg = 'IC: standard citation — take@$75 ' + take.toFixed(1) + '%, profile, evidence tier, ORCA '
+          + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '')
+          + (_npvRestates670 ? '.' + _restateClause670
+             : (d.npv_75!=null?' · NPV '+cpNpvFmt(d.npv_75):'') + (d.npv_50!=null?' · '+cpNpvFmt(d.npv_50)+' @$50 downside':'') + '.');
       col = 'var(--muted)';
     }
-    if (stab <= 1) { msg += ' · reform risk: add stability discount or probability-weighted NPV'; }
-    return '<div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:' + bg + ';border:1px solid ' + border + ';border-radius:5px;margin-top:8px;">'
+    if (stab <= 1) { msg += ' · reform risk: add a stability discount or probability-weight the case.'; }
+    // Second segment: the evidence tier the verdict tells the analyst to defend on. It was
+    // reachable only by scrolling to the Evidence Quality card, which is below the fold.
+    var _ev670 = (typeof _evidenceGrade === 'function') ? _evidenceGrade(d) : null;
+    var _evSeg670 = '';
+    if (_ev670) {
+      var _evTip670 = 'Evidence grade ' + _ev670.letter + ' for ' + country + ' — ' + _ev670.label
+        + '. ' + _ev670.aPct.toFixed(1) + '% of its ' + Number(_ev670.nFacts).toLocaleString()
+        + ' facts come from primary legal instruments'
+        + (d.n != null ? ', across ' + Number(d.n).toLocaleString() + ' contracts' : '')
+        + '. This is the figure the verdict line above tells you to defend the take on, because '
+        + 'unlike contractor NPV it is not derived from the take. Full breakdown in Evidence '
+        + 'Quality and the Key Fiscal Parameters chain below.';
+      _evSeg670 = '<span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;'
+        + 'padding:2px 8px;border-radius:12px;white-space:nowrap;cursor:help;'
+        + 'min-height:24px;box-sizing:border-box;'
+        + 'border:1px solid ' + _ev670.color + '55;background:' + _ev670.color + '14;" title="'
+        + _evTip670.replace(/"/g, '&quot;') + '">'
+        + '<strong style="color:' + _ev670.color + ';font-weight:800;">Evidence ' + _ev670.letter + '</strong>'
+        + '<span style="color:var(--muted);">' + _ev670.aPct.toFixed(0) + '% primary law'
+        + (d.n != null ? ' · n=' + Number(d.n).toLocaleString() : '') + '</span>'
+        + '</span>';
+    }
+    return '<div style="display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px;padding:5px 10px;background:' + bg + ';border:1px solid ' + border + ';border-radius:5px;margin-top:8px;">'
       + '<span style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;white-space:nowrap;">IC Memo</span>'
-      + '<span style="font-size:11px;color:' + col + ';line-height:1.4;">' + msg + '</span>'
+      + '<span style="font-size:11px;color:' + col + ';line-height:1.4;flex:1 1 260px;min-width:0;">' + msg + '</span>'
+      + _evSeg670
       + '</div>';
   })() : '';
   // v552 (T2): THE line this cycle exists for. On a fee-blended country the 26px headline take is

@@ -31248,3 +31248,120 @@ Before this cycle every one of those was on screen and none of it was in the art
 **Friction.** Cold walk of Side-by-Side at 1440×900, storage cleared, loaded Guyana / Angola / Brazil.
 
 `renderCompare()` computes up to four *set-specific* comparability notices and prints them under the grid. On that set three fire — about 340 words, the most substantive content on the tab. `copyComparisonTable()` 
+
+---
+## Cycle 576 — v670
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest; the last six
+version commits ran T3, T4, T1, T6, T3, T5.)
+
+**Friction.** Cold walk of Country Profile at 1440×900 over a local HTTP server, `sessionStorage` and
+`localStorage` cleared, Indonesia seeded, then Nigeria loaded from the dropdown — the ordinary path.
+
+The headline verdict line (`_quickIcVerdict497`, index.html:31768) ends in bold:
+
+> …on ORCA's single fixed Deepwater profile contractor NPV tracks govt take at r² 0.89 (≈−$61M per
+> point of take), so these two figures restate the take rather than test it. **Defend on the take and
+> its evidence tier (n=834 contracts), not on the NPV.**
+
+Eight pixels below it, inside a box stamped **IC MEMO** — the one element on the page that tells the
+analyst what to put in the memo — `_cpIcMemo454` (index.html:32050) said:
+
+> IC: high take — cite with profile basis; **show NPV sensitivity at $100+**
+
+Two adjacent instructions in direct contradiction, and the one an analyst obeys is the one in the box
+labelled for the artifact they are about to write. On the `else` branch it was worse: the strip put the
+NPV pair straight into the recommended citation string — *"IC: standard citation — take@$75 · NPV $302M
+· $161M @$50 downside, profile, evidence tier, ORCA v669"*.
+
+Measured over the shipped `country_data.json` at render time: **42 of the 182 non-monopoly countries got
+an NPV instruction** — 7 on the `show NPV sensitivity` branch (Iran, Iraq, Nigeria, Oman, Qatar,
+Uzbekistan, Venezuela) and 35 on the citation-string branch (Algeria, Azerbaijan, Brazil, Kazakhstan,
+Norway among them). Those are the rows an IOC actually screens.
+
+The NPV is not independent of the take it was being offered to corroborate. `cpFloorBase()` measures
+**r² 0.8869** of contractor NPV on govt take across all 182, slope −$60.6M per point of take, because
+ORCA runs ONE fixed Deepwater profile — gross revenue is constant across all 185 countries, so NPV is
+close to the residual after government take. Pasting both into an IC memo is citing the same number
+twice and calling the second one support. The verdict line says so; the IC MEMO box overrode it.
+
+**Change.**
+
+1. The NPV leaves the recommended citation and the "show NPV sensitivity" instruction wherever the
+   collinearity is *measurable* — gated on `cpFloorBase().r2 >= 0.7`, read at render time. If
+   `cpFloorBase()` cannot measure this cycle (data not loaded), the instruction is left exactly as it
+   was rather than guessed away; absence of a measurement is not evidence of independence.
+   In its place the strip names the r² and says the NPV pair restates the take.
+2. **A new branch where the NPV *is* the finding.** Contractor NPV going negative at the $50/bbl
+   downside is reached by 2 of 182 regimes — Malaysia (−$33M vs $627M @$75) and Yemen (−$139M vs
+   $1.0B). Those two now read *"IC: cite the NPV here — … On the other 180 the NPV restates the take;
+   here it does not."* in red. Previously Malaysia read the generic standard-citation line.
+3. **The strip gained a second segment carrying the thing the verdict tells the analyst to defend on**
+   and which was nowhere in this box: the country's own evidence grade, primary-law share and fact
+   count, from `_evidenceGrade()` — the page's own grader, no new threshold. Nigeria now reads
+   `Evidence C · 31% primary law · n=834`; Brazil `Evidence A · 65% · n=1,193`; Iraq `Evidence D · 12%
+   · n=610`. It was previously reachable only by scrolling to the Evidence Quality card below the fold.
+4. The strip container becomes `flex-wrap: wrap` with the message on `flex: 1 1 260px`, so the new
+   segment wraps under the sentence at 390px instead of forcing the row wide. The evidence pill carries
+   `min-height: 24px` so it is not a sub-24px target under `pointer: coarse`.
+5. Wording carries no screen-relative direction word — "the evidence grade on this strip", not "at
+   right", because the pill sits beside the sentence on desktop and below it on a phone.
+
+Not touched: the `stab <= 1` reform-risk suffix, the take>75+progressive branch, the progressive branch,
+and the `take <= 40` branch's single-price rule — none of them directed the analyst at the NPV.
+
+**Result.** An analyst asking "can I defend 81.1% for Nigeria?" now gets one instruction instead of two
+contradictory ones, and it is the defensible one: cite the take on the profile basis together with the
+evidence grade — which is on the strip, graded C at 31% primary law across 834 contracts — and not the
+NPV pair, which the same strip now says tracks take at r² 0.89 on one fixed profile. On the two
+countries where the NPV genuinely discriminates, the strip says to cite it and says how rare that is.
+
+## Verification (measured this cycle, not assumed)
+
+| check | result |
+|---|---|
+| JS syntax gate | **PASS** — 11 inline blocks, 0 failures |
+| Runtime suite, **ran this cycle** against the local build | **261 PASS / 0 FAIL / 1 WARN**, read from `/tmp/runtime_test_report.txt` |
+| — the 1 WARN, traced | `ConsoleErrors`: 404 on `/petroleum-fiscal-db/sw.js`. index.html:49 registers the service worker at the hard-coded GitHub Pages path; my harness served the repo at server root, so that path did not exist. **Serving-harness artifact, not a regression** — re-served under `/petroleum-fiscal-db/` and re-walked all 10 tabs: **0 console errors, 0 pageerrors**. Line 49 is untouched by this diff. |
+| IC Memo strip — Nigeria (was `show NPV sensitivity at $100+`) | now `NOC-dominated take — cite take@$75 on the profile basis, with the evidence grade on this strip. Not the NPV pair — it tracks take at r² 0.89…` + `Evidence C · 31% primary law · n=834` |
+| — Brazil / Norway / Kazakhstan / Algeria / Venezuela (was NPV in the citation string) | NPV pair removed; `Evidence A · 65% · n=1,193` / `A · 66% · n=7,643` / `C · 31% · n=302` / `B · 42% · n=177` / `C · 37% · n=287` |
+| — Malaysia, Yemen (the $50 downside failures) | new red branch: `cite the NPV here — contractor NPV goes negative at the $50/bbl downside (−$33M vs $627M @$75) … On the other 180 the NPV restates the take; here it does not.` |
+| — Iraq (fee-blended, comparable take 34.1%) | `favorable regime — single-price cite acceptable` + `Evidence D · 12% · n=610`; v552 comparable-take routing intact |
+| — Guyana / UK / Angola (progressive branch) | unchanged sentence, evidence segment added |
+| countries carrying an NPV instruction, before → after | **42 of 182 → 2 of 182** (and those 2 are the ones where it discriminates) |
+| collinearity gate, measured at render | `cpFloorBase()` r² = **0.8869**, slope −$60.58M/pp, n = 182, nFail = 2 |
+| Horizontal scroll, 9 tabs × 6 viewports (1920/1440/1280/1024/768/390) | **0** violations |
+| CP @390×844 `hasTouch`, Nigeria loaded | scrollWidth 390 = clientWidth 390; strip right edge 376 of 390 |
+| new evidence pill height under `pointer: coarse` | **24.0px** (21px before the `min-height` was added) |
+| pageerrors, all six widths | **0** |
+
+## Carried forward — not fixed this cycle
+- **The IC-basis badge beside the two copy buttons is green for any coverage above zero.** Indonesia
+  renders `PROD-WTD — 7.6% production-weighted` in the same green as a well-covered country, and the
+  USA at 0.2% renders `PART-PROD — 0.2%` in green too. `_dqTier()` splits at `cov > 5`, so the colour
+  says "verified" where the number says 92–99% of contracts entered unweighted. Found on this walk,
+  left as its own cycle rather than widened into this one.
+- **`FISCAL REGIME BREAKDOWN` claims the wrong weighting for the headline.** Its note reads "Blended
+  average (81.1%) weights equally across all contract types" while the take-chart caption two screens
+  up prints `Simple avg: 79.9%` and labels 81.1% production-weighted-blended. The page states two
+  incompatible derivations of the number the analyst is being asked to defend. Text-only as written,
+  so not spent as a cycle, but it is a defensibility defect and should be fixed against whichever
+  derivation is correct.
+- Everything carried from cycles 560–575 is unchanged, including: the take chart's PNG export carrying
+  the fee-basis caveat but not the proxy one; the proxy notice naming IRR and breakeven columns that do
+  not exist; the Reform Risk country lookup card printing DIRECTION over the full record beside a score
+  over the 2010 window; "Most Frequently Reformed Regimes" showing 15 of 21 sourced jurisdictions
+  without saying so; `COUNTRY_DATA` and the API disagreeing on `profit_oil_govt` / `state_eq` for 45 of
+  185 countries; the two barely-screening Screener presets; `#screener-count` at ~570 characters of
+  unbroken prose; the `Cost Recovery Cap` source badges at 21px on Country Profile @390; the Fiscal
+  Compare XLSX emitting 25 columns with no comparable-take column; `MECHANIC_BREAKDOWN` disagreeing with
+  `country_data.json` on Iraq's mechanic split; the Side-by-Side search box replacing the seeded example
+  with no add-to-set path; the two adjacent unexplained IC buttons on Country Profile; the duplicated
+  all-185 rank in CP headline Zones A and B; the non-existent `cp-price-select`; the Screener take
+  slider's `min="30"` floor excluding the USA at 23.4%; FAQ A25/A35/A40 describing a Screener
+  "Stability Score filter" that does not exist; Guyana's A-tier reform log contradicting its headline by
+  ~20pp; the CDN `onerror` handlers on lines 54/56/57; the 272 dead citations; and
+  `SPECULATIVE_COUNTRIES` still being a hand-typed list of 7 names from v41.
+
+## Bookkeeping (not the cycle)
+- v669 → v670 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
