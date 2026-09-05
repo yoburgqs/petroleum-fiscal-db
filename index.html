@@ -161,6 +161,14 @@ button:focus-visible, [role="tab"]:focus-visible, [role="button"]:focus-visible 
 .price-radio label { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 700; padding: 4px 10px; transition: .15s; }
 .price-radio input[type=radio] { display: none; }
 .price-radio input[type=radio]:checked + label { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* v651 (T1) — the Screener's own oil-price deck. Same visual language as .price-radio
+   above, but <button> elements rather than radio+label, so they pick up the v612
+   `@media (pointer: coarse) { button { min-height: 44px } }` rule without a new
+   mobile-layer selector. The v612 block itself is untouched. */
+.sc-deck-btn { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; color: var(--text); cursor: pointer; font-size: 12px; font-weight: 700; padding: 4px 10px; transition: .15s; }
+.sc-deck-btn:hover { border-color: var(--accent); color: var(--accent); }
+.sc-deck-btn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 .search-input { background: var(--card); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 13px; padding: 8px 14px; width: 240px; }
 .search-input:focus { border-color: var(--accent); outline: none; }
 .btn { background: var(--accent); border: none; border-radius: var(--radius); color: #fff; cursor: pointer; font-size: 12px; font-weight: 600; padding: 6px 14px; transition: .15s; touch-action: manipulation; }
@@ -1683,7 +1691,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v650</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v651</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1753,7 +1761,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v650</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v651</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2086,7 +2094,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v650';
+  return m ? m[0] : 'v651';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2161,7 +2169,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v650');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v651');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2505,6 +2513,31 @@ window.copyPlatformCitation = function(btn) {
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="atlanticfrontier" onclick="applyScreenerPreset('atlanticfrontier')">Atlantic Frontier</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="frontiermarkets" onclick="applyScreenerPreset('frontiermarkets')">Frontier Markets</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="downsideresilience" onclick="applyScreenerPreset('downsideresilience')">Downside Resilience</button>
+      </div>
+      <!-- v651 (T1) — the oil-price deck, ON the Screener.
+           runScreener() has always filtered on d[`take_${price}`] / d[`npv_${price}`] with
+           price = getPriceKey(), and getPriceKey() reads input[name="price"] — which lives at
+           line ~2340 inside #explorer-browse-mode. Switching to Screener mode sets that block
+           to display:none, so the single assumption that moves every take%, every NPV, every
+           tier letter and every preset threshold on this tab was not reachable from this tab.
+           Walking T1 cold: the analyst loads IOC Capital Screen, gets 15 countries "at $75/bbl",
+           and the obvious next question — "who is still on the list at $50?" — had no control to
+           ask it with. The count line names the deck and the NPV label carries an "@$75" tag, so
+           the page kept telling the analyst the price mattered while offering no way to change it.
+           These buttons drive the SAME radios rather than a second copy of the state, so there is
+           still exactly one price deck on the platform and Fiscal Compare, Explorer and the
+           Screener cannot disagree about it. -->
+      <div id="sc-deck-wrap" style="display:flex;align-items:center;gap:6px;margin-left:auto;flex-wrap:wrap;">
+        <!-- min-height 24px inline rather than a new rule inside the v612 mobile layer: the row
+             already holds a 26px select on desktop, so the floor is inert with a mouse and only
+             binds the 17px line box this span gets with a thumb. -->
+        <span style="display:inline-flex;align-items:center;min-height:24px;font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Price deck</span>
+        <div class="price-radio" id="sc-deck-btns" role="group" aria-label="Oil price deck — every take percentage, NPV, tier and preset threshold on this screen is computed at this price">
+          <button type="button" class="sc-deck-btn" data-deck="50" aria-pressed="false" onclick="_scSetDeck('50')" title="Re-run this screen at $50/bbl — the downside stress case. Every take%, NPV, tier and preset threshold below is recomputed, and the preset menu's hit counts are recomputed with them.">$50</button>
+          <button type="button" class="sc-deck-btn" data-deck="75" aria-pressed="true" onclick="_scSetDeck('75')" title="Re-run this screen at $75/bbl — the platform default deck.">$75</button>
+          <button type="button" class="sc-deck-btn" data-deck="100" aria-pressed="false" onclick="_scSetDeck('100')" title="Re-run this screen at $100/bbl. Progressive regimes (PSC cost-recovery caps, PRRT, Norway SPT) take a larger share here, so a take ceiling screens harder than it does at $75.">$100</button>
+          <button type="button" class="sc-deck-btn" data-deck="125" aria-pressed="false" onclick="_scSetDeck('125')" title="Re-run this screen at $125/bbl — the upside case.">$125</button>
+        </div>
       </div>
     </div>
     <div class="slider-row">
@@ -24343,6 +24376,12 @@ document.querySelectorAll('input[name="price"]').forEach(r => r.addEventListener
       document.getElementById('explorer-screen-mode') &&
       document.getElementById('explorer-screen-mode').style.display !== 'none') runScreener();
   else if (typeof _scSyncNpvAxis === 'function') _scSyncNpvAxis();
+  // v651: the deck moved, so the Screener's deck buttons and the preset menu's hit counts —
+  // both of which are functions of the price — are recomputed. _labelScreenerPresets() is
+  // bracketed by _scSnapshotState()/_scRestoreState(), so the analyst's current screen survives
+  // the pass; it no-ops if the menu is already counted at this deck.
+  if (typeof _scSyncDeckButtons === 'function') _scSyncDeckButtons();
+  if (typeof _labelScreenerPresets === 'function') { try { _labelScreenerPresets(); } catch(e) {} }
 }));
 document.getElementById('flt-mech').addEventListener('change', renderExplorer);
 document.getElementById('flt-region').addEventListener('change', renderExplorer);
@@ -27038,14 +27077,92 @@ window._homeOpenEvidence = _homeOpenEvidence;
 // once at boot and the resulting row count is read back, so the number on the option is by
 // construction the number the analyst will get. That matters here specifically -- v524 had to fix
 // two separate cases of this menu's captions drifting away from the criteria they described.
+// v651 (T1) — the Screener's price-deck control. Drives the canonical input[name="price"]
+// radios rather than holding a second copy of the deck, so Fiscal Compare, the Explorer and
+// the Screener cannot disagree about what price is live. The existing v617 change listener
+// already re-runs runScreener() when Screener mode is visible; this adds the button state and
+// the preset re-count on top of it.
+function _scSetDeck(v) {
+  var r = document.querySelector('input[name="price"][value="' + v + '"]');
+  if (!r) return;
+  if (!r.checked) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); }
+  _scSyncDeckButtons();
+}
+function _scSyncDeckButtons() {
+  var cur = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
+  [].slice.call(document.querySelectorAll('#sc-deck-btns .sc-deck-btn')).forEach(function (b) {
+    b.setAttribute('aria-pressed', b.dataset.deck === cur ? 'true' : 'false');
+  });
+}
+window._scSetDeck = _scSetDeck;
+window._scSyncDeckButtons = _scSyncDeckButtons;
+
+// v651 — snapshot / restore of the whole Screener control surface.
+//
+// _labelScreenerPresets() derives its counts by actually LOADING each preset, which is what
+// makes the number on the menu the number the analyst gets. At boot that is free, because
+// there is no analyst state to lose. Re-running it on a deck change is not free: it would
+// wipe whatever screen the analyst had built. So the pass is bracketed — every input, select,
+// slider read-out span and module-scope screener global is captured first and put back after.
+function _scSnapshotState() {
+  var scope = document.getElementById('explorer-screen-mode');
+  var ctrls = [], vals = [];
+  if (scope) {
+    [].slice.call(scope.querySelectorAll('input, select')).forEach(function (el) {
+      ctrls.push({ el: el, v: el.value, c: el.checked });
+    });
+    // The sv-* spans are the visible read-outs beside each slider. They are written by the
+    // slider's own input handler, which restoring el.value does not fire.
+    [].slice.call(scope.querySelectorAll('[id^="sv-"], [id^="sn-"], [id^="sc-"][id$="-n"]')).forEach(function (el) {
+      vals.push({ el: el, t: el.textContent });
+    });
+  }
+  var lbl = document.getElementById('screener-preset-label');
+  return {
+    ctrls: ctrls, vals: vals,
+    lblHtml: lbl ? lbl.innerHTML : null,
+    lblDisp: lbl ? lbl.style.display : null,
+    g: {
+      rfactor: _screenerRfactorOnly, minFacts: _screenerMinFacts,
+      minRet: _screenerMinRetention, cset: _screenerCountrySet,
+      setLbl: _screenerSetLabel, apName: _activePresetName,
+      evFirst: _screenerEvidenceFirst,
+      sortK: _scSortKey, sortD: _scSortDir, sortCmp: _scTakeSortOnCmp
+    }
+  };
+}
+function _scRestoreState(s) {
+  s.ctrls.forEach(function (o) { o.el.value = o.v; o.el.checked = o.c; });
+  s.vals.forEach(function (o) { o.el.textContent = o.t; });
+  _screenerRfactorOnly = s.g.rfactor; _screenerMinFacts = s.g.minFacts;
+  _screenerMinRetention = s.g.minRet; _screenerCountrySet = s.g.cset;
+  _screenerSetLabel = s.g.setLbl;     _activePresetName = s.g.apName;
+  _screenerEvidenceFirst = s.g.evFirst;
+  _scSortKey = s.g.sortK; _scSortDir = s.g.sortD; _scTakeSortOnCmp = s.g.sortCmp;
+  var lbl = document.getElementById('screener-preset-label');
+  if (lbl && s.lblHtml !== null) { lbl.innerHTML = s.lblHtml; lbl.style.display = s.lblDisp; }
+}
+
 function _labelScreenerPresets() {
   var sel = document.getElementById('screener-preset-select');
-  if (!sel || sel.dataset.counted === '1') return;
+  if (!sel) return;
   if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return;
+  // v651: the guard is keyed on the DECK, not on "has this ever run". The counts are a
+  // function of the price — measured cold, IOC Capital Screen returns 18 at $50, 15 at $75,
+  // 12 at $100 and 11 at $125, and Low Take · Positive NPV swings 164 / 143 / 122 / 118. The
+  // old one-shot guard froze whichever deck happened to be live when the data finished
+  // loading, so at any other price the menu overstated three presets by ~20 countries and
+  // kept a "(barely narrows)" warning on two that had stopped barely narrowing.
+  var deck = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
+  if (sel.dataset.countedDeck === deck) return;
   var total = COUNTRY_DATA.length;
+  var snap = _scSnapshotState();
   try {
     [].slice.call(sel.options).forEach(function(o) {
       if (!o.value) return;
+      // Keep the caption the markup shipped, so a re-count replaces the suffix instead of
+      // appending a second one.
+      if (typeof o.dataset.baseText !== 'string') o.dataset.baseText = o.textContent;
       applyScreenerPreset(o.value);
       var n = window._screenerLastCount;
       if (typeof n !== 'number') return;
@@ -27053,12 +27170,13 @@ function _labelScreenerPresets() {
       var share = n / total;
       // The count is stated plainly. A preset returning most of the database is not marked wrong --
       // it is a legitimate wide sweep -- but the analyst is told the size before spending the click.
-      o.textContent = o.textContent + '   \u2192 ' + n + ' of ' + total + (share >= 0.75 ? ' (barely narrows)' : '');
+      o.textContent = o.dataset.baseText + '   \u2192 ' + n + ' of ' + total + ' @$' + deck + (share >= 0.75 ? ' (barely narrows)' : '');
     });
   } catch (e) { /* non-critical: leave the menu unlabelled rather than half-labelled */ }
-  applyScreenerPreset('reset');
+  _scRestoreState(snap);
   sel.selectedIndex = 0;
-  sel.dataset.counted = '1';
+  sel.dataset.countedDeck = deck;
+  if (typeof runScreener === 'function') { try { runScreener(); } catch (e) {} }
 }
 window._labelScreenerPresets = _labelScreenerPresets;
 
@@ -41562,6 +41680,11 @@ function switchExplorerMode(mode, btn) {
     // v468: Auto-run Screener on first activation — analysts should see results immediately, not blank sliders
     if (mode === 'screen' && typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length > 0) {
       setTimeout(function() { if (typeof runScreener === 'function') runScreener(); }, 150);
+      // v651: the deck may have been changed on Fiscal Compare or in Browse mode while this
+      // panel was hidden, so the buttons and the menu's hit counts are brought into line with
+      // it on entry rather than showing $75 over a $50 screen.
+      if (typeof _scSyncDeckButtons === 'function') _scSyncDeckButtons();
+      if (typeof _labelScreenerPresets === 'function') { try { _labelScreenerPresets(); } catch (e) {} }
     }
   }
   window._explorerMode = mode;
