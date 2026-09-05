@@ -29646,3 +29646,16 @@ look like one.
   alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead citations; the two
   22.5px `.source-badge` elements; the four-price breakeven bound limit; the unrecorded DCF
   solver country selection; and cycle 539's empty Summary line.
+
+---
+## Cycle 564 Log — 2026-09-05 05:08
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete, both repos pushed.
+
+## Cycle 564 — shipped as v658
+
+**Task:** T3 — "How do these three countries compare side by side?" (stalest in the rotation; 563 was T1, 558 was the last T3)
+
+**Friction.** Side-by-Side stacks two charts 8px apart. The Govt Take chart re-bases a fee-blended country onto its production-sharing/concession contracts and says so three times — legend `Iraq (PSC/Conc)`, a second title line, and a green notice naming the 195 contracts. The comment that added it 
