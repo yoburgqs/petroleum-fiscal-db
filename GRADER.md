@@ -28717,3 +28717,23 @@ v612, v617, v621, v632, v637, v639-v651 and every locked item through v651 intac
   Evidence columns, the `IOC_PRESENCE` alias map, Netherlands 23.4% vs the North Sea Trio
   tooltip, the 272 dead citations, the two 22.5px `.source-badge` elements, the four-price
   breakeven bound limit, and the unrecorded DCF solver country selection.
+
+---
+## Cycle 558 Log — 2026-09-04 22:20
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 558 complete — shipped as **v652**, pushed to both repos.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (557 was T1, so rotated off it.)
+
+## Friction
+Side-by-Side published contractor NPV at **three** prices while everything else on the tab published four.
+
+| block | prices |
+|---|---|
+| Govt Take | $50 · $75 · **$100** · $125 |
+| Contractor NPV | $50 (downside) · $75 (base) · — · $125 (upside) |
+
+The bar chart eight rows below plots `[npv_50, npv_75, npv_100, npv_
