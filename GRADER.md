@@ -30453,3 +30453,132 @@ The Country Profile's `Fiscal character:` verdict — the one line an analyst re
 
 ```js
 if (take <= 40) { charLabel = 'Highly contractor-favorable — .
+
+---
+## Cycle 570 Log — 2026-09-05
+
+- Test before: 236 PASS / 0 FAIL (deployed-URL figure carried in from the cycle header)
+- Test after: runtime suite **RAN this cycle** against the LOCAL build — **261 PASS / 0 FAIL / 1 WARN**.
+  The WARN is the service-worker 404 the local static server raises; it is on the pre-change
+  baseline too. The 236 is the deployed-URL count; local resolves 25 additional routes.
+- JS syntax gate: PASS — 11 inline script blocks, 0 failures.
+- JS errors: 0 pageerrors across 8 tabs at 6 widths.
+- Shipped as **v664**. Both repos pushed.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."**
+(Rotation: 569 T2, 568 T4, 567 T1, 566 T6, 565 T4, 564 T3, 563 T1 — T5 last walked at 562, the
+stalest. Not a repeat of the last cycle.)
+
+## Friction
+
+Walked cold at 1440x900 over `http://localhost:8899` — no sessionStorage, no localStorage
+(asserted `Object.keys(...).length === 0` on arrival). Enumerated every artifact that leaves the
+tool and produced each one for real rather than reading its source: the six clipboard controls
+(`fc-copy-ic-btn`, `screener-copy-ic-btn`, `cmp-copy-table-btn`, `ioc-copy-ic-btn`, `dd-cite-btn`,
+`dd-ic-summary-btn`), the six file exports, and the two print paths.
+
+Ruled out on that walk, by executing each: the Country Profile IC summary for Norway / Guyana /
+Indonesia / Saudi Arabia / Suriname (all correct and fully caveated, including the state-monopoly
+and PROXY branches); the Side-by-Side paste (2,494 chars, real table, basis row present); the IOC
+Portfolio paste (7,052 chars, names its 6 fee-basis rows in the preamble and carries a Take
+comparability column); the Breakeven Map CSV and the Reform Risk CSV (both close with a full
+caveat block — row-order-is-not-a-ranking, coverage scope, and the filters-do-not-narrow-this-file
+statement); and all four XLSX workbooks, each of which opens, parses, and carries a Methodology or
+Basis & Assumptions sheet. Every export fires and every export parses.
+
+**The defect is on the flagship.** `copyFCTable()` — Fiscal Compare's `⎘ Copy for IC Memo`, on the
+tab the platform opens ranked — emits a preamble that warns about GENERIC DEFAULT rows (v563),
+state monopolies, PROXY data basis (v596), model-vs-database NPV **sign** disagreement (v568) and
+country-level IRR. It said nothing about fee-basis comparability, and had no column for it.
+
+Ticking Guyana / Norway / Iraq / Angola and pressing copy pasted, verbatim:
+
+```
+#   Country  Region        Mechanic  Govt Take % @$75 — ORCA database (CITABLE)  ...
+18  Angola   Africa        PSC       53.0
+27  Guyana   Latin America PSC       54.1
+56  Norway   Europe        Concession 68.0
+63  Iraq     Middle East   TSC       84.8
+```
+
+The platform comparability rules (2026-08-26) say a fee-basis take% — TSC, RSC, Buy-back — may not
+be ranked against a PSC/Concession take%: a fee contractor is paid a fixed $/bbl remuneration and
+keeps no price upside, so take% climbs toward 97–99% as an artefact of the contract structure, not
+because the terms are hard. Iraq's comparable take, on the 195 PSC/Concession contracts ORCA holds
+for it, is **34.1%** — *lower than every other country on that shortlist*. The pasted table put it
+last at 84.8%, at rank #63 of 185, in a column its own preamble calls "the CITABLE one".
+
+**The inversion is 50.7pp, and it is the memo that outlives the session.** Every other surface
+already carried the correction: v549 (Side-by-Side), v552 (Country Profile screen), v553 (Country
+Profile clipboard), v554 (the Screener's take ceiling — whose tooltip states outright "Iraq is
+screened at 34.1%, not 84.8%"), v660 (the Screener's paste), and the IOC Portfolio paste. The one
+artifact that did not is the one on the centerpiece tab.
+
+## Change
+
+A price-aware **`Comparable take % @$P — fee-basis contracts excluded (RANK AND CITE ON THIS where
+populated)`** column, inserted immediately beside the citable take column, computed through
+`_scFeeCmpAt()` — the same helper the Screener's ceiling gates on, so the two shortlist pastes
+cannot drift apart. Cells carry the Screener's own `← cite this` marker so the two read alike.
+
+- **Blank where the correction does not change the number at printed precision.** Russia holds one
+  fee-basis contract of 1,247 and its two figures agree to 0.0pp; `diverges` already suppresses it.
+- **The column is omitted entirely** when no row on the current view blends fee-basis contracts —
+  a Norway / Guyana / Angola shortlist pastes at 12 columns, byte-identical to before.
+- **A preamble paragraph** names the affected rows, states the rule, and says plainly that the `#`
+  column ranks on the uncorrected headline, so a placing is not read as a fiscal finding.
+- **The published headline is kept.** It is the correct all-contract average and is what the ORCA
+  database and the JSON API return; v449/v451 lock that cell. Same treatment v553 gave the CP paste.
+
+Magnitude is left to the two columns rather than to emphasis — the same sentence is emitted at
+Iraq's 50.7pp and at Azerbaijan's 1.0pp.
+
+## Result
+
+An analyst who ticks any of the **10** fee-blended jurisdictions at $75/bbl — Iraq, Ecuador,
+Malaysia, Azerbaijan, India, South Sudan, Mexico, Oman, Qatar, Kuwait among them — and pastes the
+shortlist into an IC memo now receives the figure to rank on beside the headline, and a memo reader
+can no longer read "Iraq 84.8%, #63 of 185" as the harshest regime on the list. Before this cycle
+that reader had nothing on the page to tell them otherwise.
+
+## Verification (measured, not assumed)
+
+| check | result |
+|---|---|
+| Fee rows corrected @$75 | **10** — matches the Screener's own `sc-fee-cmp-n` count |
+| Fee rows corrected @$125 | **11** — price-aware; Iraq 88.1% headline → 39.7% comparable |
+| No-fee shortlist (Norway/Guyana/Angola) | column absent, warning absent, **12** columns — unchanged |
+| JS syntax gate | PASS — 11 inline blocks, 0 failures |
+| Runtime suite (local, ran this cycle) | **261 PASS / 0 FAIL / 1 WARN** |
+| Horizontal scroll, 8 tabs x 1920/1440/1280/1024/768/390 | **0** violations |
+| pageerrors, all widths | **0** |
+| Controls under 24px on Fiscal Compare @ 390x844 `hasTouch` | **0**; `fc-copy-ic-btn` measures 44 x 129 |
+
+## Carried forward — found this cycle, not fixed
+
+- **The Fiscal Compare XLSX has the identical gap.** `exportFCResults()` emits 25 columns with no
+  comparable-take column, and its Methodology sheet's "Which columns to cite" block names
+  `GovtTake_75 (database)` as citable without qualification. Worse, that sheet asserts "This is the
+  same treatment the on-screen table and the *Copy for IC Memo* table give those rows" — a sentence
+  that is now less true than it was, because the paste carries the correction and the workbook does
+  not. Same fix, one more emitter; deliberately left out of this cycle to keep the change auditable.
+- **Side-by-Side's pasted Evidence tier cell reads `A · primary-law backed · 66% primary law · of ·
+  63,848 facts`.** The v541 child-by-child cell read inserts its separator between adjacent inline
+  spans, and the screen renders "of" as its own span. Cosmetic in the paste; no number is wrong.
+- **Two adjacent, unexplained buttons on Country Profile.** `⎘ IC Citation` and `Copy for IC Memo`
+  sit side by side and nothing on screen distinguishes a one-line cite from a five-line paragraph.
+- **The Country Profile IC paragraph is ~1,900 characters, of which ~1,550 are caveat prose** — the
+  predictability branch alone runs ~700. Every clause in it was added by a cycle that had a reason,
+  and each is individually correct, but the artifact is no longer something a person pastes
+  "straight" into a memo without editing. Not touched, because thinning it means reversing v536,
+  v596, v605 and v644 and that is a decision, not a cycle's judgement.
+- Everything carried from cycles 560–569 is unchanged, including: the duplicated all-185 rank in CP
+  headline Zones A and B; the non-existent `cp-price-select` at `:3139`; the Screener take slider's
+  `min="30"` floor excluding the USA at 23.4%; FAQ A25/A35/A40 describing a Screener "Stability
+  Score filter" that does not exist; the Side-by-Side Predictability row returning `62 · UNGRADED ·
+  one term` for Guyana / Angola / Suriname alike; `MECHANIC_BREAKDOWN` covering 20 of 185; Guyana's
+  A-tier reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on lines
+  54/56/57; `reform_history.json` carrying no `source` key on any of its 83 events; Norway's stored
+  p25/p75 vs its 29.6pp contract spread; the 272 dead citations; and `SPECULATIVE_COUNTRIES` at
+  `:24048` still being a hand-typed list of 7 names from v41.
