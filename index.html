@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v663</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v664</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v663</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v664</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v663';
+  return m ? m[0] : 'v664';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v663');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v664');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -42023,6 +42023,38 @@ function copyFCForIC(btn) {
     // shortlist paste had no column for it, so 163 PROXY rows left the tool indistinguishable
     // from the 22 with production behind them.
     'Data basis'];
+  // ── v664 (T5) ─ the comparability rule that governs every other paste artifact ─────
+  // MECHANIC_COMPARABILITY (2026-08-26): a fee-basis take% — TSC, RSC, Buy-back — may not be
+  // ranked against a PSC/Concession take%, because a fee contractor is paid a fixed $/bbl
+  // remuneration and keeps no price upside, so take% climbs toward 97–99% as an artefact of the
+  // contract structure rather than because the terms are hard.
+  //
+  // v549 put that correction on Side-by-Side, v552 on the Country Profile screen, v553 on the
+  // Country Profile clipboard, v554 on the Screener's take ceiling and v660 on the Screener's
+  // paste; the IOC Portfolio paste carries a Take comparability column and names the affected
+  // rows in its preamble. THIS artifact — the flagship shortlist, on the tab the platform opens
+  // ranked, from the button whose entire purpose is to be pasted into an IC memo — carried none
+  // of it. Tick Guyana / Norway / Iraq / Angola, press copy, and the memo receives
+  //     63   Iraq   Middle East   TSC   84.8   642 ...
+  // inside a table whose own preamble calls that column "the CITABLE one" and whose # column is
+  // a placing among all 185. Iraq's comparable take, on the 195 PSC/Concession contracts ORCA
+  // holds for it, is 34.1% — LOWER than every other country on that shortlist. The published
+  // headline is correct as an all-contract average and is kept, exactly as v553 kept it; what
+  // was missing is the figure to rank on, which now travels in its own column beside it.
+  var _feeAt = {}, nFee = 0, feeNames = [];
+  for (var _fi = 0; _fi < _entries.length; _fi++) {
+    var _fcC = _entries[_fi].c;
+    if (!byC[_fcC]) continue;
+    var _fSt = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(cd[_fcC] || {}, P) : null;
+    if (_fSt && _fSt.diverges && _fSt.cmp != null) {
+      _feeAt[_fcC] = _fSt; nFee++; if (feeNames.length < 8) feeNames.push(_fcC);
+    }
+  }
+  // Carried only when a row on THIS view actually blends fee-basis contracts. Where none does,
+  // the column would repeat the one before it on every row — same rule as the Screener paste.
+  var _anyFee = nFee > 0;
+  if (_anyFee) head.splice(5, 0, 'Comparable take % @$' + P
+    + ' — fee-basis contracts excluded (RANK AND CITE ON THIS where populated)');
   var matrix = [head];
   var nGeneric = 0, nMono = 0, nBe = 0;
   var nProxy = 0, proxyNames = [];   // v596 (T5)
@@ -42050,7 +42082,7 @@ function copyFCForIC(btn) {
       : 'GENERIC DEFAULT (' + (typeof describeDefaultTerms === 'function' ? describeDefaultTerms(r.mechanic) : r.mechanic) + ') — mechanic standard, not this country’s terms. Directional only, NOT citable.';
     var _pb = (typeof _icProdBasis === 'function') ? _icProdBasis(meta) : null;   // v596 (T5)
     if (_pb && _pb.label === 'PROXY') { nProxy++; if (proxyNames.length < 8) proxyNames.push(c); }
-    matrix.push([
+    var _row = [
       _entries[i].rank,
       c,
       r.region || meta.region || '',
@@ -42063,7 +42095,12 @@ function copyFCForIC(btn) {
       mono ? '' : num(r.liveNPV, 0),
       basis,
       (typeof _icProdBasisCell === 'function') ? _icProdBasisCell(meta) : ''   // v596 (T5)
-    ]);
+    ];
+    // v664 (T5): blank on a row whose headline needs no correction, so the analyst reads the
+    // column as "these are the rows the rule applies to" rather than as a second take on all of
+    // them. The marker is the Screener's, so the two shortlist pastes read the same way.
+    if (_anyFee) _row.splice(5, 0, _feeAt[c] ? _feeAt[c].cmp.toFixed(1) + ' ← cite this' : '');
+    matrix.push(_row);
   }
   if (matrix.length < 2) { showCopyToast('No rows on screen to copy.'); return; }
   var N = matrix.length - 1;
@@ -42111,6 +42148,22 @@ function copyFCForIC(btn) {
     + 'primary concession/PSA terms. See the Data basis column'
     + (proxyNames.length ? ' — includes ' + proxyNames.join(', ') + (nProxy > proxyNames.length ? ' and ' + (nProxy - proxyNames.length) + ' more' : '') : '')
     + '. No country in the database exceeds 37.6% production coverage. ';
+  // v664 (T5): named before the sign-flip note, because it is the only caveat in this block that
+  // says a number in the table is not comparable ACROSS rows — which is what a ranked IC table
+  // is read as. Magnitude is left to the two columns rather than to emphasis: the same sentence
+  // is emitted at Iraq's 50.7pp and at Azerbaijan's 1.0pp, and nothing is emitted where the
+  // correction does not change the number at printed precision (Russia holds 1 fee-basis
+  // contract of 1,247 and _scFeeCmpAt().diverges already suppresses it).
+  if (nFee) warn += nFee + ' of the ' + N + ' rows blend fee-basis contracts (TSC / RSC / Buy-back), '
+    + 'where the contractor is paid a fixed $/bbl remuneration fee and keeps no price upside — so '
+    + 'government take% on those rows measures the contract structure, not how hard the terms are: '
+    + feeNames.join(', ') + (nFee > feeNames.length ? ' and ' + (nFee - feeNames.length) + ' more' : '')
+    + '. Under the platform comparability rules (2026-08-26) their published headline may NOT be '
+    + 'ranked against the production-sharing and concession rows, and the # column ranks on exactly '
+    + 'that headline — so do not read their placing, or their take against another row, as a fiscal '
+    + 'finding. The Comparable take column carries the take on each of those countries’ '
+    + 'PSC/Concession contracts alone, which is the figure to rank and cite on. The headline is kept '
+    + 'because it is the correct all-contract average and is what the ORCA database and JSON API publish. '
   if (nSignFlip) warn += 'On ' + nSignFlip + ' row' + (nSignFlip > 1 ? 's' : '') + ' the citable database NPV and this screen’s model NPV disagree on the SIGN — one says the contractor creates value at this price and the other says it destroys it: '
     + flipNames.join(', ') + (nSignFlip > flipNames.length ? ' and ' + (nSignFlip - flipNames.length) + ' more' : '')
     + '. Cite the database column and do not quote the model figure for these rows without saying which basis it is on. ';
