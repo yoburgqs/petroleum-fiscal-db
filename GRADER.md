@@ -30437,3 +30437,19 @@ true — the USA's — is now defended rather than merely asserted, which it was
   `prod_coverage_pct` is a measured field on every row and 164 countries have no production. The
   badge covers 7 of them, chosen by hand ~620 versions ago. This cycle's verdict change covers the
   decision point the badge was failing to guard, but the badge itself was left alone.
+
+---
+## Cycle 569 Log — 2026-09-05 11:01
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 569 complete, shipped as **v663**. Both repos pushed.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest in rotation — 563 T1, 564 T3, 565 T4, 566 T6, 567 T1, 568 T4)
+
+## Friction
+The Country Profile's `Fiscal character:` verdict — the one line an analyst reads for the attractiveness call — had a first branch (`index.html:32017`) that was three lines with no input but the take:
+
+```js
+if (take <= 40) { charLabel = 'Highly contractor-favorable — .
