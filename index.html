@@ -1691,7 +1691,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v652</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v653</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1761,7 +1761,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v652</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v653</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2094,7 +2094,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v652';
+  return m ? m[0] : 'v653';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2169,7 +2169,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v652');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v653');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -28361,6 +28361,108 @@ document.getElementById('ioc-search').addEventListener('keydown', e => {
   }
 });
 
+// ── v653 (T6) — THE EVIDENCE GRADE ON THE OPERATOR TAB ──────────────────────────────────
+// Every other surface on this platform that prints a government take prints the grade behind
+// it: Fiscal Compare has the Quality column, Explorer and Screener have the Evidence column,
+// Country Profile has the Evidence Quality panel and the per-parameter Evidence Chain, and
+// Side-by-Side has the Evidence tier row. IOC Portfolio printed none — and it is the widest
+// take table in the tool, listing up to 49 country takes at once for a single operator.
+// v599 answered "which legal entities were rolled into this?" for this tab. It did not answer
+// "how solid is the fiscal record the number was computed from?", which is the other half of
+// the same question and the one that decides whether a row is citable.
+// Measured against the shipped country_data.json and IOC_DATA, using _evidenceGrade() — the
+// platform's own two-legged test, unchanged here:
+//   * 362 of the 1,772 operator x country x mechanic rows sit on a country graded C or D.
+//   * 321 of the 1,561 operators have at least one such row.
+//   * 28 of the 120 countries reachable on this tab are C or D.
+// Concretely, on the tab's own seeded example: Shell's table carries Iraq at 98.5% take and
+// Russia at 22.9%, both grade D — Iraq on 11.8% primary law, Russia on 3.8% — and Nigeria at
+// 83.5%, grade C, on 62 contracts, the group's fourth-largest position. Nothing on the tab
+// distinguished any of those from Norway, grade A on 66.1% primary law and 63,848 facts.
+// TotalEnergies is worse: 12 of its 49 countries are C or D.
+// The cell is getEvidenceBar() — the same function the Explorer and Screener columns already
+// call — so the letter, the composition bar, the fact count and the tooltip are byte-identical
+// to what the analyst has read on those tabs. Nothing is recomputed and nothing is filtered:
+// no take, NPV, IRR, breakeven, swing, contract count or roll-up on this tab changes. The
+// grade is the COUNTRY's fiscal record, not this operator's contracts, and the header says so.
+function _iocEvEsc(v) {
+  return String(v == null ? '' : v)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+// Contracts in this portfolio that sit in a C- or D-graded country. Counted over the same
+// deduped `rows` the table below renders, so the percentage matches what is on screen.
+function _iocEvidenceMix(rows, totalContracts) {
+  var perC = {}, gradeC = {}, graded = 0;
+  (rows || []).forEach(function(r) {
+    perC[r.country] = (perC[r.country] || 0) + r.n;
+    if (gradeC[r.country] === undefined) {
+      var e = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+        ? COUNTRY_DATA.find(function(d) { return d.country === r.country; }) : null;
+      gradeC[r.country] = e ? _evidenceGrade(e) : null;
+      if (e) graded++;
+    }
+  });
+  var weakN = 0, list = [];
+  Object.keys(perC).forEach(function(c) {
+    var g = gradeC[c];
+    if (g && (g.grade === 'c' || g.grade === 'd')) {
+      weakN += perC[c];
+      list.push({ country: c, letter: g.letter, n: perC[c], aPct: g.aPct, nFacts: g.nFacts });
+    }
+  });
+  list.sort(function(a, b) { return b.n - a.n; });
+  return { n: weakN, pct: totalContracts > 0 ? weakN / totalContracts * 100 : 0,
+           list: list, graded: graded };
+}
+// The portfolio-level roll-up of that column. Without it an analyst reading a 49-row table has
+// to scan every row to find out whether any of it is weakly evidenced.
+function _iocEvidenceStat(rows, totalContracts) {
+  var m = _iocEvidenceMix(rows, totalContracts);
+  if (!m.graded) return '';
+  var col = m.pct >= 25 ? 'var(--red)' : m.n > 0 ? 'var(--orange)' : 'var(--green)';
+  var val = m.n > 0 ? Math.round(m.pct) + '%' : 'none';
+  var tip;
+  if (m.n > 0) {
+    tip = m.n.toLocaleString() + ' of ' + totalContracts.toLocaleString() + ' contracts in this '
+      + 'portfolio sit in a country ORCA grades C or D: '
+      + m.list.map(function(x) { return x.country + ' ' + x.letter + ' (' + x.n.toLocaleString()
+          + ' contract' + (x.n === 1 ? '' : 's') + ', ' + x.aPct.toFixed(1) + '% primary law, '
+          + Number(x.nFacts).toLocaleString() + ' facts)'; }).join('; ')
+      + '. The grade is the worse of primary-law share (A ≥ 60% / B ≥ 40% / C ≥ 20%) '
+      + 'and fact depth (A ≥ 150 / B ≥ 50 / C ≥ 15 facts). Take, NPV, IRR and breakeven '
+      + 'on those rows are directional — verify against the country’s own petroleum act '
+      + 'before quoting them in an IC memo. Per-row grades are in the Evidence column below.';
+  } else {
+    tip = 'Every country in this portfolio is graded A or B by ORCA’s two-legged evidence test '
+      + '(primary-law share A ≥ 60% / B ≥ 40%, and fact depth A ≥ 150 / B ≥ 50 facts). '
+      + 'No row here rests on a C- or D-graded fiscal record. Per-row grades are in the Evidence '
+      + 'column below.';
+  }
+  return '<div class="ioc-stat" title="' + _iocEvEsc(tip) + '"><div class="sv" style="color:'
+    + col + ';">' + val + '</div><div class="sk">C/D-graded exposure</div></div>';
+}
+// One header, used by both the single-entity and the group roll-up table.
+var _IOC_EV_TH = '<th class="num" title="' + _iocEvEsc(
+    'Evidence grade for the COUNTRY whose fiscal terms produced the take, NPV, IRR and '
+  + 'breakeven on this row — not a grade of this operator’s own contracts. The letter is '
+  + 'the worse of two legs: primary-law share (A ≥ 60% / B ≥ 40% / C ≥ 20%) and fact '
+  + 'depth (A ≥ 150 / B ≥ 50 / C ≥ 15 facts), so 100% primary law on 4 facts grades D. '
+  + 'The bar is the A/B/C/D source mix and the figure beside it is the number of fiscal facts '
+  + 'held. Identical to the Explorer and Screener Evidence columns, the Fiscal Compare Quality '
+  + 'column, the Country Profile badge and the Side-by-Side Evidence tier row. C or D means '
+  + 'verify against the country’s own petroleum act before an IC memo.')
+  + '">Evidence</th>';
+// The cell. Falls back to an explicit dash where ORCA holds no country entry at all.
+function _iocEvCell(country) {
+  var e = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+    ? COUNTRY_DATA.find(function(d) { return d.country === country; }) : null;
+  if (!e) return '<td class="num"><span style="font-size:10px;color:var(--muted);" title="'
+    + _iocEvEsc('ORCA holds no country fiscal record for ' + country + ', so there is no evidence grade to show for this row.')
+    + '">no record</span></td>';
+  return '<td class="num">' + getEvidenceBar(e) + '</td>';
+}
+
 window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
   // v615 (T2): "Example loaded: Shell" survived every later operator load — same defect as CP.
   if (!window._iocSeeding) {
@@ -28406,6 +28508,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
     <div class="ioc-stat"><div class="sv">${countries.length}</div><div class="sk">Countries</div></div>
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStrAgg}</div><div class="sk">Mechanic Mix</div></div>
     <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75</div></div>
+    ${_iocEvidenceStat(rows, totalContracts)}
     ${rfPctAgg > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — higher govt take at high oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPctAgg}%</div><div class="sk">R-factor PSC</div></div>` : ''}
     <div class="ioc-stat" style="flex:1;min-width:200px;text-align:left;">
       <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">COUNTRIES</div>
@@ -28414,7 +28517,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
   const tbl = `<div class="tbl-wrap"><table>
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
-      <th class="num">Govt Take</th><th class="num">Swing</th><th class="num">NPV</th>
+      <th class="num">Govt Take</th>${_IOC_EV_TH}<th class="num">Swing</th><th class="num">NPV</th>
       <th class="num">IRR (%)</th><th class="num">Breakeven</th>
     </tr></thead>
     <tbody>${rows.sort((a,b)=>b.n-a.n).map(r => {
@@ -28432,6 +28535,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
       <td><span class="${getMechTagClass(r.mechanic)}">${r.mechanic}</span>${_hasR?' <span style="font-size:10px;color:var(--purple);font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>':''}</td>
       <td class="num">${r.n}</td>
       <td class="num">${fmtTake(r.take_75)}</td>
+      ${_iocEvCell(r.country)}
       <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'var(--red)':r.swing>=10?'var(--orange)':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
       <td class="num">${fmtNpvShared(r.npv_75)}</td>
       <td class="num">${fmtIrr(r.irr_75)}</td>
@@ -28543,6 +28647,7 @@ window.loadIOC = function(operator) {
     <div class="ioc-stat"><div class="sv">${countries.length}</div><div class="sk">Countries</div></div>
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStr}</div><div class="sk">Mechanic Mix</div></div>
     <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75</div></div>
+    ${_iocEvidenceStat(rows, totalContracts)}
     ${rfPct > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — these positions have higher govt take at higher oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPct}%</div><div class="sk">R-factor PSC</div></div>` : ''}
     <div class="ioc-stat" style="flex:1;min-width:200px;text-align:left;">
       <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">COUNTRIES</div>
@@ -28554,7 +28659,7 @@ window.loadIOC = function(operator) {
   const tbl = `<div class="tbl-wrap"><table>
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
-      <th class="num">Govt Take</th><th class="num take-50-col" style="display:none">@$50</th><th class="num take-100-col" style="display:none">@$100</th><th class="num take-125-col" style="display:none">@$125</th><th class="num">Swing</th><th class="num">NPV</th>
+      <th class="num">Govt Take</th>${_IOC_EV_TH}<th class="num take-50-col" style="display:none">@$50</th><th class="num take-100-col" style="display:none">@$100</th><th class="num take-125-col" style="display:none">@$125</th><th class="num">Swing</th><th class="num">NPV</th>
       <th class="num">IRR (%)</th><th class="num">Breakeven</th>
     </tr></thead>
     <tbody>${rows.sort((a,b)=>(b.n-a.n)).map(r => {
@@ -28572,6 +28677,7 @@ window.loadIOC = function(operator) {
       <td><span class="${getMechTagClass(r.mechanic)}">${r.mechanic}</span>${_hasR2?' <span style="font-size:10px;color:var(--purple);font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>':''}</td>
       <td class="num">${r.n}</td>
       <td class="num">${fmtTake(r.take_75)}</td>
+      ${_iocEvCell(r.country)}
       <td class="num take-50-col" style="display:none">${fmtTake(r.take_50)}</td>
       <td class="num take-100-col" style="display:none">${fmtTake(r.take_100)}</td>
       <td class="num take-125-col" style="display:none">${fmtTake(r.take_125)}</td>
@@ -33054,6 +33160,7 @@ function renderIOCExposure(operatorName) {
         <th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Region</th>
         <th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Mechanic</th>
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Take @$75</th>
+        <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Evidence grade for the COUNTRY whose fiscal terms produced the take and NPV on this row — not a grade of this operator&#39;s own contracts. The letter is the worse of two legs: primary-law share (A &ge; 60% / B &ge; 40% / C &ge; 20%) and fact depth (A &ge; 150 / B &ge; 50 / C &ge; 15 facts), so 100% primary law on 4 facts grades D. Same grade as the Evidence column in the operator table above, the Explorer and Screener Evidence columns, the Fiscal Compare Quality column and the Country Profile badge. It is carried into the XLSX and the IC clipboard by the two buttons above this table.">Evidence</th>
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">NPV @$75</th>
         <th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Contracts</th>
       </tr></thead>
@@ -33068,6 +33175,7 @@ function renderIOCExposure(operatorName) {
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.region}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%</td>
+          <td style="padding:5px 8px;font-size:12px;text-align:right;">${(function(){var _e=(COUNTRY_DATA||[]).find(function(c){return c.country===d.country;});return _e?getEvidenceBar(_e):'<span style="font-size:10px;color:var(--muted);" title="ORCA holds no country fiscal record for '+d.country+', so there is no evidence grade for this row.">no record</span>';})()}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};${isCtry?'opacity:.85;':''}">${_iocNpvFmt(d.npv75)}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:var(--muted);">${d.n||'\u2014'}</td>
         </tr>`;}).join('')}
@@ -33122,6 +33230,17 @@ function _iocExpRows() {
       'Govt Take @$75 (%)': d.take75 != null ? +d.take75.toFixed(1) : null,
       'Contractor NPV @$75 ($M)': d.npv75 != null ? Math.round(d.npv75) : null,
       Contracts: d.n != null ? d.n : null,
+      // v653 (T6): the grade the Evidence column now shows on screen, carried into the sheet and
+      // the clipboard. A badge visible only while the analyst is on the page is not evidence in
+      // an IC memo; this is the same failure v605 fixed for the Country Profile citation.
+      'Evidence grade': cd ? _evidenceGrade(cd).letter : 'no record',
+      'Evidence basis': cd
+        ? (function(g) { return g.aPct.toFixed(1) + '% primary law on '
+            + Number(g.nFacts).toLocaleString() + ' facts — ' + g.label
+            + (g.grade === 'c' || g.grade === 'd'
+                ? '. DIRECTIONAL: verify against ' + d.country + "'s own petroleum act before citing this row."
+                : '.'); })(_evidenceGrade(cd))
+        : 'ORCA holds no country fiscal record for ' + d.country + ', so this row carries no evidence grade.',
       'Take basis': d.source === 'IOC_DATA'
         ? "this operator's own contracts in ORCA"
         : 'COUNTRY AVERAGE — ORCA holds no ' + st.operator + ' contract terms for ' + d.country,
@@ -33166,6 +33285,20 @@ function _iocExpBasisLines() {
   } else {
     L.push('No row falls back to a country average.');
   }
+  L.push('');
+  L.push('EVIDENCE');
+  (function() {
+    var weak = rows.filter(function(r) { return r['Evidence grade'] === 'C' || r['Evidence grade'] === 'D'; });
+    L.push('Every row carries the same A/B/C/D grade the Evidence column shows on screen. The letter is '
+      + 'the WORSE of two legs, never an average: primary-law share (A >= 60% / B >= 40% / C >= 20%) and '
+      + 'fact depth (A >= 150 / B >= 50 / C >= 15 facts). 100% primary law on 4 facts grades D. '
+      + 'It grades the COUNTRY\u2019s fiscal record, not ' + st.operator + '\u2019s contracts.');
+    L.push(weak.length
+      ? weak.length + ' of ' + rows.length + ' rows sit on a C- or D-graded record and are DIRECTIONAL: '
+        + weak.map(function(r) { return r.Country + ' ' + r['Evidence grade']; }).join(', ')
+        + '. Verify each against that country\u2019s own petroleum act before it reaches an IC memo.'
+      : 'No row on this sheet sits on a C- or D-graded fiscal record.');
+  })();
   L.push('');
   L.push('COMPARABILITY');
   L.push(nFee > 0
@@ -33231,7 +33364,7 @@ function copyIOCPortfolio() {
               + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '')
               + ' — yoburgqs.github.io/petroleum-fiscal-db/';
 
-  var cols = ['Country','Region','Mechanic','Govt Take @$75 (%)','Contractor NPV @$75 ($M)','Contracts','Take basis','Take comparability'];
+  var cols = ['Country','Region','Mechanic','Govt Take @$75 (%)','Contractor NPV @$75 ($M)','Contracts','Evidence grade','Evidence basis','Take basis','Take comparability'];
   var matrix = [cols].concat(rows.map(function(r){
     return cols.map(function(c){
       var v = r[c];
