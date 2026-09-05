@@ -29192,3 +29192,14 @@ the `#reference-panel` `translateX` state are intact — this cycle neither narr
 removes any rule in it, and adds no negative `right` offset anywhere. The `min-width: max-content`
 opt-out markers are untouched. v371/v373, v430, v449, v451, v452, v489, v507, v517, v530, v554,
 v568, v587, v599, v609, v612, v617, v621, v632, v637, v639–v654 intact.
+
+---
+## Cycle 561 Log — 2026-09-05 01:54
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 561 complete — shipped as **v655**, pushed to both repos.
+
+**Task:** T4 — "What is my fiscal-stability and reform exposure here?" (stalest; 560 was T2, 559 T6, 558 T3, 557 T1, 556 T5 — T4 last walked at 555.)
+
+**Friction:** On the Explorer tab at 390×844, the mobile CSS block at `index.html:1464` hid column *headers* semantically (`th[data-sort-key="be"]`, `="swing"`) but hid *body cells* by position (`td:nth-child(7), (8), (9)`). Those indices fit a 9-column table. The table has 19, and 7
