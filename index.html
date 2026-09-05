@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v656</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v657</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v656</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v657</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v656';
+  return m ? m[0] : 'v657';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v656');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v657');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2528,7 +2528,7 @@ window.copyPlatformCitation = function(btn) {
         <option value="iochurdle">IOC Capital Screen — verified production · Take ≤65% · NPV positive at $75 AND at $50</option>
         <option value="sweetspot">Low Take · Positive NPV — Take ≤55% · Concession/PSC/PRRT/RSC · NPV positive</option>
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
-        <option value="deepwater">Deepwater — deepwater-only · PSC + Concession · Take ≤70%</option>
+        <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v657 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
         <option value="lowrisk">Low-Risk Stable — Take ≤55% · Concession + PRRT</option>
         <option value="downsidereturns">Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$50</option>
         <option value="highevidence" title="Countries where the majority of ORCA's fiscal facts were read out of the primary legal instrument (tier A), measured on a record deep enough for that share to mean something: A-share ≥ 55% AND ≥ 150 facts on file. 35 of 185 match. Replaces the old ≥80% A/B screen, which passed 171 of 185 because tier B is the EY / IHS / KPMG bulk harvest.">Primary-Source Evidence — tier-A ≥ 55% · ≥150 facts on file</option>
@@ -2542,7 +2542,7 @@ window.copyPlatformCitation = function(btn) {
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="iochurdle" onclick="applyScreenerPreset('iochurdle')">IOC Capital Screen</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="sweetspot" onclick="applyScreenerPreset('sweetspot')">Low Take · Positive NPV</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="pscafrica" onclick="applyScreenerPreset('pscafrica')">PSC Africa</button>
-        <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="deepwater" onclick="applyScreenerPreset('deepwater')">Deepwater</button>
+        <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="deepwater" onclick="applyScreenerPreset('deepwater')">Offshore &amp; Deepwater</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="lowrisk" onclick="applyScreenerPreset('lowrisk')">Low-Risk Stable</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="downsidereturns" onclick="applyScreenerPreset('downsidereturns')">Two-Price Return Screen</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="highevidence" onclick="applyScreenerPreset('highevidence')">Primary-Source Evidence</button>
@@ -2636,7 +2636,7 @@ window.copyPlatformCitation = function(btn) {
       </div>
     </div>
     <details id="screener-advanced-details" style="margin-top:10px;">
-      <summary style="font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;padding:6px 0;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px;user-select:none;">Advanced Filters ▸ <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7;">Mechanic · IOC Operator · Depth · Region</span></summary>
+      <summary style="font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;padding:6px 0;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px;user-select:none;">Advanced Filters ▸ <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7;">Mechanic · IOC Operator · Region · Data Basis</span></summary>
     <div class="screener-extra">
       <div class="screener-filter-block">
         <span id="sc-mech-label" class="filter-lbl">Fiscal Mechanic</span>
@@ -2675,15 +2675,35 @@ window.copyPlatformCitation = function(btn) {
           <label><input type="checkbox" value="Eni"> Eni</label>
         </div>
       </div>
-      <div class="screener-filter-block">
-        <div class="filter-lbl">Water Depth</div>
-        <div class="depth-radio-group">
-          <input type="radio" id="dep-all" name="dep-cat" value="all" checked><label for="dep-all">All</label>
-          <input type="radio" id="dep-onshore" name="dep-cat" value="onshore"><label for="dep-onshore">Onshore</label>
-          <input type="radio" id="dep-shallow" name="dep-cat" value="shallow"><label for="dep-shallow">Shallow (&lt;500m)</label>
-          <input type="radio" id="dep-deep" name="dep-cat" value="deepwater"><label for="dep-deep">Deepwater (&gt;500m)</label>
-        </div>
-      </div>
+      <!-- v657 (T1): the "Water Depth" radio group is REMOVED. It read DEPTH_PROFILE, a hardcoded
+           40-country editorial list, and screened 185 countries with it:
+
+             onshore   16 countries      mixed  13      deepwater  11      TOTAL 40
+             unclassified                                                        145
+
+           So every one of the three narrowing options silently deleted the 145 countries the list
+           has never named -- including Canada, the #1 row of the default screen, and Azerbaijan --
+           not because they lack that setting but because nobody wrote them down. Same defect class
+           as the IRR axis (v517), the breakeven ceiling (v568) and the breakeven-coverage radio
+           (v623): a control that screens on data availability while labelled with a physical
+           property.
+
+           Two of the three options were also wrong on their own terms:
+             "Shallow (&lt;500m)" mapped to DEPTH_PROFILE.mixed -- `depCat === 'shallow' ? 'mixed'`.
+               That bucket is Brazil, Norway, Angola, Nigeria, the UK, Australia, Malaysia,
+               Indonesia, Vietnam, India, Ecuador, Trinidad and Peru. A control reading "under
+               500 metres" returned Brazil pre-salt (~2,000m) and the Norwegian deepwater North Sea.
+             "Deepwater (&gt;500m)" returned 11 countries and NONE of Brazil, Angola, Nigeria, Norway,
+               the UK or the USA -- the six largest deepwater IOC jurisdictions on earth -- while the
+               entire platform computes its NPV column on a standardized DEEPWATER profile. The
+               count line names the deck as "Deepwater @$75/bbl", so the analyst was invited to ask
+               the depth question and then answered with the countries that cannot support it.
+
+           DEPTH_PROFILE itself is untouched: renderCountryBlocks() still labels a country's
+           development setting from it (and already prints "Unknown -- not classified" for the 145),
+           and Card H's Deepwater Frontier Screen still reads it. What is gone is its use as a
+           screening criterion. The depth question is now asked through the "Offshore &amp; Deepwater"
+           preset, which is an explicit country set and states its own scope in the count line. -->
       <div class="screener-filter-block">
         <div class="filter-lbl">Region</div>
         <!-- v645 (T1): this control could not express four of the region names the rest of the
@@ -6942,7 +6962,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
         <p><strong style="color:var(--text);">4-step bid calibration workflow:</strong></p>
         <ol style="margin:0 0 10px 0;padding-left:20px;line-height:1.8;">
-          <li><strong>Identify comparable regime benchmarks</strong> &mdash; Use <em>Fiscal Compare</em> to run all 185 countries at your project profile (deepwater/onshore/shallow water) and price scenario. Filter by mechanic (PSC if bidding a PSC block) and region. Note the interquartile range of government take for comparable jurisdictions: the 25th and 75th percentile define your plausible bid corridor. Filter further using <em>Screener</em> (same water depth, similar production profile tier) to narrow to the 10&ndash;20 closest comparators.</li>
+          <li><strong>Identify comparable regime benchmarks</strong> &mdash; Use <em>Fiscal Compare</em> to run all 185 countries at your project profile (deepwater/onshore/shallow water) and price scenario. Filter by mechanic (PSC if bidding a PSC block) and region. Note the interquartile range of government take for comparable jurisdictions: the 25th and 75th percentile define your plausible bid corridor. Filter further using <em>Screener</em> — its <strong>Offshore &amp; Deepwater</strong> preset scopes to the 24 jurisdictions ORCA classifies as having offshore development, and the mechanic, region and evidence filters narrow from there to the 10&ndash;20 closest comparators. (There is no water-depth filter on the Screener: ORCA classifies development setting for 40 of 185 countries, so a depth control silently removed the other 145 rather than screening them.)</li>
           <li><strong>Assess the host government&rsquo;s fiscal policy posture</strong> &mdash; Open the <em>Reform History</em> tab for the target country. Look at the direction of recent reform: if terms have been liberalized in the past 5 years (take trending down), the government is competing for capital and your bid should target the lower half of the comparable range. If terms have tightened (take trending up), the government has pricing power and a mid-range bid is safer. The Stability Score gives a quick read: below 60 means reform risk is elevated, which pushes toward a more conservative (lower-take) bid to retain upside buffer.</li>
           <li><strong>Back-solve for your IRR-anchored take floor using Scenario Builder</strong> &mdash; Enter your project&rsquo;s actual parameters (capex, opex, peak rate, plateau duration). Run the DCF for the target country&rsquo;s stated mechanic at your price scenario. Then adjust the profit oil split or royalty rate until IRR = your hurdle rate (typically 12&ndash;15% for frontier deepwater). The resulting take percentage is your <em>maximum technically acceptable take</em> &mdash; bids above this level destroy project value. Your opening bid should sit 5&ndash;10pp below this floor to preserve negotiation room.</li>
           <li><strong>Construct the bid range and IC memo disclosure</strong> &mdash; Your bid positioning: <em>Floor</em> = 25th percentile of comparable PSC take (never bid below this — government will view it as non-serious); <em>Target</em> = 50th percentile comparable take or your IRR-anchored floor minus 5pp, whichever is lower; <em>Walk-away</em> = Scenario Builder-derived maximum acceptable take. Cite in the IC memo: &ldquo;Bid profit oil split calibrated against ORCA comparable regime benchmark (n=[X] PSC countries, same region/mechanic, [price]). Target government take of [Y]% represents the [Z]th percentile of peer jurisdictions and yields project IRR of [W]% at [price]/bbl.&rdquo;</li>
@@ -11501,12 +11521,12 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <div class="faq-item" id="faq-A380">
           <div class="faq-q">A380. The Screener tab offers 8 pre-built filter presets. What are the exact filter criteria for each preset, and which IC use cases is each designed for?</div>
           <div class="faq-a">
-            <p><strong>Short answer:</strong> Each of the 8 Screener presets is a named combination of government take, IRR, NPV, breakeven, mechanic, region, and water depth filters calibrated for a specific capital allocation or bid screening workflow. Understanding the exact criteria helps analysts know when to apply each preset directly vs. when to modify thresholds for a project-specific screen.</p>
+            <p><strong>Short answer:</strong> Each Screener preset is a named combination of government take, contractor NPV at the deck and at the $50 downside, primary-source evidence, mechanic, region, data basis and — for the basin-scoped screens — an explicit country set, calibrated for a specific capital allocation or bid screening workflow. (IRR, breakeven and water depth are no longer screening axes: see v517, v568/v623 and v657.) Understanding the exact criteria helps analysts know when to apply each preset directly vs. when to modify thresholds for a project-specific screen.</p>
             <p><strong>Complete criteria breakdown for all 8 Screener presets:</strong></p>
             <ul>
               <li><strong>Low Take · Positive NPV</strong> — Take ≤55% · Breakeven ≤$65/bbl · IRR ≥12% at $75/bbl. <em>Use case:</em> Initial capital allocation screen for deepwater greenfield. Identifies regimes that are simultaneously low-take, low-breakeven, and IRR-positive at the standard benchmarking price. Typical results: Guyana, UAE, USA GoM, Trinidad, Republic of the Congo shallow shelf. <em>IC application:</em> "Countries passing Low Take · Positive NPV screen are candidate anchor positions for a diversified upstream portfolio — low fiscal risk combined with commercial viability at mid-cycle prices."</li>
               <li><strong>PSC Africa</strong> — Mechanic = PSC only · Region = Africa · Take ≤65% · IRR ≥10% at $75/bbl. <em>Use case:</em> IOC portfolio expansion in African PSC markets, typically ahead of a bid round. Identifies accessible PSC regimes (IOCs can enter without NOC-sole mandate) in Africa with competitive terms. Typical results: Ghana, Mozambique, Tanzania, Senegal, Namibia, Ivory Coast, Benin. <em>IC application:</em> "African PSC short-list for deepwater expansion; excludes concession-only and TSC markets; excludes regimes where effective take exceeds the PSC Africa benchmark."</li>
-              <li><strong>Deepwater</strong> — Water depth filter = Deepwater · Take ≤70% · IRR ≥10% at $75/bbl. <em>Use case:</em> Screening specifically for IOC-accessible deepwater regimes globally. Not restricted to any fiscal mechanic — includes PSC and concession deepwater regimes. Typical results: Brazil pre-salt, Angola Block 15+, USA GoM, Norway North Sea (SDFI-adjusted), Guyana, Mozambique Rovuma. <em>IC application:</em> "Global deepwater comparables for a greenfield FID screening analysis at standardized deepwater project economics."</li>
+              <li><strong>Offshore &amp; Deepwater</strong> — scoped to the 24 countries ORCA classifies as having offshore upstream development · PSC + Concession + EPSA · Take ≤70% at $75/bbl. <em>Use case:</em> IOC-accessible offshore regimes globally, including both the frontier deepwater margins (Guyana, Mozambique, Namibia, Senegal, Ghana, Gabon) and the established shelf-plus-deepwater producers (Brazil, Angola, Nigeria, Norway, UK, Malaysia, Indonesia, Australia). <em>Read the scope note in the count line:</em> it states how many of the 24 cleared the take ceiling and names those that did not. Countries with no development-setting classification in ORCA are out of scope rather than screened out. <em>IC application:</em> "Global offshore comparables for a greenfield FID screening analysis at standardized deepwater project economics."</li>
               <li><strong>Low-Risk Stable</strong> — Reform Risk Stability Score ≥4 · Take ≤70% · Evidence tier A/B ≥70%. <em>Use case:</em> Conservative capital allocation for IOCs with low political risk tolerance (e.g., pre-IPO or ESG-constrained portfolios). Prioritizes regimes with minimal reform history and high-quality fiscal parameter sourcing. Typical results: Norway, USA, Canada, Australia, UAE, Qatar, Netherlands. <em>IC application:</em> "Anchor positions for a risk-adjusted upstream portfolio — high fiscal stability and verified parameters reduce both fiscal risk and IC memo qualification burden."</li>
               <li><strong>High IRR</strong> — IRR ≥20% at $75/bbl (Deepwater profile). <em>Use case:</em> Identifying maximum-return regimes for opportunistic or high-risk-tolerance capital. Typically surfaces very low-take regimes where the standardized project has an exceptionally high return. Typical results: UAE (Abu Dhabi — concession with low royalty), USA GoM (Gulf of Mexico lease terms), Trinidad (aging concession framework), Republic of the Congo (shallow shelf PSC). <em>Caveat:</em> Very high IRR (≥30%) often reflects the standardized cost model more than actual project-specific returns — always verify with Scenario Builder using project-specific capex before IC presentation.</li>
               <li><strong>High Evidence</strong> — Evidence tier A/B ≥80%. <em>Use case:</em> Limiting IC analysis to countries where ORCA's fiscal parameters are sourced from primary legislation and operator filings — minimum uncertainty for IC submission. Typical results: Norway, UK, USA, Australia, Canada, Netherlands, Brazil, Angola, Nigeria (post-PIA 2021), Indonesia, Malaysia, Kazakhstan. <em>IC application:</em> "Evidence-filtered shortlist suitable for bid recommendation submissions without additional sourcing caveat."</li>
@@ -26822,10 +26842,7 @@ function applyScreenerPreset(preset) {
     const checks = document.querySelectorAll('#' + groupId + ' input[type=checkbox]');
     checks.forEach(cb => { cb.checked = values === 'all' || values.includes(cb.value); });
   };
-  const setDepth = (val) => {
-    const dep = document.querySelector('input[name="dep-cat"][value="' + val + '"]');
-    if (dep) dep.checked = true;
-  };
+  // v657: setDepth() removed with the Water Depth radio group.
 
   // Reset all to defaults first
   _screenerRfactorOnly = false;
@@ -26835,7 +26852,7 @@ function applyScreenerPreset(preset) {
   _screenerSetLabel = null;     // v560
   _activePresetName = null;
   setSlider('sl-take', 100); setSlider('sl-npv', -500); setSlider('sl-npv50', -500); setSlider('sl-evid', 0);
-  setChecks('sc-mech-checks', 'all'); setDepth('all');
+  setChecks('sc-mech-checks', 'all');   // v657: setDepth('all') removed with the radio group
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
   const feeCmp = document.getElementById('sc-fee-cmp');
   if (feeCmp) feeCmp.checked = true;   // v554
@@ -26871,11 +26888,31 @@ function applyScreenerPreset(preset) {
     if (scRgn2) scRgn2.value = 'Africa';
     _activePresetName = 'PSC Africa';
   } else if (preset === 'deepwater') {
-    // Deepwater frontier, PSC or Concession
-    setDepth('deepwater');
+    // v657 (T1). Was `setDepth('deepwater')` -- DEPTH_PROFILE.deepwater, 11 countries, and it
+    // returned exactly those 11: Namibia, Ghana, Mozambique, Tanzania, Gabon, Cameroon, Equatorial
+    // Guinea, Sierra Leone, Senegal, Guyana, Republic of the Congo. Every one of them is badged
+    // PROXY -- no verified field production anywhere in the result -- so the platform's own count
+    // line had to append "not defensible as a screening shortlist on its own" to the flagship
+    // deepwater screen. Brazil, Angola, Nigeria, Norway, the UK, Malaysia and Indonesia, which is
+    // where deepwater IOC capital actually goes, were all excluded, because DEPTH_PROFILE files
+    // them under `mixed` and the radio treated `mixed` as "shallow (<500m)".
+    //
+    // The set is now explicit and covers both offshore buckets -- 24 countries, 10 of them
+    // production-backed instead of 0 -- through the same _screenerCountrySet leg v530 built for
+    // Atlantic Frontier, so the count line states the scope and names anything the thresholds cut.
+    // Built from DEPTH_PROFILE at call time rather than copied, so the two cannot drift apart.
+    _screenerCountrySet = [].concat(DEPTH_PROFILE['deepwater'] || [], DEPTH_PROFILE['mixed'] || []);
+    var _nOnsh = (DEPTH_PROFILE['onshore'] || []).length;
+    var _nUniv = COUNTRY_DATA ? COUNTRY_DATA.length : 185;
+    _screenerSetLabel = 'the ' + _screenerCountrySet.length + ' countries ORCA classifies as having offshore upstream development \u2014 '
+      + (DEPTH_PROFILE['deepwater'] || []).length + ' deepwater-led frontier margins and '
+      + (DEPTH_PROFILE['mixed'] || []).length + ' carrying both shelf and deepwater acreage. Of the '
+      + (_nUniv - _screenerCountrySet.length) + ' outside it, ' + _nOnsh + ' are classified onshore-dominant and '
+      + (_nUniv - _screenerCountrySet.length - _nOnsh)
+      + ' hold no development-setting classification in ORCA at all \u2014 those are out of scope here rather than screened out on their terms';
     setChecks('sc-mech-checks', ['PSC','Concession','EPSA']);
     setSlider('sl-take', 70);
-    _activePresetName = 'Deepwater';
+    _activePresetName = 'Offshore & Deepwater';
   } else if (preset === 'lowrisk') {
     // Take ≤55% AND low swing (use take proxy) + Concession
     setSlider('sl-take', 55);   // v568: the ≤$75 breakeven leg was a no-op and is removed
@@ -26990,7 +27027,7 @@ function applyScreenerPreset(preset) {
       iochurdle: 'IOC Capital Screen: verified production \u00b7 Take \u226465% \u00b7 NPV \u22650 @$75 AND @$50',
       sweetspot: 'Low Take · Positive NPV: Take \u226455% \u00b7 Concession/PSC/PRRT/RSC \u00b7 NPV \u22650',
       pscafrica: 'PSC Africa: PSC \u00b7 Africa \u00b7 Take \u226475%',
-      deepwater: 'Deepwater: Deepwater depth \u00b7 PSC+Concession \u00b7 Take \u226470%',
+      deepwater: 'Offshore \u0026 Deepwater: 24 offshore jurisdictions \u00b7 PSC+Concession \u00b7 Take \u226470%',
       lowrisk: 'Low-Risk Stable: Concession+PRRT \u00b7 Take \u226455%',
       // v524: key was 'highirr', but v517 renamed the preset to 'downsidereturns'. The lookup
       // therefore missed on every apply and the label was hidden entirely -- loading the
@@ -27406,9 +27443,6 @@ function runScreener() {
     });
   }
 
-  // water depth radio
-  const depCat = document.querySelector('input[name="dep-cat"]:checked')?.value || 'all';
-
   // v554 — the filter body is a named predicate taking the comparability basis as an argument,
   // so the SAME code path can be evaluated twice: once on the active basis and once on the other.
   // The count line then reports the exact difference between the two rather than an estimate, and
@@ -27508,11 +27542,9 @@ function runScreener() {
     // IOC operator presence filter
     if (iocCountries !== null && !iocCountries.has(d.country)) return false;
 
-    // water depth filter
-    if (depCat !== 'all') {
-      const depKey2 = depCat === 'shallow' ? 'mixed' : depCat;
-      if (!(DEPTH_PROFILE[depKey2] || []).includes(d.country)) return false;
-    }
+    // v657 (T1): the water-depth leg is gone with its control. See the DOM note in
+    // #screener-advanced-details. DEPTH_PROFILE named 40 of 185 countries, so each of its three
+    // settings removed the other 145 for being unlisted, and "shallow" read the mixed bucket.
     // region filter — use _regionMatch() so "Asia Pacific" maps to Asia+Oceania, "Americas" maps to Latin America+North America (v429)
     const scRegion = document.getElementById('sc-region') ? document.getElementById('sc-region').value : '';
     if (scRegion && !_regionMatch(d.region, scRegion)) return false;
@@ -27628,7 +27660,6 @@ function runScreener() {
   if (+document.getElementById('sl-npv50').value > -500) activeCount++; // v517: downside NPV floor above default
   if (+document.getElementById('sl-npv').value > -500) activeCount++; // NPV min above default
   if (checkedIOCs.length > 0) activeCount++;
-  if (depCat !== 'all') activeCount++;
   if (scRegionActive) activeCount++;
   if (!includeProxy) activeCount++; // v517: excluding proxy-economics countries is a filter
   if (takeCeilingActive && !feeCmpOn && _nFeeDivForBadge > 0) activeCount++; // v554: screening the ceiling on the blended headline is a choice that removes countries
@@ -27773,7 +27804,6 @@ function runScreener() {
     if (_screenerMinFacts > 0) crit.push('Min facts on file: ≥' + _screenerMinFacts);
     if (_screenerMinRetention !== null) crit.push('Downside retention: keeps ≥' + Math.round(_screenerMinRetention*100) + '% of its $75/bbl contractor NPV at $50/bbl — measured for the 182 countries with a positive $75 NPV; the 3 state monopolies have no contractor position and are excluded rather than carried');
     if (checkedIOCs.length > 0) crit.push('IOC presence: ' + checkedIOCs.join(', '));
-    if (depCat !== 'all') crit.push('Water depth: ' + depCat);
     if (checkedMechs.length < totalMechBoxes) crit.push('Fiscal mechanics: ' + checkedMechs.join(', ') + ' only');
     if (!crit.length) crit.push('None — this is the full ORCA universe, not a screen result');
     // v587: an exported shortlist now states its own ordering. The rows were always written in
@@ -28068,7 +28098,7 @@ function exportScreenerCSV() {
   a.click();
 }
 
-/* ── v656 (T5) — "give me something I can paste straight into an IC memo." ─────────────
+/* ── v657 (T5) — "give me something I can paste straight into an IC memo." ─────────────
    The Screener is the surface that BUILDS the IC shortlist: the analyst loads a preset,
    moves the take/NPV/evidence thresholds, lands on 8-15 countries, and that row set is
    the table that goes in the memo. It was the only results table in the tool with no
@@ -43152,7 +43182,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Screener Reset/CSV/Excel buttons
   var scReset = document.getElementById('screener-reset-btn');
   if (scReset) scReset.addEventListener('click', function() { resetScreenerAll(); });
-  // v656 (T5): the Screener's clipboard path, alongside its two file exports.
+  // v657 (T5): the Screener's clipboard path, alongside its two file exports.
   var scCopy = document.getElementById('screener-copy-ic-btn');
   if (scCopy) scCopy.addEventListener('click', function() { copyScreenerTable(); });
   var scCsv = document.getElementById('screener-csv-btn');
@@ -43376,15 +43406,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-// v109: Screener mechanic checkboxes + breakeven/depth radios + IOC checkboxes — event delegation
+// v109: Screener mechanic checkboxes + IOC checkboxes — event delegation (v657: depth radios gone)
 document.addEventListener('DOMContentLoaded', function() {
   var mechChecks = document.getElementById('sc-mech-checks');
   if (mechChecks) mechChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   var iocChecks = document.getElementById('sc-ioc-checks');
   if (iocChecks) iocChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
-  // Depth radios — delegate on parent
-  var depParent = document.querySelector('.depth-radio-group');
-  if (depParent) depParent.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  // v657: the .depth-radio-group listener is removed with the control it drove.
 });
 
 // v109: Populate print header export date
