@@ -31233,3 +31233,18 @@ Before this cycle every one of those was on screen and none of it was in the art
   A25/A35/A40 describing a Screener "Stability Score filter" that does not exist; Guyana's A-tier
   reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57; the
   272 dead citations; and `SPECULATIVE_COUNTRIES` still being a hand-typed list of 7 names from v41.
+
+---
+## Cycle 575 Log — 2026-09-05 17:55
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 575 complete. Both repos pushed, mirror matches.
+
+## Cycle 575 — v669
+
+**Task: T3** — "How do these three countries compare side by side?" (stalest; last walked at cycle 564)
+
+**Friction.** Cold walk of Side-by-Side at 1440×900, storage cleared, loaded Guyana / Angola / Brazil.
+
+`renderCompare()` computes up to four *set-specific* comparability notices and prints them under the grid. On that set three fire — about 340 words, the most substantive content on the tab. `copyComparisonTable()` 
