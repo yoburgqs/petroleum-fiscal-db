@@ -30683,3 +30683,168 @@ An analyst comparing a fee-blended country against PSC/Concession peers now read
 I walked it cold at 1440×900 with storage cleared, dropped the seeded North Sea example, and built a real mixed-mechanic set the way an analyst would: Guyana, Angola, Iraq, typed one name at a time.
 
 Every row **above** the Economics block has been taught over several cycles to correct a fee-basis blend. Take ba
+
+---
+## Cycle 572 Log — 2026-09-05 14:35
+- Test before: 236 PASS / 0 FAIL (emailed figure)
+- Test after: **235 PASS / 0 FAIL / 1 WARN** — ran locally this cycle against `http://localhost:8899/index.html`, not assumed. The pre-change backup was served on port 8898 and run through the identical suite: **235 PASS / 0 FAIL / 1 WARN**, same single WARN. The WARN is a local-only CDN script 404 and is pre-existing.
+- JS errors: 0 pageerrors at every width tested
+- Shipped as **v666**, both repos pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?"
+(Rotation: 571 T3, 570 T5, 569 T2, 568 T4, 567 T1, 566 T6 — T6 the stalest.)
+
+## Friction
+
+Walked cold at 1440x900, storage cleared, from Home into Country Profile, then
+switched to a country an analyst would actually be defending.
+
+**The Country Profile carries two different numbers for the same fiscal term, in
+two panels, and neither one says so.**
+
+The Live DCF panel runs Angola on a **75.0%** government profit-oil split and
+carries it into its Fiscal Breakdown. The Key Fiscal Parameters table ~2,750px
+below prints **52.3%** for the same term and labels it `NO SOURCE`. 22.7pp apart.
+The table is the platform's designated answer to "where did this number come
+from" — so an analyst reads it as the provenance for the panel above. It is not.
+They are two separate harvests: `COUNTRY_DATA.profit_oil_govt` feeds the engine,
+`fiscal_facts` in `api/v1/country/{slug}.json` feeds the table.
+
+The page already knew. `_modelParam()` at `:30011` exists to detect exactly this
+and drive v601's `⚠ DCF USES` chip, the red value cell, the conflict note and the
+`Show what the DCF panel used →` button. But it returned `null` unless
+`getDCFParams()` resolved through the 9-country hard override table
+(`_basis === 'country'`). v601's reasoning for that gate was correct about a
+*generic mechanic default* — one figure applied to every PSC country is not a
+second opinion about this one. The same gate also silenced `_basis === 'db'`,
+which is not a default: it is this country's own separately harvested field, and
+it is what the panel actually ran.
+
+Measured on the shipped build, restricted to rows this table already marks
+`NO SOURCE` (so the "neither figure is cited" claim stays true):
+
+| country | Evidence Chain prints | Live DCF panel ran | gap |
+|---|---|---|---|
+| India | 35.09% | 70.0% | **34.9pp** |
+| Kazakhstan | 50.0% | 80.0% | 30.0pp |
+| Angola | 52.3% | 75.0% | 22.7pp |
+| Somalia | 37.5% | 60.0% | 22.5pp |
+| Mozambique | 85.0% | 65.0% | 20.0pp |
+| Sudan | 84.76% | 65.0% | 19.8pp |
+| South Sudan | 84.74% | 65.0% | 19.7pp |
+| Iraq-Kurdistan | 57.0% | 37.6% | 19.4pp |
+
+**30 countries** in that state, silent. Before this cycle **Norway was the only
+country on the platform** that admitted to holding two numbers for one term.
+
+**The exported annex had the same defect, one step worse.** `exportCountryProfile()`
+builds its six fiscal-term rows from `COUNTRY_DATA` and named **not one
+instrument** — no source, no tier, no retrievability, no note. Against the
+Evidence Chain the workbook disagrees on **45 of 185 countries**:
+
+- `Profit Oil (Govt)` — 39 of the 57 carrying both.
+- `State Participation` — 13 of 42, and all 13 match **neither** the screen value
+  **nor the statutory rate the platform itself cites**. Bahrain exports **100**
+  against 58.89 on screen and 50 in its cited source. Oman exports 60 against
+  10 / 10. Cameroon exports **25** where its own **A-tier** Petroleum Code 2019
+  record says **5**.
+
+So the analyst whose annex is challenged on Angola's 75% opens the platform to
+defend it, reads 52.3%, and has nothing on either surface telling them why.
+
+## Change
+
+**On screen.** `_modelParam()` now also resolves the `db` basis — requiring the
+term to have been enriched from *this* country's own `COUNTRY_DATA` field, not
+from `defaults[mechanic]` — and returns the **origin** alongside the value. The
+existing v601 machinery fires unchanged on 30 more countries. Two wording fixes
+that follow from it, because stating the wrong provenance inside the note that
+exists to fix provenance is worse than saying nothing:
+
+- The conflict note asserted the second figure is "a hard-coded engine override."
+  On the 30 new countries it is not. The clause is now built from the origins
+  actually present.
+- The note now states the **gap in pp**. The analyst has to size it, and it was
+  the one thing they had to compute themselves.
+
+The 2 db-basis conflicts on *sourced* rows (Azerbaijan and Malaysia, both cost
+recovery) are deliberately **not** flagged — v538 already separates those into a
+distinct contractual-ceiling row, and re-flagging them would contradict it.
+
+**In the workbook.** The Evidence Chain stashes its per-term provenance as it
+renders, and the exporter reads that stash rather than deriving its own answer —
+the v553 forking lesson, applied before it could fork.
+
+- Each divergent term gains an inline **⚠ row on the Country Profile sheet**
+  naming both figures, the gap, and the cited statutory rate where it matches
+  neither. The reader who never opens another sheet still sees it.
+- The **exported value is kept.** It is what the DCF ran to produce the NPVs on
+  that same sheet; swapping it would leave the workbook disagreeing with itself.
+  Same treatment v553/v660 gave the fee-basis case — publish the headline, put
+  the second figure and the gap beside it, do not silently pick a winner.
+- New **`Fiscal Terms & Sources`** sheet: per term the ORCA value, statutory
+  rate, DCF figure, gap, cited instrument, tier, and whether that citation could
+  be retrieved on 4 Sep 2026 — reusing v641/v647's measured dead-link set, which
+  had never left the screen. Guyana's sheet is the striking one: 6 terms, 5 cited
+  at A/C tier, and **every one of the 5 links dead**.
+
+## Result
+
+An analyst challenged on Angola's 75% profit-oil split now finds both figures
+named against each other on one screen, with the gap stated and a button that
+scrolls to the panel that used the other one — instead of a table printing 52.3%
+that appears to source the number above it. And the workbook that becomes the
+memo's fiscal annex now carries the instrument, its tier, whether it opens, and
+the disagreement, on 45 countries where it previously stated one of two numbers
+as fact with no source of any kind.
+
+## Verification (measured this cycle, not assumed)
+
+| check | result |
+|---|---|
+| Countries newly showing the on-screen conflict | **30** (was 1 — Norway only) |
+| Countries with a workbook inline ⚠ | **45** — 39 profit oil, 13 state participation |
+| Spot-checked live | Angola `DCF USES 75%` gap 22.7pp · India `70%` gap 34.9pp · Indonesia `71.2%` gap 6.8pp |
+| Norway (pre-existing override case) | unchanged — still reads "a hard-coded engine override" |
+| Guyana (no conflict) | correctly silent; no ⚠ row, sources sheet still emitted |
+| Workbook opens and parses | yes — 4 sheets, verified with openpyxl on 5 countries |
+| JS syntax gate | **PASS** — 11 inline blocks, 0 failures |
+| Runtime suite, ran this cycle | **235 PASS / 0 FAIL / 1 WARN** |
+| Same suite on the pre-change backup | **235 PASS / 0 FAIL / 1 WARN** — identical, no regression |
+| Horizontal scroll, 10 tabs x 1920/1440/1280/1024/768/390 | **0** violations |
+| Country Profile @390x844 `hasTouch` | scrollWidth 390 = clientWidth 390 |
+| New conflict button @390 | **36px** tall |
+| pageerrors, all widths | **0** |
+
+## Carried forward — found this cycle, not fixed
+
+- **`COUNTRY_DATA` and the API disagree on two fiscal terms for 45 of 185
+  countries, and this cycle only made the disagreement visible — it did not
+  resolve it.** Royalty, income tax, cost recovery and FTP agree exactly across
+  all 185 (0 divergences on 183/183/80/20 respectively), so the fork is specific
+  to `profit_oil_govt` and `state_eq`. The `COUNTRY_DATA` values look
+  hand-entered and statutory-flavoured (70, 75, 65, 60, 25, 55, 100 — round
+  numbers) against the API's contract-weighted averages (69.89, 52.3, 64.04,
+  58.89). Deciding which harvest is authoritative, and re-pointing the DCF engine
+  at it, changes every NPV on the platform and is not a one-cycle change.
+- **`Cost Recovery Cap` @390 shows 2 source-badge `<a>` links at 21px** on
+  Country Profile under `pointer: coarse`. Pre-existing (v518/v647 badges), not
+  added or touched this cycle, and the only sub-24px controls found there.
+- Everything carried from cycles 560–571 is unchanged, including: the Fiscal
+  Compare XLSX emitting 25 columns with no comparable-take column while its
+  Methodology sheet cites `GovtTake_75` unqualified; `MECHANIC_BREAKDOWN` at
+  `:22329` disagreeing with `country_data.json` on Iraq's mechanic split; the
+  Side-by-Side search box replacing the seeded example with no add-to-set path;
+  the Side-by-Side pasted Evidence tier cell reading `A · primary-law backed ·
+  66% primary law · of · 63,848 facts`; the two adjacent unexplained IC buttons
+  on Country Profile; the ~1,900-character CP IC paragraph of which ~1,550 is
+  caveat prose; the duplicated all-185 rank in CP headline Zones A and B; the
+  non-existent `cp-price-select` at `:3139`; the Screener take slider's
+  `min="30"` floor excluding the USA at 23.4%; FAQ A25/A35/A40 describing a
+  Screener "Stability Score filter" that does not exist; the Side-by-Side
+  Predictability row returning `62 · UNGRADED · one term` for Guyana / Angola /
+  Suriname alike; Guyana's A-tier reform log contradicting its headline by ~20pp;
+  the CDN `onerror` handlers on lines 54/56/57; Norway's stored p25/p75 vs its
+  29.6pp contract spread; the 272 dead citations; and `SPECULATIVE_COUNTRIES` at
+  `:24048` still being a hand-typed list of 7 names from v41.
