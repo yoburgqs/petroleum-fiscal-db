@@ -1683,7 +1683,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v649</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v650</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1753,7 +1753,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v649</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v650</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2086,7 +2086,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v649';
+  return m ? m[0] : 'v650';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2161,7 +2161,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v649');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v650');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -35066,8 +35066,14 @@ function exportReformRiskCSV() {
 
   var q = function(v) { return '"' + String(v).replace(/"/g,'""') + '"'; };
   var body = rows.map(function(r) { return r.map(q).join(','); }).join('\r\n');
-  var csv = pre.map(q).join('\r\n') + '\r\n\r\n' + body
-    + '\r\n\r\n' + q(pre[pre.length - 1]);
+  /* v650 (T5): the basis block used to sit ABOVE the header, so row 1 of this file was a single
+     prose cell and the real column names ("Country","Year","Reform"...) were on row 7. pandas
+     refused the file outright -- ParserError: expected 1 field in line 9, saw 12 -- and Excel,
+     Power Query and Sheets each took the caveat paragraph as the header row, leaving all twelve
+     columns unnamed. v579 fixed exactly this on the Screener CSV; the same defect survived on
+     the two other CSV exports the platform ships. Header is row 1 now; the caveats follow the
+     data, so they still travel with the file and no longer break it. */
+  var csv = body + '\r\n\r\n' + pre.map(q).join('\r\n') + '\r\n';
   var blob = _csvBlob(csv);
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
@@ -35075,7 +35081,8 @@ function exportReformRiskCSV() {
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
   showCopyToast(nSourced
-    ? N + ' events exported — ' + nSourced + ' with their citation, and the file states which rows score.'
+    ? N + ' events exported — column headers on row 1, ' + nSourced + ' rows with their citation. The '
+      + pre.length + ' caveat lines are the last ' + pre.length + ' rows of the file, below the data.'
     : N + ' events exported — WITHOUT citations: the source fetch had not finished. Reopen the tab and export again.');
 }
 window.exportReformRiskCSV = exportReformRiskCSV;
@@ -42224,15 +42231,20 @@ function exportBreakevenCSV() {
 
   var q = function(v) { return '"' + String(v).replace(/"/g,'""') + '"'; };
   var body = rows.map(function(r) { return r.map(q).join(','); }).join('\r\n');
-  var csv = pre.map(q).join('\r\n') + '\r\n\r\n' + body
-    + '\r\n\r\n' + q(pre[pre.length - 1]);
+  /* v650 (T5): same defect as the Reform History CSV, same fix. The caveat block above the
+     header made row 1 a one-cell prose row and put "Country","Region","Breakeven ($/bbl)"... on
+     row 8, so pandas raised ParserError (expected 1 field in line 8, saw 9) and a spreadsheet
+     import headed all nine columns off the "ROW ORDER IS NOT A RANKING" paragraph. Header first,
+     caveats after the data. */
+  var csv = body + '\r\n\r\n' + pre.map(q).join('\r\n') + '\r\n';
   var blob = _csvBlob(csv);
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url; a.download = 'orca_breakeven_' + new Date().toISOString().slice(0,10) + '.csv';
   document.body.appendChild(a); a.click(); document.body.removeChild(a);
   URL.revokeObjectURL(url);
-  showCopyToast(N + ' countries exported — the file carries the retention column and the "not a ranking" note.');
+  showCopyToast(N + ' countries exported — column headers on row 1, opens straight into Excel or pandas. '
+    + 'The retention column and the "not a ranking" note travel with it, as the last ' + pre.length + ' rows.');
 }
 window.exportBreakevenCSV = exportBreakevenCSV;
 
