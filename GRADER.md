@@ -29947,3 +29947,163 @@ mobile layer), 153px wide, right edge at 362 of 390. Desktop: no horizontal scro
 **Task:** T6 — *"Where did this number come from and how solid is the evidence?"* (stalest; last walked at 559)
 
 **Friction:** The box titled **Evidence Quality** at the top of Country Profile (`buildEvidencePanel()`, `index.html:~23003`) is the first evidence surface an analyst reaches and the one `_homeOpenEvidence()` opens on arrival. It states two legs of the grade — primary-law share and fact count. Both describe the country's *wh
+
+---
+## Cycle 567 Log — 2026-09-05
+- Test before: 261 PASS / 0 FAIL / 1 WARN / 1 JS error — suite RUN this cycle against the
+  PRE-change tree on a local server (`/tmp/index.before.html` swapped into the real repo so the
+  asset tree was identical), not assumed from a prior baseline.
+- Test after: 261 PASS / 0 FAIL / 1 WARN / 1 JS error — suite RUN against this build. Identical.
+- The 1 WARN / 1 JS error is the pre-existing `sw.js` 404: index.html registers the service worker
+  at `/petroleum-fiscal-db/sw.js`, which does not exist at a local server root. Present on both
+  trees. Not introduced here.
+- JS syntax gate: PASS, 11 blocks.
+- Viewports 1920 / 1440 / 1280 / 1024 / 768 / 390(touch, hasTouch:true): zero horizontal scroll on
+  all nine tabs, zero page errors, nothing touched rendering under 24px.
+- Summary: shipped as **v661**. Mirror copied, pushed.
+
+## Cycle 567 — T1
+
+**Task:** T1 — *"Which countries should even be on my screening list?"*
+(Rotation: 566 T6, 565 T4, 564 T3, 563 T1, 562 T5, 561 T4. Not a repeat of the last cycle.)
+
+## Friction
+
+Cold load, no sessionStorage or localStorage, over a local HTTP server rather than the deployed
+build, so what was read is this tree.
+
+Screener → Advanced Filters → Region → **"Africa"** returned **49** countries. **Republic of the
+Congo was not one of them** — 220 contracts, which makes it the **5th-largest African entry in the
+database**, above Mozambique (198), Algeria (177), Ghana (171) and Gabon (140). Neither was
+**Cote d'Ivoire** (144). Both ship as `region: "Other"` in `country_data.json`.
+
+The Fiscal Compare chip row (`index.html:2260`), the Screener select (`#sc-region`) and the
+Explorer select (`#flt-region`) all filter that raw field through `_regionMatch()`
+(`index.html:24126`), so **all three under-returned, and nothing on screen said a country was
+missing.** The analyst builds an Africa shortlist that is wrong and has no way to notice.
+
+18 rows are affected — 17 filed `Other`, plus `UAE — Dubai` filed `Unknown`.
+
+**The platform had already decided these rows were misfiled, and worked around it twice without
+fixing the field the filters read:**
+
+| workaround | what it covers | what it does not |
+|---|---|---|
+| `getRegion()` — its own comment names "Cote d'Ivoire, Republic of the Congo, Ireland, Iraq-Kurdistan, UAE — Abu Dhabi" as "plainly misfiled" and falls through to a hardcoded list | the "peers in region" handoff | the region controls themselves |
+| `_M49_SSA_FILED_ELSEWHERE` — hardcodes five of them into Frontier Markets | one preset | the other ten presets, and all three region controls |
+
+Same class as **cycle 344** (USA filed under region "Other", invisible to every region filter).
+
+**It is not only a filter defect.** The Country Profile peer strip medians over
+`p.region === d.region` (`index.html:32368`), so for these 18 the peer set was the `Other` grab
+bag — Vanuatu, Greenland, Barbados and Abu Dhabi treated as one region, median take **26.0%**.
+Measured in a browser against both trees:
+
+| country | take @$75 | delta vs "peers" BEFORE | delta vs real regional peers AFTER |
+|---|---|---|---|
+| **Iraq-Kurdistan** | 63.0% | **+38.5pp above** | **−11.6pp below** (Middle East, median 74.6%) |
+| Republic of the Congo | 60.2% | +35.7pp | +7.6pp (Africa, median 52.6%) |
+| Cote d'Ivoire | 56.6% | +32.1pp | +4.0pp |
+| Ireland | 27.1% | +2.6pp | +8.1pp (Europe, median 19.0%) |
+| Vanuatu | 5.0% | −21.0pp | −14.7pp (Oceania, median 19.7%) |
+
+On Iraq-Kurdistan **the sign was wrong, not just the magnitude**: the profile reported KRG as
+dramatically harsher than its regional peers when against the real Middle East median it is
+materially softer. That is a wrong number on screen, not merely a missing row.
+
+## Change
+
+**1. `_normalizeRegions()` — re-files all 18 under UN M49, once, at load.** Runs immediately after
+`COUNTRY_DATA = await cdRes.json()` and *before* `window.COUNTRY_DATA` is mirrored and before
+`initPlatform()`, so no consumer ever sees the raw value. `region_filed` keeps what the database
+shipped, so the change is auditable. Keys are checked against the loaded rows; any key matching no
+row is reported to the console, so a country rename upstream surfaces instead of silently
+un-fixing a region. UN M49 is the standard because this file already declares M49 as its boundary
+authority in the Frontier Markets option.
+
+**2. Region counts are now counted, not typed.** `_labelRegionControls()` derives every count on
+all three controls from `COUNTRY_DATA`, so a chip's count cannot disagree with the rows that chip
+returns:
+
+| | before | after |
+|---|---|---|
+| Africa | 49 | **54** |
+| Middle East | 14 | **17** |
+| Europe | 30 | **33** |
+| Latin America | 26 | **31** |
+| Oceania | 15 | **16** |
+| North America | 2 | **3** |
+| Asia Pacific (roll-up) | 41 | **42** |
+| Americas (roll-up) | 28 | **34** |
+| Asia, CIS/FSU | 26, 5 | unchanged |
+| **Other** | 17 / 18 | **0** |
+
+**3. "Other" is empty by construction and no longer offered.** The FC chip is hidden and the two
+selects drop the option, rather than leaving a control that hands back an empty table. It is
+**not deleted**: `_labelRegionControls()` restores it with a live count if a future
+`country_data.json` ships a row this platform cannot place — an unplaceable row being unreachable
+from every region control is the defect this cycle fixed, and re-introducing it would be worse
+than an odd-looking chip. Explorer's options carry no `value` attribute, so the labeller pins the
+value before touching the text; otherwise adding "(54)" to the label would have changed the
+option's value and broken the filter.
+
+**4. The re-filing is disclosed, not silent.** A collapsed `<details>` mounted on the two surfaces
+whose counts changed (Screener region block, FC region row) names every country with its
+`filed → used` region. Not a tooltip: keyboard-reachable, lists all 18, and states the standard.
+It is collapsed by default, per the v371/v373 declutter lock. Greenland resolves to **North
+America** (M49 021 Northern America) rather than Europe — unusual for a petroleum audience, which
+is exactly why it is stated on screen rather than assumed.
+
+Nothing else moved: no take, NPV, IRR, breakeven, tier letter, evidence grade or mechanic changed.
+Only which region a row is filed under, and therefore which screens return it and which peers it
+is measured against.
+
+## Result
+
+The analyst can build a regional screening list without silently dropping a 220-contract producer.
+Region = Africa returns 54 rows, every one region Africa, including Republic of the Congo and
+Cote d'Ivoire — verified in a browser, not asserted. And Iraq-Kurdistan's Country Profile no
+longer tells them it is 38.5pp harsher than its peers when it is 11.6pp softer than the Middle
+East median.
+
+## Carried forward
+
+- **Closed this cycle.** The 18 no-real-region countries (carried from 564, flagged twice as
+  "strong next T1"). Closed at source rather than with a third workaround.
+- **Surfaced by this cycle, not fixed.** The **version sweep corrupts history.** Bumping `v660` to
+  `v661` with a blanket regex — which is what the bookkeeping step invites — rewrote 23 historical
+  provenance comments (`v660 (T4): the Stability column...`, `Before v660 this preset used the
+  Water Depth radio...`) so they falsely claim the current version. Reverted here and only the
+  **4** genuine display/runtime strings were bumped (header badge, print header, and the two
+  `_orcaCiteVer` fallbacks). Earlier cycles appear to have done the blanket sweep, so an unknown
+  number of in-file `vNNN (Tn)` attributions predating this cycle are likely wrong by construction
+  and should not be trusted as a change record — `git log` remains the only authority, exactly as
+  `office/CLAUDE.md` says. A future cycle could add a guard, but the cheap fix is to never regex
+  the version.
+- **Checked and NOT a defect** (recording so a later cycle does not re-open them): `_regionMatch()`
+  roll-up expansion for Asia Pacific / Americas / CIS-FSU; `_setScreenerRegion()`'s fallback path;
+  `_frontierMarketsUniverse()` — its hardcoded `_M49_SSA_FILED_ELSEWHERE` list is now redundant
+  with the `d.region === 'Africa'` branch but `.filter()` returns each row once, so it does not
+  double-count and was left alone.
+- **Still unblocked and still wrong.** FAQ A25 (`index.html:4176`) and A35 (`index.html:4732`) on
+  the Stability Score dot scale; A40 (`index.html:4767`) on Reform Risk being "shown in the
+  Stability column of Explorer"; both A25 and A35 route to a Screener "Stability Score filter" that
+  does not exist. Adding a stability control to the Screener remains the strongest open T4.
+- **Carried from 566.** The `M` denominator in the Evidence Quality model-terms chip is the term
+  set `getDCFParams()` returns, and for 98 of 185 countries that is a 4-term Concession; whether
+  that is the right model for Brazil is a Fork-2 question, not a UX one.
+- **Carried from 563.** `rfactor` preset gates on `has_r_factor_tiers`, a data flag — a future
+  T1/T6 should measure whether it discriminates or is another coverage filter.
+- All items carried from 560 and earlier are unchanged: the Side-by-Side Predictability row
+  returning `62 · UNGRADED · one term` for Guyana / Angola / Suriname alike; `MECHANIC_BREAKDOWN`
+  covering 20 of 185; `mech_mix` not reconciling to the published headline on 68 of 185; Guyana's
+  A-tier reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on lines
+  54/56/57 firing against `#cdnWarning` before it exists in the body; `IOC_DATA`'s $75 column not
+  sharing a computation with $50/$100/$125; `reform_history.json` carrying no `source` key on any of
+  its 83 events; the Screener take slider's `min="30"` floor against USA at 23.4%; Reform Risk's
+  export not stating that tab filters do not narrow it; the NaN-padded caveat rows in the CSV
+  emitters; Norway's stored p25/p75 vs its 29.6pp contract spread; `renderSampleAnalyses()` omitting
+  72 countries; the missing retrievability signal on the three Evidence COLUMNS and in the exports;
+  the `IOC_PRESENCE` alias map; Netherlands 23.4% vs the North Sea Trio tooltip; the 272 dead
+  citations; the two 22.5px `.source-badge` elements; the four-price breakeven bound limit; the
+  unrecorded DCF solver country selection; and cycle 539's empty Summary line.
