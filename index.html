@@ -1691,7 +1691,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v651</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v652</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1761,7 +1761,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v651</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v652</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2094,7 +2094,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v651';
+  return m ? m[0] : 'v652';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2169,7 +2169,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v651');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v652');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -25497,7 +25497,8 @@ function renderCompare() {
   const _cmpJoin = (a) => a.length < 2 ? (a[0] || '') : a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1];
   const _cmpSubLine = (txt, col) => '<span style="display:block;font-size:10px;font-weight:600;color:'
     + col + ';">' + txt + '</span>';
-  // v614 (T3): the three Contractor NPV cells on a state-monopoly column. They rendered "$0M"
+  // v614 (T3): the Contractor NPV cells on a state-monopoly column (three at the time; four
+  // since v652 added $100). They rendered "$0M"
   // three times, in the same visual weight as Norway's $826M and Guyana's $1.1B, on a column
   // whose Rank cell already reads "not ranked / state monopoly", whose Predictability cell reads
   // "no contractor position", and whose four Govt Take cells are already an em dash. Read down
@@ -25902,7 +25903,7 @@ function renderCompare() {
     // how the two blocks come to rank the same columns in opposite orders. Declared here, in
     // the block it governs, and it rides the shared `rows` array into #cmp-data-table and both
     // clipboard flavours with the numbers it qualifies.
-    {label:'NPV weighting <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How the three Contractor NPV rows below are averaged across this country’s contracts. These are always an UNWEIGHTED mean of every contract’s result — production data is not used, even for countries whose Govt Take rows are production-weighted. Where the two differ, the Take block and the Economics block describe different contract mixes and their rankings need not agree.">ⓘ</span>',
+    {label:'NPV weighting <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How the four Contractor NPV rows below are averaged across this country’s contracts. These are always an UNWEIGHTED mean of every contract’s result — production data is not used, even for countries whose Govt Take rows are production-weighted. Where the two differ, the Take block and the Economics block describe different contract mixes and their rankings need not agree.">ⓘ</span>',
       key:(d)=>{ const nc = d.n != null ? Number(d.n).toLocaleString() : '?';
         const differs = d.weighting === 'prod_weighted' || d.weighting === 'prod_weighted_blended';
         const tw = d.weighting === 'prod_weighted' ? 'Prod-weighted' : d.weighting === 'prod_weighted_blended' ? 'Blended' : 'Equal-weighted';
@@ -25912,6 +25913,19 @@ function renderCompare() {
           + '">Equal-weighted · all ' + nc + (differs ? ' <span style="font-weight:400;">(≠ take basis)</span>' : '') + '</span>'; }},
     {label:'Contractor NPV @$50 (downside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $50/bbl on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI). This is the low-price stress case — the row an IC asks for first. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_50, '50')},
     {label:'Contractor NPV @$75 (base)',  key:(d)=>_cmpNpvCell(d, d.npv_75, '75')},
+    // v652 (T3): the Economics block published THREE prices while everything else on this tab
+    // published four. The Govt Take block runs $50/$75/$100/$125; the 'Contractor NPV vs Oil
+    // Price ($M)' bar chart eight rows below plots four bars, $100 among them; country_data.json
+    // carries npv_100 for 185 of 185 countries. Only the grid skipped it -- so the one place an
+    // analyst can READ a number rather than hover a bar was the only place $100 did not exist.
+    //   The tab points at that exact price itself. On the shipped Atlantic Frontier Quartet the
+    // crossover notice under the grid reads "The order first changes between $75 and $100/bbl";
+    // the analyst who is told the government-take ranking flips there scrolls down to see what
+    // the contractor side does at $100 and finds the row absent between $75 and $125.
+    //   Rides the shared `rows` array, so it lands in #cmp-data-table, the 'Copy for IC Memo'
+    // clipboard table and the printed PDF too -- where the pasted memo previously carried a
+    // Govt Take @$100 line with no contractor figure beside it.
+    {label:'Contractor NPV @$100 <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $100/bbl on the same standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI). This is the fourth published price -- the same one the Govt Take block above and the NPV bar chart below both carry -- and it is the interval in which take orderings most often reverse, so read it against the Govt Take ($100/bbl) row rather than interpolating between $75 and $125. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_100, '100')},
     {label:'Contractor NPV @$125 (upside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $125/bbl on the same standardized profile. Read against the $50 row: the gap is how much of the upside this regime lets the contractor keep, and it is the contractor-side mirror of the Price Swing row above.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_125, '125')},
     // v555 (T3): the 'Govt NPV @$75 (est.)' row is REMOVED. It was Contractor NPV x take/(1-take),
     // computed here in the browser, and it is the one row on this tab that contradicted the
