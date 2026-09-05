@@ -1462,7 +1462,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 /* v101: Prevent long country names from breaking table layout */
 #tbl-explorer tbody td:first-child { text-overflow: ellipsis; overflow: hidden; max-width: 180px; }
 @media (max-width: 768px) {
-  /* ── v655 (T4) — the phone Explorer was reading under the wrong headers ──────
+  /* ── v656 (T4) — the phone Explorer was reading under the wrong headers ──────
      This block used to hide the HEADERS of Breakeven and Swing by their sort key
      while hiding the BODY cells by position — td:nth-child(7), (8), (9). Those
      indices were correct for a 9-column table. The table has 19 columns, and
@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v655</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v656</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v655</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v656</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v655';
+  return m ? m[0] : 'v656';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v655');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v656');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2734,7 +2734,7 @@ window.copyPlatformCitation = function(btn) {
       <span id="screener-result-count" style="color:var(--muted);font-size:12px;margin-left:4px;"></span>
       <span id="screener-active-filters" class="screener-active-badge" style="display:none;"></span>
       <label id="screener-evidence-first-wrap" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): countries with verified field production are ranked above those whose economics are regional proxy estimates, NPV-descending within each group. Nothing is filtered out — a labelled divider marks the boundary. OFF: rank all 185 by modelled NPV alone, which puts the lowest-take proxy regimes (Vanuatu, Bahamas, Montenegro) at the top."><input type="checkbox" id="sc-evidence-first" checked style="cursor:pointer;">Rank verified-production countries first</label>
-      <button id="screener-reset-btn" class="btn btn-sm btn-outline" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">⬇ CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">⬇ Excel</button>
+      <button id="screener-reset-btn" class="btn btn-sm btn-outline" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-copy-ic-btn" class="btn btn-sm btn-outline" title="Copy this shortlist to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the screen that produced it (preset, thresholds, ordering), the standardized NPV profile, and the fee-basis comparability correction where the published take blends TSC/RSC/Buy-back contracts." aria-label="Copy screening shortlist for IC memo">&#9112; Copy for IC Memo</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">⬇ CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">⬇ Excel</button>
     </div>
   </div>
 
@@ -28068,6 +28068,136 @@ function exportScreenerCSV() {
   a.click();
 }
 
+/* ── v656 (T5) — "give me something I can paste straight into an IC memo." ─────────────
+   The Screener is the surface that BUILDS the IC shortlist: the analyst loads a preset,
+   moves the take/NPV/evidence thresholds, lands on 8-15 countries, and that row set is
+   the table that goes in the memo. It was the only results table in the tool with no
+   clipboard path. Fiscal Compare (fc-copy-ic-btn), Side-by-Side (cmp-copy-table-btn),
+   IOC Portfolio (ioc-copy-ic-btn) and Country Profile (dd-ic-summary-btn) all paste in
+   one click; the Screener offered "⬇ CSV" and "⬇ Excel" only, so the shortest route from
+   a finished screen to a memo table was download → open Excel → select → copy → paste,
+   out of the browser and back. The 185-row Fiscal Compare table -- the one an analyst is
+   LEAST likely to want whole -- had the paste button; the 12-row shortlist did not.
+
+   Same two-flavour write as the other three: text/html so Word / Google Docs / Outlook /
+   PowerPoint render a real table, text/plain TSV so Excel splits into columns.
+
+   The criteria block travels ABOVE the table on purpose. _scExportBasisLines() already
+   assembles "SCREEN APPLIED — these criteria produced this row set", and a pasted
+   shortlist whose screen is not stated is a list, not a screen: the IC reader cannot tell
+   whether 12 countries survived a take ceiling or are simply the first 12 alphabetically. */
+function _scCopyColumns(rows, price) {
+  var anyFee = rows.some(function(r){ return r.FeeBasis_Blend === 'Yes'; });
+  var anyBe  = rows.some(function(r){ return r.Breakeven_bbl != null; });
+  var cols = [
+    { h: 'Country',                  f: function(r){ return r.Country; } },
+    { h: 'Region',                   f: function(r){ return r.Region; } },
+    { h: 'Mechanic',                 f: function(r){ return r.Mechanics; } },
+    { h: 'Govt take @$' + price,     f: function(r){ return r['GovtTake_' + price] != null ? r['GovtTake_' + price].toFixed(1) + '%' : '—'; } }
+  ];
+  // Only carried when at least one row's headline blends fee-basis contracts. Where none
+  // does, the column would be a duplicate of the one before it on every row.
+  // The comparable figure _scExportRows() carries is computed at $75 regardless of the
+  // screened price, so the header says $75 rather than letting it read as the screened one.
+  if (anyFee) cols.push({ h: 'Comparable take @$75 (fee-basis excluded)',
+    f: function(r){ return r.GovtTake_75_Comparable != null
+        ? r.GovtTake_75_Comparable.toFixed(1) + '%' + (r.FeeBasis_Blend === 'Yes' ? ' ← cite this' : '') : '—'; } });
+  cols.push({ h: 'Contractor NPV @$75 ($M)', f: function(r){ return r.NPV_75_M != null ? cpNpvFmt(r.NPV_75_M) : '—'; } });
+  cols.push({ h: 'NPV @$50 ($M)',            f: function(r){ return r.NPV_50_M != null ? cpNpvFmt(r.NPV_50_M) : '—'; } });
+  cols.push({ h: '% of $75 NPV kept @$50',   f: function(r){ return r.NPV_Retention_50v75_pct != null ? r.NPV_Retention_50v75_pct.toFixed(0) + '%' : '—'; } });
+  // v568/v623 removed the breakeven criterion but not the column; it is populated for 65 of
+  // 185, so it is carried only when this particular shortlist has one.
+  if (anyBe) cols.push({ h: 'Breakeven ($/bbl)',
+    f: function(r){ return r.Breakeven_bbl != null
+        ? '$' + Number(r.Breakeven_bbl).toFixed(0) + (r.Breakeven_Tested === 'Yes' ? '' : ' (untested)') : '—'; } });
+  cols.push({ h: 'Price swing (pp)', f: function(r){ return r.Swing_pp != null ? '+' + Number(r.Swing_pp).toFixed(1) + 'pp' : '—'; } });
+  // Carries its own basis in the cell, so the score cannot be pasted as a stability finding
+  // where v536 ruled no predictability reading may leave the tool.
+  // The monopoly basis string already opens "not scored — ...", the no-distribution one does
+  // not, so the prefix is added only where it is missing. Concatenating unconditionally pasted
+  // "not scored — not scored — state monopoly" into an IC memo for the 3 monopoly rows.
+  cols.push({ h: 'Fiscal predictability',
+    f: function(r){
+      var basis = String(r.Predictability_Basis || '');
+      if (r.Fiscal_Predictability === 'not scored') {
+        return /^not scored/.test(basis) ? basis : 'not scored — ' + basis;
+      }
+      return r.Fiscal_Predictability + '/100 — ' + basis;
+    } });
+  cols.push({ h: 'Data basis', f: function(r){ return r.Verified_Production === 'Yes' ? 'verified field production' : 'proxy economics'; } });
+  return cols;
+}
+
+function copyScreenerTable() {
+  var btn  = document.getElementById('screener-copy-ic-btn');
+  var rows = _scExportRows();
+  if (!rows.length) { showCopyToast('No countries match the current screen — nothing to copy.'); return; }
+  var price = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
+  var b = window._screenerExportBasis;
+
+  var caption = 'ORCA petroleum fiscal screening shortlist — ' + rows.length
+    + (b ? ' of ' + b.universe : '') + ' countries, screened at $' + price + '/bbl';
+
+  // Split the basis block: the screen criteria lead (they are what makes this a shortlist),
+  // the standing assumptions and source trail follow the table.
+  var all = _scExportBasisLines();
+  var crit = [], tail = [], inCrit = false;
+  all.forEach(function(l, i) {
+    if (i === 0) return;                                   // caption, already carried above
+    if (/^SCREEN APPLIED/.test(l)) { inCrit = true; crit.push(l); return; }
+    if (/^(ASSUMPTIONS|IRR is not reported|Fiscal_Predictability is|Source:)/.test(l)) inCrit = false;
+    (inCrit ? crit : tail).push(l);
+  });
+  var critTxt = crit.join('\n');
+  var tailTxt = tail.join('\n');
+
+  var cols = _scCopyColumns(rows, price);
+  var matrix = [cols.map(function(c){ return c.h; })]
+    .concat(rows.map(function(r){ return cols.map(function(c){ var v = c.f(r); return v == null ? '—' : String(v); }); }));
+
+  var tsv = caption + '\n' + critTxt + '\n\n'
+    + matrix.map(function(r){ return r.join('\t'); }).join('\n')
+    + '\n\n' + tailTxt;
+
+  function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var th  = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;text-align:left;';
+  var td  = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:10pt;';
+  var tdL = td + 'font-weight:bold;';
+  var html = '<div style="font-family:Calibri,Arial,sans-serif;">'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 2px;">' + esc(caption) + '</p>'
+    + '<p style="font-size:9pt;color:#555;margin:0 0 6px;white-space:pre-wrap;">' + esc(critTxt) + '</p>'
+    + '<table style="border-collapse:collapse;">'
+    + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + th + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
+    + '<tbody>' + matrix.slice(1).map(function(r){
+        return '<tr>' + r.map(function(c, ci){ return '<td style="' + (ci === 0 ? tdL : td) + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
+      }).join('') + '</tbody></table>'
+    + '<p style="font-size:8pt;color:#666;margin:6px 0 0;white-space:pre-wrap;">' + esc(tailTxt) + '</p>'
+    + '</div>';
+
+  function flash(msg) {
+    if (btn) { var o = btn.innerHTML; btn.innerHTML = '✓ Copied'; setTimeout(function(){ btn.innerHTML = o; }, 2000); }
+    showCopyToast(msg);
+  }
+  var okMsg = 'Shortlist copied as a table (' + rows.length + ' countr' + (rows.length === 1 ? 'y' : 'ies')
+            + ', with the screen that produced it) — paste into your IC memo or Excel.';
+
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html':  new Blob([html], {type:'text/html'}),
+      'text/plain': new Blob([tsv],  {type:'text/plain'})
+    })]).then(function(){ flash(okMsg); }).catch(function(){
+      navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
+        .catch(function(){ showCopyToast('Clipboard unavailable — use ⬇ Excel instead.'); });
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(tsv).then(function(){ flash(okMsg); })
+      .catch(function(){ showCopyToast('Clipboard unavailable — use ⬇ Excel instead.'); });
+  } else {
+    showCopyToast('Clipboard unavailable — use ⬇ Excel instead.');
+  }
+}
+window.copyScreenerTable = copyScreenerTable;
+
 // ─── TAB 4: Vintage ──────────────────────────────────────────────────────────
 function renderVintage() {
   // pivot by decade
@@ -43022,6 +43152,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // Screener Reset/CSV/Excel buttons
   var scReset = document.getElementById('screener-reset-btn');
   if (scReset) scReset.addEventListener('click', function() { resetScreenerAll(); });
+  // v656 (T5): the Screener's clipboard path, alongside its two file exports.
+  var scCopy = document.getElementById('screener-copy-ic-btn');
+  if (scCopy) scCopy.addEventListener('click', function() { copyScreenerTable(); });
   var scCsv = document.getElementById('screener-csv-btn');
   if (scCsv) scCsv.addEventListener('click', function() { exportScreenerCSV(); });
   var scExcel = document.getElementById('screener-excel-btn');
