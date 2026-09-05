@@ -30582,3 +30582,16 @@ that reader had nothing on the page to tell them otherwise.
   54/56/57; `reform_history.json` carrying no `source` key on any of its 83 events; Norway's stored
   p25/p75 vs its 29.6pp contract spread; the 272 dead citations; and `SPECULATIVE_COUNTRIES` at
   `:24048` still being a hand-typed list of 7 names from v41.
+
+---
+## Cycle 570 Log — 2026-09-05 11:57
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 570 complete — shipped as **v664**, both repos pushed.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (Stalest in rotation; last walked at 562.)
+
+## Friction
+Walked cold at 1440×900 over a local server with zero sessionStorage/localStorage, and produced every artifact that leaves the tool for real — six clipboard controls, six file exports, two print paths — rather than reading their source. Almost all of them were clean: the Country Profile summary, the Side-b
