@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v658</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v659</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v658</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v659</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v658';
+  return m ? m[0] : 'v659';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v658');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v659');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2410,7 +2410,7 @@ window.copyPlatformCitation = function(btn) {
     </div>
     <div class="ctrl-group">
       <label>Sort</label>
-      <select id="flt-sort" aria-label="Sort Explorer table by selected metric" title="Sort options: Govt Take = rank by fiscal burden (lower = more contractor-favorable); IRR = rank by project returns (higher = more profitable); NPV = rank by contractor net present value; Breakeven = rank by minimum oil price for positive NPV (lower = more resilient); Swing = rank by fiscal price-sensitivity (higher = more progressive regime); Evidence = rank by evidence grade, weakest first (grade, then primary-law share, then fact depth); A-Z = alphabetical">
+      <select id="flt-sort" aria-label="Sort Explorer table by selected metric" title="Sort options: Govt Take = rank by fiscal burden (lower = more contractor-favorable); IRR = rank by project returns (higher = more profitable); NPV = rank by contractor net present value; Breakeven = rank by minimum oil price for positive NPV (lower = more resilient); Swing = rank by fiscal price-sensitivity (higher = more progressive regime); Evidence = rank by evidence grade, weakest first (grade, then primary-law share, then fact depth); Stability = rank by Fiscal Predictability, the 28 countries with a MEASURED take spread first and least predictable first, then the one-term UNGRADED regimes, then the ones ORCA holds no distribution for — a one-term 100 is not steadier than a measured 74, it is the one ORCA holds less contract evidence against; A-Z = alphabetical">
         <option value="take">Govt Take</option>
         <option value="irr">IRR</option>
         <option value="npv">NPV</option>
@@ -2426,6 +2426,13 @@ window.copyPlatformCitation = function(btn) {
              row order unchanged. The one control built to answer "how solid is the evidence?"
              had been silently failing. Adding the option is the fix -- the select is the single
              source of truth for the sort key, so header click and dropdown now agree. -->
+        <!-- v659 (T4): the Stability column has rendered a Fiscal Predictability Score on all 185
+             rows since v649, and it was the ONLY numeric column in this table with no way to order
+             it: no data-sort-key on the <th>, no option here, no case in _explMetricCmp(). Govt
+             Take, Evidence, NPV, IRR, Breakeven and Swing all sort; the one column a T4 analyst
+             opens Explorer to rank did not. The order is deliberately NOT the bare number -- see
+             _fpSortVal(). -->
+        <option value="stability">Stability (measured spread first, weakest first)</option>
         <option value="evidence">Evidence (weakest first)</option>
         <option value="country">Country A-Z</option>
       </select>
@@ -2460,7 +2467,7 @@ window.copyPlatformCitation = function(btn) {
           <th class="num expl-sm-off" data-sort-key="irr" tabindex="0" role="columnheader" aria-sort="none" title="Contractor IRR at $75/bbl base case — available for 124 of 185 countries. Countries without verified opex/capex data show —. Arithmetic mean of per-contract IRRs — use for screening only, not investment decisions. IRR values ≥500% are excluded as unbounded (e.g. very-low-royalty regimes at high price where NPV payback is near-instant). Sort: high→low">IRR @ $75 ⓘ<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(124/185 countries)</span></th>
           <th class="num expl-sm-off" data-sort-key="be" tabindex="0" role="columnheader" aria-sort="none" title="Breakeven oil price for contractor NPV=0 — available for 68 of 185 countries. Requires complete royalty and cost data. &lt;$50 means the field is profitable even below $50/bbl. Sort: low→high">Breakeven<br><span style="font-size:0.75em;color:var(--muted);font-weight:400;white-space:nowrap;">(68/185 countries)</span></th>
           <th class="num" data-sort-key="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price sensitivity: govt take@$125/bbl minus take@$50/bbl in percentage points. High swing = fiscal terms are price-sensitive (government captures more of oil price upside). Color: green &lt;10pp (stable), amber 10&ndash;20pp (moderate), red &gt;20pp (highly responsive). Sort: low to high.">Swing (pp)</th>
-          <th class="num" style="cursor:help;" title="Fiscal Predictability Score (0–100). A bar is drawn ONLY for the 28 countries where ORCA measured a take spread across their own contracts; the other rows show the number with an UNGRADED marker and no bar, because bar LENGTH asserts a ranking and these scores were never charged the penalty that would shorten them. Composite measure of how consistent and predictable this country's fiscal terms are. Three components: (1) Within-country IQR penalty — wide spread of take across contracts means inconsistent terms between blocks (up to −40 pts). (2) Price swing penalty — highly progressive regimes are less predictable across price cycles (up to −30 pts). (3) Regime complexity penalty — multiple fiscal mechanics within one country reduce uniformity (−8 pts per additional mechanic). Score ≥75 = HIGH (green); 60–74 = MODERATE (amber); 45–59 = LOW (orange); &lt;45 = VERY LOW (red) — but since v624 a band and a colour are awarded ONLY where ORCA measured a spread across the country's own contracts. A one-term score renders UNGRADED and uncoloured however high its number, because the band it would fall in was earned by an IQR penalty that was never charged. Each row carries its dispersion basis beside the number: 'one term' = every contract in that country prices identically, so the IQR component contributed nothing and the score reflects price swing and mechanic count only; a figure such as '15.0pp' = a measured spread the score IS penalised for; 'n/c' = no contract-level take distribution is held, so the score is not computed rather than assuming a spread of zero. Only 28 of 185 countries have a measured spread; every score that would fall in HIGH belongs to a one-term regime and none of the 28 reaches it (ceiling 74, Turkmenistan). A graded MODERATE therefore outranks any UNGRADED score on this column. Do not read a lower score as the worse regime without checking the basis. Note: distinct from the Reform Frequency Score (0–100) on the Reform Risk tab, which measures number of legislative changes since 2010.">Stability ⓘ</th>
+          <th class="num" data-sort-key="stability" tabindex="0" role="columnheader" aria-sort="none" style="cursor:pointer;" title="Sort: measured spread first, least predictable first — see the order note under the table. —— Fiscal Predictability Score (0–100). A bar is drawn ONLY for the 28 countries where ORCA measured a take spread across their own contracts; the other rows show the number with an UNGRADED marker and no bar, because bar LENGTH asserts a ranking and these scores were never charged the penalty that would shorten them. Composite measure of how consistent and predictable this country's fiscal terms are. Three components: (1) Within-country IQR penalty — wide spread of take across contracts means inconsistent terms between blocks (up to −40 pts). (2) Price swing penalty — highly progressive regimes are less predictable across price cycles (up to −30 pts). (3) Regime complexity penalty — multiple fiscal mechanics within one country reduce uniformity (−8 pts per additional mechanic). Score ≥75 = HIGH (green); 60–74 = MODERATE (amber); 45–59 = LOW (orange); &lt;45 = VERY LOW (red) — but since v624 a band and a colour are awarded ONLY where ORCA measured a spread across the country's own contracts. A one-term score renders UNGRADED and uncoloured however high its number, because the band it would fall in was earned by an IQR penalty that was never charged. Each row carries its dispersion basis beside the number: 'one term' = every contract in that country prices identically, so the IQR component contributed nothing and the score reflects price swing and mechanic count only; a figure such as '15.0pp' = a measured spread the score IS penalised for; 'n/c' = no contract-level take distribution is held, so the score is not computed rather than assuming a spread of zero. Only 28 of 185 countries have a measured spread; every score that would fall in HIGH belongs to a one-term regime and none of the 28 reaches it (ceiling 74, Turkmenistan). A graded MODERATE therefore outranks any UNGRADED score on this column. Do not read a lower score as the worse regime without checking the basis. Note: distinct from the Reform Frequency Score (0–100) on the Reform Risk tab, which measures number of legislative changes since 2010.">Stability ⓘ</th>
           <th class="num" title="Primary fiscal rate: Royalty% for Concessions · Profit Oil (Govt)% for PSCs">Key Rate</th>
           <th title="Fiscal tier classification based on government take at $75/bbl. IF = Investor-Friendly (≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = NOC-dominated (&gt;75%). Color coding matches the take% column. Use as a quick portfolio filter — most IOC mandates screen in MOD + selected HI regimes with compensating reservoir quality.">Tier</th>
         </tr>
@@ -2473,7 +2480,7 @@ window.copyPlatformCitation = function(btn) {
     <strong>Color keys</strong> &mdash;
     <strong>Breakeven</strong>: <span style="color:var(--green)">&#9632;</span> &lt;$50 &nbsp; <span style="color:var(--yellow)">&#9632;</span> $50–75 &nbsp; <span style="color:var(--red)">&#9632;</span> &gt;$75 &nbsp;|&nbsp;
     <strong>Swing</strong> (take@$125 − take@$50): <span style="color:var(--green)">&#9632;</span> &lt;10pp (royalty-stable) &nbsp; <span style="color:var(--yellow)">&#9632;</span> 10–20pp (moderate) &nbsp; <span style="color:var(--red)">&#9632;</span> &gt;20pp (profit-progressive) &nbsp;|&nbsp;
-    <strong>Stability</strong>: ◆◆◆◆◆ 5 = zero reform events since 2010 (most stable) &rarr; ◇◇◇◇◇ 0 = 5+ events (most volatile) &nbsp;|&nbsp;
+    <strong>Stability</strong> (Fiscal Predictability, 0&ndash;100 &mdash; <em>not</em> the diamond reform-event score on the Reform Risk tab): a coloured bar and a band are drawn only where ORCA measured a take spread across the country&rsquo;s own contracts &mdash; <span style="color:var(--green)">&#9632;</span> &ge;75 HIGH &nbsp; <span style="color:var(--yellow)">&#9632;</span> 60&ndash;74 MODERATE &nbsp; <span style="color:var(--orange)">&#9632;</span> 45&ndash;59 LOW &nbsp; <span style="color:var(--red)">&#9632;</span> &lt;45 VERY LOW. A row showing a bare number with <strong>UNGRADED &middot; one term</strong> was never charged the spread penalty, so its higher number is not the steadier regime. Click the header to rank measured regimes first. &nbsp;|&nbsp;
     <strong>Evidence A/B/C</strong>: hover any badge for source detail &nbsp;|&nbsp;
     <strong>IRR / Breakeven dash (—)</strong>: country lacks sufficient cost data for computation, or value &ge;500% (unbounded) &mdash; not a data error
   </div>
@@ -2528,7 +2535,7 @@ window.copyPlatformCitation = function(btn) {
         <option value="iochurdle">IOC Capital Screen — verified production · Take ≤65% · NPV positive at $75 AND at $50</option>
         <option value="sweetspot">Low Take · Positive NPV — Take ≤55% · Concession/PSC/PRRT/RSC · NPV positive</option>
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
-        <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v658 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
+        <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v659 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
         <option value="lowrisk">Low-Risk Stable — Take ≤55% · Concession + PRRT</option>
         <option value="downsidereturns">Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$50</option>
         <option value="highevidence" title="Countries where the majority of ORCA's fiscal facts were read out of the primary legal instrument (tier A), measured on a record deep enough for that share to mean something: A-share ≥ 55% AND ≥ 150 facts on file. 35 of 185 match. Replaces the old ≥80% A/B screen, which passed 171 of 185 because tier B is the EY / IHS / KPMG bulk harvest.">Primary-Source Evidence — tier-A ≥ 55% · ≥150 facts on file</option>
@@ -2675,7 +2682,7 @@ window.copyPlatformCitation = function(btn) {
           <label><input type="checkbox" value="Eni"> Eni</label>
         </div>
       </div>
-      <!-- v658 (T1): the "Water Depth" radio group is REMOVED. It read DEPTH_PROFILE, a hardcoded
+      <!-- v659 (T1): the "Water Depth" radio group is REMOVED. It read DEPTH_PROFILE, a hardcoded
            40-country editorial list, and screened 185 countries with it:
 
              onshore   16 countries      mixed  13      deepwater  11      TOTAL 40
@@ -11521,7 +11528,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <div class="faq-item" id="faq-A380">
           <div class="faq-q">A380. The Screener tab offers 8 pre-built filter presets. What are the exact filter criteria for each preset, and which IC use cases is each designed for?</div>
           <div class="faq-a">
-            <p><strong>Short answer:</strong> Each Screener preset is a named combination of government take, contractor NPV at the deck and at the $50 downside, primary-source evidence, mechanic, region, data basis and — for the basin-scoped screens — an explicit country set, calibrated for a specific capital allocation or bid screening workflow. (IRR, breakeven and water depth are no longer screening axes: see v517, v568/v623 and v658.) Understanding the exact criteria helps analysts know when to apply each preset directly vs. when to modify thresholds for a project-specific screen.</p>
+            <p><strong>Short answer:</strong> Each Screener preset is a named combination of government take, contractor NPV at the deck and at the $50 downside, primary-source evidence, mechanic, region, data basis and — for the basin-scoped screens — an explicit country set, calibrated for a specific capital allocation or bid screening workflow. (IRR, breakeven and water depth are no longer screening axes: see v517, v568/v623 and v659.) Understanding the exact criteria helps analysts know when to apply each preset directly vs. when to modify thresholds for a project-specific screen.</p>
             <p><strong>Complete criteria breakdown for all 8 Screener presets:</strong></p>
             <ul>
               <li><strong>Low Take · Positive NPV</strong> — Take ≤55% · Breakeven ≤$65/bbl · IRR ≥12% at $75/bbl. <em>Use case:</em> Initial capital allocation screen for deepwater greenfield. Identifies regimes that are simultaneously low-take, low-breakeven, and IRR-positive at the standard benchmarking price. Typical results: Guyana, UAE, USA GoM, Trinidad, Republic of the Congo shallow shelf. <em>IC application:</em> "Countries passing Low Take · Positive NPV screen are candidate anchor positions for a diversified upstream portfolio — low fiscal risk combined with commercial viability at mid-cycle prices."</li>
@@ -22720,6 +22727,30 @@ function _evidenceSortVal(entry) {
 }
 window._evidenceSortVal = _evidenceSortVal;
 
+// ── v659 (T4): ordering for the Explorer Stability column ────────────────────────────────
+// The column renders a Fiscal Predictability Score for all 185 rows and could not be sorted at
+// all until this cycle. The order is NOT the bare number, for the reason this column's own cell
+// renderer (v649), its header tooltip and renderStabilityBadge() have all stated since v624:
+// the score's largest component -- the within-country IQR penalty, worth up to -40 -- is only
+// charged where ORCA measured a take spread across that country's own contracts. Counted live
+// below rather than assumed: ~28 countries are in that cohort and their ceiling is Turkmenistan
+// at 74, while ~86 of the one-term regimes score ABOVE 74 and two (Bahamas, Vanuatu) score 100.
+// A plain descending sort would therefore have opened with the countries ORCA measured LEAST,
+// which is the exact misreading the header tooltip spends a paragraph warning against, and the
+// same trap the "Verified production first" toggle exists to keep off the top of this table.
+// Three blocks, weakest-first inside each block:
+//   0  measured spread          the only cohort the IQR penalty was charged against, and the only
+//                               one that carries a graded band at all
+//   1  one term (UNGRADED)      IQR contributed nothing; price swing and mechanic count only
+//   2  not scored / monopoly    no dispersion input, or no contractor position to score
+function _fpSortVal(entry) {
+  const disp  = _fpDispersion(entry);
+  const block = disp.state === 'measured' ? 0 : disp.state === 'single' ? 1 : 2;
+  const sc    = getFiscalPredictabilityScore(entry);
+  return block * 1000 + (sc == null ? 999 : sc);
+}
+window._fpSortVal = _fpSortVal;
+
 // ── v551 (T6): the evidence grade letter, re-tiered onto what it claims to measure ──
 // It used to be `abPct >= 80 ? A : ...` where abPct = a_pct + b_pct. Tier B is 45.2% of all
 // 330,329 facts and is overwhelmingly the EY / IHS / KPMG country-level bulk harvest, so the
@@ -24182,6 +24213,7 @@ function renderExplorer() {
       case 'npv':     va = -(a[npvKey]  ?? -999); vb = -(b[npvKey]  ?? -999); break;
       case 'be':      va = a.be_75 ?? 999; vb = b.be_75 ?? 999; break;
       case 'swing':    va = a.swing ?? 999; vb = b.swing ?? 999; break;
+      case 'stability': va = _fpSortVal(a); vb = _fpSortVal(b); break;
       case 'evidence': va = _evidenceSortVal(a); vb = _evidenceSortVal(b); break;
       case 'country':  va = a.country; vb = b.country; break;
       default: va = a[takeKey] ?? 999; vb = b[takeKey] ?? 999;
@@ -24240,7 +24272,7 @@ function renderExplorer() {
   }
 
   // v110: Update aria-sort on Explorer column headers to reflect active sort
-  const _sortDirMap = { country: 'ascending', take: 'ascending', evidence: 'ascending', be: 'ascending', swing: 'ascending', irr: 'descending', npv: 'descending' };
+  const _sortDirMap = { country: 'ascending', take: 'ascending', evidence: 'ascending', stability: 'ascending', be: 'ascending', swing: 'ascending', irr: 'descending', npv: 'descending' };
   document.querySelectorAll('#tbody-explorer').forEach(function(tb) {
     if (tb.closest('table')) {
       tb.closest('table').querySelectorAll('[data-sort-key]').forEach(function(th) {
@@ -24411,8 +24443,16 @@ function renderExplorer() {
                     ? ` — every country here has verified field production, but not to the same depth: ${_explFacts} production-weighted on more than 5% of their contracts (PROD-WTD), ${data.length - _explFacts} on a partial match ${_explThin < 1 ? `as thin as ${_explThin.toFixed(1)}%` : `below that`} (PART-PROD). Read the badge on each row before ranking them against each other. Production basis is not source quality — that is the Evidence column.`
                     : ` — all ${data.length} are production-weighted on more than 5% of their contracts (PROD-WTD) — the deepest production basis in the database. That is separate from source quality; read the Evidence column for that.`)
                 : '')));
+  // v659 (T4): when the analyst ranks ON Stability, the order this table returns is not the order
+  // the numbers alone would give, and the reason lives in a header tooltip they have already
+  // stopped reading by the time they see the rows. State it under the result set instead.
+  const _fpK = (typeof _fpCnt === 'function') ? _fpCnt() : null;
+  const _explStabNote = (sort === 'stability' && _fpK)
+    ? `<div style="margin-top:5px;line-height:1.55;">Ranked on <strong style="color:var(--text);">Fiscal Predictability</strong>, basis before number${_explGrouped ? ', inside each data-basis block above' : ''}: <strong style="color:var(--text);">countries with a measured take spread come first, least predictable first</strong> — ${_fpK.nMeas} of 185, and the only ones the score’s largest penalty (IQR, up to −40) was ever charged against or that this column grades. The ${_fpK.nSingle} one-term <strong style="color:var(--text);">UNGRADED</strong> regimes follow, then the ${_fpK.nNone} ORCA holds no contract distribution for. A one-term 100 is not a steadier regime than a measured ${_fpK.ceil} — it is the one ORCA holds less contract evidence against. This column is the Fiscal Predictability Score; reform-event counts are the separate Reform Frequency Score on the Reform Risk tab.</div>`
+    : '';
   document.getElementById('explorer-count').innerHTML = `Showing ${data.length} of ${COUNTRY_DATA.length} countries · Take, NPV, IRR at ${_explPL[price]||('$'+price)}/bbl`
-    + (_explGrouped ? _explBasisNote : `<span style="color:var(--accent);font-weight:600;">${_explBasisNote}</span>`);
+    + (_explGrouped ? _explBasisNote : `<span style="color:var(--accent);font-weight:600;">${_explBasisNote}</span>`)
+    + _explStabNote;
   // Update sort indicator on column headers
   const _curSort = document.getElementById('flt-sort').value;
   document.querySelectorAll('#tbl-explorer thead th[data-sort-key]').forEach(function(th) {
@@ -26594,7 +26634,7 @@ function renderCompare() {
   // while occupying the palette slot that desynced every other column from the chart above.
   const npvCountries = selected.filter(d => !isStateMonopoly(d.take_75));
   const hasNpv = npvCountries.some(d => d.npv_50 != null || d.npv_75 != null);
-  // v658 (T3): basis parity with the take chart 8px above. That chart RE-BASES a fee-blended
+  // v659 (T3): basis parity with the take chart 8px above. That chart RE-BASES a fee-blended
   // column onto its production-sharing/concession subset and says so three times -- legend
   // "Iraq (PSC/Conc)", a second title line, and a green notice naming the 195 contracts it drew.
   // v606 put it in the legend for an explicit reason, recorded there: "the legend is the only key
@@ -26875,7 +26915,7 @@ function applyScreenerPreset(preset) {
     const checks = document.querySelectorAll('#' + groupId + ' input[type=checkbox]');
     checks.forEach(cb => { cb.checked = values === 'all' || values.includes(cb.value); });
   };
-  // v658: setDepth() removed with the Water Depth radio group.
+  // v659: setDepth() removed with the Water Depth radio group.
 
   // Reset all to defaults first
   _screenerRfactorOnly = false;
@@ -26885,7 +26925,7 @@ function applyScreenerPreset(preset) {
   _screenerSetLabel = null;     // v560
   _activePresetName = null;
   setSlider('sl-take', 100); setSlider('sl-npv', -500); setSlider('sl-npv50', -500); setSlider('sl-evid', 0);
-  setChecks('sc-mech-checks', 'all');   // v658: setDepth('all') removed with the radio group
+  setChecks('sc-mech-checks', 'all');   // v659: setDepth('all') removed with the radio group
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
   const feeCmp = document.getElementById('sc-fee-cmp');
   if (feeCmp) feeCmp.checked = true;   // v554
@@ -26921,7 +26961,7 @@ function applyScreenerPreset(preset) {
     if (scRgn2) scRgn2.value = 'Africa';
     _activePresetName = 'PSC Africa';
   } else if (preset === 'deepwater') {
-    // v658 (T1). Was `setDepth('deepwater')` -- DEPTH_PROFILE.deepwater, 11 countries, and it
+    // v659 (T1). Was `setDepth('deepwater')` -- DEPTH_PROFILE.deepwater, 11 countries, and it
     // returned exactly those 11: Namibia, Ghana, Mozambique, Tanzania, Gabon, Cameroon, Equatorial
     // Guinea, Sierra Leone, Senegal, Guyana, Republic of the Congo. Every one of them is badged
     // PROXY -- no verified field production anywhere in the result -- so the platform's own count
@@ -27575,7 +27615,7 @@ function runScreener() {
     // IOC operator presence filter
     if (iocCountries !== null && !iocCountries.has(d.country)) return false;
 
-    // v658 (T1): the water-depth leg is gone with its control. See the DOM note in
+    // v659 (T1): the water-depth leg is gone with its control. See the DOM note in
     // #screener-advanced-details. DEPTH_PROFILE named 40 of 185 countries, so each of its three
     // settings removed the other 145 for being unlisted, and "shallow" read the mixed bucket.
     // region filter — use _regionMatch() so "Asia Pacific" maps to Asia+Oceania, "Americas" maps to Latin America+North America (v429)
@@ -28131,7 +28171,7 @@ function exportScreenerCSV() {
   a.click();
 }
 
-/* ── v658 (T5) — "give me something I can paste straight into an IC memo." ─────────────
+/* ── v659 (T5) — "give me something I can paste straight into an IC memo." ─────────────
    The Screener is the surface that BUILDS the IC shortlist: the analyst loads a preset,
    moves the take/NPV/evidence thresholds, lands on 8-15 countries, and that row set is
    the table that goes in the memo. It was the only results table in the tool with no
@@ -43215,7 +43255,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // Screener Reset/CSV/Excel buttons
   var scReset = document.getElementById('screener-reset-btn');
   if (scReset) scReset.addEventListener('click', function() { resetScreenerAll(); });
-  // v658 (T5): the Screener's clipboard path, alongside its two file exports.
+  // v659 (T5): the Screener's clipboard path, alongside its two file exports.
   var scCopy = document.getElementById('screener-copy-ic-btn');
   if (scCopy) scCopy.addEventListener('click', function() { copyScreenerTable(); });
   var scCsv = document.getElementById('screener-csv-btn');
@@ -43439,13 +43479,13 @@ document.addEventListener('DOMContentLoaded', function () {
   });
 });
 
-// v109: Screener mechanic checkboxes + IOC checkboxes — event delegation (v658: depth radios gone)
+// v109: Screener mechanic checkboxes + IOC checkboxes — event delegation (v659: depth radios gone)
 document.addEventListener('DOMContentLoaded', function() {
   var mechChecks = document.getElementById('sc-mech-checks');
   if (mechChecks) mechChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   var iocChecks = document.getElementById('sc-ioc-checks');
   if (iocChecks) iocChecks.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
-  // v658: the .depth-radio-group listener is removed with the control it drove.
+  // v659: the .depth-radio-group listener is removed with the control it drove.
 });
 
 // v109: Populate print header export date
