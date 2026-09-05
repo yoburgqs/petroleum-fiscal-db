@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v667</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v668</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v667</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v668</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v667';
+  return m ? m[0] : 'v668';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v667');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v668');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2787,7 +2787,7 @@ window.copyPlatformCitation = function(btn) {
       <span id="screener-count" aria-live="polite" aria-atomic="true" style="color:var(--muted);font-size:13px;"></span>
       <span id="screener-result-count" style="color:var(--muted);font-size:12px;margin-left:4px;"></span>
       <span id="screener-active-filters" class="screener-active-badge" style="display:none;"></span>
-      <!-- v667 (T1) — the data-basis switch, ON the count bar.
+      <!-- v668 (T1) — the data-basis switch, ON the count bar.
            Walking T1 cold: the analyst loads a preset because the intro strip tells them to, and
            on 9 of the 11 presets the result set is MAJORITY proxy economics — Low Take · Positive
            NPV returns 143 countries of which 133 have no verified field production, Two-Price
@@ -7336,7 +7336,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
         <ol style="margin:0 0 10px 0;padding-left:20px;line-height:1.8;">
           <li><strong>Map your mechanic distribution (IOC Portfolio tab):</strong> Load your company on the IOC Portfolio tab. The stats bar shows your mechanic count and weighted average take by country. Read the Mechanic column in the results table and tally the contract-count weight by mechanic type. Rule of thumb thresholds: &gt;60% of contracts in one mechanic type = concentrated; &gt;70% = high concentration risk. The IOC Portfolio tab exports to XLSX (↓ XLSX button) — use this to build the concentration audit table in Excel.</li>
           <li><strong>Stress-test your PSC positions (Fiscal Compare + Screener):</strong> Run Fiscal Compare at $50/bbl and sort by Swing. PSC regimes in Sub-Saharan Africa show the highest Swing (typically 15–28pp), because R-factor acceleration and high profit oil splits amplify price sensitivity. Filter the Screener to Mechanic = PSC + Region = Africa + Swing &gt; 15pp to identify your highest-concentration/highest-sensitivity cluster. A cluster where 8 of 14 positions share PSC mechanic + Africa region + Swing &gt;15pp is a portfolio-level stress scenario, not just individual country risk.</li>
-          <li><strong>Identify reform correlation risk (Reform Risk tab):</strong> On the Reform Risk tab, check the Regional Reform Tilt panel — it shows whether a region is net-tightening or net-liberalizing. Africa has historically been net-tightening (5–7 tightening events vs. 1–2 liberalizing per 5-year period, 2010–2023). For each country in your PSC cluster, check the Stability Score (0–5 dot scale). A cluster where &gt;3 of 5 PSC countries have Stability Score ≤ 2 means correlated reform risk is not diversified away by geography — it is amplified by regional policy contagion.</li>
+          <li><strong>Identify reform correlation risk (Reform Risk tab):</strong> On the Reform Risk tab, check the Regional Reform Tilt panel — it shows whether a region is net-tightening or net-liberalizing, over events dated 2010 or later, with the full sourced record on a second line. Read the row before quoting it: on ORCA&rsquo;s current data <em>no</em> region has a named tilt inside the window except Europe (+1), and Africa &mdash; whose 5 sourced jurisdictions carry 1 take-cut and no take-rise since 2010 &mdash; tilts <em>liberalizing</em> in-window even though its full record since 1971 is +1 tightening. A row resting on 5 of 54 jurisdictions is not a regional finding; the <em>n of N sourced</em> line under each region says what it actually rests on. For each country in your PSC cluster, check the Stability Score (0–5 dot scale). A cluster where &gt;3 of 5 PSC countries have Stability Score ≤ 2 means correlated reform risk is not diversified away by geography — it is amplified by regional policy contagion.</li>
           <li><strong>Build the IC memo concentration matrix:</strong> Report three metrics for the portfolio: (a) <em>Mechanic concentration ratio</em> = % of total contracts (or production-weighted WI%) in the dominant mechanic; (b) <em>Systemic sensitivity</em> = weighted-average Swing for positions in the dominant mechanic cluster (use Screener export for the underlying data); (c) <em>Reform correlation score</em> = % of dominant-mechanic positions in regions with net-tightening reform trend × (1 − average Stability Score). IC memo disclosure template: "Portfolio fiscal mechanic analysis (ORCA v333): [PSC] concentration [X]% of contracts (production-weighted: [Y]%). Systemic price sensitivity (weighted avg Swing, PSC cluster): [Z]pp. Reform correlation risk: [N] of [M] PSC positions in net-tightening regions with Stability Score ≤ 2. Recommended portfolio rebalancing: [target mechanic allocation] to reduce systemic sensitivity below [threshold]pp."</li>
         </ol>
 
@@ -27739,7 +27739,7 @@ function resetScreenerAll() {
 }
 window.resetScreenerAll = resetScreenerAll;
 
-// v667 (T1) — drive the data-basis filter from the count bar.
+// v668 (T1) — drive the data-basis filter from the count bar.
 // Deliberately writes #sc-proxy-keep rather than holding its own flag: runScreener() reads that
 // checkbox (`includeProxy`), the active-filter badge counts it, resetScreenerAll() restores it and
 // the export basis line reports it. A parallel piece of state would have had to be kept in step
@@ -28166,7 +28166,7 @@ function runScreener() {
     badgeEl.innerHTML = '';
   }
 
-  // v667 (T1) — the data-basis switch, rendered next to the count it qualifies.
+  // v668 (T1) — the data-basis switch, rendered next to the count it qualifies.
   // Rules, in the order they are tested:
   //   proxy in, some production-backed  -> offer the cut, and say what it leaves. Styled solid
   //                                        (accent fill) when proxy rows are the MAJORITY of the
@@ -35756,10 +35756,19 @@ function renderReformRisk() {
     // things wearing one label — a fiscal law change of unrecorded size, and an event that
     // changed no fiscal terms at all. They are counted separately now.
     const split = _rrSplit(events);
+    // ── v668 (T4): the SAME split, restricted to the 2010 scoring window ──────────
+    // The Regional Reform Tilt panel is headed "Since 2010" and its Avg Stability column IS
+    // since-2010 by construction (100 − 15 × changes since 2010). Its Tightened / Liberalized /
+    // Unmeasured / No-fiscal-change counts, its Mix bar and its Tilt verdict were not: they ran
+    // `m.split`, which is every sourced event back to Mexico 1938 and Libya 1955. So one row
+    // mixed two windows and the heading described neither. `splitIn` is the window the heading
+    // claims; `split` stays available for the full-record figure printed beside it.
+    const splitIn = _rrSplit(events.filter(function(e){ return (e.year || 0) >= 2010; }));
+    const yrLo = events.reduce(function(a,e){ return (e.year && (a === null || e.year < a)) ? e.year : a; }, null);
     const tightened = split.hostile, liberalized = split.friendly;
     const neutral = split.unmeasured + split.context;
     const cd = (COUNTRY_DATA || []).find(d => d.country === c);
-    return { country: c, total, since2010, contextIn: _rrContextInWindow(events), byDecade, take75: cd ? cd.take_75 : null, events, tightened, liberalized, neutral, split };
+    return { country: c, total, since2010, contextIn: _rrContextInWindow(events), byDecade, take75: cd ? cd.take_75 : null, events, tightened, liberalized, neutral, split, splitIn, yrLo };
   }).sort((a,b) => b.total - a.total);
 
   // Stability score: 100 - (since2010 * 15), min 0
@@ -36214,10 +36223,32 @@ function renderReformRisk() {
     // where the unmeasured fiscal changes could not overturn it. On the current data that is
     // Europe alone; the other seven print their measured margin with the unmeasured count
     // beside it, which is what the analyst needs in order not to quote the row.
-    var _rSplit = { hostile: 0, friendly: 0, unmeasured: 0, context: 0 };
+    // ── v668 (T4): this panel now counts the window its title names ─────────────
+    // Aggregating m.split ran the full record — 1938 to 2024 — under a heading that says
+    // "Since 2010", beside an Avg Stability column that is since-2010. On the live data that
+    // put the WRONG SIGN on two of the eight rows and inflated the largest number on the panel
+    // eight-fold:
+    //     Africa         shown +1 (leaning tightening)   -> since 2010 it is  −1, leaning liberalizing
+    //     North America  shown +1, "Not established"     -> since 2010 it is  −1 and DETERMINED liberalizing
+    //     Latin America  shown +8 — the panel's headline -> since 2010 it is  +1
+    //     Europe         shown "Tightening +3"           -> since 2010 it is "Tightening +1"
+    // Latin America's +8 is carried by Venezuela 2007, Colombia 2007 and Ecuador's pre-2010
+    // rises; Africa's +1 by Algeria 2005, Angola 2004 and Libya 1971. Every one of those sits
+    // outside the stated window. The in-window split is now what the columns, the bar and the
+    // tilt verdict report; the full record is printed beneath the tilt so nothing is lost and
+    // the two are never confused for each other.
+    var _rSplit  = { hostile: 0, friendly: 0, unmeasured: 0, context: 0 };
+    var _rAll    = { hostile: 0, friendly: 0, unmeasured: 0, context: 0 };
+    var _rSilent = [];   // members with a sourced log but no event inside the window
+    var _rAllLo  = null;
     members.forEach(function(m){
-      _rSplit.hostile += m.split.hostile; _rSplit.friendly += m.split.friendly;
-      _rSplit.unmeasured += m.split.unmeasured; _rSplit.context += m.split.context;
+      var si = m.splitIn || { hostile:0, friendly:0, unmeasured:0, context:0, total:0 };
+      _rSplit.hostile += si.hostile; _rSplit.friendly += si.friendly;
+      _rSplit.unmeasured += si.unmeasured; _rSplit.context += si.context;
+      _rAll.hostile += m.split.hostile; _rAll.friendly += m.split.friendly;
+      _rAll.unmeasured += m.split.unmeasured; _rAll.context += m.split.context;
+      if (!si.total) _rSilent.push(m.country);
+      if (m.yrLo && (_rAllLo === null || m.yrLo < _rAllLo)) _rAllLo = m.yrLo;
     });
     var totalT = _rSplit.hostile, totalL = _rSplit.friendly;
     var totalU = _rSplit.unmeasured, totalC = _rSplit.context;
@@ -36227,6 +36258,11 @@ function renderReformRisk() {
     _rSplit.fiscal = _rSplit.measured + totalU;
     _rSplit.margin = totalT - totalL;
     _rSplit.determined = _rSplit.measured > 0 && Math.abs(_rSplit.margin) > totalU;
+    _rAll.total = _rAll.hostile + _rAll.friendly + _rAll.unmeasured + _rAll.context;
+    _rAll.measured = _rAll.hostile + _rAll.friendly;
+    _rAll.fiscal = _rAll.measured + _rAll.unmeasured;
+    _rAll.margin = _rAll.hostile - _rAll.friendly;
+    _rAll.determined = _rAll.measured > 0 && Math.abs(_rAll.margin) > _rAll.unmeasured;
     var avgScore = members.reduce(function(s,r){return s+r.score;},0)/members.length;
     var margin = _rSplit.margin;
     var _rTilt = _rrTilt(_rSplit);
@@ -36239,8 +36275,17 @@ function renderReformRisk() {
       : ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;">' + (margin > 0 ? '+' : margin < 0 ? '−' : '±') + Math.abs(margin) + '</span>'
         + (totalU ? '<div style="font-size:10px;font-weight:600;color:var(--orange);">' + totalU + ' unmeasured</div>' : '');
     if (_rSplit.measured === 0 && totalU) marginTxt = '<div style="font-size:10px;font-weight:600;color:var(--orange);">' + totalU + ' unmeasured</div>';
+    if (total === 0) { tiltLabel = 'No in-window event'; tiltColor = 'var(--muted)'; marginTxt = ''; }
+    // v668 (T4): the full sourced record, printed under the in-window tilt rather than in place
+    // of it. Where the two disagree — and on the live data six of the eight rows do, two by sign
+    // — the analyst sees both windows instead of one number wearing the other's label.
+    var _allMarginTxt = (_rAll.margin > 0 ? '+' : _rAll.margin < 0 ? '\u2212' : '\u00b1') + Math.abs(_rAll.margin);
+    var _allLine = '<div style="font-size:10px;font-weight:400;color:var(--muted);margin-top:3px;white-space:normal;" title="The tilt over every sourced event for these jurisdictions, not only those inside the 2010 scoring window. The panel above this line reports the window; this line reports the whole record. Where they differ the difference is pre-2010 history — it is real, but it is not what &quot;since 2010&quot; means and it is not what the Avg Stability column measures.">'
+      + (_rAllLo ? _rAllLo + '\u2013now: ' : 'full record: ')
+      + (_rAll.determined ? (_rAll.margin > 0 ? '\u2191' : '\u2193') : '')
+      + _allMarginTxt + '/' + _rAll.total + '</div>';
     var barWidth = total > 0 ? Math.round(totalT/total*100) : 0;
-    var bar = '<div style="display:flex;height:8px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;overflow:hidden;width:100px;" title="' + total + ' events on record for the ' + members.length + ' scored ' + _rrEsc(region) + ' jurisdiction' + (members.length === 1 ? '' : 's') + ': ' + totalT + ' raised take, ' + totalL + ' cut take, ' + totalU + ' fiscal changes of unrecorded size, ' + totalC + ' that changed no fiscal terms.">'
+    var bar = '<div style="display:flex;height:8px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;overflow:hidden;width:100px;" title="' + total + ' event' + (total === 1 ? '' : 's') + ' dated 2010 or later for the ' + members.length + ' scored ' + _rrEsc(region) + ' jurisdiction' + (members.length === 1 ? '' : 's') + ': ' + totalT + ' raised take, ' + totalL + ' cut take, ' + totalU + ' fiscal changes of unrecorded size, ' + totalC + ' that changed no fiscal terms. Over the full sourced record these jurisdictions carry ' + _rAll.total + ' events (' + _rAll.hostile + ' up / ' + _rAll.friendly + ' down / ' + _rAll.unmeasured + ' unmeasured / ' + _rAll.context + ' no fiscal change).">'
       + '<div style="width:' + barWidth + '%;background:var(--red);"></div>'
       + '<div style="width:' + (total > 0 ? Math.round(totalL/total*100) : 0) + '%;background:var(--green);"></div>'
       + '<div style="width:' + (total > 0 ? Math.round(totalU/total*100) : 0) + '%;background:var(--orange);opacity:.75;"></div>'
@@ -36249,7 +36294,13 @@ function renderReformRisk() {
     // region. Europe reads 2 of 30. Naming the countries where there are few of them stops
     // "Middle East / Neutral / 70" from being read as a finding about the Middle East.
     var basis = members.length + ' of ' + (_rrRegionTotals[region] || members.length) + ' sourced'
-      + (members.length <= 2 ? ' &middot; ' + members.map(function(m){ return _rrEsc(m.country); }).join(', ') : '');
+      + (members.length <= 2 ? ' &middot; ' + members.map(function(m){ return _rrEsc(m.country); }).join(', ') : '')
+      // v668 (T4): a jurisdiction whose whole sourced record predates 2010 contributes nothing
+      // to a since-2010 row, and two of the three that do — Colombia and Algeria — are among the
+      // strongest tighteners in the full record. Naming them stops the row reading as though the
+      // region's sourced set had gone quiet, when part of it was never in the window at all.
+      + (_rSilent.length ? '<div style="color:var(--muted);opacity:.85;">' + _rSilent.map(_rrEsc).join(', ')
+          + ': no post-2010 event</div>' : '');
     return '<tr>'
       + '<td style="padding:5px 8px;font-size:12px;font-weight:600;color:var(--text);">' + _rrEsc(region)
       + '<div style="font-size:10px;font-weight:400;color:var(--muted);">' + basis + '</div></td>'
@@ -36258,27 +36309,27 @@ function renderReformRisk() {
       + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--orange);font-weight:700;">' + totalU + '</td>'
       + '<td style="padding:5px 8px;font-size:12px;text-align:center;color:var(--muted);">' + totalC + '</td>'
       + '<td style="padding:5px 8px;font-size:12px;text-align:center;">' + bar + '</td>'
-      + '<td style="padding:5px 8px;font-size:12px;color:' + tiltColor + ';font-weight:700;vertical-align:top;">' + tiltLabel + marginTxt + '</td>'
+      + '<td style="padding:5px 8px;font-size:12px;color:' + tiltColor + ';font-weight:700;vertical-align:top;">' + tiltLabel + marginTxt + _allLine + '</td>'
       + '<td style="padding:5px 8px;font-size:12px;text-align:right;color:' + (avgScore>70?'var(--green)':avgScore>40?'var(--yellow)':'var(--red)') + ';">' + avgScore.toFixed(0) + '</td>'
       + '</tr>';
   }).filter(Boolean).join('');
 
   var regionalTilt = '<div style="background:var(--card);border:1px solid var(--border);border-radius:10px;padding:18px;margin-bottom:20px;">'
     + '<div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">Regional Reform Tilt Since 2010</div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Have regions been net-tightening (capturing more) or net-liberalizing (attracting IOC capital)? Tilt = take-raising events minus take-cutting events. A direction is <strong>named only where the unmeasured fiscal changes could not overturn it</strong>; otherwise the row reads <em>Not established</em> and prints the measured margin with the unmeasured count beneath, so the margin is never quoted without its denominator. Bar: red = raised take, green = cut take, amber = fiscal change of unrecorded size. Avg Stability = mean reform-frequency score of the sourced jurisdictions in that row (100 = zero reforms since 2010).</div>'
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:14px;">Have regions been net-tightening (capturing more) or net-liberalizing (attracting IOC capital)? <strong>Every count, bar and tilt in this table is events dated 2010 or later</strong> \u2014 the same window as the Avg Stability column and as the Reform Frequency Score. The full sourced record, which runs back to 1938, is printed as a second line under each Tilt so the two are never read as one number. They are not the same: over the whole record Latin America is +8 and Africa +1, while inside the window they are +1 and \u22121. Tilt = take-raising events minus take-cutting events. A direction is <strong>named only where the unmeasured fiscal changes could not overturn it</strong>; otherwise the row reads <em>Not established</em> and prints the measured margin with the unmeasured count beneath, so the margin is never quoted without its denominator. Bar: red = raised take, green = cut take, amber = fiscal change of unrecorded size. Avg Stability = mean reform-frequency score of the sourced jurisdictions in that row (100 = zero reforms since 2010).</div>'
     + '<table style="width:100%;border-collapse:collapse;">'
     + '<thead><tr>'
     + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Region</th>'
-    + '<th style="text-align:center;color:var(--red);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Tightened</th>'
-    + '<th style="text-align:center;color:var(--green);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Liberalized</th>'
-    + '<th style="text-align:center;color:var(--orange);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Sourced fiscal law changes whose take impact ORCA has not quantified. Direction unknown — not neutral. Where these outnumber the tilt margin, the region&#39;s tilt is reported as not established rather than named.">Unmeasured</th>'
-    + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Sourced events that changed no fiscal terms — discoveries, first oil, conflict, a review that concluded without renegotiation. Excluded from every score and from the tilt.">No fiscal change</th>'
+    + '<th style="text-align:center;color:var(--red);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Take-raising events dated 2010 or later. Pre-2010 rises are in the full-record line under the Tilt cell, not in this column.">Tightened<div style="font-weight:400;text-transform:none;opacity:.75;">2010+</div></th>'
+    + '<th style="text-align:center;color:var(--green);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Take-cutting events dated 2010 or later. Pre-2010 cuts are in the full-record line under the Tilt cell, not in this column.">Liberalized<div style="font-weight:400;text-transform:none;opacity:.75;">2010+</div></th>'
+    + '<th style="text-align:center;color:var(--orange);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Sourced fiscal law changes whose take impact ORCA has not quantified. Direction unknown — not neutral. Where these outnumber the tilt margin, the region&#39;s tilt is reported as not established rather than named."><span>Unmeasured</span><div style="font-weight:400;text-transform:none;opacity:.75;">2010+</div></th>'
+    + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Sourced events that changed no fiscal terms — discoveries, first oil, conflict, a review that concluded without renegotiation. Excluded from every score and from the tilt."><span>No fiscal change</span><div style="font-weight:400;text-transform:none;opacity:.75;">2010+</div></th>'
     + '<th style="text-align:center;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Mix</th>'
-    + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Tilt</th>'
+    + '<th style="text-align:left;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);" title="Tightened minus Liberalized inside the 2010 window, named only where the unmeasured changes could not overturn it. The muted second line is the same arithmetic over every sourced event on record for these jurisdictions.">Tilt<div style="font-weight:400;text-transform:none;opacity:.75;">2010+</div></th>'
     + '<th style="text-align:right;color:var(--muted);font-size:10px;font-weight:600;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--border);">Avg Stability</th>'
     + '</tr></thead>'
     + '<tbody>' + regionTiltRows + '</tbody></table>'
-    + '<div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;">Rows cover all <strong>' + _rrShown + '</strong> of the ' + withScore.length + ' jurisdictions with a sourced reform log, across ' + Object.keys(regionDefs).length + ' regions. A row is an average over those jurisdictions only, never over the region — read the <em>n of N sourced</em> line before treating a row as a regional finding. Unmeasured and no-fiscal-change events are excluded from the tilt margin, and the Unmeasured column is what decides whether a tilt may be named at all. Use the country lookup above for a single-jurisdiction read.</div>'
+    + '<div style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.6;">Rows cover all <strong>' + _rrShown + '</strong> of the ' + withScore.length + ' jurisdictions with a sourced reform log, across ' + Object.keys(regionDefs).length + ' regions. A row is an average over those jurisdictions only, never over the region — read the <em>n of N sourced</em> line before treating a row as a regional finding. Unmeasured and no-fiscal-change events are excluded from the tilt margin, and the Unmeasured column is what decides whether a tilt may be named at all. A jurisdiction whose entire sourced record predates 2010 \u2014 Algeria, Colombia and the USA \u2014 contributes to the full-record line only, and its row says so. Use the country lookup above for a single-jurisdiction read.</div>'
     + '</div>';
 
   // v467: Global reform summary sentence — headline context before the section blocks
