@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v661</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v662</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v661</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v662</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -1902,7 +1902,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <div style="display:flex;align-items:flex-start;gap:12px;margin-bottom:6px;">
         <div style="flex:1;"><div style="font-weight:700;font-size:15px;margin-bottom:2px;">Screener</div><div style="font-size:11px;color:var(--muted);">Ranked shortlist with presets: IOC Capital Screen, Low Take · Positive NPV, Frontier, Downside Resilience</div></div>
       </div>
-      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a filtered, ranked shortlist of investable regimes — set max take %, min contractor NPV at $75, min NPV at the $50 downside, breakeven, mechanic, or region. One-click presets: IOC Capital Screen (verified production · Take ≤65% · NPV positive at $75 and at $50), Low Take · Positive NPV (Take ≤55% · NPV positive), Downside Resilience (keeps ≥50% of its $75 contractor NPV at $50/bbl), Deepwater, Low-Risk Stable. Export shortlist to Excel.</div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.6;margin-left:34px;">You get: a filtered, ranked shortlist of investable regimes — set max take %, min contractor NPV at $75, min NPV at the $50 downside, breakeven, mechanic, or region. One-click presets: IOC Capital Screen (verified production · Take ≤65% · NPV positive at $75 and at $50), Low Take · Positive NPV (Take ≤55% · NPV positive), Downside Resilience (keeps ≥50% of its $75 contractor NPV at $50/bbl), Deepwater, Stable Fiscal Record (≤1 sourced fiscal law change since 2010). Export shortlist to Excel.</div>
     </div>
     <!-- v491: Reform Risk promoted from More tools to card 4 — primary IOC screening criterion -->
     <div class="card" style="cursor:pointer;transition:border-color .15s;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'" onclick="switchTab('treformrisk',document.getElementById('tab-btn-treformrisk'))">
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v661';
+  return m ? m[0] : 'v662';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v661');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v662');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2544,7 +2544,7 @@ window.copyPlatformCitation = function(btn) {
         <option value="sweetspot">Low Take · Positive NPV — Take ≤55% · Concession/PSC/PRRT/RSC · NPV positive</option>
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
         <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v660 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
-        <option value="lowrisk">Low-Risk Stable — Take ≤55% · Concession + PRRT</option>
+        <option value="lowrisk" title="Scoped to the jurisdictions ORCA holds a sourced fiscal-reform event log for, keeping those with at most one fiscal law change since 2010, then a 70% take ceiling. Before v662 this preset was named Low-Risk Stable and screened on take and fiscal mechanic only — no reform or stability input of any kind — returning 141 of 185 countries led by the United Kingdom, which has 5 fiscal law changes since 2010 and the lowest Reform Frequency Score in the database.">Stable Fiscal Record — ≤1 sourced law change since 2010 · Take ≤70%</option>
         <option value="downsidereturns">Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$50</option>
         <option value="highevidence" title="Countries where the majority of ORCA's fiscal facts were read out of the primary legal instrument (tier A), measured on a record deep enough for that share to mean something: A-share ≥ 55% AND ≥ 150 facts on file. 35 of 185 match. Replaces the old ≥80% A/B screen, which passed 171 of 185 because tier B is the EY / IHS / KPMG bulk harvest.">Primary-Source Evidence — tier-A ≥ 55% · ≥150 facts on file</option>
         <option value="rfactor">R-factor PSC — price-sensitive profit oil tiers</option>
@@ -2558,7 +2558,7 @@ window.copyPlatformCitation = function(btn) {
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="sweetspot" onclick="applyScreenerPreset('sweetspot')">Low Take · Positive NPV</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="pscafrica" onclick="applyScreenerPreset('pscafrica')">PSC Africa</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="deepwater" onclick="applyScreenerPreset('deepwater')">Offshore &amp; Deepwater</button>
-        <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="lowrisk" onclick="applyScreenerPreset('lowrisk')">Low-Risk Stable</button>
+        <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="lowrisk" onclick="applyScreenerPreset('lowrisk')">Stable Fiscal Record</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="downsidereturns" onclick="applyScreenerPreset('downsidereturns')">Two-Price Return Screen</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="highevidence" onclick="applyScreenerPreset('highevidence')">Primary-Source Evidence</button>
         <button class="btn btn-sm btn-outline screener-preset-btn" data-action="applyScreenerPreset" data-preset="rfactor" onclick="applyScreenerPreset('rfactor')">R-factor PSC <span id="rfactor-preset-count" style="font-size:10px;opacity:.7;"></span></button>
@@ -2651,7 +2651,7 @@ window.copyPlatformCitation = function(btn) {
       </div>
     </div>
     <details id="screener-advanced-details" style="margin-top:10px;">
-      <summary style="font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;padding:6px 0;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px;user-select:none;">Advanced Filters ▸ <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7;">Mechanic · IOC Operator · Region · Data Basis</span></summary>
+      <summary style="font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;padding:6px 0;letter-spacing:.06em;text-transform:uppercase;display:flex;align-items:center;gap:6px;user-select:none;">Advanced Filters ▸ <span style="font-weight:400;text-transform:none;letter-spacing:0;opacity:.7;">Mechanic · IOC Operator · Region · Reform Record · Data Basis</span></summary>
     <div class="screener-extra">
       <div class="screener-filter-block">
         <span id="sc-mech-label" class="filter-lbl">Fiscal Mechanic</span>
@@ -2752,6 +2752,22 @@ window.copyPlatformCitation = function(btn) {
           <option value="Other">Other (0)</option>
         </select>
         <div id="sc-region-refiled-mount"></div>
+      </div>
+      <!-- v662 (T4): reform record as a screening axis. Before this the Screener could not
+           express "keep only the jurisdictions whose fiscal law has held still", which is the
+           question T4 asks, while the preset menu carried an option named Low-Risk Stable that
+           screened on take and mechanic and returned the most-reformed country in the database.
+           Modes are scored by _rrCountScored() -- the Reform Risk tab's own counter -- and all
+           of them are scoped to the jurisdictions ORCA actually holds a reform log for. -->
+      <div class="screener-filter-block">
+        <div class="filter-lbl">Reform Record</div>
+        <select id="sc-reform" aria-label="Filter by sourced fiscal-reform record" title="Screen on how often the fiscal law has actually changed. Counted the way the Reform Risk tab counts it: fiscal law changes dated 2010 or later, from ORCA&#39;s sourced event log. Discoveries, first-oil dates, armed conflict and terms reviews that concluded without renegotiation stay in the log and do not score. IMPORTANT: ORCA holds a sourced reform log for 21 of 185 jurisdictions. Every setting other than Any screens INSIDE those 21. The other 164 are unscored, not clean, and are excluded here rather than passed through a stability filter as though a reading existed &mdash; they need an external check (national petroleum law, IMF Article IV, operator annual reports) before an IC memo carries a reform-frequency premium of zero for them. The count line states this scope on every screen that uses it." style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;">
+          <option value="" data-base-label="Any reform record — no filter">Any reform record — no filter</option>
+          <option value="quiet" data-base-label="No sourced fiscal law change since 2010">No sourced fiscal law change since 2010</option>
+          <option value="stable" data-base-label="≤1 sourced fiscal law change since 2010">&le;1 sourced fiscal law change since 2010</option>
+          <option value="scored" data-base-label="Any jurisdiction with a sourced reform log">Any jurisdiction with a sourced reform log</option>
+        </select>
+        <div id="sc-reform-note" style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:5px;max-width:520px;"></div>
       </div>
       <div class="screener-filter-block">
         <div class="filter-lbl">Data Basis</div>
@@ -11545,7 +11561,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
               <li><strong>Low Take · Positive NPV</strong> — Take ≤55% · Breakeven ≤$65/bbl · IRR ≥12% at $75/bbl. <em>Use case:</em> Initial capital allocation screen for deepwater greenfield. Identifies regimes that are simultaneously low-take, low-breakeven, and IRR-positive at the standard benchmarking price. Typical results: Guyana, UAE, USA GoM, Trinidad, Republic of the Congo shallow shelf. <em>IC application:</em> "Countries passing Low Take · Positive NPV screen are candidate anchor positions for a diversified upstream portfolio — low fiscal risk combined with commercial viability at mid-cycle prices."</li>
               <li><strong>PSC Africa</strong> — Mechanic = PSC only · Region = Africa · Take ≤65% · IRR ≥10% at $75/bbl. <em>Use case:</em> IOC portfolio expansion in African PSC markets, typically ahead of a bid round. Identifies accessible PSC regimes (IOCs can enter without NOC-sole mandate) in Africa with competitive terms. Typical results: Ghana, Mozambique, Tanzania, Senegal, Namibia, Ivory Coast, Benin. <em>IC application:</em> "African PSC short-list for deepwater expansion; excludes concession-only and TSC markets; excludes regimes where effective take exceeds the PSC Africa benchmark."</li>
               <li><strong>Offshore &amp; Deepwater</strong> — scoped to the 24 countries ORCA classifies as having offshore upstream development · PSC + Concession + EPSA · Take ≤70% at $75/bbl. <em>Use case:</em> IOC-accessible offshore regimes globally, including both the frontier deepwater margins (Guyana, Mozambique, Namibia, Senegal, Ghana, Gabon) and the established shelf-plus-deepwater producers (Brazil, Angola, Nigeria, Norway, UK, Malaysia, Indonesia, Australia). <em>Read the scope note in the count line:</em> it states how many of the 24 cleared the take ceiling and names those that did not. Countries with no development-setting classification in ORCA are out of scope rather than screened out. <em>IC application:</em> "Global offshore comparables for a greenfield FID screening analysis at standardized deepwater project economics."</li>
-              <li><strong>Low-Risk Stable</strong> — Reform Risk Stability Score ≥4 · Take ≤70% · Evidence tier A/B ≥70%. <em>Use case:</em> Conservative capital allocation for IOCs with low political risk tolerance (e.g., pre-IPO or ESG-constrained portfolios). Prioritizes regimes with minimal reform history and high-quality fiscal parameter sourcing. Typical results: Norway, USA, Canada, Australia, UAE, Qatar, Netherlands. <em>IC application:</em> "Anchor positions for a risk-adjusted upstream portfolio — high fiscal stability and verified parameters reduce both fiscal risk and IC memo qualification burden."</li>
+              <li><strong>Stable Fiscal Record</strong> (named <em>Low-Risk Stable</em> before v662) — at most 1 sourced fiscal law change since 2010 · Take ≤70%. Scored from ORCA's sourced fiscal-reform event log with the same count the Reform Risk tab uses, so the two surfaces cannot disagree. <em>Coverage, and it is the whole caveat:</em> ORCA holds a sourced reform log for 21 of 185 jurisdictions, so this screen runs inside those 21 and returns 11. The other 164 are unscored, not clean, and are excluded by the criterion rather than passed through it. <em>Use case:</em> conservative capital allocation where a stable statute book is the constraint. <em>It is not a political-risk screen</em> — the axis counts fiscal law changes only, so Russia, Iraq and Algeria appear on it and Norway, which reformed twice since 2010, does not. <em>IC application:</em> "Anchor positions selected on a sourced legislative record, not on an assumption of stability where no record exists."</li>
               <li><strong>High IRR</strong> — IRR ≥20% at $75/bbl (Deepwater profile). <em>Use case:</em> Identifying maximum-return regimes for opportunistic or high-risk-tolerance capital. Typically surfaces very low-take regimes where the standardized project has an exceptionally high return. Typical results: UAE (Abu Dhabi — concession with low royalty), USA GoM (Gulf of Mexico lease terms), Trinidad (aging concession framework), Republic of the Congo (shallow shelf PSC). <em>Caveat:</em> Very high IRR (≥30%) often reflects the standardized cost model more than actual project-specific returns — always verify with Scenario Builder using project-specific capex before IC presentation.</li>
               <li><strong>High Evidence</strong> — Evidence tier A/B ≥80%. <em>Use case:</em> Limiting IC analysis to countries where ORCA's fiscal parameters are sourced from primary legislation and operator filings — minimum uncertainty for IC submission. Typical results: Norway, UK, USA, Australia, Canada, Netherlands, Brazil, Angola, Nigeria (post-PIA 2021), Indonesia, Malaysia, Kazakhstan. <em>IC application:</em> "Evidence-filtered shortlist suitable for bid recommendation submissions without additional sourcing caveat."</li>
               <li><strong>R-factor PSC</strong> — Mechanic = PSC · Profit oil structure = R-factor (sliding scale by cumulative revenue). <em>Use case:</em> Isolating PSC regimes where the effective profit oil split changes over the project life as the cumulative revenue-to-cost ratio rises. Critical for late-life acquisition IC analysis (R-factor will be elevated for producing assets, meaning effective government take will be above the ORCA base-case mid-tier). Typical results: Oman, Malaysia, Russia Sakhalin-era, Uganda. <em>Caveat:</em> ORCA approximates mid-tier R-factor for computing the database take figure — see FAQ A370 for producing-asset R-factor adjustment methodology.</li>
@@ -12222,7 +12238,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
             <p><strong>ORCA Breakeven Map as the starting point:</strong> The Breakeven Price Map (tab 6) shows the breakeven price for 68 countries where ORCA has sufficient A/B-tier cost data. Countries colored green break even below $40/bbl (deep-value, robust to price cycles); amber range $40–65/bbl (mid-tier, sanctionable at current prices); red above $65/bbl (high-cost, price-dependent). This map gives the <em>regime-level</em> sanction threshold — the price at which a standardized reference project (Deepwater basis: $1.2B capex, 50k bbl/d, $15/bbl opex) achieves NPV=0 in that fiscal regime.</p>
             <p><strong>Field-specific threshold via Scenario Builder:</strong> The regime-level threshold is a starting point. For a specific field, use ORCA Scenario Builder to recalibrate: (1) Enter field-specific capex (e.g., $800M for a smaller discovery vs. the $1.2B reference). (2) Enter field opex — if the target field has a cost-sharing arrangement or tieback to existing infrastructure, opex may be $8/bbl rather than $15/bbl. (3) Run NPV/IRR across the $30–$125/bbl price range. The breakeven is the price where NPV10 = 0. (4) Compare to the Breakeven Map country benchmark — a field-specific result 10pp below the national average suggests uncommonly favorable economics within that regime (could reflect a marginal development on existing infrastructure, for example).</p>
             <p><strong>Fiscal terms vs. cost structure as drivers:</strong> The two levers that move the sanction threshold are fiscal burden and cost structure. ORCA computes the fiscal component precisely; cost structure you must input. Rule of thumb: a 10pp reduction in government take (e.g., from 60% to 50%) reduces the breakeven price by approximately $5–10/bbl for a standard offshore development. A $5/bbl opex reduction (e.g., from $15 to $10) reduces the breakeven by approximately $8–12/bbl. In most frontier basin evaluations, cost structure variability dominates the threshold — but in high-take regimes (take &gt;70%), fiscal terms can dominate. PSC cost recovery cap interaction: a 50% cost recovery cap delays cost recovery and pushes the breakeven upward 5–15% relative to a 100% cost recovery PSC with the same statutory take.</p>
-            <p><strong>Portfolio application — screening for sanctionability:</strong> In a multi-country portfolio context, use the Screener tab presets &ldquo;Low Take · Positive NPV&rdquo; (take &lt;55%, IRR &gt;15%) or &ldquo;Low-Risk Stable&rdquo; (take &lt;60%, Stability Score &gt;7) to identify countries where the <em>regime</em> does not impose a sanction-prohibitive fiscal burden. Then overlay project-specific cost analysis in Scenario Builder. The countries that survive both filters are where the fiscal environment is consistent with commercially viable projects across a range of project sizes — the sweet spot for new acreage entry.</p>
+            <p><strong>Portfolio application — screening for sanctionability:</strong> In a multi-country portfolio context, use the Screener tab presets &ldquo;Low Take · Positive NPV&rdquo; (take &lt;55%, IRR &gt;15%) or &ldquo;Stable Fiscal Record&rdquo; (take &le;70%, at most 1 sourced fiscal law change since 2010) to identify countries where the <em>regime</em> does not impose a sanction-prohibitive fiscal burden. Then overlay project-specific cost analysis in Scenario Builder. The countries that survive both filters are where the fiscal environment is consistent with commercially viable projects across a range of project sizes — the sweet spot for new acreage entry.</p>
             <p><strong>IC memo disclosure language:</strong> &ldquo;The fiscal-regime breakeven price for [Country] at the standardized Deepwater profile is [X] $/bbl (ORCA <span class="orca-cite-ver">v603</span>, source tier: A/B). Project-specific breakeven, calibrated to [Field]&rsquo;s [capex]/[opex]/[peak rate] parameters, is estimated at [Y] $/bbl using the ORCA Scenario Builder. The $[Z]/bbl gap from current strip pricing implies an IRR of [Z]% at the current forward curve. Fiscal-term sensitivity: a 5pp reduction in government take (e.g., from renegotiated profit oil split) would reduce the project breakeven by approximately [W] $/bbl.&rdquo;</p>
             <p><em>Source: ORCA Petroleum Fiscal Intelligence Platform v350 (Aug 2026), yoburgqs.github.io/petroleum-fiscal-db/. Cross-references: FAQ A56 ($50/bbl energy transition stress test), FAQ A41 (IRR DCF model specification), FAQ A63 (Breakeven + IRR composite viability screen), FAQ A304 (Indonesia Gross Split and breakeven implications).</em></p>
           </div>
@@ -26863,6 +26879,92 @@ let _screenerCountrySet = null;  // null = no country-set restriction
 // with it.
 let _screenerSetLabel = null;
 
+// ── v662 (T4): the Screener's reform-record leg ──────────────────────────────
+// Walked T4 ("what is my fiscal-stability and reform exposure here?") cold. The Screener is
+// where a screening list is actually built, and the only control on it that named stability
+// was the preset "Low-Risk Stable". Its whole implementation was:
+//     setSlider('sl-take', 55); setChecks('sc-mech-checks', ['Concession','PRRT']);
+// a take ceiling and a mechanic list. No reform, stability or predictability input of any
+// kind -- its own inline comment, "Take <=55% AND low swing (use take proxy)", describes a
+// leg that was never written. It returned 141 of 185 countries, which the preset menu itself
+// annotates "(barely narrows)", and among them:
+//     United Kingdom   49.2% take, Concession -- 5 scored fiscal law changes since 2010,
+//                      Reform Frequency Score 25/100, 6 take rises on record, +85pp
+//                      cumulative. The single most-reformed jurisdiction in the database,
+//                      returned by the screen named for stability.
+//     Russia           46.4% take -- 1 scored change, and the 2022 windfall-tax environment.
+//     ~130 countries   ORCA holds NO sourced reform log for them at all. They rode along as
+//                      though the record were clean, which is the exact reading the Reform
+//                      Risk tab, the Fiscal Compare Stability cell and the Country Profile
+//                      sidebar each spend a paragraph forbidding.
+// Two of this file's own answers describe the preset as screening on "Stability Score >= 4"
+// and "Stability Score > 7". Neither leg has ever existed. So an analyst on T4 who reached
+// for the one screen promising stability was handed the worst reformer on file inside 76% of
+// the database, with nothing on screen saying the criterion had not been applied.
+//
+// The reform record is now a real screening axis with its own control, scored through the
+// SAME _rrCountScored() the Reform Risk tab uses, so the Screener and that tab cannot report
+// different reform counts for one country. The preset is now a caller of the control.
+//
+// Coverage is the whole difficulty and is handled the way this platform handles it elsewhere:
+// 164 of 185 jurisdictions have no sourced reform log, and an absent log is not a record of
+// zero changes. Every mode therefore screens INSIDE the 21 scored jurisdictions and the count
+// line states that scope, rather than letting the unscored 164 pass a stability filter.
+const _SC_REFORM_MODES = {
+  quiet:  { max: 0,        label: 'no sourced fiscal law change since 2010' },
+  stable: { max: 1,        label: 'at most one sourced fiscal law change since 2010' },
+  scored: { max: Infinity, label: 'a sourced fiscal-reform event log of any length' }
+};
+// Built from REFORM_HISTORY at call time rather than copied into a list, for the reason v660
+// gives about DEPTH_PROFILE: a copied set drifts away from the data silently.
+function _scReformUniverse(mode) {
+  const m = _SC_REFORM_MODES[mode];
+  if (!m) return null;
+  const rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+  const out = [];
+  Object.keys(rh).forEach(function (c) {
+    const evs = rh[c];
+    if (!Array.isArray(evs) || !evs.length) return;
+    if (_rrCountScored(evs) <= m.max) out.push(c);
+  });
+  return out;
+}
+// How many jurisdictions ORCA holds any sourced reform log for. The denominator every note
+// about this control has to quote.
+function _scReformScoredCount() {
+  const rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
+  return Object.keys(rh).filter(function (c) { return Array.isArray(rh[c]) && rh[c].length; }).length;
+}
+function _scReformMode() {
+  const el = document.getElementById('sc-reform');
+  return (el && _SC_REFORM_MODES[el.value]) ? el.value : '';
+}
+// Live counts on the option labels, so the analyst sees how far each mode narrows before
+// committing to it -- the same reason _labelScreenerPresets() exists for the preset menu.
+function _labelScreenerReform() {
+  const sel = document.getElementById('sc-reform');
+  if (!sel) return;
+  const nScored = _scReformScoredCount();
+  const uni = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA.length : 185;
+  [].slice.call(sel.options).forEach(function (o) {
+    if (!o.value) { o.textContent = 'Any reform record — no filter (' + uni + ')'; return; }
+    const set = _scReformUniverse(o.value);
+    o.textContent = o.dataset.baseLabel + ' (' + (set ? set.length : 0) + ')';
+  });
+  const note = document.getElementById('sc-reform-note');
+  if (note) {
+    note.innerHTML = 'ORCA holds a sourced fiscal-reform event log for <strong>' + nScored
+      + ' of ' + uni + '</strong> jurisdictions. Every setting other than <em>Any</em> screens '
+      + 'inside those ' + nScored + ' only — the other ' + (uni - nScored)
+      + ' are not a clean record, they are unscored, and this control will not pass them off as stable. '
+      + 'It counts fiscal law changes only \u2014 renegotiation pressure, contract disputes, sanctions and political risk '
+      + 'are not in it, and neither is the size of a change: Russia\u2019s 2022 windfall tax moves this axis exactly as far as '
+      + 'a 1pp administrative amendment would.';
+  }
+}
+window._scReformUniverse = _scReformUniverse;
+window._labelScreenerReform = _labelScreenerReform;
+
 // ── v648 (T2) ─────────────────────────────────────────────────────────────────────────────────
 // The Country Profile "Fiscal character" CTA used to load the Screener at a HARDCODED take
 // ceiling of 60%. It fired on 43 countries and for 30 of them the country's own take was already
@@ -27058,6 +27160,12 @@ function applyScreenerPreset(preset) {
     const checks = document.querySelectorAll('#' + groupId + ' input[type=checkbox]');
     checks.forEach(cb => { cb.checked = values === 'all' || values.includes(cb.value); });
   };
+  // v662: presets set the reform-record control rather than carrying their own copy of it,
+  // so what a preset applied is visible in the same select the analyst can change by hand.
+  const setReform = (mode) => {
+    const el = document.getElementById('sc-reform');
+    if (el) el.value = mode || '';
+  };
   // v660: setDepth() removed with the Water Depth radio group.
 
   // Reset all to defaults first
@@ -27077,6 +27185,7 @@ function applyScreenerPreset(preset) {
   if (keepProxy) keepProxy.checked = true;
   const scRgn = document.getElementById('sc-region');
   if (scRgn) scRgn.value = '';
+  setReform('');   // v662
 
   if (preset === 'iochurdle') {
     // v517 (cycle 416): rebuilt. Was IRR ≥15% · take ≤65% · NPV ≥0, with the IRR-nulls box unchecked —
@@ -27130,10 +27239,19 @@ function applyScreenerPreset(preset) {
     setSlider('sl-take', 70);
     _activePresetName = 'Offshore & Deepwater';
   } else if (preset === 'lowrisk') {
-    // Take ≤55% AND low swing (use take proxy) + Concession
-    setSlider('sl-take', 55);   // v568: the ≤$75 breakeven leg was a no-op and is removed
-    setChecks('sc-mech-checks', ['Concession','PRRT']);
-    _activePresetName = 'Low-Risk Stable';
+    // v662 (T4). Was: setSlider('sl-take', 55) + setChecks(['Concession','PRRT']), sold as
+    // "Low-Risk Stable". Neither leg touched reform, stability or predictability. It returned
+    // 141 of 185 countries — the menu's own label said "(barely narrows)" — led by the United
+    // Kingdom, which holds 5 scored fiscal law changes since 2010, a Reform Frequency Score of
+    // 25/100, and 6 take rises totalling +85pp: the most-reformed jurisdiction ORCA holds.
+    // The mechanic leg is gone with it. Concession-or-PRRT was never a stability property; it
+    // excluded every PSC regime for a reason the preset never had. Same defect class as the
+    // IRR axis (v517), the breakeven ceiling (v568), the breakeven-coverage radio (v623) and
+    // the water-depth radio (v660): a proxy standing in for a criterion the page could not
+    // express. The page can express it now, so the preset asks for it directly.
+    setReform('stable');
+    setSlider('sl-take', 70);
+    _activePresetName = 'Stable Fiscal Record';
   } else if (preset === 'downsidereturns') {
     // v517: was 'highirr' (IRR ≥15% · NPV ≥$100M). The IRR leg screened on data availability, not
     // returns. Now a genuine two-price return screen on the axis that is modelled for all 185.
@@ -27244,7 +27362,9 @@ function applyScreenerPreset(preset) {
       sweetspot: 'Low Take · Positive NPV: Take \u226455% \u00b7 Concession/PSC/PRRT/RSC \u00b7 NPV \u22650',
       pscafrica: 'PSC Africa: PSC \u00b7 Africa \u00b7 Take \u226475%',
       deepwater: 'Offshore \u0026 Deepwater: 24 offshore jurisdictions \u00b7 PSC+Concession \u00b7 Take \u226470%',
-      lowrisk: 'Low-Risk Stable: Concession+PRRT \u00b7 Take \u226455%',
+      // v662 (T4): renamed and re-criteria'd with the preset. Same failure v524 records above —
+      // a badge that keeps announcing a filter the branch no longer runs.
+      lowrisk: 'Stable Fiscal Record: \u22641 sourced fiscal law change since 2010 \u00b7 Take \u226470%',
       // v524: key was 'highirr', but v517 renamed the preset to 'downsidereturns'. The lookup
       // therefore missed on every apply and the label was hidden entirely -- loading the
       // Two-Price Return Screen showed no active-preset badge at all.
@@ -27631,6 +27751,12 @@ function runScreener() {
   // v517: the IRR axis is retired. What is left to disclose is data basis: 163 of the 185 countries
   // have no verified field production and their economics are regional proxies.
   const includeProxy = document.getElementById('sc-proxy-keep')?.checked !== false;
+  // v662 (T4): reform-record leg. Resolved once per run and shared with the count line, the
+  // active-filter badge, the export criteria and the zero-result diagnosis, so all five read
+  // the same set. See the note above _scReformUniverse().
+  const reformMode = _scReformMode();
+  const reformList = reformMode ? (_scReformUniverse(reformMode) || []) : null;
+  const reformSet  = reformList ? new Set(reformList) : null;
   // v513: breakeven null toggle + whether a ceiling is actually being applied
   const beCeilingActive = false;   // v568: breakeven ceiling removed — see the DOM note above sl-npv
   const includeBeNulls  = true;    // v568: retired with the ceiling
@@ -27676,6 +27802,9 @@ function runScreener() {
     // v530: explicit country set (Atlantic Frontier). Applied before every threshold leg so a
     // named basin returns the countries it names.
     if (_screenerCountrySet && _screenerCountrySet.indexOf(d.country) === -1) return false;
+    // v662 (T4): reform record. Every mode is scoped to the jurisdictions ORCA holds a sourced
+    // reform log for, so an unscored country is dropped rather than passed as stable.
+    if (reformSet && !reformSet.has(d.country)) return false;
 
     // v513 — a country with no modelled breakeven is UNTESTED, not passing.
     // Previously `be == null` fell straight through this check, so a $50 ceiling let all
@@ -27885,6 +28014,7 @@ function runScreener() {
   if (_screenerMinFacts > 0) activeCount++; // v518: the fact-depth floor is a filter
   if (_screenerCountrySet) activeCount++;   // v530: an explicit country set is a filter
   if (_screenerMinRetention !== null) activeCount++;   // v573: the downside-retention floor is a filter
+  if (reformSet) activeCount++;             // v662: the reform-record leg is a filter
 
   const badgeEl = document.getElementById('screener-active-filters');
   if (activeCount > 0) {
@@ -27975,6 +28105,29 @@ function runScreener() {
               : ' \u2014 every jurisdiction in scope passed')
           + `. Countries outside this scope are not ranked below, however they score.</span>`;
       })();
+  // v662 (T4) — the reform leg states its own coverage, for the same reason _setNote does:
+  // "13 countries match" against a universe of 185 hides that the axis only exists for 21 of
+  // them. Naming what was dropped for being unscored is the point of the control.
+  const _reformNote = !reformSet ? ''
+    : (function () {
+        const _nScored = _scReformScoredCount();
+        const _uni = COUNTRY_DATA.length;
+        const _inMode = COUNTRY_DATA.filter(d => reformSet.has(d.country));
+        const _cut = _inMode.filter(d => !_curSet.has(d.country));
+        return ` <span style="color:var(--accent);font-weight:600;">\u2014 reform record: `
+          + `${_inMode.length} of the ${_nScored} jurisdictions ORCA holds a sourced fiscal-reform log for carry `
+          + `${_SC_REFORM_MODES[reformMode].label}`
+          + `; ${data.length} of those cleared this screen's other thresholds`
+          + (_cut.length
+              ? `, ${_cut.length} did not: ${_cut.slice(0, 6).map(d => d.country).join(', ')}`
+                + (_cut.length > 6 ? ` and ${_cut.length - 6} more` : '')
+              : '')
+          + `. This axis counts fiscal law changes and nothing else \u2014 renegotiation pressure, `
+          + `contract disputes, sanctions and political risk are not in it, so a row here is a steady statute book, `
+          + `not a safe jurisdiction. The other ${_uni - _nScored} countries are NOT screened out on their reform record \u2014 `
+          + `ORCA holds none for them, which is not a clean record. They need an external check before an IC memo `
+          + `carries a reform-frequency premium of zero for them.</span>`;
+      })();
   const _proxyNote = includeProxy ? ''
     : ` <span style="color:var(--accent);font-weight:600;">\u2014 verified field production only; ${COUNTRY_DATA.length - COUNTRY_DATA.filter(x => _dqTier(x).hasProduction).length} proxy-economics countries excluded</span>`;
   // v518 (T6) — say what the evidence gate actually tested. The old A/B gate was silent about
@@ -27991,7 +28144,7 @@ function runScreener() {
   const _universeLead = (activeCount === 0 && !_activePresetName)
     ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${sortNote}${_basisNote}`
     : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}`;
-  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_takeBasisNote}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
+  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${_takeBasisNote}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
   // Friction this removes: an exported shortlist is the thing that reaches the investment
   // committee, and it left the tool carrying nothing but rows. Every sentence that makes the
@@ -28008,6 +28161,13 @@ function runScreener() {
     if (_screenerCountrySet) crit.push('Geographic scope' + (_screenerSetLabel ? ' — ' + _screenerSetLabel : '')
       + ' (' + _screenerCountrySet.length + ' jurisdictions): ' + _screenerCountrySet.join(', '));
     if (scRegionActive) crit.push('Region: ' + scRegionActive + ' only');
+    // v662 (T4): an exported shortlist that was narrowed on reform record must carry both the
+    // criterion and its coverage, or the IC reader reads it as a 185-country stability ranking.
+    if (reformSet) crit.push('Reform record: ' + _SC_REFORM_MODES[reformMode].label
+      + ' — scored from ORCA\'s sourced fiscal-reform event log using the same count as the Reform Risk tab ('
+      + reformList.length + ' of the ' + _scReformScoredCount() + ' jurisdictions with a sourced log qualify). '
+      + 'The remaining ' + (COUNTRY_DATA.length - _scReformScoredCount())
+      + ' countries hold no sourced reform log and are excluded by this criterion rather than scored as unreformed');
     if (maxTake < 100) crit.push('Max government take: ≤' + maxTake + '% at $' + price + '/bbl, tested on the '
       + (feeCmpOn ? 'comparable take (fee-basis contracts excluded from the blend)' : 'published blended headline'));
     if (minNPV50 > -500) crit.push('Min contractor NPV at the $50/bbl downside: ≥$' + minNPV50 + 'M');
@@ -28080,6 +28240,9 @@ function runScreener() {
     if (_screenerMinFacts > 0) _diagHints.push('At least ' + _screenerMinFacts + ' facts on file — that is ' + COUNTRY_DATA.filter(function(x){return (x.n_facts||0)>=_screenerMinFacts;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     if (_screenerMinRetention !== null) _diagHints.push('Downside retention \u2265' + Math.round(_screenerMinRetention*100) + '% of $75 NPV at $50/bbl \u2014 that is ' + COUNTRY_DATA.filter(function(x){var r=_npvRetention(x);return r!==null&&r>=_screenerMinRetention;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     if (scRegionActive) _diagHints.push('Region filter: ' + scRegionActive + ' only');
+    if (reformSet) _diagHints.push('Reform record: ' + _SC_REFORM_MODES[reformMode].label + ' &mdash; that is only '
+      + reformList.length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter, because ORCA holds a sourced reform log for just '
+      + _scReformScoredCount() + ' jurisdictions');
     var _diagStr = _diagHints.length > 0 ? '<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:left;max-width:420px;margin-left:auto;margin-right:auto;"><strong style="color:var(--text);">Likely causes:</strong><ul style="margin:4px 0 0 16px;padding:0;">' + _diagHints.map(function(h){return '<li>' + h + '</li>';}).join('') + '</ul></div>' : '';
     tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;">'
       + '<div style="font-size:20px;margin-bottom:8px;opacity:.5;">&#8960;</div>'
@@ -43253,6 +43416,9 @@ async function loadPlatformData() {
     // before the Screener is ever opened, and restores the default unfiltered state.
     try { _labelRegionControls(); } catch(e) { /* non-critical */ }
     try { _labelScreenerPresets(); } catch(e) { /* non-critical */ }
+    // v662: the reform-record options carry their live size, so the analyst sees how far each
+    // mode narrows before choosing it. Runs after REFORM_HISTORY has landed.
+    try { _labelScreenerReform(); } catch(e) { /* non-critical */ }
     // v465: Populate live hurdle stat on Home tab after data loads
     // v524 (cycle 423, T1): this line used to read "N of 185 countries clear the IOC hurdle
     // rate (IRR >=15%)" off `irr_75`, which is AVG(per-contract IRR) -- the metric v515, v516,
@@ -43721,6 +43887,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // sc-region select in Screener
   var scRegion = document.getElementById('sc-region');
   if (scRegion) scRegion.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  // v662: sc-reform (reform record) select in Screener
+  var scReform = document.getElementById('sc-reform');
+  if (scReform) scReform.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   // v517: sc-proxy-keep (data-basis) replaces the retired sc-irr-nulls control
   var scProxyKeep = document.getElementById('sc-proxy-keep');
   if (scProxyKeep) scProxyKeep.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
