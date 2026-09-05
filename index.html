@@ -1234,6 +1234,20 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 @media (max-width: 720px) {
   body { font-size: 14px; }                    /* 13px is punishing on a phone */
 
+  /* v654 (T2): .cp-spread-badge is `white-space: nowrap` so its take band never breaks
+     mid-range on a desktop. The headline-reconciliation clause added this cycle pushes the
+     longest form of it — Iraq's "65.0–98.5% (33.5pp) ⚠ none listed at headline 84.8%" — to
+     402px, which is wider than a 390px phone and made the whole document scroll sideways.
+     Allowed to wrap here only, so the desktop band keeps its single line. This badge carries
+     no `min-width: max-content`, the marker the wrap rules key off, precisely because it
+     should wrap rather than scroll. */
+  .cp-spread-badge {
+    white-space: normal;
+    max-width: 100%;
+    align-items: flex-start;
+    text-align: left;
+  }
+
   /* Wide tables scroll inside themselves. The gradient on the right edge is
      the only honest signal that there is more table — without it an analyst
      reads four of twenty-one columns and assumes that is all there is. */
@@ -1691,7 +1705,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v653</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v654</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1761,7 +1775,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v653</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v654</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2094,7 +2108,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v653';
+  return m ? m[0] : 'v654';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2169,7 +2183,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v653');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v654');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -40592,6 +40606,119 @@ function cpSpreadParts(d, obs) {
       txt += ' ⓘ';
     }
   }
+
+  // ── v654 (T2) ────────────────────────────────────────────────────────────────
+  // The headline take and the contract-level take printed on the same page can be
+  // different numbers, and until now nothing on the page said so.
+  //
+  // The measured-band branch above already discloses it, with an ⓘ and a sentence about
+  // production weighting. Only 3 of the 57 countries whose headline falls outside its own
+  // p25–p75 band ever reach that branch — Nigeria, Republic of the Congo, Sao Tome. The
+  // other 54 are single-term (p25 === p75) and land in the branch above this one, where the
+  // badge asserted the term and, once the contract table loaded, appended a green ✓.
+  //
+  // Stronger evidence than the bundled quartiles is usually already on the page: `obs` is
+  // the take across the 50 largest producing contracts in this country's own contract table.
+  // Measured against it, 25 of 185 countries print a headline that no contract the page lists
+  // supports — Peru 27.0% against 50 contracts that all price at 44.7%, Iraq 84.8% against
+  // 98.5–99.5%, Egypt 45.1% against 58.8%, Pakistan 37.4% against 51.0%, Gabon, Tunisia,
+  // Turkmenistan, Russia. Guyana prints 54.1% over 50 contracts that all price at 57.0%.
+  //
+  // The ✓ is a second defect, not a cosmetic one. It is appended when the sample's SPREAD is
+  // narrow, and its tooltip then says "CORROBORATED ... consistent with a single statutory
+  // term" — but nothing ever checked the sample's LEVEL. Peru's 50 contracts do span 0.0pp,
+  // 21.6pp away from the 23.1% the badge ticks. Russia and Canada do the same thing.
+  //
+  // So: one rule, applied after all three branches, using the strongest contract-level
+  // evidence on the page. Materiality bar is CP_OBS_REFUTE_PP — the constant this function
+  // already uses to decide whether a take difference is real or rounding. No new threshold,
+  // no number recomputed, no take overwritten.
+  //
+  // The band branch's explanation ("the headline is production-weighted") is deliberately NOT
+  // reused: 45 of these 57 carry weighting 'simple_avg' at prod_coverage_pct 0.0, where it
+  // would be false. The basis is read from the record, and the cause is named from the
+  // record's own mech_mix only where mech_mix accounts for it.
+  if (hd != null) {
+    // The range the badge is ALREADY showing, so the warning and the text it hangs off can
+    // never reference different evidence: conflict branch shows obs, single-term shows the
+    // point p25, band branch shows p25–p75.
+    var _shownLo, _shownHi;
+    if (cpSpreadConflict(d, obs)) { _shownLo = obs.min; _shownHi = obs.max; }
+    else { _shownLo = Math.min(p25, p75); _shownHi = Math.max(p25, p75); }
+
+    var _ev654 = null, _mode654 = '';
+    if (hd < _shownLo - CP_OBS_REFUTE_PP || hd > _shownHi + CP_OBS_REFUTE_PP) {
+      // The headline is outside the very range printed beside it.
+      _ev654 = { lo: _shownLo, hi: _shownHi, sample: cpSpreadConflict(d, obs),
+                 src: cpSpreadConflict(d, obs)
+                   ? 'the ' + obs.n + ' largest producing contracts in the table below'
+                   : 'this country’s own quartiles across all ' + nAll + ' contracts' };
+      _mode654 = 'outside-shown';
+    } else if (obs && obs.n >= 2 && (hd < obs.min - CP_OBS_REFUTE_PP || hd > obs.max + CP_OBS_REFUTE_PP)) {
+      // The headline sits inside the bundled band, but no contract the page actually lists
+      // reaches it. Iraq 84.8%, Egypt 45.1%, Pakistan 37.4%, Gabon, Tunisia, Turkmenistan.
+      _ev654 = { lo: obs.min, hi: obs.max, sample: true,
+                 src: 'the ' + obs.n + ' largest producing contracts in the table below' };
+      _mode654 = 'none-listed';
+    }
+
+    if (_ev654) {
+      var _gap654 = (hd < _ev654.lo) ? (_ev654.lo - hd) : (hd - _ev654.hi);
+      var _rng654 = (Math.abs(_ev654.hi - _ev654.lo) < 0.05)
+        ? _ev654.lo.toFixed(1) + '%'
+        : _ev654.lo.toFixed(1) + '–' + _ev654.hi.toFixed(1) + '%';
+      // A ✓ asserting the single-term claim is corroborated cannot stand on a badge that is
+      // at the same time reporting that the evidence does not support the headline.
+      txt = txt.replace(/ (?:✓|ⓘ|⚠)$/, '');
+      txt += (_mode654 === 'none-listed')
+        ? ' ⚠ none listed at headline ' + hd.toFixed(1) + '%'
+        : ' ⚠ vs headline ' + hd.toFixed(1) + '%';
+      col = _gap654 > 5 ? 'var(--orange)' : 'var(--yellow)';
+
+      var _basis654 = (d.weighting === 'prod_weighted_blended' && d.prod_coverage_pct)
+        ? 'The headline is production-weighted across ' + nAll + ' contracts ('
+          + Number(d.prod_coverage_pct).toFixed(1) + '% production coverage).'
+        : 'The headline is the unweighted mean across all ' + nAll + ' contracts.';
+
+      var _why654 = (function() {
+        var mx = (d && Array.isArray(d.mech_mix)) ? d.mech_mix.filter(function(x) {
+          return x && x.t75 != null && x.n; }) : [];
+        if (mx.length < 2) return '';
+        var mid = (_ev654.lo + _ev654.hi) / 2;
+        var off = mx.filter(function(x) { return Math.abs(x.t75 - mid) >= CP_OBS_REFUTE_PP; });
+        if (!off.length || off.length === mx.length) return '';
+        var nOff = off.reduce(function(a, x) { return a + x.n; }, 0);
+        return ' ORCA’s own mechanic split accounts for part of it: ' + Number(nOff).toLocaleString()
+          + ' of ' + nAll + ' contracts — '
+          + off.slice(0, 2).map(function(x) { return x.m + ' ' + Number(x.n).toLocaleString()
+              + ' at ' + x.t75.toFixed(1) + '%'; }).join(', ')
+          + (off.length > 2 ? ' and ' + (off.length - 2) + ' more' : '')
+          + ' — price away from ' + _rng654 + ' and pull the mean '
+          + (hd < _ev654.lo ? 'down' : 'up') + ' to ' + hd.toFixed(1) + '%.';
+      })();
+
+      tip = 'THE HEADLINE IS NOT SUPPORTED BY THE CONTRACT EVIDENCE ON THIS PAGE. '
+          + country + '’s headline government take is ' + hd.toFixed(1) + '% at $75/bbl, but '
+          + _ev654.src + ' price at ' + _rng654 + '. The headline sits '
+          + _gap654.toFixed(1) + 'pp ' + (hd < _ev654.lo ? 'below' : 'above')
+          + ' that' + (_ev654.sample ? ', so not one contract this page lists reaches it' : '') + '. '
+          + _basis654
+          + (_ev654.sample
+              ? ' That sample is the top ' + obs.n + ' by production, not the whole country, so it '
+                + 'cannot establish a population figure and nothing here overwrites the headline, '
+                + 'rewrites a take or rescores anything — but it is the only contract-level '
+                + 'evidence the page shows, and it does not agree.'
+              : '')
+          + _why654
+          + ' Which to use: cite ' + _rng654 + ' for the terms you would actually sign in '
+          + country + ', and ' + hd.toFixed(1) + '% only where you are ranking ' + country
+          + ' against other countries — every rank, median pill, screener filter and comparison '
+          + 'on this platform is built on the headline. State which one you used, and reconcile '
+          + 'both against the primary instrument before either goes in an IC memo. '
+          + tip;
+    }
+  }
+
   return { txt: txt, col: col, tip: tip };
 }
 // The Contract Distribution caption, same conflict rule, same single builder.
