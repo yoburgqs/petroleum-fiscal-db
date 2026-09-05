@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v664</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v665</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v664</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v665</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v664';
+  return m ? m[0] : 'v665';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v664');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v665');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -25773,7 +25773,56 @@ function renderCompare() {
         + 'contractor result: there is no position here to value. Compare the contract count, '
         + 'mechanics and evidence rows instead.') + '">—</span>';
     }
-    return fmtNpvShared(v);
+    // v665 (T3): the COMPARABLE-BASIS contractor NPV on a fee-blended column.
+    //
+    // Walked "compare three countries" cold and built Guyana / Angola / Iraq. Every row above the
+    // Economics block has been taught to correct a fee-basis blend: the Take basis row flags Iraq
+    // "68% fee-basis", the four Govt Take rows print "PSC/Conc 34.1%" under the 84.8% headline, the
+    // Rank among producers row says in words "ranked on 34.1% comparable, not 84.8%", and the warning
+    // beneath the grid tells the analyst in bold to rank on that figure. The Economics block then
+    // published the blended number alone:
+    //
+    //     Contractor NPV @$75      Guyana $1.1B     Angola $1.1B     Iraq $642M
+    //
+    // Iraq last, by a factor of two. On the same comparable basis the rest of the table insists on,
+    // country_data.json's own g1.v75 puts Iraq at $3.0B -- FIRST, by roughly 3x. The $642M is an
+    // unweighted mean across all 610 contracts, and 415 of them are TSCs whose contractor is paid a
+    // fixed $/bbl fee; mech_mix prices those at $319M against $2,138M for Iraq's PSCs and $4,344M for
+    // its Concessions. So the analyst who follows the instruction printed four rows up -- rank Iraq on
+    // its PSC/Concession terms, not its headline -- reads down into the block the IC decision actually
+    // turns on and finds the correction silently dropped, with the blended figure inverting the very
+    // ranking the correction was made to produce. The take was rescued and the value was not.
+    //
+    // g1.v75 already existed and was already trusted: three surfaces quote it in prose (the Take basis
+    // tooltip on this same grid says "with $3.0B contractor NPV"). It was never rendered as a VALUE in
+    // the row an analyst reads. It is now, in the same green sub-line, same wording and same position
+    // the Govt Take rows use for "PSC/Conc 34.1%", so the two blocks carry one basis.
+    //
+    // Only the $75 row. country_data.json carries the Group-1 split at t50/t75/t100/t125 but at v75
+    // ALONE -- there is no v50, v100 or v125 -- so the other three rows stay blended and the tooltip
+    // says so rather than interpolating a number ORCA does not hold. 11 countries carry g1.v75;
+    // measured, the sub-line renders on 8 of them -- Iraq $642M -> $3.0B, Oman $566M -> $866M,
+    // Iran $899M -> $1.2B, South Sudan $1.5B -> $1.9B, Qatar $1.1B -> $1.2B, Malaysia $627M ->
+    // $720M, Ecuador $2.1B -> $2.2B, Mexico $2.9B -> $3.0B -- and is suppressed on Azerbaijan,
+    // India and Russia, which agree with the blended figure at the precision this page prints.
+    const _npvBase = fmtNpvShared(v);
+    if (price !== '75' || v == null) return _npvBase;
+    const _npvSt = _cmpMixStat(d);
+    if (!_npvSt.blended || !_npvSt.g1 || _npvSt.g1.v75 == null) return _npvBase;
+    const _npvG1 = fmtNpvShared(_npvSt.g1.v75);
+    // Same convention as the take correction: print it only where it changes the number on screen.
+    if (_npvG1 === _npvBase) return _npvBase;
+    return _npvBase + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
+      + _cmpEsc(d.country + ': ' + _npvG1 + ' is the contractor NPV at $75/bbl across its '
+        + Number(_npvSt.g1.n).toLocaleString() + ' production-sharing and concession contracts only. '
+        + 'The ' + _npvBase + ' above is an unweighted mean over all ' + (d.n != null ? Number(d.n).toLocaleString() : _npvSt.tot ? Number(_npvSt.tot).toLocaleString() : '?')
+        + ' contracts, ' + Number(_npvSt.n2).toLocaleString() + ' of them fee-basis ('
+        + _cmpMechNames(_npvSt, 2) + '), where the contractor is paid a fixed $/bbl remuneration and the '
+        + 'DCF returns a far smaller position. Compare THIS figure against the other columns \u2014 it is the '
+        + 'contractor-side match to the PSC/Conc take printed on the Govt Take rows above, and ranking the '
+        + 'blended figure can invert the order those rows give you. ORCA holds the Group-1 split at $75/bbl '
+        + 'only, so the $50, $100 and $125 rows remain blended and are NOT on this basis.')
+      + '">PSC/Conc ' + _npvG1 + '</span>';
   };
   // The four Govt Take cells. On a fee-blended column the headline take is kept --
   // it is the platform's published figure -- and the Group-1-only take is printed
@@ -26511,7 +26560,11 @@ function renderCompare() {
         + ' two fiscal bases in one take figure.</strong> ' + _lead
         + ' In a <strong style="color:var(--text);">fee-basis</strong> contract (TSC, RSC, Buy-back) the contractor is paid a fixed $/bbl remuneration and keeps no share of the oil price, so government take% rises toward <strong style="color:var(--text);">97–99% because of the contract structure</strong> — not because the terms are hard. Iraq’s technical service contracts average <strong style="color:var(--text);">98.5% take and +$319M contractor NPV at the same time</strong>, so a high take% on such a column is not evidence of an unattractive regime.'
         + _rankTxt
-        + ' <strong style="color:var(--text);">Rank on the PSC/Conc figure printed under each Govt Take row</strong>, and state in the memo which basis you used.';
+        + ' <strong style="color:var(--text);">Rank on the PSC/Conc figure printed under each Govt Take row</strong>, and state in the memo which basis you used.'
+        // v665 (T3): the same correction now exists on the contractor side, so this instruction
+        // names it. Without the pointer the analyst applies the basis to take and not to value --
+        // which is the ranking inversion the Economics block used to publish.
+        + ' The <strong style="color:var(--text);">Contractor NPV @$75</strong> row carries the matching PSC/Conc figure where it differs; on the fee-blended columns it is the larger number, and ranking the blended one can reverse the order the take rows just gave you. ORCA holds that contractor-side split at $75/bbl only, so the $50, $100 and $125 NPV rows are still blended.';
     }
     if (_cmpPrrt.length && _cmpPrrt.length < selected.length) {
       _mb += (_mb ? '<br><br>' : '')

@@ -30595,3 +30595,76 @@ that reader had nothing on the page to tell them otherwise.
 
 ## Friction
 Walked cold at 1440×900 over a local server with zero sessionStorage/localStorage, and produced every artifact that leaves the tool for real — six clipboard controls, six file exports, two print paths — rather than reading their source. Almost all of them were clean: the Country Profile summary, the Side-b
+
+---
+## Cycle 571 Log — 2026-09-05 13:15
+- Test before: 236 PASS / 0 FAIL (harness figure, deployed URL)
+- Test after: **261 PASS / 0 FAIL / 1 WARN** — suite ACTUALLY RAN this cycle against the local
+  build, not carried forward. Identical to cycle 570's measured baseline. The single WARN is the
+  `sw.js` 404 against `python3 -m http.server`, a local-server artefact that predates this change.
+- JS errors: 0
+- Shipped as **v665**.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (Stalest in rotation: 562 T5, 563 T1, 564 T3, 565 T4, 566 T6, 567 T1, 568 T4, 569 T2, 570 T5 — T3 last walked at 564.)
+
+## Friction
+Walked cold at 1440x900 with sessionStorage and localStorage cleared, dropped the seeded North Sea example, and built a real mixed-mechanic set the way an analyst would: Guyana, Angola, Iraq, typed one at a time into `#cmp-search`.
+
+Every row **above** the Economics block has been taught to correct a fee-basis blend, over several cycles:
+
+| row | what it says about Iraq |
+|---|---|
+| Take basis (mechanic) | `⚠ 68% fee-basis · TSC blended with PSC and Concession` |
+| Govt Take ($50/$75/$100/$125) | headline `84.8%` with `PSC/Conc 34.1%` printed under it |
+| Rank among producers | `#6 of 21 · ranked on 34.1% comparable, not 84.8%` |
+| warning under the grid | *"Rank on the PSC/Conc figure printed under each Govt Take row"* — in bold |
+
+The Economics block then published the blended figure alone, with no correction of any kind:
+
+```
+Contractor NPV @$75 (base)     Guyana $1.1B     Angola $1.1B     Iraq $642M
+```
+
+Iraq last, by a factor of two. On the comparable basis the four rows above it insist on, `country_data.json`'s own `g1.v75` puts Iraq at **$3.0B** — **first, by roughly 3x**. The $642M is an unweighted mean across all 610 contracts, and 415 of them are TSCs whose contractor is paid a fixed $/bbl fee; `mech_mix` prices those at $319M against $2,138M for Iraq's 115 PSCs and $4,344M for its 80 Concessions.
+
+So the analyst follows the instruction printed four rows up — rank Iraq on its PSC/Concession terms, not its headline — reads down into the block the IC decision actually turns on, and finds the correction silently dropped. Worse than absent: the blended figure **inverts the very ranking the correction was made to produce**. The take was rescued and the value was not, and nothing on screen said the two rows were on different bases.
+
+`g1.v75` already existed and was already trusted — three surfaces quote it in prose, including the Take basis tooltip on this same grid ("with $3.0B contractor NPV"). It had never been rendered as a **value** in a row an analyst reads. Function: `_cmpNpvCell` at `index.html:25767`.
+
+## Change
+`_cmpNpvCell` now prints the comparable-basis contractor NPV as a green sub-line beneath the blended figure — same wording, same colour, same position the Govt Take rows already use for `PSC/Conc 34.1%`, so the two blocks carry one basis:
+
+```
+Contractor NPV @$75 (base)     Guyana $1.1B     Angola $1.1B     Iraq $642M
+                                                                 PSC/Conc $3.0B
+```
+
+Scoped deliberately:
+- **$75 only.** `country_data.json` carries the Group-1 split at `t50/t75/t100/t125` but at `v75` **alone** — there is no `v50`, `v100` or `v125`. The other three NPV rows stay blended and the tooltip says so rather than interpolating a number ORCA does not hold.
+- **Only where it changes the number on screen**, the same convention the take correction uses. Measured: 11 countries carry `g1.v75`; the sub-line renders on **8** and is suppressed on Azerbaijan, India and Russia, which agree with the blended figure at the printed precision.
+- The warning block under the grid now names the NPV row too, instead of pointing only at the take rows.
+
+The cell rides the shared `rows` array, so the correction lands in `#cmp-data-table`, the printed PDF, and the **Copy for IC Memo** clipboard table — verified in the paste, not assumed.
+
+## Result
+An analyst comparing a fee-blended country against PSC/Concession peers now reads the same basis in the Economics block that the Take block and the Rank row already gave them. On Guyana / Angola / Iraq they can see that Iraq's corrected take of 34.1% translates into $3.0B of contractor value — the best of the three — instead of concluding from `$642M` that the take correction made no difference to the economics. Ranking the blended figure there reverses the order the take rows just handed them, and that reversal is now visible on screen and in the pasted memo table.
+
+## Verification (measured this cycle, not assumed)
+
+| check | result |
+|---|---|
+| Countries where sub-line renders | **8 of 11** carrying `g1.v75` (Iraq $642M→$3.0B, Oman $566M→$866M, Iran $899M→$1.2B, South Sudan $1.5B→$1.9B, Qatar $1.1B→$1.2B, Malaysia $627M→$720M, Ecuador $2.1B→$2.2B, Mexico $2.9B→$3.0B) |
+| Suppressed correctly | Azerbaijan, India, Russia — identical at printed precision |
+| Non-blended columns unaffected | North Sea Trio: **0** sub-lines rendered |
+| Clipboard carries it | `Contractor NPV @$75 (base)  $1.1B  $1.1B  $642M · PSC/Conc $3.0B` |
+| JS syntax gate | **PASS** — 11 inline blocks, 0 failures |
+| Horizontal scroll, 8 tabs x 1920/1440/1280/1024/768/390 | **0** violations |
+| Side-by-Side @390x844 `hasTouch` | scrollWidth 390 = clientWidth 390; **0** controls under 24px |
+| pageerrors, all widths | **0** |
+
+## Carried forward — found this cycle, not fixed
+
+- **`MECHANIC_BREAKDOWN` disagrees with `country_data.json` on Iraq's own mechanic split.** The inline constant at `:22329` holds `PSC n=171, npv=1016` and `Concession n=24, npv=3552`; `country_data.json`'s `mech_mix` holds `PSC n=115, v75=2138.6` and `Concession n=80, v75=4344.1`. Both are on screen in different places. The JSON reproduces `g1.v75` exactly (weighted = $3,043M) and is the authoritative one; the inline constant is the stale copy, and it still covers only 20 of 185 countries. Not touched this cycle because reconciling it means deciding which surfaces re-point at the JSON, and that is a change with a wider blast radius than one cell.
+- **The Side-by-Side search box replaces the seeded example on the analyst's first add, with no way to keep it.** An analyst who genuinely wants Norway/UK/Netherlands **+ Denmark** types "Denmark" and loses the other three. The behaviour is deliberate (v509), announced in the banner and in a toast, and is right for the common case — but there is no "add to this set" path, so the North Sea + 1 build has to be typed out in full. Left alone because changing it reverses a considered decision.
+- Everything carried from cycles 560–570 is unchanged, including: the Fiscal Compare XLSX still emitting 25 columns with no comparable-take column while its Methodology sheet cites `GovtTake_75` unqualified; the Side-by-Side pasted Evidence tier cell reading `A · primary-law backed · 66% primary law · of · 63,848 facts`; the two adjacent unexplained IC buttons on Country Profile; the ~1,900-character CP IC paragraph of which ~1,550 is caveat prose; the duplicated all-185 rank in CP headline Zones A and B; the non-existent `cp-price-select` at `:3139`; the Screener take slider's `min="30"` floor excluding the USA at 23.4%; FAQ A25/A35/A40 describing a Screener "Stability Score filter" that does not exist; the Side-by-Side Predictability row returning `62 · UNGRADED · one term` for Guyana / Angola / Suriname alike; Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57; `reform_history.json` carrying no `source` key on any of its 83 events; Norway's stored p25/p75 vs its 29.6pp contract spread; the 272 dead citations; and `SPECULATIVE_COUNTRIES` at `:24048` still being a hand-typed list of 7 names from v41.
