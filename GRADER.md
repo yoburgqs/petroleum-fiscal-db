@@ -31635,3 +31635,23 @@ three tabs now return one answer for the same country instead of two opposite on
 
 ## Bookkeeping (not the cycle)
 - v671 → v672 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 578 Log — 2026-09-05 21:04
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 578 complete and pushed.
+
+## Task
+**T3** — "How do these three countries compare side by side?"
+
+## Friction
+Cold load, storage cleared, no clicks. The Side-by-Side tab seeds its own example set and prints:
+
+| | Norway | UK | Netherlands |
+|---|---|---|---|
+| Predictability Score | **76 · UNGRADED · one term** | 58 · LOW · 15.0pp | **84 · UNGRADED · one term** |
+| Take spread across contracts | **single term** | 36.4–51.4% (15.0pp) | **single term** |
+
+Read across, that says the UK is the 
