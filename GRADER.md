@@ -33168,3 +33168,117 @@ that reads **both surfaces on the same set** and requires the chart's mark and t
 Walked Side-by-Side cold, then added a real set the analyst's own way — Nigeria / Angola / Ghana.
 
 v626 built a **data-basis gate for the grid**: a country ORCA holds no verified field production for is refused a highest/lowest placement on all four Govt Take rows and reads `not ranked · statutory terms`, because its take is a sim
+
+---
+## Cycle 591 Log — 2026-09-06 15:15
+- Test before: 234 PASS / 2 FAIL (stale graded suite — see Infrastructure below)
+- Test after: 282 PASS / 0 FAIL / 1 WARN — suite RAN this cycle against the local tree
+- JS errors: 1 — sw.js registers at `/petroleum-fiscal-db/sw.js` and 404s under a localhost
+  root server. Same item as the 1 WARN. Not present on the deployed path.
+- Summary: Cycle 591 shipped as **v685**. Both repos pushed.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (590 was T3, 589 was T2)
+
+## Friction
+Walked the Screener cold: no sessionStorage, no localStorage, Home → Screener, then the
+shipped **IOC Capital Screen** preset (15 of 185), then clicked **GOVT TAKE** to rank them —
+the first thing an analyst does with a shortlist.
+
+The count line said *"sorted by Govt Take low→high (comparable take — the figure this screen
+tested)"*. The column printed:
+
+    23.4 · 32.2 · 31.0 · 32.7 · 33.5 · 84.8 · 38.5 · 46.5 · 49.2 · 53.0 · 55.6 · 59.5 · 60.8 · 61.0 · 61.9
+
+Iraq's **84.8% in the sixth slot**, 50pp clear of both neighbours, tier-badged
+**"NOC/Concession" between two "Inv-Friendly" rows**. Five of the fifteen rows led with a
+number that was not the one that placed them.
+
+The order was **right**. `_scSortVal()` (v635) ranks on the comparable PSC/Concession take;
+the cell at line ~29149 rendered `fmtTake(d[takeKey])` and the TIER cell rendered
+`tierLabel(d[takeKey])`, both on the published blend. v635 fixed the ranking and did not
+revisit the rendering, and nothing in any suite asserted the printed column — so this sat in
+the shipped build for 50 cycles.
+
+The v587 sort-indicator comment asserted *"the tier IS the take bucket, so sorting either
+produces the same order"*. That had stopped being true for the ten fee-basis countries.
+
+A ranking that is correct but **reads** as a broken sort is worse than one that is wrong: the
+analyst does not debug it, they discard the shortlist this tab exists to produce. The
+`→ screened at 34.1%` sub-line does not rescue it — nobody re-reads a column they have
+already decided is buggy.
+
+## Change
+While `_scSortKey === 'take'` **and** that sort is running on the comparable basis
+(`_scTakeSortOnCmp`), the two figures swap places in the cell:
+
+- the **comparable take leads**, at full size, tier-coloured on the comparable figure;
+- the **TIER cell follows it** onto the same basis, with a tooltip naming the published tier;
+- the published blend is named directly beneath (`published 84.8%`, muted) and in both tooltips.
+
+Nothing is hidden. Four adjacent states are byte-identical to v684 and are asserted as
+controls: the default order, the NPV/evidence/swing sorts, the third click back to default,
+and an **unticked** comparability box — which sends ceiling and ranking back to the published
+figure, where the published figure is already the one that leads.
+
+## Result
+The ascending screen now reads
+
+    23.4 · 29.7 · 31.0 · 32.7 · 33.5 · 34.1 · 38.5 · 39.3 · 49.2 · 53.0 · 55.6 · 59.5 · 59.8 · 61.0 · 63.2
+
+with the TIER column monotone beside it (8 Inv-Friendly, 5 Moderate, 2 High Take). The
+analyst can read the shortlist top-down and cut at a row, and Iraq is visible at rank 6 as the
+moderate-take jurisdiction the screen actually admitted rather than the outlier it looked like.
+
+## Test work
+New **ScreenerSortRender** section, 10 assertions: both directions monotone on the *printed*
+figure and on the TIER column; the Iraq row specifically; the published figure still on
+screen; and the three controls that must not change. Verified to **FAIL 6 of 10 against the
+pre-change build** and pass 10 of 10 after — a gate, not a description.
+
+## Infrastructure — the graded suite had silently forked
+`autonomous_cycle.py` runs `office/tools/petroleum/tests/runtime_comprehensive.js`. Cycles
+511-590 made their test edits in `petroleum-fiscal-db/tests/runtime_comprehensive.js`, which
+**nothing executes**. The graded copy was 267 lines behind: no v607 SB-PROVENANCE section, and
+still asserting `title === 'Govt Take vs Oil Price'` / `notice === ''` from before v684.
+
+**Cycle 590's "2 FAIL" was that stale control, not a product regression.** v684's data-basis
+gate is correct; the North Sea Trio is all-Group-1 but not all-one-data-basis, exactly as the
+590 log said — the fix 590 wrote for it went into the copy that never runs.
+
+- Merged the maintained content onto the graded copy's v608/v612 path header
+  (`ORCA_REPORT_FILE` / `REPO_ROOT` probing), which the repo copy had never had. Both copies
+  are byte-identical again.
+- `autonomous_cycle.py` now sha256-compares the two before every run and logs a loud
+  `*** SUITE COPIES HAVE DIVERGED ***` block naming both paths. A silent fork of the thing
+  that decides whether a cycle shipped is not acceptable — it is the same class of fault as
+  the v608/v612 blind-gate incidents, one level up.
+- Graded assertion count went 236 → 282 on the merge plus this cycle's 10.
+
+## Mobile (Step 5b)
+390 x 844, `hasTouch: true`: `scrollWidth` 390 = `clientWidth` 390 on Home, Screener cold, and
+Screener with the preset + take sort applied. No control was added or touched — the swap is
+text inside two existing `<td>`s, and the sub-line is *shorter* than the one it replaces.
+
+## Carried forward — not fixed this cycle
+- **pixel_audit**: one regression against baseline, `tablet-768::2-t7 clipped-text 33 -> 34`
+  (a mechanic tag on Country Profile, clipped by 6px). Reproduced **identically with this
+  cycle's change reverted**, so it predates it. Recorded rather than re-baselined — accepting
+  a regression nobody diagnosed is how a gate stops meaning anything.
+- **"Two-Price Return Screen" barely narrows**: `setSlider('sl-npv', 100); setSlider('sl-npv50', 500)`.
+  NPV at $50 is below NPV at $75 for every country, so the $75 leg is inert and the screen is
+  a single $500M @$50 floor that passes **153 of 185**. The preset menu now labels it
+  "(barely narrows)", which is honest but is a warning where a screen should be. Named, not
+  reopened — v517 already rebuilt this preset once.
+- Everything carried from cycles 560–590 is unchanged, including: the FC drilldown IC Citation
+  and the four tabular *Copy for IC Memo* artifacts carrying no reform leg; FC *Copy for IC
+  Memo* defaulting to all 185 rows; the SbS NPV chart carrying no data-basis mark; the
+  *Copy for IC Memo* header naming "$50 / $75 / $125" over a four-row table that includes $100;
+  the ⚠ proxy notice promising IRR and breakeven the same artifact says are not reported;
+  `#cmp-search` silently no-opping on an unmatched country or a 6th past `CMP_MAX`; the CP
+  headline pairing a fact-share with a contract count; the `fc-nav-bar` button reading
+  `#cp-price-select`, which does not exist; the 72 of 163 count-basis records that do not
+  reconcile `take_75` against `mech_mix`; and `getProducerContext()` ranking by array index.
+
+## Bookkeeping (not the cycle)
+- v684 → v685 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
