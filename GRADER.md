@@ -33579,3 +33579,21 @@ analyst can find.
 ## Bookkeeping (not the cycle)
 - v686 → v687 applied silently at the end across the 4 real version sites
   (1737, 1807, 2140, 2215).
+
+---
+## Cycle 593 Log — 2026-09-06 12:44
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 593 complete and pushed.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (Stalest in rotation: 588 T4, 589 T2, 590 T3, 591 T1, 592 T6; T5 last run at 587.)
+
+## Friction
+Every paste-ready artifact carries one sentence explaining why IRR — the metric an IC asks for first — is absent. Walked cold, they don't agree with each other:
+
+| Surface | pasted |
+|---|---|
+| Screener export | median **239.8%** across **124** countries |
+| Side-by-Side *Copy for IC Memo* | med
