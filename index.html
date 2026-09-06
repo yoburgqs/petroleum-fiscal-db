@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v674</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v675</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v674</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v675</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v674';
+  return m ? m[0] : 'v675';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v674');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v675');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -40061,6 +40061,50 @@ function renderFCResults(results, price) {
   var _fcSelPrice = (function(){ var v = parseFloat(price); return [50,75,100,125].indexOf(v) >= 0 ? v : 75; })();
   var _fcDbTake = function(r) { return _fcSelPrice===50 ? r.take_50 : _fcSelPrice===100 ? r.take_100 : _fcSelPrice===125 ? r.take_125 : r.take_75; };
   var _fcMonopoly = function(r) { return isStateMonopoly(_fcDbTake(r)); };
+  // ── v675 (T1) — the screening table is ranked and tiered on the COMPARABLE take ────
+  // T1 is "which countries should even be on my screening list?", and this table is where that
+  // list gets built. Walked cold at $75/Deepwater, sorted by take, it ranks 65 own-terms rows and
+  // draws four tier dividers. Iraq renders at rank 63 of 65, three rows from the bottom, under a
+  // red "NOC-DOMINATED · TAKE >75%" banner, on a citable take of 84.8%.
+  //
+  // Every other surface on this platform reads Iraq at 34.1%. MECHANIC_COMPARABILITY (2026-08-26)
+  // says the blended figure may not be compared across countries: 415 of Iraq's 610 contracts are
+  // fee-basis TSCs where the contractor is paid a fixed $/bbl remuneration and keeps no price
+  // upside, so take% climbs toward 97-99% as an artefact of the mechanic, not because the terms
+  // are hard. v549 put the correction on Side-by-Side, v552 on Country Profile, v553 on the
+  // IC-memo clipboard, v554 on the Screener ceiling and v674 on the XLSX. The clipboard column is
+  // literally headed "Comparable take — RANK AND CITE ON THIS".
+  //
+  // The flagship ranking was the last surface still ordering on the blend, and it is the one the
+  // analyst screens from. At 34.1% Iraq is rank 2 of 65 and sits ABOVE the investible divider —
+  // a 61-place move that inverts the screening decision. Measured on the live set, ranking on the
+  // comparable basis also moves Ecuador into the investible tier (46.5 -> 39.3) and Iran and Qatar
+  // out of the NOC-dominated block (75.7 -> 74.4, 77.2 -> 74.5). It is symmetric and not a thumb on
+  // the scale: India's comparable take is 63.2% against a 61.9% headline, so India moves the other
+  // way. 175 of the 185 rows are unaffected — _scFeeCmpAt() only diverges where the two figures
+  // differ at the precision this page prints.
+  //
+  // The published headline is still displayed, still exported, and still what the cell names.
+  // What changed is which of the two numbers decides WHERE the row sits.
+  var _fcCdMap = (function(){ var m = {}; (window.COUNTRY_DATA || []).forEach(function(x){ m[x.country] = x; }); return m; })();
+  var _fcFeeState = function(r) {
+    var d = _fcCdMap[r.country];
+    if (!d || typeof _scFeeCmpAt !== 'function') return null;
+    var st = _scFeeCmpAt(d, String(_fcSelPrice));
+    return (st && st.diverges) ? st : null;
+  };
+  var _fcCmpTake = function(r) {
+    var st = _fcFeeState(r);
+    return st ? st.cmp : _fcDbTake(r);
+  };
+  var _fcFeeMechNames = function(r) {
+    var d = _fcCdMap[r.country];
+    var mx = (d && Array.isArray(d.mech_mix)) ? d.mech_mix : [];
+    var g2 = mx.filter(function(x){ return x.g === 2; })
+               .sort(function(a,b){ return (b.n||0) - (a.n||0); });
+    if (!g2.length) return '';
+    return g2.map(function(x){ return x.m + ' ' + Number(x.n).toLocaleString(); }).join(' · ');
+  };
   // Measured on the cold default view (185 rows, $75/bbl, Deepwater): of the 65 rows this table
   // actually ranks, ordering them on the CITABLE database take instead of this screen's model
   // take moves the median row 13 places and the worst row 57. Nigeria rendered as #5 in the
@@ -40078,7 +40122,8 @@ function renderFCResults(results, price) {
   // with a populated database take at $50/$75/$100/$125, none of them a non-producer, none a
   // monopoly. So the blocker was removed by a later cycle and nobody went back for the item.
   var _fcTakeCmpDb = function(a, b) {
-    var va = _fcDbTake(a), vb = _fcDbTake(b);
+    // v675 (T1): _fcCmpTake, not _fcDbTake — the ordering is drawn on the comparable basis.
+    var va = _fcCmpTake(a), vb = _fcCmpTake(b);
     if (va == null && vb == null) return (b.swing||0) - (a.swing||0);
     if (va == null) return 1;
     if (vb == null) return -1;
@@ -40486,7 +40531,7 @@ function renderFCResults(results, price) {
   html += '<th class="fc-selcell" title="Tick rows to build an IC shortlist. \u2318 Copy for IC Memo and Export XLSX then carry ONLY the ticked countries \u2014 with nothing ticked they carry every row on screen, which on the unfiltered view is all 185. The ticks survive re-sorting, a region filter and a price or profile change; use Clear beside the button to drop them. This header box ticks or clears every row currently shown.">'
     + '<input type="checkbox" class="fc-sel-all" id="fc-sel-all" onclick="fcToggleSelAll(this)" aria-label="Select or clear all Fiscal Compare rows currently shown">'
     + '</th>';
-  html += '<th class="num" style="width:50px" title="Rank by current sort dimension (' + sortDimLabel + ', ' + sortDirLabel + '), over the ' + _fcRankedN + ' countries modelled on their OWN fiscal terms.' + (sortField === 'take' ? ' Since v580 this rank is built on the Take% db \u00b7 citable column \u2014 the figure the drilldown, Country Profile, the API and \u2318 Copy for IC Memo all quote \u2014 so the position you read and the number you cite are the same number. It was previously built on the model column to its left, which moved the median row 13 places.' : '') + ' Re-rank by clicking any other column header or using the sort buttons above. Green left border = top 10; red left border = bottom 10. The ' + (sorted.length - _fcRankedN) + ' rows on the generic mechanic default are partitioned below the divider and carry no rank: their figure is the same constant on every one of them, so ordering them would be ordering an artifact.">#</th>';
+  html += '<th class="num" style="width:50px" title="Rank by current sort dimension (' + sortDimLabel + ', ' + sortDirLabel + '), over the ' + _fcRankedN + ' countries modelled on their OWN fiscal terms.' + (sortField === 'take' ? ' Since v580 this rank is built on the Take% db \u00b7 citable column \u2014 the figure the drilldown, Country Profile, the API and \u2318 Copy for IC Memo all quote \u2014 so the position you read and the number you cite are the same number. It was previously built on the model column to its left, which moved the median row 13 places. Since v675 the 10 fee-basis-blended countries are ranked on their COMPARABLE take (the \u2696 figure in that cell), not on the published blend: on the blend Iraq ranked 63 of 65 under the NOC-dominated divider, and on the basis every other surface in this tool uses it is rank 2, investible.' : '') + ' Re-rank by clicking any other column header or using the sort buttons above. Green left border = top 10; red left border = bottom 10. The ' + (sorted.length - _fcRankedN) + ' rows on the generic mechanic default are partitioned below the divider and carry no rank: their figure is the same constant on every one of them, so ordering them would be ordering an artifact.">#</th>';
   html += '<th style="cursor:pointer;" onclick="fcSetSort(window._fcSortState===\'country\'?\'take\':\'country\')" title="Click to sort A\u2013Z \u00b7 Click again for ranked sort">Country ' + (sortField === 'country' ? '\u25b2' : '') + '</th>';
   html += '<th title="Fiscal mechanism \u2014 the structure governing how revenue is split between government and contractor, AND the mechanic this row\'s DCF was actually run on. It is the mechanic the PLURALITY of that country\'s contracts in ORCA use (the count under each tag), not the first one listed alphabetically: before v548 any country holding a single Concession contract read Concession, which named 39 of these 185 rows wrongly \u2014 Indonesia, Guyana, Iraq, Iran, India, China. Hover any tag for a full description.">Mechanic</th>';
   var priceTag = price ? ' <span style="font-size:10px;color:var(--muted);font-weight:400;">@$' + price + '</span>' : '';
@@ -40499,7 +40544,7 @@ function renderFCResults(results, price) {
   // the XLSX all carry it and instruct the analyst to cite it. The flagship table did not show it
   // anywhere, so the only way to read a citable take for a 10-country shortlist was ten drilldowns
   // or an XLSX download. It is now a column.
-  html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. Since v580 this IS what the # column ranks and where the tier dividers fall, so a row position and the number you cite agree. The model column to its left can differ from it by 25-35pp.">Take% <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="MODEL — contractor net present value ($M) this screen computes on the profile selected above (' + _fcProfName + '), 10% WACC, 100% working interest. This is the only NPV in the tool that moves with the profile selector, and it is what the # column ranks. It is NOT the citable figure and it is NOT what ⌘ Copy for IC Memo pastes: on a generic-default row it is the mechanic standard, identical across 119 of the 185 rows. The citable database NPV is the column to its right.">NPV ($M) <span style=\'font-size:10px;color:var(--muted);font-weight:700;\'>model</span>' + priceTag + '</th><th class="num" title="CITABLE — contractor net present value ($M) from the fiscal terms ORCA holds in its contract database, on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI). This is the figure Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo all carry — the one that reaches your memo. Fixed basis: it does not move with the profile selector.">NPV ($M) <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>';
+  html += '<th class="num" title="CITABLE — government take from the ORCA contract database at the selected price, computed from the fiscal terms actually held for that country. Populated for all 185 rows. This is the figure Country Profile, the JSON API, the row drilldown citation and the XLSX GovtTake_ column all carry, and the one the drilldown tells you to cite in an IC memo. Since v580 this is the column the # rank and the tier dividers are built from, so a row position and the number you cite agree. The model column to its left can differ from it by 25-35pp. Since v675, on the 10 countries whose published take blends fee-basis TSC/RSC/Buy-back contracts, the cell leads with the COMPARABLE take (marked \u2696) on its PSC/Concession contracts alone and prints the published blend beneath it \u2014 and it is the comparable figure that is ranked and tiered, because a fee-basis blend measures contract structure rather than fiscal terms and may not be compared across countries. Iraq reads \u2696 34.1% over a blended 84.8%.">Take% <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th><th class="num" ' + (sortField==='npv'?'aria-sort="descending"':'') + ' title="MODEL — contractor net present value ($M) this screen computes on the profile selected above (' + _fcProfName + '), 10% WACC, 100% working interest. This is the only NPV in the tool that moves with the profile selector, and it is what the # column ranks. It is NOT the citable figure and it is NOT what ⌘ Copy for IC Memo pastes: on a generic-default row it is the mechanic standard, identical across 119 of the 185 rows. The citable database NPV is the column to its right.">NPV ($M) <span style=\'font-size:10px;color:var(--muted);font-weight:700;\'>model</span>' + priceTag + '</th><th class="num" title="CITABLE — contractor net present value ($M) from the fiscal terms ORCA holds in its contract database, on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI). This is the figure Country Profile, the JSON API, the row drilldown citation, the XLSX and ⌘ Copy for IC Memo all carry — the one that reaches your memo. Fixed basis: it does not move with the profile selector.">NPV ($M) <span style=\'font-size:10px;color:var(--green);font-weight:700;\'>db · citable</span>' + priceTag + '</th>';
   html += '<th class="num" ' + (sortField==='breakeven'?'aria-sort="ascending"':'') + ' title="Breakeven oil price ($/bbl): minimum price for project NPV \u2265 0 under this regime. Coverage: 68 of 185 countries. — indicates incomplete cost data; use Take + Swing as proxy for uncovered countries.">BE ($/bbl)</th><th class="num" ' + (sortField==='swing'?'aria-sort="ascending"':'') + ' title="Price Swing (pp): Govt Take at $125/bbl minus Take at $50/bbl. &#10;&#10;Interpretation: &lt;10pp = royalty-dominant, predictable at any price (green). 10\u201320pp = moderate price sensitivity (amber). &gt;20pp = progressive/PSC regime, govt captures most upside above $75 (red). &#10;&#10;IC use: high-swing regimes require a price-range sensitivity analysis \u2014 contractor IRR at $50/bbl degrades less than headline take implies because PSC cost recovery accelerates. Low-swing regimes are suitable for projects depending on certainty of returns across price cycles.">Swing (pp) \u24d8</th>';
   // v551 (T6): the stated thresholds were never the ones in force. This header said the letter
   // meant "% of its fiscal facts primary-sourced" while getTierBadge() was fed a_pct + b_pct.
@@ -40558,6 +40603,37 @@ function renderFCResults(results, price) {
       t += ' The model column to the left reads ' + r.liveTake.toFixed(1) + '%'
          + (r.termsBasis === 'default' ? ' \u2014 generic ' + r.mechanic + ' default terms, not this country\'s' : '')
          + ', a gap of ' + (d > 0 ? '+' : '') + d.toFixed(1) + 'pp. Do not put both numbers in one sentence.';
+    }
+    // ── v675 (T1) — the fee-basis rows show the number they are now ranked on ──────
+    // The rank and the tier dividers moved onto the comparable take this cycle. If the cell still
+    // printed only the blend, Iraq would sit at rank 2 above the investible divider displaying a
+    // red 84.8%, which is worse than the defect being fixed: a green position carrying a red
+    // number. So on the 10 rows where the two figures differ at printed precision, the comparable
+    // take becomes the tier-coloured headline value and the published blend is kept directly
+    // beneath it, labelled, so nothing is hidden and the exported figure is still on screen.
+    // The other 175 rows render exactly as they did — _fcFeeState() returns null for them.
+    var _fst = _fcFeeState(r);
+    if (_fst) {
+      var _cv = _fst.cmp;
+      var _names = _fcFeeMechNames(r);
+      var _n1 = (_fst.n1 != null) ? Number(_fst.n1).toLocaleString() : null;
+      var _ct = 'COMPARABLE \u2014 ' + r.country + ' government take on its '
+        + (_n1 ? _n1 + ' ' : '') + 'PSC/Concession contracts alone is ' + _cv.toFixed(1)
+        + '% at $' + _fcSelPrice + '/bbl. THIS is what the # rank and the tier dividers are built from, '
+        + 'and what \u2318 Copy for IC Memo and the XLSX carry as the rankable basis. '
+        + 'The published all-contract headline is ' + v.toFixed(1) + '%, a gap of '
+        + ((_cv - v) > 0 ? '+' : '\u2212') + Math.abs(_cv - v).toFixed(1) + 'pp, and it blends '
+        + (_names ? _names + ' ' : '') + 'fee-basis contracts where the contractor is paid a fixed $/bbl '
+        + 'remuneration and keeps no oil-price upside \u2014 so their take% climbs toward 97\u201399% because '
+        + 'of the contract structure, not because the terms are hard. Per MECHANIC_COMPARABILITY, the blend '
+        + 'may not be ranked against other countries. The headline is still the figure the JSON API and the '
+        + 'XLSX GovtTake_ column publish, and it is printed below. Do not put both numbers in one sentence.';
+      return '<td class="num">'
+        + '<span class="take-val ' + takeClass(_cv) + '" style="font-size:14px;padding:2px 7px;cursor:help;" title="'
+        + _ct.replace(/"/g, '&quot;') + '">\u2696 ' + _cv.toFixed(1) + '%</span>'
+        + '<div style="font-size:10px;color:var(--muted);line-height:1.35;margin-top:2px;white-space:nowrap;cursor:help;" title="'
+        + t.replace(/"/g, '&quot;') + '">blended ' + v.toFixed(1) + '%</div>'
+        + '</td>';
     }
     return '<td class="num"><span class="take-val ' + takeClass(v) + '" style="font-size:14px;padding:2px 7px;cursor:help;" title="' + t.replace(/"/g, '&quot;') + '">' + v.toFixed(1) + '%</span></td>';
   };
@@ -40624,7 +40700,8 @@ function renderFCResults(results, price) {
     // v580 (T5): the take ranking is built on the citable database take, so tie groups must be
     // measured on the same value. Reading liveTake here would report ties that the visible rank
     // order no longer has.
-    var _tv = _fcDbTake(r);
+    // v675 (T1): and on the comparable basis, so tie groups match the visible order.
+    var _tv = _fcCmpTake(r);
     return _tv == null ? null : _tv;
   };
   // Group by exact value across the whole result set rather than by contiguous run: the
@@ -40729,7 +40806,11 @@ function renderFCResults(results, price) {
     // Australia -- but Australia's citable take is 38.5%, inside the investible band, so the
     // divider pushed an investible country out of the investible tier using a number the page
     // tells the analyst not to cite.
-    var _rDbTake = _fcDbTake(r);
+    // v675 (T1): the tier boundaries follow the comparable take too. Drawing them on the blend
+    // put Iraq under "NOC-dominated · take >75%" on a figure the platform's own clipboard tells
+    // the analyst not to rank on, and held Ecuador out of the investible band at 46.5% when its
+    // PSC/Concession contracts read 39.3%.
+    var _rDbTake = _fcCmpTake(r);
     if (sortField === 'take' && _rDbTake != null && !_rowIsGeneric) {
       if (!_take40DividerInserted && _rDbTake > 40) {
         var _t40Colspan = showStability ? 14 : 13;   // v568 (T5): +1 for the citable database NPV column; v632 (T5): +1 for the shortlist select column
