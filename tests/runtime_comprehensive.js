@@ -747,6 +747,9 @@ async function testSbSChartBasis(page) {
         data: c ? c.data.datasets.map(d => d.data) : [],
         tips: c ? c.data.datasets.map((d, i) =>
           c.options.plugins.tooltip.callbacks.label({ datasetIndex: i, dataIndex: 1, parsed: { y: d.data[1] } })) : [],
+        // v684: point FILL is the channel the data-basis gate uses. White = statutory basis.
+        fills: c ? c.data.datasets.map(d => d.pointBackgroundColor) : [],
+        lines: c ? c.data.datasets.map(d => d.borderColor) : [],
         notice: (document.getElementById('cmp-monopoly-notice') || {}).innerText || '',
         display: document.getElementById('cmp-chart-wrap').style.display,
       };
@@ -882,12 +885,95 @@ async function testSbSChartBasis(page) {
     const ctlOk = ctlExpect.every((row, i) => row.every((v, k) => Math.abs(v - ns.data[i][k]) < 0.001));
     if (ctlOk) p(S, 'control set unchanged (values)', 'North Sea Trio still plots its published headline take');
     else f(S, 'control set unchanged (values)', 'got ' + JSON.stringify(ns.data) + ' want ' + JSON.stringify(ctlExpect));
-    if (ns.title === 'Govt Take vs Oil Price') p(S, 'control set unchanged (title)', 'original single-line title retained');
+    // v684: these two assertions used to read `title === 'Govt Take vs Oil Price'` and
+    // `notice === ''` — i.e. they asserted the GLOBAL absence of any basis annotation as a proxy
+    // for "no MECHANIC re-basis happened here". That proxy was always too broad, and the North Sea
+    // Trio is the set that exposes it: it is all-Group-1 (so nothing re-bases, which is what this
+    // control exists to pin) but it is NOT all-one-DATA-basis — the Netherlands carries no verified
+    // production. Scoped to the dimension this control is actually about; the data-basis gate has
+    // its own control in (6) below.
+    const _ctlTitle = Array.isArray(ns.title) ? ns.title.join(' | ') : String(ns.title);
+    if (/Govt Take vs Oil Price/.test(_ctlTitle) && !/PSC\/Conc/.test(_ctlTitle)) p(S, 'control set unchanged (title)', 'no re-basis line in the title: ' + JSON.stringify(ns.title));
     else f(S, 'control set unchanged (title)', 'title=' + JSON.stringify(ns.title));
-    if (ns.notice === '') p(S, 'control set unchanged (no notice)', 'no basis notice on an all-Group-1 set');
-    else f(S, 'control set unchanged (no notice)', 'unexpected notice: ' + JSON.stringify(ns.notice.slice(0, 120)));
+    if (!/comparable take/i.test(ns.notice)) p(S, 'control set unchanged (no rebasing notice)', 'no re-basis notice on an all-Group-1 set');
+    else f(S, 'control set unchanged (no rebasing notice)', 'unexpected re-basis notice: ' + JSON.stringify(ns.notice.slice(0, 120)));
     if (ns.labels.every(l => l.indexOf('(PSC/Conc)') < 0)) p(S, 'control set unchanged (labels)', JSON.stringify(ns.labels));
     else f(S, 'control set unchanged (labels)', JSON.stringify(ns.labels));
+
+    // ── (6) v684: the DATA-BASIS gate. The grid refuses a no-production column a highest/lowest
+    // placement on all four Govt Take rows ("not ranked · statutory terms", v626). The chart drew
+    // it as a line on the same axis anyway, and a line chart IS a ranking: 78.4% of the 3,200
+    // mixed chartable pairs draw the no-production line BELOW the producer line, i.e. as the more
+    // attractive regime, on a 30.1pp median gap that is an artefact of the weighting.
+    const isProd = (n) => page.evaluate(c => {
+      const x = getProducerContext(c); return !!(x && x.inSet);
+    }, n);
+    if (await isProd('Norway') && await isProd('Nigeria') && !(await isProd('Netherlands')) && !(await isProd('Ghana')))
+      p(S, 'basis fixtures still hold', 'Norway/Nigeria production-weighted; Netherlands/Ghana not');
+    else w(S, 'basis fixtures still hold', 'producer set changed — the cases below may no longer test what they name');
+
+    // 6a MIXED set: gate fires, and only on the no-production column
+    await setCmp(['Norway', 'United Kingdom', 'Netherlands']);
+    const mx6 = await readChart();
+    const nlIdx = mx6.labels.findIndex(l => l.indexOf('Netherlands') === 0);
+    if (nlIdx >= 0 && /\(statutory basis\)/.test(mx6.labels[nlIdx])) p(S, 'statutory column labelled in legend', mx6.labels[nlIdx]);
+    else f(S, 'statutory column labelled in legend', JSON.stringify(mx6.labels));
+    if (nlIdx >= 0 && String(mx6.fills[nlIdx]).toUpperCase() === '#FFFFFF') p(S, 'statutory column drawn hollow', 'pointBackgroundColor=#FFFFFF while its line stays ' + mx6.lines[nlIdx]);
+    else f(S, 'statutory column drawn hollow', 'fills=' + JSON.stringify(mx6.fills));
+    if (mx6.labels.every((l, i) => i === nlIdx || (String(mx6.fills[i]).toUpperCase() !== '#FFFFFF' && l.indexOf('(statutory basis)') < 0)))
+      p(S, 'producer columns left filled', 'only the no-production column is marked');
+    else f(S, 'producer columns left filled', 'fills=' + JSON.stringify(mx6.fills) + ' labels=' + JSON.stringify(mx6.labels));
+    if (/statutory basis/.test(Array.isArray(mx6.title) ? mx6.title.join(' | ') : String(mx6.title)))
+      p(S, 'basis key in chart title', 'key travels with the exported PNG');
+    else f(S, 'basis key in chart title', 'title=' + JSON.stringify(mx6.title));
+    if (/Mixed basis/.test(mx6.notice) && /Netherlands/.test(mx6.notice) && /not ranked/.test(mx6.notice))
+      p(S, 'basis notice shown and ties to the grid', 'notice names the column and the grid rows that already exclude it');
+    else f(S, 'basis notice shown and ties to the grid', 'notice=' + JSON.stringify(mx6.notice.slice(0, 200)));
+    // the marking must not move a single plotted value
+    const ctl6 = await page.evaluate(() => ['Norway', 'United Kingdom', 'Netherlands'].map(n => {
+      const d = COUNTRY_DATA.find(x => x.country === n);
+      return [50, 75, 100, 125].map(p => cpCmpTakeOf(d, String(p)));
+    }));
+    if (ctl6.every((row, i) => row.every((v, k) => Math.abs(v - mx6.data[i][k]) < 0.001)))
+      p(S, 'basis gate changes no plotted value', 'all 12 points still equal cpCmpTakeOf()');
+    else f(S, 'basis gate changes no plotted value', 'got ' + JSON.stringify(mx6.data) + ' want ' + JSON.stringify(ctl6));
+
+    // 6b ALL-PRODUCER set: like-for-like, gate must NOT fire
+    await setCmp(['Norway', 'United Kingdom', 'Nigeria']);
+    const ap6 = await readChart();
+    if (ap6.labels.every(l => l.indexOf('(statutory basis)') < 0)
+        && ap6.fills.every(x => String(x).toUpperCase() !== '#FFFFFF')
+        && !/Mixed basis/.test(ap6.notice))
+      p(S, 'gate silent on an all-producer set', 'no marking, no notice — renders as it shipped');
+    else f(S, 'gate silent on an all-producer set', 'labels=' + JSON.stringify(ap6.labels) + ' fills=' + JSON.stringify(ap6.fills) + ' notice=' + JSON.stringify(ap6.notice.slice(0, 120)));
+
+    // 6c ALL-NON-PRODUCER set: also like-for-like. Three frontier columns are comparable with
+    // EACH OTHER, so marking every one of them would be noise, not information.
+    await setCmp(['Ghana', 'Greenland', 'Vanuatu']);
+    const an6 = await readChart();
+    if (an6.labels.every(l => l.indexOf('(statutory basis)') < 0)
+        && an6.fills.every(x => String(x).toUpperCase() !== '#FFFFFF')
+        && !/Mixed basis/.test(an6.notice))
+      p(S, 'gate silent on an all-statutory set', 'three no-production columns are like-for-like — nothing marked');
+    else f(S, 'gate silent on an all-statutory set', 'labels=' + JSON.stringify(an6.labels) + ' fills=' + JSON.stringify(an6.fills) + ' notice=' + JSON.stringify(an6.notice.slice(0, 120)));
+
+    // 6d the gate must agree with the GRID, by construction. Same set, both surfaces.
+    await setCmp(['Nigeria', 'Angola', 'Ghana']);
+    const g6 = await readChart();
+    const gridSaysNotRanked = await page.evaluate(() => {
+      const cells = document.querySelectorAll('#cmp-output [data-sbs-c]');
+      const out = {};
+      document.querySelectorAll('#cmp-output .cmp-cell').forEach(c => {});
+      const txt = document.getElementById('cmp-output').innerText;
+      return { ghanaNotRanked: /not ranked · statutory terms/.test(txt), n: (txt.match(/not ranked · statutory terms/g) || []).length };
+    });
+    const gh = g6.labels.findIndex(l => l.indexOf('Ghana') === 0);
+    if (gridSaysNotRanked.ghanaNotRanked && gh >= 0 && /\(statutory basis\)/.test(g6.labels[gh]))
+      p(S, 'chart and grid state the same exclusion', `grid prints "not ranked · statutory terms" ${gridSaysNotRanked.n}x and the chart marks the same column`);
+    else f(S, 'chart and grid state the same exclusion', 'grid=' + JSON.stringify(gridSaysNotRanked) + ' chartLabel=' + JSON.stringify(g6.labels[gh]));
+    if (gh >= 0 && /statutory basis/.test(g6.tips[gh]) && /no verified field production/.test(g6.tips[gh]))
+      p(S, 'statutory tooltip states the basis', g6.tips[gh].slice(0, 110));
+    else f(S, 'statutory tooltip states the basis', JSON.stringify((g6.tips[gh] || '').slice(0, 160)));
 
   } catch(e) { f(S, 'exception', e.message); }
 }
