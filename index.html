@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v677</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v678</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v677</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v678</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v677';
+  return m ? m[0] : 'v678';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v677');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v678');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -26497,7 +26497,30 @@ function renderCompare() {
     _cmpPriceRank[p] = {
       n: vals.length,
       lo: (srt[1].v - srt[0].v) >= 0.05 ? srt[0].c : null,
-      hi: (vals.length >= 3 && (srt[last].v - srt[last - 1].v) >= 0.05) ? srt[last].c : null,
+      // v678 (T3): was `vals.length >= 3`, so a set with exactly TWO rankable columns printed a
+      // green "lowest of 2" on one column and NOTHING on the other. The pair the phrase "of 2"
+      // refers to was therefore never identifiable on screen. Carried unfixed from cycle 552.
+      //
+      // v626's data-basis gate then pushed it onto the tab's own cold-load exhibit. Norway /
+      // United Kingdom / Netherlands, the seeded default, gates the Netherlands out as a
+      // statutory-terms column and leaves two rankable ones, so all four Govt Take rows shipped:
+      //     Govt Take ($75/bbl)   68.0%            49.2%                    23.4%
+      //                           (no marker)      "lowest of 2" (GREEN)    "not ranked"
+      // Three columns visible, the phrase says "of 2", the column carrying it is not the lowest
+      // number in the row, and the only column with no label at all is the one the marker is
+      // implicitly measured against. The analyst either reads 49.2% as the set's low -- it is not,
+      // 23.4% is on screen beside it -- or stops to work out which two "of 2" means.
+      //
+      // Measured against the shipped country_data.json by rendering real sets: 232 of 300 sampled
+      // two-country comparisons (77.3%) are one-ended this way, and two-country IS the ordinary
+      // T3 shape; of 300 sampled three-country sets, 20 (6.7%) print "of 2" against three visible
+      // columns. The tab's own "USA vs Iraq" quickstart is one of them.
+      //
+      // Both ends now mark whenever an ordering exists. The tie guard is unchanged and, at two
+      // columns, is literally the same comparison as `lo`'s -- so the two markers fire together or
+      // not at all, and the half-labelled state cannot recur. Colour already carries direction
+      // (green = lower take, red = higher), so naming both ends adds the missing member, not noise.
+      hi: (srt[last].v - srt[last - 1].v) >= 0.05 ? srt[last].c : null,
       loV: srt[0].v, hiV: srt[last].v,
       basis: _cmpAnyBlended ? 'the PSC/Concession take where a column blends fee-basis contracts' : '',
       gated: _cmpBasisGate,
