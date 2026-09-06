@@ -31782,3 +31782,18 @@ at all), and the Philippines card — 152 TSC contracts at 100% take the databas
 
 ## Bookkeeping (not the cycle)
 - v672 → v673 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 579 Log — 2026-09-05 22:47
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 579 complete and pushed (v673).
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?"
+
+## Friction
+Cold load, Country Profile → Russia. The **Fiscal Regime Breakdown** card is the one surface whose job is to answer T6, and the FAQ tells the analyst to *"use the mechanic-specific take for your analysis, not the headline blended figure"* — so these rows are what an IC memo gets built on.
+
+It showed Concession 1,191 contracts at 22.9% and PSC 69 at 56.4%, under th
