@@ -31380,3 +31380,113 @@ countries where the NPV genuinely discriminates, the strip says to cite it and s
 Cold walk of Country Profile at 1440×900 over local HTTP, storage cleared, Nigeria loaded from the dropdown.
 
 The headline verdict line (`_quickIcVerdict497`, `index.html:31768`) ends in bold: *"…contractor NPV tracks govt take at r² 0.89 … so these two figures restate the
+
+---
+## Cycle 577 Log — 2026-09-05 19:45
+- Test before: 261 PASS / 0 FAIL / 1 WARN (run locally this cycle, not assumed)
+- Test after: 261 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 pageerrors. The 1 WARN is a `sw.js` 404 under the local static server and is
+  present on the pre-change baseline too — verified by running the suite against the stashed
+  pre-change `index.html` on a second port. Not this change.
+- Summary: v671 shipped and pushed to both repos.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (5 cycles stale; the
+last six ran T5, T3, T6, T1, T4, T2, T2.)
+
+## Friction
+Cold walk of Country Profile at 1440×900 over local HTTP, `sessionStorage` and `localStorage`
+cleared, USA loaded from the dropdown.
+
+`dd-ic-basis-mark` (`index.html` ~31606, inside the v596 IIFE) had **two** colour registers where
+`_dqTier()` has **three**, and the join was `isProxy` — so every non-PROXY country rendered in the
+same green. Measured over the shipped `country_data.json`:
+
+| register | n countries | coverage range |
+|---|---|---|
+| PROD-WTD | 10 | 6.2% (Colombia) – 37.6% (United Kingdom) |
+| PART-PROD | 12 | **0.2% (USA, n=37,222)** – 3.4% (Mexico) |
+| PROXY | 163 | 0 |
+
+All 22 in the first two rows rendered `rgb(21,128,61)` green, in the identical phrasing
+`"<n>% production-weighted"` — the USA at 0.2% and the UK at 37.6%, a **188× difference in
+production depth**, in the same colour and the same sentence shape. The badge sits 8px from the
+two buttons that turn this page into memo text, and four lines below a headline that reads
+*"Defend on the take and its evidence tier (n=37,222 contracts), not on the NPV."* The page told
+the analyst to defend on the tier, and the tier badge said green.
+
+This was not a missing convention — it was an unapplied one. `.dq-partprod` (`index.html:948`) has
+rendered PART-PROD in `--yellow` on every row badge since v592. The IC-basis mark was the single
+place in the app where that did not hold.
+
+Carried forward from cycle 576, which found it on its own walk and correctly left it as its own
+cycle rather than widening T2 into it.
+
+## Change
+Three registers keyed to the existing `_dqTier()` label. **No new threshold is introduced** — the
+split is the `cov > 5` boundary already in `_dqTier()`, and the yellow is the app's own `--yellow`,
+the colour that tier already carries elsewhere. The face of the badge now states the share that is
+**not** production-weighted, because that is the figure that governs how the take may be cited.
+
+Measured at render, 1440×900:
+
+| country | colour | badge text |
+|---|---|---|
+| USA | `rgb(161,98,7)` yellow | `⚠ PART-PROD — 99.8% of contracts unweighted` |
+| Australia | yellow | `⚠ PART-PROD — 99.7% of contracts unweighted` |
+| Mexico | yellow | `⚠ PART-PROD — 96.6% of contracts unweighted` |
+| United Kingdom | `rgb(21,128,61)` green | `PROD-WTD — 37.6% prod-weighted, 62.4% not` |
+| Nigeria | green | `PROD-WTD — 14.1% prod-weighted, 85.9% not` |
+| Colombia | green | `PROD-WTD — 6.2% prod-weighted, 93.8% not` |
+| France | `rgb(150,87,10)` amber | `⚠ PROXY basis — copies as directional` |
+
+The PART-PROD tooltip now names the register explicitly ("the middle of ORCA's three production
+registers, not a verified figure") and the PROD-WTD tooltip states that no country in the database
+exceeds 37.6%, so the top rung stops reading as "verified".
+
+Badge also gained `min-height:24px` + `align-items:center`: it measured **23px**, under the
+directive's `pointer: coarse` floor, and this cycle touched it.
+
+## Result
+Before the click, the analyst can tell a country whose take rests on 0.2% verified block-level
+production from one resting on 37.6%. The twelve PART-PROD countries no longer carry a go-signal
+they had not earned, and the ten PROD-WTD countries print their own unweighted remainder instead
+of implying the figure is verified. The screen and the pasted text now say the same thing — the
+paste already carried the coverage caveat via `_icProdBasisNote()`; the badge above it did not.
+
+## Verification (all run this cycle)
+| check | result |
+|---|---|
+| JS syntax gate, 11 script blocks | **PASS** |
+| Runtime suite, local, this build | **261 PASS / 0 FAIL / 1 WARN** |
+| same suite, pre-change baseline on port 8898 | 261 / 0 / **1 WARN** — WARN is pre-existing |
+| badge height under `pointer: coarse` | **24.0px** (23px before) |
+| CP @390×844 `hasTouch`, all 3 registers | scrollWidth 390 = clientWidth 390 |
+| horizontal scroll, 9 tabs × 6 viewports (1920/1440/1280/1024/768/390) | **0** violations |
+| pageerrors, all widths | **0** |
+
+## Carried forward — not fixed this cycle
+- **`FISCAL REGIME BREAKDOWN` claims the wrong weighting for the headline.** Its note reads
+  "Blended average (81.1%) weights equally across all contract types" while the take-chart caption
+  two screens up prints `Simple avg: 79.9%` and labels 81.1% production-weighted-blended. The page
+  states two incompatible derivations of the number the analyst is asked to defend. Still the
+  strongest open defensibility defect and the natural next T6.
+- Everything carried from cycles 560–576 is otherwise unchanged, including: the take chart's PNG
+  export carrying the fee-basis caveat but not the proxy one; the proxy notice naming IRR and
+  breakeven columns that do not exist; the Reform Risk country lookup card printing DIRECTION over
+  the full record beside a score over the 2010 window; "Most Frequently Reformed Regimes" showing
+  15 of 21 sourced jurisdictions without saying so; `COUNTRY_DATA` and the API disagreeing on
+  `profit_oil_govt` / `state_eq` for 45 of 185 countries; the two barely-screening Screener presets;
+  `#screener-count` at ~570 characters of unbroken prose; the `Cost Recovery Cap` source badges at
+  21px on Country Profile @390; the Fiscal Compare XLSX emitting 25 columns with no comparable-take
+  column; `MECHANIC_BREAKDOWN` disagreeing with `country_data.json` on Iraq's mechanic split; the
+  Side-by-Side search box replacing the seeded example with no add-to-set path; the two adjacent
+  unexplained IC buttons on Country Profile; the duplicated all-185 rank in CP headline Zones A and
+  B; the non-existent `cp-price-select`; the Screener take slider's `min="30"` floor excluding the
+  USA at 23.4%; FAQ A25/A35/A40 describing a Screener "Stability Score filter" that does not exist;
+  Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on
+  lines 54/56/57; the 272 dead citations; and `SPECULATIVE_COUNTRIES` still being a hand-typed list
+  of 7 names from v41.
+
+## Bookkeeping (not the cycle)
+- v670 → v671 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
