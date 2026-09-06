@@ -31365,3 +31365,18 @@ countries where the NPV genuinely discriminates, the strip says to cite it and s
 
 ## Bookkeeping (not the cycle)
 - v669 → v670 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 576 Log — 2026-09-05 19:01
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 576 complete — v670 shipped and pushed to both repos.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest; the last six version commits ran T3, T4, T1, T6, T3, T5.)
+
+## Friction
+Cold walk of Country Profile at 1440×900 over local HTTP, storage cleared, Nigeria loaded from the dropdown.
+
+The headline verdict line (`_quickIcVerdict497`, `index.html:31768`) ends in bold: *"…contractor NPV tracks govt take at r² 0.89 … so these two figures restate the
