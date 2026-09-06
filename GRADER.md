@@ -32451,3 +32451,104 @@ tie guard correctly declines to break the tie arbitrarily — designed behaviour
 Cold load, storage cleared, click **Side-by-Side**. The tab seeds the North Sea Trio, and that seeded set is what every first-time analyst reads before touching anything. All four **Govt Take** rows — the centrepiece of the tab — shipped like this:
 
 | Govt Take ($75/bbl) | Norway
+
+---
+## Cycle 585 Log — 2026-09-06
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" Stalest in rotation
+(579=T6, 580=T5, 581=T1, 582=T4, 583=T2, 584=T3).
+
+## Friction
+Cold load, storage cleared, **Fiscal Compare**, click row #1 (USA). The drilldown
+(`openFCDrilldown`, index.html:41289) is where an analyst working the ranked table asks this
+question — 185 rows lead into it, `←/→` steps through the ranking without leaving it, and it ends
+with **⎘ IC Citation** above an IC MEMO line that instructs *"Note evidence tier in citation."*
+
+The tier it handed them was a single badge, `_fcDrillEviBadge` (~41395):
+
+    Src B · 41% primary law · 125,336 facts
+
+Both legs of that grade are properties of the **country's whole fact base** — mostly contract
+metadata. Neither one looks at the four to six fiscal terms `getDCFParams()` actually runs to
+produce the take, NPV and IRR printed inches above it. So the drawer told the analyst to carry
+into the memo the one number on the panel that does not describe the terms the take was built from.
+
+Measured 2026-09-06 across all 185 shipped `api/v1/country/*.json`, using `getDCFParams()`'s own
+term set and the Country Profile Evidence Chain's own sourcing rule (bulk harvest,
+multi-jurisdiction instruments and D-confidence rows do not count):
+
+| | |
+|---|---|
+| Countries with EVERY model term cited | **0 of 185** — best on the platform is 4 of 5 |
+| Countries citing HALF OR FEWER | **128 of 185** |
+| Countries citing NONE | **19** |
+| A/B-graded countries citing half or fewer | **59 of 107** |
+
+Concretely: Brazil grades **A** over 2 of 4 · Canada **A** over 2 of 4 · Albania **A** over 2 of 4 ·
+Somalia **D** over 0 of 5. USA, the #1 row on a cold load, reads **Src B** over **2 of 5** — State
+Participation and Special Tax are substituted, and Severance Tax is a hard-coded 5% engine override
+with no value on record.
+
+v660 put this leg on the **Country Profile**. That is a different tab, behind a country selection.
+An analyst who works the ranked table and copies the citation out of this drawer never saw it.
+
+## Change
+A second chip now sits beside the Src badge on the drawer header line:
+
+    Src B · 41% primary law · 125,336 facts     2 of 5 model terms cited →
+
+Red at half or fewer, amber below full, green at full. It is a **control, not a caption** — click or
+Enter opens that country's Country Profile and scrolls to the term-by-term **Key Fiscal Parameters —
+Evidence Chain**, which names each term, its ORCA value, the statutory value and the source, and
+flashes the section on arrival. Computed from `api/v1/country/{slug}.json` when the drawer opens and
+cached per country, so the `←/→` walk through the ranking does not refetch. Additive and
+late-binding: a failed fetch, or a regime carrying no model terms, leaves the drawer byte-identical
+to what it was.
+
+New: `_FC_TERM_LABEL`, `_FC_TERM_FACTS`, `_fcTermLeg()`, `_fcRenderTermLeg()`, `_fcOpenTermChain()`
+(all immediately above `openCountryProfileFromFC`), a placeholder `#fc-dd-terms-chip` after
+`html += _fcDrillEviBadge`, and one call after the drawer row is inserted.
+
+## Result
+The analyst reading USA at rank #1 now sees **Src B** and **2 of 5 model terms cited** on the same
+line, and one click lands on the two terms that are missing — without leaving Fiscal Compare to
+discover that the grade and the terms are different questions. Cross-checked against the Country
+Profile chip on Brazil: both surfaces read **2 of 4**. No tier letter, percentage, grade, take, NPV,
+IRR, rank, filter or export changes.
+
+## Verification
+- JS syntax gate: **PASS** — 11 inline script blocks, 0 errors.
+- Playwright runtime suite **RUN this cycle** against the local build (`TEST_URL=http://localhost:8899/index.html`):
+  **261 PASS / 0 FAIL / 1 WARN**, 0 page errors. The WARN is the service worker registering the
+  hardcoded Pages path `/petroleum-fiscal-db/sw.js`, which 404s on a bare localhost root —
+  pre-existing, localhost-only, not from this change. Number read from
+  `/tmp/runtime_test_report.txt`, not assumed.
+- Chip verified rendering on USA 2/5, Norway 3/4, Brazil 2/4, Iraq 1/3, Somalia 0/5.
+- Click path verified end to end: chip → tab `t7` → `dd-country-select` = Brazil →
+  `dd-facts-brazil` present → flash fired.
+- **Mobile 390 x 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390. Chip renders 44px tall
+  (limit 24). No horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768.
+
+## Carried forward — not fixed this cycle
+- The IOC Portfolio Evidence column, the Explorer/Screener Evidence column and the Side-by-Side
+  Evidence tier row all still print the whole-fact-base grade with no model-term leg. The Screener's
+  **Min primary-source evidence (A)** slider — the one control that lets an analyst filter on
+  sourcing — screens on that same leg, so "tier-A ≥ 55% · ≥150 facts" returns 35 countries none of
+  which cite every model term.
+- The Country Profile headline strip prints `41% primary law · n=37,222` where 37,222 is the
+  CONTRACT count, while the Evidence Quality panel 200px below pairs the same share with the FACT
+  count (125,336) — and the grade's depth leg is measured in facts, not contracts.
+- The `fc-nav-bar` "▶ Run FC at this price" button (~line 3156) reads `getElementById('cp-price-select')`
+  — no such element — falls back to `#fc-price`, then writes to `#price`, which also does not exist.
+- The data divergence behind cycle 583's chip: 72 of the 163 count-basis records do not reconcile
+  `take_75` against the `mech_mix` blend, and 7 carry only ONE mechanic. Needs a data regeneration
+  and Zach's call, not a UX cycle.
+- Side-by-Side tabulates Contractor NPV at $50/$75/$125 while the Govt Take rows and the NPV chart
+  carry all four prices — the $100 NPV is plotted but not tabulated. Carried from 552.
+- The Side-by-Side proxy/basis notice refers to "these NPV and IRR columns"; there is no IRR row and
+  no breakeven row on that tab. Carried from 552.
+- Everything else carried from cycles 560–584 is unchanged.
+
+## Bookkeeping (not the cycle)
+- v678 → v679 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).

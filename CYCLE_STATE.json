@@ -1,12 +1,12 @@
 {
-  "cycle_number": 576,
-  "cycle_start_unix": 1788650724,
-  "cycle_start_human": "2026-09-05 18:25",
-  "cycle_complete_human": "2026-09-05 17:55",
+  "cycle_number": 585,
+  "cycle_start_unix": 1788685171,
+  "cycle_start_human": "2026-09-06 03:59",
+  "cycle_complete_human": "2026-09-06 03:13",
   "cycle_interval_seconds": 1800,
-  "last_test_pass": 261,
+  "last_test_pass": 236,
   "last_test_fail": 0,
-  "last_test_warn": 1,
+  "last_test_warn": 0,
   "last_test_js_errors": 0,
   "grader_version": "2.0",
   "session_start_test": "83 PASS / 12 FAIL",
@@ -48,11 +48,11 @@
     "Professional credibility: provenance statement + benchmark attribution"
   ],
   "notes_cycle_4": "Cycle 4: Floor B+ across all 15 categories. 7 upgrades. 117/0 clean.",
-  "current_version": "v670",
+  "current_version": "v678",
   "faq_count": 965,
   "notes_cycle_341": "Cycle 341: v425 shipped. 9 analyst UX improvements. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_342": "Cycle 342: v426 shipped. 9 analyst UX improvements + FAQs A957-A959. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_343": "Cycle 343: v428 shipped. 5 analyst UX fixes + FAQs A960-A962. Back-to-FC bug fixed. Breakeven in CP strip. IRR cell tooltips. JS syntax gate PASS. 136 PASS / 0 FAIL.",
   "notes_cycle_344": "Cycle 344: v428 Cycle 344. 10 analyst UX improvements + 1 critical data fix. USA region Other->North America (was invisible to all FC region chips). North America FC chip. IRR slider @$75 label. CP Breakeven n/a state. Screener auto-Sweet Spot. SbS country count badge. FC Drilldown Peers-in-Region. FC Reading Guide Src definition. FC sort button tooltips (Govt Take, NPV, Breakeven). Screener home card preset mention. JS syntax gate PASS (12 blocks). No new FAQs.",
-  "notes_cycle_345": "Cycle 345: v429. 6 analyst UX fixes + FAQs A963-A965. (1) Screener region filter bug fixed â€” Asia Pacific/Americas returned 0 results; fixed via _regionMatch(). (2) FC Other(17) chip added â€” 17 countries previously unreachable. (3) Quick Start Step 3 label corrected. (4) FC stats bar Ctct NPV>0 label. (5) Screener preset description corrected. (6) Home hero date updated. FAQs A963-A965. JS syntax gate PASS (6 blocks)."
+  "notes_cycle_345": "Cycle 345: v429. 6 analyst UX fixes + FAQs A963-A965. (1) Screener region filter bug fixed \u00e2\u20ac\u201d Asia Pacific/Americas returned 0 results; fixed via _regionMatch(). (2) FC Other(17) chip added \u00e2\u20ac\u201d 17 countries previously unreachable. (3) Quick Start Step 3 label corrected. (4) FC stats bar Ctct NPV>0 label. (5) Screener preset description corrected. (6) Home hero date updated. FAQs A963-A965. JS syntax gate PASS (6 blocks)."
 }
