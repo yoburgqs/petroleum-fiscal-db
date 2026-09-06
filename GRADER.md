@@ -32563,3 +32563,84 @@ IRR, rank, filter or export changes.
 **Task:** T6 — "Where did this number come from and how solid is the evidence?" (stalest in rotation; 584 was T3)
 
 **Friction:** Cold load → Fiscal Compare → click row #1 (USA). The drilldown is where an analyst working the ranked table asks this question — 185 rows lead into it, and it ends with **⎘ IC Citation** above a line that says *"Note evidence tier in citation."* The tier it handed them was one badge: `Src B · 41% primary law · 
+
+---
+## Cycle 586 Log — 2026-09-06
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo." (stalest in rotation;
+580 T5, 581 T1, 582 T4, 583 T2, 584 T3, 585 T6.)
+
+**Friction:** Cold load, no sessionStorage → Country Profile → Norway → **Copy for IC Memo**
+(`#dd-ic-summary-btn`, handler at ~line 37490). The pasted paragraph carried take at four prices,
+price swing, contractor NPV at $50/$75/$125, breakeven, fiscal predictability, production-weighting
+basis, evidence tier and the IRR note — and **not one word about reform exposure, on any of the 185
+countries.** That is the single item this platform says the memo may not go out without. The Home
+"Check Reform Risk" card: *"Before finalizing any IC memo: open Reform Risk and look up your
+country. It returns one IC action — the premium to carry."* The Fiscal Compare IC Memo Quick Rules:
+*3+ law changes since 2010 → 3–5pp WACC premium.* And the Country Profile page the analyst is
+standing on already renders that verdict, from `_rrClassify()`, roughly 300px below the button.
+The copy silently left all of it on screen.
+
+Worst where the paragraph refuted itself: for the 132 one-term countries the predictability slot
+pastes *"UNGRADED … Do not cite it as evidence of fiscal stability"* and then supplied nothing in
+its place. Norway pasted that sentence while its own reform verdict is an **orange in-window take
+rise — the 2022 COVID relief expiry, +12pp**. For the 164 jurisdictions with no sourced log, silence
+reads as no exposure, when the correct memo sentence is that it is not scored and is not a zero
+premium.
+
+**Change:** a `Reform exposure:` line now sits in the pasted paragraph between the predictability
+slot and the production-basis line.
+- Covered → score/100 with its rank note, count of sourced fiscal law changes since 2010, the
+  direction verdict with the v585 honesty basis, the most recent event, and the IC action in full.
+- Uncovered → `NOT SCORED — ORCA holds a sourced fiscal-reform event log for 21 of 185 jurisdictions
+  … this is not a score of 100, and a reform-frequency premium of zero must not be carried into this
+  memo on this basis. An external check … is required before this section is final.`
+- Not loaded → says so, rather than reporting an absence of coverage that is really an absence of data.
+
+Rendered from `_rrClassify()` — the same function the Reform Risk tab and the Country Profile
+sidebar call — so the pasted memo cannot state a different verdict from either screen. Nothing
+recomputed, no threshold introduced. New: `_icPlain()`, `_icReformLine()` (both immediately below
+`_icProdBasisLine`), one call site, and the button tooltip now names what it copies.
+
+One correction to the reused text: `_rrClassify().latest` is the most recent event of *any* kind, so
+on Guyana — newest entry a 2022 terms review that concluded without renegotiation — the tab's label
+"Most recent change" would have asserted a fiscal change that did not happen. The pasted line reads
+"Most recent sourced event — not a fiscal change" where `_rrIsFiscalChange()` is false.
+
+**Result:** an analyst who copies a Country Profile straight into an IC memo now pastes the
+reform-frequency premium decision *with the numbers behind it*, instead of shipping a memo whose only
+stability sentence tells them not to cite it. Verified live across all five verdict branches:
+Norway 70/100 and Russia 85/100 (in-window rise, size unscored), Algeria 100/100 and Venezuela 85/100
+(pre-2010 artefact), Guyana 100/100 (post-2010 record is all context), Nigeria 70/100 and Iraq 85/100
+(below the Actively Reforming bar), Somalia (no sourced log). No take, NPV, IRR, breakeven, rank,
+tier, filter, export or on-screen layout changes.
+
+**Verification**
+- JS syntax gate: **PASS** — 11 inline script blocks, 0 errors.
+- Playwright runtime suite **RUN this cycle** against the local build
+  (`TEST_URL=http://localhost:8899/index.html`): **261 PASS / 0 FAIL / 1 WARN**, 0 page errors.
+  Number read from `/tmp/runtime_test_report.txt`, not assumed. The WARN is the service worker
+  registering the hardcoded Pages path `/petroleum-fiscal-db/sw.js`, which 404s on a bare localhost
+  root — pre-existing, localhost-only, not from this change.
+- **Mobile 390 x 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390; button renders 44px tall
+  (limit 24). No horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768.
+
+**Carried forward — not fixed this cycle**
+- The Fiscal Compare drilldown **⎘ IC Citation** and the four tabular *Copy for IC Memo* artifacts
+  (FC, Screener, Side-by-Side, IOC Portfolio) still carry no reform leg. FC and Screener both have a
+  Stability column, but it prints the Fiscal Predictability Score, which is a different signal and
+  is UNGRADED on 132 countries. Deliberately left: the directive bans citation-string micro-edits,
+  and the tabular artifacts need a *column*, which is a layout decision, not a string.
+- FC *Copy for IC Memo* still defaults to all 185 rows / ~50,600 characters when nothing is ticked.
+  The v632 shortlist ticks are the escape hatch and they work; the default is the open question.
+- Everything else carried from cycles 560–585 is unchanged, including: the Screener
+  **Min primary-source evidence (A)** slider screening on the whole-fact-base leg; the Country
+  Profile headline printing `41% primary law · n=37,222` on the CONTRACT count while the Evidence
+  Quality panel pairs the same share with the FACT count; the `fc-nav-bar` "▶ Run FC at this price"
+  button reading `#cp-price-select`, which does not exist, then writing to `#price`, which also does
+  not exist; the 72 of 163 count-basis records that do not reconcile `take_75` against `mech_mix`;
+  Side-by-Side tabulating Contractor NPV at $50/$75/$125 while the chart carries all four prices;
+  and the SbS proxy/basis notice referring to IRR and breakeven rows that do not exist on that tab.
+
+**Bookkeeping (not the cycle)**
+- v679 → v680 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
