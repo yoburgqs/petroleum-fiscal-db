@@ -32998,3 +32998,19 @@ memo a world rank that the same card disowns four lines earlier.
 
 **Bookkeeping (not the cycle)**
 - v682 → v683 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
+
+---
+## Cycle 589 Log — 2026-09-06 07:42
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 589 shipped as v683. Both repos pushed.
+
+**Task** — T2, "Is this one country attractive at $75/bbl, and can I defend that?" (stalest in rotation; 588 was T4).
+
+**Friction** — Walked Country Profile cold. On a fee-blended country the headline strip printed two ranks on two different bases, four lines apart, and never reconciled them. Iraq read:
+
+```
+#6 of 21 producers · lower-mid among producers · on the comparable take
+-21.5pp vs producer median @$75 (comparable)
+All 185 countries: #180 · 
