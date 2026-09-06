@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v671</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v672</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v671</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v672</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v671';
+  return m ? m[0] : 'v672';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v671');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v672');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -26193,13 +26193,13 @@ function renderCompare() {
       key:(d)=>_cmpMechBasisCell(d)},
     {label:'Rank among producers (take @$75) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Position on government take at $75/bbl, sorted lowest take first — #1 is the most contractor-favourable regime. Ranked ONLY against the countries whose take is weighted by verified field production, and with state monopolies (take ≥ 99.5%, no contractor access) excluded. A column with no production data is not given a placement here, because it does not have one: its take is a simple average of statutory terms, not realised economics. The all-185 rank is in each cell&rsquo;s tooltip; it is the weaker basis because it mixes production-weighted regimes with equal-weighted averages built on as few as 2 contracts, which pulls the low-take end of the list down and pushes every real producer toward the bottom of it.">ⓘ</span>',
       key:(d)=>_cmpProducerRankCell(d), bold:false},
-    {label:'Predictability Score <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Fiscal Predictability Score (0\u2013100) \u2014 composite measure of how consistent and stable this country\u2019s fiscal terms are. Three components: (1) Within-country IQR penalty: wide spread across contracts = lower score (up to \u221240 pts). (2) Price swing penalty: take rising sharply with price = lower score (up to \u221230 pts). (3) Regime complexity penalty: \u22128 pts per additional fiscal mechanic above one. Score \u226575 = HIGH (green), 60\u201374 = MODERATE (yellow), 45\u201359 = LOW (orange), &lt;45 = VERY LOW (red) \u2014 awarded since v624 ONLY where ORCA measured a spread. A one-term score renders UNGRADED and uncoloured however high its number. READ THE BASIS CHIP ON EACH BADGE BEFORE RANKING COLUMNS ON THIS ROW. The IQR term is the largest of the three and it is only exercised where ORCA holds a real spread. &#39;one term&#39; = every contract in that country prices identically, so the IQR penalty was zero and the score reflects price swing and mechanic count only \u2014 the same finding the Take spread row below reports as &#39;single term&#39;, which is NOT evidence of low fiscal risk. A number such as &#39;15.0pp&#39; = a measured spread, which the score IS penalised for. &#39;not scored&#39; = no contract-level distribution is held at all. Only 28 of 185 countries have a measured spread at all: 135 price to one statutory term and 22 hold no distribution. Every score that would fall in HIGH belongs to a one-term regime, and NOT ONE of the 28 with a measured spread reaches it \u2014 the ceiling among them is 74 \u2014 which is why the one-term column is shown UNGRADED. A column with a lower score here is therefore not the less stable regime; it may simply be the one ORCA holds enough contracts to see disagree with itself. Distinct from the Reform Frequency Score on the Reform Risk tab, which counts law changes since 2010.">\u24d8</span>',       key:(d)=>renderStabilityBadge(getFiscalPredictabilityScore(d), d)},
+    {label:'Predictability Score <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Fiscal Predictability Score (0\u2013100) \u2014 composite measure of how consistent and stable this country\u2019s fiscal terms are. Three components: (1) Within-country IQR penalty: wide spread across contracts = lower score (up to \u221240 pts). (2) Price swing penalty: take rising sharply with price = lower score (up to \u221230 pts). (3) Regime complexity penalty: \u22128 pts per additional fiscal mechanic above one. Score \u226575 = HIGH (green), 60\u201374 = MODERATE (yellow), 45\u201359 = LOW (orange), &lt;45 = VERY LOW (red) \u2014 awarded since v624 ONLY where ORCA measured a spread. A one-term score renders UNGRADED and uncoloured however high its number. READ THE BASIS CHIP ON EACH BADGE BEFORE RANKING COLUMNS ON THIS ROW. The IQR term is the largest of the three and it is only exercised where ORCA holds a real spread. &#39;one term&#39; = every contract in that country prices identically, so the IQR penalty was zero and the score reflects price swing and mechanic count only \u2014 the same finding the Take spread row below reports as &#39;single term&#39;, which is NOT evidence of low fiscal risk. A number such as &#39;15.0pp&#39; = a measured spread, which the score IS penalised for. &#39;not scored&#39; = no contract-level distribution is held at all. Only 28 of 185 countries have a measured spread at all: 135 price to one statutory term and 22 hold no distribution. Every score that would fall in HIGH belongs to a one-term regime, and NOT ONE of the 28 with a measured spread reaches it \u2014 the ceiling among them is 74 \u2014 which is why the one-term column is shown UNGRADED. A column with a lower score here is therefore not the less stable regime; it may simply be the one ORCA holds enough contracts to see disagree with itself. Distinct from the Reform Frequency Score on the Reform Risk tab, which counts law changes since 2010.">\u24d8</span>',       id:'fp', key:(d)=>renderStabilityBadge(getFiscalPredictabilityScore(d), d)},
     {label:'─── Govt Take ───', key:()=>'', bold:true, divider:true},
     {label:'Govt Take ($50/bbl)',   key:(d)=>_cmpTakeCell(d,50)},
     {label:'Govt Take ($75/bbl)',   key:(d)=>_cmpTakeCell(d,75)},
     {label:'Govt Take ($100/bbl)',  key:(d)=>_cmpTakeCell(d,100)},
     {label:'Govt Take ($125/bbl)',  key:(d)=>_cmpTakeCell(d,125)},
-    {label:'Take spread across contracts <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Interquartile range (p25–p75) of government take across this country&rsquo;s own contracts at $75/bbl. This is a MEASURED dispersion across the contract set — ORCA runs no Monte Carlo on government take, so there is no P10/P90 to quote and none is shown. Narrow (&lt;5pp) = consistent terms across blocks. Wide (10pp+) = material contract-level variation, common in mixed-mechanic countries and R-factor tier regimes. &lsquo;single term&rsquo; means every contract prices identically — a statutory one-term regime, not a low-risk finding. Read it beside Fiscal facts held: a narrow spread over a thin fact base is a thin sample, not a tight regime. The spread is UNWEIGHTED across contracts while the Govt Take rows above are production-weighted where coverage permits, so the band can sit slightly off the headline figure &mdash; Nigeria&rsquo;s headline take is 81.1% against an 83.1&ndash;83.5% band, because its weighted barrels sit in its lower-take contracts. Neither number is wrong; they answer different questions. Use the headline for the country figure and the spread for how much block selection matters.">ⓘ</span>',         key:(d)=>{ const p25=d.p25_take,p75=d.p75_take;
+    {label:'Take spread across contracts <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Interquartile range (p25–p75) of government take across this country&rsquo;s own contracts at $75/bbl. This is a MEASURED dispersion across the contract set — ORCA runs no Monte Carlo on government take, so there is no P10/P90 to quote and none is shown. Narrow (&lt;5pp) = consistent terms across blocks. Wide (10pp+) = material contract-level variation, common in mixed-mechanic countries and R-factor tier regimes. &lsquo;single term&rsquo; means every contract prices identically — a statutory one-term regime, not a low-risk finding. Read it beside Fiscal facts held: a narrow spread over a thin fact base is a thin sample, not a tight regime. The spread is UNWEIGHTED across contracts while the Govt Take rows above are production-weighted where coverage permits, so the band can sit slightly off the headline figure &mdash; Nigeria&rsquo;s headline take is 81.1% against an 83.1&ndash;83.5% band, because its weighted barrels sit in its lower-take contracts. Neither number is wrong; they answer different questions. Use the headline for the country figure and the spread for how much block selection matters.">ⓘ</span>',         id:'spread', key:(d)=>{ const p25=d.p25_take,p75=d.p75_take;
       if(p25==null||d.p75_take==null) return '<span style="color:var(--muted);" title="No contract-level take distribution held for this country.">\u2014</span>';
       const iqr=p75-p25;
       // v521: a degenerate spread used to render as the number "~0.0pp", which reads as a measured
@@ -26422,7 +26422,7 @@ function renderCompare() {
     } else {
       html += `<div class="cmp-row">`;
       html += `<div class="cmp-cell lbl">${r.label}</div>`;
-      selected.forEach(d => html += `<div class="cmp-cell">${r.key(d)}</div>`);
+      selected.forEach(d => html += `<div class="cmp-cell"${r.id ? ` data-sbs-row="${r.id}" data-sbs-c="${_cmpEsc(d.country)}"` : ''}>${r.key(d)}</div>`);
     }
     html += `</div>`;
   });
@@ -26715,7 +26715,7 @@ function renderCompare() {
     <span style="font-size:10px;color:var(--muted);margin-left:4px;">Tip: Ctrl+P to print, select "Save as PDF" as printer for best results</span>
   </div>`;
   // Accessibility/data table: structured table mirroring the comparison grid (screen readers and tests)
-  html += `<table style="display:none;" aria-hidden="true" id="cmp-data-table"><thead><tr><th>Metric</th>${selected.map(d=>`<th>${d.country}</th>`).join('')}</tr></thead><tbody>${rows.filter(r=>!r.divider).map(r=>`<tr><td>${r.label}</td>${selected.map(d=>`<td>${typeof r.key==='function'?r.key(d):r.key}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
+  html += `<table style="display:none;" aria-hidden="true" id="cmp-data-table"><thead><tr><th>Metric</th>${selected.map(d=>`<th>${d.country}</th>`).join('')}</tr></thead><tbody>${rows.filter(r=>!r.divider).map(r=>`<tr><td>${r.label}</td>${selected.map(d=>`<td${r.id ? ` data-sbs-row="${r.id}" data-sbs-c="${_cmpEsc(d.country)}"` : ''}>${typeof r.key==='function'?r.key(d):r.key}</td>`).join('')}</tr>`).join('')}</tbody></table>`;
   out.className = '';
   out.innerHTML = html;
 
@@ -26947,7 +26947,209 @@ function renderCompare() {
   } else if (npvChartWrap) {
     npvChartWrap.style.display = 'none';
   }
+
+  _sbsApplyObsSpread();   // v672 (T3)
 }
+
+// ─── v672 (T3): withdraw the "single term" claim on the COMPARISON screen ──────────
+//
+// v559 established that COUNTRY_DATA ships p25_take === p75_take for 135 of 185 countries, and
+// that on 41 of them the platform's OWN contract file (api/v1/country/<slug>.json, top_contracts)
+// refutes it outright. Country Profile withdraws the claim there (_cpApplyObsSpread) and Reform
+// Risk withdraws it there (_rrApplyObsSpread, which already reuses the same cache). Side-by-Side
+// never did -- and Side-by-Side is the one screen of the three whose entire purpose is to RANK
+// these countries against each other on exactly those two rows.
+//
+// Cold load, no interaction, the tab's own seeded example (Norway / UK / Netherlands):
+//
+//   Predictability Score          Norway 76 · UNGRADED one term   UK 58 · LOW 15.0pp   NL 84 · UNGRADED one term
+//   Take spread across contracts  Norway single term              UK 36.4-51.4% (15.0pp)  NL single term
+//
+// Read across, that says the UK is the only one of the three where block selection moves the
+// fiscal outcome, and ranks the set NL 84 > Norway 76 > UK 58. ORCA's own contract tables say the
+// opposite for the top two: Norway's 50 largest producing contracts run 51.1-80.7% (29.6pp) and
+// the Netherlands' run 22.9-53.7% (30.8pp) -- each about DOUBLE the UK's measured 15.0pp. The two
+// columns the grid calls uniform are the two most dispersed columns in the set, and the analyst
+// reaches that reading on the default view without clicking anything.
+//
+// It is also a straight self-contradiction across tabs. Open Norway on Country Profile and the
+// basis chip reads "≥29.6pp obs" in orange over "Observed across top 50 producing contracts:
+// 51.1% - 80.7%". Return to Side-by-Side and the same country reads "single term". Same platform,
+// same number, opposite finding -- with the wrong one on the screen that ranks it.
+//
+// Across the 41 refuted countries this is not an edge case for this tab: it hits Angola (45.2pp,
+// in TWO of the four shipped quickstart presets), Indonesia (37.2pp), Colombia (39.4pp), Thailand
+// (36.6pp), Norway, the Netherlands and 35 more.
+//
+// Nothing is recomputed and nothing is overwritten. Same rule v559 set: a top-N-by-production
+// sample cannot ESTABLISH a population IQR, but one counterexample REFUTES a universal claim, and
+// "every contract prices to the same take" is universal. So the claim is withdrawn, the measured
+// floor is printed in its place, and the score is marked as an upper bound.
+//
+// The patch is applied to BOTH the visible grid cell and the matching #cmp-data-table cell, so the
+// "Copy for IC Memo" clipboard artifact carries the withdrawal too, and the set notice is emitted
+// as a .cmp-notice, which copyComparisonTable() already sweeps into the paste (v669).
+function _sbsObsCell(row, c) {
+  var esc = String(c).replace(/"/g, '\\"');
+  return document.querySelectorAll('#cmp-output [data-sbs-row="' + row + '"][data-sbs-c="' + esc + '"]');
+}
+function _sbsPaintObsSpread(c, d, obs, token) {
+  if (token !== window._sbsRenderToken) return;                 // set changed mid-fetch
+  if (typeof cpSpreadConflict !== 'function' || !cpSpreadConflict(d, obs)) return;
+  var nAll  = (d.n != null) ? Number(d.n).toLocaleString() : 'its';
+  var range = obs.min.toFixed(1) + '\u2013' + obs.max.toFixed(1) + '%';
+  var cost  = Math.min(40, obs.spread * 0.8);
+  var fp    = (typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
+  var bound = (fp == null) ? null : Math.max(0, Math.round(fp - cost));
+  var bLbl  = bound == null ? '' : (bound >= 75 ? 'HIGH' : bound >= 60 ? 'MODERATE' : bound >= 45 ? 'LOW' : 'VERY LOW');
+
+  var why = c + ': the bundled quartiles are identical, which is what put "single term" in this '
+    + 'cell. ORCA\u2019s own contract file for ' + c + ' lists the ' + obs.n + ' largest producing '
+    + 'contracts running ' + range + ' government take at $75/bbl, across ' + obs.distinct
+    + ' distinct values \u2014 so they do not all price the same, and block selection does change the '
+    + 'fiscal outcome here. This is a FLOOR on the spread, not an IQR: a top-' + obs.n
+    + '-by-production sample cannot establish a population spread across all ' + nAll
+    + ' contracts, so nothing here is recomputed. Do not rank this column as the uniform-terms one.';
+
+  // Row: Take spread across contracts
+  var spreadCells = _sbsObsCell('spread', c);
+  for (var i = 0; i < spreadCells.length; i++) {
+    var cell = spreadCells[i];
+    if (cell.dataset.obsPainted) continue;
+    if (cell.textContent.trim().indexOf('single term') === -1) continue;   // only the claim this refutes
+    cell.dataset.obsPainted = '1';
+    cell.innerHTML = '<span style="color:var(--orange);font-weight:700;" title="' + _sbsAttr(why) + '">'
+      + '\u2265' + obs.spread.toFixed(1) + 'pp observed</span>'
+      + '<span style="display:block;font-size:10px;font-weight:600;color:var(--orange);">'
+      + range + ' across top ' + obs.n + '</span>';
+  }
+
+  // Row: Predictability Score — the basis chip inside the badge, plus a best-case marker
+  var fpCells = _sbsObsCell('fp', c);
+  for (var k = 0; k < fpCells.length; k++) {
+    var host = fpCells[k];
+    if (host.dataset.obsPainted) continue;
+    var chip = host.querySelector('.orca-fp-basis');
+    if (!chip || chip.textContent.trim() !== 'one term') continue;
+    host.dataset.obsPainted = '1';
+    chip.style.color = 'var(--orange)';
+    chip.style.fontWeight = '700';
+    chip.style.opacity = '1';
+    chip.textContent = '\u2265' + obs.spread.toFixed(1) + 'pp obs';
+    var badge = host.querySelector('.orca-fp-badge');
+    if (badge) {
+      badge.title = (badge.title || '')
+        + '  \u2014\u2014 UPPER BOUND: the take-spread component of this score \u2014 its largest, worth up to '
+        + '\u221240 points \u2014 was charged ZERO because the bundled quartiles for ' + c + ' are identical. '
+        + 'The contract file refutes that: ' + range + ' across the ' + obs.n + ' largest producing '
+        + 'contracts (' + obs.spread.toFixed(1) + 'pp). At that dispersion the spread term alone would '
+        + 'cost ' + cost.toFixed(0) + ' points'
+        + (bound == null ? '.' : ', putting ' + c + ' near ' + bound + ' \u00b7 ' + bLbl + ' rather than ' + fp + '.')
+        + ' Not recomputed here \u2014 read the printed score as the best case, not the finding.';
+      if (!badge.dataset.obsMarked) {
+        badge.dataset.obsMarked = '1';
+        badge.insertAdjacentHTML('beforeend',
+          '<span style="font-size:9px;font-weight:800;color:var(--orange);margin-left:4px;" '
+          + 'title="Upper bound \u2014 the zero take spread this score was built on is contradicted by '
+          + 'this country\u2019s own contract table.">\u25b2 best case</span>');
+      }
+    }
+  }
+
+  _sbsObsNotice(c, obs, bound, bLbl, fp, token);
+}
+function _sbsAttr(x) {
+  return String(x == null ? '' : x).replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+// One notice for the whole set, rebuilt as each column's fetch lands, so a set with three refuted
+// columns gets one sentence naming all three rather than three stacked notices.
+function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
+  if (token !== window._sbsRenderToken) return;
+  var out = document.getElementById('cmp-output');
+  if (!out) return;
+  window._sbsObsHits = window._sbsObsHits || {};
+  window._sbsObsHits[c] = { obs: obs, bound: bound, bLbl: bLbl, fp: fp };
+  var hits = Object.keys(window._sbsObsHits).filter(function(k) {
+    return compareList.indexOf(k) !== -1;
+  });
+  if (!hits.length) return;
+  var el = document.getElementById('cmp-obs-notice');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'cmp-obs-notice';
+    el.className = 'cmp-notice';
+    var grid = out.querySelector('.compare-grid');
+    if (grid && grid.nextSibling) out.insertBefore(el, grid.nextSibling);
+    else out.appendChild(el);
+  }
+  var parts = hits.map(function(k) {
+    var h = window._sbsObsHits[k];
+    return k + ' ' + h.obs.min.toFixed(1) + '\u2013' + h.obs.max.toFixed(1) + '% ('
+      + h.obs.spread.toFixed(1) + 'pp across its top ' + h.obs.n + ')';
+  });
+  var measured = compareList.filter(function(k) {
+    if (hits.indexOf(k) !== -1) return false;
+    var dd = (COUNTRY_DATA || []).filter(function(x) { return x.country === k; })[0];
+    var dp = (dd && typeof _fpDispersion === 'function') ? _fpDispersion(dd) : null;
+    return dp && dp.state === 'measured';
+  });
+  var cmp = '';
+  if (measured.length) {
+    var mList = measured.map(function(k) {
+      var dd = (COUNTRY_DATA || []).filter(function(x) { return x.country === k; })[0];
+      return k + ' ' + _fpDispersion(dd).iqr.toFixed(1) + 'pp';
+    });
+    var widest = hits.map(function(k) { return window._sbsObsHits[k].obs.spread; })
+                     .reduce(function(a, b) { return Math.max(a, b); }, 0);
+    var narrowestMeasured = measured.map(function(k) {
+      var dd = (COUNTRY_DATA || []).filter(function(x) { return x.country === k; })[0];
+      return _fpDispersion(dd).iqr;
+    }).reduce(function(a, b) { return Math.min(a, b); }, Infinity);
+    cmp = ' The column' + (measured.length > 1 ? 's' : '') + ' in this set ORCA does hold a measured '
+      + 'spread for \u2014 ' + mList.join(', ') + ' \u2014 '
+      + (widest > narrowestMeasured
+          ? 'therefore look' + (measured.length > 1 ? '' : 's') + ' like the LESS uniform regime'
+            + (measured.length > 1 ? 's' : '') + ' on this screen while sitting at a NARROWER dispersion '
+            + 'than the withdrawn column' + (hits.length > 1 ? 's' : '') + '. Do not rank the set on these two rows.'
+          : 'are shown on a measured basis and are directly readable.');
+  }
+  el.innerHTML = '<strong style="color:var(--orange);">\u26a0 The &ldquo;single term&rdquo; claim is withdrawn for '
+    + hits.length + ' column' + (hits.length > 1 ? 's' : '') + ' in this set.</strong> ORCA ships identical p25/p75 '
+    + 'take for ' + parts.length + ' of these countries, which is what the Take spread and Predictability rows were '
+    + 'built on. Its own contract file contradicts that: ' + parts.join('; ') + ' \u2014 measured government take at '
+    + '$75/bbl, not simulated.' + cmp + ' The scores are NOT recomputed here, because a top-N-by-production sample '
+    + 'cannot establish a population spread; they are marked \u25b2 best case. Carry the observed contract range into '
+    + 'the IC memo, not the grade.';
+}
+function _sbsApplyObsSpread() {
+  window._sbsRenderToken = (window._sbsRenderToken || 0) + 1;
+  var token = window._sbsRenderToken;
+  window._sbsObsHits = {};
+  var stale = document.getElementById('cmp-obs-notice');
+  if (stale && stale.parentNode) stale.parentNode.removeChild(stale);
+  if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA) return;
+  if (typeof cpSpreadConflict !== 'function' || typeof _fpDispersion !== 'function') return;
+  compareList.forEach(function(c) {
+    var d = COUNTRY_DATA.filter(function(x) { return x.country === c; })[0];
+    if (!d) return;
+    // Only the one-term basis can be refuted — a measured or absent distribution has nothing
+    // to withdraw, and a state monopoly has no contractor position to rank.
+    if (_fpDispersion(d).state !== 'single') return;
+    var cached = (typeof cpObsSpread === 'function') ? cpObsSpread(c) : null;
+    if (cached) { _sbsPaintObsSpread(c, d, cached, token); return; }
+    var slug = String(c).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    fetch('api/v1/country/' + slug + '.json')
+      .then(function(r) { return r.ok ? r.json() : null; })
+      .then(function(j) {
+        if (!j || !j.top_contracts || !j.top_contracts.length) return;
+        var obs = (typeof cpRecordObsSpread === 'function') ? cpRecordObsSpread(c, j.top_contracts) : null;
+        if (obs) _sbsPaintObsSpread(c, d, obs, token);
+      })
+      .catch(function() {});
+  });
+}
+window._sbsApplyObsSpread = _sbsApplyObsSpread;
 
 // ─── TAB 3: Screener ─────────────────────────────────────────────────────────
 let _screenerRfactorOnly = false;
