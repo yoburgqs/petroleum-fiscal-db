@@ -31935,3 +31935,18 @@ say the number measures contract structure rather than fiscal terms.
 
 ## Bookkeeping (not the cycle)
 - v673 → v674 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 580 Log — 2026-09-05 23:37
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 580 complete and pushed (v674).
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (Stalest in rotation — last walked at 570; 576 T2, 577 T6, 578 T3, 579 T6.)
+
+## Friction
+Cold load → Fiscal Compare. Two IC artifacts sit two inches apart on the same toolbar, produced from the same screen at the same moment, and they disagree about Iraq by **50.7 percentage points**.
+
+`⎘ Copy for IC Memo` carries a "Comparable take — RANK AND CITE ON THIS" column, marks Iraq `34.1 ←
