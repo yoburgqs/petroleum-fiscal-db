@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v673</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v674</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v673</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v674</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v673';
+  return m ? m[0] : 'v674';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v673');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v674');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -40945,7 +40945,10 @@ function renderFCResults(results, price) {
     announcer.textContent = sorted.length + ' countries found';
   })();
   var exportBtn = document.getElementById('fc-export-btn');
-  if (exportBtn) { exportBtn.disabled = false; exportBtn.removeAttribute('title'); }
+  // v674 (T5): was removeAttribute('title') — the button that produces the IC attachment had no
+  // hover text at all on the default path. _fcSyncSelUI() already writes this exact sentence on
+  // its no-selection branch; enable time now writes the same one so the two cannot diverge.
+  if (exportBtn) { exportBtn.disabled = false; exportBtn.title = 'Export every row on screen as an XLSX workbook for IC attachment.'; }
   // v547 (T5): the clipboard path becomes live at the same moment the export does.
   var _fcCopyBtn = document.getElementById('fc-copy-ic-btn');
   if (_fcCopyBtn) {
@@ -43273,6 +43276,49 @@ function exportFCResults() {
             g.nFacts != null ? Number(g.nFacts) : null];
   };
   const _xlSel = function(label, price) { return label + (price === _xlPP ? ' \u25c4 SELECTED PRICE' : ''); };
+  // ── v674 (T5) — the comparability rule that every OTHER IC artifact on this screen carries ──
+  // MECHANIC_COMPARABILITY (2026-08-26): a fee-basis take% — TSC, RSC, Buy-back — may not be
+  // ranked against a PSC/Concession take%. A fee contractor is paid a fixed $/bbl remuneration
+  // and keeps no price upside, so take% climbs toward 97–99% as an artefact of the CONTRACT
+  // STRUCTURE, not because the terms are hard.
+  //
+  // v549 put that correction on Side-by-Side, v552 on the Country Profile screen, v553 on the
+  // Country Profile clipboard, v554 on the Screener's take ceiling, v603 on the Home IC Capital
+  // Screen headline, v660 on the Screener paste and v664 on this tab's "⎘ Copy for IC Memo".
+  // THIS workbook — the artifact the Quick Start names in as many words, "Export XLSX for IC
+  // attachment", sitting two inches from that clipboard button on the same toolbar — carried
+  // none of it, in 25 columns and a 60-line Methodology sheet that never used the word.
+  //
+  // Measured on the live build, cold, $75 deepwater, no filters. Same screen, same moment,
+  // two buttons:
+  //   ⎘ Copy for IC Memo   Iraq …  84.8   |  34.1 ← cite this   + a preamble naming all 10 rows
+  //   ⬇ Export XLSX        Iraq …  84.8   |  Rank 63, Tier "NOC", and nothing else
+  // Iraq's comparable take, on the 195 PSC/Concession contracts ORCA holds for it, is 34.1% —
+  // lower than every country in the workbook's ranked block except the USA. The workbook filed
+  // it 63rd of 65 and graded it into the worst take tier it has. Nine other rows carry the same
+  // untagged blend: Ecuador (46.5 vs 39.3), South Sudan (53.3 vs 49.0), Qatar, Oman, Mexico,
+  // Iran, India, Malaysia, Azerbaijan. India's correction runs the OTHER way (61.9 vs 63.2), so
+  // this is a basis, not a discount.
+  //
+  // The published headline is correct as an all-contract average and is NOT changed, exactly as
+  // v553 and v664 kept it — the rank, the sort and the take columns are untouched, so the
+  // workbook and the screen still agree row for row. What was missing is the figure to rank and
+  // cite on, which now travels in its own column beside it, plus the sentence saying the Rank
+  // and Tier on that row are on the headline and are not a fiscal finding.
+  const _xlFeeAt = {};
+  let _xlNFee = 0; const _xlFeeNames = [];
+  _xlSorted.forEach(function(r) {
+    const st = (typeof _scFeeCmpAt === 'function') ? _scFeeCmpAt(_xlCD[r.country] || {}, _xlPP) : null;
+    if (st && st.diverges && st.cmp != null) { _xlFeeAt[r.country] = st; _xlNFee++; _xlFeeNames.push(r.country); }
+  });
+  const _xlAnyFee = _xlNFee > 0;
+  // Mechanic names for the blend, read off the same mech_mix the Side-by-Side and Country
+  // Profile notices read, so the three surfaces cannot name different contracts.
+  const _xlFeeMechs = function(country) {
+    const c = _xlCD[country];
+    if (!c || typeof cpFeeBasis !== 'function') return '';
+    try { return cpFeeBasis(c).names || ''; } catch (e) { return ''; }
+  };
   const data = [
     // v506: 'Take%' (compare-model DCF at the selected price) and 'GovtTake_75' (database
     // contract average) are different figures and sat here unlabelled, up to 57.7pp apart.
@@ -43342,6 +43388,32 @@ function exportFCResults() {
       ];
     })
   ];
+  // v674 (T5): the comparability pair, inserted immediately after the four government-take
+  // columns so it is read WITH the take and not found later. Carried only when a row in this
+  // export actually blends fee-basis contracts — where none does the column would repeat the
+  // one before it on every row, which is the rule the Screener and clipboard pastes use.
+  // Blank on a row the rule does not touch, so the column reads as "these are the affected
+  // rows" rather than as a second take on all 185.
+  if (_xlAnyFee) {
+    data[0].splice(11, 0,
+      'Comparable take % @$' + _xlPP + ' (fee-basis contracts excluded) — RANK AND CITE ON THIS where populated',
+      'Take comparability');
+    for (let _di = 1; _di < data.length; _di++) {
+      const _st = _xlFeeAt[data[_di][2]];
+      if (!_st) { data[_di].splice(11, 0, null, ''); continue; }
+      const _mech = _xlFeeMechs(data[_di][2]);
+      data[_di].splice(11, 0, +Number(_st.cmp).toFixed(1),
+        'FEE-BASIS BLEND — ' + Number(_st.n2).toLocaleString() + ' of this country’s contracts are '
+        + 'fee-basis (' + (_mech || 'TSC / RSC / Buy-back') + '): the contractor is paid a fixed $/bbl '
+        + 'remuneration and keeps no price upside, so take% measures the contract structure, not how '
+        + 'hard the terms are. Under the platform comparability rules (2026-08-26) the published '
+        + Number(_st.head).toFixed(1) + '% may NOT be ranked or compared against the PSC/Concession rows. '
+        + 'Cite the comparable ' + Number(_st.cmp).toFixed(1) + '%'
+        + (_st.n1 != null ? ' (this country’s ' + Number(_st.n1).toLocaleString() + ' PSC/Concession contracts)' : '')
+        + '. Where this row carries a Rank and a Tier, both are computed from the published headline so '
+        + 'that the sheet matches the on-screen table — do not read either as a fiscal finding.');
+    }
+  }
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.aoa_to_sheet(data);
   XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Fiscal Compare');
@@ -43434,6 +43506,36 @@ function exportFCResults() {
     ['  Database government take is 100% — there is no contractor share to model. These rows carry'],
     ['  no rank, no contractor NPV and no breakeven, and sort to the bottom of the sheet.'],
     [''],
+    // v674 (T5): the comparability rule, on the sheet whose whole job is to state what was
+    // modelled. Emitted only when a row in this export is actually affected.
+    ...(_xlAnyFee ? [
+    ['Fee-basis blends and the Comparable take column (v674) — READ BEFORE RANKING:'],
+    ['  ' + _xlNFee + ' of the ' + (data.length - 1) + ' rows in this sheet publish a government take that BLENDS'],
+    ['  fee-basis contracts (TSC / RSC / Buy-back) with PSC/Concession contracts:'],
+    ['    ' + _xlFeeNames.join(', ')],
+    ['  In a fee-basis contract the contractor is paid a fixed $/bbl remuneration and keeps no share of'],
+    ['  the oil price, so government take% climbs toward 97-99% because of the CONTRACT STRUCTURE, not'],
+    ['  because the fiscal terms are hard. Under the platform comparability rules (2026-08-26) that'],
+    ['  blended headline may not be ranked or compared against the production-sharing and concession'],
+    ['  rows in this same sheet.'],
+    ['  The "Comparable take % @$' + _xlPP + '" column carries the take on each of those countries\u2019'],
+    ['    PSC/Concession contracts alone. THAT is the figure to rank on and to cite. It is blank on'],
+    ['    every row the rule does not touch — a blank cell means the published headline already IS the'],
+    ['    comparable figure, not that a number is missing.'],
+    ['  Worked example, at the time of writing: Iraq publishes 84.8% at $75/bbl across 610 contracts,'],
+    ['    415 of them TSC. On its 195 PSC/Concession contracts the take is 34.1% — lower than every'],
+    ['    other country in this sheet\u2019s ranked block except the USA.'],
+    ['  The correction is a basis, not a discount, and runs both ways: India publishes 61.9% and its'],
+    ['    comparable take is HIGHER, at 63.2%.'],
+    ['  Rank, row order and Tier are computed from the PUBLISHED headline, so that this sheet and the'],
+    ['    on-screen Fiscal Compare table agree row for row. On a fee-basis row that placing and that'],
+    ['    tier are therefore not fiscal findings — the Take comparability column says so in the row'],
+    ['    itself. Re-rank on the Comparable take column before quoting a position for these countries.'],
+    ['  The published headline is kept because it is the correct all-contract average and is what the'],
+    ['    ORCA database and the public JSON API publish. This is the same treatment the Country Profile'],
+    ['    IC citation, the Screener and this tab\u2019s "Copy for IC Memo" paste already give it.'],
+    ['']
+    ] : []),
     ['Terms_Basis definitions (v505) — what the Take% (model) in each row was computed FROM:'],
     ['  Country-specific terms: ORCA holds calibrated fiscal terms for this country'],
     ['  ORCA contract database terms: terms read from this country\'s contracts in the database'],
