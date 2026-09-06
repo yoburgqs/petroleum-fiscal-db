@@ -32334,3 +32334,105 @@ every non-chip country are byte-identical.
 Walked cold from no sessionStorage: Country Profile → select a country → read the 26px headline take → look immediately below it for what that number is made of. The regime-split chip sits ~40px under it (`_cpRegimeSplit570`, `index.html` ~32540, rows from `cpRegimeRows()` at 23616).
 
 Swept all 185 records throug
+
+---
+## Cycle 584 Log — 2026-09-06
+- Test before: 235 PASS / 0 FAIL / 1 WARN (this build, local server — suite ACTUALLY RAN)
+- Test after: 235 PASS / 0 FAIL / 1 WARN — identical to the same suite run against the
+  pre-change build on a second server, so the change is regression-free by measurement,
+  not by assumption. The 1 WARN / 1 JS error is a local-server `sw.js` 404 and is absent
+  from the live 236-PASS baseline.
+- JS syntax gate: PASS (11 inline blocks, `node --check`)
+- Mobile 390x844 `hasTouch: true`: 0 horizontal overflow on all 10 tabs; the markers this
+  cycle touched render 45px tall, right edge 274 of 390
+- Shipped: v678
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest in rotation —
+577 = T6, 578 = T3, 579 = T6, 580 = T5, 581 = T1, 582 = T4, 583 = T2.)
+
+## Friction
+Cold load, `sessionStorage` and `localStorage` cleared, click **Side-by-Side**. The tab seeds
+itself with the North Sea Trio — Norway / United Kingdom / Netherlands — and that seeded set is
+the exhibit every first-time analyst reads before touching a control. All four **Govt Take**
+rows, the centrepiece of the tab, shipped like this:
+
+| Govt Take ($75/bbl) | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| | 68.0% | 49.2% | 23.4% |
+| | *(no marker)* | **"lowest of 2"** (GREEN) | "not ranked · statutory terms" |
+
+Three columns are on screen. The phrase says "of 2". The column carrying the green *lowest*
+marker is **not** the lowest number in the row — 23.4% is printed immediately beside it. And the
+one column with no label at all is the column that "of 2" is implicitly measured against, so the
+pair being ranked is nowhere identifiable on screen. The analyst either reads 49.2% as the set's
+low, which is wrong, or stops to work out which two columns "of 2" means.
+
+Cause: `_cmpPriceRank`, `index.html` ~26500. `lo` was awarded at `vals.length >= 2`; `hi` required
+`vals.length >= 3`. Any ordering over exactly two rankable columns therefore printed one end and
+suppressed the other. v626's data-basis gate then made this the *default* case — it gates the
+Netherlands out as a statutory-terms column, leaving the shipped 3-column exhibit with exactly
+2 rankable ones. Logged in this file and carried unfixed since **cycle 552**.
+
+Measured by rendering real sets against the shipped `country_data.json`:
+- **232 of 300** sampled two-country comparisons (**77.3%**) were one-ended — and two-country is
+  the ordinary T3 shape, not an edge case.
+- **20 of 300** sampled three-country sets printed "of 2" against three visible columns. The tab's
+  own **USA vs Iraq** quickstart is one of them.
+
+## Change
+`hi` now marks whenever an ordering exists, under the **same** 0.05pp tie guard as `lo` — which at
+two columns is literally the same comparison, so the two markers fire together or not at all and
+the half-labelled state cannot recur by construction. No new tooltip, no new text block, no
+threshold invented.
+
+On screen, the cold-load default now reads:
+
+| Govt Take ($75/bbl) | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| | 68.0% | 49.2% | 23.4% |
+| | **highest of 2 · of the producers** (red) | **lowest of 2 · of the producers** (green) | not ranked · statutory terms |
+
+USA vs Iraq now reads `lowest of 2 · comparable basis` / `highest of 2 · on PSC/Conc`, preserving
+v600's rule that the marker sits on the PSC/Conc line rather than the fee-blended headline.
+
+Side effect, checked and kept: `_aEndsHigh` (line ~26567) reads `_r125.hi`, which was always null
+on a two-column flip, so the reversal banner said "no longer does at $125/bbl". On a two-column set
+a flip in `lo` *is* a full reversal, so it now correctly says "the **highest** at $125/bbl".
+
+## Result
+Every column in a comparison carries an explicit placement, so the analyst can see which columns
+"of N" refers to and which were set aside — without hovering anything. One-ended rows:
+two-country **232/300 → 0/300**; three-country **22/300 → 5/300**. All 5 residuals are genuine ties
+at one end (Burundi = Costa Rica = 26.90; Tuvalu = Nauru = 19.70; Israel = Turkey = 26.00) where the
+tie guard correctly declines to break the tie arbitrarily — designed behaviour, not a leftover.
+
+## Carried forward — not fixed this cycle
+- The `fc-nav-bar` **"▶ Run FC at this price"** button (~line 3156) reads `getElementById(
+  'cp-price-select')` — no such element — falls back to Fiscal Compare's own `#fc-price`, then
+  writes to `#price`, which also does not exist.
+- The data divergence behind cycle 583's chip: 72 of the 163 count-basis records do not reconcile
+  `take_75` against the `mech_mix` blend, and 7 carry only ONE mechanic (Namibia 37.0% headline vs
+  9.9% over the same 125 contracts). This is a data regeneration, `rebuild_country_data.py` is
+  banned for breakeven regression risk, and it needs Zach's call rather than a UX cycle.
+- Side-by-Side tabulates Contractor NPV at $50/$75/$125 while the Govt Take rows and the NPV chart
+  carry all four prices — the $100 NPV is plotted but not tabulated. Carried from 552.
+- The Side-by-Side proxy/basis notice refers to "these NPV and IRR columns"; there is no IRR row and
+  no breakeven row on that tab. Carried from 552.
+- Everything else carried from cycles 560–583 is unchanged, including: `mech_mix` per-mechanic takes
+  contradicted by `top_contracts` on 8 rows; the XLSX `Tier (database take)` column grading a
+  fee-basis row off the blended headline; Qatar's CP peer strip on the blended fee-basis figure;
+  `switchTab()` not resetting scroll on the general case; the take chart PNG export carrying the
+  fee-basis caveat but not the proxy one; "Most Frequently Reformed Regimes" showing 15 of 21
+  sourced jurisdictions without saying so; `COUNTRY_DATA` and the API disagreeing on
+  `profit_oil_govt` / `state_eq` for 45 of 185; the two barely-screening Screener presets;
+  `#screener-count` at ~570 characters of unbroken prose; the Side-by-Side search box replacing the
+  seeded example with no add-to-set path; the duplicated all-185 rank in CP headline Zones A and B;
+  the Screener take slider's `min="30"` floor excluding the USA at 23.4%; FAQ A25/A35/A40 describing
+  a Screener "Stability Score filter" that does not exist; Guyana's A-tier reform log contradicting
+  its headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57; the 272 dead citations;
+  `SPECULATIVE_COUNTRIES` as a hand-typed list of 7 names from v41; and the 94 unverified one-term
+  countries from v672.
+
+## Bookkeeping (not the cycle)
+- v677 → v678 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
