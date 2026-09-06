@@ -33153,3 +33153,18 @@ that reads **both surfaces on the same set** and requires the chart's mark and t
 
 ## Bookkeeping (not the cycle)
 - v683 → v684 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
+
+---
+## Cycle 590 Log — 2026-09-06 08:54
+- Test before: 236 PASS / 0 FAIL
+- Test after: 234 PASS / 2 FAIL
+- JS errors: 0
+- Summary: Cycle 590 shipped as **v684**. Both repos pushed.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (stalest in rotation; 589 was T2)
+
+## Friction
+Walked Side-by-Side cold, then added a real set the analyst's own way — Nigeria / Angola / Ghana.
+
+v626 built a **data-basis gate for the grid**: a country ORCA holds no verified field production for is refused a highest/lowest placement on all four Govt Take rows and reads `not ranked · statutory terms`, because its take is a sim
