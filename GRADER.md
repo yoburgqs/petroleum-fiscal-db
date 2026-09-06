@@ -32436,3 +32436,18 @@ tie guard correctly declines to break the tie arbitrarily — designed behaviour
 
 ## Bookkeeping (not the cycle)
 - v677 → v678 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 584 Log — 2026-09-06 03:13
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 584 complete and pushed (v678). Both repos updated.
+
+## Task
+**T3** — "How do these three countries compare side by side?" Stalest in rotation (577=T6, 578=T3, 579=T6, 580=T5, 581=T1, 582=T4, 583=T2).
+
+## Friction
+Cold load, storage cleared, click **Side-by-Side**. The tab seeds the North Sea Trio, and that seeded set is what every first-time analyst reads before touching anything. All four **Govt Take** rows — the centrepiece of the tab — shipped like this:
+
+| Govt Take ($75/bbl) | Norway
