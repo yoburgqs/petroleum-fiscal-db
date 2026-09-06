@@ -32763,3 +32763,17 @@ No take, NPV, IRR, breakeven, rank, tier, region, export or tab-order change.
 
 **Bookkeeping (not the cycle)**
 - v680 → v681 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
+
+---
+## Cycle 587 Log — 2026-09-06 06:03
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 587 complete and pushed (v681). Both repos updated.
+
+**Task:** T1 — "Which countries should even be on my screening list?" (last run at cycle 581, stalest in rotation)
+
+**Friction:** The Screener's **Min primary-source evidence (A)** slider screened on `a_pct` alone — a ratio with no denominator floor. So dragging the platform's evidence control toward *maximum evidence* made the surviving evidence base monotonically **worse**:
+
+| A-share | pass | median facts | under 50 facts |
+|---|---|-
