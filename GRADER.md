@@ -32195,3 +32195,127 @@ answer existed.
 **Task** — T4, "What is my fiscal-stability and reform exposure here?" (stalest in rotation; 576 T2, 577 T6, 578 T3, 579 T6, 580 T5, 581 T1).
 
 **Friction** — Every surface on the platform routes that question to one place: the per-country verdict card on the Reform Risk tab, via `openReformRiskFor()`. Seven call sites do it — the Fiscal Compare Stability cell, the Country Profile headline chip and sidebar Stability line, the CP "Full reform detail" button, 
+
+---
+## Cycle 583 Log — 2026-09-06 07:20
+- Test before: 261 PASS / 0 FAIL / 1 WARN (local, this build)
+- Test after: 261 PASS / 0 FAIL / 1 WARN
+- JS errors: 0 page errors; 1 console WARN = sw.js 404, pre-existing
+- Shipped: v677, pushed
+
+**Task** — T2, "Is this one country attractive at $75/bbl, and can I defend that?"
+(stalest in rotation: 577 T6, 578 T3, 579 T6, 580 T5, 581 T1, 582 T4; T2 last run at 576).
+
+**Friction** — Walked cold, no sessionStorage, Country Profile → country → headline → look for
+the number's components. The regime-split chip sits ~40px under the 26px take figure
+(`_cpRegimeSplit570`, index.html ~32540, rows from `cpRegimeRows()` at 23616). Swept all 185
+records through the chip's own gates: 57 render it, and on **13 of those the published headline
+is above every row the chip prints**.
+
+| country | headline | rows shown | basis |
+|---|---|---|---|
+| Senegal | 56.9% | 50.4 / 0.0 | simple_avg |
+| Sierra Leone | 53.4% | 48.5 / 0.0 | simple_avg |
+| Suriname | 54.2% | 50.3 / 0.0 | simple_avg |
+| Nigeria | 81.1% | 77.5 / 68.8 | prod_weighted |
+| Bolivia | 72.1% | 69.1 / 44.3 | simple_avg |
+| Equatorial Guinea | 65.8% | 63.1 / 25.3 | simple_avg |
+| Chad | 55.3% | 53.7 / 1.9 | simple_avg |
+| Cameroon | 53.5% | 52.3 / 12.3 | simple_avg |
+| Kazakhstan | 69.9% | 69.0 / 62.7 | prod_weighted |
+| Algeria | 69.5% | 68.8 / 60.7 | simple_avg |
+| Turkmenistan | 87.2% | 86.9 / 80.9 | simple_avg |
+| Uganda | 53.2% | 52.9 / 34.9 | simple_avg |
+| Yemen | 53.4% | 53.2 / 17.3 | simple_avg |
+
+`cpRegimeRows()` carried three verdicts — `reconciles`, `weighted`, `unexplained` — and all
+three describe HOW the headline was weighted. None checked whether it was inside the range of
+the rows at all. So the chip closed with one of:
+
+- `weighted` → *"The 81.1% headline weights these by production, not by contract count."*
+  A weighted average cannot exceed its largest input. On Nigeria and Kazakhstan this asserts a
+  reconciliation that cannot hold.
+- `unexplained` → *"The 56.9% headline does not reconcile to these rows — see the breakdown."*
+  Reads as a rounding or basis nuance, and points 3,400px down at a footnote that also stopped
+  at "a 9.6pp gap".
+
+Both then ended *"Screen on the regime you would sign."* On the 11 count-basis countries both
+sides are plain averages over the **same** contract set (mech_mix `t75` is `AVG(govt_take_pct)`
+per `tools/add_mech_mix.py`), so an equal-weighted average landing outside the values it
+averages is not a weighting difference — the two figures were computed from different contract
+sets. This is the T2 defensibility failure exactly: the analyst quotes a number no row on the
+page reaches, or spots it and stops trusting the tab.
+
+**Change** — `cpRegimeRows()` now returns `lo` / `hi` / `outside` / `outsideDir`, measured over
+every row carrying a take. Measuring over all rows rather than Group-1 only is what keeps Iraq
+out: its 98.5% TSC row does contain its 84.8% headline, and Iraq already carries the v675
+fee-basis note. When `outside`:
+
+- chip header reads **"Headline 56.9% is above every regime here"** in place of the spread count,
+  and goes red regardless of spread — Kazakhstan's 6.3pp spread rendered amber under the old rule;
+- count-basis: *"No weighting of these rows produces 56.9%. Headline and rows are both plain
+  averages over the same 97 contracts, so they are not from the same computation. Neither figure
+  can be quoted as Senegal's effective take — take block terms from the contract table below or
+  from Scenario Builder before committing a number."*
+- production-weighted: *"The headline is not a blend of these rows. Each row is an unweighted mean
+  inside its regime; the 81.1% headline weights by verified field production (14.1% coverage), so
+  it cannot be rebuilt from them. Cite the regime row your asset sits in."*
+- the hover tooltip stops asserting the headline "are computed on the blend of all of them";
+- the Fiscal Regime Breakdown footnote (~33125) carries the same finding, so the two surfaces
+  cannot disagree — which is the invariant v570/v673 were built to hold.
+
+**Result** — On those 13 profiles the analyst is told at the point of reading that the headline
+cannot be rebuilt from anything on the page, is told which of the two situations they are in, and
+is routed to the one surface that can produce a defensible number. Previously they were handed
+arithmetic that does not work and instructed to screen on it. The other 44 chip countries and
+every non-chip country are byte-identical.
+
+## Verification — this cycle, run, not assumed
+| check | result |
+|---|---|
+| JS syntax, all inline `<script>` blocks | **11/11 PASS** |
+| Runtime suite, local, this build | **261 PASS / 0 FAIL / 1 WARN** |
+| WARN provenance | sw.js 404 — `git diff` contains **0** lines matching `serviceWorker`/`sw.js` |
+| horizontal scroll, 10 tabs × 6 viewports (1920/1440/1280/1024/768/390) | **0** violations |
+| horizontal scroll, CP on Senegal + Nigeria at all 6 widths | **0** violations |
+| pageerrors, all widths | **0** |
+| chip @390 `hasTouch: true` | 159px tall, right edge 354 of 390 — no new control added |
+| fires on exactly the intended set | 13 countries, Iraq correctly excluded |
+| controls: Angola, Guyana (reconciles/weighted, inside range) | text unchanged |
+
+## Carried forward — not fixed this cycle
+- **The underlying data divergence, which is larger than the 13 countries the chip can see.**
+  Sweeping `take_75` against the contract-count blend of `mech_mix` over the 163 count-basis
+  records: **72 of them do not reconcile**, and 7 of those carry only ONE mechanic — Namibia
+  (37.0% headline vs 9.9% over the same 125 contracts), Liberia, French Guiana, Albania, Belize,
+  Burkina Faso, Netherlands, Iraq-Kurdistan. A single-mechanic country whose headline differs
+  from its only regime's mean by 27pp cannot be a weighting artefact; `country_data.json`'s
+  `take_75` is stale against the `dcf_results` vintage `mech_mix` was built from (cycle 448).
+  Single-mechanic countries render no split card, so nothing on the page surfaces it. The fix is
+  a data regeneration, and `rebuild_country_data.py` is banned for breakeven regression risk —
+  this needs Zach's call, not a UX cycle.
+- The `fc-nav-bar` **"▶ Run FC at this price"** button (line ~3156) reads
+  `getElementById('cp-price-select')` — no such element — falls back to Fiscal Compare's own
+  `#fc-price`, then writes to `#price`, which also does not exist. So the button labelled "at
+  this price" neither reads the Country Profile price nor sets the FC price; it re-runs FC at
+  whatever FC already held. Only reachable when the analyst arrived from Fiscal Compare.
+- Everything carried from cycles 560–582 is otherwise unchanged, including: `mech_mix`
+  per-mechanic takes contradicted by `top_contracts` on 8 rows; the `Tier (database take)` column
+  in the XLSX grading a fee-basis row off the blended headline; the on-screen
+  `getTierInfo(r.liveTake)` badge reading the model take; Qatar's CP peer strip still on the
+  blended fee-basis figure; `switchTab()` not resetting scroll on the general case; the take
+  chart's PNG export carrying the fee-basis caveat but not the proxy one; the proxy notice naming
+  IRR/breakeven columns that do not exist; "Most Frequently Reformed Regimes" showing 15 of 21
+  sourced jurisdictions without saying so; `COUNTRY_DATA` and the API disagreeing on
+  `profit_oil_govt` / `state_eq` for 45 of 185; the two barely-screening Screener presets;
+  `#screener-count` at ~570 characters of unbroken prose; the `Cost Recovery Cap` source badges at
+  21px on CP @390; the Side-by-Side search box replacing the seeded example with no add-to-set
+  path; the two adjacent unexplained IC buttons on Country Profile; the duplicated all-185 rank in
+  CP headline Zones A and B; the Screener take slider's `min="30"` floor excluding the USA at
+  23.4%; FAQ A25/A35/A40 describing a Screener "Stability Score filter" that does not exist;
+  Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on
+  lines 54/56/57; the 272 dead citations; `SPECULATIVE_COUNTRIES` as a hand-typed list of 7 names
+  from v41; and the 94 unverified one-term countries from v672.
+
+## Bookkeeping (not the cycle)
+- v676 → v677 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
