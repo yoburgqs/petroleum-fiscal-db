@@ -32644,3 +32644,14 @@ tier, filter, export or on-screen layout changes.
 
 **Bookkeeping (not the cycle)**
 - v679 → v680 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 586 Log — 2026-09-06 05:07
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 586 complete and pushed (v680). Both repos updated.
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo." (Stalest in rotation: 580 T5, 581 T1, 582 T4, 583 T2, 584 T3, 585 T6.)
+
+**Friction:** Cold load → Country Profile → Norway → **Copy for IC Memo** (`#dd-ic-summary-btn`, handler ~line 37490). The pasted paragraph carried take at four prices, price swing, contractor NPV at $50/$75/$125, breakeven, fiscal predictability, production-weighting basis, evidence tier and th
