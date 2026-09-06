@@ -32877,3 +32877,18 @@ manufactured by JSON key order, and cannot paste that manufactured ordering into
 
 **Bookkeeping (not the cycle)**
 - v681 → v682 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
+
+---
+## Cycle 588 Log — 2026-09-06 06:50
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 588 complete and pushed (v682). Both repos updated.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** — stalest in the rotation (583 T2, 584 T3, 585 T6, 586 T5, 587 T1; T4 last walked at 582).
+
+## Friction
+Walked it cold: Reform Risk tab → *Check one country*. That card is the platform's entire T4 answer — seven surfaces route into it — and the first thing printed under the headline score is a rank. **That rank was an array index.**
+
+The Reform Frequency Score is `1
