@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v678</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v679</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v678</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v679</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v678';
+  return m ? m[0] : 'v679';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v678');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v679');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -41427,6 +41427,8 @@ function openFCDrilldown(country) {
     html += '<span style="font-size:10px;color:' + _peerCol + ';white-space:nowrap;" title="' + _peerTitle + '">' + _peerLabel + '</span>';
   })();
   html += _fcDrillEviBadge;
+  // v679 (T6): filled by _fcRenderTermLeg() once api/v1/country/{slug}.json resolves.
+  html += '<span id="fc-dd-terms-chip"></span>';
   if (mc) html += '<span class="mc-badge" title="Price scenario range ($50\u2013$125/bbl)">' + Math.min(mc.p10,mc.p90).toFixed(1) + '\u2013' + Math.max(mc.p10,mc.p90).toFixed(1) + '% range</span>';
   html += renderStabilityBadge(getFiscalPredictabilityScore(d), d);
   if (d.be_75 && d.be_75 > 0 && d.be_75 < 999) {
@@ -41953,8 +41955,152 @@ function openFCDrilldown(country) {
     }
     // Fetch production chart for drawer
     setTimeout(function() { fetchFCDrawerProductionChart(country, drawerProdId, drawerCanvasId); }, 50);
+    // v679 (T6): model-term citation leg beside the Src badge.
+    _fcRenderTermLeg(country);
   }
 }
+
+// ── v679 (T6) — THE MODEL-TERM LEG ON THE FISCAL COMPARE DRILLDOWN ─────────────────────
+// The drilldown is where a Fiscal Compare analyst asks "where did this number come from?".
+// 185 ranked rows lead into it, it ends with ⎘ IC Citation, and its own IC MEMO line tells
+// the analyst to "note evidence tier in citation". The tier it hands them was one badge:
+// "Src B · 41% primary law · 125,336 facts".
+//
+// Both of that badge's legs — primary-law share and fact depth — are properties of the
+// COUNTRY'S WHOLE FACT BASE, mostly contract metadata. Neither looks at the four to six
+// fiscal terms getDCFParams actually runs to produce the take, NPV and IRR printed six
+// inches above it. Measured 2026-09-06 against all 185 shipped api/v1/country files, using
+// getDCFParams()'s own term set and the Evidence Chain's own sourcing rule (bulk harvest,
+// multi-jurisdiction instruments and D-confidence rows do not count):
+//   * NOT ONE of the 185 countries has every model term independently cited. Best is 4 of 5.
+//   * 128 of 185 have HALF OR FEWER cited. 19 have none.
+//   * 59 of the 107 countries graded A or B are in that half-or-fewer group — Brazil A at
+//     2 of 4, Canada A at 2 of 4, Albania A at 2 of 4.
+//   * USA, the #1 row on a cold load, reads "Src B" over 2 of 5: State Participation and
+//     Special Tax are substituted, and Severance Tax is a hard-coded 5% engine override
+//     with no value on record.
+//
+// v660 put this leg on the Country Profile. It is a different tab, behind a country
+// selection, and an analyst who works the ranked table and copies the citation from this
+// drawer never sees it. The chip goes beside the Src badge, on the same line, and it is a
+// CONTROL not a caption: clicking it opens that country's Country Profile and lands on the
+// term-by-term Evidence Chain that names which terms are missing.
+//
+// No tier letter, percentage, grade, take, NPV, IRR or rank changes. How deep a fact base
+// is and whether the terms in the model are cited are different questions; this is the second.
+var _FC_TERM_LABEL = {
+  royalty_rate: 'Royalty Rate', cit_rate: 'Income Tax Rate', ftp_rate: 'FTP Rate',
+  cost_recovery_cap: 'Cost Recovery Cap', profit_oil_govt_pct: 'Profit Oil (Govt)',
+  state_equity_pct: 'State Participation', spt_rate: 'Special Tax',
+  prrt_rate: 'PRRT Rate', windfall_rate: 'Windfall Levy', severance_rate: 'Severance Tax',
+  fee_per_bbl: 'Service Fee', ept_rate: 'Excess Petroleum Tax',
+  return_on_capex: 'Capex Remuneration Rate'
+};
+// Same fiscal_facts keys the Evidence Chain's rowDefs read, indexed by model term.
+var _FC_TERM_FACTS = {
+  royalty_rate: ['levy_royalty_rate'],
+  cit_rate: ['levy_income_tax_rate', 'income_tax_rate_pct'],
+  ftp_rate: ['levy_ftp_rate'],
+  cost_recovery_cap: ['levy_cost_recovery_limit', 'levy_cost_recovery_rate', 'cost_recovery_cap_pct'],
+  profit_oil_govt_pct: ['levy_profit_oil_govt_pct', 'levy_profit_oil_rate'],
+  state_equity_pct: ['state_participation'],
+  spt_rate: ['special_petroleum_tax_rate', 'levy_special_tax_rate']
+};
+var _fcTermLegCache = {};
+
+// Resolves to {total, cited, uncited[], mech} or null. One fetch per country per session;
+// the arrow-key walk through the ranking re-reads the cache rather than the network.
+function _fcTermLeg(country) {
+  if (_fcTermLegCache[country] !== undefined) return Promise.resolve(_fcTermLegCache[country]);
+  var slug = String(country).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  return fetch('api/v1/country/' + slug + '.json')
+    .then(function(r) { return r.ok ? r.json() : null; })
+    .then(function(j) {
+      var out = null;
+      try {
+        if (j) {
+          var fs = j.fiscal_facts_sourced || {};
+          var mech = (typeof resolveLiveDCFMechanic === 'function') ? resolveLiveDCFMechanic(country) : null;
+          var pr = (mech && typeof getDCFParams === 'function') ? getDCFParams(country, mech) : null;
+          if (pr) {
+            var total = 0, cited = 0, uncited = [];
+            Object.keys(_FC_TERM_LABEL).forEach(function(k) {
+              if (!(k in pr)) return;          // this regime does not use the term
+              total++;
+              var ok = (_FC_TERM_FACTS[k] || []).some(function(x) {
+                var sm = fs[x];
+                if (!sm) return false;
+                var src = String(sm.source || '');
+                if (!src) return false;
+                if (String(sm.confidence || '').toUpperCase() === 'D') return false;
+                if (typeof _isBulkSource === 'function' && _isBulkSource(src)) return false;
+                if (typeof _sharedSource === 'function' && _sharedSource(src)) return false;
+                return true;
+              });
+              if (ok) cited++; else uncited.push(_FC_TERM_LABEL[k]);
+            });
+            if (total > 0) out = { total: total, cited: cited, uncited: uncited, mech: mech };
+          }
+        }
+      } catch (e) { out = null; }
+      _fcTermLegCache[country] = out;
+      return out;
+    })
+    .catch(function() { _fcTermLegCache[country] = null; return null; });
+}
+
+// Fills the placeholder left in the drawer header. Additive and late-binding: if the fetch
+// fails or the regime carries no model terms, the placeholder stays empty and the drawer is
+// exactly what it was.
+function _fcRenderTermLeg(country) {
+  _fcTermLeg(country).then(function(t) {
+    var el = document.getElementById('fc-dd-terms-chip');
+    if (!el || !t) return;
+    if (_fcDrawerOpen !== country) return;   // analyst has already stepped on
+    var ratio = t.cited / t.total;
+    var col = ratio <= 0.5 ? 'var(--red)' : (ratio < 1 ? 'var(--orange)' : 'var(--green)');
+    var bg  = ratio <= 0.5 ? 'rgba(185,28,28,.12)' : (ratio < 1 ? 'rgba(194,65,12,.12)' : 'rgba(21,128,61,.12)');
+    var bd  = ratio <= 0.5 ? 'rgba(185,28,28,.45)' : (ratio < 1 ? 'rgba(194,65,12,.45)' : 'rgba(21,128,61,.45)');
+    var tip = 'This counts something different from the Src badge beside it. That letter, its '
+      + 'primary-law share and its fact count all describe ' + country + '’s WHOLE fact base — '
+      + 'mostly contract metadata. This counts only the ' + t.total + ' fiscal terms the '
+      + (t.mech || 'DCF') + ' model runs to produce the take, NPV and IRR in this drawer, and asks '
+      + 'of each one whether a citation stands behind it. The bulk harvest, an instrument shared '
+      + 'across jurisdictions and an uncited contract average do not count, on the same rule the '
+      + 'Country Profile Evidence Chain uses. ' + t.cited + ' of ' + t.total + ' clear that bar'
+      + (t.uncited.length ? '; ' + t.uncited.join(', ') + ' '
+          + (t.uncited.length === 1 ? 'does' : 'do') + ' not.' : '.')
+      + ' No country on this platform cites every term, and 128 of 185 cite half or fewer — so a '
+      + 'high Src grade does not carry the terms. Click to open ' + country + '’s Evidence Chain, '
+      + 'which names each term, its ORCA value, the statutory value and the source.';
+    el.outerHTML = '<span id="fc-dd-terms-chip" role="button" tabindex="0"'
+      + ' onclick="event.preventDefault();event.stopPropagation();_fcOpenTermChain(\'' + String(country).replace(/'/g, "\\'") + '\');"'
+      + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();event.stopPropagation();_fcOpenTermChain(\'' + String(country).replace(/'/g, "\\'") + '\');}"'
+      + ' style="font-size:10px;font-weight:700;color:' + col + ';background:' + bg + ';border:1px solid ' + bd
+      + ';border-radius:3px;padding:1px 6px;white-space:nowrap;cursor:pointer;min-height:24px;'
+      + 'display:inline-flex;align-items:center;" title="' + tip.replace(/"/g, '&quot;') + '">'
+      + t.cited + ' of ' + t.total + ' model terms cited &rarr;</span>';
+  });
+}
+window._fcRenderTermLeg = _fcRenderTermLeg;
+
+// The chip's destination: the Country Profile for this country, scrolled to the Evidence
+// Chain. loadCountryProfile fetches the same file, so the table is a beat behind the tab
+// switch — poll briefly for the section rather than scrolling to where it will be.
+function _fcOpenTermChain(country) {
+  openCountryProfileFromFC(country);
+  var slug = String(country).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  var tries = 0;
+  (function wait() {
+    if (typeof _cpScrollToEvidenceChain === 'function'
+        && document.getElementById('dd-facts-' + slug)) {
+      _cpScrollToEvidenceChain(slug);
+      return;
+    }
+    if (++tries < 40) setTimeout(wait, 100);
+  })();
+}
+window._fcOpenTermChain = _fcOpenTermChain;
 
 function openCountryProfileFromFC(country) {
   const cpBtn = document.getElementById('tab-btn-t7'); // v99: id-based lookup (faster, no querySelectorAll scan)
