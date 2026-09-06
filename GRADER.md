@@ -32319,3 +32319,18 @@ every non-chip country are byte-identical.
 
 ## Bookkeeping (not the cycle)
 - v676 → v677 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 583 Log — 2026-09-06 02:26
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 583 complete and pushed (v677).
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest in rotation; T2 last run at cycle 576.)
+
+## Friction
+Walked cold from no sessionStorage: Country Profile → select a country → read the 26px headline take → look immediately below it for what that number is made of. The regime-split chip sits ~40px under it (`_cpRegimeSplit570`, `index.html` ~32540, rows from `cpRegimeRows()` at 23616).
+
+Swept all 185 records throug
