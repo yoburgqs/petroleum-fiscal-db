@@ -32655,3 +32655,111 @@ tier, filter, export or on-screen layout changes.
 **Task:** T5 — "Give me something I can paste straight into an IC memo." (Stalest in rotation: 580 T5, 581 T1, 582 T4, 583 T2, 584 T3, 585 T6.)
 
 **Friction:** Cold load → Country Profile → Norway → **Copy for IC Memo** (`#dd-ic-summary-btn`, handler ~line 37490). The pasted paragraph carried take at four prices, price swing, contractor NPV at $50/$75/$125, breakeven, fiscal predictability, production-weighting basis, evidence tier and th
+
+---
+## Cycle 587 Log — 2026-09-06
+
+**Task:** T1 — "Which countries should even be on my screening list?" (Rotation: 583 T2, 584 T3, 585 T6, 586 T5; T1 last run at 581, stalest.)
+
+**Friction:** Cold load (sessionStorage and localStorage cleared) → Home → "open the screen →" →
+Screener. The happy path is in good shape: the IOC Capital Screen returns 15, the proxy divider
+is drawn and honest, the v668 count-bar basis switch works, the fee-basis rows print
+"84.8% → screened at 34.1%" in the cell, column sort respects the production grouping, and row
+click opens the Country Profile. The break is on the **Min primary-source evidence (A)** slider
+(`#sl-evid`; filter at `runScreener()` ~line 28442, `if (minEvid > 0 && (d.a_pct || 0) < minEvid)`).
+
+`a_pct` is a **ratio with no denominator floor**, so dragging the platform's evidence control
+toward "maximum evidence" made the surviving evidence base monotonically **worse**. Measured
+against the shipped `country_data.json`:
+
+| A-share threshold | countries pass | median facts on file | under 50 facts |
+|---|---|---|---|
+| ≥0 | 185 | 159 | 55 |
+| ≥50 | 128 | 68 | 52 |
+| ≥70 | 52 | 40 | 26 |
+| ≥80 | 47 | **16** | 25 |
+| ≥90 | 32 | **5** | 25 |
+| ≥100 | 27 | **4** | **25 of 27** |
+
+At the top of the travel the nine best-evidenced countries in the database were Ascension Island,
+French Polynesia, Guadeloupe, Micronesia, Nauru, Puerto Rico, Saint Helena, Tuvalu and Western
+Sahara — **2 facts each**, zero verified production — while Norway (63,848 facts), the UK (15,899),
+Nigeria (8,203), Indonesia (5,888) and Iraq (3,577) were all removed. **23 of the 27 survivors were
+graded D by the Evidence column in their own row.** Two controls on the same tab, on the same row,
+giving opposite answers about the same property.
+
+The page already knew. The slider's tooltip read *"Caution: a high A-share on a thin fact base is
+not strong evidence … Use the Primary-Source Evidence preset, which pairs this with a fact-depth
+floor"* — a tooltip telling the analyst not to use the control it is attached to. Per the directive:
+a tooltip is what you add when you cannot fix the underlying confusion; fix the confusion instead.
+
+Same defect class the loop has already deleted four times — IRR (v517), the breakeven ceiling
+(v568), the breakeven-coverage radio (v623), Water Depth (v660) — but this axis is not measuring
+the wrong property, it is measuring the right ratio without a denominator. So it is repaired, not
+removed.
+
+**Change:** the fact-depth leg now travels with the slider instead of only with the preset.
+
+- New `#sc-evid-depth` checkbox, **checked by default**, hidden while the slider sits at 0 and
+  revealed by `_scUpdateNeutralFlags()` the moment a share is asked for — the same pattern as the
+  v554 fee-basis control on the take axis. Floor: **≥50 fiscal facts on file**.
+- 50 is `_evidenceGrade()`'s own B rung on the depth leg (`nf >= 150 = A, >= 50 = B, >= 15 = C`);
+  below it the platform already grades a country C or D however clean the sourcing. And **no
+  country with verified field production holds fewer than 50 facts**, so this floor can never
+  remove a production-backed regime — which is the axis T1 is actually about.
+- `Math.max` with `_screenerMinFacts`, so the Primary-Source Evidence preset's stricter 150 still
+  wins and that preset is **unchanged at 35**. The label prints whichever floor is actually
+  applied (`#sc-evid-depth-floor`), so it reads ≥150 under the preset and ≥50 under the slider.
+- The axis gained a live pass count (`#sc-evid-n`, same short shape as the NPV axes), and the
+  count line, the criteria panel and the diagnostic hints all now state the depth leg.
+- Unchecking reproduces the pre-v681 behaviour exactly, and the count line then says so:
+  *"on a record of ANY depth — fact-depth floor off, so 25 of these 27 are graded on fewer than
+  50 facts and the Evidence column marks them C or D."*
+
+**Result:** verified live across the slider's travel —
+
+| setting | before | after |
+|---|---|---|
+| A ≥ 100% | 27 rows, grade string `DDBBDDDDDDDDDDDDDDDDCDDCDDD`, led by Vanuatu (14 facts), Bahamas (8), Micronesia (2) | **2 rows, both B** — Greenland (62 facts), Faroe Islands (98) |
+| A ≥ 80% | 47 rows, 25 under 50 facts | **22 rows, grades entirely A/B**, led by **Canada and Angola** (production-backed) |
+| A ≥ 0 (rest) | 185, control hidden | unchanged |
+
+An analyst asking "which countries have terms I can actually defend" now gets an answer the
+Evidence column in the same table agrees with, instead of a shortlist of nine 2-fact islands.
+No take, NPV, IRR, breakeven, rank, tier, region, export or tab-order change.
+
+**Verification**
+- JS syntax gate: **PASS** — 11 inline script blocks, 0 errors.
+- Playwright runtime suite **RUN this cycle** against the local build
+  (`TEST_URL=http://localhost:8899/index.html`): **261 PASS / 0 FAIL / 1 WARN**, read from
+  `/tmp/runtime_test_report.txt`, not assumed. The WARN is the service worker registering the
+  hardcoded Pages path `/petroleum-fiscal-db/sw.js`, which 404s on a bare localhost root —
+  pre-existing, localhost-only, unrelated to this change.
+- **Mobile 390 x 844 `hasTouch`:** `scrollWidth` 390 = `clientWidth` 390; the new checkbox renders
+  24 x 24 (`#sc-evid-depth` sized in the v612 mobile layer alongside `#sc-fee-cmp`). No horizontal
+  scroll at 1920 / 1440 / 1280 / 1024 / 768.
+- **Caught and fixed inside the cycle:** the first draft put the share-vs-depth comparison inside
+  `.sc-axis-n`, which is `white-space: nowrap` and sits in a slider label. That forced the filter
+  card wider than the viewport and put **36px of horizontal scroll on a phone and 37 / 77 / 141px
+  at 1024 / 1280 / 1440** — measured against a pre-change baseline that was clean at all six
+  widths. The comparison was moved to the wrapping checkbox line and all six widths re-measured.
+  Recorded because the directive's Step 5b exists precisely because this regression class recurs.
+
+**Carried forward — not fixed this cycle**
+- The Home Screener card still advertises "set max take %, min contractor NPV at $75, min NPV at
+  the $50 downside, **breakeven**, mechanic, or region". The breakeven ceiling was deleted in v568.
+  Text-only, so deliberately left: the directive bans text-only changes as a cycle.
+- Sorting Govt Take descending puts **Saudi Arabia (take "—", no value) above Iraq at 84.8%** —
+  the null sorts as if it were the highest take. One row affected.
+- Everything carried from cycles 560–586 is unchanged, including: the Fiscal Compare drilldown
+  IC Citation and the four tabular *Copy for IC Memo* artifacts carrying no reform leg; the FC
+  *Copy for IC Memo* defaulting to all 185 rows; the Country Profile headline printing
+  `41% primary law · n=37,222` on the CONTRACT count while the Evidence Quality panel pairs the
+  same share with the FACT count; the `fc-nav-bar` "▶ Run FC at this price" button reading
+  `#cp-price-select`, which does not exist; the 72 of 163 count-basis records that do not
+  reconcile `take_75` against `mech_mix`; Side-by-Side tabulating Contractor NPV at $50/$75/$125
+  while the chart carries all four prices; and the SbS proxy/basis notice referring to IRR and
+  breakeven rows that do not exist on that tab.
+
+**Bookkeeping (not the cycle)**
+- v680 → v681 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
