@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v675</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v676</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v675</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v676</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v675';
+  return m ? m[0] : 'v676';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v675');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v676');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -35760,6 +35760,46 @@ function _rrPopulateLookup() {
   }
 }
 
+// ── v676 (T4): land the analyst on the VERDICT, not on the bottom of it ──────────
+// Seven surfaces route into the reform verdict card -- the Fiscal Compare Stability cell,
+// the Country Profile headline chip and sidebar Stability line, the CP "Full reform detail"
+// button, the no-coverage panel, the peer block and the event-log button. All of them went
+// through openReformRiskFor(), which finished with scrollIntoView({block:'nearest'}).
+//
+// That is not a small mis-scroll. 'nearest' aligns whichever EDGE is nearest, and this card
+// is always taller than the viewport -- measured 1,064-1,626px at 1440x900 and 2,301px at
+// 390x844. When the target is taller than the scrollport, 'nearest' therefore parks its
+// BOTTOM edge at the fold and leaves the top permanently above it: 49px cut for Norway,
+// 90px for Venezuela, 180px for Kazakhstan, 319px for the United Kingdom. What sits in that
+// cut is the whole answer -- the card headline, the Reform Frequency Score, the rank
+// ("21 of 21 · actively reforming"), the reforms-since-2010 count and the direction split.
+// An analyst who clicked the UK Stability cell for its reform exposure landed reading
+// "SOURCED EVENT LOG - 9 EVENTS · 1975-2024" on a tab they had just arrived at, where
+// scrolling UP is the last thing anyone tries, and never saw 25/100 or the 3-5pp WACC
+// premium the IC action tells them to carry.
+//
+// Scroll deterministically to the card's TOP instead, offset by .site-header where that
+// header is actually stuck (it is sticky only at <=720px, and would otherwise cover the
+// card's first 102px on a phone). Measured after a frame so the freshly-rendered card has
+// been laid out.
+function _rrScrollVerdictToTop() {
+  var out = document.getElementById('rr-country-verdict');
+  if (!out) return;
+  var go = function () {
+    if (out.style.display === 'none') return;
+    var pad = 12;
+    var hdr = document.querySelector('.site-header');
+    if (hdr) {
+      var pos = window.getComputedStyle(hdr).position;
+      if (pos === 'sticky' || pos === 'fixed') pad += hdr.getBoundingClientRect().height;
+    }
+    var y = out.getBoundingClientRect().top + (window.pageYOffset || 0) - pad;
+    window.scrollTo(0, Math.max(0, Math.round(y)));
+  };
+  if (window.requestAnimationFrame) window.requestAnimationFrame(go); else go();
+}
+window._rrScrollVerdictToTop = _rrScrollVerdictToTop;
+
 // v514: jump from a Country Profile with no sourced reform log straight to the Reform
 // Risk tab with that country already selected. The lookup <select> is filled by
 // _rrPopulateLookup(), which only runs once REFORM_HISTORY has landed, so poll briefly
@@ -35773,8 +35813,7 @@ function openReformRiskFor(country) {
     if (sel && sel.querySelector('option[value="' + String(country).replace(/"/g, '\\"') + '"]')) {
       sel.value = country;
       try { renderReformCountryVerdict(); } catch (e) {}
-      var out = document.getElementById('rr-country-verdict');
-      if (out && out.scrollIntoView) out.scrollIntoView({ block: 'nearest' });
+      _rrScrollVerdictToTop();
       return;
     }
     if (++tries < 30) setTimeout(attempt, 200);
