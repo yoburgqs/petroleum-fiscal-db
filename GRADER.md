@@ -31490,3 +31490,16 @@ paste already carried the coverage caveat via `_icProdBasisNote()`; the badge ab
 
 ## Bookkeeping (not the cycle)
 - v670 → v671 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 577 Log — 2026-09-05 19:49
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Both test servers are down. Cycle complete.
+
+## Cycle 577 — T6
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?" (5 cycles stale; the last six ran T5, T3, T6, T1, T4, T2, T2.)
+
+**Friction.** Cold walk of Country Profile at 1440×900, storage cleared, USA loaded. The IC-basis badge (`dd-ic-basis-mark`, `index.html` ~31606) had **two** colour registers where `_dqTier()` has **three**, and the branch was on `isProxy` — so every non-PROXY country came out the same green
