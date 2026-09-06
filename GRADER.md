@@ -31503,3 +31503,135 @@ paste already carried the coverage caveat via `_icProdBasisNote()`; the badge ab
 **Task:** T6 — "Where did this number come from and how solid is the evidence?" (5 cycles stale; the last six ran T5, T3, T6, T1, T4, T2, T2.)
 
 **Friction.** Cold walk of Country Profile at 1440×900, storage cleared, USA loaded. The IC-basis badge (`dd-ic-basis-mark`, `index.html` ~31606) had **two** colour registers where `_dqTier()` has **three**, and the branch was on `isProxy` — so every non-PROXY country came out the same green
+
+---
+## Cycle 578 Log — 2026-09-05 20:22
+- Test before: 261 PASS / 0 FAIL / 1 WARN (local, this build's pre-change baseline on :8932)
+- Test after: 261 PASS / 0 FAIL / 1 WARN (local, :8931 — suite ACTUALLY RUN this cycle, both sides)
+- JS errors: 0 pageerrors. The 1 WARN is a 404 on a service-worker script fetch, present
+  identically on the pre-change baseline — pre-existing, not introduced.
+
+## Cycle 578 — T3
+
+**Task:** T3 — "How do these three countries compare side by side?" (stalest but T5; the last
+eight ran T5, T3, T6, T1, T4, T2, T2, T6.)
+
+## Friction
+
+Cold load, `sessionStorage` and `localStorage` cleared, no interaction at all. The Side-by-Side
+tab seeds its own example set (Norway / UK / Netherlands, `switchTab` ~line 22509) and the grid
+prints two adjacent rows that are the whole answer to "which of these has the most consistent
+terms":
+
+| row | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| Predictability Score | **76 · UNGRADED · one term** | 58 · LOW · 15.0pp | **84 · UNGRADED · one term** |
+| Take spread across contracts | **single term** | 36.4–51.4% (15.0pp) | **single term** |
+
+Read left to right that says the UK is the only column in the set where block selection moves the
+fiscal outcome, and it ranks the set **NL 84 > Norway 76 > UK 58**.
+
+ORCA's own contract file says the opposite for the top two. `api/v1/country/norway.json`
+`top_contracts` lists the 50 largest producing contracts at **51.1–80.7% (29.6pp)**;
+`netherlands.json` at **22.9–53.7% (30.8pp)**. Each is roughly **double** the UK's measured
+15.0pp. The two columns the grid called uniform are the two most dispersed columns in the set,
+and the analyst reaches that reading on the default view without clicking anything.
+
+This was already known and already fixed twice — **just not on the screen that ranks**. v559
+established that `COUNTRY_DATA` ships `p25_take === p75_take` for 135 of 185 countries and that on
+**41** of them the platform's own `top_contracts` table refutes it outright. Country Profile
+withdraws the claim there (`_cpApplyObsSpread`, ~line 42097). Reform Risk withdraws it there
+(`_rrApplyObsSpread`, ~line 35613, already reusing the same `window._cpObsSpread` cache).
+Side-by-Side never did — and Side-by-Side is the one tab of the three whose entire purpose is to
+rank countries against each other on exactly those two rows.
+
+It was therefore also a straight self-contradiction across tabs, on one number, for one country:
+
+    Norway, Country Profile   basis chip "≥29.6pp obs" (orange) over
+                              "Observed across top 50 producing contracts: 51.1% – 80.7%"
+    Norway, Side-by-Side      "single term"
+
+with the wrong one on the comparison screen.
+
+Not an edge case for this tab. Of the 41 refuted countries, the ones an analyst actually loads
+here include **Angola 45.2pp** — which sits in **two of the four shipped quickstart presets**
+(Atlantic Frontier Quartet, West Africa Trio) — plus Uzbekistan 55.8pp, Colombia 39.4pp,
+Indonesia 37.2pp, Thailand 36.6pp, Norway, the Netherlands and 34 more.
+
+## Change
+
+`_sbsApplyObsSpread()` now runs at the end of `renderCompare()`. For each column whose
+`_fpDispersion()` state is `single`, it reuses the v559 cache or fetches
+`api/v1/country/<slug>.json`, and where `cpSpreadConflict()` holds it repaints:
+
+- **Take spread cell** — `single term` → `≥29.6pp observed` in orange, with `51.1–80.7% across
+  top 50` on the line beneath it.
+- **Predictability basis chip** — `one term` → `≥29.6pp obs` in orange, and the badge gains a
+  `▲ best case` marker plus a tooltip stating what the untaxed IQR term would have cost
+  (Norway ≈ 76 → 52 · LOW at the observed dispersion).
+- **One set-level `.cmp-notice`** naming every withdrawn column, and — where the set also holds a
+  measured column — saying in words that the measured column *looks* like the less uniform regime
+  on this screen while sitting at a narrower dispersion than the withdrawn ones.
+
+Both the visible grid cell and the matching `#cmp-data-table` cell are patched (rows now carry
+`data-sbs-row` / `data-sbs-c`), so the **Copy for IC Memo** artifact carries the withdrawal in the
+table itself, and the notice rides the v669 notice sweep into the paste.
+
+**Nothing is recomputed and nothing is overwritten** — no take, no score, no quartile. Same rule
+v559 set: a top-N-by-production sample cannot ESTABLISH a population IQR, but one counterexample
+REFUTES a universal claim, and "every contract prices to the same take" is universal. Scope is the
+one-term basis only: measured columns (Egypt 27.1pp) and state monopolies (Saudi Arabia, Bahrain —
+already "no contractor position") are untouched.
+
+## Result
+
+On the tab's own default view the analyst can no longer read Norway and the Netherlands as the
+uniform-terms columns, and no longer ranks the set on a Predictability column whose top two
+entries were built on a zero spread penalty the evidence refutes. In place of the withdrawn claim
+they get the observed contract range — which is the figure that actually answers how much block
+selection matters — in the cell, in the tooltip, in the set notice and in the pasted IC memo. The
+three tabs now return one answer for the same country instead of two opposite ones.
+
+## Verification (all run this cycle)
+| check | result |
+|---|---|
+| JS syntax gate, 11 script blocks | **PASS** |
+| Runtime suite, local, this build | **261 PASS / 0 FAIL / 1 WARN** |
+| same suite, pre-change baseline on port 8932 | 261 / 0 / **1 WARN** — WARN is pre-existing |
+| horizontal scroll, 9 tabs × 6 viewports (1920/1440/1280/1024/768/390) | **0** violations |
+| pageerrors, all widths | **0** |
+| touched cells under 24px @390 `pointer: coarse` | **0** |
+| SbS @390×844 `hasTouch` | scrollWidth 390 = clientWidth 390 |
+| reorder → repaint follows the column, 1 notice, no duplicates | **PASS** |
+| remove a withdrawn column → notice drops it; clear → notice removed | **PASS** |
+| measured column (Egypt 27.1pp) and monopolies (Saudi, Bahrain) untouched | **PASS** |
+| clipboard export carries both cells + the notice | **PASS** |
+
+## Carried forward — not fixed this cycle
+- **`FISCAL REGIME BREAKDOWN` claims the wrong weighting for the headline.** Its note reads
+  "Blended average (81.1%) weights equally across all contract types" while the take-chart caption
+  two screens up prints `Simple avg: 79.9%` and labels 81.1% production-weighted-blended. Still the
+  strongest open defensibility defect and the natural next T6.
+- **The 94 remaining one-term countries are unverified, not confirmed.** This cycle withdraws the
+  claim on the 41 where the contract file refutes it. On the rest the sample either agrees or is
+  too thin, and the cell still asserts "single term" as fact rather than "not contradicted by the
+  sample held". Worth a cycle.
+- Everything carried from cycles 560–577 is otherwise unchanged, including: the take chart's PNG
+  export carrying the fee-basis caveat but not the proxy one; the proxy notice naming IRR and
+  breakeven columns that do not exist; the Reform Risk country lookup card printing DIRECTION over
+  the full record beside a score over the 2010 window; "Most Frequently Reformed Regimes" showing
+  15 of 21 sourced jurisdictions without saying so; `COUNTRY_DATA` and the API disagreeing on
+  `profit_oil_govt` / `state_eq` for 45 of 185 countries; the two barely-screening Screener presets;
+  `#screener-count` at ~570 characters of unbroken prose; the `Cost Recovery Cap` source badges at
+  21px on Country Profile @390; the Fiscal Compare XLSX emitting 25 columns with no comparable-take
+  column; `MECHANIC_BREAKDOWN` disagreeing with `country_data.json` on Iraq's mechanic split; the
+  Side-by-Side search box replacing the seeded example with no add-to-set path; the two adjacent
+  unexplained IC buttons on Country Profile; the duplicated all-185 rank in CP headline Zones A and
+  B; the non-existent `cp-price-select`; the Screener take slider's `min="30"` floor excluding the
+  USA at 23.4%; FAQ A25/A35/A40 describing a Screener "Stability Score filter" that does not exist;
+  Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on
+  lines 54/56/57; the 272 dead citations; and `SPECULATIVE_COUNTRIES` still being a hand-typed list
+  of 7 names from v41.
+
+## Bookkeeping (not the cycle)
+- v671 → v672 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
