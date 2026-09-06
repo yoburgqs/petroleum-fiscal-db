@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v686</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v687</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v686</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v687</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2137,7 +2137,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v686';
+  return m ? m[0] : 'v687';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2212,7 +2212,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v686');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v687');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -26814,9 +26814,13 @@ function renderCompare() {
         + ' — but ORCA holds no verified field '
         + 'production for it. Its take is a simple average across ' + (_win.n != null ? Number(_win.n).toLocaleString() : '?')
         + ' contracts (' + (_win.n_facts != null ? Number(_win.n_facts).toLocaleString() : '?')
-        + ' fiscal facts) and its NPV, IRR and breakeven come from the standardized deepwater profile, '
+        // v687 (T5): this notice rides into the clipboard artifact (v669), and there it warned
+        // the analyst about an IRR column and a breakeven column that the same artifact says,
+        // two lines above, are not reported at all. It sent them hunting for two columns that
+        // do not exist. It now names the rows that ARE in the paste.
+        + ' fiscal facts) and its contractor NPV comes from the standardized deepwater profile, '
         + 'not from its own fields.' + _cmp
-        + ' Rank on take with the proxy stated; do not present these NPV and IRR columns as like-for-like in an IC memo.';
+        + ' Rank on take with the proxy stated; do not present these NPV rows as like-for-like in an IC memo.';
     } else {
       msg = '<strong style="color:var(--text);">'
         + _list + ' ' + (_nm.length === 1 ? 'is a proxy column' : 'are proxy columns') + '.</strong> '
@@ -29325,8 +29329,8 @@ function _scExportBasisLines() {
   }
   L.push('ASSUMPTIONS: standardized Deepwater profile, $1.2B capex, 50k bbl/d, $15/bbl opex, '
     + '10% WACC, 100% WI. Take and NPV at the screened price; breakeven always at $75/bbl.');
-  L.push('IRR is not reported: the underlying figure is an arithmetic mean of per-contract IRRs '
-    + '(median 239.8% across the 124 countries that carry one) and is not a project return.');
+  // v687 (T5): was a stale 239.8% / 124-country literal. Measured from the bundle now.
+  L.push(_icIrrNote('IRR is not reported'));
   L.push('Fiscal_Predictability is the same score the Country Profile and Side-by-Side show '
     + '(100 less IQR, price-swing and multi-mechanic penalties). Countries with no contract-level '
     + 'take distribution read "not scored" — absence of a distribution is not evidence of stability. '
@@ -34074,7 +34078,7 @@ function loadCountryProfile(country) {
     <p id="dd-be-footnote-${safe}" style="font-size:10px;color:var(--muted);margin-top:8px;line-height:1.5;">Breakeven = price at which contractor NPV = 0. Loading from database…</p>
     <!-- v516: the platform advertises IRR on Fiscal Compare, Explorer and the Screener hurdle slider,
          so a silent absence here would be its own confusion. Say where it went, once, under the table. -->
-    <p style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5;border-left:2px solid var(--border);padding-left:8px;"><strong style="color:var(--text);">No IRR column.</strong> The country-level IRR this page used to show was an arithmetic mean of per-contract IRRs — median 333% across the 165 countries that carry one, and only 9 of those below 100%. It is not a project return, and it was being pasted into IC memos. Contractor NPV at four prices is on the same standardized Deepwater profile and is computed for all 185 countries. For a genuine project IRR, <a onclick="ddOpenScenarioBuilder('${_irrCty576}');return false;" href="#" style="color:var(--accent);font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;" title="Open the Scenario Builder pre-filled with ${d.country}'s fiscal terms and compute a project IRR from your own capex, opex and production profile">run Scenario Builder with your own capex and opex →</a></p>
+    <p style="font-size:10px;color:var(--muted);margin-top:6px;line-height:1.5;border-left:2px solid var(--border);padding-left:8px;"><strong style="color:var(--text);">No IRR column.</strong> The country-level IRR this page used to show was an arithmetic mean of per-contract IRRs${(function(){var _s=_icIrrStat();return _s?' — median '+Math.round(_s.med)+'% across the '+_s.n+' countries that carry one, and only '+_s.below100+' of those below 100%':''})()}. It is not a project return, and it was being pasted into IC memos. Contractor NPV at four prices is on the same standardized Deepwater profile and is computed for all 185 countries. For a genuine project IRR, <a onclick="ddOpenScenarioBuilder('${_irrCty576}');return false;" href="#" style="color:var(--accent);font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;" title="Open the Scenario Builder pre-filled with ${d.country}'s fiscal terms and compute a project IRR from your own capex, opex and production profile">run Scenario Builder with your own capex and opex →</a></p>
     ${(function(){
       // v458: Copy as IC table — tab-separated text ready to paste into Excel or IC memo
       // v486: prepend a title row with country + profile + version so IC analysts see context when pasting into Excel
@@ -38003,8 +38007,12 @@ function copyComparisonTable(btn) {
   // trusted). It now states the NPV price points that ARE in the table, and says in the pasted
   // artifact itself why IRR is absent -- an analyst asked "where is IRR?" in the IC room needs
   // the answer inside the thing they pasted, not back on the page.
-  var assump = 'Standardized Deepwater profile, $1.2B capex, 10% WACC, 100% WI. Contractor NPV at $50 / $75 / $125/bbl; government take at $50–$125/bbl. Breakeven is not reported: every stored value under $50 rendered as the single string "<$50" and all 65 populated values fall between $27 and $34, so the field could not separate two countries; at $75/bbl the DCF engine now returns a usable breakeven for 44 of 71,576 contract rows. Use the $50 contractor NPV as the downside test. '
-    + 'IRR is not reported: the underlying figure is an arithmetic mean of per-contract IRRs (median 239.8% across the 124 countries that carry one) and is not a project return.';
+  // v687 (T5): this line claims to describe the table under it. It named three NPV price
+  // points over a grid that pastes FOUR -- $100 is a row in the artifact and was missing from
+  // its own assumption line -- and its IRR clause carried the stale 239.8% / 124-country
+  // literal. Both now match what is actually in the paste.
+  var assump = 'Standardized Deepwater profile, $1.2B capex, 10% WACC, 100% WI. Contractor NPV at $50 / $75 / $100 / $125/bbl; government take at $50–$125/bbl. Breakeven is not reported: every stored value under $50 rendered as the single string "<$50" and all 65 populated values fall between $27 and $34, so the field could not separate two countries; at $75/bbl the DCF engine now returns a usable breakeven for 44 of 71,576 contract rows. Use the $50 contractor NPV as the downside test. '
+    + _icIrrNote('IRR is not reported');
   // v511: last cycle moved three clipboard citations onto _orcaVerNow(); this one was missed,
   // so the pasted comparison table carried a hard-coded version that drifts every cycle.
   var srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow() + ' — yoburgqs.github.io/petroleum-fiscal-db/';
@@ -41973,7 +41981,7 @@ function openFCDrilldown(country) {
   // and on the Screener hurdle slider, so a silent absence from this table would be its own
   // confusion. Say where it went, once, and route to the tool that computes a real one.
   html += '<div style="max-width:480px;font-size:10px;color:var(--muted);margin:-8px 0 12px;padding-left:8px;border-left:2px solid var(--border);line-height:1.5;">'
-    + '<strong style="color:var(--text);">No IRR row.</strong> The country-level IRR is an arithmetic mean of per-contract IRRs \u2014 median 239.8% across the 124 countries that carry one at $75/bbl, and it falls as price rises for 20 countries whose NPV rises. It is not a project return. Contractor NPV above is on the same standardized profile and is computed for all 185 countries. '
+    + '<strong style="color:var(--text);">No IRR row.</strong> The country-level IRR is an arithmetic mean of per-contract IRRs' + (function(){ var _s = _icIrrStat(); return _s ? ' \u2014 median ' + Math.round(_s.med) + '% across the ' + _s.n + ' countries that carry one at $75/bbl, and it falls' : ', and it falls'; })() + ' as price rises for 20 countries whose NPV rises. It is not a project return. Contractor NPV above is on the same standardized profile and is computed for all 185 countries. '
     + '<a href="#" onclick="ddOpenScenarioBuilder(\'' + cEsc + '\');return false;" style="color:var(--accent);font-weight:600;text-decoration:underline dotted;text-underline-offset:2px;" title="Open the Scenario Builder pre-filled with ' + country + '\u2019s fiscal terms and compute a project IRR from your own capex, opex and production profile">Run Scenario Builder for a project IRR \u2192</a></div>';
   // v506: the verdict. Two government-take figures now sit adjacent and labelled; this says
   // which one goes in the IC memo and what the gap means. Severity thresholds match the
@@ -42740,7 +42748,55 @@ function cpNpvFmt(v) {
 }
 // One sentence saying where IRR went, reused in every CP clipboard artifact so the answer
 // travels inside the thing the analyst pasted rather than staying back on the page.
-var CP_IRR_NOTE = 'IRR is not reported at country level: the underlying figure is an arithmetic mean of per-contract IRRs (median 333% across the 165 countries that carry one) and is not a project return. Use Scenario Builder with project capex/opex for a project IRR.';
+//
+// -- v687 (T5) -- the four paste artifacts disagreed about why IRR is missing ----------
+// Walked cold: the Screener export, the Side-by-Side "Copy for IC Memo", the Country Profile
+// "Copy for IC Memo" and the Fiscal Compare row drilldown each carry a sentence justifying the
+// absence of the ONE metric an IC asks for first. Two of them said "median 239.8% across the
+// 124 countries that carry one"; two said "median 333% across the 165 countries". The Screener
+// FAQ says 240.9%. An analyst doing the natural T5 run -- screen, profile a country, compare
+// three -- pastes all three artifacts into one memo, and the memo then states the same
+// statistic about the same named source at the same version two incompatible ways. That is the
+// kind of thing an IC catches, and what it catches is the tool.
+//
+// The shipped country_data.json settles it: 165 of 185 rows carry irr_75, median 333.1, 9 of
+// them below 100%. The 239.8 / 124 pair is v515's audit of the PRE-v516 bundle and has been
+// stale since the data was regenerated -- wrong by 41 countries and 93 percentage points.
+// Rather than swap one constant for another, which is how it drifted in the first place, the
+// sentence is COMPUTED from COUNTRY_DATA at the moment it is written: every surface reads the
+// same number because it is the same read, not because two literals happen to agree.
+// CP_IRR_NOTE stays a string-valued global so its existing callers are untouched.
+function _icIrrStat() {
+  try {
+    var v = (window.COUNTRY_DATA || [])
+      .map(function (d) { return d && d.irr_75; })
+      .filter(function (x) { return x != null && isFinite(x); })
+      .sort(function (a, b) { return a - b; });
+    if (!v.length) return null;
+    var n = v.length;
+    var med = (n % 2) ? v[(n - 1) / 2] : (v[n / 2 - 1] + v[n / 2]) / 2;
+    var lo = 0;
+    for (var i = 0; i < n; i++) if (v[i] < 100) lo++;
+    return { n: n, med: med, below100: lo };
+  } catch (e) { return null; }
+}
+// The measured clause, or nothing at all where the bundle has not loaded. An artifact that
+// cannot count must not print a count.
+function _icIrrBasis() {
+  var s = _icIrrStat();
+  return s ? ' (median ' + Math.round(s.med) + '% across the ' + s.n
+    + ' countries that carry one at $75/bbl)' : '';
+}
+function _icIrrNote(head) {
+  return (head || 'IRR is not reported at country level')
+    + ': the underlying figure is an arithmetic mean of per-contract IRRs'
+    + _icIrrBasis() + ' and is not a project return. '
+    + 'Use Scenario Builder with project capex/opex for a project IRR.';
+}
+Object.defineProperty(window, 'CP_IRR_NOTE', {
+  configurable: true,
+  get: function () { return _icIrrNote(); }
+});
 
 // v564 (T2): the guard is now > 1, not > 0. cpBeFor() is the single read point for the Country
 // Profile breakeven (v512), and at > 0 it admitted the three state-monopoly DCF floor values
