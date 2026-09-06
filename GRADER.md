@@ -31797,3 +31797,141 @@ at all), and the Philippines card — 152 TSC contracts at 100% take the databas
 Cold load, Country Profile → Russia. The **Fiscal Regime Breakdown** card is the one surface whose job is to answer T6, and the FAQ tells the analyst to *"use the mechanic-specific take for your analysis, not the headline blended figure"* — so these rows are what an IC memo gets built on.
 
 It showed Concession 1,191 contracts at 22.9% and PSC 69 at 56.4%, under th
+
+---
+## Cycle 580 Log — 2026-09-05 23:35
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (stalest in rotation;
+last walked at 570. 576 T2, 577 T6, 578 T3, 579 T6.)
+
+## Friction
+Cold load → Fiscal Compare. Two IC artifacts sit two inches apart on the same toolbar and
+are produced from the same screen at the same moment:
+
+- **⎘ Copy for IC Memo** (`copyFCForIC`, v664) emits a `Comparable take % @$75 — fee-basis
+  contracts excluded (RANK AND CITE ON THIS where populated)` column, marks the affected
+  cells `34.1 ← cite this`, and opens with a preamble naming all 10 affected rows and
+  stating that their placing in the `#` column is not a fiscal finding.
+- **⬇ Export XLSX** (`exportFCResults`, line 43113) — the artifact the Quick Start names in
+  as many words, *"Export XLSX for IC attachment"* — carried **none of it**. 25 columns and
+  a 60-line Methodology sheet in which the string `fee-basis` did not appear once.
+
+Measured on the live build, cold, $75 deepwater, no filters, via an `XLSX.writeFile`
+intercept:
+
+| | ⎘ Copy for IC Memo | ⬇ Export XLSX |
+|---|---|---|
+| Iraq take @$75 | 84.8% **and** `34.1 ← cite this` | 84.8% only |
+| Iraq placing | rank 63, preamble says do not read it | **Rank 63**, no qualifier |
+| Iraq tier | — | **`NOC`** (worst tier the sheet has) |
+| affected rows named | 10, in the preamble | **0** |
+
+Iraq's comparable take, on the 195 PSC/Concession contracts ORCA holds for it, is **34.1%** —
+lower than every country in the workbook's ranked block except the USA. A **50.7pp** gap, in
+the one artifact the analyst cannot check against the page, because by then they have left it.
+Nine more rows carry the same untagged blend:
+
+| country | published @$75 | comparable | workbook rank |
+|---|---|---|---|
+| Iraq | 84.8 | 34.1 | 63 |
+| Ecuador | 46.5 | 39.3 | 6 |
+| South Sudan | 53.3 | 49.0 | 20 |
+| Qatar | 77.2 | 74.5 | not ranked |
+| Oman | 77.6 | 75.6 | not ranked |
+| Mexico | 32.2 | 29.7 | not ranked |
+| Iran | 75.7 | 74.4 | 61 |
+| India | 61.9 | **63.2** (higher) | 53 |
+| Malaysia | 59.4 | 58.3 | 45 |
+| Azerbaijan | 60.8 | 59.8 | 50 |
+
+The rule is not new and is not this cycle's invention: MECHANIC_COMPARABILITY (2026-08-26)
+says a fee-basis take% may not be ranked against a PSC/Concession take%. v549 put the
+correction on Side-by-Side, v552 on the Country Profile screen, v553 on the CP clipboard,
+v554 on the Screener's take ceiling, v603 on the Home IC Capital Screen headline, v660 on
+the Screener paste, v664 on this tab's clipboard. Seven surfaces. The workbook was the
+eighth and was never done.
+
+## Change
+`exportFCResults()` now emits, immediately after the four government-take columns:
+
+1. **`Comparable take % @$P (fee-basis contracts excluded) — RANK AND CITE ON THIS where
+   populated`** — numeric and sortable, read from `_scFeeCmpAt()`, the same call the
+   Screener's ceiling and the clipboard paste make, so the three cannot drift.
+2. **`Take comparability`** — the sentence, in the row: how many of that country's contracts
+   are fee-basis and which mechanics, that the contractor is paid a fixed $/bbl remuneration
+   and keeps no price upside so take% measures structure not terms, that the published
+   figure may NOT be ranked against the PSC/Concession rows, which figure to cite, and that
+   where the row carries a Rank and a Tier both are on the published headline and are not a
+   fiscal finding.
+
+Both are **blank** on a row the rule does not touch — the clipboard's and the Screener's
+convention, so the column reads as "these are the affected rows", not as a second take on
+all 185. The pair is emitted **only when a row in this export is actually affected**: a
+Norway+USA shortlist still exports 25 columns, adding Iraq to it takes it to 27.
+
+The **Methodology** sheet gains a `Fee-basis blends and the Comparable take column (v674) —
+READ BEFORE RANKING` block: the affected countries by name, the rule, the blank-cell
+convention, the worked Iraq example, and India's opposite-direction correction (61.9 → 63.2)
+so the adjustment reads as a basis rather than a discount.
+
+**Rank, row order, take values and Tier are unchanged.** The sheet and the on-screen table
+still agree row for row — the same parity v622 and v632 were about. What was added is the
+figure to rank on, beside the one that must not be.
+
+Also fixed on the way: `runFiscalCompare()` called `exportBtn.removeAttribute('title')` on
+the enable path, so the button that produces the IC attachment had **no hover text at all**
+on the default (no-shortlist) route. It now writes the same sentence `_fcSyncSelUI()`
+already writes on its own no-selection branch.
+
+## Result
+An analyst who exports the workbook and attaches it to an IC memo reads Iraq's citable
+**34.1%** off the row, next to the 84.8% headline, with the reason and the governing rule in
+the adjacent cell — instead of handing the committee an appendix that files the
+second-largest OPEC producer 63rd of 65 in the worst take tier, with nothing in the file to
+say the number measures contract structure rather than fiscal terms.
+
+## Verification — this cycle, run, not assumed
+| check | result |
+|---|---|
+| JS syntax, all inline `<script>` blocks | **11/11 PASS** |
+| Runtime suite, local, this build | **261 PASS / 0 FAIL / 1 WARN** |
+| WARN provenance | sw.js 404 — 0 lines of this diff match `serviceWorker`/`sw.js` |
+| horizontal scroll, 8 tabs × 6 viewports (1920/1440/1280/1024/768/390) | **0** violations |
+| pageerrors, all widths | **0** |
+| touched controls (`fc-export-btn`, `fc-copy-ic-btn`) @390 `hasTouch` | **0** under 24px |
+| workbook @ $75, full 185 | 27 cols, Iraq 84.8 → 34.1, Methodology block present |
+| workbook @ $125, full 185 | column re-labelled `@$125`, Iraq comparable recomputed to **39.7** |
+| workbook, shortlist Norway+USA | **25 cols**, no comparability pair, no Methodology block |
+| workbook, shortlist + Iraq | 27 cols, pair present, 3 rows |
+| non-affected rows (Norway, USA, Saudi Arabia) | both new cells empty |
+
+## Carried forward — not fixed this cycle
+- **The on-screen Fiscal Compare table itself still has no comparable-take column.** The
+  clipboard and now the workbook both add it on the way out; the table the analyst reads
+  shows Iraq at 84.8% in the "db · citable" column with rank 63 and nothing beside it. That
+  is now the last surface in the chain without the correction, and it is the one the other
+  two are derived from. Strongest open T5/T1 item.
+- The `Tier (database take)` column still grades a fee-basis row off the blended headline
+  (Iraq → `NOC`). Left deliberately, for parity with the on-screen tier badge; the new
+  comparability cell says so explicitly. Fixing it means fixing the screen first.
+- Everything carried from cycles 560–579 is otherwise unchanged, including: the 40
+  "does not reconcile" countries; `mech_mix` per-mechanic takes contradicted by
+  `top_contracts` on 8 rows; the two remaining `MECHANIC_BREAKDOWN` consumers (~35214
+  Indonesia, ~35624 Iraq); the take chart's PNG export carrying the fee-basis caveat but not
+  the proxy one; the proxy notice naming IRR/breakeven columns that do not exist; the Reform
+  Risk lookup card mixing a full-record DIRECTION with a 2010-window score; "Most Frequently
+  Reformed Regimes" showing 15 of 21 sourced jurisdictions without saying so; `COUNTRY_DATA`
+  and the API disagreeing on `profit_oil_govt` / `state_eq` for 45 of 185; the two
+  barely-screening Screener presets; `#screener-count` at ~570 characters of unbroken prose;
+  the `Cost Recovery Cap` source badges at 21px on CP @390; the Side-by-Side search box
+  replacing the seeded example with no add-to-set path; the two adjacent unexplained IC
+  buttons on Country Profile; the duplicated all-185 rank in CP headline Zones A and B; the
+  non-existent `cp-price-select`; the Screener take slider's `min="30"` floor excluding the
+  USA at 23.4%; FAQ A25/A35/A40 describing a Screener "Stability Score filter" that does not
+  exist; Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror`
+  handlers on lines 54/56/57; the 272 dead citations; `SPECULATIVE_COUNTRIES` as a
+  hand-typed list of 7 names from v41; and the 94 unverified one-term countries from v672.
+
+## Bookkeeping (not the cycle)
+- v673 → v674 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
