@@ -32892,3 +32892,109 @@ manufactured by JSON key order, and cannot paste that manufactured ordering into
 Walked it cold: Reform Risk tab → *Check one country*. That card is the platform's entire T4 answer — seven surfaces route into it — and the first thing printed under the headline score is a rank. **That rank was an array index.**
 
 The Reform Frequency Score is `1
+
+---
+## Cycle 589 Log — 2026-09-06
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** — stalest in the
+rotation (583 T2, 584 T3, 585 T6, 586 T5, 587 T1, 588 T4).
+
+## Friction
+Walked cold at 1440: Home → Country Profile → change country. The headline strip is the whole T2
+answer, and on a fee-blended country it printed **two ranks on two different bases, four lines
+apart, with no reconciliation.** Iraq:
+
+```
+#6 of 21 producers · lower-mid among producers · on the comparable take
+-21.5pp vs producer median @$75 (comparable)
+All 185 countries: #180 · +56.4pp vs the all-country median (28.4%)
+```
+
+`#180 of 185` is the fifth-highest government take on earth. It was computed on the **84.8%
+blended headline** — the figure this same card labels, one line above, *"not comparable across
+countries"*, because 415 of Iraq's 610 contracts are TSCs where the contractor is paid a fixed
+$/bbl remuneration fee and take% is a property of the remuneration mechanic, not of the fiscal
+terms (`~/MECHANIC_COMPARABILITY.md`, Group 2).
+
+v552 moved the producer rank and the vs-median pill onto the comparable take. `getGlobalTakeRank()`
+(`index.html:23411`) and `_allBasisHtml534` (`:32628`) were never moved with them. So the analyst
+reads "below the producer median, contractor-favourable" and then, in the next breath, "5th worst
+take in the world" — a **174-place, 50.7pp contradiction inside one card**, and the one that reads
+like a hard fact with a big denominator is the wrong one.
+
+Secondary defect found in the same function: the rank was an **array index**. Ten countries all sit
+at 19.7% take (Albania, Cook Islands, Kiribati, Marshall Islands, Micronesia, Nauru, Palau, Samoa,
+Tonga, Tuvalu) and were printed as **#55 through #64**; the three state monopolies, all at 100.0%,
+were printed as **#183, #184 and #185**. Same defect fixed on Reform Risk at v682, still live here.
+
+## Change
+`getGlobalTakeRank()` now ranks on `cpCmpTakeOf(c,'75')` — the same basis as the producer line —
+and counts strictly-lower countries rather than reading an array index, so tied countries share a
+rank. `_globalTakes452` (the all-country median) and `diffAll` follow the same basis.
+
+| surface | before | after |
+|---|---|---|
+| Iraq all-185 line | `#180 · +56.4pp` | `#102 · +5.7pp · on the comparable take` |
+| Iran / Qatar / Oman / Ecuador / Mexico / South Sudan / Azerbaijan / India / Malaysia | on the blend | on the comparable take |
+| Albania … Tuvalu (10 at 19.7%) | `#55` … `#64` | `#29 (tied with 9 others)` |
+| Saudi Arabia / Kuwait / Bahrain (3 at 100.0%) | `#185` / `#184` / `#183` | `#183 (tied with 2 others)` |
+
+The all-185 line gains `, on the comparable take` only when the basis actually differs from the
+published headline, and its tooltip now states what that line **would** have read on the blend
+(`"would read #180 and +56.4pp"`), so an analyst who already quoted the old number can see which
+one moved rather than finding the page silently disagreeing with a memo they wrote. The old
+tooltip's claim that this is "still what the Explorer and Screener rank against" was removed —
+it stopped being true for the Screener at v554.
+
+No take, NPV, IRR, breakeven, tier, mechanic, region, export or tab-order changed. 11 of 185
+records carry a `g1` split; the all-185 median is 28.4% on either basis.
+
+## Result
+An analyst asking "is Iraq attractive at $75, and can I defend that?" gets **one** answer on
+**one** basis — #102 of 185, +5.7pp off the median, agreeing with the `#6 of 21 producers ·
+lower-mid` line above it — instead of two answers 174 places apart, and cannot paste into an IC
+memo a world rank that the same card disowns four lines earlier.
+
+**Verification**
+- JS syntax gate: **PASS** — 11 inline script blocks, 0 errors (re-run after the version bump).
+- Playwright runtime suite **RUN this cycle** against the local build
+  (`TEST_URL=http://localhost:8899/index.html`): **261 PASS / 0 FAIL / 1 WARN**, read from
+  `/tmp/runtime_test_report.txt`, not assumed. The WARN is the pre-existing service worker
+  registering the hardcoded Pages path `/petroleum-fiscal-db/sw.js`, which 404s on a bare
+  localhost root — localhost-only, unrelated.
+- 15 countries re-read live after the change (Iraq, Iran, Qatar, Oman, Saudi Arabia, Kuwait,
+  Bahrain, Indonesia, Norway, Ecuador, Mexico, South Sudan, Albania, Tuvalu, Palau). Every one
+  prints a rank consistent with the producer line above it. 0 page errors, 0 console errors
+  other than the sw.js 404.
+- **Zero horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all ten tabs, with Iraq
+  loaded on Country Profile. 0 page errors at every width.
+- At 390 × 844 `hasTouch`, the two spans this cycle touched wrap inside the viewport
+  (right edge 358 and 339 of 390) at 33px and 31px tall. The change adds no new interactive
+  control; the two sub-24px elements on that tab are pre-existing inline source-citation links
+  in Evidence prose.
+
+**Carried forward — not fixed this cycle**
+- On a country outside the production-weighted set (Iran, Qatar, UAE, Turkmenistan, South Sudan)
+  the first rank line and the all-185 line now print the **same** rank twice, three lines apart.
+  Correct on both, but redundant on screen. Pre-existing since v534; now more visible because the
+  two numbers agree.
+- `getProducerContext()` still ranks by array index, so the producer line can invent an ordering
+  inside a tie exactly as the global rank did. No exact ties exist among the 21 producers today,
+  so nothing is wrong on screen — but the same latent defect is in that function.
+- The Home Screener card still advertises a `breakeven` ceiling deleted in v568. Text-only.
+- Sorting Govt Take descending in Fiscal Compare puts **Saudi Arabia** (take "—", no value) above
+  Iraq at 84.8% — the null sorts as the highest take. One row affected.
+- Everything carried from cycles 560–588 is unchanged, including: the FC drilldown IC Citation and
+  the four tabular *Copy for IC Memo* artifacts carrying no reform leg; FC *Copy for IC Memo*
+  defaulting to all 185 rows; the CP headline printing `41% primary law · n=37,222` on the CONTRACT
+  count while the Evidence Quality panel pairs the same share with the FACT count; the `fc-nav-bar`
+  "▶ Run FC at this price" button reading `#cp-price-select`, which does not exist (it falls back
+  to `#fc-price`, so it works — but the primary lookup is dead and there is no price control on
+  the Country Profile tab at all); the 72 of 163 count-basis records that do not reconcile
+  `take_75` against `mech_mix`; Side-by-Side tabulating Contractor NPV at $50/$75/$125 while the
+  chart carries all four prices; and the SbS proxy/basis notice referring to IRR and breakeven
+  rows that do not exist on that tab.
+
+**Bookkeeping (not the cycle)**
+- v682 → v683 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
