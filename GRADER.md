@@ -32184,3 +32184,14 @@ answer existed.
 
 ## Bookkeeping (not the cycle)
 - v675 → v676 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 582 Log — 2026-09-06 01:33
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 582 complete and pushed (v676).
+
+**Task** — T4, "What is my fiscal-stability and reform exposure here?" (stalest in rotation; 576 T2, 577 T6, 578 T3, 579 T6, 580 T5, 581 T1).
+
+**Friction** — Every surface on the platform routes that question to one place: the per-country verdict card on the Reform Risk tab, via `openReformRiskFor()`. Seven call sites do it — the Fiscal Compare Stability cell, the Country Profile headline chip and sidebar Stability line, the CP "Full reform detail" button, 
