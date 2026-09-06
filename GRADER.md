@@ -32073,3 +32073,114 @@ v554 predicted when it made the same change to the Screener ceiling.
 Cold load → Fiscal Compare, default view. The analyst reads the ranked table top-down and strikes the bottom. **Iraq rendered at rank 63 of 65, three rows from the bottom, under a red "NOC-DOMINATED · TAKE >75%" banner, at 84.8%.**
 
 `renderFCResults()` built the `#` rank, the tie groups and all four tier divider
+
+---
+## Cycle 582 Log — 2026-09-06
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (stalest in rotation;
+576 T2, 577 T6, 578 T3, 579 T6, 580 T5, 581 T1).
+
+## Friction
+Cold load → the analyst has one country and wants its reform exposure. Every surface on
+the platform routes that question to the same place: the per-country verdict card on the
+Reform Risk tab, via `openReformRiskFor()`. Seven call sites do it — the Fiscal Compare
+Stability cell, the Country Profile headline chip, the CP sidebar Stability line, the CP
+"Full reform detail" button, the no-coverage panel, the peer block and the event-log
+button.
+
+`openReformRiskFor()` ended with `out.scrollIntoView({ block: 'nearest' })`.
+
+The verdict card is **always taller than the viewport** — measured 924 / 1,064 / 1,105 /
+1,165 / 1,205 / 1,626px at 1440×900, and 2,301px at 390×844. When the target exceeds the
+scrollport, `nearest` aligns whichever edge is closest, and that is the **bottom**. So the
+routing systematically parked the card's bottom at the fold and left its top above it:
+
+| route | px of card hidden above the fold |
+|---|---|
+| Norway | 49 |
+| Venezuela | 90 |
+| Kazakhstan | 180 |
+| United Kingdom | 319 |
+
+What sits in that band is the answer: the card headline, the **Reform Frequency Score**,
+the rank (`21 of 21 · actively reforming`), the reforms-since-2010 count and the direction
+split. Clicking the United Kingdom Stability cell in Fiscal Compare landed the analyst
+reading `SOURCED EVENT LOG — 9 EVENTS · 1975–2024` — on a tab they had just arrived at,
+where scrolling **up** is the last thing anyone tries. They never saw 25/100, never saw
+"actively reforming", and never saw the IC action telling them to carry a 3–5pp WACC
+premium and state renegotiation risk explicitly.
+
+On a phone the failure differed but had the same cause: the card top landed at y=0, under
+`.site-header`, which is sticky at ≤720px and 102px tall — occluding the card's first
+102px.
+
+## Change
+New `_rrScrollVerdictToTop()` replaces the `scrollIntoView` call. It scrolls
+deterministically to the card's **top**, offset by `.site-header` only where that header is
+actually stuck (computed `position` is `sticky`/`fixed`, so desktop is unaffected), plus
+12px, measured inside a `requestAnimationFrame` so the freshly-rendered card has been laid
+out first.
+
+## Result
+Every cross-surface route now opens on the verdict rather than past it. Six Fiscal Compare
+Stability routes re-measured off the live DOM after the change:
+
+| country | hidden above fold, before → after | first line on screen after |
+|---|---|---|
+| United Kingdom | 319 → **0** | `United Kingdom — reform exposure` |
+| Kazakhstan | 180 → **0** | `Kazakhstan — reform exposure` |
+| Venezuela | 90 → **0** | `Venezuela — reform exposure` |
+| Norway | 49 → **0** | `Norway — reform exposure` |
+| Iraq | — → **0** | `Iraq — reform exposure` |
+| Brazil | — → **0** | `Brazil — reform exposure` |
+
+Mobile Country Profile route at 390×844: card top 114px against a header bottom of 102px —
+**0px occluded**, the intended 12px of clearance.
+
+The analyst reads the score, the rank and the IC action — the premium to carry — before the
+event log, instead of having to scroll up on a tab they just landed on to discover the
+answer existed.
+
+## Verification — this cycle, run, not assumed
+| check | result |
+|---|---|
+| JS syntax, all inline `<script>` blocks | **11/11 PASS** |
+| Runtime suite, local, this build | **261 PASS / 0 FAIL / 1 WARN** |
+| WARN provenance | sw.js 404 — `git diff` contains **0** lines matching `serviceWorker`/`sw.js` |
+| horizontal scroll, 10 tabs × 6 viewports (1920/1440/1280/1024/768/390) | **0** violations |
+| pageerrors, all widths | **0** |
+| new control height @390 `hasTouch` | n/a — no control added; the change is scroll behaviour only |
+| card top vs sticky header @390 | 114px vs 102px, 0 occlusion |
+
+## Carried forward — not fixed this cycle
+- `switchTab()` itself does not reset scroll, so **any** cross-tab navigation from a scrolled
+  position lands mid-page. This cycle fixed the one route where the destination is the answer
+  and the miss was systematic; the general case is untouched and is a candidate for a later
+  T3/T6 cycle.
+- Qatar's Country Profile peer strip still reads `-7.6PP VS IRAQ (84.8%)` — the blended
+  fee-basis figure that v675 removed from the Fiscal Compare ranking as non-comparable. Same
+  divergence class as the open XLSX `Tier (database take)` item, on a different surface.
+- The `Tier (database take)` column in the XLSX still grades a fee-basis row off the blended
+  headline (Iraq → `NOC`) — still the strongest open T5 item, still a one-line change.
+- The on-screen `getTierInfo(r.liveTake)` badge still reads the **model** take.
+- Everything carried from cycles 560–581 is otherwise unchanged, including: the 40
+  "does not reconcile" countries; `mech_mix` per-mechanic takes contradicted by `top_contracts`
+  on 8 rows; the two remaining `MECHANIC_BREAKDOWN` consumers; the take chart's PNG export
+  carrying the fee-basis caveat but not the proxy one; the proxy notice naming IRR/breakeven
+  columns that do not exist; the Reform Risk lookup card mixing a full-record DIRECTION with a
+  2010-window score; "Most Frequently Reformed Regimes" showing 15 of 21 sourced jurisdictions
+  without saying so; `COUNTRY_DATA` and the API disagreeing on `profit_oil_govt` / `state_eq`
+  for 45 of 185; the two barely-screening Screener presets; `#screener-count` at ~570
+  characters of unbroken prose; the `Cost Recovery Cap` source badges at 21px on CP @390; the
+  Side-by-Side search box replacing the seeded example with no add-to-set path; the two
+  adjacent unexplained IC buttons on Country Profile; the duplicated all-185 rank in CP
+  headline Zones A and B; the non-existent `cp-price-select`; the Screener take slider's
+  `min="30"` floor excluding the USA at 23.4%; FAQ A25/A35/A40 describing a Screener
+  "Stability Score filter" that does not exist; Guyana's A-tier reform log contradicting its
+  headline by ~20pp; the CDN `onerror` handlers on lines 54/56/57; the 272 dead citations;
+  `SPECULATIVE_COUNTRIES` as a hand-typed list of 7 names from v41; and the 94 unverified
+  one-term countries from v672.
+
+## Bookkeeping (not the cycle)
+- v675 → v676 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
