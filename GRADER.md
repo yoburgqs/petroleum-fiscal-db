@@ -33454,3 +33454,128 @@ hidden pane rather than as a broken layout.
 
 ## Bookkeeping (not the cycle)
 - v685 → v686 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
+
+---
+
+## Cycle 593 Log — 2026-09-06 12:00
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo."
+(Rotation: 588 T4, 589 T2, 590 T3, 591 T1, 592 T6; T5 last run at 587, stalest.)
+
+**Friction — the artifact contradicts itself once you paste more than one of them.**
+
+Walked cold at 1440x900, no sessionStorage, no localStorage. Every paste-ready
+artifact on this platform carries one sentence explaining the absence of the metric
+an investment committee asks for first. Pulled all of them and read them side by side:
+
+| Surface | line | what it pasted |
+|---|---|---|
+| Screener export | 29328 | median **239.8%** across the **124** countries that carry one |
+| Side-by-Side *Copy for IC Memo* | 38007 | median **239.8%** across the **124** |
+| Country Profile *Copy for IC Memo* | 42743 | median **333%** across the **165** |
+| Fiscal Compare *Copy for IC Memo* | via CP_IRR_NOTE | median **333%** across the **165** |
+| FC row drilldown, "No IRR row" | 41976 | median **239.8%** across the **124** |
+| Screener FAQ | 11114 | median **240.9%** |
+
+The natural T5 run is not one artifact, it is three: screen a list, profile the
+country that survives, compare it against two peers. An analyst who does that pastes
+three of these into one memo, and the memo then asserts — twice, from one named
+source, at one version string — that the same platform statistic is 333% over 165
+countries and 239.8% over 124. That is a footnote an IC reads, and what it discredits
+is the tool.
+
+The shipped bundle settles which is right. `country_data.json`: 165 of 185 rows carry
+`irr_75`, median **333.1**, 9 of them below 100%, none at a 999 sentinel. The
+239.8 / 124 pair is v515's audit of the **pre-v516** bundle — accurate when it was
+written, stale from the moment the data was regenerated, and wrong now by 41
+countries and 93 percentage points. It has been pasted into IC memos from three
+surfaces ever since.
+
+**Change — the sentence is measured, not remembered.**
+
+`_icIrrStat()` reads `irr_75` off `COUNTRY_DATA` and returns `{n, med, below100}`.
+`_icIrrBasis()` renders the parenthetical, and returns the **empty string** where the
+bundle has not loaded — an artifact that cannot count does not print a count.
+`_icIrrNote(head)` builds the full sentence. `CP_IRR_NOTE` is no longer a `var` string
+literal but a configurable getter over the same read, so its eight existing callers,
+including the two `typeof CP_IRR_NOTE === 'string'` guards, are untouched.
+
+All five surfaces now print one number because they perform one read, not because two
+literals happen to agree — the same construction principle the runtime suite's
+`ORCA_REPORT_FILE` uses. When `country_data.json` is next regenerated the sentence
+moves with it; it cannot go stale again the way it just did.
+
+Two further defects in the same sentence neighbourhood, both carried since cycle 560
+and both fixed here because they are the same analyst reading the same paragraph:
+
+- **The Side-by-Side assumption line described a table it does not match.** It named
+  contractor NPV at "$50 / $75 / $125/bbl" over a grid that pastes **four** NPV rows —
+  `Contractor NPV @$100` is in the artifact and was missing from the line whose job is
+  to say what is in the artifact. Now "$50 / $75 / $100 / $125".
+- **The proxy comparability notice pointed at columns that do not exist.** Since v669
+  that notice travels into the clipboard, and there it read "its NPV, **IRR and
+  breakeven** come from the standardized deepwater profile … do not present these NPV
+  **and IRR** columns as like-for-like in an IC memo" — two lines below an assumption
+  line that says IRR and breakeven are not reported at all. It sent the analyst hunting
+  the paste for two columns that were deliberately removed at v515/v516. It now names
+  the contractor NPV rows that are actually there.
+
+**Result:** an analyst can run the three-artifact T5 workflow and paste all of it into
+one IC memo without the memo contradicting itself. The figure they carry (median 333%
+across 165 countries at $75/bbl) is the one the shipped bundle holds. The assumption
+line describes the four NPV price points that are in the table rather than three of
+them. And the comparability warning attached to the proxy column warns about a row the
+analyst can find.
+
+**Verified.**
+- JS syntax gate: **PASS** (all inline `<script>` blocks extracted, `node --check`),
+  re-run after the version bump.
+- Playwright graded suite: **RUN this cycle** against the local build at
+  `http://localhost:8899/index.html` — **293 PASS / 0 FAIL / 1 WARN**. The WARN is a
+  404 on `/petroleum-fiscal-db/sw.js`: the service worker registers a Pages-scoped
+  absolute path that a localhost root cannot serve, and it does not occur on the
+  deployed origin (cycle 592 read 294 PASS / 0 WARN there). Confirmed not introduced
+  by this change — a plain page load logs no 4xx at all.
+- Mobile, 390x844 `hasTouch: true`: all 9 tabs `scrollWidth 390 === clientWidth 390`.
+  No control added or touched renders under 24px; the three sub-24px nodes sampled on
+  Country Profile are inline source-citation links inside body prose, pre-existing and
+  not controls.
+- Re-walked all five surfaces after the edit and read the clipboard back: Country
+  Profile, Fiscal Compare, Side-by-Side, the Screener note builder and the FC drilldown
+  all print `median 333% across the 165 countries that carry one at $75/bbl`.
+
+## Carried forward — not fixed this cycle
+- **The Screener FAQ (line 11114) still says "median 240.9%"** — a third value for the
+  same statistic. It is static HTML with no JS hook and it is scoped to explaining why
+  the v517 hurdle-rate slider was retired, so it reads as a historical statement. Left
+  because sweeping FAQ bodies is text churn and the directive freezes them; recorded
+  here so the next cycle knows it is the last surviving copy.
+- **pixel_audit**: still exactly one regression against baseline,
+  `tablet-768::2-t7 clipped-text 33 -> 34` — a mechanic tag on Country Profile clipped
+  by 6px. Third cycle carrying it; this cycle touched no part of t7's layout.
+- **The CP "Copy for IC Memo" paragraph is ~500 words for one country.** Walked it for
+  Norway, Iraq, Guyana, Russia, Indonesia, Saudi Arabia and Mexico. Every clause in it
+  was added deliberately (v536, v596, v644, v680) and every one is true, but the
+  numbers an IC memo needs and the method caveats that qualify them are fused into a
+  single unbroken paragraph, so the analyst cannot lift the figures without the essay.
+  A structural split — figures block, then a marked caveat block — is the obvious next
+  T5 cycle. Not attempted here because it is a different change from a correctness fix
+  and should not be smuggled in behind one.
+- **The API and the screen still disagree about evidence** — `api/v1/country/norway.json`
+  (2026-08-05) vs the shipped `country_data.json`. Harvest-side, out of index.html's reach.
+- **Methodology still names a `source_note` / `evidence_tier` API field and an "API
+  Explorer tab" that is `display:none`.** Un-hiding a nav entry is a tab-order change,
+  reserved for Zach.
+- Everything carried from cycles 560–592 otherwise unchanged, including: the FC drilldown
+  IC Citation and the four tabular *Copy for IC Memo* artifacts carrying no reform leg;
+  FC *Copy for IC Memo* defaulting to all 185 rows (a deliberate v632 decision, not a
+  defect); the SbS NPV chart carrying no data-basis mark; `#cmp-search` silently no-opping
+  past `CMP_MAX`; the CP headline pairing a fact-share with a contract count; the
+  `fc-nav-bar` button reading `#cp-price-select`, which does not exist; the 72 of 163
+  count-basis records that do not reconcile `take_75` against `mech_mix`;
+  `getProducerContext()` ranking by array index; and the reversed B/C tier definitions
+  surviving in the FAQ body.
+
+## Bookkeeping (not the cycle)
+- v686 → v687 applied silently at the end across the 4 real version sites
+  (1737, 1807, 2140, 2215).
