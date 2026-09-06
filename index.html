@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v676</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v677</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v676</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v677</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v676';
+  return m ? m[0] : 'v677';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v676');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v677');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -23634,8 +23634,27 @@ function cpRegimeRows(d) {
   var wt    = (d && d.weighting) || 'simple_avg';
   var countBasis = (wt === 'simple_avg' || wt === 'equal_weighted');
   var agrees = (head != null && blend.toFixed(1) === head.toFixed(1));
+  // v677 (T2): the three verdicts below all describe a HOW -- count blend, production weighting,
+  // or an unexplained gap. None of them checks the first thing an analyst does when they have to
+  // defend the headline: look for it among the rows printed directly under it. On 13 of the 57
+  // countries that render the split card the headline sits ABOVE every row on the card --
+  // Senegal 56.9% over a 0.0-50.4% range, Nigeria 81.1% over 68.8-77.5%. A weighted average of
+  // these rows cannot leave their range, so where the headline is itself a plain contract average
+  // the two figures cannot both be right, and where it is production-weighted it is not a function
+  // of these rows at all. Measured over EVERY row carrying a take, so Iraq -- whose 98.5% TSC row
+  // does contain its 84.8% headline -- does not fire.
+  var _tk = rows.filter(function(r) { return r.take != null; }).map(function(r) { return r.take; });
+  var lo = _tk.length ? Math.min.apply(null, _tk) : null;
+  var hi = _tk.length ? Math.max.apply(null, _tk) : null;
+  var outside = !!(head != null && lo != null && (head > hi + 0.05 || head < lo - 0.05));
   return {
     rows: rows, tot: tot, blend: blend, head: head, weighting: wt,
+    lo: lo, hi: hi, countBasis: countBasis,
+    // outside: the published headline is not inside the range of the rows this card prints, so it
+    // is not any weighting of them. outsideDir says which side, because "above every regime" and
+    // "below every regime" are different conversations in an IC.
+    outside: outside,
+    outsideDir: outside ? (head > hi ? 'above' : 'below') : null,
     gap: (head == null) ? null : (head - blend),
     // Three verdicts, because they mean different things to someone defending the number:
     //   'reconciles'  the rows decompose the headline and may be cited as its components
@@ -32562,7 +32581,11 @@ function loadCountryProfile(country) {
     var npvs = g1rows.filter(function(r) { return r.npv != null; }).map(function(r) { return r.npv; });
     var npvLo = npvs.length ? Math.min.apply(null, npvs) : null;
     var npvHi = npvs.length ? Math.max.apply(null, npvs) : null;
-    var big = spread >= 15;
+    // v677 (T2): outside beats spread for tone. Kazakhstan's rows differ by only 6.3pp -- amber
+    // under the old rule -- but its headline sits above both of them, which is the more serious
+    // of the two things this card can say.
+    var _out677 = !!(_rb570 && _rb570.outside);
+    var big = spread >= 15 || _out677;
     var col = big ? 'var(--red)' : 'var(--orange)';
     var bg  = big ? 'rgba(185,28,28,.07)' : 'rgba(194,65,12,.06)';
     var bd  = big ? 'rgba(185,28,28,.28)' : 'rgba(194,65,12,.22)';
@@ -32588,10 +32611,16 @@ function loadCountryProfile(country) {
           + r.take.toFixed(1) + '% take'
           + (r.npv != null ? ', ' + (typeof fmtNpvShared === 'function' ? fmtNpvShared(r.npv) : '$' + r.npv + 'M') + ' contractor NPV' : '') + ')'; }).join(' and ')
       + ', a ' + spread.toFixed(1) + 'pp take gap.' + npvSentence
-      + ' The ' + d.take_75.toFixed(1) + '% headline above, and the rank and median pill under it, '
-      + 'are computed on the blend of all of them, so they describe the country average rather than '
-      + 'either regime an entrant would actually sign. Screen and cite on the regime your asset '
-      + 'sits in. Figures are the same ones in the Fiscal Regime Breakdown table below; click to jump to it.';
+      + (_out677
+          ? ' The ' + d.take_75.toFixed(1) + '% headline above sits ' + _rb570.outsideDir
+            + ' every one of them (' + _rb570.lo.toFixed(1) + '-' + _rb570.hi.toFixed(1) + '%), so it is not '
+            + 'a weighted average of these rows and cannot be rebuilt from them. The rank and median pill '
+            + 'under it are computed on that headline. Cite a regime row and name the regime.'
+          : ' The ' + d.take_75.toFixed(1) + '% headline above, and the rank and median pill under it, '
+            + 'are computed on the blend of all of them, so they describe the country average rather than '
+            + 'either regime an entrant would actually sign. Screen and cite on the regime your asset '
+            + 'sits in.')
+      + ' Figures are the same ones in the Fiscal Regime Breakdown table below; click to jump to it.';
     return '<div onclick="(function(){var e=document.getElementById(\'cp-regime-breakdown\');if(!e)return;'
       + 'e.scrollIntoView({behavior:\'smooth\',block:\'center\'});e.style.transition=\'background .4s\';'
       + 'e.style.background=\'rgba(176,104,0,.10)\';setTimeout(function(){e.style.background=\'\';},1500);})()" '
@@ -32600,7 +32629,9 @@ function loadCountryProfile(country) {
       + 'cursor:pointer;max-width:340px;line-height:1.45;color:var(--muted);" title="' + tip.replace(/"/g, '&quot;') + '">'
       + '<div style="display:flex;align-items:center;gap:6px;margin-bottom:3px;">'
       + '<span style="color:' + col + ';flex-shrink:0;">⚠</span>'
-      + '<strong style="color:' + col + ';">' + g1rows.length + ' regimes here — take differs ' + spread.toFixed(1) + 'pp</strong>'
+      + '<strong style="color:' + col + ';">' + (_out677
+          ? 'Headline ' + d.take_75.toFixed(1) + '% is ' + _rb570.outsideDir + ' every regime here'
+          : g1rows.length + ' regimes here — take differs ' + spread.toFixed(1) + 'pp') + '</strong>'
       + '<span style="margin-left:auto;font-size:10px;opacity:.8;white-space:nowrap;">breakdown &darr;</span>'
       + '</div>'
       + rowsHtml
@@ -32609,12 +32640,31 @@ function loadCountryProfile(country) {
       // sentence was making the same unchecked claim the breakdown card below has now stopped
       // making. It states the relationship cpRegimeRows() actually measured instead.
       + '<div style="font-size:10px;opacity:.9;margin-top:3px;">'
-      + (_rb570 && _rb570.verdict === 'reconciles'
-          ? 'The ' + d.take_75.toFixed(1) + '% headline is the contract-count blend of these regimes.'
-          : _rb570 && _rb570.verdict === 'weighted'
-            ? 'The ' + d.take_75.toFixed(1) + '% headline weights these by production, not by contract count.'
-            : 'The ' + d.take_75.toFixed(1) + '% headline does not reconcile to these rows — see the breakdown.')
-      + npvSentence + ' Screen on the regime you would sign.</div>'
+      + (_out677
+          ? (_rb570.countBasis
+              // Both sides are plain averages over the same contract set, so this is not a
+              // weighting difference and cannot be reconciled by choosing a basis. Say that, and
+              // say what to cite instead, rather than pointing at a breakdown that cannot resolve it.
+              ? '<strong style="color:' + col + ';">No weighting of these rows produces '
+                + d.take_75.toFixed(1) + '%.</strong> Headline and rows are both plain averages over the same '
+                + Number(_rb570.tot).toLocaleString() + ' contracts, so they are not from the same computation. '
+                + 'Neither figure can be quoted as ' + country + '\u2019s effective take — take block terms '
+                + 'from the contract table below or from Scenario Builder before committing a number.'
+              // Production-weighted headline against unweighted within-regime means: the headline
+              // legitimately can sit outside the rows, but it is then not derivable from them, which
+              // is the part the old "weights these by production" line left the analyst to guess.
+              : '<strong style="color:' + col + ';">The headline is not a blend of these rows.</strong> '
+                + 'Each row is an unweighted mean inside its regime; the ' + d.take_75.toFixed(1)
+                + '% headline weights by verified field production ('
+                + ((d.prod_coverage_pct || 0).toFixed(1)) + '% coverage), so it cannot be rebuilt from '
+                + 'them. Cite the regime row your asset sits in.')
+          : (_rb570 && _rb570.verdict === 'reconciles'
+              ? 'The ' + d.take_75.toFixed(1) + '% headline is the contract-count blend of these regimes.'
+              : _rb570 && _rb570.verdict === 'weighted'
+                ? 'The ' + d.take_75.toFixed(1) + '% headline weights these by production, not by contract count.'
+                : 'The ' + d.take_75.toFixed(1) + '% headline does not reconcile to these rows — see the breakdown.')
+            + npvSentence + ' Screen on the regime you would sign.')
+      + '</div>'
       + '</div>';
   })();
 
@@ -33071,7 +33121,17 @@ function loadCountryProfile(country) {
         + _blendStr + '</span>. The published headline is <span style="'+_mono+'">' + _headStr + '</span>, a '
         + _gapStr + ' difference, because it weights by verified field production ('
         + ((d.prod_coverage_pct || 0).toFixed(1)) + '% coverage) rather than by contract count. '
-        + 'Both are correct on their own basis; the rows are the regime split, not the headline’s arithmetic.';
+        + 'Both are correct on their own basis; the rows are the regime split, not the headline’s arithmetic.'
+        // v677 (T2): on Nigeria and Kazakhstan the headline also sits above every row in the table,
+        // and "both are correct on their own basis" reads as a reconciliation when it is not one --
+        // a production weighting of these rows still could not reach it, because each row is an
+        // unweighted mean inside its own regime.
+        + (_rb.outside
+            ? ' It also sits <strong>' + _rb.outsideDir + ' every row in this table</strong> ('
+              + _rb.lo.toFixed(1) + '–' + _rb.hi.toFixed(1) + '%): each row is an unweighted mean '
+              + 'inside its regime, so the headline is not derivable from this table at all. Cite the row '
+              + 'your asset sits in, not the headline.'
+            : '');
     } else if (_rb.verdict === 'unexplained') {
       _recTone = ['#B91C1C','rgba(185,28,28,.06)','rgba(185,28,28,.28)'];
       _recIcon = '&#9888;';
@@ -33082,7 +33142,16 @@ function loadCountryProfile(country) {
         + 'The per-regime means above average every contract filed under a mechanic, including those whose fiscal '
         + 'terms were never resolved and are carried near zero; the headline does not. Read the rows for which '
         + 'regimes exist here and how material each is — do not cite a row as that regime’s effective take, and '
-        + 'take block-level terms from the contract table below or from Scenario Builder before committing a number.';
+        + 'take block-level terms from the contract table below or from Scenario Builder before committing a number.'
+        // v677 (T2): the gap alone leaves open "different weighting". On 10 of these countries the
+        // headline is outside the rows entirely, which forecloses that reading -- an equal-weighted
+        // average cannot land outside the values it averages.
+        + (_rb.outside
+            ? ' The headline is <strong>' + _rb.outsideDir + ' every row above</strong> ('
+              + _rb.lo.toFixed(1) + '–' + _rb.hi.toFixed(1) + '%). An equal-weighted average cannot fall '
+              + 'outside the values it averages, so this is not a weighting difference — the two figures '
+              + 'were computed from different contract sets.'
+            : '');
     } else {
       _recTone = ['var(--muted)','var(--surface2)','var(--border)'];
       _recIcon = '&#8226;';
