@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v670</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v671</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v670</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v671</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v670';
+  return m ? m[0] : 'v671';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v670');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v671');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -31603,24 +31603,52 @@ function loadCountryProfile(country) {
         + 'border:1px solid rgba(176,104,0,.55);background:rgba(176,104,0,.12);color:var(--accent);';
       icSummaryBtn.parentNode.insertBefore(mark, icSummaryBtn.nextSibling);
     }
+    // v671 (T6): this mark had TWO registers where _dqTier() has three, and the join was
+    // `isProxy` — so every non-PROXY country rendered in the same green. Measured over the
+    // shipped country_data.json: 12 of the 22 green countries are PART-PROD, running from the
+    // USA at 0.2% (37,222 contracts, 99.8% of them unweighted) to Mexico at 3.4%. The USA and
+    // the United Kingdom at 37.6% — a 188x difference in production depth — rendered in the
+    // identical green, in the identical phrasing '<n>% production-weighted', 8px from the two
+    // buttons that turn this page into memo text. The app already grades this correctly
+    // everywhere else: `.dq-partprod` (line ~948) is yellow. This mark was the one place the
+    // convention was not applied. Three registers now, keyed to the existing _dqTier() label —
+    // no new threshold is introduced — and the face of the badge states the share that is
+    // NOT production-weighted, because that is the number that governs how the take may be cited.
     if (mark) {
+      mark.style.display = 'inline-flex';
+      mark.style.minHeight = '24px';
+      mark.style.alignItems = 'center';
+      var _un = pb ? (100 - pb.cov) : 100;
       if (isProxy) {
-        mark.style.display = 'inline-flex';
+        mark.style.borderColor = 'rgba(176,104,0,.55)';
+        mark.style.background  = 'rgba(176,104,0,.12)';
+        mark.style.color       = 'var(--accent)';
         mark.textContent = '⚠ PROXY basis — copies as directional';
         mark.title = 'ORCA holds no verified block-level production for ' + country
           + ', so its take is a simple average of statutory terms. Both copy buttons state this in '
           + 'the pasted text: a PROXY take is directional (±5–15pp) and is not to be cited '
           + 'as definitive without cross-checking the primary concession/PSA terms.';
+      } else if (pb && pb.label === 'PART-PROD') {
+        mark.style.borderColor = 'rgba(161,98,7,.55)';
+        mark.style.background  = 'rgba(161,98,7,.12)';
+        mark.style.color       = 'var(--yellow)';
+        mark.textContent = '⚠ PART-PROD — ' + _un.toFixed(1) + '% of contracts unweighted';
+        mark.title = 'Verified block-level production is held for only ' + pb.cov.toFixed(1) + '% of '
+          + country + '’s ' + pb.nStr + ' contracts; the other ' + _un.toFixed(1) + '% enter the '
+          + 'average unweighted. This is the middle of ORCA’s three production registers, not a '
+          + 'verified figure — read the take as indicative of statutory terms rather than of '
+          + 'realised field economics, and state the coverage in the memo. The pasted text says so.';
       } else {
-        mark.style.display = 'inline-flex';
         mark.style.borderColor = 'rgba(21,128,61,.5)';
-        mark.style.background = 'rgba(21,128,61,.10)';
-        mark.style.color = '#15803D';
-        mark.textContent = pb ? (pb.label + ' — ' + pb.cov.toFixed(1) + '% production-weighted') : '';
-        mark.title = 'Verified block-level production is held for ' + (pb ? pb.cov.toFixed(1) : '0') + '% of '
-          + country + '’s contracts; the rest enter the average unweighted. The pasted text states this.';
+        mark.style.background  = 'rgba(21,128,61,.10)';
+        mark.style.color       = '#15803D';
+        mark.textContent = pb ? ('PROD-WTD — ' + pb.cov.toFixed(1) + '% prod-weighted, '
+          + _un.toFixed(1) + '% not') : '';
+        mark.title = 'Deepest production basis ORCA publishes. Verified block-level production is '
+          + 'held for ' + (pb ? pb.cov.toFixed(1) : '0') + '% of ' + country + '’s '
+          + (pb ? pb.nStr : '?') + ' contracts; the other ' + _un.toFixed(1) + '% enter the average '
+          + 'unweighted. No country in the database exceeds 37.6%. The pasted text states this.';
       }
-      if (isProxy) { mark.style.borderColor = 'rgba(176,104,0,.55)'; mark.style.background = 'rgba(176,104,0,.12)'; mark.style.color = 'var(--accent)'; }
     }
   })();
 
