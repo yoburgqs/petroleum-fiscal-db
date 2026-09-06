@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v681</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v682</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v681</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v682</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2137,7 +2137,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v681';
+  return m ? m[0] : 'v682';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2212,7 +2212,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v681');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v682');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -30351,6 +30351,12 @@ function selectSearchResult(el) {
 // surfaces answering the same question must not be able to drift, so the classification
 // now lives here and both call it. The logic below is moved verbatim from
 // renderReformCountryVerdict() -- no threshold, string or colour is changed.
+function _rrOrdinal(n) {
+  var v = n % 100;
+  if (v >= 11 && v <= 13) return n + 'th';
+  return n + (['th','st','nd','rd'][n % 10] || 'th');
+}
+window._rrOrdinal = _rrOrdinal;
 function _rrClassify(c) {
   var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
   var events = Array.isArray(rh[c]) ? rh[c] : [];
@@ -30371,8 +30377,30 @@ function _rrClassify(c) {
       return { country: k, score: Math.max(0, 100 - n * 15) };
     })
     .sort(function(a,b){ return b.score - a.score; });
-  var rank = 0;
-  for (var i = 0; i < scored.length; i++) { if (scored[i].country === c) { rank = i + 1; break; } }
+  // ── v682 (T4): the rank was an array index, and the score has only 5 distinct values ──
+  // Score = 100 - 15 x fiscal law changes since 2010, over 21 scoreable jurisdictions. That
+  // yields exactly five values on the live data -- 100, 85, 70, 55, 25 -- so 19 of the 21
+  // countries sit in a tie group of 6, 7 or 6. `rank = i + 1` off a stable sort then handed
+  // each of them a unique ordinal decided by nothing but key order in reform_history.json:
+  //   Libya  rank 1 of 21   Guyana rank 6 of 21    both score 100, both 0 changes since 2010
+  //   Norway rank 14        Mexico rank 19         both score 70,  both 2 changes since 2010
+  //   Kazakhstan rank 7     Iraq   rank 10         both score 85,  both 1 change  since 2010
+  // The rank prints directly under the headline score on the T4 lookup card, in the Country
+  // Profile reform sidebar, in the Fiscal Compare reform chip tooltip, and -- via
+  // _icPlain(v.scoreNote) -- inside the pasted IC memo, so a five-place gap that does not
+  // exist was leaving the product in writing. It is worst on Libya, whose own note on the
+  // same line says its 100 is a pre-2010 window artefact while the rank calls it the single
+  // most stable jurisdiction on file, five places clear of Guyana -- which actually has no
+  // post-2010 fiscal change at all.
+  // Competition ranking (1 + the number of strictly higher scores) with the tie width stated.
+  // Nothing about the score itself changes; only the claim made about its position.
+  var rank = 1, tiedN = 0;
+  for (var i = 0; i < scored.length; i++) {
+    if (scored[i].score > score) rank++;
+    else if (scored[i].score === score) tiedN++;
+  }
+  var rankTxt = 'rank ' + rank + ' of ' + scored.length + ' scoreable'
+    + (tiedN > 1 ? ' \u00b7 tied \u2014 ' + tiedN + ' share this score' : '');
   var latest = events.slice().sort(function(a,b){ return (b.year||0) - (a.year||0); })[0];
 
   // v526: the IC action used to be a pure function of the score band (<=20 / <=40 / else).
@@ -30417,7 +30445,7 @@ function _rrClassify(c) {
       + (score <= 20
           ? 'Add a <strong>5&ndash;8pp WACC premium</strong> and show a probability-weighted NPV scenario alongside the base case.'
           : 'Add a <strong>3&ndash;5pp WACC premium</strong> and state renegotiation risk explicitly in the memo.');
-    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' &middot; actively reforming';
+    scoreNote = rankTxt + ' &middot; actively reforming';
   } else if (inWindowRise) {
     icColor = 'var(--orange)';
     icLabel = 'IC action \u2014 take was raised inside the scoring window';
@@ -30435,7 +30463,7 @@ function _rrClassify(c) {
           ? ' There ' + ((_hostile.length - risesInWindow.length) === 1 ? 'is also <strong>1</strong> take rise' : 'are also <strong>' + (_hostile.length - risesInWindow.length) + '</strong> take rises')
             + ' on record <em>before</em> 2010, totalling <strong>+' + (cumRise - cumInWindow).toFixed(0) + 'pp</strong>, which the window never scores at all.'
           : '');
-    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' \u00b7 in-window rise, size unscored';
+    scoreNote = rankTxt + ' \u00b7 in-window rise, size unscored';
   } else if (windowArtefact) {
     icColor = 'var(--orange)';
     icLabel = 'IC action \u2014 score is a window artefact';
@@ -30444,7 +30472,7 @@ function _rrClassify(c) {
       + (_hostile.length > 1 ? ', one of <strong>' + _hostile.length + '</strong> pre-2010 take rises totalling <strong>+' + cumRise.toFixed(0) + 'pp</strong>' : '')
       + '. That falls outside the 2010 scoring window, so the score of ' + score + ' records where the window starts, not a clean record. '
       + '<strong>Do not carry a zero reform premium on this basis.</strong> Size the premium against the rupture in the event log, not against the count.';
-    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' &middot; pre-2010 rise unscored';
+    scoreNote = rankTxt + ' &middot; pre-2010 rise unscored';
   } else if (contextIn.length && since2010 === 0) {
     // v583 (T4): every post-2010 event this jurisdiction has is a context event, so the score
     // of 100 is produced by exclusion, not by a clean legislative record. It must not render in
@@ -30469,7 +30497,7 @@ function _rrClassify(c) {
       + ' <strong>Do not read ' + score + ' as a legislative track record.</strong> The count measures law changes only; '
       + 'renegotiation pressure, contract disputes and political risk are not in it. Read the event log below before '
       + 'carrying a zero reform premium.';
-    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' \u00b7 no post-2010 fiscal change on file';
+    scoreNote = rankTxt + ' \u00b7 no post-2010 fiscal change on file';
   } else {
     icColor = 'var(--green)';
     icLabel = 'IC action';
@@ -30477,7 +30505,7 @@ function _rrClassify(c) {
       ? 'No fiscal law change on record since 2010, and no take-raising event on record before it either. No reform-frequency premium indicated. Reform history alone does not clear the jurisdiction \u2014 check predictability and evidence tier as well.'
       : '<strong>' + since2010 + '</strong> law change' + (since2010 === 1 ? '' : 's') + ' since 2010 (' + reformYears + '), below this tab\u2019s Actively Reforming bar of 3. '
         + 'No reform-frequency premium indicated. Reform history alone does not clear the jurisdiction \u2014 check predictability and evidence tier as well.';
-    scoreNote = 'rank ' + rank + ' of ' + scored.length + ' scoreable';
+    scoreNote = rankTxt;
   }
   // The card accent and the headline score follow the verdict, not the raw band. An 85 that
   // is an artefact of where the window starts must not render in the same green as a real 85.
@@ -30500,7 +30528,7 @@ function _rrClassify(c) {
     : '';
   return { events: events, since2010: since2010, contextIn: contextIn, contextNote: contextNote, score: score, tightened: tightened,
            liberalized: liberalized, neutral: neutral, split: _split, dirHtml: dirHtml,
-           tiltBasis: tiltBasis, tiltState: _tilt.state, scored: scored, rank: rank,
+           tiltBasis: tiltBasis, tiltState: _tilt.state, scored: scored, rank: rank, tiedN: tiedN, rankTxt: rankTxt,
            latest: latest, icRule: icRule, icColor: icColor, icLabel: icLabel,
            scoreNote: scoreNote, scoreColor: scoreColor, tiltWord: tiltWord, tiltColor: tiltColor };
 }
