@@ -108,6 +108,25 @@ def run_playwright():
     if stale_report:
         REPORT_FILE.unlink()
 
+    # v685: the suite exists TWICE — the graded copy this function runs
+    # (office/tools/petroleum/tests/) and a copy in petroleum-fiscal-db/tests/.
+    # Cycles 511-590 edited the repo copy; only the office copy is ever executed.
+    # By cycle 590 the graded suite was 267 lines behind: it was missing the
+    # whole v607 SB-PROVENANCE section and still asserted the pre-v684 chart
+    # control, so it reported 2 FAIL for a product that was correct. A silent
+    # fork of the thing that decides whether a cycle shipped is not acceptable;
+    # say so, loudly, in the cycle's own log.
+    import hashlib as _hashlib
+    repo_copy = REPO / "tests" / "runtime_comprehensive.js"
+    if repo_copy.exists():
+        h_graded = _hashlib.sha256(TEST_FILE.read_bytes()).hexdigest()[:12]
+        h_repo = _hashlib.sha256(repo_copy.read_bytes()).hexdigest()[:12]
+        if h_graded != h_repo:
+            log("  *** SUITE COPIES HAVE DIVERGED ***")
+            log(f"      graded (runs): {TEST_FILE}  sha={h_graded}")
+            log(f"      repo   (idle): {repo_copy}  sha={h_repo}")
+            log("      Test edits made to the repo copy DO NOT affect this result.")
+
     # 900s, not 300s. The suite takes ~4-5 minutes to complete 136 checks, so a
     # 300s ceiling sits ON the boundary: it finishes some runs and is killed
     # mid-run on others. That is the whole "suite stalled at 38 checks" symptom

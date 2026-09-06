@@ -29116,6 +29116,28 @@ function runScreener() {
   // must say so. Otherwise an analyst reading "84.8%" inside a screen captioned "≤ 65%" sees a
   // bug. The published figure stays first and keeps its tier colour (v449/v451); the comparable
   // figure is appended beneath it, and says which of the two the ceiling was applied to.
+  //
+  // ── v685 (T1): except while the take sort is the thing doing the ordering. ──────────────
+  // v635 moved the take RANKING onto the comparable figure and left the RENDERING on the
+  // published blend, so the one column the analyst had just asked to be ordered low→high
+  // printed, on the shipped IOC Capital Screen:
+  //     23.4 · 32.2 · 31.0 · 32.7 · 33.5 · 84.8 · 38.5 · 46.5 · 49.2 · …
+  // Iraq's 84.8% in the sixth slot, 50pp clear of both neighbours and tier-badged
+  // "NOC/Concession" between two "Inv-Friendly" rows, because the TIER column reads
+  // tierLabel(d[takeKey]) on the same published basis. Five of the fifteen rows led with a
+  // number that was not the one that placed them. A ranking that is RIGHT but reads as broken
+  // is worse than one that is wrong: the analyst does not debug it, they stop trusting the
+  // shortlist this tab exists to produce, and the sub-line saying "→ screened at 34.1%" does
+  // not rescue it — nobody re-reads a column they have already decided is buggy.
+  //
+  // So: while _scSortKey === 'take' AND that sort is running on the comparable basis, the two
+  // figures swap places. The comparable take leads, carries the tier colour and drives the TIER
+  // cell; the published blend is named directly beneath it and in both tooltips. Every other
+  // state is byte-identical to v554 — default order, the NPV/evidence/swing sorts, and an
+  // unticked comparability box (which sends the ranking back to the published figure, where
+  // the published figure is already the one that leads).
+  const _takeLeadCmp = (_scSortKey === 'take' && _scTakeSortOnCmp);
+  const _feeCmpOf = (d) => (takeCeilingActive ? _scFeeCmpAt(d, price) : { diverges: false });
   const _takeCmpCell = (d) => {
     if (!takeCeilingActive) return '';
     const fc = _scFeeCmpAt(d, price);
@@ -29124,11 +29146,30 @@ function runScreener() {
       + (feeCmpOn
           ? `The ≤${maxTake}% ceiling was tested against ${fc.cmp.toFixed(1)}%.`
           : `The ≤${maxTake}% ceiling was tested against the published ${fc.head.toFixed(1)}% — tick the box under Max Govt Take to screen on ${fc.cmp.toFixed(1)}% instead.`);
-    return `<div style="font-size:10px;font-weight:700;color:var(--accent);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${tip.replace(/"/g,'&quot;')}">${feeCmpOn ? '→ screened at ' : 'cmp '}${fc.cmp.toFixed(1)}%</div>`;
+    const _tipAttr = tip.replace(/"/g,'&quot;');
+    // v685: swapped — the ranked figure is already the headline number above, so the sub-line
+    // carries the published blend instead. Muted rather than accent: it is the figure being
+    // set aside for this ordering, not the one being applied.
+    if (_takeLeadCmp) return `<div style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${_tipAttr}">published ${fc.head.toFixed(1)}%</div>`;
+    return `<div style="font-size:10px;font-weight:700;color:var(--accent);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${_tipAttr}">${feeCmpOn ? '→ screened at ' : 'cmp '}${fc.cmp.toFixed(1)}%</div>`;
+  };
+  // v685: the leading figure in the GOVT TAKE cell. Identical to fmtTake(d[takeKey]) unless the
+  // swap is live, in which case it prints the comparable take, colours it on the comparable
+  // take, and says in its own tooltip which figure it is and what the published one is.
+  const _takeLeadCell = (d) => {
+    const fc = _feeCmpOf(d);
+    if (!(_takeLeadCmp && fc.diverges)) return fmtTake(d[takeKey]);
+    const t = `${d.country}: this column is ordered by comparable government take, so it leads with that figure — ${fc.cmp.toFixed(1)}% on its PSC/Concession contracts at $${price}/bbl. The published headline is ${fc.head.toFixed(1)}%, which blends ${fc.n2.toLocaleString()} fee-basis contracts (fixed $/bbl remuneration, no price upside) and measures contract structure rather than fiscal terms. Sort by any other column, or untick "screen on comparable take", to lead with the published figure again.`;
+    return `<span class="take-val ${takeClass(fc.cmp)}" style="cursor:help;" title="${t.replace(/"/g,'&quot;')}">${fc.cmp.toFixed(1)}%</span>`;
   };
   tbody.innerHTML = _topBanner + data.map((d,i) => {
     const mechs = d.mechanics.split(',').map(m => `<span class="${getMechTagClass(m.trim())}">${m}</span>`).join('');
-    const tc = tierClass(d[takeKey]);
+    // v685: the TIER cell is the take bucket, so it follows the take cell onto the comparable
+    // basis when the swap is live. Leaving it on the published figure is what put "NOC/Concession"
+    // on row 6 of an ascending screen between two "Inv-Friendly" rows.
+    const _rowFc  = _feeCmpOf(d);
+    const _tierOn = (_takeLeadCmp && _rowFc.diverges) ? _rowFc.cmp : d[takeKey];
+    const tc = tierClass(_tierOn);
     // v507: labelled divider at the point the ranking stops being production-backed. Without it
     // the analyst reads row 23 with the same authority as row 1 — the PROXY badge alone did not
     // carry that, because every row above it was badged PROXY too and it read as decoration.
@@ -29146,13 +29187,13 @@ function runScreener() {
       <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
       <td>${mechs}</td>
-      <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${fmtTake(d[takeKey])}${_takeCmpCell(d)}</td>
+      <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}</td>
       <td class="num">${fmtNpvShared(d[npvKey])}</td>
       <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the $75 column to the left: a regime that is positive at $75 and negative here does not survive a price break. The second line is the share of the $75 value retained — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
       <td class="num" title="Production coverage: % of contracts with verified production data. Higher = take number is more production-weighted." style="color:${(d.prod_coverage_pct||0)>30?'#15803D':(d.prod_coverage_pct||0)>=10?'#A16207':'var(--muted)'}">${(d.prod_coverage_pct||0)>0?(d.prod_coverage_pct).toFixed(0)+'%':'—'}</td>
       <td class="num" style="color:${d.swing!=null?(d.swing>=20?'var(--red)':d.swing>=10?'var(--orange)':'var(--muted)'):'var(--muted)'};font-weight:${d.swing!=null&&d.swing>=15?'700':'400'}">${d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'}</td>
-      <td><span class="tier ${tc}">${tierLabel(d[takeKey])}</span></td>
+      <td><span class="tier ${tc}"${(_takeLeadCmp && _rowFc.diverges) ? ` style="cursor:help;" title="Tier on the comparable take (${_rowFc.cmp.toFixed(1)}%) — the basis this column is sorted on. On the published ${_rowFc.head.toFixed(1)}% blend the tier is ${tierLabel(_rowFc.head)}."` : ''}>${tierLabel(_tierOn)}</span></td>
     </tr>`;
   }).join('');
   window._screenerData = data;
@@ -29163,7 +29204,9 @@ function runScreener() {
   document.querySelectorAll('#tbl-screener thead th[data-sc-sort]').forEach(function (th) {
     th.classList.remove('sort-asc', 'sort-desc');
     // Tier and Govt Take share data-sc-sort="take"; both light up, which is correct — the tier
-    // IS the take bucket, so sorting either produces the same order.
+    // IS the take bucket, so sorting either produces the same order. v685: that had stopped being
+    // true for the fee-basis countries, whose tier was labelled off the published blend while the
+    // order ran on the comparable figure; both cells now read the same basis as the sort.
     if (_scSortKey && th.getAttribute('data-sc-sort') === _scSortKey) {
       th.classList.add(_scSortDir === 1 ? 'sort-asc' : 'sort-desc');
       th.setAttribute('aria-sort', _scSortDir === 1 ? 'ascending' : 'descending');

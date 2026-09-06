@@ -12,13 +12,36 @@ const path = require('path');
 
 const URL = process.env.TEST_URL || 'https://yoburgqs.github.io/petroleum-fiscal-db/';
 
-// Report path: /tmp in CI, C:/tmp locally
-const REPORT = process.platform === 'win32'
-  ? 'C:/tmp/runtime_test_report.txt'
-  : '/tmp/runtime_test_report.txt';
+// Report path. The caller decides, because the caller is the thing that reads it back.
+// v612: cycles 506-512 were blind on an ENOENT that v608 fixed; 513-516 were blind on a
+// SECOND fault the first fix masked — this file writes to /tmp while autonomous_cycle.py
+// reads office/data/runtime_test_report.txt, so the suite scored 236 PASS and the gate
+// recorded 0 PASS / 0 FAIL and shipped anyway. Honouring ORCA_REPORT_FILE makes the two
+// paths the same object by construction rather than by two constants agreeing.
+const REPORT = process.env.ORCA_REPORT_FILE
+  || (process.platform === 'win32'
+    ? 'C:/tmp/runtime_test_report.txt'
+    : '/tmp/runtime_test_report.txt');
 
 // Repo root = one level up from tests/
-const REPO_ROOT = path.resolve(__dirname, '..');
+// v608 fix: this file lives at office/tools/petroleum/tests/, so `__dirname/..` resolved to
+// office/tools/petroleum/ — which holds no country_data.json. Every run since the file was
+// copied here died on ENOENT before writing a report, and autonomous_cycle.py's "NO REPORT
+// FILE WRITTEN" branch correctly reported 0 PASS / 0 FAIL. Cycles 506-512 therefore shipped
+// with the validation gate blind. Resolve against the actual data repo, and fall back to the
+// old behaviour if someone runs a copy that does sit one level under a repo root.
+const REPO_ROOT = (function () {
+  const candidates = [
+    process.env.ORCA_REPO_ROOT,
+    path.resolve(__dirname, '..'),                                  // tests/ inside the repo
+    path.resolve(__dirname, '..', '..', '..', '..', 'petroleum-fiscal-db'),  // office/tools/petroleum/tests/
+    path.join(require('os').homedir(), 'petroleum-fiscal-db'),
+  ].filter(Boolean);
+  for (const c of candidates) {
+    if (fs.existsSync(path.join(c, 'country_data.json'))) return c;
+  }
+  throw new Error('country_data.json not found in any of: ' + candidates.join(', '));
+})();
 
 let pass = 0, fail = 0, warn = 0;
 const errors = [];
@@ -2204,6 +2227,112 @@ async function testSBProvenance(page) {
   }
 }
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// v685 (T1) — the Screener's sorted column must PRINT the figure it sorted on.
+// v635 moved the take RANKING onto the comparable (PSC/Concession) take and left the
+// RENDERING on the published blend. Nothing asserted the rendered column, so for 50 cycles
+// the shipped IOC Capital Screen, sorted "Govt Take low→high", printed:
+//     23.4 · 32.2 · 31.0 · 32.7 · 33.5 · 84.8 · 38.5 · 46.5 · …
+// with Iraq's 84.8% sixth and tier-badged "NOC/Concession" between two "Inv-Friendly" rows.
+// A correct ranking that reads as a broken sort is what this pins. Both directions, both
+// columns, and — just as important — the three adjacent states that must NOT change.
+// ─────────────────────────────────────────────────────────────────────────────
+async function testScreenerTakeSortRender(page) {
+  const S = 'ScreenerSortRender';
+  try {
+    await switchTab(page, 'tscreener');
+    await page.waitForTimeout(400);
+
+    const TIER_RANK = { 'Inv-Friendly': 0, 'Moderate': 1, 'High Take': 2, 'NOC/Concession': 3 };
+    const read = () => page.evaluate(() => {
+      const rows = [...document.querySelectorAll('#explorer-screen-mode table tbody tr')]
+        .filter(r => r.children.length > 3);
+      return rows.map(r => ({
+        country: r.children[1].innerText.split('\n')[0].replace(/^\+/, '').replace(/[↗◆].*$/, '').trim(),
+        lead: parseFloat((r.children[4].querySelector('.take-val') || {}).textContent || 'NaN'),
+        sub: (r.children[4].querySelector('div') || {}).textContent || '',
+        tier: r.children[10].innerText.trim(),
+      }));
+    });
+    const monotone = (arr, dir) => {
+      for (let i = 1; i < arr.length; i++) {
+        if (isNaN(arr[i]) || isNaN(arr[i-1])) continue;
+        if (dir === 1 ? arr[i] < arr[i-1] - 0.001 : arr[i] > arr[i-1] + 0.001) return i;
+      }
+      return -1;
+    };
+
+    await page.evaluate(() => applyScreenerPreset('iochurdle'));
+    await page.waitForTimeout(600);
+
+    // (0) the control: DEFAULT order is untouched by v685 — published leads, accent sub-line.
+    const def = await read();
+    const dIraq = def.find(r => r.country === 'Iraq');
+    if (dIraq && Math.abs(dIraq.lead - 84.8) < 0.15 && /screened at 34\.1%/.test(dIraq.sub))
+      p(S, 'default order still leads with the published blend', `Iraq ${dIraq.lead}% / "${dIraq.sub.trim()}"`);
+    else
+      f(S, 'default order still leads with the published blend', JSON.stringify(dIraq));
+    if (dIraq && dIraq.tier === 'NOC/Concession') p(S, 'default order keeps the published tier', dIraq.tier);
+    else f(S, 'default order keeps the published tier', dIraq ? dIraq.tier : 'Iraq not in the screen');
+
+    // (1) ascending: the printed column must ascend.
+    await page.evaluate(() => setScreenerSort('take'));
+    await page.waitForTimeout(600);
+    const asc = await read();
+    const badA = monotone(asc.map(r => r.lead), 1);
+    if (badA < 0) p(S, 'ascending column prints in ascending order', asc.map(r => r.lead).join(' · '));
+    else f(S, 'ascending column prints in ascending order', `row ${badA+1} (${asc[badA].country} ${asc[badA].lead}%) prints below row ${badA} (${asc[badA-1].country} ${asc[badA-1].lead}%)`);
+
+    const badT = monotone(asc.map(r => TIER_RANK[r.tier]), 1);
+    if (badT < 0) p(S, 'ascending TIER column agrees with the order', asc.map(r => r.tier).join(' · '));
+    else f(S, 'ascending TIER column agrees with the order', `row ${badT+1} ${asc[badT].country} "${asc[badT].tier}" sits under ${asc[badT-1].country} "${asc[badT-1].tier}"`);
+
+    // (2) the specific row this was found on, with the published figure still on screen.
+    const aIraq = asc.find(r => r.country === 'Iraq');
+    if (aIraq && Math.abs(aIraq.lead - 34.1) < 0.15) p(S, 'sorted cell leads with the ranked figure', `Iraq ${aIraq.lead}% (was 84.8% while sorted on 34.1%)`);
+    else f(S, 'sorted cell leads with the ranked figure', JSON.stringify(aIraq));
+    if (aIraq && /published 84\.8%/.test(aIraq.sub)) p(S, 'published blend still shown, not hidden', aIraq.sub.trim());
+    else f(S, 'published blend still shown, not hidden', aIraq ? `sub-line="${aIraq.sub}"` : 'Iraq missing');
+    if (aIraq && aIraq.tier === 'Inv-Friendly') p(S, 'tier follows the sorted basis', `Iraq tier "${aIraq.tier}" on the comparable 34.1%`);
+    else f(S, 'tier follows the sorted basis', aIraq ? aIraq.tier : 'Iraq missing');
+
+    // (3) descending is the same rule the other way.
+    await page.evaluate(() => setScreenerSort('take'));
+    await page.waitForTimeout(600);
+    const desc = await read();
+    const badD = monotone(desc.map(r => r.lead), -1);
+    if (badD < 0) p(S, 'descending column prints in descending order', desc.map(r => r.lead).join(' · '));
+    else f(S, 'descending column prints in descending order', `row ${badD+1} (${desc[badD].country} ${desc[badD].lead}%) prints above row ${badD} (${desc[badD-1].country} ${desc[badD-1].lead}%)`);
+
+    // (4) third click returns to the default render, byte for byte with (0).
+    await page.evaluate(() => setScreenerSort('take'));
+    await page.waitForTimeout(600);
+    const back = await read();
+    const sameAsDefault = back.length === def.length && back.every((r, i) =>
+      r.country === def[i].country && r.lead === def[i].lead && r.tier === def[i].tier && r.sub === def[i].sub);
+    if (sameAsDefault) p(S, 'third click restores the default render', `${back.length} rows identical to the pre-sort state`);
+    else f(S, 'third click restores the default render', 'render differs from the default order after asc→desc→off');
+
+    // (5) untick the comparability box: the ceiling AND the ranking go back to the published
+    // headline, so the published headline is what must lead — the swap must not fire here.
+    await page.evaluate(() => { const c = document.getElementById('sc-fee-cmp'); c.checked = false; c.dispatchEvent(new Event('change')); });
+    await page.waitForTimeout(400);
+    await page.evaluate(() => setScreenerSort('take'));
+    await page.waitForTimeout(600);
+    const off = await read();
+    const badO = monotone(off.map(r => r.lead), 1);
+    const anySwapped = off.some(r => /published /.test(r.sub));
+    if (badO < 0 && !anySwapped) p(S, 'unticked box sorts and prints the published headline', off.map(r => r.lead).join(' · '));
+    else f(S, 'unticked box sorts and prints the published headline', badO >= 0 ? `not ascending at row ${badO+1}` : 'swap fired with the comparability box off');
+
+    await page.evaluate(() => { const c = document.getElementById('sc-fee-cmp'); if (c) { c.checked = true; c.dispatchEvent(new Event('change')); } resetScreenerAll(); });
+    await page.waitForTimeout(400);
+  } catch (e) {
+    f(S, 'exception', e.message);
+  }
+}
+
 async function testConsoleErrors() {
   const S = 'ConsoleErrors';
   if (consoleErrors.length === 0) {
@@ -2235,6 +2364,7 @@ async function testConsoleErrors() {
     await testDCF(page);         // run DCF tests early while on t0
     await testScenarioBuilder(page);
     await testSBProvenance(page);
+    await testScreenerTakeSortRender(page);
     await testCountryProfile(page);
     await testExplorer(page);
     await testScreener(page);
