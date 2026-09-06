@@ -2023,6 +2023,115 @@ async function testMethodology(page) {
   } catch(e) { f(S, 'exception', e.message); }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+// v686 (T6) — the Methodology "At a Glance" evidence tile.
+// Regression guard for: the only tab an analyst opens to ask "how solid is the
+// evidence?" answering with a hardcoded "92.8%" labelled "A/B Evidence" — the one
+// evidence metric the platform had already retired everywhere else (v551 stopped
+// grading on it, v634 stopped exporting it, v681 rebuilt the Screener slider onto
+// tier A alone). 171 of 185 countries clear 80% A+B and 67 of those are graded C or
+// D by the badge every results table renders, so the tile contradicted the badges.
+// These assertions read the DOM against _evidenceGrade() itself rather than against
+// a literal, so the tile cannot be "fixed" back into a stale constant.
+// ─────────────────────────────────────────────────────────────────────────────
+async function testMethGlanceEvidence(page) {
+  const S = 'METH-EVIDENCE';
+  try {
+    // switchTab(page, 'tmethodology') resolves nothing: that helper looks for
+    // #tab-btn-tmethodology or a .tab-btn whose onclick ATTRIBUTE names the pane, and Methodology
+    // is #ref-item-methodology -- a .tab-dropdown-item with its handler bound in JS. So it clicks
+    // nothing and the pane stays display:none. testMethodology's own two assertions never noticed
+    // (innerHTML.length and querySelector both work on a hidden node); a geometry assertion does.
+    // Call the page's own switchTab with the real button.
+    await page.evaluate(() => switchTab('tmethodology', document.getElementById('ref-item-methodology')));
+    await page.waitForTimeout(500);
+
+    const t = await page.evaluate(() => {
+      const el  = document.getElementById('meth-glance-evidence');
+      const nEl = document.getElementById('meth-glance-ev-n');
+      const bEl = document.getElementById('meth-glance-ev-bar');
+      const mEl = document.getElementById('meth-glance-ev-mix');
+      // recomputed here, independently of the render path
+      const ct = { A: 0, B: 0, C: 0, D: 0 };
+      COUNTRY_DATA.forEach(c => { const g = _evidenceGrade(c); if (g.letter in ct) ct[g.letter]++; });
+      const abHigh = COUNTRY_DATA.filter(c => (c.ab_pct || 0) >= 80);
+      return {
+        exists: !!el,
+        paneActive: document.getElementById('tmethodology').classList.contains('active'),
+        role:   el ? el.getAttribute('role') : null,
+        height: el ? Math.round(el.getBoundingClientRect().height) : 0,
+        head:   nEl ? nEl.textContent.trim() : null,
+        mix:    mEl ? mEl.textContent.replace(/\s+/g, ' ').trim() : null,
+        segs:   bEl ? [...bEl.children].map(c => ({ t: c.getAttribute('title'), w: parseFloat(c.style.width) })) : [],
+        ct: ct, total: COUNTRY_DATA.length,
+        abHigh: abHigh.length,
+        abHighCD: abHigh.filter(c => /[CD]/.test(_evidenceGrade(c).letter)).length,
+        // the retired literal must be gone from the whole tab
+        tabHasABLabel: /A\/B Evidence/.test(document.getElementById('tmethodology').innerText),
+        // textContent, not innerText: the shortcut lives inside a collapsed <details>, whose
+        // hidden content innerText omits entirely — read through innerText this assertion saw ''
+        // and could not tell a corrected sentence from a missing one.
+        shortcut: (document.getElementById('tmethodology').textContent.replace(/\s+/g, ' ')
+                    .match(/Verification shortcut:.*?due diligence/) || [''])[0]
+      };
+    });
+
+    if (t.exists && t.role === 'button') p(S, 'tile present', 'evidence tile rendered as a control');
+    else f(S, 'tile present', 'exists=' + t.exists + ' role=' + t.role);
+
+    if (t.paneActive) p(S, 'pane active', 'the Methodology pane is displayed, so its geometry is measurable');
+    else f(S, 'pane active', 'Methodology pane is not active \u2014 every geometry assertion below is meaningless');
+
+    if (t.height >= 24) p(S, 'touch target', t.height + 'px tall');
+    else f(S, 'touch target', 'tile is ' + t.height + 'px — under the 24px floor');
+
+    const cd = t.ct.C + t.ct.D;
+    if (t.head === cd + ' of ' + t.total)
+      p(S, 'headline', 'reads "' + t.head + '" and matches _evidenceGrade() over COUNTRY_DATA');
+    else f(S, 'headline', 'headline "' + t.head + '" != grader "' + cd + ' of ' + t.total + '"');
+
+    const wantMix = ['A', 'B', 'C', 'D'].map(L => L + ' ' + t.ct[L]).join(' · ');
+    if (t.mix === wantMix) p(S, 'grade mix', t.mix);
+    else f(S, 'grade mix', 'mix "' + t.mix + '" != "' + wantMix + '"');
+
+    if (t.ct.A + t.ct.B + t.ct.C + t.ct.D === t.total)
+      p(S, 'mix totals', 'the four grades account for all ' + t.total + ' countries');
+    else f(S, 'mix totals', 'grades sum to ' + (t.ct.A + t.ct.B + t.ct.C + t.ct.D) + ' of ' + t.total);
+
+    const nonEmpty = ['A', 'B', 'C', 'D'].filter(L => t.ct[L] > 0).length;
+    const wsum = t.segs.reduce((a, s) => a + (s.w || 0), 0);
+    if (t.segs.length === nonEmpty && Math.abs(wsum - 100) < 0.5)
+      p(S, 'grade bar', t.segs.length + ' segments summing to ' + wsum.toFixed(1) + '%');
+    else f(S, 'grade bar', t.segs.length + ' segments (want ' + nonEmpty + ') summing to ' + wsum.toFixed(1) + '%');
+
+    if (!t.tabHasABLabel) p(S, 'retired credential', 'the "A/B Evidence" label is gone from the Methodology tab');
+    else f(S, 'retired credential', 'the tab still renders a tile labelled "A/B Evidence"');
+
+    // The reason the tile changed: an A+B screen and the platform's own grade disagree.
+    // If this ever stops being true the tile is restating A+B and the fix has been undone.
+    if (t.abHighCD > 0)
+      p(S, 'A+B is not the grade', t.abHighCD + ' of the ' + t.abHigh + ' countries above 80% A+B are graded C or D');
+    else f(S, 'A+B is not the grade', 'no country above 80% A+B grades C or D — the tile is now restating A+B');
+
+    if (/primary-source evidence \(A\)/i.test(t.shortcut) && !/≥80% A\/B/.test(t.shortcut))
+      p(S, 'verification shortcut', 'names the tier-A slider, not the retired A/B threshold');
+    else f(S, 'verification shortcut', 'still calibrated to A/B: ' + String(t.shortcut).slice(0, 140));
+
+    // the control has to land on the section that says what a C or a D licenses
+    const jump = await page.evaluate(async () => {
+      window.scrollTo(0, 0);
+      await new Promise(r => setTimeout(r, 150));
+      document.getElementById('meth-glance-evidence').click();
+      await new Promise(r => setTimeout(r, 1200));
+      return { y: window.scrollY, top: Math.round(document.getElementById('meth-evidence').getBoundingClientRect().top) };
+    });
+    if (jump.y > 200 && Math.abs(jump.top) < 120)
+      p(S, 'tile jumps to tiers', 'scrolled to ' + jump.y + ', Evidence Quality Tiers at ' + jump.top + 'px');
+    else f(S, 'tile jumps to tiers', 'scrollY=' + jump.y + ' section top=' + jump.top);
+
+  } catch (e) { f(S, 'exception', e.message); }
+}
+
 // ─── SECTION 19: Console Errors ────────────────────────────────────────────
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -2382,6 +2491,7 @@ async function testConsoleErrors() {
     await testBasket(page);
     await testMechanics(page);
     await testMethodology(page);
+    await testMethGlanceEvidence(page);
     await testConsoleErrors();
 
   } finally {

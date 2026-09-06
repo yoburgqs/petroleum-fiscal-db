@@ -33299,3 +33299,158 @@ Cold load, Home → Screener, loaded the shipped **IOC Capital Screen** (15 of 1
 `23.4 · 32.2 · 31.0 · 32.7 · 33.5 · **84.8** · 38.5 · 46.5 · 49.2 · …`
 
 Iraq's 84.8% sat sixth, 50pp clear of both neighbours, tier-badged "NOC/Concession" between two
+
+---
+## Cycle 592 Log — 2026-09-06 11:30
+- Test before: 283 PASS / 0 FAIL
+- Test after: **293 PASS / 0 FAIL / 1 WARN** (suite RUN this cycle against the local tree; the WARN is the service-worker 404 that only occurs on a localhost origin and reproduces on the unmodified build)
+- JS errors: 0
+- Summary: Cycle 592 shipped as **v686**. Both repos pushed.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest in the
+rotation (586 T5, 587 T1, 588 T4, 589 T2, 590 T3, 591 T1; T6 last walked at 585).
+
+## Friction
+Walked it cold, no sessionStorage, no localStorage. Home → **Reference ▾ → Methodology**, which is
+where the platform itself sends this question: the Home key-terms note, the Fiscal Compare reading
+guide, the Country Profile evidence panel and eleven FAQs all point at *Methodology → Evidence
+Quality* for the answer.
+
+Four tiles into the **At a Glance** grid (`index.html` line 3266, inside the `dd-section` under
+*Who Built This*), in the same 22px bold amber as *185 Countries* and *185/185 Benchmark PASS*:
+
+> **92.8%**
+> A/B EVIDENCE
+
+That is the first and largest evidence figure the analyst meets, and it is the one metric this
+platform has spent five cycles removing from everywhere else:
+
+| surface | what it did to A+B |
+|---|---|
+| `_evidenceGrade()` (v551) | stopped grading on it — grades on tier-A share AND fact depth |
+| Country Profile XLSX (v634) | stopped exporting it |
+| Screener evidence slider (v681) | rebuilt onto **tier A alone**, with a 50-fact depth floor |
+| Home key-terms note (v527) | says outright "a combined A/B% does not mean primary-law or operator-verified" |
+| Methodology's own tier table (line 3373) | says the A+B threshold "did not discriminate" |
+
+The tile was the last surface still publishing it, and it is arithmetically fine and analytically
+useless. Measured against the shipped `country_data.json` with the platform's own grader:
+
+```
+_evidenceGrade() over 185 countries:   A 28 · B 79 · C 43 · D 35     →  78 of 185 are C or D
+countries clearing 80% A+B:            171 of 185
+        ... of those, graded C or D:    67
+```
+
+So the analyst read **92.8%** on the Methodology tab and then read **C** on 43 countries and **D**
+on 35 from the Quality column in Fiscal Compare, the Evidence column in Explorer and Screener, the
+Evidence tier row in Side-by-Side and the badge on the Country Profile — the same platform, two
+opposite answers, the louder one wrong. Per this tab's own tier guidance four sections down, a C is
+"screening only, not for a bid recommendation" and a D "does not belong in any recommendation
+document". 78 of 185 countries are in that state and the headline said 92.8%.
+
+Two statements in the same section were calibrated to the same retired metric and are corrected with
+it, because leaving them would have the tab contradicting its own tile:
+- the page-sub defined **B-tier = "operator 10-K and annual report"** — the reverse of what the
+  database holds, and the reverse of the tier table in this same tab, which flags that exact
+  inversion as already corrected;
+- the *Verification shortcut* told the analyst to "filter to ≥80% A/B using the Evidence Quality
+  slider set to 80%". That control has gated on tier A alone since v681, so the instruction
+  described a screen the UI no longer performs, and the set it promised (171 of 185) was not an
+  auditable set at all.
+
+## Change
+The tile is no longer a literal. `#meth-glance-evidence` renders the **grade distribution**,
+computed at data-load time from `COUNTRY_DATA` through `_evidenceGrade()` itself:
+
+```
+        78 of 185
+      GRADED C OR D
+   [██▍ ██████▎ ███▌ ██▊]        ← 4-segment bar in the grade colours
+      A 28 · B 79 · C 43 · D 35
+```
+
+It reads the letter from the same function that prints the badge on every results table, so the
+tile and the badges are one measurement by construction, not two numbers that happen to agree —
+which is the specific way the old literal drifted. The segment colours come off
+`_evidenceGrade().color`, not a second palette.
+
+The tile is also a **control** now (`role="button"`, keyboard-operable, 86px tall): it lands on
+*Evidence Quality Tiers*, the only place on the platform that says what a C or a D licenses in an
+IC memo, and flashes the section so the landing is visible. The page-sub's B/C definitions and the
+Verification shortcut now match the tier table and the actual slider (80% tier-A returns **47**
+countries, and that is what the shortcut now names).
+
+## Result
+An analyst opening Methodology to ask "how solid is the evidence?" now gets the answer the rest of
+the platform gives — 78 of 185 countries are graded C or D, 43 of them C and 35 D — instead of a
+92.8% credential that 67 of those same countries would have passed. They can click straight from
+that number to the paragraph that tells them a C is screening-only and a D does not go in a
+recommendation document, and the verification shortcut they are handed now describes a screen the
+Screener actually performs.
+
+## Mobile (Step 5b)
+390 x 844, `hasTouch: true`. `document.documentElement.scrollWidth` **390** = `clientWidth` **390**
+on Home and on Methodology. The one control added measures **334 x 86** — the tile itself is the
+touch target (its inner bar and mix line are non-interactive, and the bar is `aria-hidden`). Tapped
+it on the phone viewport and it scrolled to the tiers section.
+
+**Gap found while doing this, recorded not fixed:** `pixel_audit.js` walks `button.tab-btn`, so it
+audits the 9 primary tabs and the hidden Sample Analyses pane — and **never the four Reference-
+dropdown panes**: Methodology, Fiscal Mechanics, Vintage, API Explorer. The tab an analyst is sent
+to for evidence has never been geometry-gated. Measured by hand this cycle; the fix belongs to the
+audit, not to index.html.
+
+## Infrastructure — the graded suite
+New `METH-EVIDENCE` section, 11 assertions, added to **both** copies of
+`runtime_comprehensive.js` (sha256 identical, so cycle 591's divergence check stays quiet). It
+asserts the DOM against `_evidenceGrade()` recomputed independently in the page, so the tile cannot
+be "fixed" back into a stale constant, and it asserts the fault class directly: *if no country
+above 80% A+B grades C or D, the tile is restating A+B and this cycle has been undone.*
+
+**It also found that `testMethodology` has been asserting against a hidden pane.** The suite's
+`switchTab(page, 'tmethodology')` helper looks for `#tab-btn-tmethodology` or a `.tab-btn` whose
+**onclick attribute** names the pane. Methodology is `#ref-item-methodology` — a
+`.tab-dropdown-item` with its handler bound in JS at line 46040 — so the helper matches nothing,
+clicks nothing, and the pane stays `display:none`. `testMethodology`'s two existing assertions
+(`innerHTML.length`, `querySelectorAll`) both succeed on a hidden node and never noticed; the first
+geometry assertion reported the tile as 0px tall. Same fault class as the v608/v612 blind gates,
+one level down: a check that runs, passes, and is not looking at the screen. The new section calls
+the page's own `switchTab('tmethodology', #ref-item-methodology)` and asserts
+`classList.contains('active')` **before** measuring anything, so a hidden pane is reported as a
+hidden pane rather than as a broken layout.
+
+## Carried forward — not fixed this cycle
+- **pixel_audit**: still exactly one regression against baseline,
+  `tablet-768::2-t7 clipped-text 33 -> 34` — a mechanic tag on Country Profile clipped by 6px.
+  Identical to cycle 591's finding, which reproduced it with 591's change reverted; this cycle
+  touched no part of t7. Recorded rather than re-baselined.
+- **The API and the screen disagree about evidence**, found while walking this task and out of
+  index.html's reach: `api/v1/country/norway.json` (generated 2026-08-05) carries
+  `a_pct 54.5 · d_pct 28.6 · ab_pct 71.4 · prod_coverage 6.3`, while the shipped
+  `country_data.json` the screen renders carries `66.1 · 17.0 · 83.0 · 18.2`. Its
+  `fiscal_facts.state_participation` is `0.0` against `state_eq 33.3`. The published API is a stale
+  snapshot of the evidence layer, and the Methodology tab cites it as the route to per-parameter
+  provenance. Regenerating it is a harvest-side job.
+- **Methodology names two things that do not exist**: the API "includes a `source_note` field and
+  `evidence_tier` per parameter" (the shipped JSON has `fiscal_facts_sourced` and
+  `evidence_summary`, neither of those two keys), and it is "accessible via the API Explorer tab",
+  which is `display:none; aria-hidden="true"` in the Reference dropdown. Same fault class as v527's
+  "filter by tier in Fiscal Compare". Not fixed here because un-hiding a nav entry is a tab-order
+  change and the directive reserves those for Zach.
+- The reversed B/C tier definitions survive in the FAQ body (A22, the IC checklist, the tier-by-tier
+  bid guidance). Corrected only in the page-sub and the Verification shortcut this cycle; sweeping
+  974 FAQs is text churn, not a cycle.
+- Everything carried from cycles 560–591 is unchanged, including: the FC drilldown IC Citation and
+  the four tabular *Copy for IC Memo* artifacts carrying no reform leg; FC *Copy for IC Memo*
+  defaulting to all 185 rows; the SbS NPV chart carrying no data-basis mark; the *Copy for IC Memo*
+  header naming "$50 / $75 / $125" over a four-row table that includes $100; the ⚠ proxy notice
+  promising IRR and breakeven the same artifact says are not reported; `#cmp-search` silently
+  no-opping past `CMP_MAX`; the CP headline pairing a fact-share with a contract count; the
+  `fc-nav-bar` button reading `#cp-price-select`, which does not exist; the 72 of 163 count-basis
+  records that do not reconcile `take_75` against `mech_mix`; `getProducerContext()` ranking by
+  array index; and the "Two-Price Return Screen" that passes 153 of 185.
+
+## Bookkeeping (not the cycle)
+- v685 → v686 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).

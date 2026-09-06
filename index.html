@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v684</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v686</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v684</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v686</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2137,7 +2137,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v684';
+  return m ? m[0] : 'v686';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2212,7 +2212,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v684');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v686');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -3246,7 +3246,7 @@ window.copyPlatformCitation = function(btn) {
     <h2 class="page-title" style="margin-bottom:0;">Methodology</h2>
     <button onclick="window.print()" class="no-print" style="font-size:11px;padding:5px 12px;background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--muted);cursor:pointer;white-space:nowrap;" aria-label="Print or save this Methodology document as PDF">Print / Save PDF</button>
   </div>
-  <div class="page-sub">How ORCA calculates government take: DCF model architecture (8 fiscal mechanics &mdash; Concession, PSC, TSC, PRRT, Revenue Share, RSC, Buy-back, Gross Split &mdash; across 13 price points from $30 to $125/bbl, bisection IRR solver), standardized reference project assumptions ($1.2B capex / 50k bbl/d peak / $15/bbl opex / 10% WACC for the Deepwater basis; 6 additional profiles from Marginal to Giant), evidence quality framework (A-tier = primary legislation and PSA text; B-tier = operator 10-K and annual report; C-tier = secondary industry analysis; D-tier = directional proxy &mdash; excluded from most computed outputs), production weighting methodology, benchmark validation (185/185 countries verified against Wood Mackenzie, Rystad Energy, and S&amp;P Global Commodity Insights), 974 analyst FAQs (A1&ndash;A974) covering IC workflows, rule-of-thumb adjustments, and source citation templates, and a full platform changelog.</div>
+  <div class="page-sub">How ORCA calculates government take: DCF model architecture (8 fiscal mechanics &mdash; Concession, PSC, TSC, PRRT, Revenue Share, RSC, Buy-back, Gross Split &mdash; across 13 price points from $30 to $125/bbl, bisection IRR solver), standardized reference project assumptions ($1.2B capex / 50k bbl/d peak / $15/bbl opex / 10% WACC for the Deepwater basis; 6 additional profiles from Marginal to Giant), evidence quality framework (A-tier = primary legislation and PSA text; B-tier = the EY / KPMG / IHS country-level tax and fiscal guides, assigned to a whole country and <em>not</em> an operator filing; C-tier = industry reference; D-tier = directional proxy &mdash; excluded from most computed outputs; the per-country letter is graded on the tier-A share and the fact count, never on A+B), production weighting methodology, benchmark validation (185/185 countries verified against Wood Mackenzie, Rystad Energy, and S&amp;P Global Commodity Insights), 974 analyst FAQs (A1&ndash;A974) covering IC workflows, rule-of-thumb adjustments, and source citation templates, and a full platform changelog.</div>
 
   <!-- Platform Provenance -->
   <div class="dd-section" id="meth-provenance">
@@ -3263,7 +3263,31 @@ window.copyPlatformCitation = function(btn) {
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">185</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Countries</div></div>
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">71,576</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Contracts</div></div>
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">330,329</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Verified Facts</div></div>
-      <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">92.8%</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">A/B Evidence</div></div>
+      <!-- ── v686 (T6): was a static "92.8%" over the label "A/B Evidence". That is the one
+           evidence number this platform has spent five cycles retiring, and it sat here in
+           22px bold as the answer to "how solid is the evidence?" on the only tab an analyst
+           opens to ask it. 92.8% is the fact-weighted A+B share of the 330,329 facts, and it
+           is arithmetically correct — but tier B is 45.2% of the database and is largely the
+           EY / IHS / KPMG country-level bulk harvest, assigned to a whole country and never
+           read off an individual contract. So the number does not measure sourcing quality:
+           v551 stopped grading on it, v634 stopped exporting it, v681 rebuilt the Screener
+           slider onto tier A alone, and the Home evidence note says outright "a combined A/B%
+           does not mean primary-law or operator-verified". Measured against the shipped
+           country_data.json with the platform's own _evidenceGrade(): 171 of 185 countries
+           clear 80% A+B, and 67 of those are graded C or D by the badge every other screen
+           renders. The tile therefore told the analyst 92.8% while Fiscal Compare, Explorer,
+           Screener, Side-by-Side and the Country Profile badge told them C on 43 countries
+           and D on 35.
+           It now carries the GRADE distribution, computed live from COUNTRY_DATA through
+           _evidenceGrade() itself, so this tile cannot drift from the per-country badges the
+           way the literal did. It is also a control: it lands on the Evidence Quality Tiers
+           section that says what each letter licenses in an IC memo. -->
+      <div id="meth-glance-evidence" role="button" tabindex="0" style="text-align:center;cursor:pointer;border-radius:6px;padding:3px 4px;min-height:24px;" onclick="_methJumpEvidence()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();_methJumpEvidence();}" title="Evidence grade across all 185 countries, from the same grader that prints the letter on Fiscal Compare, Explorer, Screener, Side-by-Side and the Country Profile: the WORSE of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 facts / B &ge;50 / C &ge;15). This tile used to read &quot;92.8% A/B Evidence&quot;. That figure is the fact-weighted A+B share and it is not a sourcing measure — tier B is largely the EY / IHS / KPMG country-level bulk harvest, so 171 of 185 countries clear 80% A+B and 67 of those are graded C or D here. Per this tab&rsquo;s own tier guidance, a C-grade country is for screening only and a D-grade country does not belong in a recommendation document. Click to open Evidence Quality Tiers.">
+        <div style="font-size:22px;font-weight:800;color:var(--accent);" id="meth-glance-ev-n">&mdash;</div>
+        <div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Graded C or D</div>
+        <div id="meth-glance-ev-bar" style="display:flex;height:6px;border-radius:3px;overflow:hidden;gap:1px;margin:6px auto 0;max-width:150px;" aria-hidden="true"></div>
+        <div id="meth-glance-ev-mix" style="font-size:10px;color:var(--muted);margin-top:4px;line-height:1.4;"></div>
+      </div>
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">8</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Fiscal Mechanics</div></div>
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">185/185</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Benchmark PASS</div></div>
       <div style="text-align:center;"><div style="font-size:22px;font-weight:800;color:var(--accent);">974</div><div style="font-size:11px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em;">Analyst FAQs</div></div>
@@ -3432,7 +3456,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
         <div style="font-size:24px;font-weight:800;color:var(--accent);">185/185</div>
         <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-top:2px;">Government Take</div>
-        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">All 185 countries have computed take at $30–$125/bbl across 13 price points (100% coverage). A/B-tier parameters for 92.8% of all facts.</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.5;">All 185 countries have computed take at $30–$125/bbl across 13 price points (100% coverage). 47.6% of the 330,329 facts were read out of the primary legal instrument (tier A); a further 45.2% is tier B, largely the country-level bulk harvest. Sourcing coverage is not the same as the per-country grade — see the evidence tile above.</div>
         <div style="margin-top:6px;height:4px;background:var(--green);border-radius:2px;"></div>
       </div>
       <div style="background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:12px 14px;text-align:center;">
@@ -4062,7 +4086,7 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
           <li style="margin-bottom:6px;"><strong>Compare the benchmark validation table.</strong> The Methodology tab's "Benchmark Validation" section cross-checks 170 benchmark countries against Wood Mackenzie, Rystad Energy, S&amp;P Global, and EY Oil &amp; Gas Tax Guide ranges. If your target country is in that set (Norway, UK, Iraq, Angola, Nigeria, USA, UAE, Australia, Brazil, Kazakhstan, Malaysia, Indonesia, Algeria, Qatar, Canada, Colombia, Ghana, Egypt, Azerbaijan, Mexico, Peru, Kuwait, Argentina, Tanzania, Cyprus, Ecuador, Libya, Bahrain, Iraq (KRG), Guyana, Vietnam, India, Cameroon, Gabon, Namibia, Suriname, Senegal, Mozambique, Thailand, Pakistan, Turkey, Mauritania, Ivory Coast, South Africa, Kenya, Uganda, Myanmar, Chad, Bolivia, Equatorial Guinea, Republic of Congo, Brunei, Sudan, Oman, Ireland, Trinidad and Tobago, Papua New Guinea, Timor-Leste, Venezuela, Ethiopia, Philippines, Sri Lanka, Uzbekistan, Tunisia, Republic of Guinea, Guinea-Bissau, Jordan, Morocco, New Zealand, Israel, Romania, Greece, Denmark, Sierra Leone, Bangladesh, Netherlands, South Sudan, Mongolia, Faroe Islands, Lebanon, DR Congo, Albania, Turkmenistan, Cuba, Liberia, Somalia, Madagascar, Saudi Arabia, Russia, Hungary, China, Poland, Benin, Austria, Syria, Cambodia, Yemen, Croatia, Niger, Ukraine, Togo, Georgia, Kyrgyzstan, Laos, Tajikistan, Serbia, Japan, Czech Republic, Italy, Spain, Portugal, Iran, Belarus, Eritrea, Guatemala, Honduras, Sao Tome, Belize, Uruguay, Djibouti, Burkina Faso, Bulgaria, Armenia, Greenland, Slovakia, Montenegro, and Seychelles, Kosovo, Burundi, Botswana, El Salvador, Zimbabwe, Zambia, Rwanda, Malawi, Lesotho, Comoros, Falkland Islands, Iceland, Dominican Republic, France, Mali, Jamaica, Panama, Nicaragua, Afghanistan, Chile, Germany, Paraguay, Costa Rica, South Korea, Taiwan, Lithuania, Slovenia, Belgium, Estonia, Latvia, Bosnia and Herzegovina, UAE, Finland, Sweden, Nepal, Barbados, Cabo Verde, Fiji, Haiti, Gambia, Solomon Islands, Democratic Republic of the Congo, Guinea, Moldova, Maldives, Vanuatu, Cook Islands, and Mauritius, Malta, Western Sahara, Central African Republic, Bahamas, French Guiana, New Caledonia, Samoa, Tonga, Kiribati, United Kingdom, Iraq-Kurdistan, and Republic of the Congo), the take figure has been independently verified within ±3pp. Pass rate: 185/185 (100%).</li>
           <li style="margin-bottom:6px;"><strong>For countries not in the benchmark set,</strong> the public API at <code>api/v1/country/{slug}.json</code> includes a <code>source_note</code> field and <code>evidence_tier</code> per parameter. Export via Country Profile XLSX to get the full parameter set with source annotations. For frontier countries, the <code>profit_oil_tier_schedule</code> field shows the R-factor tiers sourced from the signed PSA — compare against the actual PSA document if available.</li>
         </ol>
-        <em>Verification shortcut: countries with ≥80% A/B sourced facts (shown in the Screener's Evidence Quality slider) have the highest independent verifiability. Filter to these using the Evidence Quality slider set to 80% — this reduces the universe to the most auditable set for formal due diligence workflows.</em>
+        <em>Verification shortcut: the Screener's <strong>Min primary-source evidence (A)</strong> slider gates on tier&nbsp;A alone, with a 50-fact depth floor travelling with it. Set it to 80% for the 47 countries whose fiscal record is mostly primary law — that is the auditable set for formal due diligence. Do <strong>not</strong> screen on a combined A/B share: 171 of 185 countries clear 80% A+B, and 67 of those are graded C or D by the evidence badge on every results table, because tier&nbsp;B is the EY&nbsp;/&nbsp;IHS&nbsp;/&nbsp;KPMG bulk harvest.</em>
       </div>
     </div>
 
@@ -28189,6 +28213,24 @@ function _homeOpenEvidence(country) {
 }
 window._homeOpenEvidence = _homeOpenEvidence;
 
+// v686 (T6): destination of the Methodology "At a Glance" evidence tile. The tile states how
+// many countries are graded C or D; this section is the only place on the platform that says
+// what a C or a D licenses in an IC memo (C = screening only, D = not in a recommendation
+// document). The tile lives inside the Methodology pane, so the pane is already active -- this
+// is a scroll, not a tab switch, and it is guarded in case the section id is ever renamed.
+function _methJumpEvidence() {
+  try {
+    var el = document.getElementById('meth-evidence');
+    if (!el) return;
+    if (el.scrollIntoView) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.style.transition = 'background-color .4s';
+    var _prev = el.style.backgroundColor;
+    el.style.backgroundColor = 'rgba(176,104,0,.10)';
+    setTimeout(function() { el.style.backgroundColor = _prev || ''; }, 1400);
+  } catch (e) { /* non-critical */ }
+}
+window._methJumpEvidence = _methJumpEvidence;
+
 // v530 (cycle 429, T1) — the preset menu is the Screener's first control and the analyst's first
 // move on "which countries should even be on my screening list?". It was a blind pick: eleven
 // options, each captioned with its criteria, none of them saying what it returns. Measured cold
@@ -45443,6 +45485,45 @@ async function loadPlatformData() {
           + 'onclick="_homeOpenEvidence()" onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_homeOpenEvidence();}" '
           + 'title="Open Country Profile with the Evidence Quality panel expanded \u2014 the A / B / C / D split for that country, its bulk-harvested share, and every source named with a working link.">'
           + 'Open the evidence panel for one country \u2192</span></span>';
+      } catch (e) { /* non-critical */ }
+    })();
+    // ── v686 (T6): Methodology "At a Glance" evidence tile. The literal it replaces (92.8%,
+    // labelled "A/B Evidence") was the platform's own headline answer to "how solid is the
+    // evidence?" and it was the metric every other surface had already abandoned. This reads
+    // the grade off _evidenceGrade() -- the identical function behind the letter on Fiscal
+    // Compare's Quality column, the Explorer and Screener Evidence columns, the Side-by-Side
+    // Evidence tier row and the Country Profile badge -- so the tile and the badges are the
+    // same measurement by construction, not by two numbers agreeing.
+    (function() {
+      try {
+        var _gn = document.getElementById('meth-glance-ev-n');
+        if (!_gn || !COUNTRY_DATA || !COUNTRY_DATA.length) return;
+        if (typeof _evidenceGrade !== 'function') return;
+        var _ct = { A: 0, B: 0, C: 0, D: 0 }, _col = {};
+        COUNTRY_DATA.forEach(function(c) {
+          var g = _evidenceGrade(c);
+          if (!(g.letter in _ct)) return;
+          _ct[g.letter]++;
+          _col[g.letter] = g.color;
+        });
+        var _tot = COUNTRY_DATA.length;
+        var _cd  = _ct.C + _ct.D;
+        _gn.textContent = _cd + ' of ' + _tot;
+        var _bar = document.getElementById('meth-glance-ev-bar');
+        if (_bar) {
+          _bar.innerHTML = ['A', 'B', 'C', 'D'].map(function(L) {
+            if (!_ct[L]) return '';
+            return '<div style="width:' + (_ct[L] / _tot * 100).toFixed(2) + '%;background:'
+              + (_col[L] || 'var(--muted)') + ';" title="' + _ct[L] + ' countries graded ' + L + '"></div>';
+          }).join('');
+        }
+        var _mix = document.getElementById('meth-glance-ev-mix');
+        if (_mix) {
+          _mix.innerHTML = ['A', 'B', 'C', 'D'].map(function(L) {
+            return '<span style="color:' + (_col[L] || 'var(--muted)') + ';font-weight:700;">' + L
+              + '</span>\u00a0' + _ct[L];
+          }).join(' \u00b7 ');
+        }
       } catch (e) { /* non-critical */ }
     })();
     // v466: DB currency note on Home tab
