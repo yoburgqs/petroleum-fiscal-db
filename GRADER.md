@@ -32552,3 +32552,14 @@ IRR, rank, filter or export changes.
 
 ## Bookkeeping (not the cycle)
 - v678 → v679 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 585 Log — 2026-09-06 04:21
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 585 complete and pushed (v679). Both repos updated.
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?" (stalest in rotation; 584 was T3)
+
+**Friction:** Cold load → Fiscal Compare → click row #1 (USA). The drilldown is where an analyst working the ranked table asks this question — 185 rows lead into it, and it ends with **⎘ IC Citation** above a line that says *"Note evidence tier in citation."* The tier it handed them was one badge: `Src B · 41% primary law · 
