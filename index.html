@@ -1728,7 +1728,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v672</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v673</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1798,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v672</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v673</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2131,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v672';
+  return m ? m[0] : 'v673';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2206,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v672');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v673');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -23558,6 +23558,95 @@ function _scFeeCmpCount(price) {
   return COUNTRY_DATA.filter(function(d) { return _scFeeCmpAt(d, price).diverges; }).length;
 }
 
+// ── v673 (T6): the Fiscal Regime Breakdown card, rebuilt on the live record ───────────────
+// T6 is "where did this number come from and how solid is the evidence?", and the Fiscal Regime
+// Breakdown card is the one surface on the page whose whole job is to answer it. FAQ A-series
+// tells the analyst, in as many words, to "use the mechanic-specific take for your analysis, not
+// the headline blended figure" -- so these rows are not decoration, they are what an IC memo
+// gets built on.
+//
+// Walked cold on Russia, the card rendered: Concession 1,191 contracts at 22.9%, PSC 69 at
+// 56.4%, under a footnote reading "Blended average (46.4%) weights equally across all contract
+// types." No weighting of 22.9% and 56.4% at a 94/5 split produces 46.4%. The footnote invites
+// the analyst to check the arithmetic and the arithmetic fails by 21.7pp.
+//
+// Cause: the card renders MECHANIC_BREAKDOWN, a hand-built constant, while every decision
+// surface on the platform -- _scFeeCmpAt(), the Screener take ceiling, Side-by-Side, the IC-memo
+// clipboard -- computes from the record's own mech_mix. The two have drifted badly:
+//
+//   Russia       card Concession 22.9%   live 45.4%   -22.5pp   (and the live TSC row is missing)
+//   Bolivia      card Concession 89.6%   live 44.3%   +45.3pp   (and a 59-contract TSC row that
+//                                                                does not exist in the record)
+//   Brazil       card Concession 50.5%   live  8.2%   +42.3pp
+//   Angola       card Concession 34.7%   live  4.5%   +30.2pp
+//   Ecuador      card TSC       100.0%   live 65.0%   +35.0pp
+//   Philippines  card shows a 152-contract TSC block the record does not carry at all
+//
+// On 6 of the 18 countries the card renders for, blending its own rows by contract count misses
+// the headline it claims to explain by more than 1.5pp -- up to 38.5pp on the Philippines.
+//
+// v570 built the regime-split warning strip on the same constant, reasoning that sharing it meant
+// "the headline and the table cannot disagree". They could not disagree with each other; both
+// disagreed with the database. That strip currently fires on Russia claiming a 33.5pp regime
+// spread that "corresponds to no contract population in the country at all" -- an alarm invented
+// entirely by the stale numbers. On the live record Russia's two Group-1 regimes are 45.4% and
+// 62.9%, and they blend by contract count to 46.4%: exactly the published headline, reconciled.
+//
+// So both surfaces now read cpRegimeRows(), and the invariant v570 wanted actually holds -- not
+// just between these two cards, but against the rest of the platform.
+//
+// The second half of the defect is that the footnote's claim is not merely stale, it is not
+// derivable from ANY source. Across the 60 countries that carry a multi-mechanic split, the
+// contract-count blend of the live rows reproduces the published headline exactly for 9, differs
+// for 13 that are production-weighted (where a count blend is the wrong arithmetic and a gap is
+// expected), and differs for 38 that are labelled simple_avg -- where a plain average SHOULD
+// equal the count blend and does not, by up to 50.1pp on Sierra Leone. The gap is one-directional
+// in 36 of those 38: the headline sits ABOVE the blend, because mech_mix averages every contract
+// filed under a mechanic including those whose fiscal terms were never resolved (Sierra Leone
+// carries 41 Concessions at 0.0%, Brazil 845 at 8.2%), while the headline does not carry them.
+//
+// That is a real limit of the data and this cycle does not pretend to fix it. What it stops is
+// the card ASSERTING a reconciliation that fails silently. The card now computes the blend and
+// prints it against the headline, so the analyst is told whether these rows decompose the
+// headline or not -- and when they do not, that the per-regime means are diluted by unresolved
+// contracts and are a materiality signal rather than the regime's effective take.
+//
+// No threshold is invented: the only test is whether the two figures agree at the 0.1pp precision
+// the page prints, which is the same test _scFeeCmpAt() already applies on this page.
+function cpRegimeRows(d) {
+  var mx = (d && Array.isArray(d.mech_mix)) ? d.mech_mix : [];
+  if (mx.length < 2) return null;
+  var tot = 0;
+  for (var i = 0; i < mx.length; i++) tot += (mx[i].n || 0);
+  if (!tot) return null;
+  var rows = mx.filter(function(x) { return x && x.m && x.t75 != null; })
+               .map(function(x) {
+                 return { mechanic: x.m, n: x.n || 0, pct: Math.round((x.n || 0) / tot * 100),
+                          take: x.t75, npv: (x.v75 == null ? null : x.v75), g: (x.g == null ? 1 : x.g) };
+               })
+               .sort(function(a, b) { return b.n - a.n; });
+  if (rows.length < 2) return null;
+  // Same materiality gate the card has always used: a secondary regime worth showing holds >= 5%
+  // of the country's contracts. Kept so the v570 chip cannot promise a table that does not render.
+  if (!rows.slice(1).some(function(r) { return r.pct >= 5; })) return null;
+  var blend = rows.reduce(function(a, r) { return a + r.n * r.take; }, 0) / tot;
+  var head  = (d && d.take_75 != null) ? d.take_75 : null;
+  var wt    = (d && d.weighting) || 'simple_avg';
+  var countBasis = (wt === 'simple_avg' || wt === 'equal_weighted');
+  var agrees = (head != null && blend.toFixed(1) === head.toFixed(1));
+  return {
+    rows: rows, tot: tot, blend: blend, head: head, weighting: wt,
+    gap: (head == null) ? null : (head - blend),
+    // Three verdicts, because they mean different things to someone defending the number:
+    //   'reconciles'  the rows decompose the headline and may be cited as its components
+    //   'weighted'    the headline is production-weighted, so a count blend is the wrong
+    //                 arithmetic and the gap is expected rather than a defect
+    //   'unexplained' the headline is a plain average that does not equal the plain average of
+    //                 these rows -- the rows carry contracts the headline does not
+    verdict: (head == null) ? 'unknown' : agrees ? 'reconciles' : countBasis ? 'unexplained' : 'weighted'
+  };
+}
+
 // ── v553 (T5): the comparability caveat, for the artifacts that LEAVE the tool ────────────
 // v549 put the fee-basis correction on Side-by-Side and v552 put it on the Country Profile
 // screen. Neither reached the clipboard. So on Iraq the page said "68% fee-basis — comparable
@@ -32447,29 +32536,25 @@ function loadCountryProfile(country) {
   // materiality bar _cpCmpLine552 already uses on this same strip.
   const _cpRegimeSplit570 = (function() {
     if (_isMonopoly || d.take_75 == null) return '';
-    var mb = (typeof MECHANIC_BREAKDOWN !== 'undefined') ? MECHANIC_BREAKDOWN[country] : null;
+    // v673 (T6): was MECHANIC_BREAKDOWN. That constant put Russia's Concession block at 22.9%
+    // against a live 45.4%, which made this strip fire a 33.5pp "regimes disagree" alarm on a
+    // country whose two regimes actually blend to its headline exactly. Same source as the table
+    // below it now -- so v570's "the headline and the table cannot disagree" holds against the
+    // database, not just between two surfaces reading one stale constant.
+    var _rb570 = (typeof cpRegimeRows === 'function') ? cpRegimeRows(d) : null;
+    var mb = _rb570 ? _rb570.rows : null;
     if (!Array.isArray(mb) || mb.length < 2) return '';
     // Found by the 185-country sweep, not by reading the code: on Indonesia the chip rendered and
     // its "breakdown ↓" pointed at a section that does not exist. The Fiscal Regime Breakdown
     // block below gates on a secondary mechanic holding >= 5% of contracts, and Indonesia's
     // Gross Split block is 3% (19 of 667). The chip now carries that same existing gate, so it
     // cannot promise a table the page will not render, and the two surfaces stay coupled.
-    if (!mb.slice(1).some(function(r) { return r.pct >= 5; })) return '';
+    // materiality gate (secondary regime >= 5% of contracts) now lives in cpRegimeRows(), so the
+    // chip still cannot promise a table the page will not render.
     // Group tag from the record's own mech_mix, matched by mechanic name; the literal sets are
     // only a fallback for a name MECHANIC_BREAKDOWN carries and mech_mix does not.
-    var gByName = {};
-    ((d && Array.isArray(d.mech_mix)) ? d.mech_mix : []).forEach(function(x) {
-      if (x && x.m) gByName[String(x.m).replace(/\s+/g, '').toLowerCase()] = x.g;
-    });
-    var FEE_FALLBACK = { 'tsc': 1, 'rsc': 1, 'indiarsc': 1, 'buy-back': 1, 'buyback': 1 };
-    function groupOf(name) {
-      var k = String(name || '').replace(/\s+/g, '').toLowerCase();
-      if (gByName[k] != null) return gByName[k];
-      if (FEE_FALLBACK[k]) return 2;
-      if (k === 'prrt') return 3;
-      return 1;
-    }
-    var g1rows = mb.filter(function(r) { return groupOf(r.mechanic) === 1 && r.take != null; });
+    // Rows carry their own group tag from mech_mix now, so no name-matching fallback is needed.
+    var g1rows = mb.filter(function(r) { return r.g === 1 && r.take != null; });
     if (g1rows.length < 2) return '';
     var takes = g1rows.map(function(r) { return r.take; });
     var spread = Math.max.apply(null, takes) - Math.min.apply(null, takes);
@@ -32519,8 +32604,17 @@ function loadCountryProfile(country) {
       + '<span style="margin-left:auto;font-size:10px;opacity:.8;white-space:nowrap;">breakdown &darr;</span>'
       + '</div>'
       + rowsHtml
-      + '<div style="font-size:10px;opacity:.9;margin-top:3px;">The ' + d.take_75.toFixed(1)
-      + '% headline is the blend of all of them.' + npvSentence + ' Screen on the regime you would sign.</div>'
+      // v673 (T6): this line used to assert flatly that the headline "is the blend of all of them".
+      // On Brazil the rows blend by contract count to 24.1% against a 55.6% headline, so the
+      // sentence was making the same unchecked claim the breakdown card below has now stopped
+      // making. It states the relationship cpRegimeRows() actually measured instead.
+      + '<div style="font-size:10px;opacity:.9;margin-top:3px;">'
+      + (_rb570 && _rb570.verdict === 'reconciles'
+          ? 'The ' + d.take_75.toFixed(1) + '% headline is the contract-count blend of these regimes.'
+          : _rb570 && _rb570.verdict === 'weighted'
+            ? 'The ' + d.take_75.toFixed(1) + '% headline weights these by production, not by contract count.'
+            : 'The ' + d.take_75.toFixed(1) + '% headline does not reconcile to these rows — see the breakdown.')
+      + npvSentence + ' Screen on the regime you would sign.</div>'
       + '</div>';
   })();
 
@@ -32921,41 +33015,105 @@ function loadCountryProfile(country) {
     })()}
   </div>
   ${(function(){
-    const mb = MECHANIC_BREAKDOWN[country];
-    if (!mb || mb.length < 2) return '';
-    // Only show if secondary mechanic has ≥5% of contracts
-    const hasSignificant = mb.slice(1).some(r => r.pct >= 5);
-    if (!hasSignificant) return '';
+    // v673 (T6): rows come from cpRegimeRows() -- the record's own mech_mix -- not from the
+    // MECHANIC_BREAKDOWN constant. See the note on cpRegimeRows() for what had drifted and by
+    // how much. The footnote no longer asserts a derivation; it computes one and reports it.
+    const _rb = (typeof cpRegimeRows === 'function') ? cpRegimeRows(d) : null;
+    if (!_rb) return '';
+    const mb = _rb.rows;
     const mechColors = {
       'Concession':'#96570A','PSC':'#7C3AED','TSC':'#A16207','PRRT':'#15803D',
-      'RSC':'#C2410C','Buy-back':'#B91C1C','Revenue Share':'#6B6560','Gross Split':'rgba(21,128,61,0.68)'
+      'RSC':'#C2410C','India RSC':'#C2410C','Buy-back':'#B91C1C','Revenue Share':'#6B6560','Gross Split':'rgba(21,128,61,0.68)'
     };
+    const _nFee = mb.filter(function(r){ return r.g === 2; }).length;
     const rows = mb.map(function(r) {
       const col = mechColors[r.mechanic] || '#6B6560';
-      const _isServiceContract = (r.mechanic === 'RSC' || r.mechanic === 'IndiaRSC' || r.mechanic === 'Gross Split' || r.mechanic === 'TSC');
+      // Group 2 per the platform comparability rules: contractor is paid a fee, so take% approaches
+      // 99% structurally and is not a fiscal measure that may be read against the Group-1 rows
+      // in the same table. The card used to blend these in silently.
+      const _isFee = (r.g === 2);
       const npvStr = r.npv != null
-        ? (_isServiceContract && r.npv < 0
+        ? (_isFee && r.npv < 0
             ? '<span title="Negative NPV reflects standard greenfield profile applied to a service/fee-based contract — not directly comparable to PSC/Concession economics" style="color:var(--muted);font-style:italic;">n/a~</span>'
-            : (r.npv < 0 ? '-$' + Math.abs(r.npv).toLocaleString() : '$' + r.npv.toLocaleString()) + 'M')
+            : (r.npv < 0 ? '-$' + Math.abs(Math.round(r.npv)).toLocaleString() : '$' + Math.round(r.npv).toLocaleString()) + 'M')
         : '—';
-      const takeCol = r.take <= 40 ? 'var(--green)' : r.take <= 60 ? 'var(--yellow)' : r.take <= 80 ? 'var(--orange)' : 'var(--red)';
+      const takeCol = _isFee ? 'var(--muted)'
+                    : r.take <= 40 ? 'var(--green)' : r.take <= 60 ? 'var(--yellow)' : r.take <= 80 ? 'var(--orange)' : 'var(--red)';
+      const feeTag = _isFee
+        ? ' <span style="font-size:9px;font-weight:700;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:0 3px;vertical-align:middle;cursor:help;" title="Fee basis — the contractor is paid a fixed fee rather than an equity share of production, so government take approaches 99% as a structural property of the mechanic, not as a measure of fiscal severity. It may not be ranked against the Concession/PSC rows in this table.">not comparable</span>'
+        : '';
       return '<tr style="border-bottom:1px solid var(--border)22;">'
-        + '<td style="padding:5px 8px 5px 0;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+col+';margin-right:5px;vertical-align:middle;"></span><span style="font-weight:700;font-size:12px;">' + r.mechanic + (r.mechanic === 'PSC' && d.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;" title="R-factor profit oil tiers active — contractor share declines as R-factor rises">&#9670;</span>' : '') + '</span></td>'
+        + '<td style="padding:5px 8px 5px 0;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+col+';margin-right:5px;vertical-align:middle;"></span><span style="font-weight:700;font-size:12px;">' + r.mechanic + (r.mechanic === 'PSC' && d.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;" title="R-factor profit oil tiers active — contractor share declines as R-factor rises">&#9670;</span>' : '') + feeTag + '</span></td>'
         + '<td style="text-align:right;padding:5px 8px;font-size:12px;color:var(--muted);">' + r.n.toLocaleString() + ' <span style="font-size:10px;">(' + r.pct + '%)</span></td>'
         + '<td style="text-align:right;padding:5px 8px;font-weight:800;font-size:12px;color:'+takeCol+';font-family:\'IBM Plex Mono\',monospace;">' + r.take.toFixed(1) + '%</td>'
         + '<td style="text-align:right;padding:5px 8px;font-size:12px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;">' + npvStr + '</td>'
         + '</tr>';
     }).join('');
+    // The reconciliation the old footnote only claimed. Three outcomes, each saying a different
+    // true thing to someone who has to defend the headline in a meeting.
+    const _mono = 'font-family:\'IBM Plex Mono\',monospace;font-weight:800;color:var(--text);';
+    const _blendStr = _rb.blend.toFixed(1) + '%';
+    const _headStr  = (_rb.head == null) ? '—' : _rb.head.toFixed(1) + '%';
+    const _gapStr   = (_rb.gap == null) ? '' : (Math.abs(_rb.gap) < 0.05 ? '0.0' : Math.abs(_rb.gap).toFixed(1)) + 'pp';
+    let _recTone, _recIcon, _recHead, _recBody;
+    if (_rb.verdict === 'reconciles') {
+      _recTone = ['#15803D','rgba(21,128,61,.06)','rgba(21,128,61,.25)'];
+      _recIcon = '&#10003;';
+      _recHead = 'Reconciled — these rows do decompose the headline';
+      _recBody = 'The ' + _rb.tot.toLocaleString() + ' contracts above blend by contract count to <span style="'+_mono+'">'
+        + _blendStr + '</span>, which is the published headline of <span style="'+_mono+'">' + _headStr + '</span>. '
+        + 'The per-regime takes may be cited as components of it — use the row your asset sits in, not the blend.';
+    } else if (_rb.verdict === 'weighted') {
+      _recTone = ['#96570A','rgba(176,104,0,.06)','rgba(176,104,0,.25)'];
+      _recIcon = '&#8776;';
+      _recHead = 'Headline is production-weighted — it is not the count blend of these rows';
+      _recBody = 'The ' + _rb.tot.toLocaleString() + ' contracts above blend by contract <em>count</em> to <span style="'+_mono+'">'
+        + _blendStr + '</span>. The published headline is <span style="'+_mono+'">' + _headStr + '</span>, a '
+        + _gapStr + ' difference, because it weights by verified field production ('
+        + ((d.prod_coverage_pct || 0).toFixed(1)) + '% coverage) rather than by contract count. '
+        + 'Both are correct on their own basis; the rows are the regime split, not the headline’s arithmetic.';
+    } else if (_rb.verdict === 'unexplained') {
+      _recTone = ['#B91C1C','rgba(185,28,28,.06)','rgba(185,28,28,.28)'];
+      _recIcon = '&#9888;';
+      _recHead = 'Does not reconcile — treat these takes as a regime split, not as effective take';
+      _recBody = 'The headline for ' + country + ' is an equal-weighted average, so it should equal the equal-weighted '
+        + 'average of these rows. It does not: the rows blend to <span style="'+_mono+'">' + _blendStr
+        + '</span> against a published <span style="'+_mono+'">' + _headStr + '</span>, a ' + _gapStr + ' gap. '
+        + 'The per-regime means above average every contract filed under a mechanic, including those whose fiscal '
+        + 'terms were never resolved and are carried near zero; the headline does not. Read the rows for which '
+        + 'regimes exist here and how material each is — do not cite a row as that regime’s effective take, and '
+        + 'take block-level terms from the contract table below or from Scenario Builder before committing a number.';
+    } else {
+      _recTone = ['var(--muted)','var(--surface2)','var(--border)'];
+      _recIcon = '&#8226;';
+      _recHead = 'No published headline to reconcile against';
+      _recBody = 'The ' + _rb.tot.toLocaleString() + ' contracts above blend by contract count to <span style="'+_mono+'">'
+        + _blendStr + '</span>. No country headline take is on file at $75/bbl, so there is nothing to check it against.';
+    }
+    const _feeNote = _nFee
+      ? '<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)44;">'
+        + _nFee + ' row' + (_nFee === 1 ? ' is' : 's are') + ' fee-basis (contractor paid a fee, not an equity share). '
+        + 'Their take is a property of the mechanic and is excluded from any ranking against the Concession/PSC rows.'
+        + '</div>'
+      : '';
     return '<div class="dd-section" id="cp-regime-breakdown">'
-      + '<h3>Fiscal Regime Breakdown <span style="font-weight:400;font-size:11px;color:var(--muted);">@ $75/bbl · contract-count weighted</span></h3>'
+      + '<h3>Fiscal Regime Breakdown <span style="font-weight:400;font-size:11px;color:var(--muted);cursor:help;" title="Per-mechanic contract counts, mean government take and mean contractor NPV at $75/bbl, read from this country&#39;s own contract record. Each take is the mean across the contracts filed under that mechanic.">@ $75/bbl · mean per regime</span></h3>'
       + '<table style="width:100%;border-collapse:collapse;">'
       + '<thead><tr style="border-bottom:1px solid var(--border);">'
       + '<th style="text-align:left;color:var(--muted);padding:4px 8px 4px 0;font-size:10px;letter-spacing:.05em;">REGIME</th>'
       + '<th style="text-align:right;color:var(--muted);padding:4px 8px;font-size:10px;letter-spacing:.05em;">CONTRACTS</th>'
-      + '<th style="text-align:right;color:var(--muted);padding:4px 8px;font-size:10px;letter-spacing:.05em;">AVG TAKE</th>'
-      + '<th style="text-align:right;color:var(--muted);padding:4px 8px;font-size:10px;letter-spacing:.05em;">AVG NPV</th>'
+      + '<th style="text-align:right;color:var(--muted);padding:4px 8px;font-size:10px;letter-spacing:.05em;" title="Mean government take across the contracts filed under this mechanic at $75/bbl.">AVG TAKE</th>'
+      + '<th style="text-align:right;color:var(--muted);padding:4px 8px;font-size:10px;letter-spacing:.05em;" title="Mean contractor NPV across the contracts filed under this mechanic at $75/bbl.">AVG NPV</th>'
       + '</tr></thead><tbody>' + rows + '</tbody></table>'
-      + '<p style="font-size:10px;color:var(--muted);margin-top:8px;">Blended average (' + (d.take_75||0).toFixed(1) + '%) weights equally across all contract types. Regime-specific takes differ substantially — use per-regime figures for investment analysis.</p>'
+      + '<div style="font-size:11px;line-height:1.5;color:var(--muted);margin-top:8px;padding:7px 10px;'
+      + 'background:' + _recTone[1] + ';border:1px solid ' + _recTone[2] + ';border-radius:5px;">'
+      + '<div style="display:flex;align-items:baseline;gap:6px;margin-bottom:3px;">'
+      + '<span style="color:' + _recTone[0] + ';flex-shrink:0;">' + _recIcon + '</span>'
+      + '<strong style="color:' + _recTone[0] + ';">' + _recHead + '</strong>'
+      + '</div>'
+      + '<div>' + _recBody + '</div>'
+      + _feeNote
+      + '</div>'
       + '</div>';
   })()}
   <div class="dd-section">
