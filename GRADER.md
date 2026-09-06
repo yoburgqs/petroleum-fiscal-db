@@ -33282,3 +33282,20 @@ text inside two existing `<td>`s, and the sub-line is *shorter* than the one it 
 
 ## Bookkeeping (not the cycle)
 - v684 → v685 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
+
+---
+## Cycle 591 Log — 2026-09-06 10:17
+- Test before: 234 PASS / 2 FAIL
+- Test after: 283 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 591 shipped as **v685**. Both repos pushed.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"**
+
+## Friction
+Cold load, Home → Screener, loaded the shipped **IOC Capital Screen** (15 of 185), clicked **GOVT TAKE** to rank the shortlist. The page said *"sorted by Govt Take low→high."* The column printed:
+
+`23.4 · 32.2 · 31.0 · 32.7 · 33.5 · **84.8** · 38.5 · 46.5 · 49.2 · …`
+
+Iraq's 84.8% sat sixth, 50pp clear of both neighbours, tier-badged "NOC/Concession" between two
