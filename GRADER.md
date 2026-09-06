@@ -31655,3 +31655,130 @@ Cold load, storage cleared, no clicks. The Side-by-Side tab seeds its own exampl
 | Take spread across contracts | **single term** | 36.4–51.4% (15.0pp) | **single term** |
 
 Read across, that says the UK is the 
+
+---
+## Cycle 579 Log — 2026-09-05 21:40
+- Test before: 261 PASS / 0 FAIL / 1 WARN (local, this build)
+- Test after: 261 PASS / 0 FAIL / 1 WARN — suite ACTUALLY RAN this cycle
+- JS errors: 0 pageerrors; 1 console 404 (sw.js), pre-existing and identical in HEAD
+- Shipped: v673
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?"
+
+## Friction
+Cold load, storage cleared, Country Profile → Russia. The **Fiscal Regime Breakdown**
+card is the one surface on the page whose entire job is to answer T6, and FAQ A-series
+instructs the analyst to *"use the mechanic-specific take for your analysis, not the
+headline blended figure"* — these rows are what an IC memo gets built on.
+
+It rendered:
+
+| REGIME | CONTRACTS | AVG TAKE |
+|---|---|---|
+| Concession | 1,191 (94%) | 22.9% |
+| PSC | 69 (5%) | 56.4% |
+
+under the footnote *"Blended average (46.4%) weights equally across all contract types."*
+No weighting of 22.9% and 56.4% at a 94/5 split produces 46.4%. The footnote invites the
+arithmetic check and the check fails by **21.7pp**.
+
+Root cause: the card read `MECHANIC_BREAKDOWN` (line 22346), a hand-built constant, while
+every decision surface on the platform — `_scFeeCmpAt()`, the Screener take ceiling,
+Side-by-Side, the IC-memo clipboard — computes from the record's own `mech_mix`. Measured
+drift, card vs live record:
+
+| country | card | live | drift |
+|---|---|---|---|
+| Bolivia Concession | 89.6% | 44.3% | **+45.3pp** (+ a 59-contract TSC block not in the record) |
+| Brazil Concession | 50.5% | 8.2% | **+42.3pp** |
+| Ecuador TSC | 100.0% | 65.0% | +35.0pp |
+| Angola Concession | 34.7% | 4.5% | +30.2pp |
+| Russia Concession | 22.9% | 45.4% | −22.5pp (live TSC row omitted) |
+| Philippines TSC | 152 contracts @ 100% | **does not exist** | — |
+
+On **6 of the 18** countries the card rendered for, blending its own rows by contract count
+missed the headline it claimed to explain by >1.5pp — up to **38.5pp** on the Philippines.
+
+**v570 built the regime-split warning strip on the same constant**, reasoning that sharing it
+meant "the headline and the table cannot disagree." They could not disagree with *each other*;
+both disagreed with the database. That strip fired on Russia claiming a 33.5pp regime spread
+that "corresponds to no contract population in the country at all" — an alarm invented
+entirely by the stale numbers. On the live record Russia's two Group-1 regimes are 45.4% and
+62.9%, and they blend by contract count to **46.4%: the published headline, exactly.**
+
+## Change
+- New `cpRegimeRows(d)` builds rows from `mech_mix`. The card **and** the v570 strip both read
+  it, so v570's invariant now holds against the database, not just between two surfaces
+  sharing one stale constant.
+- The footnote no longer **asserts** a derivation — it **computes** one and reports the result,
+  in three verdicts:
+  - **reconciles** — rows do decompose the headline; cite them (Russia, Guyana)
+  - **production-weighted** — a count blend is the wrong arithmetic, gap expected and named
+    with the coverage % (Brazil 31.5pp, Iraq 6.9pp, Nigeria 5.3pp)
+  - **does not reconcile** — headline is a plain average that does not equal the plain average
+    of its own rows; states that the rows carry contracts whose fiscal terms were never
+    resolved and sit near zero while the headline does not (Sierra Leone 50.1pp, Algeria 1.6pp)
+- Group-2 fee-basis rows tagged **"not comparable"** per `MECHANIC_COMPARABILITY.md`. The card
+  previously blended TSC-at-100% into a "blended average" claim with no caveat at all.
+- The strip's closing sentence stopped asserting the headline "is the blend of all of them" —
+  the same unchecked claim, false on Brazil (rows blend to 24.1% vs a 55.6% headline).
+
+No threshold invented: the only test is whether the two figures agree at the 0.1pp precision
+the page prints, which is the test `_scFeeCmpAt()` already applies on this same page.
+
+## Result
+The analyst checking provenance is now told **whether the per-regime figures decompose the
+headline or not**. Where they do, they can cite them. Where they cannot, the page says so and
+routes them to block-level terms — instead of letting a diluted 8.2% Concession mean pass as
+Brazil's effective concession take, or a fabricated 89.6% pass as Bolivia's. Coverage goes
+**18 → 61 countries** (Algeria, Guyana, Oman, Ghana, Trinidad and 38 others had no breakdown
+at all), and the Philippines card — 152 TSC contracts at 100% take the database does not hold
+— stops rendering.
+
+## Verification (all run this cycle)
+| check | result |
+|---|---|
+| JS syntax gate, 11 script blocks | **PASS** |
+| Runtime suite, local, this build | **261 PASS / 0 FAIL / 1 WARN** |
+| WARN provenance | sw.js 404 — `serviceWorker` refs identical in HEAD, 0 lines of this diff touch it |
+| horizontal scroll, all tabs × 6 viewports (1920/1440/1280/1024/768/390) | **0** violations |
+| pageerrors, all widths | **0** |
+| Country Profile @390 after change, Brazil loaded | scrollWidth 390 = clientWidth 390 |
+| card controls under 24px @390 `pointer: coarse` | **0** |
+| 185-country render sweep | **0 throws**; 8 reconciles / 13 weighted / 40 unexplained / 124 no card |
+| Russia false alarm | 33.5pp fabricated spread → **17.5pp measured**, card and strip agree |
+
+## Carried forward — not fixed this cycle
+- **`MECHANIC_BREAKDOWN` still has two consumers** (lines ~35214 Indonesia, ~35624 Iraq) in
+  other card renderers. They still read the stale constant and should be migrated to
+  `cpRegimeRows()`/`mech_mix`; out of scope for a one-moment fix.
+- **The 40 "does not reconcile" countries are a real data defect, not a display one.** A
+  `simple_avg` headline should equal the count blend of its own mechanic rows and does not, by
+  up to 50.1pp (Sierra Leone), one-directional in 36 of 38 measured. The likely cause —
+  contracts filed under a mechanic with unresolved fiscal terms carried at ~0% take, included
+  in `mech_mix` but excluded from the headline — is stated on screen but not fixed in the
+  pipeline. This is the strongest open T6 item.
+- **`mech_mix` per-mechanic takes are contradicted by the country's own `top_contracts`
+  sample on 8 rows across 60 card countries**, worst: Brazil Concession 8.2% vs a 51.4% median
+  over its 39 top concession contracts; Angola 4.5% vs 46.5%; Colombia 30.8% vs 11.5%.
+- Everything carried from cycles 560–578 is otherwise unchanged, including: the take chart's
+  PNG export carrying the fee-basis caveat but not the proxy one; the proxy notice naming IRR
+  and breakeven columns that do not exist; the Reform Risk country lookup card printing
+  DIRECTION over the full record beside a score over the 2010 window; "Most Frequently
+  Reformed Regimes" showing 15 of 21 sourced jurisdictions without saying so; `COUNTRY_DATA`
+  and the API disagreeing on `profit_oil_govt` / `state_eq` for 45 of 185 countries; the two
+  barely-screening Screener presets; `#screener-count` at ~570 characters of unbroken prose;
+  the `Cost Recovery Cap` source badges at 21px on Country Profile @390; the Fiscal Compare
+  XLSX emitting 25 columns with no comparable-take column; the Side-by-Side search box
+  replacing the seeded example with no add-to-set path; the two adjacent unexplained IC buttons
+  on Country Profile; the duplicated all-185 rank in CP headline Zones A and B; the
+  non-existent `cp-price-select`; the Screener take slider's `min="30"` floor excluding the USA
+  at 23.4%; FAQ A25/A35/A40 describing a Screener "Stability Score filter" that does not exist;
+  Guyana's A-tier reform log contradicting its headline by ~20pp; the CDN `onerror` handlers on
+  lines 54/56/57; the 272 dead citations; and `SPECULATIVE_COUNTRIES` still being a hand-typed
+  list of 7 names from v41.
+- The 94 remaining one-term countries from v672 are still unverified rather than confirmed.
+
+## Bookkeeping (not the cycle)
+- v672 → v673 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
