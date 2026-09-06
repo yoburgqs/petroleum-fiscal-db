@@ -33014,3 +33014,142 @@ memo a world rank that the same card disowns four lines earlier.
 #6 of 21 producers · lower-mid among producers · on the comparable take
 -21.5pp vs producer median @$75 (comparable)
 All 185 countries: #180 · 
+
+---
+## Cycle 590 Log — 2026-09-06
+
+## Task
+**T3 — "How do these three countries compare side by side?"** — stalest in the rotation
+(584 T3, 585 T6, 586 T5, 587 T1, 588 T4, 589 T2).
+
+## Friction
+Walked Side-by-Side cold at 1440 (sessionStorage and localStorage cleared), then added a real
+three-country set the analyst's own way — Nigeria / Angola / Ghana, typed into `#cmp-search`.
+
+v626 built a **DATA-BASIS gate** for the grid: a column ORCA holds no verified field production
+for is refused a highest/lowest placement on all four Govt Take rows and reads
+`not ranked · statutory terms`, because its take is a simple average of statutory terms rather
+than a weighting of barrels. `Rank among producers` refuses it a placement too, and a ⚠ notice
+names it. **That gate stopped at the grid.**
+
+`Govt Take vs Oil Price` — the largest visual on the tab, and the artifact the **⬇ Chart PNG**
+button exports — then drew the excluded column as a line on the same axis as the producers.
+A line chart *is* a ranking: whichever line sits lowest reads as the most contractor-favourable
+regime. The picture states precisely the ordering the grid six inches above spends four rows, a
+Rank row and a warning box refusing to state.
+
+**The tab's own cold-load default set is the exhibit.** Norway / United Kingdom / Netherlands,
+as shipped, at $75:
+
+```
+Govt Take ($75/bbl)   68.0%            49.2%           23.4%
+                      "highest of 2"   "lowest of 2"   "not ranked ·
+                                                        statutory terms"
+the chart below       ─── 68.0 ───     ─── 49.2 ───    ─── 23.4 ───
+```
+
+Netherlands is drawn at the bottom of the plot, the clear winner of the picture, on **278 facts
+at 0% production coverage** against Norway's **63,848 at 18.2%**.
+
+Measured over the shipped `country_data.json`:
+
+| | |
+|---|---|
+| chartable 3-country sets that MIX the two bases | **284,800 of 955,860 — 29.8%** |
+| mixed chartable pairs | 3,200 |
+| …drawn with the no-production line BELOW the producer line | **2,508 — 78.4%** |
+| median comparable take @$75, 20 chartable producers | 57.0% |
+| median comparable take @$75, 160 non-producers | 26.9% (a **30.1pp** weighting artefact) |
+| of the 20 lowest comparable takes in the database, non-producers | **20 / 20** |
+
+Third instance of the same defect class on this tab: v606 found the mechanic re-basis stopped at
+the grid; v660 found the same about the NPV chart's legend.
+
+## Change
+The gate reaches the chart, on **v606's remedy rather than v614's** — the number is real and the
+analyst chose the country, so the line is **not dropped** the way a state monopoly or a PRRT
+column is. It is **marked**, on the two channels not already carrying meaning:
+
+| channel | before | after |
+|---|---|---|
+| point fill | country hue, all columns | **hollow** (white, 2.5px ring) on a no-production column; filled = production-weighted |
+| legend | `Netherlands` | `Netherlands (statutory basis)` |
+| chart title | one line | third line: *hollow markers = statutory basis, no verified production — not rankable against the filled lines* |
+| tooltip | take only | states the basis, the contract count, and that the grid does not rank it |
+| notice above chart | — | names the column, its coverage, the 30.1pp database-wide gap, and ties it to the `not ranked · statutory terms` rows |
+
+Hue is the country key shared with the NPV chart below (v614) and **does not move**; dash and
+marker shape both already mean R-factor. Legend and title are what travel with the exported PNG —
+the explicit reason v606 put the re-basis key there.
+
+**Gate scope is the grid's, verbatim.** It fires ONLY on a set that MIXES the two bases and reuses
+`_cmpHasProd` — the same `getProducerContext().inSet` the grid rows are built on — so the two
+surfaces cannot disagree by construction. Verified live: an all-producer set (Norway / UK /
+Nigeria) and an all-statutory set (Ghana / Greenland / Vanuatu) both render byte-identical to
+before. Stacks correctly with v606: Iraq / Norway / Ghana draws
+`Iraq (PSC/Conc) ◆` + `Ghana (statutory basis) ◆` with both title lines. **No plotted value
+changes** — all 12 points still equal `cpCmpTakeOf()`.
+
+## Result
+An analyst comparing three countries can no longer read a country ORCA holds no production for as
+the low-take winner of the picture — nor export that picture into an IC memo — while the table
+directly above it declines to rank that column at all. On the shipped default set, and on 29.8%
+of all three-country sets, the chart and the grid now say the same thing.
+
+## Verification
+- JS syntax gate: **PASS** — 11 inline script blocks, 0 errors (re-run after the version bump).
+- Playwright runtime suite **RUN this cycle** against the local build
+  (`TEST_URL=http://localhost:8899/index.html`): **272 PASS / 0 FAIL / 1 WARN**, read from
+  `/tmp/runtime_test_report.txt`. Was 259 PASS before this cycle's test work; +13 assertions.
+  The WARN is the pre-existing service worker registering the hardcoded Pages path
+  `/petroleum-fiscal-db/sw.js`, which 404s on a bare localhost root — localhost-only, unrelated.
+- **Zero horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all eight primary tabs,
+  0 page errors and 0 console errors at every width.
+- At **390 × 844 `hasTouch`**, Side-by-Side has **0 controls under 24px**. The change adds no
+  interactive control — it alters a canvas dataset and adds one static notice div.
+- Rendered chart screenshotted and read: hollow markers legible against filled, legend reads
+  `Netherlands (statutory basis)`, title carries the key, hues unchanged.
+
+## Test work — an over-broad assertion corrected, not weakened
+The v606 control asserted `title === 'Govt Take vs Oil Price'` and `notice === ''`, i.e. the
+**global absence of any basis annotation** as a proxy for *"no MECHANIC re-basis happened here"*.
+That proxy was always too broad, and the North Sea Trio is the set that exposes it: it is
+all-Group-1 (nothing re-bases, which is what the control exists to pin) but it is **not**
+all-one-data-basis. Those two assertions are now scoped to the mechanic dimension — no
+`(PSC/Conc)` in the title, no re-basis notice — and the values/labels assertions are untouched
+and still pass.
+
+New coverage for the data-basis gate (10 assertions): fires on a mixed set; silent on
+all-producer; silent on all-statutory; marks only the no-production column; basis key present in
+legend, title and tooltip; notice ties to the grid; changes no plotted value; and one assertion
+that reads **both surfaces on the same set** and requires the chart's mark and the grid's
+`not ranked · statutory terms` to name the same column.
+
+## Carried forward — not fixed this cycle
+- The **NPV chart** below carries no data-basis mark. It is arguably worse there (for a
+  no-production column the NPV comes wholly from the standardized deepwater profile), but v660
+  already put a legend divergence on that chart for the mechanic dimension and the two marks
+  would need designing together. Named here rather than half-done.
+- **`Copy for IC Memo` header says "Contractor NPV at $50 / $75 / $125/bbl"** while the table it
+  heads tabulates four NPV rows including $100. Stale since the $100 row was added.
+- The ⚠ proxy notice still says *"its NPV, IRR and breakeven come from the standardized deepwater
+  profile"* while the same pasted artifact's header states IRR and breakeven are **not reported**.
+  Internal contradiction inside one deliverable.
+- Typing an unmatched country (e.g. "Zanzibar") or a 6th country past `CMP_MAX` leaves the text in
+  `#cmp-search` and gives **no feedback at all** — silent no-op in both cases.
+- On a set of ≥3 that mixes bases, the grid's marker still reads **"lowest of 2"** on a column
+  that is not the lowest number on screen (Angola 53.0% tagged lowest, Ghana 52.6% beside it
+  tagged `not ranked`). Correct by the v626 gate and explained in its tooltip, but the phrase
+  and the numbers still disagree at a glance. Deliberately not reopened — v600 and v626 both
+  worked this line.
+- Everything carried from cycles 560–589 is unchanged, including: the FC drilldown IC Citation
+  and the four tabular *Copy for IC Memo* artifacts carrying no reform leg; FC *Copy for IC Memo*
+  defaulting to all 185 rows; the CP headline printing `41% primary law · n=37,222` on the
+  CONTRACT count while Evidence Quality pairs the same share with the FACT count; the
+  `fc-nav-bar` "▶ Run FC at this price" button reading `#cp-price-select`, which does not exist;
+  the 72 of 163 count-basis records that do not reconcile `take_75` against `mech_mix`; the SbS
+  proxy/basis notice referring to IRR and breakeven rows that do not exist on that tab; and
+  `getProducerContext()` ranking by array index.
+
+## Bookkeeping (not the cycle)
+- v683 → v684 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
