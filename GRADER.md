@@ -32777,3 +32777,103 @@ No take, NPV, IRR, breakeven, rank, tier, region, export or tab-order change.
 
 | A-share | pass | median facts | under 50 facts |
 |---|---|-
+
+---
+## Cycle 588 Log — 2026-09-06
+
+**Task:** T4 — "What is my fiscal-stability and reform exposure here?" (stalest in rotation:
+583 T2, 584 T3, 585 T6, 586 T5, 587 T1 — T4 last walked at 582.)
+
+**Friction.** Walked T4 cold: no sessionStorage, no localStorage, Reform Risk tab, `Check one
+country` lookup. The card is the platform's whole T4 answer — seven surfaces route into it — and
+the first thing under the headline Reform Frequency Score is a rank. That rank was an array
+index. `_rrClassify()` sorted the 21 scoreable jurisdictions by score and took `rank = i + 1`.
+
+The score is `100 − 15 × fiscal law changes since 2010`. Over 21 jurisdictions that yields
+**exactly five distinct values** on the live data, so 19 of the 21 countries sit in a tie group,
+and `Array.prototype.sort` being stable meant each tied country's ordinal was decided by nothing
+but key order in `reform_history.json`:
+
+| score | tie group | ranks printed |
+|---|---|---|
+| 100 | Libya, USA, Algeria, Colombia, Ghana, Guyana | **1, 2, 3, 4, 5, 6** |
+| 85 | Kazakhstan, Russia, India, Iraq, Venezuela, Ecuador, Canada | **7 – 13** |
+| 70 | Norway, Australia, Nigeria, Indonesia, Angola, Mexico | **14 – 19** |
+| 55 | Brazil | 20 |
+| 25 | United Kingdom | 21 |
+
+So the card asserted, in the rank slot, that Libya is the single most fiscally stable
+jurisdiction on file and Guyana is five places behind it — on identical scores of 100 and
+identical zero fiscal law changes since 2010. Libya's own note **on the same line** reads
+`pre-2010 rise unscored`, i.e. its 100 is an artefact of where the window starts, while Guyana's
+reads `no post-2010 fiscal change on file`. The rank inverted the one of the two that is real.
+Same defect at 5 places between Norway and Mexico, and 3 between Kazakhstan and Iraq.
+
+`scoreNote` carries that rank to four surfaces, not one:
+
+| surface | line |
+|---|---|
+| Reform Risk lookup card | 36505 |
+| Country Profile reform sidebar | 31510 |
+| Fiscal Compare / CP reform chip tooltip | 32316 |
+| **Pasted IC memo**, via `_icPlain(v.scoreNote)` | 23942 |
+
+The fourth is why this was the worst moment in the walk rather than a cosmetic one: a five-place
+gap that does not exist was leaving the product in writing.
+
+**Change.** Competition ranking — `1 + the number of strictly higher scores` — with the tie width
+stated rather than hidden:
+
+| country | before | after |
+|---|---|---|
+| Libya | `rank 1 of 21 · pre-2010 rise unscored` | `rank 1 of 21 scoreable · tied — 6 share this score · pre-2010 rise unscored` |
+| Guyana | `rank 6 of 21 · no post-2010 fiscal change on file` | `rank 1 of 21 scoreable · tied — 6 share this score · no post-2010 fiscal change on file` |
+| Norway | `rank 14 of 21 · in-window rise, size unscored` | `rank 14 of 21 scoreable · tied — 6 share this score · in-window rise, size unscored` |
+| Mexico | `rank 19 of 21 scoreable` | `rank 14 of 21 scoreable · tied — 6 share this score` |
+| Brazil | `rank 20 of 21 · actively reforming` | unchanged — genuinely unique, no tie clause |
+| UK | `rank 21 of 21 · actively reforming` | unchanged |
+
+Built once in `_rrClassify()` (new `_rrOrdinal()` helper unused in the final wording; `tiedN` and
+`rankTxt` are exposed on the returned object), so all four surfaces inherit it and none can print
+a different position for the same country. The score itself is unchanged, nothing is recomputed,
+and no take, NPV, IRR, breakeven, tier, region, export or tab-order changed.
+
+**Result.** An analyst who looks up two countries on this tab reads their true relative position
+on the reform-frequency count — identical where the count is identical — instead of an ordering
+manufactured by JSON key order, and cannot paste that manufactured ordering into an IC memo.
+
+**Verification**
+- JS syntax gate: **PASS** — 11 inline script blocks, 0 errors (re-run after the version bump).
+- Playwright runtime suite **RUN this cycle** against the local build
+  (`TEST_URL=http://localhost:8899/index.html`): **261 PASS / 0 FAIL / 1 WARN**, read from
+  `/tmp/runtime_test_report.txt`, not assumed. The WARN is the service worker registering the
+  hardcoded Pages path `/petroleum-fiscal-db/sw.js`, which 404s on a bare localhost root —
+  pre-existing, localhost-only, unrelated.
+- All four consuming surfaces re-read live after the change (lookup card, CP sidebar, chip
+  tooltip, IC memo string) — all four print the same corrected string. 0 page errors, 0 console
+  errors other than the sw.js 404.
+- **Zero horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390.** At 390 × 844 `hasTouch`,
+  `scrollWidth` 390 = `clientWidth` 390 and no control on the Reform Risk tab renders under 24px.
+- Wording checked once mid-cycle: the first draft read `tied 7th of 21 with 6 others scoreable`,
+  which parses as "6 others [are] scoreable". Reordered so the denominator and the tie clause
+  cannot run together.
+
+**Carried forward — not fixed this cycle**
+- The Reform Frequency Score's own resolution is the underlying limit here: five values over 21
+  jurisdictions. The rank now says so honestly rather than papering over it, but a count-based
+  score cannot separate Norway's +12pp 2022 expiry from a 1pp administrative tweak. The IC action
+  line already states this per country; the score does not.
+- The Home Screener card still advertises a `breakeven` ceiling deleted in v568. Text-only.
+- Sorting Govt Take descending puts **Saudi Arabia** (take "—", no value) above Iraq at 84.8% —
+  the null sorts as if it were the highest take. One row affected.
+- Everything carried from cycles 560–587 is unchanged, including: the FC drilldown IC Citation and
+  the four tabular *Copy for IC Memo* artifacts carrying no reform leg; FC *Copy for IC Memo*
+  defaulting to all 185 rows; the CP headline printing `41% primary law · n=37,222` on the CONTRACT
+  count while the Evidence Quality panel pairs the same share with the FACT count; the `fc-nav-bar`
+  "▶ Run FC at this price" button reading `#cp-price-select`, which does not exist; the 72 of 163
+  count-basis records that do not reconcile `take_75` against `mech_mix`; Side-by-Side tabulating
+  Contractor NPV at $50/$75/$125 while the chart carries all four prices; and the SbS proxy/basis
+  notice referring to IRR and breakeven rows that do not exist on that tab.
+
+**Bookkeeping (not the cycle)**
+- v681 → v682 applied silently at the end across the 4 real version sites (1737, 1807, 2140, 2215).
