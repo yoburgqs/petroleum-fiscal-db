@@ -1213,6 +1213,12 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      checkbox in the Screener's collapsed mechanic/IOC grids. */
   #sc-fee-cmp { width: 24px; height: 24px; margin-top: 0; }
 
+  /* v681 (T1): the fact-depth checkbox sits directly under Min primary-source evidence and
+     decides whether a 100% tier-A share on a 2-fact record is admitted. Same reasoning and
+     same sizing as #sc-fee-cmp above — named individually rather than by widening the
+     input[type=checkbox] selector, which would grow the collapsed mechanic/IOC grids. */
+  #sc-evid-depth { width: 24px; height: 24px; margin-top: 0; }
+
   /* v641 (T6): the LINK DEAD chip added this cycle carries its whole explanation in a
      title="" and is the tap target for it, but it is a 10px span inside a table cell and
      measured 17px with a thumb. Given its own class rather than widening the `td a` rule
@@ -1728,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v680</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v681</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1798,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v680</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v681</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2131,7 +2137,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v680';
+  return m ? m[0] : 'v681';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2206,7 +2212,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v680');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v681');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -2646,8 +2652,38 @@ window.copyPlatformCitation = function(btn) {
         <input type="range" id="sl-npv50" min="-500" max="2000" value="-500" aria-label="Minimum contractor NPV in millions of dollars at the 50 dollar per barrel downside price (-500 to 2000). Starts at -500 - no floor applied.">
       </div>
       <div class="slider-group">
-        <label title="Filter by the share of a country&#39;s fiscal facts read directly out of the primary legal instrument — the petroleum act, gazette, finance act or PSC text (tier A). Median across the 185 countries is 66.7%. This slider used to gate on A+B combined; tier B is the EY / IHS / Wood Mac / Rystad bulk harvest, which is 45.2% of the whole database, so the A+B gate passed 171 of 185 countries at 80% and 102 of 185 at its maximum setting of 100% — and it ranked USA, Georgia and Mongolia at a perfect 100 while rejecting Senegal and Liberia, the two most primary-law-sourced countries in the set. Tier A alone discriminates: 128 countries at 50%, 107 at 60%, 52 at 70%. Caution: a high A-share on a thin fact base is not strong evidence — a country with 12 facts all read from one model act scores 100%. Use the Primary-Source Evidence preset, which pairs this with a fact-depth floor.">Min primary-source evidence (A): <span class="val" id="sv-evid">0</span>%</label>
-        <input type="range" id="sl-evid" min="0" max="100" value="0" aria-label="Minimum primary-source evidence percentage — share of fiscal facts read from the primary legal instrument, tier A (0–100%)">
+        <label title="Filter by the share of a country&#39;s fiscal facts read directly out of the primary legal instrument — the petroleum act, gazette, finance act or PSC text (tier A). Median across the 185 countries is 66.7%. This slider used to gate on A+B combined; tier B is the EY / IHS / Wood Mac / Rystad bulk harvest, which is 45.2% of the whole database, so the A+B gate passed 171 of 185 countries at 80% and 102 of 185 at its maximum setting of 100%. Tier A alone discriminates: 128 countries at 50%, 107 at 60%, 52 at 70%. A share is only as good as the record it is a share OF, so the fact-depth floor below travels with this slider — see its own tooltip.">Min primary-source evidence (A): <span class="val" id="sv-evid">0</span>%<span class="sc-nolimit" id="sn-evid"> &middot; no floor</span><span class="sc-axis-n" id="sc-evid-n"></span></label>
+        <input type="range" id="sl-evid" min="0" max="100" value="0" aria-label="Minimum primary-source evidence percentage — share of fiscal facts read from the primary legal instrument, tier A (0–100%). A fact-depth floor of 50 facts travels with this slider by default.">
+        <!-- v681 (T1): the fact-depth leg, ON the evidence slider. Hidden while the slider sits at
+             0 (nothing to qualify); revealed by _scUpdateNeutralFlags() the moment a share is set.
+             Same pattern as the v554 sc-fee-cmp control on the take axis.
+             a_pct is a RATIO and this slider screened on it with no denominator floor, so pushing
+             the platform's evidence control toward "maximum evidence" made the surviving evidence
+             base monotonically WORSE. Measured against the shipped country_data.json:
+                 A>=0    185 pass   median 159 facts
+                 A>=50   128 pass   median  68
+                 A>=70    52 pass   median  40
+                 A>=80    47 pass   median  16
+                 A>=90    32 pass   median   5
+                 A>=100   27 pass   median   4   <- 25 of the 27 hold under 50 facts
+             At the top of the travel the nine best-evidenced countries in the database are
+             Ascension Island, French Polynesia, Guadeloupe, Micronesia, Nauru, Puerto Rico, Saint
+             Helena, Tuvalu and Western Sahara -- 2 facts each, zero verified production, and every
+             one of them graded D by the Evidence column in the same row. Norway (63,848 facts),
+             the UK (15,899), Nigeria (8,203), Indonesia (5,888) and Iraq (3,577) are all removed.
+             So the filter and the column beside it gave opposite answers about the same property,
+             and the slider's own tooltip told the analyst to use a preset instead of the control
+             it was attached to -- which is what a tooltip is for only when the confusion cannot
+             be fixed.
+             The floor is 50 because that is _evidenceGrade()'s own depth ladder (nf >= 150 = A,
+             >= 50 = B, >= 15 = C): below 50 facts the platform already grades a country C or D on
+             depth however clean its sourcing. It is safe on the axis that matters -- no country
+             with verified field production holds fewer than 50 facts, so this floor can never
+             remove a production-backed regime. The Primary-Source Evidence preset's own 150-fact
+             floor is stricter and still wins (max of the two), so that preset is unchanged at 35.
+             Unchecking restores the pre-v681 ratio-only behaviour, and the count line then says
+             what that admitted. -->
+        <label id="sc-evid-depth-wrap" style="display:none;margin-top:7px;font-size:10px;font-weight:400;color:var(--muted);cursor:pointer;line-height:1.5;align-items:flex-start;gap:5px;" title="A primary-source SHARE is a ratio, and a ratio on a 2-fact record is not evidence. 27 countries hold a perfect 100% tier-A share; 25 of them have fewer than 50 fiscal facts on file and nine have exactly two, so without this floor the strictest setting of this slider returns Micronesia, Nauru and Tuvalu and removes Norway, the UK, Nigeria, Indonesia and Iraq. CHECKED (default): a country must also hold at least 50 fiscal facts — the same depth rung _evidenceGrade() uses for its B grade, and below which the Evidence column in this very table already grades the country C or D. No country with verified field production has fewer than 50 facts, so this floor never removes a production-backed regime. UNCHECKED: screen on the share alone, which is what this slider did before v681; the count line then names how many thin-record countries that admits."><input type="checkbox" id="sc-evid-depth" checked style="cursor:pointer;flex:0 0 auto;margin-top:1px;"><span style="flex:1 1 auto;min-width:0;">On a record deep enough to mean it &mdash; <span style="font-weight:700;">&ge;<span id="sc-evid-depth-floor">50</span> fiscal facts</span> on file <span style="opacity:.8;white-space:normal;">&mdash; <span id="sc-evid-depth-n">55 of 185 countries fall short</span></span></span></label>
       </div>
     </div>
     <details id="screener-advanced-details" style="margin-top:10px;">
@@ -27356,6 +27392,10 @@ window._sbsApplyObsSpread = _sbsApplyObsSpread;
 // ─── TAB 3: Screener ─────────────────────────────────────────────────────────
 let _screenerRfactorOnly = false;
 let _screenerMinFacts = 0;   // v518: fact-depth floor, set only by the Primary-Source Evidence preset
+// v681 (T1): the fact-depth floor that travels with the #sl-evid slider itself. 50 is
+// _evidenceGrade()'s own B rung on the depth leg (nf >= 150 = A, >= 50 = B, >= 15 = C).
+// It is a floor, not a replacement: the Primary-Source Evidence preset's 150 still wins.
+const SC_EVID_MIN_FACTS = 50;
 // v573: minimum share of $75 contractor NPV retained at the $50 downside. null = leg not applied.
 // Set only by the Downside Resilience preset. See _npvRetention().
 let _screenerMinRetention = null;
@@ -27721,6 +27761,8 @@ function applyScreenerPreset(preset) {
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
   const feeCmp = document.getElementById('sc-fee-cmp');
   if (feeCmp) feeCmp.checked = true;   // v554
+  const evDep = document.getElementById('sc-evid-depth');
+  if (evDep) evDep.checked = true;     // v681
   // v517: sc-irr-nulls retired with the IRR axis; sc-proxy-keep replaces it.
   const keepProxy = document.getElementById('sc-proxy-keep');
   if (keepProxy) keepProxy.checked = true;
@@ -28218,6 +28260,55 @@ function _scUpdateNeutralFlags() {
   }
 
   // v568: the v513 breakeven-nulls control retired with the breakeven ceiling it disclosed.
+
+  // v681: the fact-depth leg of the evidence axis. Meaningless while the share slider sits at 0,
+  // so it is revealed only once a share is asked for, and it states the size of what it removes
+  // and what the two legs are doing right now — read off COUNTRY_DATA, never hard-coded.
+  const _evSl = document.getElementById('sl-evid');
+  const _evWrap = document.getElementById('sc-evid-depth-wrap');
+  const _evFlag = document.getElementById('sn-evid');
+  const _evAxis = document.getElementById('sc-evid-n');
+  if (_evSl) {
+    const _evV = +_evSl.value;
+    if (_evWrap) _evWrap.style.display = _evV > 0 ? 'inline-flex' : 'none';
+    if (_evFlag) _evFlag.style.display = _evV > 0 ? 'none' : 'inline';
+    if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA.length) {
+      const _evDepthOn = !!(document.getElementById('sc-evid-depth') || {}).checked;
+      const _evFloor = Math.max(_evDepthOn ? SC_EVID_MIN_FACTS : 0, _screenerMinFacts || 0);
+      const _nDep = document.getElementById('sc-evid-depth-n');
+      if (_evV <= 0) {
+        if (_nDep) _nDep.textContent = COUNTRY_DATA.filter(d => (d.n_facts || 0) < SC_EVID_MIN_FACTS).length
+          + ' of ' + COUNTRY_DATA.length + ' countries fall short';
+        const _fl0 = document.getElementById('sc-evid-depth-floor');
+        if (_fl0) _fl0.textContent = SC_EVID_MIN_FACTS;
+      }
+      if (_evAxis) {
+        if (_evV <= 0) { _evAxis.textContent = ''; _evAxis.className = 'sc-axis-n'; }
+        else {
+          const _shareOnly = COUNTRY_DATA.filter(d => (d.a_pct || 0) >= _evV).length;
+          const _both = COUNTRY_DATA.filter(d => (d.a_pct || 0) >= _evV && (d.n_facts || 0) >= _evFloor).length;
+          // Kept to the same short shape as the NPV axes: .sc-axis-n is white-space:nowrap and
+          // sits inside a slider label, so a long string here forces the whole filter card wider
+          // than the viewport. The share-vs-depth comparison goes on the checkbox line below,
+          // which wraps. (v681 shipped that text here first and put 36px of horizontal scroll on
+          // a phone and 37-141px at 1024/1280/1440.)
+          _evAxis.textContent = '\u00b7 ' + _both + ' of ' + COUNTRY_DATA.length + ' clear this';
+          // An axis that is removing nobody should read as inert rather than as work being done.
+          _evAxis.className = 'sc-axis-n' + (_both >= COUNTRY_DATA.length ? ' sc-axis-inert' : '');
+          // The floor the analyst is told about must be the floor that is actually applied:
+          // the Primary-Source Evidence preset raises it to 150, which beats the checkbox's 50.
+          const _flEl = document.getElementById('sc-evid-depth-floor');
+          if (_flEl) _flEl.textContent = _evFloor > 0 ? _evFloor : SC_EVID_MIN_FACTS;
+          if (_nDep) {
+            _nDep.textContent = _evFloor > 0
+              ? (_shareOnly - _both) + ' of the ' + _shareOnly + ' that clear the share are held on a thinner record and removed'
+              : COUNTRY_DATA.filter(d => (d.a_pct || 0) >= _evV && (d.n_facts || 0) < SC_EVID_MIN_FACTS).length
+                + ' of the ' + _shareOnly + ' rows below hold the share on fewer than ' + SC_EVID_MIN_FACTS + ' facts';
+          }
+        }
+      }
+    }
+  }
 }
 
 // v617 (T1) — the Min Contractor NPV floor is a PRICE-FOLLOWING filter on a FIXED range.
@@ -28309,6 +28400,9 @@ function runScreener() {
   const minNPV  = +document.getElementById('sl-npv').value;
   const minNPV50 = +document.getElementById('sl-npv50').value;
   const minEvid = +(document.getElementById('sl-evid') ? document.getElementById('sl-evid').value : 0);
+  // v681: the fact-depth leg of the evidence axis, checked by default. Only bites when a share
+  // is set; unchecking restores the pre-v681 ratio-only behaviour and the count line says so.
+  const evidDepthOn = !!(document.getElementById('sc-evid-depth') || {}).checked;
 
   // v517: the IRR axis is retired. What is left to disclose is data basis: 163 of the 185 countries
   // have no verified field production and their economics are regional proxies.
@@ -28442,8 +28536,14 @@ function runScreener() {
     if (minEvid > 0 && (d.a_pct || 0) < minEvid) return false;
     // Fact-depth leg. A-share on its own rewards thin coverage: the median fact count among the
     // 52 countries at A>=70% is 39.5, against 159 across all 185, because a jurisdiction whose
-    // entire record is 12 facts from one model petroleum act scores 100% A. Only the
-    // Primary-Source Evidence preset sets this; the slider alone leaves it at 0.
+    // entire record is 12 facts from one model petroleum act scores 100% A.
+    // v681 (T1): that leg now travels with the slider instead of only with the preset. Before
+    // this, pushing the platform's evidence control to its maximum returned 27 countries of which
+    // 25 hold under 50 facts and nine hold exactly two, while removing Norway, the UK, Nigeria,
+    // Indonesia and Iraq -- i.e. the strictest evidence screen on the platform returned the worst
+    // evidence in it, and the Evidence column graded 25 of its own survivors D. The floor is only
+    // applied when a share is actually being asked for, so the rest state is unchanged.
+    if (evidDepthOn && minEvid > 0 && (d.n_facts || 0) < SC_EVID_MIN_FACTS) return false;
     if (_screenerMinFacts > 0 && (d.n_facts || 0) < _screenerMinFacts) return false;
 
     // IOC operator presence filter
@@ -28737,8 +28837,25 @@ function runScreener() {
   // its own composition, which is how a screen returning 171 of 185 countries could be labelled
   // "highest data quality for due diligence" without anyone noticing. Tier A is stated, tier B is
   // named for what it is, and the fact-depth leg reports its own size.
+  // v681 (T1): the count line now states the DEPTH leg as well as the share, because the share
+  // alone is what used to make the strictest setting of this axis return the thinnest records in
+  // the database. When the floor is off, it names how many thin-record countries that admits.
+  const _evidFloorEff = Math.max((minEvid > 0 && evidDepthOn) ? SC_EVID_MIN_FACTS : 0, _screenerMinFacts || 0);
+  let _evidDepthPhrase = '';
+  if (minEvid > 0) {
+    if (_evidFloorEff > 0) {
+      _evidDepthPhrase = ` on \u2265${_evidFloorEff} fiscal facts on file`;
+    } else if (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA.length) {
+      const _thinIn = data.filter(d => (d.n_facts || 0) < SC_EVID_MIN_FACTS).length;
+      _evidDepthPhrase = _thinIn > 0
+        ? ` on a record of ANY depth \u2014 fact-depth floor off, so ${_thinIn} of these ${data.length} are graded on fewer than ${SC_EVID_MIN_FACTS} facts and the Evidence column marks them C or D`
+        : ' on a record of any depth (fact-depth floor off)';
+    }
+  } else if (_screenerMinFacts > 0) {
+    _evidDepthPhrase = ` on \u2265${_screenerMinFacts} facts on file`;
+  }
   const _evidNote = (minEvid <= 0 && _screenerMinFacts <= 0) ? ''
-    : ` <span style="color:var(--accent);font-weight:600;">\u2014 ${data.length} with \u2265${minEvid}% of fiscal facts read from the primary legal instrument (tier A)${_screenerMinFacts > 0 ? ` on \u2265${_screenerMinFacts} facts on file` : ''}; the EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward this</span>`;
+    : ` <span style="color:var(--accent);font-weight:600;">\u2014 ${data.length} with \u2265${minEvid}% of fiscal facts read from the primary legal instrument (tier A)${_evidDepthPhrase}; the EY / IHS / KPMG bulk harvest (tier B, 45.2% of the database) does not count toward this</span>`;
   // v587 (T1): sortNote was only concatenated into the FILTERED branch, so an analyst who sorted
   // the unfiltered 185-country universe -- the commonest T1 entry point, and the state the page
   // cold-loads into -- reordered the table and the count line said nothing about it and offered no
@@ -28779,7 +28896,9 @@ function runScreener() {
     // v623: neither is the coverage radio. No breakeven criterion is claimed because none exists.
     if (!includeProxy) crit.push('Verified field production only — '
       + (COUNTRY_DATA.length - COUNTRY_DATA.filter(function(x){ return _dqTier(x).hasProduction; }).length) + ' proxy-economics countries excluded');
-    if (minEvid > 0) crit.push('Min primary-source evidence: ≥' + minEvid + '% of fiscal facts read from the primary legal instrument (tier A); the EY/IHS/KPMG bulk harvest (tier B) does not count toward this');
+    if (minEvid > 0) crit.push('Min primary-source evidence: ≥' + minEvid + '% of fiscal facts read from the primary legal instrument (tier A); the EY/IHS/KPMG bulk harvest (tier B) does not count toward this'
+      + (evidDepthOn ? ', on a record of at least ' + SC_EVID_MIN_FACTS + ' fiscal facts — a share on a thinner record is not evidence'
+                     : ', on a record of ANY depth — fact-depth floor switched OFF, so a 100% share on a 2-fact record passes'));
     if (_screenerMinFacts > 0) crit.push('Min facts on file: ≥' + _screenerMinFacts);
     if (_screenerMinRetention !== null) crit.push('Downside retention: keeps ≥' + Math.round(_screenerMinRetention*100) + '% of its $75/bbl contractor NPV at $50/bbl — measured for the 182 countries with a positive $75 NPV; the 3 state monopolies have no contractor position and are excluded rather than carried');
     if (checkedIOCs.length > 0) crit.push('IOC presence: ' + checkedIOCs.join(', '));
@@ -28839,7 +28958,10 @@ function runScreener() {
     if (!includeProxy) _diagHints.push('Verified field production only — that is ' + COUNTRY_DATA.filter(function(x){return _dqTier(x).hasProduction;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     if (_diagTake < 60) _diagHints.push('Max take &le;' + _diagTake + '% — few countries qualify at this threshold');
     if (_checkedMechsCount < _totalMechs && _checkedMechsCount > 0) _diagHints.push('Only ' + _checkedMechsCount + ' of ' + _totalMechs + ' fiscal mechanics selected');
-    if (minEvid > 0) _diagHints.push('Min primary-source evidence &ge;' + minEvid + '% (tier A) — only ' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid;}).length + ' of ' + COUNTRY_DATA.length + ' countries hold that share of their facts from the primary legal instrument');
+    if (minEvid > 0) _diagHints.push('Min primary-source evidence &ge;' + minEvid + '% (tier A)'
+      + (evidDepthOn ? ' on &ge;' + SC_EVID_MIN_FACTS + ' facts' : '')
+      + ' — only ' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid && (!evidDepthOn || (x.n_facts||0)>=SC_EVID_MIN_FACTS);}).length + ' of ' + COUNTRY_DATA.length + ' countries clear that'
+      + (evidDepthOn ? ' (' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid && (x.n_facts||0)<SC_EVID_MIN_FACTS;}).length + ' more hold the share on a record thinner than ' + SC_EVID_MIN_FACTS + ' facts)' : ''));
     if (_screenerMinFacts > 0) _diagHints.push('At least ' + _screenerMinFacts + ' facts on file — that is ' + COUNTRY_DATA.filter(function(x){return (x.n_facts||0)>=_screenerMinFacts;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     if (_screenerMinRetention !== null) _diagHints.push('Downside retention \u2265' + Math.round(_screenerMinRetention*100) + '% of $75 NPV at $50/bbl \u2014 that is ' + COUNTRY_DATA.filter(function(x){var r=_npvRetention(x);return r!==null&&r>=_screenerMinRetention;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     if (scRegionActive) _diagHints.push('Region filter: ' + scRegionActive + ' only');
@@ -45485,6 +45607,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // v554: take-comparability toggle
   var scFeeCmp = document.getElementById('sc-fee-cmp');
   if (scFeeCmp) scFeeCmp.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  // v681: fact-depth leg of the evidence axis
+  var scEvDepth = document.getElementById('sc-evid-depth');
+  if (scEvDepth) scEvDepth.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   // v507: evidence-first ranking toggle
   var scEvFirst = document.getElementById('sc-evidence-first');
   if (scEvFirst) scEvFirst.addEventListener('change', function() {
