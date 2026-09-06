@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v682</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v683</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v682</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v683</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2137,7 +2137,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v682';
+  return m ? m[0] : 'v683';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2212,7 +2212,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v682');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v683');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -23409,17 +23409,53 @@ function formatBreakeven(val) {
 // v43: Global percentile rank for take@$75 among all 185 countries
 // rank=1 = LOWEST take (most investor-friendly), rank=N = HIGHEST take
 function getGlobalTakeRank(country) {
-  const all = COUNTRY_DATA.filter(c => c.take_75 != null).sort((a, b) => a.take_75 - b.take_75);
-  const idx = all.findIndex(c => c.country === country);
-  if (idx < 0) return null;
-  const rank = idx + 1;  // 1 = lowest take
+  // v683 (T2): ranked on the COMPARABLE take (cpCmpTakeOf) — the same basis the producer rank
+  // three lines above it in the same headline strip has used since v552 — not on the blended
+  // published headline. Ranking the two lines on two different bases printed a contradiction the
+  // analyst had no way to resolve. Iraq read:
+  //     #6 of 21 producers · lower-mid among producers · on the comparable take
+  //     -21.5pp vs producer median @$75 (comparable)
+  //     All 185 countries: #180 · +56.4pp vs the all-country median (28.4%)
+  // #180 of 185 is the fifth-highest government take on earth, and it was computed on the 84.8%
+  // blend that this same card labels, one line up, "not comparable across countries" — because
+  // 415 of Iraq's 610 contracts are TSCs where the contractor is paid a fixed $/bbl fee and take%
+  // is set by the remuneration structure, not by the fiscal terms. On the comparable 34.1% Iraq
+  // is #102 of 185 and +5.7pp off the median. 11 countries carry a g1 split; the all-185 median
+  // is 28.4% on either basis, and the other 174 countries are unaffected by the basis change.
+  //
+  // Ties now SHARE a rank (standard competition ranking) instead of taking an array index. 28
+  // exact ties exist at this precision: ten countries all sit at 19.7% take and were printed as
+  // #55 through #64 — a nine-place spread manufactured by JSON key order — and the three state
+  // monopolies, all at 100.0%, were printed as #183, #184 and #185. Same defect as the reform
+  // rank fixed at v682.
+  const all = COUNTRY_DATA.filter(c => c.take_75 != null);
+  const self = all.filter(c => c.country === country)[0];
+  if (!self) return null;
+  const mine = cpCmpTakeOf(self, '75');
+  if (mine == null) return null;
   const n = all.length;
-  // pctFromTop: what fraction of countries have HIGHER take than this one
-  // rank=1 → pctFromTop=99% (almost all are higher) → "lowest 1%"
-  // rank=N → pctFromTop=0% (none higher) → "highest 1%"
-  const pctHigherThanThis = Math.round((n - rank) / n * 100); // % of countries with higher take
-  return { rank, n, pctHigherThanThis };
+  let nBelow = 0, nTied = 0;
+  for (let i = 0; i < n; i++) {
+    const v = cpCmpTakeOf(all[i], '75');
+    if (v < mine) nBelow++; else if (v === mine) nTied++;
+  }
+  const rank = nBelow + 1;  // 1 = lowest take; tied countries share the lowest rank in their band
+  // % of countries with a strictly HIGHER take than this one
+  const pctHigherThanThis = Math.round((n - nBelow - nTied) / n * 100);
+  return { rank, n, tiedN: nTied, pctHigherThanThis };
 }
+// v683 (T2): what the all-185 rank WOULD have said on the published blended headline. Used only
+// inside the tooltip on that line, so an analyst who has quoted the old figure elsewhere can see
+// which number moved and by how much, rather than finding the page silently disagreeing with a
+// memo they already wrote.
+getGlobalTakeRank.__blendedRank = function(country) {
+  const all = COUNTRY_DATA.filter(c => c.take_75 != null);
+  const self = all.filter(c => c.country === country)[0];
+  if (!self) return '\u2014';
+  let nBelow = 0;
+  for (let i = 0; i < all.length; i++) { if (all[i].take_75 < self.take_75) nBelow++; }
+  return String(nBelow + 1);
+};
 
 // v534 (T2): the peer basis behind every "vs median" and every rank claim on Country Profile.
 //
@@ -32565,6 +32601,11 @@ function loadCountryProfile(country) {
     : '<span id="cp-be-head" style="font-size:11px;color:var(--muted);opacity:.65;" title="No solved breakeven on file for this country, and contractor NPV is not present at all four modelled prices, so no bound can be read off this page either. Use Scenario Builder with field-specific capex and opex for a project-level estimate.">BE: n/a</span>';
   // v452: compute global rank + vs-median BEFORE _headlineStrip344 uses them
   const _grank452 = getGlobalTakeRank(country);
+  // v683 (T2): printed only when the rank is genuinely shared, so an unqualified '#102'
+  // still means what it says.
+  const _tie683 = (_grank452 && _grank452.tiedN > 1)
+    ? ' <span style="opacity:.85;">(tied with ' + (_grank452.tiedN - 1) + ' other'
+      + ((_grank452.tiedN - 1) === 1 ? '' : 's') + ')</span>' : '';
   // v534 (T2): rank and vs-median now read against the 21 production-weighted regimes, not
   // against all 185. Both elements stay (v452 lock) and stay computed before the strip (TDZ);
   // what changed is the denominator, and the all-185 figures move to their own second line
@@ -32600,11 +32641,13 @@ function loadCountryProfile(country) {
     // A state monopoly IS production-weighted; it is excluded because take >= 99.5% means no
     // contractor access, so ranking it against contractor regimes is meaningless either way.
     if (_isMonopoly) {
-      return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="State monopoly \u2014 no contractor access, so government take is not a regime an IOC can enter and is excluded from the producer peer median. The all-185 rank is shown only for completeness.">#<strong style="color:var(--text);">' + _grank452.rank + '</strong> of ' + _grank452.n + ' \u00b7 <strong style="color:var(--muted);">state monopoly \u2014 not a contractor regime</strong></span>';
+      return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="State monopoly \u2014 no contractor access, so government take is not a regime an IOC can enter and is excluded from the producer peer median. The all-185 rank is shown only for completeness, and all three monopolies sit at 100.0% take, so they share it rather than being ordered against each other.">#<strong style="color:var(--text);">' + _grank452.rank + '</strong> of ' + _grank452.n + _tie683 + ' \u00b7 <strong style="color:var(--muted);">state monopoly \u2014 not a contractor regime</strong></span>';
     }
-    return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="This country is not in the production-weighted set \u2014 its take is an equal-weighted average across ' + (d.n || 0) + ' contract' + ((d.n === 1) ? '' : 's') + ' with no verified production data (prod_coverage_pct = ' + (d.prod_coverage_pct || 0).toFixed(0) + '). It is a fiscal-terms comparison, not a producer benchmark, and it should not be ranked head-to-head against one. The rank shown is across all 185 countries and mixes both kinds.">#<strong style="color:var(--text);">' + _grank452.rank + '</strong> of ' + _grank452.n + ' \u00b7 <strong style="color:var(--muted);">not production-weighted</strong></span>';
+    return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="This country is not in the production-weighted set \u2014 its take is an equal-weighted average across ' + (d.n || 0) + ' contract' + ((d.n === 1) ? '' : 's') + ' with no verified production data (prod_coverage_pct = ' + (d.prod_coverage_pct || 0).toFixed(0) + '). It is a fiscal-terms comparison, not a producer benchmark, and it should not be ranked head-to-head against one. The rank shown is across all 185 countries and mixes both kinds. It is computed on the comparable take, so it is not ordered against a fee-basis blend.' + (_cmpTakeOn552 ? ' This country\u2019s own rank is on its comparable take of ' + _cpFee552.cmpTake.toFixed(1) + '%, not on the published headline of ' + d.take_75.toFixed(1) + '%.' : '') + '">#<strong style="color:var(--text);">' + _grank452.rank + '</strong> of ' + _grank452.n + _tie683 + ' \u00b7 <strong style="color:var(--muted);">not production-weighted' + (_cmpTakeOn552 ? ' \u00b7 on the comparable take' : '') + '</strong></span>';
   })() : '';
-  const _globalTakes452 = COUNTRY_DATA.filter(function(x){return x.take_75!=null;}).map(function(x){return x.take_75;}).sort(function(a,b){return a-b;});
+  // v683 (T2): median on the same comparable basis as the rank above. Lands on 28.4% either way
+  // (only 11 of 185 records carry a g1 split), but the two must not be built on different numbers.
+  const _globalTakes452 = COUNTRY_DATA.filter(function(x){return x.take_75!=null;}).map(function(x){return cpCmpTakeOf(x,'75');}).sort(function(a,b){return a-b;});
   const _globalMedian452 = _globalTakes452.length ? _globalTakes452[Math.floor(_globalTakes452.length/2)] : null;
   const _prodMedian534 = _prodCtx534 ? _prodCtx534.median : null;
   const _vsMedianHtml452 = (!_isMonopoly && d.take_75 != null && _prodMedian534 != null) ? (function(){
@@ -32626,8 +32669,11 @@ function loadCountryProfile(country) {
   })() : '';
   // v534: the all-185 basis, kept and labelled, on its own muted line beneath the pill.
   const _allBasisHtml534 = (!_isMonopoly && d.take_75 != null && _grank452 && _globalMedian452 != null && _prodCtx534) ? (function(){
-    var diffAll = d.take_75 - _globalMedian452;
-    return '<span style="font-size:10px;color:var(--muted);opacity:.8;cursor:help;" title="Shown because it is the figure the profile quoted until v534, and it is still what the Explorer and Screener rank against. It mixes ' + _prodCtx534.n + ' production-weighted regimes with ' + _prodCtx534.nEqualWeighted + ' equal-weighted averages built on as few as 2 contracts, so it is a weaker basis for an IC claim.">All 185 countries: #' + _grank452.rank + ' \u00b7 ' + (diffAll >= 0 ? '+' : '') + diffAll.toFixed(1) + 'pp vs the all-country median (' + _globalMedian452.toFixed(1) + '%), which includes ' + _prodCtx534.nEqualWeighted + ' countries with no production data</span>';
+    // v683 (T2): on the comparable take, matching the producer rank and pill above. Was
+    // d.take_75 against a blended median, which put Iraq at #180 / +56.4pp directly beneath a
+    // producer line reading "lower-mid \u00b7 -21.5pp \u00b7 on the comparable take".
+    var diffAll = _verdictTake552 - _globalMedian452;
+    return '<span style="font-size:10px;color:var(--muted);opacity:.8;cursor:help;" title="Same basis as the producer rank above \u2014 the comparable take, on every country \u2014 but a wider and weaker peer set: it mixes ' + _prodCtx534.n + ' production-weighted regimes with ' + _prodCtx534.nEqualWeighted + ' equal-weighted averages built on as few as 2 contracts. Cite the producer line for an IC claim; this line is here so the two denominators are both visible.' + (_cmpTakeOn552 ? ' On ' + country + '\u2019s published headline of ' + d.take_75.toFixed(1) + '% instead, this line would read #' + getGlobalTakeRank.__blendedRank(country) + ' and ' + ((d.take_75 - _globalMedian452) >= 0 ? '+' : '') + (d.take_75 - _globalMedian452).toFixed(1) + 'pp \u2014 a position set by the remuneration structure of its fee-basis contracts rather than by its fiscal terms.' : '') + '">All 185 countries: #' + _grank452.rank + _tie683 + ' \u00b7 ' + (diffAll >= 0 ? '+' : '') + diffAll.toFixed(1) + 'pp vs the all-country median (' + _globalMedian452.toFixed(1) + '%), which includes ' + _prodCtx534.nEqualWeighted + ' countries with no production data' + (_cmpTakeOn552 ? ', on the comparable take' : '') + '</span>';
   })() : '';
   // v454: IC Memo implication for CP headline strip — distills take+swing+stability into a specific IC memo rule
   // v670 (T2): this box is the page's ONE instruction on what to put in the memo, and it was
