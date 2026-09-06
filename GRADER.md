@@ -32058,3 +32058,18 @@ v554 predicted when it made the same change to the Screener ceiling.
 
 ## Bookkeeping (not the cycle)
 - v674 → v675 applied silently at the end across the 4 real version sites (1731, 1801, 2134, 2209).
+
+---
+## Cycle 581 Log — 2026-09-06 00:41
+- Test before: 236 PASS / 0 FAIL
+- Test after: 236 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 581 complete and pushed (v675).
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (stalest in rotation; 576 T2, 577 T6, 578 T3, 579 T6, 580 T5).
+
+## Friction
+Cold load → Fiscal Compare, default view. The analyst reads the ranked table top-down and strikes the bottom. **Iraq rendered at rank 63 of 65, three rows from the bottom, under a red "NOC-DOMINATED · TAKE >75%" banner, at 84.8%.**
+
+`renderFCResults()` built the `#` rank, the tie groups and all four tier divider
