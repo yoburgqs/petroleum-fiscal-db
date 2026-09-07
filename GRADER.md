@@ -35122,3 +35122,125 @@ longer shows a downside column that duplicates the base column while claiming 60
 **Task:** T1 — "Which countries should even be on my screening list?" (stalest; 604 ran T2, 603 T3, 602 T5, 601 T2, 600 T4, 599 T6 — T1 last walked at 598.)
 
 **Friction.** The entry path is fine — Home's IOC-screen headline, the "open the screen →" click, the preset menu's live per-deck hit counts, the basis divider and the header sorts all held up under test. The break is
+
+---
+## Cycle 606 Log — 2026-09-07
+
+- Test before: 294 PASS / 0 FAIL (harness figure)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — suite RAN this cycle against the served build
+- JS errors: 1 (known `sw.js` 404 artefact under root-serving; absent on the deployed site)
+- Shipped as **v700**, pushed, mirrored to `projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?"
+(stalest; 605 ran T1, 604 T2, 603 T3, 602 T5, 601 T2, 600 T4 — T6 last walked at 599.)
+
+**Friction.** Walked T6 cold: load → Country Profile (Indonesia, the default) → Evidence
+Quality panel → Key Fiscal Parameters (Evidence Chain). The Profit Oil (Govt) row renders the
+loudest element in that table — a red chip reading **`⚠ DCF USES 71.2%`** — and its tooltip and
+block note say *"The Live DCF panel further up this same page runs Indonesia on 71.2% and
+carries that through to its Fiscal Breakdown."*
+
+That is false. `dcfPSC()` resolves the government profit-oil share off `params.tier_schedule`
+year by year as R moves, and only falls back to `params.profit_oil_govt_pct` when there is no
+ladder:
+
+    const contractorPct = tiers ? getContractorPct(R) : (1 - (params.profit_oil_govt_pct || 0.6));
+
+`getDCFParams()` populates `tier_schedule` from COUNTRY_DATA for **94 PSC-family countries**, so
+on those the flat share rides along on the params object and is never read. Proven by
+perturbation on the shipped build: Indonesia at 71.2% and at 10.0% both return take **64.142%** /
+NPV **$2,616.4M**, identical to 3dp; strip the ladder and the same swing moves take 66.3% → 42.2%.
+
+Measured blast radius, against the shipped `country_data.json` and `api/v1/country/*`:
+
+| surface | countries | what it said |
+|---|---|---|
+| `⚠ DCF USES x%` chip (`_modelParam`, index.html ~31500) | **30** | a flat rate the engine never reads |
+| `NOT HELD` substitute row (`_missTerms`) | **34** | "it substitutes X%" — a substitution that does not happen |
+| XLSX `Fiscal Terms & Sources` → `DCF engine (%)` | same 30 | wrote the flat rate into an engine column |
+| XLSX `Country Profile` → "second harvest disagrees" | same 30 | "the field the ORCA DCF engine used to produce the NPVs on this sheet" |
+
+Affected countries include Angola (52.3 vs a claimed 75.0, ladder 50–80), India (35.09 vs 70.0,
+ladder 40–85), Kazakhstan, Sudan, Egypt, Mozambique, Iraq-Kurdistan, Malaysia, Azerbaijan,
+Vietnam, Timor-Leste.
+
+The page also **contradicted itself**: the Profit Oil Tier Schedule's own reconciliation note,
+~600px above, already said *"The DCF resolves PSC contracts on this ladder … neither flat figure
+is an input to it"* — the correct statement of the two, and the one **not** wearing the warning
+triangle. An analyst asking exactly the T6 question got two mutually exclusive answers within one
+screen, and the wrong one was the one styled as an alert.
+
+**Change.** `_modelParam()` now detects a live `tier_schedule` for `profit_oil_govt_pct` and
+returns the ladder (`{origin:'tiers', lo, hi, n}`) instead of a phantom flat rate. Downstream:
+
+- The chip reads **`⚠ DCF USES TIERS 60–88%`**. Its tooltip states the row's figure is not an
+  input to the take, NPV or IRR — *"change it and not one figure on this profile moves"* — and
+  points at the tier table.
+- The block note now leads **"The model does not use the value this table prints for Profit Oil
+  (Govt)"**, names the tier count and range, and drops the "two different values / neither figure
+  is a source" framing, which does not describe this case.
+- Its button changed destination: **`Show the tiers the DCF used →`** (`_cpScrollToTierSchedule`,
+  new) scrolls to and flashes `#cp-tier-schedule`, rather than the Live DCF panel that ignores the
+  term. Falls back to `_cpScrollToLiveDcf` if no ladder is rendered.
+- `NOT HELD` rows read **"DCF resolves on 30–80% R-factor ladder"** (Georgia) instead of naming a
+  flat substitute; the term is no longer counted as an "invented" substitution.
+- XLSX: `DCF engine (%)` carries `60–88% R-factor ladder`, `Gap (pp)` reads `n/a — not an input`,
+  the ladder sentence now survives the no-source branch that was swallowing it, the sheet legend
+  and SUMMARY line say so, and the Country Profile sheet's warning is retitled **"neither figure
+  is what the DCF ran"**.
+
+No value, tier letter, take, NPV or evidence grade changes anywhere.
+
+**Result.** An analyst defending a profit-oil split in an IC memo is now sent to the ladder the
+engine actually resolves on — and onward to the tier table's own basis note, which says that
+ladder is a shared MODEL template rather than the signed agreement — instead of chasing a flat
+rate that is not an input to any number on the page. The two provenance surfaces on the Country
+Profile now agree with each other and with `dcfPSC()`.
+
+## Verification
+
+- **JS syntax gate: PASS** — 11 inline blocks, `vm.Script`, 0 failures (re-run after the version bump).
+- **Runtime suite RAN this cycle** against the served build: **293 PASS / 0 FAIL / 1 WARN**,
+  identical to the pre-change run on the same server — zero test delta. The WARN and the 1 JS
+  error are the known artefact: the page registers `/petroleum-fiscal-db/sw.js`, a Pages-absolute
+  path that 404s under a root-served local server. Not present on the deployed site. Same as
+  cycles 603–605.
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390, measured on a ladder country
+  (Indonesia) so the changed elements were on screen.
+- **Mobile (Step 5b), 390×844 `hasTouch: true`:** `scrollWidth === clientWidth` (390 = 390). The
+  one control added — the `Show the tiers the DCF used →` button — measures **36px** tall. The
+  `⚠ DCF USES TIERS 60–88%` chip measures 17px but is a non-interactive `<span>` (tabindex −1, no
+  handler, `cursor:help`), exactly as the 17px chip it replaced.
+- **Regression check on the untouched flat path:** Norway still renders `⚠ DCF USES 33.4%` on
+  State Participation (override basis, no ladder); Libya `PSC default 10%`, Algeria `engine
+  override 51%`, Ecuador `contract avg 50%` NOT HELD rows unchanged; Iraq (TSC) and Russia
+  (Concession) unchanged. Measured: **0** no-ladder flat profit-oil conflicts remain, i.e. all 30
+  that existed were ladder countries.
+- **XLSX re-exported and parsed in openpyxl:** 4 sheets, `Fiscal Terms & Sources` row reads
+  `Profit Oil (Govt) | 64.39 | not captured | 60–88% R-factor ladder | n/a — not an input`.
+- Version bumped v699 → v700 silently at the end: **2 live strings only** (lines 1737, 1807).
+
+## Carried forward — not fixed this cycle
+
+- **The Methodology tab's tier definitions contradict the Home tab's.** Methodology (~line 4089)
+  says *"Tier B (green) = sourced from operator annual report or government filing"*; the Home
+  evidence block (~line 1884) says tier B is the EY/KPMG/IHS country-level guides and explicitly
+  *"not an operator filing"*. The Evidence Quality panel and the Screener slider tooltip both
+  follow the Home definition, so Methodology is the outlier. Text-only, so not this cycle's
+  change, but it is the definition an analyst reads when they go looking for what the letter means.
+- Grammar in the Evidence Chain verdict lines on n=1 cases: *"None of those 1 citation can be
+  opened"*, *"The 1 independently sourced parameter matches"* (Namibia, Vanuatu). Text-only.
+- **The Home tab's Screener card still advertises a breakeven filter removed at v568** (from 605).
+- `FC_PROFILES` / `DCF_PROFILES` remain two tables with divergent key sets (from 604).
+- Methodology "Recent Platform Updates" is still an empty placeholder.
+- Everything on the cycle-603/604/605 carried lists remains open: `Take weighting` / `NPV
+  weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier on a regime
+  with no contractor position; the three monopolies carrying `be_75 = 1.0` (7th cycle); the 862
+  contracts with no fiscal terms; zero-rate defaults inside published country `take_75`;
+  `⬇ Chart PNG` exporting only `#cmp-chart`; the Screener Contractor NPV tooltip naming a profile
+  selector absent from that tab (9th cycle); the `Other` region bucket misfiling 17 jurisdictions;
+  164 of 185 jurisdictions with no sourced reform log; the Methodology tab naming a `display:none`
+  API Explorer tab; the unweighted per-mechanic pivot averages; the incomplete 2020s cohort; and
+  the duplicated `renderVintageTrendChart()` / `renderVintage()` line charts.
+- **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 16th cycle. Points at
+  the detector, not the layout.
