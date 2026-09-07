@@ -35839,3 +35839,18 @@ visible. Flagged for Zach as an open call.
   averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
 - `pixel_audit` not run this cycle (the change touches Screener only; the 20-cycle
   `tablet-768::2-t7 clipped-text` carry is on an untouched tab).
+
+---
+## Cycle 612 Log — 2026-09-07 18:11
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 612 complete — shipped as **v706**, pushed to both repos, mirror updated.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (611 ran T3; T1 was the stalest.) Walked cold twice at 1440×900.
+
+## Friction
+I first checked the preset menu itself and found it **already solved** — v651 labels every option with its live hit count. So the worst moment is one step later.
+
+Measured over the real data: `npv_50 ≤ npv_75` for **all 185 countries, zero inversions**. The shipped **T
