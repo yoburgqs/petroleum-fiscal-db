@@ -35244,3 +35244,16 @@ Profile now agree with each other and with `dcfPSC()`.
   the duplicated `renderVintageTrendChart()` / `renderVintage()` line charts.
 - **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 16th cycle. Points at
   the detector, not the layout.
+
+---
+## Cycle 606 Log — 2026-09-07 09:15
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 606 shipped as **v700**, pushed, and mirrored.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (stalest: 605 ran T1, 604 T2, 603 T3, 602 T5, 601 T2, 600 T4 — T6 last walked at 599.)
+
+## Friction
+Walking T6 cold — load → Country Profile → Key Fiscal Parameters (Evidence Chain) — the Profit Oil row on Indonesia renders the loudest thing in the table: a red chip reading **`⚠ DCF USES 71.2%`**, whose tooltip says *"The Live DCF panel further up this same page
