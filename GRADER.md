@@ -33972,3 +33972,18 @@ now all produce the same shape.
 - **164 of 185 jurisdictions hold no sourced reform log**, which dominates the T4 answer.
 - The **Methodology tab still names an API Explorer tab that is `display:none`**.
 - The **Screener FAQ's third value for the median IRR statistic** is still unreconciled.
+
+---
+## Cycle 596 Log — 2026-09-06 22:25
+- Test before: 294 PASS / 0 FAIL
+- Test after: 290 PASS / 4 FAIL
+- JS errors: 0
+- Summary: Cycle 596 complete and pushed.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."**
+
+## Friction
+Walked T5 cold, no sessionStorage or localStorage: Country Profile → pick a country → press the amber **Copy for IC Memo** (`#dd-ic-summary-btn` → `copyICSummary()`, index.html:38090) → paste into Word.
+
+What arrived was one unbroken block of prose. Read back off the clipboard through Playwright, not estimated: **3,126 characters / 518 words on Indonesia**, 3,288 / 541 on Guyan
