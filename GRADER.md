@@ -34380,3 +34380,122 @@ at all — now carry a figure.
 Walked T6 cold at 1440: Fiscal Compare → click a row → read the drawer header strip, which is where the drilldown states its basis.
 
 The drawer's breakeven branch gated on `d.be_75 > 0`. It was the **last place on the platform still using that test** — the Explorer's BE-only checkbox, the Breakeven Map, the Screen
+
+---
+## Cycle 600 Log — 2026-09-07 06:45 — v694
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest in the rotation
+(594 T4, 595 T2, 596 T5, 597 T3, 598 T1, 599 T6); T4 last walked at cycle 594.
+
+## Friction
+Walked T4 cold at 1440, no sessionStorage, no localStorage: Home → Reform Risk tab → read
+down the page the way a first-time analyst does.
+
+The per-country lookup at the top is in good shape — the picker already splits into two
+optgroups so the 21-scoreable / 164-uncovered divide is visible *before* committing to a
+selection, and the Saudi Arabia no-coverage verdict correctly refuses to score and offers a
+Country Profile escape hatch. Nothing worse than minor there.
+
+The failure is three screens down, in the **Reform Activity Heatmap** — the only element on
+this tab that is *scanned* rather than read, and therefore the one an analyst trusts without
+cross-checking.
+
+Its caption reads *"Cell color = number of fiscal law changes in that decade."* `byDecade`
+(`renderReformRisk()`, index.html:37094) counted **every sourced event**:
+
+```js
+events.forEach(e => { const yr = e.year;
+  if (yr) { const dec = Math.floor(yr/10)*10; byDecade[dec] = (byDecade[dec]||0)+1; } });
+```
+
+v583 established the rule for this whole tab — discoveries, first-oil dates, armed conflict
+and terms reviews that concluded without renegotiation carry `fiscal_change:false`, stay in
+the log, stay on screen, stay labelled, and **do not score**. Every score on the tab was
+rebuilt around it. The heatmap was missed and kept counting them as law changes.
+
+**Guyana** has zero fiscal law changes on record at any date. Its own verdict card, two
+screens above, scores it **100/100** and says so in as many words. The heatmap painted it
+**amber (1) in the 2010s and orange (2) in the 2020s** — its darkest cell in the current
+decade — off the 2015 Liza-1 discovery, 2020 first oil, and a 2022 commission review that
+changed no terms. **Ghana** the same: three coloured cells, zero fiscal law changes in any
+of them, while its own card lower on the page reads *"no fiscal law change since 2010 · all
+2 in-window events are context."* Two elements on one tab, giving opposite answers.
+
+Full extent — **9 cells across 6 of the 20 rows**, concentrated in the two most recent
+decades, which are precisely the ones read for forward risk, and in exactly the frontier
+jurisdictions an IOC is deciding whether to enter:
+
+| Country | Cell | Painted | Actual fiscal law changes |
+|---|---|---|---|
+| Guyana | 2010s / 2020s | 1 / 2 | 0 / 0 |
+| Ghana | 2000s / 2010s | 1 / 2 | 0 / 0 |
+| Libya | 2010s / 2020s | 1 / 1 | 0 / 0 |
+| Iraq | 2010s | 1 | 0 |
+| Australia | 2010s | 2 | 1 |
+| Brazil | 2000s | 1 | 0 |
+
+**Second defect in the same element.** `const decades = [1970,1980,1990,2000,2010,2020]`
+silently discarded everything older. Five real fiscal law changes were invisible: Mexico
+1938 (nationalization / PEMEX monopoly), Indonesia 1966 (first PSC — the Pertamina model),
+Algeria 1963, Libya 1955, Nigeria 1969 (PPTA). Mexico's row therefore read as though its
+entire fiscal record were two changes in the 2010s.
+
+## Change
+- **A lit cell is now fiscal law changes only.** Context events are not deleted — the v583
+  rule is that they stay on screen and stay labelled — they move to a separate `byDecadeCtx`
+  and render as a muted **`·n`** on an unlit, dashed-border cell. Hovering names what they
+  are ("a discovery, a first-oil date, conflict, or a terms review that concluded without
+  renegotiation") and states that they carry no reform-frequency premium. The `·` marker is
+  the same one the tab's direction split already uses for that bucket (`↑27 / ↓10 / ?35 / ·11`).
+- **New `<1970` column** carrying the 5 pre-1970 fiscal law changes.
+- Caption rewritten to state the counting rule, the marker, and the new column.
+
+## Result
+An analyst scanning the grid for where fiscal reform is concentrated now reads **Guyana as
+entirely unlit** — with its three sourced events still visible as `·1` / `·2` so the record
+is not hidden — instead of reading it as one of the more active reformers of the current
+decade. Ghana, Libya, Iraq, Brazil the same. Mexico, Indonesia, Algeria, Libya and Nigeria
+now show their founding fiscal legislation instead of appearing to have none. The heatmap
+and the verdict cards below it can no longer return two different answers for one country.
+
+## Verification
+- **A/B of all 20 heatmap rows** against a served copy of the pre-edit file: **exactly the 9
+  predicted cells** changed from a lit count to `·n`, **5 `<1970` cells** gained a real
+  change, and **no lit cell lost a fiscal law change**. Cell backgrounds confirmed
+  `var(--surface2)` (unlit) on every `·n`.
+- **JS syntax gate: PASS** — 11 inline `<script>` blocks extracted, `node --check`.
+- **Runtime suite RAN this cycle** against the local build: **293 PASS / 0 FAIL / 1 WARN**.
+  The WARN is the known localhost `sw.js` 404 — the service worker registers at an absolute
+  Pages path that does not exist when serving from repo root. Identical to v692's and v693's,
+  present before any edit, and untouchable by a change to the heatmap.
+- **0 page errors.**
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390, all tabs — the 7th
+  column stays inside the existing `overflow-x:auto` container.
+- **Mobile (Step 5b), 390x844 `hasTouch: true`:** `scrollWidth 390 === clientWidth 390`
+  before and after the country lookup. **0 controls under 24px** on Reform Risk.
+- Version bumped v693 → v694 silently at the end, per the directive.
+
+## Carried forward — not fixed this cycle
+- **The "Most Frequently Reformed Regimes" table still ranks on total events**, context
+  included, so Guyana ranks into the top 20 partly on a discovery and a production
+  milestone. Unlike the heatmap, that table *discloses* it ("stay in the Total Events
+  column"), so it is disclosed-but-inflated rather than wrong. Changing the sort would
+  desynchronise it from the heatmap's row set; worth one deliberate cycle, not a drive-by.
+- **`be_75 = 1.0` is still in the underlying data** for Bahrain / Kuwait / Saudi Arabia.
+  Every consumer guards it, in ~12 repeated places. The durable fix is harvest-side.
+- The **Contractor NPV header tooltip on the Screener** still says "see profile selector for
+  assumptions"; there is no profile selector on that tab. Third cycle carrying it.
+- **pixel_audit** still carries exactly one regression, `tablet-768::2-t7 clipped-text
+  33 -> 34` — **tenth cycle carrying it**, still the longest-standing unaddressed item.
+  Points at the detector, not the layout.
+- The **`Other` region bucket** is empty by construction in the Screener select (v661), but
+  the harvest-side misfiling of the 17 jurisdictions is unfixed.
+- The **CP CLOSEST FISCAL PEERS chips still sort on the blended `take_75`** rather than the
+  comparable take.
+- **164 of 185 jurisdictions hold no sourced reform log**, which still dominates the T4
+  answer. Every surface now says so explicitly rather than scoring them clean; the gap is
+  data, not UX.
+- The **Methodology tab still names an API Explorer tab that is `display:none`**.
+- The **`⬇ Chart PNG` button exports only the take chart** (`downloadCmpChart()` hard-codes
+  `#cmp-chart`); the Side-by-Side NPV chart has no export path.
