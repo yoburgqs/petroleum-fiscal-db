@@ -1827,7 +1827,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v705</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v706</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1897,7 +1897,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v705</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v706</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2726,7 +2726,7 @@ window.copyPlatformCitation = function(btn) {
            left untouched; the Advanced "measured breakeven only" data-coverage filter stays, since
            it is honestly labelled as a coverage filter and not as a price test. -->
       <div class="slider-group">
-        <label title="Filter by minimum contractor NPV at the price deck currently selected (the &quot;@$&quot; tag names it). runScreener() has always tested this floor against npv_50/75/100/125 following the price selector, so the slider&#39;s travel is re-scaled to that deck&#39;s own distribution rather than to a fixed $50-era range. 0 = NPV-positive only. Negative = allow negative-NPV (loss-making). All values in $M.">Min Contractor NPV: $<span class="val" id="sv-npv">-500</span>M <span style="font-size:10px;color:var(--muted);">@$<span id="sv-npv-deck">75</span></span><span class="sc-nolimit" id="sn-npv"> · no floor</span><span class="sc-axis-n" id="sc-npv-n"></span></label>
+        <label title="Filter by minimum contractor NPV at the price deck currently selected (the &quot;@$&quot; tag names it). runScreener() has always tested this floor against npv_50/75/100/125 following the price selector, so the slider&#39;s travel is re-scaled to that deck&#39;s own distribution rather than to a fixed $50-era range. 0 = NPV-positive only. Negative = allow negative-NPV (loss-making). All values in $M.">Min Contractor NPV: $<span class="val" id="sv-npv">-500</span>M <span style="font-size:10px;color:var(--muted);">@$<span id="sv-npv-deck">75</span></span><span class="sc-nolimit" id="sn-npv"> · no floor</span><span class="sc-axis-n" id="sc-npv-n"></span><span class="sc-nolimit" id="sn-npv-inert" style="display:none;color:var(--accent);font-weight:600;"></span></label>
         <input type="range" id="sl-npv" min="-500" max="4500" value="-500" aria-label="Minimum contractor NPV in millions of dollars at the selected price deck. Upper bound re-scales with the deck. Starts at -500 — no floor applied, loss-making regimes are shown.">
       </div>
       <div class="slider-group">
@@ -2741,7 +2741,7 @@ window.copyPlatformCitation = function(btn) {
              downside leg of contractor NPV: 185/185 coverage, so a missing value cannot be confused
              with a passing one, and real dynamic range (median $1,361M; a $1,000M floor cuts
              185 -> 110). NPV>0 discounted at 10% WACC IS the hurdle test; the $50 leg is the stress. -->
-        <label title="Filter by minimum contractor NPV at the $50/bbl downside price, on the same standardized Deepwater profile as the $75 column. This is the price-break survival test: a regime that is NPV-positive at $75 but negative at $50 does not survive a downturn. Modelled for all 185 countries &mdash; unlike breakeven or IRR there is no missing-data gap, so every row in the result set was actually tested against this floor. At &minus;$500M no floor is applied. All values in $M." style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">Min NPV @$50: $<span class="val" id="sv-npv50">-500</span>M <span style="font-size:10px;color:var(--muted);">downside</span><span class="sc-nolimit" id="sn-npv50"> &middot; no floor</span><span class="sc-axis-n" id="sc-npv50-n"></span> <button onclick="(function(){var s=document.getElementById('sl-npv50');s.value=0;document.getElementById('sv-npv50').textContent='0';s.dispatchEvent(new Event('input'));s.dispatchEvent(new Event('change'));})()" style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);border-radius:4px;color:var(--accent);cursor:pointer;font-size:10px;font-weight:700;padding:2px 7px;line-height:1.4;white-space:nowrap;" title="Set the downside floor to $0M &mdash; keep only regimes still value-creating if oil falls to $50/bbl" aria-label="Set minimum contractor NPV at 50 dollars per barrel to zero">Set $0 &#10229; survives $50/bbl</button></label>
+        <label title="Filter by minimum contractor NPV at the $50/bbl downside price, on the same standardized Deepwater profile as the $75 column. This is the price-break survival test: a regime that is NPV-positive at $75 but negative at $50 does not survive a downturn. Modelled for all 185 countries &mdash; unlike breakeven or IRR there is no missing-data gap, so every row in the result set was actually tested against this floor. At &minus;$500M no floor is applied. All values in $M." style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">Min NPV @$50: $<span class="val" id="sv-npv50">-500</span>M <span style="font-size:10px;color:var(--muted);">downside</span><span class="sc-nolimit" id="sn-npv50"> &middot; no floor</span><span class="sc-axis-n" id="sc-npv50-n"></span><span class="sc-nolimit" id="sn-npv50-inert" style="display:none;color:var(--accent);font-weight:600;"></span> <button onclick="(function(){var s=document.getElementById('sl-npv50');s.value=0;document.getElementById('sv-npv50').textContent='0';s.dispatchEvent(new Event('input'));s.dispatchEvent(new Event('change'));})()" style="background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.35);border-radius:4px;color:var(--accent);cursor:pointer;font-size:10px;font-weight:700;padding:2px 7px;line-height:1.4;white-space:nowrap;" title="Set the downside floor to $0M &mdash; keep only regimes still value-creating if oil falls to $50/bbl" aria-label="Set minimum contractor NPV at 50 dollars per barrel to zero">Set $0 &#10229; survives $50/bbl</button></label>
         <input type="range" id="sl-npv50" min="-500" max="2000" value="-500" aria-label="Minimum contractor NPV in millions of dollars at the 50 dollar per barrel downside price (-500 to 2000). Starts at -500 - no floor applied.">
       </div>
       <div class="slider-group">
@@ -29141,7 +29141,10 @@ function runScreener() {
   // so the SAME code path can be evaluated twice: once on the active basis and once on the other.
   // The count line then reports the exact difference between the two rather than an estimate, and
   // cannot drift from the filter the way a parallel re-implementation of it would.
-  const _scPass = (d, useCmp) => {
+  // v706 (T1): third argument names ONE leg to skip, so the marginal effect of that leg can be
+  // measured by re-running this exact predicate rather than by a parallel re-implementation of
+  // it. Used below to detect a floor that is set but cannot remove anything.
+  const _scPass = (d, useCmp, ignoreLeg) => {
     const take = d[takeKey];
     const npv  = d[npvKey];
 
@@ -29167,13 +29170,13 @@ function runScreener() {
     // analyst would use ($34-$120 = 87 inert positions), and below $27 it failed every country that
     // HAD a breakeven while keeping all 120 that did not. Downside screening now runs on Min NPV @$50.
 
-    if (npv !== null && npv !== undefined && npv < minNPV) return false;
+    if (ignoreLeg !== 'npv75' && npv !== null && npv !== undefined && npv < minNPV) return false;
 
     // v517 — the $50/bbl downside leg replaces the IRR criterion. npv_50 is modelled for 185/185
     // countries, so unlike IRR (165 non-null, 124 displayable) and breakeven (68) there is no
     // untested/passing ambiguity to disclose: if the floor is above its neutral position, every row
     // still in the list was measured against it.
-    if (minNPV50 > -500) {
+    if (ignoreLeg !== 'npv50' && minNPV50 > -500) {
       const npv50 = d.npv_50;
       if (npv50 === null || npv50 === undefined) return false;
       if (npv50 < minNPV50) return false;
@@ -29258,6 +29261,43 @@ function runScreener() {
     return true;
   };
   let data = COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn));
+  // ── v706 (T1) — does each NPV floor actually remove anything? ───────────────────────────────
+  // npv_50 <= npv_75 for all 185 rows in the database (0 inversions), so a downside floor set at
+  // or above the deck floor SUBSUMES it and the deck leg cannot reject a single row. The shipped
+  // Two-Price Return Screen preset is exactly that shape -- NPV >=$100M @$75 AND >=$500M @$50 --
+  // so it advertised a two-sided price test, and the exported IC memo listed both legs under
+  // "these criteria produced this row set", while only the $50 leg could ever bind.
+  //
+  // Rather than assert the arithmetic, each leg is MEASURED against the same predicate with that
+  // one leg switched off. A leg whose removal count is 0 is inert, whatever the reason, and both
+  // the slider and the exported criteria say so.
+  const _npv75Removes = (minNPV > -500)
+    ? COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn, 'npv75')).length - data.length : null;
+  const _npv50Removes = (minNPV50 > -500)
+    ? COUNTRY_DATA.filter(d => _scPass(d, feeCmpOn, 'npv50')).length - data.length : null;
+  // A zero-row result makes every leg's removal count 0 by arithmetic rather than by inertness,
+  // so the claim is only made while there is a row set to make it about.
+  const _npv75Inert = (_npv75Removes === 0) && data.length > 0;
+  const _npv50Inert = (_npv50Removes === 0) && data.length > 0;
+  // Why the deck leg is inert, when the downside leg is what makes it so. Stated separately
+  // because "removed 0" alone reads as "everything passed", which is the opposite of the point.
+  const _npv75Subsumed = _npv75Inert && (minNPV50 > -500) && (minNPV50 >= minNPV);
+  (function(){
+    const f = document.getElementById('sn-npv-inert');
+    if (!f) return;
+    if (_npv75Inert) {
+      f.textContent = _npv75Subsumed
+        ? ' \u00b7 not binding \u2014 the $50 floor is ' + (minNPV50 > minNPV ? 'higher' : 'the same') + ' and removes these already'
+        : ' \u00b7 not binding \u2014 removes nothing here';
+      f.style.display = 'inline';
+    } else f.style.display = 'none';
+  })();
+  (function(){
+    const f = document.getElementById('sn-npv50-inert');
+    if (!f) return;
+    if (_npv50Inert) { f.textContent = ' \u00b7 not binding \u2014 removes nothing here'; f.style.display = 'inline'; }
+    else f.style.display = 'none';
+  })();
   // The same filter on the OTHER basis. Only computed when a ceiling is live — with no ceiling
   // the two bases are identical by construction and the second pass would be pure waste.
   const _dataAlt = takeCeilingActive ? COUNTRY_DATA.filter(d => _scPass(d, !feeCmpOn)) : null;
@@ -29469,6 +29509,11 @@ function runScreener() {
   // equivalent statement here is unambiguous, and the data-basis filter states its own size.
   const _npv50Note = (minNPV50 <= -500) ? ''
     : ` <span style="color:var(--accent);font-weight:600;">\u2014 all ${data.length} tested at the $50/bbl downside and clearing $${minNPV50}M (npv_50 modelled for 185/185 \u2014 no untested rows)</span>`;
+  // v706 (T1) \u2014 the count line named the $50 leg but never said whether the DECK leg beside it
+  // did any work. On the shipped Two-Price Return Screen it did none, and the analyst read a
+  // two-price screen off a one-price result. An inert leg is now named on screen, not just in the export.
+  const _npvLegNote = !_npv75Inert ? ''
+    : ` <span style="color:var(--accent);font-weight:600;" title="Contractor NPV at $50/bbl is less than or equal to contractor NPV at the deck price for all 185 countries, so a downside floor set at or above the deck floor removes every row the deck floor would have removed, and more.">\u2014 the $${minNPV}M floor at ${priceLabel} removed 0 rows${_npv75Subsumed ? ` and cannot remove any: the $${minNPV50}M downside floor is ${minNPV50 > minNPV ? 'higher' : 'the same'}, so this screen is decided at $50/bbl alone` : ''}</span>`;
   // v699 (T1) \u2014 the Downside Resilience preset's defining criterion was the one screen criterion
   // the count line never stated, and it is the one whose denominator moves with the price deck.
   const _retRef = _scRetRefDeck();
@@ -29569,7 +29614,7 @@ function runScreener() {
   const _universeLead = (activeCount === 0 && !_activePresetName)
     ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${sortNote}${_basisNote}`
     : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}`;
-  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${_takeBasisNote}${_npv50Note}${_retNote}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
+  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${_takeBasisNote}${_npv50Note}${_npvLegNote}${_retNote}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
   // Friction this removes: an exported shortlist is the thing that reaches the investment
   // committee, and it left the tool carrying nothing but rows. Every sentence that makes the
@@ -29595,8 +29640,17 @@ function runScreener() {
       + ' countries hold no sourced reform log and are excluded by this criterion rather than scored as unreformed');
     if (maxTake < 100) crit.push('Max government take: ≤' + maxTake + '% at $' + price + '/bbl, tested on the '
       + (feeCmpOn ? 'comparable take (fee-basis contracts excluded from the blend)' : 'published blended headline'));
-    if (minNPV50 > -500) crit.push('Min contractor NPV at the $50/bbl downside: ≥$' + minNPV50 + 'M');
-    if (minNPV > -500) crit.push('Min contractor NPV at $' + price + '/bbl: ≥$' + minNPV + 'M');
+    // v706 (T1): a criterion listed under "these criteria produced this row set" must have
+    // actually produced it. Each NPV leg reports how many rows it removed on its own, and a leg
+    // that removed none says so in the memo instead of implying a test it did not apply.
+    if (minNPV50 > -500) crit.push('Min contractor NPV at the $50/bbl downside: ≥$' + minNPV50 + 'M'
+      + (_npv50Inert ? ' — NOT BINDING: removed 0 of the ' + data.length + ' rows; every row passing the other criteria already cleared it' : ' — removed ' + _npv50Removes + (_npv50Removes === 1 ? ' country' : ' countries')));
+    if (minNPV > -500) crit.push('Min contractor NPV at $' + price + '/bbl: ≥$' + minNPV + 'M'
+      + (_npv75Inert
+          ? ' — NOT BINDING: removed 0 rows.' + (_npv75Subsumed
+              ? ' The $50/bbl floor of $' + minNPV50 + 'M is ' + (minNPV50 > minNPV ? 'higher' : 'the same') + ', and contractor NPV at $50 is ≤ NPV at $' + price + ' for every country in the database, so this leg cannot reject anything the $50 leg has not already rejected. This shortlist was decided by the $50/bbl floor alone — do not present it as a two-sided price test.'
+              : ' Every row passing the other criteria already cleared it.')
+          : ' — removed ' + _npv75Removes + (_npv75Removes === 1 ? ' country' : ' countries')));
     // v568: the 'Max breakeven' criterion is no longer offered, so it is no longer claimed here.
     // v623: neither is the coverage radio. No breakeven criterion is claimed because none exists.
     if (!includeProxy) crit.push('Verified field production only — '
