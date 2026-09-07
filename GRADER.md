@@ -34636,3 +34636,19 @@ regimes.
 - The **CP CLOSEST FISCAL PEERS chips still sort on the blended `take_75`**.
 - **164 of 185 jurisdictions hold no sourced reform log.** Data gap, not UX.
 - The **Methodology tab still names an API Explorer tab that is `display:none`**.
+
+---
+## Cycle 601 Log — 2026-09-07 03:17
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 601 complete and pushed (v695).
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** — stalest in the rotation (T2 last at cycle 595; 596–600 ran T5/T3/T1/T6/T4).
+
+## Friction
+Walked T2 cold at 1440. The Country Profile headline carries a regime split card — the element built specifically to stop an analyst citing the country blend when their asset sits in one regime. On **Brazil** it read:
+
+| Concession | 845 (71%) | **8.2%** | **$5.0B** |
+|---|---|---|---
