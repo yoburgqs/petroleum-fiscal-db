@@ -34887,3 +34887,18 @@ predictable regime.
   `renderVintage()` line charts.
 - **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 13th cycle. Points at the
   detector, not the layout.
+
+---
+## Cycle 603 Log — 2026-09-07 05:17
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed (`9dd5e00..7a7511e`).
+
+## Cycle 603 — v697
+
+**Task:** T3 — "How do these three countries compare side by side?" (stalest; last walked at 597)
+
+**Friction.** I walked Side-by-Side from a cold load with analyst-chosen sets rather than the seeded example. On **Iraq / Kuwait / UAE**, Kuwait broke it.
+
+Kuwait — like Bahrain and Saudi Arabia — stores a placeholder government take of `100.0` at every price. That placeholder means *the state holds the acreage and there is n
