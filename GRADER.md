@@ -35109,3 +35109,16 @@ longer shows a downside column that duplicates the base column while claiming 60
   duplicated `renderVintageTrendChart()` / `renderVintage()` line charts.
 - **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 15th cycle. Points at
   the detector, not the layout.
+
+---
+## Cycle 605 Log — 2026-09-07 08:21
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 605 shipped as v699, pushed, and mirrored to `projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+## Cycle summary
+
+**Task:** T1 — "Which countries should even be on my screening list?" (stalest; 604 ran T2, 603 T3, 602 T5, 601 T2, 600 T4, 599 T6 — T1 last walked at 598.)
+
+**Friction.** The entry path is fine — Home's IOC-screen headline, the "open the screen →" click, the preset menu's live per-deck hit counts, the basis divider and the header sorts all held up under test. The break is
