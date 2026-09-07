@@ -35595,3 +35595,137 @@ those three as unranked.
 **T6 — "Where did this number come from and how solid is the evidence?"**
 
 T1 and T3 were staler by cycle number, so I walked both cold first. The Screener's 12 presets all fire and their counts match their labels; the "Other region misfiling 17 jurisdictions" item that had been on the carried list since cycle 344 turns out to be genuinely closed by v629/v645, and I've removed it. Side-by-Side already withdraws every f
+
+---
+## Cycle 611 Log — 2026-09-07 16:45
+- Test before: 294 PASS / 0 FAIL (Pages baseline) · 293 PASS / 0 FAIL / 1 WARN / 1 JS err (local control)
+- Test after: 293 PASS / 0 FAIL / 1 WARN / 1 JS error — suite RUN this cycle, local server
+- JS errors: 0 page errors on the walked flow; the 1 captured console error is a 404 on the
+  service-worker script fetch, reproduced identically on `HEAD:index.html`
+- Shipped as **v705**. Pushed to petroleum-fiscal-db; office mirror updated.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (610 ran T6, 609 T2, 608 T5,
+607 T4, 606 T6, 605 T1, 603 T3 — T3 was the stalest.)
+
+Walked it cold twice: once on the tab's seeded default set, and once as the analyst who arrives
+with their OWN three countries (Clear → type Indonesia / Angola / Iraq). Along the way, confirmed
+working and NOT changed: all four `Order columns` modes reorder the grid correctly; the search
+dropdown disambiguates Iraq from Iraq-Kurdistan; `Clear` restores the four quickstart presets
+(v509) and tears down both charts and the notice (v620); `Share Link` round-trips
+`#/compare/norway+united_kingdom+netherlands`; `▦ Rank all 185 countries` lands on Fiscal Compare.
+
+## Friction
+**Side-by-Side, ECONOMICS block — the last numeric block on the grid with no data-basis gate.**
+
+Cold load, seeded default Norway / United Kingdom / Netherlands. Every row above the ECONOMICS
+block has been taught that a column ORCA holds no verified field production for is not on the
+same basis as one it does:
+
+| row | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| Data basis | PROD-WTD | PROD-WTD | **PROXY** |
+| Rank among producers | #17 of 21 | #9 of 21 | **not ranked · no production data** |
+| Govt Take ($75/bbl) | 68.0% *highest of 2* | 49.2% *lowest of 2* | 23.4% **not ranked · statutory terms** |
+
+v626 built that gate for the four take rows, v684 pushed it into the take line chart, and the NPV
+bar chart already draws the excluded column hollow under the printed line *"a taller bar there
+reports the basis, not a better project."* Then `_cmpNpvCell` (index.html:26233) rendered the four
+Contractor NPV rows — the rows an IC memo quotes for **value**, sitting directly above
+`Copy for IC Memo` — as:
+
+    Contractor NPV @$75      $826M          $1.2B          $3.6B
+
+in plain, full-strength, unmarked black. The proxy column, refused a placement on every take row
+three inches above and drawn hollow in the chart below, wins the value block by **4.4×** with
+nothing on the number at all.
+
+Worse, the single flag that *was* in the block pointed the wrong way. The `NPV weighting` row
+(index.html:26792) fires on `differs`, which is true only for a production-weighted column — so
+Norway and the UK carried a loud orange **"(≠ take basis)"** and the Netherlands, 278 facts at 0%
+production coverage, was the one cell in the entire ECONOMICS block rendered clean, under a
+tooltip closing *"Both blocks use the same basis for this country."* True, and it reads as
+reassurance; what it omitted is that the shared basis is statutory terms, not barrels. The
+strongest visual warning in the block sat on the two strongest columns and nothing sat on the
+weakest.
+
+Measured over the shipped `country_data.json` (21 producers, 161 non-producers, monopolies
+excluded):
+
+- median contractor NPV @$75 — **$3,231M** for the non-producers against **$1,341M** for the
+  producers, a 2.4× gap that is an artefact of running the standardized deepwater profile over
+  statutory terms instead of weighting verified barrels;
+- of the **3,381** mixed producer/non-producer column pairs, the non-producer shows the **larger**
+  contractor NPV in **2,532 (74.9%)**, and larger at all four published prices in **2,311 (68.4%)**;
+- **all 20** of the highest contractor NPVs in the database are non-producer columns — Vanuatu,
+  Bahamas, Montenegro, Greenland, Faroe Islands, Moldova, Romania, Sweden…
+
+That is the same signature v562 deleted the Breakeven row for (*"a low-price endorsement of
+Vanuatu and the Bahamas"*) and v555 deleted the derived Govt NPV row for. This row cannot be
+deleted — it **is** the economics — so it is gated instead, on the same rule and in the same words
+the take rows use.
+
+## Change
+- New **`_cmpNpvBasisFlag(d, v)`**, reusing the SAME `_cmpBasisGate` flag and the same
+  `getProducerContext().inSet` membership v626 built, so the take block and the economics block
+  cannot disagree again by construction. No new threshold is invented.
+- On a set that **mixes** the two bases, a non-producer column's four Contractor NPV figures render
+  **muted** and each carries a **`not comparable · statutory terms`** sub-line, with the measured
+  2.4× / 74.9% / top-20 figures in the tooltip and a pointer to the faded dashed bar in the chart
+  below.
+- **`NPV weighting` un-inverted.** That column now flags **`(statutory basis)`** in the same orange
+  as its neighbours, and its tooltip states that the shared basis is statutory terms rather than
+  barrels — instead of closing on the bare reassurance.
+- Figures are **kept**. They are the platform's published numbers and 185/185 covered. Nothing is
+  removed from the grid.
+- Rides the shared `rows` array, so `#cmp-data-table`, `Export PDF` and both Copy-for-IC-Memo
+  flavours carry the markings — verified in the clipboard text.
+
+## Result
+An analyst reading down the Netherlands column no longer meets a clean, full-strength $3.6B under
+four gated take rows and a "not ranked" rank row. The value block now says about that column
+exactly what the take rows, the rank row, both charts and the warning box already say — and the
+pasted IC table says it too, which is where the number actually gets used.
+
+## Verification
+- JS syntax gate: **PASS** (all 11 inline script blocks).
+- Runtime suite **RUN this cycle**: 293 PASS / 0 FAIL / 1 WARN / 1 JS error. Control:
+  `HEAD:index.html` served from an equivalent local tree returns **identical** 293 / 0 / 1 / 1.
+- Horizontal scroll **0** at 1920 / 1440 / 1280 / 1024 / 768 / 390 across every visible tab.
+- **Step 5b, 390×844 `hasTouch: true`:** `scrollWidth === clientWidth`; **0** controls under 24px
+  on Side-by-Side under `pointer: coarse`. The added elements are 10px block sub-lines inside
+  existing cells — no new control.
+- `pixel_audit`: one regression, `tablet-768::2-t7 clipped-text 33 -> 34`, reproduced identically
+  against the **live v704 build**, so pre-existing. **20th cycle** carrying it, and it is on a tab
+  this change does not touch. It points at the detector.
+- **Scope controls, both run:** all-producer set (Norway / United Kingdom) and all-frontier set
+  (Netherlands / Belgium) render **exactly as they shipped** — the gate fires only on a mixed set.
+  Edge set Iraq / Kuwait / Australia / Belgium: Kuwait's monopoly cells keep their `—` with no
+  flag, Australia (PART-PROD) is treated as a producer and is ungated, Iraq keeps its v666
+  `PSC/Conc $3.0B` sub-line, Belgium is gated. Zero page errors on every set.
+
+## Carried forward — not fixed this cycle
+- `⬇ Chart PNG` / `downloadCmpChart()` (index.html:38637) hard-codes `#cmp-chart`. Two charts are
+  on screen; an analyst who has scrolled to **Contractor NPV vs Oil Price** and clicks the button
+  in the action row beneath it silently receives the *take* line chart as
+  `petroleum_comparison.png`. The NPV chart has no PNG button of its own. Confirmed again this
+  cycle; natural next T5.
+- The `cp-run-fc-btn` handler writes to `document.getElementById('price')`, which does not exist;
+  it reads `cp-price-select` (also absent) and falls back to `fc-price`, so "▶ Run FC at this
+  price" runs Fiscal Compare at FC's own price.
+- The Country Profile contradicts itself on whether NPV carries information — the headline says
+  contractor NPV restates the take (r²=0.89, −$61M/pp), the Similar Fiscal Profile table tells the
+  analyst to rank contractor value on the same column.
+- `renderTornadoPanel` / `_buildTornadoChart` call `getDCFParams()` on the generic-template path
+  and render a sensitivity chart with no basis marking at all (found cycle 610).
+- Everything on the cycle-603 through 610 carried lists remains open: the Methodology/Home tier
+  definition conflict; the Methodology FAQ naming a "Stability Score filter at ≥4" that does not
+  exist; Evidence Chain grammar on n=1 cases; the Home Screener card advertising a breakeven
+  filter removed at v568; `FC_PROFILES` / `DCF_PROFILES` divergence; the empty "Recent Platform
+  Updates" placeholder; `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's
+  evidence tier; the three monopolies carrying `be_75 = 1.0` (11th cycle); the 862 contracts with
+  no fiscal terms; zero-rate defaults inside published `take_75`; the Screener Contractor NPV
+  tooltip naming an absent profile selector (13th cycle); 164 of 185 jurisdictions with no sourced
+  reform log; the Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic
+  pivot averages; the incomplete 2020s cohort; and the duplicated `renderVintageTrendChart()` /
+  `renderVintage()` line charts.
