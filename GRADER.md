@@ -35742,3 +35742,100 @@ pasted IC table says it too, which is where the number actually gets used.
 
 ## Friction
 Side-by-Side's **ECONOMICS block was the last numeric block on the grid with no data-basis gate.
+
+## Cycle 612 Log — 2026-09-07 — v706
+
+**Task: T1 — "Which countries should even be on my screening list?"**
+(611 ran T3, 610 T6, 609 T2, 608 T5, 607 T4, 605 T1 — T1 was the stalest.)
+Walked cold twice at 1440x900: once on the cold-load 185-country universe, once as the analyst
+who opens the preset menu and picks the screen that sounds most like an IC return hurdle.
+
+**Friction.**
+The preset menu itself is fine — v651 already labels every option with its live hit count and
+marks a wide sweep "(barely narrows)", so the *choose a screen* moment was checked and found
+already solved. Verified on screen rather than assumed:
+
+    IOC Capital Screen        -> 15 of 185      Two-Price Return Screen -> 153 of 185 (barely narrows)
+    Stable Fiscal Record      -> 11 of 185      Atlantic Frontier       -> 6 of 185
+
+The worst moment is one step later. Measured over `COUNTRY_DATA`: `npv_50 <= npv_75` for **all
+185 rows, 0 inversions**. The shipped **Two-Price Return Screen** preset
+(`applyScreenerPreset`, index.html:28448) sets `sl-npv = 100` and `sl-npv50 = 500` — so the $50
+floor is *higher* than the deck floor and **subsumes it**. The $75 leg is arithmetically
+incapable of rejecting a single row. The screen is decided at $50/bbl alone.
+
+Both thresholds also sit in the bottom quartile of their own distributions — median `npv_75` is
+$3,110M against a $100M floor, median `npv_50` is $1,361M against a $500M floor — which is why
+the "two-hurdle" screen returns 153 of 185.
+
+That claim then escaped the page. `Copy for IC Memo` emitted:
+
+    SCREEN APPLIED — these criteria produced this row set:
+      2. Min contractor NPV at the $50/bbl downside: >=$500M
+      3. Min contractor NPV at $75/bbl: >=$100M          <-- removed nothing, and cannot
+
+Criterion 3 did not produce that row set. An analyst pasting it into an IC memo asserts a
+two-sided price test that was never applied. The same dead leg is in the **IOC Capital Screen**,
+where both floors are $0 — also confirmed on screen, not inferred.
+
+**Change.**
+`_scPass(d, useCmp, ignoreLeg)` takes a third argument naming ONE leg to skip, so each NPV
+floor's marginal effect is **measured by re-running the same predicate** with that leg switched
+off — no parallel re-implementation to drift. A floor that removed 0 rows is now named in three
+places:
+
+  - an amber **"· not binding — the $50 floor is higher and removes these already"** flag beside
+    the Min Contractor NPV slider (`#sn-npv-inert`, and `#sn-npv50-inert` for the reverse case);
+  - a count-line clause: *"the $100M floor at $75/bbl removed 0 rows and cannot remove any: the
+    $500M downside floor is higher, so this screen is decided at $50/bbl alone"*;
+  - an exported criteria line: *"NOT BINDING: removed 0 rows. … This shortlist was decided by the
+    $50/bbl floor alone — do not present it as a two-sided price test."*
+
+Legs that DO bind now report their real removal count ("— removed 29 countries"). Wording
+distinguishes *higher* from *the same*, since the IOC Capital Screen's two floors are equal.
+
+**Result.**
+The analyst can see which of the criteria on screen are actually doing work before building a
+shortlist on them, and an exported shortlist can no longer carry a screening claim into an
+investment committee that the screen did not perform.
+
+**Deliberately NOT done:** the thresholds were left alone. Re-picking $100M/$500M would be
+inventing business logic; the platform now *reports* that they do not bind and leaves the choice
+visible. Flagged for Zach as an open call.
+
+**Verification (all run this cycle, none assumed).**
+- JS syntax gate: **PASS**, 11/11 inline script blocks.
+- Runtime suite **RUN**: **293 PASS / 0 FAIL / 1 WARN / 1 JS error**. Control: unmodified
+  `HEAD:index.html` served from the identical tree returns **exactly 293 / 0 / 1 / 1**, so the
+  WARN (an `sw.js` 404 under local serving) is pre-existing and unchanged by this cycle. Note the
+  deployed-URL number is 294; the 1-test delta is the local-serving artifact, not a regression.
+- Horizontal scroll **0** at 1920 / 1440 / 1280 / 1024 / 768 / 390 across all 8 tabs.
+- **Step 5b, 390x844 `hasTouch: true`:** `scrollWidth === clientWidth` (390 === 390) with the
+  preset loaded and the new flag rendered inside the viewport. No new control — the flags are
+  text spans inside existing labels.
+- **0 page errors** on every run.
+- Controls, both run: a $3,000M deck floor set alone is correctly NOT flagged (it removes 90);
+  a zero-row screen (Africa · take <=1% · NPV >=$4500M) correctly makes **no** inertness claim,
+  because every leg removes 0 by arithmetic when there is nothing to remove.
+
+## Carried forward — not fixed this cycle
+- The Two-Price Return Screen's thresholds still sit in the bottom quartile and it still returns
+  153 of 185. Now disclosed rather than silent. **Zach's call.**
+- `⬇ Chart PNG` / `downloadCmpChart()` (index.html:38637) hard-codes `#cmp-chart`; an analyst
+  scrolled to **Contractor NPV vs Oil Price** silently receives the *take* chart. Natural next T5.
+- `cp-run-fc-btn` writes to `#price`, which does not exist; falls back to `fc-price`.
+- Country Profile contradicts itself on whether contractor NPV carries information beyond take.
+- `renderTornadoPanel` / `_buildTornadoChart` render a sensitivity chart with no basis marking on
+  the generic-template path.
+- Everything on the cycle-603 through 611 carried lists remains open: Methodology/Home tier
+  definition conflict; the FAQ naming a "Stability Score filter at >=4" that does not exist;
+  Evidence Chain grammar on n=1; the Home Screener card advertising a breakeven filter removed at
+  v568; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+  `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier; three
+  monopolies carrying `be_75 = 1.0` (12th cycle); 862 contracts with no fiscal terms; zero-rate
+  defaults inside published `take_75`; the Screener Contractor NPV tooltip naming an absent
+  profile selector (14th cycle); 164 of 185 jurisdictions with no sourced reform log; the
+  Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic pivot
+  averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
+- `pixel_audit` not run this cycle (the change touches Screener only; the 20-cycle
+  `tablet-768::2-t7 clipped-text` carry is on an untouched tab).
