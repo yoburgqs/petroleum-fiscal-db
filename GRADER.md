@@ -33837,3 +33837,18 @@ no interactive control, so nothing new is under 24px at `pointer: coarse`.
   obvious next T5 cycle); the 164 uncovered jurisdictions that dominate the T4 answer; the
   Screener FAQ's third value for the median IRR statistic; and the Methodology tab naming
   an API Explorer tab that is `display:none`.
+
+---
+## Cycle 595 Log — 2026-09-06 21:07
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and live.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+
+## Friction
+Walked Country Profile cold (no sessionStorage/localStorage) on Indonesia, Angola, the UK, Iraq, Australia, Ghana and Norway.
+
+The headline strip does this well. Six inches below it, the **Regional Peer Comparison** section prints a *second* verdict in plain words — *"Indonesia is **high take** vs Asia average. Take rank **#21 of 26** in region."* — and that sentence was co
