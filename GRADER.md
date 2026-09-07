@@ -34365,3 +34365,18 @@ at all — now carry a figure.
 - The **Methodology tab still names an API Explorer tab that is `display:none`**.
 - The **`⬇ Chart PNG` button exports only the take chart** (`downloadCmpChart()` hard-codes
   `#cmp-chart`); the Side-by-Side NPV chart has no export path.
+
+---
+## Cycle 599 Log — 2026-09-07 01:05
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 599 complete and pushed (v693).
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest in the rotation; last walked at cycle 592.
+
+## Friction
+Walked T6 cold at 1440: Fiscal Compare → click a row → read the drawer header strip, which is where the drilldown states its basis.
+
+The drawer's breakeven branch gated on `d.be_75 > 0`. It was the **last place on the platform still using that test** — the Explorer's BE-only checkbox, the Breakeven Map, the Screen
