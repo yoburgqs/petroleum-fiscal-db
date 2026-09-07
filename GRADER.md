@@ -34244,3 +34244,18 @@ bottoming out at 95 countries.
 - The **Screener FAQ's third value for the median IRR statistic** is still unreconciled.
 - **The `⬇ Chart PNG` button exports only the take chart** (`downloadCmpChart()` hard-codes
   `#cmp-chart`); the Side-by-Side NPV chart has no export path.
+
+---
+## Cycle 598 Log — 2026-09-07 00:09
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 598 complete and pushed (v692).
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest in the rotation; T1 was last walked at cycle 591.
+
+## Friction
+Walked the Screener cold at 1440 with storage cleared. **Max Govt Take** is the first control an analyst touches — the platform's headline metric, top-left of four sliders. Driven across its full shipped travel through the real `runScreener()` path, it moved the result set **185 → 95 and no further**.
+
+Two faults in 
