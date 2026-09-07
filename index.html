@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v696</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v697</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v696</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v697</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -26506,6 +26506,16 @@ function renderCompare() {
     {label:'Govt Take ($100/bbl)',  key:(d)=>_cmpTakeCell(d,100)},
     {label:'Govt Take ($125/bbl)',  key:(d)=>_cmpTakeCell(d,125)},
     {label:'Take spread across contracts <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Interquartile range (p25–p75) of government take across this country&rsquo;s own contracts at $75/bbl. This is a MEASURED dispersion across the contract set — ORCA runs no Monte Carlo on government take, so there is no P10/P90 to quote and none is shown. Narrow (&lt;5pp) = consistent terms across blocks. Wide (10pp+) = material contract-level variation, common in mixed-mechanic countries and R-factor tier regimes. &lsquo;single term&rsquo; means every contract prices identically — a statutory one-term regime, not a low-risk finding. Read it beside Fiscal facts held: a narrow spread over a thin fact base is a thin sample, not a tight regime. The spread is UNWEIGHTED across contracts while the Govt Take rows above are production-weighted where coverage permits, so the band can sit slightly off the headline figure &mdash; Nigeria&rsquo;s headline take is 81.1% against an 83.1&ndash;83.5% band, because its weighted barrels sit in its lower-take contracts. Neither number is wrong; they answer different questions. Use the headline for the country figure and the spread for how much block selection matters.">ⓘ</span>',         id:'spread', key:(d)=>{ const p25=d.p25_take,p75=d.p75_take;
+      // v697 (T3): same placeholder leak as the Price Swing row below. A state monopoly stores
+      // p25 = p75 = 100.0, so the degenerate-IQR branch below resolved to "single term" -- an
+      // affirmative finding about a contract set, on a column whose take ORCA has withdrawn.
+      if (isStateMonopoly(d.take_75)) return '<span style="color:var(--muted);cursor:help;" title="'
+        + _cmpEsc(d.country + ': no take spread is reported. Its p25 and p75 are both the '
+          + 'state-monopoly placeholder ('
+          + (d.take_75 != null ? d.take_75.toFixed(1) + '%' : '\u2265 99.5%')
+          + '), so they are identical for the same reason the headline take is withheld -- not '
+          + 'because the contracts were measured and agreed. "single term" here would describe a '
+          + 'distribution ORCA does not hold.') + '">\u2014</span>';
       if(p25==null||d.p75_take==null) return '<span style="color:var(--muted);" title="No contract-level take distribution held for this country.">\u2014</span>';
       const iqr=p75-p25;
       // v521: a degenerate spread used to render as the number "~0.0pp", which reads as a measured
@@ -26519,7 +26529,27 @@ function renderCompare() {
         ? ' Its headline take (' + _hd.toFixed(1) + '%) sits outside this band because the headline is production-weighted and this spread is not -- the weighted barrels are concentrated in contracts at one end of the range.'
         : '';
       return '<span style="color:' + col + ';' + (iqr>=5?'font-weight:700;':'') + '" title="' + _cmpEsc(d.country + ': the middle half of its contracts fall between ' + p25.toFixed(1) + '% and ' + p75.toFixed(1) + '% take at $75/bbl -- a ' + iqr.toFixed(1) + 'pp spread, measured (not simulated) across the contract set.' + _off) + '">' + p25.toFixed(1) + '\u2013' + p75.toFixed(1) + '% <span style="font-weight:400;opacity:.75;">(' + iqr.toFixed(1) + 'pp)</span></span>'; }},
-    {label:'Price Swing ($50→$125)',key:(d)=>d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'},
+    // v697 (T3): a state monopoly's Price Swing was the last unguarded cell on this grid, and it
+    // was the most reassuring number on the platform. Bahrain, Kuwait and Saudi Arabia carry a
+    // placeholder take_50..take_125 of 100.0, so swing computes as 100 - 100 = +0.0pp. The four
+    // Govt Take cells above, all four Contractor NPV cells, the Rank cell and the Predictability
+    // cell already withdraw on exactly this predicate (v529 / v614) -- and then this row derived a
+    // headline statistic from the same withheld placeholder and printed it in full weight. On the
+    // platform's own legend ("<10pp = royalty-dominant, stable") +0.0pp is the BEST score in the
+    // database, so on Iraq / Kuwait / UAE the column with no contractor position at all won the
+    // stability comparison outright: Kuwait 0.0pp, Iraq 6.6pp, UAE 6.7pp. It rode into the
+    // IC-memo clipboard through the shared `rows` array. Withdrawn on the shared predicate.
+    {label:'Price Swing ($50→$125)',key:(d)=>{
+      if (isStateMonopoly(d.take_75)) return '<span style="color:var(--muted);cursor:help;" title="'
+        + _cmpEsc(d.country + ': no price swing is reported. Government take is stored as '
+          + (d.take_75 != null ? d.take_75.toFixed(1) + '%' : '\u2265 99.5%')
+          + ' at $50, $75, $100 and $125/bbl -- a state-monopoly placeholder, not four measured '
+          + 'points -- so the difference between the ends is 0.0pp by construction. Reading that as '
+          + '"0pp swing, the most price-stable regime on the board" inverts it: there is no '
+          + 'contractor position here whose returns could swing. The same placeholder is why the '
+          + 'four Govt Take rows above and the Contractor NPV rows below are also withdrawn.') + '">\u2014</span>';
+      return d.swing !== null ? '+'+fmt(d.swing)+'pp' : '\u2014';
+    }},
     {label:'Take weighting <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How the four Govt Take rows above are averaged across this country’s contracts — and ONLY those rows. Prod-weighted = weighted by verified production per block (most accurate — use for IC memos). Blended = mix of production and equal weighting. Equal-weighted = simple average across all contracts, common for frontier or pre-production countries with no output history. The Economics block below is averaged differently; see NPV weighting.">ⓘ</span>',      key:(d)=>d.weighting === 'prod_weighted' ? 'Prod-weighted' : d.weighting === 'prod_weighted_blended' ? 'Blended' : 'Equal-weighted'},
     {label:'─── Economics ───', key:()=>'', bold:true, divider:true},
     // v531: the Economics block never declared its own averaging basis, and it is NOT the one
@@ -26821,7 +26851,10 @@ function renderCompare() {
   // default set: Netherlands takes every economic row and is a 0%-coverage proxy.
   const _cmpProxies = selected.filter(d => !_cmpDqOf(d).hasProduction);
   if (_cmpProxies.length) {
-    const _rank = selected.filter(d => d.take_75 != null);
+    // v697 (T3): was `d.take_75 != null`, which counts a state monopoly as a ranked column.
+    // With Kuwait in the set this notice said UAE had the lowest take "of the 3 columns"
+    // when only 2 carried a take at all. A monopoly is not an entry this comparison ranks.
+    const _rank = selected.filter(d => d.take_75 != null && !isStateMonopoly(d.take_75));
     const _win = _rank.length ? _rank.reduce((a,b) => (b.take_75 < a.take_75 ? b : a)) : null;
     const _winProxy = _win && !_cmpDqOf(_win).hasProduction;
     const _backed = selected.filter(d => _cmpDqOf(d).hasProduction);
@@ -26840,7 +26873,7 @@ function renderCompare() {
       const _leadsNpv = _npvs.length > 1 && _npvs.reduce((a,b) => (b.npv_75 > a.npv_75 ? b : a)).country === _win.country;
       msg = '<strong style="color:var(--text);">⚠ The column that wins this comparison is a proxy.</strong> '
         + _win.country + ' shows the lowest government take (' + _win.take_75.toFixed(1) + '%) of the '
-        + selected.length + ' columns'
+        + _rank.length + ' ranked column' + (_rank.length === 1 ? '' : 's')
         + (_leadsNpv ? ' and the highest contractor NPV' : '')
         + ' — but ORCA holds no verified field '
         + 'production for it. Its take is a simple average across ' + (_win.n != null ? Number(_win.n).toLocaleString() : '?')
@@ -26863,6 +26896,39 @@ function renderCompare() {
         + ' Say which is which if this table goes into an IC memo.';
     }
     html += `<div class="cmp-notice" style="margin-top:10px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">${msg}</div>`;
+  }
+  // v697 (T3): a state-monopoly column in a side-by-side set had no set-level notice at all.
+  // Walking Iraq / Kuwait / UAE cold, Kuwait rendered as a full column -- header, region, 177
+  // contracts, 722 facts, evidence tier B, "Concession" -- with every take and NPV cell an em
+  // dash, and the only word anywhere explaining that was "state monopoly" inside one Rank cell,
+  // six rows up, in 10px grey. The two notices that DID fire (proxy, fee-blend) never named it.
+  // So the analyst got a column that looks populated and reads as blank, with no stated reason.
+  // Named here, on the same channel as the other comparability notices -- which is also the
+  // channel the IC-memo clipboard scrapes (#cmp-output .cmp-notice).
+  const _cmpMonos = selected.filter(d => isStateMonopoly(d.take_75));
+  if (_cmpMonos.length) {
+    const _mn    = _cmpMonos.map(d => d.country);
+    const _mList = _cmpJoin(_mn);
+    const _one   = _cmpMonos.length === 1;
+    const _rest  = selected.filter(d => !isStateMonopoly(d.take_75)).map(d => d.country);
+    html += '<div class="cmp-notice" style="margin-top:10px;background:rgba(100,116,139,.08);border:1px solid rgba(100,116,139,.30);border-left:3px solid var(--muted);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
+      + '<strong style="color:var(--text);">⚠ ' + _cmpEsc(_mList) + ' ' + (_one ? 'is a state monopoly and carries no comparable column.' : 'are state monopolies and carry no comparable columns.') + '</strong> '
+      + 'ORCA stores government take for ' + (_one ? 'it' : 'them') + ' as '
+      + _cmpEsc(_one ? (_cmpMonos[0].take_75 != null ? _cmpMonos[0].take_75.toFixed(1) + '%' : '≥ 99.5%')
+                    : _cmpJoin(_cmpMonos.map(d => d.country + ' ' + (d.take_75 != null ? d.take_75.toFixed(1) + '%' : '≥ 99.5%'))))
+      + ' at every modelled price — a placeholder meaning the state holds the acreage and there is '
+      + 'no contractor position to model, not a measured 100% fiscal take. Every figure derived from '
+      + 'it is therefore withdrawn: the four Govt Take rows, the four Contractor NPV rows, the '
+      + 'Predictability Score, the producer rank, the take spread and the price swing all read '
+      + '— on ' + (_one ? 'this column' : 'these columns') + '. '
+      + '<strong style="color:var(--text);">The rows that remain are real</strong> — contract count, '
+      + 'fiscal mechanics, evidence tier and facts held describe the terms the state publishes for '
+      + 'itself, and are the only rows on ' + (_one ? 'this column' : 'these columns') + ' worth citing. '
+      + (_rest.length
+          ? 'Rank this set on ' + _cmpEsc(_cmpJoin(_rest)) + ' only; ' + (_one ? _cmpEsc(_mn[0]) + ' is not a ranked entry, and its absence from the ordering is neither a good nor a bad score.' : 'the monopoly columns are not ranked entries.')
+          : 'Every column in this set is a state monopoly, so there is no fiscal ranking to take from this table at all.')
+      + ' If this goes into an IC memo, say the country is closed to contractor entry rather than reporting a take of any value.'
+      + '</div>';
   }
   // v549 (T3): the comparability caveat. This is the block the whole cycle exists for.
   // Cold walk, USA vs Iraq: Iraq rendered 84.8% take, "#21 of 21 producers", "highest-take
