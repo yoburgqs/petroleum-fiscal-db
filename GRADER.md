@@ -33708,3 +33708,16 @@ edge**. The change adds no control, so nothing new is under 24px at `pointer: co
 ## Bookkeeping (not the cycle)
 - v687 → v688 applied silently at the end across the 4 real version sites
   (1737, 1807, 2140, 2215).
+
+---
+## Cycle 594 Log — 2026-09-06 20:09
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 594 complete and live.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (T4 was stalest: 589 T2, 590 T3, 591 T1, 592 T6, 593 T5.)
+
+## Friction
+`_rrClassify()` is the one classifier behind every T4 surface. Its green verdict is reached **by elimination**: not 3+ changes since 2010, no *measured* take rise in the window, no pre-2010 rupture, not context-only. A sourced in-window fiscal law change whose take impact ORCA never quantified passes all four tests — so the 
