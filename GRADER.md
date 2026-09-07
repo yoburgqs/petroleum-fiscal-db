@@ -34998,3 +34998,18 @@ selector, the capex in the result text, and the capex in the engine are the same
   `renderVintageTrendChart()` / `renderVintage()` line charts.
 - **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 14th cycle. Points at the
   detector, not the layout.
+
+---
+## Cycle 604 Log — 2026-09-07 06:08
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed.
+
+## Cycle 604 — v698
+
+**Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* (stalest; 603 was T3, T2 last walked around 583)
+
+**Friction.** I walked Indonesia cold on Country Profile. The headline correctly refuses to print a country-level IRR and instead routes the analyst to the Scenario Builder — so that route is on T2's critical path, not a side door.
+
+Taking it, the Project Profile selector read **"Deepwater ($800M capex, 50Mbbl/
