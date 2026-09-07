@@ -35471,3 +35471,115 @@ being discredited by the one next to them that was not.
 
 ## Friction
 Cold load, no storage, Country Profile auto-loads Indonesia. The headline, rank line, peer tables, tier ladder and reform notices are all sound. 
+
+---
+## Cycle 610 Log — 2026-09-07 — v704
+- Test before: 294 PASS / 0 FAIL (last cycle's report)
+- Test after: 293 PASS / 0 FAIL / 1 WARN / 1 JS error — suite RUN this cycle against the patched
+  build on a local server. `HEAD:index.html` served identically also returns 293 / 0 / 1 / 1, so
+  the delta from 294 and the console 404 are artefacts of serving locally rather than from
+  GitHub Pages, not of this change.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (609 ran T2, 608 T5,
+607 T4, 606 T6, 605 T1, 603 T3.) T1 and T3 were nominally staler, so both were walked cold first:
+the Screener's 12 presets all fire, their counts match their labels, and the `Other` region
+misfiling carried on the list since cycle 344 is genuinely closed by v629/v645. Side-by-Side
+already withdraws every figure for a state monopoly and for a fee-basis blend. Neither walk
+produced friction worse than what the Country Profile's Live DCF panel does, so the cycle went
+there.
+
+## Friction
+Country Profile, cold load, scroll to **⚙ Live DCF Model**. Its scope line
+(`renderLiveDCFPanel`, index.html:39957) read *"Runs one hypothetical project through
+&lt;Country&gt;'s &lt;Mechanic&gt; terms"*, and the reconciliation block below it
+(`_execLiveDCF`) closed with *"this scenario applies &lt;Country&gt;'s country-default statutory
+parameters"*. Measured against `getDCFParams()` over all 185 countries, that is true for 65 and
+false for 120:
+
+| `_basis` | countries | meaning |
+|---|---|---|
+| `country` | 9 | hard-coded override (Norway, UK, USA, Australia, Nigeria, Iraq, Iran, Libya, Algeria) |
+| `db` | 56 | at least one term read from `COUNTRY_DATA` |
+| `default` | **120** | nothing country-specific at all |
+
+119 of those 120 fall through to the Concession template — 10% royalty, 25% CIT, no resource-rent
+tax, no state equity — and therefore print the **same three numbers**: 22.2% govt take, 138.4%
+IRR, $4.3B contractor NPV, +$2.9B at a 15% hurdle. Brazil, Argentina, Kuwait, Botswana and
+Belgium are indistinguishable on this panel. And 22.2% sits in the green band of the take tier
+ramp, so on 119 countries the page was actively signalling *investible* on the strength of a
+constant that carries no information about any of them.
+
+`_basis` has existed since v505 with the comment "so the UI can stop presenting a generic default
+as if it were this country's own fiscal regime". Fiscal Compare's Quality column reads it. This
+panel never did.
+
+Worst case inside that: the three state monopolies. Kuwait's reconciliation block rendered
+**"✔ Cite this — 100.0% — Kuwait's government take @ $75/bbl — 177 contracts, averaged."** The
+100.0% is the placeholder the DCF solver writes for closed acreage, not an average of 177
+contracts. Side-by-Side has withdrawn it for these three countries since v697; the Country
+Profile was still publishing it as the answer to "which number goes in the IC memo".
+
+## Change
+- New `_ldcfProvenance(country)` — basis, monopoly flag, the generic term string from
+  `describeDefaultTerms()`, and a cached count of how many of the 185 share the template.
+- **Scope line branches.** Generic: *"ORCA holds no &lt;Country&gt;-specific fiscal parameters in
+  this engine, so this run uses the platform's generic Concession template: 10% royalty, 25% CIT,
+  no resource-rent tax, no state equity. **119 of the 185 countries share that template and return
+  these same three numbers.**"* Country/db basis: wording unchanged.
+- **Govt Take and Contractor NPV cards** relabelled `— generic template`, taken off the tier
+  colour ramp to muted (the same rule v703 applied to the inflated IRR), notes now read "no
+  &lt;Country&gt; terms in the engine · 119 countries return this" and "not &lt;Country&gt;'s".
+- **Reconciliation.** The Terms driver is truthful and moves to FIRST on a generic run — it is
+  the whole gap, not the base case. The scenario card header becomes "Generic template — do not
+  cite". The severity verdict stops calling a generic gap "consistent" or "modest gap", which read
+  as corroboration; it now says the gap measures the template, not the regime.
+- **Monopolies** get a dedicated block: *"Neither. Both figures on this panel are withdrawn for
+  Kuwait"*, an explanation that 100.0% is a closed-acreage marker and not an average of the 177
+  contracts on file, and a citable sentence in place of the withdrawn number.
+
+## Result
+An analyst on any of the 120 countries with no modelled terms now reads, at the point of the
+number, that it is a platform template shared with 118 other countries — instead of a green
+country-specific government take. On Kuwait, Saudi Arabia and Bahrain the panel no longer
+instructs them to put a solver placeholder in an IC memo as a measured take, and the Country
+Profile now agrees with Side-by-Side, Fiscal Compare and the Screener, all of which already treat
+those three as unranked.
+
+## Verification
+- JS syntax gate: **PASS** (all 11 inline script blocks).
+- Runtime suite **RUN this cycle**: 293 PASS / 0 FAIL / 1 WARN / 1 JS error. Controlled against
+  `HEAD:index.html` served from the same local server: identical 293 / 0 / 1 / 1.
+- Horizontal scroll **0** at 1920 / 1440 / 1280 / 1024 / 768 / 390 across all 10 visible tabs.
+- **Step 5b, 390×844 `hasTouch: true`:** `scrollWidth === clientWidth` on all 10 tabs and on both
+  the Kuwait and Brazil profiles. No control touched by this change renders under 24px — the four
+  relabelled elements are 15px `.dcf-result-label` / `.dcf-result-note` text, unchanged in height.
+- `pixel_audit`: one regression, `tablet-768::2-t7 clipped-text 33 -> 34` — reproduced identically
+  on `HEAD:index.html`, so pre-existing. **19th cycle** carrying it; it points at the detector.
+- Regression-checked on Norway (`country` basis), Indonesia and Guyana (`db` basis) and Nigeria:
+  scope line, card labels, colours and reconciliation all unchanged on those paths.
+
+## Carried forward — not fixed this cycle
+- The `cp-run-fc-btn` handler writes to `document.getElementById('price')`, which does not exist;
+  it reads `cp-price-select` (also absent) and falls back to `fc-price`, so "▶ Run FC at this
+  price" runs Fiscal Compare at FC's own price.
+- The Country Profile contradicts itself on whether NPV carries information — the headline says
+  contractor NPV restates the take (r²=0.89, −$61M/pp), the Similar Fiscal Profile table tells the
+  analyst to rank contractor value on the same column.
+- **New, found this cycle and not fixed:** the same 120-country generic-template blind spot
+  applies to `renderTornadoPanel` / `_buildTornadoChart`, which calls `getDCFParams()` on the same
+  path and renders a sensitivity chart with no basis marking at all. Natural next T6 or T2.
+- Everything on the cycle-603 through 609 carried lists remains open: the Methodology/Home tier
+  definition conflict; the Methodology FAQ naming a "Stability Score filter at ≥4" that does not
+  exist; Evidence Chain grammar on n=1 cases; the Home Screener card advertising a breakeven
+  filter removed at v568; `FC_PROFILES` / `DCF_PROFILES` divergence; the empty "Recent Platform
+  Updates" placeholder; `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's
+  evidence tier; the three monopolies carrying `be_75 = 1.0` (10th cycle); the 862 contracts with
+  no fiscal terms; zero-rate defaults inside published `take_75`; `⬇ Chart PNG` exporting only
+  `#cmp-chart`; the Screener Contractor NPV tooltip naming an absent profile selector (12th
+  cycle); 164 of 185 jurisdictions with no sourced reform log; the Methodology tab naming a
+  `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete 2020s
+  cohort; and the duplicated `renderVintageTrendChart()` / `renderVintage()` line charts.
+- **Closed this cycle by verification, not by code:** the `Other` region bucket misfiling 17
+  jurisdictions. `_regionMatch` (v629) and `_setScreenerRegion` (v645) resolve it, and the
+  re-filing is disclosed on both surfaces via `_mountRefiledDisclosure()`. Drop it from the list.
