@@ -35729,3 +35729,16 @@ pasted IC table says it too, which is where the number actually gets used.
   reform log; the Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic
   pivot averages; the incomplete 2020s cohort; and the duplicated `renderVintageTrendChart()` /
   `renderVintage()` line charts.
+
+---
+## Cycle 611 Log — 2026-09-07 16:59
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 611 complete — shipped as **v705**, pushed to both repos, mirror updated.
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (610 ran T6, 609 T2, 608 T5, 607 T4, 605 T1, 603 T3 — T3 was the stalest.) Walked it cold twice: once on the tab's seeded default set, once as the analyst who arrives with their own three countries (Clear → type Indonesia / Angola / Iraq).
+
+## Friction
+Side-by-Side's **ECONOMICS block was the last numeric block on the grid with no data-basis gate.
