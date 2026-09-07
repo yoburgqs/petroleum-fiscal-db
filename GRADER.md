@@ -35337,3 +35337,124 @@ An analyst comparing finalists can see — on the comparison grid, and in the ta
 The per-country reform surfaces are in good shape and weren't the problem: the Reform Risk lookup, the Country Profile stability line, and the Screener's Reform Record filter all work and all route through the same classifier.
 
 **The hole is Side-by-Side.** Its row
+
+---
+## Cycle 609 Log — 2026-09-07 13:xx
+- Test before: 294 PASS / 0 FAIL (live URL, read from the suite's own report)
+- Test after: 293 PASS / 0 FAIL / 1 WARN / 1 JS error (local build, suite RUN this cycle)
+- The one JS error is a service-worker registration 404 that reproduces identically on
+  `HEAD:index.html` served the same way, and does not occur on GitHub Pages — which is why the
+  live number is 294/0/0 and the local number is 293/0/1. Verified before/after, not assumed.
+- Summary: Cycle 609 shipped as **v703**, pushed, and mirrored.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"**
+608 ran T5, 607 T4, 606 T6, 605 T1, 604 T2, 603 T3. T3 was nominally stalest, but Side-by-Side
+was substantially rebuilt at 607 and its export path at 608, so T2 was walked instead — its
+surface (Country Profile) had had no cycle since 604.
+
+## Friction
+Walked cold: no sessionStorage, no localStorage, Country Profile auto-loads Indonesia. The
+headline strip, rank line, evidence panel, peer tables, tier ladder and the fee-basis and
+reform notices are all in good shape and were not the problem. The Scenario Builder handoff
+(`ddOpenScenarioBuilder`) genuinely pre-fills and its v607 basis banner is honest.
+
+**The worst moment is the Live DCF panel's Contractor IRR card**, four screens into the page,
+directly above the section headed "WHICH NUMBER GOES IN THE IC MEMO?". `_execLiveDCF()` printed
+`result.irr` raw and painted it green for anything at or above 20%. Measured across all 185
+countries on this panel's own default profile at $75/bbl:
+
+| Contractor IRR shown | countries |
+|---|---|
+| ≥ 100% | **174** — Indonesia 155.2, Guyana 275.3, Kazakhstan 473.9, Malaysia 203.5 |
+| ≥ 500% | 2 — Australia and Denmark, both printing **20740.0%** |
+| a figure an IC would accept | 7 |
+| no IRR / uneconomic | 2 |
+
+Two separate defects sit behind that number.
+
+1. **A literal ×100.** `solveIRR()` → `calcIRR()` returns a **percent** (`mid * 100`). `dcfPRRT`
+   and `dcfBuyback` then applied `Math.round(irr * 1000) / 10` — a second ×100. `dcfConcession`,
+   `dcfPSC` and `dcfTSC` return it unscaled. Australia and Denmark read 20740.0% against a true
+   207.4%. `calcIRR`'s own `>= 500` guard could not catch it, because the guard fires *before*
+   the multiplication.
+
+2. **The rate is a return on the wrong base.** Cost recovery reimburses capex in the year it is
+   spent, so of $1,200M of project capex only **$74–223M is ever net negative**, repaid by year
+   2–3. A 155% return on a small, brief exposure is not a project IRR and cannot go in an IC memo.
+   `_sbReturnReading()` has classified exactly this case since v594 — state `inflated` — and the
+   Scenario Builder's card has rendered it. **The Country Profile never called the function.**
+
+So the tool already knew, on another tab, that this number was not a project return, and told the
+analyst so there — while printing it green here. The Country Profile headline even suppresses
+country IRR on purpose ("Country-level IRR is not reported…"), then the panel below reports a
+worse one.
+
+## Change
+The Live DCF Contractor IRR card now routes through **`_sbReturnReading(result)`** — the same
+function the Scenario Builder uses — so the two surfaces cannot report one run two ways.
+
+- The ×100 is removed from `dcfPRRT` and `dcfBuyback`; all five engines now return IRR on the
+  same unit.
+- An `inflated` or `unbounded` rate is **never painted green**, and the card label changes to
+  `Contractor IRR — not a project return`.
+- The note states contractor capital **actually at risk** against project capex, the repayment
+  year, and why the rest was never exposed: *"Only $178M of $1.2B capex is ever at risk — cost
+  recovery reimburses the rest as it is spent, repaid by year 3. The rate is a return on that
+  exposure, not on the project."*
+- **Every state now carries the 15% IOC hurdle test** — NPV @ 15%, which exists for 100% of runs
+  including the ones where no IRR exists — labelled `Quote this instead:`.
+- Iran, which rendered a bare `no IRR`, now reads `no IRR · $4.2B at risk · never repaid ·
+  fails a 15% IOC hurdle (−$1.1B)`.
+- Two live version strings bumped v702 → v703 silently at the end (lines 1830, 1900).
+
+## Result
+An analyst on the Country Profile is no longer shown a green **155.2%** contractor IRR on a $1.2B
+deepwater project, or a **20740.0%** one on Australia and Denmark. They are given the figure that
+survives an IC — contractor NPV at a 15% hurdle — together with the exposure and payback year the
+rate was concealing. The two numbers on that card that were always right (govt take, NPV) stop
+being discredited by the one next to them that was not.
+
+## Verify
+- **JS syntax gate:** 11/11 inline blocks parse (re-run after the version bump).
+- **Playwright: RUN this cycle**, not assumed — `TEST_URL` pointed at the local build.
+  293 PASS / 0 FAIL / 1 WARN / 1 JS error. The console 404 was reproduced on `HEAD:index.html`
+  served identically, so it is pre-existing and not this change.
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390, across all 10 visible tabs.
+- **Mobile (Step 5b), 390×844 `hasTouch: true`:** `scrollWidth === clientWidth` on all 10 tabs.
+  The card's value renders 30px and its note 63px under `pointer: coarse`. The `.dcf-result-label`
+  is 15px — it is a label, not a control, and its height is unchanged from before this cycle.
+- **Regression check:** verified on Indonesia, Denmark, Australia, Norway, Nigeria, Iran, Kuwait,
+  Iraq, Guyana and Kazakhstan. Norway (63.2%) and Nigeria (39.5%) keep a normal `computed`
+  reading with the original colour ramp; only `inflated`/`unbounded` states change appearance.
+  Take, NPV, the waterfall and the "which number goes in the IC memo" reconciliation are
+  untouched.
+
+## Carried forward — not fixed this cycle
+- **The Live DCF panel runs generic Concession defaults on state monopolies.** Kuwait's card
+  prints govt take 22.2% / NPV $4.3B with nothing on the panel saying ORCA holds no contractor
+  terms for it. `ddOpenScenarioBuilder` got exactly this warning at v607; `renderLiveDCFPanel`
+  did not. Strong candidate for the next T2 or T6 cycle.
+- **The `cp-run-fc-btn` handler writes to `document.getElementById('price')`, which does not
+  exist** in the document. It reads `cp-price-select` (also absent) and falls back to `fc-price`,
+  so "▶ Run FC at this price" runs Fiscal Compare at FC's own price, not the Country Profile's.
+  The button is inside `#fc-nav-bar`, hidden unless the analyst arrived from FC.
+- **The Country Profile contradicts itself on whether NPV carries information.** The headline says
+  contractor NPV "restate[s] the take rather than test[s] it" (r²=0.89, −$61M/pp — confirmed
+  accurate against `country_data.json`: n=182, slope −60.6, r² 0.887), while the Similar Fiscal
+  Profile table tells the analyst to "rank contractor value" on the same column. Residuals are
+  large where it matters: Azerbaijan +$1,724M, Indonesia −$561M, Iraq +$869M.
+- Everything on the cycle-603 through 608 carried lists remains open: the Methodology/Home tier
+  definition conflict; the Methodology FAQ naming a "Stability Score filter at ≥4" that does not
+  exist; Evidence Chain grammar on n=1 cases; the Home Screener card advertising a breakeven
+  filter removed at v568; `FC_PROFILES` / `DCF_PROFILES` divergence; the empty "Recent Platform
+  Updates" placeholder; `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's
+  evidence tier; the three monopolies carrying `be_75 = 1.0` (9th cycle); the 862 contracts with
+  no fiscal terms; zero-rate defaults inside published `take_75`; `⬇ Chart PNG` exporting only
+  `#cmp-chart`; the Screener Contractor NPV tooltip naming an absent profile selector (11th
+  cycle); the `Other` region bucket misfiling 17 jurisdictions; 164 of 185 jurisdictions with no
+  sourced reform log; the Methodology tab naming a `display:none` API Explorer tab; unweighted
+  per-mechanic pivot averages; the incomplete 2020s cohort; and the duplicated
+  `renderVintageTrendChart()` / `renderVintage()` line charts.
+- **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 18th cycle. Points at
+  the detector, not the layout.
