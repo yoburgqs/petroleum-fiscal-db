@@ -33597,3 +33597,114 @@ Every paste-ready artifact carries one sentence explaining why IRR — the metri
 |---|---|
 | Screener export | median **239.8%** across **124** countries |
 | Side-by-Side *Copy for IC Memo* | med
+
+---
+## Cycle 594 Log — 2026-09-06 20:05
+
+- Test before: 294 PASS / 0 FAIL (deployed origin)
+- Test after: 293 PASS / 0 FAIL / 1 WARN local · 294 PASS / 0 FAIL / 0 WARN deployed. Suite RUN this cycle, both times; the local WARN is the known `sw.js` 404 (the service worker registers a Pages-scoped absolute path a localhost root cannot serve) and is the only difference between the two numbers.
+- JS errors: 0
+- Version: v687 → v688
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (Stalest in rotation: 589 T2, 590 T3, 591 T1, 592 T6, 593 T5; T4 last run at 588.)
+
+## Friction
+`_rrClassify()` is the single classifier behind every T4 surface — the Reform Risk
+lookup card, the Country Profile reform chip, the Fiscal Compare Stability cell and
+the pasted IC memo. Its green branch is reached **by elimination**: not 3+ changes
+since 2010, no *measured* take rise inside the window, no pre-2010 rupture, not
+context-only.
+
+A sourced in-window fiscal law change whose take impact ORCA has never quantified
+satisfies all four tests. So the card returned, in green:
+
+> **N law changes since 2010, below this tab's Actively Reforming bar of 3.
+> No reform-frequency premium indicated.**
+
+for 5 of the 21 scoreable jurisdictions, and the changes it cleared are the largest
+statutory rewrites on file:
+
+| Country | in-window changes it cleared |
+|---|---|
+| Nigeria | 2021 **Petroleum Industry Act** (PPTA replaced outright) + 2022 implementation |
+| Mexico | 2013 **Energy Reform** (sector opened to private capital) + 2018 licensing suspension |
+| India | 2016 **HELP** (NELP PSC regime replaced by revenue sharing) |
+| Iraq | 2023 **KRG–Baghdad FSC ruling** |
+| Angola | 2019 **Executive Decree 5/19** — revised PSA terms |
+
+The card contradicted itself doing it. Three inches below the green line, its own
+DIRECTION row reads *"direction not established — only 1 of 6 fiscal changes carries
+a quantified take move; the 5 unmeasured could level or reverse it"*, and its own
+event log tags 2021 PIA *"fiscal change · take move not quantified"*. v583 stopped
+context events scoring and v585 stopped them being called "neutral" in the DIRECTION
+row — the IC action, the one line that actually leaves this platform, never got the
+same treatment.
+
+Because the classifier is shared, the same green drove **Fiscal Compare — the
+screening surface — to paint India and Iraq an unmuted 4/5 green diamond ramp**,
+tooltip "Reform verdict: no premium indicated".
+
+## Change
+A fifth IC-action class, orange, keyed on v585's own `unmeasured` direction read
+inside the 2010 window. **No new threshold is introduced** — the test is the
+platform's existing `_rrEventDir(e) === 'unmeasured'`, applied to scored in-window
+events. It names the acts, states that the count clears the *frequency* bar and that
+the frequency bar is the only thing it clears, and says a zero premium here is an
+absence of measurement rather than evidence of stability. Where some in-window
+changes were measured (Angola, 2020 −4pp) it prints them and says they cannot settle
+the direction on their own.
+
+Two consistency edits fall out of it: the green branch now states explicitly that
+every in-window change it cleared carries a quantified take move that did not raise
+take; and the "Reformed Twice Since 2010" card no longer says "this tab's IC rule
+indicates no frequency premium for them" about rows the lookup now flags.
+
+Measured after the change, all four consuming surfaces moved together:
+
+| Surface | before | after |
+|---|---|---|
+| RR lookup (Nigeria) | green *"No reform-frequency premium indicated"* | orange *"terms were rewritten inside the window, size never quantified"* |
+| CP reform chip | green *"Reform risk 70/100 · no frequency premium"* | orange *"Reform risk 70/100 · terms were rewritten inside the window, size never quantified"* |
+| FC Stability cell | Iraq/India green ◆◆◆◆◇, Nigeria/Mexico/Angola amber ◆◆◆◇◇ | all five **muted + red `!`**, tooltip carries the new verdict |
+| Pasted IC memo | *"IC action: 2 law changes since 2010 (2021, 2022) … No reform-frequency premium indicated."* | names both acts and instructs the analyst to source their take effect externally |
+
+Countries in the other four classes are unchanged: Norway/Russia/Australia/Indonesia/
+Ecuador keep "take was raised inside the scoring window"; Algeria/Libya/Venezuela/
+Kazakhstan/USA keep "score is a window artefact"; Guyana keeps "nothing in the
+post-2010 record is a fiscal change"; UK/Brazil keep "Actively Reforming". Verified
+by walking all 21 scoreable jurisdictions plus an uncovered one (Saudi Arabia) cold.
+
+## Result
+An analyst screening Nigeria, Mexico, India, Iraq or Angola no longer reads a green
+clean bill over a decade in which the fiscal code was rewritten — and on Fiscal
+Compare, where the screening cut is actually made, those five stop rendering a
+diamond ramp that implies a track record. The line they paste into the memo now
+tells them to source the named act's take effect externally rather than carry zero.
+
+## Mobile (Step 5b)
+390×844 `hasTouch: true`: all 10 tabs `scrollWidth 390 === clientWidth 390`. The
+changed verdict card renders 3,118px tall with **0 elements crossing the right
+edge**. The change adds no control, so nothing new is under 24px at `pointer: coarse`.
+
+## Carried forward — not fixed this cycle
+- **pixel_audit**: still exactly one regression against baseline,
+  `tablet-768::2-t7 clipped-text 33 -> 34`. Fourth cycle carrying it. This diff touches
+  no `.tag` element and produced **no new regression on any tab × viewport cell**.
+  Worth noting for whoever takes it: every `clipped-text` hit of this shape is a
+  `.tag` mechanic chip whose `scrollWidth` exceeds `clientWidth` by exactly 6px while
+  its computed `overflow` is `visible` — nothing is actually clipped on screen. That
+  points at the detector, not the layout.
+- **The 164 uncovered jurisdictions still dominate the T4 answer.** ORCA carries a
+  sourced reform log for 21 of 185. The lookup says so plainly, but a reform-exposure
+  question is unanswerable for 89% of the table and no cycle has moved that number —
+  it is harvest-side, out of index.html's reach.
+- Everything carried from cycles 560–593 otherwise unchanged, including: the CP
+  "Copy for IC Memo" paragraph being ~500 words with figures and caveats fused into
+  one block (the obvious next T5 cycle); the Screener FAQ's third value for the median
+  IRR statistic; the API/screen evidence disagreement; and the Methodology tab naming
+  an API Explorer tab that is `display:none`.
+
+## Bookkeeping (not the cycle)
+- v687 → v688 applied silently at the end across the 4 real version sites
+  (1737, 1807, 2140, 2215).
