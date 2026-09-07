@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v687</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v688</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v687</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v688</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2137,7 +2137,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v687';
+  return m ? m[0] : 'v688';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2212,7 +2212,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v687');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v688');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -30645,6 +30645,33 @@ function _rrClassify(c) {
   var reformYears = events.filter(_rrScores)
     .map(function(e){ return e.year; }).sort(function(a,b){ return a - b; }).join(', ');
 
+  // ── v688 (T4): the last place an unmeasured law change was still read as no change ──
+  // v583 stopped context events scoring. v585 stopped them being called "neutral" in the
+  // DIRECTION row, and named the other half of that bucket: `unmeasured` — a sourced fiscal
+  // law change whose take impact ORCA has not quantified. The IC action, which is the one line
+  // that leaves this platform (it is the Fiscal Compare Stability tooltip, the Country Profile
+  // chip and the pasted memo), never got the same treatment. Its green branch is reached by
+  // elimination: not 3+ changes, no MEASURED take rise in the window, no pre-2010 rupture, not
+  // context-only. An in-window law change of unrecorded size satisfies all four, so it returned
+  //   "N law changes since 2010, below this tab's Actively Reforming bar of 3.
+  //    No reform-frequency premium indicated."
+  // in green, for 5 of the 21 scoreable jurisdictions, and the changes it cleared are the
+  // largest statutory rewrites on file:
+  //   Nigeria  2021 Petroleum Industry Act (PPTA replaced outright) + 2022 implementation
+  //   Mexico   2013 Energy Reform (sector opened) + 2018 licensing suspension
+  //   India    2016 HELP (NELP PSC regime replaced by revenue sharing)
+  //   Iraq     2023 KRG–Baghdad FSC ruling
+  //   Angola   2019 Executive Decree 5/19 — revised PSA terms
+  // The card contradicted itself in the process: three inches below the green line, its own
+  // DIRECTION row reads "direction not established — only 1 of 6 fiscal changes carries a
+  // quantified take move", and its own event log tags 2021 PIA "fiscal change · take move not
+  // quantified". Because _rrClassify is shared, the same green also drove Fiscal Compare to
+  // paint India and Iraq an unmuted 4/5 green diamond ramp on the screening surface.
+  // No new threshold: the test is v585's own `unmeasured` direction, read inside the 2010 window.
+  var unmeasuredIn = events.filter(function(e){
+    return (e.year || 0) >= 2010 && _rrEventDir(e) === 'unmeasured';
+  }).sort(function(a,b){ return (b.year||0) - (a.year||0); });
+
   var icRule, icColor, icLabel, scoreNote;
   if (activelyReforming) {
     icColor = score <= 20 ? 'var(--red)' : 'var(--orange)';
@@ -30707,12 +30734,41 @@ function _rrClassify(c) {
       + 'renegotiation pressure, contract disputes and political risk are not in it. Read the event log below before '
       + 'carrying a zero reform premium.';
     scoreNote = rankTxt + ' \u00b7 no post-2010 fiscal change on file';
+  } else if (unmeasuredIn.length) {
+    // v688 (T4): an in-window statutory change whose size is not on file. The count clears the
+    // frequency bar; the size clears nothing, because there is no size. Say that, in orange.
+    var _measIn = events.filter(_rrScores).filter(function(e){ return _rrEventDir(e) !== 'unmeasured'; });
+    var _uList = unmeasuredIn.slice().sort(function(a,b){ return (a.year||0)-(b.year||0); })
+      .map(function(e){ return '<strong>' + _rrEsc(e.year) + '</strong> ' + _rrEsc(e.event); }).join('; ');
+    icColor = 'var(--orange)';
+    icLabel = 'IC action \u2014 terms were rewritten inside the window, size never quantified';
+    var _uLead = (unmeasuredIn.length === since2010)
+      ? (since2010 === 1 ? 'The one sourced fiscal law change since 2010'
+         : since2010 === 2 ? '<strong>Both</strong> sourced fiscal law changes since 2010'
+         : '<strong>All ' + since2010 + '</strong> sourced fiscal law changes since 2010')
+      : '<strong>' + unmeasuredIn.length + '</strong> of the ' + since2010
+        + ' sourced fiscal law changes since 2010';
+    icRule = _uLead + ' '
+      + (unmeasuredIn.length === 1 ? 'carries' : 'carry') + ' no quantified take move \u2014 ' + _uList + '. '
+      + 'The count is ' + since2010 + ', below this tab\u2019s Actively Reforming bar of 3, so the '
+      + '<em>frequency</em> rule indicates no premium. That is not the same finding as no exposure: '
+      + '<strong>ORCA has not measured what ' + (unmeasuredIn.length === 1 ? 'this change' : 'these changes') + ' did to government take</strong>, '
+      + 'so a zero premium here is an absence of measurement, not evidence of stability. '
+      + (_measIn.length
+          ? 'The ' + _measIn.length + ' in-window change' + (_measIn.length === 1 ? '' : 's') + ' ORCA did measure ('
+            + _measIn.slice().sort(function(a,b){ return (a.year||0)-(b.year||0); })
+                .map(function(e){ return _rrEsc(e.year) + ' ' + _rrEsc(e.take_change); }).join(', ')
+            + ') cannot settle the direction on ' + (unmeasuredIn.length === 1 ? 'its' : 'their') + ' own. '
+          : 'No in-window change on file carries a quantified take move at all, so there is nothing to size against. ')
+      + '<strong>Read the named act in the event log below and source its take effect externally before carrying a zero reform premium.</strong>';
+    scoreNote = rankTxt + ' \u00b7 in-window change, size never quantified';
   } else {
     icColor = 'var(--green)';
     icLabel = 'IC action';
     icRule = (since2010 === 0)
       ? 'No fiscal law change on record since 2010, and no take-raising event on record before it either. No reform-frequency premium indicated. Reform history alone does not clear the jurisdiction \u2014 check predictability and evidence tier as well.'
-      : '<strong>' + since2010 + '</strong> law change' + (since2010 === 1 ? '' : 's') + ' since 2010 (' + reformYears + '), below this tab\u2019s Actively Reforming bar of 3. '
+      : '<strong>' + since2010 + '</strong> law change' + (since2010 === 1 ? '' : 's') + ' since 2010 (' + reformYears + '), below this tab\u2019s Actively Reforming bar of 3, '
+        + 'and every one of them carries a quantified take move that did not raise government take. '
         + 'No reform-frequency premium indicated. Reform history alone does not clear the jurisdiction \u2014 check predictability and evidence tier as well.';
     scoreNote = rankTxt;
   }
@@ -37134,7 +37190,7 @@ function renderReformRisk() {
 
   var midCard = '<div style="background:var(--card);border:1px solid var(--border);border-left:3px solid var(--orange);border-radius:10px;padding:16px;">'
     + '<div style="font-size:11px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Reformed Twice Since 2010 <span style="color:var(--muted);">(' + midList.length + ')</span></div>'
-    + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Exactly 2 sourced fiscal law changes since 2010 \u2014 one below the Actively Reforming bar of 3, so this tab\u2019s IC rule indicates no frequency premium for them. '
+    + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;">Exactly 2 sourced fiscal law changes since 2010 \u2014 one below the Actively Reforming <em>frequency</em> bar of 3. That bar is the only thing they clear. '
     + (midRaisedInWindow
         ? '<strong style="color:var(--text);">' + midRaisedInWindow + ' of these ' + midList.length + ' raised government take inside the window anyway.</strong> What falls short is the count, not the size.'
         : 'What falls short is the count, not the size.')
