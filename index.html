@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v691</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v692</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v691</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v692</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2600,8 +2600,8 @@ window.copyPlatformCitation = function(btn) {
     </div>
     <div class="slider-row">
       <div class="slider-group">
-        <label>Max Govt Take: <span class="val" id="sv-take">100</span>%<span class="sc-nolimit" id="sn-take"> · no ceiling</span></label>
-        <input type="range" id="sl-take" min="30" max="100" value="100" aria-label="Maximum government take percentage (30–100%). Starts at 100% — no ceiling applied, every country passes.">
+        <label title="Maximum government take at the selected price deck. The counter beside it is live: how many of the 185 clear this ceiling, and how many of those have verified field production. Counted on the basis the ceiling actually tests — comparable take while the checkbox below is ticked, published blend when it is not. The counter greys amber when the ceiling is removing fewer than a tenth of the set, i.e. when it is doing no work.">Max Govt Take: <span class="val" id="sv-take">100</span>%<span class="sc-nolimit" id="sn-take"> · no ceiling</span><span class="sc-axis-n" id="sc-take-n"></span></label>
+        <input type="range" id="sl-take" min="10" max="100" value="100" aria-label="Maximum government take percentage (10–100%). Starts at 100% — no ceiling applied, every country passes. The floor was 30% until v692; the median comparable take across the 185 countries is 28.4%, so half the distribution sat behind the stop and the hardest reachable screen still returned 95 countries.">
         <!-- v554: take-comparability control. Hidden while the slider sits at 100 (no ceiling =
              nothing to test); revealed by _scUpdateNeutralFlags() the moment a ceiling is set.
              Same pattern as the v513 sc-be-nulls control, applied to the axis that silently
@@ -28486,6 +28486,53 @@ function _scUpdateNeutralFlags() {
   }
 
   // v568: the v513 breakeven-nulls control retired with the breakeven ceiling it disclosed.
+
+  // v692 (T1): the take axis finally states its own effect.
+  // Walked T1 cold: Max Govt Take is the first control an analyst touches and it was the only one
+  // of the four sliders that reported nothing back. Min Contractor NPV has carried a live
+  // "· N of 185 clear this" counter since v617, Min NPV @$50 the same, the evidence axis since
+  // v681 -- take, the platform's headline metric, had neither a counter nor an inert flag.
+  // Measured across its whole shipped travel it moved the result set 185 -> 95 and no further:
+  // its floor stop was 30% while the median comparable take across the 185 is 28.4%, so 51% of
+  // the distribution sat behind a hard stop and no setting of this slider could produce a
+  // shortlist. At the other end 100 -> 80 removed six countries and 100 -> 90 removed three.
+  // Same pathology v568 deleted Max Breakeven for and v517 deleted Min IRR for. Take cannot be
+  // deleted, so it is re-ranged (floor 30 -> 10) and made to report.
+  // Counted on the basis the ceiling ACTUALLY tests -- comparable take while sc-fee-cmp is
+  // checked, published blend when it is not -- by calling the same _scFeeCmpAt() the filter body
+  // calls, so the counter and the result set cannot disagree by construction.
+  // The second number is the verified-production count, because that is the one that answers T1:
+  // across this axis the headline separates 95 -> 185 while verified production separates 2 -> 22,
+  // and below 24% take there is no verified country left at all.
+  const _tkAxis = document.getElementById('sc-take-n');
+  if (_tkSl && _tkAxis && typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA.length) {
+    const _tkV = +_tkSl.value;
+    if (_tkV >= 100) { _tkAxis.textContent = ''; _tkAxis.className = 'sc-axis-n'; }
+    else {
+      const _tkPrice = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
+      const _tkKey   = 'take_' + _tkPrice;
+      const _tkCmpOn = (document.getElementById('sc-fee-cmp') || {}).checked !== false;
+      const _tkPass = COUNTRY_DATA.filter(function (d) {
+        const _h = d[_tkKey];
+        if (_h === null || _h === undefined) return false;
+        const _fc = _tkCmpOn ? _scFeeCmpAt(d, _tkPrice) : null;
+        return ((_fc && _fc.diverges) ? _fc.cmp : _h) <= _tkV;
+      });
+      const _tkVer = _tkPass.filter(function (d) { return _dqTier(d).hasProduction; }).length;
+      // Kept to the same short shape as the sibling axes. .sc-axis-n is white-space:nowrap and
+      // sits inside a slider label; v681 already put 36px of horizontal scroll on a phone and
+      // 37-141px at 1024/1280/1440 by writing a long string into one of these spans.
+      // "clear this" is load-bearing: like sc-npv-n this is a PER-AXIS count, not the size of the
+      // result set. Under a preset that also filters region or mechanic the two differ -- IOC
+      // Capital Screen returns 15 rows while 167 countries clear its 65% ceiling on its own.
+      _tkAxis.textContent = '\u00b7 ' + _tkPass.length + ' of ' + COUNTRY_DATA.length
+                          + ' clear this \u00b7 ' + _tkVer + ' verified';
+      // A ceiling removing under a tenth of the set is doing no work and should read that way --
+      // same threshold the NPV axes use in paint().
+      _tkAxis.className = 'sc-axis-n'
+        + (_tkPass.length >= COUNTRY_DATA.length * 0.9 ? ' sc-axis-inert' : '');
+    }
+  }
 
   // v681: the fact-depth leg of the evidence axis. Meaningless while the share slider sits at 0,
   // so it is revealed only once a share is asked for, and it states the size of what it removes
