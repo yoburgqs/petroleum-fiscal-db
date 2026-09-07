@@ -35458,3 +35458,16 @@ being discredited by the one next to them that was not.
   `renderVintageTrendChart()` / `renderVintage()` line charts.
 - **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 18th cycle. Points at
   the detector, not the layout.
+
+---
+## Cycle 609 Log — 2026-09-07 13:50
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 609 shipped as **v703**. Pushed and mirrored.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (608 ran T5, 607 T4, 606 T6, 605 T1, 604 T2, 603 T3. T3 was nominally stalest but Side-by-Side was rebuilt at 607 and its exports at 608, so I walked T2 — the Country Profile had had no cycle since 604.)
+
+## Friction
+Cold load, no storage, Country Profile auto-loads Indonesia. The headline, rank line, peer tables, tier ladder and reform notices are all sound. 
