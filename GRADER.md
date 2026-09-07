@@ -34108,3 +34108,18 @@ the set's tallest bar no longer silently claims to be its best project.
 - The **Screener FAQ's third value for the median IRR statistic** is still unreconciled.
 - **The `⬇ Chart PNG` button exports only the take chart** (`downloadCmpChart()` hard-codes
   `#cmp-chart`). The NPV chart, now that it carries its own basis keys, has no export path.
+
+---
+## Cycle 597 Log — 2026-09-06 23:16
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 597 complete and pushed (v691).
+
+## Task
+**T3 — "How do these three countries compare side by side?"** — stalest in the rotation (591 T1, 592 T6, 593 T5, 594 T4, 595 T2, 596 T5; T3 last walked at 590).
+
+## Friction
+Walked Side-by-Side cold at 1440 with storage cleared, on the tab's own shipped default set: Norway / United Kingdom / Netherlands.
+
+v626 built a data-basis gate for the grid — a column with no verified field production is refused a highest/lowest placement and reads `not ranked
