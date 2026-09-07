@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v695</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v696</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v695</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v696</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2977,7 +2977,7 @@ window.copyPlatformCitation = function(btn) {
   <h2 class="page-title">Vintage Analysis</h2>
   <!-- v469: Vintage Analysis intro strip — orients first-time analysts on what "vintage" means and IC application -->
   <div style="background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.18);border-radius:6px;padding:8px 14px;margin-bottom:14px;font-size:11px;color:var(--muted);line-height:1.6;">
-    <strong style="color:var(--accent);">What this shows:</strong> How government take has evolved by decade and fiscal mechanism — from 1950s Concession dominance to the 2010s PSC proliferation and post-2000 progressive levy trend. <strong style="color:var(--text);">IC application:</strong> Use the decade trend to frame the secular fiscal environment in a long-term IC memo (e.g., "PSC average take rose 8pp since the 1980s cohort"). For individual country reform events and stability scores, see the <button onclick="switchTab('treformrisk',document.getElementById('tab-btn-treformrisk'))" style="background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;font-size:11px;padding:0;text-decoration:underline;">Reform Risk tab &rarr;</button>
+    <strong style="color:var(--accent);">What this shows:</strong> How government take has evolved by decade and fiscal mechanism — from 1950s Concession dominance to the 2010s PSC proliferation and post-2000 progressive levy trend. <strong style="color:var(--text);">IC application:</strong> Cite a <em>single mechanic</em> across decades, from the table &mdash; e.g. &ldquo;Concession average take rose from 26.1% in the 1980s cohort to 40.3% in the 2020s&rdquo;. Do not read across a row: TSC and Buy-back take is a fee-basis artefact and is not comparable with Concession or PSC take. For individual country reform events and stability scores, see the <button onclick="switchTab('treformrisk',document.getElementById('tab-btn-treformrisk'))" style="background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;font-size:11px;padding:0;text-decoration:underline;">Reform Risk tab &rarr;</button>
   </div>
 
   <div class="card">
@@ -2992,10 +2992,10 @@ window.copyPlatformCitation = function(btn) {
             <th>Decade</th>
             <th class="num" title="Concession — royalty + corporate income tax model. Contractor holds equity in the resource. Most common globally (Europe, Americas, parts of Africa). Government take is the sum of royalty, CIT, and any resource rent surcharges (e.g. Norway SPT, UK SCT).">Concession Avg Take (%)</th>
             <th class="num" title="Production Sharing Contract — contractor recovers costs from 'cost oil', then splits remaining 'profit oil' with the government per agreed formula. Often includes R-factor tiers (take scales with cost-recovery ratio). Dominant in West Africa, SE Asia, and the Middle East.">PSC Avg Take (%)</th>
-            <th class="num" title="Technical Service Contract — contractor provides services at a fixed fee per barrel; government or NOC takes all revenue risk and retains equity ownership. Dominant in Iraq (1,800+ contracts). Contractor has no equity stake — remuneration is fee-only and insensitive to oil price movements.">TSC Avg Take (%)</th>
+            <th class="num" title="Technical Service Contract — contractor provides services at a fixed fee per barrel; government or NOC takes all revenue risk and retains equity ownership. Dominant in Iraq (1,800+ contracts). Contractor has no equity stake — remuneration is fee-only and insensitive to oil price movements.">TSC Avg Take (%) <span style="color:var(--orange);font-weight:700;" title="Fee-basis regime: the contractor is paid a fixed $/bbl fee and keeps no price upside, so this take percentage measures contract structure, not fiscal hardness. It is NOT comparable with the Concession, PSC or PRRT columns and is excluded from the contract-weighted decade series below.">&#8856; fee-basis</span></th>
             <th class="num" title="Petroleum Resource Rent Tax — Australia's profit-based upstream fiscal system. Tax triggers only when project cash flows exceed an uplift threshold (LTBR+5% general, LTBR+15% exploration), making it back-loaded relative to royalty/CIT regimes. Used offshore Australia and in some Australian onshore basins.">PRRT Avg Take (%)</th>
-            <th class="num" title="Risk Service Contract — contractor finances exploration and development at full risk. If commercial, is repaid from production over a defined term including a remuneration fee. Similar to Buy-back but with more cost-recovery flexibility. Used in Iran (pre-sanctions era), Kuwait, and select MENA NOC arrangements.">RSC Avg Take (%)</th>
-            <th class="num" title="Buy-back Contract — contractor finances and develops the field, then transfers operatorship to the NOC. Contractor is repaid from production over a fixed term (7–10 years typically) plus a negotiated fee. Iran is the primary Buy-back jurisdiction (284 contracts in this database). No ongoing equity stake for contractor after repayment period.">Buy-back Avg Take (%)</th>
+            <th class="num" title="Risk Service Contract — contractor finances exploration and development at full risk. If commercial, is repaid from production over a defined term including a remuneration fee. Similar to Buy-back but with more cost-recovery flexibility. Used in Iran (pre-sanctions era), Kuwait, and select MENA NOC arrangements.">RSC Avg Take (%) <span style="color:var(--orange);font-weight:700;" title="Fee-basis regime: the contractor is paid a fixed $/bbl fee and keeps no price upside, so this take percentage measures contract structure, not fiscal hardness. It is NOT comparable with the Concession, PSC or PRRT columns and is excluded from the contract-weighted decade series below.">&#8856; fee-basis</span></th>
+            <th class="num" title="Buy-back Contract — contractor finances and develops the field, then transfers operatorship to the NOC. Contractor is repaid from production over a fixed term (7–10 years typically) plus a negotiated fee. Iran is the primary Buy-back jurisdiction (284 contracts in this database). No ongoing equity stake for contractor after repayment period.">Buy-back Avg Take (%) <span style="color:var(--orange);font-weight:700;" title="Fee-basis regime: the contractor is paid a fixed $/bbl fee and keeps no price upside, so this take percentage measures contract structure, not fiscal hardness. It is NOT comparable with the Concession, PSC or PRRT columns and is excluded from the contract-weighted decade series below.">&#8856; fee-basis</span></th>
             <th class="num" title="Revenue Share — gross revenue split between government and contractor with no cost recovery mechanism. Contractor bears all cost risk. Used in select African and Latin American contracts. Distinct from PSC: there is no cost oil tranche — government share applies to gross revenue from first barrel.">Rev Share Avg Take (%)</th>
             <th class="num" title="Total number of contracts in the database signed during this decade, across all fiscal mechanics. Includes all contract types with a verified signing or effective date. Useful for assessing database coverage depth by era.">Total Contracts</th>
           </tr>
@@ -3004,7 +3004,11 @@ window.copyPlatformCitation = function(btn) {
       </table>
     </div>
 
-    <div class="card-title">Avg Govt Take by Decade (All Mechanics, $75/bbl)</div>
+    <div class="card-title">Avg Govt Take by Decade &mdash; Contract-Weighted, Comparable Mechanics ($75/bbl)</div>
+    <!-- v696 (T5): was "All Mechanics" and was an unweighted mean of the mechanic buckets. -->
+    <div style="font-size:10.5px;color:var(--muted);line-height:1.55;margin:2px 0 4px;">
+      Each bar is the <strong style="color:var(--text);">contract-count-weighted</strong> average take of every Concession, PSC, PRRT, Gross&nbsp;Split and Revenue&nbsp;Share contract signed that decade &mdash; the mechanics whose take percentages are commensurable. The grey number at the right of each bar is that contract count. <strong style="color:var(--text);">Fee-basis contracts (TSC, RSC, Buy-back) are excluded</strong>, shown as <span style="color:var(--orange);font-weight:700;">&#8856;&nbsp;n</span>: the contractor is paid a fixed&nbsp;$/bbl fee and keeps no price upside, so their ~99% take measures contract structure, not how hard the terms are, and averaging it into a government-take series inflates the trend. The per-mechanic table above is unweighted by design &mdash; it reports each mechanic separately, which is the comparison that is valid.
+    </div>
     <div class="decade-bar-wrap" id="decade-bars"></div>
   </div>
 
@@ -29676,6 +29680,31 @@ function copyScreenerTable() {
 window.copyScreenerTable = copyScreenerTable;
 
 // ─── TAB 4: Vintage ──────────────────────────────────────────────────────────
+// v696 (T5): shared by the decade bars and the CSV export so the two cannot fork.
+// Fee-basis mechanics are excluded per MECHANIC_COMPARABILITY Group 2 — a fixed
+// $/bbl fee is not a take measure — and what remains is weighted by contract count.
+var VINTAGE_FEE_BASIS = ['TSC','RSC','Buy-back'];
+window._VINTAGE_FEE_BASIS = VINTAGE_FEE_BASIS;
+function _vintageDecadeStat() {
+  if (typeof VINTAGE_DATA === 'undefined' || !VINTAGE_DATA) return [];
+  var decs = [...new Set(VINTAGE_DATA.map(function(d){ return d.decade; }))].sort();
+  return decs.map(function(dec) {
+    var all   = VINTAGE_DATA.filter(function(d){ return d.decade === dec && d.avg_take != null && d.n > 0; });
+    var comp  = all.filter(function(d){ return VINTAGE_FEE_BASIS.indexOf(d.mechanic) === -1; });
+    var nComp = comp.reduce(function(s,r){ return s + r.n; }, 0);
+    var nFee  = all.reduce(function(s,r){ return s + r.n; }, 0) - nComp;
+    if (!nComp) return { decade: dec, stat: null };
+    return { decade: dec, stat: {
+      avg:   comp.reduce(function(s,r){ return s + r.avg_take * r.n; }, 0) / nComp,
+      n:     nComp,
+      nFee:  nFee,
+      feeM:  all.filter(function(d){ return VINTAGE_FEE_BASIS.indexOf(d.mechanic) !== -1; }).map(function(d){ return d.mechanic; }).sort(),
+      mechs: comp.map(function(r){ return r.mechanic; }).sort()
+    }};
+  });
+}
+window._vintageDecadeStat = _vintageDecadeStat;
+
 function renderVintage() {
   // pivot by decade
   const decades = [...new Set(VINTAGE_DATA.map(d=>d.decade))].sort();
@@ -29700,24 +29729,42 @@ function renderVintage() {
     </tr>`;
   }).join('');
 
-  // bar visualization — avg all mechanics per decade
-  const avgByDecade = decades.map(dec => {
-    const rows = VINTAGE_DATA.filter(d=>d.decade===dec && d.avg_take!==null);
-    if (!rows.length) return null;
-    return rows.reduce((s,r)=>s+r.avg_take,0)/rows.length;
+  // ── v696 (T5): these bars were an UNWEIGHTED mean of the mechanic buckets.
+  // Concession's 13,784 contracts and TSC's 96 counted the same, so 0.9% of the
+  // 2010s cohort carried half the plotted number: the bar read 67.3% where the
+  // contract-weighted take across the same 16,628 contracts is 41.3%. It also
+  // manufactured a 2020s "reversal" (67.3 -> 57.3) that was nothing but TSC's
+  // column going empty. The tab tells the analyst to paste this trend into an IC
+  // memo, so the series is now (a) contract-weighted and (b) restricted to the
+  // mechanics MECHANIC_COMPARABILITY calls commensurable. Fee-basis regimes
+  // (TSC / RSC / Buy-back) pay a fixed $/bbl fee, so their ~99% take measures
+  // contract structure rather than fiscal hardness and cannot be averaged into a
+  // government-take series at any weight.
+  const _vStat = _vintageDecadeStat();
+  const decadeStat = decades.map(dec => {
+    const e = _vStat.find(x => x.decade === dec);
+    return e ? e.stat : null;
   });
-  const maxVal = Math.max(...avgByDecade.filter(Boolean));
 
+  const _nfmt = n => n.toLocaleString('en-US');
   const barsDiv = document.getElementById('decade-bars');
   barsDiv.innerHTML = decades.map((dec,i) => {
-    const avg = avgByDecade[i];
-    if (avg === null) return '';
+    const st = decadeStat[i];
+    if (!st) return '';
+    const avg = st.avg;
     const w = (avg/100*80).toFixed(1);
     const col = avg<=40?'var(--green)':avg<=60?'var(--yellow)':avg<=75?'var(--orange)':'var(--red)';
-    return `<div class="decade-row">
+    const excl = st.nFee
+      ? ' ' + _nfmt(st.nFee) + ' fee-basis contract' + (st.nFee===1?'':'s') + ' (' +
+        st.feeM.join(', ') + ') are excluded from this average \u2014 a fixed $/bbl fee is not a take measure.'
+      : '';
+    const ttl = dec + 's: ' + avg.toFixed(1) + '% government take, weighted by contract count across ' +
+                _nfmt(st.n) + ' ' + st.mechs.join(' + ') + ' contracts signed this decade.' + excl;
+    return `<div class="decade-row" title="${ttl.replace(/"/g,'&quot;')}">
       <div class="decade-lbl">${dec}s</div>
       <div class="bar-track">
         <div class="bar-fill" style="width:${w}%;background:${col};">${avg.toFixed(1)}%</div>
+        <div style="position:absolute;right:8px;top:0;height:100%;display:flex;align-items:center;font-size:10px;font-weight:600;color:var(--muted);white-space:nowrap;pointer-events:none;">${_nfmt(st.n)}${st.nFee ? ' <span style="color:var(--orange);margin-left:5px;">\u2298 ' + _nfmt(st.nFee) + '</span>' : ''}</div>
       </div>
     </div>`;
   }).join('');
@@ -45995,9 +46042,38 @@ function exportVintageCSV() {
     var cols = mechs.map(function(m){ return p[m] != null ? p[m].toFixed(1) : ''; });
     rows.push(dec + 's,' + cols.join(',') + ',' + (p.n||0));
   });
+  // v696 (T5): this file was a bare pivot with no basis line. It puts Concession
+  // ~30% and TSC ~99% in adjacent columns of one table and was being pasted into IC
+  // memos, so it now carries the contract-weighted comparable series the tab shows,
+  // the per-cell contract counts, and the comparability rule.
+  const q = function(v){ return '"' + String(v).replace(/"/g,'""') + '"'; };
+  const FEE = (window._VINTAGE_FEE_BASIS || ['TSC','RSC','Buy-back']);
+  const nOf = function(dec,m){ var r = VINTAGE_DATA.find(function(v){ return v.decade===dec && v.mechanic===m; }); return r && r.n != null ? r.n : ''; };
+
   rows.push('');
-  rows.push('Source: ORCA Petroleum Fiscal Intelligence Platform — Vintage Analysis');
-  rows.push('Export date: ' + new Date().toISOString().slice(0,10));
+  rows.push('CONTRACT COUNT BEHIND EACH CELL ABOVE (the take averages are unweighted within each mechanic)');
+  rows.push('Decade,' + mechs.join(',') + ',Total Contracts');
+  decades.forEach(function(dec) {
+    var p2 = pivot[dec] || {};
+    rows.push(dec + 's,' + mechs.map(function(m){ return nOf(dec,m); }).join(',') + ',' + (p2.n||0));
+  });
+
+  rows.push('');
+  rows.push('BLENDED GOVT TAKE BY DECADE \u2014 contract-weighted, comparable mechanics only (the series charted on the tab)');
+  rows.push('Decade,Govt Take (%),Contracts Weighted,Mechanics Included,Fee-Basis Contracts Excluded,Fee-Basis Mechanics Excluded');
+  var stat = _vintageDecadeStat();
+  stat.forEach(function(e) {
+    if (!e || !e.stat) return;
+    rows.push(e.decade + 's,' + e.stat.avg.toFixed(1) + ',' + e.stat.n + ',' +
+      q(e.stat.mechs.join(' + ')) + ',' + e.stat.nFee + ',' + q(e.stat.feeM.join(', ') || 'none'));
+  });
+
+  rows.push('');
+  rows.push(q('COMPARABILITY \u2014 READ BEFORE CITING ANY FIGURE IN THIS FILE. Take percentages are commensurable only within Group 1: Concession, PSC, Gross Split, Revenue Share. TSC, RSC and Buy-back are fee-basis regimes \u2014 the contractor is paid a fixed $/bbl fee and keeps no price upside, so a ~99% (TSC) or ~84% (Buy-back) take is a structural artefact of the contract form, not a measure of how hard the fiscal terms are. Do NOT read across a row of the pivot above and do NOT rank those columns against Concession or PSC. PRRT is profit-based and comparable, but triggers only above an uplift threshold, so an early-life project sees a lower effective take than the decade average implies.'));
+  rows.push(q('WHY THE BLENDED SERIES DIFFERS FROM AVERAGING THE PIVOT ROW. The blended series is weighted by contract count and excludes fee-basis contracts. Averaging the mechanic columns of a pivot row unweighted gives every mechanic equal weight regardless of size \u2014 in the 2010s that hands 149 fee-basis contracts the same weight as 13,784 Concession contracts and returns 67.3% against a true contract-weighted 41.3%, a 26pp overstatement, and produces an apparent 2020s reversal that is only the TSC column going empty.'));
+  rows.push(q('BASIS. Government take at $75/bbl. Take averages within each mechanic are unweighted country/contract averages as held in the ORCA contract database. Decade is assigned on contract signing or effective date. No NPV, breakeven or IRR is carried here \u2014 export those from Fiscal Compare or the Screener, which carry the standardized Deepwater profile.'));
+  rows.push('');
+  rows.push(q('Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '') + ' \u2014 Vintage Analysis  |  yoburgqs.github.io/petroleum-fiscal-db/  |  Exported ' + new Date().toISOString().slice(0,10)));
   var blob = _csvBlob(rows.join('\n'));
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
