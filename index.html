@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v694</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v695</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v694</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v695</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -23715,21 +23715,44 @@ function cpRegimeRows(d) {
   var tot = 0;
   for (var i = 0; i < mx.length; i++) tot += (mx[i].n || 0);
   if (!tot) return null;
+  // v695 (T2): the take and NPV on each row are now read off the contracts that carry fiscal
+  // rates, not off every contract filed under the mechanic. Where petroleum_dcf.py could find no
+  // rates it stamps the contract "No fiscal rates found; defaulting to zero-rate concession" and
+  // prices it at 0.0% take and $5,533.1M contractor NPV -- the untaxed project value, identical
+  // to the decimal on all 862 of them. Averaging those in is what put Brazil's Concession row on
+  // this card and in the breakdown table at 8.2% take / $5.0B NPV, directly under a line telling
+  // the analyst to "screen on the regime you would sign". Over the 142 Brazil Concession
+  // contracts that DO carry rates the same regime is 48.7% / $2.2B: 40.5pp and 2.2x away.
+  // tools/add_zero_rate_flag.py carries zr / t75p / v75p onto mech_mix from the engine's own
+  // warnings column, so this is the engine's judgement, not a plausibility threshold invented
+  // here. 17 rows across 17 countries are affected; on 6 of them NO contract in the regime is
+  // priced, and those now carry no take at all rather than a zero that reads as a fiscal fact.
   var rows = mx.filter(function(x) { return x && x.m && x.t75 != null; })
                .map(function(x) {
+                 var zr  = (typeof x.zr === 'number' && x.zr > 0) ? x.zr : 0;
+                 var tk  = zr ? (x.t75p == null ? null : x.t75p) : x.t75;
+                 var nv  = zr ? (x.v75p == null ? null : x.v75p) : (x.v75 == null ? null : x.v75);
                  return { mechanic: x.m, n: x.n || 0, pct: Math.round((x.n || 0) / tot * 100),
-                          take: x.t75, npv: (x.v75 == null ? null : x.v75), g: (x.g == null ? 1 : x.g) };
+                          take: tk, npv: nv, g: (x.g == null ? 1 : x.g),
+                          zr: zr, nPriced: Math.max(0, (x.n || 0) - zr), takeAll: x.t75,
+                          // Material on the same 5pp bar the spread gate uses, or where the regime
+                          // has no priced contract left to state a take from at all.
+                          zrMaterial: !!(zr && (tk == null || Math.abs(tk - x.t75) >= 5)) };
                })
                .sort(function(a, b) { return b.n - a.n; });
   if (rows.length < 2) return null;
   // Same materiality gate the card has always used: a secondary regime worth showing holds >= 5%
   // of the country's contracts. Kept so the v570 chip cannot promise a table that does not render.
   if (!rows.slice(1).some(function(r) { return r.pct >= 5; })) return null;
-  var blend = rows.reduce(function(a, r) { return a + r.n * r.take; }, 0) / tot;
+  // v695 (T2): weighted over the contracts that carry a take, not over every contract. A row
+  // with no priced contract contributes nothing here rather than dragging the blend to zero.
+  var _bn = 0, _bs = 0;
+  rows.forEach(function(r) { if (r.take != null) { _bn += r.nPriced; _bs += r.nPriced * r.take; } });
+  var blend = _bn ? (_bs / _bn) : null;
   var head  = (d && d.take_75 != null) ? d.take_75 : null;
   var wt    = (d && d.weighting) || 'simple_avg';
   var countBasis = (wt === 'simple_avg' || wt === 'equal_weighted');
-  var agrees = (head != null && blend.toFixed(1) === head.toFixed(1));
+  var agrees = (head != null && blend != null && blend.toFixed(1) === head.toFixed(1));
   // v677 (T2): the three verdicts below all describe a HOW -- count blend, production weighting,
   // or an unexplained gap. None of them checks the first thing an analyst does when they have to
   // defend the headline: look for it among the rows printed directly under it. On 13 of the 57
@@ -23751,14 +23774,18 @@ function cpRegimeRows(d) {
     // "below every regime" are different conversations in an IC.
     outside: outside,
     outsideDir: outside ? (head > hi ? 'above' : 'below') : null,
-    gap: (head == null) ? null : (head - blend),
+    gap: (head == null || blend == null) ? null : (head - blend),
+    // v695 (T2): how much of this table is the engine's zero-rate default, so the card and the
+    // breakdown below can say which rows were rebuilt and on how many contracts.
+    zrRows: rows.filter(function(r) { return r.zrMaterial; }).length,
+    zrTot:  rows.reduce(function(a, r) { return a + (r.zr || 0); }, 0),
     // Three verdicts, because they mean different things to someone defending the number:
     //   'reconciles'  the rows decompose the headline and may be cited as its components
     //   'weighted'    the headline is production-weighted, so a count blend is the wrong
     //                 arithmetic and the gap is expected rather than a defect
     //   'unexplained' the headline is a plain average that does not equal the plain average of
     //                 these rows -- the rows carry contracts the headline does not
-    verdict: (head == null) ? 'unknown' : agrees ? 'reconciles' : countBasis ? 'unexplained' : 'weighted'
+    verdict: (head == null || blend == null) ? 'unknown' : agrees ? 'reconciles' : countBasis ? 'unexplained' : 'weighted'
   };
 }
 
@@ -33199,32 +33226,70 @@ function loadCountryProfile(country) {
     // Group tag from the record's own mech_mix, matched by mechanic name; the literal sets are
     // only a fallback for a name MECHANIC_BREAKDOWN carries and mech_mix does not.
     // Rows carry their own group tag from mech_mix now, so no name-matching fallback is needed.
-    var g1rows = mb.filter(function(r) { return r.g === 1 && r.take != null; });
+    // v695 (T2): a regime with no priced contract left (Sierra Leone's 41 of 44 Concessions,
+    // Senegal's 6, Suriname's 8) has take == null and used to be filtered out here -- which
+    // deleted the largest regime in the country from the card rather than reporting it. Rows are
+    // kept; the spread is measured only over the ones that carry a take.
+    var g1rows  = mb.filter(function(r) { return r.g === 1; });
     if (g1rows.length < 2) return '';
-    var takes = g1rows.map(function(r) { return r.take; });
-    var spread = Math.max.apply(null, takes) - Math.min.apply(null, takes);
-    if (spread < 5) return '';                       // same bar _cpCmpLine552 uses
-    var npvs = g1rows.filter(function(r) { return r.npv != null; }).map(function(r) { return r.npv; });
+    var g1priced = g1rows.filter(function(r) { return r.take != null; });
+    var takes = g1priced.map(function(r) { return r.take; });
+    var spread = takes.length >= 2 ? (Math.max.apply(null, takes) - Math.min.apply(null, takes)) : 0;
+    var _zrHere = g1rows.filter(function(r) { return r.zrMaterial; });
+    // Three reasons to print this card, any one sufficient:
+    //   spread >= 5      the regimes materially differ            (the original bar, _cpCmpLine552's)
+    //   outside          the headline is not inside these rows    (v677 called this the more
+    //                    serious of the two; it was unreachable before, because the spread gate
+    //                    returned first -- Kazakhstan only ever cleared it on artifact takes)
+    //   _zrHere          a row is materially the zero-rate default
+    var _out677 = !!(_rb570 && _rb570.outside);
+    if (spread < 5 && !_out677 && !_zrHere.length) return '';
+    var npvs = g1priced.filter(function(r) { return r.npv != null; }).map(function(r) { return r.npv; });
     var npvLo = npvs.length ? Math.min.apply(null, npvs) : null;
     var npvHi = npvs.length ? Math.max.apply(null, npvs) : null;
     // v677 (T2): outside beats spread for tone. Kazakhstan's rows differ by only 6.3pp -- amber
     // under the old rule -- but its headline sits above both of them, which is the more serious
-    // of the two things this card can say.
-    var _out677 = !!(_rb570 && _rb570.outside);
-    var big = spread >= 15 || _out677;
+    // of the two things this card can say. (_out677 is declared with the gate above.)
+    // v695: a row rebuilt off the zero-rate default is red too -- the figure it replaces is the
+    // one that was on screen at the decision point.
+    var big = spread >= 15 || _out677 || _zrHere.length > 0;
     var col = big ? 'var(--red)' : 'var(--orange)';
     var bg  = big ? 'rgba(185,28,28,.07)' : 'rgba(194,65,12,.06)';
     var bd  = big ? 'rgba(185,28,28,.28)' : 'rgba(194,65,12,.22)';
     var rowsHtml = g1rows.map(function(r) {
-      var tc = r.take <= 40 ? 'var(--green)' : r.take <= 60 ? 'var(--yellow)' : r.take <= 80 ? 'var(--orange)' : 'var(--red)';
+      // v695 (T2): a row with no priced contract prints no take and no NPV. It used to print
+      // 0.0% and $5,533M -- the untaxed project value -- which reads as the most
+      // contractor-favourable regime on the platform rather than as an absence of terms.
+      var _unpriced = (r.take == null);
+      var tc = _unpriced ? 'var(--muted)'
+             : r.take <= 40 ? 'var(--green)' : r.take <= 60 ? 'var(--yellow)' : r.take <= 80 ? 'var(--orange)' : 'var(--red)';
       var nv = (r.npv == null) ? '—'
         : (typeof fmtNpvShared === 'function' ? fmtNpvShared(r.npv)
            : (r.npv < 0 ? '-$' + Math.abs(r.npv).toLocaleString() + 'M' : '$' + r.npv.toLocaleString() + 'M'));
-      return '<div style="display:flex;align-items:baseline;gap:6px;white-space:nowrap;">'
+      var _cnt = _unpriced
+        ? Number(r.n).toLocaleString() + ' (' + r.pct + '%)'
+        : (r.zr
+            ? Number(r.nPriced).toLocaleString() + ' of ' + Number(r.n).toLocaleString()
+            : Number(r.n).toLocaleString() + ' (' + r.pct + '%)');
+      var _zrTip = r.zr
+        ? Number(r.zr).toLocaleString() + ' of this regime\u2019s ' + Number(r.n).toLocaleString()
+          + ' contracts carry no fiscal rates at all \u2014 the DCF engine stamped them "No fiscal '
+          + 'rates found; defaulting to zero-rate concession" and priced them at 0% take on the '
+          + 'untaxed project NPV. '
+          + (_unpriced
+              ? 'That is every contract in the regime here, so there is no take to state: this row '
+                + 'records that the regime exists and how many contracts sit in it, nothing more.'
+              : 'This row is the ' + Number(r.nPriced).toLocaleString() + ' that do carry rates. '
+                + 'Including the other ' + Number(r.zr).toLocaleString() + ' would print '
+                + r.takeAll.toFixed(1) + '%.')
+        : '';
+      return '<div style="display:flex;align-items:baseline;gap:6px;white-space:nowrap;"'
+        + (_zrTip ? ' title="' + _zrTip.replace(/"/g, '&quot;') + '"' : '') + '>'
         + '<span style="font-weight:700;color:var(--text);min-width:74px;">' + r.mechanic + '</span>'
-        + '<span style="opacity:.75;min-width:62px;">' + Number(r.n).toLocaleString() + ' (' + r.pct + '%)</span>'
-        + '<span style="font-family:\'IBM Plex Mono\',monospace;font-weight:800;color:' + tc + ';min-width:46px;text-align:right;">' + r.take.toFixed(1) + '%</span>'
-        + '<span style="font-family:\'IBM Plex Mono\',monospace;opacity:.85;text-align:right;">' + nv + '</span>'
+        + '<span style="opacity:.75;min-width:62px;">' + _cnt + '</span>'
+        + '<span style="font-family:\'IBM Plex Mono\',monospace;font-weight:800;color:' + tc + ';min-width:46px;text-align:right;">'
+        + (_unpriced ? 'no terms' : r.take.toFixed(1) + '%') + '</span>'
+        + '<span style="font-family:\'IBM Plex Mono\',monospace;opacity:.85;text-align:right;">' + (_unpriced ? '—' : nv) + '</span>'
         + '</div>';
     }).join('');
     var npvSentence = (npvLo != null && npvHi != null && npvLo !== npvHi)
@@ -33234,9 +33299,10 @@ function loadCountryProfile(country) {
       : '';
     var tip = country + ' does not run one fiscal regime. Its contracts split across '
       + g1rows.map(function(r) { return r.mechanic + ' (' + Number(r.n).toLocaleString() + ' contracts, '
-          + r.take.toFixed(1) + '% take'
+          // v695: a regime with no rate-carrying contract states no take here either.
+          + (r.take == null ? 'no fiscal rates on file' : r.take.toFixed(1) + '% take')
           + (r.npv != null ? ', ' + (typeof fmtNpvShared === 'function' ? fmtNpvShared(r.npv) : '$' + r.npv + 'M') + ' contractor NPV' : '') + ')'; }).join(' and ')
-      + ', a ' + spread.toFixed(1) + 'pp take gap.' + npvSentence
+      + (spread >= 5 ? ', a ' + spread.toFixed(1) + 'pp take gap.' : '.') + npvSentence
       + (_out677
           ? ' The ' + d.take_75.toFixed(1) + '% headline above sits ' + _rb570.outsideDir
             + ' every one of them (' + _rb570.lo.toFixed(1) + '-' + _rb570.hi.toFixed(1) + '%), so it is not '
@@ -33246,6 +33312,15 @@ function loadCountryProfile(country) {
             + 'are computed on the blend of all of them, so they describe the country average rather than '
             + 'either regime an entrant would actually sign. Screen and cite on the regime your asset '
             + 'sits in.')
+      + (_zrHere.length
+          ? ' ' + _zrHere.map(function(r) {
+              return r.mechanic + ' is stated over the ' + Number(r.nPriced).toLocaleString() + ' of '
+                + Number(r.n).toLocaleString() + ' contracts that carry fiscal rates; the other '
+                + Number(r.zr).toLocaleString() + ' were stamped "No fiscal rates found" by the DCF '
+                + 'engine and priced at 0% take on the untaxed project NPV'
+                + (r.take == null ? ', which is every contract in the regime.' : '.');
+            }).join(' ')
+          : '')
       + ' Figures are the same ones in the Fiscal Regime Breakdown table below; click to jump to it.';
     return '<div onclick="(function(){var e=document.getElementById(\'cp-regime-breakdown\');if(!e)return;'
       + 'e.scrollIntoView({behavior:\'smooth\',block:\'center\'});e.style.transition=\'background .4s\';'
@@ -33257,7 +33332,11 @@ function loadCountryProfile(country) {
       + '<span style="color:' + col + ';flex-shrink:0;">⚠</span>'
       + '<strong style="color:' + col + ';">' + (_out677
           ? 'Headline ' + d.take_75.toFixed(1) + '% is ' + _rb570.outsideDir + ' every regime here'
-          : g1rows.length + ' regimes here — take differs ' + spread.toFixed(1) + 'pp') + '</strong>'
+          : spread >= 5
+            ? g1rows.length + ' regimes here — take differs ' + spread.toFixed(1) + 'pp'
+            // v695: reachable only where the regimes agree within 5pp and the headline sits inside
+            // them, so the defaults are the whole reason this card is on screen.
+            : _zrHere.length + ' of ' + g1rows.length + ' regimes here carry no fiscal rates') + '</strong>'
       + '<span style="margin-left:auto;font-size:10px;opacity:.8;white-space:nowrap;">breakdown &darr;</span>'
       + '</div>'
       + rowsHtml
@@ -33291,6 +33370,22 @@ function loadCountryProfile(country) {
                 : 'The ' + d.take_75.toFixed(1) + '% headline does not reconcile to these rows — see the breakdown.')
             + npvSentence + ' Screen on the regime you would sign.')
       + '</div>'
+      // v695 (T2): the instruction above sends the analyst to a regime row. Where that row was
+      // rebuilt off the engine's zero-rate default, say so on screen and name the figure it
+      // replaces -- on Brazil the card read 8.2% / $5.0B against 48.7% / $2.2B on the contracts
+      // that carry rates, and nothing on the page distinguished the two.
+      + (_zrHere.length
+          ? '<div style="font-size:10px;margin-top:4px;padding-top:4px;border-top:1px solid ' + bd + ';">'
+            + _zrHere.map(function(r) {
+                return '<span style="color:' + col + ';font-weight:700;">' + Number(r.zr).toLocaleString()
+                  + ' of ' + Number(r.n).toLocaleString() + ' ' + r.mechanic + '</span> contracts carry no '
+                  + 'fiscal rates'
+                  + (r.take == null
+                      ? ' — every one in the regime, so no take is stated for it.'
+                      : '; excluded. Including them prints ' + r.takeAll.toFixed(1) + '%.');
+              }).join(' ')
+            + '</div>'
+          : '')
       + '</div>';
   })();
 
@@ -33713,22 +33808,40 @@ function loadCountryProfile(country) {
             ? '<span title="Negative NPV reflects standard greenfield profile applied to a service/fee-based contract — not directly comparable to PSC/Concession economics" style="color:var(--muted);font-style:italic;">n/a~</span>'
             : (r.npv < 0 ? '-$' + Math.abs(Math.round(r.npv)).toLocaleString() : '$' + Math.round(r.npv).toLocaleString()) + 'M')
         : '—';
-      const takeCol = _isFee ? 'var(--muted)'
+      // v695 (T2): null take = the regime has no contract carrying fiscal rates. See cpRegimeRows().
+      const _unpriced = (r.take == null);
+      const takeCol = (_isFee || _unpriced) ? 'var(--muted)'
                     : r.take <= 40 ? 'var(--green)' : r.take <= 60 ? 'var(--yellow)' : r.take <= 80 ? 'var(--orange)' : 'var(--red)';
+      const _zrTag = r.zr
+        ? ' <span style="font-size:9px;font-weight:700;color:#B91C1C;border:1px solid rgba(185,28,28,.35);border-radius:3px;padding:0 3px;vertical-align:middle;cursor:help;" title="'
+          + (Number(r.zr).toLocaleString() + ' of this regime\u2019s ' + Number(r.n).toLocaleString()
+             + ' contracts carry no fiscal rates. petroleum_dcf.py stamped them &quot;No fiscal rates found; '
+             + 'defaulting to zero-rate concession&quot; and priced each at 0% government take on the untaxed '
+             + 'project NPV of $5,533M. They are excluded from the take and NPV in this row. '
+             + (_unpriced
+                 ? 'That is every contract in the regime, so this row states no take at all.'
+                 : 'Including them would print ' + r.takeAll.toFixed(1) + '% take.'))
+          + '">' + (_unpriced ? 'no rates on file' : Number(r.zr).toLocaleString() + ' unpriced') + '</span>'
+        : '';
       const feeTag = _isFee
         ? ' <span style="font-size:9px;font-weight:700;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:0 3px;vertical-align:middle;cursor:help;" title="Fee basis — the contractor is paid a fixed fee rather than an equity share of production, so government take approaches 99% as a structural property of the mechanic, not as a measure of fiscal severity. It may not be ranked against the Concession/PSC rows in this table.">not comparable</span>'
         : '';
       return '<tr style="border-bottom:1px solid var(--border)22;">'
-        + '<td style="padding:5px 8px 5px 0;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+col+';margin-right:5px;vertical-align:middle;"></span><span style="font-weight:700;font-size:12px;">' + r.mechanic + (r.mechanic === 'PSC' && d.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;" title="R-factor profit oil tiers active — contractor share declines as R-factor rises">&#9670;</span>' : '') + feeTag + '</span></td>'
-        + '<td style="text-align:right;padding:5px 8px;font-size:12px;color:var(--muted);">' + r.n.toLocaleString() + ' <span style="font-size:10px;">(' + r.pct + '%)</span></td>'
-        + '<td style="text-align:right;padding:5px 8px;font-weight:800;font-size:12px;color:'+takeCol+';font-family:\'IBM Plex Mono\',monospace;">' + r.take.toFixed(1) + '%</td>'
-        + '<td style="text-align:right;padding:5px 8px;font-size:12px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;">' + npvStr + '</td>'
+        + '<td style="padding:5px 8px 5px 0;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:'+col+';margin-right:5px;vertical-align:middle;"></span><span style="font-weight:700;font-size:12px;">' + r.mechanic + (r.mechanic === 'PSC' && d.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;" title="R-factor profit oil tiers active — contractor share declines as R-factor rises">&#9670;</span>' : '') + feeTag + _zrTag + '</span></td>'
+        + '<td style="text-align:right;padding:5px 8px;font-size:12px;color:var(--muted);">' + r.n.toLocaleString() + ' <span style="font-size:10px;">(' + r.pct + '%)</span>'
+        + (r.zr && !_unpriced ? '<span style="display:block;font-size:9px;opacity:.85;">' + Number(r.nPriced).toLocaleString() + ' priced</span>' : '') + '</td>'
+        + '<td style="text-align:right;padding:5px 8px;font-weight:800;font-size:12px;color:'+takeCol+';font-family:\'IBM Plex Mono\',monospace;">' + (_unpriced ? '<span style="font-weight:600;font-style:italic;">no terms on file</span>' : r.take.toFixed(1) + '%') + '</td>'
+        + '<td style="text-align:right;padding:5px 8px;font-size:12px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;">' + (_unpriced ? '\u2014' : npvStr) + '</td>'
         + '</tr>';
     }).join('');
     // The reconciliation the old footnote only claimed. Three outcomes, each saying a different
     // true thing to someone who has to defend the headline in a meeting.
     const _mono = 'font-family:\'IBM Plex Mono\',monospace;font-weight:800;color:var(--text);';
-    const _blendStr = _rb.blend.toFixed(1) + '%';
+    // v695 (T2): the blend is now weighted over the contracts that carry fiscal rates, so the
+    // sentences below must count those rather than every contract filed under a mechanic.
+    const _nBlend = mb.reduce(function(a, r) { return a + (r.take != null ? r.nPriced : 0); }, 0);
+    const _zrDrop = mb.reduce(function(a, r) { return a + (r.zr || 0); }, 0);
+    const _blendStr = (_rb.blend == null) ? '\u2014' : _rb.blend.toFixed(1) + '%';
     const _headStr  = (_rb.head == null) ? '—' : _rb.head.toFixed(1) + '%';
     const _gapStr   = (_rb.gap == null) ? '' : (Math.abs(_rb.gap) < 0.05 ? '0.0' : Math.abs(_rb.gap).toFixed(1)) + 'pp';
     let _recTone, _recIcon, _recHead, _recBody;
@@ -33736,14 +33849,14 @@ function loadCountryProfile(country) {
       _recTone = ['#15803D','rgba(21,128,61,.06)','rgba(21,128,61,.25)'];
       _recIcon = '&#10003;';
       _recHead = 'Reconciled — these rows do decompose the headline';
-      _recBody = 'The ' + _rb.tot.toLocaleString() + ' contracts above blend by contract count to <span style="'+_mono+'">'
+      _recBody = 'The ' + _nBlend.toLocaleString() + (_zrDrop ? ' rate-carrying' : '') + ' contracts above blend by contract count to <span style="'+_mono+'">'
         + _blendStr + '</span>, which is the published headline of <span style="'+_mono+'">' + _headStr + '</span>. '
         + 'The per-regime takes may be cited as components of it — use the row your asset sits in, not the blend.';
     } else if (_rb.verdict === 'weighted') {
       _recTone = ['#96570A','rgba(176,104,0,.06)','rgba(176,104,0,.25)'];
       _recIcon = '&#8776;';
       _recHead = 'Headline is production-weighted — it is not the count blend of these rows';
-      _recBody = 'The ' + _rb.tot.toLocaleString() + ' contracts above blend by contract <em>count</em> to <span style="'+_mono+'">'
+      _recBody = 'The ' + _nBlend.toLocaleString() + (_zrDrop ? ' rate-carrying' : '') + ' contracts above blend by contract <em>count</em> to <span style="'+_mono+'">'
         + _blendStr + '</span>. The published headline is <span style="'+_mono+'">' + _headStr + '</span>, a '
         + _gapStr + ' difference, because it weights by verified field production ('
         + ((d.prod_coverage_pct || 0).toFixed(1)) + '% coverage) rather than by contract count. '
@@ -33765,8 +33878,12 @@ function loadCountryProfile(country) {
       _recBody = 'The headline for ' + country + ' is an equal-weighted average, so it should equal the equal-weighted '
         + 'average of these rows. It does not: the rows blend to <span style="'+_mono+'">' + _blendStr
         + '</span> against a published <span style="'+_mono+'">' + _headStr + '</span>, a ' + _gapStr + ' gap. '
-        + 'The per-regime means above average every contract filed under a mechanic, including those whose fiscal '
-        + 'terms were never resolved and are carried near zero; the headline does not. Read the rows for which '
+        + (_zrDrop
+            ? 'The per-regime means above exclude the ' + _zrDrop.toLocaleString() + ' contracts the DCF engine '
+              + 'could resolve no fiscal rates for; the published headline does not exclude them, and that alone '
+              + 'can open a gap. '
+            : 'The per-regime means above average every contract filed under a mechanic; the headline does not. ')
+        + 'Read the rows for which '
         + 'regimes exist here and how material each is — do not cite a row as that regime’s effective take, and '
         + 'take block-level terms from the contract table below or from Scenario Builder before committing a number.'
         // v677 (T2): the gap alone leaves open "different weighting". On 10 of these countries the
@@ -33782,7 +33899,7 @@ function loadCountryProfile(country) {
       _recTone = ['var(--muted)','var(--surface2)','var(--border)'];
       _recIcon = '&#8226;';
       _recHead = 'No published headline to reconcile against';
-      _recBody = 'The ' + _rb.tot.toLocaleString() + ' contracts above blend by contract count to <span style="'+_mono+'">'
+      _recBody = 'The ' + _nBlend.toLocaleString() + (_zrDrop ? ' rate-carrying' : '') + ' contracts above blend by contract count to <span style="'+_mono+'">'
         + _blendStr + '</span>. No country headline take is on file at $75/bbl, so there is nothing to check it against.';
     }
     const _feeNote = _nFee
@@ -33807,6 +33924,16 @@ function loadCountryProfile(country) {
       + '<strong style="color:' + _recTone[0] + ';">' + _recHead + '</strong>'
       + '</div>'
       + '<div>' + _recBody + '</div>'
+      + (_zrDrop
+          ? '<div style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border)44;">'
+            + '<strong>' + _zrDrop.toLocaleString() + ' of this country\u2019s ' + _rb.tot.toLocaleString()
+            + ' contracts carry no fiscal rates</strong> and are excluded from the takes and NPVs above. '
+            + 'petroleum_dcf.py stamped each of them &ldquo;No fiscal rates found; defaulting to zero-rate '
+            + 'concession&rdquo; and priced it at 0% government take on the untaxed project NPV of $5,533M, '
+            + 'so averaging them in understates government take and overstates contractor NPV by construction. '
+            + 'The exclusion is the engine&rsquo;s own record for each contract, not a plausibility rule applied here.'
+            + '</div>'
+          : '')
       + _feeNote
       + '</div>'
       + '</div>';
