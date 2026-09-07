@@ -1827,7 +1827,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v703</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v704</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1897,7 +1897,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v703</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v704</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -39933,6 +39933,59 @@ function runLiveDCF(country, profileKey, price) {
 // v30 — Live DCF Panel: inject into Country Profile
 // ================================================================
 
+// ── v704 (T6) — where the Live DCF panel's numbers actually come from ──────────────
+// The panel has always said it "runs one hypothetical project through <Country>'s
+// <Mechanic> terms", and the reconciliation block under it has always closed with
+// "this scenario applies <Country>'s country-default statutory parameters". Measured
+// against getDCFParams() across all 185 countries, that is true for 65 of them and
+// false for 120:
+//
+//     _basis 'country'   9   hard-coded override (Norway, UK, USA, Australia,
+//                            Nigeria, Iraq, Iran, Libya, Algeria)
+//     _basis 'db'       56   at least one term read from COUNTRY_DATA for that country
+//     _basis 'default' 120   nothing country-specific at all
+//
+// 119 of those 120 fall through to the Concession template (10% royalty, 25% CIT, no
+// resource-rent tax, no state equity) and therefore print the SAME three numbers:
+// 22.2% govt take, $4.3B contractor NPV, +$2.9B at a 15% hurdle. Brazil, Argentina,
+// Kuwait, Botswana and Belgium are indistinguishable on this panel. An analyst asking
+// "where did this come from and how solid is it" was told it came from the country.
+//
+// _basis has existed since v505 for exactly this reason -- Fiscal Compare's Quality
+// column already uses it. This panel never read it. It does now.
+function _cpEsc704(x) {
+  return String(x == null ? '' : x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function _ldcfProvenance(country) {
+  const d = COUNTRY_DATA.find(x => x.country === country);
+  if (!d) return null;
+  const mech = resolveLiveDCFMechanic(country);
+  let pr = null;
+  try { pr = getDCFParams(country, fcResolveMechanic(d)); } catch (e) {}
+  const basis = (pr && pr._basis) || 'default';
+  // How many of the 185 run this identical generic template. Computed once, cached.
+  if (_ldcfProvenance._shared === undefined) {
+    let n = 0;
+    try {
+      COUNTRY_DATA.forEach(function(x) {
+        const m2 = fcResolveMechanic(x);
+        const p2 = getDCFParams(x.country, m2);
+        if (p2 && p2._basis === 'default' && resolveLiveDCFMechanic(x.country) === 'Concession') n++;
+      });
+    } catch (e) { n = 0; }
+    _ldcfProvenance._shared = n;
+  }
+  return {
+    basis: basis,
+    mechanic: mech,
+    monopoly: isStateMonopoly(d.take_75),
+    generic: basis === 'default',
+    terms: (typeof describeDefaultTerms === 'function') ? describeDefaultTerms(mech) : '',
+    shared: (mech === 'Concession' && basis === 'default') ? _ldcfProvenance._shared : 0
+  };
+}
+
 function renderLiveDCFPanel(country, containerId) {
   const container = document.getElementById(containerId);
   if (!container) return;
@@ -39947,6 +40000,31 @@ function renderLiveDCFPanel(country, containerId) {
   const defaultPrice = 75;
   // v504: label the regime the engine will actually run, not d.mechanics[0]
   const _runMech504 = resolveLiveDCFMechanic(country);
+  // v704 (T6): and say whether those terms are this country's or the platform's generic template.
+  const _prov704 = _ldcfProvenance(country) || { basis:'default', generic:true, monopoly:false, terms:'', shared:0, mechanic:_runMech504 };
+  const _scope704 = _prov704.monopoly
+    ? '<strong style="color:var(--orange);">No contractor regime to model.</strong> ORCA holds '
+      + country + ' as a <strong>state monopoly</strong> \u2014 the acreage is closed to contractor entry, and the 100.0% '
+      + 'take stored against it is a placeholder for &ldquo;no contractor position&rdquo;, not a measured fiscal take. '
+      + 'There are no ' + country + ' fiscal terms in the engine, so the run below is the platform\u2019s generic '
+      + _runMech504 + ' template (' + _prov704.terms + ') and describes a hypothetical opening of the acreage on '
+      + 'those terms. It is <strong>not</strong> ' + country + '\u2019s economics and no figure in it is citable for '
+      + country + '.'
+    : _prov704.generic
+      ? '<strong style="color:var(--text);">What-if tool \u2014 generic terms.</strong> ORCA holds <strong>no '
+        + country + '-specific fiscal parameters</strong> in this engine, so this run uses the platform\u2019s '
+        + 'generic <strong>' + _runMech504 + '</strong> template: ' + _prov704.terms + '. '
+        + (_prov704.shared > 1
+            ? '<strong>' + _prov704.shared + ' of the 185 countries share that template and return these same three numbers.</strong> '
+            : '')
+        + 'Move the price and profile to see how the template responds \u2014 but the result is a property of the '
+        + 'template, not of ' + country + '. ' + country + '\u2019s own take, averaged over '
+        + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts, is at the top of this page.'
+      : '<strong style="color:var(--text);">What-if tool.</strong> Runs <strong>one</strong> hypothetical project through '
+        + country + '\u2019s ' + _runMech504 + ' terms at a price and profile you choose. '
+        + 'The results below are that project\u2019s economics &mdash; <em>not</em> ' + country + '\u2019s headline figures, '
+        + 'which are averaged over ' + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts. '
+        + 'Reconciliation of the two is at the bottom of this panel.';
 
   container.innerHTML = `
 <div class="live-dcf-panel" id="ldcf-${country.replace(/[^a-z0-9]/gi,'_')}">
@@ -39954,9 +40032,7 @@ function renderLiveDCFPanel(country, containerId) {
   <!-- v504: scope line — this panel is a what-if on ONE synthetic project, not ${country}'s headline take.
        Without this, its 20px "Govt Take" card reads as a second, contradictory country statistic. -->
   <div style="font-size:11px;color:var(--muted);line-height:1.5;margin:0 0 12px 0;padding-bottom:10px;border-bottom:1px dashed var(--border);">
-    <strong style="color:var(--text);">What-if tool.</strong> Runs <strong>one</strong> hypothetical project through ${country}&rsquo;s ${_runMech504} terms at a price and profile you choose.
-    The results below are that project&rsquo;s economics &mdash; <em>not</em> ${country}&rsquo;s headline figures, which are averaged over ${d.n ? d.n.toLocaleString() : 'all'} real contracts.
-    Reconciliation of the two is at the bottom of this panel.
+    ${_scope704}
   </div>
   <div class="dcf-controls">
     <div class="dcf-control-group">
@@ -39981,9 +40057,9 @@ function renderLiveDCFPanel(country, containerId) {
   </div>
   <div class="dcf-results-row" id="ldcf-results-${country.replace(/[^a-z0-9]/gi,'_')}">
     <div class="dcf-result-card">
-      <div class="dcf-result-label">Govt Take &mdash; this scenario</div>
+      <div class="dcf-result-label" id="ldcf-take-lbl-${country.replace(/[^a-z0-9]/gi,'_')}">Govt Take &mdash; this scenario</div>
       <div class="dcf-result-value" id="ldcf-take-${country.replace(/[^a-z0-9]/gi,'_')}">—</div>
-      <div class="dcf-result-note">% of revenue &middot; 1 project</div>
+      <div class="dcf-result-note" id="ldcf-take-note-${country.replace(/[^a-z0-9]/gi,'_')}">% of revenue &middot; 1 project</div>
     </div>
     <div class="dcf-result-card">
       <div class="dcf-result-label" id="ldcf-irr-lbl-${country.replace(/[^a-z0-9]/gi,'_')}">Contractor IRR &mdash; this scenario</div>
@@ -39991,9 +40067,9 @@ function renderLiveDCFPanel(country, containerId) {
       <div class="dcf-result-note" id="ldcf-irr-note-${country.replace(/[^a-z0-9]/gi,'_')}">25yr project</div>
     </div>
     <div class="dcf-result-card">
-      <div class="dcf-result-label">Contractor NPV &mdash; this scenario</div>
+      <div class="dcf-result-label" id="ldcf-npv-lbl-${country.replace(/[^a-z0-9]/gi,'_')}">Contractor NPV &mdash; this scenario</div>
       <div class="dcf-result-value" id="ldcf-npv-${country.replace(/[^a-z0-9]/gi,'_')}">—</div>
-      <div class="dcf-result-note">10% disc. rate ($M)</div>
+      <div class="dcf-result-note" id="ldcf-npv-note-${country.replace(/[^a-z0-9]/gi,'_')}">10% disc. rate ($M)</div>
     </div>
   </div>
   <div class="dcf-waterfall" id="ldcf-wf-${country.replace(/[^a-z0-9]/gi,'_')}"></div>
@@ -40034,9 +40110,42 @@ function _execLiveDCF(country, profileKey, price) {
   const irrEl  = document.getElementById('ldcf-irr-' + slug);
   const npvEl  = document.getElementById('ldcf-npv-' + slug);
 
+  // ── v704 (T6): what basis are these terms on? ───────────────────────────────────
+  const _p704 = _ldcfProvenance(country) || { basis:'default', generic:true, monopoly:false, terms:'', shared:0 };
+  const _tkLbl704  = document.getElementById('ldcf-take-lbl-' + slug);
+  const _tkNote704 = document.getElementById('ldcf-take-note-' + slug);
+  const _npLbl704  = document.getElementById('ldcf-npv-lbl-' + slug);
+  const _npNote704 = document.getElementById('ldcf-npv-note-' + slug);
+
   if (takeEl) {
     takeEl.textContent = result.take.toFixed(1) + '%';
-    takeEl.style.color = result.take > 75 ? 'var(--red)' : result.take > 60 ? 'var(--orange)' : result.take > 40 ? 'var(--yellow)' : 'var(--green)';
+    // A generic-template result is never painted on the take tier ramp. The ramp is the page
+    // telling the analyst where THIS COUNTRY sits, and a number 119 countries share says nothing
+    // about any of them. Same rule v703 applied to the inflated IRR.
+    takeEl.style.color = _p704.generic
+      ? 'var(--muted)'
+      : (result.take > 75 ? 'var(--red)' : result.take > 60 ? 'var(--orange)' : result.take > 40 ? 'var(--yellow)' : 'var(--green)');
+  }
+  if (_tkLbl704) {
+    _tkLbl704.innerHTML = _p704.generic
+      ? 'Govt Take &mdash; <span style="color:var(--orange);font-weight:700;">generic template</span>'
+      : 'Govt Take &mdash; this scenario';
+  }
+  if (_tkNote704) {
+    _tkNote704.innerHTML = _p704.generic
+      ? 'no ' + _cpEsc704(country) + ' terms in the engine'
+        + (_p704.shared > 1 ? ' &middot; ' + _p704.shared + ' countries return this' : '')
+      : '% of revenue &middot; 1 project';
+  }
+  if (_npLbl704) {
+    _npLbl704.innerHTML = _p704.generic
+      ? 'Contractor NPV &mdash; <span style="color:var(--orange);font-weight:700;">generic template</span>'
+      : 'Contractor NPV &mdash; this scenario';
+  }
+  if (_npNote704) {
+    _npNote704.innerHTML = _p704.generic
+      ? '10% disc. rate ($M) &middot; not ' + _cpEsc704(country) + '&rsquo;s'
+      : '10% disc. rate ($M)';
   }
   // ── v703 (T2): the Contractor IRR card was the worst number on the Country Profile ──────
   // It printed `result.irr` raw, in green for anything at or above 20%. Measured across all
@@ -40183,7 +40292,43 @@ function _execLiveDCF(country, profileKey, price) {
   // why they differ, and how big the gap is — in words.
   // ================================================================
   const vsEl = document.getElementById('ldcf-vsdb-' + slug);
-  if (vsEl && result.dbTake != null) {
+
+  // ── v704 (T6) — a state monopoly has no citable take, so stop telling the analyst to cite one.
+  // This block used to render "✔ Cite this — 100.0% — Kuwait's government take @ $75/bbl —
+  // 177 contracts, averaged" beside a scenario reading of 22.2%. Both halves are wrong. The
+  // 100.0% is the placeholder the DCF solver stores for closed acreage, not an average of 177
+  // contracts; the 22.2% is the platform's generic Concession template, because ORCA holds no
+  // Kuwait terms. Side-by-Side has withdrawn both figures for these three countries since v697;
+  // the Country Profile was still publishing them as the answer to "which number goes in the memo".
+  if (vsEl && _p704.monopoly) {
+    const _cdM = COUNTRY_DATA.find(x => x.country === country);
+    const _nM  = _cdM && _cdM.n ? _cdM.n.toLocaleString() : null;
+    vsEl.innerHTML =
+      '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Which number goes in the IC memo?</div>'
+      + '<div style="background:rgba(185,28,28,.05);border:1px solid rgba(185,28,28,.3);border-radius:6px;padding:10px 12px;margin-bottom:8px;">'
+        + '<div style="font-size:12px;font-weight:800;color:var(--red);margin-bottom:4px;">Neither. Both figures on this panel are withdrawn for ' + _cpEsc704(country) + '.</div>'
+        + '<div style="font-size:11px;color:var(--text);line-height:1.55;">'
+          + 'ORCA stores ' + _cpEsc704(country) + '’s government take as <strong>'
+          + (result.dbTake != null ? result.dbTake.toFixed(1) : '100.0') + '% at every modelled price</strong>. '
+          + 'That is the value the DCF solver writes when there is no contractor cash flow to model — a marker for '
+          + '<strong>closed acreage</strong>, not a measured fiscal take'
+          + (_nM ? ', and not an average of the ' + _nM + ' contracts on file' : '') + '. '
+          + 'The scenario figure beside it (' + result.take.toFixed(1) + '%) comes from the platform’s generic '
+          + result.mechanic + ' template, because the engine holds no ' + _cpEsc704(country) + ' fiscal parameters at all. '
+          + 'Quoting either one as ' + _cpEsc704(country) + '’s government take would be inventing a number.'
+        + '</div>'
+      + '</div>'
+      + '<div style="background:rgba(176,104,0,.07);border:1px solid rgba(176,104,0,.35);border-radius:6px;padding:9px 12px;">'
+        + '<div style="font-size:10px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:.04em;">✔ Cite this instead</div>'
+        + '<div style="font-size:11px;color:var(--text);line-height:1.55;margin-top:3px;">'
+          + '&ldquo;' + _cpEsc704(country) + ' is closed to contractor entry; the state holds the acreage, so there is no '
+          + 'contractor fiscal position to model.&rdquo; The rows that remain real on this page are the ones that describe '
+          + 'the published terms rather than an investor return — contract count, fiscal mechanics, evidence tier and '
+          + 'facts held. Fiscal Compare, Side-by-Side and the Screener all treat '
+          + _cpEsc704(country) + ' as unranked for the same reason.'
+        + '</div>'
+      + '</div>';
+  } else if (vsEl && result.dbTake != null) {
     const cd = COUNTRY_DATA.find(x => x.country === country);
     const delta = result.take - result.dbTake;
     const adelta = Math.abs(delta);
@@ -40202,6 +40347,16 @@ function _execLiveDCF(country, profileKey, price) {
       verdict = 'Material gap \u2014 do not put these two numbers in the same sentence. Quoting ' + result.take.toFixed(1)
               + '% as \u201c' + country + '\u2019s government take\u201d would understate/overstate it by ' + adelta.toFixed(1)
               + 'pp against every other tab, the API and the XLSX export.';
+    }
+    // v704 (T6): on a generic-template run the gap is not a fiscal finding about the country --
+    // it is the distance between the country's real contracts and a template that knows nothing
+    // about them. Saying "consistent" or "modest gap" there would read as corroboration.
+    if (_p704.generic) {
+      sevCol = 'var(--orange)'; sevBg = 'rgba(176,104,0,.06)'; sevBorder = 'rgba(176,104,0,.3)';
+      verdict = 'This gap is not a finding about ' + _cpEsc704(country) + '. The scenario ran the generic '
+              + result.mechanic + ' template because the engine holds no ' + _cpEsc704(country)
+              + ' terms, so the difference measures the template, not the regime. Cite the '
+              + result.dbTake.toFixed(1) + '% country average; cite the scenario only as a template run, and say so.';
     }
 
     // Why they differ — every driver below is read off the data, none is asserted blind.
@@ -40225,9 +40380,23 @@ function _execLiveDCF(country, profileKey, price) {
     if (cd && cd.tier_schedule && cd.tier_schedule.length > 0) {
       drivers.push('<strong>R-factor tiers:</strong> government profit-oil share rises with cumulative profitability. One project traces a single R-factor path; the country average blends contracts sitting at many different R-factor stages.');
     }
-    // Always true, and the fundamental driver — stated last so it reads as the base case.
-    drivers.push('<strong>Terms:</strong> this scenario applies ' + country + '\u2019s <em>country-default statutory</em> parameters. The country average uses each contract\u2019s own negotiated terms'
-      + (cd && cd.weighting === 'prod_weighted' ? ', production-weighted where field data exists' : '') + '.');
+    // v704 (T6): this line used to read "this scenario applies <Country>'s country-default
+    // statutory parameters" on all 185 countries. On the 120 with _basis 'default' there are no
+    // country parameters -- it is the platform's mechanic template, and it is the dominant driver
+    // of the gap, so on those countries it is stated first rather than last.
+    const _termsDriver704 = _p704.generic
+      ? '<strong>Terms — this is the whole gap:</strong> the engine holds <strong>no '
+        + _cpEsc704(country) + '-specific fiscal parameters</strong>. This scenario ran the generic '
+        + result.mechanic + ' template (' + _p704.terms + ')'
+        + (_p704.shared > 1 ? ', which ' + _p704.shared + ' of the 185 countries share and which returns this identical result for all of them' : '')
+        + '. The country average above is built from ' + (cd && cd.n ? cd.n.toLocaleString() + ' ' : '')
+        + 'real contracts and their own negotiated terms'
+        + (cd && cd.weighting === 'prod_weighted' ? ', production-weighted where field data exists' : '')
+        + ' — so the two are not two readings of one regime, and the scenario carries no '
+        + _cpEsc704(country) + ' information.'
+      : '<strong>Terms:</strong> this scenario applies ' + country + '’s <em>statutory</em> parameters as held in the engine. The country average uses each contract’s own negotiated terms'
+        + (cd && cd.weighting === 'prod_weighted' ? ', production-weighted where field data exists' : '') + '.';
+    if (_p704.generic) drivers.unshift(_termsDriver704); else drivers.push(_termsDriver704);
 
     vsEl.innerHTML =
       '<div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Which number goes in the IC memo?</div>'
@@ -40240,10 +40409,16 @@ function _execLiveDCF(country, profileKey, price) {
             + (cd && cd.n ? cd.n.toLocaleString() + ' contracts, averaged' : 'Contract average') + '. This is the figure Fiscal Compare ranks on, Side-by-Side shows, the XLSX exports and the API returns.</div>'
         + '</div>'
         + '<div style="flex:1 1 220px;background:var(--surface);border:1px dashed var(--border);border-radius:6px;padding:9px 12px;">'
-          + '<div style="font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;">Scenario result \u2014 label it</div>'
+          + '<div style="font-size:10px;font-weight:800;color:' + (_p704.generic ? 'var(--orange)' : 'var(--muted)') + ';text-transform:uppercase;letter-spacing:.04em;">'
+            + (_p704.generic ? 'Generic template \u2014 do not cite' : 'Scenario result \u2014 label it') + '</div>'
           + '<div style="font-size:19px;font-weight:900;color:var(--muted);margin:3px 0 2px;">' + result.take.toFixed(1) + '%</div>'
-          + '<div style="font-size:11px;color:var(--text);line-height:1.45;">One ' + result.profileName + ' project on ' + result.mechanic + ' terms @ $' + price + '/bbl</div>'
-          + '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px;">Answers \u201cwhat would <em>my</em> project pay here\u201d. If you use it, say so in the memo.</div>'
+          + '<div style="font-size:11px;color:var(--text);line-height:1.45;">One ' + result.profileName + ' project on '
+            + (_p704.generic ? 'the generic ' + result.mechanic + ' template' : country + '\u2019s ' + result.mechanic + ' terms') + ' @ $' + price + '/bbl</div>'
+          + '<div style="font-size:10px;color:var(--muted);line-height:1.45;margin-top:3px;">'
+            + (_p704.generic
+                ? 'Carries no ' + _cpEsc704(country) + '-specific terms'
+                  + (_p704.shared > 1 ? ' \u2014 ' + _p704.shared + ' countries return this same figure' : '') + '.'
+                : 'Answers \u201cwhat would <em>my</em> project pay here\u201d. If you use it, say so in the memo.') + '</div>'
         + '</div>'
       + '</div>'
       + '<div style="background:' + sevBg + ';border:1px solid ' + sevBorder + ';border-radius:6px;padding:8px 12px;margin-bottom:8px;">'
