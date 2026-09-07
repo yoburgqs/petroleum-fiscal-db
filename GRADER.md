@@ -34259,3 +34259,109 @@ bottoming out at 95 countries.
 Walked the Screener cold at 1440 with storage cleared. **Max Govt Take** is the first control an analyst touches — the platform's headline metric, top-left of four sliders. Driven across its full shipped travel through the real `runScreener()` path, it moved the result set **185 → 95 and no further**.
 
 Two faults in 
+
+---
+## Cycle 599 Log — 2026-09-07
+
+- Test before: 294 PASS / 0 FAIL (deployed) · 293 PASS / 0 FAIL / 1 WARN (local)
+- Test after: **293 PASS / 0 FAIL / 1 WARN — suite RAN this cycle** against the local build
+- JS errors: 0
+- Shipped: **v693**
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest in the
+rotation (593 T5, 594 T4, 595 T2, 596 T5, 597 T3, 598 T1; T6 last walked at 592).
+
+## Friction
+Walked T6 cold at 1440 with storage cleared: Fiscal Compare → click a row → read the drawer
+header strip, which is where the drilldown states its basis.
+
+`openFCDrilldown()`'s breakeven branch (~L42326) gated on **`d.be_75 > 0`**. It is the last
+place on the platform still using that test. The Explorer's BE-only checkbox (L24635), the
+Breakeven Map's own set (L32062), the Screener ceiling (L41499), the XLSX export (L35252) and
+`formatBreakeven()` itself all gate on **`> 1`** — because `be_75 = 1.0` is the DCF solver
+hitting its floor on a regime with no contractor position, not a breakeven. L24072 already
+names it in a comment: *"the be_75 = 1.0 state-monopoly sentinel."*
+
+Two consequences, both live, both measured:
+
+1. **Bahrain, Kuwait and Saudi Arabia** each carry `take_75 = 100.0` at $50/$75/$100/$125 and
+   `npv_75 = $0`. Their drawers rendered **`BE $1/bbl` in GREEN** — the most resilient
+   breakeven on the platform, for the three jurisdictions closed to IOC equity. Fiscal
+   Compare's own BE column already printed `—` with a state-monopoly tooltip for the same
+   three, so one page disagreed with itself two clicks apart.
+
+2. The v500 regional-median fallback filtered peers on `x.be_75 > 0` as well, so those three
+   floor values sat **inside the peer set**. The Middle East's five surviving values were
+   **{1, 1, 1, 28, 31} → median $1**. Twelve countries rendered
+   `BE: — (regional median $1/bbl)` over a tooltip reading *"$1/bbl across 5 countries with
+   verified data"*: **Iraq — rank #2 in the default ranking** — Iran, Qatar, Oman, UAE,
+   UAE—Dubai, Iraq-Kurdistan, Yemen, Jordan, Lebanon, Syria, Turkey.
+
+This was the worst moment in the walk because it is the one place the platform answers a T6
+question with a hard number, a stated sample size and the word *verified* — and all three
+were wrong. Everywhere else ORCA is scrupulous about these three monopolies; here it
+laundered them into a peer median.
+
+The other 97 affected countries got an arithmetically honest median that still carried
+nothing: all 65 modelled breakevens fall between $27 and $34/bbl and 43 sit on two integers,
+which is the finding the whole Breakeven Map tab is built around.
+
+## Change
+- First branch now gates on `_beIsTested(d.be_75) && d.be_75 > 1 && d.be_75 < 999`, matching
+  the platform convention. All three monopolies fall through.
+- The regional-median proxy is **deleted outright**, not corrected. Replaced with the axis the
+  Breakeven Map explicitly points the analyst at: **NPV retention $75 → $50**, defined for 182
+  of 185, spanning -14% to +75%, median 45%.
+- `_npvRetention()` returns null for exactly the three monopolies, which now read
+  **`BE: — (no contractor position)`** with the closed-regime explanation and no number.
+- Bands and colours reuse `_retentionSub()`, so the drawer and the Screener's NPV @$50 column
+  agree on sight.
+
+## Result
+No country is told its breakeven is $1/bbl. An analyst opening **Iraq — the second row of the
+default view** — reads **`61% of NPV kept at $50`** instead of a fabricated regional median,
+and the figure now *separates*: Yemen -14%, Oman 21%, Angola 33%, UK 43%, Norway 46%,
+UAE 47%, Nigeria 53%, Qatar 55%, Iraq 61%, Iran 70%. Eight countries in CIS/FSU and North
+America — regions with fewer than 2 peers, where the old code `return`ed and printed nothing
+at all — now carry a figure.
+
+## Verification
+- **A/B sweep of all 185 drawers** against a served copy of the pre-edit file:
+  **65 unchanged** (exactly the set holding a real modelled breakeven), **120 changed** —
+  3 monopoly, 12 that read `$1 median`, 97 regional median, 8 previously blank — and
+  **NONE lost a real breakeven**.
+- **JS syntax gate: PASS** — 11 inline `<script>` blocks extracted, `node --check`.
+- **Runtime suite RAN this cycle** against the local build: **293 PASS / 0 FAIL / 1 WARN**.
+  The WARN is the localhost `sw.js` 404 — the service worker registers at an absolute Pages
+  path that does not exist when serving from repo root. Present before any edit, identical to
+  v691's and v692's, and untouchable by a change to the FC drawer.
+- **0 page errors** on both the pre-edit and post-edit builds.
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390, all 10 tabs.
+- **Mobile (Step 5b), 390x844 `hasTouch: true`**, drawer open on Iraq / Saudi Arabia / Yemen:
+  `scrollWidth 390 === clientWidth 390` in all three. The new span carries no
+  `white-space:nowrap` (the v681 lesson), measures 180-186px and wraps with its row.
+  Controls under 24px: **3 before and the same 3 after**, measured against the served pre-edit
+  copy — the replaced element is a `cursor:help` label, not a focusable control, same as its
+  predecessor.
+- Version bumped v692 → v693 silently at the end, per the directive. `_orcaCiteVer()` reads
+  the badge, so all `.orca-cite-ver` citations propagated automatically — verified live.
+
+## Carried forward — not fixed this cycle
+- **`be_75 = 1.0` is still in the underlying data** for Bahrain / Kuwait / Saudi Arabia. Every
+  consumer now guards it, but the guard is repeated in ~11 places and a twelfth was found this
+  cycle. The durable fix is harvest-side — null the field for a 100%-take regime — not another
+  guard. That is a data change, not a UX one.
+- The **Contractor NPV header tooltip on the Screener** still says "see profile selector for
+  assumptions"; there is no profile selector on that tab. Second cycle carrying it.
+- **pixel_audit** still carries exactly one regression, `tablet-768::2-t7 clipped-text 33 -> 34`
+  — **ninth cycle carrying it**, and still the longest-standing unaddressed item in the loop.
+  Points at the detector, not the layout.
+- The **`Other` region bucket** is empty by construction in the Screener select (v661), but the
+  harvest-side misfiling of the 17 jurisdictions is unfixed.
+- The **CP CLOSEST FISCAL PEERS chips still sort on the blended `take_75`** rather than the
+  comparable take.
+- **164 of 185 jurisdictions hold no sourced reform log**, which dominates the T4 answer.
+- The **Methodology tab still names an API Explorer tab that is `display:none`**.
+- The **`⬇ Chart PNG` button exports only the take chart** (`downloadCmpChart()` hard-codes
+  `#cmp-chart`); the Side-by-Side NPV chart has no export path.
