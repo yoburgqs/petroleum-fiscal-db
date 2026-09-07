@@ -34902,3 +34902,99 @@ predictable regime.
 **Friction.** I walked Side-by-Side from a cold load with analyst-chosen sets rather than the seeded example. On **Iraq / Kuwait / UAE**, Kuwait broke it.
 
 Kuwait — like Bahrain and Saudi Arabia — stores a placeholder government take of `100.0` at every price. That placeholder means *the state holds the acreage and there is n
+
+---
+## Cycle 604 Log — 2026-09-07 11:05
+- Test before: 294 PASS / 0 FAIL
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local server; identical on the pre-change build — zero delta)
+- JS errors: 1 (sw.js 404, local-server artefact only)
+- Summary: shipped and pushed (`7a7511e..075265c`).
+
+## Cycle 604 — v698
+
+**Task:** T2 — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest;
+603 was T3, and T2 was last walked around 583.)
+
+**Friction.** Walked Indonesia cold on Country Profile. The headline correctly refuses to print a
+country-level IRR (v516 retired it — the bundled figure is an arithmetic mean of per-contract IRRs
+that clears a 15% hurdle almost everywhere) and instead routes the analyst to the Scenario Builder
+via `→ Model in Scenario Builder`. That route is the platform's own answer to the second half of T2,
+so it is on the critical path for the task.
+
+Taking it, the **Project Profile** selector read `Deepwater ($800M capex, 50Mbbl/d peak)`.
+`DCF_PROFILES.deepwater` carries `capexMM: 1200`. The label was hand-typed in the HTML at line 22038
+and was wrong — on the **default** option, the one the modal opens on, and the one the entire
+platform names as its standardized reference basis:
+
+| where | states |
+|---|---|
+| Country Profile NPV footnote (the screen the analyst just left) | `$1.2B capex · 50k bbl/d peak · $15/bbl opex · 25-year life` |
+| Methodology assumptions table | `$1.2B deepwater ($1,200M)` |
+| FC citation string (line 2217) | `$1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC` |
+| `DCF_PROFILES` / `FC_PROFILES` (what actually runs) | `capexMM: 1200` |
+| **Scenario Builder selector** | **`$800M capex`** |
+
+The modal also contradicted **itself**: its own result panel prints `capital at risk $190M of $1.2B
+project capex`, read from the same object the label misquoted. So the one screen an analyst is sent
+to in order to defend an NPV was the only screen in the platform disagreeing about which project
+produced it — and disagreeing by $400M, a third of the basis.
+
+The other five labels were all correct (shallow 400 ✓, onshore_me 300 ✓, north_sea 600 ✓, lng 5000 ✓,
+onshore_us 150 ✓). That is what made this the worst moment rather than a known caveat: nothing
+signals that one of the six is untrustworthy, so the analyst has no reason to check any of them.
+
+**Change.**
+- The six `<option>` labels are now **generated from `DCF_PROFILES` at load** (`_sbBuildProfileOptions`),
+  so a label cannot drift from the engine again. The instance is fixed by removing the class.
+  Deepwater now reads `Deepwater — $1.2B capex · 50k bbl/d · $15/bbl opex`.
+- Peak rate is stated in `k bbl/d`, the unit every other basis string on the platform uses. The old
+  labels wrote `50Mbbl/d` for 50,000 b/d.
+- A **live basis line** under the selector (`_sbRenderBasis`) prints the full project the DCF is about
+  to run: capex, peak rate, ramp / plateau / decline, opex, 25-year life, WACC, 100% WI. Opex,
+  project life and the production shape were never shown at the point of decision before — the label
+  only ever carried capex and peak rate. It updates on `onchange`, on both programmatic paths
+  (preset buttons and country pre-fill, where `.value =` does not fire `onchange`), and on modal open
+  so the basis is stated before any result is read.
+- Its tooltip flags that only the Deepwater profile matches the standardized basis behind the
+  published Country Profile and Fiscal Compare NPVs — the other five do not, and nothing said so.
+
+**Result.** An analyst quoting an NPV or IRR out of the Scenario Builder can read the exact project
+basis off the same screen, and it now agrees with the Country Profile footnote they arrived from
+instead of naming a capex a third lower. The IC line they paste is defensible: the capex in the
+selector, the capex in the result text, and the capex in the engine are the same number.
+
+## Verification
+
+- **JS syntax gate: PASS** — 11 inline blocks, `vm.Script` parse, 0 failures.
+- **Runtime suite RAN this cycle** against the served build: **293 PASS / 0 FAIL / 1 WARN**. The same
+  suite run against the **pre-change** build on the same server returned an identical **293 / 0 / 1**
+  — **zero test delta**. The WARN, the 1 JS error and the 293-vs-294 gap are one artefact: the page
+  registers `/petroleum-fiscal-db/sw.js` (a Pages-absolute path) which 404s under a root-served local
+  server. Not present on the deployed site. Same as cycle 603.
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390.
+- **Mobile (Step 5b), 390×844 `hasTouch: true`:** `scrollWidth === clientWidth` (390 = 390);
+  **0 touched controls under 24px**.
+- **Paths re-exercised:** country pre-fill (`ddOpenScenarioBuilder('Indonesia')` → deepwater, basis
+  renders), manual change (→ lng, basis follows), preset button (Norway → `north_sea`, basis follows
+  through the programmatic path), and `Run DCF` (result capex line now agrees with the selector).
+- Version bumped v697 → v698 silently at the end: **2 live strings only** (lines 1737, 1807).
+
+## Carried forward — not fixed this cycle
+
+- **`FC_PROFILES` and `DCF_PROFILES` are two separate tables with divergent key sets.** `FC_PROFILES`
+  has `onshore` / `marginal` / `giant` and no `onshore_me` / `onshore_us`; `DCF_PROFILES` is the
+  reverse. `deepwater`, `shallow` and `north_sea` agree in both. Nothing observed is wrong today, but
+  this is the same duplicated-constant shape that produced the label drift fixed above, and a future
+  edit to one table will not reach the other. Worth collapsing to one source.
+- The Methodology "Recent Platform Updates" block is a placeholder paragraph with no entries.
+- Everything on the cycle-603 carried list remains open: `Take weighting` / `NPV weighting` still
+  print "Equal-weighted" on a monopoly column; Kuwait's evidence tier grades a regime with no
+  contractor position; the three monopolies still carry `be_75 = 1.0` (5th cycle); the 862 contracts
+  with no fiscal terms; zero-rate defaults inside published country `take_75`; `⬇ Chart PNG`
+  exporting only `#cmp-chart`; the Screener Contractor NPV tooltip naming a profile selector absent
+  from that tab (7th cycle); the `Other` region bucket misfiling 17 jurisdictions; 164 of 185
+  jurisdictions with no sourced reform log; the Methodology tab naming a `display:none` API Explorer
+  tab; the unweighted per-mechanic pivot averages; the incomplete 2020s cohort; and the duplicated
+  `renderVintageTrendChart()` / `renderVintage()` line charts.
+- **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 14th cycle. Points at the
+  detector, not the layout.
