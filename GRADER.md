@@ -35257,3 +35257,68 @@ Profile now agree with each other and with `dcfPSC()`.
 
 ## Friction
 Walking T6 cold — load → Country Profile → Key Fiscal Parameters (Evidence Chain) — the Profit Oil row on Indonesia renders the loudest thing in the table: a red chip reading **`⚠ DCF USES 71.2%`**, whose tooltip says *"The Live DCF panel further up this same page
+
+---
+## Cycle 607 Log — 2026-09-07 (v701)
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local server; the WARN is the known `sw.js` 404 under a root-served local server, absent on Pages — the deployed number is 294 PASS / 0 WARN)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — Playwright **actually run this cycle**, and run a second time against `git show HEAD:index.html` on the same server to prove the number is a baseline and not a regression. Byte-identical totals.
+- JS errors: 0 (11/11 inline script blocks parse)
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest: 606 ran T6, 605 T1, 604 T2, 603 T3, 602 T5, 601 T2 — T4 last walked at 600.)
+
+## Friction
+Walked T4 cold at 1440x900, no sessionStorage, no localStorage.
+
+The per-country surfaces are in good shape and were not the problem. Reform Risk → *Check one country* returns a full verdict card for a scored jurisdiction (Norway 70/100, rank + tie width, direction split, IC action, sourced event log) and an explicit no-coverage card for an unscored one (Qatar: *"This is not a score of 100. No events on file means no coverage, not a clean record"*). Country Profile carries `Stability: n/c (no sourced reform log · 21 of 185 jurisdictions covered · Reform Risk →)` and three separate controls that call `openReformRiskFor(country)`. The Screener has the `sc-reform` Reform Record filter, scoped inside the 21 with a live count on every option label.
+
+**The hole is Side-by-Side.** Its `rows` array (`renderCompare()`, ~line 26502) carried **no reform record at all** — and Side-by-Side is where a shortlist becomes finalists. The Screener's `⇌ Load top 5 in Side-by-Side` lands here; Methodology Phase 2 sends the analyst here; and this grid is what leaves the tool through Export PDF, Share Link and Copy for IC Memo. Fiscal Compare has the Stability column, Country Profile has the Stability line, the Screener has the Reform Record filter, the Reform Risk tab has the lookup — all four driven by `_rrClassify()`. This grid had none of it.
+
+The absence was not neutral, which is what made it the worst moment rather than a gap. The only stability-shaped number on the grid is the **Predictability Score**, and its own tooltip says it is *"distinct from the Reform Frequency Score on the Reform Risk tab"*. So the analyst asking the T4 question reads the nearest thing and gets the ranking backwards. Loading Norway / Russia / Guyana / Qatar / Iraq, the grid printed exactly one stability row:
+
+```
+Predictability   Norway 76   Russia 75   Guyana 62   Qatar 67   Iraq 47
+```
+
+Against `reform_history.json` the true reform position of those same five columns is:
+
+| Column | Reform Frequency | What is actually on file |
+|---|---|---|
+| Guyana | **100/100** | no post-2010 fiscal change of any kind |
+| Russia | 85/100 | **+15pp windfall tax on oil export revenues, 2022** — a take rise inside the scoring window |
+| Iraq | 85/100 | 2023 KRG–Baghdad FSC ruling, take effect never quantified |
+| Norway | 70/100 | 2 in-window changes (−12pp 2020, +12pp 2022) |
+| Qatar | **n/c** | no sourced reform log at all — 1 of the 164 uncovered jurisdictions |
+
+So the one column with a clean post-2010 record ranked **second-worst** on the only stability row the grid had (Guyana 62, below Russia's 75); the column with a +15pp rupture ranked second-best; and the column with no reform reading at all printed a graded **MODERATE 67**. None of that appeared on this screen, and `copyComparisonTable()` pasted the same ordering into the IC memo.
+
+## Change
+New row **`Reform record (since 2010)`**, placed immediately under Predictability Score in the Data Basis block, so the two signals sit adjacent and are read as two questions rather than one standing in for the other.
+
+- Each scored cell prints three lines: the Reform Frequency Score, the count of scored law changes, and that country's **verdict class** — `take was raised inside the scoring window`, `nothing in the post-2010 record is a fiscal change`, `terms were rewritten inside the window, size never quantified`. Colour is `_rrClassify()`'s own `scoreColor`, so a 100 that is a window artefact does not render in the same green as a real one.
+- **Nothing is recomputed.** The cell renders `_rrClassify()` output — the same function the Reform Risk tab, the Fiscal Compare Stability column and the Country Profile sidebar all call. Four surfaces, one classifier, one premium per country.
+- Uncovered jurisdictions render **`n/c · no sourced reform log`**, not a blank. The tooltip states the 21-of-185 denominator and that n/c is neither a 100 nor a clean record.
+- Every cell is a control (`role="button"`, keyboard-activable) that opens the full verdict via `openReformRiskFor()`.
+- The row rides the **shared `rows` array**, so it reaches the visible grid, the hidden `#cmp-data-table`, Export PDF and both Copy-for-IC-Memo flavours by the same path every other row does. Verified by intercepting `navigator.clipboard.write`: the pasted text/plain now carries `Reform record (since 2010)  70/100 · 2 law changes since 2010 · take was raised inside the scoring window  …  n/c · no sourced reform log  …`.
+
+## Result
+An analyst comparing finalists can see — on the comparison grid, and in the table they paste into the memo — that Guyana has no post-2010 fiscal change on file, that Russia raised government take 15pp in 2022, that Iraq's 2023 ruling has no measured take effect, and that Qatar has no reform reading at all. Before this cycle none of that was on the screen, and the only stability row present ranked those five columns in close to the opposite order.
+
+## Verify
+- **JS syntax gate:** 11/11 inline blocks parse.
+- **Playwright:** run this cycle, 293 PASS / 0 FAIL / 1 WARN, and re-run against stashed `HEAD:index.html` on the same server for an identical 293/0/1. The change adds no failure and the number was read from the suite's own output, not assumed.
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390, measured with the five-country set loaded so the changed row was on screen.
+- **Mobile (Step 5b), 390x844 `hasTouch: true`:** `scrollWidth === clientWidth` (390 = 390) on all nine visible tabs. The new control measures **77–182px** tall under `pointer: coarse`.
+- **Caught by Step 5b, not by the suite:** the first implementation used a standard `position:absolute` visually-hidden span to keep the three lines from concatenating into `70/1002 law changes since 2010` in the clipboard. An out-of-flow child is laid out against the nearest *positioned* ancestor, so it escaped Side-by-Side's `overflow-x` scroller and pushed the document to **427px against a 390px viewport**. Desktop was clean at every width and the runtime suite was 293 PASS either way. Replaced with an in-flow zero-size span; re-measured 390 = 390. This is the second time the mobile check has caught something nothing else was looking at.
+- **Regression check on untouched paths:** Predictability Score row, its `≥29.6pp obs / ▲ best case` v674 repaint on Norway, the Take-spread row, the fee-basis notice and the inverted-ranking notice all render unchanged with the same five-country set. State-monopoly withdrawal paths untouched.
+- Version bumped v700 → v701 silently at the end: **2 live strings only** (lines 1737, 1807).
+
+## Carried forward — not fixed this cycle
+- **The Methodology tab's tier definitions still contradict the Home tab's** (Methodology ~4089 vs Home ~1884). Text-only.
+- **The Methodology tab's own FAQ text (~line 4377) still tells the analyst to "apply the Stability Score filter at ≥4 in the Screener".** No such control exists — the Screener's reform axis is the `sc-reform` select with four named modes, and there is no 0–5 Stability filter on that tab. Text-only, so not this cycle's change, but it is instruction an analyst will try to follow.
+- Grammar in the Evidence Chain verdict lines on n=1 cases (Namibia, Vanuatu). Text-only.
+- **The Home tab's Screener card still advertises a breakeven filter removed at v568** (from 605).
+- `FC_PROFILES` / `DCF_PROFILES` remain two tables with divergent key sets (from 604).
+- Methodology "Recent Platform Updates" is still an empty placeholder.
+- Everything on the cycle-603/604/605/606 carried lists remains open: `Take weighting` / `NPV weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier on a regime with no contractor position; the three monopolies carrying `be_75 = 1.0` (8th cycle); the 862 contracts with no fiscal terms; zero-rate defaults inside published country `take_75`; `⬇ Chart PNG` exporting only `#cmp-chart`; the Screener Contractor NPV tooltip naming a profile selector absent from that tab (10th cycle); the `Other` region bucket misfiling 17 jurisdictions; 164 of 185 jurisdictions with no sourced reform log; the Methodology tab naming a `display:none` API Explorer tab; the unweighted per-mechanic pivot averages; the incomplete 2020s cohort; and the duplicated `renderVintageTrendChart()` / `renderVintage()` line charts.
+- **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 17th cycle. Points at the detector, not the layout.
