@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v700</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v701</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v700</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v701</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -26499,6 +26499,87 @@ function renderCompare() {
       + nc + ' contracts. That is a fiscal-terms figure, not realised economics, and it has no honest position in a producer ranking. Compare it on the Govt Take rows below with the PROXY basis stated.' + allNote)
       + '">not ranked' + sub('no production data', 'var(--muted)') + '</span>';
   };
+  // ── v701 (T4) — the reform record was missing from the one grid built to rank countries ──
+  // Side-by-Side is where a shortlist becomes finalists: the Screener's "Load top 5 in
+  // Side-by-Side" lands here, Methodology Phase 2 sends the analyst here, and this grid is what
+  // leaves the tool through Export PDF, Share Link and Copy for IC Memo. It carried no reform
+  // row at all. Every other surface has one -- Fiscal Compare has the Stability column, Country
+  // Profile has the Stability line and the "Check reform risk" control, the Screener has the
+  // Reform Record filter, and the Reform Risk tab has the per-country lookup -- all four driven
+  // by _rrClassify(). This grid was the hole.
+  //
+  // The damage is not just absence. The row that DOES sit in this block, Predictability Score,
+  // is the only stability-shaped number on the grid, and its own tooltip says it is "distinct
+  // from the Reform Frequency Score on the Reform Risk tab". So an analyst asking "what is my
+  // reform exposure across these finalists?" reads the nearest thing and gets the ranking
+  // backwards. Loading Norway / Russia / Guyana / Qatar / Iraq, the grid printed exactly one
+  // stability row:
+  //   Predictability   Norway 76   Russia 75   Guyana 62   Qatar 67   Iraq 47
+  // Against reform_history.json the true reform position of those same five columns is:
+  //   Guyana  100/100  no post-2010 fiscal change of any kind on file
+  //   Russia   85/100  +15pp windfall tax on oil export revenues, 2022 -- a take rise inside
+  //                    the scoring window, the case this platform flags in orange everywhere else
+  //   Iraq     85/100  2023 KRG-Baghdad FSC ruling, take effect never quantified
+  //   Norway   70/100  2 in-window changes (-12pp 2020, +12pp 2022)
+  //   Qatar    n/c     no sourced reform log at all -- 1 of the 164 uncovered jurisdictions
+  // So the one column with a clean post-2010 record ranked SECOND-WORST on the only stability
+  // row the grid had (Guyana 62, below Russia's 75), the column with a +15pp rupture ranked
+  // second-BEST, and the column with no reform reading at all printed a graded MODERATE 67. None
+  // of that appeared on this screen, and the pasted IC memo carried the same ordering.
+  //
+  // Nothing is recomputed: the cell renders _rrClassify()'s own score, verdict class and note,
+  // so the four surfaces cannot report different premiums for one country. The n/c state is the
+  // point of the row as much as the scored one -- 164 of 185 jurisdictions have no sourced log,
+  // and this cell says so rather than leaving a blank that reads as clean.
+  const _cmpReformCell = (d) => {
+    const c  = d.country;
+    const js = String(c).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+    const open = 'onclick="event.stopPropagation();openReformRiskFor(\'' + js + '\')"'
+      + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openReformRiskFor(\'' + js + '\');}"'
+      + ' role="button" tabindex="0"';
+    const v = (typeof _rrClassify === 'function') ? _rrClassify(c) : null;
+    if (!v) {
+      const nScored = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY)
+        ? Object.keys(REFORM_HISTORY).filter(function(k){ return Array.isArray(REFORM_HISTORY[k]) && REFORM_HISTORY[k].length; }).length
+        : 21;
+      return '<span ' + open + ' style="cursor:pointer;color:var(--muted);border-bottom:1px dotted var(--border);" title="'
+        + _cmpEsc(c + ': ORCA holds a sourced fiscal-reform event log for ' + nScored + ' of 185 jurisdictions and '
+          + c + ' is not one of them. n/c is NOT a score of 100 and NOT a clean record — it is no reading at all. '
+          + 'Do not carry a reform-frequency premium of zero for this column on the strength of a blank cell; it needs an '
+          + 'external check (national petroleum law, IMF Article IV, operator annual reports) before it goes to an IC. '
+          + 'The Predictability Score row above is a different signal — it is computed from this country’s own contract '
+          + 'terms and says nothing about how often the law changed. Click to open the Reform Risk lookup on ' + c + '.')
+        + '">n/c<span style="display:block;font-size:10px;font-weight:600;color:var(--muted);"><span style="display:inline-block;width:0;height:0;overflow:hidden;font-size:0;line-height:0;"> · </span>no sourced reform log</span></span>';
+    }
+    // The short verdict is the same string the Country Profile reform control prints.
+    const short = (v.icLabel === 'IC action')
+      ? 'no frequency premium'
+      : v.icLabel.replace('IC action — ', '');
+    const nTxt = v.since2010 + ' law change' + (v.since2010 === 1 ? '' : 's') + ' since 2010';
+    const plain = (typeof _icPlain === 'function') ? _icPlain(v.icRule)
+      : String(v.icRule).replace(/<[^>]*>/g, '');
+    return '<span ' + open + ' style="cursor:pointer;color:' + v.scoreColor + ';font-weight:700;border-bottom:1px dotted ' + v.scoreColor + ';" title="'
+      + _cmpEsc(c + ' — Reform Frequency Score ' + v.score + '/100 (100 − 15 × fiscal law changes since 2010), '
+        + v.scoreNote + '. ' + plain
+        + ' This score is a COUNT and never reads how large a change was, so a +15pp rupture and a 1pp administrative '
+        + 'tweak move it by the same 15 points. Distinct from the Predictability Score row above, which is computed from '
+        + 'contract terms and counts no legislation. Click to open the full reform verdict and event log for ' + c + '.')
+      + '">' + v.score + '/100'
+      // The separators are inside the block spans on purpose. #cmp-data-table is read by
+      // innerText for the clipboard, which concatenates block children without whitespace --
+      // without them the memo pasted "70/1002 law changes since 2010", a number that is not
+      // a number. Hidden from the visual grid, where the line break already separates them.
+      // Zero-size and IN FLOW, not position:absolute: an out-of-flow child is laid out against
+      // the nearest positioned ancestor, escapes this grid's overflow-x scroller, and pushed
+      // the document scroll width to 427px against a 390px viewport on a phone.
+      + '<span style="display:block;font-size:10px;font-weight:600;color:' + v.scoreColor + ';">'
+      +   '<span style="display:inline-block;width:0;height:0;overflow:hidden;font-size:0;line-height:0;"> · </span>'
+      +   _cmpEsc(nTxt) + '</span>'
+      + '<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);">'
+      +   '<span style="display:inline-block;width:0;height:0;overflow:hidden;font-size:0;line-height:0;"> · </span>'
+      +   _cmpEsc(short) + '</span>'
+      + '</span>';
+  };
   const rows = [
     {label:'─── Data Basis ───', key:()=>'', bold:true, divider:true},
     {label:'Data basis <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How this column’s take, NPV and IRR were produced — the same classification as the PROXY badge in Fiscal Compare. FACTS = weighted by verified field production (more than 5% of contracts carry output data). EVIDENCE = partial production coverage, blended with equal weighting. PROXY = no verified field production anywhere in this country’s contract set, so the economics are modelled from the standardized profile and describe the legal regime rather than realised output. A PROXY column is not comparable to a FACTS column on NPV or IRR.">ⓘ</span>',
@@ -26550,6 +26631,10 @@ function renderCompare() {
     {label:'Rank among producers (take @$75) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Position on government take at $75/bbl, sorted lowest take first — #1 is the most contractor-favourable regime. Ranked ONLY against the countries whose take is weighted by verified field production, and with state monopolies (take ≥ 99.5%, no contractor access) excluded. A column with no production data is not given a placement here, because it does not have one: its take is a simple average of statutory terms, not realised economics. The all-185 rank is in each cell&rsquo;s tooltip; it is the weaker basis because it mixes production-weighted regimes with equal-weighted averages built on as few as 2 contracts, which pulls the low-take end of the list down and pushes every real producer toward the bottom of it.">ⓘ</span>',
       key:(d)=>_cmpProducerRankCell(d), bold:false},
     {label:'Predictability Score <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Fiscal Predictability Score (0\u2013100) \u2014 composite measure of how consistent and stable this country\u2019s fiscal terms are. Three components: (1) Within-country IQR penalty: wide spread across contracts = lower score (up to \u221240 pts). (2) Price swing penalty: take rising sharply with price = lower score (up to \u221230 pts). (3) Regime complexity penalty: \u22128 pts per additional fiscal mechanic above one. Score \u226575 = HIGH (green), 60\u201374 = MODERATE (yellow), 45\u201359 = LOW (orange), &lt;45 = VERY LOW (red) \u2014 awarded since v624 ONLY where ORCA measured a spread. A one-term score renders UNGRADED and uncoloured however high its number. READ THE BASIS CHIP ON EACH BADGE BEFORE RANKING COLUMNS ON THIS ROW. The IQR term is the largest of the three and it is only exercised where ORCA holds a real spread. &#39;one term&#39; = every contract in that country prices identically, so the IQR penalty was zero and the score reflects price swing and mechanic count only \u2014 the same finding the Take spread row below reports as &#39;single term&#39;, which is NOT evidence of low fiscal risk. A number such as &#39;15.0pp&#39; = a measured spread, which the score IS penalised for. &#39;not scored&#39; = no contract-level distribution is held at all. Only 28 of 185 countries have a measured spread at all: 135 price to one statutory term and 22 hold no distribution. Every score that would fall in HIGH belongs to a one-term regime, and NOT ONE of the 28 with a measured spread reaches it \u2014 the ceiling among them is 74 \u2014 which is why the one-term column is shown UNGRADED. A column with a lower score here is therefore not the less stable regime; it may simply be the one ORCA holds enough contracts to see disagree with itself. Distinct from the Reform Frequency Score on the Reform Risk tab, which counts law changes since 2010.">\u24d8</span>',       id:'fp', key:(d)=>renderStabilityBadge(getFiscalPredictabilityScore(d), d)},
+    // v701 (T4): see _cmpReformCell above. The reform record now rides the shared `rows` array,
+    // so it reaches the visible grid, #cmp-data-table, Export PDF and both Copy-for-IC-Memo
+    // clipboard flavours by the same path every other row does.
+    {label:'Reform record (since 2010) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Reform Frequency Score (0–100) — the SEPARATE stability signal, and the one this grid was missing. Formula: 100 − 15 × sourced fiscal law changes dated 2010 or later. Discoveries, first-oil dates, armed conflict and terms reviews that concluded without renegotiation stay in the event log and do NOT score. Same classifier (_rrClassify) the Reform Risk tab, the Fiscal Compare Stability column and the Country Profile sidebar run, so those four surfaces cannot hand you four different premiums for one country. READ THIS ROW AND THE PREDICTABILITY SCORE ROW ABOVE AS TWO DIFFERENT QUESTIONS. Predictability is computed from contract terms — take spread, price swing, mechanic count — and counts no legislation; this row counts legislation and reads no contract. A column can score well on one and badly on the other. IMPORTANT — THREE STATES, NOT INTERCHANGEABLE. A score = a sourced log exists and was counted. ‘n/c’ = NO sourced log on file, which is not a clean record and is not a 100: ORCA covers 21 of 185 jurisdictions, and an n/c column needs an external check (national petroleum law, IMF Article IV, operator annual reports) before an IC memo carries a zero reform premium for it. The third line of each scored cell is that country&#39;s verdict class — a high score whose line reads ‘window artefact’ or ‘size never quantified’ is not an all-clear. The score is a COUNT and is blind to magnitude: Russia&#39;s +15pp windfall tax in 2022 moves it exactly as far as a 1pp administrative amendment would. IC rule: 3 or more law changes since 2010 → add 3–5pp WACC premium (5–8pp and a probability-weighted NPV at score ≤ 20). Click any cell for that country&#39;s full verdict and event log.">ⓘ</span>',       id:'reform', key:(d)=>_cmpReformCell(d)},
     {label:'─── Govt Take ───', key:()=>'', bold:true, divider:true},
     {label:'Govt Take ($50/bbl)',   key:(d)=>_cmpTakeCell(d,50)},
     {label:'Govt Take ($75/bbl)',   key:(d)=>_cmpTakeCell(d,75)},
