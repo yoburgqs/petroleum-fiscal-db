@@ -34652,3 +34652,104 @@ Walked T2 cold at 1440. The Country Profile headline carries a regime split card
 
 | Concession | 845 (71%) | **8.2%** | **$5.0B** |
 |---|---|---|---
+
+---
+## Cycle 602 Log — 2026-09-07 (v696)
+
+**Task: T5 — "Give me something I can paste straight into an IC memo."**
+Stalest in rotation (T5 last at cycle 596; 597–601 ran T3/T1/T6/T4/T2).
+
+### Walk
+Walked T5 cold at 1440, no sessionStorage/localStorage, exercising every paste-and-export
+surface end to end and reading the actual clipboard and the actual downloaded bytes:
+
+- **Country Profile → Copy for IC Memo** — 3,260 chars, Metric/Value table, 5 numbered notes
+  keyed to the rows they qualify. Strong; no change.
+- **Fiscal Compare → Copy for IC Memo** — 50,658 chars / 185 rows; toast states the row count,
+  row-tick shortlist exists, database-vs-model columns separated. Strong; no change.
+- **Side-by-Side → Copy for IC Memo** cold — correctly refuses: "Load at least 2 countries
+  into Side-by-Side first." Clipboard untouched (sentinel survived). No change.
+- **IOC Portfolio → Copy for IC Memo** cold — defaults to Shell, 7,052 chars, names the 9 of 23
+  rows that are country averages rather than operator terms. Strong; no change.
+- **All 9 exports downloaded and parsed**: FC XLSX, Explorer XLSX, Screener XLSX+CSV, IOC XLSX,
+  CP XLSX, Breakeven CSV, Reform CSV, Vintage CSV. Eight of the nine carry an ASSUMPTIONS block.
+
+### Friction — the one worst moment
+**The Vintage tab's blended decade series was arithmetically wrong, and it is the one surface
+that explicitly instructs the analyst to paste its output into an IC memo.**
+
+`renderVintage()` (index.html ~29704) averaged the mechanic **buckets**, never reading `r.n`:
+
+```js
+rows.reduce((s,r)=>s+r.avg_take,0)/rows.length
+```
+
+TSC (96 contracts) and Buy-back (53) each weighed the same as Concession (13,784). In the
+2010s, **149 fee-basis contracts — 0.9% of the 16,628 signed that decade — carried half the
+plotted number.**
+
+| decade | charted | contract-weighted, comparable | error |
+|---|---|---|---|
+| 1980s | 41.0% | 26.5% | +14.5pp |
+| 2000s | 65.3% | 33.4% | +31.9pp |
+| 2010s | 67.3% | 40.8% | **+26.5pp** |
+| 2020s | 57.3% | 40.9% | +16.4pp |
+
+Two separate defects compounded: the missing weight, and a MECHANIC_COMPARABILITY Group 2
+violation — fee-basis take (TSC ~98%, Buy-back 83.6%) is a structural artefact of a fixed
+$/bbl fee, not a fiscal measure, and cannot enter a government-take average at any weight.
+The apparent 2020s "reversal" (67.3 → 57.3) was **not a fiscal easing at all** — it was the
+TSC column going empty. The `Vintage CSV` export (383B) shipped the pivot with no basis line,
+so the fabricated series was the version leaving the building.
+
+### Change
+- Series now **contract-count-weighted and restricted to commensurable mechanics**. New shared
+  `_vintageDecadeStat()` backs both the bars and the CSV so the two cannot fork.
+- Each bar carries the contract count it rests on, plus an orange `⊘ n` for fee-basis contracts
+  excluded; row `title` names the mechanics on both sides of the line.
+- Heading `Avg Govt Take by Decade (All Mechanics, $75/bbl)` → `— Contract-Weighted, Comparable
+  Mechanics ($75/bbl)`, with a basis line stating the weighting, the exclusion and the reason.
+- TSC / RSC / Buy-back column headers marked `⊘ fee-basis` with the non-comparability rule.
+- Intro strip's IC example rewritten to cite **one mechanic across decades** (the valid
+  comparison) rather than the blended row.
+- CSV rebuilt 383B → 2,965B: per-cell contract counts, the blended series with weighting and
+  exclusions as explicit columns, the Group 1/2/3 comparability rule, and a worked note on why
+  averaging a pivot row unweighted returns 67.3 against a true 41.3.
+
+### Result
+An analyst pasting the decade trend into an IC memo now carries **26.5% (1980s) → 40.8%
+(2010s) → 40.9% (2020s)** — a real ~14pp secular rise concentrated post-2000 and flat in the
+2020s — instead of **41% → 67% → 57%**, whose rise was roughly double the truth and whose
+"easing" never happened. The count beside each bar shows what the figure rests on, and the
+export now carries the rule that stops the pivot's TSC and Buy-back columns being ranked
+against Concession.
+
+### Verification
+- **JS syntax gate: PASS** — 11 inline `<script>` blocks, `node --check` equivalent via `vm.Script`.
+- **Runtime suite RAN this cycle** against the served build: **294 PASS / 0 FAIL / 0 WARN**,
+  0 JS errors. Identical to the pre-edit baseline.
+- Corrected series **independently recomputed from `VINTAGE_DATA` outside the page** before the
+  fix was written; rendered output matches to 0.1pp on all 8 decades.
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390, all 12 tabs.
+- **Mobile (Step 5b), 390×844 `hasTouch: true`:** `scrollWidth === clientWidth`; **0 controls
+  under 24px** on the changed tab.
+- CSV re-downloaded and parsed: 37 rows, source line resolves to v696 via `_orcaVerNow()`.
+- Version bumped v695 → v696 silently at the end (5 live strings; 3 prior-cycle code comments
+  restored to v695 after an over-broad regex).
+
+### Carried forward — not fixed this cycle
+- **The per-mechanic take averages inside the pivot are themselves unweighted** across the
+  countries in each bucket. That is defensible for a per-mechanic report and is now stated, but
+  it means a decade's PSC figure is a mean of country means, not of contracts.
+- **The 2020s cohort is incomplete** (11,780 contracts vs 16,628 in the 2010s) and nothing on
+  the tab says so, so the flat 40.8 → 40.9 reading may be a partial-decade artefact.
+- **`renderVintageTrendChart()` and `renderVintage()` both build a per-mechanic line chart**
+  from the same data with different colour maps and titles — duplicated, not consolidated.
+- Everything on the cycle-601 carried list remains open: the 862 contracts with no fiscal terms,
+  the zero-rate defaults inside published country `take_75`, `⬇ Chart PNG` exporting only
+  `#cmp-chart`, `be_75 = 1.0` for Bahrain/Kuwait/Saudi Arabia, the Screener Contractor NPV
+  tooltip naming a profile selector that does not exist on that tab (5th cycle), the `Other`
+  region bucket misfiling 17 jurisdictions, 164 of 185 jurisdictions with no sourced reform log,
+  and the Methodology tab naming a `display:none` API Explorer tab.
+- **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 12th cycle. Points at
+  the detector, not the layout.
