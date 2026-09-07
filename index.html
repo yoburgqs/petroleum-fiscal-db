@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v699</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v700</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v699</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v700</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -31172,6 +31172,21 @@ function _cpScrollToEvidenceChain(slug) {
 }
 window._cpScrollToEvidenceChain = _cpScrollToEvidenceChain;
 
+// v700 (T6): the ladder counterpart of _cpScrollToLiveDcf. Where the Evidence Chain's profit-oil
+// row is contradicted by a tier schedule, the thing the analyst has to look at is the ladder --
+// the basis dcfPSC() actually resolves on -- not the Live DCF panel's flat parameter, which the
+// engine ignores on these 94 countries. Same flash treatment so the destination is unambiguous.
+function _cpScrollToTierSchedule() {
+  var el = document.getElementById('cp-tier-schedule');
+  if (!el) { if (typeof _cpScrollToLiveDcf === 'function') _cpScrollToLiveDcf(); return; }
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { el.scrollIntoView(); }
+  var prev = el.style.boxShadow;
+  el.style.transition = 'box-shadow .3s';
+  el.style.boxShadow = '0 0 0 3px rgba(185,28,28,.45)';
+  setTimeout(function() { el.style.boxShadow = prev || ''; }, 1800);
+}
+window._cpScrollToTierSchedule = _cpScrollToTierSchedule;
+
 function renderReformTimeline(country) {
   // Fiscal facts from API JSON
   const ddSlug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -31295,6 +31310,30 @@ function renderReformTimeline(country) {
         if (!mk) return null;
         const pr = getDCFParams(country, resolveLiveDCFMechanic(country));
         if (!pr) return null;
+        // ── v700 (T6): a live R-factor ladder makes the flat share a DEAD INPUT ─────────────
+        // dcfPSC() resolves the government profit-oil share off params.tier_schedule year by
+        // year as R moves, and only falls back to params.profit_oil_govt_pct when there is no
+        // ladder (`const contractorPct = tiers ? getContractorPct(R) : (1 - profit_oil_govt_pct)`).
+        // getDCFParams() populates tier_schedule from COUNTRY_DATA for 94 PSC-family countries,
+        // so on those the flat figure is carried on the params object and never read. Verified by
+        // perturbation on the shipped build: Indonesia at 71.2% and at 10.0% both return take
+        // 64.142% / NPV $2,616.4M, identical to 3dp; strip the ladder and the same swing moves
+        // take 66.3% -> 42.2%.
+        // Reporting the flat figure as "the value the DCF used" was therefore false on 30
+        // countries, and it was false in the loudest element on the page — a red warning chip in
+        // the one table an analyst opens to ask where a number came from. It also contradicted
+        // the reconciliation note the tier schedule prints ~600px above ("neither flat figure is
+        // an input to it"), which was the correct statement of the two.
+        // The ladder is returned instead, so every downstream surface — chip, block note and the
+        // XLSX Fiscal Terms & Sources sheet — names the basis the engine actually resolves on.
+        if (mk === 'profit_oil_govt_pct' && Array.isArray(pr.tier_schedule) && pr.tier_schedule.length) {
+          const _g = pr.tier_schedule.map(function(t) { return Number(t.govt); })
+                       .filter(function(x) { return isFinite(x); });
+          if (_g.length) {
+            return { v: null, origin: 'tiers', lo: Math.min.apply(null, _g),
+                     hi: Math.max.apply(null, _g), n: pr.tier_schedule.length };
+          }
+        }
         let origin = null;
         if (pr._basis === 'country') {
           // The key itself must come from the country override, not from defaults[mechanic].
@@ -31497,28 +31536,54 @@ function renderReformTimeline(country) {
           if (_uZero) unsourcedZeroLabels.push(label);
           const _mp601 = _modelParam(label);
           const _mv601 = _mp601 ? _mp601.v : null;
-          const _mo601 = _mp601 ? _mp601.origin : null;      // v666 (T6): 'override' | 'contract'
-          const _conf601 = (_mv601 != null && numVal != null &&
+          const _mo601 = _mp601 ? _mp601.origin : null;      // 'override' | 'contract' | 'tiers'
+          // v700 (T6): a ladder is a conflict whatever the printed flat figure reads, because the
+          // disagreement is not between two numbers — it is that the number in this row is not
+          // the basis the engine resolves on at all. A tolerance test on a value the engine never
+          // reads would let 30 countries through on a coincidence.
+          const _lad700 = (_mo601 === 'tiers') ? _mp601 : null;
+          const _ladTxt700 = _lad700
+            ? _lad700.lo.toFixed(0) + '\u2013' + _lad700.hi.toFixed(0) + '%' : '';
+          const _conf601 = _lad700 ? (numVal != null) : (_mv601 != null && numVal != null &&
             Math.abs(_mv601 - numVal) > Math.max(0.5, 0.02 * Math.max(Math.abs(_mv601), 1)));
           let _badgeTip601;
           if (_conf601) {
             isUnsourcedConflict = true;
-            modelConflicts.push({ label: label, shown: val, modelled: _fmtPct(_mv601),
+            modelConflicts.push({ label: label, shown: val,
+                                  modelled: _lad700 ? ('the ' + _ladTxt700 + ' R-factor ladder') : _fmtPct(_mv601),
                                   // v666 (T6): the raw number too — the workbook column is headed
                                   // "(%)" and a spreadsheet cell reading "75%" as text cannot be
                                   // sorted, filtered or subtracted by whoever receives the annex.
-                                  modelledNum: Math.round(_mv601 * 100) / 100,
-                                  origin: _mo601, gap: Math.abs(_mv601 - numVal) });
+                                  // v700: null on a ladder — there is no single engine rate to put
+                                  // in that cell, and inventing one is the defect being fixed.
+                                  modelledNum: _lad700 ? null : Math.round(_mv601 * 100) / 100,
+                                  ladder: _lad700 ? { lo: _lad700.lo, hi: _lad700.hi, n: _lad700.n } : null,
+                                  origin: _mo601,
+                                  gap: _lad700 ? null : Math.abs(_mv601 - numVal) });
             // v666 (T6): name the OTHER figure for what it is. A hard-coded engine override and a
             // second harvest of the same term are different failures; conflating them would tell
             // 36 of the 38 affected countries something untrue about where their number came from.
             const _what666 = (_mo601 === 'override')
               ? 'That figure is a hard-coded country override inside the DCF engine \u2014 also not a citation.'
               : 'That figure is this country\u2019s separately harvested country-level field \u2014 a second '
-                + 'harvest of the same term, ' + (Math.abs(_mv601 - numVal)).toFixed(1) + 'pp from the '
+                + 'harvest of the same term, ' + (_lad700 ? '0' : Math.abs(_mv601 - numVal).toFixed(1)) + 'pp from the '
                 + 'contract average beside it, and no more cited than it is. Nothing on record says which '
                 + 'of the two is right.';
-            const cTip = _esc(label + ': this page carries two different answers. The table shows '
+            // v700 (T6): the ladder case says what the engine resolves on, not a flat rate it
+            // carries and never reads. This is now the same statement the Profit Oil Tier
+            // Schedule\u2019s own reconciliation note makes higher up the page, instead of its
+            // opposite.
+            const cTip = _lad700
+              ? _esc(label + ': the flat figure in this row is not what the model runs. '
+                + country + ' carries an R-factor profit-oil ladder of ' + _lad700.n + ' tiers, and the '
+                + 'DCF resolves the government share off those tiers year by year as R (cumulative '
+                + 'contractor revenue \u00f7 cumulative contractor cost) moves \u2014 government share ranges '
+                + _ladTxt700 + ' across the ladder. The ' + val + ' shown here is the average across this '
+                + 'country\u2019s contract records, it carries no citation of any kind, and it is not an input '
+                + 'to the take, NPV or IRR on this page: change it and not one figure on this profile moves. '
+                + 'Cite the ladder, not this row. The tier table is printed above under Profit Oil Tier '
+                + 'Schedule \u2014 check its own basis note before any of it goes in an IC memo.')
+              : _esc(label + ': this page carries two different answers. The table shows '
               + val + ', which is the average across this country\u2019s contract records and carries no '
               + 'citation of any kind. The Live DCF panel further up this same page runs ' + country
               + ' on ' + _fmtPct(_mv601) + ' and reports the result in its Fiscal Breakdown. ' + _what666
@@ -31526,7 +31591,8 @@ function renderReformTimeline(country) {
               + 'rate from ' + country + '\u2019s own petroleum act before either number goes in an IC memo.');
             statHtml = '<span style="cursor:help;background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
               + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;'
-              + 'letter-spacing:.04em;white-space:nowrap;" title="' + cTip + '">\u26a0 DCF USES ' + _fmtPct(_mv601) + '</span>';
+              + 'letter-spacing:.04em;white-space:nowrap;" title="' + cTip + '">\u26a0 DCF USES '
+              + (_lad700 ? ('TIERS ' + _ladTxt700) : _fmtPct(_mv601)) + '</span>';
             _badgeTip601 = cTip;
           } else {
             const uTip = _esc(label + ': no statute, no secondary guide, no bulk harvest \u2014 no citation of '
@@ -31657,12 +31723,27 @@ function renderReformTimeline(country) {
             const v   = _pr[k];
             const num = (typeof v === 'number' && isFinite(v)) ? v : null;
             const cdf = _TERM_CD[k];
-            const origin = (_ovk.indexOf(k) !== -1) ? 'override'
-              : ((cdf && _cdr && _cdr[cdf] != null) ? 'contract' : 'default');
+            // v700 (T6): same correction as the sourced-row chip. Where a live tier schedule is
+            // present the engine resolves profit oil off the ladder and never reads
+            // profit_oil_govt_pct, so naming that flat rate as "what it substitutes" describes a
+            // substitution that does not happen. 34 countries reach this branch with a ladder.
+            const _ladK = (k === 'profit_oil_govt_pct' && Array.isArray(_pr.tier_schedule)
+                           && _pr.tier_schedule.length)
+              ? (function() {
+                  const g = _pr.tier_schedule.map(function(t) { return Number(t.govt); })
+                              .filter(function(x) { return isFinite(x); });
+                  return g.length ? { lo: Math.min.apply(null, g), hi: Math.max.apply(null, g),
+                                      n: _pr.tier_schedule.length } : null;
+                })()
+              : null;
+            const origin = _ladK ? 'tiers'
+              : ((_ovk.indexOf(k) !== -1) ? 'override'
+              : ((cdf && _cdr && _cdr[cdf] != null) ? 'contract' : 'default'));
             _missTerms.push({
-              key: k, label: _TERM_LABEL[k], mech: _mech, origin: origin,
-              sub: num == null ? null
-                : (k === 'fee_per_bbl' ? '$' + num.toFixed(2) + '/bbl' : _fmtPct(num * 100)),
+              key: k, label: _TERM_LABEL[k], mech: _mech, origin: origin, ladder: _ladK,
+              sub: _ladK ? (_ladK.lo.toFixed(0) + '\u2013' + _ladK.hi.toFixed(0) + '% R-factor ladder')
+                : (num == null ? null
+                : (k === 'fee_per_bbl' ? '$' + num.toFixed(2) + '/bbl' : _fmtPct(num * 100))),
               // The dangerous case: a NON-ZERO rate that came from nowhere in this country's own
               // data -- a generic mechanic default or a hard-coded engine override. A substituted
               // zero assumes the term is absent; a substituted 60% asserts a split nobody signed.
@@ -31675,20 +31756,27 @@ function renderReformTimeline(country) {
         }
       } catch (e) { _missTerms = []; _termsTotal = _heldRows; _termKeys = []; _termsMech = null; }
       _missTerms.forEach(function(t) {
-        const where = t.origin === 'override'
+        const where = t.origin === 'tiers'
+          ? 'the R-factor tier schedule printed above this table — the engine resolves the government '
+            + 'share off those ' + t.ladder.n + ' tiers year by year as R moves, so no flat rate is '
+            + 'substituted at all. Read the tier table’s own basis note: on most countries that ladder '
+            + 'is a model template, not the signed agreement'
+          : (t.origin === 'override'
           ? 'a hard-coded ' + country + ' override inside the DCF engine, which is not a citation'
           : (t.origin === 'contract'
               ? 'the average across this country’s own contract records, which carries no citation'
               : 'the generic ' + t.mech + ' default — one figure applied to every ' + t.mech
-                + ' country on the platform, describing none of them');
+                + ' country on the platform, describing none of them'));
         // The absence claimed here is an absence of SOURCING, not of any number at all: for
         // origin 'contract' a figure does exist, it just carries no citation. Saying "not a
         // contract average either" and then naming one would contradict itself in one sentence.
         const tip = _esc(t.label + ': ORCA holds no sourced fact for this term — not primary law, '
           + 'not a secondary guide, not the bulk harvest. Nothing on record cites it for ' + country
           + '. This platform’s ' + t.mech + ' model needs the term, so where this page runs the regime '
-          + 'it substitutes ' + (t.sub || 'a value') + ', which is ' + where + '. Establish it from '
-          + country + '’s own petroleum act before an IC memo.');
+          + (t.origin === 'tiers'
+              ? 'it resolves it from ' + where
+              : 'it substitutes ' + (t.sub || 'a value') + ', which is ' + where)
+          + '. Establish it from ' + country + '’s own petroleum act before an IC memo.');
         const chip = '<span style="cursor:help;background:'
           + (t.invented ? 'rgba(194,65,12,.10)' : 'rgba(107,101,96,.08)') + ';border:1px dashed '
           + (t.invented ? 'rgba(194,65,12,.55)' : 'var(--border)') + ';color:'
@@ -31697,7 +31785,8 @@ function renderReformTimeline(country) {
           + 'white-space:nowrap;" title="' + tip + '">NOT HELD</span>';
         const badge = '<span class="source-badge conf-db" style="opacity:.85;cursor:help;" title="'
           + tip + '">' + (t.invented ? '⚠ ' : '') + 'No value on record'
-          + (t.sub ? ' · ' + (t.origin === 'override' ? 'engine override '
+          + (t.sub ? ' · ' + (t.origin === 'tiers' ? 'DCF resolves on '
+                                 : t.origin === 'override' ? 'engine override '
                                  : t.origin === 'contract' ? 'contract avg '
                                  : _esc(t.mech) + ' default ') + _esc(t.sub) : '')
           + '</span>';
@@ -31795,9 +31884,23 @@ function renderReformTimeline(country) {
     // take it is not a fix.
     const _conflictNote601 = modelConflicts.length
       ? '<div style="margin-top:8px;background:rgba(185,28,28,.06);border:1px solid rgba(185,28,28,.30);border-left:3px solid var(--red);border-radius:5px;padding:9px 11px;font-size:11px;color:var(--muted);line-height:1.55;">'
-        + '<strong style="color:var(--text);">\u26a0 This page carries two different values for '
+        + '<strong style="color:var(--text);">\u26a0 ' + (modelConflicts.every(function(c){ return !!c.ladder; })
+            ? 'The model does not use the value this table prints for '
+            : 'This page carries two different values for ')
         + modelConflicts.map(function(c){ return _esc(c.label); }).join(', ') + '.</strong> '
         + modelConflicts.map(function(c) {
+            // v700 (T6): a ladder country is not a two-figure disagreement, and describing it as
+            // one sent the analyst to defend the wrong number. dcfPSC() reads tier_schedule and
+            // ignores profit_oil_govt_pct entirely whenever a ladder is present.
+            if (c.ladder) {
+              return 'The table above shows <strong style="color:var(--text);">' + _esc(c.shown)
+                + '</strong> with no citation behind it \u2014 and the DCF never reads it. '
+                + _esc(country) + ' carries an R-factor profit-oil ladder of <strong style="color:var(--text);">'
+                + c.ladder.n + ' tiers</strong>, and the engine resolves the government share off those '
+                + 'tiers year by year as R moves, over a range of <strong style="color:var(--text);">'
+                + c.ladder.lo.toFixed(0) + '\u2013' + c.ladder.hi.toFixed(0) + '%</strong>. '
+                + 'Change the figure in this row and not one number on this profile moves.';
+            }
             return 'The table above shows <strong style="color:var(--text);">' + _esc(c.shown)
               + '</strong> with no citation behind it. The Live DCF panel further up this same page runs '
               + _esc(country) + ' on <strong style="color:var(--text);">' + _esc(c.modelled)
@@ -31810,18 +31913,30 @@ function renderReformTimeline(country) {
         // the 36 db-basis countries it is not — it is a separately harvested country-level field.
         // Stating the wrong provenance in the note that exists to fix provenance is worse than
         // saying nothing, so the clause is now built from the origins actually present.
-        + ' Neither figure is a source \u2014 one is an unsourced contract average, the other '
+        // v700 (T6): the ladder case has no "second figure" to characterise, and the instruction
+        // that follows is a different one \u2014 cite the tiers, and check the tier table's own
+        // basis note, which already says the ladder is a model template shared across countries.
+        + (modelConflicts.every(function(c) { return !!c.ladder; })
+            ? ' The figure in that row is not a source either \u2014 it is an uncited contract average. '
+              + '<strong style="color:var(--text);">Cite the tier schedule, not this row, and read its own '
+              + 'basis note before quoting the tiers.</strong> '
+            : ' Neither figure is a source \u2014 one is an unsourced contract average, the other '
         + (modelConflicts.every(function(c) { return c.origin === 'override'; })
             ? 'a hard-coded engine override'
             : modelConflicts.every(function(c) { return c.origin === 'contract'; })
               ? 'a separately harvested country-level field that carries no citation either'
               : 'a hard-coded engine override or a second, equally uncited harvest of the same term')
         + '. <strong style="color:var(--text);">Do not quote either until you have the rate from '
-        + _esc(country) + '\u2019s own petroleum act.</strong> '
-        + '<button type="button" onclick="_cpScrollToLiveDcf()" style="margin-top:6px;background:rgba(185,28,28,.10);'
+        + _esc(country) + '\u2019s own petroleum act.</strong> ')
+        + (modelConflicts.every(function(c) { return !!c.ladder; })
+            ? '<button type="button" onclick="_cpScrollToTierSchedule()" style="margin-top:6px;background:rgba(185,28,28,.10);'
+              + 'border:1px solid rgba(185,28,28,.40);border-radius:4px;color:var(--red);font-size:11px;font-weight:700;'
+              + 'cursor:pointer;padding:3px 9px;" title="Scroll to the Profit Oil Tier Schedule on this page \u2014 the '
+              + 'ladder the DCF actually resolves the government profit-oil share on">Show the tiers the DCF used \u2192</button>'
+            : '<button type="button" onclick="_cpScrollToLiveDcf()" style="margin-top:6px;background:rgba(185,28,28,.10);'
         + 'border:1px solid rgba(185,28,28,.40);border-radius:4px;color:var(--red);font-size:11px;font-weight:700;'
         + 'cursor:pointer;padding:3px 9px;" title="Scroll to the Live DCF panel on this page and show the value '
-        + 'its Fiscal Breakdown is built on">Show what the DCF panel used \u2192</button>'
+        + 'its Fiscal Breakdown is built on">Show what the DCF panel used \u2192</button>')
         + '</div>'
       : '';
     // v601 (T2): every other absence on this table already has a named state -- BULK (v569),
@@ -31958,6 +32073,9 @@ function renderReformTimeline(country) {
           dead: !!(_sm && _sm.url && typeof _citeLinkDead === 'function' && _citeLinkDead(_sm.url)),
           modelled: (_cf && _cf.modelledNum != null) ? _cf.modelledNum : null,
           gap: (_cf && _cf.gap != null) ? Math.round(_cf.gap * 10) / 10 : null,
+          // v700 (T6): so the workbook's "DCF engine (%)" column cannot state a flat rate the
+          // engine never reads. On a ladder country there is no single number for that cell.
+          ladder: (_cf && _cf.ladder) ? _cf.ladder : null,
           origin: _cf ? _cf.origin : null
         });
       });
@@ -35472,12 +35590,23 @@ function exportCountryProfile() {
       const _t = _prov666.terms.filter(t => t.label === _tl)[0];
       if (!_t || typeof _t.orca !== 'number') continue;
       if (Math.abs(_t.orca - _xv) <= 0.1) continue;
-      summaryRows.splice(i + 1, 0, { Metric: '   \u26a0 ' + _tl + ' — second harvest disagrees',
+      summaryRows.splice(i + 1, 0, { Metric: '   \u26a0 ' + _tl
+          + (_t.ladder ? ' — neither figure is what the DCF ran' : ' — second harvest disagrees'),
         Value: 'The Evidence Chain on the ORCA Country Profile screen prints ' + _t.orca
           + '% for this term, a gap of ' + Math.abs(_t.orca - _xv).toFixed(1) + 'pp from the '
-          + _xv + '% exported above. The exported figure is the COUNTRY_DATA contract field the '
+          + _xv + '% exported above. '
+          // v700 (T6): on a ladder country the exported flat figure did NOT produce the NPVs on
+          // this sheet — dcfPSC() resolves profit oil off the tier schedule and never reads it.
+          // Saying otherwise in the row that exists to fix provenance is the defect being fixed.
+          + (_t.ladder
+              ? 'Neither figure is what the DCF ran: ' + country + ' carries an R-factor profit-oil '
+                + 'ladder of ' + _t.ladder.n + ' tiers and the engine resolves the government share off '
+                + 'those tiers year by year as R moves (' + _t.ladder.lo.toFixed(0) + '\u2013'
+                + _t.ladder.hi.toFixed(0) + '%). Both flat figures are uncited harvests carried alongside '
+                + 'the ladder; changing either moves nothing on this sheet. '
+              : 'The exported figure is the COUNTRY_DATA contract field the '
           + 'ORCA DCF engine used to produce the NPVs on this sheet; the screen figure is a '
-          + 'separate harvest of the same term. '
+          + 'separate harvest of the same term. ')
           + (_t.statutory != null
               ? 'The rate cited from ' + (_t.source || 'the source on record') + ' (tier ' + (_t.tier || '?')
                 + ') is ' + _t.statutory + '%'
@@ -35517,7 +35646,7 @@ function exportCountryProfile() {
       ['This sheet is the provenance behind the fiscal terms on the Country Profile sheet. Read it before citing any of them.'],
       ['ORCA value  = the contract-weighted average across this country\u2019s contracts in the ORCA database. This is what the Evidence Chain on the Country Profile screen prints.'],
       ['Statutory   = the rate stated in the cited instrument itself. Cite THIS figure when you quote the legislation, not the ORCA average.'],
-      ['DCF engine  = the figure the platform\u2019s own DCF ran for this term, where it differs from the ORCA value. The NPV, IRR and take on the Country Profile sheet were produced with it.'],
+      ['DCF engine  = the basis the platform\u2019s own DCF ran for this term, where it differs from the ORCA value. The NPV, IRR and take on the Country Profile sheet were produced with it. Where this reads as an R-factor ladder rather than a rate, the engine resolves that term off the tier schedule year by year and the ORCA value beside it is not an input at all.'],
       ['Retrievable = whether ORCA could fetch the cited document at the address on record when every citation URL on the platform was checked on ' + (_prov666.checked || 'the date on record') + '. A dead link is not a judgement on the instrument — the tier letter is unchanged and the rate was read off it at harvest time. It means the one step that would let you check it yourself is currently broken.'],
       [''],
       ['Term', 'ORCA value (%)', 'Statutory (%)', 'DCF engine (%)', 'Gap (pp)', 'Cited source', 'Tier', 'Retrievable', 'Note']
@@ -35528,16 +35657,23 @@ function exportCountryProfile() {
         t.label,
         (typeof t.orca === 'number') ? t.orca : String(t.orca),
         (t.statutory != null) ? t.statutory : 'not captured',
-        t.modelled != null ? t.modelled : '',
-        t.gap != null ? t.gap : '',
+        t.ladder ? (t.ladder.lo.toFixed(0) + '\u2013' + t.ladder.hi.toFixed(0) + '% R-factor ladder')
+                 : (t.modelled != null ? t.modelled : ''),
+        t.gap != null ? t.gap : (t.ladder ? 'n/a \u2014 not an input' : ''),
         _noSrc ? 'NO SOURCE ON RECORD' : (t.bulk ? t.source + '  [country-level bulk harvest — assigned to every contract in this country, not read off any one of them]' : t.source),
         _noSrc ? '' : (t.tier || '?'),
         _noSrc ? '' : (!t.url ? 'no URL on record' : (t.dead ? 'NO — link dead as at ' + (_prov666.checked || '') : 'yes')),
-        _noSrc
+        (_noSrc
           ? 'Not primary law, not a secondary guide, not the bulk harvest — nothing cites this term for ' + country + '. The value is a contract average and nothing corroborates it.'
-          : (t.gap != null
+            // v700 (T6): the ladder fact is orthogonal to whether the row is cited, and it is the
+            // one an analyst defending the number needs. It was being swallowed by this branch on
+            // exactly the countries that need it most.
+            + (t.ladder ? ' It is also not what the DCF ran: the engine resolves this term off the ' + t.ladder.n + '-tier R-factor ladder (' + t.ladder.lo.toFixed(0) + '\u2013' + t.ladder.hi.toFixed(0) + '%), not off this rate.' : '')
+          : (t.ladder
+              ? 'The DCF does not use the ORCA value beside it. ' + country + ' carries an R-factor profit-oil ladder of ' + t.ladder.n + ' tiers and the engine resolves the government share off those tiers year by year as R moves (' + t.ladder.lo.toFixed(0) + '\u2013' + t.ladder.hi.toFixed(0) + '%). The figure in this row is an uncited contract average and is not an input to the take, NPV or IRR on the Country Profile sheet. Cite the ladder, not this row.'
+              : (t.gap != null
               ? 'The DCF engine ran ' + t.modelled + '% for this term, ' + t.gap + 'pp from the ORCA value beside it. Two harvests of the same term; neither is cited. Establish it from ' + country + '\u2019s own petroleum act.'
-              : '')
+              : '')))
       ]);
     });
     const _deadN = _prov666.terms.filter(t => t.dead).length;
@@ -35546,7 +35682,10 @@ function exportCountryProfile() {
     _srcAoa.push(['']);
     _srcAoa.push(['SUMMARY', _prov666.terms.length + ' fiscal terms carried on the Country Profile sheet. '
       + _noSrcN + ' carry no source of any kind. ' + _deadN + ' cite a document ORCA could not retrieve. '
-      + _confN + ' are a term for which this platform holds two different numbers.']);
+      + _confN + ' are a term for which this platform holds two different numbers. '
+      + (function(n){ return n + (n === 1 ? ' is resolved off an R-factor ladder, so the ORCA value beside it is'
+                                           : ' are resolved off an R-factor ladder, so the ORCA value beside them is')
+                              + ' not what the DCF ran.'; })(_prov666.terms.filter(t => t.ladder).length)]);
     const ws4 = XLSX.utils.aoa_to_sheet(_srcAoa);
     ws4['!cols'] = [{wch:34},{wch:15},{wch:14},{wch:15},{wch:10},{wch:64},{wch:6},{wch:26},{wch:96}];
     XLSX.utils.book_append_sheet(wb, ws4, 'Fiscal Terms & Sources');
