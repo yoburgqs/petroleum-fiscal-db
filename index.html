@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v698</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v699</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v698</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v699</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2861,7 +2861,7 @@ window.copyPlatformCitation = function(btn) {
           <th>#</th><th data-sc-sort="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z. Click again for Z–A, a third time to return to the default ranking.">Country</th><th data-sc-sort="region" tabindex="0" role="columnheader" aria-sort="none" title="Group the result set by region, A–Z. Click again to reverse, a third time to return to the default ranking.">Region</th><th>Mechanics</th>
           <th class="num" data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take</th><th class="num" data-sc-sort="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
           <th class="num" data-sc-sort="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV</th>
-          <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the $75 contractor NPV still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). Observed range &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th>
+          <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the contractor NPV at the ACTIVE PRICE DECK still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). The sub-heading names the deck it is measured against and follows the Price deck buttons above; at the $50 deck this column is the base column and the cell says so rather than printing a ratio of a number against itself. Observed range at the $75 deck &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span id="sc-npv50-den" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th>
           <th class="num" data-sc-sort="prodcov" tabindex="0" role="columnheader" aria-sort="none" title="Production Coverage — percentage of a country's contracts that have verified field-level production data. High Prod Cov (≥30%, green) means government take is production-weighted by actual output. Low coverage means equal-weighting across contracts, which can over-represent small or inactive blocks. Click 'Prod Data Only' in Explorer to filter to high-coverage countries only.">Prod Cov <span style="font-size:10px;cursor:help;">ⓘ</span></th><th class="num" data-sc-sort="swing" tabindex="0" role="columnheader" aria-sort="none" title="Price Swing — government take at $125/bbl minus take at $50/bbl, in percentage points. Measures fiscal progressivity: how much more government captures at high prices vs. low prices. High swing (>20pp, red) = regime is highly price-progressive — contractor upside is capped. Low swing (<10pp, green) = stable fiscal terms across the price cycle. Useful for stress-testing IOC economics in oil price scenarios.">Swing (pp)</th><th data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Fiscal tier: classification of fiscal regime by government take level at $75/bbl. IF = Investor-Friendly (≤40%); MOD = Moderate (41–60%); HI = High Take (61–75%); NOC = NOC-dominated (>75%). Used for portfolio-level screening when comparing across diverse geographies.">Tier</th>
         </tr>
       </thead>
@@ -23408,25 +23408,69 @@ function _npvRetention(d) {
 }
 window._npvRetention = _npvRetention;
 
+// v699 (T1) — the same ratio measured against the deck the SCREENER is actually running at.
+//
+// _npvRetention() above is the canonical $75 -> $50 axis and stays that way: the Breakeven Map's
+// "highest retention" list and the Country Profile's downside line are both written as "$75/bbl
+// contractor NPV at $50", and they are correct.
+//
+// The Screener is different, because v651 gave it a price deck. Its Contractor NPV column follows
+// that deck -- Canada reads $3.9B at $75 and $6.2B at $100 -- while the cell beside it kept a $75
+// denominator, so the percentage printed between two visible numbers could not be derived from
+// either of them. Measured cold at the $100 deck: Canada showed $6.2B, $1.6B and "42% kept"
+// (1.6/6.2 = 26%). At the $50 deck it was worse -- Azerbaijan showed $1.8B in BOTH NPV columns and
+// "60% kept" beside them.
+function _npvRetentionAt(d, deck) {
+  if (!d) return null;
+  var base = d['npv_' + (deck || '75')];
+  if (base === null || base === undefined || base <= 0) return null;
+  if (d.npv_50 === null || d.npv_50 === undefined) return null;
+  return d.npv_50 / base;
+}
+window._npvRetentionAt = _npvRetentionAt;
+
+function _scDeckKey() {
+  return (typeof getPriceKey === 'function') ? getPriceKey() : '75';
+}
+// The reference the $50 downside is measured against on this tab. It is the active deck -- with
+// one exception: at the $50 deck the downside case IS the base case, the ratio is 1.0 by
+// construction for every row, and an axis that cannot separate any two countries is not a screen.
+// There the canonical $75 reference is kept, and every surface that uses it says so out loud.
+function _scRetRefDeck() {
+  var k = _scDeckKey();
+  return k === '50' ? '75' : k;
+}
+function _scDeckIsDownside() { return _scDeckKey() === '50'; }
+window._scRetRefDeck = _scRetRefDeck;
+
 // v573 — the retention figure rendered under the NPV @$50 value in the Screener row, so the
 // axis the Downside Resilience preset screens on is legible on every row rather than being a
 // hidden ratio between two columns the analyst would have to divide by hand across 185 rows.
 // Bands are read off the observed distribution (median 45%, p90 53%), not invented: >=50% is
 // the top decile-and-a-bit, 35-49% is the bulk, <35% is the tail, negative is a failed regime.
 function _retentionSub(d) {
-  const r = _npvRetention(d);
+  // v699 (T1): at the $50 deck this cell and the Contractor NPV cell to its left hold the SAME
+  // number, and a ratio between a value and itself is 100% — which is not what the column used to
+  // print. It printed the $75-based figure, so the row read "$1.8B  $1.8B  60% kept". The column
+  // now says plainly that there is no gap to measure at this deck rather than inventing one.
+  const _ref = (typeof _scRetRefDeck === 'function') ? _scRetRefDeck() : '75';
+  if (typeof _scDeckIsDownside === 'function' && _scDeckIsDownside()) {
+    return '<span style="display:block;font-size:10px;color:var(--muted);letter-spacing:.02em;cursor:help;" title="The screen is running at $50/bbl, so this column is the same figure as Contractor NPV beside it and there is no price break between them to measure. Switch the price deck to $75, $100 or $125 to see how much of that deck&#39;s contractor NPV survives a fall to $50.">= base deck</span>';
+  }
+  const r = _npvRetentionAt(d, _ref);
   if (r === null) {
-    return '<span style="display:block;font-size:10px;color:var(--muted);letter-spacing:.02em;" title="No downside retention defined: contractor NPV at $75 is $0, so there is no contractor value for a price break to erode. This is a state-monopoly regime — the question here is access, not price resilience.">no position</span>';
+    return '<span style="display:block;font-size:10px;color:var(--muted);letter-spacing:.02em;" title="No downside retention defined: contractor NPV at $' + _ref + ' is $0 or below, so there is no contractor value for a price break to erode. This is a state-monopoly regime — the question here is access, not price resilience.">no position</span>';
   }
   const pct = r * 100;
   const col = pct < 0 ? 'var(--red)' : pct >= 50 ? '#15803D' : pct >= 35 ? 'var(--muted)' : 'var(--orange)';
   const wt  = (pct < 0 || pct >= 50) ? '700' : '400';
-  const tip = 'Retains ' + pct.toFixed(0) + '% of its $75/bbl contractor NPV when oil falls to $50 — '
+  const tip = 'Retains ' + pct.toFixed(0) + '% of its $' + _ref + '/bbl contractor NPV when oil falls to $50 — '
     + (pct < 0 ? 'value turns NEGATIVE through the price break; this regime does not survive a downturn.'
       : pct >= 50 ? 'top of the range. Regimes that insulate contractor cash flow from price (service terms, high royalties) retain the most, which is why several high-take countries lead this column.'
       : pct >= 35 ? 'around the 45% median of the 182 countries where the ratio is defined.'
       : 'bottom of the range — most of the contractor position is price-dependent.')
-    + ' Measured, not estimated: npv_75 and npv_50 are modelled for 185 of 185. This is the axis the Downside Resilience preset screens on (≥50%).';
+    + ' Measured, not estimated: npv_' + _ref + ' and npv_50 are modelled for 185 of 185. This is the axis the Downside Resilience preset screens on (≥50%), measured against the $' + _ref + ' deck this screen is running at.'
+    + (_ref === '75' ? '' : ' The observed range quoted in the column header (−14% to +75%, median 45%) is the $75 distribution; at $' + _ref + ' the whole distribution shifts down, because the denominator is larger.');
   return '<span style="display:block;font-size:10px;font-weight:' + wt + ';color:' + col + ';letter-spacing:.02em;font-family:\'IBM Plex Mono\',monospace;cursor:help;" title="' + tip + '">' + pct.toFixed(0) + '% kept</span>';
 }
 
@@ -28726,6 +28770,20 @@ function _scSyncNpvAxis() {
   var deck = document.getElementById('sv-npv-deck');
   if (deck) deck.textContent = price;
 
+  // v699 (T1): the NPV @$50 column's sub-heading names the denominator its "% kept" line is
+  // measured against, and follows the deck. It read "% of $75 kept" at every deck, including the
+  // $50 deck where the column is a verbatim copy of the one beside it.
+  var _den = document.getElementById('sc-npv50-den');
+  if (_den) {
+    if (price === '50') {
+      _den.textContent = 'same as base column';
+      _den.style.color = 'var(--accent)';
+    } else {
+      _den.textContent = '% of $' + price + ' kept';
+      _den.style.color = 'var(--muted)';
+    }
+  }
+
   if (sl) {
     var newMax = _scNpvAxisMax(key);
     if (+sl.max !== newMax) {
@@ -28761,6 +28819,16 @@ function _scSyncNpvAxis() {
   }
   paint('sc-npv-n',   'sl-npv',   key);
   paint('sc-npv50-n', 'sl-npv50', 'npv_50');
+  // v699 (T1): at the $50 deck the "downside" floor and the base NPV floor test the same field.
+  // Two sliders that do the same thing, one of them captioned "survives $50/bbl", is a trap.
+  if (price === '50') {
+    var _n50 = document.getElementById('sc-npv50-n');
+    if (_n50) {
+      _n50.textContent = (_n50.textContent ? _n50.textContent + ' \u00b7 ' : '\u00b7 ')
+        + 'same field as the base NPV floor at this deck';
+      _n50.className = 'sc-axis-n sc-axis-inert';
+    }
+  }
 }
 window._scSyncNpvAxis = _scSyncNpvAxis;
 
@@ -28863,8 +28931,12 @@ function runScreener() {
     // A country with no defined ratio (npv_75 <= 0 — Bahrain, Kuwait, Saudi Arabia) is UNTESTED,
     // not passing, exactly as v513 established for breakeven: absence of a measurement is not a
     // passed stress test. Set only by the Downside Resilience preset.
+    // v699 (T1): measured against the deck the screen is running at, so a row cannot sit inside
+    // the Downside Resilience shortlist while the "% kept" printed on it reads below the floor.
+    // At the $50 deck the ratio is 1.0 for every row, so the canonical $75 reference is kept and
+    // the count line says which reference was used.
     if (_screenerMinRetention !== null) {
-      const _ret = _npvRetention(d);
+      const _ret = _npvRetentionAt(d, _scRetRefDeck());
       if (_ret === null) return false;
       if (_ret < _screenerMinRetention) return false;
     }
@@ -29145,6 +29217,11 @@ function runScreener() {
   // equivalent statement here is unambiguous, and the data-basis filter states its own size.
   const _npv50Note = (minNPV50 <= -500) ? ''
     : ` <span style="color:var(--accent);font-weight:600;">\u2014 all ${data.length} tested at the $50/bbl downside and clearing $${minNPV50}M (npv_50 modelled for 185/185 \u2014 no untested rows)</span>`;
+  // v699 (T1) \u2014 the Downside Resilience preset's defining criterion was the one screen criterion
+  // the count line never stated, and it is the one whose denominator moves with the price deck.
+  const _retRef = _scRetRefDeck();
+  const _retNote = (_screenerMinRetention === null) ? ''
+    : ` <span style="color:var(--accent);font-weight:600;" title="Retention is contractor NPV at $50/bbl divided by contractor NPV at the reference deck. Both legs are modelled for 185 of 185 countries. Countries with no contractor position at the reference deck (npv <= 0 \u2014 the three state monopolies) have no ratio and are treated as untested, not as passing.">\u2014 downside retention \u2265${Math.round(_screenerMinRetention*100)}% of the $${_retRef}/bbl contractor NPV still standing at $50${price === '50' ? ', measured against $75 because the screen deck is already $50 and a row cannot retain less than 100% of itself' : ''}, and that share is printed on every row</span>`;
   // v554 — the take basis states BOTH directions, by name and with both numbers, so the analyst
   // can see exactly which countries the ceiling treats differently and check the claim.
   const _fmtBasisList = arr => arr.map(d => {
@@ -29240,7 +29317,7 @@ function runScreener() {
   const _universeLead = (activeCount === 0 && !_activePresetName)
     ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${sortNote}${_basisNote}`
     : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}`;
-  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${_takeBasisNote}${_npv50Note}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
+  document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${_takeBasisNote}${_npv50Note}${_retNote}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
   // Friction this removes: an exported shortlist is the thing that reaches the investment
   // committee, and it left the tool carrying nothing but rows. Every sentence that makes the
@@ -29339,7 +29416,7 @@ function runScreener() {
       + ' — only ' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid && (!evidDepthOn || (x.n_facts||0)>=SC_EVID_MIN_FACTS);}).length + ' of ' + COUNTRY_DATA.length + ' countries clear that'
       + (evidDepthOn ? ' (' + COUNTRY_DATA.filter(function(x){return (x.a_pct||0)>=minEvid && (x.n_facts||0)<SC_EVID_MIN_FACTS;}).length + ' more hold the share on a record thinner than ' + SC_EVID_MIN_FACTS + ' facts)' : ''));
     if (_screenerMinFacts > 0) _diagHints.push('At least ' + _screenerMinFacts + ' facts on file — that is ' + COUNTRY_DATA.filter(function(x){return (x.n_facts||0)>=_screenerMinFacts;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
-    if (_screenerMinRetention !== null) _diagHints.push('Downside retention \u2265' + Math.round(_screenerMinRetention*100) + '% of $75 NPV at $50/bbl \u2014 that is ' + COUNTRY_DATA.filter(function(x){var r=_npvRetention(x);return r!==null&&r>=_screenerMinRetention;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
+    if (_screenerMinRetention !== null) _diagHints.push('Downside retention \u2265' + Math.round(_screenerMinRetention*100) + '% of $' + _scRetRefDeck() + ' NPV at $50/bbl \u2014 that is ' + COUNTRY_DATA.filter(function(x){var r=_npvRetentionAt(x,_scRetRefDeck());return r!==null&&r>=_screenerMinRetention;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     if (scRegionActive) _diagHints.push('Region filter: ' + scRegionActive + ' only');
     if (reformSet) _diagHints.push('Reform record: ' + _SC_REFORM_MODES[reformMode].label + ' &mdash; that is only '
       + reformList.length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter, because ORCA holds a sourced reform log for just '
@@ -29446,7 +29523,7 @@ function runScreener() {
       <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}</td>
       <td class="num">${fmtNpvShared(d[npvKey])}</td>
-      <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the $75 column to the left: a regime that is positive at $75 and negative here does not survive a price break. The second line is the share of the $75 value retained — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
+      <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the Contractor NPV column to the left, which is computed at the active price deck: a regime that is positive there and negative here does not survive a price break. The second line is the share of THAT column&#39;s value retained, so the percentage can be checked against the two figures on this row — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
       <td class="num" title="Production coverage: % of contracts with verified production data. Higher = take number is more production-weighted." style="color:${(d.prod_coverage_pct||0)>30?'#15803D':(d.prod_coverage_pct||0)>=10?'#A16207':'var(--muted)'}">${(d.prod_coverage_pct||0)>0?(d.prod_coverage_pct).toFixed(0)+'%':'—'}</td>
       <td class="num" style="color:${d.swing!=null?(d.swing>=20?'var(--red)':d.swing>=10?'var(--orange)':'var(--muted)'):'var(--muted)'};font-weight:${d.swing!=null&&d.swing>=15?'700':'400'}">${d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'}</td>
       <td><span class="tier ${tc}"${(_takeLeadCmp && _rowFc.diverges) ? ` style="cursor:help;" title="Tier on the comparable take (${_rowFc.cmp.toFixed(1)}%) — the basis this column is sorted on. On the published ${_rowFc.head.toFixed(1)}% blend the tier is ${tierLabel(_rowFc.head)}."` : ''}>${tierLabel(_tierOn)}</span></td>
@@ -29559,6 +29636,11 @@ function _scExportBasisLines() {
 // countries where v536 ruled no predictability reading may be carried into an IC memo at all.
 function _scExportRows() {
   var data = window._screenerData || [];
+  // v699 (T1): the deck the shortlist was actually screened at. Every export used to carry
+  // NPV_75_M and a $75-based retention regardless of the deck, so a screen run at $100 exported
+  // the $75 NPV under a title that said "screened at $100/bbl".
+  var _xDeck = (typeof _scDeckKey === 'function') ? _scDeckKey() : '75';
+  var _xRef  = (typeof _scRetRefDeck === 'function') ? _scRetRefDeck() : '75';
   return data.map(function(d, i) {
     var fc = _scFeeCmpAt(d, '75');
     var fp = getFiscalPredictabilityScore(d);
@@ -29578,7 +29660,10 @@ function _scExportRows() {
       FeeBasis_Blend: fc.diverges ? 'Yes' : 'No',
       NPV_50_M: d.npv_50,
       NPV_75_M: d.npv_75,
-      NPV_Retention_50v75_pct: (function(){ var r = _npvRetention(d); return r === null ? null : +(r*100).toFixed(1); })(),
+      Screened_At_bbl: _xDeck,
+      NPV_Screened_M: d['npv_' + _xDeck],
+      Retention_Reference_bbl: _xRef,
+      NPV_Retention_pct: (function(){ var r = _npvRetentionAt(d, _xRef); return r === null ? null : +(r*100).toFixed(1); })(),
       Breakeven_bbl: d.be_75,
       Breakeven_Tested: _beIsTested(d.be_75) ? 'Yes' : 'No',
       Swing_pp: d.swing,
@@ -29655,9 +29740,16 @@ function _scCopyColumns(rows, price) {
   if (anyFee) cols.push({ h: 'Comparable take @$75 (fee-basis excluded)',
     f: function(r){ return r.GovtTake_75_Comparable != null
         ? r.GovtTake_75_Comparable.toFixed(1) + '%' + (r.FeeBasis_Blend === 'Yes' ? ' ← cite this' : '') : '—'; } });
-  cols.push({ h: 'Contractor NPV @$75 ($M)', f: function(r){ return r.NPV_75_M != null ? cpNpvFmt(r.NPV_75_M) : '—'; } });
-  cols.push({ h: 'NPV @$50 ($M)',            f: function(r){ return r.NPV_50_M != null ? cpNpvFmt(r.NPV_50_M) : '—'; } });
-  cols.push({ h: '% of $75 NPV kept @$50',   f: function(r){ return r.NPV_Retention_50v75_pct != null ? r.NPV_Retention_50v75_pct.toFixed(0) + '%' : '—'; } });
+  // v699 (T1) — these three columns were pinned to $75 while the title line one paragraph above
+  // them and the Govt take column beside them both followed the deck. An analyst who screened at
+  // $100, read Canada as $6.2B on screen and pressed Copy for IC Memo pasted "$3.9B" into the
+  // memo. The NPV that leaves the tool is now the NPV the screen was run at.
+  var _refD = (rows[0] && rows[0].Retention_Reference_bbl) || '75';
+  cols.push({ h: 'Contractor NPV @$' + price + ' ($M)', f: function(r){ return r.NPV_Screened_M != null ? cpNpvFmt(r.NPV_Screened_M) : '—'; } });
+  if (price !== '50') {
+    cols.push({ h: 'NPV @$50 ($M) — downside',  f: function(r){ return r.NPV_50_M != null ? cpNpvFmt(r.NPV_50_M) : '—'; } });
+    cols.push({ h: '% of $' + _refD + ' NPV kept @$50', f: function(r){ return r.NPV_Retention_pct != null ? r.NPV_Retention_pct.toFixed(0) + '%' : '—'; } });
+  }
   // v568/v623 removed the breakeven criterion but not the column; it is populated for 65 of
   // 185, so it is carried only when this particular shortlist has one.
   if (anyBe) cols.push({ h: 'Breakeven ($/bbl)',
