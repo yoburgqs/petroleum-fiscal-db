@@ -1827,7 +1827,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v702</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v703</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1897,7 +1897,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v702</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v703</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -39986,9 +39986,9 @@ function renderLiveDCFPanel(country, containerId) {
       <div class="dcf-result-note">% of revenue &middot; 1 project</div>
     </div>
     <div class="dcf-result-card">
-      <div class="dcf-result-label">Contractor IRR &mdash; this scenario</div>
-      <div class="dcf-result-value" id="ldcf-irr-${country.replace(/[^a-z0-9]/gi,'_')}">—</div>
-      <div class="dcf-result-note">25yr project</div>
+      <div class="dcf-result-label" id="ldcf-irr-lbl-${country.replace(/[^a-z0-9]/gi,'_')}">Contractor IRR &mdash; this scenario</div>
+      <div class="dcf-result-value" id="ldcf-irr-${country.replace(/[^a-z0-9]/gi,'_')}">&mdash;</div>
+      <div class="dcf-result-note" id="ldcf-irr-note-${country.replace(/[^a-z0-9]/gi,'_')}">25yr project</div>
     </div>
     <div class="dcf-result-card">
       <div class="dcf-result-label">Contractor NPV &mdash; this scenario</div>
@@ -40038,11 +40038,69 @@ function _execLiveDCF(country, profileKey, price) {
     takeEl.textContent = result.take.toFixed(1) + '%';
     takeEl.style.color = result.take > 75 ? 'var(--red)' : result.take > 60 ? 'var(--orange)' : result.take > 40 ? 'var(--yellow)' : 'var(--green)';
   }
-  if (irrEl) {
-    irrEl.textContent = result.irr !== null ? result.irr.toFixed(1) + '%' : 'n/a';
-    if (result.irr !== null) {
-      irrEl.style.color = result.irr < 10 ? 'var(--red)' : result.irr < 20 ? 'var(--orange)' : 'var(--green)';
+  // ── v703 (T2): the Contractor IRR card was the worst number on the Country Profile ──────
+  // It printed `result.irr` raw, in green for anything at or above 20%. Measured across all
+  // 185 countries on this panel's own default profile at $75: 174 printed an IRR of 100% or
+  // more, 2 printed above 500%, and only 7 printed a figure an IC would accept. Indonesia
+  // read 155.2%, Kazakhstan 473.9%, Guyana 275.3% -- all green, all on a $1.2B deepwater
+  // project. The rate is not wrong arithmetic; it is a return on the wrong base. Cost
+  // recovery reimburses capex in the year it is spent, so of $1,200M of capex only ~$223M is
+  // ever net negative and it is repaid by year 3. A 155% return on a small, brief exposure
+  // is not a project IRR and cannot go in an IC memo.
+  //
+  // _sbReturnReading() already classifies exactly this -- it is what the Scenario Builder's
+  // own card has rendered since v594. The Country Profile never called it. Routing this card
+  // through the same function means the two surfaces cannot report the same run differently,
+  // and it reports the two figures that exist for every run: contractor capital actually at
+  // risk, and NPV at a 15% IOC hurdle, which is the hurdle test the rate was standing in for.
+  const _r703 = (typeof _sbReturnReading === 'function') ? _sbReturnReading(result) : null;
+  const _lblEl703  = document.getElementById('ldcf-irr-lbl-' + slug);
+  const _noteEl703 = document.getElementById('ldcf-irr-note-' + slug);
+  if (irrEl && _r703) {
+    const _capexMM703 = (DCF_PROFILES[profileKey] && DCF_PROFILES[profileKey].capexMM) || null;
+    const _m703 = v => v >= 1000 ? '$' + (v / 1000).toFixed(1) + 'B' : '$' + Math.round(v) + 'M';
+    const _sgn703 = v => (v < 0 ? '−' : '+') + _m703(Math.abs(v));
+    const _inflated703 = (_r703.state === 'inflated' || _r703.state === 'unbounded');
+
+    irrEl.textContent = _r703.value;
+    // An inflated or unbounded rate is never painted green. Green is the page telling the
+    // analyst the number is usable, and this one is not.
+    irrEl.style.color = _inflated703 ? 'var(--muted)' : _r703.color;
+    irrEl.style.fontSize = (_r703.value.length > 7) ? '15px' : '';
+
+    if (_lblEl703) {
+      _lblEl703.innerHTML = _inflated703
+        ? 'Contractor IRR &mdash; <span style="color:var(--orange);font-weight:700;">not a project return</span>'
+        : 'Contractor IRR &mdash; this scenario';
     }
+    if (_noteEl703) {
+      const _hurdle703 = (_r703.npv15 !== null)
+        ? (_r703.npv15 > 0 ? '<span style="color:var(--green);font-weight:700;">clears</span>' : '<span style="color:var(--red);font-weight:700;">fails</span>')
+          + ' a 15% IOC hurdle (' + _sgn703(_r703.npv15) + ')'
+        : '';
+      let _body703;
+      if (_r703.state === 'no-capital-at-risk') {
+        _body703 = 'Contractor funds no negative year'
+          + (_capexMM703 ? ' &mdash; cost recovery reimburses the ' + _m703(_capexMM703) + ' capex as it is spent' : '')
+          + ', so there is no capital base for a rate of return.';
+      } else if (_r703.state === 'uneconomic') {
+        _body703 = _m703(_r703.atRisk) + ' at risk &middot; never repaid.';
+      } else if (_inflated703) {
+        _body703 = 'Only <strong style="color:var(--text);">' + _m703(_r703.atRisk) + '</strong>'
+          + (_capexMM703 ? ' of ' + _m703(_capexMM703) + ' capex' : '')
+          + ' is ever at risk &mdash; cost recovery reimburses the rest as it is spent'
+          + (_r703.payback ? ', repaid by year ' + _r703.payback : '')
+          + '. The rate is a return on that exposure, not on the project.';
+      } else {
+        _body703 = _m703(_r703.atRisk) + ' at risk'
+          + (_r703.payback ? ' &middot; payback year ' + _r703.payback : ' &middot; never repaid')
+          + ' &middot; 25yr project.';
+      }
+      _noteEl703.innerHTML = _body703 + (_hurdle703 ? '<br><span style="display:inline-block;margin-top:3px;">Quote this instead: ' + _hurdle703 + '.</span>' : '');
+      _noteEl703.style.lineHeight = '1.5';
+    }
+  } else if (irrEl) {
+    irrEl.textContent = result.irr !== null ? result.irr.toFixed(1) + '%' : 'n/a';
   }
   if (npvEl) {
     if (result.npv !== null) {
@@ -41284,7 +41342,12 @@ function dcfPRRT(params, price, profile) {
 
   return {
     take: Math.round(take * 10) / 10,
-    irr:  irr !== null ? Math.round(irr * 1000) / 10 : null,
+    // v703 (T2): solveIRR() -> calcIRR() already returns a PERCENT (mid * 100). Multiplying
+    // by 1000/10 applied a second x100, so every PRRT and Buy-back run reported its IRR one
+    // hundred times too large -- Australia and Denmark both printed 20740.0% on the Country
+    // Profile's Live DCF card against a true 207.4%. dcfConcession/dcfPSC/dcfTSC return the
+    // percent unscaled; these two are now on the same unit as the other three.
+    irr:  irr !== null ? Math.round(irr * 10) / 10 : null,
     npv:  Math.round(npvSum),
     waterfall: {
       royalty:   toR(totalRoyalty),
@@ -41357,7 +41420,12 @@ function dcfBuyback(params, price, profile) {
 
   return {
     take: Math.round(take * 10) / 10,
-    irr:  irr !== null ? Math.round(irr * 1000) / 10 : null,
+    // v703 (T2): solveIRR() -> calcIRR() already returns a PERCENT (mid * 100). Multiplying
+    // by 1000/10 applied a second x100, so every PRRT and Buy-back run reported its IRR one
+    // hundred times too large -- Australia and Denmark both printed 20740.0% on the Country
+    // Profile's Live DCF card against a true 207.4%. dcfConcession/dcfPSC/dcfTSC return the
+    // percent unscaled; these two are now on the same unit as the other three.
+    irr:  irr !== null ? Math.round(irr * 10) / 10 : null,
     npv:  Math.round(npvSum),
     waterfall: {
       cost_reimb:   toR(totalCostRecovery),
