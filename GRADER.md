@@ -33987,3 +33987,124 @@ now all produce the same shape.
 Walked T5 cold, no sessionStorage or localStorage: Country Profile → pick a country → press the amber **Copy for IC Memo** (`#dd-ic-summary-btn` → `copyICSummary()`, index.html:38090) → paste into Word.
 
 What arrived was one unbroken block of prose. Read back off the clipboard through Playwright, not estimated: **3,126 characters / 518 words on Indonesia**, 3,288 / 541 on Guyan
+
+---
+## Cycle 597 Log — 2026-09-06 23:05
+- Test before: 294 PASS / 0 FAIL (live)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local build, suite RAN this cycle)
+- JS errors: 0 page errors; 1 console 404 on /petroleum-fiscal-db/sw.js, a local-harness artefact
+- Shipped: v691
+
+## Task
+**T3 — "How do these three countries compare side by side?"** — stalest in the rotation
+(591 T1, 592 T6, 593 T5, 594 T4, 595 T2, 596 T5; T3 last walked at 590).
+
+## Friction
+Walked Side-by-Side cold at 1440, sessionStorage and localStorage cleared, on the tab's own
+shipped cold-load set: **Norway / United Kingdom / Netherlands**.
+
+v626 built a **DATA-BASIS gate** for the grid: a column ORCA holds no verified field production
+for is refused a highest/lowest placement on all four Govt Take rows and reads
+`not ranked · statutory terms`. v684 carried that gate to the **Govt Take line chart** — hollow
+markers, `(statutory basis)` in the legend, a second title line. **It stopped there.**
+
+The **Contractor NPV bar chart**, 8px below and sharing the same v614 colour key, never got it.
+Read off the live `Chart.getChart()` object, not the changelog: the render block applied
+`_npvRebased` (v660, fee-basis divergence) and dropped state monopolies (v614), but **never
+referenced `_cmpStatSet` at all**. Netherlands drew a plain solid bar under a legend entry
+reading `Netherlands`, and a bare title `Contractor NPV vs Oil Price ($M)`.
+
+**The direction is what makes this worse than it was on the take chart.** Up there the statutory
+line plots LOW, and a low take at least reads as "check this". Here the SAME column plots HIGH,
+because contractor NPV is derived from the take — a lower take produces a larger contractor NPV.
+A taller bar in an NPV chart is not ambiguous to anyone. And this is the *Economics* half of the
+tab: the number that goes into the IC recommendation.
+
+The cold-load set is the exhibit:
+
+```
+Contractor NPV @$75      Norway $826M    United Kingdom $1.2B    Netherlands $3.6B
+evidence behind it       63,848 facts    15,899 facts            278 facts
+production coverage      18.2%           (producer)              0%
+the bar chart below      ▇               ▇▇                      ▇▇▇▇▇▇▇▇  (4.4x Norway)
+```
+
+Measured over the shipped `country_data.json`:
+
+| | |
+|---|---|
+| 3-country sets that MIX the two bases | **328,119 of 1,038,220 — 31.6%** |
+| producer × statutory column pairs | 3,586 |
+| …where the statutory column draws the **TALLER** bar | **2,693 — 75.1%** |
+| median height ratio when it does | **2.46x** |
+| median `npv_75` — statutory vs producers | **$3,231M vs $1,341M** |
+| median `take_75` — statutory vs producers | 26.9% vs 59.5% |
+
+The bias is structural, not noise: the same 30pp take gap that v684's notice already quantifies
+for the take chart runs backwards through the NPV derivation and inflates exactly the columns
+with the least evidence behind them.
+
+The notice under the grid already says, in words, *"do not present these NPV rows as
+like-for-like in an IC memo."* The picture directly below it said the opposite in the strongest
+visual language the tab has. The picture wins.
+
+## Change
+The remedy is **v684's, not v614's** — the number is real and the analyst chose the country, so
+the series is **not dropped** the way a state monopoly is. It is **marked**, on the two channels
+carrying no meaning yet on this chart:
+
+- **Fill alpha** `88` → `1F` — the bar analogue of the take chart's hollow marker. Hue is the
+  v614 country key shared between the two charts and **does not move**; border dashed `[4,3]`,
+  border width 2.
+- **Legend** reads `Netherlands (statutory basis)`, stacking after v660's `(all contracts)`.
+- **Third title line:** *"faded dashed bar = statutory basis, no verified production — a taller
+  bar there reports the basis, not a better project."*
+- **Tooltip** states the caveat *with its direction* — that a lower take produces a larger NPV,
+  so the bar is taller for a reason that is not the regime. Canvas `aria-label` carries the same.
+
+Gate scope is the grid's and the take chart's, verbatim: fires **only** on a set that MIXES the
+two bases, and reuses `_cmpHasProd`, so grid, take chart and NPV chart cannot disagree by
+construction. It is computed over `npvCountries` rather than reusing `_cmpStatSet`, **because
+the two sets differ** — `chartCountries` also drops PRRT columns, which this chart draws.
+Confirmed live: Australia + Norway + Netherlands marks only Netherlands, and Australia stays
+solid.
+
+## Result
+An analyst reading the Economics half of Side-by-Side can now see, without scrolling back to the
+prose above the grid, which bars are rankable against each other. On 31.6% of three-country sets
+the set's tallest bar no longer silently claims to be its best project.
+
+## Verification
+- **JS syntax gate: PASS** — all 11 inline `<script>` blocks extracted, `node --check`.
+- **Runtime suite RAN this cycle** against the local build: **293 PASS / 0 FAIL / 1 WARN**. The
+  single WARN is a console 404 on `/petroleum-fiscal-db/sw.js` — the service worker registers at
+  an absolute Pages path that does not exist when serving from repo root on localhost. It was
+  present in the cold walk **before any edit**, so it is a harness artefact, not this change.
+- **Six sets driven through the real `addCompare()` path** and read back off the live Chart.js
+  objects. Both negative controls hold: *Norway/UK/Angola* (three producers) and
+  *Chad/Ireland/Greenland* (three statutory — Ireland $3.3B, Greenland $4.5B) each leave every
+  bar solid and add no title line, because they are like-for-like with each other.
+  *Iraq/Netherlands/Norway* stacks both keys across three title lines. Saudi Arabia stays
+  dropped. **0 page errors.**
+- **v614 colour-key invariant re-checked** across three sets including the monopoly case: every
+  shared country's hue MATCHES between the take and NPV charts.
+- **Mobile (Step 5b), 390x844 `hasTouch: true`:** all 10 tabs `scrollWidth 390 === clientWidth
+  390`. **0** controls under 24px on `t2` under `pointer: coarse`. 0 page errors. The change adds
+  no control and no on-screen layout, so nothing new can overflow.
+
+## Carried forward — not fixed this cycle
+- **pixel_audit** still carries exactly one regression, `tablet-768::2-t7 clipped-text 33 -> 34`
+  — **seventh cycle carrying it**, and the longest-standing unaddressed item in the loop. A
+  `.tag` mechanic chip whose `scrollWidth` exceeds `clientWidth` by ~6px while its computed
+  `overflow` is `visible`; nothing is clipped on screen. This points at the detector, not the
+  layout, and should be fixed in the detector.
+- The **`Other` region bucket holds 17 jurisdictions across four continents** (Iraq-Kurdistan,
+  UAE — Abu Dhabi, Republic of the Congo, Greenland, Ireland). Harvest-side misfiling, same class
+  as cycle 344's "USA filed under Other".
+- The **CP CLOSEST FISCAL PEERS chips still sort on the blended `take_75`** rather than the
+  comparable take, so on the 11 divergent countries they list neighbours of the artefact figure.
+- **164 of 185 jurisdictions hold no sourced reform log**, which dominates the T4 answer.
+- The **Methodology tab still names an API Explorer tab that is `display:none`**.
+- The **Screener FAQ's third value for the median IRR statistic** is still unreconciled.
+- **The `⬇ Chart PNG` button exports only the take chart** (`downloadCmpChart()` hard-codes
+  `#cmp-chart`). The NPV chart, now that it carries its own basis keys, has no export path.
