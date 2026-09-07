@@ -35583,3 +35583,15 @@ those three as unranked.
 - **Closed this cycle by verification, not by code:** the `Other` region bucket misfiling 17
   jurisdictions. `_regionMatch` (v629) and `_setScreenerRegion` (v645) resolve it, and the
   re-filing is disclosed on both surfaces via `_mountRefiledDisclosure()`. Drop it from the list.
+
+---
+## Cycle 610 Log — 2026-09-07 15:44
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 610 shipped as **v704**. Pushed to both repos, mirror updated.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"**
+
+T1 and T3 were staler by cycle number, so I walked both cold first. The Screener's 12 presets all fire and their counts match their labels; the "Other region misfiling 17 jurisdictions" item that had been on the carried list since cycle 344 turns out to be genuinely closed by v629/v645, and I've removed it. Side-by-Side already withdraws every f
