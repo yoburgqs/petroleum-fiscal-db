@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v692</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v693</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v692</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v693</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -42323,19 +42323,76 @@ function openFCDrilldown(country) {
   html += '<span id="fc-dd-terms-chip"></span>';
   if (mc) html += '<span class="mc-badge" title="Price scenario range ($50\u2013$125/bbl)">' + Math.min(mc.p10,mc.p90).toFixed(1) + '\u2013' + Math.max(mc.p10,mc.p90).toFixed(1) + '% range</span>';
   html += renderStabilityBadge(getFiscalPredictabilityScore(d), d);
-  if (d.be_75 && d.be_75 > 0 && d.be_75 < 999) {
+  // v693 (T6): the guard here was `d.be_75 > 0` — the last place on the platform still using
+  // it. Everywhere else gates on `> 1`: the Explorer's BE-only checkbox, the Breakeven Map's
+  // own set, the Screener ceiling, the XLSX export and formatBreakeven() itself, because
+  // be_75 = 1.0 is the DCF solver bottoming out on a regime with no contractor position, not a
+  // breakeven. Bahrain, Kuwait and Saudi Arabia each carry take_75 = 100.0 at every modelled
+  // price and npv_75 = $0, and this branch printed their floor as "BE $1/bbl" in GREEN — the
+  // most resilient breakeven on the platform, for the three jurisdictions closed to IOC equity.
+  // Fiscal Compare's own BE column already prints "—" for them. All three now fall through.
+  if (_beIsTested(d.be_75) && d.be_75 > 1 && d.be_75 < 999) {
     const beCol = d.be_75 < 50 ? 'var(--green)' : d.be_75 < 80 ? 'var(--yellow)' : 'var(--red)';
     html += '<span style="font-size:11px;color:' + beCol + ';font-family:\'IBM Plex Mono\',monospace;margin-left:4px;">BE $' + d.be_75.toFixed(0) + '/bbl</span>';
   } else {
-    // v500: when no breakeven data, show regional peer median as proxy context
+    // v693 (T6): was a regional peer median (v500). Two faults, either one fatal to a T6 answer.
+    //   1. Its peer filter was `x.be_75 > 0`, so the three floor values above sat INSIDE the
+    //      peer set. The Middle East's five surviving values were {1, 1, 1, 28, 31} — median
+    //      $1. Twelve countries rendered "regional median $1/bbl" — Iraq (rank #2 in the
+    //      default ranking), Iran, Qatar, Oman, UAE, Iraq-Kurdistan and Yemen among them —
+    //      over a tooltip that called it "5 countries with verified data".
+    //   2. Corrected, it still carries nothing. All 65 modelled breakevens fall between $27
+    //      and $34/bbl and 43 of them sit on two integers — the finding the whole Breakeven
+    //      Map tab is built around. A regional median off that axis is the global constant
+    //      with a region's name on it, and it reads as a country-specific estimate.
+    // Replaced with the axis the Breakeven Map explicitly points at instead: NPV retention
+    // $75 → $50. Defined for 182 of 185, spans -14% to +75%, median 45%. _npvRetention()
+    // returns null for exactly the three monopolies, so they read as a closed regime rather
+    // than as a number. Bands and colours match _retentionSub() so the two agree on sight.
     (function() {
       try {
-        var _beRegion = d.region;
-        if (!_beRegion || typeof COUNTRY_DATA === 'undefined') return;
-        var _bePeers = COUNTRY_DATA.filter(function(x) { return x.region === _beRegion && x.be_75 != null && x.be_75 > 0 && x.be_75 < 999; }).map(function(x) { return x.be_75; }).sort(function(a,b){return a-b;});
-        if (_bePeers.length < 2) return;
-        var _bePeerMed = _bePeers.length % 2 === 0 ? (_bePeers[_bePeers.length/2-1]+_bePeers[_bePeers.length/2])/2 : _bePeers[Math.floor(_bePeers.length/2)];
-        html += '<span style="font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;margin-left:4px;" title="Breakeven not available for this country — insufficient cost data. Regional median shown for reference: ' + _beRegion + ' median breakeven is $' + _bePeerMed.toFixed(0) + '/bbl across ' + _bePeers.length + ' countries with verified data. Use Screener → filter by Breakeven to compare countries with full data.">BE: — <span style="font-style:italic;opacity:.7;">(regional median $' + _bePeerMed.toFixed(0) + '/bbl)</span></span>';
+        var _mono = (typeof _fpNoContractorPosition === 'function') && _fpNoContractorPosition(d);
+        var _ret  = (typeof _npvRetention === 'function') ? _npvRetention(d) : null;
+        var _esc  = function(s) { return String(s).replace(/"/g, '&quot;'); };
+        if (_mono || _ret === null) {
+          var _t0 = _mono
+            ? country + ' has no contractor position to break even ON. Government take is '
+              + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% at $50, $75, $100 and $125/bbl '
+              + 'alike and modelled contractor NPV is $0, so there is no price at which a contractor '
+              + 'recovers costs and earns a return. The database carries 1.0 for this country; that is '
+              + 'the DCF solver hitting its floor, not a $1/bbl breakeven. Read it as a closed regime — '
+              + 'the question here is access, not price. Fiscal Compare prints n/c on this row for the '
+              + 'same reason, and Fiscal Predictability is left unscored.'
+            : 'Breakeven is not modelled for ' + country + '. It needs complete royalty and cost data, '
+              + 'which ORCA holds for 65 of 185 countries. No regional proxy is shown here on purpose: '
+              + 'all 65 modelled breakevens fall between $27 and $34/bbl and 43 of them sit on two '
+              + 'integers, so a regional median off that axis is the global constant with a region name '
+              + 'on it. Use the $50/bbl NPV in the price table below for this country\'s downside.';
+          html += '<span style="font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;'
+            + 'margin-left:4px;cursor:help;" title="' + _esc(_t0) + '">BE: — <span style="font-style:italic;'
+            + 'opacity:.7;">(' + (_mono ? 'no contractor position' : 'not modelled') + ')</span></span>';
+        } else {
+          var _rp  = _ret * 100;
+          var _col = _rp < 0 ? 'var(--red)' : _rp >= 50 ? '#15803D' : _rp >= 35 ? 'var(--muted)' : 'var(--orange)';
+          var _t1 = 'Breakeven is not modelled for ' + country + ' — ORCA holds complete royalty and cost '
+            + 'data for 65 of 185 countries. This is the downside figure that IS measured for it: '
+            + country + ' retains ' + _rp.toFixed(0) + '% of its $75/bbl contractor NPV when oil falls to '
+            + '$50 ($' + Math.round(d.npv_50) + 'M of $' + Math.round(d.npv_75) + 'M — both rows are in the '
+            + 'price table below). '
+            + (_rp < 0 ? 'Value turns NEGATIVE through the price break; this regime does not survive a downturn.'
+              : _rp >= 50 ? 'Top of the range. Regimes that insulate contractor cash flow from price — service '
+                  + 'terms, high royalties — retain the most, which is why several high-take countries lead here.'
+              : _rp >= 35 ? 'Around the 45% median of the 182 countries where the ratio is defined.'
+              : 'Bottom of the range — most of the contractor position is price-dependent.')
+            + ' Measured, not estimated: npv_75 and npv_50 are modelled for 185 of 185, and the axis spans '
+            + '-14% to +75%. No regional breakeven median is shown, because all 65 modelled breakevens sit '
+            + 'between $27 and $34/bbl and would not separate this country from any other. Same figure and '
+            + 'bands as the Screener\'s NPV @$50 column and the Downside Resilience preset (≥50%).';
+          html += '<span style="font-size:10px;color:var(--muted);font-family:\'IBM Plex Mono\',monospace;'
+            + 'margin-left:4px;cursor:help;" title="' + _esc(_t1) + '">BE: — <span style="font-style:italic;'
+            + 'opacity:.7;">· </span><span style="color:' + _col + ';font-weight:'
+            + ((_rp < 0 || _rp >= 50) ? '700' : '400') + ';">' + _rp.toFixed(0) + '% of NPV kept at $50</span></span>';
+        }
       } catch(e) { /* non-critical */ }
     })();
   }
