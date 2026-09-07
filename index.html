@@ -1449,6 +1449,99 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     print-color-adjust: exact !important;
   }
 
+  /* ── v702 (T5) — a PDF is not a scrollport ─────────────────────────────────
+     Every ranked table on this platform lives in .tbl-wrap, which is a bounded
+     scroll container: `max-height: calc(100vh - 150px)` + `overflow: auto`. That is
+     correct on screen — it is what gives the sticky header something to stick to.
+     Nothing reset it for print, and Chromium does not paginate a bounded scroll
+     container. It clips it and drops everything past the box.
+
+     Measured on this file at A4 landscape before this rule:
+
+       Fiscal Compare   189 rows ->  12 printed, 176 laid out below the clip edge
+       Explorer browse  186 rows ->  17 printed
+       Country Profile   30 rows ->  18 printed
+       horizontally     1805px of columns into a 1318px box — 5 of 13 columns gone
+
+     The header, the profile/assumptions strip and the ORCA source line all printed
+     correctly, so the PDF looked complete. That is the whole problem: it is a silent
+     94% data loss on the artifact the Methodology tab tells the analyst to attach to
+     an IC memo in four separate places ("Download Country Profile PDFs for each
+     finalist"; "Side-by-Side exports to PDF — attach directly to the screening memo").
+
+     `white-space: normal` on the header cells is load-bearing, not cosmetic: the
+     `nowrap` that keeps headers on one line on screen is what forced the table to
+     1805px, and with overflow visible that width would run off the page edge instead
+     of the box edge. Letting headers wrap is what makes the table fit the paper.
+
+     `display: table-header-group` re-states the column headers on every printed page.
+     A 185-row table spans ~15 pages; without it, pages 2..N are unlabelled numbers —
+     the same failure the v371 note describes for the on-screen sticky header. */
+  .tbl-wrap, .table-scroll, .dd-section > div[style*="overflow-x"] {
+    max-height: none !important;
+    overflow: visible !important;
+    border-radius: 0 !important;
+  }
+  /* The right-edge fade is a scroll affordance. On paper there is nothing to scroll. */
+  .tbl-wrap.has-overflow-x { background-image: none !important; }
+
+  .tbl-wrap table { width: 100% !important; table-layout: auto !important; }
+  thead { display: table-header-group !important; }
+  tfoot { display: table-footer-group !important; }
+  thead th {
+    position: static !important;
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere;
+  }
+
+  /* Unclipping the box is only half of it. These tables are laid out for a 1440px
+     screen — Fiscal Compare measures 1805px and Explorer 1913px — while an A4
+     landscape page box at 15mm margins is ~1009 CSS px. With the scrollport gone,
+     that surplus runs off the right edge of the paper instead of the right edge of
+     the box, which loses the same last four columns by a different mechanism.
+     Every cell carries `white-space: nowrap` on screen; on paper the table has to
+     fit, so cells wrap and the type steps down to a print size. */
+  .tbl-wrap table { font-size: 8.5px !important; }
+  .tbl-wrap th, .tbl-wrap td {
+    white-space: normal !important;
+    padding: 3px 5px !important;
+    overflow-wrap: break-word;
+  }
+  /* Badges and tags inside the cells carry their own nowrap, which held Explorer
+     138px wider than the td rule alone could bring it. */
+  .tbl-wrap th *, .tbl-wrap td * { white-space: normal !important; }
+
+  /* Measured at the A4-landscape page box (1009 CSS px) after the rules above:
+       Fiscal Compare   887 of 887 available — fits
+       Screener         967 of 967          — fits
+       Country Profile  617 of 617          — fits
+       Explorer browse 1108 of 967          — 141px over, last column still clipped
+     Explorer carries 19 columns and does not fit A4 landscape at a readable size;
+     dropping to 7px type recovers only 10px of that, because the residual is cell
+     padding and borders across 19 columns rather than text. It is left legible and
+     139px better than the 595px it lost before, not squeezed until the other three
+     tables become unreadable to rescue one column on a tab the Methodology does not
+     name as an IC attachment. Open. */
+
+  /* Row-level screen controls. v535 deliberately refused a blanket `button` rule here
+     because country names inside the ranked tables are unclassed <button>s and would be
+     blanked out of the printed table. These two are named instead: the v632 shortlist
+     checkbox column, and the +Compare button, which now carries a class for exactly this
+     reason. Both are inert on paper and between them they were taking ~120px of a
+     1009px page. */
+  #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell,
+  .fc-compare-btn { display: none !important; }
+
+  /* Let the freed table paginate, but never split a row down the middle. */
+  .tbl-wrap, .tbl-wrap table, tbody { break-inside: auto !important; page-break-inside: auto !important; }
+  tr { break-inside: avoid; page-break-inside: avoid; }
+  /* The break-inside:avoid below is meant for compact cards. A card wrapping a
+     185-row table is not one, and asking to keep 15 pages intact is unsatisfiable. */
+  .card:has(.tbl-wrap), .dd-section:has(.tbl-wrap), .panel:has(.tbl-wrap) {
+    break-inside: auto !important; page-break-inside: auto !important;
+  }
+
   /* Prevent key sections from splitting across page boundaries (IC-ready output) */
   .dd-section, .card, #dd-profile-head, canvas { break-inside: avoid; page-break-inside: avoid; }
   h2, h3, .dd-section-hdr { break-after: avoid; page-break-after: avoid; }
@@ -1734,7 +1827,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v701</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v702</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1897,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v701</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v702</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -42658,7 +42751,7 @@ function renderFCResults(results, price) {
     if (showStability) {
       html += '<td class="num">' + stabCell(r.country) + '</td>';
     }
-    html += '<td class="num"><button onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Side-by-Side compare tab (max ' + CMP_MAX + ' countries). Tip: use the Screener + basket for larger sets.">+Compare</button></td>';
+    html += '<td class="num"><button class="fc-compare-btn" onclick="event.stopPropagation();addCompare(\'' + cEsc + '\');this.textContent=\'\u2713\';this.style.color=\'var(--green)\';this.disabled=true;" style="background:transparent;border:1px solid var(--border);border-radius:4px;color:var(--muted);font-size:10px;padding:2px 6px;cursor:pointer;" title="Add to Side-by-Side compare tab (max ' + CMP_MAX + ' countries). Tip: use the Screener + basket for larger sets.">+Compare</button></td>';
     html += '</tr>';
   });
   html += '</tbody>';
