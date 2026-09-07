@@ -34767,3 +34767,123 @@ against Concession.
 ## Friction
 
 I walked every paste-and-export surface cold, reading the actual clipboard contents and the actual downloaded bytes. Four "Copy for IC Memo" paths and eight of nine exports were genuinely strong — Side-by-Side correctly refuses when empty, Fiscal Compare tells you it copied 185 rows, the Country Profile summary carries five notes ke
+
+---
+## Cycle 603 Log — 2026-09-07 (v697)
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest in rotation (597 T3, 598 T1,
+599 T6, 600 T4, 601 T2, 602 T5; T3 last walked at 597).
+
+## Friction
+
+Walked Side-by-Side cold — storage cleared, reload, no share hash — with three analyst-chosen sets
+rather than the seeded North Sea Trio: Guyana/Brazil/Suriname, **Iraq/Kuwait/UAE**, Nigeria/Angola/Ghana.
+
+The Middle East set is where it broke. **Kuwait** is one of three countries — with Bahrain and Saudi
+Arabia — whose `country_data.json` row stores a placeholder `take_50..take_125 = 100.0`,
+`p25 = p75 = 100.0`, `npv_75 = 0`. The placeholder means *the state holds the acreage and there is no
+contractor position to model*. It is not a measured 100% fiscal take.
+
+The grid already knows this and withdraws in six places on the shared `isStateMonopoly()` predicate
+(v529, v614): all four Govt Take cells, all four Contractor NPV cells, the producer rank, and the
+Predictability Score each render an em dash. **Two rows were never covered**, and both derived a
+headline statistic from the same withheld placeholder:
+
+| Row | Source line | Computed | Rendered |
+|---|---|---|---|
+| `Price Swing ($50→$125)` | `key:(d)=>d.swing !== null ? …` | `100 − 100` | **`+0.0pp`** |
+| `Take spread across contracts` | `id:'spread'` degenerate-IQR branch | `p25 === p75` | **`single term`** |
+
+This is the platform contradicting itself on one screen: it refuses to print the take, then publishes
+two summary statistics computed *from* the take it just refused to print.
+
+The severity is in the direction of the error. The platform's own legend (line 1885) reads
+*"Price Swing … &lt;10pp = royalty-dominant, stable"*. **+0.0pp is the best score in the database.**
+So on this set the column with no contractor position at all won the stability comparison outright:
+
+    Kuwait 0.0pp   ·   Iraq 6.6pp   ·   UAE 6.7pp
+
+Reading down Kuwait's column, the only two numbers left in the fiscal block both say *the most stable
+regime possible* — and both are artefacts of absence. This is the "stable but wrong" failure mode,
+in the one place it costs money.
+
+Three aggravating findings in the same walk:
+
+1. **It rides into the IC memo.** The `rows` array feeds `#cmp-data-table` and both clipboard
+   flavours. Clicking `⎘ Copy for IC Memo` pasted `Price Swing … +0.0pp` and `Take spread … single
+   term` for Kuwait, directly under four em-dashed take rows.
+2. **No set-level notice named Kuwait.** Two `.cmp-notice` blocks fired (proxy, fee-blend); neither
+   mentioned it. The only explanation anywhere on screen was the string `state monopoly` inside one
+   Rank cell, six rows up, in 10px grey. The analyst got a column that *looks* populated — header,
+   region, 177 contracts, 722 facts, evidence tier B, "Concession" — and reads blank, with no
+   stated reason.
+3. **The proxy notice counted it as ranked.** `const _rank = selected.filter(d => d.take_75 != null)`
+   includes monopolies, so the notice said UAE had the lowest take "of the **3** columns" on a set
+   where only 2 carried a take at all.
+
+Country Profile already guards this exact row (`!_isMonopoly && _swing344 !== null`, line 32999).
+**Side-by-Side — the tab whose entire job is ranking columns against each other — did not.**
+
+## Change
+
+- **`Price Swing ($50→$125)` and `Take spread across contracts` now withdraw** on the same shared
+  `isStateMonopoly()` predicate the take, NPV, rank and predictability cells already use. Each
+  renders `—` with a title stating the figure is 0.0pp / identical **by construction, not by
+  measurement**, and pointing at the placeholder as the reason.
+- **New set-level `.cmp-notice`** whenever a monopoly column is in the set. States the stored
+  placeholder, that it means the state holds the acreage rather than a measured 100% take, lists
+  every row withdrawn as a consequence, says which rows *remain real* (contract count, mechanics,
+  evidence tier, facts held), and names the columns the set should actually be ranked on. Handles
+  the all-monopoly set explicitly ("there is no fiscal ranking to take from this table at all").
+  Rides into the clipboard through the existing `#cmp-output .cmp-notice` scrape.
+- **Proxy notice count corrected** — monopolies excluded from `_rank`; now reads "of the 2 ranked
+  columns".
+
+## Result
+
+An analyst comparing Iraq / Kuwait / UAE can no longer read Kuwait as the most fiscally stable of the
+three. The two rows that said so are withdrawn, and the memo they paste now carries a numbered note
+saying Kuwait is closed to contractor entry and the set ranks on Iraq and UAE only — instead of
+silently carrying `+0.0pp` and `single term` into an investment committee as evidence of a flat,
+predictable regime.
+
+## Verification
+
+- **JS syntax gate: PASS** — 11 inline blocks, `vm.Script` parse, 0 failures.
+- **Runtime suite RAN this cycle** against the served build: **293 PASS / 0 FAIL / 1 WARN**. The same
+  suite was then run against the **pre-change** build on the same server and returned an identical
+  293 / 0 / 1 — so this change has **zero test delta**. The WARN, the 1 JS error and the 293-vs-294
+  gap are all one artefact: the page registers `/petroleum-fiscal-db/sw.js` (a Pages-absolute path)
+  which 404s under a root-served local server. It does not occur on the deployed site.
+- **Regression:** Norway/UK/Netherlands and Guyana/Brazil/Suriname render byte-identical to
+  pre-change on both touched rows (`+15.7 / +21.8 / +10.4pp`, `+26.0 / +11.1 / +25.0pp`), and their
+  notice counts are unchanged (2 and 3). Only monopoly columns changed.
+- **All-monopoly set** (Kuwait/Saudi Arabia/Bahrain) exercised: every fiscal row dashes, the
+  all-monopoly branch of the new notice fires.
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390.
+- **Mobile (Step 5b), 390×844 `hasTouch: true`:** `scrollWidth === clientWidth` (390 = 390);
+  **0 controls under 24px** on the changed tab.
+- Clipboard re-read post-fix and confirmed carrying `—` on both rows plus the new note as item 2.
+- Version bumped v696 → v697 silently at the end: **2 live strings only** (lines 1737, 1807); the
+  4 remaining `v696` occurrences are prior-cycle code comments and were deliberately left, per the
+  over-broad-regex mistake logged last cycle.
+
+## Carried forward — not fixed this cycle
+
+- **`Take weighting` and `NPV weighting` still print "Equal-weighted" / "Equal-weighted · all 177"
+  on a monopoly column** — describing the averaging of rows that are now all dashes. Lower severity
+  than the two fixed rows because neither is a stability or attractiveness signal, but they are the
+  same category of leak.
+- **`Evidence tier B · 49% primary law of 722 facts` on Kuwait** grades the sourcing of a regime with
+  no contractor position. Defensible (it grades the facts held, which are real) but unqualified.
+- The three monopolies still carry **`be_75 = 1.0`** (Bahrain/Kuwait/Saudi Arabia) — 4th cycle noted.
+- Everything on the cycle-602 carried list remains open: the 862 contracts with no fiscal terms, the
+  zero-rate defaults inside published country `take_75`, `⬇ Chart PNG` exporting only `#cmp-chart`,
+  the Screener Contractor NPV tooltip naming a profile selector absent from that tab (6th cycle), the
+  `Other` region bucket misfiling 17 jurisdictions, 164 of 185 jurisdictions with no sourced reform
+  log, the Methodology tab naming a `display:none` API Explorer tab, the unweighted per-mechanic
+  pivot averages, the incomplete 2020s cohort, and the duplicated `renderVintageTrendChart()` /
+  `renderVintage()` line charts.
+- **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 13th cycle. Points at the
+  detector, not the layout.
