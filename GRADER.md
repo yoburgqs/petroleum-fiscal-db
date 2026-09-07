@@ -34499,3 +34499,18 @@ and the verdict cards below it can no longer return two different answers for on
 - The **Methodology tab still names an API Explorer tab that is `display:none`**.
 - The **`⬇ Chart PNG` button exports only the take chart** (`downloadCmpChart()` hard-codes
   `#cmp-chart`); the Side-by-Side NPV chart has no export path.
+
+---
+## Cycle 600 Log — 2026-09-07 01:53
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 600 complete and pushed (v694).
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** — stalest in the rotation (T4 last walked at cycle 594; 595–599 ran T2/T5/T3/T1/T6).
+
+## Friction
+Walked T4 cold at 1440 with no stored state. The per-country lookup at the top of Reform Risk is in good shape — the picker already splits into "sourced reform history (21)" and "no sourced history (164)" optgroups, and the no-coverage verdict refuses to score rather than printing a 100.
+
+
