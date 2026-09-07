@@ -35013,3 +35013,99 @@ selector, the capex in the result text, and the capex in the engine are the same
 **Friction.** I walked Indonesia cold on Country Profile. The headline correctly refuses to print a country-level IRR and instead routes the analyst to the Scenario Builder — so that route is on T2's critical path, not a side door.
 
 Taking it, the Project Profile selector read **"Deepwater ($800M capex, 50Mbbl/
+
+---
+## Cycle 605 — v699
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* (stalest in the rotation:
+604 T2, 603 T3, 602 T5, 601 T2, 600 T4, 599 T6 — T1 last walked at 598.)
+
+**Friction.** Walked T1 cold: Home → "open the screen →" → Screener. The entry path is sound —
+the Home headline count, the preset menu's live per-deck hit counts, the basis divider, the
+header sorts and the zero-result diagnostic all behaved correctly under test.
+
+The break is one step further, at the control v651 added for exactly this question. The Screener's
+price deck moves `Contractor NPV` (Canada $3.9B at $75, $6.2B at $100). Three things beside it
+stayed pinned to $75:
+
+1. **The `% kept` line under `NPV @$50`** (`_retentionSub()`, index.html:23416 → `_npvRetention()`,
+   hardwired `npv_50 / npv_75`). At the $100 deck Canada rendered `$6.2B | $1.6B | 42% kept` —
+   1.6/6.2 is 26%. At the $50 deck it was worse: Azerbaijan rendered **`$1.8B | $1.8B | 60% kept`**,
+   the same number in both NPV columns with a ratio between them that no arithmetic on the row
+   produces. The column header still read `% of $75 kept` at every deck.
+2. **`Copy for IC Memo`** (`_scCopyColumns()`, index.html:29743). At the $100 deck it emitted a
+   column headed `Contractor NPV @$75 ($M)` carrying **$3.9B**, under a title line reading
+   *"15 of 185 countries, screened at $100/bbl"*, for the row the screen had just shown as $6.2B.
+   The take column beside it followed the deck correctly, so one row of the pasted table mixed
+   a $100 take with a $75 NPV. This is the worst of the three because it lands in a document that
+   leaves the tool.
+3. **CSV / XLSX** (`_scExportRows()`) carried `NPV_75_M` and a `$75` retention with no column
+   naming the deck the shortlist was screened at.
+
+And the **Downside Resilience** preset screened on the $75 ratio while the column printed
+something else, so at a non-$75 deck rows could sit inside a "≥50% retained" shortlist showing
+a smaller number. The count line never stated that criterion at all.
+
+**Change.**
+- `_npvRetentionAt(d, deck)` added. `_npvRetention()` is untouched and stays the canonical
+  $75→$50 axis — the Breakeven Map's retention list and the Country Profile downside line are
+  both *written* as "$75/bbl NPV at $50" and are correct as they stand.
+- `_scRetRefDeck()` — the reference the $50 downside is measured against on this tab: the active
+  deck, except at the $50 deck where the ratio is 1.0 for every row by construction.
+- The `% kept` line, the column sub-heading (`#sc-npv50-den`), the Downside Resilience filter,
+  the zero-result diagnostic and both exports now follow the deck. The sub-heading reads
+  `% of $100 kept`; Canada at $100 now renders `$6.2B | $1.6B | 27% kept`.
+- **At the $50 deck** the column is the base column and now says so: cells read `= base deck`
+  instead of a fabricated ratio, the sub-heading reads `same as base column`, the two duplicate
+  NPV columns collapse to one in the IC paste, and the `Min NPV @$50 · survives $50/bbl` slider
+  is flagged as testing the same field as the base NPV floor. Downside Resilience keeps the $75
+  reference there and the count line states that it did and why.
+- The count line now carries the retention criterion.
+- Exports gain `Screened_At_bbl`, `NPV_Screened_M`, `Retention_Reference_bbl`, `NPV_Retention_pct`.
+
+**Result.** The analyst can divide the two NPV figures on a row and get the percentage printed
+between them, at any deck. Screening at $100 and pressing **Copy for IC Memo** now pastes the
+$100 NPV under a `Contractor NPV @$100` header instead of the $75 figure. Screening at $50 no
+longer shows a downside column that duplicates the base column while claiming 60% survived.
+
+## Verification
+
+- **JS syntax gate: PASS** — 11 inline blocks, `vm.Script`, 0 failures (re-run after the version bump).
+- **Runtime suite RAN this cycle** against the served build: **293 PASS / 0 FAIL / 1 WARN**,
+  identical to the pre-change run on the same server — zero test delta. The WARN and the 1 JS
+  error are the one known artefact: the page registers `/petroleum-fiscal-db/sw.js`, a
+  Pages-absolute path that 404s under a root-served local server. Not present on the deployed
+  site. Same as cycles 603 and 604.
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390 — measured on **both** the
+  $75 and the $50 deck, since the $50 branch is new this cycle.
+- **Mobile (Step 5b), 390×844 `hasTouch: true`:** `scrollWidth === clientWidth` (390 = 390).
+  No control added or touched renders under 24px: the sortable `<th>` is 44.5px, `#sl-npv50`
+  44px, the deck buttons 44px. `#sc-npv50-den` and `#sc-npv50-n` measure 15px but are
+  non-interactive text sub-lines (no tabindex, no handler) inside those controls.
+- **Exports re-exercised at $75 / $100 / $50:** clipboard header follows the deck; CSV carries
+  `Screened_At_bbl,NPV_Screened_M,Retention_Reference_bbl,NPV_Retention_pct` (at $50:
+  `50, 1779.9, 75, 60.3` — coherent); XLSX opens in openpyxl, 2 sheets, 23 columns, 13 rows.
+- **Downside Resilience by deck:** 24 @$75 (unchanged — no regression at the default deck),
+  4 @$100, 24 @$50 on the stated $75 reference.
+- Version bumped v698 → v699 silently at the end: **2 live strings only** (lines 1737, 1807).
+
+## Carried forward — not fixed this cycle
+
+- **The Home tab's Screener card advertises a filter that no longer exists.** Its "You get" line
+  offers "set max take %, min contractor NPV at $75, min NPV at the $50 downside, **breakeven**,
+  mechanic, or region" — the breakeven ceiling was removed as a Screener filter at v568, and the
+  legend under the table now says so explicitly. Same defect class as v537/v568. Text-only, so
+  not this cycle's change, but it is a first-contact promise the tab does not keep.
+- `FC_PROFILES` / `DCF_PROFILES` remain two tables with divergent key sets (from 604).
+- Methodology "Recent Platform Updates" is still an empty placeholder.
+- Everything on the cycle-603/604 carried lists remains open: `Take weighting` / `NPV weighting`
+  printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier on a regime with no
+  contractor position; the three monopolies carrying `be_75 = 1.0` (6th cycle); the 862 contracts
+  with no fiscal terms; zero-rate defaults inside published country `take_75`; `⬇ Chart PNG`
+  exporting only `#cmp-chart`; the Screener Contractor NPV tooltip naming a profile selector
+  absent from that tab (8th cycle); the `Other` region bucket misfiling 17 jurisdictions; 164 of
+  185 jurisdictions with no sourced reform log; the Methodology tab naming a `display:none` API
+  Explorer tab; the unweighted per-mechanic pivot averages; the incomplete 2020s cohort; and the
+  duplicated `renderVintageTrendChart()` / `renderVintage()` line charts.
+- **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 15th cycle. Points at
+  the detector, not the layout.
