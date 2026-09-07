@@ -33721,3 +33721,119 @@ edge**. The change adds no control, so nothing new is under 24px at `pointer: co
 
 ## Friction
 `_rrClassify()` is the one classifier behind every T4 surface. Its green verdict is reached **by elimination**: not 3+ changes since 2010, no *measured* take rise in the window, no pre-2010 rupture, not context-only. A sourced in-window fiscal law change whose take impact ORCA never quantified passes all four tests — so the 
+
+---
+## Cycle 595 Log — 2026-09-06 21:10
+- Test before: 294 PASS / 0 FAIL / 0 WARN
+- Test after: **294 PASS / 0 FAIL / 0 WARN** — suite RUN this cycle against the deployed
+  build (`https://yoburgqs.github.io/petroleum-fiscal-db/`) after the push, not assumed.
+- JS errors: 0
+- pixel_audit: 1 regression vs baseline, `tablet-768::2-t7 clipped-text 33 -> 34` — the
+  same carried `.tag` detector artefact as cycles 591–594, unchanged. No new cell moved.
+- Version: v688 → v689 (bookkeeping, applied at the end, 4 real sites)
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (T2 was
+stalest: 590 T3, 591 T1, 592 T6, 593 T5, 594 T4.)
+
+## Friction
+Walked T2 cold on Country Profile — no sessionStorage, no localStorage, default Indonesia
+load, then the same walk on Angola, the UK, Iraq, Australia, Ghana and Norway.
+
+The headline strip does this well now. Six inches below it, the **Regional Peer
+Comparison** section (`loadCountryProfile`, `index.html` ~34300) prints a second verdict
+in plain words — *"Indonesia is **high take** vs Asia average. Take rank **#21 of 26** in
+region."* — and that sentence was computed against the **plain average of every country
+filed under the region**.
+
+v534 had already established, on this same page, that that basis inverts the sign of the
+answer. 163 of ORCA's 185 records carry no verified block-level production; they are
+equal-weighted statutory averages over as few as 2 contracts, and inside every region
+bucket they outnumber the producers roughly 8:1. Europe's "average" is 22.8% because 31 of
+its 33 members have no production data at all.
+
+Measured against the shipped `country_data.json`, the word printed in this section
+contradicted the producer-basis verdict the headline strip prints above it on **86 of 185
+countries**, and inverted it outright on **35**:
+
+| Country | this section said | producer basis says |
+|---|---|---|
+| Angola | high take vs Africa avg 44.1% | **investor-friendly** vs the 3 Africa producers (76.1%) |
+| United Kingdom | high take vs Europe avg 22.8% | **investor-friendly** vs Norway (68.0%) |
+| Iraq | high take vs M. East avg 60.2% | **investor-friendly** on its comparable take |
+| Indonesia | high take vs Asia avg 45.0% | **near average** vs the 3 Asia producers (61.0%) |
+
+The rank was the same defect in a different dress: "#21 of 26 in region" counted 23
+jurisdictions with no production behind them, while the strip above said "#13 of 21
+producers". And 17 records sit in a residual region bucket literally named `Other`, so
+Iraq-Kurdistan and UAE — Abu Dhabi were being told they were *"high take vs Other average"*.
+
+This is the worst moment in the T2 walk because it is not a missing number — it is the
+page contradicting itself in the analyst's own vocabulary, at the point where they stop
+reading and start writing. "High take" is what goes in the memo.
+
+## Change
+- Verdict word, benchmark and rank now come from `getProducerPeers()` and `cpCmpTakeOf()`
+  — the same 21-country producer set and the same v552 comparable-take basis the headline
+  strip already ranks on. **No new threshold**: the −5/+5pp bands are this section's own.
+- **18 countries have no other producer in their region.** The section now says so and
+  falls back to the global producer median, naming it as such; for the `Other` bucket it
+  states outright that Other is a residual bucket, not a peer group.
+- Where the country **itself** is not a producer (163 of 185), the sentence adds that its
+  own take is a statutory average and the two sides of the comparison are not on the same
+  evidential footing.
+- The all-region average is **not deleted**. It is demoted to a stated non-benchmark under
+  the verdict — *"22 of them carry no verified production data; their plain average, 45.0%,
+  would call Indonesia 'high take' and is not a peer benchmark"* — so an analyst who
+  already quoted the old line can see which number moved. Same disclosure pattern as v683.
+- On the **11** countries whose blended headline diverges from their Group-1 comparable
+  take, the section names both and the ruler draws both marks. Iraq now reads
+  *"investor-friendly vs Oman … −41.5pp. Measured on Iraq's comparable take of 34.1% (its
+  195 PSC/Concession contracts). The 84.8% plotted on the ruler is the published blended
+  figure, lifted by the 68% of contracts that are fee-basis (TSC 415)."*
+
+### Two pre-existing bugs in the same ruler, surfaced by walking it and fixed
+- **The ruler bounds excluded the country the page is about.** `rulerMin`/`rulerMax` were
+  computed from `peerTakes` only. Any country outside its own peers' range plotted off the
+  track: Norway's marker, its `68.0%` label and its name all rendered at `left:113.3%` —
+  outside the chart — on the tab whose entire job is to place that one country. Bounds now
+  cover every mark drawn. **0 off-track marks across all 185**, measured.
+- **The ruler clipped its own labels.** A 32px box with `overflow-y:hidden` holding 10px
+  labels at `top:25px`, so the country's name and both axis labels were sliced along their
+  baseline on every profile. Box is now 46px. Labels within 12% of either end anchor to
+  that end instead of centring, which had been pushing Saudi Arabia's name past the right
+  edge of the card at 390px.
+
+## Result
+An analyst reading one country can no longer scroll from a headline that says
+*"investor-friendly, −23.1pp vs producers"* to a section eight inches below that says
+*"high take"* about the same country at the same price. The sentence they paste now names
+its peer set, its size, and what is missing from it — and on Iraq it says which of the two
+takes it is measured on, instead of leaving a 50.7pp gap for the reader to reconcile.
+
+## Mobile (Step 5b)
+390×844 `hasTouch: true`, against the deployed build: all 10 tabs
+`scrollWidth 390 === clientWidth 390`. Across **all 185 profiles**: 0 elements past the
+right edge of the changed section, 0 off-track ruler marks, 0 page errors. The change adds
+no interactive control, so nothing new is under 24px at `pointer: coarse`.
+
+## Carried forward — not fixed this cycle
+- **pixel_audit** still carries exactly one regression, `tablet-768::2-t7 clipped-text
+  33 -> 34`. **Fifth cycle carrying it.** Confirmed again this cycle to be the `.tag`
+  mechanic chip whose `scrollWidth` exceeds `clientWidth` by ~6px while its computed
+  `overflow` is `visible` — nothing is clipped on screen. This points at the detector, not
+  the layout, and it is now the longest-standing unaddressed item in the loop.
+- **The `Other` region bucket holds 17 jurisdictions across four continents**, including
+  Iraq-Kurdistan, UAE — Abu Dhabi, Republic of the Congo, Greenland and Ireland. This cycle
+  stops the section from pretending Other is a peer group, but the underlying misfiling is
+  harvest-side and unaddressed. Same class of defect as cycle 344's "USA filed under Other".
+- The **CLOSEST FISCAL PEERS** chips at the foot of this section still sort on the blended
+  `take_75` rather than the comparable take, so on the 11 divergent countries they list
+  neighbours of the artefact figure. Left alone deliberately to keep this diff on the
+  verdict; they are a navigation aid, not a claim, and the same peer set is rendered twice
+  elsewhere on the page.
+- Everything carried from cycles 560–594 otherwise unchanged, including: the CP "Copy for
+  IC Memo" paragraph at ~500 words with figures and caveats fused into one block (still the
+  obvious next T5 cycle); the 164 uncovered jurisdictions that dominate the T4 answer; the
+  Screener FAQ's third value for the median IRR statistic; and the Methodology tab naming
+  an API Explorer tab that is `display:none`.
