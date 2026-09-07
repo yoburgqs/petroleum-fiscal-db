@@ -34514,3 +34514,125 @@ and the verdict cards below it can no longer return two different answers for on
 Walked T4 cold at 1440 with no stored state. The per-country lookup at the top of Reform Risk is in good shape — the picker already splits into "sourced reform history (21)" and "no sourced history (164)" optgroups, and the no-coverage verdict refuses to score rather than printing a 100.
 
 
+
+---
+## Cycle 601 Log — 2026-09-07
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local, pre-edit build, same server)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local, post-edit build)
+- JS errors: 0 page errors across all 185 country profiles
+- Shipped: v695
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** — stalest in the
+rotation (T2 last walked at cycle 595; 596–600 ran T5/T3/T1/T6/T4).
+
+## Friction
+Walked T2 cold at 1440, no sessionStorage, no localStorage. The Country Profile headline strip
+carries the regime split card (`_cpRegimeSplit570`, index.html ~33180) — the element built
+specifically to stop an analyst citing the country blend when their asset sits in one regime.
+On **Brazil**, the largest IOC target on the platform, it read:
+
+| | | | |
+|---|---|---|---|
+| Concession | 845 (71%) | **8.2%** | **$5.0B** |
+| PSC | 348 (29%) | 62.7% | $780M |
+
+directly above the line *"Contractor NPV across them runs $780M to $5.0B. **Screen on the regime
+you would sign.**"*
+
+**703 of those 845 Concession contracts carry no fiscal rates at all.** `dcf_results.warnings`
+holds the DCF engine's own stamp on each: `"No fiscal rates found; defaulting to zero-rate
+concession"`. Each is priced at `govt_take_pct = 0.0` and `contractor_npv = $5,533.1M` — the
+untaxed project value, identical to the decimal on all 862 such contracts platform-wide. Those
+defaults are what dragged the row to 8.2%. Over the **142** Brazil Concession contracts that do
+carry rates, the same regime is **48.7% take / $2.2B NPV** — 40.5pp and 2.2× from what the page
+printed at the decision point.
+
+This was not a plausibility judgement made here. The engine recorded it per contract at compute
+time, and the record had never reached any surface.
+
+**862 contracts, 17 countries, 17 regime rows:**
+
+| country | regime | contracts | unpriced | printed | actual |
+|---|---|---:|---:|---:|---:|
+| Brazil | Concession | 845 | 703 | 8.2% / $5.0B | **48.7% / $2.2B** |
+| Angola | Concession | 50 | 43 | 4.5% / $4.8B | **32.5% / $2.2B** |
+| Sierra Leone | Concession | 41 | **41** | 0.0% / $5.5B | **no terms on file** |
+| Chad | Concession | 18 | 17 | 1.9% / $5.4B | **34.0% / $2.6B** |
+| Suriname | Concession | 8 | **8** | 0.0% / $5.5B | **no terms on file** |
+| South Sudan | Concession | 8 | 7 | 4.0% / $5.2B | **32.3% / $3.2B** |
+| Senegal | Concession | 6 | **6** | 0.0% / $5.5B | **no terms on file** |
+| Timor-Leste | Concession | 9 | 5 | 13.2% / $4.4B | **29.6% / $3.0B** |
+| Turkmenistan | Concession | 35 | 2 | 86.9% / $693M | **92.1% / $400M** |
+
+Six regimes had **no priced contract at all**, so the row was 0.0% take on the untaxed project
+NPV end to end — and rendered as the most contractor-favourable terms on the platform.
+
+## Change
+- **`tools/add_zero_rate_flag.py`** (new) — additively patches `country_data.json` with `zr` /
+  `t75p` / `v75p` per `mech_mix` row, read-only off `dcf_results`, on the same contract as
+  `add_mech_mix.py`: only adds keys, never rewrites a field, never runs
+  `rebuild_country_data.py`. Verified purely additive against a pre-image — 17 rows gained keys,
+  nothing else in the 185-record file changed.
+- **`cpRegimeRows()`** states each row's take and NPV over the contracts that carry fiscal rates.
+  A regime with none carries **no take** rather than a zero. The blend is weighted over
+  rate-carrying contracts.
+- **The card and the Fiscal Regime Breakdown table both render from it**, so the two surfaces
+  cannot disagree. Brazil's row now reads `142 of 845 · 48.7% · $2.2B` with *"703 of 845
+  Concession contracts carry no fiscal rates; excluded. Including them prints 8.2%."* Sierra
+  Leone's reads `41 (93%) · no terms · —`.
+- **Unpriced rows are no longer filtered out of the card.** The old `r.take != null` filter
+  deleted the largest regime in the country rather than reporting it.
+- **`outside` becomes a trigger** alongside spread. v677 called it *"the more serious of the two
+  things this card can say"*, but the `spread < 5` gate returned first, so it was unreachable —
+  Kazakhstan only ever cleared the gate on artifact takes and would have gone silent otherwise.
+
+## Result
+The analyst screening Brazil deepwater is no longer shown a Concession route at 8.2% government
+take and 6.4× the PSC's contractor NPV, under an instruction to screen on it. Where a regime has
+no fiscal terms on file the page says so, instead of printing the untaxed project NPV as the best
+terms on the platform. The false reconciliation alarms shrink with it — **Brazil's
+headline-vs-rows gap 31.5pp → 3.0pp, Sierra Leone's 50.1pp → 4.9pp, Chad's → 1.9pp** — because
+those gaps were largely the artifact, not a genuine disagreement between the headline and the
+regimes.
+
+## Verification
+- **185-country A/B** against a served pre-edit build (both country_data.json versions):
+  **57 cards and 61 tables render before and after — none appeared, none vanished.** Substantive
+  change confined to the 17 flagged countries. The other 31 tables change only by losing a clause
+  that is now false everywhere ("including those whose fiscal terms were never resolved and are
+  carried near zero").
+- **JS syntax gate: PASS** — 11 inline `<script>` blocks extracted, `node --check`.
+- **Runtime suite RAN this cycle**, both builds on the same local server: before **293 PASS /
+  0 FAIL / 1 WARN**, after **293 PASS / 0 FAIL / 1 WARN**. The WARN is the known localhost
+  `sw.js` 404 — the service worker registers at an absolute Pages path that does not exist when
+  serving from repo root. Confirmed present on the pre-edit build in the same run.
+- **0 page errors** across all 185 country profiles (one initial pass threw three
+  `null.toFixed` on the fully-unpriced countries; found by the sweep, fixed, re-swept clean).
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390, every tab.
+- **Mobile (Step 5b), 390×844 `hasTouch: true`:** `scrollWidth === clientWidth`; **0 controls
+  under 24px** on the changed surface, checked on Brazil / Angola / Sierra Leone.
+- Version bumped v694 → v695 silently at the end, per the directive.
+
+## Carried forward — not fixed this cycle
+- **The 862 contracts still hold no fiscal terms.** This cycle makes their absence visible; it
+  does not fill it. The durable fix is harvest-side, and Brazil (703) is by far the largest
+  single target on the platform.
+- **The same zero-rate defaults are still inside the published country headline `take_75`.**
+  Brazil's 55.6% is production-weighted so the effect is small there, but the equal-weighted
+  countries (Sierra Leone, Senegal, Suriname) carry them into the headline, the Screener, Fiscal
+  Compare and every export. Only the regime split surfaces are corrected here. This is the single
+  biggest carried item this cycle creates and is worth a deliberate cycle of its own.
+- The **`⬇ Chart PNG` button exports only the take chart** (`downloadCmpChart()` hard-codes
+  `#cmp-chart`); the Side-by-Side NPV chart has no export path.
+- The **"Most Frequently Reformed Regimes" table still ranks on total events**, context included.
+- **`be_75 = 1.0`** is still in the underlying data for Bahrain / Kuwait / Saudi Arabia; every
+  consumer guards it in ~12 repeated places. Harvest-side fix.
+- The **Contractor NPV header tooltip on the Screener** still says "see profile selector for
+  assumptions"; there is no profile selector on that tab. Fourth cycle carrying it.
+- **pixel_audit** still carries exactly one regression, `tablet-768::2-t7 clipped-text 33 -> 34`
+  — **eleventh cycle carrying it**. Points at the detector, not the layout.
+- The **`Other` region bucket** misfiling of 17 jurisdictions is unfixed harvest-side.
+- The **CP CLOSEST FISCAL PEERS chips still sort on the blended `take_75`**.
+- **164 of 185 jurisdictions hold no sourced reform log.** Data gap, not UX.
+- The **Methodology tab still names an API Explorer tab that is `display:none`**.
