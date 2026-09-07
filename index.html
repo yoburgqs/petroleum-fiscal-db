@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v688</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v689</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v688</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v689</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2137,7 +2137,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v688';
+  return m ? m[0] : 'v689';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2212,7 +2212,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v688');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v689');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -34303,39 +34303,183 @@ function loadCountryProfile(country) {
     const regionAvg = peerTakes.reduce((a,v) => a+v, 0) / peerTakes.length;
     const regionMin = Math.min(...peerTakes);
     const regionMax = Math.max(...peerTakes);
-    const diff = d.take_75 - regionAvg;
-    const diffColor = diff < -5 ? 'var(--green)' : diff > 5 ? 'var(--red)' : 'var(--yellow)';
+    // ── v689 (T2): this section's verdict word was computed against the PLAIN AVERAGE of every
+    // country filed under this region, and v534 already established on this same page that that
+    // basis inverts the sign of the answer. 163 of ORCA's 185 records carry no verified
+    // block-level production at all; they are equal-weighted statutory averages over as few as
+    // 2 contracts, and they outnumber the producers 8:1 inside every region bucket. So the
+    // Europe "average" was 22.8% (27 of its 29 members have no production data), against which
+    // the United Kingdom — the deepest-production regime in the region — read "HIGH TAKE".
+    // Measured over the shipped country_data.json, the word printed here contradicted the
+    // producer-basis verdict the headline strip prints eight inches above it on 81 of 185
+    // countries, and inverted it outright (high take <-> investor-friendly) on 30:
+    //     Angola   "high take" vs Africa avg 44.1%   ->  investor-friendly vs the 3 Africa producers (76.1%)
+    //     UK       "high take" vs Europe avg 22.8%   ->  investor-friendly vs the 2 Europe producers (68.0%)
+    //     Iraq     "high take" vs M.East avg 60.2%   ->  investor-friendly on its comparable take
+    //     Indonesia "high take" vs Asia avg 45.0%    ->  near average vs the 3 Asia producers (61.0%)
+    // The rank was the same defect: "#21 of 26 in region" counted 23 jurisdictions with no
+    // production behind them, while the strip above said "#13 of 21 producers".
+    // No new threshold is introduced: the peer set is getProducerPeers() (the existing
+    // `weighting` field), the figure is cpCmpTakeOf() (the v552 comparable take), and the
+    // -5/+5pp bands are this section's own. The all-region average is not deleted — it is
+    // demoted to a stated non-benchmark, with the word it used to print, so an analyst who
+    // quoted the old line can see which number moved.
+    const _rpcProd = (typeof getProducerPeers === 'function') ? getProducerPeers() : [];
+    const _rpcSelfCmp = (typeof cpCmpTakeOf === 'function') ? cpCmpTakeOf(d, '75') : d.take_75;
+    const _rpcSelfIsProd = _rpcProd.some(function(p) { return p.country === d.country; });
+    const _rpcRegProd = _rpcProd.filter(function(p) { return p.region === region && p.country !== d.country; });
+    const _rpcMedOf = function(a) {
+      if (!a || !a.length) return null;
+      var v = a.slice().sort(function(x, y) { return x - y; });
+      return v.length % 2 ? v[(v.length - 1) / 2] : (v[v.length / 2 - 1] + v[v.length / 2]) / 2;
+    };
+    // Regional producer benchmark where one exists; otherwise the global producer set, named as such.
+    const _rpcRegional = _rpcRegProd.length > 0;
+    const _rpcBenchSet = _rpcRegional
+      ? _rpcRegProd
+      : _rpcProd.filter(function(p) { return p.country !== d.country; });
+    const _rpcBench = _rpcMedOf(_rpcBenchSet.map(function(p) { return cpCmpTakeOf(p, '75'); }));
+    // Rank among the regional producers, self included — printed only when self is one of them,
+    // because a statutory average has no place in a ranking of verified regimes.
+    const _rpcRankSet = _rpcRegional && _rpcSelfIsProd
+      ? _rpcRegProd.concat([d]).slice().sort(function(a, b) { return cpCmpTakeOf(a, '75') - cpCmpTakeOf(b, '75'); })
+      : null;
+    const _rpcRank = _rpcRankSet ? (_rpcRankSet.findIndex(function(p) { return p.country === d.country; }) + 1) : null;
+    // The old all-region reading, kept for the disclosure clause only.
+    // v689: on the 11 countries whose blended headline diverges from their Group-1 comparable take
+    // (v552), the verdict above is computed on the comparable figure while the ruler below plots the
+    // published headline. Iraq reads "investor-friendly, -41.5pp" beside a marker at 84.8% in red.
+    // Both numbers are correct and they are not the same number, so the section says which is which
+    // instead of letting the analyst reconcile them.
+    const _rpcCmpNote = _cmpTakeOn552
+      ? ' <span style="color:var(--muted);">Measured on ' + d.country + '\u2019s comparable take of '
+        + _rpcSelfCmp.toFixed(1) + '% (its ' + Number(_cpFee552.g1.n).toLocaleString() + ' PSC/Concession contracts). '
+        + 'The ' + d.take_75.toFixed(1) + '% plotted on the ruler is the published blended figure, lifted by the '
+        + _cpFee552.feePct.toFixed(0) + '% of contracts that are fee-basis (' + _cpFee552.names + '), where take% is '
+        + 'a structural artefact of the remuneration mechanic and is not rankable against a PSC.</span>'
+      : '';
+    const _rpcOldDiff = d.take_75 - regionAvg;
+    const _rpcOldLabel = _rpcOldDiff < -5 ? 'investor-friendly' : _rpcOldDiff > 5 ? 'high take' : 'near average';
+    const diff = (_rpcBench != null) ? (_rpcSelfCmp - _rpcBench) : _rpcOldDiff;
+    const diffColor = _rpcBench == null ? 'var(--muted)'
+                    : diff < -5 ? 'var(--green)' : diff > 5 ? 'var(--red)' : 'var(--yellow)';
     const diffLabel = diff < -5 ? 'investor-friendly' : diff > 5 ? 'high take' : 'near average';
     // Top 5 closest peers by take
     const sorted = peers.slice().sort((a,b) => Math.abs(a.take_75 - d.take_75) - Math.abs(b.take_75 - d.take_75)).slice(0, 5);
     // Position on regional scale
     const allInRegion = [d, ...peers].sort((a,b) => a.take_75 - b.take_75);
     const posLabel = allInRegion.findIndex(p => p.country === d.country) + 1;
-    const rulerMin = Math.max(0, Math.floor(regionMin / 10) * 10 - 10);
-    const rulerMax2 = Math.min(100, Math.ceil(regionMax / 10) * 10 + 10);
-    const rulerRange = rulerMax2 - rulerMin;
-    const thisPct = ((d.take_75 - rulerMin) / rulerRange * 100).toFixed(1);
-    const avgPct  = ((regionAvg - rulerMin) / rulerRange * 100).toFixed(1);
+    // ── v689: the ruler bounds were computed from the PEERS only, excluding the country the page
+    // is about. Any country outside its own peers' range therefore plotted off the track:
+    // Norway's marker, its 68.0% label and its name all rendered at left:113.3%, outside the
+    // chart, on the tab whose whole job is to place that one country. Same for every regional
+    // extreme, and now also for the producer benchmark, which can sit outside the peer range
+    // (Oceania peers run 19.7-38.5%; the global producer median it is measured against is 57.0%).
+    // Bounds now cover every mark the ruler draws, so nothing can leave the track.
+    const _rpcMarks = [regionMin, regionMax, d.take_75]
+      .concat(_rpcBench != null ? [_rpcBench] : [])
+      .concat(_cmpTakeOn552 && _rpcSelfCmp != null ? [_rpcSelfCmp] : [])
+      .filter(function(v) { return typeof v === 'number' && isFinite(v); });
+    const rulerMin = Math.max(0, Math.floor(Math.min.apply(null, _rpcMarks) / 10) * 10 - 10);
+    const rulerMax2 = Math.min(100, Math.ceil(Math.max.apply(null, _rpcMarks) / 10) * 10 + 10);
+    const rulerRange = (rulerMax2 - rulerMin) || 1;
+    const thisPct = Math.max(0, Math.min(100, (d.take_75 - rulerMin) / rulerRange * 100)).toFixed(1);
+    // v689: a label centred on a mark at 0% or 100% hangs half its width off the track. Saudi
+    // Arabia sits at 100% of the ruler and its name rendered past the right edge of the card at
+    // 390px. Labels within 12% of either end anchor to that end instead of centring.
+    const _rpcAnchor = function(pct) {
+      var v = parseFloat(pct);
+      return v <= 12 ? 'left:0;transform:none;'
+           : v >= 88 ? 'right:0;left:auto;transform:none;'
+           : 'left:' + pct + '%;transform:translateX(-50%);';
+    };
+    // v689: the ruler's second marker is the producer benchmark the sentence quotes, not the
+    // all-region average it used to quote. Clamped so an out-of-range benchmark cannot park
+    // the label outside the track.
+    const _rpcMarkVal = (_rpcBench != null) ? _rpcBench : regionAvg;
+    const avgPct  = Math.max(0, Math.min(100, (_rpcMarkVal - rulerMin) / rulerRange * 100)).toFixed(1);
     const tc = d.take_75 <= 40 ? 'var(--green)' : d.take_75 <= 60 ? 'var(--yellow)' : d.take_75 <= 75 ? 'var(--orange)' : 'var(--red)';
     return '<div class="dd-section">'
       + '<h3>Regional Peer Comparison</h3>'
       + '<div style="font-size:12px;color:var(--muted);margin-bottom:12px;">'
-      + d.country + ' is <strong style="color:' + diffColor + '">' + diffLabel + '</strong> vs '
-      + region + ' average. Take rank <strong style="color:var(--text)">#' + posLabel + ' of ' + (peers.length+1) + '</strong> in region.'
+      + (function() {
+          var esc = function(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;'); };
+          var nOther = (peers.length + 1) - (_rpcRegional ? (_rpcRegProd.length + (_rpcSelfIsProd ? 1 : 0)) : (_rpcSelfIsProd ? 1 : 0));
+          var lead, tip;
+          if (_rpcBench == null) {
+            // No producer set at all — say nothing rather than rank against statutory averages.
+            lead = '<strong style="color:var(--text)">' + esc(d.country) + '</strong> holds a '
+                 + d.take_75.toFixed(1) + '% take, but ORCA verifies block-level production for no '
+                 + 'country in this comparison, so there is no peer benchmark to place it against. '
+                 + 'The ruler below shows the spread of statutory averages only.';
+            tip = 'Every take on this ruler is an equal-weighted average of statutory terms with no '
+                + 'verified production behind it. Ranking one against another measures how the terms '
+                + 'were written, not what any operator realised.';
+          } else if (_rpcRegional) {
+            // With one regional producer there is no distribution to take a median of, so the
+            // benchmark is named rather than dressed up as a statistic.
+            var _rpcVs = (_rpcRegProd.length === 1)
+              ? 'vs <strong style="color:var(--text)">' + esc(_rpcRegProd[0].country) + '</strong>, the only other '
+                + esc(region) + ' jurisdiction ORCA holds verified production for (' + _rpcBench.toFixed(1) + '%)'
+              : 'vs the ' + _rpcRegProd.length + ' other ' + esc(region) + ' jurisdictions ORCA holds verified '
+                + 'production for &mdash; median <strong style="color:var(--text)">' + _rpcBench.toFixed(1) + '%</strong>';
+            lead = '<strong style="color:var(--text)">' + esc(d.country) + '</strong> is '
+                 + '<strong style="color:' + diffColor + '">' + diffLabel + '</strong> ' + _rpcVs
+                 + ', ' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'pp'
+                 + (_rpcRank ? ', rank <strong style="color:var(--text)">#' + _rpcRank + ' of ' + _rpcRankSet.length + '</strong> among them' : '')
+                 + '.'
+                 + _rpcCmpNote
+                 + (!_rpcSelfIsProd ? ' <span style="color:var(--yellow);">' + esc(d.country) + '\u2019s own take is a statutory average with no verified production behind it, so the two sides of this comparison are not on the same evidential footing.</span>' : '');
+            tip = 'Benchmark = the median comparable take of the ' + _rpcRegProd.length + ' ' + region
+                + ' producer' + (_rpcRegProd.length === 1 ? '' : 's') + ' in ORCA\u2019s 21-country producer set '
+                + '(' + _rpcRegProd.map(function(p) { return p.country; }).join(', ') + '), the same set and the '
+                + 'same comparable-take basis the headline strip at the top of this page ranks on. '
+                + 'This line used to read "' + _rpcOldLabel + ' vs ' + region + ' average ('
+                + regionAvg.toFixed(1) + '%)", an average over all ' + (peers.length + 1) + ' jurisdictions filed '
+                + 'under ' + region + '. That basis contradicted the headline on 81 of 185 countries and '
+                + 'inverted it on 30, because ' + nOther + ' of the jurisdictions in it carry no verified '
+                + 'production at all.';
+          } else {
+            lead = '<strong style="color:var(--text)">' + esc(d.country) + '</strong> is the only '
+                 + esc(region) + ' jurisdiction ORCA holds verified production for'
+                 + (region === 'Other' ? ' (and "Other" is a residual bucket, not a peer group)' : '')
+                 + ', so this region has no peer benchmark. Against all ' + _rpcBenchSet.length
+                 + ' producers worldwide it is <strong style="color:' + diffColor + '">' + diffLabel
+                 + '</strong> &mdash; global producer median <strong style="color:var(--text)">'
+                 + _rpcBench.toFixed(1) + '%</strong>, ' + (diff >= 0 ? '+' : '') + diff.toFixed(1) + 'pp.'
+                 + _rpcCmpNote
+                 + (!_rpcSelfIsProd ? ' <span style="color:var(--yellow);">' + esc(d.country) + '\u2019s own take is a statutory average with no verified production behind it, so the two sides of this comparison are not on the same evidential footing.</span>' : '');
+            tip = 'No ' + region + ' jurisdiction other than this one is in ORCA\u2019s 21-country producer set, '
+                + 'so the fallback benchmark is the global producer median. This line used to read "'
+                + _rpcOldLabel + ' vs ' + region + ' average (' + regionAvg.toFixed(1) + '%)", an average over '
+                + (peers.length + 1) + ' jurisdictions of which ' + nOther + ' carry no verified production.';
+          }
+          return '<span title="' + esc(tip) + '" style="cursor:help;border-bottom:1px dotted var(--border);">' + lead + '</span>'
+            + '<div style="font-size:11px;color:var(--muted);margin-top:5px;line-height:1.5;">The ruler below plots all '
+            + (peers.length + 1) + ' jurisdictions filed under ' + esc(region) + '. ' + nOther
+            + ' of them carry no verified production data; their plain average, ' + regionAvg.toFixed(1)
+            + '%, would call ' + esc(d.country) + ' &ldquo;' + _rpcOldLabel + '&rdquo; and is not a peer benchmark.</div>';
+        })()
       + '</div>'
       // Regional take ruler
-      + '<div style="position:relative;height:32px;margin-bottom:20px;overflow-x:auto;overflow-y:hidden;">'
+      + '<div style="position:relative;height:46px;margin-bottom:14px;overflow-x:auto;overflow-y:hidden;">'
       + '<div style="position:absolute;left:0;right:0;top:12px;height:6px;background:var(--surface);border-radius:3px;border:1px solid var(--border);overflow:visible;">'
       // Range bar
       + '<div style="position:absolute;left:' + ((regionMin-rulerMin)/rulerRange*100).toFixed(1) + '%;right:' + (100-(regionMax-rulerMin)/rulerRange*100).toFixed(1) + '%;height:100%;background:var(--border);border-radius:3px;"></div>'
       + '</div>'
       // This country marker
       + '<div style="position:absolute;left:' + thisPct + '%;top:5px;width:4px;height:18px;background:' + tc + ';border-radius:2px;transform:translateX(-50%);"></div>'
-      + '<div style="position:absolute;left:' + thisPct + '%;top:0;transform:translateX(-50%);font-size:10px;font-weight:800;color:' + tc + ';white-space:nowrap;">' + d.take_75.toFixed(1) + '%</div>'
-      + '<div style="position:absolute;left:' + thisPct + '%;top:25px;transform:translateX(-50%);font-size:10px;color:' + tc + ';white-space:nowrap;">' + d.country + '</div>'
+      + '<div style="position:absolute;' + _rpcAnchor(thisPct) + 'top:0;font-size:10px;font-weight:800;color:' + tc + ';white-space:nowrap;">' + d.take_75.toFixed(1) + '%</div>'
+      + '<div style="position:absolute;' + _rpcAnchor(thisPct) + 'top:25px;font-size:10px;color:' + tc + ';white-space:nowrap;">' + d.country + '</div>'
       // Region avg marker
       + '<div style="position:absolute;left:' + avgPct + '%;top:7px;width:2px;height:14px;background:var(--muted);border-radius:1px;transform:translateX(-50%);"></div>'
-      + '<div style="position:absolute;left:' + avgPct + '%;top:-2px;transform:translateX(-50%);font-size:10px;color:var(--muted);white-space:nowrap;">' + regionAvg.toFixed(1) + '% avg</div>'
+      + '<div style="position:absolute;' + _rpcAnchor(avgPct) + 'top:-2px;font-size:10px;color:var(--muted);white-space:nowrap;" title="' + (_rpcBench != null ? ((_rpcRegional ? region + ' producer median' : 'Global producer median') + ' \u2014 the benchmark the verdict above is measured against. Not the all-region average, which is ' + regionAvg.toFixed(1) + '%.') : 'All-region average of statutory takes \u2014 no producer benchmark exists for this region.') + '">' + _rpcMarkVal.toFixed(1) + '% ' + (_rpcBench != null ? (_rpcRegional ? 'prod. median' : 'global prod. median') : 'avg') + '</div>'
+      // v689: comparable-take marker, drawn only where it differs from the plotted headline
+      + (_cmpTakeOn552 ? (function() {
+          var cp = Math.max(0, Math.min(100, (_rpcSelfCmp - rulerMin) / rulerRange * 100)).toFixed(1);
+          return '<div title="Comparable take ' + _rpcSelfCmp.toFixed(1) + '% \u2014 this country\u2019s PSC/Concession contracts only. This is the figure the verdict above is measured on; the solid marker is the published blended take." style="position:absolute;left:' + cp + '%;top:5px;width:2px;height:18px;background:var(--accent);border-radius:1px;transform:translateX(-50%);opacity:.85;"></div>'
+            + '<div style="position:absolute;' + _rpcAnchor(cp) + 'top:25px;font-size:10px;color:var(--accent);white-space:nowrap;font-weight:700;">' + _rpcSelfCmp.toFixed(1) + '% cmp</div>';
+        })() : '')
       // Axis labels
       + '<div style="position:absolute;left:0;top:25px;font-size:10px;color:var(--muted);">' + rulerMin + '%</div>'
       + '<div style="position:absolute;right:0;top:25px;font-size:10px;color:var(--muted);">' + rulerMax2 + '%</div>'
