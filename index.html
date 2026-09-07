@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v697</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v698</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v697</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v698</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -22034,14 +22034,20 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
 
         <div class="sb-control-group">
           <label>Project Profile</label>
-          <select id="sb-profile" aria-label="Select project production profile for Scenario Builder DCF">
-            <option value="deepwater">Deepwater ($800M capex, 50Mbbl/d peak)</option>
-            <option value="shallow">Shallow Offshore ($400M capex, 30Mbbl/d)</option>
-            <option value="onshore_me">Onshore ME/Africa ($300M capex, 80Mbbl/d)</option>
-            <option value="north_sea">North Sea ($600M capex, 40Mbbl/d)</option>
-            <option value="lng">LNG Project ($5B capex, 200Mbbl/d eq)</option>
-            <option value="onshore_us">Onshore US ($150M capex, 10Mbbl/d)</option>
-          </select>
+          <!-- v698 (T2): these six <option> labels were hand-typed and one of them was wrong.
+               "Deepwater ($800M capex, 50Mbbl/d peak)" named $800M; DCF_PROFILES.deepwater
+               carries capexMM: 1200. Deepwater is the default option, it is the profile this
+               modal opens on, and $1.2B is the standardized basis every Country Profile NPV
+               footnote, the FC citation string and the Methodology assumptions table all cite.
+               So the one screen an analyst is routed to in order to defend an NPV was the one
+               screen contradicting it — and contradicting itself, since the result panel below
+               prints "of $1.2B project capex" from the same object the label misquoted.
+               The labels are now BUILT FROM DCF_PROFILES at load (_sbBuildProfileOptions), so a
+               label cannot drift from the engine again, and the basis line under the selector
+               prints opex, project life and WACC, which the label never showed at all. -->
+          <select id="sb-profile" aria-label="Select project production profile for Scenario Builder DCF"
+                  onchange="_sbRenderBasis()"></select>
+          <div id="sb-profile-basis" style="font-size:10px;color:var(--muted);line-height:1.5;margin-top:4px;"></div>
         </div>
 
         <div class="sb-control-group">
@@ -38904,6 +38910,57 @@ const DCF_PROFILES = {
   onshore_us:   { name: 'Onshore US',      peakBblDay: 10000,  rampYears: 1, plateauYears: 5,  declineRate: 0.25, capexMM: 150,  opexBbl: 15, discountRate: 0.10 }
 };
 
+// ── v698 (T2) — Scenario Builder profile labels are generated, never typed ──────────────
+// The <select id="sb-profile"> used to carry six hardcoded labels. One of them ("Deepwater
+// ($800M capex, ...)") disagreed with DCF_PROFILES.deepwater.capexMM = 1200, which is the
+// figure the DCF actually runs and the figure the rest of the platform cites as its
+// standardized basis. Generating the labels from the same object the engine reads removes
+// the class of bug rather than the instance.
+function _sbFmtCapex(mm) {
+  return mm >= 1000 ? '$' + (mm / 1000).toFixed(mm % 1000 === 0 ? 0 : 1) + 'B' : '$' + mm + 'M';
+}
+function _sbProfileLabel(p) {
+  // "k bbl/d" to match the unit the Country Profile footnote, the FC citation and the
+  // Methodology assumptions table all use. The old labels wrote "50Mbbl/d" for 50,000 b/d.
+  return p.name + ' \u2014 ' + _sbFmtCapex(p.capexMM) + ' capex \u00b7 '
+       + (p.peakBblDay / 1000) + 'k bbl/d \u00b7 $' + p.opexBbl + '/bbl opex';
+}
+function _sbBuildProfileOptions() {
+  var sel = document.getElementById('sb-profile');
+  if (!sel) return;
+  var keep = sel.value;
+  var html = '';
+  Object.keys(DCF_PROFILES).forEach(function (k) {
+    html += '<option value="' + k + '">' + _sbProfileLabel(DCF_PROFILES[k]) + '</option>';
+  });
+  sel.innerHTML = html;
+  if (keep && DCF_PROFILES[keep]) sel.value = keep;
+  _sbRenderBasis();
+}
+function _sbRenderBasis() {
+  var sel = document.getElementById('sb-profile');
+  var out = document.getElementById('sb-profile-basis');
+  if (!sel || !out) return;
+  var p = DCF_PROFILES[sel.value];
+  if (!p) { out.textContent = ''; return; }
+  // 25 years is fixed in buildProductionProfile(); ramp/plateau come from the profile.
+  out.innerHTML = 'Runs: <strong style="color:var(--text);">' + _sbFmtCapex(p.capexMM)
+    + '</strong> capex \u00b7 <strong style="color:var(--text);">' + (p.peakBblDay / 1000)
+    + 'k bbl/d</strong> peak (' + p.rampYears + 'yr ramp, ' + p.plateauYears + 'yr plateau, '
+    + Math.round(p.declineRate * 100) + '%/yr decline) \u00b7 <strong style="color:var(--text);">$'
+    + p.opexBbl + '/bbl</strong> opex \u00b7 25-year life \u00b7 '
+    + Math.round(p.discountRate * 100) + '% WACC \u00b7 100% WI';
+  out.title = 'The exact project the DCF below is run on, read from the engine\u2019s own profile table. '
+    + 'Cite these figures alongside any NPV or IRR you take from this modal. '
+    + (sel.value === 'deepwater'
+        ? 'Deepwater is ORCA\u2019s standardized reference basis \u2014 it is the same project behind the '
+          + 'NPV on every Country Profile and in Fiscal Compare.'
+        : 'Note: only the Deepwater profile matches the standardized basis behind the published '
+          + 'Country Profile and Fiscal Compare NPVs.');
+}
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', _sbBuildProfileOptions);
+else _sbBuildProfileOptions();
+
 function buildProductionProfile(profile) {
   const years = 25;
   const prod = [];
@@ -40070,6 +40127,7 @@ function loadPreset(name) {
   if (_sbPfB) _sbPfB.style.display = 'none';
   document.getElementById('sb-mechanic').value = p.mechanic;
   document.getElementById('sb-profile').value = p.profile;
+  if (typeof _sbRenderBasis === 'function') _sbRenderBasis();  // v698 (T2): .value= does not fire onchange
   document.getElementById('sb-price').value = p.price;
   sbUpdateMechanic();
   if (p.mechanic === 'Concession') {
@@ -40711,6 +40769,7 @@ function ddOpenScenarioBuilder(country) {
                     (mechanic === 'TSC' ? 'onshore_me' : 'deepwater') : 'deepwater';
   const profileEl = document.getElementById('sb-profile');
   if (profileEl) profileEl.value = profile;
+  if (typeof _sbRenderBasis === 'function') _sbRenderBasis();  // v698 (T2): keep the basis line in step with the country pre-fill
 
   // Pre-fill form values
   if (mechEl && mechEl.value === 'Concession') {
@@ -45419,6 +45478,7 @@ function toggleReferencePanel() {
 function openScenarioBuilder() {
   var modal = document.getElementById('scenario-modal');
   modal.classList.add('open');
+  if (typeof _sbRenderBasis === 'function') _sbRenderBasis();  // v698 (T2): the running basis is stated before the analyst reads any result
   // v363: hide pre-fill banner when opening fresh from header (not from Country Profile)
   var banner = document.getElementById('sb-prefill-banner');
   if (banner) banner.style.display = 'none';
