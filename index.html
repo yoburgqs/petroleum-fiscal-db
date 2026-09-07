@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v690</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v691</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v690</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v691</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2966,7 +2966,7 @@ window.copyPlatformCitation = function(btn) {
     <canvas id="cmp-chart" aria-label="Line chart comparing comparable government take percentage across selected countries at 4 price points. Fee-basis and cash-flow columns are re-based or excluded; see the notices above the chart." role="img"></canvas>
   </div>
   <div id="cmp-npv-chart-wrap" class="chart-wrap" style="display:none;margin-top:8px;">
-    <canvas id="cmp-npv-chart" aria-label="Side-by-side bar chart comparing contractor NPV across selected countries at 4 price points" role="img"></canvas>
+    <canvas id="cmp-npv-chart" aria-label="Side-by-side bar chart comparing contractor NPV across selected countries at 4 price points. Where the set mixes bases, a faded dashed bar is a statutory-basis column ORCA holds no verified production for; its bar runs taller because its take is lower, and it is not rankable against the solid bars." role="img"></canvas>
   </div>
 </div>
 
@@ -27283,6 +27283,44 @@ function renderCompare() {
   _cmpChartRebased.forEach(function(d){ _npvRebased[d.country] = true; });
   const _npvAnyRebased = npvCountries.some(d => _npvRebased[d.country]);
   const _npvHasR = npvCountries.some(d => d.has_r_factor_tiers);
+  // ── v691 (T3): the DATA-BASIS gate reaches the NPV chart ────────────────────────
+  // v626 built the gate for the grid, v684 carried it to the take chart 8px above (hollow
+  // markers + "(statutory basis)" in the legend + a second title line). It stopped there. This
+  // chart -- the ECONOMICS artifact, the one whose number goes into the IC recommendation --
+  // still drew a no-production column as a plain solid bar under a plain legend entry.
+  //
+  // The direction is what makes it worse here than it was on the take chart. Up there the
+  // statutory line plots LOW, and a low take at least reads as "check this". Here the SAME
+  // column plots HIGH, because contractor NPV is derived from the take: the 163 countries ORCA
+  // holds no production for average 26.9% take against 59.5% for the 22 that have it, so a
+  // statutory column arrives with a structurally larger contractor NPV. A taller bar in an NPV
+  // chart is not ambiguous to anyone -- it reads "better project", full stop.
+  //
+  // Measured over the shipped country_data.json, not estimated:
+  //   3-country sets that MIX the two bases ....... 328,119 of 1,038,220 = 31.6%
+  //   producer x statutory column pairs ........... 3,586
+  //   ...where the statutory column draws the TALLER bar .... 2,693 = 75.1%
+  //   median height ratio when it does ............ 2.46x
+  //   median npv_75: statutory $3,231M vs producers $1,341M
+  // The tab's own shipped cold-load set is the exhibit: Netherlands draws $3.6B against Norway's
+  // $826M -- 4.4x the tallest bar on screen -- on 278 facts at 0% production coverage against
+  // Norway's 63,848 at 18.2%. The notice under the grid already says in words "do not present
+  // these NPV rows as like-for-like in an IC memo". The picture directly below it said the
+  // opposite in the strongest visual language the tab has, and the picture wins.
+  //
+  // Remedy is v684's, not v614's: the number is real and the analyst chose the country, so the
+  // series is NOT dropped the way a state monopoly is. It is MARKED, on the two channels that
+  // carry no meaning yet on this chart -- fill ALPHA (hue is the shared country key from v614
+  // and must not move; borderDash means R-factor on the take chart but is unused here) and the
+  // legend text. Gate scope is the grid's and the take chart's, verbatim: fires ONLY on a set
+  // that MIXES the two bases, and reuses _cmpHasProd, so grid, take chart and NPV chart cannot
+  // disagree by construction. It is computed over npvCountries rather than reusing _cmpStatSet,
+  // because the two sets differ -- chartCountries also drops PRRT columns, which are drawn here.
+  const _npvProdN = npvCountries.filter(_cmpHasProd).length;
+  const _npvBasisGate = _npvProdN > 0 && _npvProdN < npvCountries.length;
+  const _npvStatSet = {};
+  if (_npvBasisGate) npvCountries.forEach(function(d){ if (!_cmpHasProd(d)) _npvStatSet[d.country] = true; });
+  const _npvStatN = Object.keys(_npvStatSet).length;
   if (hasNpv && npvChartWrap) {
     npvChartWrap.style.display = 'block';
     if (window._cmpNpvChart) window._cmpNpvChart.destroy();
@@ -27292,11 +27330,16 @@ function renderCompare() {
       data: {
         labels: ['$50/bbl','$75/bbl','$100/bbl','$125/bbl'],
         datasets: npvCountries.map((d, i) => ({
-          label: d.country + (_npvRebased[d.country] ? ' (all contracts)' : '') + (d.has_r_factor_tiers ? ' ◆' : ''),
+          label: d.country + (_npvRebased[d.country] ? ' (all contracts)' : '')
+                 + (_npvStatSet[d.country] ? ' (statutory basis)' : '')
+                 + (d.has_r_factor_tiers ? ' ◆' : ''),
           data: [d.npv_50, d.npv_75, d.npv_100, d.npv_125],
-          backgroundColor: _cmpColorOf(d) + '88',
+          // v691 (T3): fill alpha carries the data basis -- the bar analogue of the take chart's
+          // hollow marker. Hue is untouched (v614 country key, shared between the two charts).
+          backgroundColor: _cmpColorOf(d) + (_npvStatSet[d.country] ? '1F' : '88'),
           borderColor: _cmpColorOf(d),
-          borderWidth: 1.5,
+          borderWidth: _npvStatSet[d.country] ? 2 : 1.5,
+          borderDash: _npvStatSet[d.country] ? [4,3] : [],
           borderRadius: 3,
         }))
       },
@@ -27306,21 +27349,38 @@ function renderCompare() {
         plugins: {
           legend: { labels: { color: '#6B6560', font: { size: 11 } } },
           title: { display: true,
-            text: _npvAnyRebased
-              ? ['Contractor NPV vs Oil Price ($M)' + (_npvHasR ? '  ◆ = R-factor PSC' : ''),
-                 '(all contracts) = fee-basis contracts INCLUDED — NOT the PSC/Conc basis of the take chart above']
-              : ('Contractor NPV vs Oil Price ($M)' + (_npvHasR ? '  ◆ = R-factor PSC' : '')),
+            // v691 (T3): title is built as a list so the basis keys stack, matching the take chart.
+            text: (function(){
+              const _t = ['Contractor NPV vs Oil Price ($M)' + (_npvHasR ? '  ◆ = R-factor PSC' : '')];
+              if (_npvAnyRebased) _t.push('(all contracts) = fee-basis contracts INCLUDED — NOT the PSC/Conc basis of the take chart above');
+              if (_npvStatN) _t.push('faded dashed ' + (_npvStatN === 1 ? 'bar = statutory basis' : 'bars = statutory basis')
+                + ', no verified production — a taller bar there reports the basis, not a better project');
+              return _t.length === 1 ? _t[0] : _t;
+            })(),
             color: '#1C1A17', font: { size: 13, weight: 'bold' } },
           tooltip: { callbacks: { label: ctx => {
             const d2 = npvCountries[ctx.datasetIndex];
-            const base = ' ' + d2.country + ': $' + Math.round(ctx.raw).toLocaleString() + 'M';
-            if (!_npvRebased[d2.country]) return base;
-            const st = _cmpMixStat(d2);
-            return base + ' — unweighted mean across ALL ' + Number(st.tot).toLocaleString()
-              + ' contracts, including the ' + Number(st.n2).toLocaleString() + ' fee-basis ('
-              + _cmpMechBare(st, 2) + ') the take chart above excludes. The take line for '
-              + d2.country + ' is drawn on its ' + Number(st.n1).toLocaleString()
-              + ' PSC/Concession contracts only, so the two charts are not the same contract set.';
+            let base = ' ' + d2.country + ': $' + Math.round(ctx.raw).toLocaleString() + 'M';
+            if (_npvRebased[d2.country]) {
+              const st = _cmpMixStat(d2);
+              base += ' — unweighted mean across ALL ' + Number(st.tot).toLocaleString()
+                + ' contracts, including the ' + Number(st.n2).toLocaleString() + ' fee-basis ('
+                + _cmpMechBare(st, 2) + ') the take chart above excludes. The take line for '
+                + d2.country + ' is drawn on its ' + Number(st.n1).toLocaleString()
+                + ' PSC/Concession contracts only, so the two charts are not the same contract set.';
+            }
+            // v691 (T3): the basis caveat, stated with its DIRECTION. Silence here was the defect.
+            if (_npvStatSet[d2.country]) {
+              base += ' — statutory basis: ORCA holds no verified field production for ' + d2.country
+                + ', so this NPV comes from the standardized deepwater profile priced off a simple '
+                + 'average of statutory terms across its ' + Number(d2.n || 0).toLocaleString()
+                + ' contracts, not from its own fields. The bias has a direction: the 163 countries '
+                + 'with no production average 26.9% take against 59.5% for the 22 that have it, and '
+                + 'a lower take produces a LARGER contractor NPV — so this bar is taller than the '
+                + 'solid ones for a reason that is not the regime. The grid above does not rank it '
+                + 'against them either.';
+            }
+            return base;
           } } }
         },
         scales: {
