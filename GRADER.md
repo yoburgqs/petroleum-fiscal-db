@@ -35322,3 +35322,18 @@ An analyst comparing finalists can see — on the comparison grid, and in the ta
 - Methodology "Recent Platform Updates" is still an empty placeholder.
 - Everything on the cycle-603/604/605/606 carried lists remains open: `Take weighting` / `NPV weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier on a regime with no contractor position; the three monopolies carrying `be_75 = 1.0` (8th cycle); the 862 contracts with no fiscal terms; zero-rate defaults inside published country `take_75`; `⬇ Chart PNG` exporting only `#cmp-chart`; the Screener Contractor NPV tooltip naming a profile selector absent from that tab (10th cycle); the `Other` region bucket misfiling 17 jurisdictions; 164 of 185 jurisdictions with no sourced reform log; the Methodology tab naming a `display:none` API Explorer tab; the unweighted per-mechanic pivot averages; the incomplete 2020s cohort; and the duplicated `renderVintageTrendChart()` / `renderVintage()` line charts.
 - **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 17th cycle. Points at the detector, not the layout.
+
+---
+## Cycle 607 Log — 2026-09-07 10:28
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 607 shipped as **v701**, pushed, and mirrored.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (606 ran T6, 605 T1, 604 T2, 603 T3, 602 T5, 601 T2 — T4 was the stalest, last walked at 600.)
+
+## Friction
+The per-country reform surfaces are in good shape and weren't the problem: the Reform Risk lookup, the Country Profile stability line, and the Screener's Reform Record filter all work and all route through the same classifier.
+
+**The hole is Side-by-Side.** Its row
