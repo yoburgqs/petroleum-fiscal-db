@@ -34753,3 +34753,17 @@ against Concession.
   and the Methodology tab naming a `display:none` API Explorer tab.
 - **pixel_audit** still carries `tablet-768::2-t7 clipped-text 33 -> 34` — 12th cycle. Points at
   the detector, not the layout.
+
+---
+## Cycle 602 Log — 2026-09-07 04:11
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 602 complete and pushed (v696).
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest in rotation (T5 last at 596).
+
+## Friction
+
+I walked every paste-and-export surface cold, reading the actual clipboard contents and the actual downloaded bytes. Four "Copy for IC Memo" paths and eight of nine exports were genuinely strong — Side-by-Side correctly refuses when empty, Fiscal Compare tells you it copied 185 rows, the Country Profile summary carries five notes ke
