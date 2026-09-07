@@ -1827,7 +1827,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v704</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v705</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1897,7 +1897,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v704</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v705</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -26271,14 +26271,21 @@ function renderCompare() {
     // Iran $899M -> $1.2B, South Sudan $1.5B -> $1.9B, Qatar $1.1B -> $1.2B, Malaysia $627M ->
     // $720M, Ecuador $2.1B -> $2.2B, Mexico $2.9B -> $3.0B -- and is suppressed on Azerbaijan,
     // India and Russia, which agree with the blended figure at the precision this page prints.
-    const _npvBase = fmtNpvShared(v);
-    if (price !== '75' || v == null) return _npvBase;
+    // v705 (T3): the data-basis gate. The figure itself is kept -- it is the platform's published
+    // number and 185/185 covered -- but it is taken off full-strength text and carries the basis
+    // note, exactly as the Govt Take rows keep their number and carry "not ranked . statutory
+    // terms". Applies to all four price rows, because the gate is a property of the column.
+    const _npvGate = _cmpNpvBasisFlag(d, v);
+    const _npvBase = _npvGate
+      ? '<span style="color:var(--muted);">' + fmtNpvShared(v) + '</span>'
+      : fmtNpvShared(v);
+    if (price !== '75' || v == null) return _npvBase + _npvGate;
     const _npvSt = _cmpMixStat(d);
-    if (!_npvSt.blended || !_npvSt.g1 || _npvSt.g1.v75 == null) return _npvBase;
+    if (!_npvSt.blended || !_npvSt.g1 || _npvSt.g1.v75 == null) return _npvBase + _npvGate;
     const _npvG1 = fmtNpvShared(_npvSt.g1.v75);
     // Same convention as the take correction: print it only where it changes the number on screen.
-    if (_npvG1 === _npvBase) return _npvBase;
-    return _npvBase + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
+    if (_npvG1 === fmtNpvShared(v)) return _npvBase + _npvGate;
+    return _npvBase + _npvGate + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
       + _cmpEsc(d.country + ': ' + _npvG1 + ' is the contractor NPV at $75/bbl across its '
         + Number(_npvSt.g1.n).toLocaleString() + ' production-sharing and concession contracts only. '
         + 'The ' + _npvBase + ' above is an unweighted mean over all ' + (d.n != null ? Number(d.n).toLocaleString() : _npvSt.tot ? Number(_npvSt.tot).toLocaleString() : '?')
@@ -26371,6 +26378,60 @@ function renderCompare() {
         + 'regime. This is the same exclusion the Rank among producers row above already applies. '
         + 'Read the number, and compare it against other statutory-basis columns.')
       + '">not ranked \u00b7 statutory terms</span>';
+  };
+  // v705 (T3): the DATA-BASIS gate reaches the ECONOMICS block — the last numeric block on this
+  // grid that did not have it.
+  //
+  // Walked "compare three countries" cold on the tab's own seeded default, Norway / United
+  // Kingdom / Netherlands, and read straight down the column the analyst actually quotes. Every
+  // row in the DATA BASIS and GOVT TAKE blocks has been taught that a column ORCA holds no
+  // verified field production for is not on the same basis as one it does:
+  //     Data basis              PROD-WTD      PROD-WTD      PROXY
+  //     Rank among producers    #17 of 21     #9 of 21      not ranked · no production data
+  //     Govt Take ($75/bbl)     68.0%         49.2%         23.4%  "not ranked · statutory terms"
+  // v626 built that gate for the four take rows, v684 pushed it into the take line chart, and the
+  // NPV bar chart draws the excluded column as a faded dashed bar with "a taller bar there reports
+  // the basis, not a better project" printed over it. Then the four Contractor NPV rows of the
+  // grid — the rows an IC memo quotes for VALUE, sitting directly above Copy for IC Memo — printed:
+  //     Contractor NPV @$75     $826M         $1.2B         $3.6B
+  // in plain unmarked black. The proxy column, refused a placement on every take row three inches
+  // above and drawn hollow in the chart below, wins the value block by 4.4x with nothing on the
+  // number at all.
+  //
+  // Measured over the shipped country_data.json (21 producers, 161 non-producers, monopolies
+  // excluded): median contractor NPV at $75/bbl is $3,231M for the non-producers against $1,341M
+  // for the producers — a 2.4x gap that is an artefact of running the standardized deepwater
+  // profile over statutory terms instead of weighting verified barrels. Of the 3,381 mixed
+  // producer/non-producer column pairs the non-producer shows the LARGER contractor NPV in 2,532
+  // (74.9%), and larger at all four published prices in 2,311 (68.4%). All 20 of the highest
+  // contractor NPVs in the database are non-producer columns — Vanuatu, the Bahamas, Montenegro,
+  // Greenland, the Faroe Islands, Moldova. That is the same signature v562 deleted the Breakeven
+  // row for ("a low-price endorsement of Vanuatu and the Bahamas"), and the same one v555 deleted
+  // the derived Govt NPV row for. This row cannot be deleted — it IS the economics — so it is
+  // gated instead, on the same rule, in the same words the take rows use.
+  //
+  // Scope is identical to v626's: fires ONLY on a set that MIXES the two bases, via the same
+  // `_cmpBasisGate` flag and the same `getProducerContext().inSet` membership, so an all-frontier
+  // set and an all-producer set are unchanged and the two blocks cannot disagree by construction.
+  const _cmpNpvBasisFlag = (d, v) => {
+    if (!_cmpBasisGate || _cmpHasProd(d)) return '';
+    if (v == null || isStateMonopoly(d.take_75)) return '';
+    const nc = d.n != null ? Number(d.n).toLocaleString() : '?';
+    return '<span style="display:block;font-size:10px;font-weight:600;color:var(--muted);cursor:help;" title="'
+      + _cmpEsc(d.country + ': this contractor NPV is NOT on the same basis as the production-weighted '
+        + 'columns beside it. ORCA holds no verified field production for it (prod_coverage_pct = '
+        + (d.prod_coverage_pct || 0).toFixed(0) + '), so the figure is an unweighted mean of the '
+        + 'standardized deepwater profile run across the statutory terms of its ' + nc + ' contracts '
+        + '— it describes the legal regime, not the economics of this country’s own fields. '
+        + 'Across the database that difference alone is worth about 2.4x: median contractor NPV at '
+        + '$75/bbl is $3.2B for the 161 countries with no production against $1.3B for the 21 that '
+        + 'have it, and all 20 of the highest contractor NPVs in the database are no-production '
+        + 'columns. In 2,532 of the 3,381 mixed pairs (74.9%) the no-production column shows the '
+        + 'LARGER NPV. A bigger number here reports the basis, not a better project. This is the '
+        + 'same exclusion the four Govt Take rows and the Rank among producers row above already '
+        + 'apply, and the same one the NPV bar chart below draws as a faded dashed bar. Compare it '
+        + 'against other statutory-basis columns, or state the proxy basis in the memo.')
+      + '">not comparable · statutory terms</span>';
   };
   // v600 (T3): the marker has to sit on the number it actually ranks. _cmpPriceRank ranks on the
   // COMPARABLE take (v549/v552), so on a fee-blended column it describes the PSC/Conc figure -- not
@@ -26793,10 +26854,23 @@ function renderCompare() {
       key:(d)=>{ const nc = d.n != null ? Number(d.n).toLocaleString() : '?';
         const differs = d.weighting === 'prod_weighted' || d.weighting === 'prod_weighted_blended';
         const tw = d.weighting === 'prod_weighted' ? 'Prod-weighted' : d.weighting === 'prod_weighted_blended' ? 'Blended' : 'Equal-weighted';
-        return '<span style="' + (differs ? 'color:var(--orange);font-weight:700;' : '') + '" title="'
+        // v705 (T3): the flag on this row was INVERTED against the evidence. It fires on
+        // `differs`, which is true only for a production-weighted column -- so in the cold-load
+        // default set Norway and the UK carried a loud orange "(!= take basis)" and the
+        // Netherlands, the 278-fact proxy with 0% production coverage, was the one cell in the
+        // whole ECONOMICS block rendered clean, under a tooltip that closed "Both blocks use the
+        // same basis for this country." That sentence is true and reads as reassurance; what it
+        // omits is that the shared basis is statutory terms, not barrels. The strongest visual
+        // warning in the block sat on the two strongest columns and nothing sat on the weakest.
+        const statGate = _cmpBasisGate && !_cmpHasProd(d) && !isStateMonopoly(d.take_75);
+        return '<span style="' + (differs || statGate ? 'color:var(--orange);font-weight:700;' : '') + '" title="'
           + _cmpEsc(d.country + ': contractor NPV is an unweighted mean across all ' + nc + ' contracts. Its Govt Take rows are ' + tw + '.'
-            + (differs ? ' The two blocks are averaged over the same contracts with DIFFERENT weights, so they need not rank countries the same way.' : ' Both blocks use the same basis for this country.'))
-          + '">Equal-weighted · all ' + nc + (differs ? ' <span style="font-weight:400;">(≠ take basis)</span>' : '') + '</span>'; }},
+            + (differs ? ' The two blocks are averaged over the same contracts with DIFFERENT weights, so they need not rank countries the same way.'
+               : statGate ? ' Both blocks use the same basis for this country — but that basis is statutory terms, not barrels: ORCA holds no verified field production here, so neither the take nor the NPV describes realised economics, while the other columns in this set are weighted by production. That is why the four NPV rows below are marked “not comparable”.'
+               : ' Both blocks use the same basis for this country.'))
+          + '">Equal-weighted · all ' + nc
+          + (differs ? ' <span style="font-weight:400;">(≠ take basis)</span>'
+             : statGate ? ' <span style="font-weight:400;">(statutory basis)</span>' : '') + '</span>'; }},
     {label:'Contractor NPV @$50 (downside) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Contractor NPV at $50/bbl on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 25yr, 10% WACC, 100% WI). This is the low-price stress case — the row an IC asks for first. Coverage is 185 of 185 countries.">\u24d8</span>', key:(d)=>_cmpNpvCell(d, d.npv_50, '50')},
     {label:'Contractor NPV @$75 (base)',  key:(d)=>_cmpNpvCell(d, d.npv_75, '75')},
     // v652 (T3): the Economics block published THREE prices while everything else on this tab
