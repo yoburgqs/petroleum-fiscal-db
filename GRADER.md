@@ -34123,3 +34123,124 @@ the set's tallest bar no longer silently claims to be its best project.
 Walked Side-by-Side cold at 1440 with storage cleared, on the tab's own shipped default set: Norway / United Kingdom / Netherlands.
 
 v626 built a data-basis gate for the grid — a column with no verified field production is refused a highest/lowest placement and reads `not ranked
+
+---
+## Cycle 598 Log — 2026-09-07 00:05
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local) — suite RAN this cycle
+- JS errors: 0
+- Shipped: v692
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** — stalest in the rotation
+(592 T6, 593 T5, 594 T4, 595 T2, 596 T5, 597 T3; T1 last walked at 591).
+
+## Friction
+Walked the Screener cold at 1440 with sessionStorage and localStorage cleared, entering
+through the tab button the way a first-time analyst does.
+
+**Max Govt Take** is the first control they touch. It is the platform's headline metric and
+the top-left slider of four. Driven across its whole shipped travel through the real
+`runScreener()` path, it moved the result set **185 → 95 and no further**:
+
+| ceiling | rows | verified prod |
+|---|---|---|
+| ≤100% | 185 | 22 |
+| ≤90% | 182 | 21 |
+| ≤80% | 179 | 20 |
+| ≤65% | 167 | 16 |
+| ≤55% | 143 | 10 |
+| ≤50% | 123 | 9 |
+| ≤40% | 110 | 8 |
+| ≤30% (floor stop) | **95** | 2 |
+
+Two faults in one control.
+
+1. **The floor stop was 30%, above the median of the set it screens.** Median comparable
+   take across the 185 is **28.4%** (min 5.0, p25 21.3, p75 54.2). So 51% of the
+   distribution sat behind a hard stop: the analyst could not express "take under 25%" at
+   all, and the hardest screen the slider could reach still handed back more than half the
+   database. The top of the travel was dead in the other direction — 100 → 80 removed six
+   countries, 100 → 90 removed three.
+
+2. **It reported nothing back.** `Min Contractor NPV` has carried a live
+   `· N of 185 clear this` counter with amber inert-greying since v617 (`paint()` in
+   `_scSyncNpvAxis`), `Min NPV @$50` the same, and the evidence axis since v681. Take —
+   the one axis that was actually inert — had neither a counter nor an inert flag. Nothing
+   on screen distinguished "I have screened hard" from "this control is not working."
+
+This is the same pathology **v568** deleted Max Breakeven for (87 inert positions of 101)
+and **v517** deleted Min IRR for (185 → 179). Take is the platform's core metric and cannot
+be deleted, so it is re-ranged and made to report.
+
+## Change
+- **`sl-take` floor 30 → 10**, so the axis reaches the distribution it screens. aria-label
+  updated and carries the reason.
+- **New `#sc-take-n` live counter in the slider label**, reading e.g.
+  `· 123 of 185 clear this · 9 verified`, greying amber through the existing
+  `.sc-axis-inert` class when the ceiling clears ≥90% of the set — the same threshold and
+  the same visual language `paint()` already uses on the two NPV axes.
+- It is counted **on the basis the ceiling actually tests**: it calls the same
+  `_scFeeCmpAt()` the filter body calls, so it follows the `$50/$75/$100/$125` deck and the
+  `sc-fee-cmp` comparable-take checkbox and cannot disagree with the result set by
+  construction. `clear this` is load-bearing wording — like `sc-npv-n` this is a per-axis
+  count, not the size of the result set, and under a preset that also filters region or
+  mechanic the two legitimately differ (IOC Capital Screen returns 15 rows while 167
+  countries clear its 65% ceiling on its own).
+- The **second number is the verified-production count**, because that is the one that
+  answers T1. Across this axis the headline separates 95 → 185 while verified production
+  separates 2 → 22, and below 24% take there is no verified country left at all. Dragging
+  into the newly reachable band now reads `· 38 of 185 clear this · 0 verified` while it is
+  happening, instead of silently handing back 38 proxy-only countries.
+
+## Result
+An analyst setting a take ceiling can now see, at the control and while dragging, whether
+the ceiling is doing any work and how much of what survives is defensible. The ceiling
+reaches below the set's median for the first time, so it can produce a shortlist instead of
+bottoming out at 95 countries.
+
+## Verification
+- **JS syntax gate: PASS** — 11 inline `<script>` blocks extracted, `node --check`.
+- **Counter checked against the real rendered table at 16 slider positions** (95 down to
+  10): every total and every verified count matches exactly. Inert greying fires at 65 and
+  above (167/185 = 90.3%) and clears at 60.
+- **Follows the deck:** at take ≤55, $50 → 166, $75 → 143, $100 → 122, $125 → 118, each
+  matching its own table. **Follows the basis:** `sc-fee-cmp` on 143/10, off 142/9.
+- **All 11 presets re-run.** Every one sets the slider inside the new range and its counter
+  agrees with its own axis. `Reset All` returns 100 / 185 rows / blank counter. The Country
+  Profile "See all investible regimes →" CTA, which pokes `sl-take` to 40 directly and calls
+  `runScreener()` outside the input listener, still resolves: 110 rows,
+  `· 110 of 185 clear this · 8 verified`.
+- **Runtime suite RAN this cycle** against the local build: **293 PASS / 0 FAIL / 1 WARN**.
+  The single WARN is the localhost `sw.js` 404 — the service worker registers at an absolute
+  Pages path that does not exist when serving from repo root. Present before any edit and
+  identical to v691's.
+- **Horizontal scroll: 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390, all 10 tabs.
+- **Mobile (Step 5b), 390x844 `hasTouch: true`:** `scrollWidth 390 === clientWidth 390` on
+  the Screener with a ceiling set. The counter renders 168px wide ending at x=325, well
+  inside the viewport — the v681 lesson (a long string in a `white-space:nowrap`
+  `.sc-axis-n` inside a slider label put 36-141px of scroll on the page) held. Take slider
+  is 44px tall under `pointer: coarse`. Controls under 24px: **19 before the change and the
+  same 19 after**, measured against a served copy of the pre-edit file — pre-existing
+  checkboxes, none added or touched here.
+- **0 page errors.**
+
+## Carried forward — not fixed this cycle
+- **The Contractor NPV header tooltip says "see profile selector for assumptions"**, but
+  there is no profile selector on the Screener tab, and the Screener's NPV is a fixed
+  Deepwater basis that by design does not move with the Fiscal Compare profile selector
+  (see the notes at v580 and the `db · citable` header). The header points the analyst at a
+  control that does not exist here and would not change the column if it did.
+- **pixel_audit** still carries exactly one regression, `tablet-768::2-t7 clipped-text
+  33 -> 34` — **eighth cycle carrying it**, and still the longest-standing unaddressed item
+  in the loop. Points at the detector, not the layout.
+- The **`Other` region bucket** is now empty by construction in the Screener select (v661),
+  but the underlying harvest-side misfiling of the 17 jurisdictions is a data fix, not a UX
+  one, and has not been made.
+- The **CP CLOSEST FISCAL PEERS chips still sort on the blended `take_75`** rather than the
+  comparable take.
+- **164 of 185 jurisdictions hold no sourced reform log**, which dominates the T4 answer.
+- The **Methodology tab still names an API Explorer tab that is `display:none`**.
+- The **Screener FAQ's third value for the median IRR statistic** is still unreconciled.
+- **The `⬇ Chart PNG` button exports only the take chart** (`downloadCmpChart()` hard-codes
+  `#cmp-chart`); the Side-by-Side NPV chart has no export path.
