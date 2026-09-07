@@ -1734,7 +1734,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v689</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v690</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1804,7 +1804,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v689</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v690</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2137,7 +2137,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 window._orcaCiteVer = function() {
   var b = document.querySelector('header .badge, .badge');
   var m = b && /v\d+/.exec(b.textContent || '');
-  return m ? m[0] : 'v689';
+  return m ? m[0] : 'v690';
 };
 window._orcaCiteCounts = function() {
   var d = window.COUNTRY_DATA;
@@ -2212,7 +2212,7 @@ window.copyPlatformCitation = function(btn) {
       // Update IOC note — use innerHTML to preserve inner (ⓘ cite basis) span; update title attribute with profile-specific IC cite text
       var noteEl = stripEl ? stripEl.querySelector('span[style*="italic"]') : null;
       if (noteEl) {
-        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v689');
+        var _cv = (window._orcaCiteVer ? window._orcaCiteVer() : 'v690');
         var profileCite = {
           deepwater: { label: 'IOC standard benchmarking basis', cite: 'Computed using ORCA Deepwater profile: $1.2B capex / 50k bbl/d / $15/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
           onshore:   { label: 'Onshore conventional profile', cite: 'Computed using ORCA Onshore profile: $200M capex / 20k bbl/d / $8/bbl opex / 10% WACC / 100% WI. Source: ORCA ' + _cv + ' (Aug 2026).' },
@@ -3178,7 +3178,7 @@ window.copyPlatformCitation = function(btn) {
     </button>
     <!-- v425: Copy IC Summary button — one-click copy of full IC memo paragraph for analyst use -->
     <!-- v474: renamed from "IC Summary" to "Copy for IC Memo" — clearer action label for first-time analysts -->
-    <button id="dd-ic-summary-btn" title="Copy a ready-to-paste IC memo summary paragraph for this country to clipboard — take at 4 prices, mechanic, price swing, contractor NPV at $50/$75/$125, breakeven, fiscal predictability with its basis, REFORM EXPOSURE (score, law changes since 2010, direction and the IC action — or a plain statement that no sourced reform log exists), production-weighting basis and evidence tier" aria-label="Copy IC memo summary paragraph to clipboard"
+    <button id="dd-ic-summary-btn" title="Copy this country to the clipboard as a real IC assumption table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted Metric/Value table, and into Excel as two columns. Rows: government take at $50/$75/$100/$125, the comparable take where the published figure blends fee-basis contracts, price swing, contractor NPV at $50/$75/$125, breakeven, fiscal predictability, reform exposure, mechanic, contract count, evidence tier and the production-weighting basis. Every caveat follows as a numbered note keyed to the row it qualifies." aria-label="Copy IC memo assumption table to clipboard"
             style="display:none;margin-left:6px;background:var(--accent);border:1px solid var(--accent);border-radius:4px;padding:4px 10px;cursor:pointer;color:#fff;font-size:11px;font-weight:600;">
       Copy for IC Memo
     </button>
@@ -38086,6 +38086,31 @@ function copyICCitation() {
   }).catch(function(){ showCopyToast('Clipboard unavailable — copy from address bar.'); });
 }
 
+// v690 (T5): split a verdict sentence into the cell and the note. Every caveat string on this
+// tab is written verdict-first, reasoning-after-an-em-dash ("LOW (score 47/100, graded) —
+// measured spread of 33.5pp across 610 contracts..."), so the head is exactly what belongs in a
+// one-line table cell and the whole sentence is exactly what belongs in the note beneath it.
+// Only " — " (spaced em dash) is treated as the boundary: em dashes also occur INSIDE the
+// reform score note's parentheses, which is why that one is parsed by _icReformHead() instead.
+function _icHeadTail(s) {
+  var t = String(s == null ? '' : s).trim();
+  var i = t.indexOf(' — ');
+  if (i <= 0) return { head: t, tail: '' };
+  return { head: t.slice(0, i).trim(), tail: t.slice(i + 3).trim() };
+}
+// The reform paragraph's own first clause, compressed to a cell: score and the count it is
+// built from. Both absence registers (_icReformLine's NOT SCORED / NOT READ branches) are
+// carried through as themselves -- neither may be shown as a number, and neither is a zero.
+function _icReformHead(txt) {
+  var t = String(txt == null ? '' : txt);
+  var m = /^Reform exposure:\s*(\d+)\/100[\s\S]*?,\s*(\d+) sourced fiscal law change/.exec(t);
+  if (m) return m[1] + '/100 · ' + m[2] + ' sourced law change'
+    + (m[2] === '1' ? '' : 's') + ' since 2010';
+  var m2 = /^Reform exposure:\s*(NOT SCORED|NOT READ)/.exec(t);
+  if (m2) return m2[1] + ' — see note below (this is not a zero premium)';
+  return 'see note below';
+}
+
 // v425: Copy IC Summary — builds a full IC memo paragraph with take at 4 prices, swing, IRR, breakeven, stability, mechanic, and source tier
 function copyICSummary() {
   var sel = document.getElementById('dd-country-select');
@@ -38129,25 +38154,140 @@ function copyICSummary() {
     : stabScore == null ? 'predictability not scored \u2014 no contract-level take distribution held'
     : _fpCiteVerdict(stabScore, d);
   var nStr = d.n ? d.n.toLocaleString() + ' contracts' : '';
-  var summary = country + ' (' + mechStr + ', ' + nStr + ', ' + tierStr + '):\n'
-    + 'Government take: ' + t50Str + ' @$50 · ' + takeStr + ' @$75 · ' + t100Str + ' @$100 · ' + t125Str + ' @$125/bbl. '
-    + 'Price Swing: ' + swingStr + '. '
-    // v516: this paragraph carried a single 'IRR: 421.4% @$75' line off the bundled mean. Replaced
-    // with the three-price contractor NPV read -- downside / base / upside -- which is the row an
-    // IC asks for, plus a one-line statement of why IRR is absent, inside the pasted artifact.
-    + 'Contractor NPV (10% WACC, Deepwater, 100% WI): ' + npv50Str + ' @$50 (downside) · ' + npvStr + ' @$75 (base) · ' + npv125Str + ' @$125 (upside). '
-    + 'Breakeven: ' + beStr + '. '
-    + 'Fiscal predictability: ' + stabLabel + '.\n'
-    + _icReformLine(country)   // v680 (T5)
-    + _icProdBasisLine(d)   // v596 (T5)
-    + _icBasisLine(d)
-    + CP_IRR_NOTE + '\n'
-    + 'Source: ORCA Petroleum Fiscal Intelligence Platform ' + _orcaVerNow() + ' (2026) — yoburgqs.github.io/petroleum-fiscal-db/';
-  navigator.clipboard.writeText(summary).then(function(){
+  // ── v690 (T5): the flagship paste artifact is now a TABLE plus notes, not one 520-word block.
+  //
+  // Walked T5 cold: Country Profile -> "Copy for IC Memo" -> paste into Word. What arrived was
+  // 3,126 characters / 518 words on Indonesia (Guyana 3,288 / 541, Iraq 3,183 / 516) in five
+  // run-on paragraphs, with every figure the analyst came for buried mid-sentence:
+  //   "Government take: 46.9% @$50 · 59.5% @$75 · 66.4% @$100 · 70.3% @$125/bbl. Price Swing:
+  //    23.4pp. Contractor NPV (10% WACC, Deepwater, 100% WI): $334M @$50 (downside) · ..."
+  // An IC memo wants an assumption TABLE. To build one the analyst had to re-key fifteen values
+  // out of prose -- four takes, three NPVs, swing, breakeven, predictability, reform score,
+  // mechanic, contract count, evidence tier, data basis -- by hand, from the output of the
+  // control whose entire promise is "paste straight into an IC memo".
+  //
+  // Every other Copy for IC Memo on this platform already writes two flavours -- Fiscal Compare
+  // (v676), Screener, Side-by-Side (v503) and IOC Portfolio all emit text/html so Word, Docs,
+  // Outlook and PowerPoint render a real table, and TSV so Excel splits into columns. This one,
+  // the single-country artifact and the most-clicked of the five, called plain writeText().
+  //
+  // Nothing is dropped. Every caveat sentence that was in the paragraph is still in the paste,
+  // moved BELOW the table as a numbered note and keyed to the row it qualifies, so a figure and
+  // its qualification stay attached however the memo is later cut down. The split is mechanical:
+  // each of breakeven / predictability / reform / basis already stated its verdict first and its
+  // reasoning after an em dash, so the head becomes the cell and the whole sentence becomes the
+  // note. Where a row has no caveat -- Norway's solved $29/bbl breakeven -- no note is emitted.
+  var _pb   = _icProdBasis(d);
+  var _pbHead = (_pb.label === 'PROXY')
+      ? 'ORCA PROXY — statutory model, no verified block-level production'
+      : _pb.label + ' — ' + _pb.cov.toFixed(1) + '% of contracts production-weighted';
+  var _beHT   = _icHeadTail(beStr);
+  var _stabHT = _icHeadTail(stabLabel);
+  var _refTxt = _icReformLine(country).trim();
+
+  var _rows = [
+    ['Government take @ $50/bbl',  t50Str],
+    ['Government take @ $75/bbl',  takeStr],
+    ['Government take @ $100/bbl', t100Str],
+    ['Government take @ $125/bbl', t125Str]
+  ];
+  // On the 10 fee-basis-blended countries the rankable figure is not the published headline.
+  // v675 put it in the Fiscal Compare cell and v553 put it in this paste's prose; here it earns
+  // a row of its own, directly under the published four, because a memo table that carried only
+  // Iraq's 84.8% would be ranked against PSC countries on a contract-structure artefact.
+  var _fb = (typeof cpFeeBasis === 'function') ? cpFeeBasis(d) : null;
+  if (_fb && _fb.diverges && _fb.cmpTake != null) {
+    _rows.push(['Government take @ $75/bbl — COMPARABLE basis (rank on this)',
+                _fb.cmpTake.toFixed(1) + '% · ' + Number(_fb.n1).toLocaleString()
+                  + ' PSC/Concession contracts only']);
+  }
+  _rows.push(
+    ['Price swing ($50 → $125)', swingStr],
+    ['Contractor NPV @ $50/bbl (downside)',  npv50Str],
+    ['Contractor NPV @ $75/bbl (base case)', npvStr],
+    ['Contractor NPV @ $125/bbl (upside)',   npv125Str],
+    ['Breakeven', _beHT.head],
+    ['Fiscal predictability', _stabHT.head],
+    ['Reform exposure', _icReformHead(_refTxt)],
+    ['Fiscal mechanic', mechStr],
+    ['Contracts in sample', d.n ? Number(d.n).toLocaleString() : '—'],
+    ['Evidence tier', tierStr],
+    ['Data basis', _pbHead]
+  );
+
+  // Notes, in table order. Each names the row it belongs to so the pairing survives an edit.
+  var _notes = [];
+  // The head is repeated inside the note so the note still identifies its own row after an
+  // editor moves it; a comma rather than a second em dash, because the tail already opens with one.
+  if (_beHT.tail)   _notes.push('Breakeven, ' + _beHT.head + ' — ' + _beHT.tail);
+  if (_stabHT.tail) _notes.push('Fiscal predictability, ' + _stabHT.head + ' — ' + _stabHT.tail);
+  if (_refTxt)      _notes.push(_refTxt);
+  var _pbNote = _icProdBasisNote(d);
+  if (_pbNote)      _notes.push(_pbNote);
+  var _fbNote = _icFeeBasisNote(d);
+  if (_fbNote)      _notes.push(_fbNote);
+  _notes.push(CP_IRR_NOTE);
+
+  var _caption = country + ' — ORCA fiscal summary (' + mechStr + ', ' + nStr + ', ' + tierStr + ')';
+  var _assump  = 'Standardized Deepwater profile: $1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, '
+    + '100% working interest. Government take and contractor NPV are modelled at the prices shown. '
+    + 'The ' + _notes.length + ' note' + (_notes.length === 1 ? '' : 's') + ' below this table '
+    + 'qualify the rows they name and travel with it.';
+  var _srcLine = 'Source: ORCA Petroleum Fiscal Intelligence Platform ' + _orcaVerNow()
+    + ' (2026) — yoburgqs.github.io/petroleum-fiscal-db/';
+
+  // --- plain-text / TSV flavour (Excel splits Metric / Value into two columns) ---
+  var _tsv = _caption + '\n' + _assump + '\n\n'
+    + 'Metric\tValue\n'
+    + _rows.map(function(r){ return r[0] + '\t' + r[1]; }).join('\n')
+    + '\n\nNotes — carried from the ORCA Country Profile for ' + country + ':\n'
+    + _notes.map(function(t, i){ return (i + 1) + '. ' + t; }).join('\n')
+    + '\n\n' + _srcLine;
+
+  // --- rich HTML flavour (Word / Google Docs / Outlook / PowerPoint render a real table) ---
+  function _e(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var _th = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;text-align:left;';
+  var _td = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:10pt;';
+  var _html = '<div style="font-family:Calibri,Arial,sans-serif;">'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 2px;">' + _e(_caption) + '</p>'
+    + '<p style="font-size:9pt;color:#555;margin:0 0 6px;">' + _e(_assump) + '</p>'
+    + '<table style="border-collapse:collapse;">'
+    + '<thead><tr><th style="' + _th + '">Metric</th><th style="' + _th + '">Value</th></tr></thead>'
+    + '<tbody>' + _rows.map(function(r){
+        return '<tr><td style="' + _td + 'font-weight:bold;">' + _e(r[0]) + '</td>'
+             + '<td style="' + _td + '">' + _e(r[1]) + '</td></tr>';
+      }).join('') + '</tbody></table>'
+    + '<p style="font-size:9pt;font-weight:bold;margin:8px 0 2px;">'
+    + _e('Notes — carried from the ORCA Country Profile for ' + country + ':') + '</p>'
+    + '<ol style="font-size:9pt;color:#333;margin:0 0 4px;padding-left:18px;">'
+    + _notes.map(function(t){ return '<li style="margin-bottom:3px;">' + _e(t) + '</li>'; }).join('')
+    + '</ol>'
+    + '<p style="font-size:8pt;color:#666;margin:6px 0 0;">' + _e(_srcLine) + '</p>'
+    + '</div>';
+
+  function _flash(msg) {
     var btn = document.getElementById('dd-ic-summary-btn');
     if (btn) { var orig = btn.innerHTML; btn.innerHTML = '&#x2713; Copied!'; setTimeout(function(){ btn.innerHTML = orig; }, 2000); }
-    showCopyToast('IC summary copied — paste into your IC memo or model assumption table.');
-  }).catch(function(){ showCopyToast('Clipboard unavailable.'); });
+    showCopyToast(msg);
+  }
+  var _okMsg = 'Copied as a table — ' + _rows.length + ' metrics + ' + _notes.length
+    + ' note' + (_notes.length === 1 ? '' : 's') + '. Pastes as a formatted table into Word/Docs, '
+    + 'as two columns into Excel.';
+
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html':  new Blob([_html], {type:'text/html'}),
+      'text/plain': new Blob([_tsv],  {type:'text/plain'})
+    })]).then(function(){ _flash(_okMsg); }).catch(function(){
+      navigator.clipboard.writeText(_tsv).then(function(){ _flash(_okMsg); })
+        .catch(function(){ showCopyToast('Clipboard unavailable.'); });
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(_tsv).then(function(){ _flash(_okMsg); })
+      .catch(function(){ showCopyToast('Clipboard unavailable.'); });
+  } else {
+    showCopyToast('Clipboard unavailable.');
+  }
 }
 
 // v503 (T5): Copy the Side-by-Side comparison to the clipboard AS A TABLE.

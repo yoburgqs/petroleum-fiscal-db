@@ -33852,3 +33852,123 @@ no interactive control, so nothing new is under 24px at `pointer: coarse`.
 Walked Country Profile cold (no sessionStorage/localStorage) on Indonesia, Angola, the UK, Iraq, Australia, Ghana and Norway.
 
 The headline strip does this well. Six inches below it, the **Regional Peer Comparison** section prints a *second* verdict in plain words — *"Indonesia is **high take** vs Asia average. Take rank **#21 of 26** in region."* — and that sentence was co
+
+---
+## Cycle 596 Log — 2026-09-06
+
+- Test before: 294 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 294 PASS / 0 FAIL / 0 WARN / 0 JS errors  — suite ACTUALLY RAN this cycle against the changed build
+- JS errors: 0
+- Version: v689 -> v690
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."**
+
+## Friction
+Walked T5 cold (no sessionStorage, no localStorage): Home -> Country Profile -> pick a
+country -> press the amber **Copy for IC Memo** button (`#dd-ic-summary-btn`, handler
+`copyICSummary()` at index.html:38090) -> paste into Word.
+
+What arrived was one unbroken block of prose. Measured, not estimated — clipboard read back
+through Playwright with clipboard permissions granted:
+
+| country | characters pasted | words |
+|---|---|---|
+| Indonesia | 3,126 | 518 |
+| Norway | 2,832 | 464 |
+| Iraq | 3,183 | 516 |
+| Angola | 3,193 | 524 |
+| Guyana | 3,288 | 541 |
+
+Every figure the analyst came for was buried mid-sentence inside that block:
+
+> "Government take: 46.9% @$50 · 59.5% @$75 · 66.4% @$100 · 70.3% @$125/bbl. Price Swing:
+> 23.4pp. Contractor NPV (10% WACC, Deepwater, 100% WI): $334M @$50 (downside) · $745M @$75
+> (base) · $1.5B @$125 (upside). Breakeven: < $50/bbl — bounded, not solved: ..."
+
+An IC memo wants an assumption **table**. To build one, the analyst had to re-key fifteen
+values out of running prose by hand — four takes, three NPVs, price swing, breakeven,
+predictability, reform score, mechanic, contract count, evidence tier, data basis — out of
+the output of the one control on the platform whose entire promise is "paste straight into
+an IC memo". That is the worst moment in the T5 walk: the button fires, it says "Copied",
+and the analyst's next twenty minutes are spent retyping the thing they just copied.
+
+**The rest of the platform already solved this and this surface was skipped.** Every other
+"Copy for IC Memo" on ORCA writes two clipboard flavours — `copyComparisonTable()` (v503),
+the Fiscal Compare copy (v676), the Screener copy and the IOC Portfolio copy all emit
+`text/html` so Word / Google Docs / Outlook / PowerPoint render a real bordered table, plus
+TSV so Excel splits into columns. `copyICSummary()` — the single-country artifact, and the
+most-clicked of the five — called plain `navigator.clipboard.writeText()`. One flavour, no
+structure.
+
+## Change
+`copyICSummary()` now writes the same two flavours as its four siblings.
+
+**text/html** — a bordered Metric / Value table in Calibri 10pt, sized to paste directly into
+a memo, with 16-17 rows:
+
+    Government take @ $50 / $75 / $100 / $125 per bbl     4 rows
+    Government take @ $75/bbl — COMPARABLE basis          fee-basis countries only
+    Price swing ($50 -> $125)
+    Contractor NPV @ $50 (downside) / $75 (base) / $125 (upside)
+    Breakeven · Fiscal predictability · Reform exposure
+    Fiscal mechanic · Contracts in sample · Evidence tier · Data basis
+
+**text/plain** — the same rows as `Metric<TAB>Value`, so an Excel paste lands as two columns.
+
+**Nothing was dropped.** Every caveat sentence that was in the 500-word paragraph is still in
+the paste, moved *below* the table as a numbered note that names the row it qualifies, so a
+figure and its qualification stay attached however the memo is later cut down. The split is
+mechanical, not editorial: breakeven, predictability, reform and data basis each already
+stated a verdict first and its reasoning after a spaced em dash, so the head becomes the cell
+and the whole sentence becomes the note (`_icHeadTail()`). Where a row carries no caveat —
+Norway's solved `$29/bbl` breakeven — no note is emitted, and the note count in the
+assumption line is computed, not asserted.
+
+**The fee-basis comparable take got promoted to a row of its own.** v553 put it in this
+paste's prose and v675 put it in the Fiscal Compare cell; here it sits directly under the four
+published prices, labelled *"COMPARABLE basis (rank on this)"*. Iraq now pastes
+`34.1% · 195 PSC/Concession contracts only` as a table row rather than as a clause 400 words
+down. A memo table that carried only Iraq's 84.8% would rank it against PSC countries on a
+contract-structure artefact — the exact thing MECHANIC_COMPARABILITY forbids.
+
+Both absence registers survive the compression and neither is shown as a number:
+Saudi Arabia pastes `Reform exposure: NOT SCORED — see note below (this is not a zero premium)`
+and `Fiscal predictability: predictability not scored`, with the full "no coverage is not a
+clean record" sentence intact in the notes.
+
+The button's `title` was rewritten to describe a table rather than a paragraph.
+
+## Result
+The analyst presses **Copy for IC Memo**, pastes into Word, and gets a finished assumption
+table plus numbered notes — no retyping. Pastes into Excel and gets two columns. On the 10
+fee-basis-blended countries the rankable figure is a row in that table rather than a sentence
+they have to find. The five artifacts on the platform that claim to produce IC memo content
+now all produce the same shape.
+
+## Verification
+- JS syntax gate: **PASS** (all 11 inline `<script>` blocks extracted, `node --check`).
+- Clipboard read back through Playwright on 6 countries covering every branch —
+  Indonesia (PROD-WTD / ungraded / scored reform), Norway (solved breakeven, no breakeven
+  note), Iraq (fee-basis divergent, graded LOW, D-tier), Guyana (PROXY, reform score 100 on
+  zero fiscal changes), Saudi Arabia (state monopoly, no contractor position, reform NOT
+  SCORED), Chad (PROXY, graded, reform NOT SCORED). `text/html` verified to contain a real
+  `<table>`: Iraq renders 17 `<tr>` and a 6-item `<ol>` of notes. 0 page errors.
+- Mobile (Step 5b), 390x844 `hasTouch: true`: all 10 tabs `scrollWidth 390 === clientWidth 390`.
+  `#dd-ic-summary-btn` measures **44px** tall under `pointer: coarse`. 0 page errors. The change
+  adds no new control and no on-screen layout, so nothing new can overflow.
+
+## Carried forward — not fixed this cycle
+- **pixel_audit** still carries exactly one regression, `tablet-768::2-t7 clipped-text 33 -> 34`
+  — **sixth cycle carrying it**, and the longest-standing unaddressed item in the loop. The
+  `.tag` mechanic chip whose `scrollWidth` exceeds `clientWidth` by ~6px while its computed
+  `overflow` is `visible`; nothing is clipped on screen. This points at the detector, not the
+  layout, and it should be fixed in the detector.
+- The **`Other` region bucket holds 17 jurisdictions across four continents** (Iraq-Kurdistan,
+  UAE — Abu Dhabi, Republic of the Congo, Greenland, Ireland). Harvest-side misfiling, same
+  class as cycle 344's "USA filed under Other".
+- The **CP CLOSEST FISCAL PEERS chips still sort on the blended `take_75`** rather than the
+  comparable take, so on the 11 divergent countries they list neighbours of the artefact figure.
+- **164 of 185 jurisdictions hold no sourced reform log**, which dominates the T4 answer.
+- The **Methodology tab still names an API Explorer tab that is `display:none`**.
+- The **Screener FAQ's third value for the median IRR statistic** is still unreconciled.
