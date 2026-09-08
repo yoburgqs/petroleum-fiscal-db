@@ -38416,3 +38416,16 @@ selector (33rd cycle); the Methodology tab naming a `display:none` API Explorer 
 per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
 `renderVintageTrendChart()`/`renderVintage()`; the Breakeven Map's price-marker slider inert above
 $34; and the Side-by-Side 3,425-character comparability notice block.
+
+---
+## Cycle 632 Log — 2026-09-08 17:53
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Two throwaway `python3 -m http.server` processes (ports 8791/8792) are still running — the cleanup command was denied, so they'll need `pkill -f http.server` if you want them gone.
+
+## Cycle 632 — shipped as v725 (`a3d7213`)
+
+**Task:** T4 — "What is my fiscal-stability and reform exposure here?" (stalest by rotation; 626 last ran it.)
+
+**Friction.** Walked T4 cold at 1440×900 into the Reform Risk country lookup — the control the tab is named for. Its verdict strip has 
