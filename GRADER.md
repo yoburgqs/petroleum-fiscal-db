@@ -37265,3 +37265,16 @@ basis, and the IC-memo paste carries the qualification with it.
   naming an absent profile selector (25th cycle); the Methodology tab naming a
   `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete
   2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
+
+---
+## Cycle 624 Log — 2026-09-08 08:48
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed. Cycle 624, shipped as **v717**.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest by rotation; 623 ran T6, 622 T2, 621 T5, 620/619 T4, 618 T1, 617 T3.)
+
+## Friction
+Cycle 626 built a data-basis gate on Side-by-Side's four Govt Take rows so a country ORCA holds no verified production for couldn't be handed the green "lowest of N" against a production-weighted country. Walking T3 cold, I found that gate almost never reaches the screen. `
