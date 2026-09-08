@@ -36455,3 +36455,118 @@ never set, the hint never renders and the sticky rule is outside its media query
 Walked Side-by-Side cold at 390×844 with touch, no sessionStorage or localStorage. The tab's advertised maximum is five countries, and the badge says so — *"5/5 countries (full) — remove one to add another."* At five countries on a 390px phone the grid's content measured **467px inside a 360px box**:
 
 `
+
+---
+## Cycle 618 Log — 2026-09-08 00:54
+- Test before: 294 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 294 PASS / 0 FAIL / 0 WARN / 0 JS errors — **the suite RAN this cycle**, against
+  the local build carrying this change (`TEST_URL=http://localhost:8897/petroleum-fiscal-db/`),
+  not assumed from a prior clean baseline. Number read from the suite's own report file.
+- JS errors: 0
+- Summary: Cycle 618 complete — shipped as **v712**.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (T1 was stalest: 617 ran T3,
+616 T6, 615 T2, 614 T5, 613 T4, 612 T1.)
+
+## Friction
+Walked T1 cold over HTTP — no sessionStorage, no localStorage — Home → Screener tab → load the
+flagship **IOC Capital Screen** preset → 15 countries → sort by the column that answers "which of
+these do I actually trust?".
+
+The **Prod Cov** cell in the Screener row template inside `runScreener()` (index.html:30214)
+rendered with `.toFixed(0)`:
+
+    ${(d.prod_coverage_pct||0)>0 ? (d.prod_coverage_pct).toFixed(0)+'%' : '—'}
+
+The same expression reserves an **em dash for coverage of exactly zero**. That makes `0%` the one
+string in this column that already means *no verified field production at all* — and `.toFixed(0)`
+collapsed every value in (0, 0.5) onto it. Measured against the live data, four of the 22
+production-backed countries land in that band:
+
+| country | true coverage | rendered |
+|---|---|---|
+| USA | 0.2% | **0%** |
+| Australia | 0.3% | **0%** |
+| Malaysia | 0.3% | **0%** |
+| Saudi Arabia | 0.3% | **0%** |
+| Oman | 0.5% | 1% (overstated) |
+| Libya | 0.7% | 1% (overstated) |
+
+The IOC Capital Screen's own count line reads *"verified field production only; 163
+proxy-economics countries excluded."* The screen therefore asserted, in its own headline, that
+every row on it has verified production — and then printed **0%** on **rank #2 (USA, $3.3B, the
+largest contractor NPV on the shortlist)** and **rank #8 (Australia)**.
+
+Sorting by Prod Cov is the analyst's direct move on this task, and it made the contradiction the
+punchline: the list ended `1% China · 0% Australia · 0% USA`, both zeroes tied and
+indistinguishable, each sitting on a row whose own `PART-PROD` badge says the opposite. The
+analyst had exactly two readings available and **both are wrong** — either *the filter is broken,
+distrust the whole shortlist*, or *USA's take is an unweighted proxy, drop the biggest name on
+the list*. The truth is neither: USA's production basis is real but thin.
+
+## Change
+Two new helpers declared immediately above `runScreener()`:
+
+- **`_scProdCovCell(d)`** — sub-1% coverage now carries a decimal, so a non-zero value can never
+  render as the sentinel. The em dash for true zero is **unchanged**; that distinction is
+  load-bearing and is what gives the column its meaning.
+- **`_scProdCovTip(d)`** — replaces the single generic `title` string shared by all 185 rows with
+  a row-specific one giving the exact coverage and *what it implies for the take*
+  (PROD-WTD / PART-PROD / PROXY). Thresholds mirror `_dqTier()` so the tooltip and the badge on
+  the same row cannot disagree. It also states that production basis is not source quality —
+  that is the Evidence column.
+
+## Result
+The IOC shortlist sorted by Prod Cov now ends **`1% China · 0.3% Australia · 0.2% USA`** instead
+of `1% · 0% · 0%`. Across all 185 countries: **zero rows print "0%"**, and the **163 genuine
+proxies keep their em dash** (verified in-browser, not asserted). Hovering USA now reads
+*"USA: 0.2% of contracts carry verified field-level production, which makes this take a thin
+partial match, so the take is close to equal-weighted across contracts (PART-PROD)."*
+
+The analyst can now read **how thin** a production basis is without being told it is **absent**,
+and can rank a shortlist by data basis without the column contradicting the screen that produced
+it. Oman and Libya also stop being rounded *up*.
+
+## Step 5b — mobile
+Measured at **360 / 390 / 414** with `hasTouch: true` (`matchMedia('(pointer: coarse)')` confirmed
+true at all three) and at 768 / 1024 / 1280 / 1440 / 1920.
+`document.documentElement.scrollWidth === clientWidth` at **all eight widths** — zero horizontal
+scroll. **No control was added or touched** — the change is confined to a `<td>`'s text content
+and its `title`. Sub-24px control count under `pointer: coarse` was measured **against the v711
+build served side by side**: 19 before, 19 after, **delta 0**. (Those 19 are pre-existing and go
+on the carried list.) Prod Cov cells render correctly at 390: `20% 0.2% 15% 3% 3% 6% 1% 0.3% …`
+
+## Carried forward — not fixed this cycle
+- **19 sub-24px controls inside `#explorer-screen-mode` under `pointer: coarse`** at 360/390/414.
+  Pre-existing and unchanged by this cycle, but they are a direct violation of finalization
+  criterion 3 and nothing is currently measuring them per-tab. Good next T1 or mobile task.
+- **`pixel_audit` still exercises Side-by-Side only with the seeded three-country example**
+  (carried from 617) — the gate cannot see a five-column layout at all. One-line harness change.
+- **v710's `t7` clipped-text regression is still open** — `tablet-768::2-t7 33 → 37`,
+  `phone-390::2-t7 33 → 36`.
+- The inverted tier-B definition survives in ~12 further FAQ answers in the GRADER-era archive.
+- Everything on the cycle-603 through 617 carried lists remains open, including:
+  `cp-price-select` absent from the DOM so Country Profile has no price control and
+  `cp-run-fc-btn` falls through to `fc-price`; Mozambique's "Commercially attractive" verdict
+  under its own non-reconciliation panel; Country Profile contradicting itself on whether
+  contractor NPV carries information beyond take; `renderTornadoPanel` with no basis marking on
+  the generic-template path; reform coverage 21 of 185; the Two-Price Return Screen thresholds in
+  the bottom quartile; the Methodology/Home tier-definition conflict; the FAQ naming a "Stability
+  Score filter at >=4" that does not exist; Evidence Chain grammar on n=1; the Home Screener card
+  advertising a breakeven filter removed at v568; `FC_PROFILES`/`DCF_PROFILES` divergence; the
+  empty "Recent Platform Updates" placeholder; `Take weighting` printing "Equal-weighted" on a
+  monopoly column; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (18th cycle);
+  862 contracts with no fiscal terms; zero-rate defaults inside published `take_75`; the Screener
+  Contractor NPV tooltip naming an absent profile selector (20th cycle); the Methodology tab
+  naming a `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete
+  2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
+- **New, found on this walk, not fixed:** the runtime suite's 294th check depends on the service
+  worker registering, and `navigator.serviceWorker.register('/petroleum-fiscal-db/sw.js')`
+  (index.html:49) is a **hard-coded absolute path**. Served from any origin root the fetch 404s
+  and the suite drops to 293 PASS / 1 WARN. It is correct on GitHub Pages, so this is not a
+  user-facing defect today — but it means a local run of the gate silently reports a different
+  number than a live run unless the tester happens to replicate the `/petroleum-fiscal-db/` path
+  prefix. Given the directive's finalization criterion 1 is specifically "the number actually read
+  from the suite's own report", a gate whose result depends on how it was served is worth making
+  origin-relative.
