@@ -36111,3 +36111,127 @@ XLSX exports were not touched. Only the PNG export path was in the walk.
 
 ## Friction
 Side-by-Side draws **two** charts: "Govt Take vs Oil Price" and, 368px below it, "Contractor NPV vs Oil
+
+---
+## Cycle 615 Log — 2026-09-07 21:35
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL (293/0/1/1 served locally; control on unmodified HEAD returns exactly 293/0/1/1)
+- JS errors: 0
+- Summary: Cycle 615 complete, shipped as **v709**, pushed to both repos, mirror updated.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** (614 ran T5, 613 T4,
+612 T1, 611 T3, 610 T6 — T2 was the stalest.) Walked cold at 1440x900, no sessionStorage, no
+localStorage: Home → Country Profile → dropdown. Walked Norway (the well-worked default),
+Mozambique (a PROXY-basis mid-tier case) and **Iraq**, which is where the walk broke.
+
+## Friction
+Iraq's headline strip opens on the **comparable** take, and has since v552:
+
+> **34.1% govt take @$75 — investor-friendly tier (≤40%)** … #6 of 21 producers · lower-mid among
+> producers · on the comparable take … **−21.5pp vs producer median @$75 (comparable)**
+
+That correction exists because **415 of Iraq's 610 contracts are fee-basis TSC**, where the
+contractor takes a fixed $/bbl remuneration and no price upside, so take% climbs toward 97–99% as a
+property of the mechanic rather than of how hard the terms are — the Group 2 rule.
+
+Three inches below that verdict, **both peer surfaces on the same page still ranked on `take_75`** —
+the 84.8% blend the strip has just told the analyst is "not comparable across countries":
+
+| basis | who Country Profile called Iraq's closest fiscal terms |
+|---|---|
+| published blend 84.8% | Uzbekistan 85.6 · Turkmenistan 87.2 · Nigeria 81.1 · Oman 77.6 · Qatar 77.2 |
+| comparable 34.1% | Colombia 33.5 · Guatemala 35.2 · Canada 32.7 · France 31.6 · Eritrea 31.4 |
+
+`getPeerCountries()` sorted on `Math.abs(d.take_75 - current.take_75)`, and the `Δ vs Iraq` column
+in `_bpr()` was `r.take_75 - d.take_75` — so every delta on screen was wrong by up to 50.7pp. The
+Similar Fiscal Profile grid drew its ±6pp window off the same blend.
+
+And a third contradiction in the same walk: the producer-median pill in the **Govt Take by Price
+Scenario** header (`_vsMedianHtml`) printed **"+29.2pp vs producer median (55.6%)"** while the
+headline pill (`_vsMedianHtml452`, v552) printed **"−21.5pp vs producer median (comparable)"** —
+same metric, same median, opposite sign, on one screen, with nothing to say which one the memo
+should carry. The v534 comment sitting directly above `_vsMedianHtml` states the invariant that a
+later cycle had silently broken: *"Same producer basis as the headline pill above it, so the two
+cannot disagree on one screen."*
+
+## Change
+- New `cpPeerBasis()` / `cpPeerBasisTip()`, using the same divergence test `cpFeeBasis()` and
+  `_scFeeCmpAt()` already use — print and act on the correction only where it changes the number at
+  the 0.1pp the page prints. The test is taken **once, at $75**, so a row cannot switch basis
+  between its own @$50 / @$75 / @$125 columns.
+- `getPeerCountries()` selects on comparable take, **symmetrically** — subject and candidate each
+  placed on their own figure.
+- **Peer Comparison:** all three take columns render the comparable figure, coloured and tiered on
+  it, with `blend 84.8%` printed beneath on corrected rows. Δ measured on the comparable basis.
+  Corrected rows carry a `⊘` mark, and the Mechanic cell names the Group-1 mechanics the number came
+  from (`PSC · Concession`) instead of `fcResolveMechanic()`'s blend-majority `TSC` printed beside a
+  PSC/Concession take.
+- **Similar Fiscal Profile:** ±6pp window, ordering and Δ take all on comparable take.
+- Both sections state the basis in **visible text**, not a tooltip, whenever any row is corrected.
+- `_vsMedianHtml` now reads on `_verdictTake552` and names the figure it is measured on
+  ("· on comparable take 34.1%, not the 84.8% charted below").
+- The published blend is unchanged everywhere it is displayed, coloured, tiered and exported —
+  the v554 rule: display the headline, act on the comparable figure, say which.
+
+**Scope:** the 10 countries that diverge at printed precision — Iraq −50.7pp, Ecuador −7.2, South
+Sudan −4.3, Qatar −2.7, Mexico −2.5, Oman −2.0, India **+1.3**, Iran −1.3, Malaysia −1.1,
+Azerbaijan −1.0 — plus any profile carrying one of them as a peer (verified on Nigeria, where Oman's
+row is corrected in place and the generic basis note appears). The correction runs in both
+directions. Norway, Brazil, Guyana and the three state monopolies render byte-identically: no note,
+no `⊘`, same peer sets, same deltas.
+
+## Result
+An analyst screening Iraq is no longer told "investor-friendly, −21.5pp below the producer median"
+at the top of the page and "your closest fiscal analogues are Turkmenistan and Nigeria, +29.2pp
+above the producer median" two inches below it. Both peer sets and every delta now answer the
+question the headline verdict is on, so **the peer table can be pasted into an IC memo as the
+support for that verdict instead of as a refutation of it** — and the analyst who does not spot the
+contradiction no longer walks into IC with the wrong five analogues.
+
+## Verification — all run this cycle, none assumed
+- **JS syntax gate:** PASS, 11/11 inline script blocks (re-run after the version bump).
+- **Runtime suite RUN**, served locally: **293 PASS / 0 FAIL / 1 WARN / 1 JS error**.
+  **Control:** unmodified `HEAD:index.html` served from the same origin returns **exactly
+  293 / 0 / 1 / 1**. The WARN and the JS error are the pre-existing `sw.js` 404 under local serving,
+  unchanged by this cycle. Deployed figure is 294; the 1-test delta is the local-serving artefact.
+- **Horizontal scroll 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390 across 8 tabs, with Iraq loaded on
+  Country Profile at every viewport. **0 page errors** at every viewport.
+- **Step 5b, 390x844 `hasTouch: true`** (`matchMedia('(pointer: coarse)')` confirmed true): the two
+  new `⊘` marks and the new mechanic span each measure **24.0px tall**, via a `.cp-fee-mark` rule
+  added *inside* the v612 mobile layer — `pointer: coarse` only, invisible `::after` hit area on the
+  pattern `.chip::after` already uses, no desktop layout change. Measured 7.2 x 12px before the rule.
+- **Behaviour walked on screen** across 16 countries (all 10 divergent, plus Norway, Nigeria, Saudi
+  Arabia, Kuwait, Brazil, Guyana): corrected peer sets and basis notes on the 10, a corrected peer
+  *row* on Nigeria, and no change at all on the six controls.
+
+**Deliberately NOT done:** the Regional Peers ruler and the Closest Fiscal Peers list further down
+the page were not touched — they are within-region and were not in this walk's decision path. The
+Explorer and Breakeven Map peer surfaces were not audited for the same defect.
+
+## Carried forward — not fixed this cycle
+- **New, found this cycle:** `cp-price-select` does not exist in the DOM, so Country Profile has no
+  price control at all and `cp-run-fc-btn`'s price read always falls through to `fc-price`; it then
+  writes to `#price`, which also does not exist. FC runs at whatever `fc-price` already held.
+- **New, found this cycle:** on Mozambique the Fiscal character line says "Commercially attractive"
+  directly below a panel stating the 54.0% headline does not reconcile to its own regime rows
+  (47.6% blended, a 6.4pp gap) and that observed contract take is 55.6–57.8%, i.e. outside the
+  headline. The verdict sentence carries no reference to the non-reconciliation flagged above it.
+- Country Profile contradicts itself on whether contractor NPV carries information beyond take.
+- `renderTornadoPanel` / `_buildTornadoChart` render a sensitivity chart with no basis marking on
+  the generic-template path.
+- Reform coverage is still 21 of 185. Disclosed everywhere; unresolved.
+- The Two-Price Return Screen's thresholds still sit in the bottom quartile (disclosed since v706).
+- Everything on the cycle-603 through 614 carried lists remains open: Methodology/Home tier
+  definition conflict; the FAQ naming a "Stability Score filter at >=4" that does not exist;
+  Evidence Chain grammar on n=1; the Home Screener card advertising a breakeven filter removed at
+  v568; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+  `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier; three
+  monopolies carrying `be_75 = 1.0` (15th cycle); 862 contracts with no fiscal terms; zero-rate
+  defaults inside published `take_75`; the Screener Contractor NPV tooltip naming an absent
+  profile selector (17th cycle); the Methodology tab naming a `display:none` API Explorer tab;
+  unweighted per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
+  `renderVintageTrendChart()`/`renderVintage()`.
+- `pixel_audit` not run this cycle (the change adds two inline glyphs, one table sub-line and two
+  note blocks inside existing containers; the 23-cycle `tablet-768::2-t7 clipped-text` carry is
+  pre-existing and no new horizontal scroll appeared at 768 in this cycle's own sweep).
