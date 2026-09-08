@@ -1632,7 +1632,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   }
 }
 
-/* ── v711 (T3): the comparison grid now scrolls inside itself on a phone ─────────────
+/* ── v712 (T3): the comparison grid now scrolls inside itself on a phone ─────────────
    The header of the rule above says "horizontal scroll wrapper". There was no wrapper
    and no scroll. `.compare-grid` ships `overflow: hidden` (the base rule, for the 8px
    radius) and the ≤600px rule floors each country column at 72px. Load the tab's own
@@ -1905,7 +1905,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v711</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v712</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1975,7 +1975,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v711</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v712</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27374,7 +27374,7 @@ function renderCompare() {
   // v501: --cmp-n drives the responsive overrides too — the ≤768px and ≤600px rules
   // used to force repeat(4)/repeat(2) with !important regardless of how many countries
   // were loaded, which shifted every row out of alignment at any other count.
-  // v711 (T3): sits BEFORE the grid so `grid.nextSibling` — which _sbsObsNotice() uses to
+  // v712 (T3): sits BEFORE the grid so `grid.nextSibling` — which _sbsObsNotice() uses to
   // place the comparability notices — still resolves the same way. Hidden until
   // _sbsScrollHint() measures a real overflow, so it costs nothing on a desktop.
   let html = `<div id="cmp-scroll-hint" role="status"></div>`;
@@ -28106,10 +28106,10 @@ function renderCompare() {
   }
 
   _sbsApplyObsSpread();   // v672 (T3)
-  _sbsScrollHint();       // v711 (T3)
+  _sbsScrollHint();       // v712 (T3)
 }
 
-// ─── v711 (T3): name the columns that are off the right edge ──────────────────────────
+// ─── v712 (T3): name the columns that are off the right edge ──────────────────────────
 // The CSS above makes the grid scrollable rather than clipped, which puts the hidden
 // columns back within reach. It does not tell the analyst they are there — an iOS scroll
 // bar is invisible until a finger is already moving, which is the same failure the v612
@@ -29465,6 +29465,46 @@ function _scSyncNpvAxis() {
 }
 window._scSyncNpvAxis = _scSyncNpvAxis;
 
+// v712 (T1) --- the Production Coverage cell rendered with `.toFixed(0)`, so every country
+// whose coverage sits in (0, 0.5) printed "0%". The same cell reserves an em dash for coverage
+// of exactly zero, which makes "0%" the one string in this column that already means "no
+// verified field production at all". Four of the 22 production-backed countries land in that
+// band: USA (0.2%), Australia (0.3%), Malaysia (0.3%) and Saudi Arabia (0.3%).
+//
+// On the flagship IOC Capital Screen --- whose own count line reads "verified field production
+// only; 163 proxy-economics countries excluded" --- that printed "0%" on rank #2 (USA, $3.3B,
+// the largest contractor NPV on the shortlist) and rank #8 (Australia). Sorting this column is
+// the analyst's direct move for "which of these 15 do I actually trust?", and it parked both at
+// the bottom tied at 0%, contradicting the PART-PROD badge on their own row and the screen's own
+// filter. The two available readings were "the filter is broken" and "drop the biggest name on
+// the list"; both are wrong.
+//
+// Sub-1% coverage now carries a decimal, so a non-zero value can never render as the sentinel.
+// The em dash for true zero is unchanged --- that distinction is load-bearing.
+function _scProdCovCell(d) {
+  var cov = d.prod_coverage_pct || 0;
+  if (!(cov > 0)) return '\u2014';
+  return (cov < 1 ? cov.toFixed(1) : cov.toFixed(0)) + '%';
+}
+
+// Row-specific rather than one generic string: at 0.2% the number alone does not tell the
+// analyst what it implies for the take, and that implication is the reason they opened the
+// column. Thresholds mirror _dqTier() so the tooltip and the row badge cannot disagree.
+function _scProdCovTip(d) {
+  var cov = d.prod_coverage_pct || 0;
+  var name = String(d.country || 'This country').replace(/"/g, '');
+  if (!(cov > 0)) {
+    return name + ': no verified field production on any contract (PROXY). Government take is '
+      + 'modelled from statutory fiscal parameters on the standard profile, not weighted by output.';
+  }
+  var depth = cov > 5
+    ? 'production-weighted on the covered contracts (PROD-WTD)'
+    : 'a thin partial match, so the take is close to equal-weighted across contracts (PART-PROD)';
+  return name + ': ' + cov.toFixed(1) + '% of contracts carry verified field-level production, which makes '
+    + 'this take ' + depth + '. Higher coverage means the take is weighted by actual output rather than '
+    + 'by contract count. Not a measure of source quality --- that is the Evidence column.';
+}
+
 function runScreener() {
   _scUpdateNeutralFlags();
   _scSyncNpvAxis();   // v617: re-scale the NPV axis to the active deck BEFORE its value is read
@@ -30211,7 +30251,7 @@ function runScreener() {
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}</td>
       <td class="num">${fmtNpvShared(d[npvKey])}</td>
       <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the Contractor NPV column to the left, which is computed at the active price deck: a regime that is positive there and negative here does not survive a price break. The second line is the share of THAT column&#39;s value retained, so the percentage can be checked against the two figures on this row — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
-      <td class="num" title="Production coverage: % of contracts with verified production data. Higher = take number is more production-weighted." style="color:${(d.prod_coverage_pct||0)>30?'#15803D':(d.prod_coverage_pct||0)>=10?'#A16207':'var(--muted)'}">${(d.prod_coverage_pct||0)>0?(d.prod_coverage_pct).toFixed(0)+'%':'—'}</td>
+      <td class="num" title="${_scProdCovTip(d)}" style="color:${(d.prod_coverage_pct||0)>30?'#15803D':(d.prod_coverage_pct||0)>=10?'#A16207':'var(--muted)'}">${_scProdCovCell(d)}</td>
       <td class="num" style="color:${d.swing!=null?(d.swing>=20?'var(--red)':d.swing>=10?'var(--orange)':'var(--muted)'):'var(--muted)'};font-weight:${d.swing!=null&&d.swing>=15?'700':'400'}">${d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'}</td>
       <td><span class="tier ${tc}"${(_takeLeadCmp && _rowFc.diverges) ? ` style="cursor:help;" title="Tier on the comparable take (${_rowFc.cmp.toFixed(1)}%) — the basis this column is sorted on. On the published ${_rowFc.head.toFixed(1)}% blend the tier is ${tierLabel(_rowFc.head)}."` : ''}>${tierLabel(_tierOn)}</span></td>
     </tr>`;
