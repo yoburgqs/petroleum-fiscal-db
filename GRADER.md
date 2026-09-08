@@ -36310,3 +36310,133 @@ and the one-line cite reads `… B-tier sourcing (52.0% primary law on 1,051 fac
 
 
 Pixel gate: 0 hard-rule failure(s), 2 regression(s): tablet-768::2-t7: clipped-text 33 -> 37; phone-390::2-t7: clipped-text 33 -> 36
+
+---
+## Cycle 617 Log — 2026-09-08 — shipped as v711
+
+- Test before: 294 PASS / 0 FAIL (deployed v710 baseline)
+- Test after: **293 PASS / 0 FAIL / 1 WARN on the local pre-push build** — the suite
+  **RAN this cycle**, number read from its own report (`/tmp/rt_v711_local2.txt`), not
+  assumed. The WARN is `testConsoleErrors()` catching the service-worker registration 404
+  on `http://localhost` (`sw.js` is not served from that path); it does not exist on the
+  deployed origin, which is why the same build scores 294 / 0 / 0 there. No test regressed.
+- JS syntax gate: PASS (11 inline scripts)
+- JS errors: 0 page errors
+- `pixel_audit` **RAN this cycle**: 0 hard-rule failures. `t2` is byte-identical to
+  baseline at every viewport — `desktop-1920`, `laptop-1440`, `laptop-1280`,
+  `tablet-768`, `phone-390` all report `page-h-scroll 0 · viewport-overflow 0 ·
+  covered-control 0 · zero-size-control 0 · clipped-text 0`, with the same 2
+  `small-touch-target` hits at phone/tablet (the footer `API ↗` / `CI ↗` links) that the
+  baseline already carries. The only 2 regressions in the whole run are v710's
+  pre-existing `tablet-768::2-t7 clipped-text 33 → 37` and `phone-390::2-t7 33 → 36`,
+  untouched by this cycle.
+
+**Task — T3:** "How do these three countries compare side by side?" (616 ran T6, 615 T2,
+614 T5, 613 T4, 612 T1 — T3 was stalest, last run at 611.)
+
+**Friction.** Walked cold at **390×844 with `hasTouch: true`**, no sessionStorage, no
+localStorage: Home → Side-by-Side → the seeded North Sea Trio → Clear → build a real
+five-country set through the search box.
+
+The tab's advertised maximum is five countries and the badge says so — `5/5 countries
+(full) — remove one to add another`. At five countries on a 390px phone the grid's content
+measures **467px inside a 360px box**:
+
+```
+METRIC 15–115 · Angola 115–187 · Brazil 187–259 · Norway 259–331
+Nigeria 331–403 · United Kingdom 403–475          visible box ends at 375
+```
+
+`.compare-grid` ships `overflow: hidden` (index.html:246, there for the 8px radius) and the
+`≤600px` rule floors each country column at 72px (:1628). So **United Kingdom — the country
+the analyst added last — was clipped away in full, and Nigeria lost 60% of its width**, with
+no scrollbar, no gesture and no signal of any kind. The DOCUMENT does not scroll either
+(`scrollWidth 390 == clientWidth 390`), which is exactly why nothing caught it: every
+existing gate measures the document, and the document was clean.
+
+| viewport | 5-column content | visible box | columns lost |
+|---|---|---|---|
+| 360 | 467px | 330px | Nigeria (partial) + United Kingdom |
+| 390 | 467px | 360px | Nigeria (partial) + United Kingdom |
+| 414 | 467px | 384px | United Kingdom |
+| 768 | 746px | 746px | none |
+
+Four countries clip too (100 + 4×72 = 388 > 360). `pixel_audit` visits this tab with the
+seeded **three**-country example, which fits exactly (100 + 3×86.7 = 360), so the gate has
+never seen the failing case.
+
+The header of the CSS block in question reads `/* ── Mobile compare grid — horizontal
+scroll wrapper ── */`. **There was no wrapper and no scroll.** The v612 mobile layer had
+already written the rule for precisely this case — *"Wide tables scroll inside themselves.
+The gradient on the right edge is the only honest signal that there is more table — without
+it an analyst reads four of twenty-one columns and assumes that is all there is"* — and
+applied it to `.tbl-wrap` / `.table-scroll`. The one screen whose entire purpose is reading
+every column against every other was never in that set.
+
+**Change.**
+- `@media (max-width: 768px)`: `.compare-grid` becomes its own horizontal scroll container
+  (`overflow-x: auto`, `overscroll-behavior-x: contain`, `scroll-snap-type: x proximity`).
+  The page still does not scroll sideways at any width — the overflow is consumed by the
+  grid, not the document, which is the standard pattern this file already uses for every
+  other wide table.
+- The **Metric column is pinned** (`position: sticky; left: 0`) at those widths, because a
+  bare `68.0%` with its row label scrolled off is not a fiscal figure. Both label cells
+  already carried an opaque `var(--surface)`; verified pinned at offset 1px after a
+  107px scroll.
+- New **`_sbsScrollHint()`** names the columns currently off the right edge and clears
+  itself once the last one is on screen. Paired with an inset right-edge shadow, since a
+  grid container cannot take the `.tbl-wrap` `::after` gradient (it would become a grid
+  item). Driven by a `ResizeObserver` on `#cmp-output` so it survives the tab switch and
+  rotation, with a measurement-signature guard so the observer cannot loop into a window
+  error the suite would count. Header cells now carry `data-cmp-country` to name themselves.
+- `#cmp-scroll-hint` is emitted **before** the grid so `grid.nextSibling` — which
+  `_sbsObsNotice()` uses to place the comparability notices — still resolves the same way.
+
+**Result — what the analyst can now do that they could not before.** On a phone, load five
+countries and the grid reads:
+
+> *2 of 5 columns are off the right edge — Nigeria and United Kingdom. Swipe the table
+> sideways to read them; the Metric column stays put.*
+
+Swipe, and all five columns are readable with the row labels still on screen; the line
+removes itself at the end of the scroll. At 414 the same set says *"1 of 5 columns is off
+the right edge — United Kingdom"* — correct count, correct grammar. **Before this cycle the
+fifth country was not merely hard to reach; it was unreachable and unannounced, on the
+screen whose only job is comparing every column against every other.**
+
+**Step 5b — mobile.** 360 / 390 / 414 / 768 / 1440 all measured, `hasTouch: true` and
+`matchMedia('(pointer: coarse)')` confirmed on the first four. `documentElement.scrollWidth`
+never exceeded `clientWidth` at any width, with three countries or five, before or after
+scrolling. **No control was added** — `#cmp-scroll-hint` is a non-interactive `role="status"`
+line, so the 24px rule does not apply to it, and no existing control was touched.
+
+**Desktop is unchanged.** At 768 and 1440 the grid does not overflow, `data-cmp-ovf` is
+never set, the hint never renders and the sticky rule is outside its media query.
+
+## Carried forward — not fixed this cycle
+- **v710's `t7` clipped-text regression is still open** — `tablet-768::2-t7 33 → 37` and
+  `phone-390::2-t7 33 → 36`, introduced by the v710 Country Profile / Methodology prose and
+  carried unchanged through this cycle. This is the obvious next T6 or T2 task.
+- The inverted tier-B definition survives in ~12 further FAQ answers in the GRADER-era
+  archive (A29 §, WPT, legal-DD, scoring-rubric, citation-template blocks).
+- Everything on the cycle-603 through 616 carried lists remains open, including:
+  `cp-price-select` absent from the DOM so Country Profile has no price control and
+  `cp-run-fc-btn` falls through to `fc-price`; Mozambique's "Commercially attractive"
+  verdict under its own non-reconciliation panel; Country Profile contradicting itself on
+  whether contractor NPV carries information beyond take; `renderTornadoPanel` with no basis
+  marking on the generic-template path; reform coverage 21 of 185; the Two-Price Return
+  Screen thresholds in the bottom quartile; the Methodology/Home tier-definition conflict;
+  the FAQ naming a "Stability Score filter at >=4" that does not exist; Evidence Chain
+  grammar on n=1; the Home Screener card advertising a breakeven filter removed at v568;
+  `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+  `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier;
+  three monopolies carrying `be_75 = 1.0` (17th cycle); 862 contracts with no fiscal terms;
+  zero-rate defaults inside published `take_75`; the Screener Contractor NPV tooltip naming
+  an absent profile selector (19th cycle); the Methodology tab naming a `display:none` API
+  Explorer tab; unweighted per-mechanic pivot averages; the incomplete 2020s cohort;
+  duplicated `renderVintageTrendChart()`/`renderVintage()`.
+- **New, found on this walk, not fixed:** `pixel_audit` exercises Side-by-Side only with the
+  seeded three-country example. Every count it reports for `t2` describes a set that happens
+  to fit. The gate cannot see a five-column layout at all, which is why this defect survived
+  every cycle since the ≤600px rule was written. Making the audit load the tab's own maximum
+  is a one-line change to the harness and would have caught this.
