@@ -1827,7 +1827,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v706</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v707</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1897,7 +1897,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v706</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v707</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -22466,6 +22466,97 @@ function _rrDirCells(o, size) {
   if (o.context)    out += sep + '<span style="color:var(--muted);font-weight:600;" title="' + o.context + ' sourced event' + (o.context === 1 ? '' : 's') + ' that changed no fiscal terms — discovery, first oil, conflict, a review that concluded without renegotiation">&middot;' + o.context + '</span>';
   return out;
 }
+// ── v707 (T4): the external check the platform could already start ───────────
+// Both "no sourced reform log" surfaces — the Reform Risk country lookup card and the
+// Country Profile Fiscal Reform History panel — ended by telling the analyst to go and
+// check the national petroleum law themselves. That is the correct advice and it is the
+// dead end for 164 of 185 jurisdictions, i.e. for 89% of every country an analyst can
+// type into this tab.
+//
+// ORCA already holds that law. 160 of those 164 carry an A-tier `legislation` entry in
+// top_sources naming the statute their fiscal facts were read from, with a live URL and
+// the number of verified facts drawn from it — Malaysia's Petroleum Development Act 1974,
+// Namibia's Act 2 of 2017, Qatar's Income Tax Law Decree 21 of 2009. The analyst was
+// being sent out of the product to locate a document the product was displaying two
+// panels away on the same screen.
+//
+// This surfaces it, and asserts nothing further. A statute citation is NOT an event log:
+// it does not produce a reform count, a Reform Frequency Score, or a premium, and none is
+// implied here. What it does give is the year of the instrument ORCA's own numbers rest
+// on, which is a fact the platform holds and which decides where the external check
+// starts. 64 of the 164 name a statute year inside the 2010 window and 71 name one before
+// it — two materially different starting positions that the page previously flattened
+// into the same blank.
+function _rrStatuteYears(name) {
+  var ys = [], re = /(^|[^0-9.])((?:19|20)\d{2})(?![0-9.])/g, m;
+  while ((m = re.exec(String(name == null ? '' : name)))) ys.push(parseInt(m[2], 10));
+  return ys;
+}
+function _rrStatuteSources(d) {
+  var out = [];
+  ((d && d.top_sources) || []).forEach(function(s) {
+    if (!s || s.type !== 'legislation' || !s.name) return;
+    out.push({ name: s.name, url: s.url || '', tier: s.tier || '', n: s.n || 0, ys: _rrStatuteYears(s.name) });
+  });
+  return out;
+}
+function _rrStatuteMaxYear(legs) {
+  var mx = 0;
+  (legs || []).forEach(function(s) { s.ys.forEach(function(y) { if (y > mx) mx = y; }); });
+  return mx;
+}
+// The closing sentence of the uncovered-country card. Unchanged wording where ORCA holds
+// no statute citation either; where it does, it names the starting document instead of
+// handing back a generic reading list.
+function _rrStatuteTail(d) {
+  var legs = _rrStatuteSources(d);
+  if (!legs.length) {
+    return 'For reform exposure specifically, an uncovered jurisdiction needs an external check '
+         + '(national petroleum law, IMF Article IV, operator annual reports) before it goes in front of an IC.';
+  }
+  return 'For reform exposure specifically this jurisdiction needs an external check — but not from a standing start. '
+       + 'ORCA read its fiscal terms out of a named statute, and that statute is the first document to check; '
+       + 'it is printed below, with IMF Article IV and operator annual reports after it.';
+}
+// The block itself. Returns '' where there is no legislation citation to show.
+function _rrStatuteBlock(d) {
+  var legs = _rrStatuteSources(d);
+  if (!legs.length) return '';
+  var esc  = _rrEsc((d && d.country) || 'this country');
+  var maxY = _rrStatuteMaxYear(legs);
+  var rows = legs.map(function(s) {
+    var nm  = _rrEsc(s.name);
+    var url = String(s.url || '');
+    var head = /^https?:\/\//.test(url)
+      ? '<a href="' + _rrEsc(url) + '" target="_blank" rel="noopener" '
+        + 'style="display:inline-block;min-height:24px;padding:4px 0;line-height:1.6;color:var(--accent);font-weight:700;text-decoration:none;font-size:11.5px;" '
+        + 'title="Open the source register ORCA cites for this statute">' + nm + ' &nearr;</a>'
+      : '<span style="display:inline-block;min-height:24px;padding:4px 0;line-height:1.6;color:var(--text);font-weight:700;font-size:11.5px;">' + nm + '</span>';
+    return '<div style="margin-bottom:7px;">' + head
+      + '<div style="font-size:10.5px;color:var(--muted);line-height:1.5;">'
+      + (s.tier ? _rrEsc(s.tier) + '-tier legislation' : 'legislation')
+      + (s.n ? ' &middot; ' + s.n.toLocaleString() + ' of ' + esc + '&rsquo;s verified facts were read from it' : '')
+      + '</div></div>';
+  }).join('');
+  var verdict = maxY >= 2010
+    ? 'The most recent year that citation names is <strong style="color:var(--text);">' + maxY + '</strong> — <strong style="color:var(--text);">inside</strong> the 2010 scoring window. '
+      + 'The terms ORCA prints for ' + esc + ' already rest on a post-2010 instrument, so the missing event log is a gap in the <em>record of changes</em>, not evidence the law has stood still. Check that act for amendments made since.'
+    : maxY > 0
+    ? 'The most recent year that citation names is <strong style="color:var(--text);">' + maxY + '</strong> — <strong style="color:var(--text);">before</strong> the 2010 scoring window. '
+      + 'Everything ORCA prints for ' + esc + ' is read from it, so any amendment passed since 2010 is unrecorded on this platform. That act is where the check starts.'
+    : 'That citation names no year, so ORCA cannot tell you whether the instrument it read predates the 2010 window. Establish which version is in force before anything else.';
+  return '<div style="margin-top:12px;padding:10px 12px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:6px;background:var(--surface);">'
+    + '<div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:6px;">Start the external check here — the statute ORCA sourced these terms from</div>'
+    + rows
+    + '<div style="font-size:11px;color:var(--muted);line-height:1.6;margin-top:4px;">'
+    + '<strong style="color:var(--text);">This is a source citation, not a reform log.</strong> It produces no reform count, no Reform Frequency Score and no premium — ' + esc + ' remains unscored. '
+    + verdict
+    + '</div></div>';
+}
+window._rrStatuteSources = _rrStatuteSources;
+window._rrStatuteBlock = _rrStatuteBlock;
+window._rrStatuteTail = _rrStatuteTail;
+
 window._rrEventDir = _rrEventDir;
 window._rrSplit = _rrSplit;
 window._rrTilt = _rrTilt;
@@ -32493,7 +32584,8 @@ function renderReformTimeline(country) {
             + '<div style="font-size:11px;color:var(--muted);line-height:1.6;">Fiscal Predictability is computed from ' + _esc0 + '&rsquo;s own contracts — take spread between blocks, take movement from $50 to $125/bbl, and number of mechanics in force. It measures how consistent the terms are, not how often the law changed.</div>'
             + '</div>'
           : '')
-      + '<div style="margin-top:12px;font-size:11px;color:var(--muted);line-height:1.6;">For reform exposure specifically, an uncovered jurisdiction needs an external check — national petroleum law, IMF Article IV, or operator annual reports — before it goes in front of an IC.</div>'
+      + '<div style="margin-top:12px;font-size:11px;color:var(--muted);line-height:1.6;">' + _rrStatuteTail(_cdRow) + '</div>'
+      + _rrStatuteBlock(_cdRow)
       + '<div style="margin-top:12px;"><button class="btn btn-sm btn-outline" onclick="openReformRiskFor(\'' + _jsC0 + '\')" title="Open the Reform Risk tab with ' + _esc0 + ' selected in the country lookup">Check ' + _esc0 + ' on Reform Risk &rsaquo;</button></div>';
   }
 
@@ -37787,8 +37879,10 @@ function renderReformCountryVerdict() {
       // v536 (T3): this used to assert the Predictability Score "exists for all 185 countries".
       // It does not: 22 of the 185 carry no contract-level take distribution and are now not scored.
 
-      + 'For reform exposure specifically, an uncovered jurisdiction needs an external check (national petroleum law, IMF Article IV, operator annual reports) before it goes in front of an IC.'
+      + _rrStatuteTail(d)
       + '</div>'
+      + _rrStatuteBlock(d)
+      + '<div style="margin-top:12px;"></div>'
       + cpBtn
       + '</div>';
     _rrApplyObsSpread(c);
