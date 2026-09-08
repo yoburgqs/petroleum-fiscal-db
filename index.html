@@ -1949,7 +1949,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v719</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v720</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2019,7 +2019,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v719</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v720</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -24755,9 +24755,65 @@ function _fpCiteVerdict(score, d) {
       + 'this score however high its number. Do not cite it as evidence of fiscal stability'
       + _fpCiteObsClause(d);
   }
-  return _fpBandLabel(score) + ' (score ' + score + '/100, graded) \u2014 measured spread of '
-    + disp.iqr.toFixed(1) + 'pp across ' + nC + ' contracts, the only basis on which ORCA awards a band; '
-    + k.nMeas + ' of 185 countries qualify and their ceiling is ' + k.ceil;
+  // ── v720 (T5): the GRADED branch now carries the withdrawal the screen already prints ────
+  // Walked T5 cold: Country Profile -> Nigeria -> "Copy for IC Memo" -> paste. The Fiscal
+  // predictability row arrived as:
+  //     MODERATE (score 73/100, graded) | measured spread of 0.4pp across 834 contracts,
+  //     the only basis on which ORCA awards a band
+  // Open the Reform Risk tab in the same session, look up the same country, and it reads
+  // "Carry <=46 . LOW, not 73 . MODERATE" over an orange bound bar, because v719 established
+  // that ORCA's own contract file lists Nigeria's 50 largest producing contracts running
+  // 57.5-91.4% take at $75/bbl -- 33.9pp, not 0.4pp. Same tool, same country, opposite claims,
+  // and the one that reached the committee document was the one the tool disowns. Worse than
+  // the one-term case v644 fixed: this branch is the only one that awards a BAND, and the
+  // cohort line beside it tells the analyst a graded band outranks any ungraded score.
+  // Measured live this cycle against api/v1/country/*.json for all 28, not asserted: 10 have a
+  // bundled IQR their own contract table exceeds by more than CP_OBS_REFUTE_PP, 9 clear the
+  // materiality bar and on 7 the BAND moves --
+  //   Nigeria 73 MODERATE -> 46 LOW      Kazakhstan 73 MODERATE -> 53 LOW
+  //   Rep. of Congo 62 MODERATE -> 47 LOW  Mexico 51 LOW -> 27 VERY LOW
+  //   Morocco 45 LOW -> 39 VERY LOW      Brazil 61 MODERATE -> 59 LOW
+  //   Mauritania 60 MODERATE -> 58 LOW
+  // Qatar (67 -> 60) and Sao Tome (70 -> 65) stay in band and are stated without the withdrawal
+  // wording; India (52 -> 51) is below the bar and only has the bound appended.
+  // Nothing is recomputed and no new threshold is introduced -- the bound is read from the same
+  // _fpObsCeilingFrom() object the Reform Risk card paints from. Silent where no contract
+  // sample is loaded for the country, exactly as _fpCiteObsClause() is on the one-term path.
+  var _why = 'measured spread of ' + disp.iqr.toFixed(1) + 'pp across ' + nC
+    + ' contracts, the only basis on which ORCA awards a band; ' + k.nMeas
+    + ' of 185 countries qualify and their ceiling is ' + k.ceil;
+  var _cl = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+  if (!_cl) return _fpBandLabel(score) + ' (score ' + score + '/100, graded) \u2014 ' + _why;
+  var _rng = _cl.obs.min.toFixed(1) + '\u2013' + _cl.obs.max.toFixed(1) + '%';
+  // The head becomes the table cell (_icHeadTail splits on the first spaced em dash), so it
+  // must state the correction on its own: a cell reading MODERATE is the failure being fixed.
+  var _head = !_cl.material
+    ? _fpBandLabel(score) + ' (score ' + score + '/100, graded) \u00b7 bounded at ' + _cl.bound
+      + '/100 by this country\u2019s own contract table'
+    : _cl.bandMoves
+      ? _cl.band + ' \u00b7 upper bound ' + _cl.bound + '/100 (the printed ' + score + ' \u00b7 '
+        + _cl.printedBand + ' is withdrawn)'
+      : _cl.band + ' \u00b7 upper bound ' + _cl.bound + '/100 (the printed ' + score
+        + ' is withdrawn; the band holds at this bound)';
+  return _head + ' \u2014 ORCA\u2019s own contract file contradicts the '
+    + disp.iqr.toFixed(1) + 'pp bundled spread this grade was penalised on: the ' + _cl.obs.n
+    + ' largest producing contracts it holds for this country run ' + _rng
+    + ' government take at $75/bbl across ' + _cl.obs.distinct + ' distinct values \u2014 '
+    + _cl.obs.spread.toFixed(1) + 'pp, wider than the bundled figure by ' + _cl.excess.toFixed(1)
+    + 'pp. The interquartile-range term, the score\u2019s largest at up to \u221240 points, was therefore '
+    + 'charged ' + _cl.charged.toFixed(1) + ' points where the observed dispersion costs '
+    + _cl.cost.toFixed(0) + '. The score is NOT recomputed: a top-' + _cl.obs.n
+    + '-by-production sample cannot establish a population IQR across all ' + nC
+    + ' contracts. But that dispersion is a FLOOR on the real spread, so the penalty is a floor and '
+    + _cl.bound + ' is a CEILING on the score \u2014 the true figure is at or below it, never above. '
+    + 'Carry ' + _cl.bound + ' \u00b7 ' + _cl.band + ' with the observed range ' + _rng + ' attached'
+    + (_cl.material ? ', not ' + score + ' \u00b7 ' + _cl.printedBand : '')
+    + '; this is the same bound the Reform Risk tab prints for this country. '
+    + (_cl.bandMoves
+        ? 'Because the band moves from ' + _cl.printedBand + ' to ' + _cl.band + ' at the ceiling, the '
+          + 'cohort rank and the rule that a graded band outranks an UNGRADED score do not hold here. '
+        : '')
+    + 'For context on the printed figure: ' + _why + '.';
 }
 // Rank of `d` within the cohort that shares its dispersion basis, plus the cross-cohort bar.
 // Returns '' where there is no cohort to rank in (not scored, or state monopoly).
@@ -36756,11 +36812,30 @@ function exportCountryProfile() {
     { Metric: 'Weighting Method', Value: d.weighting || '' },
     { Metric: 'Data Basis', Value: _cpBasis },
     { Metric: 'Prod Coverage (%)', Value: d.prod_coverage_pct != null ? +d.prod_coverage_pct.toFixed(1) : null },
-    { Metric: 'Predictability Score', Value: (function(){ const v = getFiscalPredictabilityScore(d); return v == null ? 'not scored — no contract-level take distribution held' : v; })() },
+    // v720 (T5): the workbook leaves the tool with the same figure the clipboard does, so it
+    // carries the same withdrawal. Where this country's own contract table bounds the score,
+    // the cell states the bound instead of a bare number an IC reader would sort on.
+    { Metric: 'Predictability Score', Value: (function(){
+        const v = getFiscalPredictabilityScore(d);
+        if (v == null) return 'not scored — no contract-level take distribution held';
+        const c = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+        if (c && c.material) return v + ' — WITHDRAWN, carry ≤' + c.bound + ' (' + c.band + ')';
+        return v; })() },
     // v536 (T3): the score's largest component is inert for 157 of 185 countries, so the exported
     // number is not interpretable without its dispersion basis. Exported beside it rather than left
     // for the reader to assume the spread was measured.
-    { Metric: 'Predictability Basis', Value: (function(){ const b = _fpDispersion(d); return b.state === 'monopoly' ? 'not scored — state monopoly: ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% government take at every modelled price, contractor NPV $0 / IRR −100%. No contractor position to score.' : b.state === 'none' ? 'not scored — no p25/p75 distribution' : b.state === 'single' ? 'one statutory term — IQR component not exercised (score is price swing + mechanic count only)' : 'measured spread ' + b.iqr.toFixed(1) + 'pp across contracts'; })() },
+    { Metric: 'Predictability Basis', Value: (function(){
+        const b = _fpDispersion(d);
+        if (b.state === 'monopoly') return 'not scored — state monopoly: ' + (d.take_75 != null ? d.take_75.toFixed(1) : '100.0') + '% government take at every modelled price, contractor NPV $0 / IRR −100%. No contractor position to score.';
+        if (b.state === 'none')   return 'not scored — no p25/p75 distribution';
+        if (b.state === 'single') return 'one statutory term — IQR component not exercised (score is price swing + mechanic count only)';
+        const c = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+        if (!c) return 'measured spread ' + b.iqr.toFixed(1) + 'pp across contracts';
+        return 'bundled spread ' + b.iqr.toFixed(1) + 'pp, but ORCA’s own contract table for this country runs '
+          + c.obs.min.toFixed(1) + '–' + c.obs.max.toFixed(1) + '% take at $75/bbl across its '
+          + c.obs.n + ' largest producing contracts (' + c.obs.spread.toFixed(1) + 'pp, '
+          + c.excess.toFixed(1) + 'pp wider). Ceiling, not a recomputed score: carry ≤' + c.bound
+          + ' · ' + c.band + ' with that range attached, not ' + c.printed + ' · ' + c.printedBand + '.'; })() },
     { Metric: '', Value: '' },
     { Metric: 'Take Comparability', Value: _cpCmp },
     { Metric: 'Govt Take @$50 (%)', Value: d.take_50 != null ? +d.take_50.toFixed(1) : null },
@@ -38681,6 +38756,42 @@ window._rrIqrUnderstated = _rrIqrUnderstated;
 
 function _rrFpBand(v) { return v >= 75 ? 'HIGH' : v >= 60 ? 'MODERATE' : v >= 45 ? 'LOW' : 'VERY LOW'; }
 
+// ── v720 (T5): one ceiling object, read by the screen AND by the clipboard ────────────────
+// v719 computed this arithmetic inline inside _rrPaintIqrUnderstated(), which paints the
+// Reform Risk card. That made it a screen fact. The artifact that leaves the tool -- Country
+// Profile's "Copy for IC Memo" -- computed its predictability sentence in _fpCiteVerdict()
+// from the printed score, so the tool told the analyst "carry 46 · LOW, not 73" on one tab and
+// pasted "MODERATE (score 73/100, graded)" into their committee document from another.
+// Factored out so the number that is read and the number that is pasted are the same object,
+// on the same principle v644 applied to the band word. Pure: takes the sample it is given.
+function _fpObsCeilingFrom(d, obs, u) {
+  if (!d || !obs || !u) return null;
+  var fp = (typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
+  if (fp == null) return null;
+  var charged = Math.min(40, u.iqr * 0.8);        // what the bundled IQR actually cost
+  var cost    = Math.min(40, obs.spread * 0.8);   // what the observed dispersion costs
+  var bound   = Math.max(0, Math.round(fp + charged - cost));
+  var band = _fpBandLabel(bound), printedBand = _fpBandLabel(fp);
+  var bandMoves = (band !== printedBand);
+  return { obs: obs, iqr: u.iqr, excess: u.excess, printed: fp, printedBand: printedBand,
+           bound: bound, band: band, charged: charged, cost: cost, bandMoves: bandMoves,
+           // Same materiality rule v719 stated: a 1-point correction dressed like Nigeria's
+           // 27-point one is what trains an analyst to skip the line.
+           material: bandMoves || (fp - bound) >= 5 };
+}
+// Resolves the sample from the v559 cache. Returns null where no sample is loaded for this
+// country -- silent rather than guessing, exactly as _fpCiteObsClause() is on the one-term path.
+function _fpObsCeiling(d) {
+  if (!d || typeof cpObsSpread !== 'function' || typeof _rrIqrUnderstated !== 'function') return null;
+  var obs = null;
+  try { obs = cpObsSpread(d.country); } catch (e) { return null; }
+  if (!obs) return null;
+  var u = _rrIqrUnderstated(d, obs);
+  if (!u) return null;
+  return _fpObsCeilingFrom(d, obs, u);
+}
+window._fpObsCeiling = _fpObsCeiling;
+
 function _rrPaintIqrUnderstated(c, d, obs, u) {
   var sel = document.getElementById('rr-country-lookup');
   if (!sel || sel.value !== c) return;                       // analyst moved on mid-fetch
@@ -38688,21 +38799,19 @@ function _rrPaintIqrUnderstated(c, d, obs, u) {
   if (!out || out.dataset.iqrPainted === c) return;
   out.dataset.iqrPainted = c;
 
-  var fp = (typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
-  if (fp == null) return;
-  var charged = Math.min(40, u.iqr * 0.8);
-  var cost    = Math.min(40, obs.spread * 0.8);
-  var bound   = Math.max(0, Math.round(fp + charged - cost));
-  var bLabel  = _rrFpBand(bound);
-  var pLabel  = _rrFpBand(fp);
-  var bandMoves = (bLabel !== pLabel);
+  // v720 (T5): derived, not recomputed -- _fpObsCeilingFrom() is now the single source and
+  // Country Profile's Copy for IC Memo reads the same object.
+  var _cl = _fpObsCeilingFrom(d, obs, u);
+  if (!_cl) return;
+  var fp = _cl.printed, charged = _cl.charged, cost = _cl.cost, bound = _cl.bound;
+  var bLabel = _cl.band, pLabel = _cl.printedBand, bandMoves = _cl.bandMoves;
   // Materiality, on the same principle cpDefendDispersion() uses: one counterexample is enough to
   // withdraw the CLAIM, but a 1-point correction painted the same orange as Nigeria's 27-point one
   // is what trains an analyst to skip the line. Emphatic treatment -- the ▲ marker, the orange
   // ceiling bar, the withdrawn cohort rank -- only where the correction is worth 5 points of score
   // or moves the band. Below that the refutation is still stated, in muted type, with the numbers.
   // Live: this mutes India alone (13.3pp bundled vs 15.0pp observed, 52 -> 51, LOW either way).
-  var material = bandMoves || (fp - bound) >= 5;
+  var material = _cl.material;
   var nAll  = (d.n != null) ? Number(d.n).toLocaleString() : 'its';
   var range = obs.min.toFixed(1) + '–' + obs.max.toFixed(1) + '%';
   var why = 'The Fiscal Predictability Score charged ' + c + '’s interquartile-range penalty '
