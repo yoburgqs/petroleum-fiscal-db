@@ -36717,3 +36717,141 @@ is rendered.
 Walked cold over HTTP in a fresh browser context: Home → Reform Risk → the single-country lookup, which is the tab's real T4 entry point.
 
 The Fiscal Predictability Score is built on a **zero take-spread penalty — its largest component, worth up to −40 points** — wh
+
+---
+## Cycle 621 Log — 2026-09-08 04:41
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local build, measured this cycle — not assumed)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (identical on the pre-change build, delta 0)
+- JS errors: 0 page errors. The 1 WARN is the known origin-dependent service-worker 404
+  (`index.html:49`), present in BOTH builds when served over localhost and absent on the
+  live origin. Carried from cycle 618, not introduced here.
+- Shipped as **v714**.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." Stalest by rotation:
+619/620 ran T4, 618 T1, 617 T3, 616 T6, 615 T2, 614 T5.
+
+## Friction
+Walked T5 cold over HTTP in a fresh browser context — no sessionStorage, no localStorage.
+Exercised every surface that claims to produce a memo artifact, by clicking it and reading
+the clipboard, not by reading the changelog:
+
+| surface | result |
+|---|---|
+| Fiscal Compare `fc-copy-ic-btn` | works; row-tick shortlist works (3 ticked → "⎘ Copy 3 selected", 3-row paste, `Export XLSX (3)`) |
+| Screener `screener-copy-ic-btn` | works; states its own screen, incl. "None — this is the full ORCA universe" |
+| IOC Portfolio `ioc-copy-ic-btn` | works; carries the country-average substitution and fee-basis notice |
+| Country Profile `dd-ic-summary-btn` / `dd-cite-btn` | work; 6 numbered notes travel with the table |
+| 6 file exports (FC / Screener XLSX+CSV / Explorer / IOC / CP) | all download, all parse in openpyxl, all carry an assumptions sheet |
+
+That is a finished surface, and none of it was the worst moment. The worst moment is on
+**Side-by-Side** — the one screen whose entire purpose is to RANK countries against each
+other, and the multi-country T5 artifact.
+
+`_sbsPaintObsSpread()` (index.html:28281) already detects the columns whose "every contract
+prices to one statutory term" basis their own contract file refutes, and already computes the
+ceiling the platform's own formula puts on the score:
+
+```js
+var cost  = Math.min(40, obs.spread * 0.8);
+var bound = (fp == null) ? null : Math.max(0, Math.round(fp - cost));
+```
+
+It passed `bound`/`bLbl` to `_sbsObsNotice()`, which stored them in `window._sbsObsHits` and
+**never rendered either one**. The value existed, was correct, and reached the DOM only inside
+a `title` attribute.
+
+So the Predictability row that leaves the tool through "Copy for IC Memo" read, on this tab's
+own cold-load seeded set, with no interaction at all:
+
+```
+Predictability Score  Norway 76 · UNGRADED ≥29.6pp obs ▲ best case
+                      United Kingdom 58 · LOW · 15.0pp
+                      Netherlands 84 · UNGRADED ≥30.8pp obs ▲ best case
+```
+
+Read as a ranking — the only thing a comparison table is for — that pastes
+**NL 84 > Norway 76 > UK 58** into the memo. The UK is the one column of the three carrying a
+genuinely measured score, and it prints last.
+
+The set notice under the grid closed: *"Do not rank the set on these two rows. Carry the
+observed contract range into the IC memo, not the grade."* Correct, and unusable — a spread in
+pp is not a predictability reading. The analyst was told the row was wrong and handed nothing
+to put in its place, so the artifact still went into the memo ranked backwards, now with a
+caveat under it.
+
+## Change
+1. The fp cell prints the ceiling under the badge: **`→ carry ≤52 · LOW`**. Applied to both the
+   visible grid cell and the matching `#cmp-data-table` cell, which is what `copyComparisonTable()`
+   builds the clipboard from, so it travels into the paste rather than living on hover.
+2. New `_sbsBoundOrder()` replaces the notice's closing sentence with the per-country ceilings
+   and re-ranks the whole set on them, alongside any column ORCA *does* hold a measured spread
+   for. The preceding sentence changed from "Do not rank the set on these two rows" to "Do not
+   rank the set on the printed scores — rank it on the ceilings below", so the notice no longer
+   contradicts the ordering it now supplies.
+
+Nothing is recomputed and nothing is overwritten. `obs.spread` is a **floor** on the true spread,
+so `cost` is a floor on the penalty and the printed figure is a **ceiling** on the score. It is
+marked `≤` everywhere it appears so it can never be pasted as a point estimate — same rule as
+v559 and v713.
+
+## Result
+Measured live on both shipped quickstart presets:
+
+| set | pasted before | pasted now |
+|---|---|---|
+| North Sea Trio (cold-load default) | NL 84 › Norway 76 › UK 58 | **NL ≤59 › UK 58 › Norway ≤52** |
+| West Africa Trio | Nigeria 73 › Angola 62 › Ghana 52 | **Nigeria 73 › Ghana 52 › Angola ≤26** |
+| USA vs Iraq | USA 91 › Iraq 47 | USA ≤82 › Iraq 47 (order unchanged) |
+
+The UK goes from last to joint first; Norway drops two places; Angola drops from 2nd of 3 to
+last by 26 points and from UNGRADED to VERY LOW. Sets with no refuted column render nothing new.
+The analyst pastes a predictability row they can rank and defend, instead of one the tool has
+just told them not to use.
+
+## Step 5b — mobile
+Measured at **360 / 390 / 414** with `hasTouch:true` (`matchMedia('(pointer: coarse)')` confirmed
+true at all three) and at 768 / 1024 / 1280 / 1440 / 1920, A/B against the pre-change build served
+side by side on port 8897, with a conflicted set loaded so the new element renders.
+
+- `documentElement.scrollWidth === clientWidth` at **all 8 widths, on both builds**. Delta 0.
+  (Note: 360 is clean on this tab; the carried "360 scrolls 386px" is Reform Risk, not SbS.)
+- Sub-24px controls in `#t2` under `pointer: coarse`: **0 before, 0 after**. At desktop widths:
+  **1 before, 1 after** — `#cmp-clear-btn` at 23px, measured at 23px on BOTH builds, pre-existing
+  and not caused here. Goes on the carried list.
+- The new element is a `<span>`, not a control: 27px tall at 390/414, 41px at 360, fully inside
+  the viewport at every width.
+
+*Method note: the first A/B run staged the BEFORE build with only `index.html` + `api/`, so the
+Side-by-Side pane never rendered there and its "0 sub-24px" reading was an artifact of an empty
+pane. Re-staged with the full asset tree symlinked; the numbers above are from that run.*
+
+## Carried forward — not fixed this cycle
+- **`#cmp-clear-btn` renders 23px tall at desktop widths** — pre-existing, confirmed A/B, outside
+  the directive's `pointer: coarse` scope but the only sub-24px control on this tab.
+- **The bound is still absent from the other two IC artifacts that could carry it.** The Country
+  Profile "Copy for IC Memo" note 2 states the conflict in full prose for a conflicted country
+  (Angola: "13 distinct values spanning 45.2pp") but never prints the ≤26 ceiling, and the table
+  row above it still reads "UNGRADED (score 62/100)". Same for the Reform Risk `_fpCohortLine()`.
+  Narrower follow-on and a good next T5.
+- The **Screener** IC copy prints "one statutory term — spread component not exercised" as fact
+  for conflicted countries (e.g. Colombia 72/100) with no marker at all. Unlike SbS and CP this
+  one cannot be fixed the same way: `_cpObsSpread` is populated only by a per-country contract
+  fetch, and the Screener carries up to 185 rows. Needs a bundled spread field, not a UI change.
+- `_fpCohortLine()` still ranks the conflicted countries inside the one-term cohort.
+- The service-worker absolute path (`index.html:49`) is still origin-dependent.
+- **19 sub-24px controls inside `#explorer-screen-mode` under `pointer: coarse`** at 360/390/414.
+- `pixel_audit` still exercises Side-by-Side only with the seeded three-country example.
+- v710's `t7` clipped-text regression: `tablet-768::2-t7 33 → 37`, `phone-390::2-t7 33 → 36`.
+- The inverted tier-B definition survives in ~12 further FAQ answers in the GRADER-era archive.
+- Everything on the cycle-603 through 620 carried lists remains open, including: `cp-price-select`
+  absent from the DOM; Mozambique's "Commercially attractive" verdict under its own
+  non-reconciliation panel; `renderTornadoPanel` with no basis marking on the generic-template
+  path; reform coverage 21 of 185; the Two-Price Return Screen thresholds; the Methodology/Home
+  tier-definition conflict; the FAQ naming a "Stability Score filter at >=4" that does not exist;
+  the Home Screener card advertising a breakeven filter removed at v568; `FC_PROFILES`/`DCF_PROFILES`
+  divergence; the empty "Recent Platform Updates" placeholder; Kuwait's evidence tier; three
+  monopolies carrying `be_75 = 1.0` (20th cycle); 862 contracts with no fiscal terms; the Screener
+  Contractor NPV tooltip naming an absent profile selector (22nd cycle); the Methodology tab naming
+  a `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete 2020s
+  cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
