@@ -36246,3 +36246,57 @@ Explorer and Breakeven Map peer surfaces were not audited for the same defect.
 **Task — T2:** "Is this one country attractive at $75/bbl, and can I defend that?" (614 ran T5, 613 T4, 612 T1, 611 T3, 610 T6 — T2 was stalest.) Walked cold at 1440×900 with no sessionStorage/localStorage: Home → Country Profile → dropdown, on Norway, Mozambique, and Iraq.
 
 **Friction.** Iraq's headline strip opens `34.1% govt take @$75 — investor-friendly tier (≤40%) … #6 of 21 producers … −21.5pp vs producer medi
+
+---
+## Cycle 616 Log — 2026-09-07 22:20
+- Test before: 294 PASS / 0 FAIL (live, v709)
+- Test after: **293 PASS / 0 FAIL / 1 WARN** — the suite RAN this cycle against the local build and the number is read from its own report (`/tmp/rt_v710.txt`), not assumed. Same **294 checks** as the 294 / 0 / 0 baseline: `testConsoleErrors()` emits exactly one result, PASS on zero console errors and WARN otherwise, and on `http://localhost` it caught the service-worker registration 404 (`sw.js` is not served from that path). No test regressed. A re-run against the deployed origin was launched after the push and had not returned when this entry was written — the deployed build was independently checked for page errors and returned **0**.
+- JS errors: 0 page errors at 1920 / 1440 / 1280 / 1024 / 768 / 390 across 12 tabs
+- Summary: Cycle 616 complete — shipped as **v710**, pushed to both repos, mirror updated.
+
+**Task — T6:** "Where did this number come from and how solid is the evidence?" (615 ran T2, 614 T5, 613 T4, 612 T1, 611 T3 — T6 was stalest, last run at 610.) Walked cold at 1440×900 with no sessionStorage and no localStorage: Home → Country Profile → dropdown → Guyana, then Kuwait, Norway and Micronesia.
+
+**Friction.** On screen the evidence answer is complete and honest. The Evidence Quality panel (`buildEvidencePanel`, `#cp-evidence-panel`) prints grade **B**, `52.0% primary law · 1,051 facts`, an orange **`41%+ bulk-harvested`** chip and a red **`2 of 3 source links dead`** chip; the per-parameter Evidence Chain below repeats both in full sentences and names every dead citation.
+
+Then the analyst clicks the control this page exists to feed — **Copy for IC Memo** (`#dd-ic-summary-btn` → `copyICSummary()`, index.html:~39490) — and what lands in the memo is:
+
+```
+Evidence tier    B-tier sourcing, 52.0% primary law on 1,051 facts
+```
+
+with no note under it. Every other row that carries a caveat ships one: breakeven, fiscal predictability, reform exposure and data basis each emit a numbered note that the header line promises will "travel with" the table. **The Evidence tier row was the only substantive row in the paste with a caveat on screen and no caveat in the artifact — and it is the row the whole question rests on.** The screen warns and the paste un-warns, at precisely the moment the number stops being something the analyst is reading and becomes something a committee is being told. The one-line **IC Citation** (`copyICCitation()`, :~39327) and the Country Profile **XLSX** `EVIDENCE` block (:~35962) dropped the same two qualifiers.
+
+Measured on the shipped `country_data.json`, not an edge case:
+
+| qualifier visible on screen | countries |
+|---|---|
+| bulk-harvest share > 0 | **151** of 185 |
+| at least one cited document that does not resolve | **171** of 185 |
+| **no** retrievable citation at all | **55** of 185 |
+| at least one of the three | **182** of 185 |
+
+Kuwait pasted `B-tier sourcing, 49.0% primary law on 722 facts` with every one of its citations dead. Micronesia pasted `D-tier sourcing (100.0% primary law on 2 facts)` — a two-fact record whose only source is a multi-jurisdiction model act, none of it retrievable — which reads as an impeccable sourcing record.
+
+**Second finding on the same walk (Methodology tab).** FAQ **A13**, titled *"How do I independently verify a government take figure?"*, defined the tiers as `B = operator annual report or government filing` and `C = cross-referenced secondary (Wood Mac, Rystad)` — **the reverse of what the database holds**, and the reverse of the Evidence Quality Tiers table on the same tab, whose own paragraph says in bold that this exact inversion was corrected there. The bid-threshold block further down went one step worse and supplied the citation to paste: *"Sourced from [Operator] 10-K/Annual Report"*. Following the platform's own instruction would put a fabricated attribution in a client document for a figure read out of an EY country tax guide.
+
+**Change.**
+- **New `_icEvidenceQual(entry)`** (index.html, after `window._sharedPct`). Reads the same `_bulkPct` / `_sharedPct` / `_citeLinkDead` the on-screen chips read; returns a short clause and a full note, or `null` when a country carries no qualifier. No new data, no new measurement, no change to any value, tier letter or grade.
+- `copyICSummary()` now emits an **`Evidence tier, …`** note in table order, between Reform exposure and Data basis.
+- `copyICCitation()` and the XLSX `EVIDENCE` block carry the clause **inline** — `_icSourcingTier()` gained a `qual` flag — because a one-liner has no note slot.
+- Methodology: A13's tier definitions corrected; the tier-B and tier-C bid-threshold blocks rewritten (B is now stated as the EY/KPMG/IHS/Wood Mac/Rystad country guide, explicitly *not* an operator filing, with the replacement caveat sentence to paste); the benchmark-validation parenthetical `(A = primary legislation, B = operator filing)` corrected; XLSX `C-tier` line corrected and the missing `D-tier` line added.
+
+**Result — what the analyst can now do that they could not before.** Guyana's IC memo paste now reads:
+
+> **Evidence tier** — B-tier sourcing, 52.0% primary law on 1,051 facts
+> *Note 4.* Evidence tier, B-tier sourcing … — the letter grades the RECORD, not the retrievability of the documents behind it. At least 41% of those facts came from the EY / IHS / KPMG country-level bulk harvest … 2 of the 3 documents this profile cites cannot be retrieved — they returned a 404, or named a hostname that does not resolve, when every citation URL on the platform was fetched on 4 Sep 2026 … Locate the instruments by name before this row is cited as verification.
+
+and the one-line cite reads `… B-tier sourcing (52.0% primary law on 1,051 facts; 41%+ country-level bulk harvest; 2 of 3 cited sources not retrievable, checked 4 Sep 2026)`. Micronesia's now reads `D-tier sourcing (100.0% primary law on 2 facts; 100%+ multi-jurisdiction source; no cited source retrievable, checked 4 Sep 2026)`. The qualification the platform already computes no longer stops at the screen edge, and the analyst is no longer instructed to attribute a tax-guide figure to a 10-K.
+
+**Step 5b — mobile.** 390×844 with `hasTouch: true`, `matchMedia('(pointer: coarse)')` confirmed **true**. `documentElement.scrollWidth` did not exceed `clientWidth` on any of the 12 tabs, at any of 1920 / 1440 / 1280 / 1024 / 768 / 390. **No control was added.** The two controls in the changed path measure **44.0px** tall each (`#dd-ic-summary-btn`, `#dd-cite-btn`).
+
+**Step 6 — verify.** The runtime suite **RAN this cycle**, twice: against the local build before push (293 PASS / 0 FAIL / 1 WARN, the WARN being the localhost service-worker 404 that does not exist on the deployed origin) a re-run was launched against `https://yoburgqs.github.io/petroleum-fiscal-db/` after the push, which had not returned when this entry was written. The deployed build was separately exercised (Country Profile → Netherlands and Bahamas, both clipboard controls): **0 page errors**, and the three countries that carry no qualifier — Bahamas, Netherlands, UAE — Abu Dhabi — emit no clause and no note, so their output is byte-identical to v709.
+
+## Carried forward — not fixed this cycle
+- The inverted tier-B definition survives in **~12 further FAQ answers** in the GRADER-era archive (A29 §, WPT, legal-DD, scoring-rubric, citation-template blocks). The two on the direct T6 path were corrected; a sweep of the rest was not attempted this cycle and is the obvious next T6 task.
+- Everything on the cycle-603 through 615 carried lists remains open, including: `cp-price-select` absent from the DOM so Country Profile has no price control and `cp-run-fc-btn` falls through to `fc-price`; Mozambique's "Commercially attractive" verdict sitting under its own non-reconciliation panel; Country Profile contradicting itself on whether contractor NPV carries information beyond take; `renderTornadoPanel` with no basis marking on the generic-template path; reform coverage 21 of 185; the Two-Price Return Screen thresholds in the bottom quartile; the Methodology/Home tier-definition conflict; the FAQ naming a "Stability Score filter at >=4" that does not exist; Evidence Chain grammar on n=1; the Home Screener card advertising a breakeven filter removed at v568; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder; `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (16th cycle); 862 contracts with no fiscal terms; zero-rate defaults inside published `take_75`; the Screener Contractor NPV tooltip naming an absent profile selector (18th cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
+- `pixel_audit` not run this cycle. The change adds clipboard text and prose inside existing paragraphs and one XLSX row; the six-viewport horizontal-scroll sweep above was run in its place and found none, and the 24-cycle `tablet-768::2-t7 clipped-text` carry is pre-existing.
