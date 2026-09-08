@@ -1930,7 +1930,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v714</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v715</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2000,7 +2000,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v714</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v715</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -22824,7 +22824,15 @@ function switchTab(id, btn) {
                 cpBanner.id = 'cp-example-banner';
                 cpBanner.className = 'no-print';   // v535: screen-only example banner — keep it out of printed/PDF output
                 cpBanner.style.cssText = 'padding:2px 0 8px;margin-bottom:6px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:8px;';
-                cpBanner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> Indonesia — a PSC benchmark (644 of 648 contracts on their own terms). Use the dropdown above to load any country. ';
+                // v715 (T2): "644 of 648 contracts" was hardcoded. 644 is Indonesia's n_psc and
+                // 648 was its contract total when this string was written; the total is now 667,
+                // and every other figure on this same screen prints 667. Read both from the data.
+                var _cpIdn = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+                  ? COUNTRY_DATA.find(function(x){ return x.country === 'Indonesia'; }) : null;
+                var _cpIdnTxt = (_cpIdn && _cpIdn.n_psc != null && _cpIdn.n != null)
+                  ? ' (' + Number(_cpIdn.n_psc).toLocaleString() + ' of its '
+                    + Number(_cpIdn.n).toLocaleString() + ' contracts are PSC)' : '';
+                cpBanner.innerHTML = '<span style="color:var(--accent);font-weight:700;">Example loaded:</span> Indonesia — a PSC benchmark' + _cpIdnTxt + '. Use the dropdown above to load any country. ';
                 ddContent.parentNode.insertBefore(cpBanner, ddContent);
               }
             }, 400);
@@ -33910,6 +33918,7 @@ function loadCountryProfile(country) {
     // at 84.8% govt take" for Iraq -- directly above the new headline line stating a comparable
     // 34.1%. It now quotes the comparable figure and names the basis, so the two agree.
     var take = _verdictTake552;
+    try { (window._cpVerdictTake = window._cpVerdictTake || {})[d.country] = take; } catch (e) {}
     var npv = d.npv_75;
     var npv50 = d.npv_50;                                  // v516: the downside leg
     var be = _cpBeR;   // v512: resolved breakeven, so the verdict cites the same number the page shows
@@ -33969,6 +33978,10 @@ function loadCountryProfile(country) {
           // headline strip already prints as a chip; no new threshold, no new judgement.
           + '. <strong>Defend on the take and its evidence tier' + (d.n != null ? ' (n=' + Number(d.n).toLocaleString() + ' contracts)' : '')
           + ', not on the NPV.</strong>' + beStr
+          // v715 (T2): the dispersion of the take this sentence just told the analyst to defend on.
+          // Wrapper is always emitted so _cpApplyObsSpread() can fill it when the contract sample
+          // lands after render; cpDefendDispersion() returns '' where the take really is one term.
+          + '<span id="cp-defend-disp">' + cpDefendDispersion(d, take) + '</span>'
           // v550 (T4): the trigger was take>55 alone, so the United Kingdom -- rank 21 of 21,
           // 5 law changes since 2010, the single most reform-exposed regime ORCA scores -- got a
           // green verdict with no mention of reform at all, because its 49.2% take reads
@@ -35639,7 +35652,7 @@ function loadCountryProfile(country) {
       : '';
     const iqrLeft = Math.max(0, Math.min(100, p25)).toFixed(2);
     const iqrWidth = Math.max(0, Math.min(100, p75v) - Math.max(0, p25)).toFixed(2);
-    return '<div class="dd-section">'
+    return '<div class="dd-section" id="cp-dist-section">'
       + '<h3>Contract Distribution — ' + d.country + '</h3>'
       + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Take distribution across ' + (d.n || 0) + ' contracts at $75/bbl. Median shown as vertical marker; IQR (P25–P75) shaded.</div>'
       + '<div style="margin-bottom:14px;">'
@@ -45425,6 +45438,80 @@ function cpRecordObsSpread(country, contracts) {
   return obs;
 }
 function cpObsSpread(country) { return window._cpObsSpread[country] || null; }
+
+// v715 (T2): the verdict line's instruction, calibrated to the dispersion of the number it
+// points at. The line reads "Defend on the take and its evidence tier, not on the NPV" -- and
+// on 61 of 185 countries this page ALSO holds a reading that the take is not a point estimate.
+// Every other surface was already patched to say so: the basis chip (cpSpreadParts), the
+// distribution caption (cpDistNote), the dashed band on the distribution bar and the
+// predictability chip all carry it. The verdict -- the first line an analyst reads, and the one
+// that tells them what to quote -- did not, because it is built synchronously and the contract
+// sample lands on a later fetch. So the analyst followed the page's own instruction, quoted a
+// point take, and was refuted 3,500px below by the page's own contract table.
+// Two readings, in order of strength. Neither is a new threshold: the conflict test is
+// cpSpreadConflict() (the existing CP_OBS_REFUTE_PP = 1.0pp rule) and the IQR cut is the 5pp
+// "consistent terms" line the basis-chip tooltip has used since v559.
+function cpDefendDispersion(d, take) {
+  if (!d || (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75))) return '';
+  var hd = (typeof take === 'number' && isFinite(take)) ? take : d.take_75;
+  if (hd == null) return '';
+  var obs = (typeof cpObsSpread === 'function') ? cpObsSpread(d.country) : null;
+  // Materiality and refutation are different tests and are stated differently. cpSpreadConflict()
+  // fires at 1.0pp because one counterexample is enough to withdraw "every contract prices the
+  // same" -- but a 2.2pp floor (Mozambique) is not a fact that changes a screening decision, and
+  // dressing it in the same orange as Indonesia's 37.2pp is what trains an analyst to skip the
+  // line. The emphatic wording is gated on the 5pp "consistent terms" cut the basis-chip tooltip
+  // has used since v559; below it the refutation is still stated, in muted type, without the CTA.
+  var MATERIAL_PP = 5;
+  var body = null, material = true;
+  if (typeof cpSpreadConflict === 'function' && cpSpreadConflict(d, obs)) {
+    material = obs.spread >= MATERIAL_PP;
+    body = (material
+        ? '<strong style="color:var(--orange);">Take is a range here, not a point.</strong> '
+        : '<strong style="color:var(--text);">Not a single term, but a narrow one.</strong> ')
+         + 'The contract table on this page runs <strong style="color:var(--text);">'
+         + obs.min.toFixed(1) + '\u2013' + obs.max.toFixed(1) + '%</strong> across its '
+         + obs.n + ' largest producing contracts \u2014 a floor of \u2265' + obs.spread.toFixed(1)
+         + 'pp, and the bundled quartiles that call this a single term are not usable for '
+         + d.country + '.'
+         + (material
+            ? ' Quote ' + hd.toFixed(1) + '% as a contract average and carry the range.'
+            : ' At that width ' + hd.toFixed(1) + '% is quotable as a contract average.');
+  } else if (d.p25_take != null && d.p75_take != null && (d.p75_take - d.p25_take) >= MATERIAL_PP) {
+    var pp = d.p75_take - d.p25_take;
+    body = '<strong style="color:var(--orange);">Take is a range here, not a point.</strong> '
+         + 'Half of ' + d.country + '\u2019s contracts price between <strong style="color:var(--text);">'
+         + d.p25_take.toFixed(1) + '%</strong> and <strong style="color:var(--text);">'
+         + d.p75_take.toFixed(1) + '%</strong> (' + pp.toFixed(1) + 'pp measured), so the block you '
+         + 'sign moves the take. Quote ' + hd.toFixed(1) + '% as a contract average and carry the range.';
+  }
+  if (!body) return '';
+  if (!material) {
+    return '<span style="display:block;margin-top:5px;padding-top:5px;border-top:1px solid var(--border);color:var(--muted);">'
+         + body + '</span>';
+  }
+  return '<span style="display:block;margin-top:5px;padding-top:5px;border-top:1px solid rgba(194,65,12,.22);">'
+       + body
+       + ' <button type="button" onclick="event.stopPropagation();_cpScrollToDistribution()" '
+       + 'title="Jump to the Contract Distribution panel \u2014 the measured spread behind this take" '
+       + 'style="display:inline-block;min-height:24px;vertical-align:middle;background:rgba(194,65,12,.10);'
+       + 'border:1px solid rgba(194,65,12,.35);border-radius:4px;padding:2px 8px;margin-left:2px;'
+       + 'font-size:11px;font-weight:700;color:var(--orange);cursor:pointer;">See the spread \u2192</button>'
+       + '</span>';
+}
+// Same flash treatment as _cpScrollToEvidenceChain / _cpScrollToTierSchedule so the destination
+// of the verdict's new affordance is unambiguous.
+function _cpScrollToDistribution() {
+  var el = document.getElementById('cp-dist-section') || document.getElementById('cp-dist-bar');
+  if (!el) return;
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { el.scrollIntoView(); }
+  var prev = el.style.boxShadow;
+  el.style.transition = 'box-shadow .3s';
+  el.style.boxShadow = '0 0 0 3px rgba(194,65,12,.45)';
+  setTimeout(function() { el.style.boxShadow = prev || ''; }, 1800);
+}
+window._cpScrollToDistribution = _cpScrollToDistribution;
+window._cpVerdictTake = window._cpVerdictTake || {};
 // A sample spread this wide or wider is treated as refuting "every contract prices the same".
 // Not a new business threshold: 1pp is one tenth of the smallest tier step the platform's own
 // take colour bands use, and every one of the 41 conflicts clears it by more than 11x.
@@ -45658,6 +45745,16 @@ function _cpApplyObsSpread(country) {
   }
   var note = document.getElementById('cp-dist-note');
   if (note && d.p25_take != null && d.p75_take != null) note.innerHTML = cpDistNote(d, obs);
+
+  // v715 (T2): the verdict is built before this fetch resolves, so on the 41 conflict countries
+  // it shipped "Defend on the take" with no dispersion beside it. Fill it here, from the same
+  // builder the synchronous path uses, so the two cannot drift.
+  var disp = document.getElementById('cp-defend-disp');
+  if (disp) {
+    var _vt = (window._cpVerdictTake || {})[country];
+    var _html = cpDefendDispersion(d, _vt);
+    if (_html !== disp.innerHTML) disp.innerHTML = _html;
+  }
 
   // Draw the observed range on the distribution bar. Without this the panel renders a zero-width
   // band and two stacked markers, which is the refuted claim redrawn as a chart.
