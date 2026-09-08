@@ -212,6 +212,33 @@ table { width: 100%; border-collapse: collapse; }
      flagged both since it was built). Left alone they would now sit beside a 24px box doing the
      same kind of job, at half the size. Same rule, same tab, same control type. */
   #fc-stability-check, #fc-filter-be, #fc-filter-reform { width: 24px; height: 24px; }
+
+  /* v726 (T1): the identical defect on the two tabs the rule above never reached. Measured at
+     390 x 844, hasTouch, on the shipped build:
+
+       #expl-evidence-first  input 13x13   label row 362x17
+       #expl-irr-check       input 13x13   label row 362x17
+       #expl-be-check        input 13x13   label row 362x17
+       #sc-evidence-first    input 13x13   label row 212x17
+
+     Both numbers matter, and the label one is the one that bites. Each box sits inside its own
+     <label>, so the whole row is the tap target, not just the box — and at 17px the ROW is
+     under the 24px rule too. These are not decorative toggles: "Verified production first" and
+     "Rank verified-production countries first" decide whether the 22 production-backed
+     countries outrank the 163 proxy-estimate ones. An analyst on a tablet mis-hitting that
+     toggle reads a different ranking and does not know it changed.
+
+     Sizing the box to 24 lifts the flex row with it (the labels are align-items:center), so one
+     declaration clears both measurements. Same rule, same control type as the FC block above —
+     this is the third tab it has been applied to, which is the argument for it being a rule
+     about checkboxes rather than a rule about Fiscal Compare. */
+  #expl-evidence-first, #expl-irr-check, #expl-be-check, #sc-evidence-first { width: 24px; height: 24px; }
+
+  /* v726: the footer's two outbound links measured 30x15 (API) and 24x15 (CI) — the last two
+     sub-24px targets on the platform, and the only finding present on all ten tabs, because the
+     footer is. They are inline <a> in a monospace 10px strip; inline-block plus a 24px min-height
+     gives the thumb a target without moving the strip, which stays 10px text on a 24px line. */
+  #data-vintage-footer a { display: inline-block; min-height: 24px; line-height: 24px; padding: 0 4px; }
 }
 thead th { z-index: 60; background: #EDE9E3; color: var(--muted); font-family: system-ui, sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; padding: 7px 10px; text-align: left; text-transform: uppercase; position: sticky; top: 0; white-space: nowrap; cursor: default; user-select: none; border-bottom: 1px solid var(--border); }
 /* v587 (T1): the hand cursor and the hover-darken are the browser's universal "this is clickable"
