@@ -35995,3 +35995,106 @@ harvesting job, and remains Zach's call.**
 
 ## Friction
 The Reform Risk tab is in good shape for the 21 jurisdictions it covers. The problem is everyone else. ORCA holds a sourced reform event log for **
+
+---
+## Cycle 614 Log — 2026-09-07 20:05
+- Test before: 294 PASS / 0 FAIL (deployed) · 293 PASS / 0 FAIL / 1 WARN / 1 JS err (local control)
+- Test after: 293 PASS / 0 FAIL / 1 WARN / 1 JS err (local, identical to control)
+- JS errors: 0 page errors across 6 viewports x 10 tabs
+- Shipped as **v708**.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (613 ran T4, 612 T1, 611 T3,
+610 T6, 609 T2 — T5 was the stalest, last walked at 608.) Walked cold at 1440x900 with no
+sessionStorage and no localStorage: Home → Side-by-Side, which auto-loads the default
+Norway / United Kingdom / Netherlands set and draws both charts without any input.
+
+## Friction
+Side-by-Side draws **two** charts. `#cmp-chart` — "Govt Take vs Oil Price" — at document top 1772.
+`#cmp-npv-chart` — "Contractor NPV vs Oil Price ($M)" — 368px below it at top 2140.
+
+Enumerating every `button`/`a`/`select`/`input` inside each wrap on a cold load:
+
+| wrap | controls found |
+|---|---|
+| `#cmp-chart-wrap` | 1 — `#cmp-chart-png-btn` ("⬇ PNG") |
+| `#cmp-npv-chart-wrap` | **0** |
+
+**The returns chart had no export path of any kind.** Take answers what the government keeps;
+NPV answers what the project earns. The second is the exhibit that sits beside the recommendation
+in an IC memo, and it could not be got off the screen.
+
+Worse, the recovery move failed silently. The toolbar's `⬇ Chart PNG`
+(`.cmp-inline-png-btn`, index.html:27513) renders **above both charts** and reads as "the chart",
+but `downloadCmpChart()` (index.html:38859) hard-coded `document.getElementById('cmp-chart')`.
+Measured on the cold default set: clicking it from the NPV plot produced the *take* chart —
+461,770 base64 bytes, not the NPV chart's 298,070. Both buttons also wrote the identical filename
+`petroleum_comparison.png`, which names neither the metric nor the countries. A file in Downloads
+could not be told from any other comparison, so shipping the wrong exhibit into a memo required no
+mistake beyond trusting the button.
+
+Third state, also silent: with the set cleared both wraps are `display:none`, and the old function
+had no visibility guard — it would re-export the stale canvas of a comparison no longer on screen.
+
+## Change
+1. **The NPV chart now has its own `⬇ PNG` button**, overlaid top-right inside
+   `#cmp-npv-chart-wrap` exactly as the take chart's is, so it hides and shows with the chart.
+2. **`downloadCmpChart(which)` takes a target.** `'take'` / `'npv'` from the two overlay buttons;
+   the shared `_cmpSavePng()` refuses to write anything whose wrap computes to `display:none`.
+3. **Filenames name the exhibit and the set** — `ORCA_govt-take_Norway-United-Kingdom-Netherlands.png`
+   and `ORCA_contractor-npv_Norway-United-Kingdom-Netherlands.png`. The two exports can no longer
+   collide, and a file found later still says which chart it is.
+4. **The ambiguous toolbar button now saves both** and is relabelled `⬇ Chart PNGs (take + NPV)`.
+   It stops guessing which of two charts was meant, and an IC memo wants the pair anyway. Charts
+   not on screen are skipped.
+5. **Every path reports what it did** via `showCopyToast` — "Saved both charts: … + …", or
+   "Contractor NPV vs Oil Price is not on screen — nothing exported." Nothing is written silently.
+6. Both overlay buttons are `display:none` in the print stylesheet so they cannot print over the
+   plots in an IC pack PDF.
+
+## Result
+The analyst can export the contractor-returns chart at all — previously impossible — and one click
+on the toolbar yields **both** exhibits as separately-named files instead of one unnamed file that
+might be either. The failure mode where they paste the government-take chart under an NPV heading,
+having clicked a button that gave no indication which chart it grabbed, is gone.
+
+## Verification — all run this cycle, none assumed
+- **JS syntax gate:** PASS, 11/11 inline script blocks (re-run after the version bump).
+- **Runtime suite RUN:** 293 PASS / 0 FAIL / 1 WARN / 1 JS error, served locally.
+  **Control:** unmodified `HEAD:index.html` written into the identical tree and served from the
+  same origin returns **exactly 293 / 0 / 1 / 1**. The WARN is the pre-existing `sw.js` 404 under
+  local serving, unchanged by this cycle. Deployed figure is 294; the 1-test delta is the
+  local-serving artefact, not a regression.
+- **Horizontal scroll 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390, all 10 tabs. 0 page errors at
+  every viewport.
+- **Step 5b, 390x844 `hasTouch: true`** (`matchMedia('(pointer: coarse)')` confirmed true): both
+  PNG buttons render **44.0px tall x 59.3px wide** and visible — the v612 mobile layer picks up the
+  new button through the existing `.btn` selector, no new rule needed. Well above the 24px floor.
+- **Behaviour walked on screen**, cold default set: NPV overlay → 1 file, `ORCA_contractor-npv_…`;
+  take overlay → 1 file, `ORCA_govt-take_…`, different byte count; toolbar → 2 files, both names,
+  toast naming both. **Cleared set → 0 files written** and the toast says nothing was exported
+  (old code would have written the stale canvas).
+
+**Deliberately NOT done:** the `Save as PDF` / `window.print()` path was not restructured, and the
+XLSX exports were not touched. Only the PNG export path was in the walk.
+
+## Carried forward — not fixed this cycle
+- `cp-run-fc-btn` writes to `#price`, which does not exist; falls back to `fc-price`.
+- Country Profile contradicts itself on whether contractor NPV carries information beyond take.
+- `renderTornadoPanel` / `_buildTornadoChart` render a sensitivity chart with no basis marking on
+  the generic-template path.
+- Reform coverage is still 21 of 185. Disclosed everywhere; unresolved.
+- The Two-Price Return Screen's thresholds still sit in the bottom quartile (disclosed since v706).
+- Everything on the cycle-603 through 613 carried lists remains open: Methodology/Home tier
+  definition conflict; the FAQ naming a "Stability Score filter at >=4" that does not exist;
+  Evidence Chain grammar on n=1; the Home Screener card advertising a breakeven filter removed at
+  v568; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+  `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier; three
+  monopolies carrying `be_75 = 1.0` (14th cycle); 862 contracts with no fiscal terms; zero-rate
+  defaults inside published `take_75`; the Screener Contractor NPV tooltip naming an absent
+  profile selector (16th cycle); the Methodology tab naming a `display:none` API Explorer tab;
+  unweighted per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
+  `renderVintageTrendChart()`/`renderVintage()`.
+- `pixel_audit` not run this cycle (the change adds one overlay button to an existing wrap and
+  relabels one toolbar button; the 22-cycle `tablet-768::2-t7 clipped-text` carry is pre-existing
+  and no new horizontal scroll appeared at 768 in this cycle's own sweep).

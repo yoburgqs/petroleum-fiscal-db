@@ -1417,6 +1417,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   .btn-print { display: none !important; }
   /* Hide XLSX button in print */
   #dd-export-btn, #dd-copy-link-btn, #dd-select-wrap, #dd-cite-btn { display: none !important; }
+  /* v708: the two chart-overlay PNG buttons are screen controls sitting ON the plots -- they must
+     not print over the charts in an IC pack PDF. #cmp-chart-png-btn already fell under the .btn
+     rule above; its NPV twin is listed for the same reason and to keep the pair together. */
+  #cmp-chart-png-btn, #cmp-npv-chart-png-btn { display: none !important; }
   /* v503: action buttons under the Side-by-Side grid are screen-only — keep them out of the PDF */
   .cmp-inline-copy-btn, .cmp-inline-print-btn, .cmp-inline-png-btn, .cmp-inline-share-btn { display: none !important; }
 
@@ -1827,7 +1831,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v707</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v708</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1897,7 +1901,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v707</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v708</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3058,7 +3062,12 @@ window.copyPlatformCitation = function(btn) {
     </div>
     <canvas id="cmp-chart" aria-label="Line chart comparing comparable government take percentage across selected countries at 4 price points. Fee-basis and cash-flow columns are re-based or excluded; see the notices above the chart." role="img"></canvas>
   </div>
-  <div id="cmp-npv-chart-wrap" class="chart-wrap" style="display:none;margin-top:8px;">
+  <div id="cmp-npv-chart-wrap" class="chart-wrap" style="display:none;margin-top:8px;position:relative;">
+    <!-- v708 (T5): the returns chart had no export control of any kind. Mirrors the take chart's
+         overlay button 368px above, and is inside the wrap so it hides with the chart. -->
+    <div style="position:absolute;top:8px;right:8px;z-index:10;">
+      <button class="btn btn-outline btn-sm" id="cmp-npv-chart-png-btn" aria-label="Download the Contractor NPV vs Oil Price chart as a PNG image" title="Download THIS chart &mdash; Contractor NPV vs Oil Price &mdash; as a PNG. Saves as ORCA_contractor-npv_&lt;countries&gt;.png so it cannot be confused with the Govt Take chart above.">&#11015; PNG</button>
+    </div>
     <canvas id="cmp-npv-chart" aria-label="Side-by-side bar chart comparing contractor NPV across selected countries at 4 price points. Where the set mixes bases, a faded dashed bar is a statutory-basis column ORCA holds no verified production for; its bar runs taller because its take is lower, and it is not rankable against the solid bars." role="img"></canvas>
   </div>
 </div>
@@ -27501,7 +27510,7 @@ function renderCompare() {
   html += `<div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
     <button class="cmp-inline-copy-btn" style="background:var(--accent);border:1px solid var(--accent);border-radius:6px;color:#fff;font-size:11px;font-weight:700;padding:5px 12px;cursor:pointer;" title="Copy this comparison to the clipboard as a real table \u2014 pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Includes the profile/price assumptions, every comparability notice shown under the grid for this particular set, and the ORCA source line.">\u2398 Copy Table for IC Memo</button>
     <button class="cmp-inline-print-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Print or Save as PDF via browser print dialog — comparison table and chart included">⬇ Save as PDF</button>
-    <button class="cmp-inline-png-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Download chart as PNG image">⬇ Chart PNG</button>
+    <button class="cmp-inline-png-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Download BOTH comparison charts as PNGs \u2014 Govt Take vs Oil Price and Contractor NPV vs Oil Price. Each file is named for its metric and the countries in the set (ORCA_govt-take_... / ORCA_contractor-npv_...), so the two exhibits cannot be mixed up in an IC memo. Charts not currently on screen are skipped, and the toast says what was saved.">⬇ Chart PNGs (take + NPV)</button>
     <button class="cmp-inline-share-btn" style="background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;" title="Copy shareable link to this comparison">⎘ Share Link</button>
     <button onclick="switchTab('t0',document.getElementById('tab-btn-t0'));setTimeout(function(){if(typeof runFiscalCompare==='function')runFiscalCompare();},200);" style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:6px;color:var(--accent);font-size:11px;font-weight:600;padding:5px 12px;cursor:pointer;transition:.15s;" onmouseover="this.style.background='rgba(176,104,0,.08)'" onmouseout="this.style.background='transparent'" title="Switch to Fiscal Compare — see all 185 countries ranked at the same price and profile. Your ${compareList.length} selected countries will be visible in the global ranking.">&#x25A6; Rank all 185 countries</button>
     <span style="font-size:10px;color:var(--muted);margin-left:4px;">Tip: Ctrl+P to print, select "Save as PDF" as printer for best results</span>
@@ -38856,13 +38865,79 @@ function _canvasPng2x(canvas) {
   } catch (e) { return canvas.toDataURL('image/png'); }
 }
 
-function downloadCmpChart() {
-  var canvas = document.getElementById('cmp-chart');
-  if (!canvas) return;
+// v708 (T5) -- the Contractor NPV chart could not be exported at all, and the one PNG
+// button on the tab silently handed over a different chart.
+//   Side-by-Side draws TWO charts: "Govt Take vs Oil Price" (#cmp-chart) and, 368px below it,
+// "Contractor NPV vs Oil Price ($M)" (#cmp-npv-chart). Measured on a cold load of the default
+// Norway/UK/Netherlands set: #cmp-chart-wrap carried one control (#cmp-chart-png-btn), and
+// #cmp-npv-chart-wrap carried ZERO. The returns exhibit -- the one that sits next to the
+// recommendation in an IC memo -- had no export path.
+//   The toolbar's "Chart PNG" button renders ABOVE both charts and reads as "the chart", but
+// this function hard-coded #cmp-chart, so an analyst scrolled to the NPV plot who went back up
+// and clicked it received the take chart. Both buttons also wrote the identical filename
+// 'petroleum_comparison.png', which names neither the metric nor the countries -- so the file
+// sitting in Downloads could not be told apart from any other comparison, and pasting the wrong
+// exhibit into a memo required no mistake beyond trusting the button.
+// Take answers what the government keeps. NPV answers what the project earns. They are not
+// interchangeable, and the export must not treat them as though they were.
+var _CMP_PNG_TARGETS = {
+  take: { canvas: 'cmp-chart',     wrap: 'cmp-chart-wrap',     slug: 'govt-take',      label: 'Govt Take vs Oil Price' },
+  npv:  { canvas: 'cmp-npv-chart', wrap: 'cmp-npv-chart-wrap', slug: 'contractor-npv', label: 'Contractor NPV vs Oil Price' }
+};
+
+// Filename carries the metric and the set, so two exports from this tab can never collide and a
+// file found later still says which exhibit it is.
+function _cmpPngName(slug) {
+  var names = (typeof compareList !== 'undefined' && compareList && compareList.length)
+    ? compareList.slice(0, 5).map(function(c) {
+        return String(c).replace(/[^A-Za-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }).filter(Boolean)
+    : [];
+  var set = names.length ? '_' + names.join('-') : '';
+  if (set.length > 80) set = set.slice(0, 80).replace(/-+$/, '');
+  return 'ORCA_' + slug + set + '.png';
+}
+
+// Returns the saved filename, or null if that chart is not on screen.
+function _cmpSavePng(key) {
+  var t = _CMP_PNG_TARGETS[key];
+  if (!t) return null;
+  var wrap = document.getElementById(t.wrap);
+  var canvas = document.getElementById(t.canvas);
+  if (!canvas || !canvas.width) return null;
+  // A hidden wrap means the chart is not part of the current comparison (no NPV data, or the
+  // set was cleared). Exporting a stale canvas would be the same silent-wrong-file failure.
+  if (wrap && getComputedStyle(wrap).display === 'none') return null;
+  var name = _cmpPngName(t.slug);
   var a = document.createElement('a');
-  a.download = 'petroleum_comparison.png';
+  a.download = name;
   a.href = _canvasPng2x(canvas);
   a.click();
+  return name;
+}
+
+// Per-chart overlay buttons pass their own key. The toolbar button passes nothing and now saves
+// EVERY chart currently drawn, because an IC memo wants the pair, and because a button sitting
+// above two charts should not have to guess which one was meant.
+function downloadCmpChart(which) {
+  if (which === 'take' || which === 'npv') {
+    var one = _cmpSavePng(which);
+    if (!one) {
+      showCopyToast(_CMP_PNG_TARGETS[which].label + ' is not on screen \u2014 nothing exported.');
+      return;
+    }
+    showCopyToast('Saved ' + one);
+    return;
+  }
+  var saved = [];
+  ['take', 'npv'].forEach(function(k) { var n = _cmpSavePng(k); if (n) saved.push(n); });
+  if (!saved.length) {
+    showCopyToast('No comparison chart is on screen \u2014 select at least 2 countries first.');
+    return;
+  }
+  showCopyToast(saved.length === 2
+    ? 'Saved both charts: ' + saved.join('  +  ')
+    : 'Saved ' + saved[0] + ' (the other chart is not on screen)');
 }
 
 function downloadBubblePng() {
@@ -47582,8 +47657,12 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
   var vintageCsv = document.getElementById('vintage-csv-btn');
   if (vintageCsv) vintageCsv.addEventListener('click', function() { if (typeof exportVintageCSV === 'function') exportVintageCSV(); });
+  // v708 (T5): each overlay button now names its own chart. Previously both this one and the
+  // toolbar button called downloadCmpChart() with no argument against a hard-coded #cmp-chart.
   var cmpPng = document.getElementById('cmp-chart-png-btn');
-  if (cmpPng) cmpPng.addEventListener('click', function() { if (typeof downloadCmpChart === 'function') downloadCmpChart(); });
+  if (cmpPng) cmpPng.addEventListener('click', function() { if (typeof downloadCmpChart === 'function') downloadCmpChart('take'); });
+  var cmpNpvPng = document.getElementById('cmp-npv-chart-png-btn');
+  if (cmpNpvPng) cmpNpvPng.addEventListener('click', function() { if (typeof downloadCmpChart === 'function') downloadCmpChart('npv'); });
   var beExport = document.getElementById('be-export-csv-btn');
   if (beExport) beExport.addEventListener('click', function() { if (typeof exportBreakevenCSV === 'function') exportBreakevenCSV(); });
   var apiCopy = document.getElementById('api-copy-btn');
