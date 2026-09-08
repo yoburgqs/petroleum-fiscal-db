@@ -36570,3 +36570,16 @@ on the carried list.) Prod Cov cells render correctly at 390: `20% 0.2% 15% 3% 3
   prefix. Given the directive's finalization criterion 1 is specifically "the number actually read
   from the suite's own report", a gate whose result depends on how it was served is worth making
   origin-relative.
+
+---
+## Cycle 618 Log — 2026-09-08 01:00
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 618 complete, shipped as **v712**. All steps executed: fix committed, mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`, pushed to `origin/main`, cycle log appended to GRADER.md.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (stalest; 617 ran T3, 616 T6, 615 T2, 614 T5, 613 T4, 612 T1.)
+
+## Friction
+Walked it cold over HTTP: Home → Screener → load the flagship **IOC Capital Screen** → 15 countries → sort by the column that answers "which of
