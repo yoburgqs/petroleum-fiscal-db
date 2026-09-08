@@ -1483,6 +1483,12 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   /* v503: action buttons under the Side-by-Side grid are screen-only — keep them out of the PDF */
   .cmp-inline-copy-btn, .cmp-inline-print-btn, .cmp-inline-png-btn, .cmp-inline-share-btn { display: none !important; }
 
+  /* v723 (T3): the evidence-depth rows are collapsed on screen so the Govt Take block is on the
+     first paint, but an IC pack PDF must carry the full provenance -- force them open and drop
+     the screen-only toggle, exactly as v577 does for the absent-countries note below. */
+  #cmp-output .compare-grid [data-cmp-grp="ev"] { display: contents !important; }
+  #cmp-ev-toggle { display: none !important; }
+
   /* v577: the "not in this table" note is collapsed on screen so it stops walling off the
      IC-memo button, but an IC pack PDF must still carry the full reasoning -- force it open. */
   #cmp-absent-note > .cmp-absent-body { display: block !important; }
@@ -1723,6 +1729,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      never showing when there is nothing further right. */
   .compare-grid[data-cmp-ovf="1"] { box-shadow: inset -16px 0 14px -12px rgba(45,38,32,.30); }
 }
+/* v723 (T3): the evidence-block header is one line. On a phone the descriptive tail would wrap
+   it to two, which is exactly the vertical space this collapse exists to recover -- the toggle
+   itself still names the count and its title carries the full list. */
+@media (max-width: 720px) { #cmp-ev-what { display: none; } }
 #cmp-scroll-hint {
   display: none;
   font-size: 11px;
@@ -1949,7 +1959,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v722</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v723</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2019,7 +2029,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v722</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v723</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -26490,6 +26500,28 @@ function _sbsQuickstartHTML() {
   return '<div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">\n      <button class="cmp-quickstart-btn" data-countries="Guyana|Angola|Brazil|Nigeria" style="background:transparent;border:1px solid rgba(194,65,12,.4);border-radius:6px;color:var(--orange);font-size:11px;padding:5px 12px;cursor:pointer;" title="Atlantic Frontier PSC: Guyana ~52%, Angola ~55%, Brazil ~65%, Nigeria ~58% — four PSC regimes spanning a 30pp take range. Standard IOC Atlantic capital allocation benchmark.">Atlantic Frontier Quartet</button>\n      <button class="cmp-quickstart-btn" data-countries="Norway|United Kingdom|Netherlands" style="background:transparent;border:1px solid rgba(21,128,61,.35);border-radius:6px;color:var(--green);font-size:11px;padding:5px 12px;cursor:pointer;" title="North Sea Trio: Norway (Concession+SDFI, ~68% take), UK (RFCT+SC+EPL, ~49% take), Netherlands (~48% take) — the three core North Sea fiscal benchmarks in one view. Standard reference for European offshore capital allocation.">&#9632; North Sea Trio</button>\n      <button class="cmp-quickstart-btn" data-countries="USA|Iraq" style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-size:11px;padding:5px 12px;cursor:pointer;" title="Compare USA GoM (Concession, ~23% take) vs Iraq (TSC, fixed fee)">USA vs Iraq</button>\n      <button class="cmp-quickstart-btn" data-countries="Angola|Nigeria|Ghana" style="background:transparent;border:1px solid rgba(29,78,216,.35);border-radius:6px;color:#1d4ed8;font-size:11px;padding:5px 12px;cursor:pointer;" title="West Africa Trio PSC: Angola (EPSA IV ~68%), Nigeria (PSC/PIA2021 ~58%), Ghana (Jubilee Concession ~55%) — three core West Africa PSC/Concession regimes spanning a 13pp take range. Standard IOC West Africa capital allocation benchmark.">&#9632; West Africa Trio</button>\n    </div>';
 }
 
+// v723 (T3): open/shut the Side-by-Side evidence-depth rows. Patches the DOM in place rather
+// than calling renderCompare(), so the analyst keeps their scroll position — a full re-render
+// rebuilds the grid above them and throws them back to the top of a 1,330px table, which is the
+// same friction this change exists to remove. sessionStorage only, so it never persists past the
+// browser session and a cold load always opens on the numbers.
+function toggleSbsEvidence() {
+  var btn = document.getElementById('cmp-ev-toggle');
+  if (!btn) return;
+  var open = btn.getAttribute('aria-expanded') !== 'true';
+  try { sessionStorage.setItem('orca_sbs_ev', open ? '1' : '0'); } catch (e) {}
+  btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+  var caret = document.getElementById('cmp-ev-caret');
+  var word  = document.getElementById('cmp-ev-word');
+  if (caret) caret.textContent = open ? '\u25be' : '\u25b8';
+  if (word)  word.textContent  = open ? 'Hide' : 'Show';
+  var rws = document.querySelectorAll('#cmp-output .compare-grid [data-cmp-grp="ev"]');
+  for (var i = 0; i < rws.length; i++) rws[i].style.display = open ? '' : 'none';
+  // The horizontal-overflow hint measures the grid; a row set appearing or vanishing can change
+  // whether it needs to show, so re-run it on the same element the render path uses.
+  if (typeof _sbsScrollHint === 'function') { try { _sbsScrollHint(); } catch (e) {} }
+}
+
 const PRICES = [50, 75, 100, 125];
 
 function renderCompare() {
@@ -27205,7 +27237,7 @@ function renderCompare() {
       + '</span>';
   };
   const rows = [
-    {label:'─── Data Basis ───', key:()=>'', bold:true, divider:true},
+    {grpHead:'ev', label:'─── Data Basis ───', key:()=>'', bold:true, divider:true},
     {label:'Data basis <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How this column’s take, NPV and IRR were produced — the same classification as the PROXY badge in Fiscal Compare. FACTS = weighted by verified field production (more than 5% of contracts carry output data). EVIDENCE = partial production coverage, blended with equal weighting. PROXY = no verified field production anywhere in this country’s contract set, so the economics are modelled from the standardized profile and describe the legal regime rather than realised output. A PROXY column is not comparable to a FACTS column on NPV or IRR.">ⓘ</span>',
       key:(d)=>{ const t=_cmpDqOf(d); return '<span class="dq-badge ' + t.cls + '" title="' + _cmpBasisTip(d) + '">' + t.label + '</span>'; }},
     // v551 (T6): this row printed "% A/B · grade" off ab_pct. Tier B is 45.2% of the database
@@ -27213,7 +27245,7 @@ function renderCompare() {
     // thoroughly the bulk tables had run: Russia read 98% A/B · A on 3.8% primary law, above
     // Senegal at 74% A/B · B on 67.2%. Now shows the primary-law share and the v551 two-legged
     // grade — the same letter Fiscal Compare and Country Profile show, so the three cannot disagree.
-    {label:'Evidence tier <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How much of this country’s fiscal record was read out of the primary legal instrument — petroleum act, gazette, finance act, PSC text — rather than a secondary tax guide, industry reference or a default estimate. The grade letter takes the WORSE of two legs: primary-law share (A ≥60% / B ≥40% / C ≥20%) and fact depth (A ≥150 / B ≥50 / C ≥15), because a 100% primary-law record built on 2 facts is not strong evidence. The EY / IHS / KPMG bulk harvest does not count toward the primary-law leg. Country Profile → Evidence Quality lists the actual documents.">ⓘ</span>',
+    {grp:'ev', label:'Evidence tier <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How much of this country’s fiscal record was read out of the primary legal instrument — petroleum act, gazette, finance act, PSC text — rather than a secondary tax guide, industry reference or a default estimate. The grade letter takes the WORSE of two legs: primary-law share (A ≥60% / B ≥40% / C ≥20%) and fact depth (A ≥150 / B ≥50 / C ≥15), because a 100% primary-law record built on 2 facts is not strong evidence. The EY / IHS / KPMG bulk harvest does not count toward the primary-law leg. Country Profile → Evidence Quality lists the actual documents.">ⓘ</span>',
       // v625 (T6): this cell led with the primary-law PERCENTAGE, and Side-by-Side is the one tab
       // whose entire job is ranking columns against each other. Measured against the shipped
       // country_data.json: 80 of 185 countries are graded by the DEPTH leg, 52 print a primary-law
@@ -27275,9 +27307,9 @@ function renderCompare() {
     // fetch. No grade, letter, colour or threshold on the row above changes — how deep a fact
     // base is and whether the model's terms are cited are different questions, and this is the
     // second one, printed next to the first instead of two tabs away.
-    {label:'Model terms cited <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Of the fiscal terms this column&rsquo;s DCF actually runs &mdash; royalty, CIT, FTP, cost-recovery cap, profit-oil split, state equity, special tax, whichever its mechanic uses &mdash; how many have a citation standing behind them. THIS IS NOT THE ROW ABOVE. Evidence tier grades the country&rsquo;s whole fact base, most of which is contract metadata the model never reads; this counts only the terms that produce the take, NPV and IRR below. The two orderings can invert: in the seeded Norway / UK / Netherlands example the Netherlands is the only A at 97% primary law AND the only column citing 1 of 4, its uncited terms including the royalty rate. The bulk harvest, an instrument shared across jurisdictions and a D-confidence value do not count, the same rule the Country Profile Evidence Chain uses. No country on this platform cites every term and 128 of 185 cite half or fewer, so read this as which column is thinnest where it matters, not as a pass mark. Click any cell to open that country&rsquo;s Evidence Chain, which names each term, its ORCA value, the statutory value and the source.">ⓘ</span>',
+    {grp:'ev', label:'Model terms cited <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Of the fiscal terms this column&rsquo;s DCF actually runs &mdash; royalty, CIT, FTP, cost-recovery cap, profit-oil split, state equity, special tax, whichever its mechanic uses &mdash; how many have a citation standing behind them. THIS IS NOT THE ROW ABOVE. Evidence tier grades the country&rsquo;s whole fact base, most of which is contract metadata the model never reads; this counts only the terms that produce the take, NPV and IRR below. The two orderings can invert: in the seeded Norway / UK / Netherlands example the Netherlands is the only A at 97% primary law AND the only column citing 1 of 4, its uncited terms including the royalty rate. The bulk harvest, an instrument shared across jurisdictions and a D-confidence value do not count, the same rule the Country Profile Evidence Chain uses. No country on this platform cites every term and 128 of 185 cite half or fewer, so read this as which column is thinnest where it matters, not as a pass mark. Click any cell to open that country&rsquo;s Evidence Chain, which names each term, its ORCA value, the statutory value and the source.">ⓘ</span>',
       id:'terms', key:()=>'<span style="font-size:10px;color:var(--muted);opacity:.6;">checking…</span>'},
-    {label:'Fiscal facts held <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How many verified fiscal facts ORCA holds for this country. Read it against the tier above: a high A/B percentage over a small fact base is a thin sample. 278 facts and 63,848 facts are not the same evidence even at the same tier.">ⓘ</span>',
+    {grp:'ev', label:'Fiscal facts held <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How many verified fiscal facts ORCA holds for this country. Read it against the tier above: a high A/B percentage over a small fact base is a thin sample. 278 facts and 63,848 facts are not the same evidence even at the same tier.">ⓘ</span>',
       key:(d)=>{ const nf=d.n_facts; if(nf==null) return '—';
         const thin = nf < 1000;
         return '<span style="font-family:\'IBM Plex Mono\',monospace;' + (thin?'color:var(--orange);':'') + '" title="' + _cmpEsc(d.country + ': ' + Number(nf).toLocaleString() + ' verified fiscal facts across ' + (d.n!=null?Number(d.n).toLocaleString():'?') + ' contracts.' + (thin?' Thin fact base — treat single-parameter conclusions with caution.':'')) + '">' + Number(nf).toLocaleString() + (thin?' ⚠':'') + '</span>'; }},
@@ -27285,11 +27317,11 @@ function renderCompare() {
       key:(d)=>_cmpMechBasisCell(d)},
     {label:'Rank among producers (take @$75) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Position on government take at $75/bbl, sorted lowest take first — #1 is the most contractor-favourable regime. Ranked ONLY against the countries whose take is weighted by verified field production, and with state monopolies (take ≥ 99.5%, no contractor access) excluded. A column with no production data is not given a placement here, because it does not have one: its take is a simple average of statutory terms, not realised economics. The all-185 rank is in each cell&rsquo;s tooltip; it is the weaker basis because it mixes production-weighted regimes with equal-weighted averages built on as few as 2 contracts, which pulls the low-take end of the list down and pushes every real producer toward the bottom of it.">ⓘ</span>',
       key:(d)=>_cmpProducerRankCell(d), bold:false},
-    {label:'Predictability Score <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Fiscal Predictability Score (0\u2013100) \u2014 composite measure of how consistent and stable this country\u2019s fiscal terms are. Three components: (1) Within-country IQR penalty: wide spread across contracts = lower score (up to \u221240 pts). (2) Price swing penalty: take rising sharply with price = lower score (up to \u221230 pts). (3) Regime complexity penalty: \u22128 pts per additional fiscal mechanic above one. Score \u226575 = HIGH (green), 60\u201374 = MODERATE (yellow), 45\u201359 = LOW (orange), &lt;45 = VERY LOW (red) \u2014 awarded since v624 ONLY where ORCA measured a spread. A one-term score renders UNGRADED and uncoloured however high its number. READ THE BASIS CHIP ON EACH BADGE BEFORE RANKING COLUMNS ON THIS ROW. The IQR term is the largest of the three and it is only exercised where ORCA holds a real spread. &#39;one term&#39; = every contract in that country prices identically, so the IQR penalty was zero and the score reflects price swing and mechanic count only \u2014 the same finding the Take spread row below reports as &#39;single term&#39;, which is NOT evidence of low fiscal risk. A number such as &#39;15.0pp&#39; = a measured spread, which the score IS penalised for. &#39;not scored&#39; = no contract-level distribution is held at all. Only 28 of 185 countries have a measured spread at all: 135 price to one statutory term and 22 hold no distribution. Every score that would fall in HIGH belongs to a one-term regime, and NOT ONE of the 28 with a measured spread reaches it \u2014 the ceiling among them is 74 \u2014 which is why the one-term column is shown UNGRADED. A column with a lower score here is therefore not the less stable regime; it may simply be the one ORCA holds enough contracts to see disagree with itself. Distinct from the Reform Frequency Score on the Reform Risk tab, which counts law changes since 2010.">\u24d8</span>',       id:'fp', key:(d)=>renderStabilityBadge(getFiscalPredictabilityScore(d), d)},
+    {grp:'ev', label:'Predictability Score <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Fiscal Predictability Score (0\u2013100) \u2014 composite measure of how consistent and stable this country\u2019s fiscal terms are. Three components: (1) Within-country IQR penalty: wide spread across contracts = lower score (up to \u221240 pts). (2) Price swing penalty: take rising sharply with price = lower score (up to \u221230 pts). (3) Regime complexity penalty: \u22128 pts per additional fiscal mechanic above one. Score \u226575 = HIGH (green), 60\u201374 = MODERATE (yellow), 45\u201359 = LOW (orange), &lt;45 = VERY LOW (red) \u2014 awarded since v624 ONLY where ORCA measured a spread. A one-term score renders UNGRADED and uncoloured however high its number. READ THE BASIS CHIP ON EACH BADGE BEFORE RANKING COLUMNS ON THIS ROW. The IQR term is the largest of the three and it is only exercised where ORCA holds a real spread. &#39;one term&#39; = every contract in that country prices identically, so the IQR penalty was zero and the score reflects price swing and mechanic count only \u2014 the same finding the Take spread row below reports as &#39;single term&#39;, which is NOT evidence of low fiscal risk. A number such as &#39;15.0pp&#39; = a measured spread, which the score IS penalised for. &#39;not scored&#39; = no contract-level distribution is held at all. Only 28 of 185 countries have a measured spread at all: 135 price to one statutory term and 22 hold no distribution. Every score that would fall in HIGH belongs to a one-term regime, and NOT ONE of the 28 with a measured spread reaches it \u2014 the ceiling among them is 74 \u2014 which is why the one-term column is shown UNGRADED. A column with a lower score here is therefore not the less stable regime; it may simply be the one ORCA holds enough contracts to see disagree with itself. Distinct from the Reform Frequency Score on the Reform Risk tab, which counts law changes since 2010.">\u24d8</span>',       id:'fp', key:(d)=>renderStabilityBadge(getFiscalPredictabilityScore(d), d)},
     // v701 (T4): see _cmpReformCell above. The reform record now rides the shared `rows` array,
     // so it reaches the visible grid, #cmp-data-table, Export PDF and both Copy-for-IC-Memo
     // clipboard flavours by the same path every other row does.
-    {label:'Reform record (since 2010) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Reform Frequency Score (0–100) — the SEPARATE stability signal, and the one this grid was missing. Formula: 100 − 15 × sourced fiscal law changes dated 2010 or later. Discoveries, first-oil dates, armed conflict and terms reviews that concluded without renegotiation stay in the event log and do NOT score. Same classifier (_rrClassify) the Reform Risk tab, the Fiscal Compare Stability column and the Country Profile sidebar run, so those four surfaces cannot hand you four different premiums for one country. READ THIS ROW AND THE PREDICTABILITY SCORE ROW ABOVE AS TWO DIFFERENT QUESTIONS. Predictability is computed from contract terms — take spread, price swing, mechanic count — and counts no legislation; this row counts legislation and reads no contract. A column can score well on one and badly on the other. IMPORTANT — THREE STATES, NOT INTERCHANGEABLE. A score = a sourced log exists and was counted. ‘n/c’ = NO sourced log on file, which is not a clean record and is not a 100: ORCA covers 21 of 185 jurisdictions, and an n/c column needs an external check (national petroleum law, IMF Article IV, operator annual reports) before an IC memo carries a zero reform premium for it. The third line of each scored cell is that country&#39;s verdict class — a high score whose line reads ‘window artefact’ or ‘size never quantified’ is not an all-clear. The score is a COUNT and is blind to magnitude: Russia&#39;s +15pp windfall tax in 2022 moves it exactly as far as a 1pp administrative amendment would. IC rule: 3 or more law changes since 2010 → add 3–5pp WACC premium (5–8pp and a probability-weighted NPV at score ≤ 20). Click any cell for that country&#39;s full verdict and event log.">ⓘ</span>',       id:'reform', key:(d)=>_cmpReformCell(d)},
+    {grp:'ev', label:'Reform record (since 2010) <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Reform Frequency Score (0–100) — the SEPARATE stability signal, and the one this grid was missing. Formula: 100 − 15 × sourced fiscal law changes dated 2010 or later. Discoveries, first-oil dates, armed conflict and terms reviews that concluded without renegotiation stay in the event log and do NOT score. Same classifier (_rrClassify) the Reform Risk tab, the Fiscal Compare Stability column and the Country Profile sidebar run, so those four surfaces cannot hand you four different premiums for one country. READ THIS ROW AND THE PREDICTABILITY SCORE ROW ABOVE AS TWO DIFFERENT QUESTIONS. Predictability is computed from contract terms — take spread, price swing, mechanic count — and counts no legislation; this row counts legislation and reads no contract. A column can score well on one and badly on the other. IMPORTANT — THREE STATES, NOT INTERCHANGEABLE. A score = a sourced log exists and was counted. ‘n/c’ = NO sourced log on file, which is not a clean record and is not a 100: ORCA covers 21 of 185 jurisdictions, and an n/c column needs an external check (national petroleum law, IMF Article IV, operator annual reports) before an IC memo carries a zero reform premium for it. The third line of each scored cell is that country&#39;s verdict class — a high score whose line reads ‘window artefact’ or ‘size never quantified’ is not an all-clear. The score is a COUNT and is blind to magnitude: Russia&#39;s +15pp windfall tax in 2022 moves it exactly as far as a 1pp administrative amendment would. IC rule: 3 or more law changes since 2010 → add 3–5pp WACC premium (5–8pp and a probability-weighted NPV at score ≤ 20). Click any cell for that country&#39;s full verdict and event log.">ⓘ</span>',       id:'reform', key:(d)=>_cmpReformCell(d)},
     {label:'─── Govt Take ───', key:()=>'', bold:true, divider:true},
     {label:'Govt Take ($50/bbl)',   key:(d)=>_cmpTakeCell(d,50)},
     {label:'Govt Take ($75/bbl)',   key:(d)=>_cmpTakeCell(d,75)},
@@ -27582,13 +27614,60 @@ function renderCompare() {
       : '';
     html += `<div class="cmp-hdr" data-cmp-country="${_cmpEsc(d.country)}">${d.country}${d.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;" title="R-factor profit oil tiers active">◆</span>' : ''}${specBadge}<br><span style="color:var(--muted);font-size:11px;">${d.region}</span></div>`;
   });
+  // ── v723 (T3): the eight-row provenance preamble. ───────────────────────────────────────────
+  // v511 put the basis rows at the head of the grid so "the basis of a column is read before its
+  // numbers", and that intent is right. But the block was three rows then and it is EIGHT now --
+  // Data basis, Evidence tier, Model terms cited, Fiscal facts held, Take basis, Rank among
+  // producers, Predictability Score, Reform record -- and every row added since rode in above the
+  // numbers by default. Measured on the tab's own cold-load default set (Norway / United Kingdom /
+  // Netherlands), no storage, Playwright:
+  //     1440 x  900   grid top 262   Govt Take ($75/bbl) at y=858   OFF SCREEN
+  //      390 x  844   grid top 773   Govt Take ($75/bbl) at y=1888  1,115px BELOW the grid top
+  // The base case -- the one row a screening meeting is actually run on -- is off screen at the
+  // standard laptop size and more than a full phone screen further down on a phone. At 1440 the
+  // ENTIRE first paint of a tab whose whole purpose is comparing take is provenance metadata:
+  // not one government take figure is visible until the analyst scrolls.
+  //
+  // The two rows that GATE comparability stay where v511 put them, first and always visible:
+  //   Data basis            PROD-WTD / PART-PROD / PROXY -- whether NPV is comparable at all
+  //   Take basis (mechanic) price-linked / fee-basis / cash-flow -- whether take is comparable
+  // Plus Rank among producers, which is not provenance, it is the answer to this tab's question.
+  //
+  // The five that are evidence DEPTH rather than comparability go behind the section header,
+  // which becomes a real toggle naming exactly what it holds. Collapsed by default; the choice is
+  // remembered in sessionStorage for the session, the same pattern v430 uses for the FC Analyst
+  // Guide. Nothing is removed: the rows ride the shared `rows` array into #cmp-data-table, so
+  // Copy for IC Memo and the XLSX/Word paste carry all eight regardless of the toggle, and the
+  // @media print rule forces them open so an IC-pack PDF is complete.
+  //
+  // Collapsed, measured the same way: $75 moves to y=590 at 1440 (all four price rows, Take
+  // spread, Price Swing and the ECONOMICS header now land above the fold) and to y=1264 at 390.
+  const _sbsEvOpen = (function(){ try { return sessionStorage.getItem('orca_sbs_ev') === '1'; } catch(e) { return false; } })();
+  const _sbsEvN = rows.filter(r => r.grp === 'ev').length;
   rows.forEach(r => {
     if (r.divider) {
+      const _isEvHead = r.grpHead === 'ev' && _sbsEvN > 0;
       html += `<div class="cmp-row" style="background:var(--surface);border-top:1px solid var(--border);border-bottom:none;padding:6px 0 2px;">`;
-      html += `<div class="cmp-cell lbl" style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;">${r.label.replace(/─+/g,'').trim()}</div>`;
-      for (let i = 0; i < selected.length; i++) html += `<div class="cmp-cell" style="background:var(--surface);"></div>`;
+      if (_isEvHead) {
+        // The toggle spans the whole grid width rather than sitting in the 200px metric column.
+        // Inside that column it wrapped to three lines and stood 70px tall on a desktop and 115px
+        // on a phone -- the divider row then grew from 34px to ~90px and gave back most of the
+        // vertical space collapsing the rows had just won. One full-width line costs 34px.
+        html += `<div class="cmp-cell lbl" style="grid-column:1 / -1;display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;">`
+          + `<span>${r.label.replace(/─+/g,'').trim()}</span>`
+          + `<button type="button" id="cmp-ev-toggle" onclick="toggleSbsEvidence()" aria-expanded="${_sbsEvOpen ? 'true' : 'false'}"`
+          + ` title="Evidence depth for each column: the tier grade and its primary-law share, how many of the DCF&#39;s own fiscal terms carry a citation, the size of the fact base, the Fiscal Predictability Score and the post-2010 reform record. Collapsed by default so the Govt Take rows are on screen when the tab opens. The two rows that decide whether these columns may be compared at all — Data basis and Take basis — stay above it, and every row in here is still carried into Copy for IC Memo, Export PDF and the exports whether it is open or shut."`
+          + ` style="background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);font:inherit;font-size:10px;font-weight:600;letter-spacing:.02em;text-transform:none;padding:4px 10px;min-height:26px;line-height:1.5;cursor:pointer;white-space:nowrap;">`
+          + `<span id="cmp-ev-caret">${_sbsEvOpen ? '▾' : '▸'}</span> <span id="cmp-ev-word">${_sbsEvOpen ? 'Hide' : 'Show'}</span> ${_sbsEvN} evidence rows</button>`
+          + `<span id="cmp-ev-what" style="font-weight:400;letter-spacing:0;text-transform:none;opacity:.8;">tier · terms cited · facts held · predictability · reform</span>`
+          + `</div>`;
+      } else {
+        html += `<div class="cmp-cell lbl" style="font-size:10px;font-weight:700;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;">${r.label.replace(/─+/g,'').trim()}</div>`;
+        for (let i = 0; i < selected.length; i++) html += `<div class="cmp-cell" style="background:var(--surface);"></div>`;
+      }
     } else {
-      html += `<div class="cmp-row">`;
+      const _evRow = r.grp === 'ev';
+      html += `<div class="cmp-row${_evRow ? ' cmp-ev-row' : ''}"${_evRow ? ` data-cmp-grp="ev"${_sbsEvOpen ? '' : ' style="display:none;"'}` : ''}>`;
       html += `<div class="cmp-cell lbl">${r.label}</div>`;
       selected.forEach(d => html += `<div class="cmp-cell"${r.id ? ` data-sbs-row="${r.id}" data-sbs-c="${_cmpEsc(d.country)}"` : ''}>${r.key(d)}</div>`);
     }
