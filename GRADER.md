@@ -37414,3 +37414,14 @@ not removed, not weakened, not narrowed; the new rule sits outside it and carrie
   selector (26th cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted
   per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
   `renderVintageTrendChart()`/`renderVintage()`.
+
+---
+## Cycle 625 Log — 2026-09-08 09:45
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 625 complete and pushed as **v718** (`0cc98ba`).
+
+**Task:** T1 — "Which countries should even be on my screening list?" (stalest by rotation; 624 ran T3, 618 was the last T1.)
+
+**Friction:** The cold path works — Home hero → "open the screen →" → Screener with the IOC Capital Screen preset, 15 countries. The break is one click later, at the most ordinary thing an analyst does to a preset: **tightening it**, because their own mandate is stricter. Moving the take ceiling 65% → 63% correctly 
