@@ -36098,3 +36098,16 @@ XLSX exports were not touched. Only the PNG export path was in the walk.
 - `pixel_audit` not run this cycle (the change adds one overlay button to an existing wrap and
   relabels one toolbar button; the 22-cycle `tablet-768::2-t7 clipped-text` carry is pre-existing
   and no new horizontal scroll appeared at 768 in this cycle's own sweep).
+
+---
+## Cycle 614 Log — 2026-09-07 20:09
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 614 complete, shipped as **v708**, pushed to both repos, mirror updated.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (613 ran T4, 612 T1, 611 T3, 610 T6, 609 T2 — T5 was the stalest.) Walked cold at 1440×900, no sessionStorage, no localStorage: Home → Side-by-Side, which auto-loads Norway / UK / Netherlands and draws both charts with no input.
+
+## Friction
+Side-by-Side draws **two** charts: "Govt Take vs Oil Price" and, 368px below it, "Contractor NPV vs Oil
