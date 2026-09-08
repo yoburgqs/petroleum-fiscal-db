@@ -1930,7 +1930,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v715</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v716</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2000,7 +2000,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v715</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v716</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27117,6 +27117,37 @@ function renderCompare() {
           + '<span style="color:var(--muted);opacity:.55;"> of </span>'
           + '<span style="' + _nSt + '">' + _nf.toLocaleString() + ' fact' + (_nf === 1 ? '' : 's') + '</span>'
           + '</span>'; }},
+    // ── v716 (T6): the row that says whether the grade above covers the terms the model ran ──
+    // Side-by-Side is the one tab whose entire job is ranking columns against each other, and
+    // Evidence tier is the row an analyst ranks them on when the question is "how solid is this?"
+    // That letter grades the country's WHOLE fact base — hundreds of rows, most of them contract
+    // metadata — on primary-law share and fact depth. It does not look at the four to six fiscal
+    // terms getDCFParams() actually feeds the DCF to produce the take, NPV and IRR printed 20 rows
+    // below it. On the tab's own seeded example, cold, no interaction, those two questions give
+    // OPPOSITE orderings of the same three columns:
+    //
+    //   Evidence tier      Norway A · 66% of 63,848    UK B · 43% of 15,899    NL A · 97% of 278
+    //   Model terms cited  Norway 3 of 4               UK 2 of 5               NL 1 of 4
+    //
+    // Read the shipped row and the Netherlands is the best-evidenced column in the set — the only
+    // 97%, an A, ahead of Norway's 66%. Read what the model was actually given and it is the worst
+    // of the three: one cited term out of four, and the uncited three include the ROYALTY RATE,
+    // which on a Concession is most of the take. Nothing on the grid said so.
+    //
+    // This is not an edge case. Measured across all 185 shipped api/v1/country files against
+    // getDCFParams()'s own term set: not one country cites every model term, 128 of 185 cite half
+    // or fewer, and 19 cite none. The FC drawer chip (v709) and the Country Profile chip (v660)
+    // both answer this at the single-country level. Side-by-Side — the surface where the misread
+    // does the most damage, because it is a comparison — had no leg for it at all.
+    //
+    // Same sourcing rule as both of those and as the Evidence Chain: the bulk harvest, an
+    // instrument shared across jurisdictions and a D-confidence value do not count. Reuses
+    // _fcTermLeg()'s per-country cache, so a country already opened in the FC drawer costs no
+    // fetch. No grade, letter, colour or threshold on the row above changes — how deep a fact
+    // base is and whether the model's terms are cited are different questions, and this is the
+    // second one, printed next to the first instead of two tabs away.
+    {label:'Model terms cited <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="Of the fiscal terms this column&rsquo;s DCF actually runs &mdash; royalty, CIT, FTP, cost-recovery cap, profit-oil split, state equity, special tax, whichever its mechanic uses &mdash; how many have a citation standing behind them. THIS IS NOT THE ROW ABOVE. Evidence tier grades the country&rsquo;s whole fact base, most of which is contract metadata the model never reads; this counts only the terms that produce the take, NPV and IRR below. The two orderings can invert: in the seeded Norway / UK / Netherlands example the Netherlands is the only A at 97% primary law AND the only column citing 1 of 4, its uncited terms including the royalty rate. The bulk harvest, an instrument shared across jurisdictions and a D-confidence value do not count, the same rule the Country Profile Evidence Chain uses. No country on this platform cites every term and 128 of 185 cite half or fewer, so read this as which column is thinnest where it matters, not as a pass mark. Click any cell to open that country&rsquo;s Evidence Chain, which names each term, its ORCA value, the statutory value and the source.">ⓘ</span>',
+      id:'terms', key:()=>'<span style="font-size:10px;color:var(--muted);opacity:.6;">checking…</span>'},
     {label:'Fiscal facts held <span style="cursor:help;color:var(--muted);font-size:11px;font-weight:400;" title="How many verified fiscal facts ORCA holds for this country. Read it against the tier above: a high A/B percentage over a small fact base is a thin sample. 278 facts and 63,848 facts are not the same evidence even at the same tier.">ⓘ</span>',
       key:(d)=>{ const nf=d.n_facts; if(nf==null) return '—';
         const thin = nf < 1000;
@@ -28139,6 +28170,7 @@ function renderCompare() {
   }
 
   _sbsApplyObsSpread();   // v672 (T3)
+  _sbsApplyTermsCited();  // v716 (T6) — must follow, it reads the token _sbsApplyObsSpread bumps
   _sbsScrollHint();       // v712 (T3)
 }
 
@@ -28475,6 +28507,73 @@ function _sbsApplyObsSpread() {
   });
 }
 window._sbsApplyObsSpread = _sbsApplyObsSpread;
+
+// ─── v716 (T6): fill the Model terms cited row ───────────────────────────────────────
+// The row above renders a "checking…" placeholder synchronously, because the answer needs
+// api/v1/country/<slug>.json and the grid must not wait on the network to paint. This fills
+// it, on the same token/patch pattern _sbsPaintObsSpread() uses, into BOTH the visible grid
+// cell and the matching #cmp-data-table cell — so Export PDF and both Copy-for-IC-Memo
+// flavours carry the leg too, rather than pasting a memo table whose evidence row omits it.
+// Reuses _fcTermLeg()'s cache: a country already opened in the Fiscal Compare drawer costs
+// no second fetch, and stepping through the ranking re-reads memory.
+function _sbsPaintTermsCited(c, t, token) {
+  if (token !== window._sbsRenderToken) return;            // set changed mid-fetch
+  var cells = _sbsObsCell('terms', c);
+  if (!cells.length) return;
+  var html;
+  if (!t || !t.total) {
+    // Never leave "checking…" on screen. No model-term set resolved for this column means
+    // the question has no answer here, and saying so is the honest cell.
+    html = '<span style="font-size:10px;color:var(--muted);" title="'
+      + _sbsAttr(c + ': ORCA could not resolve a model term set for this column, so this row has '
+        + 'nothing to count. That is a coverage gap, not a pass — it does NOT mean the terms are '
+        + 'cited. Open ' + c + ' in Country Profile and read the Evidence Chain directly before an '
+        + 'IC memo.') + '">not resolved</span>';
+  } else {
+    var ratio = t.cited / t.total;
+    var col = ratio <= 0.5 ? 'var(--red)' : (ratio < 1 ? 'var(--orange)' : 'var(--green)');
+    var tip = c + ': the ' + (t.mech || 'DCF') + ' model runs ' + t.total + ' fiscal term'
+      + (t.total === 1 ? '' : 's') + ' to produce this column’s take, NPV and IRR, and '
+      + t.cited + ' of them ' + (t.cited === 1 ? 'has' : 'have') + ' a citation standing behind '
+      + (t.cited === 1 ? 'it' : 'them') + '. '
+      + (t.uncited.length
+          ? t.uncited.join(', ') + ' ' + (t.uncited.length === 1 ? 'does' : 'do') + ' not — the '
+            + 'value used is a bulk-harvest entry, a regional instrument shared across '
+            + 'jurisdictions, an uncited contract average or a mechanic default. '
+          : 'Every term clears the bar, which no other country on this platform does. ')
+      + 'This is a different question from the Evidence tier row above, which grades the whole '
+      + 'fact base and can rank the columns the other way round. Click to open ' + c
+      + '’s Evidence Chain, which names each term, its ORCA value, the statutory value and '
+      + 'the source.';
+    html = '<span role="button" tabindex="0" style="font-size:11px;font-weight:700;color:' + col
+      + ';cursor:pointer;min-height:24px;display:inline-flex;align-items:center;" title="'
+      + _sbsAttr(tip) + '"'
+      + ' onclick="event.preventDefault();event.stopPropagation();_fcOpenTermChain(\''
+      + String(c).replace(/'/g, "\\'") + '\');"'
+      + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();'
+      + 'event.stopPropagation();_fcOpenTermChain(\'' + String(c).replace(/'/g, "\\'") + '\');}">'
+      + t.cited + ' of ' + t.total + ' →</span>'
+      + (t.uncited.length
+          ? '<span style="display:block;font-size:10px;line-height:1.3;color:var(--muted);">uncited: '
+            + _sbsAttr(t.uncited.join(', ')) + '</span>'
+          : '');
+  }
+  for (var i = 0; i < cells.length; i++) {
+    if (cells[i].dataset.termsPainted) continue;
+    cells[i].dataset.termsPainted = '1';
+    cells[i].innerHTML = html;
+  }
+}
+function _sbsApplyTermsCited() {
+  if (typeof _fcTermLeg !== 'function') return;   // additive: never take the grid down
+  var token = window._sbsRenderToken;
+  compareList.forEach(function(c) {
+    _fcTermLeg(c)
+      .then(function(t) { _sbsPaintTermsCited(c, t, token); })
+      .catch(function() { _sbsPaintTermsCited(c, null, token); });
+  });
+}
+window._sbsApplyTermsCited = _sbsApplyTermsCited;
 
 // ─── TAB 3: Screener ─────────────────────────────────────────────────────────
 let _screenerRfactorOnly = false;
