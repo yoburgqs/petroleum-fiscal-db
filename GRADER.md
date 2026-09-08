@@ -37593,3 +37593,110 @@ build**. The v612 mobile layer is untouched — not removed, not weakened, not n
 **Friction:** Walking the Reform Risk lookup cold, the reform-frequency half of the card is sound. The break is the other half — Fiscal Predictability. Look up Nigeria and the card printed, in an amber graded band:
 
 > **73 MODERATE** · measured spread **0.4pp** across its contracts · 3rd of 2
+
+---
+## Cycle 627 Log — 2026-09-08 — shipped as v720 (`fa5ec66`)
+
+- Test before: 294 PASS / 0 FAIL (deployed) · 293 PASS / 0 FAIL / 1 WARN (local, known SW 404)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — suite RAN this cycle, number read from its own report
+- JS errors: 0 page errors, 0 console errors other than the known local service-worker 404
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo."
+(Stalest by rotation: 626 ran T4, 625 T1, 624 T3, 623 T6, 622 T2, 621 T5.)
+
+**Friction.** Walked T5 cold at 1440x900, no sessionStorage, no localStorage, straight to
+Country Profile → Nigeria → **Copy for IC Memo** → paste. The Fiscal predictability row arrived as:
+
+> **MODERATE (score 73/100, graded)** — measured spread of 0.4pp across 834 contracts, the only
+> basis on which ORCA awards a band
+
+Open Reform Risk in the same session, look up the same country, and it reads **"Carry ≤46 · LOW,
+not 73 · MODERATE"** over an orange bound bar — because v719 established that ORCA's own contract
+file lists Nigeria's 50 largest producing contracts running **57.5–91.4%** government take at
+$75/bbl across 11 distinct values (**33.9pp**, not 0.4pp), so the IQR penalty — the score's
+largest component at up to −40 points — was charged **0.3** points where the observed dispersion
+costs **27**.
+
+Same tool, same country, opposite claims, and the one that reached the committee document was the
+one the tool disowns. v719 fixed the screen and stopped there. `_fpCiteVerdict()`'s graded branch
+(`index.html:24756`) — the sentence `copyICSummary()` splits into the table cell and note 2 — had
+no refutation path at all. It is also the **only** branch that awards a band, printed beside a
+cohort line that tells the analyst a graded band outranks any UNGRADED score. The one-term branch
+had carried `_fpCiteObsClause()` since v644; the graded one, the higher-stakes half, never got it.
+
+**Change.**
+- v719's ceiling arithmetic is factored out of `_rrPaintIqrUnderstated()` into
+  **`_fpObsCeilingFrom(d, obs, u)`** (pure) and **`_fpObsCeiling(d)`** (resolves the v559 sample
+  cache). The Reform Risk card now derives its numbers from that object rather than recomputing
+  them, so the number read on screen and the number pasted are one object — the same
+  no-drift principle v644 applied to the band word.
+- `_fpCiteVerdict()`'s graded branch states the bound. Nigeria's pasted cell is now
+  **`LOW · upper bound 46/100 (the printed 73 · MODERATE is withdrawn)`**, and note 2 carries the
+  observed range, the wider-by figure, the charged-vs-costs points, the explicit "NOT recomputed —
+  a top-50-by-production sample cannot establish a population IQR" statement, the floor/ceiling
+  logic, and the withdrawal of the cohort rank and the outranks-UNGRADED rule where the band moves.
+- The CP **XLSX** carries it too: `Predictability Score` → `73 — WITHDRAWN, carry ≤46 (LOW)`,
+  `Predictability Basis` → the bundled-vs-observed sentence with the bound.
+- Three registers, on v719's own materiality rule: band moves → withdrawal wording; material but
+  band holds (Qatar 67→60, Sao Tome 70→65) → "the printed 67 is withdrawn; the band holds at this
+  bound"; below the bar (India 52→51) → the graded head with "bounded at 51/100" appended.
+  Silent where no contract sample is loaded, exactly as `_fpCiteObsClause()` is.
+
+**Measured live this cycle**, not asserted — `api/v1/country/*.json` fetched for all 28 countries
+in the measured cohort: **10 refuted** (bundled IQR exceeded by more than `CP_OBS_REFUTE_PP`),
+**9 material**, **7 band-moving**:
+
+| country | bundled | observed | printed | bound |
+|---|---|---|---|---|
+| Nigeria | 0.4pp | 33.9pp | 73 MODERATE | 46 LOW |
+| Kazakhstan | 1.8pp | 26.9pp | 73 MODERATE | 53 LOW |
+| Republic of the Congo | 0.4pp | 18.8pp | 62 MODERATE | 47 LOW |
+| Mexico | 20.5pp | 67.3pp | 51 LOW | 27 VERY LOW |
+| Morocco | 29.7pp | 36.7pp | 45 LOW | 39 VERY LOW |
+| Brazil | 17.8pp | 20.6pp | 61 MODERATE | 59 LOW |
+| Mauritania | 2.7pp | 4.8pp | 60 MODERATE | 58 LOW |
+| Qatar | 1.2pp | 9.7pp | 67 MODERATE | 60 MODERATE |
+| Sao Tome and Principe | 0.5pp | 7.2pp | 70 MODERATE | 65 MODERATE |
+| India | 13.3pp | 15.0pp | 52 LOW | 51 LOW |
+
+**Result.** An analyst pasting Nigeria into an IC memo now carries **46 · LOW with the observed
+57.5–91.4% range attached** — the same figure the tool tells them to carry on screen — instead of
+a MODERATE grade they would have had to defend in the room and could not. Seven countries stop
+pasting a band the platform's own contract file contradicts.
+
+**Not changed, deliberately.** The Screener "Copy for IC Memo" carries the same claim for up to
+185 rows, but `window._cpObsSpread` is **empty on a cold load** (measured: 0 keys after opening
+the Screener) — the sample is a per-country fetch, so correcting 185 rows would need 185 fetches.
+Left alone rather than firing inconsistently. The on-screen CP predictability badge still reads
+`73 · MODERATE`; widening `cpSpreadConflict()` to reach it would ship prose that is now false, per
+cycle 626's note, and the CP surfaces need the `_fpObsCeiling()` treatment instead. Both are the
+next cycles' work.
+
+**Step 5b — phone.** `pointer: coarse` confirmed at 390x844 with `hasTouch: true`.
+`scrollWidth == clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 / 390** on Country Profile
+(Nigeria) and Reform Risk (Nigeria) — zero horizontal scroll. This cycle added **no control**:
+the change is clipboard and workbook text. The v612 mobile layer is untouched.
+
+**Verification.** JS syntax gate 16/16 script blocks. Playwright runtime suite executed against
+`http://localhost:8899/index.html` — 293/0/1, unchanged from the pre-change local baseline.
+XLSX downloaded, opened and parsed with `openpyxl`. Reform Risk card output confirmed identical
+after the refactor (`Carry ≤46 · LOW, not 73 · MODERATE` / `73 MODERATE ▲ best case` /
+`bundled spread 0.4pp — but ≥33.9pp observed`). Re-selection Nigeria → Norway → Nigeria emits no
+duplicate. Norway (one-term), Turkmenistan (measured, unrefuted) and Saudi Arabia (monopoly)
+pastes byte-identical to before.
+
+**Carried forward — unchanged from cycle 626 and still open:** the CP headline chip and
+predictability badge printing the refuted basis; the Home Screener card advertising a breakeven
+filter removed at v568; the ~600-character `#screener-count` line; the service-worker absolute
+path (`index.html:49`); the Screener carrying no model-terms leg and printing "one statutory term"
+as fact for conflicted countries; `#cmp-clear-btn` at 23px on desktop; the CP "Copy for IC Memo"
+note 2 and `_fpCohortLine()` omitting the ≤26 predictability ceiling; 19 sub-24px controls in
+`#explorer-screen-mode` under `pointer: coarse`; v710's `t7` clipped-text regression;
+`cp-price-select` absent from the DOM; Mozambique's "Commercially attractive" verdict;
+`renderTornadoPanel` unmarked on the generic-template path; reform coverage 21 of 185; the
+Methodology/Home tier-definition conflict; the FAQ naming a non-existent "Stability Score filter
+at >=4"; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (26th cycle); 862 contracts with
+no fiscal terms; the Screener Contractor NPV tooltip naming an absent profile selector (28th
+cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic
+pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
