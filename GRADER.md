@@ -38114,3 +38114,16 @@ column is a proxy — four separate prohibitions with no single statement of wha
 ordering IS. Whether Side-by-Side should carry a set-level verdict strip the way Country Profile
 carries its v450/v452 two-zone headline is a T3 question for a later cycle; it was set aside here
 because the measured first-paint defect was the worse of the two.
+
+---
+## Cycle 630 Log — 2026-09-08 15:29
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 630 complete and pushed as **v723** (`8468ec5`).
+
+## Task
+**T3 — "How do these three countries compare side by side?"** (stalest in rotation; 629 ran T6, 624 was the last T3.)
+
+## Friction
+Walked T3 cold — no sessionStorage, no localStorage — on the tab's own default set (Norway / UK / Netherlands). v511 put the basis rows at the head of the grid so the basis of a column is read before its numbers. That intent is right, but the block was **three rows** when v511 wrote it and it is **eight*
