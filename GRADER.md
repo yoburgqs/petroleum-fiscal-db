@@ -36995,3 +36995,140 @@ silent because the take really is one term.
 Walked T2 cold into Country Profile, which auto-loads Indonesia. The verdict strip — the first thing an analyst reads — ends with the page's own instruction: *"Defend on the take and its evidence tier (n=667 contracts), not on the NPV."*
 
 But on 61 of 185 countries this same pa
+
+---
+## Cycle 623 Log — 2026-09-08 12:35
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local, this cycle, actually run)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — A/B delta 0
+- JS errors: 1 (carried service-worker 404 off localhost, present on BOTH builds)
+- Shipped as v716, pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?"
+(stalest by rotation: 622 ran T2, 621 T5, 620/619 T4, 618 T1, 617 T3, 616 T6)
+
+## Friction
+Walked T6 cold. Fiscal Compare and Country Profile both answer it well — the FC
+drawer carries a "N of M model terms cited →" chip (v709) and Country Profile the
+same (v660), both wired to the Evidence Chain. **Side-by-Side had no equivalent**,
+and Side-by-Side is the one tab whose entire job is ranking columns against each
+other.
+
+Its **Evidence tier** row is what an analyst ranks on when the question is "how
+solid is this?" That letter grades the country's WHOLE fact base — hundreds of
+rows, most of them contract metadata — on primary-law share and fact depth. It
+never looks at the four to six fiscal terms `getDCFParams()` actually feeds the
+DCF to produce the take, NPV and IRR printed twenty rows below it.
+
+On the tab's own seeded example, cold load, no interaction, the two questions give
+**opposite orderings of the same three columns**:
+
+| row | Norway | United Kingdom | Netherlands |
+|---|---|---|---|
+| Evidence tier (shipped) | A · 66% of 63,848 | B · 43% of 15,899 | **A · 97% of 278** |
+| Model terms cited (measured) | 3 of 4 | 2 of 5 | **1 of 4** |
+
+Read the shipped row and the Netherlands is the best-evidenced column in the set —
+the only 97%, an A, ahead of Norway's 66%. Read what the model was actually handed
+and it is the worst of the three: one cited term out of four, and the uncited three
+include the **royalty rate**, which on a Concession is most of the take. Nothing on
+the grid said so.
+
+Not an edge case. Measured across all 185 shipped `api/v1/country` files against
+`getDCFParams()`'s own term set: **not one country cites every model term, 128 of
+185 cite half or fewer, 19 cite none.**
+
+## Change
+A **Model terms cited** row inserted directly under Evidence tier in the
+Side-by-Side grid (`index.html` ~27120, painter `_sbsPaintTermsCited` /
+`_sbsApplyTermsCited` ~28509, wired after `_sbsApplyObsSpread()` so it reads the
+token that call bumps).
+
+- Cell reads `3 of 4 →`, colour-tiered red ≤50% / orange <100% / green, with the
+  uncited terms named on a second line ("uncited: Royalty Rate, State
+  Participation, Special Tax").
+- Each cell is a **control**, not a caption: click or Enter opens that country's
+  Country Profile scrolled to the Evidence Chain, via the existing
+  `_fcOpenTermChain()`. Verified: lands on `t7`, correct country selected,
+  `dd-facts-<slug>` present.
+- Same sourcing rule as the FC chip and the Evidence Chain — bulk harvest, an
+  instrument shared across jurisdictions, and D-confidence values do not count.
+- Reuses `_fcTermLeg()`'s per-country cache, so a country already opened in the FC
+  drawer costs **no extra fetch**.
+- Painted into **both** the visible grid and `#cmp-data-table`, so Export PDF and
+  both Copy-for-IC-Memo flavours carry it. Clipboard verified to contain the row.
+- Renders a `checking…` placeholder synchronously and never strands it: a country
+  with no resolvable term set prints "not resolved" with a tooltip saying that is a
+  coverage gap and **not** a pass.
+- No grade, letter, colour or threshold on any existing row changed.
+
+## Result
+An analyst comparing three countries can see — on the grid and in the pasted IC
+memo table — which column is thinnest on the terms that actually produced its
+numbers, and can no longer rank the Netherlands above Norway on evidence because
+its percentage is bigger. On the default view that reordering is visible without
+clicking anything.
+
+## Verification — all run this cycle, none assumed
+- **JS syntax gate:** PASS. 11 inline `<script>` blocks, each `node --check`ed.
+- **Playwright `runtime_comprehensive.js` actually ran**, twice, against the local
+  build on the **real asset tree** (not a symlink stage). Before: 293 PASS / 0 FAIL
+  / 1 WARN. After: 293 PASS / 0 FAIL / 1 WARN. Test-name sets diffed **identical —
+  delta 0**.
+  - **Method note, recorded because it cost this cycle a wasted run.** The
+    symlink-staging method described in cycles 621-622 is **broken**:
+    `python3 -m http.server` does **not** serve a symlinked *directory*, so
+    `api/v1/country/*.json` 404s on the staged build while it 200s on the live one.
+    That staging scored **274 PASS / 19 FAIL** on an *unmodified* HEAD — 19 phantom
+    failures across ScreenerSortRender, SbSChartBasis and METH-EVIDENCE, all of
+    which read `api/`. Result discarded. The correct A/B is to swap `index.html` in
+    place on the real tree and run both passes against the same server. Do not use
+    the symlink method again.
+- **Horizontal scroll**, 11 tabs × 1920/1440/1280/1024/768/390: **0 overflow at
+  every width on every tab.**
+- **Step 5b, phone:** the new control measures **24px** at desktop widths and
+  **44px** under `pointer: coarse` at both 768 and 390 (the v612 mobile layer picks
+  it up). At 390×844 `hasTouch:true` the third column's control has right edge 354
+  of 390 — inside the viewport.
+- **Set churn:** add / remove / rapid add-then-remove all repaint correctly; no
+  stale `checking…` and no cell painted for a country no longer in the set (token
+  guard). Single-country state correctly shows the "add 1–4 more" prompt with no
+  grid, which is pre-existing behaviour.
+
+## Carried forward — not fixed this cycle
+- The Screener still carries **no model-terms leg at all** — its EVIDENCE column
+  prints the same whole-fact-base letter this cycle showed can invert. Same
+  blocker as the carried spread gap: `_fcTermLeg()` is a per-country fetch and the
+  Screener carries up to 185 rows, so this needs a **bundled per-country
+  terms-cited count**, not a UI change. This cycle makes that gap starker — SbS now
+  names the Netherlands as 1-of-4 on a row the Screener still grades A.
+- The Screener IC copy still prints "one statutory term — spread component not
+  exercised" as fact for conflicted countries (same bundling blocker).
+- `#cmp-clear-btn` renders 23px at desktop widths (pre-existing, A/B confirmed).
+- The Country Profile "Copy for IC Memo" note 2 and `_fpCohortLine()` still omit
+  the ≤26 predictability ceiling; the CP table row still reads "UNGRADED (score
+  62/100)". `_fpCohortLine()` still ranks conflicted countries inside the one-term
+  cohort.
+- Service-worker absolute path (`index.html:49`) still origin-dependent.
+- 19 sub-24px controls inside `#explorer-screen-mode` under `pointer: coarse`.
+- `pixel_audit` still exercises Side-by-Side only with the seeded three-country
+  example — which is now the example that carries this cycle's new row, so the
+  audit does cover it, but only in that one configuration.
+- v710's `t7` clipped-text regression: `tablet-768::2-t7 33 → 37`,
+  `phone-390::2-t7 33 → 36`.
+- The inverted tier-B definition survives in ~12 further FAQ answers in the GRADER
+  archive.
+- Everything on the cycle-603 through 622 carried lists remains open, including:
+  `cp-price-select` absent from the DOM; Mozambique's "Commercially attractive"
+  verdict under its own non-reconciliation panel; `renderTornadoPanel` with no
+  basis marking on the generic-template path; reform coverage 21 of 185; the
+  Two-Price Return Screen thresholds; the Methodology/Home tier-definition
+  conflict; the FAQ naming a "Stability Score filter at >=4" that does not exist;
+  the Home Screener card advertising a breakeven filter removed at v568;
+  `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+  placeholder; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0`
+  (22nd cycle); 862 contracts with no fiscal terms; the Screener Contractor NPV
+  tooltip naming an absent profile selector (24th cycle); the Methodology tab
+  naming a `display:none` API Explorer tab; unweighted per-mechanic pivot averages;
+  the incomplete 2020s cohort; duplicated
+  `renderVintageTrendChart()`/`renderVintage()`.
