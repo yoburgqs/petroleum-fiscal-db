@@ -37846,3 +37846,144 @@ per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
 ## First, the 4 FAILs in the brief did not reproduce
 
 Before touching anything I re-ran the suite against both targets: **live 294/0/0**, **localhost 293/0/1**. All four passed on both. They're the v601 Country Profile block, which asserts after a **fixed 2200ms** wait following `loadCountryProfile('Norway')` — when that fetch runs long the assertions read the previously-rendered country, giving exactly the observed signature (the one *negati
+
+---
+## Cycle 629 Log — 2026-09-08 — shipped as v722 (`b2c41a8`)
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?"
+(Stalest by rotation: 628 ran T2, 627 T5, 626 T4, 625 T1, 624 T3, 623 T6.)
+
+### First — the 4 FAILs in the brief did not reproduce, again
+
+Before touching anything, baseline against `http://localhost:8899/index.html`:
+**293 PASS / 0 FAIL / 1 WARN.** The single WARN is the pre-existing service-worker 404
+(`index.html:49`), already on the carried-forward list. This is the second cycle running that
+the brief's 4 FAIL has not reproduced; cycle 628 traced it to the v601 Country Profile block's
+fixed 2200ms wait. That race is still open and is still generating phantom failures in the
+cycle brief. It should be fixed with a state assertion rather than a sleep.
+
+### Friction
+
+Walked T6 cold at 1440x900, no sessionStorage and no localStorage. Country Profile answers T6
+well — the per-parameter Evidence Chain names ORCA value, statutory value and source per term,
+the LINK DEAD chips (v641) are honest about which citations cannot be opened, and the
+"3 of 4 model terms cited →" chip is wired to it. Fiscal Compare, Explorer, Screener,
+Side-by-Side and IOC Portfolio all carry an evidence marker on a ranked country.
+
+**The Breakeven Map carries none.** Measured on the rendered tab: not one occurrence of
+"evidence", "tier" or "source" in any string the tab draws.
+
+That would be a minor omission on a secondary tab. It is not minor here, because the tab's own
+intro paragraph sends the analyst to a specific card by name:
+
+> *"For downside screening use NPV @$50 (modelled 185/185) — the right-hand card below, and the
+> Screener's Downside Resilience preset."*
+
+Of the two surfaces that sentence recommends, the Screener puts `getEvidenceBar()` on every row.
+`be-highest-list` — the right-hand card — printed country and "% kept" and stopped
+(`index.html`, the v591 right-card IIFE, `row()`).
+
+What the omission costs, measured against the shipped `country_data.json` and confirmed on the
+rendered DOM. These are the ten rows the card actually draws:
+
+| rank | country | % kept | grade | primary law | facts |
+|---|---|---|---|---|---|
+| 1 | **Turkmenistan** | 75% | **C** | 36.7% | 515 |
+| 2 | Uzbekistan | 74% | A | 62.6% | 585 |
+| 3 | Iran | 70% | B | 56.7% | 3,792 |
+| 4 | **Bolivia** | 63% | **C** | 27.5% | 1,074 |
+| 5 | Libya | 63% | B | 52.7% | 2,132 |
+| … | | | | | |
+| −5 | **Oman** | 21% | **C** | 35.5% | 1,241 |
+| −4 | Cambodia | 16% | A | 67.1% | 219 |
+| −3 | Bangladesh | 5% | B | 57.0% | 962 |
+| −2 | Malaysia | −5% | B | 52.4% | 2,679 |
+| −1 | Yemen | −14% | A | 70.7% | 351 |
+
+The country the platform ranks **first** for downside resilience is graded **C**. 3 of the 10
+drawn are C. Across the full ranking 77 of 182 are C or D (42%), and the first ten by retention
+alone hold four Cs and a D.
+
+The reason this is a T6 failure and not a T1 one: retention is `npv_50 / npv_75` — a ratio of
+two **modelled** numbers. It inherits whatever the fiscal terms underneath it are worth. A
+shortlist that prints the ratio to the percentage point and hides the grade is the one shape of
+this card an analyst cannot audit. The only way to learn that the #1 pick was C-graded was to
+leave the tab and open all ten profiles one at a time.
+
+### Change
+
+Each of the ten rows now carries the evidence letter **on its face** — `Turkmenistan C · 75% kept`
+— coloured by `_evidenceGrade()`, the platform's single grader, in the same convention as the
+Explorer/Screener Evidence column, the Fiscal Compare Quality column, the Country Profile badge
+and the Side-by-Side Evidence tier row. This is v557's fix (which put the letter on the
+Explorer/Screener composition bar) applied to the ranked list that never received it.
+
+The row object now keeps its source entry (`d: d`) so the grader can run on it — it previously
+projected to four scalars and discarded the country record, which is why no grade was reachable
+at render time.
+
+A line under the card states what the letter is and counts how many of the ten, and of the 182,
+are C or D. **Both counts are computed at render from `COUNTRY_DATA`, not written in**, so they
+cannot drift from the data the way a hardcoded figure would. It currently renders:
+
+> The letter is the country's evidence grade — the same A/B/C/D the Explorer, Screener and
+> Country Profile show, on primary-law share AND fact depth. **3 of the 10 rows above are C or
+> D**, starting with top-ranked Turkmenistan (C — 36.7% primary law), and 77 of the 182 ranked
+> are. Retention is a ratio of two modelled NPVs: it ranks regimes, it does not vouch for the
+> terms they were computed from. Open the profile before shortlisting.
+
+The per-row `title` gained the grade, its label and its two legs. That is an extension of an
+existing tooltip on an existing control, not a new tooltip standing in for a fix — the fix is the
+letter on the face, which is what the directive's tooltip ban is asking for.
+
+### Result
+
+An analyst screening for downside resilience reads `Turkmenistan C · 75% kept` instead of
+`Turkmenistan 75% kept`, and can see **before** shortlisting that the platform's own #1 pick is
+its evidence-thin one — without leaving the tab. The two surfaces the tab recommends in the same
+sentence now answer T6 the same way.
+
+### Step 5b — phone
+
+390x844 with `hasTouch: true`. `scrollWidth == clientWidth` at **1920 / 1440 / 1280 / 1024 / 768
+/ 390** — zero horizontal scroll at every viewport. **No control was added**; the letter is a
+`<span>` inside the existing `.be-ret-row`. Rows measure **44px** under `pointer: coarse` and
+31px on desktop — zero under 24px. The right-hand group took `flex:none` and the country name
+took `min-width:0` + ellipsis so the added letter can never widen the row past its column; at
+390px the card is only 139px wide and all ten names still render **unclipped**, so the ellipsis
+is a never-firing safety net rather than a visible truncation. The v612 mobile layer is untouched.
+
+### Verification
+
+JS syntax gate **11/11** script blocks, run twice (after the change and again after the version
+bump). Runtime suite **EXECUTED** this cycle against `http://localhost:8899/index.html` —
+**293 PASS / 0 FAIL / 1 WARN**, identical to the pre-change baseline taken before any edit.
+Zero page errors on the tab before or after. The rendered counts (3 of 10, 77 of 182,
+Turkmenistan at 36.7%) were cross-checked against an independent Python pass over
+`country_data.json` and agree exactly.
+
+**Carried forward — unchanged from cycle 628.** Still open: the v601 evidence-chain block's
+2200ms fixed-wait race (now twice the cause of a phantom 4 FAIL in the cycle brief — this should
+be next); the `.orca-fp-badge` 21px touch target needing a `renderStabilityBadge()`-level fix
+across four tabs; the Home Screener card advertising a breakeven filter removed at v568; the
+~600-character `#screener-count` line; the service-worker absolute path (`index.html:49`, and it
+is the standing 1 WARN in every suite run); the Screener carrying no model-terms leg; the
+Screener "Copy for IC Memo" firing against an empty `window._cpObsSpread` on a cold load;
+`#cmp-clear-btn` at 23px on desktop; the CP "Copy for IC Memo" note 2 and `_fpCohortLine()`
+omitting the ≤26 predictability ceiling; 19 sub-24px controls in `#explorer-screen-mode`; v710's
+`t7` clipped-text regression; `cp-price-select` absent from the DOM; Mozambique's "Commercially
+attractive" verdict; `renderTornadoPanel` unmarked on the generic-template path; reform coverage
+21 of 185; the Methodology/Home tier-definition conflict; the FAQ naming a non-existent
+"Stability Score filter at >=4"; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent
+Platform Updates" placeholder; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0`
+(28th cycle — note the Breakeven Map itself already excludes them via `_beIsTested()`); 862
+contracts with no fiscal terms; the Screener Contractor NPV tooltip naming an absent profile
+selector (30th cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted
+per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
+`renderVintageTrendChart()`/`renderVintage()`.
+
+*(New this cycle, deliberately not fixed — out of T6 scope.)* The Breakeven Map's price-marker
+slider is inert above $34: every modelled breakeven falls in $27–$34, so at the default $75 the
+summary reads "65 viable below / 0 above" and never changes until the analyst drags below $34.
+The tab is already honest about the compressed range in prose; whether the slider should default
+to somewhere inside the data is a T1/T2 question for a later cycle.
