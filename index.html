@@ -1930,7 +1930,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v713</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v714</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2000,7 +2000,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v713</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v714</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -28305,6 +28305,37 @@ function _sbsPaintObsSpread(c, d, obs, token) {
           + 'this country\u2019s own contract table.">\u25b2 best case</span>');
       }
     }
+
+    // \u2500\u2500 v714 (T5): print the bound in the cell, not just in the badge's title \u2500\u2500
+    // This grid exists to RANK countries, and "Copy for IC Memo" turns the row into a memo
+    // table. The refuted columns printed their score with a \u25b2 best case marker and the set
+    // notice said "do not rank the set on these two rows" -- correct, and unusable: the
+    // analyst was told the row is wrong and handed nothing to put in its place, so the
+    // pasted artifact still ranked NL 84 > Norway 76 > UK 58 with a caveat under it.
+    // The ceiling was already computed here, passed to _sbsObsNotice() and dropped on the
+    // floor. Printing it re-orders the same three columns to NL \u226459, UK 58, Norway \u226452 --
+    // the UK, the only measured column, goes from last to joint first.
+    // Not a recompute: obs.spread is a FLOOR on the true spread, so cost is a floor on the
+    // penalty and this is a CEILING on the score. Same rule as v559 and v713.
+    if (bound != null && !host.dataset.obsBound) {
+      host.dataset.obsBound = '1';
+      host.insertAdjacentHTML('beforeend',
+        '<span style="display:block;margin-top:3px;font-size:10px;font-weight:800;'
+        + 'color:var(--orange);line-height:1.35;" title="' + _sbsAttr(
+            'Carry ' + bound + ' \u00b7 ' + bLbl + ' for ' + c + ', not the printed ' + fp + '. '
+          + 'The take-spread component of this score \u2014 its largest, worth up to \u221240 points \u2014 '
+          + 'was charged ZERO because the bundled p25 and p75 take for ' + c + ' are identical. '
+          + 'ORCA\u2019s own contract file lists the ' + obs.n + ' largest producing contracts running '
+          + range + ' government take at $75/bbl across ' + obs.distinct + ' distinct values, so that '
+          + 'basis does not hold. At ' + obs.spread.toFixed(1) + 'pp the spread term alone costs '
+          + cost.toFixed(0) + ' points. The score is NOT recomputed \u2014 a top-' + obs.n
+          + '-by-production sample cannot establish a population IQR across all ' + nAll
+          + ' contracts \u2014 but the observed spread is a floor on the real one, so '
+          + cost.toFixed(0) + ' points is a floor on the penalty and ' + bound + ' is a CEILING on '
+          + 'the score: the true figure is at or below it, never above. Rank this column on '
+          + bound + ', with the observed range ' + range + ' attached.')
+        + '">\u2192 carry \u2264' + bound + ' \u00b7 ' + bLbl + '</span>');
+    }
   }
 
   _sbsObsNotice(c, obs, bound, bLbl, fp, token);
@@ -28315,6 +28346,41 @@ function _sbsAttr(x) {
 }
 // One notice for the whole set, rebuilt as each column's fetch lands, so a set with three refuted
 // columns gets one sentence naming all three rather than three stacked notices.
+// v714 (T5): the notice used to end "Carry the observed contract range into the IC memo, not
+// the grade." A pp range is not a predictability reading -- it tells the analyst the row is
+// unusable without giving them anything to paste in its place, on the one screen whose job is
+// ranking. Each refuted column already has a CEILING computed from the platform's own formula
+// (score minus the spread penalty it was never charged); this states them, and re-ranks the set
+// on the ceilings together with any column ORCA does hold a measured spread for. A ceiling and a
+// measured score are both defensible upper reads, which is what makes them orderable together;
+// a ceiling is marked with "<=" everywhere it appears so it is never pasted as a point estimate.
+function _sbsBoundOrder(hits, measured) {
+  var rows = [];
+  hits.forEach(function(k) {
+    var h = window._sbsObsHits[k];
+    if (!h || h.bound == null) return;
+    rows.push({ c: k, v: h.bound, txt: k + ' \u2264' + h.bound + ' \u00b7 ' + h.bLbl
+                                        + ' (printed ' + h.fp + ')' });
+  });
+  if (!rows.length) return ' Carry the observed contract range into the IC memo, not the grade.';
+  var bounded = rows.map(function(r) { return r.txt; });
+  (measured || []).forEach(function(k) {
+    var dd = (COUNTRY_DATA || []).filter(function(x) { return x.country === k; })[0];
+    var sc = (dd && typeof getFiscalPredictabilityScore === 'function')
+               ? getFiscalPredictabilityScore(dd) : null;
+    if (sc != null) rows.push({ c: k, v: sc, txt: k + ' ' + sc + ' (measured)' });
+  });
+  rows.sort(function(a, b) { return b.v - a.v; });
+  var order = rows.map(function(r) {
+    return r.c + ' ' + (r.txt.indexOf('\u2264') !== -1 ? '\u2264' : '') + r.v;
+  }).join(' \u203a ');
+  return ' On this platform\u2019s own formula the withdrawn column'
+    + (bounded.length > 1 ? 's bound at ' : ' bounds at ') + bounded.join(', ')
+    + '. Ranked on those ceilings' + ((measured && measured.length) ? ' alongside the measured column'
+        + (measured.length > 1 ? 's' : '') : '') + ', this set reads ' + order
+    + ' \u2014 carry that order and those figures into the IC memo, each with its observed range '
+    + 'attached, not the printed scores.';
+}
 function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
   if (token !== window._sbsRenderToken) return;
   var out = document.getElementById('cmp-output');
@@ -28362,7 +28428,8 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
       + (widest > narrowestMeasured
           ? 'therefore look' + (measured.length > 1 ? '' : 's') + ' like the LESS uniform regime'
             + (measured.length > 1 ? 's' : '') + ' on this screen while sitting at a NARROWER dispersion '
-            + 'than the withdrawn column' + (hits.length > 1 ? 's' : '') + '. Do not rank the set on these two rows.'
+            + 'than the withdrawn column' + (hits.length > 1 ? 's' : '') + '. Do not rank the set on the '
+            + 'printed scores \u2014 rank it on the ceilings below.'
           : 'are shown on a measured basis and are directly readable.');
   }
   el.innerHTML = '<strong style="color:var(--orange);">\u26a0 The &ldquo;single term&rdquo; claim is withdrawn for '
@@ -28370,8 +28437,7 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
     + 'take for ' + parts.length + ' of these countries, which is what the Take spread and Predictability rows were '
     + 'built on. Its own contract file contradicts that: ' + parts.join('; ') + ' \u2014 measured government take at '
     + '$75/bbl, not simulated.' + cmp + ' The scores are NOT recomputed here, because a top-N-by-production sample '
-    + 'cannot establish a population spread; they are marked \u25b2 best case. Carry the observed contract range into '
-    + 'the IC memo, not the grade.';
+    + 'cannot establish a population spread; they are marked \u25b2 best case.' + _sbsBoundOrder(hits, measured);
 }
 function _sbsApplyObsSpread() {
   window._sbsRenderToken = (window._sbsRenderToken || 0) + 1;
