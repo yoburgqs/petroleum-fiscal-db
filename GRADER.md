@@ -36868,3 +36868,115 @@ pane. Re-staged with the full asset tree symlinked; the numbers above are from t
 
 ## Friction
 I walked T5 cold and clicked every surface that claims to produce a memo artifact, reading the actual clipboard rather than the changelog. Fiscal Compare, Screener, IOC Portfolio and Country Profile all copy correctly — including the FC row-tick shortlist, where t
+
+---
+## Cycle 622 Log — 2026-09-08 05:54 — shipped as v715
+
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local build, A/B'd — see Verify)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — delta 0
+- JS errors: 1, identical on both builds (carried service-worker 404 off localhost)
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?"
+Stalest by rotation: 621 ran T5, 620/619 T4, 618 T1, 617 T3, 616 T6, 615 T2.
+
+## Friction
+Walked T2 cold — no sessionStorage, no localStorage — into Country Profile, which
+auto-loads Indonesia. The verdict strip is the first thing read and it ends with the
+page's own instruction, from `_quickIcVerdict497` (index.html:33970):
+
+> "Defend on the take and its evidence tier (n=667 contracts), not on the NPV."
+
+On 61 of 185 countries this same page also holds a reading that the take is **not a
+point estimate**, and every other surface had already been patched to say so:
+`cpSpreadParts()` rewrites the basis chip to "Contract take: 42.5–79.7% observed
+(≥37.2pp) ⚠", `cpDistNote()` rewrites the distribution caption, `_cpApplyObsSpread()`
+draws a dashed observed band on the distribution bar and re-labels the predictability
+chip from "one term" to "≥37.2pp obs".
+
+The verdict was the one element `_cpApplyObsSpread()` did **not** touch — it patches
+four things and skips the sentence that tells the analyst what to quote. It is built
+synchronously; the contract sample lands on a later fetch. So the page instructs the
+analyst to defend a point figure that its own contract table, 3,891px below, refutes.
+Measured this cycle: Indonesia ≥37.2pp, Angola ≥45.2pp, Norway ≥29.6pp, USA ≥11.3pp,
+Cyprus 62.8pp, Iraq 33.5pp, Brazil 17.8pp.
+
+## Change
+The verdict strip now has a second zone under the instruction, built by a new
+`cpDefendDispersion(d, take)` called from **both** paths — at render (cached sample or
+measured IQR) and from `_cpApplyObsSpread()` when the fetch lands — so the two cannot
+drift. Four states:
+
+| state | on screen |
+|---|---|
+| single-term claim refuted, ≥5pp | orange **"Take is a range here, not a point."** + observed min–max + ≥Npp floor + **See the spread →** control |
+| measured IQR ≥5pp | orange, p25–p75 band, "the block you sign moves the take" |
+| refuted but <5pp (Mozambique ≥2.2pp) | muted **"Not a single term, but a narrow one."** — stated, no alarm, no CTA |
+| genuine single term (Vanuatu, Qatar, Guyana, Nigeria) | nothing added |
+
+**See the spread →** calls a new `_cpScrollToDistribution()` that scrolls to and flashes
+the Contract Distribution panel — same treatment as the existing
+`_cpScrollToEvidenceChain()` / `_cpScrollToTierSchedule()`. The distribution section
+gained `id="cp-dist-section"` as its anchor.
+
+No new threshold. The refutation test is the existing `cpSpreadConflict()` /
+`CP_OBS_REFUTE_PP = 1.0`; the 5pp materiality cut is the "consistent terms" line the
+basis-chip tooltip has used since v559. The <5pp branch exists because dressing a 2.2pp
+floor in the same orange as Indonesia's 37.2pp is what trains an analyst to skip the row.
+
+Also fixed in the same walk: the cold-load example banner read "644 of 648 contracts on
+their own terms". 644 is Indonesia's `n_psc`; 648 was its contract total when that string
+was hardcoded. The total is **667**, and the headline, the basis chip, the distribution
+panel and the mechanic breakdown on that same screen all print 667. Both figures now
+read from `COUNTRY_DATA`.
+
+## Result
+An analyst screening a country at $75 now learns, **on the same line that tells them what
+to defend**, whether that number is a statutory term or an average over a spread — and
+reaches the evidence for it in one click, instead of scrolling 3,891px and finding it by
+accident. On 8 of the 15 countries sampled the line changed; on 6 it correctly stayed
+silent because the take really is one term.
+
+## Verify — all run this cycle, none assumed
+- **JS syntax gate:** PASS. 11 inline `<script>` blocks, each `node --check`ed.
+- **Playwright `runtime_comprehensive.js` actually ran**, against the local build:
+  293 PASS / 0 FAIL / 1 WARN. A/B against the pre-change build staged **with the full
+  asset tree symlinked** (per cycle 621's method note): identical, **delta 0**.
+  The 1 WARN and the 293-vs-294 gap versus the deployed number are the carried
+  origin-dependent service-worker path (`index.html:49`) 404-ing off localhost — present
+  on **both** builds, not caused here.
+- **Horizontal scroll**, 11 tabs × 1920/1440/1280/1024/768/390: **0 overflow at every
+  width on every tab.**
+- **Step 5b, phone:** at 390×844 `hasTouch:true` and at 768 `pointer: coarse`, the new
+  control measures **24px**; the block sits fully inside the viewport (right edge 363 of
+  390). CP sub-24px controls at 390: 6 before, 6 after — unchanged.
+
+## Carried forward — not fixed this cycle
+- `#cmp-clear-btn` renders 23px at desktop widths (pre-existing, A/B confirmed).
+- The Screener IC copy still prints "one statutory term — spread component not exercised"
+  as fact for conflicted countries. Unlike CP and SbS this needs a **bundled spread
+  field**, not a UI change: `_cpObsSpread` is populated only by a per-country contract
+  fetch and the Screener carries up to 185 rows. This cycle makes that gap starker — CP
+  now says "range, not a point" on countries the Screener still calls single-term.
+- The Country Profile "Copy for IC Memo" note 2 and `_fpCohortLine()` still omit the ≤26
+  predictability ceiling; the CP table row still reads "UNGRADED (score 62/100)".
+- `_fpCohortLine()` still ranks conflicted countries inside the one-term cohort.
+- Service-worker absolute path (`index.html:49`) still origin-dependent.
+- 19 sub-24px controls inside `#explorer-screen-mode` under `pointer: coarse`.
+- `pixel_audit` still exercises Side-by-Side only with the seeded three-country example.
+- v710's `t7` clipped-text regression: `tablet-768::2-t7 33 → 37`, `phone-390::2-t7 33 → 36`.
+- The inverted tier-B definition survives in ~12 further FAQ answers in the GRADER archive.
+- Everything on the cycle-603 through 621 carried lists remains open, including:
+  `cp-price-select` absent from the DOM (the `cp-run-fc-btn` handler falls back to
+  `fc-price`, so it works, but the `getElementById('price')` leg of that same handler
+  targets an element that does not exist); Mozambique's "Commercially attractive" verdict
+  under its own non-reconciliation panel; `renderTornadoPanel` with no basis marking on
+  the generic-template path; reform coverage 21 of 185; the Two-Price Return Screen
+  thresholds; the Methodology/Home tier-definition conflict; the FAQ naming a "Stability
+  Score filter at >=4" that does not exist; the Home Screener card advertising a breakeven
+  filter removed at v568; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent
+  Platform Updates" placeholder; Kuwait's evidence tier; three monopolies carrying
+  `be_75 = 1.0` (21st cycle); 862 contracts with no fiscal terms; the Screener Contractor
+  NPV tooltip naming an absent profile selector (23rd cycle); the Methodology tab naming a
+  `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete
+  2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
