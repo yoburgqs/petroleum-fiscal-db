@@ -36300,3 +36300,13 @@ and the one-line cite reads `… B-tier sourcing (52.0% primary law on 1,051 fac
 - The inverted tier-B definition survives in **~12 further FAQ answers** in the GRADER-era archive (A29 §, WPT, legal-DD, scoring-rubric, citation-template blocks). The two on the direct T6 path were corrected; a sweep of the rest was not attempted this cycle and is the obvious next T6 task.
 - Everything on the cycle-603 through 615 carried lists remains open, including: `cp-price-select` absent from the DOM so Country Profile has no price control and `cp-run-fc-btn` falls through to `fc-price`; Mozambique's "Commercially attractive" verdict sitting under its own non-reconciliation panel; Country Profile contradicting itself on whether contractor NPV carries information beyond take; `renderTornadoPanel` with no basis marking on the generic-template path; reform coverage 21 of 185; the Two-Price Return Screen thresholds in the bottom quartile; the Methodology/Home tier-definition conflict; the FAQ naming a "Stability Score filter at >=4" that does not exist; Evidence Chain grammar on n=1; the Home Screener card advertising a breakeven filter removed at v568; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder; `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (16th cycle); 862 contracts with no fiscal terms; zero-rate defaults inside published `take_75`; the Screener Contractor NPV tooltip naming an absent profile selector (18th cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
 - `pixel_audit` not run this cycle. The change adds clipboard text and prose inside existing paragraphs and one XLSX row; the six-viewport horizontal-scroll sweep above was run in its place and found none, and the 24-cycle `tablet-768::2-t7 clipped-text` carry is pre-existing.
+
+---
+## Cycle 616 Log — 2026-09-07 22:26
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: The last monitor has ended. Cycle 616 is complete with nothing outstanding — v710 is shipped, pushed to both repos, mirrored, verified green on the deployed build (294 PASS / 0 FAIL / 0 WARN, 0 JS errors), and logged in GRADER.md.
+
+
+Pixel gate: 0 hard-rule failure(s), 2 regression(s): tablet-768::2-t7: clipped-text 33 -> 37; phone-390::2-t7: clipped-text 33 -> 36
