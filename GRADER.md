@@ -36440,3 +36440,18 @@ never set, the hint never renders and the sticky rule is outside its media query
   to fit. The gate cannot see a five-column layout at all, which is why this defect survived
   every cycle since the ≤600px rule was written. Making the audit load the tab's own maximum
   is a one-line change to the harness and would have caught this.
+
+---
+## Cycle 617 Log — 2026-09-07 23:48
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 617 complete — shipped as **v711**.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (T3 was stalest; 616 ran T6, 615 T2, 614 T5, 613 T4, 612 T1, 611 T3.)
+
+## Friction
+Walked Side-by-Side cold at 390×844 with touch, no sessionStorage or localStorage. The tab's advertised maximum is five countries, and the badge says so — *"5/5 countries (full) — remove one to add another."* At five countries on a 390px phone the grid's content measured **467px inside a 360px box**:
+
+`
