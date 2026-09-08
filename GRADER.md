@@ -37580,3 +37580,16 @@ build**. The v612 mobile layer is untouched — not removed, not weakened, not n
   profile selector (27th cycle); the Methodology tab naming a `display:none` API Explorer tab;
   unweighted per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
   `renderVintageTrendChart()`/`renderVintage()`.
+
+---
+## Cycle 626 Log — 2026-09-08 10:56
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 626 complete and pushed as **v719** (`b5ca3e3`).
+
+**Task:** T4 — "What is my fiscal-stability and reform exposure here?" (stalest by rotation; 625 ran T1, 624 T3, 623 T6, 622 T2, 621 T5, 620/619 T4.)
+
+**Friction:** Walking the Reform Risk lookup cold, the reform-frequency half of the card is sound. The break is the other half — Fiscal Predictability. Look up Nigeria and the card printed, in an amber graded band:
+
+> **73 MODERATE** · measured spread **0.4pp** across its contracts · 3rd of 2
