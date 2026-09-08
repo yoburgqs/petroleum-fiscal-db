@@ -38277,3 +38277,18 @@ a `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the i
 cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`; and the Breakeven Map's
 price-marker slider being inert above $34. Plus the Side-by-Side 3,425-character comparability
 notice block raised as new-not-fixed by cycle 630.
+
+---
+## Cycle 631 Log — 2026-09-08 16:44
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 631 complete, shipped as **v724** (`a09ee83`), pushed to `main`.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (stalest by rotation: 630 ran T3, 629 T6, 628 T2, 627 T5, 626 T4, 625 T1.)
+
+## Friction
+Walked T1 cold at 1440×900 with no sessionStorage or localStorage: Home → Screener card → the preset dropdown, which is the one control built for this question. The option named for what an IC asks first read:
+
+> Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$
