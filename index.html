@@ -1949,7 +1949,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v721</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v722</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2019,7 +2019,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v721</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v722</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -48337,21 +48337,65 @@ async function renderBreakevenMap() {
     if (!host) return;
     const retFn = (typeof _npvRetention === 'function') ? _npvRetention : null;
     if (!retFn) { host.innerHTML = '<div style="font-size:12px;color:var(--muted);">Downside retention unavailable.</div>'; return; }
-    const rows = COUNTRY_DATA.map(function(d) { return { c: d.country, r: retFn(d), npv50: d.npv_50, take: d.take_75 }; })
+    const rows = COUNTRY_DATA.map(function(d) { return { c: d.country, r: retFn(d), npv50: d.npv_50, take: d.take_75, d: d }; })
                              .filter(function(x) { return x.r !== null && x.r !== undefined; })
                              .sort(function(a, b) { return b.r - a.r; });
     if (!rows.length) { host.innerHTML = '<div style="font-size:12px;color:var(--muted);">Downside retention unavailable.</div>'; return; }
+    // ── v722 (T6): the evidence grade goes on the FACE of each row ──────────────────────────
+    // This card is not one ranking among several: the paragraph at the top of this tab sends the
+    // analyst here by name -- "For downside screening use NPV @$50 (modelled 185/185) -- the
+    // right-hand card below, and the Screener's Downside Resilience preset." Of those two
+    // recommended surfaces the Screener carries getEvidenceBar() on every row and this one
+    // carried nothing. Measured against the shipped country_data.json, the whole tab contained no
+    // occurrence of "evidence", "tier" or "source" in any rendered string.
+    // What that costs, on the ten rows this card actually draws:
+    //   * the TOP-RANKED country is Turkmenistan at 75% kept, and it is graded C -- 36.7% primary
+    //     law. Bolivia at #4 (63%) is C. Oman in the bottom five is C. 3 of the 10 drawn.
+    //   * across the full 182-country ranking 77 are C or D (42%), and the first ten by retention
+    //     alone hold four Cs and a D.
+    // Retention is npv_50 / npv_75 -- a ratio of two MODELLED numbers -- so it inherits whatever
+    // the fiscal terms underneath it are worth. A shortlist that prints the ratio to the point and
+    // hides the grade is the one shape of this card an analyst cannot audit.
+    // Same letter, same grader (_evidenceGrade) and same convention as the Explorer / Screener
+    // Evidence column, the Fiscal Compare Quality column, the Country Profile badge and the
+    // Side-by-Side Evidence tier row -- v557's fix, applied to the ranked list that never got it.
+    const gradeOf = (typeof _evidenceGrade === 'function') ? _evidenceGrade : null;
+    const isCD = function(x) { var g = gradeOf && gradeOf(x.d); return !!g && (g.grade === 'c' || g.grade === 'd'); };
     const row = function(x) {
       const pct = x.r * 100;
       const col = pct < 0 ? 'var(--red)' : pct >= 50 ? '#15803D' : pct >= 35 ? 'var(--text)' : 'var(--orange)';
+      const g = gradeOf ? gradeOf(x.d) : null;
+      const gTip = g ? ' Evidence grade ' + g.letter + ' \u2014 ' + g.label + ' (' + g.aPct.toFixed(1)
+                     + '% primary law on ' + Number(g.nFacts).toLocaleString() + ' facts). Retention is a ratio of two'
+                     + ' modelled NPVs, so it is only as good as the fiscal terms underneath it.' : '';
+      const gHtml = g ? '<span style="color:' + g.color + ';font-weight:700;font-size:11px;line-height:1;font-family:\'IBM Plex Mono\',monospace;">' + g.letter + '</span>'
+                      + '<span style="color:var(--border);font-size:11px;line-height:1;">\u00b7</span>' : '';
       return '<div class="be-ret-row" data-country="' + String(x.c).replace(/"/g, '&quot;') + '" role="button" tabindex="0"'
-        + ' title="' + String(x.c).replace(/"/g, '&quot;') + ' keeps ' + pct.toFixed(0) + '% of its $75/bbl contractor NPV at $50/bbl (NPV @$50 = $' + Math.round(x.npv50) + 'M, govt take ' + (x.take != null ? x.take.toFixed(1) + '%' : 'n/a') + '). Click to open the Country Profile."'
-        + ' style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;">'
-        + '<span style="color:var(--text);">' + x.c + '</span>'
+        + ' title="' + String(x.c).replace(/"/g, '&quot;') + ' keeps ' + pct.toFixed(0) + '% of its $75/bbl contractor NPV at $50/bbl (NPV @$50 = $' + Math.round(x.npv50) + 'M, govt take ' + (x.take != null ? x.take.toFixed(1) + '%' : 'n/a') + ').' + gTip + ' Click to open the Country Profile."'
+        + ' style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:13px;cursor:pointer;">'
+        // min-width:0 + ellipsis so the added letter can never widen the row past its column at 390px
+        + '<span style="color:var(--text);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + x.c + '</span>'
+        + '<span style="display:flex;align-items:center;gap:5px;flex:none;">' + gHtml
         + '<span style="color:' + col + ';font-weight:700;font-variant-numeric:tabular-nums;">' + pct.toFixed(0) + '% kept</span>'
+        + '</span>'
         + '</div>';
     };
     const top = rows.slice(0, 5), bot = rows.slice(-5);
+    // The letters need one sentence saying what they are, and the count is the part that changes
+    // the read: a shortlist whose #1 is C is a different object from one whose #1 is A.
+    var _evLine = '';
+    if (gradeOf) {
+      var _shown = top.concat(bot);
+      var _cdShown = _shown.filter(isCD).length;
+      var _cdAll = rows.filter(isCD).length;
+      var _topG = gradeOf(top[0].d);
+      _evLine = ' <span style="display:block;margin-top:7px;">The letter is the country\u2019s evidence grade \u2014 the same '
+        + 'A/B/C/D the Explorer, Screener and Country Profile show, on primary-law share AND fact depth. '
+        + '<strong style="color:var(--text);">' + _cdShown + ' of the 10 rows above ' + (_cdShown === 1 ? 'is' : 'are') + ' C or D</strong>'
+        + (isCD(top[0]) ? ', starting with top-ranked ' + top[0].c + ' (' + _topG.letter + ' \u2014 ' + _topG.aPct.toFixed(1) + '% primary law)' : '')
+        + ', and ' + _cdAll + ' of the ' + rows.length + ' ranked are. Retention is a ratio of two modelled NPVs: it '
+        + 'ranks regimes, it does not vouch for the terms they were computed from. Open the profile before shortlisting.</span>';
+    }
     let h = '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;">Keeps the most at $50/bbl</div>'
           + top.map(row).join('')
           + '<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin:12px 0 2px;">Keeps the least \u2014 negative = value destroyed</div>'
@@ -48360,6 +48404,7 @@ async function renderBreakevenMap() {
           + 'Share of contractor NPV surviving a $75 \u2192 $50/bbl price break. Modelled for <strong style="color:var(--text);">' + rows.length + ' of ' + COUNTRY_DATA.length + '</strong> countries \u2014 no untested rows \u2014 and it spans '
           + (bot[bot.length - 1].r * 100).toFixed(0) + '% to ' + (top[0].r * 100).toFixed(0) + '%, which is a gradient breakeven does not have. '
           + 'The ' + (COUNTRY_DATA.length - rows.length) + ' with no figure have $0 contractor NPV at $75 (state monopolies): no position for a price break to erode.'
+          + _evLine
           + '</div>';
     host.innerHTML = h;
     host.querySelectorAll('.be-ret-row').forEach(function(el) {
