@@ -1949,7 +1949,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v720</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v721</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2019,7 +2019,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v720</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v721</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -46136,6 +46136,22 @@ function cpSpreadParts(d, obs) {
   var hd = (d.take_75 != null && d.take_75 > 0 && d.take_75 < 200) ? d.take_75 : null;
   var nAll = (d.n || 0).toLocaleString();
   var txt, col, tip;
+
+  // ── v721 (T2): the measured cohort understates its own dispersion ─────────────────
+  // cpSpreadConflict() below owns the ONE-TERM refutation: p25 === p75, the contract table
+  // disagrees, the badge switches to the observed range. Nigeria never reaches it. Its bundled
+  // quartiles are NOT identical — they differ by 0.4pp — so it falls to the final branch, prints
+  // "Contract take: 83.1–83.5% (0.4pp)" in MUTED grey (pp < 5 = "consistent terms"), and the
+  // refutation is appended to the title attribute as "...run 57.5–91.4% (33.9pp min-to-max,
+  // wider than the IQR by construction)". That parenthesis is doing too much work: 33.9pp across
+  // 11 distinct values is not the by-construction widening of a 0.4pp IQR, and it is legible only
+  // on hover. Same defect v713 named on the Reform Risk card — the visible correction was
+  // inversely sized to the error.
+  // The predicate is _rrIqrUnderstated(), already shipping on Reform Risk (v719) and in the IC
+  // clipboard (v720). This is a third surface reading the same rule, not a fourth rule. Nothing
+  // is recomputed: obs is a top-50-by-production sample, so its spread is a FLOOR on the real
+  // dispersion and this badge says "observed", never "IQR".
+  var _und = (typeof _rrIqrUnderstated === 'function') ? _rrIqrUnderstated(d, obs) : null;
   if (cpSpreadConflict(d, obs)) {
     txt = 'Contract take: ' + obs.min.toFixed(1) + '–' + obs.max.toFixed(1) + '% observed (≥'
         + obs.spread.toFixed(1) + 'pp) ⚠';
@@ -46153,6 +46169,25 @@ function cpSpreadParts(d, obs) {
         + 'they are not usable for this country. Read the contract table before quoting a single '
         + 'country take: on this evidence the block you sign moves government take by at least '
         + obs.spread.toFixed(1) + ' percentage points.';
+  } else if (_und) {
+    txt = 'Contract take: ' + obs.min.toFixed(1) + '\u2013' + obs.max.toFixed(1) + '% observed (\u2265'
+        + obs.spread.toFixed(1) + 'pp) \u26a0';
+    col = obs.spread > 15 ? 'var(--orange)' : obs.spread > 5 ? 'var(--yellow)' : 'var(--muted)';
+    tip = 'BLOCK SELECTION MATTERS FAR MORE HERE THAN THE BUNDLED QUARTILES SUGGEST. The bundled '
+        + 'table holds p25 = ' + p25.toFixed(1) + '% and p75 = ' + p75.toFixed(1) + '% for ' + country
+        + ' \u2014 an interquartile range of ' + pp.toFixed(1) + 'pp, which reads as tightly consistent '
+        + 'terms. This page\u2019s own contract table does not support that: across the ' + obs.n
+        + ' largest producing contracts it lists, government take at $75/bbl runs from '
+        + obs.min.toFixed(1) + '% to ' + obs.max.toFixed(1) + '% \u2014 ' + obs.spread.toFixed(1)
+        + 'pp, over ' + obs.distinct + ' distinct values. A min-to-max is wider than an IQR by '
+        + 'construction, so the two are not the same statistic and this is not a contradiction in '
+        + 'itself; what makes it one is the SIZE of the gap \u2014 ' + _und.excess.toFixed(1)
+        + 'pp of excess, against the ' + CP_OBS_REFUTE_PP.toFixed(1) + 'pp bar this page uses '
+        + 'everywhere else to decide whether a take difference is real or rounding. '
+        + 'The quartiles are left untouched and are still shown in the Contract Distribution panel '
+        + 'below. The sample is the top ' + obs.n + ' by production, not all ' + nAll
+        + ' contracts, so ' + obs.spread.toFixed(1) + 'pp is a FLOOR on the real spread. '
+        + 'Do not quote this country as a narrow-spread regime.';
   } else if (pp < 0.05) {
     txt = 'Contract take: single term · ' + p25.toFixed(1) + '%';
     col = 'var(--muted)';
@@ -46230,14 +46265,19 @@ function cpSpreadParts(d, obs) {
     // never reference different evidence: conflict branch shows obs, single-term shows the
     // point p25, band branch shows p25–p75.
     var _shownLo, _shownHi;
-    if (cpSpreadConflict(d, obs)) { _shownLo = obs.min; _shownHi = obs.max; }
+    // v721: _und now also puts the OBSERVED range on the badge, so it joins the conflict
+    // branch here. Without this the badge would show 57.5\u201391.4% while the warning hanging
+    // off it was still measured against the 83.1\u201383.5% quartiles \u2014 the exact drift this
+    // block was written to prevent.
+    var _obsLed654 = cpSpreadConflict(d, obs) || !!_und;
+    if (_obsLed654) { _shownLo = obs.min; _shownHi = obs.max; }
     else { _shownLo = Math.min(p25, p75); _shownHi = Math.max(p25, p75); }
 
     var _ev654 = null, _mode654 = '';
     if (hd < _shownLo - CP_OBS_REFUTE_PP || hd > _shownHi + CP_OBS_REFUTE_PP) {
       // The headline is outside the very range printed beside it.
-      _ev654 = { lo: _shownLo, hi: _shownHi, sample: cpSpreadConflict(d, obs),
-                 src: cpSpreadConflict(d, obs)
+      _ev654 = { lo: _shownLo, hi: _shownHi, sample: _obsLed654,
+                 src: _obsLed654
                    ? 'the ' + obs.n + ' largest producing contracts in the table below'
                    : 'this country’s own quartiles across all ' + nAll + ' contracts' };
       _mode654 = 'outside-shown';
@@ -46412,6 +46452,74 @@ function _cpApplyObsSpread(country) {
         + Math.min(40, obs.spread * 0.8).toFixed(0) + ' points. The score is not recomputed here — a '
         + 'top-' + obs.n + '-by-production sample is not a population IQR — but treat this number as '
         + 'the best case, not the finding.';
+    }
+  }
+
+  // ── v721 (T2): the MEASURED cohort's badge, which no surface had corrected ─────────────
+  // The loop above only ever touches a chip reading exactly "one term". That is by design: it
+  // implements the one-term refutation, and cpSpreadConflict() is false for anything else.
+  // Nigeria is not one-term. Its bundled quartiles differ by 0.4pp, so it is "measured", it
+  // KEEPS a graded band and a colour, and none of the one-term machinery reaches it. Its badge
+  // read "73 · MODERATE / 0.4pp" in amber.
+  //
+  // That is the worst version of this defect, not a leftover case, because of a rule this
+  // platform prints itself. Since v624 a one-term score renders UNGRADED and uncoloured, and
+  // the Explorer column note, the Fiscal Compare tooltip and the Reform Risk card all state
+  // that "a graded MODERATE outranks any UNGRADED score, however high its number". So Nigeria,
+  // whose own contract file shows 57.5–91.4% across 11 distinct values, ranked ABOVE Indonesia
+  // (≥37.2pp obs) and Angola (≥45.2pp obs) — the two countries that had honestly withdrawn the
+  // claim — on the strength of an IQR penalty of 0.3 points out of a possible 40.
+  //
+  // v719 put the ceiling on the Reform Risk card; v720 put it in the "Copy for IC Memo"
+  // clipboard. Both read _fpObsCeiling(). This is the same object on the badge the analyst
+  // actually looks at, so screen, card and paste now carry one number instead of three.
+  // Not a recompute — obs.spread is a floor, so the penalty is a floor and the printed figure
+  // is a CEILING. It is rendered with a ≤ for that reason.
+  var _cl = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+  if (!conflict && _cl && _cl.material) {
+    var _h2 = document.getElementById('dd-content');
+    var _c2 = _h2 ? _h2.querySelectorAll('.orca-fp-basis') : [];
+    var _want = _cl.iqr.toFixed(1) + 'pp';          // the bundled basis this refutes, and only it
+    var _col2 = _cl.bound >= 75 ? 'var(--green)' : _cl.bound >= 60 ? 'var(--yellow)'
+              : _cl.bound >= 45 ? 'var(--orange)' : 'var(--red)';
+    var _bg2  = _cl.bound >= 75 ? 'rgba(21,128,61,0.1)' : _cl.bound >= 60 ? 'rgba(161,98,7,0.1)'
+              : _cl.bound >= 45 ? 'rgba(194,65,12,0.1)' : 'rgba(185,28,28,0.1)';
+    for (var m = 0; m < _c2.length; m++) {
+      var ch2 = _c2[m];
+      if (ch2.textContent.trim() !== _want) continue;
+      var wr2 = ch2.closest('.orca-fp-badge');
+      if (!wr2 || wr2._obsCeilPatched) continue;
+      wr2._obsCeilPatched = true;
+      // The score+band sits in the badge's leading text node, ahead of the basis chip.
+      var _tn = wr2.firstChild;
+      if (_tn && _tn.nodeType === 3) _tn.nodeValue = '\u2264' + _cl.bound + ' \u00b7 ' + _cl.band;
+      wr2.style.color = _col2;
+      wr2.style.borderColor = _col2;
+      wr2.style.background = _bg2;
+      ch2.style.color = _col2;
+      ch2.style.borderLeftColor = _col2;
+      ch2.style.fontWeight = '700';
+      ch2.style.opacity = '1';
+      ch2.textContent = '\u2265' + _cl.obs.spread.toFixed(1) + 'pp obs';
+      wr2.title = 'CEILING, NOT THE PRINTED SCORE. The Fiscal Predictability Score for '
+        + country + ' is computed as ' + _cl.printed + ' \u00b7 ' + _cl.printedBand + ', and its '
+        + 'largest component \u2014 the within-country interquartile penalty, worth up to \u221240 '
+        + 'points \u2014 was charged only ' + _cl.charged.toFixed(1) + ' of them, because the bundled '
+        + 'quartiles for this country differ by just ' + _cl.iqr.toFixed(1) + 'pp. ORCA\u2019s own '
+        + 'contract file lists the ' + _cl.obs.n + ' largest producing contracts running '
+        + _cl.obs.min.toFixed(1) + '\u2013' + _cl.obs.max.toFixed(1) + '% government take at $75/bbl '
+        + 'across ' + _cl.obs.distinct + ' distinct values (' + _cl.obs.spread.toFixed(1) + 'pp) \u2014 '
+        + _cl.excess.toFixed(1) + 'pp more than the bundled figure, against the '
+        + CP_OBS_REFUTE_PP.toFixed(1) + 'pp bar this page uses elsewhere to separate a real take '
+        + 'difference from rounding. At the observed dispersion that penalty alone costs '
+        + _cl.cost.toFixed(0) + ' points, putting this country at ' + _cl.bound + ' \u00b7 ' + _cl.band
+        + '. The score is NOT recomputed here: a top-' + _cl.obs.n + '-by-production sample cannot '
+        + 'establish a population IQR across all ' + (d.n != null ? Number(d.n).toLocaleString() : 'its')
+        + ' contracts. But the observed spread is a FLOOR on the true dispersion, so the penalty is a '
+        + 'floor and ' + _cl.bound + ' is a CEILING \u2014 the real figure is at or below it, never '
+        + 'above. Carry ' + _cl.bound + ' \u00b7 ' + _cl.band + ' with the range '
+        + _cl.obs.min.toFixed(1) + '\u2013' + _cl.obs.max.toFixed(1) + '% attached, not the printed '
+        + _cl.printed + '. Same figure the Reform Risk card and the IC-memo clipboard now carry.';
     }
   }
 }
