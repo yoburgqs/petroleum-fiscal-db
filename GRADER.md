@@ -37132,3 +37132,18 @@ clicking anything.
   naming a `display:none` API Explorer tab; unweighted per-mechanic pivot averages;
   the incomplete 2020s cohort; duplicated
   `renderVintageTrendChart()`/`renderVintage()`.
+
+---
+## Cycle 623 Log — 2026-09-08 07:38
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 623 complete, shipped as v716, pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest by rotation; 622 ran T2)
+
+## Friction
+Fiscal Compare and Country Profile both answer T6 well — each has a "N of M model terms cited →" chip wired to the Evidence Chain. **Side-by-Side had nothing equivalent**, and Side-by-Side is the one tab whose entire job is ranking countries against each other.
+
+Its **Evidence tier** row is what an analyst ranks on. That le
