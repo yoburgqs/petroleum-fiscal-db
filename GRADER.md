@@ -38000,3 +38000,117 @@ to somewhere inside the data is a T1/T2 question for a later cycle.
 **Task:** T6 — "Where did this number come from and how solid is the evidence?" (stalest in rotation; 628 ran T2, 623 was the last T6.)
 
 **Friction.** Walked T6 cold at 1440×900, no sessionStorage or localStorage. Country Profile answers T6 well — the Evidence Chain names every term's ORCA value, statutory value and source, and the LINK DEAD chips are honest about which citations won't open. Fiscal Com
+
+---
+## Cycle 630 Log — 2026-09-08 20:35
+- Test before: 293 PASS / 0 FAIL / 1 WARN (suite RUN against the pre-change build)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (suite RUN this cycle)
+- JS errors: 0 page errors; 1 console 404 (the standing service-worker WARN)
+- Summary: All steps complete and pushed. Cycle 630, shipped as **v723** (`8468ec5`).
+
+## Cycle 630 — T3
+
+**Task:** T3 — "How do these three countries compare side by side?" (stalest in rotation;
+629 ran T6, 628 T2, 627 T5, 626 T4, 625 T1 — T3 last walked at 624.)
+
+**Friction.** Walked T3 cold at 1440x900 and 390x844, no sessionStorage or localStorage, on the
+tab's own cold-load default set (Norway / United Kingdom / Netherlands). v511 put the basis rows
+at the head of the Side-by-Side grid so "the basis of a column is read before its numbers", and
+that intent is right. But the block was THREE rows when v511 wrote it and it is EIGHT now — Data
+basis, Evidence tier, Model terms cited, Fiscal facts held, Take basis, Rank among producers,
+Predictability Score, Reform record — and every row added since rode in above the numbers by
+default. Nothing was watching the cumulative height. Measured with Playwright:
+
+| viewport | grid top | `Govt Take ($75/bbl)` | |
+|---|---|---|---|
+| 1440 x 900 | 262 | **y=858** | OFF SCREEN |
+| 1920 x 1080 | 262 | y=858 | visible |
+| 390 x 844 | 773 | **y=1888** | 1,115px below the grid top |
+
+The base case — the row a 20-minute portfolio screening meeting is actually run on — was off
+screen at the standard laptop size. At 1440 the ENTIRE first paint of a tab whose only purpose is
+comparing government take contained **no government take figure at all**: eight rows of
+provenance metadata (451px, y=354->758), then the fold. On a phone the analyst scrolled more than
+a full extra screen past the top of the table before reaching a single take number.
+
+**Change.** The two rows that GATE comparability stay exactly where v511 put them, first and
+always visible — `Data basis` (PROD-WTD / PART-PROD / PROXY, which decides whether NPV is
+comparable at all) and `Take basis (mechanic)` (price-linked / fee-basis / cash-flow, which
+decides whether take is comparable) — plus `Rank among producers`, which is not provenance, it is
+this tab's answer. The five rows that are evidence DEPTH rather than comparability — Evidence
+tier, Model terms cited, Fiscal facts held, Predictability Score, Reform record — go behind the
+`DATA BASIS` section header, which becomes a real toggle reading `▸ Show 5 evidence rows ·
+tier · terms cited · facts held · predictability · reform`. Collapsed by default; the choice is
+remembered in `sessionStorage` (`orca_sbs_ev`) for the session, the same pattern v430 uses for the
+FC IC Analyst Guide. `toggleSbsEvidence()` patches the DOM in place rather than calling
+`renderCompare()`, because a full re-render rebuilds the grid above the analyst and throws them
+back to the top of a 1,073px table — the same friction this change exists to remove.
+
+**Nothing is removed.** The five rows ride the shared `rows` array into `#cmp-data-table`, which
+is what `copyComparisonTable()` reads, so Copy for IC Memo carries all eight rows whether the
+toggle is open or shut — verified against the live clipboard. A `@media print` rule forces them
+open and hides the toggle, so an IC-pack PDF is complete: the same on-screen-collapsed /
+print-open pattern v577 established for the absent-countries note.
+
+The toggle spans the full grid width (`grid-column:1 / -1`) rather than sitting in the 200px
+metric column. Inside that column it wrapped to three lines and stood 70px tall on a desktop and
+115px on a phone, which grew the divider row from 34px to ~90px and gave back most of the vertical
+space the collapse had just won. One full-width line costs 34px.
+
+**Result.** `Govt Take ($75/bbl)` moves to **y=601** at 1440x900. All four price rows ($50 548,
+$75 601, $100 655, $125 708), plus Take spread, Price Swing and Take weighting, now land above the
+fold on first paint — so the analyst reads the whole take comparison, and its highest-of-N /
+lowest-of-N markers, without scrolling at all. $75 is above the fold at **1920, 1440, 1280, 1024
+and 768**. On a phone it moves from 1,115px below the grid top to **486px**, so the four price
+rows fit within roughly one screen once the grid is scrolled to the top.
+
+### Step 5b — phone
+
+390x844 with `hasTouch: true`. `scrollWidth == clientWidth` at **1920 / 1440 / 1280 / 1024 / 768 /
+390** — zero horizontal scroll at every viewport. The one control added measures **26px** at every
+viewport. Sub-24px controls in the pane under `pointer: coarse` are **0**, and on desktop **4**
+(3 chip remove-glyph spans at 18px, `#cmp-clear-btn` at 23px) — both counts measured against the
+pre-change build in the same run and **byte-identical to baseline**, so nothing was added. The
+`#cmp-ev-what` descriptive tail is dropped below 720px so the header stays one line. The v612
+mobile layer is untouched.
+
+### Verification
+
+JS syntax gate **11/11** script blocks, run after the change and again after the version bump.
+Runtime suite **EXECUTED** this cycle against `http://localhost:8899/index.html` — **293 PASS /
+0 FAIL / 1 WARN**. The pre-change build was served separately and run through the same suite for
+comparison: **293 PASS / 0 FAIL / 1 WARN, identical** — so the number is a measured
+non-regression, not an assumption. The 1 WARN is the standing service-worker 404. Zero page errors
+on the tab before or after. Functionally verified: toggle opens and shuts, survives a
+`renderCompare()` with a 4th country added, preserves `scrollY` exactly (400 -> 400 -> 400), is
+forced open and its button hidden under print media, and leaves the IC-memo clipboard carrying
+Evidence tier, Model terms cited, Fiscal facts held, Predictability and Reform record while
+collapsed. Every `.cmp-row` still carries `1 + n` cells, so grid alignment holds at 3 and 4
+columns.
+
+**Carried forward — unchanged from cycle 629.** Still open: the v601 evidence-chain block's 2200ms
+fixed-wait race; the `.orca-fp-badge` 21px touch target needing a `renderStabilityBadge()`-level
+fix across four tabs; the Home Screener card advertising a breakeven filter removed at v568; the
+~600-character `#screener-count` line; the service-worker absolute path (`index.html:49`, the
+standing 1 WARN); the Screener carrying no model-terms leg; the Screener "Copy for IC Memo" firing
+against an empty `window._cpObsSpread` on a cold load; `#cmp-clear-btn` at 23px on desktop; the CP
+"Copy for IC Memo" note 2 and `_fpCohortLine()` omitting the ≤26 predictability ceiling; 19
+sub-24px controls in `#explorer-screen-mode`; v710's `t7` clipped-text regression;
+`cp-price-select` absent from the DOM; Mozambique's "Commercially attractive" verdict;
+`renderTornadoPanel` unmarked on the generic-template path; reform coverage 21 of 185; the
+Methodology/Home tier-definition conflict; the FAQ naming a non-existent "Stability Score filter at
+>=4"; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (29th cycle); 862 contracts with no
+fiscal terms; the Screener Contractor NPV tooltip naming an absent profile selector (31st cycle);
+the Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic pivot
+averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`;
+and the Breakeven Map's price-marker slider being inert above $34.
+
+*(New this cycle, deliberately not fixed — out of T3 scope.)* Below the grid, the Guyana / Brazil /
+Angola set renders **3,425 characters** of comparability notices across four blocks, all starting
+at y=1612, all below the fold, and they collectively tell the analyst not to rank on the
+predictability scores, not to rank on one price row, not to rank on the NPV rows, and that one
+column is a proxy — four separate prohibitions with no single statement of what the defensible
+ordering IS. Whether Side-by-Side should carry a set-level verdict strip the way Country Profile
+carries its v450/v452 two-zone headline is a T3 question for a later cycle; it was set aside here
+because the measured first-paint defect was the worse of the two.
