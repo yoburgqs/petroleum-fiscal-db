@@ -1632,6 +1632,65 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   }
 }
 
+/* ── v711 (T3): the comparison grid now scrolls inside itself on a phone ─────────────
+   The header of the rule above says "horizontal scroll wrapper". There was no wrapper
+   and no scroll. `.compare-grid` ships `overflow: hidden` (the base rule, for the 8px
+   radius) and the ≤600px rule floors each country column at 72px. Load the tab's own
+   advertised maximum of five countries on a 390px phone and the grid's content measures
+   467px inside a 360px box:
+
+     METRIC 15–115 · Angola 115–187 · Brazil 187–259 · Norway 259–331
+     Nigeria 331–403 · United Kingdom 403–475          visible box ends at 375
+
+   United Kingdom — the country the analyst added last — is clipped away in full, and
+   Nigeria loses 60% of its width. The DOCUMENT does not scroll (scrollWidth 390 =
+   clientWidth 390), so there is no scrollbar, no gesture and no signal of any kind that
+   two columns are missing, while the badge above reads "5/5 countries (full)".
+   Reproduced identically at 360, 390 and 414; four countries clip too (100 + 4×72 = 388).
+
+   The v612 mobile layer already wrote the rule for exactly this — "Wide tables scroll
+   inside themselves … without it an analyst reads four of twenty-one columns and assumes
+   that is all there is" — and applied it to .tbl-wrap / .table-scroll. The compare grid,
+   the one screen whose entire purpose is reading every column against every other, was
+   never in that set.
+
+   Scoped by width only, so nothing changes above 768px, and the document still does not
+   scroll sideways at any width: the overflow is consumed by the grid, not by the page.
+   The metric column is pinned because a bare "68.0%" with the row label scrolled off is
+   not a fiscal figure; both label cells already carry an opaque var(--surface). */
+@media (max-width: 768px) {
+  .compare-grid {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x proximity;
+  }
+  .compare-grid > .cmp-hdr.row-label,
+  .compare-grid .cmp-cell.lbl {
+    position: sticky;
+    left: 0;
+    z-index: 3;
+    border-right: 1px solid var(--border);
+  }
+  .compare-grid > .cmp-hdr:not(.row-label) { scroll-snap-align: end; }
+  /* Inset, so it is painted on the padding box and stays pinned to the right edge as the
+     grid scrolls. Removed by _sbsScrollHint() once the last column is on screen, so it is
+     never showing when there is nothing further right. */
+  .compare-grid[data-cmp-ovf="1"] { box-shadow: inset -16px 0 14px -12px rgba(45,38,32,.30); }
+}
+#cmp-scroll-hint {
+  display: none;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--orange);
+  background: rgba(194,65,12,.05);
+  border: 1px solid rgba(194,65,12,.22);
+  border-radius: 5px;
+  padding: 5px 10px;
+  margin-bottom: 6px;
+}
+
 /* ── Mobile bubble chart hint ── */
 @media (max-width: 600px) {
   .mobile-only { display: block !important; }
@@ -1846,7 +1905,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v710</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v711</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -1916,7 +1975,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v710</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v711</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27315,14 +27374,18 @@ function renderCompare() {
   // v501: --cmp-n drives the responsive overrides too — the ≤768px and ≤600px rules
   // used to force repeat(4)/repeat(2) with !important regardless of how many countries
   // were loaded, which shifted every row out of alignment at any other count.
-  let html = `<div class="compare-grid" style="--cmp-n:${compareList.length};grid-template-columns: 200px repeat(${compareList.length}, minmax(96px, 1fr));">`;
+  // v711 (T3): sits BEFORE the grid so `grid.nextSibling` — which _sbsObsNotice() uses to
+  // place the comparability notices — still resolves the same way. Hidden until
+  // _sbsScrollHint() measures a real overflow, so it costs nothing on a desktop.
+  let html = `<div id="cmp-scroll-hint" role="status"></div>`;
+  html += `<div class="compare-grid" style="--cmp-n:${compareList.length};grid-template-columns: 200px repeat(${compareList.length}, minmax(96px, 1fr));">`;
   // header row
   html += `<div class="cmp-hdr row-label">Metric</div>`;
   selected.forEach(d => {
     const specBadge = SPECULATIVE_COUNTRIES.has(d.country)
       ? `<span title="Pre-production or speculative (Somalia, South Sudan, North Korea, Afghanistan, Central African Republic, Comoros, Sao Tome and Principe) — fiscal terms modeled from standard profile; no production history for DCF validation" style="color:var(--yellow);font-size:10px;margin-left:4px;cursor:help;">⚠ speculative</span>`
       : '';
-    html += `<div class="cmp-hdr">${d.country}${d.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;" title="R-factor profit oil tiers active">◆</span>' : ''}${specBadge}<br><span style="color:var(--muted);font-size:11px;">${d.region}</span></div>`;
+    html += `<div class="cmp-hdr" data-cmp-country="${_cmpEsc(d.country)}">${d.country}${d.has_r_factor_tiers ? ' <span style="color:var(--purple);font-size:10px;font-weight:700;" title="R-factor profit oil tiers active">◆</span>' : ''}${specBadge}<br><span style="color:var(--muted);font-size:11px;">${d.region}</span></div>`;
   });
   rows.forEach(r => {
     if (r.divider) {
@@ -28043,7 +28106,76 @@ function renderCompare() {
   }
 
   _sbsApplyObsSpread();   // v672 (T3)
+  _sbsScrollHint();       // v711 (T3)
 }
+
+// ─── v711 (T3): name the columns that are off the right edge ──────────────────────────
+// The CSS above makes the grid scrollable rather than clipped, which puts the hidden
+// columns back within reach. It does not tell the analyst they are there — an iOS scroll
+// bar is invisible until a finger is already moving, which is the same failure the v612
+// layer solved for .tbl-wrap with a gradient. A grid container cannot take that ::after
+// (it would become a grid item), so the signal is an inset shadow plus one line that
+// names what is currently out of view, and clears itself once the last column is on
+// screen. Runs on every render, on scroll and on resize; costs nothing when nothing
+// overflows, which is every desktop width.
+function _sbsScrollHint() {
+  var out  = document.getElementById('cmp-output');
+  var grid = out && out.querySelector('.compare-grid');
+  var hint = document.getElementById('cmp-scroll-hint');
+  if (!grid || !hint) return;
+
+  // Tab hidden, or measured before layout: every width is 0 and every column would read as
+  // off-edge. Leave the previous state alone; the ResizeObserver below re-runs this the
+  // moment the pane actually has a width.
+  if (!grid.clientWidth) return;
+
+  // Showing the hint changes #cmp-output's height, which is what the ResizeObserver below
+  // watches. Bail on an unchanged measurement so the second pass is a no-op and the observer
+  // cannot loop — an RO loop surfaces as a window error and the runtime suite counts those.
+  var sig = grid.scrollWidth + '/' + grid.clientWidth + '/' + Math.round(grid.scrollLeft);
+  if (hint._sbsSig === sig) return;
+  hint._sbsSig = sig;
+
+  var remaining = grid.scrollWidth - grid.clientWidth - grid.scrollLeft;
+  if (grid.scrollWidth - grid.clientWidth <= 8) {
+    grid.removeAttribute('data-cmp-ovf');
+    hint.style.display = 'none';
+    return;
+  }
+  if (remaining > 4) grid.setAttribute('data-cmp-ovf', '1');
+  else grid.removeAttribute('data-cmp-ovf');
+
+  var edge = grid.getBoundingClientRect().left + grid.clientWidth;
+  var hdrs = grid.querySelectorAll('.cmp-hdr[data-cmp-country]');
+  var off = [], total = hdrs.length;
+  for (var i = 0; i < hdrs.length; i++) {
+    // >12px of the column hidden — a column shaved by a pixel or two is still readable
+    if (hdrs[i].getBoundingClientRect().right > edge + 12) off.push(hdrs[i].getAttribute('data-cmp-country'));
+  }
+  if (!off.length) { hint.style.display = 'none'; return; }
+
+  var names = off.length === 1 ? off[0]
+    : off.slice(0, -1).join(', ') + ' and ' + off[off.length - 1];
+  hint.style.display = 'block';
+  hint.textContent = off.length + ' of ' + total + ' columns ' + (off.length === 1 ? 'is' : 'are')
+    + ' off the right edge — ' + names + '. Swipe the table sideways to read '
+    + (off.length === 1 ? 'it' : 'them') + '; the Metric column stays put.';
+}
+(function _sbsBindScrollHint() {
+  window.addEventListener('resize', function () { setTimeout(_sbsScrollHint, 120); });
+  // Scroll does not bubble; capture it. Only the compare grid is acted on.
+  document.addEventListener('scroll', function (e) {
+    var t = e.target;
+    if (t && t.classList && t.classList.contains('compare-grid')) _sbsScrollHint();
+  }, true);
+  // The grid is rebuilt on every render and is 0-wide until the tab is shown, so measuring
+  // once at render time is not enough. Observing #cmp-output covers the render, the tab
+  // switch and the rotation with one callback.
+  if (typeof ResizeObserver === 'function') {
+    var host = document.getElementById('cmp-output');
+    if (host) new ResizeObserver(function () { _sbsScrollHint(); }).observe(host);
+  }
+})();
 
 // ─── v672 (T3): withdraw the "single term" claim on the COMPARISON screen ──────────
 //
