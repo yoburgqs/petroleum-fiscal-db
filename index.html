@@ -1949,7 +1949,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v718</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v719</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2019,7 +2019,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v718</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v719</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -38638,24 +38638,172 @@ function _rrPaintObsSpread(c, d, obs) {
   }
 }
 
+// ── v719 (T4): the refutation stopped at the cohort that needed it least ─────────────────
+// v604 and v713 established that ORCA's own contract file can contradict the basis the Fiscal
+// Predictability Score was built on, and taught this card to withdraw the claim and print a
+// ceiling when it does. Both were scoped by one line -- "Only the one-term basis can be
+// refuted; a measured or absent distribution has nothing to withdraw" -- and that line is
+// wrong. A MEASURED distribution has exactly as much to withdraw when the measurement is the
+// thing the contract table contradicts, and it is the cohort where the consequence is worse,
+// because it is the ONLY cohort that still carries a graded band and a colour. Since v624 the
+// card tells the analyst, in orange, that "MODERATE here outranks any UNGRADED score, however
+// high its number".
+//
+// Measured live against country_data.json and api/v1/country/*.json, not asserted. Of the 28
+// countries in the measured cohort, 9 have a bundled interquartile spread their own top-50
+// producing contracts exceed by more than 1pp, and on 7 of those the correction moves the band:
+//   Nigeria        bundled 0.4pp  -> contracts run 57.5-91.4%  (33.9pp, 11 values)  73 MODERATE -> ceiling 46 LOW
+//   Kazakhstan     bundled 1.8pp  -> 50.9-77.8%                (26.9pp)             73 MODERATE -> ceiling 53 LOW
+//   Mexico         bundled 20.5pp -> 25.2-92.5%                (67.3pp)             51 LOW      -> ceiling 27 VERY LOW
+//   Rep. of Congo  bundled 0.4pp  -> 42.2-61.0%                (18.8pp)             62 MODERATE -> ceiling 47 LOW
+// Nigeria is the worst of them and the likeliest T4 lookup on the list: the card printed
+// "73 MODERATE - measured spread 0.4pp across its contracts - 3rd of 28 countries ORCA can
+// measure", an amber graded band, above a sentence saying that grade outranks any ungraded
+// score -- for the country whose own file shows a 33.9pp spread. The IQR term, the score's
+// largest at up to -40 points, was charged 0.3 of them.
+//
+// Nothing is recomputed, same reason v559/v604/v713 gave: a top-50-by-production sample is not
+// a population IQR. obs.spread is a FLOOR on the real dispersion, so the penalty is a floor and
+// the printed number is a CEILING -- which is what it is now labelled. The bar for refuting is
+// CP_OBS_REFUTE_PP, the platform's existing one-counterexample rule, applied to the EXCESS over
+// the bundled spread rather than to the spread itself.
+function _rrIqrUnderstated(d, obs) {
+  if (!d || !obs) return null;
+  var p25 = d.p25_take, p75 = d.p75_take;
+  if (p25 == null || p75 == null) return null;
+  var iqr = p75 - p25;
+  if (iqr < 0.05) return null;            // one-term cohort -- cpSpreadConflict() owns that path
+  var excess = obs.spread - iqr;
+  if (!(excess > CP_OBS_REFUTE_PP)) return null;
+  return { iqr: iqr, excess: excess };
+}
+window._rrIqrUnderstated = _rrIqrUnderstated;
+
+function _rrFpBand(v) { return v >= 75 ? 'HIGH' : v >= 60 ? 'MODERATE' : v >= 45 ? 'LOW' : 'VERY LOW'; }
+
+function _rrPaintIqrUnderstated(c, d, obs, u) {
+  var sel = document.getElementById('rr-country-lookup');
+  if (!sel || sel.value !== c) return;                       // analyst moved on mid-fetch
+  var out = document.getElementById('rr-country-verdict');
+  if (!out || out.dataset.iqrPainted === c) return;
+  out.dataset.iqrPainted = c;
+
+  var fp = (typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
+  if (fp == null) return;
+  var charged = Math.min(40, u.iqr * 0.8);
+  var cost    = Math.min(40, obs.spread * 0.8);
+  var bound   = Math.max(0, Math.round(fp + charged - cost));
+  var bLabel  = _rrFpBand(bound);
+  var pLabel  = _rrFpBand(fp);
+  var bandMoves = (bLabel !== pLabel);
+  // Materiality, on the same principle cpDefendDispersion() uses: one counterexample is enough to
+  // withdraw the CLAIM, but a 1-point correction painted the same orange as Nigeria's 27-point one
+  // is what trains an analyst to skip the line. Emphatic treatment -- the ▲ marker, the orange
+  // ceiling bar, the withdrawn cohort rank -- only where the correction is worth 5 points of score
+  // or moves the band. Below that the refutation is still stated, in muted type, with the numbers.
+  // Live: this mutes India alone (13.3pp bundled vs 15.0pp observed, 52 -> 51, LOW either way).
+  var material = bandMoves || (fp - bound) >= 5;
+  var nAll  = (d.n != null) ? Number(d.n).toLocaleString() : 'its';
+  var range = obs.min.toFixed(1) + '–' + obs.max.toFixed(1) + '%';
+  var why = 'The Fiscal Predictability Score charged ' + c + '’s interquartile-range penalty '
+    + '— its largest component, worth up to −40 points — only ' + charged.toFixed(1)
+    + ' points, because the bundled p25/p75 take are ' + u.iqr.toFixed(1) + 'pp apart. ORCA’s own '
+    + 'contract file for ' + c + ' lists the ' + obs.n + ' largest producing contracts running ' + range
+    + ' government take at $75/bbl, across ' + obs.distinct + ' distinct values — ' + obs.spread.toFixed(1)
+    + 'pp, wider than the bundled spread by ' + u.excess.toFixed(1) + 'pp. The score is not recomputed here: '
+    + 'a top-' + obs.n + '-by-production sample cannot establish a population IQR across all ' + nAll
+    + ' contracts. But the observed dispersion is a FLOOR on the real spread, so ' + cost.toFixed(0)
+    + ' points is a floor on the penalty and ' + bound + ' is a CEILING on the score — the true figure '
+    + 'is at or below it, never above. Carry ' + bound + ' · ' + bLabel + ' into the IC memo with the '
+    + 'observed range ' + range + ' attached, not the printed ' + fp + '.';
+
+  var basis = document.getElementById('rr-fp-basis');
+  if (basis) {
+    basis.innerHTML = 'bundled spread ' + u.iqr.toFixed(1) + 'pp — <span style="'
+      + (material ? 'color:var(--orange);font-weight:700;' : 'color:var(--text);')
+      + '">but &ge;' + obs.spread.toFixed(1) + 'pp observed</span> across ' + obs.n
+      + ' contracts; the quartiles this score was penalised on understate ' + _rrEsc(c)
+      + '’s own contract table by ' + u.excess.toFixed(1) + 'pp';
+    basis.title = why;
+  }
+
+  var score = document.getElementById('rr-fp-score');
+  if (material && score && !score.dataset.obsMarked) {
+    score.dataset.obsMarked = '1';
+    score.insertAdjacentHTML('beforeend',
+      '<span style="font-size:10px;font-weight:800;color:var(--orange);margin-left:5px;" '
+      + 'title="Upper bound — the bundled take spread this grade was penalised on is contradicted by this country’s own contract table.">'
+      + '&#9650; best case</span>');
+  }
+
+  // The grade slot's own tooltip asserted "the interquartile-range penalty was actually charged
+  // and the band is earned". That is the sentence this country's contract table refutes, so it
+  // is replaced rather than left standing beside the correction.
+  var grade = document.getElementById('rr-fp-grade');
+  if (grade) {
+    if (material) grade.style.color = 'var(--muted)';
+    grade.title = pLabel + ' IS NOT EARNED HERE. This band is awarded because the interquartile-range '
+      + 'penalty was charged — but it was charged ' + charged.toFixed(1) + ' points on a bundled '
+      + u.iqr.toFixed(1) + 'pp spread, and ' + c + '’s own contract table runs ' + range + '. ' + why;
+  }
+
+  var bnd = document.getElementById('rr-fp-bound');
+  if (bnd && !bnd.dataset.painted) {
+    bnd.dataset.painted = '1';
+    bnd.style.cssText = 'display:block;max-width:230px;margin-top:5px;padding-left:6px;border-left:2px solid '
+      + (material ? 'var(--orange)' : 'var(--border)') + ';font-size:10px;line-height:1.45;color:var(--muted);';
+    bnd.innerHTML = '<span style="' + (material ? 'color:var(--orange);font-weight:800;' : 'color:var(--text);font-weight:700;')
+      + '">Carry &le;' + bound
+      + ' &middot; ' + bLabel + '</span>, not ' + fp + ' &middot; ' + pLabel + '. The spread term was charged '
+      + charged.toFixed(1) + ' points on a bundled ' + u.iqr.toFixed(1) + 'pp; at the ' + obs.spread.toFixed(1)
+      + 'pp its own contracts show it costs ' + cost.toFixed(0) + '. Ceiling, not a recomputed score.';
+    bnd.title = why;
+  }
+
+  // The cohort line's closing claim -- "MODERATE here outranks any UNGRADED score, however high
+  // its number" -- is an instruction to prefer this row over a one-term one, and the rank inside
+  // it was computed from the refuted score. Withdraw it where the ceiling lands in a lower band.
+  var coh = document.getElementById('rr-fp-cohort');
+  if (coh && bandMoves && !coh.dataset.withdrawn) {
+    coh.dataset.withdrawn = '1';
+    coh.insertAdjacentHTML('beforeend',
+      '<div style="font-size:10px;line-height:1.5;color:var(--muted);margin-top:5px;padding-left:6px;'
+      + 'border-left:2px solid var(--orange);max-width:230px;">'
+      + '<strong style="color:var(--orange);">That rank and that comparison do not hold for ' + _rrEsc(c) + '.</strong> '
+      + 'Both are computed from the printed ' + fp + ', which this country’s own contract table bounds at '
+      + bound + ' · ' + bLabel + '. At the ceiling ' + _rrEsc(c) + ' is no longer a ' + pLabel
+      + ', so do not rank it above an ungraded score on the strength of the band.</div>');
+  }
+}
+window._rrPaintIqrUnderstated = _rrPaintIqrUnderstated;
+
 // Reuses the v559 cache, so a country already opened on Country Profile costs no fetch, and a
 // country first seen here populates the cache Country Profile reads later.
 function _rrApplyObsSpread(c) {
   var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
   var d = cd.filter(function(x){ return x.country === c; })[0];
   if (!d || typeof cpSpreadConflict !== 'function') return;
-  // Only the one-term basis can be refuted; a measured or absent distribution has nothing to withdraw.
+  // v719 (T4): both dispersion cohorts are now checked against the contract table. 'single' goes
+  // to _rrPaintObsSpread (the v604/v713 path, which withdraws "every contract prices the same");
+  // 'measured' goes to _rrPaintIqrUnderstated, which withdraws the GRADE where the bundled
+  // quartiles the penalty was charged on understate the country's own contracts. Neither
+  // recomputes. 'none' and 'monopoly' hold no distribution and still have nothing to withdraw.
   var disp = (typeof _fpDispersion === 'function') ? _fpDispersion(d) : null;
-  if (!disp || disp.state !== 'single') return;
+  if (!disp || (disp.state !== 'single' && disp.state !== 'measured')) return;
+  var paint = function(obs) {
+    if (disp.state === 'single') { _rrPaintObsSpread(c, d, obs); return; }
+    var u = _rrIqrUnderstated(d, obs);
+    if (u) _rrPaintIqrUnderstated(c, d, obs, u);
+  };
   var cached = (typeof cpObsSpread === 'function') ? cpObsSpread(c) : null;
-  if (cached) { _rrPaintObsSpread(c, d, cached); return; }
+  if (cached) { paint(cached); return; }
   var slug = String(c).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
   fetch('api/v1/country/' + slug + '.json')
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(j) {
       if (!j || !j.top_contracts || !j.top_contracts.length) return;
       var obs = (typeof cpRecordObsSpread === 'function') ? cpRecordObsSpread(c, j.top_contracts) : null;
-      if (obs) _rrPaintObsSpread(c, d, obs);
+      if (obs) paint(obs);
     })
     .catch(function() {});
 }
@@ -38676,6 +38824,7 @@ function renderReformCountryVerdict() {
   if (clr) clr.style.display = '';
   out.style.display = 'block';
   delete out.dataset.obsPainted;   // v604: re-arm the refutation for the newly selected country
+  delete out.dataset.iqrPainted;   // v719: same, for the measured-cohort refutation
 
   var rh = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY) ? REFORM_HISTORY : {};
   var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA : [];
@@ -38742,7 +38891,7 @@ function renderReformCountryVerdict() {
     : '<div id="rr-fp-score" style="font-size:18px;font-weight:800;color:' + fpColor + ';">' + fp
       + (fpSingle
           ? ' <span style="font-size:9px;font-weight:800;letter-spacing:.05em;border:1px solid var(--muted);border-radius:3px;padding:1px 5px;vertical-align:2px;cursor:help;" title="' + _rrEsc(fpGradeTip) + '">UNGRADED</span>'
-          : ' <span style="font-size:11px;font-weight:700;cursor:help;" title="' + _rrEsc(fpGradeTip) + '">' + fpLabel + '</span>')
+          : ' <span id="rr-fp-grade" style="font-size:11px;font-weight:700;cursor:help;" title="' + _rrEsc(fpGradeTip) + '">' + fpLabel + '</span>')
       + '</div>';
   var fpNote = (fpDisp.state === 'monopoly')
     ? 'not scored \u2014 state monopoly, no contractor position'
@@ -38774,7 +38923,11 @@ function renderReformCountryVerdict() {
           ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability Score</div>'
             + fpGradeHtml
             + '<div style="font-size:10px;color:var(--muted);max-width:230px;line-height:1.45;"><span id="rr-fp-basis">' + fpNote + '</span></div>'
-            + _fpCohortLine(d) + '</div>'
+            // v719 (T4): this branch had no bound slot at all, so a measured-cohort country with
+            // no reform log -- Republic of the Congo, Qatar, Morocco -- had nowhere to print the
+            // ceiling on the one score the card offers it as "what you can defend instead".
+            + '<div id="rr-fp-bound" style="display:none;"></div>'
+            + '<span id="rr-fp-cohort">' + _fpCohortLine(d) + '</span></div>'
           : '')
       + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
       + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
@@ -38839,7 +38992,7 @@ function renderReformCountryVerdict() {
           // _rrPaintObsSpread finds this country's own contract table refutes the
           // one-term basis the printed score was built on. See the note there.
           + '<div id="rr-fp-bound" style="display:none;"></div>'
-          + _fpCohortLine(d) + '</div>'
+          + '<span id="rr-fp-cohort">' + _fpCohortLine(d) + '</span></div>'
         : '')
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Govt Take @ $75</div>'
     + '<div style="font-size:18px;font-weight:800;color:var(--text);">' + take + '</div></div>'
