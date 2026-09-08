@@ -36702,3 +36702,18 @@ is rendered.
   Contractor NPV tooltip naming an absent profile selector (21st cycle); the Methodology tab naming
   a `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete 2020s
   cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
+
+---
+## Cycle 620 Log — 2026-09-08 03:07
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 619 complete, shipped as **v713**. All steps executed and pushed.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" (stalest by rotation; 618 ran T1, 617 T3, 616 T6, 615 T2, 614 T5, 613 T4.)
+
+## Friction
+Walked cold over HTTP in a fresh browser context: Home → Reform Risk → the single-country lookup, which is the tab's real T4 entry point.
+
+The Fiscal Predictability Score is built on a **zero take-spread penalty — its largest component, worth up to −40 points** — wh
