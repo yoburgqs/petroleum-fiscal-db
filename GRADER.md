@@ -36855,3 +36855,16 @@ pane. Re-staged with the full asset tree symlinked; the numbers above are from t
   Contractor NPV tooltip naming an absent profile selector (22nd cycle); the Methodology tab naming
   a `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete 2020s
   cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
+
+---
+## Cycle 621 Log — 2026-09-08 04:46
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 621 complete, shipped as v714. All steps executed and pushed.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." (Stalest by rotation: 619/620 ran T4, 618 T1, 617 T3, 616 T6, 615 T2, 614 T5.)
+
+## Friction
+I walked T5 cold and clicked every surface that claims to produce a memo artifact, reading the actual clipboard rather than the changelog. Fiscal Compare, Screener, IOC Portfolio and Country Profile all copy correctly — including the FC row-tick shortlist, where t
