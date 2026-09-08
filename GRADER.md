@@ -38127,3 +38127,153 @@ because the measured first-paint defect was the worse of the two.
 
 ## Friction
 Walked T3 cold — no sessionStorage, no localStorage — on the tab's own default set (Norway / UK / Netherlands). v511 put the basis rows at the head of the grid so the basis of a column is read before its numbers. That intent is right, but the block was **three rows** when v511 wrote it and it is **eight*
+
+---
+## Cycle 631 Log — 2026-09-08 — shipped as v724 (`a09ee83`)
+
+- Test before: 293 PASS / 0 FAIL / 1 WARN (localhost, pre-change build served separately)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — suite **EXECUTED** this cycle against both builds,
+  number read from the suite's own report, not assumed. Identical, so a measured non-regression.
+- JS errors: 0 page errors. The 1 WARN is the standing service-worker 404 (`index.html:49`).
+- JS syntax gate: 11/11 script blocks, run after the change and again after the version bump.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"**
+Stalest by rotation: 630 ran T3, 629 T6, 628 T2, 627 T5, 626 T4, 625 T1.
+
+## Friction
+
+Walked T1 cold at 1440x900, no `sessionStorage`, no `localStorage`: Home → the **Screener** card
+→ the **preset dropdown**, which is the one control on the platform built for this question. An
+analyst with 20 minutes does not build a screen from four sliders; they pick the option named for
+what they are trying to do.
+
+The option named for the question an IC asks first read:
+
+> **Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$50   → 153 of 185 @$75 (barely narrows)**
+
+**153 of 185 is 83% of the database.** That is not a shortlist — it is the database with three
+state monopolies and twenty-nine thin regimes removed.
+
+And the first of its two legs **could never bind**. `npv_50 <= npv_75` for all 185 rows in the
+shipped `country_data.json` — zero inversions — so a $500M floor at the downside price removes
+every row a $100M floor at the deck price would remove, and more. The deck leg was inert **by
+construction, not by calibration**: no value of the data could have made it reject a row. So the
+preset advertised a two-sided price test and ran a one-sided one.
+
+The sharpest part of this: **the platform already knew.** Three separate surfaces reported the
+defect and the preset shipped unchanged anyway —
+
+| surface | what it said |
+|---|---|
+| count line (v706) | "the $100M floor at $75/bbl removed 0 rows **and cannot remove any**" |
+| exported IC memo (v558) | "Min contractor NPV at $75/bbl: ≥$100M — **NOT BINDING: removed 0 rows**" |
+| the menu option itself | "**(barely narrows)**" |
+
+A detector that fires correctly and changes nothing is not an enforcement mechanism. Same defect
+class as v517 (IRR axis), v568 (breakeven ceiling), v623 (breakeven-coverage radio), v660
+(water-depth radio) and v662 (Low-Risk Stable): *a criterion that names a property the screen does
+not apply* — left live on a sibling option in the same dropdown.
+
+## Change
+
+`applyScreenerPreset('downsidereturns')`, `index.html:29365`. Three legs, all measured:
+
+1. **Deck leg — contractor NPV ≥ $2.4B** = **2× the standardized project's $1.2B capex**
+   (`DCF_PROFILES.deepwater.capexMM`), the only capital anchor the model has. Twice the capital
+   back at the planning price.
+2. **Downside leg — contractor NPV ≥ $1.2B at $50/bbl** = **1× capex**, still fully recovered in
+   present-value terms at the downside.
+3. **Verified field production only** (`sc-proxy-keep` off), as on IOC Capital Screen since v517.
+
+The deck floor is now the **higher** of the two, which is the only ordering under which both legs
+can bind at all: leg 1 rejects a row only where `f50 ≤ npv_50 ≤ npv_75 < f75`, which is empty
+unless `f75 > f50`. The shipped pair had them inverted.
+
+**Why the proxy leg is not scope creep.** Absolute NPV in this database rises as take falls, so a
+raw NPV hurdle set high enough to be a shortlist selects the low-take PROXY micro-states and
+nothing else. Measured on the shipped data: `≥$3.6B` / `≥$1.8B` returns **22 countries, of which
+ZERO have any verified field production**. A tight list of Vanuatu-class proxy jurisdictions is a
+worse answer to T1 than the 153 it replaces. A return hurdle read off regional proxy terms is not
+a return.
+
+**The $50 deck.** There the two prices are the same price, so a 2×-capex deck floor is not a
+second test — it is the same test made twice as hard, it returns **zero rows** (max `npv_50` is
+$2.37B), and the slider silently clamps 2400 to its own $2.0B ceiling on the way. A preset that
+loads an empty table is a dead end, so at that deck the screen degenerates to the single hurdle
+that still means something — 1× capex at $50 — exactly as Downside Resilience re-references its
+denominator at the $50 deck (v699). Both floors then test the same number and the v706 detector
+says so on screen, rather than leaving the analyst to work out that a "two-price" screen is
+running on one price.
+
+## Result
+
+**153 → 5 of 185 at $75: Canada, USA, Azerbaijan, Mexico, Argentina.** All five production-backed.
+
+Both legs measurably do work the other does not, verified on the live page by switching each leg
+off in turn:
+
+| leg switched off | result | uniquely removed by that leg |
+|---|---|---|
+| deck leg ($2.4B) | 6 | **China** — clears the downside floor, fails the deck floor |
+| downside leg ($1.2B) | 6 | **Colombia** — clears the deck floor, fails the downside floor |
+
+The exported IC memo now reads `Min contractor NPV at the $50/bbl downside: ≥$1200M — removed 1
+country` and `Min contractor NPV at $75/bbl: ≥$2400M — removed 1 country`, where it used to carry
+`NOT BINDING: removed 0 rows` into an investment committee. Every deck returns a live shortlist —
+$50 → 6, $75 → 5, $100 → 6, $125 → 6 — with no empty tables and no page errors. The
+"(barely narrows)" annotation is gone from the option because the option no longer earns it.
+
+The analyst can now open the preset menu, pick the screen named for a two-price return hurdle, and
+get five countries they can defend line by line, with both hurdles stated as multiples of the
+capex the model actually spends — instead of 153 rows under a caption describing a filter that
+could not run.
+
+### Mobile (Step 5b)
+
+390 x 844, `hasTouch: true`, cold: `document.documentElement.scrollWidth` **390** =
+`clientWidth` **390** — no horizontal scroll. The only control touched,
+`#screener-preset-select`, measures **44px** tall under `pointer: coarse` (floor is 24px). The
+preset returns its 5 rows on the phone. The **v612 MOBILE LAYER** and the `#reference-panel`
+`translateX` state are untouched; no `min-width: max-content` marker added or removed.
+
+### Still locked — nothing touched
+
+No new FAQ (still 974). No new tooltip on any column header, mechanic tag, waterfall line or
+Scenario Builder input — the one `title` added is on a rebuilt preset option, the same pattern
+`deepwater`, `lowrisk`, `highevidence`, `atlanticfrontier` and `frontiermarkets` already carry.
+No page-sub paragraph, amber instructional banner, routing hint or "How to read" block; no SbS
+card wrapper; no visible Explorer chip row. Screener advanced filters still collapsed, presets
+still a dropdown, Home "More tools" still collapsed. No tab added, removed or reordered. No
+published take, NPV, rank, score, band, tier colour or pill value altered. v371/v373, v430, v449,
+v451, v452, v489, v517, v568, v612, v699, v706, v718 and v723 all intact. Version sweep
+**v723 → v724** done silently at the end — it also corrected the `<title>`, which had been stale
+at **v626** while the header chip read v723. It is **not** the deliverable.
+
+### Carried forward — unchanged from cycle 630
+
+Still open: **`sweetspot` (Low Take · Positive NPV) returns 143 of 185 and carries the same
+"(barely narrows)" tag** — same symptom as the preset fixed here, but not the same defect: it
+states its legs honestly and applies them, it is merely unselective, where Two-Price promised a
+test it could not run. Deliberately left for a later cycle rather than bundled. Also still open:
+the v601 evidence-chain 2200ms fixed-wait race; the `.orca-fp-badge` 21px touch target across
+four tabs; the Home Screener card and the `#tab-btn-tscreener` title/aria-label **both still
+advertising a `breakeven` and an `IRR` filter**, deleted at v568 and v517 respectively and absent
+from the Screener's sliders, advanced filters and columns; the ~700–1,150 character
+`#screener-count` run-on line (worst case `lowrisk` at **1,151 chars / 117px / 6 lines**); the
+service-worker absolute path (`index.html:49`, the standing 1 WARN); the Screener carrying no
+model-terms leg; the Screener "Copy for IC Memo" firing against an empty `window._cpObsSpread` on
+a cold load; the active-preset badge keeping its `@$75` wording on the other decks for every
+preset except this one; `#cmp-clear-btn` at 23px on desktop; the CP "Copy for IC Memo" note 2 and
+`_fpCohortLine()` omitting the ≤26 predictability ceiling; 19 sub-24px controls in
+`#explorer-screen-mode`; v710's `t7` clipped-text regression; `cp-price-select` absent from the
+DOM; Mozambique's "Commercially attractive" verdict; `renderTornadoPanel` unmarked on the
+generic-template path; reform coverage 21 of 185; the Methodology/Home tier-definition conflict;
+the FAQ naming a non-existent "Stability Score filter at >=4"; `FC_PROFILES`/`DCF_PROFILES`
+divergence; the empty "Recent Platform Updates" placeholder; Kuwait's evidence tier; three
+monopolies carrying `be_75 = 1.0` (30th cycle); 862 contracts with no fiscal terms; the Screener
+Contractor NPV tooltip naming an absent profile selector (32nd cycle); the Methodology tab naming
+a `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete 2020s
+cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`; and the Breakeven Map's
+price-marker slider being inert above $34. Plus the Side-by-Side 3,425-character comparability
+notice block raised as new-not-fixed by cycle 630.
