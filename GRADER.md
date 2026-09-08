@@ -38292,3 +38292,127 @@ notice block raised as new-not-fixed by cycle 630.
 Walked T1 cold at 1440×900 with no sessionStorage or localStorage: Home → Screener card → the preset dropdown, which is the one control built for this question. The option named for what an IC asks first read:
 
 > Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$
+
+## Cycle 632 Log — 2026-09-08 — shipped as v725
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (stalest by rotation: 631 ran T1,
+630 T3, 629 T6, 628 T2, 627 T5, 626 T4.)
+
+## Friction
+
+Walked T4 cold at 1440×900, no sessionStorage or localStorage, served over HTTP (on `file://` the
+JSON fetches fail and `#loading-overlay` never clears, so the tab cannot be walked at all that way).
+Home → Reform Risk tab → the **Check one country** lookup, which is the one control this tab is
+named for. Selected the covered jurisdictions and read the verdict strip.
+
+The verdict strip is four tiles. Three are scoped to the 2010 scoring window — the Reform Frequency
+Score *is* `100 − 15 × changes since 2010`, the tile beside it is literally headed **Reforms since
+2010**, and the rank is computed off that score. **DIRECTION, sitting between them under an
+unqualified header, was computed over the whole sourced record back to 1938.**
+
+`_rrClassify()` (index.html:32262) built it as `_rrSplit(events)` over every event, and
+`_rrTilt(_split)` produced the coloured verdict word from that. Measured against the live
+`reform_history.json`, the two windows disagree for **9 of the 21** scoreable jurisdictions, and
+four disagree by sign or by verdict word:
+
+| | whole record (what shipped) | in-window 2010+ (what the neighbouring tile means) |
+|---|---|---|
+| **Venezuela** | ↑3/↓0/?1 → **net-tightening against the contractor**, in red | ↑0/↓0/?1 — nothing measured since 2010 |
+| **Colombia** | ↑2/↓0/?1 → **net-tightening**, in red | no sourced event since 2010 at all |
+| **Russia** | ↑1/↓0/?1 → "direction not established", withheld | ↑1/↓0 → **net-tightening** |
+| **Canada** | ↑1/↓1/?1 → "direction not established" | ↑0/↓1 → **net-liberalizing** |
+
+Venezuela is the worst moment. The analyst reads **"Reforms since 2010: 1"** and, three inches to
+its right, a red **"net-tightening against the contractor."** That verdict is carried entirely by
+the 2001/2006/2007 nationalisations. Real history — and not what the tile beside it says. Russia
+fails the other way and matters more for a 2026 memo: the 2022 windfall tax (+15pp) is the single
+event the case turns on, and the tile diluted it with a 1990s unmeasured entry and refused to name
+a direction at all.
+
+`_rrClassify()` is shared, so the same whole-record verdict was also the Country Profile reform
+sidebar (index.html:33628) and — worst — the **pasted IC memo** at index.html:24519, which put
+`Direction: net-tightening against the contractor` into a Word document one clause after
+`1 sourced fiscal law change since 2010`.
+
+This is not a missing feature. **v668 already fixed exactly this defect on this same tab** for the
+Regional Reform Tilt table — in-window is the headline, the full sourced record prints beneath it,
+in its own words *"so the two are never read as one number."* The per-country card never got that
+treatment.
+
+## Change
+
+The DIRECTION tile now reads the same window as the score next to it.
+
+- `_rrClassify()` computes `_splitWin = _rrSplit(events.filter(y >= 2010))`. The counts, the colour
+  and the verdict word come from the window. `_split` is left intact for downstream readers.
+- Tile header now reads **DIRECTION SINCE 2010** on both the lookup card and the CP sidebar.
+- The whole record prints as a second muted line beneath — `full record 1975–now: ↑3 / ↓0 / ?1 ·
+  net-tightening against the contractor` — v668's pattern, with v668's tooltip wording. It renders
+  **only where the two windows differ**, so the 12 countries that agree carry no redundant line
+  (verified: Guyana, all 3 events in-window, shows none; the UK shows one).
+- Empty window says so: `no sourced event since 2010 — nothing on file inside the scoring window,
+  the full record is below`, rather than letting `_rrTilt`'s zero branch print "no fiscal change on
+  record", which would be a false claim about the whole record.
+- The IC memo line now says **"Direction since 2010: …"** and, where the windows differ, appends the
+  full-record split explicitly tagged *"pre-2010 history, not a since-2010 finding."*
+
+Nothing is recomputed or hidden: no score, rank, band, take, tier colour or pill value changed. The
+whole-record split is still on screen — it just stopped wearing the window's label.
+
+## Result
+
+An analyst pulling Venezuela for a screening no longer carries a red "net-tightening against the
+contractor" into an IC memo on the strength of nationalisations that predate the scoring window by
+a decade — the card now says nothing measured has happened since 2010, and shows the pre-2010
+record separately, labelled as such. An analyst pulling Russia now gets the 2022 +15pp windfall tax
+named as net-tightening *in the window*, instead of a withheld "direction not established."
+
+## Verify
+
+- JS syntax gate: 11 blocks, **0 failures**.
+- Playwright runtime suite **actually run this cycle** against the modified file over HTTP:
+  **293 PASS / 0 FAIL / 1 WARN**. Control run of the pre-change `HEAD:index.html` on the same
+  harness returned the identical **293 PASS / 0 FAIL / 1 WARN** — so the delta from the 294
+  headline is the localhost service-worker 404 (`index.html:49`, the standing WARN), not this
+  change. Zero regression attributable to the cycle. (The control reported 2 JS errors to the
+  changed file's 1; the extra one is a bare asset 404 from the stripped-down control directory,
+  which does not carry the full asset tree — not a behavioural difference. Both runs carry the
+  same service-worker 404.) The suite was run against localhost rather than the deployed URL
+  because the change is not yet pushed; on `file://` the tab cannot be exercised at all.
+- All 21 covered jurisdictions rendered without error; the 164 uncovered path is untouched
+  (`_rrClassify` returns null before any of this) and re-checked on Qatar.
+- Mobile 390×844 `hasTouch:true`: `scrollWidth === clientWidth === 390` on Venezuela, Russia,
+  Colombia and the UK. The new line is a `<div>` and adds no control, sub-24px or otherwise.
+
+## Still locked — nothing touched
+
+No new FAQ (974). No new tooltip on any column header, mechanic tag, waterfall line or Scenario
+Builder input — the one `title` added is on the new full-record line and is v668's own wording. No
+page-sub paragraph, amber banner, routing hint or "How to read" block. No tab added, removed or
+reordered. The "all dates" Direction column in the Most Frequently Reformed Regimes table is
+deliberately left whole-record — that table is explicitly ranked on all dates and says so in its
+header. v371/v373, v430, v449, v451, v452, v489, v517, v568, v612, v699, v706, v718, v723 and v724
+all intact. Version sweep **v724 → v725** done silently at the end. It is **not** the deliverable.
+
+## Carried forward — unchanged
+
+Still open: `sweetspot` (Low Take · Positive NPV) returning 143 of 185 under a "(barely narrows)"
+tag; the v601 evidence-chain 2200ms fixed-wait race; the `.orca-fp-badge` 21px touch target across
+four tabs; the Home Screener card and `#tab-btn-tscreener` title/aria-label both still advertising
+a `breakeven` and an `IRR` filter deleted at v568/v517; the ~700–1,150 character `#screener-count`
+run-on line; the service-worker absolute path (`index.html:49`, the standing 1 WARN); the Screener
+carrying no model-terms leg; the Screener "Copy for IC Memo" firing against an empty
+`window._cpObsSpread` on a cold load; the active-preset badge `@$75` wording on other decks;
+`#cmp-clear-btn` at 23px on desktop; the CP "Copy for IC Memo" note 2 and `_fpCohortLine()` omitting
+the ≤26 predictability ceiling; 19 sub-24px controls in `#explorer-screen-mode`; v710's `t7`
+clipped-text regression; `cp-price-select` absent from the DOM; Mozambique's "Commercially
+attractive" verdict; `renderTornadoPanel` unmarked on the generic-template path; reform coverage 21
+of 185; the Methodology/Home tier-definition conflict; the FAQ naming a non-existent "Stability
+Score filter at >=4"; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+placeholder; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (31st cycle); 862
+contracts with no fiscal terms; the Screener Contractor NPV tooltip naming an absent profile
+selector (33rd cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted
+per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
+`renderVintageTrendChart()`/`renderVintage()`; the Breakeven Map's price-marker slider inert above
+$34; and the Side-by-Side 3,425-character comparability notice block.

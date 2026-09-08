@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v724</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v725</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1959,7 +1959,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v724</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v725</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2029,7 +2029,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v724</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v725</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -24516,7 +24516,18 @@ function _icReformLine(country) {
   }
   return 'Reform exposure: ' + v.score + '/100 reform-frequency score (' + _icPlain(v.scoreNote) + '), '
     + v.since2010 + ' sourced fiscal law change' + (v.since2010 === 1 ? '' : 's') + ' since 2010. '
-    + 'Direction: ' + _icPlain(v.tiltWord) + ' — ' + _icPlain(v.tiltBasis) + '. '
+    // v725 (T4): this line is pasted into an IC memo, so it must name the window it describes.
+    // It reported the WHOLE sourced record under a sentence whose previous clause says "since
+    // 2010" -- so Venezuela pasted "Direction: net-tightening against the contractor" next to
+    // "1 sourced fiscal law change since 2010", when every one of the 3 take rises behind that
+    // verdict predates the window. The verdict is now the window's, with the full record after
+    // it where the two differ.
+    + 'Direction since 2010: ' + _icPlain(v.tiltWord) + ' — ' + _icPlain(v.tiltBasis) + '. '
+    + (v.dirAllLine
+        ? 'Over the full sourced record (' + v.split.hostile + ' raised take / ' + v.split.friendly
+          + ' cut take / ' + v.split.unmeasured + ' unmeasured / ' + v.split.context
+          + ' no fiscal change): ' + _icPlain(v.tiltAllWord) + ' — pre-2010 history, not a since-2010 finding. '
+        : '')
     // `latest` is the most recent event of ANY kind, so on a jurisdiction whose newest entry is a
     // discovery or a terms review it is not a change at all. The tab's own card calls it "Most
     // recent change"; in a pasted memo that would assert a fiscal change that did not happen.
@@ -32261,6 +32272,30 @@ function _rrClassify(c) {
   // v585 (T4): the third bucket split into unmeasured-fiscal vs context. `neutral` is kept
   // as their sum only so no downstream reader breaks; nothing renders it as a bucket now.
   var _split = _rrSplit(events);
+  // ── v725 (T4): the one tile on this card that was never windowed ─────────────────────
+  // Every other figure in the verdict strip is scoped to the 2010 scoring window: the Reform
+  // Frequency Score is 100 - 15 x changes since 2010, the tile beside it is literally headed
+  // "Reforms since 2010", and the rank is computed off that score. DIRECTION was computed over
+  // the WHOLE sourced record, back to 1938, under an unqualified header, sitting between them.
+  // Measured against the live reform_history.json, the two windows disagree for 9 of the 21
+  // scoreable jurisdictions, and 4 of those disagree by SIGN or by verdict word:
+  //   Venezuela  whole record ^3/v0/?1 -> "net-tightening against the contractor" in RED
+  //              in-window     ^0/v0/?1 -> nothing measured since 2010 at all. The red verdict
+  //              is carried entirely by the 2001/2006/2007 nationalisations, which is real
+  //              history and is NOT what the tile beside it ("Reforms since 2010: 1") means.
+  //   Colombia   same shape: RED net-tightening from 2 pre-2010 rises, zero measured in window.
+  //   Russia     whole record ^1/v0/?1 -> "direction not established", withheld
+  //              in-window     ^1/v0/?0 -> net-tightening. The 2022 windfall tax (+15pp) is the
+  //              one event a 2026 IC memo turns on, and the tile diluted it with a 1990s
+  //              unmeasured entry and refused to name a direction.
+  //   Canada     whole record "not established"; in-window a single take CUT -> liberalizing.
+  // This is not a new rule and not a new threshold. v668 already established the fix on this
+  // same tab for the Regional Reform Tilt table -- in-window is the headline, the full sourced
+  // record prints as a second line beneath it, "so the two are never read as one number". The
+  // per-country card, which is THE control this tab is named for, never got that treatment.
+  // The whole-record split is still shown, and nothing is recomputed or hidden; it simply stops
+  // wearing the window's label. _split is left intact for downstream readers.
+  var _splitWin = _rrSplit(events.filter(function(e){ return (e.year || 0) >= 2010; }));
   var tightened = _split.hostile, liberalized = _split.friendly;
   var neutral = _split.unmeasured + _split.context;
   var scored = Object.keys(rh)
@@ -32465,9 +32500,29 @@ function _rrClassify(c) {
   // v585 (T4): the tilt used to be a bare majority of tightened vs liberalized, with every
   // unmeasured fiscal change silently counted as agreement. It is now asserted only where the
   // unmeasured events could not overturn it; otherwise the count is printed in place of the word.
-  var _tilt = _rrTilt(_split);
+  // v725 (T4): the verdict now reads the same window as the score next to it. Where the window
+  // holds no sourced event at all, say that plainly rather than letting _rrTilt's zero-context
+  // branch print "no fiscal change on record" -- which would be a claim about the whole record.
+  var _tilt = (_splitWin.total === 0)
+    ? { word: 'no sourced event since 2010', color: 'var(--muted)', state: 'empty',
+        basis: 'nothing on file inside the scoring window \u2014 the full record is below' }
+    : _rrTilt(_splitWin);
   var tiltWord = _tilt.word, tiltColor = _tilt.color, tiltBasis = _tilt.basis;
-  var dirHtml = _rrDirCells(_split);
+  var dirHtml = (_splitWin.total === 0) ? '<span style="color:var(--muted);font-weight:600;">\u2014</span>' : _rrDirCells(_splitWin);
+  // The full sourced record, printed beneath the window rather than in place of it -- the same
+  // treatment v668 gave the Regional Reform Tilt rows. Rendered only where it actually differs,
+  // so the 12 countries whose two windows agree do not carry a redundant line.
+  var _yrLo = events.reduce(function(m,e){ return Math.min(m, e.year || 9999); }, 9999);
+  var _allTilt = _rrTilt(_split);
+  var dirAllLine = (_split.total === _splitWin.total)
+    ? ''
+    : '<div style="font-size:10px;font-weight:400;color:var(--muted);margin-top:3px;line-height:1.45;" title="'
+      + 'The direction split over every sourced event ORCA holds for this jurisdiction, not only those inside the 2010 scoring window. '
+      + 'The counts and the verdict above this line report the window \u2014 the same window as the Reform Frequency Score and the Reforms since 2010 tile. '
+      + 'This line reports the whole record. Where they differ the difference is pre-2010 history: it is real, and it is not what &quot;since 2010&quot; means.">'
+      + (_yrLo < 9999 ? 'full record ' + _yrLo + '\u2013now: ' : 'full record: ')
+      + _rrDirCells(_split, 'sm')
+      + ' \u00b7 ' + _allTilt.word + '</div>';
   // v583 (T4): every surface that prints the count must also print what the count left out.
   var contextNote = contextIn.length
     ? ('+ ' + contextIn.length + ' in-window event' + (contextIn.length === 1 ? '' : 's') + ' not scored \u2014 '
@@ -32476,7 +32531,8 @@ function _rrClassify(c) {
            .join(', '))
     : '';
   return { events: events, since2010: since2010, contextIn: contextIn, contextNote: contextNote, score: score, tightened: tightened,
-           liberalized: liberalized, neutral: neutral, split: _split, dirHtml: dirHtml,
+           liberalized: liberalized, neutral: neutral, split: _split, splitWin: _splitWin,
+           dirHtml: dirHtml, dirAllLine: dirAllLine, tiltAllWord: _allTilt.word,
            tiltBasis: tiltBasis, tiltState: _tilt.state, scored: scored, rank: rank, tiedN: tiedN, rankTxt: rankTxt,
            latest: latest, icRule: icRule, icColor: icColor, icLabel: icLabel,
            scoreNote: scoreNote, scoreColor: scoreColor, tiltWord: tiltWord, tiltColor: tiltColor };
@@ -33580,10 +33636,11 @@ function renderReformTimeline(country) {
       + '<div style="font-size:10px;color:var(--muted);">law changes</div>'
       + (_vcp.contextNote ? '<div style="font-size:10px;color:var(--orange);font-weight:700;max-width:200px;line-height:1.4;">' + _vcp.contextNote + '</div>' : '')
       + '</div>'
-      + '<div style="max-width:230px;"><div style="' + _lbl + '">Direction</div>'
+      + '<div style="max-width:230px;"><div style="' + _lbl + '">Direction <span style="font-weight:600;opacity:.8;">since 2010</span></div>'
       + '<div style="font-size:13px;font-weight:800;">' + _vcp.dirHtml + '</div>'
       + '<div style="font-size:10px;color:' + _vcp.tiltColor + ';font-weight:700;">' + _vcp.tiltWord + '</div>'
-      + '<div style="font-size:10px;color:var(--muted);line-height:1.45;">' + _vcp.tiltBasis + '</div></div>'
+      + '<div style="font-size:10px;color:var(--muted);line-height:1.45;">' + _vcp.tiltBasis + '</div>'
+      + (_vcp.dirAllLine || '') + '</div>'
       + '</div>'
       + '<div style="font-size:11px;color:var(--text);line-height:1.6;padding:7px 10px;background:var(--card);'
       + 'border-left:3px solid ' + _vcp.icColor + ';border-radius:4px;">'
@@ -39204,10 +39261,11 @@ function renderReformCountryVerdict() {
     + '<div style="font-size:10px;color:var(--muted);">' + events.length + ' on record since ' + (events.reduce(function(m,e){ return Math.min(m, e.year || 9999); }, 9999)) + '</div>'
     + (_v.contextNote ? '<div style="font-size:10px;color:var(--orange);font-weight:700;max-width:210px;line-height:1.4;">' + _v.contextNote + '</div>' : '')
     + '</div>'
-    + '<div style="max-width:250px;"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Direction</div>'
+    + '<div style="max-width:250px;"><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Direction <span style="font-weight:600;opacity:.8;">since 2010</span></div>'
     + '<div style="font-size:14px;font-weight:800;">' + _v.dirHtml + '</div>'
     + '<div style="font-size:10px;color:' + tiltColor + ';font-weight:700;">' + tiltWord + '</div>'
-    + '<div style="font-size:10px;color:var(--muted);line-height:1.45;">' + _v.tiltBasis + '</div></div>'
+    + '<div style="font-size:10px;color:var(--muted);line-height:1.45;">' + _v.tiltBasis + '</div>'
+    + (_v.dirAllLine || '') + '</div>'
     + (fp != null
         ? '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Fiscal Predictability</div>'
           + fpGradeHtml
