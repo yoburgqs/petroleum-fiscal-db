@@ -35982,3 +35982,16 @@ harvesting job, and remains Zach's call.**
 - `pixel_audit` not run this cycle (the change adds one block to two existing panels on Reform
   Risk and Country Profile; the 21-cycle `tablet-768::2-t7 clipped-text` carry is pre-existing and
   no new horizontal scroll appeared at 768 in this cycle's own sweep).
+
+---
+## Cycle 613 Log — 2026-09-07 19:06
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 613 complete — shipped as **v707**, pushed to both repos, mirror updated.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (612 ran T1, 611 T3, 610 T6, 609 T2, 608 T5 — T4 was the stalest, last walked at 607.) Walked cold at 1440×900, Home → Reform Risk, then the same question from the Country Profile side.
+
+## Friction
+The Reform Risk tab is in good shape for the 21 jurisdictions it covers. The problem is everyone else. ORCA holds a sourced reform event log for **
