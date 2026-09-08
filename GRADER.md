@@ -36583,3 +36583,122 @@ on the carried list.) Prod Cov cells render correctly at 390: `20% 0.2% 15% 3% 3
 
 ## Friction
 Walked it cold over HTTP: Home → Screener → load the flagship **IOC Capital Screen** → 15 countries → sort by the column that answers "which of
+
+---
+## Cycle 619 Log — 2026-09-08 08:05 — shipped as v713
+
+- Test before: 294 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: 294 PASS / 0 FAIL / 0 WARN / 0 JS errors — **the suite RAN this cycle**
+  (`node office/tools/petroleum/tests/runtime_comprehensive.js`, graded copy, report read from
+  `office/data/runtime_test_report.txt` written 2026-09-08T08:01:36Z). Not carried forward.
+- JS syntax gate: PASS, 11 inline blocks, 0 bad.
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" Stalest by rotation: 618 ran T1,
+617 T3, 616 T6, 615 T2, 614 T5, 613 T4.
+
+## Friction
+Walked cold over HTTP at `localhost:8899`, fresh browser context — no sessionStorage, no
+localStorage. Home → **Reform Risk** → the `#rr-country-lookup` single-country lookup, which is
+the tab's actual T4 entry point and which three other surfaces route the analyst to.
+
+The lookup is in good shape: the dropdown is split into two `<optgroup>`s ("Sourced reform
+history — scoreable (21)" / "No sourced reform history — predictability only (164)"), the
+unscored card refuses to print a score of 100, and the Kuwait monopoly card correctly withholds
+Fiscal Predictability entirely. None of that was the worst moment.
+
+The worst moment is on the **scored** card, and it is structural rather than editorial.
+
+The **Fiscal Predictability Score** is built on a zero within-country take-spread penalty — its
+largest component, worth up to −40 points — whenever `_fpDispersion()` returns `state:'single'`.
+For **8 of the 21 scoreable jurisdictions**, ORCA's own `api/v1/country/<slug>.json` contract file
+refutes that basis, and `_rrPaintObsSpread()` (index.html:38131) correctly detects it via
+`cpSpreadConflict()`.
+
+But the prose that states the **corrected bound** is written into `#rr-fp-claim`, and
+`#rr-fp-claim` is emitted **only on the UNSCORED card** (index.html:38337). The scored card
+(index.html:38382) emitted `#rr-fp-basis` and `_fpCohortLine()` only. So the `claim` block of
+`_rrPaintObsSpread` was a **silent no-op** on the scored path, and the bound survived only inside
+a `title` attribute.
+
+The result was a visible correction sized **inversely to the error**, measured live:
+
+| country | printed | observed spread | true ceiling | bound shown on screen? |
+|---|---|---|---|---|
+| Angola | 62 UNGRADED | ≥45.2pp / 50 contracts | **26 · VERY LOW** | **no — hover only** |
+| Colombia | 72 UNGRADED | ≥39.4pp | **40 · VERY LOW** | **no — hover only** |
+| Indonesia | 62 UNGRADED | ≥37.2pp | **32 · VERY LOW** | **no — hover only** |
+| Norway | 76 UNGRADED | ≥29.6pp | **52 · LOW** | **no — hover only** |
+| Ecuador | 56 UNGRADED | ≥18.8pp | 41 · VERY LOW | no — hover only |
+| Libya | 74 UNGRADED | ≥17.3pp | 60 · MODERATE | no — hover only |
+| USA | 91 UNGRADED | ≥11.3pp | 82 · HIGH | no — hover only |
+| Venezuela / Algeria | 73 / 72 | ≥4.8 / ≥3.6pp | 69 / 69 | no — hover only |
+| *Mozambique (unscored)* | 63 | ≥2.2pp | 61 · MODERATE | **yes — full visible prose** |
+
+Mozambique, whose correction is **2 points and no band change**, printed its bound in full
+sentences. Angola, whose correction is **36 points and drops it to the bottom band on the
+platform**, printed the refutation and then withheld the number. The analyst asking T4 about
+Angola could read that the score was wrong but not what to carry instead — the only two numbers
+available on the card were the refuted one and none. Four of the eight move **two bands**.
+
+## Change
+New `#rr-fp-bound` slot on the scored Fiscal Predictability tile, sitting between the basis note
+and the cohort line, `display:none` until `_rrPaintObsSpread` fires. When the conflict is
+detected it renders an orange rule-bordered line:
+
+> **Carry ≤26 · VERY LOW**, not 62. At 45.2pp the take-spread term alone costs 36 points and the
+> printed score charged none of it. Ceiling, not a recomputed score.
+
+The score is **not** recomputed — a top-50-by-production sample is not a population IQR, the same
+reason v559 gave and the same position the existing tooltip already took. Because `obs.spread` is
+a floor on the true spread, `cost` is a floor on the penalty and the printed figure is a **ceiling**
+on the score; it is labelled as one, rather than as an estimate. The hover carries the full
+derivation, the observed take range, and the distinct-value count.
+
+## Result
+All 9 conflicted countries now print a defensible band **on screen**: Angola 26 VERY LOW,
+Colombia 40 VERY LOW, Indonesia 32 VERY LOW, Norway 52 LOW, Ecuador 41 VERY LOW, Libya 60
+MODERATE, USA 82 HIGH, Venezuela 69, Algeria 69. Countries with no conflict (Guyana, Russia,
+Brazil, Australia, Canada) render nothing new, and the unscored path is untouched. The analyst
+walking T4 now leaves the lookup with a number they can defend in an IC memo instead of a
+contradiction they have to resolve themselves.
+
+## Step 5b — mobile
+Measured at **360 / 390 / 414** with `hasTouch:true` (`matchMedia('(pointer: coarse)')` confirmed
+true at all three) and at 768 / 1024 / 1280 / 1440 / 1920, with Angola loaded so the new element
+is rendered.
+
+- `documentElement.scrollWidth === clientWidth` at **390, 414, 768, 1024, 1280, 1440, 1920**.
+- **360 scrolls 386px** — but it does so **identically in the v712 build served side by side on
+  port 8898** (386 before, 386 after). Pre-existing, not caused here. Goes on the carried list.
+- The new element is a `<div>`, not a control. Sub-24px controls inside `#treformrisk` under
+  `pointer: coarse`: **2 before, 2 after, delta 0**, measured A/B against v712.
+- `#rr-fp-bound` renders 58px tall and fully inside the viewport at all three phone widths;
+  it inherits the tile's `max-width:230px`.
+
+## Carried forward — not fixed this cycle
+- **360px width scrolls 386px on the Reform Risk tab** — pre-existing in v712, confirmed A/B this
+  cycle. 360 is not in the directive's required width list (which starts at 390) but it is one
+  cycle 618 claimed clean.
+- **`_fpCohortLine()` still ranks the 8 conflicted countries inside the one-term cohort** — Norway
+  reads "84th of 132 one-term regimes" on a card that has just said its one-term basis is refuted.
+  The bound line now sits directly above it and contradicts it. Narrower follow-on than this fix
+  and a good next T4.
+- The service-worker absolute path (`index.html:49`) is still origin-dependent, so a locally served
+  run logs a 404 console error the live build does not — carried from 618, confirmed present in
+  both builds this cycle.
+- **19 sub-24px controls inside `#explorer-screen-mode` under `pointer: coarse`** at 360/390/414.
+- `pixel_audit` still exercises Side-by-Side only with the seeded three-country example.
+- v710's `t7` clipped-text regression: `tablet-768::2-t7 33 → 37`, `phone-390::2-t7 33 → 36`.
+- The inverted tier-B definition survives in ~12 further FAQ answers in the GRADER-era archive.
+- Everything on the cycle-603 through 618 carried lists remains open, including: `cp-price-select`
+  absent from the DOM; Mozambique's "Commercially attractive" verdict under its own
+  non-reconciliation panel; `renderTornadoPanel` with no basis marking on the generic-template
+  path; reform coverage 21 of 185; the Two-Price Return Screen thresholds; the Methodology/Home
+  tier-definition conflict; the FAQ naming a "Stability Score filter at >=4" that does not exist;
+  the Home Screener card advertising a breakeven filter removed at v568; `FC_PROFILES`/`DCF_PROFILES`
+  divergence; the empty "Recent Platform Updates" placeholder; Kuwait's evidence tier; three
+  monopolies carrying `be_75 = 1.0` (19th cycle); 862 contracts with no fiscal terms; the Screener
+  Contractor NPV tooltip naming an absent profile selector (21st cycle); the Methodology tab naming
+  a `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete 2020s
+  cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
