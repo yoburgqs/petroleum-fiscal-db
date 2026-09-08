@@ -35854,3 +35854,131 @@ visible. Flagged for Zach as an open call.
 I first checked the preset menu itself and found it **already solved** — v651 labels every option with its live hit count. So the worst moment is one step later.
 
 Measured over the real data: `npv_50 ≤ npv_75` for **all 185 countries, zero inversions**. The shipped **T
+
+---
+## Cycle 613 Log — 2026-09-07 — v707
+- Test before: 294 PASS / 0 FAIL (deployed URL, as reported to the cycle)
+- Test after: **293 PASS / 0 FAIL / 1 WARN / 1 JS error** (suite RUN this cycle against the local
+  tree; control below shows the 1-test delta is the local-serving artefact, not a regression)
+- JS errors: 0 page errors; 1 console 404 (`sw.js`), pre-existing and present in the control
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** (612 ran T1, 611 T3, 610 T6,
+609 T2, 608 T5 — T4 was the stalest, last walked at cycle 607.) Walked cold at 1440×900 from
+Home → Reform Risk with a country in mind, then the same question from the Country Profile side.
+
+## Friction
+The Reform Risk tab itself is in good shape: the picker carries two optgroups that name the
+coverage split before you commit, and the covered-country card (Nigeria, Guyana, Iraq, Norway)
+returns a real IC action with its basis attached. The problem is what happens for everyone else.
+
+ORCA holds a sourced reform event log for **21 of 185** jurisdictions. So **89% of the lookups an
+analyst can run** land on the uncovered card — and both uncovered surfaces closed with the same
+sentence:
+
+    "needs an external check (national petroleum law, IMF Article IV, operator annual reports)"
+
+- Reform Risk country lookup — `index.html:37790`
+- Country Profile → Fiscal Reform History — `index.html:32496`
+
+The advice is correct. It is also the point where the walk ends: the analyst is handed a reading
+list and a blank page, on a tab named for the question they just asked.
+
+**The platform already had the first item on that list.** Measured over `country_data.json`:
+**160 of the 164** uncovered jurisdictions carry an A-tier `legislation` entry in `top_sources`
+naming the statute their fiscal facts were read from — with a live URL and a fact count.
+
+| country | statute ORCA cites | facts read from it |
+|---|---|---|
+| Saudi Arabia | Royal Decree M/22 **2017** Petroleum Income Tax Rate 50 pct | 746 |
+| Malaysia | Petroleum Development Act **1974** (Petronas PSC standard terms) | 1,416 |
+| Qatar | Income Tax Law Decree 21 of **2009** | 427 |
+| Namibia | Petroleum Exploration and Production Act 2 of **2017** | 122 |
+| Egypt | EGPC Model PSA / Petroleum Law 66 of **1953** Amended | 748 |
+
+Saudi Arabia is the sharpest case: the Country Profile prints that A-tier citation in its own
+evidence table *on the same screen*, four panels above a paragraph telling the analyst to go and
+find the national petroleum law. They were being sent out of the product to locate a document the
+product was displaying.
+
+## Change
+Both uncovered cards now end with the statute instead of the reading list. One implementation
+(`_rrStatuteYears` / `_rrStatuteSources` / `_rrStatuteMaxYear` / `_rrStatuteBlock` /
+`_rrStatuteTail`, defined beside the other `_rr*` helpers) drives both surfaces, so the lookup and
+the Country Profile cannot name different documents for one country.
+
+A new block, `START THE EXTERNAL CHECK HERE — the statute ORCA sourced these terms from`, prints
+the named act as a link to its source register, its evidence tier, and how many of that country's
+verified facts came out of it.
+
+**It asserts nothing further, and says so in place:** *"This is a source citation, not a reform
+log. It produces no reform count, no Reform Frequency Score and no premium — X remains unscored."*
+No score was invented and no threshold was picked; the uncovered card still refuses to produce a
+reform reading.
+
+What it does add is a fact the page already held and never printed — the year the citation names,
+which decides where the check starts. Four states, all exercised on screen:
+
+| state | n | what the card now says |
+|---|---|---|
+| statute year ≥ 2010 | 64 | "inside the 2010 window — the terms already rest on a post-2010 instrument, so the missing event log is a gap in the record of changes, not evidence the law has stood still. Check that act for amendments made since." |
+| statute year < 2010 | 71 | "before the 2010 window — everything ORCA prints is read from it, so any amendment passed since 2010 is unrecorded on this platform. That act is where the check starts." |
+| citation names no year | 25 | "ORCA cannot tell you whether the instrument it read predates the window. Establish which version is in force before anything else." |
+| no legislation citation | 4 | original wording kept **verbatim** — Iraq-Kurdistan, Paraguay, Somalia, UAE — Abu Dhabi |
+
+The closing sentence changes only where a statute exists; where none does it is byte-identical to
+before.
+
+## Result
+For **160 of 185 countries** the reform-exposure answer stops being *"we do not know, go and
+look"* and becomes *"we do not hold the change log; here is the act our numbers came from, here is
+whether it predates the scoring window, start there"* — with the document one click away instead
+of one search engine away. An analyst with 20 minutes now leaves the tab with a named instrument
+and a year rather than a research task.
+
+## Verification — all run this cycle, none assumed
+- **JS syntax gate:** PASS, 11/11 inline script blocks.
+- **Runtime suite RUN:** 293 PASS / 0 FAIL / 1 WARN / 1 JS error.
+  **Control:** unmodified `HEAD:index.html`, written into the identical tree and served from the
+  same origin, returns **exactly 293 / 0 / 1 / 1**. The WARN (an `sw.js` 404 under local serving)
+  is pre-existing and unchanged by this cycle. The deployed-URL figure is 294; the 1-test delta is
+  the local-serving artefact, not a regression.
+- **Horizontal scroll 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390 across all 10 tabs.
+- **Step 5b, 390×844 `hasTouch: true`:** `scrollWidth === clientWidth` (390 === 390) with the new
+  block rendered on both surfaces. One control added — the statute link — measuring **63.2px** on
+  Reform Risk and **33.0px** on Country Profile, both above the 24px floor under `pointer: coarse`.
+- **0 page errors** on every run, desktop and mobile.
+- Controls walked on screen: Namibia (≥2010), Malaysia and Qatar (<2010), Belize (no year),
+  Paraguay (no legislation citation — unchanged text), Norway and Ghana (scored countries —
+  card untouched).
+- Year extraction validated over all 164 uncovered rows: min 1934, max 2022, no false hits from
+  rate strings, `Ley 18714`-style statute numbers correctly not read as years.
+
+**Deliberately NOT done:** these citations were not converted into reform events, and the 21/185
+coverage figure is unchanged. A statute citation records the instrument a fact was read from, not
+that the law changed — turning 160 of them into a reform log would be inventing the event record
+the tab exists to report honestly. **Extending real reform coverage beyond 21 jurisdictions is a
+harvesting job, and remains Zach's call.**
+
+## Carried forward — not fixed this cycle
+- Reform coverage is still 21 of 185. Disclosed everywhere; unresolved.
+- `⬇ Chart PNG` / `downloadCmpChart()` (index.html:38637) hard-codes `#cmp-chart`; an analyst
+  scrolled to **Contractor NPV vs Oil Price** silently receives the *take* chart. Natural next T5.
+- `cp-run-fc-btn` writes to `#price`, which does not exist; falls back to `fc-price`.
+- Country Profile contradicts itself on whether contractor NPV carries information beyond take.
+- `renderTornadoPanel` / `_buildTornadoChart` render a sensitivity chart with no basis marking on
+  the generic-template path.
+- The Two-Price Return Screen's thresholds still sit in the bottom quartile (disclosed since v706).
+- Everything on the cycle-603 through 612 carried lists remains open: Methodology/Home tier
+  definition conflict; the FAQ naming a "Stability Score filter at >=4" that does not exist;
+  Evidence Chain grammar on n=1; the Home Screener card advertising a breakeven filter removed at
+  v568; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+  `Take weighting` printing "Equal-weighted" on a monopoly column; Kuwait's evidence tier; three
+  monopolies carrying `be_75 = 1.0` (13th cycle); 862 contracts with no fiscal terms; zero-rate
+  defaults inside published `take_75`; the Screener Contractor NPV tooltip naming an absent
+  profile selector (15th cycle); the Methodology tab naming a `display:none` API Explorer tab;
+  unweighted per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
+  `renderVintageTrendChart()`/`renderVintage()`.
+- `pixel_audit` not run this cycle (the change adds one block to two existing panels on Reform
+  Risk and Country Profile; the 21-cycle `tablet-768::2-t7 clipped-text` carry is pre-existing and
+  no new horizontal scroll appeared at 768 in this cycle's own sweep).
