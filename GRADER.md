@@ -37835,3 +37835,14 @@ contracts with no fiscal terms; the Screener Contractor NPV tooltip naming an ab
 selector (29th cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted
 per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
 `renderVintageTrendChart()`/`renderVintage()`.
+
+---
+## Cycle 628 Log — 2026-09-08 13:24
+- Test before: 290 PASS / 4 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 628 shipped as **v721**, pushed to both repos.
+
+## First, the 4 FAILs in the brief did not reproduce
+
+Before touching anything I re-ran the suite against both targets: **live 294/0/0**, **localhost 293/0/1**. All four passed on both. They're the v601 Country Profile block, which asserts after a **fixed 2200ms** wait following `loadCountryProfile('Norway')` — when that fetch runs long the assertions read the previously-rendered country, giving exactly the observed signature (the one *negati
