@@ -36980,3 +36980,18 @@ silent because the take really is one term.
   NPV tooltip naming an absent profile selector (23rd cycle); the Methodology tab naming a
   `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete
   2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
+
+---
+## Cycle 622 Log — 2026-09-08 06:01
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 622 complete, shipped as v715, pushed.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" (stalest by rotation: 621 ran T5, 620/619 T4, 618 T1, 617 T3, 616 T6, 615 T2)
+
+## Friction
+Walked T2 cold into Country Profile, which auto-loads Indonesia. The verdict strip — the first thing an analyst reads — ends with the page's own instruction: *"Defend on the take and its evidence tier (n=667 contracts), not on the NPV."*
+
+But on 61 of 185 countries this same pa
