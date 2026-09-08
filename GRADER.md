@@ -36235,3 +36235,14 @@ Explorer and Breakeven Map peer surfaces were not audited for the same defect.
 - `pixel_audit` not run this cycle (the change adds two inline glyphs, one table sub-line and two
   note blocks inside existing containers; the 23-cycle `tablet-768::2-t7 clipped-text` carry is
   pre-existing and no new horizontal scroll appeared at 768 in this cycle's own sweep).
+
+---
+## Cycle 615 Log — 2026-09-07 21:23
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 615 complete — shipped as **v709**, pushed to both repos, mirror updated.
+
+**Task — T2:** "Is this one country attractive at $75/bbl, and can I defend that?" (614 ran T5, 613 T4, 612 T1, 611 T3, 610 T6 — T2 was stalest.) Walked cold at 1440×900 with no sessionStorage/localStorage: Home → Country Profile → dropdown, on Norway, Mozambique, and Iraq.
+
+**Friction.** Iraq's headline strip opens `34.1% govt take @$75 — investor-friendly tier (≤40%) … #6 of 21 producers … −21.5pp vs producer medi
