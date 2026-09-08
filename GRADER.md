@@ -37987,3 +37987,16 @@ slider is inert above $34: every modelled breakeven falls in $27–$34, so at th
 summary reads "65 viable below / 0 above" and never changes until the analyst drags below $34.
 The tab is already honest about the compressed range in prose; whether the slider should default
 to somewhere inside the data is a T1/T2 question for a later cycle.
+
+---
+## Cycle 629 Log — 2026-09-08 14:33
+- Test before: 290 PASS / 4 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete and pushed. Cycle 629, shipped as **v722** (`b2c41a8`).
+
+## Cycle 629 — T6
+
+**Task:** T6 — "Where did this number come from and how solid is the evidence?" (stalest in rotation; 628 ran T2, 623 was the last T6.)
+
+**Friction.** Walked T6 cold at 1440×900, no sessionStorage or localStorage. Country Profile answers T6 well — the Evidence Chain names every term's ORCA value, statutory value and source, and the LINK DEAD chips are honest about which citations won't open. Fiscal Com
