@@ -37278,3 +37278,139 @@ basis, and the IC-memo paste carries the qualification with it.
 
 ## Friction
 Cycle 626 built a data-basis gate on Side-by-Side's four Govt Take rows so a country ORCA holds no verified production for couldn't be handed the green "lowest of N" against a production-weighted country. Walking T3 cold, I found that gate almost never reaches the screen. `
+
+---
+## Cycle 625 Log — 2026-09-08 09:39
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local; the WARN is the known origin-dependent sw.js 404)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — **suite actually ran this cycle**, report written
+  2026-09-08T14:38:52Z, read back from `/tmp/runtime_test_report.txt`. The 5-hour-old report
+  that was on disk was moved aside to `/tmp/runtime_test_report.STALE_0440.txt` BEFORE the read,
+  so a stale file could not be mistaken for this run (the cycles 506-516 failure).
+- JS errors: 0 new. The 1 captured is the same sw.js 404.
+- Shipped as **v718**.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (stalest by rotation: 624 ran T3,
+623 T6, 622 T2, 621 T5, 620/619 T4, 618 T1.)
+
+## Friction
+Walked T1 cold, no sessionStorage or localStorage: Home hero → "open the screen →"
+(`_homeOpenICScreen()`) → Screener with the IOC Capital Screen preset applied, 15 rows. That
+whole path is sound. The break comes one click later, at the most ordinary thing an analyst does
+to a preset: **they tighten it, because their own mandate is stricter than the preset's.**
+
+Moving the take ceiling from 65% to 63% correctly drops the list to 14 countries. Three captions
+did not move with it:
+
+| surface | said |
+|---|---|
+| `#screener-preset-label` | "◆ IOC Capital Screen: verified production · **Take ≤65%** · NPV ≥0 @$75 AND @$50" |
+| `#screener-count` prefix | "**IOC Capital Screen** · 14 countries match … take ceiling ≤63% …" |
+| `_screenerExportBasis.criteria[0]` | "**Preset: IOC Capital Screen**" |
+
+The chip asserts ≤65% two inches above a table screened at ≤63%, and the count line contradicts
+itself inside one sentence. Worst of the three is the export: it is the line that heads the CSV
+and the XLSX basis sheet, so the artifact that reaches the investment committee is titled with
+the name of a screen that was not run. Nobody in that room can tell the shortlist was edited.
+
+**Root cause, verified at runtime, not inferred.** The slider `input` handler cleared
+`window._activePresetName`. But `_activePresetName` is declared `let` at top level of a classic
+script, so it is a global *declarative* binding and never a property of `window` —
+`Object.prototype.hasOwnProperty.call(window,'_activePresetName')` reads **false** before the
+assignment, and the assignment merely creates an unrelated window property (observed going
+`undefined` → `null` while the real binding stayed `'IOC Capital Screen'`). Every reader reads the
+`let`. **The clear had never once fired since it was written.** This is the same failure class the
+file's own v524 comment records twice — "the analyst got 14 correct rows under a caption
+describing a filter that no longer runs" — except it now reaches the memo attachment.
+
+## Change
+Restoring the clear would have been the wrong fix: erasing the name loses information the analyst
+wants (that this shortlist *started* as the IOC Capital Screen) and cannot come back if they move
+the slider home again. Instead the preset's own control state is captured when it is applied
+(`_activePresetBase = _scCriteriaState()`, taken after every control is written and before the
+render, so it cannot drift from a hand-maintained copy of the criteria), and every subsequent
+`runScreener()` diffs against it via `_scPresetDrift()`.
+
+- **Unchanged screen** → all three surfaces read exactly as before. Clean path is byte-identical.
+- **Edited screen** → the chip turns red and reads
+  "◆ IOC Capital Screen — **MODIFIED**: take ceiling ≤65% → ≤63%", one phrase per changed
+  threshold in the analyst's own units; the count line prefix becomes
+  "IOC Capital Screen **(modified)** · "; the export header becomes
+  "Preset: IOC Capital Screen — MODIFIED after loading (…). The thresholds listed below are what ran."
+- **Moved back** → the clean caption returns. Drift is recomputed every render, not latched.
+- One evaluation, three consumers — `_scPaintPresetChip()` runs at the top of `runScreener()`
+  before the count line and the export basis are built, so the chip cannot say one thing while
+  the export says another.
+- Added to `_scSnapshotState()`/`_scRestoreState()`, because `_labelScreenerPresets()` applies
+  every preset in turn to read its live hit count; without that, the boot pass would leave the
+  analyst's screen diffing against a preset they never loaded. Verified: the dropdown's 11 live
+  counts are identical to the pre-change run.
+
+**Second defect, found by the fix and fixed with it.** The chip's `×` had *never worked*. Its
+`onclick` was authored with backslash-escaped single quotes inside a double-quoted HTML
+attribute, so the browser parsed the literal backslashes as JavaScript: every real mouse click
+threw `Invalid or unexpected token` and reset nothing. Confirmed byte-identical in the pre-change
+file, so pre-existing. It had to be fixed here because the new MODIFIED tooltip tells the analyst
+to press it. Now `onclick="_scClearPreset()"`; a real click resets take 65→100, restores all 185
+countries, hides the chip, re-includes proxies, 0 errors.
+
+## Result
+An analyst who tightens a preset can no longer paste a shortlist into an IC memo under the name
+of a screen that was not run. On screen they are told, at the moment they cause it, that the
+list is no longer the preset and exactly which threshold they moved; in the export the header
+says MODIFIED and names the change; and the `×` that undoes it works for the first time.
+
+## Verified
+Every state walked cold (no sessionStorage, no localStorage), real keyboard/mouse gestures:
+- **Preset loaded** — 15 rows, chip amber `rgb(150,87,10)`, count "IOC Capital Screen · 15
+  countries", export "Preset: IOC Capital Screen". Identical to pre-change.
+- **Take 65 → 63** — 14 rows, chip red `rgb(163,35,27)` "MODIFIED: take ceiling ≤65% → ≤63%",
+  count "(modified)", export carries the MODIFIED sentence.
+- **Moved back to 65** — all three clean again, 15 rows.
+- **Proxy checkbox flipped** (15 → 165 rows) — "MODIFIED: data basis verified production only →
+  proxy countries included". This is the more dangerous drift of the two and it now says so.
+- **No preset + slider moved** — chip stays `display:none`, no phantom "modified".
+- **Preset switched while modified** (IOC → Atlantic Frontier) — new preset's clean chip, 7 rows.
+- **`×` real mouse click** — take 100, 186 rows, chip hidden, proxy re-checked, 0 page errors.
+- **Preset dropdown live counts** — all 11 unchanged (15/143/34/22/11/153/35/70/6/56/24 @$75).
+- **Clean chip geometry pre vs post** — 495x25 at 1920/1440/1280/1024 on both builds. No-op.
+- **Desktop `×` box** — 12x13 pre and post; the coarse-pointer rule does not touch a mouse.
+
+## Step 5b — phone
+390x844, `hasTouch:true`, `pointer: coarse` confirmed true. `scrollWidth` 390 = `clientWidth` 390
+in clean, one-drift and two-drift states. Zero horizontal scroll at 1920/1440/1280/1024/768/390.
+`×` renders **28 x 44px** under a thumb (was 12 x 44) — it is a control this cycle touched, so the
+24px rule applies; the widening is scoped to `pointer: coarse` and measured a no-op on desktop.
+
+**One regression caught by this check and fixed before commit, recorded because it nearly
+shipped.** The chip's inline style carries `white-space:nowrap`, and the only override was inside
+the v612 `max-width:720px` layer. The MODIFIED string is longer and unbounded in phrase count:
+with two drifts it measured **779px against a 768px client width and scrolled the page sideways
+at the 768 breakpoint**. Fixed by wrapping the chip at every width. The v612 layer is untouched —
+not removed, not weakened, not narrowed; the new rule sits outside it and carries no
+`!important`. Re-measured clean at all six widths in both a mobile and a desktop context.
+
+## Carried forward — not fixed this cycle
+- The Home Screener card still advertises a **breakeven** filter removed at v568 ("set max take %,
+  min contractor NPV at $75, min NPV at the $50 downside, **breakeven**, mechanic, or region").
+  Same class of defect as the one fixed above — a caption naming a control that is gone — but on
+  the Home card it is a text-only edit, so it is logged rather than spent as a cycle.
+- The `#screener-count` line now runs to ~600 characters on a loaded preset. Everything in it is
+  true and load-bearing, but it is a wall of prose at the exact moment the analyst wants a list.
+  Worth a cycle; it is a layout problem, not a correctness one.
+- Service-worker absolute path (`index.html:49`) still origin-dependent — why the local suite
+  reads 293/1 WARN rather than the deployed 294/0.
+- Everything on the cycle-603 through 624 carried lists remains open, including: the Screener
+  carrying no model-terms leg; the Screener IC copy printing "one statutory term" as fact for
+  conflicted countries; `#cmp-clear-btn` at 23px on desktop; the CP "Copy for IC Memo" note 2 and
+  `_fpCohortLine()` omitting the <=26 predictability ceiling; 19 sub-24px controls in
+  `#explorer-screen-mode` under `pointer: coarse`; v710's `t7` clipped-text regression;
+  `cp-price-select` absent from the DOM; Mozambique's "Commercially attractive" verdict;
+  `renderTornadoPanel` unmarked on the generic-template path; reform coverage 21 of 185; the
+  Methodology/Home tier-definition conflict; the FAQ naming a non-existent "Stability Score filter
+  at >=4"; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+  placeholder; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (24th cycle); 862
+  contracts with no fiscal terms; the Screener Contractor NPV tooltip naming an absent profile
+  selector (26th cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted
+  per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
+  `renderVintageTrendChart()`/`renderVintage()`.

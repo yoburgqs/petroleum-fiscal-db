@@ -1374,6 +1374,25 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   }
 }
 
+/* ── v718 (T1) — the preset chip wraps at EVERY width, not only inside the v612 mobile layer.
+   The chip's inline style carries white-space:nowrap. Until v718 its content was a fixed
+   criteria sentence that fitted, so the only override needed was the one in the max-width:720px
+   layer below (which is untouched — not removed, not weakened, not narrowed in scope). v718 lets
+   the chip also render "◆ <preset> — MODIFIED: <one phrase per changed threshold>", which is
+   longer and unbounded in the number of phrases: with two drifts it measured 779px against a
+   768px client width and scrolled the page sideways at the 768 breakpoint. A label is not a row
+   that must scroll, so it wraps. Measured no-op on the clean chip at 1920/1440/1280/1024 — that
+   string fits on one line and never reaches the wrap. ── */
+#screener-preset-label { white-space: normal; max-width: 100%; }
+#screener-preset-label-text { min-width: 0; overflow-wrap: anywhere; }
+
+/* v718: the chip's × is a real control as of this cycle (its onclick had never parsed). It
+   measured 12px wide x 44px tall under a thumb — tall enough for the 24px rule, too narrow to
+   hit. Scoped to pointer:coarse, so the desktop chip is unchanged. */
+@media (pointer: coarse) {
+  #screener-preset-clear-btn { min-width: 28px; padding-left: 8px !important; padding-right: 4px !important; }
+}
+
 /* ── 3. Inline-styled flex rows. Most of this product's layout is generated in JS with
       inline `display:flex`, and on a phone those rows run off the screen rather than wrap.
       Rows that deliberately scroll instead of wrapping opt out with min-width:max-content,
@@ -1930,7 +1949,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v717</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v718</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2000,7 +2019,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v717</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v718</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2739,7 +2758,7 @@ window.copyPlatformCitation = function(btn) {
       <!-- v459: Active preset label — shows the current preset name and criteria inline after loading.
            An analyst who loaded a preset and walked away needs to know what filters are active at a glance.
            applyScreenerPreset() sets window._screenerActivePreset; renderScreener() clears it if sliders move away from preset values. -->
-      <div id="screener-preset-label" style="display:none;font-size:11px;color:var(--accent);font-weight:600;background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:4px;padding:3px 10px;margin-left:4px;white-space:nowrap;align-items:center;gap:6px;" aria-live="polite"><span id="screener-preset-label-text"></span><button id="screener-preset-clear-btn" onclick="(function(){var sel=document.getElementById(\'screener-preset-select\');if(sel){sel.value=\'reset\';applyScreenerPreset(\'reset\');}var lbl=document.getElementById(\'screener-preset-label\');if(lbl)lbl.style.display=\'none\';})()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;padding:0 0 0 4px;line-height:1;" title="Clear active preset and reset all filters">&#xd7;</button></div>
+      <div id="screener-preset-label" style="display:none;font-size:11px;color:var(--accent);font-weight:600;background:rgba(176,104,0,.08);border:1px solid rgba(176,104,0,.25);border-radius:4px;padding:3px 10px;margin-left:4px;white-space:nowrap;align-items:center;gap:6px;" aria-live="polite"><span id="screener-preset-label-text"></span><button id="screener-preset-clear-btn" onclick="_scClearPreset()" style="background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;font-weight:700;padding:0 0 0 4px;line-height:1;" title="Clear active preset and reset all filters">&#xd7;</button></div>
       <select id="screener-preset-select" onchange="if(this.value){applyScreenerPreset(this.value);this.value='';}" style="background:var(--surface);border:1px solid var(--border);color:var(--text);padding:5px 10px;border-radius:4px;font-size:12px;" title="Load a preset screen — sets all sliders and filters to a predefined IC workflow. You can then adjust any slider to fine-tune. Use Ctrl+Enter to re-run.">
         <option value="">Load a screen…</option>
         <option value="iochurdle">IOC Capital Screen — verified production · Take ≤65% · NPV positive at $75 AND at $50</option>
@@ -28969,6 +28988,136 @@ window.clearScreenerSort = clearScreenerSort;
 
 let _activePresetName = null; // tracks which preset is currently applied
 
+// ── v718 (T1) — a preset the analyst has edited must stop calling itself that preset ──────
+//
+// Walked T1 cold: Home hero -> "open the screen" -> IOC Capital Screen (15 rows) -> analyst
+// tightens the take ceiling because their own mandate is stricter than 65%. The list correctly
+// drops to 14. Three captions did NOT move with it:
+//
+//   #screener-preset-label   "◆ IOC Capital Screen: verified production · Take ≤65% · NPV ≥0 …"
+//   #screener-count prefix   "IOC Capital Screen · 14 countries match at $75/bbl … ≤63% …"
+//   _screenerExportBasis     "Preset: IOC Capital Screen" as the FIRST criteria line
+//
+// The chip asserts ≤65% two inches above a table screened at ≤63%, and the export — the thing
+// that actually reaches the investment committee — is headed with the name of a screen that was
+// not run. This is the exact failure the v524 comment below records twice ("the analyst got 14
+// correct rows under a caption describing a filter that no longer runs"), except it now reaches
+// the memo attachment rather than only the screen.
+//
+// Root cause, verified at runtime: the slider `input` handler (search "v718 — was
+// window._activePresetName") cleared `window._activePresetName`. But `_activePresetName` is
+// declared with `let` at top level of a classic script, so it lives in the global DECLARATIVE
+// record and is NOT a property of window — `hasOwnProperty(window,'_activePresetName')` reads
+// false before the assignment and the assignment merely CREATES an unrelated window property.
+// Every reader below reads the `let`. The clear had never once fired since it was written.
+//
+// Fix is not to restore the clear. Erasing the name loses information the analyst wants — that
+// this shortlist STARTED as the IOC Capital Screen — and it cannot come back if they move the
+// slider home again. Instead the preset's own control state is captured when it is applied, and
+// every subsequent render diffs against it. Unmodified: everything reads exactly as before, so
+// the clean-preset path is untouched. Modified: all three captions say so and name the change,
+// and returning the control restores the clean caption.
+let _activePresetBase = null;         // snapshot of the control state the preset itself set
+let _activePresetCriteriaText = null; // the chip's criteria sentence for the active preset
+let _activePresetModified = false;    // recomputed on every runScreener()
+
+// Not criteria: the preset loader itself, and the evidence-first RANKING toggle (it reorders,
+// it removes nothing). Column sort is likewise excluded — the count line already reports it.
+var _SC_SIG_SKIP = { 'screener-preset-select': 1, 'sc-evidence-first': 1 };
+
+var _SC_SIG_LABELS = {
+  'sl-take':       { n: 'take ceiling',     f: function (v) { return '≤' + v + '%'; } },
+  'sl-npv':        { n: 'min NPV @$75',     f: function (v) { return '$' + v + 'M'; } },
+  'sl-npv50':      { n: 'min NPV @$50',     f: function (v) { return '$' + v + 'M'; } },
+  'sl-evid':       { n: 'min tier-A share', f: function (v) { return v + '%'; } },
+  'sc-region':     { n: 'region',           f: function (v) { return v || 'all'; } },
+  'sc-reform':     { n: 'reform record',    f: function (v) { return v || 'any'; } },
+  'sc-proxy-keep': { n: 'data basis',       f: function (v) { return v ? 'proxy countries included' : 'verified production only'; } },
+  'sc-fee-cmp':    { n: 'take basis',       f: function (v) { return v ? 'comparable' : 'published blend'; } },
+  'sc-evid-depth': { n: 'fact-depth leg',   f: function (v) { return v ? 'on' : 'off'; } }
+};
+
+function _scCriteriaState() {
+  var scope = document.getElementById('explorer-screen-mode');
+  var st = { ctrl: {}, mech: [], ioc: [], g: {} };
+  if (scope) {
+    [].slice.call(scope.querySelectorAll('input, select')).forEach(function (el) {
+      if (!el.id || _SC_SIG_SKIP[el.id]) return;   // mechanic / IOC boxes carry no id; captured below
+      st.ctrl[el.id] = (el.type === 'checkbox' || el.type === 'radio') ? !!el.checked : String(el.value);
+    });
+  }
+  st.mech = [].slice.call(document.querySelectorAll('#sc-mech-checks input[type=checkbox]:checked')).map(function (c) { return c.value; }).sort();
+  st.ioc  = [].slice.call(document.querySelectorAll('#sc-ioc-checks input[type=checkbox]:checked')).map(function (c) { return c.value; }).sort();
+  st.g = {
+    rfactor:  !!_screenerRfactorOnly,
+    minFacts: (_screenerMinFacts === null || _screenerMinFacts === undefined) ? null : _screenerMinFacts,
+    minRet:   (_screenerMinRetention === null || _screenerMinRetention === undefined) ? null : _screenerMinRetention,
+    cset:     _screenerCountrySet ? _screenerCountrySet.slice().sort().join('|') : null
+  };
+  return st;
+}
+
+// Returns [] when the screen still matches the preset that named it. Otherwise one readable
+// phrase per divergence, in the analyst's units — "take ceiling ≤65% → ≤63%".
+function _scPresetDrift() {
+  if (!_activePresetName || !_activePresetBase) return [];
+  var now = _scCriteriaState(), base = _activePresetBase, out = [];
+  Object.keys(base.ctrl).forEach(function (id) {
+    if (!(id in now.ctrl)) return;
+    if (String(now.ctrl[id]) === String(base.ctrl[id])) return;
+    var L = _SC_SIG_LABELS[id];
+    out.push(L ? (L.n + ' ' + L.f(base.ctrl[id]) + ' → ' + L.f(now.ctrl[id])) : (id + ' changed'));
+  });
+  if (base.mech.join(',') !== now.mech.join(',')) out.push('fiscal mechanics changed');
+  if (base.ioc.join(',')  !== now.ioc.join(','))  out.push('IOC presence filter changed');
+  if (String(base.g.rfactor)  !== String(now.g.rfactor))  out.push('R-factor leg changed');
+  if (String(base.g.minFacts) !== String(now.g.minFacts)) out.push('fact-depth floor changed');
+  if (String(base.g.minRet)   !== String(now.g.minRet))   out.push('downside-retention floor changed');
+  if (String(base.g.cset)     !== String(now.g.cset))     out.push('country set changed');
+  return out;
+}
+
+// Repaints the chip from the CURRENT drift. Called at the end of every runScreener(), so the
+// caption cannot outlive the screen it describes — including when the analyst moves a control
+// back to its preset value, which restores the clean caption.
+function _scPaintPresetChip() {
+  var lbl  = document.getElementById('screener-preset-label');
+  var lblT = document.getElementById('screener-preset-label-text');
+  if (!lbl || !lblT) return;
+  var drift = _activePresetName ? _scPresetDrift() : [];
+  _activePresetModified = drift.length > 0;
+  if (!_activePresetName || !_activePresetCriteriaText) return;
+  if (!_activePresetModified) {
+    lblT.textContent = '◆ ' + _activePresetCriteriaText;
+    lbl.style.color        = 'var(--accent)';
+    lbl.style.background   = 'rgba(176,104,0,.08)';
+    lbl.style.borderColor  = 'rgba(176,104,0,.25)';
+    lbl.title = '';
+    return;
+  }
+  lblT.textContent = '◆ ' + _activePresetName + ' — MODIFIED: ' + drift.join(' · ');
+  lbl.style.color       = '#a3231b';
+  lbl.style.background  = 'rgba(163,35,27,.07)';
+  lbl.style.borderColor = 'rgba(163,35,27,.35)';
+  lbl.title = 'You changed a threshold after loading this preset, so this shortlist is no longer '
+            + _activePresetName + '. The thresholds that actually ran are in the line under the table, '
+            + 'and the export is labelled MODIFIED. Move the control back, or press × to reset.';
+}
+window._scPaintPresetChip = _scPaintPresetChip;
+
+// v718 — the chip's × had never worked. Its onclick attribute was authored with
+// backslash-escaped single quotes INSIDE a double-quoted HTML attribute, so the browser parsed
+// the literal backslashes as JavaScript and every click threw "Invalid or unexpected token" and
+// reset nothing. Verified on the pre-change build with a real mouse click: filters unchanged,
+// chip still on screen, page error raised. It matters more now that the chip can read MODIFIED
+// and its tooltip tells the analyst to press this control to get back to a clean screen.
+function _scClearPreset() {
+  var sel = document.getElementById('screener-preset-select');
+  if (sel) sel.value = '';
+  applyScreenerPreset('reset');   // clears every filter, the chip and the new v718 baseline
+}
+window._scClearPreset = _scClearPreset;
+
 function applyScreenerPreset(preset) {
   // v587 (T1): a preset defines the whole screen, ranking included — R-factor PSC ranks by price
   // sensitivity, the rest by the v507 evidence-first order. So loading one clears any column sort
@@ -28998,6 +29147,7 @@ function applyScreenerPreset(preset) {
   _screenerCountrySet = null;   // v530
   _screenerSetLabel = null;     // v560
   _activePresetName = null;
+  _activePresetBase = null; _activePresetCriteriaText = null; _activePresetModified = false;   // v718
   setSlider('sl-take', 100); setSlider('sl-npv', -500); setSlider('sl-npv50', -500); setSlider('sl-evid', 0);
   setChecks('sc-mech-checks', 'all');   // v660: setDepth('all') removed with the radio group
   document.querySelectorAll('#sc-ioc-checks input').forEach(cb => cb.checked = false);
@@ -29205,11 +29355,23 @@ function applyScreenerPreset(preset) {
       if (lblText) lblText.textContent = '\u25c6 ' + presetCriteria[preset];
       else lbl.textContent = '\u25c6 ' + presetCriteria[preset];
       lbl.style.display = 'inline-flex';
+      // v718: the chip starts clean, in the accent tone _scPaintPresetChip() will restore it to.
+      lbl.style.color = 'var(--accent)';
+      lbl.style.background = 'rgba(176,104,0,.08)';
+      lbl.style.borderColor = 'rgba(176,104,0,.25)';
+      lbl.title = '';
+      _activePresetCriteriaText = presetCriteria[preset];
     } else {
       lbl.style.display = 'none';
       if (lblText) lblText.textContent = ''; else lbl.textContent = '';
+      _activePresetCriteriaText = null;
     }
   })();
+  // v718: capture the control state the preset just set, AFTER every control is written and
+  // BEFORE the render, so runScreener() diffs the analyst's edits against the preset's own
+  // baseline rather than against a hand-maintained copy of the criteria that can drift from it.
+  _activePresetBase = _activePresetName ? _scCriteriaState() : null;
+  _activePresetModified = false;
   runScreener();
 }
 
@@ -29389,10 +29551,16 @@ function _scSnapshotState() {
     ctrls: ctrls, vals: vals,
     lblHtml: lbl ? lbl.innerHTML : null,
     lblDisp: lbl ? lbl.style.display : null,
+    lblCss: lbl ? lbl.getAttribute('style') : null,   // v718: the chip now carries a modified tone
+    lblTitle: lbl ? lbl.title : null,
     g: {
       rfactor: _screenerRfactorOnly, minFacts: _screenerMinFacts,
       minRet: _screenerMinRetention, cset: _screenerCountrySet,
       setLbl: _screenerSetLabel, apName: _activePresetName,
+      // v718: _labelScreenerPresets() applies every preset in turn to read its live hit count.
+      // Without these three the pass would leave the analyst's screen holding the LAST preset's
+      // baseline, and the chip would report drift against a screen they never loaded.
+      apBase: _activePresetBase, apCrit: _activePresetCriteriaText, apMod: _activePresetModified,
       evFirst: _screenerEvidenceFirst,
       sortK: _scSortKey, sortD: _scSortDir, sortCmp: _scTakeSortOnCmp
     }
@@ -29404,10 +29572,16 @@ function _scRestoreState(s) {
   _screenerRfactorOnly = s.g.rfactor; _screenerMinFacts = s.g.minFacts;
   _screenerMinRetention = s.g.minRet; _screenerCountrySet = s.g.cset;
   _screenerSetLabel = s.g.setLbl;     _activePresetName = s.g.apName;
+  _activePresetBase = s.g.apBase; _activePresetCriteriaText = s.g.apCrit; _activePresetModified = s.g.apMod;   // v718
   _screenerEvidenceFirst = s.g.evFirst;
   _scSortKey = s.g.sortK; _scSortDir = s.g.sortD; _scTakeSortOnCmp = s.g.sortCmp;
   var lbl = document.getElementById('screener-preset-label');
-  if (lbl && s.lblHtml !== null) { lbl.innerHTML = s.lblHtml; lbl.style.display = s.lblDisp; }
+  if (lbl && s.lblHtml !== null) {
+    lbl.innerHTML = s.lblHtml;
+    if (s.lblCss !== null && s.lblCss !== undefined) lbl.setAttribute('style', s.lblCss);   // v718
+    lbl.style.display = s.lblDisp;
+    if (s.lblTitle !== null && s.lblTitle !== undefined) lbl.title = s.lblTitle;            // v718
+  }
 }
 
 function _labelScreenerPresets() {
@@ -29762,6 +29936,10 @@ function _scProdCovTip(d) {
 function runScreener() {
   _scUpdateNeutralFlags();
   _scSyncNpvAxis();   // v617: re-scale the NPV axis to the active deck BEFORE its value is read
+  // v718: recompute preset drift and repaint the chip BEFORE the count line and the export basis
+  // are built, because both read _activePresetModified. One evaluation, three consumers, so the
+  // chip cannot say "IOC Capital Screen" while the exported header says "modified" or vice versa.
+  _scPaintPresetChip();
   // Bug 4 fix: use active price point, not hardcoded $75
   const price   = getPriceKey();   // '50' | '75' | '100' | '125'
   const takeKey = `take_${price}`;
@@ -30150,7 +30328,11 @@ function runScreener() {
   const sortNote = _scSortKey
     ? ` · sorted by <strong style="color:var(--accent);">${_scSortLabelNow()}</strong> <button onclick="event.stopPropagation();clearScreenerSort();" style="background:none;border:1px solid var(--border);border-radius:3px;color:var(--muted);cursor:pointer;font-size:10px;padding:0 5px;margin-left:3px;" title="Return to the default ranking — verified field production first, contractor NPV descending within each group">&#x21ba; default order</button>`
     : (_screenerRfactorOnly ? ' · sorted by price sensitivity (swing ↓)' : '');
-  const presetPrefix = _activePresetName ? `${_activePresetName} · ` : '';
+  // v718: a screen the analyst has edited is no longer the preset that named it. The prefix
+  // says so rather than letting the name sit in front of thresholds it does not describe.
+  const presetPrefix = _activePresetName
+    ? `${_activePresetName}${_activePresetModified ? ' (modified)' : ''} · `
+    : '';
   // v456: "click any row" hint now accent-colored and bold — matches v455 FC status hint fix
   // v469: Added Deepwater profile context to screener count — analysts need to know the profile basis before using results in IC memo
   // v500: with the Screener now opening unfiltered, the zero-filter state gets its own sentence —
@@ -30300,7 +30482,12 @@ function runScreener() {
   // element no file carries. The IC saw 15 rows and no basis for any of them.
   window._screenerExportBasis = (function() {
     var crit = [];
-    if (_activePresetName) crit.push('Preset: ' + _activePresetName);
+    // v718: the export is what reaches the investment committee. If the analyst moved a
+    // threshold after loading the preset, the header must not present the shortlist under the
+    // preset's name as though it were the preset's result.
+    if (_activePresetName) crit.push('Preset: ' + _activePresetName + (_activePresetModified
+      ? ' \u2014 MODIFIED after loading (' + _scPresetDrift().join('; ') + '). The thresholds listed below are what ran.'
+      : ''));
     // v560: name the scope first. A 57-member set dumped as a bare name list told the IC reader
     // nothing about where the boundary was drawn or why.
     if (_screenerCountrySet) crit.push('Geographic scope' + (_screenerSetLabel ? ' — ' + _screenerSetLabel : '')
@@ -48587,7 +48774,12 @@ document.addEventListener('DOMContentLoaded', function() {
     if (slider && display) {
       slider.addEventListener('input', function() {
         display.textContent = this.value;
-        window._activePresetName = null;
+        // v718 — was `window._activePresetName = null;`, which was inert: _activePresetName is a
+        // top-level `let`, so it is a global declarative binding and never a window property. The
+        // assignment created an unrelated window._activePresetName and left the real one set, so
+        // the chip, the count-line prefix and the export header all kept naming a preset the
+        // analyst had just edited away from. runScreener() now recomputes the drift instead, which
+        // also lets the caption come back when a control is moved home again.
         if (typeof runScreener === 'function') runScreener();
       });
     }
