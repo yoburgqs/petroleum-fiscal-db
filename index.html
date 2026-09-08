@@ -1930,7 +1930,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v716</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v717</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2000,7 +2000,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v716</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v717</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -26696,18 +26696,72 @@ function renderCompare() {
     return !!(c && c.inSet);
   };
   let _cmpBasisGate = false;   // assigned below, once `selected` exists — no TDZ in the closures
+  let _cmpProdNames = [], _cmpStatNames = [];   // assigned with _cmpBasisGate, same reason
   // A column the gate dropped says so in place of the marker, rather than going silently blank:
   // otherwise the lowest number in the row carries no label while a larger one is tagged "lowest
   // of 2", which is a worse read than the bug. Monopoly columns keep their existing blank cell.
+  //
+  // v717 (T3): the gate above reached the screen almost nowhere, because of the early return that
+  // used to sit here:
+  //
+  //     if (!_cmpPriceRank[p]) return '';        // “no ordering on screen, so nothing to explain”
+  //
+  // _cmpPriceRank[p] is null whenever fewer than TWO columns survive _cmpRankTake. Only 21 of the
+  // 185 countries carry verified production, so the ordinary mixed set is ONE producer against one
+  // or two statutory-terms columns — which leaves exactly one rankable column and nulls the map.
+  // Counted exhaustively over the shipped country_data.json:
+  //     two-country mixed sets   3,444 of   3,444 gate fires then prints NOTHING — 100.0%
+  //     three-country mixed sets 280,686 of 315,126                              —  89.1%
+  // Two-country IS the ordinary T3 shape, so on that shape v626 has never once been visible.
+  //
+  // The premise of the early return was that the note exists to explain an exclusion from an
+  // ordering. It is the other way round. When an ordering IS on screen the analyst is already being
+  // told, by the green/red markers, which columns were ranked; the unlabelled column is the safe
+  // case. When NO ordering is on screen the analyst gets four rows of bare tier-coloured numbers
+  // with nothing on them at all, and reads them left to right as a ranking — which is precisely
+  // what the gate was built to stop. The warning was suppressed in the case that needed it.
+  //
+  // Walked cold at 1440 on Guyana / Brazil / Suriname — an ordinary Atlantic-margin screen, one
+  // producer (Brazil) and two proxies. Shipped:
+  //     Data basis              PROXY        PART-PROD    PROXY
+  //     Govt Take ($75/bbl)     54.1%        55.6%        54.2%      <- three bare numbers
+  //     Contractor NPV @$75     $1.1B        $1.7B        $1.0B
+  //                             “not comparable · statutory terms” on Guyana and Suriname
+  // The SAME two columns are flagged on the NPV rows by v705 — whose scope comment says it is
+  // “identical to v626's” — and unflagged six rows above on the take rows, which are the rows the
+  // notice under this very grid tells the analyst to rank on: “Rank these countries on Govt Take,
+  // which is the production-weighted figure this platform publishes.” Two of those three are not
+  // production-weighted. The grid contradicts itself, in favour of the wrong read.
+  //
+  // Both cases now speak. The ranked case keeps its wording exactly as v626 shipped it.
   const _cmpBasisNote = (d, p) => {
     if (!_cmpBasisGate || _cmpHasProd(d)) return '';
-    // Only where an ordering is actually ON SCREEN. If the gate left fewer than two rankable
-    // columns there is no highest/lowest anywhere in the row, so there is nothing to explain
-    // an exclusion from and the note would be noise.
-    if (!_cmpPriceRank[p]) return '';
     const v = d['take_' + p];
     if (v == null || isStateMonopoly(v)) return '';
     const nc = d.n != null ? Number(d.n).toLocaleString() : '?';
+    if (!_cmpPriceRank[p]) {
+      const peersTxt = _cmpStatNames.filter(c => c !== d.country);
+      return '<span style="display:block;font-size:10px;font-weight:600;color:var(--muted);cursor:help;" title="'
+        + _cmpEsc(d.country + ': this row is NOT a ranking, and this figure is not on the same basis as '
+          + (_cmpProdNames.length === 1 ? _cmpProdNames[0] : _cmpProdNames.join(' or ')) + ' beside it. '
+          + 'ORCA holds no verified field production for ' + d.country + ' (prod_coverage_pct = '
+          + (d.prod_coverage_pct || 0).toFixed(0) + '), so this ' + Number(v).toFixed(1)
+          + '% is a simple average of statutory terms across its ' + nc + ' contracts — not '
+          + 'output-weighted economics. This set holds only '
+          + (_cmpProdNames.length === 1 ? 'one production-weighted column' : _cmpProdNames.length + ' production-weighted columns')
+          + ', so there is no like-for-like ordering to place this number in and no highest/lowest '
+          + 'marker appears anywhere on the row. Do not read the four Govt Take rows left to right '
+          + 'as a ranking. '
+          + (peersTxt.length
+              ? 'It IS on the same basis as ' + peersTxt.join(', ') + ' in this set — those columns may '
+                + 'be compared with each other. '
+              : '')
+          + 'Across the database the basis difference alone is worth about 33 percentage points: the '
+          + '163 countries with no production average 26.9% take against 59.5% for the 22 that have '
+          + 'it. This is the same exclusion the Rank among producers row above and the Contractor '
+          + 'NPV rows below already apply.')
+        + '">not comparable · statutory terms</span>';
+    }
     return '<span style="display:block;font-size:10px;font-weight:600;color:var(--muted);cursor:help;" title="'
       + _cmpEsc(d.country + ': not given a highest/lowest placement on this row. ORCA holds no verified '
         + 'field production for it (prod_coverage_pct = ' + (d.prod_coverage_pct || 0).toFixed(0)
@@ -27390,6 +27444,8 @@ function renderCompare() {
   // columns. All-producer sets and all-statutory sets are internally like-for-like and unchanged.
   const _cmpNProd = selected.filter(d => d && _cmpHasProd(d)).length;
   _cmpBasisGate = _cmpNProd > 0 && _cmpNProd < selected.filter(d => !!d).length;
+  _cmpProdNames = selected.filter(d => d && _cmpHasProd(d)).map(d => d.country);
+  _cmpStatNames = selected.filter(d => d && !_cmpHasProd(d)).map(d => d.country);
   const _cmpAnyBlended = selected.some(d => _cmpMixStat(d).blended);
   _CMP_PRICES.forEach(p => {
     const vals = selected.map(d => ({ c: d.country, v: _cmpRankTake(d, p) })).filter(x => x.v != null);
@@ -27722,7 +27778,7 @@ function renderCompare() {
       + '<strong style="color:var(--text);">⚠ Govt Take and Contractor NPV rank these columns in opposite orders.</strong> '
       + _shown + _more
       + ' Both rows are on the same standardized Deepwater profile at the same price, so this is not a profile difference — <strong style="color:var(--text);">the two blocks are not averaged the same way.</strong> '
-      + 'The four <strong style="color:var(--text);">Govt Take</strong> rows are production-weighted per country. The three <strong style="color:var(--text);">Contractor NPV</strong> rows are an unweighted mean of every contract’s result, with production ignored — the <em>NPV weighting</em> row marks every column where the two differ. '
+      + 'The four <strong style="color:var(--text);">Govt Take</strong> rows are production-weighted on every column ORCA holds verified production for, and a simple average of statutory terms on the columns marked <em>statutory terms</em> on those rows. The three <strong style="color:var(--text);">Contractor NPV</strong> rows are an unweighted mean of every contract’s result, with production ignored — the <em>NPV weighting</em> row marks every column where the two differ. '
       + 'Across all 185 countries the pre-take project value these two rows jointly imply ranges from <strong style="color:var(--text);">$1.3B to $9.6B</strong> on a profile that is identical for every column, so they are not two views of one cash flow and cannot be ranked against each other. '
       + '<strong style="color:var(--text);">Rank these countries on Govt Take</strong>, which is the production-weighted figure this platform publishes, and read the NPV rows as each country’s contract-set average. If this table goes into an IC memo, do not present the NPV ordering as the fiscal ranking.'
       + '</div>';
