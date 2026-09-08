@@ -37147,3 +37147,121 @@ clicking anything.
 Fiscal Compare and Country Profile both answer T6 well — each has a "N of M model terms cited →" chip wired to the Evidence Chain. **Side-by-Side had nothing equivalent**, and Side-by-Side is the one tab whose entire job is ranking countries against each other.
 
 Its **Evidence tier** row is what an analyst ranks on. That le
+
+---
+## Cycle 624 Log — 2026-09-08 (v717)
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local A/B baseline, same server, pre-change)
+- Test after: 293 PASS / 0 FAIL / 1 WARN / 0 page errors — suite ACTUALLY RUN this cycle
+- Deployed-origin baseline is 294/0/0; the 1 WARN is the known origin-dependent
+  `sw.js` 404 (`index.html:49`) that only occurs off the Pages origin. Delta vs the
+  pre-change run on the identical server is zero.
+- JS syntax gate: PASS (11 blocks)
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest by rotation;
+623 ran T6, 622 T2, 621 T5, 620/619 T4, 618 T1, 617 T3.)
+
+## Friction
+v626 built a DATA-BASIS gate on the four Govt Take rows of Side-by-Side, so a column
+ORCA holds no verified field production for could not be handed the green "lowest of N"
+against a production-weighted column. `_cmpBasisNote()` (`index.html:26702`) then
+suppressed itself:
+
+    if (!_cmpPriceRank[p]) return '';   // "no ordering on screen, nothing to explain"
+
+`_cmpPriceRank[p]` is null whenever fewer than TWO columns survive `_cmpRankTake`.
+Only 21 of the 185 countries carry verified production, so the ordinary mixed set is
+ONE producer against one or two statutory-terms columns — which leaves exactly one
+rankable column and nulls the map. Counted exhaustively over the shipped
+`country_data.json`:
+
+| set shape | gate fires | of which print NOTHING |
+|---|---|---|
+| two-country mixed | 3,444 | **3,444 — 100.0%** |
+| three-country mixed | 315,126 | **280,686 — 89.1%** |
+
+Two-country is the ordinary T3 shape, so on that shape v626 has never once been visible.
+The premise of the early return was inverted: when an ordering IS on screen the analyst
+is already told by the green/red markers which columns were ranked — that is the safe
+case. When NO ordering is on screen they get four rows of bare tier-coloured numbers
+with nothing on them and read them left to right as a ranking, which is exactly what
+the gate was written to stop. The warning was suppressed in the case that needed it.
+
+Walked cold at 1440 (no sessionStorage, no localStorage) on **Guyana / Brazil /
+Suriname** — an ordinary Atlantic-margin screen, one producer and two proxies. Shipped:
+
+    Data basis              PROXY        PART-PROD    PROXY
+    Govt Take ($75/bbl)     54.1%        55.6%        54.2%    <- three bare numbers
+    Contractor NPV @$75     $1.1B        $1.7B        $1.0B
+                            "not comparable · statutory terms" on Guyana and Suriname
+
+The SAME two columns are flagged on the NPV rows by v705 — whose scope comment states
+it is "identical to v626's" — and unflagged six rows above on the take rows, which are
+the rows the notice under this very grid tells the analyst to rank on: *"Rank these
+countries on Govt Take, which is the production-weighted figure this platform
+publishes."* Two of those three are not production-weighted. The grid contradicted
+itself, in favour of the wrong read, three rows above Copy for IC Memo.
+
+## Change
+- The unranked case now prints **"not comparable · statutory terms"** under the figure
+  on every statutory-basis column of all four Govt Take rows — the same 10px muted
+  style, and the same wording, the Contractor NPV block already uses, so a proxy column
+  now reads identically in both blocks.
+- Its tooltip names the production-weighted column it is *not* comparable to, states
+  that the row is not a ranking and that no highest/lowest marker appears anywhere on
+  it, and names the columns it *is* on the same basis as, which may be compared with
+  each other.
+- The marker flows into **Copy for IC Memo** and the PDF with no extra work —
+  `cellText()` picks it up: the pasted line now reads
+  `Govt Take ($75/bbl)  54.1% · not comparable · statutory terms  55.6%  54.2% · not comparable · statutory terms`.
+- Comparability notice 3's blanket claim that *"the four Govt Take rows are
+  production-weighted per country"* is corrected to say production-weighted on the
+  columns ORCA holds production for and a simple average of statutory terms on the
+  columns marked *statutory terms* — otherwise the notice would now contradict the
+  row above it.
+- `_cmpProdNames` / `_cmpStatNames` declared beside `_cmpBasisGate` and assigned in the
+  same place, so no closure reads `selected` before it exists (v452 TDZ rule).
+
+## Result
+On the ordinary one-producer screen — which is 100% of mixed two-country sets and 89%
+of mixed three-country sets — the analyst can now see, **on the take row itself**, that
+two of the three figures are statutory-terms averages and that the row is not a ranking.
+They no longer rank Guyana first off a 1.5pp gap between numbers that are not on one
+basis, and the IC-memo paste carries the qualification with it.
+
+## Verified
+- Ranked case (Norway / UK / Netherlands, the seeded cold-load exhibit): **unchanged** —
+  still "highest of 2 · of the producers" / "lowest of 2 · of the producers" /
+  "not ranked · statutory terms".
+- All-proxy set (Vanuatu / Montenegro / Moldova): **unchanged**, gate off, still ranks.
+- All-producer set (Norway / UK / Angola): **unchanged**, still "highest of 3"/"lowest of 3".
+- Two-country mixed (Brazil / Guyana): now marked; was silent in 100% of such sets.
+- **Step 5b, phone:** 390x844 `hasTouch:true`, `pointer: coarse` confirmed true.
+  `scrollWidth` 390 = `clientWidth` 390 — no sideways scroll. Marker right edge 361 of
+  390, inside the viewport. Zero overflow at 1920/1440/1280/1024/768/390 on this tab.
+  The marker is a static label, not a control, so the 24px rule does not apply; it
+  renders 15px on desktop and wraps to 60px at 390.
+- 0 page errors and 0 console errors (excluding the known `sw.js` 404) in every set walked.
+
+## Carried forward — not fixed this cycle
+- The two statutory columns in a one-producer set are like-for-like **with each other**
+  and could carry their own ordering. This cycle marks the basis; it does not build a
+  second ranking block. Deliberate — that is a new ranking system, not this moment.
+- Service-worker absolute path (`index.html:49`) still origin-dependent — it is why the
+  local suite reads 293/1 WARN rather than the deployed 294/0.
+- Everything on the cycle-603 through 623 carried lists remains open, including: the
+  Screener carrying no model-terms leg (needs a bundled per-country terms-cited count);
+  the Screener IC copy printing "one statutory term" as fact for conflicted countries;
+  `#cmp-clear-btn` at 23px on desktop; the CP "Copy for IC Memo" note 2 and
+  `_fpCohortLine()` omitting the <=26 predictability ceiling; 19 sub-24px controls in
+  `#explorer-screen-mode` under `pointer: coarse`; v710's `t7` clipped-text regression;
+  `cp-price-select` absent from the DOM; Mozambique's "Commercially attractive" verdict;
+  `renderTornadoPanel` unmarked on the generic-template path; reform coverage 21 of 185;
+  the Methodology/Home tier-definition conflict; the FAQ naming a non-existent
+  "Stability Score filter at >=4"; the Home Screener card advertising a breakeven filter
+  removed at v568; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform
+  Updates" placeholder; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0`
+  (23rd cycle); 862 contracts with no fiscal terms; the Screener Contractor NPV tooltip
+  naming an absent profile selector (25th cycle); the Methodology tab naming a
+  `display:none` API Explorer tab; unweighted per-mechanic pivot averages; the incomplete
+  2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
