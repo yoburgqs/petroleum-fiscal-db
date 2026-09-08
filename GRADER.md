@@ -37700,3 +37700,14 @@ Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (26th cycle); 86
 no fiscal terms; the Screener Contractor NPV tooltip naming an absent profile selector (28th
 cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic
 pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`.
+
+---
+## Cycle 627 Log — 2026-09-08 12:04
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 627 shipped as **v720** (`fa5ec66`), pushed to `main`.
+
+**Task:** T5 — "Give me something I can paste straight into an IC memo." (Stalest by rotation; 626 ran T4, 625 T1, 624 T3, 623 T6, 622 T2, 621 T5.)
+
+**Friction:** Cold walk, no storage, straight to Country Profile → Nigeria → **Copy for IC Memo** → paste. The Fiscal predictability row came out as *"MODERATE (score 73/100, graded) — measured spread of 0.4pp across 834 contracts."* Open Reform Risk in the same session, same country, and
