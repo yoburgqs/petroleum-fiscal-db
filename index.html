@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v626</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v724</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1959,7 +1959,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v723</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v724</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2029,7 +2029,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v723</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v724</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2776,7 +2776,7 @@ window.copyPlatformCitation = function(btn) {
         <option value="pscafrica">PSC Africa — PSC · Africa · Take ≤75%</option>
         <option value="deepwater" title="Scoped to the 24 countries ORCA classifies as having offshore upstream development (11 deepwater-led frontier margins + 13 with both shelf and deepwater acreage), screened as an explicit list. Before v660 this preset used the Water Depth radio and returned 11 countries, every one of them proxy-economics, excluding Brazil, Angola, Nigeria, Norway and the UK.">Offshore &amp; Deepwater — 24 offshore jurisdictions · PSC + Concession · Take ≤70%</option>
         <option value="lowrisk" title="Scoped to the jurisdictions ORCA holds a sourced fiscal-reform event log for, keeping those with at most one fiscal law change since 2010, then a 70% take ceiling. Before v662 this preset was named Low-Risk Stable and screened on take and fiscal mechanic only — no reform or stability input of any kind — returning 141 of 185 countries led by the United Kingdom, which has 5 fiscal law changes since 2010 and the lowest Reform Frequency Score in the database.">Stable Fiscal Record — ≤1 sourced law change since 2010 · Take ≤70%</option>
-        <option value="downsidereturns">Two-Price Return Screen — NPV ≥$100M @$75 AND ≥$500M @$50</option>
+        <option value="downsidereturns" title="Rebuilt at v724. The shipped thresholds were NPV &ge;$100M at the deck AND &ge;$500M at $50 &mdash; but contractor NPV at $50 is &le; contractor NPV at the deck for all 185 countries, so a $500M downside floor removes everything a $100M deck floor could, and the deck leg could never reject a single row. It returned 153 of 185 under the platform's own &quot;(barely narrows)&quot; annotation, and the deck leg was inert by construction, not by calibration. The hurdles are now stated as multiples of the standardized project's $1.2B capex, with the DECK hurdle above the downside hurdle &mdash; the only ordering under which both legs can bind &mdash; and the proxy-economics jurisdictions are out, because a return hurdle read off regional proxy terms is not a return.">Two-Price Return Screen — verified production · NPV ≥$2.4B at deck (2× capex) AND ≥$1.2B at $50 (1× capex)</option>
         <option value="highevidence" title="Countries where the majority of ORCA's fiscal facts were read out of the primary legal instrument (tier A), measured on a record deep enough for that share to mean something: A-share ≥ 55% AND ≥ 150 facts on file. 35 of 185 match. Replaces the old ≥80% A/B screen, which passed 171 of 185 because tier B is the EY / IHS / KPMG bulk harvest.">Primary-Source Evidence — tier-A ≥ 55% · ≥150 facts on file</option>
         <option value="rfactor">R-factor PSC — price-sensitive profit oil tiers</option>
         <option value="atlanticfrontier" title="Atlantic margin deepwater benchmark set — the six countries named, screened as an explicit list with no take ceiling. Nigeria (81.1% take) is in the set by name; a 75% ceiling used to remove it silently.">Atlantic Frontier — Guyana · Angola · Brazil · Nigeria · Suriname · Gabon</option>
@@ -29364,8 +29364,42 @@ function applyScreenerPreset(preset) {
     _activePresetName = 'Stable Fiscal Record';
   } else if (preset === 'downsidereturns') {
     // v517: was 'highirr' (IRR ≥15% · NPV ≥$100M). The IRR leg screened on data availability, not
-    // returns. Now a genuine two-price return screen on the axis that is modelled for all 185.
-    setSlider('sl-npv', 100); setSlider('sl-npv50', 500);
+    // returns. v517 replaced it with NPV ≥$100M at the deck AND ≥$500M at $50.
+    //
+    // v724 (T1) — that pair could not be a two-price test. npv_50 ≤ npv_75 for all 185 rows
+    // (0 inversions), so a $500M downside floor removes every row a $100M deck floor would remove
+    // and more: the deck leg was inert BY CONSTRUCTION, not by calibration. The page's own v706
+    // detector said so on screen ("the $100M floor at $75/bbl removed 0 rows and cannot remove
+    // any"), the exported IC memo said so under "these criteria produced this row set", and the
+    // preset menu annotated the option "(barely narrows)" at 153 of 185 — 83% of the database.
+    // Three separate surfaces reported the defect and the preset shipped unchanged.
+    //
+    // Both legs can only bind when the DECK floor is the HIGHER one, so that is the shape now, and
+    // the two floors are stated as multiples of the one capital anchor the model has — the
+    // standardized project's $1.2B capex (DCF_PROFILES.deepwater.capexMM):
+    //   deck leg     NPV ≥ $2.4B = 2× capex   — twice the capital back at the planning price
+    //   downside leg NPV ≥ $1.2B = 1× capex   — the capital still fully recovered in PV at $50
+    // Measured at the $75 deck both legs do work the other does not: China clears the downside
+    // floor and fails the deck floor, Colombia clears the deck floor and fails the downside floor.
+    //
+    // The proxy-economics jurisdictions are excluded, as they are on IOC Capital Screen (v517).
+    // Absolute NPV in this database rises as take falls, so a raw NPV hurdle high enough to be a
+    // shortlist selects the low-take PROXY micro-states and NOTHING with verified field
+    // production: measured on the shipped data, ≥$3.6B/≥$1.8B returns 22 countries of which
+    // ZERO have any verified production. A return hurdle read off regional proxy terms is not a
+    // return. Result: 5 of 185 at $75 — Canada, USA, Azerbaijan, Mexico, Argentina.
+    //
+    // At the $50 DECK the two prices are the same price, so a 2x-capex deck floor is not a second
+    // test — it is the SAME test made twice as hard, and on the shipped data it returns zero rows
+    // (max npv_50 is $2.37B) while the slider silently clamps 2400 to its own $2.0B ceiling. A
+    // preset that loads an empty table is a dead end, so at that deck the screen degenerates to
+    // the single hurdle that still means something — 1x capex at $50 — exactly as the Downside
+    // Resilience preset re-references its denominator at the $50 deck (v699). Both floors then
+    // test the same number, and the v706 detector says so on screen rather than leaving the
+    // analyst to infer that a "two-price" screen is running on one price.
+    var _dr50 = (typeof getPriceKey === 'function' && getPriceKey() === '50');
+    setSlider('sl-npv', _dr50 ? 1200 : 2400); setSlider('sl-npv50', 1200);
+    if (keepProxy) keepProxy.checked = false;
     _activePresetName = 'Two-Price Return Screen';
   } else if (preset === 'rfactor') {
     // PSC countries with R-factor profit oil tiers only
@@ -29478,7 +29512,9 @@ function applyScreenerPreset(preset) {
       // v524: key was 'highirr', but v517 renamed the preset to 'downsidereturns'. The lookup
       // therefore missed on every apply and the label was hidden entirely -- loading the
       // Two-Price Return Screen showed no active-preset badge at all.
-      downsidereturns: 'Two-Price Return Screen: NPV \u2265$100M @$75 \u00b7 NPV \u2265$500M @$50',
+      // v724: the badge follows the rebuilt legs, and names the deck leg as "at the deck price"
+      // rather than "@$75", because this preset is re-run at whichever deck button is pressed.
+      downsidereturns: 'Two-Price Return Screen: verified production \u00b7 NPV \u2265$2.4B at the deck price (2\u00d7 capex) \u00b7 NPV \u2265$1.2B at $50 (1\u00d7 capex)',
       highevidence: 'Primary-Source Evidence: tier-A \u2265\u00a055% \u00b7 \u2265\u00a0150 facts on file',
       rfactor: 'R-factor PSC: price-sensitive profit oil tiers',
       atlanticfrontier: 'Atlantic Frontier: Guyana \u00b7 Angola \u00b7 Brazil \u00b7 Nigeria \u00b7 Suriname \u00b7 Gabon \u2014 explicit set, no take ceiling',
