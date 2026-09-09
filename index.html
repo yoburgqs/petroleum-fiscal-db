@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v728</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v729</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -227,7 +227,7 @@ table { width: 100%; border-collapse: collapse; }
   /* The two checkboxes already on this toolbar measured 13x13 under a thumb (pixel_audit has
      flagged both since it was built). Left alone they would now sit beside a 24px box doing the
      same kind of job, at half the size. Same rule, same tab, same control type. */
-  #fc-stability-check, #fc-filter-be, #fc-filter-reform { width: 24px; height: 24px; }
+  #fc-stability-check, #fc-filter-be, #fc-filter-reform, #fc-filter-prod { width: 24px; height: 24px; }
 
   /* v726 (T1): the identical defect on the two tabs the rule above never reached. Measured at
      390 x 844, hasTouch, on the shipped build:
@@ -2003,7 +2003,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v728</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v729</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2073,7 +2073,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v728</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v729</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2564,6 +2564,24 @@ window.copyPlatformCitation = function(btn) {
          it is off, because a table filtered to the reform-scored set with the reform column
          hidden shows the analyst nothing about why those 21 rows are the ones left. -->
     <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the countries ORCA holds a sourced fiscal-reform event log for. The other rows are not low-risk and are not a score of 5 -- they are unscored (n/c), and this toggle hides them rather than letting them sit in a ranking as though a reading existed. Ticking this also switches the Stability column on. Untick to return to all 185."><input type="checkbox" id="fc-filter-reform" style="accent-color:var(--accent);" onchange="(function(cb){if(cb.checked){var st=document.getElementById('fc-stability-check');if(st&&!st.checked)st.checked=true;}renderFCResults(window._fcResults||[],window._fcLastPrice||75);})(this)"> &#9670; Reform-scored only<span id="fc-filter-reform-n" style="font-weight:400;opacity:.7;"></span></label>
+    <!-- ── v729 (T1): the production-data basis had no control on this table ───────────
+         Measured off the live cold-default DOM: 163 of the 185 rows hold ZERO verified
+         block-level production, and 6 of the TOP 10 by the default Govt Take sort are
+         among them (Somalia #3, Madagascar #6, Egypt #7, Philippines #8, Georgia and
+         Trinidad =#9). v596's own note says it outright -- "all 30 of the lowest-take
+         countries on the default Fiscal Compare ranking are PROXY".
+         The Screener fixed this at v507 (evidence-first ranking, ON by default) and
+         Explorer Browse at v578 (labelled divider). Fiscal Compare -- the first tool tab,
+         and the table an analyst builds a screening list from -- got neither. Its only
+         signal is the per-row PROXY pill, and v578 established that a pill every row
+         above the fold carries "reads as decoration rather than as a caveat".
+         v563 partitioned this table on the TERMS axis (generic default to the bottom).
+         This is the same fix on the PRODUCTION axis, as a filter rather than a
+         partition, because PROXY rows are legitimately comparable here -- FC is a
+         comparison tool. What was missing was the ability to drop them in one click.
+         Count is read off the same _dqTier() the row badge uses, so label and rows
+         cannot disagree. -->
+    <label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap;" title="Show only the countries for which ORCA holds verified field production. The rows this hides are not low-production and are not zero-production countries — ORCA simply holds no block-level production for them, so their NPV, IRR and breakeven are computed on a regional-proxy basis and are indicative, not a shortlist. Their take may still be modelled on their own sourced fiscal terms; this toggle is the production axis, not the terms axis (that one is the Quality column's G). Untick to return to all 185."><input type="checkbox" id="fc-filter-prod" style="accent-color:var(--accent);" onchange="renderFCResults(window._fcResults||[],window._fcLastPrice||75)"> &#9671; Production-backed only<span id="fc-filter-prod-n" style="font-weight:400;opacity:.7;"></span></label>
   </div>
 
   <!-- v423: Reading guide — always visible before and after results; dismissible per session -->
@@ -43982,6 +44000,37 @@ function _fcSyncReformFilterCount() {
   }, 250);
 })();
 
+// ── v729 (T1) ────────────────────────────────────────────────────────────────
+// One predicate for the production axis, delegating to _dqTier() so the filter, the
+// count on the label and the PROXY pill on the row are all the same decision.
+function _fcHasProd(r) {
+  if (!r) return false;
+  if (typeof _dqTier === 'function') return !!_dqTier(r).hasProduction;
+  return (r.prod_coverage_pct || 0) > 0;
+}
+window._fcHasProd = _fcHasProd;
+
+// The control states its own coverage, counted off the data rather than written into
+// the label -- same discipline as _fcSyncReformFilterCount().
+function _fcSyncProdFilterCount() {
+  var out = document.getElementById('fc-filter-prod-n');
+  if (!out) return false;
+  var rows = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA && COUNTRY_DATA.length)
+    ? COUNTRY_DATA : (window._fcResults || []);
+  if (!rows.length) return false;
+  var n = rows.filter(_fcHasProd).length;
+  if (!n) return false;
+  out.textContent = ' (' + n + ' of ' + rows.length + ')';
+  return true;
+}
+(function _fcWaitForProdCount() {
+  if (_fcSyncProdFilterCount()) return;
+  var tries = 0;
+  var iv = setInterval(function() {
+    if (_fcSyncProdFilterCount() || ++tries > 40) clearInterval(iv);
+  }, 250);
+})();
+
 function renderFCResults(results, price) {
   // Sort state
   if (!window._fcSortState) window._fcSortState = 'take';
@@ -44142,6 +44191,11 @@ function renderFCResults(results, price) {
   // filtered set and the rendered column can never disagree about who is scored.
   var _fRR = document.getElementById('fc-filter-reform');
   if (_fRR && _fRR.checked) sorted = sorted.filter(function(r) { return _fcHasReformLog(r.country); });
+  // ── v729 (T1): production-backed-only filter ─────────────────────────────────
+  // Same _dqTier() the row badge calls, so the filtered set and the PROXY pill can
+  // never disagree about who is production-backed.
+  var _fPB = document.getElementById('fc-filter-prod');
+  if (_fPB && _fPB.checked) sorted = sorted.filter(function(r) { return _fcHasProd(r); });
   // v465: Apply sort direction reversal if analyst toggled it
   if (window._fcSortDir === 'desc') sorted = sorted.slice().reverse();
   // ── v563 (T6) — generic-default rows are no longer ranked ────────────────────
@@ -44186,8 +44240,8 @@ function renderFCResults(results, price) {
       _fcResEl.innerHTML = '<div style="text-align:center;padding:48px 24px;max-width:560px;margin:0 auto;">'
         + '<div style="font-size:24px;margin-bottom:12px;opacity:.35;">\u2296</div>'
         + '<strong style="color:var(--text);font-size:14px;">No countries match your current filters</strong>'
-        + '<div style="margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6;">Your <strong>Region</strong> filter or the <strong>Breakeven-only / Reform-scored-only</strong> toggles returned 0 countries. Reform-scored-only keeps just the countries ORCA holds a sourced fiscal-reform log for, and most regions hold only one or two of them, so pairing it with a region filter empties the table quickly. Try clearing the region filter or unchecking the data-only toggles.</div>'
-        + '<button onclick="(function(){window._fcRegionFilter=\'\';var irr=document.getElementById(\'fc-filter-irr\');var be=document.getElementById(\'fc-filter-be\');var rr=document.getElementById(\'fc-filter-reform\');if(irr)irr.checked=false;if(be)be.checked=false;if(rr)rr.checked=false;window._fcIRRManuallySet=false;window._fcBEManuallySet=false;var chips=document.querySelectorAll(\'.fc-region-chip\');chips.forEach(function(c){c.setAttribute(\'aria-pressed\',\'false\');c.classList.remove(\'active\');});var allChip=document.querySelector(\'.fc-region-chip[data-region=\\\"\\\"]\');if(allChip){allChip.classList.add(\'active\');allChip.setAttribute(\'aria-pressed\',\'true\');}renderFCResults(window._fcResults||[],window._fcLastPrice||75);})()" style="margin-top:16px;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.3);color:var(--accent);border-radius:5px;padding:6px 18px;font-size:12px;cursor:pointer;font-weight:600;">Reset Region &amp; Data Filters</button>'
+        + '<div style="margin-top:8px;font-size:12px;color:var(--muted);line-height:1.6;">Your <strong>Region</strong> filter or the <strong>Breakeven-only / Reform-scored-only / Production-backed-only</strong> toggles returned 0 countries. ORCA holds verified field production for only 22 of the 185 countries, so pairing <strong>Production-backed only</strong> with a region that holds none of them — or with Reform-scored-only — empties the table quickly. Reform-scored-only keeps just the countries ORCA holds a sourced fiscal-reform log for, and most regions hold only one or two of them, so pairing it with a region filter empties the table quickly. Try clearing the region filter or unchecking the data-only toggles.</div>'
+        + '<button onclick="(function(){window._fcRegionFilter=\'\';var irr=document.getElementById(\'fc-filter-irr\');var be=document.getElementById(\'fc-filter-be\');var rr=document.getElementById(\'fc-filter-reform\');var pb=document.getElementById(\'fc-filter-prod\');if(irr)irr.checked=false;if(be)be.checked=false;if(rr)rr.checked=false;if(pb)pb.checked=false;window._fcIRRManuallySet=false;window._fcBEManuallySet=false;var chips=document.querySelectorAll(\'.fc-region-chip\');chips.forEach(function(c){c.setAttribute(\'aria-pressed\',\'false\');c.classList.remove(\'active\');});var allChip=document.querySelector(\'.fc-region-chip[data-region=\\\"\\\"]\');if(allChip){allChip.classList.add(\'active\');allChip.setAttribute(\'aria-pressed\',\'true\');}renderFCResults(window._fcResults||[],window._fcLastPrice||75);})()" style="margin-top:16px;background:rgba(176,104,0,.12);border:1px solid rgba(176,104,0,.3);color:var(--accent);border-radius:5px;padding:6px 18px;font-size:12px;cursor:pointer;font-weight:600;">Reset Region &amp; Data Filters</button>'
         + '</div>';
     }
     return;
@@ -44429,6 +44483,43 @@ function renderFCResults(results, price) {
       + (_fcAvgSwing!==null?'<span title="Average Price Swing (govt take@$125 minus take@$50 in percentage points) across '+_fcSwings.length+' countries with swing data. Low swing (&lt;10pp) = royalty-dominant, stable returns across price cycles; preferred for certainty mandates. High swing (&gt;20pp) = progressive/PSC regime — government captures most price upside; requires multi-price sensitivity table in IC memo. '+_fcHighSwing+' of '+sorted.length+' countries have Swing &gt;20pp. Use ‘Swing ↑’ sort button to rank by price sensitivity."><strong style="color:var(--text);">Avg swing: </strong>'+_fcAvgSwing+'pp <span style="opacity:.7;">('+_fcHighSwing+' progressive)</span></span>':'')
       + '<span style="margin-left:auto;" title="Click to sort FC by NPV \u2014 positive-NPV countries float to top. Countries where the contractor earns a positive NPV (100% working interest, 10% WACC) at this price and profile."><button onclick="if(typeof fcSetSort===\'function\')fcSetSort(\'npv\');" style="background:none;border:none;padding:0;cursor:pointer;font-size:11px;color:var(--muted);font-family:inherit;text-decoration:underline dotted;text-underline-offset:2px;" title="Sort Fiscal Compare by NPV to see all project-viable countries ranked"><strong style="color:var(--text);">Project viable: </strong>'+_fcPosNPV+' of '+sorted.length+'</button></span>'
       + '<span title="How many rows in this view are modelled on their OWN fiscal terms as held in ORCA, versus the standard default for their mechanic. Rows on generic defaults land on identical take, NPV and breakeven and their order relative to each other is not a ranking \u2014 the Quality column marks them G. This is the number to check before you present any two rows as different."><strong style="color:var(--text);">On own terms: </strong>'+_fcOwnTerms+' of '+sorted.length+'</span>'
+      + (function(){
+          // ── v729 (T1): the production basis, stated where the ranking is read ──────
+          // The strip already reports the TERMS axis ("On own terms", "◆ n investible").
+          // It reported nothing on the PRODUCTION axis, and that is the axis that decides
+          // whether a row belongs on a screening list: 163 of 185 rows hold zero verified
+          // block-level production, and on the cold default sort SIX OF THE TOP TEN are
+          // among them. The per-row PROXY pill cannot carry that -- v578 established that
+          // a badge every row above the fold carries reads as decoration.
+          // This counts the band the analyst actually reads and pastes (the top 10, and
+          // the top 5 that "Load Top 5 in Side-by-Side" hands to another tab), not just
+          // the table total, and it recounts on every sort, region chip and profile change.
+          var _pbTotal = sorted.filter(_fcHasProd).length;
+          var _pbBox   = document.getElementById('fc-filter-prod');
+          var _pbOn    = !!(_pbBox && _pbBox.checked);
+          if (_pbOn) {
+            return '<span title="The Production-backed only filter is on: every row in this view has verified block-level field production behind its NPV, IRR and breakeven. Untick it in the filter row above to bring back the ' + (185 - _pbTotal) + ' regional-proxy rows for fiscal comparison."><strong style="color:var(--green);">◇ Production-backed: </strong><span style="color:var(--green);font-weight:600;">all ' + _pbTotal + '</span></span>';
+          }
+          var _pbProxy = sorted.length - _pbTotal;
+          if (!_pbProxy) return '';
+          var _head    = sorted.slice(0, 10);
+          var _headPx  = _head.filter(function(r){ return !_fcHasProd(r); }).length;
+          var _t5Px    = sorted.slice(0, 5).filter(function(r){ return !_fcHasProd(r); }).length;
+          var _isRank  = (sortField !== 'country');
+          var _lead    = (_isRank && _headPx)
+            ? '<span style="color:var(--orange);font-weight:700;">' + _headPx + ' of the top 10</span> ranked here'
+            : '<span style="color:var(--orange);font-weight:700;">' + _pbProxy + ' of ' + sorted.length + '</span> rows here';
+          var _tip = 'ORCA holds no verified block-level field production for ' + _pbProxy + ' of the ' + sorted.length
+                   + ' rows in this view, so their NPV, breakeven and IRR are computed on a regional-proxy basis — indicative, not defensible as a screening shortlist.'
+                   + (_isRank && _headPx ? ' On the current sort that includes ' + _headPx + ' of the ten highest-ranked rows'
+                        + (_t5Px ? ', and ' + _t5Px + ' of the five that “Load Top 5 in Side-by-Side” would hand to the next tab' : '') + '.' : '')
+                   + ' Their take may still be modelled on their own sourced fiscal terms — this is the production axis, not the terms axis. Click to keep only the '
+                   + _pbTotal + ' production-backed rows.';
+          return '<span title="' + _tip.replace(/"/g,'&quot;') + '" style="cursor:pointer;" '
+            + 'onclick="(function(){var b=document.getElementById(\'fc-filter-prod\');if(b){b.checked=true;renderFCResults(window._fcResults||[],window._fcLastPrice||75);var l=document.getElementById(\'fc-filter-prod\');if(l&&l.scrollIntoView)l.scrollIntoView({block:\'center\'});}})()">'
+            + '<strong style="color:var(--text);">◇ No verified production: </strong>' + _lead
+            + ' <span style="color:var(--accent);text-decoration:underline dotted;text-underline-offset:2px;">show the ' + _pbTotal + ' that have it</span></span>';
+        })()
       + (function(){
           // v492: Best breakeven country — most resilient regime, instant scannability for downside mandates
           // v563 (T6): filtered be_75 > 0, which admits the 0 < v <= 1 DCF floor artifact that
