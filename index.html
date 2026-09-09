@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v746</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v747</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -213,6 +213,7 @@ table { width: 100%; border-collapse: collapse; }
 #tbl-screener th.sc-selcell, #tbl-screener td.sc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-screener tr.sc-row-sel > td { background: rgba(176,104,0,0.09); }
+#sc-mobile-cols-note { display: none; }
 @media (pointer: coarse) {
   /* Directive step 5b: a control this cycle adds may not render under 24px under a thumb. */
   #tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all { width: 24px; height: 24px; }
@@ -1425,6 +1426,105 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   .tbl-wrap table th:first-child,
   .tbl-wrap table td:first-child { scroll-snap-align: start; }
 
+  /* ══ v747 (T1) — the Screener answered "which countries?" with names and nothing else ══
+     Walked T1 cold on a phone (390x844, hasTouch): Home hero -> "open the screen ->" ->
+     IOC Capital Screen, 15 rows. Measured inside the 360px .tbl-wrap, the analyst could see
+     exactly four cells per row: the shortlist checkbox, the rank number, the country name and
+     the region. #tbl-screener is 1435px wide. Govt Take starts at x=637 and Contractor NPV at
+     x=923 — 277px and 563px past the right edge of the phone.
+
+     So the tab whose entire job is answering T1 returned, on a phone, a ranked list of country
+     NAMES WITH NO NUMBERS ON IT. And the recovery was worse than the problem: thead is
+     `position: sticky; top: 0`, which is VERTICAL only, so swiping right to reach the take
+     scrolled the country name AND its column header off the left edge together. The analyst
+     arrived at "60.8%" attached to nothing. There was no horizontal affordance either —
+     `.tbl-wrap::after` draws a 26px right-edge fade, which says "more exists", not "the
+     decision columns are three screens that way".
+
+     Two changes, both scoped to <=720px so the desktop table is byte-identical:
+
+     1. IDENTITY IS PINNED. The checkbox / rank / country cells go `position: sticky` on the
+        LEFT as well, so the name stays on screen through the whole horizontal swipe. The
+        header cells keep their existing `top: 0`, so a th in this block is sticky in both
+        axes and outranks the body cells (z-index 61 vs 50 — thead is 60).
+        The country cell is allowed to WRAP rather than clamp-and-clip: its content carries the
+        PROD-WTD / PART-PROD / PROXY data-basis badge, which is the one thing this platform is
+        least willing to lose off the edge of a cell. Taller rows on a phone are the cheap side
+        of that trade.
+
+     2. REGION AND MECHANICS STEP ASIDE. They are the 4th and 5th columns, 113px and 185px, and
+        together they were holding 298px of a 360px screen between the country name and the
+        first number. Neither is the answer to T1: region is legible from the country name and
+        is a filter in this same tab's Advanced panel, and the mechanic mix is on the Country
+        Profile that every row already opens on tap. Critically, the mechanic's ONE screening
+        consequence — a fee-basis headline that is not rankable — is not carried by this column
+        anyway: it is rendered inline in the Govt Take cell as "84.8% -> screened at 34.1%", and
+        that cell is now on screen at rest.
+        Hidden, not deleted: both stay in the DOM, in the CSV, in the XLSX and in Copy for IC
+        Memo, all of which build from _scExportRows() rather than from these cells. And it is
+        said out loud in #sc-mobile-cols-note below the count bar, because dropping content
+        silently is the failure mode this platform keeps having to fix, not a fix.
+
+     The v612 mobile layer is not weakened by any of this: no selector in it is narrowed or
+     removed, #reference-panel is untouched, and nothing here sets a negative offset. ── */
+  #tbl-screener th.sc-selcell, #tbl-screener td.sc-selcell,
+  #tbl-screener thead th:nth-child(2), #tbl-screener tbody td:nth-child(2),
+  #tbl-screener thead th:nth-child(3), #tbl-screener tbody td:nth-child(3) {
+    position: sticky;
+    background: var(--surface);
+  }
+  #tbl-screener th.sc-selcell, #tbl-screener td.sc-selcell {
+    left: 0; width: 34px; min-width: 34px; max-width: 34px;
+  }
+  #tbl-screener thead th:nth-child(2), #tbl-screener tbody td:nth-child(2) {
+    left: 34px; width: 26px; min-width: 26px; max-width: 26px;
+    padding-left: 4px; padding-right: 4px;
+  }
+  #tbl-screener thead th:nth-child(3), #tbl-screener tbody td:nth-child(3) {
+    left: 60px;
+    /* An explicit width, not a max-width. Left to auto-layout this column collapsed to 94px,
+       which is narrower than the PROD-WTD / PART-PROD data-basis badge, so every cell broke
+       into four lines (+Compare / name / arrow / badge) and one row stood 230px tall — three
+       and a half rows of a fifteen-row shortlist per screen. 150px puts the name and the badge
+       on two lines and still leaves Govt Take inside the 360px wrap. */
+    width: 150px; min-width: 150px; max-width: 150px;
+    white-space: normal;               /* wrap, never clip the data-basis badge */
+    border-right: 1px solid var(--border);
+  }
+  /* The +Compare button is a 26px block that was taking a line of its own inside a 150px cell.
+     Inline-block with the name; the basket it feeds is a desktop comparison workflow and the
+     row's own tap target (open Country Profile) is unaffected. */
+  #tbl-screener tbody td:nth-child(3) button { padding-left: 4px; padding-right: 4px; }
+  /* thead cells are already sticky-top with z-index 60; keep the pinned header corner above
+     both the pinned body column and the scrolling header. */
+  #tbl-screener thead th.sc-selcell,
+  #tbl-screener thead th:nth-child(2),
+  #tbl-screener thead th:nth-child(3) { z-index: 61; background: #EDE9E3; }
+  #tbl-screener tbody td.sc-selcell,
+  #tbl-screener tbody td:nth-child(2),
+  #tbl-screener tbody td:nth-child(3) { z-index: 50; }
+  /* The row tints are semi-transparent overlays on a transparent cell; a pinned cell needs an
+     opaque base first, so they are re-stated as gradients over --surface. Without this the
+     scrolled columns read through the pinned name. */
+  #tbl-screener tbody tr:nth-child(even) > td.sc-selcell,
+  #tbl-screener tbody tr:nth-child(even) > td:nth-child(2),
+  #tbl-screener tbody tr:nth-child(even) > td:nth-child(3) {
+    background-image: linear-gradient(rgba(0,0,0,.018), rgba(0,0,0,.018));
+  }
+  #tbl-screener tbody tr.sc-row-sel > td.sc-selcell,
+  #tbl-screener tbody tr.sc-row-sel > td:nth-child(2),
+  #tbl-screener tbody tr.sc-row-sel > td:nth-child(3) {
+    background-image: linear-gradient(rgba(176,104,0,.09), rgba(176,104,0,.09));
+  }
+  /* Region (4) and Mechanics (5) — see note 2 above. */
+  #tbl-screener thead th:nth-child(4), #tbl-screener tbody td:nth-child(4),
+  #tbl-screener thead th:nth-child(5), #tbl-screener tbody td:nth-child(5) {
+    display: none;
+  }
+  /* The divider rows span all 12 columns and must keep spanning the visible ones. */
+  #tbl-screener tbody tr.screener-basis-divider > td { position: static; }
+  #sc-mobile-cols-note { display: block; }
+
   /* Control rows wrap instead of squeezing — but they WRAP, they do not stack.
      The v38 rule put .fc-controls into a full-width column, so once every button got a
      44px touch height the Country Profile opened with six stacked buttons and the
@@ -2077,7 +2177,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v746</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v747</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2147,7 +2247,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v746</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v747</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3224,6 +3324,10 @@ window.copyPlatformCitation = function(btn) {
     </div>
   </div>
 
+  <!-- v747 (T1): hidden at every width except the one where it is true. Two columns step
+       aside under 720px so Govt Take reaches the first screen of a phone; this says which,
+       and where they went. See the v747 block in the mobile layer for the measurements. -->
+  <div id="sc-mobile-cols-note" style="font-size:11px;color:var(--muted);margin:8px 0 4px;line-height:1.5;padding:6px 10px;background:var(--surface2);border-radius:4px;border:1px solid var(--border);">Narrow screen — <strong style="color:var(--text);">Region</strong> and <strong style="color:var(--text);">Mechanics</strong> are hidden so Govt Take fits without scrolling. Country stays pinned as you swipe right to Contractor NPV. Both columns are still in the CSV, the XLSX and Copy for IC Memo, and both are on the Country Profile that any row opens on tap; Region is also a filter under Advanced Filters above.</div>
   <div class="tbl-wrap">
     <table id="tbl-screener">
       <thead>
