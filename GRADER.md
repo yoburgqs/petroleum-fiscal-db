@@ -41109,3 +41109,131 @@ tree over `http://localhost:8080`, this cycle.
 
 ## Friction
 **The IOC Portfolio fiscal-exposure annex was built from a single legal entity,
+
+---
+## Cycle 652 Log — 2026-09-09 19:45
+- Test before: 296 PASS / 0 FAIL / 1 WARN (local tree, read from ORCA_REPORT_FILE)
+- Test after: 296 PASS / 0 FAIL / 1 WARN (local tree, read from ORCA_REPORT_FILE)
+- JS errors: 0 on the walk (the 1 counted by the suite is the sw.js 404, present in both runs)
+- Shipped: v746
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by
+rotation (646 T2 · 647 T1 · 648 T6 · 649 T3 · 650 T4 · 651 T5). Walked cold at 1440×900 and
+390×844 with touch, sessionStorage and localStorage cleared before every load, served over
+HTTP from the working tree. Indonesia auto-loads on this tab, so it is the profile a
+first-time analyst actually reads.
+
+## Friction
+**A fiscal regime holding 3% of a country's contracts, pricing at a NEGATIVE contractor NPV,
+was gated off the Country Profile entirely — and the previous cycle to find it removed the
+warning instead of the gate.**
+
+`cpRegimeRows()` (index.html) decides whether the Fiscal Regime Breakdown card and its
+headline chip render. Its materiality gate was contract-count share alone:
+
+    if (!rows.slice(1).some(function(r) { return r.pct >= 5; })) return null;
+
+Indonesia's **Gross Split is 19 of 667 contracts = 3%**, so it failed. What that suppressed:
+
+| regime | contracts | take @$75 | contractor NPV @$75 |
+|---|---|---|---|
+| PSC | 644 (97%) | 58.0% | $765M |
+| **Gross Split** | **19 (3%)** | **65.3%** | **-$215.5M** |
+| Concession | 4 (1%) | 32.9% | $2,030M |
+
+Count share is the wrong materiality test here, and the page's own other sections say so:
+
+- Gross Split is the mechanic **every Indonesian block awarded since 2017 runs on** — the
+  Reform History section on this same page scores that reform at **+9pp** and the 2020
+  amendment at −3pp. Both post-2010 reform events the page reports are about the regime the
+  page does not name.
+- It is the mechanic of the **single largest producing contract in the country** — `Indonesia
+  WK Rokan`, 8,487 MMbbl of the country's 11,270 MMbbl cumulative, row #1 of the contract
+  table three sections down.
+- It is the **only** Indonesian regime with negative contractor NPV.
+
+So the analyst read "59.5% govt take @$75 · moderate tier · NPV $745M · clears the 10% WACC
+at $75 and at the $50 downside", and nothing on screen told them the regime they would
+actually enter today returns **-$216M on the same standardized project**. The word "Gross
+Split" appeared on the profile only as a TYPE cell in the contract table and twice in the
+reform timeline — never as a priced regime.
+
+`d.mechanics` for Indonesia is the string `"Concession,PSC"` and `n_concession + n_psc =
+648` against `n = 667`, so the 19 Gross Split contracts are absent from the mechanic label
+too. Five countries carry a `mech_mix` mechanic missing from `mechanics` (Denmark, India,
+Liberia, Indonesia, Philippines) — recorded here, not fixed this cycle.
+
+The v673 comment block at the gate shows the previous cycle **found this exact case** and
+resolved it the wrong way round: it suppressed the chip so the chip "cannot promise a table
+the page will not render", rather than asking whether a 3% regime with negative economics
+should render. Coupling the two surfaces was right; coupling them at silence was not.
+
+## Change
+The gate now passes a secondary **Group-1** regime whose contractor NPV has the **opposite
+sign to the headline's**. That is a sign flip, not a threshold invented here — it is the same
+discriminating test the headline strip already runs on the $50/bbl downside ("fails at $50",
+which only Malaysia and Yemen reach).
+
+Deliberately narrow, and swept over all 185 countries before shipping:
+- **61 countries rendered the card before, 62 after.** The only addition is Indonesia.
+- The engine's **zero-rate default rows stay excluded** — Mauritania, Ethiopia and Tanzania
+  each carry a 1–2 contract Concession row stamped 0.0% take on the untaxed $5,533.1M NPV.
+  They are filtered by the existing `zrMaterial` flag, not by a new rule. Verified still
+  suppressed after the change.
+- **Malaysia's RSC at -$2.2B stays out**: it is Group 2, where v552 already handles it and
+  the platform comparability rules forbid ranking its take against Group 1.
+
+The card also now **states the negative regime in words** rather than leaving a minus sign
+in a monospace column to be noticed. Cyprus (PSC, 25 of 71 contracts, -$885M) was already
+rendering the card on count share and gains the same sentence — with the "below the count
+bar" clause suppressed, because at 35% it is not below the bar. That clause is gated on
+`r.pct < 5` so it can only print where it is true.
+
+On screen for Indonesia, where there was previously nothing:
+
+> ⚠ **3 regimes here — take differs 32.4pp**  ·  breakdown ↓
+> PSC 644 (97%) 58.0% $765M · **Gross Split 19 (3%) 65.3% -$216M** · Concession 4 (1%) 32.9% $2.0B
+> The 59.5% headline weights these by production, not by contract count. Contractor NPV
+> across them runs -$216M to $2.0B. Screen on the regime you would sign.
+> **Gross Split returns -$216M** on the same standardized project the $745M headline is
+> computed on — the country average clears a 10% WACC and this regime does not. It is 19 of
+> 667 contracts (3%), below the 5% count bar this card normally uses — which is why it was
+> not on the page at all until now. Confirm which regime your block would be awarded under
+> before citing the headline.
+
+The chip's "breakdown ↓" now points at a `#cp-regime-breakdown` table that exists and lists
+all three regimes, so the two surfaces are coupled at disclosure instead of at silence.
+
+## Result
+An analyst can no longer carry Indonesia's 59.5% / $745M to an investment committee without
+being told, on the same screen and above the fold, that the regime Indonesia has awarded
+every block under since 2017 prices at 65.3% take and **loses $216M** on the identical
+standardized project the headline is computed on. The question T2 asks — "is it attractive
+at $75, and can I defend that?" — now has a different answer on this page than it had an
+hour ago, and the analyst can see which of the three regimes their block would sit in before
+they quote a number.
+
+## Verification — measured, not assumed
+Both figures read from the suite's own report file (`ORCA_REPORT_FILE`), run this cycle
+against this working tree over `http://localhost:8099`, before and after on the same server
+and the same URL.
+
+- **Before (v745): 296 PASS / 0 FAIL / 1 WARN.** **After (v746): 296 PASS / 0 FAIL / 1 WARN.**
+  No regression. The cycle prompt again carried **297 PASS**, which is the deployed GitHub
+  Pages figure; local scores 296. Recorded rather than restated, per finalization test #1.
+  The single WARN and single "JS error" are the same `sw.js` 404 in both runs — an artifact
+  of serving the tree from a localhost root rather than the `/petroleum-fiscal-db/` scope the
+  service worker registers against.
+- **JS syntax gate: PASS**, 11 inline blocks, re-checked after every edit.
+- **185-country sweep in the live page**: `cpRegimeRows()` returns a card for 62 countries
+  (was 61), `npvFlip` non-empty on exactly 2 (Cyprus, Indonesia), 0 thrown errors.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390**, across all ten tabs.
+- **Console / page errors: 0** at all six viewports.
+- **Touch targets:** 1 control under 24px at `pointer: coarse` — `open the screen →` on Home,
+  height 14px. Confirmed **pre-existing** by running the same probe against the stashed
+  baseline: identical before and after. Not introduced by this cycle and not in the T2 path.
+  The element added here is a `div`, not a control. The **v612 mobile layer was not touched**.
+- Nothing on the STILL LOCKED list was altered: no tooltip, FAQ or citation-string edit, no
+  tab reordering, no change to the CP headline's two zones, tier colouring, rank or
+  vs-median pill, and the Govt NPV column stays removed from Fiscal Compare.
