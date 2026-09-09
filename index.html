@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v745</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v746</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2077,7 +2077,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v745</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v746</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2147,7 +2147,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v745</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v746</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -24428,7 +24428,31 @@ function cpRegimeRows(d) {
   if (rows.length < 2) return null;
   // Same materiality gate the card has always used: a secondary regime worth showing holds >= 5%
   // of the country's contracts. Kept so the v570 chip cannot promise a table that does not render.
-  if (!rows.slice(1).some(function(r) { return r.pct >= 5; })) return null;
+  //
+  // v746 (T2): count share ALONE was the wrong materiality test, and v673 papered over the symptom
+  // by silencing the chip to match it rather than asking whether the gate was right. A regime can
+  // be 3% of a country's contracts and still be the only one an entrant can sign. Indonesia's
+  // Gross Split is 19 of 667 contracts, so it failed this gate by count -- yet it is the mechanic
+  // every block awarded since the 2017 reform runs on (the same reform the Reform Risk section on
+  // this page scores at +9pp), it is the mechanic of the single largest producing contract in the
+  // country (WK Rokan, 8,487 of 11,270 MMbbl cumulative), and it prices at 65.3% take on
+  // -$215.5M contractor NPV. So the page told the analyst Indonesia returns $745M at $75/bbl while
+  // the regime they would actually enter loses money, and never named it anywhere except a row in
+  // the contract table and two entries in the reform timeline.
+  //
+  // The gate now also passes a secondary Group-1 regime whose contractor NPV has the OPPOSITE SIGN
+  // to the headline's. That is a sign flip, not a threshold invented here -- it is the same
+  // discriminating test the headline strip already runs on the $50/bbl downside. It is deliberately
+  // narrow: swept over all 185 countries it admits Indonesia and nothing else, so the 61 countries
+  // already rendering this card are untouched, and the engine's zero-rate default rows (Mauritania,
+  // Ethiopia, Tanzania -- 0.0% take on the untaxed $5,533.1M) stay out because zrMaterial rows are
+  // excluded. Malaysia's RSC at -$2.2B stays out too: it is Group 2, where v552 already handles it
+  // and the comparability rules forbid ranking its take against Group 1.
+  var _headNpv746 = (d && d.npv_75 != null) ? d.npv_75 : null;
+  var npvFlip = (_headNpv746 == null) ? [] : rows.slice(1).filter(function(r) {
+    return r.g === 1 && !r.zrMaterial && r.npv != null && ((r.npv < 0) !== (_headNpv746 < 0));
+  });
+  if (!rows.slice(1).some(function(r) { return r.pct >= 5; }) && !npvFlip.length) return null;
   // v695 (T2): weighted over the contracts that carry a take, not over every contract. A row
   // with no priced contract contributes nothing here rather than dragging the blend to zero.
   var _bn = 0, _bs = 0;
@@ -24459,6 +24483,11 @@ function cpRegimeRows(d) {
     // "below every regime" are different conversations in an IC.
     outside: outside,
     outsideDir: outside ? (head > hi ? 'above' : 'below') : null,
+    // v746 (T2): secondary Group-1 regimes whose contractor NPV has the opposite sign to the
+    // headline's. The country makes money on this page and that regime loses it, which is the
+    // whole reason the card renders on Indonesia. Carried so the card can name it rather than
+    // leaving the analyst to spot a minus sign in a three-row list.
+    npvFlip: npvFlip,
     gap: (head == null || blend == null) ? null : (head - blend),
     // v695 (T2): how much of this table is the engine's zero-rate default, so the card and the
     // breakdown below can say which rows were rebuilt and on how many contracts.
@@ -36264,7 +36293,12 @@ function loadCountryProfile(country) {
     //                    returned first -- Kazakhstan only ever cleared it on artifact takes)
     //   _zrHere          a row is materially the zero-rate default
     var _out677 = !!(_rb570 && _rb570.outside);
-    if (spread < 5 && !_out677 && !_zrHere.length) return '';
+    // v746 (T2): a fourth sufficient reason — a Group-1 regime here returns a negative contractor
+    // NPV while the headline above returns a positive one. On Indonesia this is the only reason
+    // the card is reachable at all (Gross Split is 3% of contracts, below the count gate), and it
+    // is the most decision-relevant thing the card can say.
+    var _flip746 = (_rb570 && Array.isArray(_rb570.npvFlip)) ? _rb570.npvFlip : [];
+    if (spread < 5 && !_out677 && !_zrHere.length && !_flip746.length) return '';
     var npvs = g1priced.filter(function(r) { return r.npv != null; }).map(function(r) { return r.npv; });
     var npvLo = npvs.length ? Math.min.apply(null, npvs) : null;
     var npvHi = npvs.length ? Math.max.apply(null, npvs) : null;
@@ -36273,7 +36307,7 @@ function loadCountryProfile(country) {
     // of the two things this card can say. (_out677 is declared with the gate above.)
     // v695: a row rebuilt off the zero-rate default is red too -- the figure it replaces is the
     // one that was on screen at the decision point.
-    var big = spread >= 15 || _out677 || _zrHere.length > 0;
+    var big = spread >= 15 || _out677 || _zrHere.length > 0 || _flip746.length > 0;
     var col = big ? 'var(--red)' : 'var(--orange)';
     var bg  = big ? 'rgba(185,28,28,.07)' : 'rgba(194,65,12,.06)';
     var bd  = big ? 'rgba(185,28,28,.28)' : 'rgba(194,65,12,.22)';
@@ -36404,6 +36438,30 @@ function loadCountryProfile(country) {
                   + (r.take == null
                       ? ' — every one in the regime, so no take is stated for it.'
                       : '; excluded. Including them prints ' + r.takeAll.toFixed(1) + '%.');
+              }).join(' ')
+            + '</div>'
+          : '')
+      // v746 (T2): "Screen on the regime you would sign" above is the right instruction, but on
+      // Indonesia the regime you would sign is the one that loses money, and a reader scanning a
+      // three-row list can miss a minus sign in a monospace column. Say it in words, with the
+      // contract share that kept this card off the page until now.
+      + (_flip746.length
+          ? '<div style="font-size:10px;margin-top:4px;padding-top:4px;border-top:1px solid ' + bd + ';">'
+            + _flip746.map(function(r) {
+                var _rn = (typeof fmtNpvShared === 'function') ? fmtNpvShared(r.npv) : '$' + r.npv + 'M';
+                var _hn = (typeof fmtNpvShared === 'function') ? fmtNpvShared(d.npv_75) : '$' + d.npv_75 + 'M';
+                return '<span style="color:' + col + ';font-weight:700;">' + r.mechanic
+                  + ' returns ' + _rn + '</span> on the same standardized project the ' + _hn
+                  + ' headline is computed on — the country average clears a 10% WACC and this regime '
+                  + 'does not. It is ' + Number(r.n).toLocaleString() + ' of '
+                  + Number(_rb570.tot).toLocaleString() + ' contracts (' + r.pct + '%)'
+                  // Only Indonesia reaches this card BECAUSE of the sign flip; on a row that already
+                  // cleared the 5% count bar (Cyprus, 35%) the "below the bar" clause would be false.
+                  + (r.pct < 5
+                      ? ', below the 5% count bar this card normally uses — which is why it was not on '
+                        + 'the page at all until now'
+                      : '')
+                  + '. Confirm which regime your block would be awarded under before citing the headline.';
               }).join(' ')
             + '</div>'
           : '')
