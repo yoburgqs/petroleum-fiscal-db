@@ -39978,3 +39978,14 @@ state monopolies carrying `be_75 = 1.0` rather than null in `country_data.json`.
    sourced value for 4 of the 5 fiscal terms its PSC model needs."* Both are defined in their own
    tooltips (cited = independent citation; sourced value = a value on record at all) and neither is
    wrong, but the two figures sit on one screen and read as a contradiction.
+
+---
+## Cycle 642 Log — 2026-09-09 04:50
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: ## Cycle 642 — T6
+
+**Task.** T6 — *"Where did this number come from and how solid is the evidence?"* Stalest by rotation (641 ran T1, 640 T2, 639 T5, 638 T4, 637 T3, 636 T6). Walked cold at 1440×900 and 390×844 with touch, storage cleared, served over HTTP.
+
+**Friction.** The T6 machinery is genuinely good, and I verified that before looking elsewhere — the Fiscal Compare drilldown carries a `1 of 3 model terms cited →` chip, all **185 of 185** countries render both that chip and a working Evide
