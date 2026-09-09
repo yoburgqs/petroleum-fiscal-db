@@ -40980,3 +40980,119 @@ against this working tree over `http://localhost:8080`, this cycle.
 **Shipped:** v744 — the Fiscal Compare `Stability` column stopped printing a diamond count that ranked Libya and Algeria above Norway, and now prints the six-way reform verdict the classifier already computed (`↑ PRE-2010`, `SIZE UNKNOWN`, `↑ +15pp`, `PREMIUM 3–5pp`, `NO LAW CHANGE`, `NO PREMIUM`, `n/c`), with the count demoted to a grey second line. Header renamed to `Reform verdict`.
 
 **Gates, all measured this cycle:** sui
+
+---
+# Cycle 651 — T5, shipped as v745
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."**
+Rotation: 650 T4, 649 T3, 648 T6, 647 T1, 646 T2 — T5 last walked at cycle 645.
+Walked cold at 1440x900 (no sessionStorage, no localStorage), then at all six gate viewports.
+
+The walk enumerated every IC affordance reachable from a cold load and exercised each one
+against the real clipboard, reading both the `text/plain` and `text/html` flavours back:
+`fc-copy-ic-btn` (Fiscal Compare), `screener-copy-ic-btn`, `cmp-copy-table-btn` (Side-by-Side),
+`ioc-copy-ic-btn` (IOC Portfolio), `dd-ic-summary-btn` and `dd-cite-btn` (Country Profile),
+and the FC row-drilldown citation. Five of the seven were sound. One was not.
+
+## Friction
+**IOC Portfolio tab, `renderIOCExposure()` — the fiscal-exposure annex was built from a single
+legal entity, not the operator.**
+
+`const opData = (IOC_DATA || []).filter(d => d.operator === operatorName);` — an exact
+operator-string match. That is precisely the defect the long comment above `_iocBrandEntities`
+already documents, and every *other* brand entry point on this tab was routed through that
+function to fix it: the cold-load seed, the five empty-state benchmark buttons, the 16 "Quick:"
+buttons, and Enter in the search box. `renderIOCExposure` was missed — and it is the one that
+feeds **`⎘ Copy for IC Memo`** and **`⬇ XLSX`**, i.e. the only artifact on the tab that reaches
+the memo.
+
+Measured against `IOC_DATA` on the deployed tree, exact-match vs. the group:
+
+| Operator | annex as shipped | group (after dedupe) | error |
+|---|---|---|---|
+| Chevron | 12 contracts / 5 countries @ 57.2% | 630 / 16 @ 30.2% | **27.0pp** |
+| ConocoPhillips | 22 / 4 @ 28.9% | 144 / 9 @ 57.9% | **29.0pp** |
+| Equinor | 22 / 7 @ 39.1% | 901 / 11 @ 61.3% | **22.2pp** |
+| Woodside | 2 / 1 @ 55.2% | 309 / 8 | — |
+| Shell | 112 / 14 @ 39.0% | 884 / 31 @ 39.1% | 87% of contracts absent |
+| Kosmos Energy | **0 / 0** | 53 / 8 @ 36.3% | every row a country average |
+| Harbour Energy | **0 / 0** | 105 / 2 | every row a country average |
+
+Two consequences, both of which travelled into the clipboard.
+
+1. **The annex omitted up to 99% of the group's contracts.** Equinor's exposure annex was 22
+   contracts, because Norway sits under `Equinor Energy AS` (785) and `Statoil Petroleum AS`
+   (200), neither of which is the string "Equinor".
+2. **The rows it could not match were refilled from `COUNTRY_DATA` and mislabelled.** Those rows
+   print, in the copied table and the XLSX Basis sheet, *"the COUNTRY average, substituted
+   because ORCA holds no operator-level terms there."* That sentence is **false** wherever ORCA
+   holds the group's terms under a subsidiary name — Shell Offshore Inc. (474 USA contracts),
+   SPDC (Nigeria), A/S Norske Shell (Norway), SHELL U.K. LIMITED. On Shell it mislabelled 9 of
+   23 rows. The v639 heading then read the fallback back as fact: *"Kosmos Energy — none of them
+   is Kosmos Energy. ORCA holds no Kosmos Energy contract terms"*, on an operator ORCA holds
+   53 contracts across 8 countries for.
+
+And the contradiction was on one screen at one moment. On the cold load the tab headline read
+**884 CONTRACTS · 31 COUNTRIES · 39.1% WTD AVG TAKE @$75**; the exposure section three inches
+below, for the same operator, produced **23 countries @ 56.2%**, and that was the figure the
+`Copy for IC Memo` button put on the clipboard. An analyst who quotes the headline in the
+narrative and pastes the annex underneath ships a memo that disagrees with itself by 17pp —
+and by 22–29pp on Equinor, Chevron and ConocoPhillips.
+
+## Change
+Resolution is now the tab's own. `renderIOCExposure` routes through `_iocBrandEntities`:
+**group** when the brand resolves to more than one entity, **exact** when the dropdown names a
+single legal entity (the select is populated from `IOC_DATA.operator`, so both cases are real
+and they are now different documents, each one saying which it is).
+
+Nothing about the aggregation is invented. Rows are deduplicated by `country|mechanic` keeping
+the highest `n` — `loadIOCAggregated`'s existing convention, adopted rather than replaced,
+because summing group entities double-counts the 2018 `Statoil Petroleum AS` → `Equinor Energy
+AS` rename. Mechanics within a country are then collapsed contract-weighted into the one row per
+country the table renders. The result is that this section counts exactly what the headline
+counts.
+
+Three smaller things follow from the fix and travel with the artifact:
+
+- A full-width metric prints the **contract-weighted take**, the same quantity as the headline
+  tile, with its contract and country count. Before the fix the two could not be reconciled at
+  all, because they were computed over different operator sets; now the only gap left is the
+  weighting, and the tile says so.
+- The **roll-up basis and entity list** go into the copied caption and the XLSX `Basis &
+  Assumptions` sheet under a new `WHOSE CONTRACTS` heading — 48 named entities for Shell — and
+  the single-entity case states in writing that it is *not* the group position. Entities held
+  out by `IOC_BRAND_NOT` (Aker BP) are named with their reason.
+- Rows spanning more than one mechanic carry a `+N` marker beside the dominant one, because
+  their take is a weighted blend and not that mechanic's terms.
+
+## Result
+Shell's exposure annex now reads **884 contracts over 31 countries at 39.1% contract-weighted** —
+the same three numbers as the `Wtd Avg Take @$75` tile at the top of the same tab, which it
+contradicted by 17pp an hour ago. The analyst can paste the annex under a narrative that quotes
+the headline without the two disagreeing. The 9 Shell rows that stated ORCA held no Shell terms
+are Shell's own contracts; country-average fallbacks drop from **9 of 23 to 2 of 33**. Kosmos
+Energy and Harbour Energy stop rendering a screen on which not one figure is the operator's.
+Equinor's annex stops reporting a 22-contract sample at 39.1% for a group that sits at 61.3%
+over 901 — a 22pp error in the direction that makes a high-take jurisdiction look benign.
+
+## Verification — measured, not assumed
+Both figures read from the suite's own report file (`ORCA_REPORT_FILE`), run against this working
+tree over `http://localhost:8080`, this cycle.
+
+- **Test before (v744): 293 PASS / 0 FAIL / 1 WARN.** The cycle prompt again carried **297 PASS**
+  from cycle 650; that number is produced against the deployed GitHub Pages URL. Local scores
+  293/0/1, 0 failures either way. Recorded rather than restated, per finalization test #1.
+- **Test after (v745): 293 PASS / 0 FAIL / 1 WARN** — no change, no regression. The single WARN
+  and the single "JS error" are the same `sw.js` 404 present in the before-run, an artifact of
+  serving the tree from a localhost root rather than the `/petroleum-fiscal-db/` scope the
+  service worker registers against.
+- JS syntax gate: **PASS**, 11 inline blocks, re-checked after every edit.
+- Horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390: **0px at all six**, across nine tabs.
+- Console / page errors on the walk: **0** at all six viewports.
+- Touch targets: the new `+N` marker measures **24px** under `pointer: coarse` and 12px on a
+  mouse, so the 33 rows do not grow on desktop. `ioc-copy-ic-btn` measures 44px under a thumb.
+  The **v612 mobile layer was not touched**.
+- Tie-out checked live for six operators (Shell, Chevron, Equinor, Kosmos Energy,
+  ConocoPhillips, Eni); Shell's weighted take and contract and country counts match the headline
+  tile exactly.
