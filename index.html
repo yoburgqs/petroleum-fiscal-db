@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v731</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v732</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2013,7 +2013,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v731</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v732</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2083,7 +2083,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v731</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v732</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -34890,15 +34890,22 @@ function loadCountryProfile(country) {
   const _cpReformCta = function(cn) {
     var v = (typeof _rrClassify === 'function') ? _rrClassify(cn) : null;
     var js = String(cn).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-    var short = !v ? 'Check reform risk'
+    // v732 (T4): the no-log arm said 'Check reform risk' -- an errand, not a reading. It is the
+    // arm that fires for the 164 unscored jurisdictions, and on the one line an analyst reads to
+    // decide viability it has to say what the FC cell (n/c) and the RR lookup already say: there
+    // is no log, and that is not a clean record.
+    var short = !v ? 'Reform risk not scored \u00b7 no sourced log \u2014 not a clean record'
       : (v.icLabel === 'IC action'
           ? 'Reform risk ' + v.score + '/100 · no frequency premium'
           : 'Reform risk ' + v.score + '/100 · ' + v.icLabel.replace('IC action — ', ''));
     var col = v ? v.icColor : 'var(--muted)';
     var tip = v ? 'Reform Frequency Score ' + v.score + '/100 — ' + v.scoreNote
                 + '. Click to open the full reform verdict for ' + cn + '.'
-              : 'ORCA holds no sourced fiscal-reform log for ' + cn
-                + '. Click to see what that means and what to check instead.';
+              : 'ORCA carries a sourced fiscal-reform event log for 21 of 185 jurisdictions and ' + cn
+                + ' is one of the 164 without one. This is NOT a Reform Frequency Score of 100 and it does'
+                + ' not support carrying a zero reform-frequency premium into an IC memo. Click to open the'
+                + ' lookup for ' + cn + ', which names the statute ORCA read its terms from as the place'
+                + ' the external check starts.';
     return ' <span role="button" tabindex="0" onclick="event.stopPropagation();openReformRiskFor(\'' + js + '\')"'
       + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();openReformRiskFor(\'' + js + '\');}"'
       + ' style="cursor:pointer;font-weight:700;color:' + col + ';border-bottom:1px dotted ' + col + ';"'
@@ -35008,7 +35015,15 @@ function loadCountryProfile(country) {
           // and Guyana (actively reforming) and Russia and Ecuador (in-window take rises). The
           // control now also fires whenever the reform classifier itself returns a non-green
           // verdict. No new threshold: it is the tab's own verdict, read here.
-          + ((favourable && !(_cpReformV && _cpReformV.icColor !== 'var(--green)')) ? '' : _cpReformCta(d.country));
+          // v732 (T4): the gate read `!(v && v.icColor !== green)`, which is TRUE when v is null.
+          // _rrClassify() returns null for the 164 jurisdictions with no sourced reform log, so a
+          // country ORCA holds NO reform data on cleared this test exactly as a scored-clean one
+          // did, and the control was withheld from 130 of 185 profiles -- every unscored country
+          // taking <=55%. Silence from a classifier that has nothing to read is not a pass; it is
+          // the coverage gap this platform prints as n/c everywhere else. Suppression now requires
+          // a verdict that actually exists AND is green. Measured against the live data that set
+          // is currently empty, so nothing that shows a CTA today loses one.
+          + ((favourable && _cpReformV && _cpReformV.icColor === 'var(--green)') ? '' : _cpReformCta(d.country));
     } else if (hasNpv && npv > 0 && hasDown && npv50 <= 0) {
       icon = '\u26a0'; col = 'var(--yellow)'; bg = 'rgba(161,98,7,.05)'; border = 'rgba(161,98,7,.2)';
       // v589 (T2): this is the rare branch -- 2 of 182 non-monopoly countries reach it. Saying so
@@ -35021,7 +35036,12 @@ function loadCountryProfile(country) {
       msg = 'Price-dependent entry \u2014 contractor NPV ' + cpNpvFmt(npv) + ' @$75 but ' + cpNpvFmt(npv50)
           + ' at $50/bbl: this regime does not survive a price break on the standardized profile, at '
           + take.toFixed(1) + '% govt take' + _cmpBasisNote552 + '.' + _rareF589 + beStr
-          + ' IC: carry a low-price case.';
+          // v732 (T4): same control as the passing branch above. This arm carries no `favourable`
+          // suppression of its own, so it was silent on reform for a different reason -- it simply
+          // never called the CTA. Both countries that reach it (Malaysia, Yemen) are unscored, so
+          // both were telling an analyst to "carry a low-price case" with no word on the reform
+          // exposure they cannot carry a zero premium for either.
+          + ' IC: carry a low-price case.' + _cpReformCta(d.country);
     } else if (hasNpv && npv > 0) {
       icon = '\u2714'; col = take <= 55 ? 'var(--green)' : 'var(--yellow)';
       bg = take <= 55 ? 'rgba(21,128,61,.05)' : 'rgba(161,98,7,.05)';
