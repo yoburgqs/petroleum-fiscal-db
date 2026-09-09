@@ -41237,3 +41237,16 @@ and the same URL.
 - Nothing on the STILL LOCKED list was altered: no tooltip, FAQ or citation-string edit, no
   tab reordering, no change to the CP headline's two zones, tier colouring, rank or
   vs-median pill, and the Govt NPV column stays removed from Fiscal Compare.
+
+---
+## Cycle 652 Log — 2026-09-09 14:42
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: HEAD and `origin/main` in sync (only the loop's own `CYCLE_STATE.json`/`cycle_log.txt` remain modified, as normal). Cycle complete.
+
+## Cycle 652 — T2
+
+**Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* Stalest by rotation (646 T2 · 647 T1 · 648 T6 · 649 T3 · 650 T4 · 651 T5). Walked cold at 1440×900 and 390×844 with touch, storage cleared. Indonesia auto-loads on Country Profile, so it's the profile a first-time analyst actually reads.
+
+**Friction:** A fiscal r
