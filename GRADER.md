@@ -39858,3 +39858,123 @@ real fix is upstream, in whatever writes that field.
 **Task.** T1 — *"Which countries should even be on my screening list?"* (stalest by rotation; 640 ran T2, 639 T5, 638 T4, 637 T3, 636 T6). Walked cold at 1440×900 and 390×844 with touch, storage cleared on every load.
 
 **Friction.** The Screener held up well — presets, the four price decks and the sliders all behaved, including recomputing all 11 preset hit-counts when the deck moved. The problem was one mode ov
+
+---
+## Cycle 642 Log — 2026-09-09 04:45
+- Test before: 294 PASS / 0 FAIL / 0 WARN (deployed v735)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local v736) — suite RAN this cycle, not assumed
+- JS errors: 0 attributable to this change (the 1 WARN is the standing sw.js absolute-path 404,
+  which fires only off GitHub Pages; the deployed run above is the control)
+- Version: v735 → v736, 3 display strings, silently at the end
+
+## Cycle 642 — T6
+
+**Task.** T6 — *"Where did this number come from and how solid is the evidence?"* Stalest by
+rotation (641 T1, 640 T2, 639 T5, 638 T4, 637 T3, 636 T6). Walked cold at 1440×900 and
+390×844 `hasTouch`, storage cleared on every load, served over HTTP so the fetches resolve.
+
+## Friction
+
+The T6 machinery on this platform is genuinely good, and I checked before concluding otherwise:
+the FC drilldown carries a `1 of 3 model terms cited →` chip, `_fcOpenTermChain()` lands on the
+Country Profile Evidence Chain and flashes it, all **185 of 185** countries render both the chip
+and a chain (swept — 0 dead links, 0 missing chains), Side-by-Side carries five evidence rows
+including per-country *Model terms cited*, and the Explorer evidence sort is monotonic
+D→C→B→A within each data-basis block.
+
+The failure was upstream of all of it. The Home hero subtitle — `index.html:2190`, the **first
+sentence on the platform** — read **"Every number sourced."**
+
+Measured today by walking all 185 country profiles and reading each one's own `cp-terms-chip`,
+i.e. the platform's own citation rule with the bulk harvest, shared-regional instruments and
+D-confidence rows excluded, exactly as the Evidence Chain excludes them:
+
+| measure | value |
+|---|---|
+| countries with **every** model term cited | **0 of 185** |
+| countries with **zero** cited | **19** |
+| model terms cited platform-wide | **393 of 802 — 49.0%** |
+| countries grading C or D | **78 of 185** (A 28 · B 79 · C 43 · D 35) |
+| best country on the platform | 4 of 5 |
+
+The claim is true for no country. And the platform already knew: Iraq's Evidence Chain says three
+of its five rows carry *"no source at all — not primary law, not a secondary guide, not the bulk
+harvest — nothing"*; Somalia's opens *"No parameter on this table is independently sourced"*; the
+Methodology glance tile has read *"78 of 185 GRADED C OR D"* since v592; and **v660's own comment
+records the same measurement I reproduced**. v660 fixed the Country Profile. Nobody went back to
+the front door. So the landing page and the drilldown three clicks later have been asserting
+opposite things — and the landing page errs in the direction that makes the analyst *over*-trust
+the data. It is the one sentence that stops the T6 question being asked at all.
+
+## Change
+
+- **The claim is deleted.** `#home-sourcing-claim` renders in its place, as a control:
+  `Sourcing  A 28 · B 79 · C 43 · D 35 of 185 | 393 of 802 model terms cited — no country cites
+  all of its own   what the grades mean →`
+  The grade mix is computed at load from `COUNTRY_DATA` through **`_evidenceGrade()`** — the
+  identical function behind the evidence letter on Fiscal Compare, Explorer, Screener,
+  Side-by-Side, IOC Portfolio and the Country Profile — so this line cannot drift from the badges
+  it describes. The model-terms figure is carried as a dated measurement, not a claim.
+- **`_homeOpenEvidenceTiers()`.** `_methJumpEvidence()` only scrolls, and Methodology lives behind
+  the Reference dropdown — from Home its target sits inside an inactive `.tab-pane`, where
+  `scrollIntoView()` is a silent no-op. Shipping the chip against it would have made the one
+  control that answers *"how solid is the evidence?"* a dead click, which is the defect being
+  fixed. It activates the tab first, on the same path `welcome-faq-btn` uses, then jumps.
+- **The destination now answers the question the analyst arrives with.** Evidence Quality Tiers
+  graded *facts* and never said what the letter on a *country* means. It now states both legs of
+  the grade (primary-law share AND fact depth, worse of the two), writes the live C/D count into
+  `#meth-evidence-cd-count` from the same `_evidenceGrade()` pass, gives the usage rule — C is
+  screening-only, a D does not go in a recommendation document — and warns that the grade measures
+  the fact base and not the model, pointing at the per-country *N of N model terms cited* chip.
+
+## Result
+
+An analyst landing cold is told, **above the fold and before they touch a number**, that 78 of 185
+countries grade C or D and that no country on the platform cites every term its own DCF runs — and
+one click puts them on the definition of the letters and the rule for using a C or a D. They reach
+the first take% already knowing it needs checking. Previously they were told the opposite, in the
+first sentence, and every correction lived three clicks and ~2,750px away on a tab they had no
+reason to open.
+
+## Mobile (Step 5b)
+
+390×844 `hasTouch: true`. Chip is 92px tall (wraps to 3 lines), 362px wide, `scrollWidth` 390 =
+`clientWidth` 390. Swept all ten tabs at 390 — **no horizontal scroll on any**. Tap on the chip
+activates Methodology and lands `#meth-evidence` at 0px.
+
+## Still open (carried forward)
+
+Unchanged from v735 and not touched this cycle: the `IRR:` headline chip that renders a label with
+no value; the 7 countries with fewer than 8 comparable regimes in range reading the all-country r²
+clause; the Scenario Builder `.page-sub` promising an IRR the deck does not carry;
+`_exportScenariosXLSX()` requiring Save Scenario first; the 3 state monopolies rendering no Quick
+IC verdict; `sweetspot` returning 143 of 185 with 133 PROXY; the v729 production filter having no
+Screener preset equivalent; `Load Top 5 in Side-by-Side` taking `sorted.slice(0,5)`; the v601
+evidence-chain 2200ms fixed-wait race; `.orca-fp-badge` at 21px across four tabs; the Home Screener
+card and `#tab-btn-tscreener` advertising a `breakeven` and an `IRR` filter deleted at v568/v517;
+the `#screener-count` run-on line; the service-worker absolute path (`index.html:49`, the standing
+1 WARN); `#cmp-clear-btn` at 23px on desktop; 19 sub-24px controls in `#explorer-screen-mode`;
+v710's `t7` clipped-text regression; `cp-price-select` absent from the DOM; Mozambique's
+"Commercially attractive" verdict; reform coverage 21 of 185; the Methodology/Home tier-definition
+conflict; `FC_PROFILES` / `DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+placeholder; Kuwait's evidence tier; 862 contracts with no fiscal terms; unweighted per-mechanic
+pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()` /
+`renderVintage()`; the Breakeven Map price-marker slider inert above $34; the FC/Screener
+shortlists being two independent selections; the CP headline printing `#13 of 21 producers` three
+lines above `12 / 20 producers take less`; the `getEvidenceBar()` chip missing from Explorer Browse
+and IOC Portfolio; the `# Contracts` row printing `7643` without a thousands separator; the three
+state monopolies carrying `be_75 = 1.0` rather than null in `country_data.json`.
+
+**New, not fixed.** Two things the sweep surfaced.
+1. **Not one evidence badge anywhere on the platform is clickable.** Fiscal Compare renders 349
+   evidence elements and 0 are controls; Explorer 187, Screener 191, IOC Portfolio — all
+   hover-only `title` spans. On the same FC row, `STABILITY` **is** a button that opens Reform
+   Risk while `QUALITY` beside it is inert, with no visual difference between them. An analyst who
+   learns the first is clickable will click the second and get nothing. Row-click reaches the
+   drilldown, so it is not a dead end — but it is an inconsistency, and on a phone every one of
+   those tooltips is unreachable.
+2. **The `cp-terms-chip` and the Evidence Chain body count different things in the same words.**
+   Somalia's chip says `0 of 5 model terms cited`; four lines down the chain body says *"ORCA has a
+   sourced value for 4 of the 5 fiscal terms its PSC model needs."* Both are defined in their own
+   tooltips (cited = independent citation; sourced value = a value on record at all) and neither is
+   wrong, but the two figures sit on one screen and read as a contradiction.
