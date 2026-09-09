@@ -31504,6 +31504,52 @@ function _scExportBasisLines() {
   return L;
 }
 
+// ── v738 (T4): the two stability readings, in the form a workbook can carry ────────
+// Both read from the same functions the screens render from. Where a reading does not exist
+// these return the words the screens print — 'not scored', 'n/c' — never a number, and never
+// a blank that a spreadsheet sorts as zero. An absent reading is not a good one.
+function _fpXlsx(d) {
+  var score = (typeof getFiscalPredictabilityScore === 'function') ? getFiscalPredictabilityScore(d) : null;
+  var disp  = (typeof _fpDispersion === 'function') ? _fpDispersion(d) : { state: 'none', iqr: null };
+  if (score === null || score === undefined) {
+    return { score: 'not scored', band: 'not scored',
+             basis: disp.state === 'monopoly'
+               ? 'no contractor position to score — state monopoly'
+               : 'no contract-level take distribution held — not computed, not a spread of zero' };
+  }
+  if (disp.state === 'single') {
+    // The v624 rule, carried into the file: a one-term score was never charged the IQR
+    // penalty, so the band its number would fall in was not earned. UNGRADED, as on screen.
+    return { score: score, band: 'UNGRADED',
+             basis: 'one term — every contract prices identically, so the take-spread penalty '
+                  + '(the largest of the three, up to −40) was never charged. Price swing and '
+                  + 'mechanic count only. Do not rank this above a graded score.' };
+  }
+  return { score: score, band: (typeof _fpBandLabel === 'function') ? _fpBandLabel(score) : '',
+           basis: disp.iqr.toFixed(1) + 'pp measured spread across this country\u2019s own contracts '
+                + '— the take-spread penalty IS charged here. Only the measured cohort carries a graded band.' };
+}
+function _rrXlsx(d) {
+  var ev = (typeof REFORM_HISTORY !== 'undefined' && REFORM_HISTORY && d)
+             ? (REFORM_HISTORY[d.country] || []) : [];
+  if (!ev.length) {
+    return { count: 'n/c',
+             basis: 'NO sourced fiscal-reform event log on file. This is missing coverage, not a '
+                  + 'clean record — it is not zero reforms and it carries no reform premium of zero '
+                  + 'into an IC memo. Needs an external check (national petroleum law, IMF Article IV, '
+                  + 'operator annual reports) first.' };
+  }
+  var n   = (typeof _rrCountScored === 'function') ? _rrCountScored(ev) : 0;
+  var ctx = (typeof _rrContextInWindow === 'function') ? _rrContextInWindow(ev).length : 0;
+  return { count: n,
+           basis: 'sourced fiscal law changes dated 2010 or later, from an event log of ' + ev.length
+                + ' event' + (ev.length === 1 ? '' : 's')
+                + (ctx ? '; ' + ctx + ' further in-window event' + (ctx === 1 ? '' : 's')
+                       + ' (discovery, first oil, conflict, a review that changed no terms) are held but do not score' : '')
+                + '. A count, never a magnitude — Russia\u2019s 2022 windfall tax (+15pp) counts as one, '
+                + 'the same as a 1pp administrative change. See the Reform Risk tab for the IC action.' };
+}
+
 // v558 (T5) — one column set for both buttons. CSV and XLSX had drifted into different
 // columns (XLSX carried Rank and a Stability the CSV lacked; the CSV carried nothing to
 // replace it), so which button the analyst pressed decided what the IC received.
@@ -38130,7 +38176,29 @@ function exportExplorer() {
     [`IRR @$${price} (%)`]: (d[irrKey] !== null && d[irrKey] !== undefined && d[irrKey] < 500) ? +d[irrKey].toFixed(1) : null,
     'Breakeven @$75 ($/bbl)': (d.be_75 && d.be_75 > 1 && d.be_75 < 999) ? d.be_75 : null,
     'Swing $50→$125 (pp)': d.swing !== null ? +d.swing.toFixed(1) : null,
-    'Stability Score': d.swing !== null ? Math.max(0, Math.min(100, Math.round(100 - d.swing * 3))) : null,
+    // ── v738 (T4): the workbook's one "stability" number was invented here ───────────
+    // This column shipped as 'Stability Score' = 100 - swing*3, computed nowhere else and
+    // rendered on no screen in the product. It is the same local formula v558 deleted from
+    // the Fiscal Compare workbook for disagreeing with getFiscalPredictabilityScore(); it
+    // survived here. Measured against the score the Explorer and Country Profile actually
+    // show, it disagreed on 157 of the 160 scoreable countries and landed in a DIFFERENT
+    // BAND on 82 of them — and it inverted both ends of the range:
+    //     Iraq      workbook 80 HIGH   screen 47 LOW
+    //     Cyprus    workbook 89 HIGH   screen 47 LOW
+    //     Guyana    workbook 22 V.LOW  screen 62 MODERATE
+    //     Liberia   workbook 25 V.LOW  screen 70 MODERATE  (widest, 45 points)
+    // Being pure price swing, it ranked the regimes whose take barely moves with price as
+    // the most fiscally stable on file. That number left the platform as an IC attachment,
+    // where nothing on screen contradicts it.
+    // It is replaced by the two readings the analyst was actually asking for, each named for
+    // what it measures and each carrying the basis that decides whether it may be ranked.
+    // Neither is computed here: both are read from the functions the screens render from,
+    // so the workbook and the tab can no longer disagree.
+    'Fiscal Predictability (0–100)': _fpXlsx(d).score,
+    'Predictability Band': _fpXlsx(d).band,
+    'Predictability Basis': _fpXlsx(d).basis,
+    'Reform Record (2010+)': _rrXlsx(d).count,
+    'Reform Record Basis': _rrXlsx(d).basis,
     // v634 (T6): was 'Evidence A/B (%)': d.ab_pct — the deleted grader. Same three columns
     // the Fiscal Compare workbook now carries, so two exports of the same country agree.
     'Evidence Grade': _evidenceGrade(d).letter + ' — ' + _evidenceGrade(d).label,
@@ -38172,6 +38240,12 @@ function exportExplorer() {
     { Field: 'Data Basis key', Value: 'FACTS = take production-weighted, >5% contract coverage. EVIDENCE = partial production match. PROXY = no verified production; regional estimate.' },
     { Field: 'Govt take', Value: 'Production-weighted where production data exists, equal-weighted otherwise.' },
     { Field: 'Breakeven', Value: 'Reported at $75/bbl for all rows — it is a price, not a function of the price radio.' },
+    // v738 (T4): the workbook previously carried one column called 'Stability Score' and no note
+    // saying what it was. It was 100 - swing*3, matched nothing on screen, and inverted Iraq and
+    // Guyana against the platform's own reading. Two named readings now, each with its basis.
+    { Field: 'Fiscal Predictability', Value: '0–100 composite of how consistent this country\u2019s terms are, read from the same function the Explorer and Country Profile render: within-country take spread (IQR, up to −40), price swing (up to −30), and −8 per fiscal mechanic beyond the first. It measures term consistency, NOT how often the law changed — that is the Reform Record column. Read Predictability Basis before ranking this column: a band is earned only where ORCA measured a spread across the country\u2019s own contracts (28 of 185). A one-term score is shown UNGRADED however high its number, because the penalty that would have shortened it was never charged — a graded MODERATE outranks any UNGRADED score.' },
+    { Field: 'Reform Record (2010+)', Value: 'Count of sourced fiscal law changes dated 2010 or later. ORCA holds a sourced reform event log for 21 of 185 jurisdictions; the other 164 read n/c. n/c is missing coverage, NOT a clean record and NOT a count of zero — do not carry a reform-frequency premium of zero on an n/c row without an external check. The count never reads how large a change was.' },
+    { Field: 'The two are not one number', Value: 'A country can be predictable and heavily reformed, or unreformed and inconsistent. Norway reads Predictability 76 with 2 sourced law changes since 2010; Guyana reads 62 with 0. Neither column substitutes for the other, and neither is a substitute for the Reform Risk tab\u2019s IC action.' },
     { Field: '', Value: '' },
     { Field: 'Source', Value: 'ORCA Petroleum Fiscal Intelligence Platform' },
     { Field: 'Export Date', Value: new Date().toISOString().slice(0,10) },
@@ -38180,7 +38254,7 @@ function exportExplorer() {
 
   const wb = XLSX.utils.book_new();
   const ws = XLSX.utils.json_to_sheet(rows);
-  ws['!cols'] = [{wch:6},{wch:24},{wch:11},{wch:16},{wch:10},{wch:26},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16},{wch:22},{wch:14},{wch:20},{wch:18},{wch:14},{wch:16},{wch:17},{wch:14}];
+  ws['!cols'] = [{wch:6},{wch:24},{wch:11},{wch:16},{wch:10},{wch:26},{wch:16},{wch:16},{wch:16},{wch:16},{wch:16},{wch:22},{wch:14},{wch:20},{wch:18},{wch:22},{wch:18},{wch:60},{wch:20},{wch:60},{wch:16},{wch:17},{wch:14},{wch:16},{wch:17},{wch:14}];
   XLSX.utils.book_append_sheet(wb, _finishSheet(ws), 'Screening List');
   const ws2 = XLSX.utils.json_to_sheet(ctx);
   ws2['!cols'] = [{wch:24},{wch:110}];
