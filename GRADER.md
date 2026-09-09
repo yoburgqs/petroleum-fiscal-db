@@ -38848,3 +38848,19 @@ correction exactly as the presets do — Iraq screens at 34.1% against a publish
 paths, and sorting the GOVT TAKE column re-sorts on the comparable figure and flips the cell to
 `34.1% published 84.8%`. Walked both paths this cycle to check they could not diverge. They do not.
 Recorded so a later cycle does not go looking for a bug that was already fixed.
+
+---
+## Cycle 635 Log — 2026-09-08 21:55
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 636 complete — shipped as v729, pushed.
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** (stalest by rotation; last walked at cycle 625).
+
+## Friction
+Walked cold at 1440, no sessionStorage or localStorage: Home → **Fiscal Compare**, the first tool tab and the table an analyst actually builds a screening list from. Default sort, Govt Take ascending. Measured off the live DOM:
+
+- **163 of 185** rows hold zero verified block-level field production
+- **6 of the top 10*
