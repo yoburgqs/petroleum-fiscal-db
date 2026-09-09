@@ -39350,3 +39350,186 @@ deliverable.
 
 ## Friction
 The three reform surfaces are genuinely coherent — I checked the Reform Risk lookup, the Fiscal Compare Stability column, and the Country Profile reform block across Norway, Russia, 
+
+---
+## Cycle 639 Log — 2026-09-09 01:5x — shipped as v733 (`9991bd4`), pushed, mirror copied
+
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local server; the WARN is the standing
+  service-worker absolute-path 404)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — suite ACTUALLY RUN this cycle, and run
+  a second time against the untouched v732 tree on a second port for a byte-for-byte
+  comparison. Identical. No regression.
+- JS syntax gate: 11 inline blocks, 0 errors.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest by rotation
+(638 ran T4, 637 T3, 636 T6, 635 T2, 634 was the last T5). Walked cold at 1440×900 and
+390×844 `hasTouch`, storage cleared, served over HTTP.
+
+## Friction
+
+The walk started where the analyst starts: which control on this platform is labelled
+for the job. Six of them are, and all six were exercised cold and their clipboard read
+back in both flavours:
+
+| artifact | plain | html | rows | verdict on the walk |
+|---|---|---|---|---|
+| Fiscal Compare `fc-copy-ic-btn` | 50,658 | 317,926 | 186 | tickable since v632; sound |
+| Screener `screener-copy-ic-btn` | 27,978 | 272,594 | 186 | tickable since v728; 4,844 chars / 15 rows once the IOC Capital Screen preset is on, with a criteria block. Good |
+| Side-by-Side `cmp-copy-table-btn` | 5,269 | 16,868 | 24 | sound |
+| IOC Portfolio `ioc-copy-ic-btn` | 7,052 | 34,166 | 24 | sound |
+| Country Profile `dd-ic-summary-btn` | 4,848 | 9,418 | 16 | sound |
+| CP `dd-cite-btn` | 487 | — | prose | plain-only, correctly |
+
+So the button layer is in good shape and the paste machinery is not where the analyst
+is losing. The loss is one step further on, and it is a structural one.
+
+**Every one of those five table artifacts ends by routing the analyst to the Scenario
+Builder.** Fiscal Compare, Side-by-Side and IOC Portfolio all close their clipboard text
+with a variant of *"use Scenario Builder with project capex/opex for a project IRR"*, and
+the Methodology IC workflow says it six more times ("Export each Scenario Builder result",
+"read from the Scenario Builder output panel", "run the Scenario Builder at your firm's
+risk-adjusted hurdle rate per country"). It is the terminal step of the memo workflow —
+the only place on the platform where the analyst's OWN capex, opex, profile and fiscal
+terms meet the DCF engine rather than a standardized $1.2B Deepwater stand-in.
+
+**It was the only IC artifact on the platform that answered at one price.**
+
+`runCustomScenario()` (index.html:43057 pre-change) called exactly one `dcf*()`, at the
+single price in `#sb-price`. Output: three cards, a hurdle verdict, a fiscal breakdown,
+a vs-185 rank, and the copyable IC line — all at $75/bbl and nothing else.
+
+The rest of the product will not accept a one-price case, and says so in writing:
+
+- The Screener's **IOC Capital Screen is decided at the $50/bbl downside** — its own
+  criteria block reads "Min contractor NPV at the $50/bbl downside: ≥$0M — removed 1
+  country ... This shortlist was decided by the $50/bbl floor alone".
+- **Side-by-Side prints "Use the $50 contractor NPV as the downside test"** inside the
+  artifact it hands the analyst.
+- **Country Profile** pastes take at $50/$75/$100/$125 and a "Price swing ($50 → $125)"
+  row.
+- The Methodology IC Memo Checklist asks for a price-escalation curve and $100/$125
+  stress cases.
+
+So the platform screens a country on its $50 downside, then sends the analyst to the one
+screen that takes their real numbers — and that screen hands back a case with no downside
+in it. The pasted IC line read, in full: *"Concession, Deepwater profile, $75/bbl — govt
+take 22.2%, contractor NPV +$4.3B @10% WACC and +$2.9B @15% IOC hurdle (clears), capital
+at risk $223M, payback year 3"* and stopped.
+
+**And the modal had been promising the deck the whole time.** The `.page-sub` at
+`index.html:22312`: *"hit **Run DCF** to compute contractor government take, NPV, IRR,
+and **Price Swing at 4 price points**."* No second price was ever run and no swing was
+ever computed. The description of the feature and the feature disagreed.
+
+The workaround available to the analyst was four round-trips: edit `#sb-price`, press Run
+DCF, read the cards, press Copy IC line, paste, repeat for $50, $100, $125 — through a
+modal that keeps no record of which run is on screen, so a misread puts the wrong price's
+take in the memo — then merge four sentences by hand in Word.
+
+## Change
+
+`runCustomScenario()` now builds a price deck before it renders. The DCF entry points
+already took `price` as an argument, so this is three more calls on the same params:
+
+- **`_sbRunDCF(mech, params, price, profile)`** — the mechanic dispatcher, extracted from
+  the branch at the top of `runCustomScenario` and passed fresh shallow copies so four
+  runs cannot contaminate each other.
+- **`_sbBuildDeck()`** — $50 / $75 / $100 / $125, the same four prices Fiscal Compare,
+  Country Profile, Side-by-Side and every export use, so a Scenario Builder row is
+  comparable with the other artifacts in the same memo. The base run is reused, not
+  recomputed. `here` marks the column the analyst's own price input is sitting on.
+- **`_sbPriceDeckHtml()`** — a new strip between the three result cards and the hurdle
+  verdict: **Govt take** and **Contractor NPV** across the four prices, the analyst's
+  column highlighted with a ▲, then **price swing ($50 → $125)** and **"$50/bbl downside
+  $X — keeps N% of the $75 NPV"**, which is the Screener's own downside-resilience
+  measure computed on the analyst's terms for the first time. Where the input price is
+  off-deck (e.g. $62) the strip says which number the cards report and marks no column.
+- **`_sbICDeckClause()`** — the deck goes into `window._sbICLine`, so the **copied**
+  artifact carries all four prices, the swing and the downside. Built from the same
+  `window._sbPriceDeck` the strip renders, so screen and clipboard cannot drift.
+
+**One thing the deck made visible that no prose caveat here ever managed.** On a
+fee-basis regime contractor NPV is IDENTICAL at $50 and $125 while government take climbs:
+Iraq TSC returns **$595M at all four prices** as take goes 78.6% → 91.5%; India RSC −$195M
+flat; Iran Buy-back −$1.3B flat. Read off the resilience row that is *"keeps 100% of the
+$75 NPV"* — which would score as the best downside number on the platform and is in fact
+the total absence of price exposure, the Group 2 non-comparability of
+`MECHANIC_COMPARABILITY.md` showing up as a number instead of a warning. `_sbDeckFlatNpv()`
+detects it **from the numbers, not the mechanic name** (so a zero-royalty Concession is not
+mislabelled), suppresses the "keeps N%" read, and prints: *"Contractor NPV does not move
+across the deck ... government take absorbs the whole 12.8pp. Do not read the flat $50
+column as downside resilience: there is no exposure here to be resilient about, and this
+take% is not rankable against a PSC or Concession."* The same clause goes into the IC line.
+
+CSS: `.sb-deck` is a 5-column **grid**, every track `minmax(0, …)`, deliberately **not** a
+table — it compresses rather than scrolling, and carries no `min-width: max-content`.
+
+## Result
+
+The analyst runs their own capex, opex and fiscal terms once and pastes a four-price case
+— downside, base, upside, swing — straight into the IC memo, instead of four hand-merged
+single-price sentences from four separate runs. The $50 downside the Screener admitted the
+country on can now be tested on the analyst's actual project. On a fee-basis regime they
+can no longer mistake flat NPV for downside strength.
+
+## Verification
+
+- JS syntax gate: 11 blocks, **0 errors**.
+- Playwright **RUN this cycle**, not assumed: `293 PASS / 0 FAIL / 1 WARN` against the
+  changed tree on `localhost:8099`, and `293 PASS / 0 FAIL / 1 WARN` against the untouched
+  v732 file served on `localhost:8098`. **Identical — no regression.** The 1 WARN / 1 JS
+  error is the standing service-worker absolute-path 404 (`index.html:49`), local only.
+- All **13 presets / 8 mechanics** exercised end to end (Concession, PSC, TSC, RSC, PRRT,
+  Buy-back, Revenue Share, Gross Split). Deck rendered correctly on every one, including
+  the three flat-NPV cases and the two negative-NPV cases.
+- Horizontal scroll at **1920 / 1440 / 1280 / 1024 / 768 / 390** across all 9 visible tabs
+  AND with the Scenario Builder open and the deck rendered: **zero violations at every
+  width**. Page errors across the same sweep: **zero**.
+- At **390×844 `hasTouch`** the deck measures scrollWidth 313 / clientWidth 313, **0
+  clipped cells**, and the document stays 390/390 with the modal open.
+- Touch targets: **no new controls added**, so the 24px floor is untouched. The deck is
+  static text.
+- Nothing on the STILL LOCKED list touched. No tooltip added as a substitute for a fix,
+  no FAQ, no citation re-wording, no text-only edit — the change is four DCF runs where
+  there was one, and new content on screen and in the clipboard.
+
+## Still open (carried forward, plus this cycle)
+
+**New this cycle, not fixed.** The Scenario Builder's `.page-sub` also promises **IRR** in
+the same breath as the price deck, and IRR is still reported at the single card price only
+— correctly, since `_sbReturnReading()` has three distinct null states per price and a
+four-column IRR row would print "no IRR" three times for the cost-recovery mechanics. Left
+alone deliberately; the hurdle test is the defensible reading and the deck now carries the
+NPV that supports it. Also: `_exportScenariosXLSX()` still requires **Save Scenario** first,
+so the Methodology's repeated "Export each Scenario Builder result to XLSX" has no
+one-click path from a live run — the IC line and the deck are now the paste route.
+
+Unchanged from v732: the 3 state monopolies rendering no Quick IC verdict; `sweetspot`
+returning 143 of 185 with 133 PROXY; the v729 production filter having no Screener preset
+equivalent; `Load Top 5 in Side-by-Side` taking `sorted.slice(0,5)` with Somalia PROXY in
+the cold five; the v601 evidence-chain 2200ms fixed-wait race; `.orca-fp-badge` at 21px
+across four tabs; the Home Screener card and `#tab-btn-tscreener` advertising a `breakeven`
+and an `IRR` filter deleted at v568/v517 — and, found again this cycle, the **Home Fiscal
+Compare card advertising "IRR, and breakeven price"** in the same list; the
+`#screener-count` run-on line (measured at ~700 characters on the IOC Capital Screen this
+cycle); the service-worker absolute path (`index.html:49`, the standing 1 WARN); Screener
+"Copy for IC Memo" firing against an empty `window._cpObsSpread` on a cold load;
+`#cmp-clear-btn` at 23px on desktop; 19 sub-24px controls in `#explorer-screen-mode`;
+v710's `t7` clipped-text regression; `cp-price-select` absent from the DOM; Mozambique's
+"Commercially attractive" verdict; reform coverage 21 of 185; the Methodology/Home
+tier-definition conflict; the FAQ naming a non-existent "Stability Score filter at >=4";
+`FC_PROFILES` / `DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0`; 862 contracts with no
+fiscal terms; the Screener Contractor NPV tooltip naming an absent profile selector; the
+Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic pivot
+averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()` /
+`renderVintage()`; the Breakeven Map price-marker slider inert above $34; the FC/Screener
+shortlists being two independent selections; the CP headline printing `#13 of 21 producers`
+three lines above `12 / 20 producers take less`; the `getEvidenceBar()` chip missing from
+Explorer Browse and IOC Portfolio; the three Screener notes quoting three different term
+counts; the `# Contracts` row printing `7643` without a thousands separator above a row
+printing `Concession (7,643)`; and the two unsequenced Side-by-Side notices giving opposite
+leads on the same column within 400px.
+
+**Version.** v732 -> v733, three display strings, silently at the end. Not the deliverable.
