@@ -40709,3 +40709,16 @@ live and unpartitioned on Explorer Browse and the Bubble Chart, and `getDCFParam
    record. The chain now says so plainly and it is the first thing a T6 walk hits. Whether a
    fee-basis TSC take built on an uncited override should be published alongside Group 1 regimes
    at all is a domain question, not a UX one — flagged for Zach, not actioned.
+
+---
+## Cycle 648 Log — 2026-09-09 10:40
+- Test before: 294 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 648 complete — shipped as **v742**, `cb29e74`, mirrored and pushed to both repos.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest by rotation: 642 was the last T6).
+
+## Friction
+The Country Profile's Evidence Chain builds its rows from a fixed eight-row list and renders every fiscal fact the API happens to hold — whether or not that country's mechanic reads it. Every count and every instruction under the table was then computed over that undiffer
