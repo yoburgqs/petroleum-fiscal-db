@@ -18938,3 +18938,229 @@ subprocess.TimeoutExpired: Command '['claude', '-p', 'You are running the 30-min
 [2026-09-09 13:15:40]       Test edits made to the repo copy DO NOT affect this result.
 [2026-09-09 13:18:54]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
 [2026-09-09 13:18:54] Step 3-6: Running Claude autonomous fix cycle...
+[2026-09-09 13:38:04]   Claude cycle complete. Output length: 3596 chars
+[2026-09-09 13:38:04] Step 7: Re-running Playwright test for validation...
+[2026-09-09 13:38:04] Step 2: Running Playwright test...
+[2026-09-09 13:38:04]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 13:38:04]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 13:38:04]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 13:38:04]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 13:41:19]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 13:41:19] Step 7b: Pixel audit against the local tree (pre-push gate)...
+[2026-09-09 13:42:35]   PIXEL GATE PASS — no surface got worse than baseline
+[2026-09-09 13:42:35] Step 8: Updating GRADER.md cycle log...
+[2026-09-09 13:42:35] Step 9: Pushing to GitHub Pages...
+[2026-09-09 13:42:38]   Push: To https://github.com/yoburgqs/petroleum-fiscal-db.git
+   8810d72..297a062  main -> main
+
+[2026-09-09 13:42:38] Step 10: Sending cycle completion email...
+[2026-09-09 13:42:39]   Email sent.
+[2026-09-09 13:42:40]   current_version v744 -> v745 (from git)
+[2026-09-09 13:42:40] === CYCLE 651 COMPLETE === 297 PASS / 0 FAIL ===
+[2026-09-09 13:15:37] === STARTING CYCLE 651 ===
+[2026-09-09 13:15:37] Step 1: Checking email for Zach replies...
+[2026-09-09 13:15:40]   Email found: 20 message(s) matching 'petroleum':
+
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 632 — 294 PASS / 0 FAIL
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 633 — 2
+[2026-09-09 13:15:40] Step 2: Running Playwright test...
+[2026-09-09 13:15:40]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 13:15:40]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 13:15:40]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 13:15:40]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 13:18:54]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 13:18:54] Step 3-6: Running Claude autonomous fix cycle...
+[2026-09-09 13:38:04]   Claude cycle complete. Output length: 3596 chars
+[2026-09-09 13:38:04] Step 7: Re-running Playwright test for validation...
+[2026-09-09 13:38:04] Step 2: Running Playwright test...
+[2026-09-09 13:38:04]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 13:38:04]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 13:38:04]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 13:38:04]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 13:41:19]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 13:41:19] Step 7b: Pixel audit against the local tree (pre-push gate)...
+[2026-09-09 13:42:35]   PIXEL GATE PASS — no surface got worse than baseline
+[2026-09-09 13:42:35] Step 8: Updating GRADER.md cycle log...
+[2026-09-09 13:42:35] Step 9: Pushing to GitHub Pages...
+[2026-09-09 13:42:38]   Push: To https://github.com/yoburgqs/petroleum-fiscal-db.git
+   8810d72..297a062  main -> main
+
+[2026-09-09 13:42:38] Step 10: Sending cycle completion email...
+[2026-09-09 13:42:39]   Email sent.
+[2026-09-09 13:42:40]   current_version v744 -> v745 (from git)
+[2026-09-09 13:42:40] === CYCLE 651 COMPLETE === 297 PASS / 0 FAIL ===
+[2026-09-09 14:12:40] === STARTING CYCLE 652 ===
+[2026-09-09 14:12:40] Step 1: Checking email for Zach replies...
+[2026-09-09 14:12:42]   Email found: 20 message(s) matching 'petroleum':
+
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 633 — 294 PASS / 0 FAIL
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 634 — 2
+[2026-09-09 14:12:42] Step 2: Running Playwright test...
+[2026-09-09 14:12:42]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 14:12:42]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 14:12:42]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 14:12:42]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 14:15:57]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 14:15:57] Step 3-6: Running Claude autonomous fix cycle...
+[2026-09-09 14:38:24]   Claude cycle complete. Output length: 4467 chars
+[2026-09-09 14:38:24] Step 7: Re-running Playwright test for validation...
+[2026-09-09 14:38:24] Step 2: Running Playwright test...
+[2026-09-09 14:38:24]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 14:38:24]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 14:38:24]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 14:38:24]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 14:41:40]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 14:41:40] Step 7b: Pixel audit against the local tree (pre-push gate)...
+[2026-09-09 14:42:56]   PIXEL GATE PASS — no surface got worse than baseline
+[2026-09-09 14:42:56] Step 8: Updating GRADER.md cycle log...
+[2026-09-09 14:42:56] Step 9: Pushing to GitHub Pages...
+[2026-09-09 14:43:01]   Push: To https://github.com/yoburgqs/petroleum-fiscal-db.git
+   ead3ed6..e3f2edc  main -> main
+
+[2026-09-09 14:43:01] Step 10: Sending cycle completion email...
+[2026-09-09 14:43:03]   Email sent.
+[2026-09-09 14:43:04]   current_version v745 -> v746 (from git)
+[2026-09-09 14:43:04] === CYCLE 652 COMPLETE === 297 PASS / 0 FAIL ===
+[2026-09-09 14:12:40] === STARTING CYCLE 652 ===
+[2026-09-09 14:12:40] Step 1: Checking email for Zach replies...
+[2026-09-09 14:12:42]   Email found: 20 message(s) matching 'petroleum':
+
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 633 — 294 PASS / 0 FAIL
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 634 — 2
+[2026-09-09 14:12:42] Step 2: Running Playwright test...
+[2026-09-09 14:12:42]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 14:12:42]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 14:12:42]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 14:12:42]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 14:15:57]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 14:15:57] Step 3-6: Running Claude autonomous fix cycle...
+[2026-09-09 14:38:24]   Claude cycle complete. Output length: 4467 chars
+[2026-09-09 14:38:24] Step 7: Re-running Playwright test for validation...
+[2026-09-09 14:38:24] Step 2: Running Playwright test...
+[2026-09-09 14:38:24]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 14:38:24]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 14:38:24]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 14:38:24]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 14:41:40]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 14:41:40] Step 7b: Pixel audit against the local tree (pre-push gate)...
+[2026-09-09 14:42:56]   PIXEL GATE PASS — no surface got worse than baseline
+[2026-09-09 14:42:56] Step 8: Updating GRADER.md cycle log...
+[2026-09-09 14:42:56] Step 9: Pushing to GitHub Pages...
+[2026-09-09 14:43:01]   Push: To https://github.com/yoburgqs/petroleum-fiscal-db.git
+   ead3ed6..e3f2edc  main -> main
+
+[2026-09-09 14:43:01] Step 10: Sending cycle completion email...
+[2026-09-09 14:43:03]   Email sent.
+[2026-09-09 14:43:04]   current_version v745 -> v746 (from git)
+[2026-09-09 14:43:04] === CYCLE 652 COMPLETE === 297 PASS / 0 FAIL ===
+[2026-09-09 15:13:04] === STARTING CYCLE 653 ===
+[2026-09-09 15:13:04] Step 1: Checking email for Zach replies...
+[2026-09-09 15:13:07]   Email found: 20 message(s) matching 'petroleum':
+
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 634 — 294 PASS / 0 FAIL
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 635 — 2
+[2026-09-09 15:13:07] Step 2: Running Playwright test...
+[2026-09-09 15:13:07]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 15:13:07]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 15:13:07]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 15:13:07]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 15:16:22]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 15:16:22] Step 3-6: Running Claude autonomous fix cycle...
+[2026-09-09 15:38:15]   Claude cycle complete. Output length: 3237 chars
+[2026-09-09 15:38:15] Step 7: Re-running Playwright test for validation...
+[2026-09-09 15:38:15] Step 2: Running Playwright test...
+[2026-09-09 15:38:15]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 15:38:15]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 15:38:15]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 15:38:15]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 15:41:31]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 15:41:31] Step 7b: Pixel audit against the local tree (pre-push gate)...
+[2026-09-09 15:42:47]   PIXEL GATE FAIL — 0 hard-rule, 1 regression(s)
+[2026-09-09 15:42:47]     phone-390::4-texplorer: clipped-text 0 -> 86
+[2026-09-09 15:42:47] Step 8: Updating GRADER.md cycle log...
+[2026-09-09 15:42:47] Step 9: PUSH BLOCKED — pixel gate failed. The work is committed locally and is NOT live; the next cycle re-runs the gate.
+[2026-09-09 15:42:47] Step 10: Sending cycle completion email...
+[2026-09-09 15:42:48]   Email sent.
+[2026-09-09 15:42:49]   current_version v746 -> v747 (from git)
+[2026-09-09 15:42:49] === CYCLE 653 COMPLETE === 297 PASS / 0 FAIL ===
+[2026-09-09 15:13:04] === STARTING CYCLE 653 ===
+[2026-09-09 15:13:04] Step 1: Checking email for Zach replies...
+[2026-09-09 15:13:07]   Email found: 20 message(s) matching 'petroleum':
+
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 634 — 294 PASS / 0 FAIL
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 635 — 2
+[2026-09-09 15:13:07] Step 2: Running Playwright test...
+[2026-09-09 15:13:07]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 15:13:07]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 15:13:07]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 15:13:07]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 15:16:22]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 15:16:22] Step 3-6: Running Claude autonomous fix cycle...
+[2026-09-09 15:38:15]   Claude cycle complete. Output length: 3237 chars
+[2026-09-09 15:38:15] Step 7: Re-running Playwright test for validation...
+[2026-09-09 15:38:15] Step 2: Running Playwright test...
+[2026-09-09 15:38:15]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 15:38:15]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 15:38:15]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 15:38:15]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 15:41:31]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 15:41:31] Step 7b: Pixel audit against the local tree (pre-push gate)...
+[2026-09-09 15:42:47]   PIXEL GATE FAIL — 0 hard-rule, 1 regression(s)
+[2026-09-09 15:42:47]     phone-390::4-texplorer: clipped-text 0 -> 86
+[2026-09-09 15:42:47] Step 8: Updating GRADER.md cycle log...
+[2026-09-09 15:42:47] Step 9: PUSH BLOCKED — pixel gate failed. The work is committed locally and is NOT live; the next cycle re-runs the gate.
+[2026-09-09 15:42:47] Step 10: Sending cycle completion email...
+[2026-09-09 15:42:48]   Email sent.
+[2026-09-09 15:42:49]   current_version v746 -> v747 (from git)
+[2026-09-09 15:42:49] === CYCLE 653 COMPLETE === 297 PASS / 0 FAIL ===
+[2026-09-09 16:12:49] === STARTING CYCLE 654 ===
+[2026-09-09 16:12:49] Step 1: Checking email for Zach replies...
+[2026-09-09 16:13:19] Step 2: Running Playwright test...
+[2026-09-09 16:13:19]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 16:13:19]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 16:13:19]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 16:13:19]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 16:16:34]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 16:16:34] Step 3-6: Running Claude autonomous fix cycle...
+[2026-09-09 16:12:49] === STARTING CYCLE 654 ===
+[2026-09-09 16:12:49] Step 1: Checking email for Zach replies...
+[2026-09-09 16:13:19] Step 2: Running Playwright test...
+[2026-09-09 16:13:19]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 16:13:19]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 16:13:19]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 16:13:19]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 16:16:34]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 16:16:34] Step 3-6: Running Claude autonomous fix cycle...
+Traceback (most recent call last):
+  File "/Users/yoburg/petroleum-fiscal-db/autonomous_cycle.py", line 562, in <module>
+    main()
+  File "/Users/yoburg/petroleum-fiscal-db/autonomous_cycle.py", line 469, in main
+    claude_summary = run_claude_cycle(directive, grader_tail, test_before, email_content)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/yoburg/petroleum-fiscal-db/autonomous_cycle.py", line 231, in run_claude_cycle
+    result = subprocess.run(
+             ^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.14/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.14/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.12/3.12.14/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/opt/homebrew/Cellar/python@3.12/3.12.14/Frameworks/Python.framework/Versions/3.12/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['claude', '-p', 'You are running the 30-minute autonomous improvement cycle for the ORCA petroleum fiscal platform.\n\nCURRENT TEST RESULTS:\n297 PASS / 0 FAIL / 0 WARN / 0 JS errors\n\nEMAIL FROM ZACH (if any):\nNo new emails\n\n=== ACTIVE DIRECTIVE (authoritative — follow this over anything in GRADER.md) ===\n# LOOP DIRECTIVE — USER IMPACT FOCUS\n**Set by Zach, 2026-08-23. This file is read IN FULL every cycle. It supersedes\nevery directive block inside GRADER.md.**\n\nGRADER.md is now an ARCHIVE — grade tables and cycle logs. It is 1.7 MB and the\nloop only ever saw its first 3,000 characters (0.17%), which were stale\nprohibitions from 2026-08-19. That is why the loop drifted. Do not look to\nGRADER.md for direction. Direction lives here.\n\n---\n\n## THE ONE RULE\n\n**Every cycle must reduce friction for a person trying to do a real job.**\n\nNot a grade. Not a version string. Not a tooltip. Not a FAQ. A person.\n\n## WHO THE PERSON IS\n\nA petroleum investment-committee analyst at a major IOC. They have 20 minutes\nbefore a portfolio screening meeting. They have never used this tool before, or\nthey used it once last month. They are not stupid and they are not patient.\nThey will not read a methodology section to understand a column header.\n\n## HOW TO RUN A CYCLE\n\n**Step 1 — Pick ONE user task from this list.** Rotate; do not pick the same\ntask two cycles running. The cycle log must name which one you picked.\n\n  T1. "Which countries should even be on my screening list?"\n  T2. "Is this one country attractive at $75/bbl, and can I defend that?"\n  T3. "How do these three countries compare side by side?"\n  T4. "What is my fiscal-stability and reform exposure here?"\n  T5. "Give me something I can paste straight into an IC memo."\n  T6. "Where did this number come from and how solid is the evidence?"\n\n**Step 2 — Actually walk the task end to end in the code.** Start from a cold\nload (no sessionStorage, no localStorage). Trace the real DOM and the real JS\npath a first-time user would hit — the elements, the handlers, the render\nfunctions, the empty states. Do not reason from the changelog. Do not reason\nfrom what GRADER.md claims is done. Read what the page actually does.\n\n**Step 3 — Find the WORST moment in that walk.** The single point where this\nanalyst would stop, squint, guess wrong, click the wrong thing, or give up. One\nmoment. The worst one. Not a list of ten small ones.\n\n**Step 4 — Fix that moment.** Change behavior or layout so the moment stops\nhappening.\n\n**Step 5 — State the impact in user terms, in the commit and the cycle log:**\n  - Task: which of T1–T6\n  - Friction: what the analyst hit, and where (element / function / line)\n  - Change: what is now different on screen or in behavior\n  - Result: what the analyst can now do that they could not do before\n\nIf you cannot write Step 5 without vague words like "improved", "enhanced",\n"clarity", or "polish", you have not made a real change. Go back to Step 3.\n\n**Step 5b — Check it on a phone.** Set by Zach 2026-08-30: *"make sure we stay on\ncourse for finalization of oil gas expertise fiscal ux including mobile defaults."*\n\nEvery cycle now verifies its own change at **390 x 844 with `hasTouch: true`**, not\nonly at desktop width. Two numbers, both cheap to measure:\n\n  - `document.documentElement.scrollWidth` must not exceed `clientWidth`. If your\n    change made the page scroll sideways on a phone, it is not done.\n  - No control you added or touched may render under 24px tall under\n    `pointer: coarse`.\n\nThis is in the directive because the loop has already broken it once: v579 left\nmobile clean, and by v611 four screens scrolled sideways again and Reform Risk alone\nhad 15 overflowing elements. Nothing in the cycle was looking, so nothing caught it.\n\n**Step 6 — Verify.** JS syntax gate must PASS. Playwright must actually RUN —\ndo not record a number "based on prior clean baseline". If the test did not run\nthis cycle, say so in the log.\n\n## HARD BANS — these are not improvements, do not spend a cycle on them\n\n- **Rubric chasing.** Do not read the 15-category grade table and work the\n  lowest rows. 14 of 15 are self-assessed A+; the rubric is at ceiling and has\n  stopped carrying information. Grade tables are a record, not a work queue.\n- **Version sweeps as the deliverable.** Bumping v490 to v491 across 43\n  locations is bookkeeping. Do it silently at the END if you shipped something\n  real. It is never the reason a cycle happened, and it does not go in the\n  summary as an improvement.\n- **Changelog catch-up.** Same. Bookkeeping.\n- **New tooltips.** The tooltip audit finished at v448. Every column header,\n  mechanic tag, waterfall line and Scenario Builder input already has one. A\n  tooltip is what you add when you cannot fix the underlying confusion — fix\n  the underlying confusion instead.\n- **New FAQs.** Frozen at 974. Nobody reads FAQ 975.\n- **Citation-string micro-edits.** The IC citation now carries take, NPV, IRR\n  and breakeven. It is done. Stop re-wording it.\n- **Text-only changes.** If the rendered layout and the interactive behavior are\n  both identical after your edit, it was not a cycle.\n\n## WHAT A GOOD CYCLE LOOKS LIKE\n\nRecent cycles that were genuinely good, for calibration:\n\n- **v451** — deleted the Govt NPV column from Fiscal Compare because the "not\n  independently modeled" caveat made it untrustworthy at the decision point.\n  Removing a thing was the improvement.\n- **v450/v452** — CP headline rebuilt into two zones with global rank and a\n  vs-median pill, so the analyst reads position, not just a number.\n- **v460 (screener preset clear)** — found a button that called the wrong\n  function and had been silently failing. Real bug, real user impact.\n- **cycle 344** — found USA filed under region "Other", invisible to every\n  region filter. Data bug surfaced by walking the user\'s actual path.\n\nNotice: all four came from walking a flow, not from reading a rubric.\n\n## STILL LOCKED — do not revert (compressed from the GRADER archive)\n\n- **v371/v373 declutter:** no page-sub paragraphs, no amber instructional\n  banners, no routing hints, no "How to read" blocks, no SbS card wrapper, no\n  visible Explorer chip rows. Explorer analytics, Screener advanced filters and\n  Home "More tools" stay collapsed by default. Screener presets stay a dropdown.\n- **v430:** FC IC Analyst Guide starts OPEN with sessionStorage collapse memory.\n  Keep the sessionStorage logic.\n- **v449:** CP headline take% stays tier-coloured (green≤40 / yellow≤60 /\n  orange≤75 / red>75). Screener row-click hint stays.\n- **v451:** CP headline stays two-zone. Govt NPV column stays REMOVED from FC.\n  Contractor NPV header stays "NPV ($M)". Take% cell stays 14px.\n- **v452:** CP headline Zone A keeps global rank + vs-median pill, computed\n  before the headline strip to avoid the TDZ error.\n- **v489:** Reform Risk stays in the primary Home card grid.\n- **v612 mobile layer — do not remove, weaken or narrow its scope.** The block\n  headed `v612 — MOBILE LAYER` and the `translateX` state on `#reference-panel`.\n  It is deliberately scoped to `pointer: coarse` and `max-width: 720px`, so it\n  changes nothing on a desktop: Fiscal Compare still measures 382 of 601 controls\n  under 24px with a mouse, and 3 with a thumb. If a cycle finds it in the way, the\n  answer is to narrow the selector, never to delete the rule.\n  - `#reference-panel` must never go back to a negative `right` offset. A fixed\n    element parked off-canvas that way extends the document\'s scroll width, which\n    is what made all twelve screens scroll 390px sideways on a phone.\n  - Rows that must scroll rather than wrap opt out with `min-width: max-content`.\n    That marker is load-bearing — the wrap rule keys off its absence.\n- Tab order is not to be restructured without Zach\'s explicit approval.\n\n## WHAT "FINISHED" MEANS\n\nSet by Zach 2026-08-30. The course is **finalization of the oil & gas expertise\nfiscal UX**, and nothing else. Career is on hold — if a cycle finds itself doing\ncareer work, something has misrouted and the cycle should stop and say so.\n\nFinalization is these five, all measured against the deployed build, none of them\nself-assessed:\n\n  1. Runtime suite green, and the number actually read from the suite\'s own report\n     rather than assumed. (Cycles 506-516 shipped while the gate read nothing.)\n  2. Zero horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390.\n  3. Zero controls under 24px under `pointer: coarse`.\n  4. Zero console and page errors across every tab.\n  5. Every export opens, parses, and carries the assumptions behind its numbers.\n\nWhen all five hold, a cycle that finds nothing should say so and stop, rather than\ninvent work. That is a finished product, not a failed cycle.\n\n## IF YOU FIND NOTHING\n\nYou have not looked hard enough — but do not invent work to fill the cycle. A\ncycle that ships nothing and says honestly "walked T3 cold, found no friction\nworse than X, which is minor" is worth more than a version sweep dressed up as\nan improvement. Log it and stop.\n\n=== END DIRECTIVE ===\n\nRECENT CYCLE HISTORY (last few cycles, for context — do NOT repeat this work):\n, name, region) | 5 — **incl. Govt Take** |\n| Numbers on screen without swiping | **none** | take, tier colour, fee-basis correction |\n| Table width | 1435px | 1023px |\n| Row height | 230px | 72px |\n| Rows visible per screen | ~3.5 | 9 |\n| Country name during horizontal swipe | scrolls away | **pinned** |\n| Distance to Contractor NPV | x=923 (563px off-screen) | x=512, one short swipe, name pinned |\n\nAn analyst on a phone can now rank a screening shortlist by government take without touching\nthe table horizontally, see which of those takes are fee-basis corrections, and swipe once to\ncontractor NPV while still knowing which country they are reading. Before this cycle they read\neleven country names and a truncated "REGI…" header, and not one number.\n\n### Verification — measured, not assumed\n\n- **Runtime suite RAN this cycle, both sides**, read from each run\'s own `ORCA_REPORT_FILE`,\n  against the same suite over `http://localhost:8xxx`. The "before" side was served from a\n  **pristine copy of v746 on a second port**, not from the working tree, because a first\n  attempt overlapped the edits and was discarded as untrustworthy.\n  **Before (v746): 293 PASS / 0 FAIL / 1 WARN. After (v747): 293 PASS / 0 FAIL / 1 WARN.**\n  No regression. The cycle prompt again carried **297 PASS**, which is the deployed GitHub\n  Pages figure; local scores 293. Recorded rather than restated, per finalization test #1.\n  The single console error is the same `sw.js` 404 in both runs — an artifact of serving the\n  tree from a localhost root rather than the `/petroleum-fiscal-db/` scope the service worker\n  registers against.\n  - A first `timeout 900 node …` invocation failed with `command not found: timeout` (not a\n    macOS builtin) and wrote nothing. Caught because the report file was deleted first — this\n    is precisely the blind-gate failure recorded in the repo\'s own post-cutover notes.\n- **JS syntax gate: PASS**, 11 inline blocks, re-checked after the version bump.\n- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all ten tabs. An earlier\n  sweep of this used wrong tab-button ids and silently no-opped on five tabs; redone against\n  the ids read off the live `.tab-btn` list.\n- **Console / page errors: 0** at all six viewports, all ten tabs.\n- **Touch targets:** controls under 24px at `pointer: coarse` are **identical before and after**\n  — Home 1, Country Profile 3, Screener 17 — measured with the same probe against the pristine\n  v746 baseline. All pre-existing; the 17 on the Screener are the collapsed Advanced-Filters\n  mechanic/IOC grid checkboxes the v612 comment explicitly declined to widen. None introduced\n  by this cycle.\n- **Desktop proven unchanged, not assumed:** at 1440 the screener table measures 1419px on both\n  builds, all 12 header x/width pairs are identical, every cell is still `position: static`, and\n  `#sc-mobile-cols-note` is not rendered. At **768** the table is still 1419px with 12 columns\n  and a static country cell; the layer engages at **720** and below.\n- **STILL LOCKED respected:** the v612 mobile layer has no selector narrowed, weakened or\n  removed; `#reference-panel` untouched; no negative offsets added; no tooltip, FAQ or\n  citation-string edit; no tab reordering; CP headline zones, tier colouring, rank and\n  vs-median pill untouched; Govt NPV stays removed from Fiscal Compare.\n\n---\n## Cycle 653 Log — 2026-09-09 15:42\n- Test before: 297 PASS / 0 FAIL\n- Test after: 297 PASS / 0 FAIL\n- JS errors: 0\n- Summary: Cleanup of the two temp localhost servers was declined, so they\'re still running on ports 8099/8100 along with `/tmp/orca_base` (a copy of v746 plus symlinks) — harmless, but worth clearing manually if you want them gone.\n\n## Cycle 653 — T1, shipped as v747\n\n**Task:** T1 — *"Which countries should even be on my screening list?"* Stalest by rotation (647 T1 · 648 T6 · 649 T3 · 650 T4 · 651 T5 · 652 T2).\n\n**Friction.** The desktop T1 path is genuinely in good shape — I walked it cold and found not\n\n\nYOUR TASKS (execute all in order, no stopping):\n1. Pick ONE user task (T1-T6) from the directive. Do not repeat the task used in\n   the most recent cycle shown above.\n2. Walk that task end to end in /Users/yoburg/petroleum-fiscal-db/index.html from a COLD load — no\n   sessionStorage, no localStorage. Read the real DOM and the real JS handlers.\n   Do not reason from the changelog or from what GRADER.md claims is done.\n3. Identify the single WORST friction moment in that walk — the one point where\n   the analyst stops, guesses wrong, or gives up.\n4. Fix that one moment by changing behavior or layout in index.html. Then commit.\n   Respect every item in the directive\'s STILL LOCKED list.\n5. Copy index.html to /Users/yoburg/office/projects/oil-gas-expertise/fiscal_db_interface.html\n6. Run: cd /Users/yoburg/petroleum-fiscal-db && git push origin main\n7. Append a cycle log entry to GRADER.md stating, in this order:\n   Task (which of T1-T6) / Friction (what and where) / Change (what is different\n   on screen) / Result (what the analyst can now do). Grade tables are optional\n   and are NOT the point of the cycle.\n8. Return that same Task/Friction/Change/Result summary in plain English.\n\nThe measure of this cycle is whether a real analyst is less frustrated than they\nwere an hour ago. Not the grade table. If you did not change what the user sees\nor does, the cycle failed — say so honestly rather than shipping a version sweep.\n\nDo NOT ask for confirmation. Execute all steps autonomously.', '--allowedTools', 'Read,Edit,Write,Bash,Glob,Grep']' timed out after 1800 seconds
+[2026-09-09 17:16:34] === STARTING CYCLE 655 ===
+[2026-09-09 17:16:34] Step 1: Checking email for Zach replies...
+[2026-09-09 17:16:37]   Email found: 20 message(s) matching 'petroleum':
+
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 635 — 294 PASS / 0 FAIL
+  Tue, 08 Sep 2026   ztuchman@gmail.com         [Petroleum] Cycle 636 — 2
+[2026-09-09 17:16:37] Step 2: Running Playwright test...
+[2026-09-09 17:16:37]   *** SUITE COPIES HAVE DIVERGED ***
+[2026-09-09 17:16:37]       graded (runs): /Users/yoburg/office/tools/petroleum/tests/runtime_comprehensive.js  sha=6cf91e5ce9c7
+[2026-09-09 17:16:37]       repo   (idle): /Users/yoburg/petroleum-fiscal-db/tests/runtime_comprehensive.js  sha=74bd8d60bf15
+[2026-09-09 17:16:37]       Test edits made to the repo copy DO NOT affect this result.
+[2026-09-09 17:19:52]   Test: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors
+[2026-09-09 17:19:52] Step 3-6: Running Claude autonomous fix cycle...

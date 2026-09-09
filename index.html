@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v748</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v749</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -298,6 +298,21 @@ tbody td { padding: 6px 10px; white-space: nowrap; }
 .take-mod { color: var(--yellow); }
 .take-hi  { color: var(--orange); }
 .take-noc { color: var(--red);    }
+
+/* v748 (T6) — generic-default MODEL cells in Fiscal Compare.
+   116 of 189 rows hold no country-specific terms in the compare engine, so both model
+   columns print the same mechanic constant: an identical 22.2% and an identical $4.3B.
+   Rendered in the tier-coloured .take-val pill that constant took takeClass(22.2) ->
+   .take-if, i.e. BOLD GREEN "investible", on Venezuela, UAE, Qatar and Russia — whose
+   citable takes are 74.9 / 74.6 / 74.5 / 46.4. The v563 divider that partitions these
+   rows is conditional on sort mode (_fcGenericLast = sortField !== 'country') and
+   vanishes the moment the analyst clicks Country to look one country up. This marking
+   lives on the cell, so it cannot switch off with the sort. */
+.fc-gen-val { font-weight: 500; color: var(--muted); }
+.fc-gen-tag { display: inline-block; margin-left: 5px; font-size: 9px; font-weight: 700;
+  letter-spacing: .05em; text-transform: uppercase; color: var(--muted);
+  border: 1px dashed var(--muted); border-radius: 3px; padding: 0 3px; line-height: 13px;
+  vertical-align: 1px; opacity: .85; }
 
 /* ── comparison ── */
 .compare-grid { display: grid; grid-template-columns: 160px repeat(4, 1fr); gap: 0; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
@@ -2177,7 +2192,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v748</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v749</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2247,7 +2262,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v748</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v749</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -47074,11 +47089,34 @@ function renderFCResults(results, price) {
       html += _monoCell('n/c', _monoWhy);
       html += _monoCell('\u2014', _monoWhy);
     } else {
+      // ── v748 (T6): the two MODEL columns on a generic-default row ────────────────
+      // termsBasis === 'default' means the compare engine holds no country-specific terms,
+      // so BOTH model figures are the mechanic constant -- 116 of 189 rows print an
+      // identical 22.2% and an identical $4.3B. Through the tier-coloured take-val pill
+      // that constant rendered bold GREEN, because takeClass(22.2) returns 'take-if', the
+      // investible tier. Venezuela, UAE, Qatar and Russia therefore carried a green
+      // investible take against citable figures of 74.9 / 74.6 / 74.5 / 46.4.
+      // The only thing separating those rows was the v563 divider, and that is conditional
+      // on sort mode -- click the Country header for A-Z and the partition disappears and
+      // the constants interleave with real numbers in identical styling. Marking the cell
+      // itself holds in every sort.
+      if (r.termsBasis === 'default') {
+        var _genWhy = r.country + ': ORCA holds no country-specific terms for this row in the compare engine, '
+          + 'so this figure is the standard ' + r.mechanic + ' default and is identical on every G row of that '
+          + 'mechanic. It used none of ' + r.country + '\u2019s own fiscal record. Not citable \u2014 the citable '
+          + 'figure is the green db column beside it.';
+        html += '<td class="num" title="' + _genWhy + '"><span class="fc-gen-val">' + r.liveTake.toFixed(1) + '%</span><span class="fc-gen-tag">default</span></td>';
+        html += _fcDbTakeCell(r);
+        html += '<td class="num" title="' + _genWhy + '"><span class="fc-gen-val">' + npvStr + '</span><span class="fc-gen-tag">default</span></td>';
+        html += _fcDbNpvCell(r);
+        html += '<td class="num">' + beStr + '</td>';
+      } else {
       html += '<td class="num"><span class="take-val ' + takeClass(r.liveTake) + '" style="font-size:14px;padding:2px 7px;">' + r.liveTake.toFixed(1) + '%</span></td>';
       html += _fcDbTakeCell(r);
       html += '<td class="num">' + npvStr + '</td>';
       html += _fcDbNpvCell(r);
       html += '<td class="num">' + beStr + '</td>';
+      }
     }
     html += '<td class="num">' + (r.swing != null ? '<span style="color:' + swingCol + ';font-weight:600">' + (r.swing > 0 ? '+' : '') + r.swing.toFixed(1) + 'pp</span>' : '\u2014') + '</td>';
     // v505: The Quality column used to show the country's A/B evidence tier on every row.
