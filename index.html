@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v736</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v737</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2058,7 +2058,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v736</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v737</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2128,7 +2128,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v736</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v737</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -28123,16 +28123,76 @@ function renderCompare() {
   // $1.7B contractor NPV against Guyana at 54.1% and $1.1B. Detected and named on screen when it
   // occurs, instead of being discovered in the IC room.
   const _cmpEcon = selected.filter(d => d.take_75 != null && d.npv_75 != null);
-  const _cmpInv = [];
+  // v737 (T3): THE BASIS GATE REACHES THE INVERSION NOTICE — the last block on this tab that
+  // still compared a production-weighted column against a statutory-terms column at face value.
+  //
+  // v626 gated the four Govt Take rows, v705 gated the four Contractor NPV rows, v684 gated the
+  // take line chart and the NPV bar chart draws an excluded column as a faded dashed bar. All of
+  // them refuse, on a mixed set, to place a no-production column against a producer: the take
+  // cell reads “not ranked · statutory terms” and the NPV cell reads “not comparable · statutory
+  // terms”. This notice then read the SAME two numbers off the SAME two columns and printed
+  // “Brazil takes more of the barrel than Guyana (55.6% vs 54.1%) and still shows more contractor
+  // NPV ($1.7B vs $1.1B)” — in a red-bordered box, headed as a paradox, three inches below the
+  // cells that refuse both halves of that sentence. And it is carried verbatim into the IC-memo
+  // clipboard as a numbered comparability note, so it leaves the platform.
+  //
+  // Measured over the shipped country_data.json, on 3-country sets that MIX the two bases — the
+  // ordinary T3 shape, since only 21 of 185 countries carry verified production:
+  //     mixed-basis 3-country sets                    315,126
+  //     notice fires                                   77,389  (24.6%)
+  //     pairs it prints                                89,792
+  //       of those, CROSS-basis                        72,556  (80.8%)
+  //     sets where EVERY printed pair is cross-basis    60,153  (77.7% of fired)
+  // So in 60,153 sets the analyst is shown a fiscal paradox that is entirely the basis artefact
+  // the rest of the tab exists to flag — the take gap is not established and the NPV gap is the
+  // 2.4x proxy premium v705 measured, not a better project.
+  //
+  // Same rule, same membership, same words as v626/v705: `_cmpHasProd` / `getProducerContext().inSet`.
+  // A same-basis inversion is REAL and keeps its wording character-for-character — an all-producer
+  // set and an all-frontier set are byte-identical to what shipped. Only the cross-basis pairs
+  // change, and they are now reported as what they are.
+  const _cmpInv = [], _cmpInvX = [];
   for (let _i = 0; _i < _cmpEcon.length; _i++) {
     for (let _j = 0; _j < _cmpEcon.length; _j++) {
       if (_i === _j) continue;
       const _a = _cmpEcon[_i], _b = _cmpEcon[_j];
-      if (_a.take_75 > _b.take_75 && _a.npv_75 > _b.npv_75) _cmpInv.push([_a, _b]);
+      if (_a.take_75 > _b.take_75 && _a.npv_75 > _b.npv_75) {
+        ((_cmpBasisGate && _cmpHasProd(_a) !== _cmpHasProd(_b)) ? _cmpInvX : _cmpInv).push([_a, _b]);
+      }
     }
   }
+  const _invGap = (x, y) => (y[0].npv_75 - y[1].npv_75) - (x[0].npv_75 - x[1].npv_75);
+  // The cross-basis line names the pair and both figures — the analyst must still be able to see
+  // WHICH columns provoked it — but it never asserts that one takes more of the barrel than the
+  // other, because on this set that ordering is not established.
+  let _xHtml = '';
+  if (_cmpInvX.length) {
+    _cmpInvX.sort(_invGap);
+    const _x = _cmpInvX[0];
+    const _stat = _cmpHasProd(_x[0]) ? _x[1] : _x[0];
+    const _pw   = _cmpHasProd(_x[0]) ? _x[0] : _x[1];
+    _xHtml = '<strong style="color:var(--text);">⚠ '
+      + _cmpEsc(_stat.country) + ' and ' + _cmpEsc(_pw.country)
+      + ' cannot be ranked against each other on either row.</strong> '
+      + 'Their take and NPV figures do invert (' + _cmpEsc(_x[0].country) + ' ' + _x[0].take_75.toFixed(1) + '% / '
+      + fmtNpvShared(_x[0].npv_75) + ' against ' + _cmpEsc(_x[1].country) + ' ' + _x[1].take_75.toFixed(1) + '% / '
+      + fmtNpvShared(_x[1].npv_75) + ')'
+      + (_cmpInvX.length > 1 ? ', as ' + (_cmpInvX.length === 2 ? 'does 1 further cross-basis pair'
+          : 'do ' + (_cmpInvX.length - 1) + ' further cross-basis pairs') + ' in this set' : '')
+      + ' — but ORCA holds no verified field production for <strong style="color:var(--text);">'
+      + _cmpEsc(_stat.country) + '</strong>, so that column’s take is a simple average of statutory terms and its NPV '
+      + 'is the standardized profile run over those terms. This is the same exclusion the '
+      + '<em>Rank among producers</em> row, the four <em>Govt Take</em> rows and the four '
+      + '<em>Contractor NPV</em> rows already apply to it, where it reads <em>not ranked · statutory '
+      + 'terms</em> and <em>not comparable · statutory terms</em>. Across the database the basis '
+      + 'difference alone is worth about 33 percentage points of take and about 2.4x of contractor '
+      + 'NPV, and all 20 of the highest contractor NPVs in the database are no-production columns — '
+      + 'so an inversion between these two reports the basis, not a fiscal finding. '
+      + '<strong style="color:var(--text);">Do not carry this pair into an IC memo as a take/NPV '
+      + 'paradox.</strong> Compare ' + _cmpEsc(_stat.country) + ' against other statutory-basis columns.';
+  }
   if (_cmpInv.length) {
-    _cmpInv.sort((x, y) => (y[0].npv_75 - y[1].npv_75) - (x[0].npv_75 - x[1].npv_75));
+    _cmpInv.sort(_invGap);
     const _pair = (pr) => '<strong style="color:var(--text);">' + _cmpEsc(pr[0].country) + '</strong> takes more of the barrel than '
       + '<strong style="color:var(--text);">' + _cmpEsc(pr[1].country) + '</strong> (' + pr[0].take_75.toFixed(1) + '% vs '
       + pr[1].take_75.toFixed(1) + '%) and still shows more contractor NPV (' + fmtNpvShared(pr[0].npv_75) + ' vs '
@@ -28146,7 +28206,15 @@ function renderCompare() {
       + 'The four <strong style="color:var(--text);">Govt Take</strong> rows are production-weighted on every column ORCA holds verified production for, and a simple average of statutory terms on the columns marked <em>statutory terms</em> on those rows. The three <strong style="color:var(--text);">Contractor NPV</strong> rows are an unweighted mean of every contract’s result, with production ignored — the <em>NPV weighting</em> row marks every column where the two differ. '
       + 'Across all 185 countries the pre-take project value these two rows jointly imply ranges from <strong style="color:var(--text);">$1.3B to $9.6B</strong> on a profile that is identical for every column, so they are not two views of one cash flow and cannot be ranked against each other. '
       + '<strong style="color:var(--text);">Rank these countries on Govt Take</strong>, which is the production-weighted figure this platform publishes, and read the NPV rows as each country’s contract-set average. If this table goes into an IC memo, do not present the NPV ordering as the fiscal ranking.'
+      + (_xHtml ? '<br><br>' + _xHtml : '')
       + '</div>';
+  } else if (_xHtml) {
+    // No same-basis inversion in this set, so there is no take/NPV paradox to report and the
+    // v531 heading would be a false claim. 60,153 of the 77,389 mixed 3-country sets that fire
+    // land here. The box stays -- an unexplained inversion the analyst can see on the grid is
+    // its own confusion, which is why v531 exists -- but it says what the inversion actually is.
+    html += '<div class="cmp-notice" style="margin-top:10px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
+      + _xHtml + '</div>';
   }
   // v515: the Economics block used to carry a row headed "IRR @$75 (%)" and it was not an IRR.
   // rebuild_country_data.py computes it as AVG(irr_pct) over every contract in the country with
