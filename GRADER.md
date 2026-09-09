@@ -41096,3 +41096,16 @@ tree over `http://localhost:8080`, this cycle.
 - Tie-out checked live for six operators (Shell, Chevron, Equinor, Kosmos Energy,
   ConocoPhillips, Eni); Shell's weighted take and contract and country counts match the headline
   tile exactly.
+
+---
+## Cycle 651 Log — 2026-09-09 13:42
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 651 complete. Clean tree, `origin/main` in sync, mirror updated.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** (Rotation: 650 was T4; T5 last walked at 645.) Walked cold at 1440×900 with no sessionStorage or localStorage, exercising all seven IC-copy affordances against the real clipboard and reading both the plain-text and HTML flavours back. Five of seven were sound.
+
+## Friction
+**The IOC Portfolio fiscal-exposure annex was built from a single legal entity,
