@@ -39722,3 +39722,126 @@ giving opposite leads on the same column within 400px.
 
 ## Task
 **T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by rotation (639 ran T5, 638 T4, 637 T3, 636 T6, 635 T1; T2 last walked at cycle 633). Walked cold at 1440×
+
+---
+## Cycle 641 Log — 2026-09-09 08:45 — shipped as v735 (`b023c71`)
+- Test before: 294 PASS / 0 FAIL (deployed baseline, from the cycle email)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — suite RUN this cycle against
+  `http://localhost:8899/index.html`. The 1 WARN is the standing service-worker 404 that only
+  exists off the GitHub Pages path (same as cycles 636 and 640).
+- JS errors: 0 page errors, desktop 1440x900 and mobile 390x844 hasTouch
+- JS syntax gate: PASS (11 blocks)
+
+## Task
+**T1 — "Which countries should even be on my screening list?"** Stalest by rotation (640 ran T2,
+639 T5, 638 T4, 637 T3, 636 T6 — T1 last walked at cycle 635). Walked cold at 1440x900 and again
+at 390x844 `hasTouch`, `sessionStorage` and `localStorage` cleared on every load. Route: Home
+card grid → Screener (preset menu, all 11 presets, the four price decks, the take / NPV / NPV@$50
+/ evidence sliders, the empty-ish tail states) → Browse → Bubble.
+
+The Screener itself held up. The v668 proxy action, the v729 production filter, the v699
+deck-following `% of $X kept` sub-heading and the v651 preset hit-counts all behaved: switching
+the deck to $100 recomputed all 11 preset counts from "→ 15 of 185 @$75" to "→ 12 of 185 @$100",
+and the count bar and column sub-heading followed. The friction was one mode over, in Browse.
+
+## Friction
+`renderExplorer()` — the comparator at `index.html:25395` and the sort chain at `:25408`.
+
+Choosing **Breakeven** from the Sort menu is the most direct expression of T1 there is: rank the
+countries by the price at which they stop making money. It returned a ranking led by rows that
+hold no breakeven at all. Measured off the live DOM:
+
+| rank | country | Breakeven cell |
+|---|---|---|
+| 1 | Saudi Arabia | `—` |
+| 2 | Australia | `<$50` |
+| 3 | Argentina | `<$50` |
+| 4–22 | Angola, Azerbaijan, Brazil, Canada, China, Colombia, Ecuador, India, … | `—` |
+| 24 | Bahrain | `—` |
+| 25 | Kuwait | `—` |
+| 26 | Belgium | `<$50` |
+
+Twenty of the top twenty-two rows printed an em dash. Two causes, independent:
+
+**1. The sentinel was read as data.** `case 'be': va = a.be_75 ?? 999`. Bahrain, Kuwait and Saudi
+Arabia carry `be_75 = 1.0` alongside `take_75 = 100.0`, `npv_75 = 0.0` and `irr_75 = -100.0` —
+the state-monopoly placeholder meaning *no contractor position exists to model*, not a $1/bbl
+breakeven. Every other consumer of the field already knew this and guarded `> 1`: the BE-only
+filter (`:25368`), the breakeven cell renderer (`:25520`, whose own inline comment reads
+`<=1 is state-monopoly sentinel`), the `_beIsTested()` leaderboards, the Fiscal Compare tie
+groups via `_fcMonopoly()`, and the CSV. One of ~15 readers disagreed with the other 14, and it
+was the one that decides rank order. So the three monopolies sorted *ahead of Belgium at $27* —
+the genuine lowest breakeven in the database — at the top of a screening list.
+
+**2. Data basis outranked data presence.** v578 sorts `dqRank` before the metric. Only 2 of the
+22 production-backed countries hold a tested breakeven, so ranks 1–22 were the verified block
+with almost nothing to rank inside it. Correct for take / NPV / IRR, which are populated for all
+185; wrong for the one metric that is modelled for 65.
+
+**3. And the column could not be read even once ordered.** Every modelled breakeven in the
+database falls between **$27 and $34**. `formatBreakeven()` ended `if (val < 50) return '<$50'`,
+so that branch caught all 65 of them and the column printed one identical six-character string
+down its entire length. Rank 3 (Belgium, $27) and rank 65 (France, $34) rendered the same. The
+bucket was a hedge against the negative sentinels — which are already handled two lines above it.
+
+## Change
+- **`_beTested(d)`** — one predicate for "holds a rankable breakeven", excluding null (120
+  countries), the `<= 1` monopoly sentinel (3) and the `>= 999` no-solution marker. The `be`
+  comparator now uses it, so the monopolies leave the ranking.
+- **On the `be` sort only, breakeven presence is the top-level split.** The 65 countries that
+  hold one are ranked — v578's verified-first grouping still applies *within* them, and its
+  divider is scoped to that block — and the other 120 sit below a new labelled line that names
+  the three monopolies ("no contractor position exists to break even, which is not the same as
+  breaking even cheaply") and points at the **BE only** filter. Every other sort is byte-for-byte
+  unchanged: take, NPV, IRR, swing, stability and evidence are populated for all 185 and have no
+  unrankable block to separate. Verified per-sort — basis dividers 1, be dividers 0, on all five.
+- **The count line states coverage before the row numbers are read:** *"ranked on breakeven for
+  the 65 countries ORCA models one for; the other 120 print — and are listed below the line, not
+  ranked"*. The column header already said `(68/185 COUNTRIES)`, but that is a caption on a
+  column, not a statement about what the rank numbers mean.
+- **`formatBreakeven()` prints a modelled figure as a figure.** The negative sentinels (`-1`,
+  `<= 0`) still print `<$50` — the one case where "below the modelled floor" is the honest
+  answer — and `<= 1` still prints `—`, `>= 999` still prints `>$125`. No test pins the old
+  string.
+- **Coverage count corrected, 68 → 65, in 15 places** (Explorer header and coverage strip, FC
+  sort button and legend, Breakeven Map footer and tfoot, Methodology, the stat tile, FAQ A381,
+  the drilldown header). 68 counts the three sentinels. 65 is what the platform's own filter
+  returns and what the new divider says, and the two numbers were about to appear on one screen.
+
+## Result
+Sorting Browse by Breakeven now returns **$27, $27, $27, $27, $28, $28, $28, $28, $29 … $32,
+$33, $34** — a monotonic ranking of the 65 countries ORCA models a breakeven for. Rank 1 is
+Australia at $28 (the best production-backed one), the divider then hands over to Belgium, the
+Faroes, the Netherlands and Sweden at $27, and the analyst is told in the same view that the 120
+rows underneath are a list rather than a ranking. Position 1 is no longer a 100%-take state
+monopoly with $0M contractor NPV and an em dash in the column being sorted, and the analyst can
+now read both order *and* magnitude off the Breakeven column instead of 65 rows of `<$50`.
+
+## Still open (carried forward)
+Unchanged from v734, and not touched this cycle: the `IRR:` headline chip that renders a label
+with no value; the 7 countries with fewer than 8 comparable regimes in range reading the
+all-country r² clause; the Scenario Builder `.page-sub` promising an IRR the deck does not carry;
+`_exportScenariosXLSX()` requiring Save Scenario first; the 3 state monopolies rendering no Quick
+IC verdict; `sweetspot` returning 143 of 185 with 133 PROXY; the v729 production filter having no
+Screener preset equivalent; `Load Top 5 in Side-by-Side` taking `sorted.slice(0,5)`; the v601
+evidence-chain 2200ms fixed-wait race; `.orca-fp-badge` at 21px across four tabs; the Home
+Screener card and `#tab-btn-tscreener` advertising a `breakeven` and an `IRR` filter deleted at
+v568/v517; the `#screener-count` run-on line; the service-worker absolute path (`index.html:49`,
+the standing 1 WARN); `#cmp-clear-btn` at 23px on desktop; 19 sub-24px controls in
+`#explorer-screen-mode`; v710's `t7` clipped-text regression; `cp-price-select` absent from the
+DOM; Mozambique's "Commercially attractive" verdict; reform coverage 21 of 185; the
+Methodology/Home tier-definition conflict; `FC_PROFILES` / `DCF_PROFILES` divergence; the empty
+"Recent Platform Updates" placeholder; Kuwait's evidence tier; 862 contracts with no fiscal
+terms; unweighted per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
+`renderVintageTrendChart()` / `renderVintage()`; the Breakeven Map price-marker slider inert
+above $34; the FC/Screener shortlists being two independent selections; the CP headline printing
+`#13 of 21 producers` three lines above `12 / 20 producers take less`; the `getEvidenceBar()`
+chip missing from Explorer Browse and IOC Portfolio; the `# Contracts` row printing `7643`
+without a thousands separator.
+
+**New, not fixed.** The three state monopolies still carry `be_75 = 1.0` in `country_data.json`
+rather than null. Every reader now guards it, so nothing on screen is wrong — but the guard is
+defensive and a fourth monopoly added later would arrive unguarded in any new code path. The
+real fix is upstream, in whatever writes that field.
+
+**Version.** v734 → v735, 3 display strings, silently at the end. Not the deliverable.
