@@ -2357,12 +2357,23 @@ async function testScreenerTakeSortRender(page) {
     const read = () => page.evaluate(() => {
       const rows = [...document.querySelectorAll('#explorer-screen-mode table tbody tr')]
         .filter(r => r.children.length > 3);
-      return rows.map(r => ({
-        country: r.children[1].innerText.split('\n')[0].replace(/^\+/, '').replace(/[↗◆].*$/, '').trim(),
-        lead: parseFloat((r.children[4].querySelector('.take-val') || {}).textContent || 'NaN'),
-        sub: (r.children[4].querySelector('div') || {}).textContent || '',
-        tier: r.children[10].innerText.trim(),
-      }));
+      // v727: these three cells were read by fixed column index (1 / 4 / 10). The Screener
+      // grew an IC-shortlist tick column at position 0, which shifted every index by one and
+      // turned all six assertions below into "undefined" — a suite failure reporting a column
+      // count, not a behaviour. Anchored on what each cell actually CONTAINS instead, so the
+      // next column added anywhere in this table cannot fake a regression.
+      const cellWith = (r, sel) => [...r.children].find(td => td.querySelector(sel));
+      return rows.map(r => {
+        const nameTd = cellWith(r, 'strong') || r.children[1];
+        const takeTd = cellWith(r, '.take-val') || r.children[4];
+        const tierTd = cellWith(r, '.tier') || r.children[10];
+        return {
+          country: nameTd.innerText.split('\n')[0].replace(/^\+/, '').replace(/[↗◆].*$/, '').trim(),
+          lead: parseFloat((takeTd.querySelector('.take-val') || {}).textContent || 'NaN'),
+          sub: (takeTd.querySelector('div') || {}).textContent || '',
+          tier: tierTd.innerText.trim(),
+        };
+      });
     });
     const monotone = (arr, dir) => {
       for (let i = 1; i < arr.length; i++) {

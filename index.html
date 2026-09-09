@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v725</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v727</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -202,6 +202,22 @@ table { width: 100%; border-collapse: collapse; }
    into Word and then hand-deleted ~175 rows, or gave up and used the XLSX. These
    checkboxes let the shortlist BE a shortlist. With nothing ticked the button behaves
    exactly as before (all rows shown), so no existing path changes. */
+/* ── v727 (T5) — Screener row selection ─────────────────────────
+   The v632 defect, on the tab actually named for the job. "Copy for IC Memo" on the
+   Screener pasted every row it was showing: 27,978 characters over 185 rows on the cold
+   view, under a caption reading "screening shortlist" and a criteria block whose only
+   entry was "None — this is the full ORCA universe, not a screen result". The presets do
+   not close the gap either — Low Take · Positive NPV returns 143 of 185. Fiscal Compare
+   has been tickable since v632; the tab whose whole purpose is producing a shortlist was
+   the one that could not produce one. Same markup, same state model, same escape hatch. */
+#tbl-screener th.sc-selcell, #tbl-screener td.sc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
+#tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
+#tbl-screener tr.sc-row-sel > td { background: rgba(176,104,0,0.09); }
+@media (pointer: coarse) {
+  /* Directive step 5b: a control this cycle adds may not render under 24px under a thumb. */
+  #tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all { width: 24px; height: 24px; }
+  #tbl-screener th.sc-selcell, #tbl-screener td.sc-selcell { width: 40px; }
+}
 #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-fc tr.fc-row-sel > td { background: rgba(176,104,0,0.09); }
@@ -1492,7 +1508,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      <button>s, and a blanket rule would blank them out of the printed table. */
   .btn, .search-input, #cmp-dropdown, #cmp-print-btn, #cmp-share-btn, #cmp-copy-table-btn, #cmp-order-wrap,
   .cmp-quickstart-btn, .expl-mode-btn, .explorer-mode-toggle,
-  #fc-export-btn, #fc-copy-ic-btn, #breakeven-csv-btn { display: none !important; }
+  #fc-export-btn, #fc-copy-ic-btn, #breakeven-csv-btn, #sc-sel-note { display: none !important; }
   /* chip remove-glyphs are a screen control, not data */
   #cmp-chips span[role="button"] { display: none !important; }
 
@@ -1627,6 +1643,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      reason. Both are inert on paper and between them they were taking ~120px of a
      1009px page. */
   #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell,
+  #tbl-screener th.sc-selcell, #tbl-screener td.sc-selcell,
   .fc-compare-btn { display: none !important; }
 
   /* Let the freed table paginate, but never split a row down the middle. */
@@ -1986,7 +2003,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v725</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v727</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2056,7 +2073,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v725</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v727</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3094,6 +3111,11 @@ window.copyPlatformCitation = function(btn) {
       <span id="screener-basis-action" style="display:none;"></span>
       <label id="screener-evidence-first-wrap" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): countries with verified field production are ranked above those whose economics are regional proxy estimates, NPV-descending within each group. Nothing is filtered out — a labelled divider marks the boundary. OFF: rank all 185 by modelled NPV alone, which puts the lowest-take proxy regimes (Vanuatu, Bahamas, Montenegro) at the top."><input type="checkbox" id="sc-evidence-first" checked style="cursor:pointer;">Rank verified-production countries first</label>
       <button id="screener-reset-btn" class="btn btn-sm btn-outline" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-copy-ic-btn" class="btn btn-sm btn-outline" title="Copy this shortlist to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the screen that produced it (preset, thresholds, ordering), the standardized NPV profile, and the fee-basis comparability correction where the published take blends TSC/RSC/Buy-back contracts." aria-label="Copy screening shortlist for IC memo">&#9112; Copy for IC Memo</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">⬇ CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">⬇ Excel</button>
+      <!-- v727 (T5): shows only while a shortlist exists; the escape hatch back to "all rows the screen returned". -->
+      <span id="sc-sel-note" style="display:none;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.30);border-radius:12px;padding:2px 4px 2px 10px;white-space:nowrap;margin-left:6px;">
+        <span id="sc-sel-count" title="Countries ticked for the IC shortlist. Copy, CSV and Excel carry only these.">0 selected</span>
+        <button type="button" onclick="scClearSel()" title="Untick every country and go back to copying and exporting every row the screen returned" aria-label="Clear the IC shortlist selection" style="background:transparent;border:1px solid rgba(176,104,0,.35);border-radius:10px;color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;min-height:24px;cursor:pointer;font-family:inherit;">Clear</button>
+      </span>
     </div>
   </div>
 
@@ -3110,7 +3132,7 @@ window.copyPlatformCitation = function(btn) {
                order, and it does not carry the hand cursor.
                v623 (T1): the Breakeven column this comment used to also exempt is GONE from this
                table -- see the note under it. -->
-          <th>#</th><th data-sc-sort="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z. Click again for Z–A, a third time to return to the default ranking.">Country</th><th data-sc-sort="region" tabindex="0" role="columnheader" aria-sort="none" title="Group the result set by region, A–Z. Click again to reverse, a third time to return to the default ranking.">Region</th><th>Mechanics</th>
+          <th class="sc-selcell" title="Tick rows to build an IC shortlist. &#x2398; Copy for IC Memo, &#8595; CSV and &#8595; Excel then carry ONLY the ticked countries &mdash; with nothing ticked they carry every row the screen returned, which on the cold view is all 185. The ticks survive re-sorting and a price-deck change; use Clear beside the buttons to drop them. This header box ticks or clears every row currently shown."><input type="checkbox" class="sc-sel-all" id="sc-sel-all" onclick="scToggleSelAll(this)" aria-label="Select or clear all Screener rows currently shown"></th><th>#</th><th data-sc-sort="country" tabindex="0" role="columnheader" aria-sort="none" title="Sort A–Z. Click again for Z–A, a third time to return to the default ranking.">Country</th><th data-sc-sort="region" tabindex="0" role="columnheader" aria-sort="none" title="Group the result set by region, A–Z. Click again to reverse, a third time to return to the default ranking.">Region</th><th>Mechanics</th>
           <th class="num" data-sc-sort="take" tabindex="0" role="columnheader" aria-sort="none" title="Government take at $75/bbl — share of project economics captured by the state (royalty + taxes + state profit oil/gas + NOC carry). Lower = more contractor-favorable. Color-coded: green ≤40% (attractive), amber 41–60% (moderate), orange 61–75% (high), red >75% (very high/NOC-dominated).">Govt Take</th><th class="num" data-sc-sort="evidence" tabindex="0" role="columnheader" aria-sort="none" title="Evidence grade A/B/C/D, the composition bar, and the number of fiscal facts held. The grade is the worse of primary-law share (A &ge;60% / B &ge;40% / C &ge;20%) and fact depth (A &ge;150 / B &ge;50 / C &ge;15). A country with 100% primary law on 4 facts grades D. Same grade as Fiscal Compare&#39;s Quality column and the Country Profile badge.">Evidence</th>
           <th class="num" data-sc-sort="npv" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at $75/bbl in $M — net present value for an IOC-operated upstream project using the standardized reference profile (see profile selector for assumptions). Positive = value-creating for contractor at $75. Negative = requires >$75/bbl or more favorable terms to be economic. Discounted at 10% nominal.">Contractor NPV</th>
           <th class="num" data-sc-sort="npv50" tabindex="0" role="columnheader" aria-sort="none" title="Contractor NPV at the $50/bbl downside price in $M, same standardized Deepwater profile as the $75 column. The price-break survival test: a regime NPV-positive at $75 but negative here does not survive a downturn. Modelled for all 185 countries. The second line in each cell is % kept &mdash; the share of the contractor NPV at the ACTIVE PRICE DECK still standing at $50, which is the axis the Downside Resilience preset screens on (&ge;50%). The sub-heading names the deck it is measured against and follows the Price deck buttons above; at the $50 deck this column is the base column and the cell says so rather than printing a ratio of a number against itself. Observed range at the $75 deck &minus;14% to +75%, median 45%.">NPV @$50 ($M)<span id="sc-npv50-den" style="display:block;font-size:10px;font-weight:400;color:var(--muted);letter-spacing:.02em;">% of $75 kept</span></th>
@@ -30799,7 +30821,7 @@ function runScreener() {
       + reformList.length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter, because ORCA holds a sourced reform log for just '
       + _scReformScoredCount() + ' jurisdictions');
     var _diagStr = _diagHints.length > 0 ? '<div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:left;max-width:420px;margin-left:auto;margin-right:auto;"><strong style="color:var(--text);">Likely causes:</strong><ul style="margin:4px 0 0 16px;padding:0;">' + _diagHints.map(function(h){return '<li>' + h + '</li>';}).join('') + '</ul></div>' : '';
-    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;">'
+    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center;padding:40px 20px;color:var(--muted);font-size:13px;">'
       + '<div style="font-size:20px;margin-bottom:8px;opacity:.5;">&#8960;</div>'
       + '<strong style="color:var(--text);display:block;margin-bottom:6px;">No countries match your current filters</strong>'
       + 'Try relaxing your criteria — reduce the IRR minimum, raise the government take ceiling, or uncheck some mechanic filters.'
@@ -30812,7 +30834,7 @@ function runScreener() {
   // same amber voice as the v507 divider. The count line above the table is easy to skip past; the
   // first row of the grid is not.
   const _topBanner = (_allProxy || _mixedUngrouped)
-    ? `<tr class="screener-basis-divider"><td colspan="11" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+    ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
       + (_allProxy
           ? `<strong style="color:var(--accent);letter-spacing:.04em;">EVERY ROW BELOW &mdash; ${data.length} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
             + `This screen returned no production-backed regime. Fiscal terms are regional proxy estimates and the NPV / breakeven shown are indicative only. `
@@ -30884,7 +30906,7 @@ function runScreener() {
     // the analyst reads row 23 with the same authority as row 1 — the PROXY badge alone did not
     // carry that, because every row above it was badged PROXY too and it read as decoration.
     const _divider = (_grouped && i > 0 && _dqTier(data[i-1]).hasProduction && !_dqTier(d).hasProduction)
-      ? `<tr class="screener-basis-divider"><td colspan="11" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+      ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
         + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nProxy} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
         + `Fiscal terms are regional proxy estimates and the NPV / IRR / breakeven shown are indicative only. `
         + `Ranked among themselves by ${_scSortKey ? _scSortLabelNow().toLowerCase() : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
@@ -30892,7 +30914,12 @@ function runScreener() {
       : '';
     // Bug 3 fix: click row to navigate to country profile
     const safeName = d.country.replace(/'/g, "\\'");
-    return _divider + `<tr style="cursor:pointer" onclick="openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
+    // v727 (T5): data-country is what the shortlist is keyed on, so a tick survives a
+    // re-sort and a price-deck change. The tick cell stops propagation so ticking a row
+    // does not also navigate to that country's profile.
+    const attrName = d.country.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    return _divider + `<tr style="cursor:pointer" data-country="${attrName}" class="${_scSelHas(d.country) ? 'sc-row-sel' : ''}" onclick="openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
+      <td class="sc-selcell" onclick="event.stopPropagation();"><input type="checkbox" class="sc-sel"${_scSelHas(d.country) ? ' checked' : ''} onclick="event.stopPropagation();scToggleSel(this,'${safeName}')" onkeydown="event.stopPropagation();" aria-label="Add ${attrName} to the IC shortlist"></td>
       <td class="num" style="color:var(--muted)">${i+1}</td>
       <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
@@ -30907,6 +30934,9 @@ function runScreener() {
     </tr>`;
   }).join('');
   window._screenerData = data;
+  // v727 (T5): re-label Copy/CSV/Excel and re-draw the shortlist badge for the row set
+  // that is now on screen — including a warning when a ticked country no longer passes.
+  if (typeof _scSyncSelUI === 'function') _scSyncSelUI();
 
   // v587 (T1): sort indicator on the Screener headers. The ▲/▼ CSS (thead th.sort-asc/.sort-desc)
   // has existed since the Explorer table was built; #tbl-screener simply never set the class,
@@ -30970,23 +31000,59 @@ function _scExportBasisLines() {
   var L = [];
   L.push('ORCA petroleum fiscal screening shortlist');
   if (b) {
-    L.push(b.matched + ' of ' + b.universe + ' countries match, screened at $' + b.price + '/bbl.');
+    // ── v727 (T5) ────────────────────────────────────────────────────────────────
+    // A hand-ticked shortlist is a narrowing step, so it has to travel as one. Without
+    // this the pasted file carried six rows under "SCREEN APPLIED — 1. None: this is the
+    // full ORCA universe, not a screen result", and the IC reader could not tell whether
+    // six countries survived a take ceiling or were picked because the analyst liked them.
+    // Every count below is recomputed against the rows actually in the file: the data-basis
+    // split, the all-proxy warning and the fee-basis list all described the pre-shortlist
+    // match set, which is the wrong denominator once rows have been dropped.
+    var _sel = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
+    var _picked = !!(_sel && _sel.length);
+    var _crit = b.criteria.slice();
+    var _bV = b.verified, _bP = b.proxy, _bAll = b.allProxy, _bN = b.matched, _fee = b.feeBasis;
+    if (_picked) {
+      var _dSel = (window._screenerData || []).filter(function(x){ return _sel.indexOf(x.country) >= 0; });
+      _bN = _dSel.length;
+      _bV = _dSel.filter(function(x){ return _dqTier(x).hasProduction; }).length;
+      _bP = _bN - _bV;
+      _bAll = _bN > 0 && _bV === 0;
+      _fee = (b.feeBasis || []).filter(function(f){
+        return _sel.some(function(c){ return f.indexOf(c + ':') === 0; });
+      });
+      // "the full ORCA universe" is false the moment rows have been ticked out of it.
+      _crit = _crit.filter(function(c){ return c.indexOf('None — this is the full ORCA universe') !== 0; });
+      var _pickLine = 'Manual IC shortlist — ' + _sel.length + ' of the ' + b.matched
+        + ' countries that passed the criteria above were ticked by hand on screen, and they are the '
+        + 'ONLY rows in this file: ' + _sel.join(', ')
+        + '. The Rank / # column keeps each one’s position in the full ' + b.matched + '-row screen, '
+        + 'so a row can still be quoted as "nth of ' + b.matched + '".';
+      // Sits last among the narrowing steps but ahead of the ordering line, which is not one.
+      var _rk = -1;
+      for (var _i = 0; _i < _crit.length; _i++) if (_crit[_i].indexOf('Ranked by: ') === 0) { _rk = _i; break; }
+      if (_rk >= 0) _crit.splice(_rk, 0, _pickLine); else _crit.push(_pickLine);
+      L.push(_sel.length + ' hand-picked from the ' + b.matched + ' of ' + b.universe
+        + ' countries that match, screened at $' + b.price + '/bbl.');
+    } else {
+      L.push(b.matched + ' of ' + b.universe + ' countries match, screened at $' + b.price + '/bbl.');
+    }
     L.push('SCREEN APPLIED — these criteria produced this row set:');
-    b.criteria.forEach(function(c, i) { L.push('  ' + (i + 1) + '. ' + c); });
-    L.push('Data basis of the rows below: ' + b.verified + ' with verified field production, '
-      + b.proxy + ' whose economics are regional proxy estimates.');
-    if (b.allProxy) {
-      L.push('WARNING: none of these ' + b.matched + ' countries has verified field production. '
+    _crit.forEach(function(c, i) { L.push('  ' + (i + 1) + '. ' + c); });
+    L.push('Data basis of the rows below: ' + _bV + ' with verified field production, '
+      + _bP + ' whose economics are regional proxy estimates.');
+    if (_bAll) {
+      L.push('WARNING: none of these ' + _bN + ' countries has verified field production. '
         + 'Every take, NPV and breakeven below is a regional proxy estimate, indicative only, '
         + 'and not defensible as a screening shortlist on its own.');
     }
-    if (b.feeBasis.length) {
+    if (_fee.length) {
       L.push('FEE-BASIS TAKE — why two take columns disagree for these countries:');
       L.push('  GovtTake_75 is the published blended headline. GovtTake_75_Comparable excludes '
         + 'fee-basis contracts (TSC / RSC / Buy-back), whose ~99% take is a structural artefact '
         + 'of a per-barrel fee with no price upside, not a fiscal measure. Per '
         + 'the platform comparability rules the published figure may NOT be compared across countries.');
-      b.feeBasis.forEach(function(f) { L.push('  - ' + f); });
+      _fee.forEach(function(f) { L.push('  - ' + f); });
     }
   } else {
     L.push('Screen state unavailable — open the Screener tab and re-export to record the criteria.');
@@ -31011,6 +31077,105 @@ function _scExportBasisLines() {
 // it disagreed with getFiscalPredictabilityScore on 179 of 185 countries -- Australia 47 vs the
 // 73 the profile shows, two full bands apart -- and it printed a hard number for the 22
 // countries where v536 ruled no predictability reading may be carried into an IC memo at all.
+// ── v727 (T5) — "Give me something I can paste straight into an IC memo." ─────────────
+// Walked T5 cold at 1440x900: Home -> Screener -> the button labelled "Copy for IC Memo".
+// The clipboard received 185 rows and 27,978 characters, captioned "ORCA petroleum fiscal
+// screening shortlist -- 185 of 185 countries" over a SCREEN APPLIED block whose only entry
+// read "None -- this is the full ORCA universe, not a screen result". The artifact contradicted
+// its own title, and the analyst pasted six pages into Word and hand-deleted ~175 rows. The
+// filters do not rescue it: they narrow the SCREEN, and an IC shortlist is not a screen -- the
+// Low Take / Positive NPV preset still returns 143 of 185. Fiscal Compare got this at v632.
+// This is the same state model: selection is held by country NAME, so a tick survives a
+// re-sort, a preset change and a price-deck change. With nothing ticked, Copy, CSV and XLSX
+// behave exactly as they did before.
+window._scSelected = window._scSelected || [];
+function _scSelHas(c) { return window._scSelected.indexOf(c) >= 0; }
+function scToggleSel(cb, country) {
+  var i = window._scSelected.indexOf(country);
+  if (cb.checked) { if (i < 0) window._scSelected.push(country); }
+  else if (i >= 0) window._scSelected.splice(i, 1);
+  var tr = cb.closest ? cb.closest('tr') : null;
+  if (tr) { if (cb.checked) tr.classList.add('sc-row-sel'); else tr.classList.remove('sc-row-sel'); }
+  _scSyncSelUI();
+}
+function scToggleSelAll(cb) {
+  var trs = document.querySelectorAll('#tbl-screener tbody tr[data-country]');
+  for (var i = 0; i < trs.length; i++) {
+    var c = trs[i].getAttribute('data-country');
+    var box = trs[i].querySelector('input.sc-sel');
+    if (box) box.checked = cb.checked;
+    var j = window._scSelected.indexOf(c);
+    if (cb.checked) { if (j < 0) window._scSelected.push(c); trs[i].classList.add('sc-row-sel'); }
+    else { if (j >= 0) window._scSelected.splice(j, 1); trs[i].classList.remove('sc-row-sel'); }
+  }
+  _scSyncSelUI();
+}
+function scClearSel() {
+  window._scSelected = [];
+  var boxes = document.querySelectorAll('#tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all');
+  for (var i = 0; i < boxes.length; i++) { boxes[i].checked = false; boxes[i].indeterminate = false; }
+  var rows = document.querySelectorAll('#tbl-screener tr.sc-row-sel');
+  for (var k = 0; k < rows.length; k++) rows[k].classList.remove('sc-row-sel');
+  _scSyncSelUI();
+}
+window.scToggleSel = scToggleSel; window.scToggleSelAll = scToggleSelAll; window.scClearSel = scClearSel;
+// The countries to put in an artifact right now: the ticked ones, in the order the CURRENT
+// screen ranks them. A country that was ticked and has since been screened out is deliberately
+// NOT carried -- an export whose rows do not satisfy the criteria block printed above them is
+// the "stable but wrong" failure. It stays ticked, and _scSyncSelUI() says so on screen.
+// Returns null when nothing is ticked, which means "every row the screen returned".
+function _scSelOrdered() {
+  if (!window._scSelected.length) return null;
+  var data = window._screenerData || [];
+  var out = [];
+  for (var i = 0; i < data.length; i++) if (_scSelHas(data[i].country)) out.push(data[i].country);
+  return out;
+}
+function _scSyncSelUI() {
+  var n = window._scSelected.length;
+  var inScreen = _scSelOrdered() || [];
+  var nIn = inScreen.length, nOut = n - nIn;
+  function relabel(id, base, withN) {
+    var b = document.getElementById(id);
+    if (!b) return;
+    if (!b.dataset.allLabel) { b.dataset.allLabel = b.innerHTML; b.dataset.allTitle = b.title || ''; }
+    if (n) {
+      b.innerHTML = withN;
+      b.title = 'Carries only the ' + nIn + ' ticked countr' + (nIn === 1 ? 'y' : 'ies')
+        + ' — not every row the screen returned. The file states the hand-pick as a screening '
+        + 'criterion and keeps each row’s position in the full screen. Press Clear to go back to all rows.';
+    } else {
+      b.innerHTML = b.dataset.allLabel;
+      b.title = b.dataset.allTitle;
+    }
+  }
+  relabel('screener-copy-ic-btn', null, '⎘ Copy ' + nIn + ' selected');
+  relabel('screener-csv-btn',     null, '⬇ CSV (' + nIn + ')');
+  relabel('screener-excel-btn',   null, '⬇ Excel (' + nIn + ')');
+  var note = document.getElementById('sc-sel-note');
+  if (note) {
+    note.style.display = n ? 'inline-flex' : 'none';
+    var lbl = document.getElementById('sc-sel-count');
+    if (lbl) {
+      lbl.textContent = nIn + ' selected' + (nOut ? ' · ' + nOut + ' outside this screen' : '');
+      lbl.title = nOut
+        ? nOut + ' ticked countr' + (nOut === 1 ? 'y is' : 'ies are') + ' no longer returned by the current screen, so '
+          + 'Copy, CSV and Excel will NOT carry ' + (nOut === 1 ? 'it' : 'them') + ' — an exported row has to satisfy the '
+          + 'criteria printed above it. Widen the screen to bring ' + (nOut === 1 ? 'it' : 'them') + ' back, or press Clear.'
+        : 'Countries ticked for the IC shortlist. Copy, CSV and Excel carry only these.';
+    }
+  }
+  var all = document.getElementById('sc-sel-all');
+  if (all) {
+    var trs = document.querySelectorAll('#tbl-screener tbody tr[data-country]');
+    var vis = trs.length, on = 0;
+    for (var i = 0; i < trs.length; i++) if (_scSelHas(trs[i].getAttribute('data-country'))) on++;
+    all.checked = vis > 0 && on === vis;
+    all.indeterminate = on > 0 && on < vis;
+  }
+}
+window._scSyncSelUI = _scSyncSelUI;
+
 function _scExportRows() {
   var data = window._screenerData || [];
   // v699 (T1): the deck the shortlist was actually screened at. Every export used to carry
@@ -31018,7 +31183,10 @@ function _scExportRows() {
   // the $75 NPV under a title that said "screened at $100/bbl".
   var _xDeck = (typeof _scDeckKey === 'function') ? _scDeckKey() : '75';
   var _xRef  = (typeof _scRetRefDeck === 'function') ? _scRetRefDeck() : '75';
-  return data.map(function(d, i) {
+  // v727 (T5): one choke point for all three export paths — clipboard, CSV and XLSX — so a
+  // hand-ticked shortlist cannot apply to one button and not the others.
+  var _sel = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
+  var _all = data.map(function(d, i) {
     var fc = _scFeeCmpAt(d, '75');
     var fp = getFiscalPredictabilityScore(d);
     var disp = _fpDispersion(d);
@@ -31051,11 +31219,26 @@ function _scExportRows() {
         : 'measured spread ' + disp.iqr.toFixed(1) + 'pp'
     };
   });
+  // Rank is left at the position each country held in the FULL screen, not renumbered 1..N.
+  // "Norway, #14 of the 143 that passed" is a defensible line in a memo; "Norway, #2" of a
+  // hand-picked six is not a screening result at all.
+  return _sel ? _all.filter(function(r){ return _sel.indexOf(r.Country) >= 0; }) : _all;
 }
+
+// v727 (T5): with a shortlist active, "nothing to export" has two different causes and
+// two different fixes. Naming the wrong one sends the analyst to widen a screen that is
+// not the problem.
+function _scEmptyMsg(verb) {
+  var n = (window._scSelected || []).length;
+  if (n) return 'None of the ' + n + ' ticked countr' + (n === 1 ? 'y is' : 'ies are')
+    + ' returned by the current screen — press Clear beside the buttons, or widen the screen.';
+  return 'No countries match the current screen — nothing to ' + verb + '.';
+}
+window._scEmptyMsg = _scEmptyMsg;
 
 function exportScreenerCSV() {
   var rows = _scExportRows();
-  if (!rows.length) { showCopyToast('No countries match the current screen — nothing to export.'); return; }
+  if (!rows.length) { showCopyToast(_scEmptyMsg('export')); return; }
   var hdr = Object.keys(rows[0]);
   // v517 — this CSV was malformed for 75 of the 185 countries. Mechanics is a comma-joined
   // string ("Concession,PSC") and the row was emitted with a bare r.join(','), so every column
@@ -31104,12 +31287,20 @@ function exportScreenerCSV() {
 function _scCopyColumns(rows, price) {
   var anyFee = rows.some(function(r){ return r.FeeBasis_Blend === 'Yes'; });
   var anyBe  = rows.some(function(r){ return r.Breakeven_bbl != null; });
-  var cols = [
+  var cols = [];
+  // v727 (T5): a hand-picked row has to say where it placed, or the reader cannot tell a
+  // shortlist from a favourites list. The criteria block above the table asserts this
+  // column exists; CSV and XLSX have always carried Rank, the clipboard table did not.
+  // Off when nothing is ticked, where the rows are already in screen order top to bottom.
+  var _selN = (typeof _scSelOrdered === 'function' && _scSelOrdered()) ? _scSelOrdered().length : 0;
+  var _uni  = (window._screenerExportBasis && window._screenerExportBasis.matched) || rows.length;
+  if (_selN) cols.push({ h: '# in screen (of ' + _uni + ')', f: function(r){ return r.Rank != null ? String(r.Rank) : '\u2014'; } });
+  cols.push.apply(cols, [
     { h: 'Country',                  f: function(r){ return r.Country; } },
     { h: 'Region',                   f: function(r){ return r.Region; } },
     { h: 'Mechanic',                 f: function(r){ return r.Mechanics; } },
     { h: 'Govt take @$' + price,     f: function(r){ return r['GovtTake_' + price] != null ? r['GovtTake_' + price].toFixed(1) + '%' : '—'; } }
-  ];
+  ]);
   // Only carried when at least one row's headline blends fee-basis contracts. Where none
   // does, the column would be a duplicate of the one before it on every row.
   // The comparable figure _scExportRows() carries is computed at $75 regardless of the
@@ -31153,7 +31344,7 @@ function _scCopyColumns(rows, price) {
 function copyScreenerTable() {
   var btn  = document.getElementById('screener-copy-ic-btn');
   var rows = _scExportRows();
-  if (!rows.length) { showCopyToast('No countries match the current screen — nothing to copy.'); return; }
+  if (!rows.length) { showCopyToast(_scEmptyMsg('copy')); return; }
   var price = (typeof getPriceKey === 'function') ? getPriceKey() : '75';
   var b = window._screenerExportBasis;
 
@@ -31174,6 +31365,9 @@ function copyScreenerTable() {
   var tailTxt = tail.join('\n');
 
   var cols = _scCopyColumns(rows, price);
+  // v727 (T5): bold the Country cell wherever it sits — the rank column now precedes it
+  // on a hand-picked shortlist, and column 0 is no longer necessarily the country.
+  var _cNameIdx = cols.map(function(c){ return c.h; }).indexOf('Country');
   var matrix = [cols.map(function(c){ return c.h; })]
     .concat(rows.map(function(r){ return cols.map(function(c){ var v = c.f(r); return v == null ? '—' : String(v); }); }));
 
@@ -31191,7 +31385,7 @@ function copyScreenerTable() {
     + '<table style="border-collapse:collapse;">'
     + '<thead><tr>' + matrix[0].map(function(c){ return '<th style="' + th + '">' + esc(c) + '</th>'; }).join('') + '</tr></thead>'
     + '<tbody>' + matrix.slice(1).map(function(r){
-        return '<tr>' + r.map(function(c, ci){ return '<td style="' + (ci === 0 ? tdL : td) + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
+        return '<tr>' + r.map(function(c, ci){ return '<td style="' + (ci === _cNameIdx ? tdL : td) + '">' + esc(c) + '</td>'; }).join('') + '</tr>';
       }).join('') + '</tbody></table>'
     + '<p style="font-size:8pt;color:#666;margin:6px 0 0;white-space:pre-wrap;">' + esc(tailTxt) + '</p>'
     + '</div>';
@@ -40230,7 +40424,7 @@ function ddAddCompare(country, btn) {
 function exportScreenerExcel() {
   if (typeof XLSX === 'undefined') { showCopyToast('Excel library not loaded — check internet connection.'); return; }
   var rows = _scExportRows();
-  if (!rows.length) { showCopyToast('No countries match the current screen — nothing to export.'); return; }
+  if (!rows.length) { showCopyToast(_scEmptyMsg('export')); return; }
   var wb = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(wb, _finishSheet(XLSX.utils.json_to_sheet(rows)), 'Screener');
   // v558 (T5): the basis travels with the file on its own sheet, so the data sheet stays a clean
