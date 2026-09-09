@@ -40969,3 +40969,14 @@ against this working tree over `http://localhost:8080`, this cycle.
 - Touch targets under `pointer: coarse` at 768 and 390: the cell button measures **36px**,
   above the 24px floor. The v612 mobile layer was not touched.
 - Console / page errors on the walk: **0** at all six viewports.
+
+---
+## Cycle 650 Log — 2026-09-09 12:45
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 650 is closed out and `origin/main` is in sync with local HEAD.
+
+**Shipped:** v744 — the Fiscal Compare `Stability` column stopped printing a diamond count that ranked Libya and Algeria above Norway, and now prints the six-way reform verdict the classifier already computed (`↑ PRE-2010`, `SIZE UNKNOWN`, `↑ +15pp`, `PREMIUM 3–5pp`, `NO LAW CHANGE`, `NO PREMIUM`, `n/c`), with the count demoted to a grey second line. Header renamed to `Reform verdict`.
+
+**Gates, all measured this cycle:** sui
