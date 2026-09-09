@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v741</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v742</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1267,7 +1267,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   input[type="number"], .chip, .expl-mode-btn, .tab-dropdown-btn {
     min-height: 44px;
   }
-  /* v741 (T1): the two data-basis checkboxes in the Screener's Advanced panel. They answer
+  /* v742 (T1): the two data-basis checkboxes in the Screener's Advanced panel. They answer
      two different questions -- "has anyone drilled here" and "is this take a measurement" --
      and mis-hitting one for the other on a phone returns a different shortlist. Scoped to
      these two ids rather than to input[type=checkbox]: the mechanic and IOC grids in the same
@@ -2072,7 +2072,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v741</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v742</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2142,7 +2142,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v741</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v742</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3175,7 +3175,7 @@ window.copyPlatformCitation = function(btn) {
                filter, so the flagship IC screen could not express "only the countries anyone has
                actually drilled", which is exactly what T1 asks. -->
           <label title="163 of 185 countries have no verified field production: their fiscal terms are regional proxy estimates and the NPV and breakeven shown for them are indicative only &mdash; the Screener already says so in the divider row it draws at that boundary. CHECKED (default): all 185 stay in the list, ranked with the production-backed 22 first. UNCHECKED: keep only the 22 countries whose economics are backed by real field production."><input type="checkbox" id="sc-proxy-keep" checked> Include the <span style="font-weight:700;">163</span> countries with no verified field production <span style="color:var(--muted);font-size:10px;">(proxy economics &mdash; indicative only)</span></label>
-          <!-- v741 (T1): the escape hatch for the floor-take block. The default is unchanged --
+          <!-- v742 (T1): the escape hatch for the floor-take block. The default is unchanged --
                the rows stay in the list, partitioned last under their own divider with bounded
                cells -- because dropping 45 rows silently is the failure mode this platform keeps
                fixing, not a fix. What did not exist was any way to say "only the countries whose
@@ -29134,7 +29134,7 @@ let _screenerMinFacts = 0;   // v518: fact-depth floor, set only by the Primary-
 // It is a floor, not a replacement: the Primary-Source Evidence preset's 150 still wins.
 const SC_EVID_MIN_FACTS = 50;
 
-// ─── v741 (T1) — is this country's government take a MEASUREMENT or a FLOOR? ────────────────
+// ─── v742 (T1) — is this country's government take a MEASUREMENT or a FLOOR? ────────────────
 // The database take is the sum of the fiscal levers ORCA actually holds for a country. Where the
 // record holds no petroleum rent instrument AT ALL -- no state participation, no profit-oil or
 // revenue share, no resource-rent surtax, no cost-recovery limit, no first-tranche petroleum, no
@@ -29609,7 +29609,7 @@ var _SC_SIG_LABELS = {
   'sc-proxy-keep': { n: 'data basis',       f: function (v) { return v ? 'proxy countries included' : 'verified production only'; } },
   'sc-fee-cmp':    { n: 'take basis',       f: function (v) { return v ? 'comparable' : 'published blend'; } },
   'sc-evid-depth': { n: 'fact-depth leg',   f: function (v) { return v ? 'on' : 'off'; } },
-  // v741 (T1): so the exported IC criteria block and the active-filter badge both say which of
+  // v742 (T1): so the exported IC criteria block and the active-filter badge both say which of
   // the two data-basis questions was actually asked. They are different questions.
   'sc-floor-keep': { n: 'take basis',       f: function (v) { return v ? 'floor-take countries included' : 'measured take only'; } }
 };
@@ -29737,7 +29737,7 @@ function applyScreenerPreset(preset) {
   const keepProxy = document.getElementById('sc-proxy-keep');
   if (keepProxy) keepProxy.checked = true;
   const keepFloor = document.getElementById('sc-floor-keep');
-  if (keepFloor) keepFloor.checked = true;   // v741
+  if (keepFloor) keepFloor.checked = true;   // v742
   const scRgn = document.getElementById('sc-region');
   if (scRgn) scRgn.value = '';
   setReform('');   // v662
@@ -30566,7 +30566,7 @@ function _scProdCovTip(d) {
 }
 
 function runScreener() {
-  // v741 (T1): the floor-take population is read off the live data, not written into the label.
+  // v742 (T1): the floor-take population is read off the live data, not written into the label.
   (function(){ var el = document.getElementById('sc-floor-n'); if (el) el.textContent = _scFloorCount(); })();
   _scUpdateNeutralFlags();
   _scSyncNpvAxis();   // v617: re-scale the NPV axis to the active deck BEFORE its value is read
@@ -30590,7 +30590,7 @@ function runScreener() {
   // v517: the IRR axis is retired. What is left to disclose is data basis: 163 of the 185 countries
   // have no verified field production and their economics are regional proxies.
   const includeProxy = document.getElementById('sc-proxy-keep')?.checked !== false;
-  // v741 (T1): a SECOND data-basis leg, not a synonym for the one above. All 45 floor-take rows
+  // v742 (T1): a SECOND data-basis leg, not a synonym for the one above. All 45 floor-take rows
   // are proxy rows, but only 45 of the 163 proxy rows are floor-take: unticking the production
   // box to escape Vanuatu also threw away Guyana, Namibia, Mozambique, Senegal and Suriname.
   const includeFloor = document.getElementById('sc-floor-keep')?.checked !== false;
@@ -30691,7 +30691,7 @@ function runScreener() {
     // a divider at the boundary, but never let the analyst screen on it. "Only the countries anyone
     // has actually drilled" is the single most useful narrowing available for T1.
     if (!includeProxy && !_dqTier(d).hasProduction) return false;
-    // v741 (T1): floor-take basis filter. See _scTakeIsFloor().
+    // v742 (T1): floor-take basis filter. See _scTakeIsFloor().
     if (!includeFloor && _scTakeIsFloor(d)) return false;
 
     // mechanic: country passes if ANY of its mechanics is in the checked set
@@ -30816,7 +30816,7 @@ function runScreener() {
   //
   // Countries with verified production now sort first, proxies after, NPV DESC within each
   // group. Nothing is removed — all 185 stay in the table, the export and the count.
-  // v741 (T1): three registers, not two. 0 = verified field production. 1 = proxy economics but
+  // v742 (T1): three registers, not two. 0 = verified field production. 1 = proxy economics but
   // ORCA holds at least one petroleum rent instrument, so the take is a modelled figure. 2 = the
   // take is a floor (see _scTakeIsFloor). All 45 rank-2 rows sit inside the rank-1 set on the
   // shipped data, so this refines the v507 partition rather than cutting across it.
@@ -30864,7 +30864,7 @@ function runScreener() {
   }
   const _nVerified = data.filter(d => _dqTier(d).hasProduction).length;
   const _nProxy    = data.length - _nVerified;
-  // v741 (T1): rows in this result set whose take is a floor rather than a measurement.
+  // v742 (T1): rows in this result set whose take is a floor rather than a measurement.
   const _nFloor    = data.filter(_scTakeIsFloor).length;
   const _nModelled = _nProxy - _nFloor;
   // v609 — `!_scSortKey` removed. Grouping is now decided by the toggle the analyst controls,
@@ -30872,7 +30872,7 @@ function runScreener() {
   // the R-factor swing order, so it can group there too. With the toggle OFF and a sort active
   // the rows genuinely are interleaved, _grouped is false, and the v543 banner still fires.
   const _grouped   = _screenerEvidenceFirst && (!!_scSortKey || !_screenerRfactorOnly) && _nVerified > 0 && _nProxy > 0;
-  // v741: the floor block is partitioned on the same toggle and the same sort paths as the
+  // v742: the floor block is partitioned on the same toggle and the same sort paths as the
   // production block. It can be drawn when the result set holds both kinds of proxy row, and
   // does not require any production-backed row to exist -- the all-proxy screens (Deepwater,
   // PSC Africa, Frontier Markets) are exactly where the distinction carries most.
@@ -30995,7 +30995,7 @@ function runScreener() {
   // problem; "which of these has anyone actually drilled" is.
   // v609 — when a column sort is active the grouped note says the sort runs INSIDE each block,
   // so the analyst is not left thinking their click was ignored.
-  // v741 (T1): the basis sentence now names three registers when the third is present, because
+  // v742 (T1): the basis sentence now names three registers when the third is present, because
   // "163 regional proxies" put Vanuatu and Mozambique in one bucket and the analyst reads the
   // top of that bucket as the frontier shortlist.
   const _floorNote = _nFloor > 0
@@ -31340,7 +31340,7 @@ function runScreener() {
     // basis when the swap is live. Leaving it on the published figure is what put "NOC/Concession"
     // on row 6 of an ascending screen between two "Inv-Friendly" rows.
     const _rowFc  = _feeCmpOf(d);
-    // v741 (T1): the bound marker. A glyph is not the fix here -- the divider and the ranking
+    // v742 (T1): the bound marker. A glyph is not the fix here -- the divider and the ranking
     // are -- but a row lifted out of the block by a column sort, ticked into the shortlist, or
     // read on a phone where the divider has scrolled away still has to carry its own direction.
     const _rowFloor = _scTakeIsFloor(d);
@@ -31361,7 +31361,7 @@ function runScreener() {
         + `Ranked among themselves by ${_scSortKey ? _scSortLabelNow().toLowerCase() : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
         + `</td></tr>`
       : '';
-    // v741 (T1): second boundary, drawn where the ranking stops being a measurement at all.
+    // v742 (T1): second boundary, drawn where the ranking stops being a measurement at all.
     // The v507 divider above answers "has anyone drilled here". It does not answer "is this
     // number a number", and on an NPV-descending sort those two questions have opposite
     // consequences: the thinner the fiscal record, the lower the modelled take, the HIGHER the
@@ -31630,7 +31630,7 @@ function _scExportBasisLines() {
   }
   L.push('ASSUMPTIONS: standardized Deepwater profile, $1.2B capex, 50k bbl/d, $15/bbl opex, '
     + '10% WACC, 100% WI. Take and NPV at the screened price; breakeven always at $75/bbl.');
-  // v741 (T1): only stated when this shortlist actually contains such a row, and it names them,
+  // v742 (T1): only stated when this shortlist actually contains such a row, and it names them,
   // because a caveat about countries that are not in the export is noise in an IC memo.
   (function(){
     // Same two sources _scExportBasisLines() already uses for the data-basis split, so this
@@ -31834,7 +31834,7 @@ function _scExportRows() {
       Mechanics: d.mechanics,
       R_factor_Tiers: d.has_r_factor_tiers ? 'Yes' : 'No',
       Verified_Production: _dqTier(d).hasProduction ? 'Yes' : 'No',
-      // v741 (T1): the take/NPV basis flag. A shortlist that reaches an IC memo has to carry the
+      // v742 (T1): the take/NPV basis flag. A shortlist that reaches an IC memo has to carry the
       // direction of its own error, or the divider on screen stops at the browser window.
       Take_Is_Floor: _scTakeIsFloor(d) ? 'Yes' : 'No',
       Take_Basis: _scTakeIsFloor(d)
@@ -33534,6 +33534,9 @@ function renderReformTimeline(country) {
         + 'white-space:nowrap;vertical-align:bottom;">' + _esc(s) + '</span>';
     };
     const _fmtPct = function(v) { return (Math.round(v * 100) / 100) + '%'; };
+    // v742 (T6): row labels are HTML (v625 wraps NOT HELD labels in an opacity span). Any label
+    // that reaches a sentence rather than a cell is reduced to its text first.
+    const _stripTag742 = function(x) { return String(x == null ? '' : x).replace(/<[^>]*>/g, ''); };
     const _mono = 'font-family:IBM Plex Mono,monospace;';
     // v601 (T2): the value this platform's OWN DCF engine uses for the same parameter. Only
     // reported where getDCFParams() resolves through the 9-country hard override table
@@ -33624,11 +33627,80 @@ function renderReformTimeline(country) {
     // Quality chip at the top of this profile.
     const _termsCited = new Set();
 
+    // ── v742 (T6): WHICH ROWS THE NUMBER IS ACTUALLY BUILT FROM ──────────────────────────
+    // v625 fixed the missing direction: a term the model runs and the fact base does not hold
+    // now gets a NOT HELD row. The opposite direction was never handled. rowDefs is a fixed
+    // eight-row list and every key the API happens to hold gets a row, whether or not this
+    // country's resolved mechanic reads it — and every count and every imperative under the
+    // table is computed over that undifferentiated set.
+    //
+    // Measured on the shipped build against this page's own resolveLiveDCFMechanic() and
+    // getDCFParams(): 53 of 185 countries render at least one row the live model never reads,
+    // 79 such rows in total. 32 of those 79 carry NO SOURCE, which is what fires the note that
+    // ends "Establish these from <country>'s own petroleum act before an IC memo", and 6 diverge
+    // from the statutory rate, which is what the orange "N of M sourced parameters differ"
+    // headline counts.
+    //
+    // Iraq is the sharpest case. Resolved mechanic TSC; the model runs three terms (service fee,
+    // excess petroleum tax, CIT). The Evidence Chain renders five held rows and FOUR of them —
+    // Royalty Rate, Cost Recovery Cap, Profit Oil (Govt), State Participation — are read by
+    // nothing. The page then told the analyst, in bold, to go establish royalty, cost recovery
+    // and profit oil from Iraq's petroleum act before their IC memo: three numbers that cannot
+    // move the take, NPV or IRR printed above them. Nigeria (resolved Concession) prints FTP
+    // Rate, Cost Recovery Cap and Profit Oil (Govt) the same way, and its loudest note names
+    // Profit Oil first.
+    //
+    // An analyst who came here to ask "where did this number come from" was reading a table in
+    // which up to four fifths of the rows are provenance for something else, with the alarms
+    // concentrated on exactly those rows. Rows are now partitioned: terms the live model reads
+    // stay in the table proper; terms it does not read move below a labelled divider and are
+    // marked. The two notes that issue an IC-memo imperative are scoped to the terms that
+    // produce the number. No value, tier letter, take, NPV, grade or row is deleted.
+    let _liveTermSet = null, _liveMechName = null;
+    try {
+      const _lm = (typeof resolveLiveDCFMechanic === 'function') ? resolveLiveDCFMechanic(country) : null;
+      const _lp = (_lm && typeof getDCFParams === 'function') ? getDCFParams(country, _lm) : null;
+      if (_lp) {
+        _liveMechName = _lm;
+        _liveTermSet = new Set();
+        Object.keys(_MODEL_KEY).forEach(function(l) {
+          const k = _MODEL_KEY[l];
+          if (k in _lp) _liveTermSet.add(k);
+        });
+        if (!_liveTermSet.size) _liveTermSet = null;   // nothing resolvable -- change nothing
+      }
+    } catch (e) { _liveTermSet = null; _liveMechName = null; }
+    // True unless we positively know this regime's model does not read the term. Unknown mechanic,
+    // unknown params or a label outside _MODEL_KEY all fall through as "reads it", so the table is
+    // byte-identical to v741 for every country the check cannot speak to.
+    const _readsRow = function(label) {
+      if (!_liveTermSet) return true;
+      const mk = _MODEL_KEY[label];
+      if (!mk) return true;
+      return _liveTermSet.has(mk);
+    };
+    let offRows = [];                 // v742: rows the live model does not read
+    let offUnsourcedLabels = [];      // v742: ...of which these carry no source at all
+    let offDivergentLabels = [];      // v742: ...and these disagree with their cited statute
+    let offSourcedCount = 0;          // v742: independently sourced, but not an input
+
     if (fk) {
       // API data available — build rows with source badges
       rowDefs.forEach(([label, key, fallbackKey]) => {
         let rawVal = fk[key] != null ? fk[key] : (fallbackKey ? fk[fallbackKey] : null);
         if (rawVal == null) return;
+        // v742 (T6): every counter and label list under this table is a statement about the terms
+        // that produce the take. A row the live model does not read must not move any of them, so
+        // the whole set is snapshotted here and rolled back at the push site if the row is
+        // off-model. Rolling back is used rather than gating each increment because the increments
+        // are spread across six branches and a missed one would silently corrupt a denominator.
+        const _snap742 = {
+          sourced: sourcedCount, divergent: divergentCount, unsourced: unsourcedCount,
+          bulk: bulkCount, shared: sharedCount, cited: citedLinkCount, dead: deadLinkCount,
+          uL: unsourcedLabels.length, uZ: unsourcedZeroLabels.length, bL: bulkLabels.length,
+          sL: sharedLabels.length, dL: deadLinkLabels.length, mC: modelConflicts.length,
+          tC: Array.from(_termsCited)
+        };
         const val = (typeof rawVal === 'number') ? _fmtPct(rawVal) : String(rawVal);
         const numVal = (typeof rawVal === 'number') ? rawVal : null;
         if (label === 'Profit Oil (Govt)' && numVal !== null) poPrinted = numVal;   // v636 (T2)
@@ -33883,10 +33955,34 @@ function renderReformTimeline(country) {
             // so the row is findable in a table scan rather than only on hover.
             ? '<span style="color:var(--red);font-weight:700;">' + val + '</span>'
             : val;
-        rows.push([label, valHtml, statHtml, badgeHtml]);
+        // v742 (T6): terms the live model does not read are held back for the partition below.
+        if (_readsRow(label)) {
+          rows.push([label, valHtml, statHtml, badgeHtml]);
+        } else {
+          offRows.push([label, valHtml, statHtml, badgeHtml]);
+          if (unsourcedCount > _snap742.unsourced) offUnsourcedLabels.push(label);
+          else if (sourcedCount > _snap742.sourced) {
+            offSourcedCount++;
+            if (divergentCount > _snap742.divergent) offDivergentLabels.push(label);
+          }
+          sourcedCount   = _snap742.sourced;
+          divergentCount = _snap742.divergent;
+          unsourcedCount = _snap742.unsourced;
+          bulkCount      = _snap742.bulk;
+          sharedCount    = _snap742.shared;
+          citedLinkCount = _snap742.cited;
+          deadLinkCount  = _snap742.dead;
+          unsourcedLabels.length     = _snap742.uL;
+          unsourcedZeroLabels.length = _snap742.uZ;
+          bulkLabels.length          = _snap742.bL;
+          sharedLabels.length        = _snap742.sL;
+          deadLinkLabels.length      = _snap742.dL;
+          modelConflicts.length      = _snap742.mC;
+          _termsCited.clear(); _snap742.tC.forEach(function(k) { _termsCited.add(k); });
+        }
       });
 
-      if (!rows.length) {
+      if (!rows.length && !offRows.length) {   // v742 (T6): off-model rows still make a table
         el.innerHTML = '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:10px 14px;font-size:12px;color:var(--muted);line-height:1.5;">No sourced fiscal parameters available for this country. Key parameters (royalty, CIT, profit oil split) have not yet been verified at A/B-tier confidence. The Take% and DCF metrics shown above are computed from contract averages — use the Evidence badge above for sourcing context. <strong style="color:var(--text);">Analyst note:</strong> verify fiscal terms via primary legislation or operator filings before IC memo use.</div>';
         _cpApplyPOReconcile(slug, poPrinted);   // v636 (T2)
         return;
@@ -34142,7 +34238,9 @@ function renderReformTimeline(country) {
     // whole-table pass when three is the only number on screen. The denominator is now on the line.
     const _coverage601 = unsourcedCount > 0
       ? ' <strong style="color:var(--orange);">' + sourcedCount + ' of the ' + _heldRows
-        + ' rows above ' + (sourcedCount === 1 ? 'is' : 'are') + ' independently sourced; '
+        + (offRows.length ? ' rows the ' + (_liveMechName ? _esc(_liveMechName) + ' ' : '')
+             + 'model reads ' : ' rows above ')
+        + (sourcedCount === 1 ? 'is' : 'are') + ' independently sourced; '
         + unsourcedCount + ' ' + (unsourcedCount === 1 ? 'is' : 'are') + ' not sourced at all.</strong> '
       : '';
     // v601 (T2): the severe case -- an unsourced row this platform's own DCF engine contradicts.
@@ -34209,7 +34307,8 @@ function renderReformTimeline(country) {
     // N JURISDICTIONS (v588), Estimated default D. "No source at all" had none.
     const _unsourcedNote601 = unsourcedCount > 0
       ? '<div style="margin-top:8px;background:rgba(107,101,96,.05);border:1px solid var(--border);border-left:3px solid var(--muted);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
-        + '<strong style="color:var(--text);">' + unsourcedCount + ' of the ' + _heldRows + ' rows above ('
+        + '<strong style="color:var(--text);">' + unsourcedCount + ' of the ' + _heldRows
+        + (offRows.length ? ' rows the model reads (' : ' rows above (')
         + _esc(unsourcedLabels.join(', ')) + ') carr' + (unsourcedCount === 1 ? 'ies' : 'y')
         + ' no source at all.</strong> Not primary law, not a secondary guide, not the bulk harvest \u2014 nothing. '
         + 'The value shown is the average across this country\u2019s contract records and nothing corroborates it.'
@@ -34237,7 +34336,9 @@ function renderReformTimeline(country) {
         + 'color:var(--muted);line-height:1.5;">'
         + '<strong style="color:var(--text);">\u26a0 '
         + (_allDead
-            ? 'Not one of the ' + citedLinkCount + ' cited source' + _pl(citedLinkCount) + ' above can be retrieved'
+            ? (citedLinkCount === 1
+                ? 'The only cited source above cannot be retrieved'
+                : 'Not one of the ' + citedLinkCount + ' cited sources above can be retrieved')
             : deadLinkCount + ' of the ' + citedLinkCount + ' cited sources above cannot be retrieved')
         + ' at the address on record.</strong> '
         + _esc(deadLinkLabels.join(', ')) + ' link' + (deadLinkCount === 1 ? 's' : '')
@@ -34261,13 +34362,19 @@ function renderReformTimeline(country) {
     const _citeScope641 = deadLinkCount > 0
       ? ' <strong style="color:var(--red);">'
         + (_allDead
-            ? 'None of those ' + citedLinkCount + ' citation' + _pl(citedLinkCount) + ' can be opened from here.'
+            ? (citedLinkCount === 1
+                ? 'That one citation cannot be opened from here.'
+                : 'None of those ' + citedLinkCount + ' citations can be opened from here.')
             : deadLinkCount + ' of those ' + citedLinkCount + ' citations cannot be opened from here.')
         + '</strong>'
       : '';
     const _mainNote = divergentCount > 0
       ? '<div style="margin-top:8px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
-        + '<strong style="color:var(--text);">⚠ ' + divergentCount + ' of ' + sourcedCount + ' independently sourced parameter' + _pl(sourcedCount) + ' differ from the statutory rate.</strong> '
+        + '<strong style="color:var(--text);">⚠ ' + divergentCount + ' of ' + sourcedCount
+        + ' independently sourced parameter' + _pl(sourcedCount)
+        + (offRows.length ? ' the model reads' : '')
+        + (divergentCount === 1 && sourcedCount === 1 ? ' differs' : ' differ')
+        + ' from the statutory rate.</strong> '
         + _coverage601
         + 'ORCA’s take%, NPV and IRR are built from the contract terms in the ORCA Value column, not from the statute. '
         + 'The gap is normally real — grandfathered licence rounds, block-specific terms and sliding scales. '
@@ -34278,12 +34385,52 @@ function renderReformTimeline(country) {
       : (sourcedCount > 0
         ? '<div style="margin-top:8px;font-size:11px;color:' + (_missInvented.length ? 'var(--orange)' : 'var(--muted)') + ';">'
           + (_missInvented.length ? '\u26a0 ' : '\u2713 ')
-          + (sourcedCount === 1 ? 'The 1 independently sourced parameter matches' : 'All ' + sourcedCount + ' independently sourced parameters match')
+          + (sourcedCount === 1
+              ? 'The 1 independently sourced parameter' + (offRows.length ? ' the model reads' : '') + ' matches'
+              : 'All ' + sourcedCount + ' independently sourced parameters'
+                + (offRows.length ? ' the model reads' : '') + ' match')
           + ' the rate stated in the cited source.' + _citeScope641 + _coverage601 + _scope625 + '</div>'
         : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
-    const reconNote = _mainNote + _deadNote641 + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _bulkNote + _sharedNote;
+    // ── v742 (T6): what the rows below the divider are, and what they are not ────────────
+    // Placed FIRST in the note stack, immediately under the partition it explains, because the
+    // divider is the new thing on screen and an unexplained divider is worse than none. It states
+    // the negative fact the analyst needs (these do not enter the number) and, where those rows
+    // carry the absences that used to drive the IC-memo imperative, says so without repeating the
+    // imperative — chasing a statute for a term the model never reads is the wasted work this
+    // cycle exists to stop.
+    const _offNote742 = offRows.length
+      ? '<div style="margin-top:8px;background:rgba(107,101,96,.04);border:1px solid var(--border);'
+        + 'border-left:3px solid var(--border);border-radius:5px;padding:8px 11px;font-size:11px;'
+        + 'color:var(--muted);line-height:1.5;">'
+        + '<strong style="color:var(--text);">' + offRows.length + ' row' + _pl(offRows.length)
+        + ' below the divider (' + _esc(offRows.map(function(r) { return _stripTag742(r[0]); }).join(', '))
+        + ') ' + (offRows.length === 1 ? 'is' : 'are') + ' on record for ' + _esc(country)
+        + ' but ' + (offRows.length === 1 ? 'is' : 'are') + ' not read by '
+        + (_liveMechName ? 'the ' + _esc(_liveMechName) + ' model' : 'the model') + ' this page runs.</strong> '
+        + 'Change ' + (offRows.length === 1 ? 'it' : 'any of them')
+        + ' and the take, NPV, IRR and breakeven above do not move. '
+        + (function() {
+            const cl = [];
+            if (offUnsourcedLabels.length) {
+              cl.push(_esc(offUnsourcedLabels.join(', ')) + ' carr'
+                + (offUnsourcedLabels.length === 1 ? 'ies' : 'y') + ' no source');
+            }
+            if (offDivergentLabels.length) {
+              cl.push(_esc(offDivergentLabels.join(', ')) + ' disagree'
+                + (offDivergentLabels.length === 1 ? 's' : '') + ' with the cited statute');
+            }
+            if (!cl.length) return '';
+            return cl.join(' and ') + ' \u2014 ' + (cl.length > 1 ? 'neither of which is' : 'which is not')
+              + ' a gap in the evidence behind the number above. ';
+          })()
+        + 'Every count and every instruction under this table is scoped to the rows above the '
+        + 'divider. They are kept on screen because they are real records of this country\u2019s '
+        + 'contracts — they are simply provenance for something other than the figure on this page.'
+        + '</div>'
+      : '';
+    const reconNote = _mainNote + _deadNote641 + _regimeNote625 + _conflictNote601 + _unsourcedNote601 + _offNote742 + _bulkNote + _sharedNote;
 
     // v500: Parameter | ORCA Value | Statutory (cited source) | Source
     // Previously the Source badge sat next to the contract average and read as though the primary
@@ -34303,6 +34450,25 @@ function renderReformTimeline(country) {
           + '<td>' + r[3] + '</td>'
           + '</tr>'
         ).join('')
+      // v742 (T6): the partition. A full-width divider row carrying the regime name, then the
+      // rows the model does not read, at 60% opacity so the eye stops at the divider on a scan.
+      // They stay in the same table -- moving them to a second table would make them look like a
+      // different kind of record, and they are not; they are the same harvest, read by nothing.
+      + (offRows.length
+          ? '<tr class="ec-offmodel-div"><td colspan="4" style="padding:9px 8px 6px;border-top:2px solid var(--border);'
+            + 'font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);">'
+            + 'Not read by ' + (_liveMechName ? 'the ' + _esc(_liveMechName) + ' model' : 'the model')
+            + ' &middot; on record for ' + _esc(country) + ', no effect on the take, NPV or IRR above'
+            + '</td></tr>'
+            + offRows.map(r =>
+                '<tr class="ec-offmodel" style="opacity:.6;">'
+                + '<td class="param-name">' + r[0] + '</td>'
+                + '<td class="param-val">' + r[1] + '</td>'
+                + '<td class="param-val">' + r[2] + '</td>'
+                + '<td>' + r[3] + '</td>'
+                + '</tr>'
+              ).join('')
+          : '')
       + '</tbody></table>'
       + reconNote;
 
@@ -34342,10 +34508,15 @@ function renderReformTimeline(country) {
           // v700 (T6): so the workbook's "DCF engine (%)" column cannot state a flat rate the
           // engine never reads. On a ladder country there is no single number for that cell.
           ladder: (_cf && _cf.ladder) ? _cf.ladder : null,
-          origin: _cf ? _cf.origin : null
+          origin: _cf ? _cf.origin : null,
+          // v742 (T6): the partition travels with the workbook. The sheet exists to answer "where
+          // did this number come from"; a row that produced no number needs to say so before a
+          // committee reads it as an input that did.
+          readByModel: _readsRow(_lbl)
         });
       });
       window._cpTermProv = { country: country, slug: slug, terms: _prov666,
+        mech: _liveMechName,
         checked: (typeof _CITE_DEAD_CHECKED !== 'undefined') ? _CITE_DEAD_CHECKED : '' };
     } catch (e) { window._cpTermProv = null; }
 
@@ -38319,7 +38490,11 @@ function exportCountryProfile() {
       ['DCF engine  = the basis the platform\u2019s own DCF ran for this term, where it differs from the ORCA value. The NPV, IRR and take on the Country Profile sheet were produced with it. Where this reads as an R-factor ladder rather than a rate, the engine resolves that term off the tier schedule year by year and the ORCA value beside it is not an input at all.'],
       ['Retrievable = whether ORCA could fetch the cited document at the address on record when every citation URL on the platform was checked on ' + (_prov666.checked || 'the date on record') + '. A dead link is not a judgement on the instrument — the tier letter is unchanged and the rate was read off it at harvest time. It means the one step that would let you check it yourself is currently broken.'],
       [''],
-      ['Term', 'ORCA value (%)', 'Statutory (%)', 'DCF engine (%)', 'Gap (pp)', 'Cited source', 'Tier', 'Retrievable', 'Note']
+      ['Read by model = whether the platform\u2019s DCF for this country\u2019s resolved mechanic'
+        + (_prov666.mech ? ' (' + _prov666.mech + ')' : '') + ' actually reads this term. A term marked NO is a real record of '
+        + country + '\u2019s contracts, but it is not an input: change it and the take, NPV, IRR and breakeven on the Country Profile sheet do not move. Do not carry a NO row into an IC memo as evidence for those figures.'],
+      [''],
+      ['Term', 'ORCA value (%)', 'Statutory (%)', 'DCF engine (%)', 'Gap (pp)', 'Cited source', 'Tier', 'Retrievable', 'Read by model', 'Note']
     ];
     _prov666.terms.forEach(t => {
       const _noSrc = !t.source;
@@ -38333,7 +38508,13 @@ function exportCountryProfile() {
         _noSrc ? 'NO SOURCE ON RECORD' : (t.bulk ? t.source + '  [country-level bulk harvest — assigned to every contract in this country, not read off any one of them]' : t.source),
         _noSrc ? '' : (t.tier || '?'),
         _noSrc ? '' : (!t.url ? 'no URL on record' : (t.dead ? 'NO — link dead as at ' + (_prov666.checked || '') : 'yes')),
-        (_noSrc
+        t.readByModel === false ? 'NO — not an input' : 'yes',
+        ((t.readByModel === false
+            ? 'NOT AN INPUT. The ' + (_prov666.mech ? _prov666.mech + ' ' : '') + 'model this platform runs for '
+              + country + ' does not read this term, so nothing in this row supports the take, NPV, IRR or breakeven '
+              + 'on the Country Profile sheet. It is on record and shown for completeness. '
+            : '')
+        + (_noSrc
           ? 'Not primary law, not a secondary guide, not the bulk harvest — nothing cites this term for ' + country + '. The value is a contract average and nothing corroborates it.'
             // v700 (T6): the ladder fact is orthogonal to whether the row is cited, and it is the
             // one an analyst defending the number needs. It was being swallowed by this branch on
@@ -38343,21 +38524,25 @@ function exportCountryProfile() {
               ? 'The DCF does not use the ORCA value beside it. ' + country + ' carries an R-factor profit-oil ladder of ' + t.ladder.n + ' tiers and the engine resolves the government share off those tiers year by year as R moves (' + t.ladder.lo.toFixed(0) + '\u2013' + t.ladder.hi.toFixed(0) + '%). The figure in this row is an uncited contract average and is not an input to the take, NPV or IRR on the Country Profile sheet. Cite the ladder, not this row.'
               : (t.gap != null
               ? 'The DCF engine ran ' + t.modelled + '% for this term, ' + t.gap + 'pp from the ORCA value beside it. Two harvests of the same term; neither is cited. Establish it from ' + country + '\u2019s own petroleum act.'
-              : '')))
+              : ''))))
       ]);
     });
     const _deadN = _prov666.terms.filter(t => t.dead).length;
     const _noSrcN = _prov666.terms.filter(t => !t.source).length;
     const _confN = _prov666.terms.filter(t => t.gap != null).length;
     _srcAoa.push(['']);
-    _srcAoa.push(['SUMMARY', _prov666.terms.length + ' fiscal terms carried on the Country Profile sheet. '
+    const _offN = _prov666.terms.filter(t => t.readByModel === false).length;
+    _srcAoa.push(['SUMMARY', _prov666.terms.length + ' fiscal terms carried on the Country Profile sheet'
+      + (_offN ? ', of which ' + _offN + ' ' + (_offN === 1 ? 'is' : 'are')
+          + ' NOT read by the ' + (_prov666.mech ? _prov666.mech + ' ' : '')
+          + 'model and support no figure on that sheet' : '') + '. '
       + _noSrcN + ' carry no source of any kind. ' + _deadN + ' cite a document ORCA could not retrieve. '
       + _confN + ' are a term for which this platform holds two different numbers. '
       + (function(n){ return n + (n === 1 ? ' is resolved off an R-factor ladder, so the ORCA value beside it is'
                                            : ' are resolved off an R-factor ladder, so the ORCA value beside them is')
                               + ' not what the DCF ran.'; })(_prov666.terms.filter(t => t.ladder).length)]);
     const ws4 = XLSX.utils.aoa_to_sheet(_srcAoa);
-    ws4['!cols'] = [{wch:34},{wch:15},{wch:14},{wch:15},{wch:10},{wch:64},{wch:6},{wch:26},{wch:96}];
+    ws4['!cols'] = [{wch:34},{wch:15},{wch:14},{wch:15},{wch:10},{wch:64},{wch:6},{wch:26},{wch:17},{wch:96}];
     XLSX.utils.book_append_sheet(wb, ws4, 'Fiscal Terms & Sources');
   }
   const slug = country.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
@@ -51057,7 +51242,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // v517: sc-proxy-keep (data-basis) replaces the retired sc-irr-nulls control
   var scProxyKeep = document.getElementById('sc-proxy-keep');
   if (scProxyKeep) scProxyKeep.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
-  // v741: floor-take data-basis toggle
+  // v742: floor-take data-basis toggle
   var scFloorKeep = document.getElementById('sc-floor-keep');
   if (scFloorKeep) scFloorKeep.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   // v554: take-comparability toggle
