@@ -40093,3 +40093,16 @@ different things in the same words.
 as the carried-forward `7643`). And the IC-memo plain-text export renders the Evidence tier cell as
 `B · mixed sourcing · 52% primary law · of · 1,051 facts` — a stray `· of ·` from the hidden
 block-span separators that read correctly on screen but concatenate oddly under `innerText`.
+
+---
+## Cycle 643 Log — 2026-09-09 05:44
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Here is the cycle summary.
+
+## Cycle 643 — T3, shipped as v737
+
+**Task.** T3 — *"How do these three countries compare side by side?"* Stalest by rotation (642 ran T6, 641 T1, 640 T2, 639 T5, 638 T4, 637 T3). Walked cold at 1440×900 and 390×844 with touch, storage cleared, over HTTP.
+
+**Friction.** Side-by-Side's take/NPV inversion notice (`index.html:28123`) was the last block on the tab with **no basis gate**. Every other block — the four Govt Take rows (v626), the four Cont
