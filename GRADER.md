@@ -40446,3 +40446,124 @@ second one.
 
 ## Friction
 Country Profile routes the analyst to Scenario Builder **six times** — including the CTA on the IRR chip itself, since CP deliberately refuses to print a country IRR. So it isn't a s
+
+---
+## Cycle 647 Log — 2026-09-09
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local http server). The pre-change HEAD build,
+  served from the same server as `_baseline_index.html`, measured **identically** — so the
+  delta vs the deployed 294/0/0 is the local service-worker 404, not this change.
+- Test after: 293 PASS / 0 FAIL / 1 WARN. Suite actually RAN this cycle, twice.
+- JS syntax gate: PASS (11 blocks). Page errors on the cold walk: 0, at all six viewports.
+- Pixel gate: **PASS** — no surface worse than baseline.
+- Viewports 1920 / 1440 / 1280 / 1024 / 768 / 390: `scrollWidth === clientWidth` on every one.
+- Mobile 390x844 `hasTouch`: no horizontal scroll; the two controls this cycle touched
+  (`#sc-proxy-keep`, `#sc-floor-keep`) measure 24x24 under `pointer: coarse`, up from 13px.
+- Shipped as **v741**, committed, mirrored, pushed.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" Stalest by rotation
+(641 T1 · 642 T6 · 643 T3 · 644 T4 · 645 T5 · 646 T2). Walked cold at 1440x900 and 390x844
+with touch, `sessionStorage` and `localStorage` cleared before every load, through the
+Screener and all eleven presets.
+
+## Friction
+The Screener ranks by contractor NPV descending. Contractor NPV is a monotone decreasing
+function of government take on the fixed standardized project, so **"ranked by NPV" is
+"ranked by lowest take"** — and the lowest takes in this database belong to the jurisdictions
+with the least fiscal record, because the take is the sum of the levers ORCA actually holds.
+
+Cold, at v740, the first row **below** the v507 verified-production divider — rank 23, the top
+of the frontier block, the exact place where T1 gets answered for anything outside the 22
+producers — was **Vanuatu at $5.1B, the highest contractor NPV in the database**, computed
+from 14 facts across 7 contracts: royalty 5%, CIT 0%, and nothing else. Then the Bahamas
+($4.7B, 8 facts) and Montenegro. On the **Low Take · Positive NPV** preset — the screen whose
+name *is* the T1 question — they land at ranks **10, 11 and 12 of 142**. The whole top-20 of
+the 185-country NPV ranking is this class: Vanuatu, Bahamas, Montenegro, Moldova, Sweden,
+Bulgaria, Bosnia, Belgium, Lithuania, Barbados, Hungary and the rest.
+
+The disclosure that existed described *quality*, never *direction*. A row read `PROXY` and
+`D · 14 facts`; nothing said that a thin record biases the number **one way** — take down,
+NPV up — which is what makes it sort to the top rather than scatter.
+
+And the only control that removed them was the wrong one: unticking **verified production
+only** also removes Guyana, Namibia, Mozambique, Senegal and Suriname — precisely the frontier
+the screen exists to find. The two questions ("has anyone drilled here" / "is this take a
+measurement") had one binary between them.
+
+Meanwhile **Fiscal Compare already refuses to do this.** v563 partitions its generic-default
+rows below a divider, unranked, and the v580 note names these same five countries by name as
+"already below the divider". One tab called Vanuatu unrankable; the tab beside it ranked it
+first in the world.
+
+## Change
+A **third data-basis register** on the Screener, built on a measured, non-arbitrary test
+(`_scTakeIsFloor`, index.html:29117): a country whose record holds **no petroleum rent
+instrument at all** — no state participation, profit-oil or revenue share, resource-rent
+surtax, cost-recovery limit, first-tranche petroleum, service fee or R-factor schedule — **on
+fewer than `SC_EVID_MIN_FACTS` (50) facts**. Its take is royalty + income tax alone, which is
+a **lower bound**, and its contractor NPV an **upper bound**: any instrument that exists in
+law and is not yet in the record moves take up and NPV down.
+
+It is a conjunction for the same reason v681 made the evidence axis one — royalty+tax alone
+also describes Canada and the USA, where it is not news and rests on 1,758 and 125,336 facts.
+Measured on the shipped `country_data.json` the class is **45 of 185**, all 45 already inside
+the 163 with no verified production (so the two axes nest, and the ranking carries both as
+three blocks rather than two), and **not one real petroleum jurisdiction is in it**. The
+threshold is not knife-edge: at a 100-fact floor the set grows by 5, at 150 by 0 more.
+
+On screen, cold:
+- `_dqRank` has three registers, so those rows **rank last**, under their own amber divider in
+  the v507 voice: *"BELOW THIS LINE — 45 COUNTRIES WHOSE TAKE IS A FLOOR, NOT A MEASUREMENT."*
+- Their Govt Take cell reads **`≥5.0%`** and their Contractor NPV cell **`≤$5.1B`**, so a row
+  lifted out of the block by a column sort, ticked into the shortlist, or read on a phone where
+  the divider has scrolled past still carries its own direction.
+- The count line names three registers, not two: *"22 with verified field production first,
+  then 118 modelled on regional proxy terms, then 45 whose take is a floor."*
+- A second, separate control in Advanced — `#sc-floor-keep`, **checked by default**, so the
+  rest state keeps every row — expresses "only the countries whose take is a measurement"
+  without throwing away the frontier. Wired into the filter, the preset reset, the active-filter
+  badge, the exported criteria and the zero-result diagnosis.
+- The export carries it: `Take_Is_Floor` / `Take_Basis` columns, `≥`/`≤` on the pasted IC-memo
+  take and NPV cells, and a `TAKE BASIS:` line in the criteria block that fires **only when the
+  shortlist actually contains such a row** and names them.
+
+Exercised live against all eleven presets, both grouped and ungrouped sorts, evidence-first on
+and off, a Govt Take column sort, both basis filters together, and the clipboard IC-memo path.
+
+## Result
+Cold, the first row below the verified-production divider is now **Greenland** — a real fiscal
+record with state participation held — instead of Vanuatu. Vanuatu moves rank 23 → 141 on the
+default screen and 11 → 99 on Low Take · Positive NPV. An analyst who reads the top of the
+frontier block now reads modelled regimes; an analyst who reaches the floor block is told, in
+the divider and again in the two cells, that a low take there is **missing record, not
+favourable terms**; and one click in Advanced gives them the 98-row list of countries whose
+take is actually a measurement — a list they could not previously ask for, because the only
+button that removed Vanuatu also removed Guyana.
+
+Presets that name real petroleum provinces are untouched: **Offshore & Deepwater** and
+**Atlantic Frontier** contain zero floor rows and render exactly as before.
+
+## Still open (carried forward)
+Everything carried into cycle 646 that this walk did not touch remains open — the two on-screen
+columns both headed `Stability` (FC 0-5 diamonds vs Explorer 0-100 composite), the FC Stability
+`!` marker firing on 19 of 20 scored rows, the Side-by-Side paste not marked as the demo set,
+the Screener XLSX filename not encoding the shortlist size, the Scenario Builder header sentence
+naming the profile *as loaded*, and Country Profile's two NPV cohort ranks never stated as
+different cohorts.
+
+**Surfaced by this walk, not fixed:**
+1. `Fiscal_Predictability` scores **Vanuatu 100/100** and Canada 80/100. The score is
+   `100 − IQR − swing − multi-mechanic penalties`, and Vanuatu has a zero spread because it
+   holds one statutory term. That is the v513 defect class again — absence of a distribution
+   read as perfect stability — on an axis this cycle did not touch. The cell does print
+   "one statutory term — spread component not exercised" beside it, so it is disclosed but not
+   ranked on.
+2. The same floor-take inversion is live on **Explorer Browse** and the **Bubble Chart**, which
+   share `COUNTRY_DATA` and the same NPV axis but not `_dqRank`. Explorer's own tooltip already
+   names "Vanuatu 5.0%, Bahamas 10.0%, Montenegro 10.5%" as what its ranking returns when
+   verified-production-first is switched off — so the pathology is documented there and
+   unpartitioned. `_scTakeIsFloor` is exported on `window` for that reason.
+3. `getDCFParams()` enriches from `COUNTRY_DATA` only for the PSC family, so on Fiscal Compare
+   every Concession country falls to `termsBasis === 'default'` regardless of how good its
+   record is — which is why Canada is unranked there and ranked #1 here. The two tabs disagree
+   about Canada for a reason that is a code path, not a data judgement.

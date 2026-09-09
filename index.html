@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v740</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v741</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1267,6 +1267,16 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   input[type="number"], .chip, .expl-mode-btn, .tab-dropdown-btn {
     min-height: 44px;
   }
+  /* v741 (T1): the two data-basis checkboxes in the Screener's Advanced panel. They answer
+     two different questions -- "has anyone drilled here" and "is this take a measurement" --
+     and mis-hitting one for the other on a phone returns a different shortlist. Scoped to
+     these two ids rather than to input[type=checkbox]: the mechanic and IOC grids in the same
+     panel hold dozens of boxes, and widening those is how a 390px column starts scrolling.
+     accent-color is not set here; only the hit box changes. */
+  #sc-proxy-keep, #sc-floor-keep {
+    min-width: 24px; min-height: 24px; width: 24px; height: 24px;
+    flex: 0 0 auto; margin-right: 4px;
+  }
   /* Inline chips and pills sit inside running text; give them a hit area
      without letting them shove the line box around. */
   .chip, .tag, .source-badge, .reform-mechanic, .reform-take {
@@ -2062,7 +2072,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v740</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v741</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2132,7 +2142,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v740</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v741</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3165,6 +3175,15 @@ window.copyPlatformCitation = function(btn) {
                filter, so the flagship IC screen could not express "only the countries anyone has
                actually drilled", which is exactly what T1 asks. -->
           <label title="163 of 185 countries have no verified field production: their fiscal terms are regional proxy estimates and the NPV and breakeven shown for them are indicative only &mdash; the Screener already says so in the divider row it draws at that boundary. CHECKED (default): all 185 stay in the list, ranked with the production-backed 22 first. UNCHECKED: keep only the 22 countries whose economics are backed by real field production."><input type="checkbox" id="sc-proxy-keep" checked> Include the <span style="font-weight:700;">163</span> countries with no verified field production <span style="color:var(--muted);font-size:10px;">(proxy economics &mdash; indicative only)</span></label>
+          <!-- v741 (T1): the escape hatch for the floor-take block. The default is unchanged --
+               the rows stay in the list, partitioned last under their own divider with bounded
+               cells -- because dropping 45 rows silently is the failure mode this platform keeps
+               fixing, not a fix. What did not exist was any way to say "only the countries whose
+               take is actually a measurement", which is the shape of T1 once the analyst has read
+               the divider. The verified-production filter beside it does not answer that: it also
+               removes Guyana, Namibia, Mozambique, Senegal and Suriname, i.e. the frontier the
+               screen exists to find. -->
+          <label title="Countries for which ORCA holds no petroleum rent instrument at all &mdash; no state participation, profit-oil or revenue share, resource-rent surtax, cost-recovery limit, first-tranche petroleum or service fee &mdash; on a record of fewer than 50 fiscal facts. Their take is royalty and income tax alone, which is a LOWER bound, and the contractor NPV beside it an UPPER bound. Because NPV falls as take rises, they sort to the TOP of an NPV ranking: Vanuatu leads the whole database at $5.1B on 14 facts. CHECKED (default): they stay in the list, ranked last under their own divider with &ge; and &le; markers on the two cells. UNCHECKED: keep only the countries whose take is computed from at least one petroleum rent instrument, or from a record of 50+ facts. This is a different question from the production filter above &mdash; Guyana, Namibia, Mozambique, Senegal and Suriname have no verified production but are modelled on real PSC terms, and this filter keeps them."><input type="checkbox" id="sc-floor-keep" checked> Include the <span style="font-weight:700;" id="sc-floor-n">45</span> countries whose take is a <span style="font-weight:700;">floor</span>, not a measurement <span style="color:var(--muted);font-size:10px;">(royalty + tax only, thin record)</span></label>
         </div>
       </div>
     </div>
@@ -29114,6 +29133,66 @@ let _screenerMinFacts = 0;   // v518: fact-depth floor, set only by the Primary-
 // _evidenceGrade()'s own B rung on the depth leg (nf >= 150 = A, >= 50 = B, >= 15 = C).
 // It is a floor, not a replacement: the Primary-Source Evidence preset's 150 still wins.
 const SC_EVID_MIN_FACTS = 50;
+
+// ─── v741 (T1) — is this country's government take a MEASUREMENT or a FLOOR? ────────────────
+// The database take is the sum of the fiscal levers ORCA actually holds for a country. Where the
+// record holds no petroleum rent instrument AT ALL -- no state participation, no profit-oil or
+// revenue share, no resource-rent surtax, no cost-recovery limit, no first-tranche petroleum, no
+// service fee, no R-factor tier schedule -- the take is royalty plus income tax and nothing else.
+// That is a LOWER bound: every instrument that exists in law and is not yet in the record can
+// only move take UP, and contractor NPV (a decreasing function of take on the fixed standardized
+// project) only DOWN.
+//
+// On its own that is true of Canada and the USA too, and for them it is not news: royalty + tax
+// IS the regime, and the claim rests on 1,758 and 125,336 facts respectively. So the test is a
+// CONJUNCTION, exactly as v681 made the evidence axis (share AND depth): no rent instrument AND
+// a record thinner than SC_EVID_MIN_FACTS. Measured on the shipped country_data.json that is
+// 45 of 185 countries -- Vanuatu, the Bahamas, Montenegro, Moldova, Sweden, Belgium, the nine
+// Pacific micro-states, the five French overseas territories, Nepal, Saint Helena, Ascension
+// Island, Burundi, Costa Rica, Malta, Slovakia, France, UAE-Dubai and the rest -- and not one
+// real petroleum jurisdiction. All 45 sit inside the 163 with no verified field production, so
+// the two axes nest cleanly and the ranking can carry both as three blocks rather than two.
+//
+// Why this matters at all: the Screener ranks by contractor NPV descending, and NPV is monotone
+// decreasing in take, so "ranked by NPV" IS "ranked by lowest take" -- and the lowest takes in
+// the database are the jurisdictions with the least fiscal record. Cold, at v740, the first row
+// BELOW the verified-production divider -- rank 23, the top of the frontier block, the exact spot
+// where T1 gets answered for anything outside the 22 producers -- was Vanuatu at $5.1B, the
+// highest contractor NPV in the database, computed from 14 facts (royalty 5%, CIT 0%). Then the
+// Bahamas ($4.7B, 8 facts) and Montenegro. On the Low Take - Positive NPV preset they land at
+// ranks 10, 11 and 12 of 142.
+//
+// Fiscal Compare already refuses to do this: v563 partitions its generic-default rows below a
+// divider unranked, and the v580 note names these same five countries. The Screener had no
+// equivalent, so one tab called Vanuatu unrankable while the tab beside it ranked it first.
+const SC_RENT_LEVERS = ['spt','state_eq','profit_oil_govt','cost_recovery','cr_cap','ftp','tsc_fee','rev_share_min','rev_share_max'];
+function _scRentLevers(d) {
+  if (!d) return 0;
+  let n = 0;
+  for (let i = 0; i < SC_RENT_LEVERS.length; i++) {
+    const v = d[SC_RENT_LEVERS[i]];
+    if (v !== null && v !== undefined) n++;
+  }
+  if (d.tier_schedule && d.tier_schedule.length) n++;
+  return n;
+}
+function _scTakeIsFloor(d) {
+  return _scRentLevers(d) === 0 && (d.n_facts || 0) < SC_EVID_MIN_FACTS;
+}
+window._scTakeIsFloor = _scTakeIsFloor;
+function _scFloorCount() {
+  return (window.COUNTRY_DATA || []).filter(_scTakeIsFloor).length;
+}
+// Shared sentence, so the divider, the count line, the checkbox and the export criteria cannot
+// drift apart about what the block is.
+function _scFloorWhy() {
+  return 'ORCA holds no petroleum rent instrument for these \u2014 no state participation, profit-oil or '
+       + 'revenue share, resource-rent surtax, cost-recovery limit, first-tranche petroleum or service fee '
+       + '\u2014 on a record of fewer than ' + SC_EVID_MIN_FACTS + ' fiscal facts. Their take is royalty and '
+       + 'income tax alone, so it is a LOWER bound and the contractor NPV beside it an UPPER bound: any '
+       + 'instrument that exists in law and is not yet in the record moves take up and NPV down. That is '
+       + 'why they rank where they do.';
+}
 // v573: minimum share of $75 contractor NPV retained at the $50 downside. null = leg not applied.
 // Set only by the Downside Resilience preset. See _npvRetention().
 let _screenerMinRetention = null;
@@ -29529,7 +29608,10 @@ var _SC_SIG_LABELS = {
   'sc-reform':     { n: 'reform record',    f: function (v) { return v || 'any'; } },
   'sc-proxy-keep': { n: 'data basis',       f: function (v) { return v ? 'proxy countries included' : 'verified production only'; } },
   'sc-fee-cmp':    { n: 'take basis',       f: function (v) { return v ? 'comparable' : 'published blend'; } },
-  'sc-evid-depth': { n: 'fact-depth leg',   f: function (v) { return v ? 'on' : 'off'; } }
+  'sc-evid-depth': { n: 'fact-depth leg',   f: function (v) { return v ? 'on' : 'off'; } },
+  // v741 (T1): so the exported IC criteria block and the active-filter badge both say which of
+  // the two data-basis questions was actually asked. They are different questions.
+  'sc-floor-keep': { n: 'take basis',       f: function (v) { return v ? 'floor-take countries included' : 'measured take only'; } }
 };
 
 function _scCriteriaState() {
@@ -29654,6 +29736,8 @@ function applyScreenerPreset(preset) {
   // v517: sc-irr-nulls retired with the IRR axis; sc-proxy-keep replaces it.
   const keepProxy = document.getElementById('sc-proxy-keep');
   if (keepProxy) keepProxy.checked = true;
+  const keepFloor = document.getElementById('sc-floor-keep');
+  if (keepFloor) keepFloor.checked = true;   // v741
   const scRgn = document.getElementById('sc-region');
   if (scRgn) scRgn.value = '';
   setReform('');   // v662
@@ -30482,6 +30566,8 @@ function _scProdCovTip(d) {
 }
 
 function runScreener() {
+  // v741 (T1): the floor-take population is read off the live data, not written into the label.
+  (function(){ var el = document.getElementById('sc-floor-n'); if (el) el.textContent = _scFloorCount(); })();
   _scUpdateNeutralFlags();
   _scSyncNpvAxis();   // v617: re-scale the NPV axis to the active deck BEFORE its value is read
   // v718: recompute preset drift and repaint the chip BEFORE the count line and the export basis
@@ -30504,6 +30590,10 @@ function runScreener() {
   // v517: the IRR axis is retired. What is left to disclose is data basis: 163 of the 185 countries
   // have no verified field production and their economics are regional proxies.
   const includeProxy = document.getElementById('sc-proxy-keep')?.checked !== false;
+  // v741 (T1): a SECOND data-basis leg, not a synonym for the one above. All 45 floor-take rows
+  // are proxy rows, but only 45 of the 163 proxy rows are floor-take: unticking the production
+  // box to escape Vanuatu also threw away Guyana, Namibia, Mozambique, Senegal and Suriname.
+  const includeFloor = document.getElementById('sc-floor-keep')?.checked !== false;
   // v662 (T4): reform-record leg. Resolved once per run and shared with the count line, the
   // active-filter badge, the export criteria and the zero-result diagnosis, so all five read
   // the same set. See the note above _scReformUniverse().
@@ -30601,6 +30691,8 @@ function runScreener() {
     // a divider at the boundary, but never let the analyst screen on it. "Only the countries anyone
     // has actually drilled" is the single most useful narrowing available for T1.
     if (!includeProxy && !_dqTier(d).hasProduction) return false;
+    // v741 (T1): floor-take basis filter. See _scTakeIsFloor().
+    if (!includeFloor && _scTakeIsFloor(d)) return false;
 
     // mechanic: country passes if ANY of its mechanics is in the checked set
     const dMechs = d.mechanics.split(',').map(m => m.trim());
@@ -30724,7 +30816,11 @@ function runScreener() {
   //
   // Countries with verified production now sort first, proxies after, NPV DESC within each
   // group. Nothing is removed — all 185 stay in the table, the export and the count.
-  const _dqRank = d => (_dqTier(d).hasProduction ? 0 : 1);
+  // v741 (T1): three registers, not two. 0 = verified field production. 1 = proxy economics but
+  // ORCA holds at least one petroleum rent instrument, so the take is a modelled figure. 2 = the
+  // take is a floor (see _scTakeIsFloor). All 45 rank-2 rows sit inside the rank-1 set on the
+  // shipped data, so this refines the v507 partition rather than cutting across it.
+  const _dqRank = d => (_dqTier(d).hasProduction ? 0 : (_scTakeIsFloor(d) ? 2 : 1));
   // v609 (T1): a column sort now orders rows WITHIN each data-basis block instead of across
   // both of them, whenever "Rank verified-production countries first" is ticked.
   //
@@ -30768,11 +30864,20 @@ function runScreener() {
   }
   const _nVerified = data.filter(d => _dqTier(d).hasProduction).length;
   const _nProxy    = data.length - _nVerified;
+  // v741 (T1): rows in this result set whose take is a floor rather than a measurement.
+  const _nFloor    = data.filter(_scTakeIsFloor).length;
+  const _nModelled = _nProxy - _nFloor;
   // v609 — `!_scSortKey` removed. Grouping is now decided by the toggle the analyst controls,
   // not by whether they happen to have clicked a column header. An explicit sort also overrides
   // the R-factor swing order, so it can group there too. With the toggle OFF and a sort active
   // the rows genuinely are interleaved, _grouped is false, and the v543 banner still fires.
   const _grouped   = _screenerEvidenceFirst && (!!_scSortKey || !_screenerRfactorOnly) && _nVerified > 0 && _nProxy > 0;
+  // v741: the floor block is partitioned on the same toggle and the same sort paths as the
+  // production block. It can be drawn when the result set holds both kinds of proxy row, and
+  // does not require any production-backed row to exist -- the all-proxy screens (Deepwater,
+  // PSC Africa, Frontier Markets) are exactly where the distinction carries most.
+  const _floorGrouped = _screenerEvidenceFirst && (!!_scSortKey || !_screenerRfactorOnly)
+                        && _nFloor > 0 && (data.length - _nFloor) > 0;
   // v543 (cycle 442, T1) — _grouped was the single gate on ALL THREE proxy safeguards: the basis
   // sentence in the count line, the amber divider in the table, and the verified-production
   // handoff into Side-by-Side. It is false in two states where the analyst needs them MOST, and
@@ -30890,8 +30995,14 @@ function runScreener() {
   // problem; "which of these has anyone actually drilled" is.
   // v609 — when a column sort is active the grouped note says the sort runs INSIDE each block,
   // so the analyst is not left thinking their click was ignored.
+  // v741 (T1): the basis sentence now names three registers when the third is present, because
+  // "163 regional proxies" put Vanuatu and Mozambique in one bucket and the analyst reads the
+  // top of that bucket as the frontier shortlist.
+  const _floorNote = _nFloor > 0
+    ? ` \u2014 <span style="color:var(--accent);font-weight:600;">${_nFloor} of ${data.length} ${_nFloor === 1 ? 'row carries a take that is a floor' : 'rows carry a take that is a floor'}, not a measurement: royalty and income tax only on under ${SC_EVID_MIN_FACTS} facts, so take is a lower bound and NPV an upper bound${_floorGrouped ? '. They are ranked last, under their own line' : ''}.</span>`
+    : '';
   const _basisNote = _grouped
-    ? ` \u2014 ranked by data basis: ${_nVerified} with verified field production first, then ${_nProxy} whose economics are regional proxies${_scSortKey ? `, ${_scSortLabelNow().toLowerCase()} within each block` : ''}`
+    ? ` \u2014 ranked by data basis: ${_nVerified} with verified field production first, then ${_nModelled} modelled on regional proxy terms${_nFloor > 0 ? `, then ${_nFloor} whose take is a floor` : ''}${_scSortKey ? `, ${_scSortLabelNow().toLowerCase()} within each block` : ''}`
     : _allProxy
       ? ` <span style="color:var(--accent);font-weight:600;">\u2014 none of these ${data.length} countries has verified field production. Every take, NPV and breakeven below is a regional proxy estimate, indicative only, and not defensible as a screening shortlist on its own.</span>`
       : _mixedUngrouped
@@ -31017,8 +31128,8 @@ function runScreener() {
   // way back. Sorting is not filtering, so the "no filters applied yet" lead is still correct; it
   // now carries the sort alongside it.
   const _universeLead = (activeCount === 0 && !_activePresetName)
-    ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${sortNote}${_basisNote}`
-    : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}`;
+    ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${sortNote}${_basisNote}${_grouped ? '' : _floorNote}`
+    : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}${_grouped ? '' : _floorNote}`;
   document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${_takeBasisNote}${_npv50Note}${_npvLegNote}${_retNote}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
   // Friction this removes: an exported shortlist is the thing that reaches the investment
@@ -31124,6 +31235,7 @@ function runScreener() {
     var _totalMechs = document.querySelectorAll('#sc-mech-checks input[type=checkbox]').length;
     var _checkedMechsCount = document.querySelectorAll('#sc-mech-checks input[type=checkbox]:checked').length;
     if (_diagNPV50 > -500) _diagHints.push('Min NPV @$50 &ge;$' + _diagNPV50 + 'M — only ' + COUNTRY_DATA.filter(function(x){return x.npv_50!=null&&x.npv_50>=_diagNPV50;}).length + ' of ' + COUNTRY_DATA.length + ' countries clear this downside floor');
+    if (!includeFloor) _diagHints.push('Measured take only \u2014 that removes the ' + _scFloorCount() + ' of ' + COUNTRY_DATA.length + ' countries whose take is royalty and income tax alone on under ' + SC_EVID_MIN_FACTS + ' facts');
     if (!includeProxy) _diagHints.push('Verified field production only — that is ' + COUNTRY_DATA.filter(function(x){return _dqTier(x).hasProduction;}).length + ' of ' + COUNTRY_DATA.length + ' countries before any other filter');
     if (_diagTake < 60) _diagHints.push('Max take &le;' + _diagTake + '% — few countries qualify at this threshold');
     if (_checkedMechsCount < _totalMechs && _checkedMechsCount > 0) _diagHints.push('Only ' + _checkedMechsCount + ' of ' + _totalMechs + ' fiscal mechanics selected');
@@ -31228,6 +31340,15 @@ function runScreener() {
     // basis when the swap is live. Leaving it on the published figure is what put "NOC/Concession"
     // on row 6 of an ascending screen between two "Inv-Friendly" rows.
     const _rowFc  = _feeCmpOf(d);
+    // v741 (T1): the bound marker. A glyph is not the fix here -- the divider and the ranking
+    // are -- but a row lifted out of the block by a column sort, ticked into the shortlist, or
+    // read on a phone where the divider has scrolled away still has to carry its own direction.
+    const _rowFloor = _scTakeIsFloor(d);
+    const _floorTip = (d.country + ': ' + _scFloorWhy() + ' Record on file: '
+                      + Number(d.n_facts || 0).toLocaleString() + ' fiscal facts across '
+                      + Number(d.n || 0).toLocaleString() + ' contracts, royalty and income tax only.').replace(/"/g, '&quot;');
+    const _floorGe = _rowFloor ? `<span style="color:var(--accent);font-weight:700;cursor:help;" title="${_floorTip}">&ge;</span>` : '';
+    const _floorLe = _rowFloor ? `<span style="color:var(--accent);font-weight:700;cursor:help;" title="${_floorTip}">&le;</span>` : '';
     const _tierOn = (_takeLeadCmp && _rowFc.diverges) ? _rowFc.cmp : d[takeKey];
     const tc = tierClass(_tierOn);
     // v507: labelled divider at the point the ranking stops being production-backed. Without it
@@ -31240,21 +31361,33 @@ function runScreener() {
         + `Ranked among themselves by ${_scSortKey ? _scSortLabelNow().toLowerCase() : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
         + `</td></tr>`
       : '';
+    // v741 (T1): second boundary, drawn where the ranking stops being a measurement at all.
+    // The v507 divider above answers "has anyone drilled here". It does not answer "is this
+    // number a number", and on an NPV-descending sort those two questions have opposite
+    // consequences: the thinner the fiscal record, the lower the modelled take, the HIGHER the
+    // NPV, the higher the row. Vanuatu led the block below the v507 line at $5.1B.
+    const _floorDiv = (_floorGrouped && i > 0 && !_scTakeIsFloor(data[i-1]) && _scTakeIsFloor(d))
+      ? `<tr class="screener-basis-divider screener-floor-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+        + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nFloor} ${_nFloor === 1 ? 'COUNTRY WHOSE TAKE IS A FLOOR' : 'COUNTRIES WHOSE TAKE IS A FLOOR'}, NOT A MEASUREMENT</strong><br>`
+        + _scFloorWhy()
+        + ` Their take cells read <strong style="color:var(--accent);">&ge;</strong> and their NPV cells <strong style="color:var(--accent);">&le;</strong> for that reason. A low take here is missing record, not favourable terms &mdash; do not carry this block into a shortlist.`
+        + `</td></tr>`
+      : '';
     // Bug 3 fix: click row to navigate to country profile
     const safeName = d.country.replace(/'/g, "\\'");
     // v728 (T5): data-country is what the shortlist is keyed on, so a tick survives a
     // re-sort and a price-deck change. The tick cell stops propagation so ticking a row
     // does not also navigate to that country's profile.
     const attrName = d.country.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-    return _divider + `<tr style="cursor:pointer" data-country="${attrName}" class="${_scSelHas(d.country) ? 'sc-row-sel' : ''}" onclick="openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
+    return _divider + _floorDiv + `<tr style="cursor:pointer" data-country="${attrName}" class="${_scSelHas(d.country) ? 'sc-row-sel' : ''}" onclick="openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
       <td class="sc-selcell" onclick="event.stopPropagation();"><input type="checkbox" class="sc-sel"${_scSelHas(d.country) ? ' checked' : ''} onclick="event.stopPropagation();scToggleSel(this,'${safeName}')" onkeydown="event.stopPropagation();" aria-label="Add ${attrName} to the IC shortlist"></td>
       <td class="num" style="color:var(--muted)">${i+1}</td>
       <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
       <td>${mechs}</td>
-      <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
+      <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${_floorGe}${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
       <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}<div class="sc-terms-slot" data-tc-country="${attrName}" style="margin-top:2px;"></div></td>
-      <td class="num">${fmtNpvShared(d[npvKey])}</td>
+      <td class="num">${_floorLe}${fmtNpvShared(d[npvKey])}</td>
       <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the Contractor NPV column to the left, which is computed at the active price deck: a regime that is positive there and negative here does not survive a price break. The second line is the share of THAT column&#39;s value retained, so the percentage can be checked against the two figures on this row — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
       <td class="num" title="${_scProdCovTip(d)}" style="color:${(d.prod_coverage_pct||0)>30?'#15803D':(d.prod_coverage_pct||0)>=10?'#A16207':'var(--muted)'}">${_scProdCovCell(d)}</td>
       <td class="num" style="color:${d.swing!=null?(d.swing>=20?'var(--red)':d.swing>=10?'var(--orange)':'var(--muted)'):'var(--muted)'};font-weight:${d.swing!=null&&d.swing>=15?'700':'400'}">${d.swing !== null ? '+'+fmt(d.swing)+'pp' : '—'}</td>
@@ -31497,6 +31630,26 @@ function _scExportBasisLines() {
   }
   L.push('ASSUMPTIONS: standardized Deepwater profile, $1.2B capex, 50k bbl/d, $15/bbl opex, '
     + '10% WACC, 100% WI. Take and NPV at the screened price; breakeven always at $75/bbl.');
+  // v741 (T1): only stated when this shortlist actually contains such a row, and it names them,
+  // because a caveat about countries that are not in the export is noise in an IC memo.
+  (function(){
+    // Same two sources _scExportBasisLines() already uses for the data-basis split, so this
+    // sentence counts the rows actually in the file rather than the pre-shortlist match set.
+    var _s2 = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
+    var _inFile = (window._screenerData || []);
+    if (_s2 && _s2.length) _inFile = _inFile.filter(function(x){ return _s2.indexOf(x.country) >= 0; });
+    var _fl = _inFile.filter(_scTakeIsFloor);
+    if (!_fl.length) return;
+    L.push('TAKE BASIS: ' + _fl.length + ' row' + (_fl.length > 1 ? 's' : '') + ' in this shortlist carr'
+      + (_fl.length > 1 ? 'y' : 'ies') + ' a take that is a FLOOR, not a measurement, and '
+      + (_fl.length > 1 ? 'are' : 'is') + ' marked with \u2265 on take and \u2264 on NPV: '
+      + _fl.map(function(r){ return r.country; }).join(', ') + '. ORCA holds no petroleum rent instrument '
+      + 'for these \u2014 no state participation, profit-oil or revenue share, resource-rent surtax, '
+      + 'cost-recovery limit, first-tranche petroleum or service fee \u2014 on a record of fewer than '
+      + SC_EVID_MIN_FACTS + ' fiscal facts. Any instrument that exists in law and is not yet in the record '
+      + 'moves take up and NPV down, so a low take here is missing record rather than favourable terms. '
+      + 'See the Take_Basis column.');
+  })();
   // v687 (T5): was a stale 239.8% / 124-country literal. Measured from the bundle now.
   L.push(_icIrrNote('IRR is not reported'));
   L.push('Fiscal_Predictability is the same score the Country Profile and Side-by-Side show '
@@ -31681,6 +31834,19 @@ function _scExportRows() {
       Mechanics: d.mechanics,
       R_factor_Tiers: d.has_r_factor_tiers ? 'Yes' : 'No',
       Verified_Production: _dqTier(d).hasProduction ? 'Yes' : 'No',
+      // v741 (T1): the take/NPV basis flag. A shortlist that reaches an IC memo has to carry the
+      // direction of its own error, or the divider on screen stops at the browser window.
+      Take_Is_Floor: _scTakeIsFloor(d) ? 'Yes' : 'No',
+      Take_Basis: _scTakeIsFloor(d)
+        ? 'FLOOR - royalty + income tax only, ' + Number(d.n_facts || 0).toLocaleString()
+          + ' facts on file, no rent instrument held. Take is a lower bound; contractor NPV an upper bound.'
+        : _scRentLevers(d) > 0
+          ? 'Measured - ' + _scRentLevers(d) + ' petroleum rent instrument(s) held on '
+            + Number(d.n_facts || 0).toLocaleString() + ' facts'
+          // Royalty + tax with no rent instrument, but on a record deep enough to carry the
+          // claim that this IS the regime. Canada (1,758 facts) and the USA (125,336) are here.
+          : 'Measured - royalty + income tax regime, no rent instrument, on '
+            + Number(d.n_facts || 0).toLocaleString() + ' facts',
       GovtTake_50: d.take_50,
       GovtTake_75: d.take_75,
       GovtTake_100: d.take_100,
@@ -31783,7 +31949,7 @@ function _scCopyColumns(rows, price) {
     { h: 'Country',                  f: function(r){ return r.Country; } },
     { h: 'Region',                   f: function(r){ return r.Region; } },
     { h: 'Mechanic',                 f: function(r){ return r.Mechanics; } },
-    { h: 'Govt take @$' + price,     f: function(r){ return r['GovtTake_' + price] != null ? r['GovtTake_' + price].toFixed(1) + '%' : '—'; } }
+    { h: 'Govt take @$' + price,     f: function(r){ return r['GovtTake_' + price] != null ? (r.Take_Is_Floor === 'Yes' ? '≥' : '') + r['GovtTake_' + price].toFixed(1) + '%' : '—'; } }
   ]);
   // Only carried when at least one row's headline blends fee-basis contracts. Where none
   // does, the column would be a duplicate of the one before it on every row.
@@ -31791,13 +31957,13 @@ function _scCopyColumns(rows, price) {
   // screened price, so the header says $75 rather than letting it read as the screened one.
   if (anyFee) cols.push({ h: 'Comparable take @$75 (fee-basis excluded)',
     f: function(r){ return r.GovtTake_75_Comparable != null
-        ? r.GovtTake_75_Comparable.toFixed(1) + '%' + (r.FeeBasis_Blend === 'Yes' ? ' ← cite this' : '') : '—'; } });
+        ? (r.Take_Is_Floor === 'Yes' ? '≥' : '') + r.GovtTake_75_Comparable.toFixed(1) + '%' + (r.FeeBasis_Blend === 'Yes' ? ' ← cite this' : '') : '—'; } });
   // v699 (T1) — these three columns were pinned to $75 while the title line one paragraph above
   // them and the Govt take column beside them both followed the deck. An analyst who screened at
   // $100, read Canada as $6.2B on screen and pressed Copy for IC Memo pasted "$3.9B" into the
   // memo. The NPV that leaves the tool is now the NPV the screen was run at.
   var _refD = (rows[0] && rows[0].Retention_Reference_bbl) || '75';
-  cols.push({ h: 'Contractor NPV @$' + price + ' ($M)', f: function(r){ return r.NPV_Screened_M != null ? cpNpvFmt(r.NPV_Screened_M) : '—'; } });
+  cols.push({ h: 'Contractor NPV @$' + price + ' ($M)', f: function(r){ return r.NPV_Screened_M != null ? (r.Take_Is_Floor === 'Yes' ? '≤' : '') + cpNpvFmt(r.NPV_Screened_M) : '—'; } });
   if (price !== '50') {
     cols.push({ h: 'NPV @$50 ($M) — downside',  f: function(r){ return r.NPV_50_M != null ? cpNpvFmt(r.NPV_50_M) : '—'; } });
     cols.push({ h: '% of $' + _refD + ' NPV kept @$50', f: function(r){ return r.NPV_Retention_pct != null ? r.NPV_Retention_pct.toFixed(0) + '%' : '—'; } });
@@ -50891,6 +51057,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // v517: sc-proxy-keep (data-basis) replaces the retired sc-irr-nulls control
   var scProxyKeep = document.getElementById('sc-proxy-keep');
   if (scProxyKeep) scProxyKeep.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
+  // v741: floor-take data-basis toggle
+  var scFloorKeep = document.getElementById('sc-floor-keep');
+  if (scFloorKeep) scFloorKeep.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   // v554: take-comparability toggle
   var scFeeCmp = document.getElementById('sc-fee-cmp');
   if (scFeeCmp) scFeeCmp.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
