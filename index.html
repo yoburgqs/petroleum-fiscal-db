@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v730</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v731</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2013,7 +2013,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v730</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v731</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2083,7 +2083,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v730</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v731</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -28719,6 +28719,42 @@ function _sbsBoundOrder(hits, measured) {
     + ' \u2014 carry that order and those figures into the IC memo, each with its observed range '
     + 'attached, not the printed scores.';
 }
+// v731 (T3): the withdrawal notice under the grid is an argument ABOUT the Predictability Score
+// row -- "Do not rank the set on the printed scores -- rank it on the ceilings" -- and that row
+// lives inside the evidence drawer, which is collapsed on every cold load. So the notice landed
+// on a screen carrying no printed score, no ceiling and no Predictability row at all: 1,179
+// characters of bold orange correction pointing at nothing the analyst could see. It fires on the
+// cold-load default set (Norway / United Kingdom / Netherlands) and on all four quickstart
+// presets, so this was the tab's normal state, not an edge case.
+//   The correction itself was never missing -- _sbsPaintObsSpread() above had already written it
+// into the cell ("76 UNGRADED / >=29.6pp obs / best case / -> carry <=52 . LOW"). It was one
+// click away behind a 10px grey toggle whose own tooltip explains that it is collapsed to keep
+// the Govt Take rows above the fold. Nothing on screen connected the two.
+//   The drawer now opens when, and only when, a column in THIS set has actually been withdrawn.
+// A set with nothing withdrawn keeps it shut and the Govt Take rows stay where they were. An
+// analyst who has explicitly collapsed it this session ('0') is not overridden, and the auto-open
+// deliberately does NOT write sessionStorage: it is a property of the data on screen, not a
+// remembered preference, so it must not leak onto the next set the analyst builds.
+function _sbsRevealEvidence() {
+  var btn = document.getElementById('cmp-ev-toggle');
+  if (!btn || btn.getAttribute('aria-expanded') === 'true') return;
+  try { if (sessionStorage.getItem('orca_sbs_ev') === '0') return; } catch (e) {}
+  btn.setAttribute('aria-expanded', 'true');
+  var caret = document.getElementById('cmp-ev-caret');
+  var word  = document.getElementById('cmp-ev-word');
+  if (caret) caret.textContent = '\u25be';
+  if (word)  word.textContent  = 'Hide';
+  var rws = document.querySelectorAll('#cmp-output .compare-grid [data-cmp-grp="ev"]');
+  for (var i = 0; i < rws.length; i++) rws[i].style.display = '';
+  var what = document.getElementById('cmp-ev-what');
+  if (what && what.dataset.sbsRevealed !== '1') {
+    what.dataset.sbsRevealed = '1';
+    what.innerHTML = '<span style="color:var(--orange);font-weight:700;">Opened because a '
+      + 'Predictability Score in this set is withdrawn \u2014 the corrected ceiling is on that '
+      + 'row.</span>';
+  }
+  if (typeof _sbsScrollHint === 'function') { try { _sbsScrollHint(); } catch (e) {} }
+}
 function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
   if (token !== window._sbsRenderToken) return;
   var out = document.getElementById('cmp-output');
@@ -28729,6 +28765,8 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
     return compareList.indexOf(k) !== -1;
   });
   if (!hits.length) return;
+  // v731 (T3): put the row this notice corrects on screen before writing the notice about it.
+  _sbsRevealEvidence();
   var el = document.getElementById('cmp-obs-notice');
   if (!el) {
     el = document.createElement('div');
@@ -28767,7 +28805,8 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
           ? 'therefore look' + (measured.length > 1 ? '' : 's') + ' like the LESS uniform regime'
             + (measured.length > 1 ? 's' : '') + ' on this screen while sitting at a NARROWER dispersion '
             + 'than the withdrawn column' + (hits.length > 1 ? 's' : '') + '. Do not rank the set on the '
-            + 'printed scores \u2014 rank it on the ceilings below.'
+            + 'printed scores \u2014 rank it on the \u2264 ceilings now shown on the Predictability '
+            + 'Score row above.'
           : 'are shown on a measured basis and are directly readable.');
   }
   el.innerHTML = '<strong style="color:var(--orange);">\u26a0 The &ldquo;single term&rdquo; claim is withdrawn for '
