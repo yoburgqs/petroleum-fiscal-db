@@ -38558,3 +38558,18 @@ New this cycle, not fixed: the FC and Screener shortlists are two independent se
 (`_fcSelected` / `_scSelected`) — an analyst who builds a shortlist on one tab does not see it on
 the other. Deliberate for now; a shared basket is a bigger change than one cycle should make
 unannounced, and `addToBasket`/Side-by-Side already occupies that ground.
+
+---
+## Cycle 633 Log — 2026-09-08 19:54
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 634 shipped as **v727** (`f8cbbdb`), pushed. The three stray `http.server` processes from cycle 632 are also cleaned up.
+
+## Task
+**T5 — "Give me something I can paste straight into an IC memo."** Stalest by rotation (633 ran T1, 632 T4, 627 was the last T5).
+
+## Friction
+Walked all four paste-ready artifacts and clicked every export on every tab — all seven downloads land and all five workbooks carry a basis sheet, so the directive's finalization item 5 holds.
+
+The break is on the **Scree
