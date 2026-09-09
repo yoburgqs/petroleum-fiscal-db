@@ -38724,3 +38724,127 @@ everywhere — and it is correct not to print it. Recorded so a later cycle does
 **Friction.** The Country Profile answers "attractive?" and then offers one control for the follow-up every IC analyst asks — *compared to what?*:
 
 > See the 12 producers 
+
+---
+
+## Cycle 636 — shipped as v729 (`59b3e08`), pushed
+
+**Task:** T1 — "Which countries should even be on my screening list?" (Stalest by rotation: 635 T2, 634 T4, 633 T3, 632 T6, 631 T5 — T1 last walked at 625.)
+
+**Friction.** Walked cold at 1440 with no sessionStorage or localStorage: Home → Fiscal Compare,
+the first tool tab and the table an analyst actually builds a screening list from. Default sort,
+Govt Take ascending. Measured off the live DOM, not the changelog:
+
+| | |
+|---|---|
+| rows holding ZERO verified block-level production | **163 of 185** |
+| of the **top ten** on the default sort | **6** |
+| of the top **five** — the set `Load Top 5 in Side-by-Side` hands to another tab | **1** |
+
+The six are Somalia **#3**, Madagascar **#6**, Egypt **#7**, Philippines **#8**, Georgia and
+Trinidad and Tobago **=#9**. Their NPV, breakeven and IRR are regional-proxy estimates. An IC
+analyst with twenty minutes reads down from the top and puts them on the list.
+
+This is not a new discovery so much as an unfinished one — the file says it itself, in the v596
+note at `index.html:24455`: *"all 30 of the lowest-take countries on the default Fiscal Compare
+ranking are PROXY."* v596 fixed the **paste** artifacts and left the **ranking on screen** alone.
+
+The same axis is already solved twice elsewhere:
+
+- **Screener, v507** — evidence-first ranking, ON by default, with a labelled divider.
+- **Explorer Browse, v578** — labelled divider at the point the ranking stops being production-backed.
+
+Fiscal Compare had neither. Its only signal was the per-row `PROXY` pill — and v578's own comment
+already established why that is not enough: *"every row above the fold carried it too, so it reads
+as decoration rather than as a caveat."* v563 partitioned this very table on the **terms** axis
+(generic-default rows to the bottom, under a divider, unranked). The **production** axis had no
+sort, no divider, no filter and no count.
+
+**Change.** Two edits, both behavioural.
+
+1. **`◇ Production-backed only (22 of 185)`** — a new checkbox in the FC filter row (`2567`,
+   applied at `44194`), sitting beside the existing `△ Breakeven only` and `◆ Reform-scored only`.
+   This is deliberately a filter and not a v563-style partition: PROXY rows are legitimately
+   comparable on this tab — FC is a comparison tool — and what was missing was the ability to drop
+   them in one click, not a decision made for the analyst. New `_fcHasProd()` delegates to
+   `_dqTier()`, the same function the row badge calls, so the filtered set and the pill can never
+   disagree. `_fcSyncProdFilterCount()` (`44003`) reads the count off the data rather than writing
+   it into the label — the v633 discipline, which exists because the Breakeven button's hardcoded
+   `(68/185)` can drift.
+2. **The stats strip now states the production basis where the ranking is read** (`44487`). It
+   renders `◇ No verified production: 6 of the top 10 ranked here — show the 22 that have it`, and
+   the label is itself the click target for the filter. It counts the band the analyst reads and
+   pastes, not just the table total, and recounts on every sort, region chip and profile change.
+   Under an alphabetical sort, where "top ten" means nothing, it falls back to the view total.
+   With the filter on it flips to a green `◇ Production-backed: all 22`. This half is the one that
+   reaches the analyst who never scrolls to the filter row.
+
+Also: the toggle is cleared by `Reset Region & Data Filters`, named in the zero-results copy
+(pairing it with a region holding none of the 22 empties the table quickly, and the empty state now
+says so), and added to the `pointer: coarse` 24px touch-target rule at `230`.
+
+**Result.** The analyst can drop 163 proxy rows in one click and screen against the 22 countries
+whose economics are backed by verified field production — USA, Iraq, Australia, Ecuador, United
+Kingdom, Angola, Malaysia, Indonesia and so on. And if they never find the filter, they are told,
+above the table and before they read it, that six of its top ten rows are not defensible as a
+shortlist.
+
+## Verification — the suite RAN this cycle
+
+- **JS syntax gate:** PASS, 16 blocks.
+- **Runtime suite:** run against the local build — **293 PASS / 0 FAIL / 1 WARN**, 1 JS error.
+  The pre-change file was then re-served on a second local port and re-run: **293 / 0 / 1**,
+  identical. So the delta from the deployed 294/0/0 is the standing service-worker 404
+  (`index.html:49`, absolute path — resolves on GitHub Pages, 404s on a bare local server), not
+  this change. No regression.
+- **Mobile, 390 x 844 `hasTouch: true`:** `scrollWidth` 390 / `clientWidth` 390 on **all nine**
+  tabs — zero horizontal scroll. `#fc-filter-prod` measures **24 x 24** under `pointer: coarse`,
+  parity with the two toggles beside it. 0 page errors.
+
+## Still locked — nothing touched
+
+No new FAQ (974). No new tooltip on any column header, mechanic tag, waterfall line or Scenario
+Builder input — the two tooltips written this cycle belong to a checkbox and a strip stat that did
+not exist before it. No page-sub paragraph, amber banner, routing hint or "How to read" block. No
+tab added, removed or reordered. v371/v373, v430, v449, v451, v452, v489 and the v612 mobile layer
+all intact; the `#reference-panel` offset and the `min-width: max-content` opt-out markers were not
+touched. Version sweep **v728 → v729** done silently at the end, three display strings only —
+historical `v728 (T5)` code comments left alone. It is **not** the deliverable.
+
+## Carried forward — unchanged
+
+Still open: `sweetspot` (Low Take · Positive NPV) returning 143 of 185, of which **133 are PROXY** —
+this cycle's finding applies to that preset too, and the same one-click remedy does not exist on the
+Screener preset; the v601 evidence-chain 2200ms fixed-wait race; the `.orca-fp-badge` 21px touch
+target across four tabs; the Home Screener card and `#tab-btn-tscreener` title/aria-label both still
+advertising a `breakeven` and an `IRR` filter deleted at v568/v517 — walked again this cycle and
+still wrong; the `#screener-count` run-on line (now ~470 characters on a manual take screen); the
+service-worker absolute path (`index.html:49`, the standing 1 WARN); the Screener carrying no
+model-terms leg; the Screener "Copy for IC Memo" firing against an empty `window._cpObsSpread` on a
+cold load; the active-preset badge `@$75` wording on other decks; `#cmp-clear-btn` at 23px on
+desktop; the CP "Copy for IC Memo" note 2 and `_fpCohortLine()` omitting the ≤26 predictability
+ceiling; 19 sub-24px controls in `#explorer-screen-mode`; v710's `t7` clipped-text regression;
+`cp-price-select` absent from the DOM; Mozambique's "Commercially attractive" verdict;
+`renderTornadoPanel` unmarked on the generic-template path; reform coverage 21 of 185; the
+Methodology/Home tier-definition conflict; the FAQ naming a non-existent "Stability Score filter at
+>=4"; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (34th cycle); 862 contracts with no
+fiscal terms; the Screener Contractor NPV tooltip naming an absent profile selector (36th cycle);
+the Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic pivot
+averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`; the
+Breakeven Map's price-marker slider inert above $34; the Side-by-Side 3,425-character comparability
+notice block; the FC/Screener shortlists being two independent selections (`_fcSelected` /
+`_scSelected`); and the CP headline printing `#13 of 21 producers` three lines above
+`12 / 20 producers take less`.
+
+**New this cycle, not fixed.** `Load Top 5 in Side-by-Side` still takes `sorted.slice(0,5)` and its
+tooltip claims it "takes the first five countries modelled on their own fiscal terms" — true on the
+terms axis after v563, but on the cold default view the five are USA, Iraq, Somalia, Australia,
+Ecuador, and **Somalia is PROXY**. The button is now one click away from a clean set (tick the new
+filter first) but does not say so. Smaller than this cycle's find; left for a later T1 or T3.
+
+**Observed and NOT a defect.** The Screener's manual take slider applies the fee-basis comparability
+correction exactly as the presets do — Iraq screens at 34.1% against a published 84.8% on both
+paths, and sorting the GOVT TAKE column re-sorts on the comparable figure and flips the cell to
+`34.1% published 84.8%`. Walked both paths this cycle to check they could not diverge. They do not.
+Recorded so a later cycle does not go looking for a bug that was already fixed.
