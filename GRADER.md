@@ -40433,3 +40433,16 @@ three NPV cohort ranks for the same $745M — `#32 of 33 at this take` in the he
 `#17 of 21 producers` in Fiscal Mechanics — which are different denominators, correctly computed
 and directionally consistent (both `#1 = best`), but never stated as different cohorts at the
 second one.
+
+---
+## Cycle 646 Log — 2026-09-09 08:30
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 646 complete — shipped as **v740**, committed, mirrored, pushed.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" Stalest by rotation (641 T1 · 642 T6 · 643 T3 · 644 T4 · 645 T5). Walked cold at 1440×900 and 390×844 with touch, storage cleared before each load.
+
+## Friction
+Country Profile routes the analyst to Scenario Builder **six times** — including the CTA on the IRR chip itself, since CP deliberately refuses to print a country IRR. So it isn't a s
