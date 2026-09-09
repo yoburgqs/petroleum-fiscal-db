@@ -38429,3 +38429,132 @@ $34; and the Side-by-Side 3,425-character comparability notice block.
 **Task:** T4 — "What is my fiscal-stability and reform exposure here?" (stalest by rotation; 626 last ran it.)
 
 **Friction.** Walked T4 cold at 1440×900 into the Reform Risk country lookup — the control the tab is named for. Its verdict strip has 
+
+---
+## Cycle 634 Log — 2026-09-08 — shipped as v727 (`f8cbbdb`)
+
+- Test before: 293 PASS / 0 FAIL / 1 WARN (localhost control, pre-change build, same harness)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — suite **EXECUTED** this cycle, number read from the
+  suite's own report (`ORCA_REPORT_FILE`), not assumed. Identical to the control, so a measured
+  non-regression. The 1 WARN is the standing localhost service-worker 404 (`index.html:49`),
+  the known delta from the 294 live headline.
+- JS errors: 0 page errors.
+- JS syntax gate: 11/11 script blocks, run after the change and again after the version bump.
+
+## Task
+
+**T5 — "Give me something I can paste straight into an IC memo."**
+Stalest by rotation: 633 ran T1, 632 T4, 631 T1, 630 T3, 629 T6, 628 T2, 627 T5.
+
+## Friction
+
+Walked T5 cold at 1440x900, no `sessionStorage`, no `localStorage`. Home offers no export of any
+kind, so the analyst goes to a tab. Fiscal Compare, Country Profile, Side-by-Side and IOC Portfolio
+were all walked and all four paste-ready artifacts were captured and read. Every export on every
+tab was clicked and every downloaded workbook parsed — all seven land, all five XLSX carry a basis
+sheet, so directive finalization item 5 holds.
+
+The break is on the **Screener** — `#screener-copy-ic-btn` → `copyScreenerTable()`. Measured, not
+inferred: the clipboard receives **185 rows and 27,978 characters**, captioned
+
+    ORCA petroleum fiscal screening shortlist — 185 of 185 countries, screened at $75/bbl
+    SCREEN APPLIED — these criteria produced this row set:
+      1. None — this is the full ORCA universe, not a screen result
+
+The artifact contradicts its own title in its first two lines. The CSV was 31,248 bytes, the XLSX
+155,975. This is the v632 defect on the tab actually named for the job — and the filters do not
+rescue it, because a filter narrows the SCREEN and an IC shortlist is not a screen: a take ceiling
+of 55% still returns 143 rows, and the `sweetspot` preset carried on the open list returns 143 of
+185. Fiscal Compare has been tickable since v632. The one tab whose whole purpose is producing a
+shortlist was the one that could not produce one.
+
+## Change
+
+`#tbl-screener` rows are tickable. Same state model as v632: selection is held by country NAME in
+`window._scSelected`, so a tick survives a re-sort, a preset change and a price-deck change (all
+verified). All three export paths run through the single choke point `_scExportRows()`, so a
+shortlist cannot apply to one button and not the others. Copy / CSV / Excel relabel to
+`⎘ Copy 4 selected` / `⬇ CSV (4)` / `⬇ Excel (4)`, and a badge beside them carries a Clear escape
+hatch back to "every row the screen returned".
+
+The pasted artifact stays honest about where its rows came from — this is the half that matters,
+because a six-row file under "None — this is the full ORCA universe" is the "stable but wrong"
+failure, not a formatting problem:
+
+- The hand-pick is written into the criteria block as a numbered **screening step** naming every
+  country, spliced in ahead of the `Ranked by:` ordering line, and the now-false "full ORCA
+  universe" entry is dropped.
+- The data-basis split, the all-proxy warning and the fee-basis list are recomputed against the
+  rows **actually in the file**. They described the pre-shortlist match set, which is the wrong
+  denominator the moment rows are dropped (4 picks read `3 verified / 1 proxy`, not `22 / 163`).
+- Rank is **not** renumbered 1..N. Each row keeps its position in the full screen, and the
+  clipboard table gains a `# in screen (of 185)` column — which CSV and XLSX always carried and
+  the paste did not, so the criteria block was previously promising a column that did not exist.
+  "Norway, #16 of 185" is a defensible memo line; "Norway, #3" of a hand-picked four is not.
+- A country ticked and then screened out is **not** exported — an exported row has to satisfy the
+  criteria printed above it. It stays ticked, and the badge reads `2 selected · 2 outside this
+  screen` with a title saying which fix applies. `_scEmptyMsg()` splits the two causes of an empty
+  export so the analyst is not sent to widen a screen that is not the problem.
+
+## Result
+
+The analyst ticks four countries and pastes **2,372 characters instead of 27,978** — a four-row
+table whose every row states where it placed in the screen that produced it, under a criteria block
+that names the hand-pick as a screening step. CSV 31,248 → 2,565 bytes; XLSX 155,975 → 22,709.
+The six pages of Word table and the ~175 hand-deleted rows are gone.
+
+## Verification
+
+- **Cold path byte-identical.** With nothing ticked, the clipboard (27,978 chars), the basis block
+  and the export column set are identical to the pre-change build served from the same asset tree.
+  No existing path changes.
+- **The suite's own reads were the only casualty, and they were positional.** `ScreenerSortRender`
+  read three cells by fixed column index (`children[1]` / `[4]` / `[10]`) and returned 6 FAIL —
+  `undefined`, `Iraq not in the screen` — purely because a column was inserted at position 0. That
+  is a suite reporting a column count, not a behaviour. Re-anchored on what each cell **contains**
+  (`strong` / `.take-val` / `.tier`), with the old indices kept as fallbacks, in **both** suite
+  copies, which remain in sync (`sha 4da3f101`) so `autonomous_cycle.py`'s divergence warning stays
+  quiet. Proven behaviour-preserving rather than weakened: the **pre-change** build passes all six
+  assertions under the new reads.
+- **Mobile 390x844 `hasTouch:true`:** `scrollWidth === clientWidth === 390` on all nine tabs, and
+  again on the Screener with a shortlist active. The controls this cycle added measure 24x24 (both
+  `input.sc-sel` and `input.sc-sel-all`, under the `pointer: coarse` rule) and 45x24 (Clear).
+- Print CSS hides the tick column and the badge, so the v535 printable tables are unaffected.
+- Ticking a row does not navigate: the tick cell stops propagation, so the v449 row-click-to-profile
+  hint still works and the two do not collide.
+
+## Still locked — nothing touched
+
+No new FAQ (974). No new tooltip on any column header, mechanic tag, waterfall line or Scenario
+Builder input — the two `title` strings added belong to controls this cycle created. No page-sub
+paragraph, amber banner, routing hint or "How to read" block. No tab added, removed or reordered.
+v371/v373, v430, v449, v451, v452, v489, v612 and the v612 mobile layer all intact. Version sweep
+**v725 → v727** done silently at the end — v726 shipped without bumping the string, so the sweep
+closed two. It is **not** the deliverable.
+
+## Carried forward — unchanged
+
+Still open: `sweetspot` (Low Take · Positive NPV) returning 143 of 185 under a "(barely narrows)"
+tag; the v601 evidence-chain 2200ms fixed-wait race; the `.orca-fp-badge` 21px touch target across
+four tabs; the Home Screener card and `#tab-btn-tscreener` title/aria-label both still advertising
+a `breakeven` and an `IRR` filter deleted at v568/v517; the ~700–1,150 character `#screener-count`
+run-on line; the service-worker absolute path (`index.html:49`, the standing 1 WARN); the Screener
+carrying no model-terms leg; the Screener "Copy for IC Memo" firing against an empty
+`window._cpObsSpread` on a cold load; the active-preset badge `@$75` wording on other decks;
+`#cmp-clear-btn` at 23px on desktop; the CP "Copy for IC Memo" note 2 and `_fpCohortLine()` omitting
+the ≤26 predictability ceiling; 19 sub-24px controls in `#explorer-screen-mode`; v710's `t7`
+clipped-text regression; `cp-price-select` absent from the DOM; Mozambique's "Commercially
+attractive" verdict; `renderTornadoPanel` unmarked on the generic-template path; reform coverage 21
+of 185; the Methodology/Home tier-definition conflict; the FAQ naming a non-existent "Stability
+Score filter at >=4"; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+placeholder; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (32nd cycle); 862
+contracts with no fiscal terms; the Screener Contractor NPV tooltip naming an absent profile
+selector (34th cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted
+per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
+`renderVintageTrendChart()`/`renderVintage()`; the Breakeven Map's price-marker slider inert above
+$34; and the Side-by-Side 3,425-character comparability notice block.
+
+New this cycle, not fixed: the FC and Screener shortlists are two independent selections
+(`_fcSelected` / `_scSelected`) — an analyst who builds a shortlist on one tab does not see it on
+the other. Deliberate for now; a shared basket is a bigger change than one cycle should make
+unannounced, and `addToBasket`/Side-by-Side already occupies that ground.
