@@ -39712,3 +39712,13 @@ printing `7643` without a thousands separator; and the two unsequenced Side-by-S
 giving opposite leads on the same column within 400px.
 
 **Version.** v733 → v734, 7 display strings, silently at the end. Not the deliverable.
+
+---
+## Cycle 640 Log — 2026-09-09 02:53
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 640 complete. Shipped as **v734** (`85e96f5`), pushed, mirror copied, GRADER logged (`8c1fff3`). Test servers cleaned up — including the two from cycle 639 that were left running (they were serving the wrong directory, which is why my first verification run showed the function as undefined).
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by rotation (639 ran T5, 638 T4, 637 T3, 636 T6, 635 T1; T2 last walked at cycle 633). Walked cold at 1440×
