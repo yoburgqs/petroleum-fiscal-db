@@ -40864,3 +40864,108 @@ hard-coded $6.00/bbl engine override.
 
 ## Friction
 I walked the whole tab cold — search box, all four quickstart sets, the Fiscal Compare `+Compare` path, the Explorer basket → `Compare →` path, the grid, both charts, the clipboard and the PDF. The plumbing turned out sound, so I dropped two promising leads rather than write them up: the basket round
+
+---
+## Cycle 650 Log — 2026-09-09 — shipped as v744
+
+## Task
+**T4** — "What is my fiscal-stability and reform exposure here?" Stalest by rotation
+(644 T4 · 645 T5 · 646 T2 · 647 T1 · 648 T6 · 649 T3). Walked cold at 1440x900 and at
+390x844 with `hasTouch:true`, sessionStorage and localStorage cleared before every load,
+through the Home Reform Risk card, the Reform Risk tab and its country lookup (Guyana,
+Malaysia, Nigeria, Norway, Russia), and the Fiscal Compare screening table.
+
+## Friction
+The Reform Risk tab itself is in good shape — the lookup card, the optgrouped picker that
+shows the 21/164 coverage split before you commit, the withdrawal machinery on the
+Predictability tile, the six-way IC action. None of that is where the analyst forms a view.
+
+**The view is formed on Fiscal Compare, in the column headed `Stability`, and that column
+was printing a number the file's own comments say is not the verdict.** Measured on the live
+cold-default table (185 rows, `stabCell()` at index.html:45860):
+
+| rendering | rows |
+|---|---|
+| `◆◆◆◆◆!` | 6 — USA, Ghana, Guyana, Algeria, **Libya**, Colombia |
+| `◆◆◆◆◇!` | 7 — Iraq, Ecuador, India, Kazakhstan, **Venezuela**, Canada, Russia |
+| `◆◆◆◇◇!` | 6 — Australia, Angola, Indonesia, **Norway**, Nigeria, Mexico |
+| coloured, no `!` | 2 — Brazil, United Kingdom |
+| `n/c` | 164 |
+
+An analyst scanning that column reads an ordinal, because five-out-of-five diamonds is an
+ordinal: **Libya and Algeria are the most fiscally stable jurisdictions on the board, and
+Norway is among the least.** `_rrClassify` disagrees with every one of those readings. It is
+why 19 of the 21 scoreable rows carried `info.muted`, whose own comment in this file reads
+*"the diamond count is not the verdict for this country"*.
+
+The disclaimer for that was a red `!`. It fired on **19 of the 19** grey rows. A marker
+present on the entire population it is meant to partition carries no information, so the
+false ordinal survived it intact — and the six-way verdict that would have corrected it
+(`icLabel` / `icRule`, 200–900 characters) was reachable only by hovering one cell at a
+time, twenty times, on the surface where a shortlist gets cut.
+
+Two further findings from the same walk, both confirming the column had stopped working as a
+signal rather than merely being terse: the colour ramp's **green branch was never once
+reached on live data** (no jurisdiction classifies green), and the two rows that *did* render
+in colour were the two worst ones — so colour meant "bad" and grey meant "everything else",
+the inverse of how a five-point ramp reads.
+
+## Change
+`_rrClassify()` gains **`icToken`** — the same six-way classification it already computes,
+at table width. Derived inside the classifier, not re-derived by the caller, for the reason
+v556 gave when this cell was last found running its own copy of these rules and disagreeing
+with `_rrClassify` on 10 of the 21 scoreable jurisdictions.
+
+`stabCell()` now prints the verdict on line 1 in the verdict's own colour, and demotes the
+count to a small grey line 2. Header `Stability ⓘ` → **`Reform verdict ⓘ`** — which also
+ends the collision with Explorer's unrelated `Stability` (Fiscal Predictability) column.
+
+What the column shows now, on the same 185 rows:
+
+| verdict | rows |
+|---|---|
+| `↑ PRE-2010` | 7 — the last take rise predates the scoring window |
+| `SIZE UNKNOWN` | 5 — terms rewritten in-window, take effect never quantified |
+| `↑ +5pp` `↑ +9pp` `↑ +12pp` `↑ +15pp` | 5 — the magnitude the count is blind to, named |
+| `PREMIUM 3–5pp` | 2 — Actively Reforming |
+| `NO LAW CHANGE` | 2 — every post-2010 event is a discovery, first oil or a review |
+| `NO PREMIUM` | 0 |
+| `n/c` | 164 — unchanged |
+
+Nothing is recomputed and no threshold is introduced: every string and colour comes out of
+`_rrClassify` unchanged, and the cell is the same button onto the same panel. Norway now
+reads `↑ +12pp` on the screening table and *"take was raised inside the scoring window …
+2022 COVID relief package expired +12pp"* on the Reform Risk card — the same finding at two
+widths. The tooltip lead was rewritten to match (it opened `USA — 5/5`, a diamond-scale
+reading with nothing left on screen to refer to). Four surfaces that described the old
+rendering were corrected rather than left to drift: the Home legend, the FC IC-reference
+legend, the `Show Reform verdict` toggle tooltip, and FAQ A-workflow step 3 which told the
+analyst to enable a control by its old name. The `◆` glyph was dropped from the
+`Reform-scored only` filter label, where it no longer referred to anything.
+
+## Result
+An analyst screening a shortlist for reform exposure reads the answer down the column instead
+of hovering twenty cells to find it, and the answer they read is no longer wrong. Libya and
+Algeria stop presenting as the most stable jurisdictions in the table; Russia stops being a
+four-diamond row and states `↑ +15pp`; Nigeria and Iraq stop being ranked on a count whose
+own classifier says it never measured what the 2021 Petroleum Industry Act did to government
+take, and say `SIZE UNKNOWN` instead. The five countries where a quantified in-window take
+rise exists now carry that number — +5, +9, +12, +15pp — on the screening surface, which is
+the number the IC action tells them to size the premium against.
+
+## Verification — measured, not assumed
+Both numbers below were read from the suite's own report file (`ORCA_REPORT_FILE`), run
+against this working tree over `http://localhost:8080`, this cycle.
+
+- **Test before (v743): 293 PASS / 0 FAIL / 1 WARN.** The cycle prompt carried **297 PASS**
+  from cycle 649. That figure was produced against the deployed GitHub Pages URL; the local
+  run scores 293/0/1 with 0 failures either way. Recording the discrepancy rather than
+  restating the inherited number, per finalization test #1.
+- **Test after (v744): 293 PASS / 0 FAIL / 1 WARN** — no change, no regression. The one WARN and the one "JS error" are the same `sw.js` 404 present in the before-run: an artifact of serving the tree from a localhost root rather than the `/petroleum-fiscal-db/` scope the service worker registers against. Confirmed twice on the final tree.
+- JS syntax gate: PASS, 11 inline blocks, checked after every edit.
+- Horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390: **0px at all six.** The
+  verdict column widened 105px → 138px and the FC table width was **unchanged at 1805px**
+  (absorbed within the existing overflow container).
+- Touch targets under `pointer: coarse` at 768 and 390: the cell button measures **36px**,
+  above the 24px floor. The v612 mobile layer was not touched.
+- Console / page errors on the walk: **0** at all six viewports.
