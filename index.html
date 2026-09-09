@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v732</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v733</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -758,6 +758,44 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 .sb-result-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
 .sb-result-value { font-size: 22px; font-weight: 700; margin-top: 2px; }
 .sb-result-note  { font-size: 10px; color: var(--muted); margin-top: 2px; }
+/* ── v733 (T5) — Scenario Builder price deck ─────────────────────────────────
+   A 5-column grid rather than a table, so it COMPRESSES instead of scrolling.
+   Every track is minmax(0,...): at 390 the label column gives way and the four
+   price columns hold $50/$75/$100/$125 at 10px without the modal — or the
+   document — gaining any horizontal scroll. No `min-width: max-content`
+   anywhere in here; this row is meant to wrap, not to scroll. */
+.sb-deck {
+  margin-bottom: 14px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  padding: 9px 11px 10px;
+}
+.sb-deck-hdr {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .06em; margin-bottom: 7px;
+}
+.sb-deck-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) repeat(4, minmax(0, 1fr));
+  gap: 2px 4px;
+  align-items: baseline;
+}
+.sb-deck-grid > div { min-width: 0; overflow-wrap: anywhere; }
+.sb-deck-ph { font-size: 11px; font-weight: 700; color: var(--muted); text-align: right; }
+.sb-deck-rh { font-size: 11px; color: var(--muted); }
+.sb-deck-v  { font-size: 12px; font-weight: 700; color: var(--text); text-align: right; }
+.sb-deck-here { color: var(--accent); }
+.sb-deck-col-here { background: rgba(176,104,0,0.09); border-radius: 3px; }
+.sb-deck-foot {
+  margin-top: 8px; padding-top: 7px; border-top: 1px solid var(--border);
+  font-size: 11px; line-height: 1.55; color: var(--muted);
+}
+@media (max-width: 420px) {
+  .sb-deck-grid { grid-template-columns: minmax(0, 1.2fr) repeat(4, minmax(0, 1fr)); gap: 2px 2px; }
+  .sb-deck-ph, .sb-deck-rh { font-size: 10px; }
+  .sb-deck-v { font-size: 11px; }
+}
 .sb-saved-table {
   width: 100%;
   border-collapse: collapse;
@@ -2013,7 +2051,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v732</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v733</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2083,7 +2121,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v732</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v733</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -41894,6 +41932,34 @@ function _sbICBasisClause() {
   return '';
 }
 
+// v733 (T5): the price deck, as a clause the memo can carry. Without it the pasted IC line
+// stated a single price, on a platform whose own screens reject a single-price case — the
+// Screener admits a country on its $50/bbl NPV and Side-by-Side tells you in writing to use
+// the $50 column as the downside test.
+function _sbICDeckClause() {
+  var deck = window._sbPriceDeck;
+  if (!deck || !deck.length) return '';
+  var f = function(v) { return v == null ? '—' : fmtNpvShared(v); };
+  var parts = [];
+  for (var i = 0; i < deck.length; i++) {
+    var d = deck[i];
+    if (d.take == null && d.npv == null) continue;
+    parts.push('$' + d.price + ' ' + (d.take == null ? '—' : d.take.toFixed(1) + '% / ' + f(d.npv)));
+  }
+  if (!parts.length) return '';
+  var swing = _sbDeckSwing(deck), kept = _sbDeckKept(deck), lo = _sbDeckAt(deck, 50);
+  var out = '; price deck on the same terms (govt take / contractor NPV @10%) — ' + parts.join(', ');
+  if (swing != null) out += '; price swing ' + (swing >= 0 ? '+' : '') + swing.toFixed(1) + 'pp ($50 to $125)';
+  if (lo && lo.npv != null) {
+    var flat = _sbDeckFlatNpv(deck);
+    out += '; $50/bbl downside ' + f(lo.npv)
+         + ((kept != null && !flat) ? ' (' + kept + '% of the $75 NPV)' : '')
+         + (lo.npv < 0 ? ' — fails the downside test' : '');
+    if (flat) out += '; contractor NPV is flat across the deck — fixed per-barrel remuneration, no price upside or downside, so government take absorbs the whole swing and this take% is not rankable against a PSC or Concession';
+  }
+  return out;
+}
+
 function _sbHurdleLine(res, profile, price, mech) {
   var R = _sbReturnReading(res);
   if (R.npv15 === null) return '';
@@ -41915,6 +41981,7 @@ function _sbHurdleLine(res, profile, price, mech) {
               ? '; IRR not quoted — first oil lands in the same year as first capex on this profile, so the rate is not a project return'
               : (R.irr != null ? '; IRR ' + R.irr.toFixed(1) + '%' : '')))
     + _sbICBasisClause()
+    + _sbICDeckClause()
     + '. Source: ORCA Petroleum Fiscal Intelligence Platform (2026), ' + _orcaVerNow()
     + ' — yoburgqs.github.io/petroleum-fiscal-db/';
   var riskTxt;
@@ -43054,6 +43121,149 @@ function sbGetParams() {
   return { mech, profileKey, price, profile, params };
 }
 
+// ── v733 (T5) — "Give me something I can paste straight into an IC memo." ──────────────
+//
+// Walked T5 cold. Every paste artifact on this platform ends by routing the analyst HERE.
+// Fiscal Compare, Side-by-Side and IOC Portfolio all close their clipboard text with "use
+// Scenario Builder with project capex/opex for a project IRR"; the Methodology IC workflow
+// says it six more times. The Scenario Builder is the last step of the memo workflow — the
+// only place the analyst's own capex, opex and terms meet the DCF engine — and it was the
+// only IC artifact on the platform that answered at ONE price.
+//
+// The rest of the product will not accept a one-price answer. The Screener's IOC Capital
+// Screen is decided at the $50/bbl downside ("removed 1 country"). Side-by-Side prints "Use
+// the $50 contractor NPV as the downside test" inside the artifact it hands you. Country
+// Profile pastes take at $50/$75/$100/$125 and a price swing. Run those same terms here on
+// your own project and the IC line read "$75/bbl — govt take 22.2%, contractor NPV +$4.3B"
+// and stopped. No downside, no swing, nothing to stress. The one screen that takes the
+// analyst's real numbers produced the least defensible artifact in the building.
+//
+// The modal's own description has promised the deck all along — "hit Run DCF to compute
+// contractor government take, NPV, IRR, and Price Swing at 4 price points" (the .page-sub at
+// the top of #scenario-modal). No second price was ever run and no swing was ever computed.
+//
+// To get a downside the analyst had to edit the price field, press Run DCF, read the cards,
+// press Copy IC line, paste, and repeat for $100 and $125 — four round-trips through a modal
+// that shows no record of which run is on screen, then merge four sentences in Word by hand.
+//
+// The DCF entry points already take price as an argument, so the deck is three more calls on
+// the same params. Both the screen and the copied IC line now carry it.
+function _sbRunDCF(mech, params, price, profile) {
+  var pr = Object.assign({}, params), pf = Object.assign({}, profile);
+  if (mech === 'PSC' || mech === 'Revenue Share' || mech === 'Gross Split') return dcfPSC(pr, price, pf);
+  if (mech === 'TSC' || mech === 'RSC')      return dcfTSC(pr, price, pf);
+  if (mech === 'PRRT')                        return dcfPRRT(pr, price, pf);
+  if (mech === 'Buy-back' || mech === 'Buyback') return dcfBuyback(pr, price, pf);
+  return dcfConcession(pr, price, pf);
+}
+
+// The platform-standard deck. Same four prices Fiscal Compare, Country Profile, Side-by-Side
+// and the exports all use, so a Scenario Builder row is comparable with every other artifact
+// the memo carries. `here` marks the column the analyst's own price input is sitting on.
+var _SB_DECK_PRICES = [50, 75, 100, 125];
+function _sbBuildDeck(mech, params, profile, basePrice, baseResult) {
+  var deck = [];
+  for (var i = 0; i < _SB_DECK_PRICES.length; i++) {
+    var px = _SB_DECK_PRICES[i];
+    var r;
+    try { r = (px === basePrice && baseResult) ? baseResult : _sbRunDCF(mech, params, px, profile); }
+    catch (e) { r = null; }
+    if (!r) { deck.push({ price: px, take: null, npv: null, here: px === basePrice }); continue; }
+    var rd = (typeof _sbReturnReading === 'function') ? _sbReturnReading(r) : null;
+    deck.push({ price: px, take: (r.take == null ? null : r.take), npv: (r.npv == null ? null : r.npv),
+                npv15: rd ? rd.npv15 : null, here: px === basePrice });
+  }
+  return deck;
+}
+
+function _sbDeckAt(deck, px) {
+  for (var i = 0; i < deck.length; i++) if (deck[i].price === px) return deck[i];
+  return null;
+}
+
+// Swing is take@$125 − take@$50, in points — the same definition as the Price Swing column on
+// Fiscal Compare and the "Price swing ($50 → $125)" row in the Country Profile IC paste.
+function _sbDeckSwing(deck) {
+  var lo = _sbDeckAt(deck, 50), hi = _sbDeckAt(deck, 125);
+  if (!lo || !hi || lo.take == null || hi.take == null) return null;
+  return hi.take - lo.take;
+}
+// "% of $75 NPV kept at $50" — the Screener's downside-resilience column, on the analyst's
+// own terms this time. Only meaningful where the base case is actually positive.
+function _sbDeckKept(deck) {
+  var lo = _sbDeckAt(deck, 50), base = _sbDeckAt(deck, 75);
+  if (!lo || !base || lo.npv == null || base.npv == null || base.npv <= 0) return null;
+  return Math.round((lo.npv / base.npv) * 100);
+}
+
+// The deck makes one thing visible that no prose caveat on this platform ever managed: on a
+// fee-basis regime (TSC / RSC / Buy-back) contractor NPV is IDENTICAL at $50 and at $125 while
+// government take climbs 12-22pp. Iraq TSC returns $595M at all four prices. Read off the
+// resilience row that is "keeps 100% of the $75 NPV" — which looks like the best downside
+// score on the platform and is in fact the absence of any price exposure at all, the same
+// Group 2 non-comparability the platform enforces everywhere else. Detected from the numbers,
+// not from the mechanic name, so a zero-royalty Concession is not mislabelled.
+function _sbDeckFlatNpv(deck) {
+  var vals = [], takes = [];
+  for (var i = 0; i < deck.length; i++) {
+    if (deck[i].npv == null || deck[i].take == null) return false;
+    vals.push(deck[i].npv); takes.push(deck[i].take);
+  }
+  if (vals.length < 2) return false;
+  var lo = Math.min.apply(null, vals), hi = Math.max.apply(null, vals);
+  var scale = Math.max(Math.abs(lo), Math.abs(hi));
+  if (scale < 1) return false;
+  var takeMove = Math.max.apply(null, takes) - Math.min.apply(null, takes);
+  return ((hi - lo) / scale) < 0.005 && takeMove > 1;
+}
+
+function _sbPriceDeckHtml(deck, basePrice) {
+  if (!deck || !deck.length) return '';
+  var f = function(v) { return v == null ? '—' : fmtNpvShared(v); };
+  var swing = _sbDeckSwing(deck), kept = _sbDeckKept(deck);
+  var lo = _sbDeckAt(deck, 50);
+  var offDeck = _SB_DECK_PRICES.indexOf(basePrice) < 0;
+
+  var h = '<div class="sb-deck"><div class="sb-deck-hdr">Price deck — your terms and profile at the four ORCA prices ($/bbl)</div>'
+        + '<div class="sb-deck-grid">'
+        + '<div class="sb-deck-rh"></div>';
+  var i, d;
+  for (i = 0; i < deck.length; i++) {
+    d = deck[i];
+    h += '<div class="sb-deck-ph ' + (d.here ? 'sb-deck-here sb-deck-col-here' : '') + '" title="'
+       + (d.here ? 'The price in the input above — this is the column the three cards report.'
+                 : 'Same fiscal terms, same production profile, oil price $' + d.price + '/bbl.')
+       + '">$' + d.price + (d.here ? ' ▲' : '') + '</div>';
+  }
+  h += '<div class="sb-deck-rh" title="Government share of gross project revenue at each price, on the terms entered above.">Govt take</div>';
+  for (i = 0; i < deck.length; i++) {
+    d = deck[i];
+    h += '<div class="sb-deck-v ' + (d.here ? 'sb-deck-col-here' : '') + '">'
+       + (d.take == null ? '—' : d.take.toFixed(1) + '%') + '</div>';
+  }
+  h += '<div class="sb-deck-rh" title="Contractor NPV at the 10% WACC used by the cards above. $50/bbl is the downside column — the ORCA Screener’s IOC Capital Screen is decided on it.">Contractor NPV</div>';
+  for (i = 0; i < deck.length; i++) {
+    d = deck[i];
+    var col = (d.npv != null && d.npv < 0) ? 'color:var(--red);' : '';
+    h += '<div class="sb-deck-v ' + (d.here ? 'sb-deck-col-here' : '') + '" style="' + col + '">' + f(d.npv) + '</div>';
+  }
+  h += '</div>';
+
+  var foot = [];
+  if (swing != null) foot.push('Price swing <strong style="color:var(--text);">' + (swing >= 0 ? '+' : '') + swing.toFixed(1) + 'pp</strong> ($50 → $125)');
+  var flat = _sbDeckFlatNpv(deck);
+  if (lo && lo.npv != null) foot.push('$50/bbl downside <strong style="color:' + (lo.npv < 0 ? 'var(--red)' : 'var(--text)') + ';">' + f(lo.npv) + '</strong>'
+      + ((kept != null && !flat) ? ' — keeps <strong style="color:var(--text);">' + kept + '%</strong> of the $75 NPV' : ''));
+  if (foot.length) {
+    h += '<div class="sb-deck-foot">' + foot.join(' &nbsp;·&nbsp; ')
+       + '. Every price runs the identical fiscal parameters and production profile — only the oil price moves.'
+       + (offDeck ? ' Your input price of $' + basePrice + '/bbl is what the three cards above report; it is not one of the four standard points, so no column is marked.' : '')
+       + (flat ? '<div style="margin-top:6px;color:var(--orange);font-weight:600;">Contractor NPV does not move across the deck. These terms pay the contractor a fixed amount per barrel, so it holds no price upside and no price downside — government take absorbs the whole ' + (swing != null ? swing.toFixed(1) + 'pp' : 'move') + '. Do not read the flat $50 column as downside resilience: there is no exposure here to be resilient about, and this take% is not rankable against a PSC or Concession.</div>' : '')
+       + '</div>';
+  }
+  return h + '</div>';
+}
+
 function runCustomScenario() {
   const { mech, profileKey, price, profile, params } = sbGetParams();
   let result;
@@ -43062,6 +43272,9 @@ function runCustomScenario() {
   else if (mech === 'PRRT') result = dcfPRRT(params, price, profile);
   else if (mech === 'Buy-back' || mech === 'Buyback') result = dcfBuyback(params, price, profile);
   else result = dcfConcession(params, price, profile);
+  // Built BEFORE _sbHurdleLine(), which reads window._sbPriceDeck to put the downside and the
+  // swing into the copied IC line. One source, so the screen and the clipboard cannot drift.
+  window._sbPriceDeck = _sbBuildDeck(mech, params, profile, price, result);
 
   const wf = result.waterfall;
   const wfColors = { royalty:'#96570A', ftp:'#7C3AED', profit_oil:'#C2410C', cit:'#B91C1C', special:'#A16207', state_eq:'#6B6560', base_govt:'rgba(21,128,61,0.68)', ept:'#B91C1C', cost_reimb:'#6B6560', windfall:'#B91C1C', severance:'#C2410C' };
@@ -43129,6 +43342,7 @@ ${_sbOriginNote(result)}
     <div class="sb-result-note">10% disc. rate</div>
   </div>
 </div>
+${_sbPriceDeckHtml(window._sbPriceDeck, price)}
 ${_sbHurdleLine(result, DCF_PROFILES[profileKey], price, mech)}
 <div class="dcf-waterfall-title">Fiscal Breakdown (% of Revenue)</div>
 ${wfHtml}
