@@ -39546,3 +39546,169 @@ leads on the same column within 400px.
 
 ## Friction
 I exercised all six "Copy for IC Memo" controls cold and 
+
+---
+## Cycle 640 Log — 2026-09-09 — shipped as v734
+
+- Test before: 294 PASS / 0 FAIL / 0 WARN (live URL, cycle 639 report)
+- Test after: **293 PASS / 0 FAIL / 1 WARN**, JS page errors 0 — `runtime_comprehensive.js`
+  ACTUALLY RAN this cycle against `http://localhost:8097/index.html`, number read from the
+  suite's own TOTAL line, not assumed. The 1 WARN and the −1 PASS are the same known defect:
+  the service-worker registration at `index.html:49` uses an absolute path, so it 404s when the
+  build is served from anywhere other than the deployed root. It is on the carried-forward list
+  as "the standing 1 WARN" and predates this cycle. 0 FAIL either way.
+- JS syntax gate: 11 script blocks, 0 failures.
+- Viewports 1920 / 1440 / 1280 / 1024 / 768 / 390: `scrollWidth === clientWidth` at all six.
+  New pill measures 22.5px with a mouse, 24px under `pointer: coarse`.
+
+## Task
+
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by
+rotation: 639 ran T5, 638 T4, 637 T3, 636 T6, 635 T1, and T2 was last walked at cycle 633.
+Walked cold at 1440×900 and 390×844 with `hasTouch`, `sessionStorage` and `localStorage`
+cleared, served over HTTP. Country Profile opens on Indonesia as the PSC benchmark.
+
+## Friction
+
+**The first sentence on the tab told the analyst, in bold, to discard the one number that
+answers the question they came with — and a table three screens below told them the opposite.**
+
+The Quick IC verdict (`_quickIcVerdict497`, index.html ~35030) closed with:
+
+> …and on ORCA's single fixed Deepwater profile contractor NPV tracks govt take at r² 0.89
+> (≈−$61M per point of take), so these two figures restate the take rather than test it.
+> **Defend on the take and its evidence tier (n=667 contracts), not on the NPV.**
+
+That r² comes from `cpFloorBase()`, which regresses `npv_75` on `take_75` across all 182
+non-monopoly countries — a take range running from roughly 10% to 97%. Over that range the
+claim is true. At the point where an IC screening actually stands it is not, and I measured it
+against the live `country_data.json` before changing anything:
+
+| set | n | r² | slope | contractor NPV range |
+|---|---|---|---|---|
+| all non-monopoly countries | 182 | 0.887 | −$61M/pt | — |
+| **Indonesia's own ±6pp band** | **33** | **0.017** | **+$21M/pt** | **$627M → $2,950M (4.7×)** |
+| the 65% band | 15 | 0.002 | −$8M/pt | $627M → $2,950M (4.7×) |
+| the 30% band | 36 | 0.458 | −$64M/pt | $2.5B → $3.9B (1.6×) |
+
+Inside a band the slope collapses and in two of them it **flips sign**. Contractor NPV still
+varies more than fourfold at a constant government take — and since that NPV is computed on ONE
+fixed project ($1.2B capex / 50k bbl/d / $15/bbl opex / 25 yr / 10% WACC) held identical for
+every country, gross revenue, cost and discount rate are constants across every row in the band.
+`govt_take_pct` in `petroleum_dcf.py` is `govt_take_total / gross_rev_total`, an **undiscounted
+lifetime** share; `npv_75` is **discounted**. So at a near-constant lifetime take the 4.7× spread
+in the discounted figure is arithmetically forced to be *when* the government takes its share,
+not how much. That is a second, independent fiscal reading, and the page was throwing it away.
+
+Concretely for the country that loads by default: Indonesia's take of 59.5% is mid-pack
+(+3.9pp vs the producer median, #13 of 21), but its $745M is the **2nd-lowest contractor NPV of
+the 33 regimes taking 53.5–65.5%**, against a $1,148M band median and an Azerbaijan at $2,950M
+sitting +0.3pp away on take. That is the finding on this tab. Nothing on the headline strip
+carried it — the NPV printed as a bare number with no comparator at all, while the take three
+lines above it carried both a rank and a vs-median pill.
+
+And the page contradicted itself. The Similar Fiscal Profile block (index.html:36438) is headed:
+
+> **IC use:** … Read **NPV @$75** against this country's own row to rank contractor value on
+> the base case…
+
+which is the correct instruction, three screens under a bold one saying not to.
+
+The one NPV rank the page did print — "#17 of 21 producers · lowest contractor-NPV quartile" in
+the Key Metrics grid — ranks across a 23%-to-85% take spread, so it *does* largely restate the
+take: of course the high-take country ranks low. It is not the comparison an IC shortlist needs.
+
+## Change
+
+Three edits, all in `index.html`. New `cpTakeBandNpv(d, widthPp)` measures the country's own
+±6pp band on **comparable take** (`cpPeerBasis`, so fee-basis TSC/RSC/Buy-back rows sit on their
+PSC/Concession take, not their 97–99% structural artefact) and returns n, r², slope, the NPV
+range, the band median, and the country's rank within it. Under 8 comparable regimes in range it
+returns null rather than print a slope off four points — 7 countries take that path (Bahrain,
+Kuwait, Nigeria, Saudi Arabia, Turkmenistan, Uzbekistan, Vanuatu) and keep the old all-country
+clause verbatim. 178 of 185 resolve a band.
+
+1. **Headline strip, new pill next to NPV** — the layout change. `NPV: $745M @$75` now carries
+   `NPV rank #32 of 33 at this take · −$403M vs band median`, coloured against the measured band
+   median (green above, orange below). Ranked HIGHEST FIRST. Same pill shape and the same ±6pp
+   window as the take pill three lines above, so the strip finally answers "am I getting paid"
+   alongside "how hard is the regime".
+2. **Verdict sentence** — the global-r² clause is replaced by `cpBandNpvNote()`, which reports
+   the band the analyst is actually standing in, and then states the rank in words:
+   *"Indonesia carries 2nd-lowest contractor NPV of the 33 in its own take band ($745M against a
+   $1.1B band median). Defend on the take and its evidence tier (n=667 contracts), and carry that
+   NPV position separately — they are two findings, not one."*
+3. **Both are gated on the measured r², in three branches.** Where the band shows NPV genuinely
+   tracking take (r² ≥ 0.60 — 94 countries, e.g. the USA's 73-country band at r² 0.99, spread only
+   1.3×) the note says so outright and the original **"not on the NPV"** instruction is kept,
+   because there it is correct. An earlier draft of this cycle printed the timing explanation
+   unconditionally and would have stated something false on those 94; it was caught by walking
+   USA and Norway before commit, not by the suite.
+
+Also caught pre-commit: the rank was initially ascending, which made Norway read `#1 of 8` while
+holding the **lowest** NPV in its band and Azerbaijan `#32 of 32` while holding the highest —
+worse than what it replaced, on a pill read in half a second by someone who will not hover.
+Rank is now descending, and the verdict prose names the direction in words rather than trusting
+the number to carry it.
+
+`.orca-npv-band-pill` gets a `min-height: 24px` inside the v612 `pointer: coarse` layer —
+vertical only, per the v713 lesson that horizontal reach on an inline element inflates its
+parent's `scrollWidth` and reports to `pixel_audit` as clipped text.
+
+Nothing on the STILL LOCKED list touched. The v449 tier colours, the v451/v452 two-zone headline
+and its rank + vs-median pill, and the v612 mobile layer are all unchanged; the v612 block was
+added to, never narrowed. No tooltip added as a substitute for a fix, no FAQ, no citation
+re-wording. This is not a text-only edit: a new measurement that existed nowhere in the codebase
+is computed at render time and a new element renders on the strip.
+
+## Result
+
+The analyst asking "is Indonesia attractive at $75 and can I defend it?" now gets an answer with
+two independent legs instead of one number restated three ways. They read, without hovering and
+without scrolling: 59.5% take, mid-pack among producers — **and NPV rank #32 of 33 at that take,
+$403M below the band median**. That gap is the case against the entry, it is measured against the
+33 regimes they would actually screen alongside it, and it is checkable by scrolling to the
+Similar Fiscal Profile table built on the same ±6pp window. Where the gap is not real — the 94
+bands whose NPV does track take — the page still says so and still tells them not to lean on it.
+The headline and the peer table no longer give opposite instructions about the same column.
+
+## Still open (carried forward, plus this cycle)
+
+**New this cycle, not fixed.** The `IRR:` chip on the headline strip renders a label, no value,
+and a `→ Model in Scenario Builder` button. Every other metric on that row prints a figure. v516
+removed the country-level IRR deliberately and correctly (a bundled arithmetic mean of
+per-contract IRRs, median 333%), and the reason lives in the chip's `title` — but an analyst who
+does not hover reads a metric with a blank next to it. Left alone this cycle because the fix is a
+judgement about whether a label with no number should be on the strip at all, not a defect.
+Also: the 7 countries with fewer than 8 comparable regimes in range (Bahrain, Kuwait, Nigeria,
+Saudi Arabia, Turkmenistan, Uzbekistan, Vanuatu) still read the all-country r² clause, which is
+the same clause this cycle established is not the reading that applies at a decision point. For
+those 7 there is no band to read instead; widening the window for them alone would be inventing a
+threshold to make a sentence available.
+
+Unchanged from v733: the Scenario Builder `.page-sub` promising IRR the deck does not carry;
+`_exportScenariosXLSX()` requiring Save Scenario first; the 3 state monopolies rendering no Quick
+IC verdict; `sweetspot` returning 143 of 185 with 133 PROXY; the v729 production filter having no
+Screener preset equivalent; `Load Top 5 in Side-by-Side` taking `sorted.slice(0,5)` with Somalia
+PROXY in the cold five; the v601 evidence-chain 2200ms fixed-wait race; `.orca-fp-badge` at 21px
+across four tabs; the Home Screener card and `#tab-btn-tscreener` advertising a `breakeven` and an
+`IRR` filter deleted at v568/v517, and the Home Fiscal Compare card advertising "IRR, and
+breakeven price"; the `#screener-count` run-on line; the service-worker absolute path
+(`index.html:49`, the standing 1 WARN); Screener "Copy for IC Memo" firing against an empty
+`window._cpObsSpread` on a cold load; `#cmp-clear-btn` at 23px on desktop; 19 sub-24px controls in
+`#explorer-screen-mode`; v710's `t7` clipped-text regression; `cp-price-select` absent from the
+DOM; Mozambique's "Commercially attractive" verdict; reform coverage 21 of 185; the
+Methodology/Home tier-definition conflict; the FAQ naming a non-existent "Stability Score filter
+at >=4"; `FC_PROFILES` / `DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+placeholder; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0`; 862 contracts with
+no fiscal terms; the Screener Contractor NPV tooltip naming an absent profile selector; the
+Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic pivot averages;
+the incomplete 2020s cohort; duplicated `renderVintageTrendChart()` / `renderVintage()`; the
+Breakeven Map price-marker slider inert above $34; the FC/Screener shortlists being two
+independent selections; the CP headline printing `#13 of 21 producers` three lines above
+`12 / 20 producers take less`; the `getEvidenceBar()` chip missing from Explorer Browse and IOC
+Portfolio; the three Screener notes quoting three different term counts; the `# Contracts` row
+printing `7643` without a thousands separator; and the two unsequenced Side-by-Side notices
+giving opposite leads on the same column within 400px.
+
+**Version.** v733 → v734, 7 display strings, silently at the end. Not the deliverable.
