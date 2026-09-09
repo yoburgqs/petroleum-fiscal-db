@@ -40567,3 +40567,16 @@ different cohorts.
    every Concession country falls to `termsBasis === 'default'` regardless of how good its
    record is — which is why Canada is unranked there and ranked #1 here. The two tabs disagree
    about Canada for a reason that is a code path, not a data judgement.
+
+---
+## Cycle 647 Log — 2026-09-09 09:34
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 647 complete — shipped as **v741**, committed, mirrored, pushed.
+
+## Task
+**T1** — "Which countries should even be on my screening list?" (stalest by rotation: 641 T1 · 642 T6 · 643 T3 · 644 T4 · 645 T5 · 646 T2). Walked cold at 1440×900 and 390×844 with touch, storage cleared before every load, through the Screener and all eleven presets.
+
+## Friction
+The Screener ranks by contractor NPV descending. NPV is monotone *decreasing* in government take, so "ranked by NPV" is "ranked by lowest t
