@@ -39989,3 +39989,107 @@ state monopolies carrying `be_75 = 1.0` rather than null in `country_data.json`.
 **Task.** T6 — *"Where did this number come from and how solid is the evidence?"* Stalest by rotation (641 ran T1, 640 T2, 639 T5, 638 T4, 637 T3, 636 T6). Walked cold at 1440×900 and 390×844 with touch, storage cleared, served over HTTP.
 
 **Friction.** The T6 machinery is genuinely good, and I verified that before looking elsewhere — the Fiscal Compare drilldown carries a `1 of 3 model terms cited →` chip, all **185 of 185** countries render both that chip and a working Evide
+
+---
+## Cycle 643 Log — 2026-09-09 05:38 — shipped as v737 (`82829f1`), pushed, mirror copied
+
+- Test before: 294 PASS / 0 FAIL (deployed baseline)
+- Test after: **293 PASS / 0 FAIL / 1 WARN** — suite ACTUALLY RUN this cycle against the local
+  build (`TEST_URL=http://localhost:8899/index.html`). The 1 WARN is the standing service-worker
+  absolute path at `index.html:49` (`/petroleum-fiscal-db/sw.js`), which 404s off the GitHub Pages
+  base path and is a local-run artefact, not a regression. JS syntax gate PASS. 0 page errors.
+
+## Cycle 643 — T3
+
+**Task.** T3 — *"How do these three countries compare side by side?"* Stalest by rotation
+(642 ran T6, 641 T1, 640 T2, 639 T5, 638 T4, 637 T3). Walked cold at 1440x900 and 390x844 with
+touch, storage cleared, served over HTTP.
+
+**What I checked and cleared first.** The entry path is in good shape and I verified it rather
+than assuming: the search box resolves `UK`→United Kingdom, `Congo`→both Congos, `Brasil`→Brazil
+(fuzzy), `Kurdistan`→Iraq-Kurdistan, `Holland`→Netherlands, `sau`→Saudi Arabia (not
+Guinea-Bissau), and Enter adds the pre-highlighted row in every case. *I briefly read Enter as a
+silent no-op — that was my own test artefact (`compareList` is not a `window` global), not a
+defect.* The take-row and NPV-row basis gates (v626/v705), the `Order columns` select, the
+IC-memo clipboard (carries assumptions + every set-specific notice), and mobile layout were all
+walked and are sound.
+
+**Friction.** `renderCompare()`'s take/NPV inversion detector (`index.html:28123`) was the last
+block on this tab with **no basis gate**. Every other block refuses, on a mixed set, to place a
+no-production column against a producer — the cells read *not ranked · statutory terms* and *not
+comparable · statutory terms*. This notice read those same two numbers off those same two columns
+and printed, in a red-bordered box headed as a paradox:
+
+> ⚠ Govt Take and Contractor NPV rank these columns in opposite orders. **Brazil** takes more of
+> the barrel than **Guyana** (55.6% vs 54.1%) and still shows more contractor NPV ($1.7B vs $1.1B).
+
+— three inches below the cells that refuse both halves of that sentence, and directly above
+*Copy for IC Memo*, which carries it verbatim into the clipboard as a numbered comparability
+note. So it left the platform.
+
+Measured over the shipped `country_data.json`, on 3-country sets that MIX the two bases (only
+21 of 185 countries carry verified production, so this is the ordinary T3 shape):
+
+| | |
+|---|---|
+| mixed-basis 3-country sets | 315,126 |
+| notice fires | 77,389 (24.6%) |
+| pairs it prints | 89,792 |
+| of those, **CROSS-basis** | **72,556 (80.8%)** |
+| sets where **every** printed pair is cross-basis | **60,153 (77.7% of fired)** |
+
+In 60,153 sets the analyst is shown a fiscal paradox that is entirely the basis artefact the rest
+of the tab exists to flag: the take gap is not established, and the NPV gap is the 2.4x proxy
+premium v705 already measured.
+
+**Change.** Same rule, same membership, same words as v626/v705 (`_cmpHasProd` /
+`getProducerContext().inSet`). Inverted pairs are split:
+- **Same-basis pairs are real** and keep their wording character-for-character. An all-producer
+  set and an all-frontier set are behaviourally unchanged.
+- **Cross-basis pairs** move to a line that names the pair and both figures — the analyst must
+  still see which columns provoked it — but never asserts one takes more of the barrel than the
+  other, and points at the same exclusion the take/NPV rows already apply.
+- Where a set has **only** cross-basis pairs, the "opposite orders" heading does not appear at
+  all, because there is no paradox to report. The box stays (an unexplained inversion visible on
+  the grid is its own confusion — that is why v531 exists) and says what the inversion actually is.
+
+**Result.** On *Guyana / Brazil / Suriname* the analyst previously read a take/NPV paradox between
+Brazil and two proxy columns; they now read that those columns cannot be ranked against each other
+on either row, and why. On *Guyana / Angola / Brazil* the headline narrows to the one genuine
+same-basis inversion (Brazil vs Angola) and the Guyana pair is reported as the artefact it is.
+Verified the false claim no longer reaches the IC-memo clipboard for either set.
+
+## Mobile (Step 5b)
+
+390x844 `hasTouch: true`. `scrollWidth` 390 = `clientWidth` 390. The new notice is 362px wide,
+293px tall, wraps cleanly, 0 controls under 24px in `#t2`, 0 page errors.
+
+## Still open (carried forward)
+
+Unchanged from v736 and not touched this cycle: the `IRR:` headline chip rendering a label with no
+value; the 7 countries with fewer than 8 comparable regimes reading the all-country r² clause; the
+Scenario Builder `.page-sub` promising an IRR the deck does not carry; `_exportScenariosXLSX()`
+requiring Save Scenario first; the 3 state monopolies rendering no Quick IC verdict; `sweetspot`
+returning 143 of 185 with 133 PROXY; the v729 production filter having no Screener preset
+equivalent; `Load Top 5 in Side-by-Side` taking `sorted.slice(0,5)`; the v601 evidence-chain 2200ms
+fixed-wait race; `.orca-fp-badge` at 21px across four tabs; the Home Screener card and
+`#tab-btn-tscreener` advertising `breakeven`/`IRR` filters deleted at v568/v517; the
+`#screener-count` run-on line; the service-worker absolute path (`index.html:49`, the standing
+1 WARN); `#cmp-clear-btn` at 23px on desktop; 19 sub-24px controls in `#explorer-screen-mode`;
+v710's `t7` clipped-text regression; `cp-price-select` absent from the DOM; Mozambique's
+"Commercially attractive" verdict; reform coverage 21 of 185; the Methodology/Home tier-definition
+conflict; `FC_PROFILES` / `DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+placeholder; Kuwait's evidence tier; 862 contracts with no fiscal terms; unweighted per-mechanic
+pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()` /
+`renderVintage()`; the Breakeven Map price-marker slider inert above $34; the FC/Screener
+shortlists being two independent selections; the CP headline printing `#13 of 21 producers` three
+lines above `12 / 20 producers take less`; the `getEvidenceBar()` chip missing from Explorer Browse
+and IOC Portfolio; the `# Contracts` row printing `7643` without a thousands separator; the three
+state monopolies carrying `be_75 = 1.0` rather than null; no evidence badge anywhere being
+clickable while `STABILITY` beside it is; the `cp-terms-chip` and Evidence Chain counting
+different things in the same words.
+
+**New, not fixed.** The `# Contracts` row still prints `1193` unseparated on this tab (same defect
+as the carried-forward `7643`). And the IC-memo plain-text export renders the Evidence tier cell as
+`B · mixed sourcing · 52% primary law · of · 1,051 facts` — a stray `· of ·` from the hidden
+block-span separators that read correctly on screen but concatenate oddly under `innerText`.
