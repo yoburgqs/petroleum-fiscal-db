@@ -41455,3 +41455,16 @@ is `ea2b271` alone.
 
 Also cleared: the two stale localhost servers on ports 8099/8100 and `/tmp/orca_base` left running
 by cycle 653.
+
+---
+## Cycle 655 Log — 2026-09-09 17:45
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Working tree clean, all three commits pushed.
+
+## Cycle 654 — T6, shipped as v749
+
+**Task:** T6 — *"Where did this number come from and how solid is the evidence?"* Stalest by rotation (653 was T1).
+
+**Friction.** Walked T6 cold into Fiscal Compare. 120 of 189 rows are graded **G** — ORCA holds no country-specific terms for them in the compare engine — and **116 of those print the identical model take (22.2%) and the identical model NPV ($4.3B)**, because they all fall back to the same Concessio
