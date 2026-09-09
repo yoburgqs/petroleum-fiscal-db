@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v727</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v728</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -202,7 +202,7 @@ table { width: 100%; border-collapse: collapse; }
    into Word and then hand-deleted ~175 rows, or gave up and used the XLSX. These
    checkboxes let the shortlist BE a shortlist. With nothing ticked the button behaves
    exactly as before (all rows shown), so no existing path changes. */
-/* ── v727 (T5) — Screener row selection ─────────────────────────
+/* ── v728 (T5) — Screener row selection ─────────────────────────
    The v632 defect, on the tab actually named for the job. "Copy for IC Memo" on the
    Screener pasted every row it was showing: 27,978 characters over 185 rows on the cold
    view, under a caption reading "screening shortlist" and a criteria block whose only
@@ -2003,7 +2003,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v727</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v728</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2073,7 +2073,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v727</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v728</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3111,7 +3111,7 @@ window.copyPlatformCitation = function(btn) {
       <span id="screener-basis-action" style="display:none;"></span>
       <label id="screener-evidence-first-wrap" style="margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:11px;color:var(--muted);cursor:pointer;white-space:nowrap;" title="ON (default): countries with verified field production are ranked above those whose economics are regional proxy estimates, NPV-descending within each group. Nothing is filtered out — a labelled divider marks the boundary. OFF: rank all 185 by modelled NPV alone, which puts the lowest-take proxy regimes (Vanuatu, Bahamas, Montenegro) at the top."><input type="checkbox" id="sc-evidence-first" checked style="cursor:pointer;">Rank verified-production countries first</label>
       <button id="screener-reset-btn" class="btn btn-sm btn-outline" title="Reset all filters to default state">Reset All</button>&nbsp;<button id="screener-copy-ic-btn" class="btn btn-sm btn-outline" title="Copy this shortlist to the clipboard as a real table &mdash; pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the screen that produced it (preset, thresholds, ordering), the standardized NPV profile, and the fee-basis comparability correction where the published take blends TSC/RSC/Buy-back contracts." aria-label="Copy screening shortlist for IC memo">&#9112; Copy for IC Memo</button>&nbsp;<button id="screener-csv-btn" class="btn btn-sm btn-outline" aria-label="Export screener results as CSV file">⬇ CSV</button>&nbsp;<button id="screener-excel-btn" class="btn btn-sm" aria-label="Export screener results as Excel file">⬇ Excel</button>
-      <!-- v727 (T5): shows only while a shortlist exists; the escape hatch back to "all rows the screen returned". -->
+      <!-- v728 (T5): shows only while a shortlist exists; the escape hatch back to "all rows the screen returned". -->
       <span id="sc-sel-note" style="display:none;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.30);border-radius:12px;padding:2px 4px 2px 10px;white-space:nowrap;margin-left:6px;">
         <span id="sc-sel-count" title="Countries ticked for the IC shortlist. Copy, CSV and Excel carry only these.">0 selected</span>
         <button type="button" onclick="scClearSel()" title="Untick every country and go back to copying and exporting every row the screen returned" aria-label="Clear the IC shortlist selection" style="background:transparent;border:1px solid rgba(176,104,0,.35);border-radius:10px;color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;min-height:24px;cursor:pointer;font-family:inherit;">Clear</button>
@@ -28865,6 +28865,42 @@ let _screenerCountrySet = null;  // null = no country-set restriction
 // can state the scope rather than dumping 57 names. Set alongside _screenerCountrySet, cleared
 // with it.
 let _screenerSetLabel = null;
+// ── v728 (T2): was this country set CHOSEN on comparable take? ───────────────
+// cpScreenLowerTake() and cpScreenInvestibleProducers() both select their members on comparable
+// take (fee-basis TSC/RSC/buy-back contracts excluded), then land the analyst on a Screener whose
+// GOVT TAKE column prints the published headline. The cell that reconciles the two, _takeCmpCell(),
+// was gated on takeCeilingActive — and both CTAs call applyScreenerPreset(null) first, which clears
+// the ceiling. So the one row set built on the comparable basis was the one row set that never
+// showed it. Set alongside _screenerCountrySet, cleared with it.
+let _screenerSetOnCmp = false;
+
+// v728 (T2): the divergent members of a comparable-take set, named for the caption. One helper,
+// called by both CTAs, so the two cannot drift the way they had (v663 named them, v648 did not).
+function _scCmpSetDivergence(set, price) {
+  var p = String(price || '75');
+  return (set || []).map(function (n) {
+    var c = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+      ? COUNTRY_DATA.filter(function (x) { return x.country === n; })[0] : null;
+    if (!c) return null;
+    var fc = _scFeeCmpAt(c, p);
+    return fc.diverges ? { country: n, head: fc.head, cmp: fc.cmp } : null;
+  }).filter(Boolean);
+}
+// Names ONLY the rows that visibly contradict the scope — those whose published headline breaks
+// the threshold the scope line just asserted. Every diverging row carries its comparable figure in
+// the cell regardless; naming the non-contradicting ones here only lengthens a caption the loop has
+// already flagged as a run-on. Reads as a parenthetical so it nests inside _setNote's sentence.
+function _scCmpSetNote(set, price, headCeiling) {
+  var div = _scCmpSetDivergence(set, price).filter(function (x) {
+    return headCeiling == null || x.head > headCeiling;
+  });
+  if (!div.length) return '';
+  return ' (the TAKE column prints the published headline, which for largely fee-basis contracts'
+    + ' measures remuneration structure rather than fiscal terms — '
+    + div.map(function (x) { return x.country + ' ' + x.head.toFixed(1) + '% vs the '
+        + x.cmp.toFixed(1) + '% comparable that placed it here'; }).join('; ')
+    + '; each such row carries its comparable beneath)';
+}
 
 // ── v662 (T4): the Screener's reform-record leg ──────────────────────────────
 // Walked T4 ("what is my fiscal-stability and reform exposure here?") cold. The Screener is
@@ -28981,6 +29017,10 @@ window.cpLowerTakeProducers = cpLowerTakeProducers;
 function cpScreenLowerTake(countryName) {
   var set = cpLowerTakeProducers(countryName);
   if (!set.length) return;
+  // v728 (T2): the reference take the scope line asserts. A row printing a headline above it is
+  // the one that reads as a contradiction, and is the only one the caption needs to name.
+  var _self728 = (COUNTRY_DATA || []).filter(function(c) { return c.country === countryName; })[0];
+  var _ref728 = _self728 ? cpCmpTakeOf(_self728, '75') : null;
   switchTab('texplorer', document.getElementById('tab-btn-tscreener'));
   switchExplorerMode('screen', document.getElementById('mode-btn-screen'));
   setTimeout(function() {
@@ -28988,7 +29028,12 @@ function cpScreenLowerTake(countryName) {
     // whatever the analyst had set before.
     if (typeof applyScreenerPreset === 'function') applyScreenerPreset(null);
     _screenerCountrySet = set;
-    _screenerSetLabel = 'the ' + set.length + ' production-weighted producers with a lower comparable government take than ' + countryName + ' at $75/bbl';
+    // v728 (T2): the set is chosen on COMPARABLE take, so say so on the rows and in the caption.
+    // Without this, 16 of the 21 producers sent the analyst to a table captioned "lower take than
+    // X" containing Iraq at a printed 84.8% — a caption its own first screenful refutes.
+    _screenerSetOnCmp = true;
+    _screenerSetLabel = 'the ' + set.length + ' production-weighted producers with a lower comparable government take than ' + countryName + ' at $75/bbl'
+      + _scCmpSetNote(set, '75', _ref728);
     if (typeof runScreener === 'function') runScreener();
   }, 150);
 }
@@ -29027,18 +29072,11 @@ function cpScreenInvestibleProducers() {
     // prints the HEADLINE take. For Iraq and Ecuador those differ by 50.7pp and 7.2pp, so without
     // this the caption would announce "under 40%" over rows reading 84.8% and 46.5% — the exact
     // caption/rows disagreement v524 and v568 were both logged for. Named here, on screen.
-    var _hi663 = set.filter(function(n) {
-      var c = (COUNTRY_DATA || []).filter(function(x) { return x.country === n; })[0];
-      return c && c.take_75 != null && c.take_75 > 40;
-    }).map(function(n) {
-      var c = (COUNTRY_DATA || []).filter(function(x) { return x.country === n; })[0];
-      return n + ' (headline ' + c.take_75.toFixed(1) + '%, comparable ' + cpCmpTakeOf(c, '75').toFixed(1) + '%)';
-    });
+    // v728 (T2): the naming moved into _scCmpSetNote(), shared with cpScreenLowerTake(), which
+    // had no equivalent at all. Same sentence from one place, plus the per-row sub-line.
+    _screenerSetOnCmp = true;
     _screenerSetLabel = 'the ' + set.length + ' production-weighted producers whose COMPARABLE government take at $75/bbl is 40% or lower'
-      + (_hi663.length
-          ? ' \u2014 the TAKE column below prints the headline take, which is higher for ' + _hi663.join(' and ')
-            + ', because a large share of those contracts are fee-basis and their take% is a remuneration artefact rather than a fiscal one'
-          : '');
+      + _scCmpSetNote(set, '75', 40);
     if (typeof runScreener === 'function') runScreener();
   }, 150);
 }
@@ -29341,6 +29379,7 @@ function applyScreenerPreset(preset) {
   _screenerMinRetention = null; // v573
   _screenerCountrySet = null;   // v530
   _screenerSetLabel = null;     // v560
+  _screenerSetOnCmp = false;    // v728
   _activePresetName = null;
   _activePresetBase = null; _activePresetCriteriaText = null; _activePresetModified = false;   // v718
   setSlider('sl-take', 100); setSlider('sl-npv', -500); setSlider('sl-npv50', -500); setSlider('sl-evid', 0);
@@ -29787,7 +29826,7 @@ function _scSnapshotState() {
     g: {
       rfactor: _screenerRfactorOnly, minFacts: _screenerMinFacts,
       minRet: _screenerMinRetention, cset: _screenerCountrySet,
-      setLbl: _screenerSetLabel, apName: _activePresetName,
+      setLbl: _screenerSetLabel, setCmp: _screenerSetOnCmp, apName: _activePresetName,
       // v718: _labelScreenerPresets() applies every preset in turn to read its live hit count.
       // Without these three the pass would leave the analyst's screen holding the LAST preset's
       // baseline, and the chip would report drift against a screen they never loaded.
@@ -29803,6 +29842,7 @@ function _scRestoreState(s) {
   _screenerRfactorOnly = s.g.rfactor; _screenerMinFacts = s.g.minFacts;
   _screenerMinRetention = s.g.minRet; _screenerCountrySet = s.g.cset;
   _screenerSetLabel = s.g.setLbl;     _activePresetName = s.g.apName;
+  _screenerSetOnCmp = !!s.g.setCmp;   // v728
   _activePresetBase = s.g.apBase; _activePresetCriteriaText = s.g.apCrit; _activePresetModified = s.g.apMod;   // v718
   _screenerEvidenceFirst = s.g.evFirst;
   _scSortKey = s.g.sortK; _scSortDir = s.g.sortD; _scTakeSortOnCmp = s.g.sortCmp;
@@ -30869,13 +30909,21 @@ function runScreener() {
   // unticked comparability box (which sends the ranking back to the published figure, where
   // the published figure is already the one that leads).
   const _takeLeadCmp = (_scSortKey === 'take' && _scTakeSortOnCmp);
-  const _feeCmpOf = (d) => (takeCeilingActive ? _scFeeCmpAt(d, price) : { diverges: false });
+  // v728 (T2): the comparable sub-line fires on either basis — a take ceiling tested on comparable
+  // take (v554), OR a country set whose MEMBERSHIP was decided on it (the two Country Profile
+  // CTAs). Both CTAs clear every filter on arrival, so the ceiling-only gate blanked the one
+  // reconciliation the analyst needed. Ordering, colouring, tiering and export are untouched:
+  // this adds a sub-line, it does not change which figure leads.
+  const _cmpBasisActive = takeCeilingActive || _screenerSetOnCmp;
+  const _feeCmpOf = (d) => (_cmpBasisActive ? _scFeeCmpAt(d, price) : { diverges: false });
   const _takeCmpCell = (d) => {
-    if (!takeCeilingActive) return '';
+    if (!_cmpBasisActive) return '';
     const fc = _scFeeCmpAt(d, price);
     if (!fc.diverges) return '';
     const tip = `${d.country}: ${fc.n2.toLocaleString()} of its contracts are fee-basis (fixed $/bbl remuneration, no price upside), so the published ${fc.head.toFixed(1)}% blends contract structure into the take figure. On its ${fc.n1 != null ? Number(fc.n1).toLocaleString() + ' ' : ''}PSC/Concession contracts government take is ${fc.cmp.toFixed(1)}% at $${price}/bbl — the figure the platform comparability rules permits comparing against other countries. `
-      + (feeCmpOn
+      + (!takeCeilingActive
+          ? `This row is in the list because ${fc.cmp.toFixed(1)}% met the scope stated above the table — the ${fc.head.toFixed(1)}% printed beside it did not, and is shown because it is the published figure everywhere else on the platform.`
+          : feeCmpOn
           ? `The ≤${maxTake}% ceiling was tested against ${fc.cmp.toFixed(1)}%.`
           : `The ≤${maxTake}% ceiling was tested against the published ${fc.head.toFixed(1)}% — tick the box under Max Govt Take to screen on ${fc.cmp.toFixed(1)}% instead.`);
     const _tipAttr = tip.replace(/"/g,'&quot;');
@@ -30883,7 +30931,10 @@ function runScreener() {
     // carries the published blend instead. Muted rather than accent: it is the figure being
     // set aside for this ordering, not the one being applied.
     if (_takeLeadCmp) return `<div style="font-size:10px;font-weight:700;color:var(--muted);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${_tipAttr}">published ${fc.head.toFixed(1)}%</div>`;
-    return `<div style="font-size:10px;font-weight:700;color:var(--accent);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${_tipAttr}">${feeCmpOn ? '→ screened at ' : 'cmp '}${fc.cmp.toFixed(1)}%</div>`;
+    // v728 (T2): on the set-basis path there is no ceiling, so "screened at" would name a control
+    // that is not on. "in list on" says why this row is here against a headline that says it should not be.
+    const _cmpLbl = !takeCeilingActive ? '→ in list on ' : (feeCmpOn ? '→ screened at ' : 'cmp ');
+    return `<div style="font-size:10px;font-weight:700;color:var(--accent);line-height:1.3;margin-top:2px;white-space:nowrap;cursor:help;" title="${_tipAttr}">${_cmpLbl}${fc.cmp.toFixed(1)}%</div>`;
   };
   // v685: the leading figure in the GOVT TAKE cell. Identical to fmtTake(d[takeKey]) unless the
   // swap is live, in which case it prints the comparable take, colours it on the comparable
@@ -30914,7 +30965,7 @@ function runScreener() {
       : '';
     // Bug 3 fix: click row to navigate to country profile
     const safeName = d.country.replace(/'/g, "\\'");
-    // v727 (T5): data-country is what the shortlist is keyed on, so a tick survives a
+    // v728 (T5): data-country is what the shortlist is keyed on, so a tick survives a
     // re-sort and a price-deck change. The tick cell stops propagation so ticking a row
     // does not also navigate to that country's profile.
     const attrName = d.country.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
@@ -30934,7 +30985,7 @@ function runScreener() {
     </tr>`;
   }).join('');
   window._screenerData = data;
-  // v727 (T5): re-label Copy/CSV/Excel and re-draw the shortlist badge for the row set
+  // v728 (T5): re-label Copy/CSV/Excel and re-draw the shortlist badge for the row set
   // that is now on screen — including a warning when a ticked country no longer passes.
   if (typeof _scSyncSelUI === 'function') _scSyncSelUI();
 
@@ -31000,7 +31051,7 @@ function _scExportBasisLines() {
   var L = [];
   L.push('ORCA petroleum fiscal screening shortlist');
   if (b) {
-    // ── v727 (T5) ────────────────────────────────────────────────────────────────
+    // ── v728 (T5) ────────────────────────────────────────────────────────────────
     // A hand-ticked shortlist is a narrowing step, so it has to travel as one. Without
     // this the pasted file carried six rows under "SCREEN APPLIED — 1. None: this is the
     // full ORCA universe, not a screen result", and the IC reader could not tell whether
@@ -31077,7 +31128,7 @@ function _scExportBasisLines() {
 // it disagreed with getFiscalPredictabilityScore on 179 of 185 countries -- Australia 47 vs the
 // 73 the profile shows, two full bands apart -- and it printed a hard number for the 22
 // countries where v536 ruled no predictability reading may be carried into an IC memo at all.
-// ── v727 (T5) — "Give me something I can paste straight into an IC memo." ─────────────
+// ── v728 (T5) — "Give me something I can paste straight into an IC memo." ─────────────
 // Walked T5 cold at 1440x900: Home -> Screener -> the button labelled "Copy for IC Memo".
 // The clipboard received 185 rows and 27,978 characters, captioned "ORCA petroleum fiscal
 // screening shortlist -- 185 of 185 countries" over a SCREEN APPLIED block whose only entry
@@ -31183,7 +31234,7 @@ function _scExportRows() {
   // the $75 NPV under a title that said "screened at $100/bbl".
   var _xDeck = (typeof _scDeckKey === 'function') ? _scDeckKey() : '75';
   var _xRef  = (typeof _scRetRefDeck === 'function') ? _scRetRefDeck() : '75';
-  // v727 (T5): one choke point for all three export paths — clipboard, CSV and XLSX — so a
+  // v728 (T5): one choke point for all three export paths — clipboard, CSV and XLSX — so a
   // hand-ticked shortlist cannot apply to one button and not the others.
   var _sel = (typeof _scSelOrdered === 'function') ? _scSelOrdered() : null;
   var _all = data.map(function(d, i) {
@@ -31225,7 +31276,7 @@ function _scExportRows() {
   return _sel ? _all.filter(function(r){ return _sel.indexOf(r.Country) >= 0; }) : _all;
 }
 
-// v727 (T5): with a shortlist active, "nothing to export" has two different causes and
+// v728 (T5): with a shortlist active, "nothing to export" has two different causes and
 // two different fixes. Naming the wrong one sends the analyst to widen a screen that is
 // not the problem.
 function _scEmptyMsg(verb) {
@@ -31288,7 +31339,7 @@ function _scCopyColumns(rows, price) {
   var anyFee = rows.some(function(r){ return r.FeeBasis_Blend === 'Yes'; });
   var anyBe  = rows.some(function(r){ return r.Breakeven_bbl != null; });
   var cols = [];
-  // v727 (T5): a hand-picked row has to say where it placed, or the reader cannot tell a
+  // v728 (T5): a hand-picked row has to say where it placed, or the reader cannot tell a
   // shortlist from a favourites list. The criteria block above the table asserts this
   // column exists; CSV and XLSX have always carried Rank, the clipboard table did not.
   // Off when nothing is ticked, where the rows are already in screen order top to bottom.
@@ -31365,7 +31416,7 @@ function copyScreenerTable() {
   var tailTxt = tail.join('\n');
 
   var cols = _scCopyColumns(rows, price);
-  // v727 (T5): bold the Country cell wherever it sits — the rank column now precedes it
+  // v728 (T5): bold the Country cell wherever it sits — the rank column now precedes it
   // on a hand-picked shortlist, and column 0 is no longer necessarily the country.
   var _cNameIdx = cols.map(function(c){ return c.h; }).indexOf('Country');
   var matrix = [cols.map(function(c){ return c.h; })]
