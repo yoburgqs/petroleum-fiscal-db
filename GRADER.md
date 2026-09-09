@@ -38709,3 +38709,18 @@ Also observed and NOT a defect: the headline strip's IRR slot renders `→ Model
 for every one of the 16 countries walked, never a number. That is the deliberate v516 handoff —
 country-level IRR is an arithmetic mean of per-contract IRRs and clears a 15% hurdle almost
 everywhere — and it is correct not to print it. Recorded so a later cycle does not "fix" it.
+
+---
+## Cycle 634 Log — 2026-09-08 20:59
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Both servers stopped. (The temp build copy at `/tmp/t2walk/pre` is left in place — `rm -rf` is on the deny list, and it's in `/tmp`.)
+
+## Cycle 635 — shipped as v728 (`fe96222`), pushed
+
+**Task: T2** — "Is this one country attractive at $75/bbl, and can I defend that?" Stalest by rotation; 628 was the last T2.
+
+**Friction.** The Country Profile answers "attractive?" and then offers one control for the follow-up every IC analyst asks — *compared to what?*:
+
+> See the 12 producers 
