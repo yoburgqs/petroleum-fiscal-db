@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v733</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v734</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1296,6 +1296,13 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
      title-only glyphs, 7x12px with a mouse, and the directive's floor is 24px under a
      thumb. Given the box height and the same invisible hit area the chips use, so the
      glyph stays inline in a dense table row on desktop and is reachable on a phone. */
+  /* v734 (T2): the Country Profile NPV band-rank pill. 22.5px inline with a mouse, which is
+     under the directive's 24px coarse-pointer floor. Grown vertically only -- the v713 lesson:
+     any horizontal reach on an inline element inflates its parent's scrollWidth and reports to
+     pixel_audit as clipped text. */
+  .orca-npv-band-pill {
+    min-height: 24px;
+  }
   .cp-fee-mark {
     position: relative;
     display: inline-flex;
@@ -2051,7 +2058,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v733</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v734</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2121,7 +2128,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v733</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v734</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -34478,6 +34485,131 @@ function cpFloorBase() {
 }
 window.cpFloorBase = cpFloorBase;
 
+// v734 (T2) -- the LOCAL version of cpFloorBase()'s regression, and the reason the verdict
+// sentence above it was giving the analyst the wrong instruction.
+//
+// cpFloorBase() regresses npv_75 on take_75 across all 182 non-monopoly countries -- a take
+// range running from roughly 10% to 97% -- and gets r2 0.89. From that the v589 verdict told
+// the analyst, in bold, on the first line of the tab, that contractor NPV "restates the take
+// rather than tests it" and to "defend on the take and its evidence tier, NOT on the NPV."
+//
+// That inference is true across the whole database and false everywhere an IC screening
+// actually stands. Nobody compares Indonesia against a 10%-take regime. They compare it
+// against the regimes in its own take band -- which is precisely the set the Similar Fiscal
+// Profile table two screens below this line builds, at +/-6pp on comparable take. Measured on
+// the live country_data.json:
+//
+//     all 182 non-monopoly       r2 0.887   slope -$61M/pt
+//     Indonesia's band (n=33)    r2 0.017   slope +$21M/pt   NPV $627M -> $2,950M  (4.7x)
+//     the 65% band    (n=15)     r2 0.002   slope  -$8M/pt   NPV $627M -> $2,950M  (4.7x)
+//     the 30% band    (n=36)     r2 0.458                    NPV $2.5B -> $3.9B    (1.6x)
+//
+// Inside a band the slope collapses and in two of them it flips sign. Contractor NPV still
+// varies more than fourfold at a constant government take, and that variation is the only
+// thing separating one shortlist candidate from another -- so it is exactly the number the
+// page was telling the analyst to discard.
+//
+// Why the spread is real and not noise: govt_take_pct in petroleum_dcf.py is
+// govt_take_total / gross_rev_total, an UNDISCOUNTED lifetime share, while npv_75 is
+// discounted at 10% on ONE fixed project ($1.2B capex / 50k bbl/d peak / $15/bbl opex /
+// 25 years), identical for every country. Gross revenue, cost and discount rate are therefore
+// constant across every row in the band. At a near-constant lifetime take%, undiscounted
+// contractor cash is near-constant too, so a 4.7x spread in the DISCOUNTED figure is when the
+// government takes its share and how fast costs are recovered -- not how much it takes. Two
+// separate fiscal readings, and the tab was collapsing them into one.
+//
+// Everything is measured off COUNTRY_DATA at render time on the same comparable-take basis
+// (cpPeerBasis) the peer tables use, so fee-basis TSC/RSC/Buy-back rows are placed on their
+// PSC/Concession take rather than their 97-99% structural artefact.
+var _cpBandNpvCache = {};
+function cpTakeBandNpv(d, widthPp) {
+  if (!d || typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return null;
+  if (d.npv_75 == null) return null;
+  var w = widthPp || 6;
+  var key = (d.country || '?') + '|' + w;
+  if (_cpBandNpvCache[key] !== undefined) return _cpBandNpvCache[key];
+  var _basis = function(p) {
+    return (typeof cpPeerBasis === 'function') ? cpPeerBasis(p, '75').v : p.take_75;
+  };
+  var selfTake = _basis(d);
+  if (selfTake == null || isStateMonopoly(selfTake)) { _cpBandNpvCache[key] = null; return null; }
+  var band = [];
+  COUNTRY_DATA.forEach(function(p) {
+    if (p.npv_75 == null) return;
+    var pv = _basis(p);
+    if (pv == null || isStateMonopoly(pv)) return;
+    if (Math.abs(pv - selfTake) > w) return;
+    band.push({ t: pv, v: p.npv_75 });
+  });
+  // Fewer than 8 comparable regimes in range is not a slope, it is four points and a ruler.
+  // The caller falls back to the all-country clause rather than printing a reading off noise.
+  if (band.length < 8) { _cpBandNpvCache[key] = null; return null; }
+  var n = band.length, mx = 0, my = 0;
+  band.forEach(function(b) { mx += b.t; my += b.v; });
+  mx /= n; my /= n;
+  var sxy = 0, sxx = 0, syy = 0;
+  band.forEach(function(b) {
+    var x = b.t - mx, y = b.v - my;
+    sxy += x * y; sxx += x * x; syy += y * y;
+  });
+  var vals = band.map(function(b) { return b.v; }).sort(function(a, b) { return a - b; });
+  var med = vals.length % 2 ? vals[(vals.length - 1) / 2]
+                            : (vals[vals.length / 2 - 1] + vals[vals.length / 2]) / 2;
+  // Rank DESCENDING: #1 is the HIGHEST contractor NPV in the band. Ascending was tried first
+  // and read backwards on the strip -- Norway showed "#1 of 8" while holding the LOWEST NPV of
+  // its band, and Azerbaijan "#32 of 32" while holding the highest. Both pills are read in half
+  // a second by someone who will not hover. fromLow is kept for the wording below, which names
+  // the direction in words rather than trusting the number to carry it.
+  var rank = 1;
+  band.forEach(function(b) { if (b.v > d.npv_75) rank++; });
+  var fromLow = 1;
+  band.forEach(function(b) { if (b.v < d.npv_75) fromLow++; });
+  var out = {
+    n: n,
+    r2: (sxx > 0 && syy > 0) ? (sxy * sxy) / (sxx * syy) : null,
+    slope: sxx > 0 ? sxy / sxx : null,
+    lo: selfTake - w, hi: selfTake + w, w: w,
+    min: vals[0], max: vals[vals.length - 1], median: med,
+    rank: rank, fromLow: fromLow, npv: d.npv_75,
+    ratio: (vals[0] > 0) ? vals[vals.length - 1] / vals[0] : null
+  };
+  _cpBandNpvCache[key] = out;
+  return out;
+}
+window.cpTakeBandNpv = cpTakeBandNpv;
+
+// The sentence the band reading turns into, shared by the verdict line and the strip tooltip so
+// the two can never drift the way the four IRR-absence sentences did before v687.
+function cpBandNpvNote(d, b) {
+  if (!b) return '';
+  var r2 = b.r2, hasR2 = (r2 != null);
+  var win = 'Among the ' + b.n + ' regimes taking ' + b.lo.toFixed(1) + '\u2013' + b.hi.toFixed(1)
+    + '% \u2014 \u00b1' + b.w + 'pp on comparable take, the window the Similar Fiscal Profile table '
+    + 'below draws from before it drops this country\u2019s own region \u2014 ';
+  var range = ': those NPVs run ' + cpNpvFmt(b.min) + ' to ' + cpNpvFmt(b.max)
+    + ' on the identical standardized project';
+  // The timing reading is only available where take has been shown NOT to carry the spread.
+  // At r2 0.99 (the USA's 73-country band) it would be flatly false, and an earlier draft of
+  // this sentence printed it there. Three branches, keyed to the number actually measured.
+  if (hasR2 && r2 < 0.25) {
+    return win + 'take explains almost none of the contractor NPV spread (r\u00b2 ' + r2.toFixed(2) + ')'
+      + range + '. Take% is an undiscounted lifetime share while NPV is discounted at 10% on the same '
+      + '$1.2B / 50k bbl/d profile for every country, so '
+      + (b.ratio != null ? 'that ' + b.ratio.toFixed(1) + '\u00d7 gap' : 'that gap')
+      + ' is largely WHEN the government takes its share, not how much.';
+  }
+  if (hasR2 && r2 < 0.60) {
+    return win + 'take explains under half the contractor NPV spread (r\u00b2 ' + r2.toFixed(2) + ')'
+      + range + '. The remainder is timing \u2014 take% is an undiscounted lifetime share, NPV is '
+      + 'discounted at 10% on a project held identical across every country \u2014 so the two readings '
+      + 'are related here but not interchangeable.';
+  }
+  return win + 'contractor NPV does track take (r\u00b2 ' + (hasR2 ? r2.toFixed(2) : 'n/a') + ')'
+    + range + ', a spread of only ' + (b.ratio != null ? b.ratio.toFixed(1) + '\u00d7' : 'little')
+    + '. In this band the NPV genuinely restates the take and adds nothing to it.';
+}
+window.cpBandNpvNote = cpBandNpvNote;
+
 // v636 (T2) — the reconciliation note above was the page's one instruction for defending the
 // profit-oil split, and it quoted a number that is not printed anywhere on the page. It tested
 // COUNTRY_DATA.profit_oil_govt against the ladder and then reported the result as "the Evidence
@@ -35028,11 +35160,54 @@ function loadCountryProfile(country) {
       var _baseClause589 = (_fb589 && _fb589.n)
         ? ' \u2014 but so do ' + _fb589.nPass + ' of ' + _fb589.n + ' non-monopoly regimes here'
         : '';
-      var _dependClause589 = (_fb589 && _fb589.r2 != null && _fb589.slope != null)
-        ? ', and on ORCA\u2019s single fixed Deepwater profile contractor NPV tracks govt take at r\u00b2\u00a0'
-          + _fb589.r2.toFixed(2) + ' (\u2248\u2212$' + Math.abs(_fb589.slope).toFixed(0)
-          + 'M per point of take), so these two figures restate the take rather than test it'
-        : '';
+      // v734 (T2): the all-country regression this clause used to print is true and useless.
+      // r2 0.89 is measured over a 10%-to-97% take range; inside the +/-6pp band an IC
+      // shortlist is actually drawn from, it collapses to 0.02 with the slope flipped, and
+      // contractor NPV still spans 4.7x. See cpTakeBandNpv(). The clause now reports the band
+      // the analyst is standing in, and falls back to the all-country reading only where
+      // fewer than 8 comparable regimes sit in range.
+      var _band734 = (typeof cpTakeBandNpv === 'function') ? cpTakeBandNpv(d, 6) : null;
+      var _dependClause589 = _band734
+        ? '. ' + cpBandNpvNote(d, _band734).replace(/\.$/, '')
+        : ((_fb589 && _fb589.r2 != null && _fb589.slope != null)
+            ? ', and on ORCA\u2019s single fixed Deepwater profile contractor NPV tracks govt take at r\u00b2\u00a0'
+              + _fb589.r2.toFixed(2) + ' (\u2248\u2212$' + Math.abs(_fb589.slope).toFixed(0)
+              + 'M per point of take), so these two figures restate the take rather than test it'
+            : '');
+      // The instruction the clause supports. Where the band resolves, "not on the NPV" is
+      // withdrawn -- it was telling the analyst to discard the one column that discriminates
+      // inside their own shortlist, three screens above a table headed "Read NPV @$75 against
+      // this country's own row to rank contractor value on the base case." The two surfaces
+      // now agree, and the rank is stated rather than left for the analyst to eyeball.
+      var _rankWord734 = '';
+      if (_band734) {
+        var _lo734 = _band734.fromLow, _hi734 = _band734.rank, _n734 = _band734.n;
+        var _ord = function(k) {
+          return k + (k % 10 === 1 && k % 100 !== 11 ? 'st'
+                    : k % 10 === 2 && k % 100 !== 12 ? 'nd'
+                    : k % 10 === 3 && k % 100 !== 13 ? 'rd' : 'th');
+        };
+        _rankWord734 = _lo734 === 1 ? 'the lowest contractor NPV of the ' + _n734
+                     : _hi734 === 1 ? 'the highest contractor NPV of the ' + _n734
+                     : _lo734 <= 3 ? _ord(_lo734) + '-lowest contractor NPV of the ' + _n734
+                     : _hi734 <= 3 ? _ord(_hi734) + '-highest contractor NPV of the ' + _n734
+                     : 'contractor NPV #' + _hi734 + ' of ' + _n734 + ' (highest first)';
+      }
+      // Where the band shows NPV moving with take (r2 >= 0.60) the original v589 instruction is
+      // the correct one and stays -- the NPV really is the take restated there, and telling the
+      // analyst to carry it as a second finding would be inventing one. Where it does not, the
+      // instruction is withdrawn: it was sending them past the one column that discriminates
+      // inside their own shortlist, three screens above a table headed "Read NPV @$75 against
+      // this country's own row to rank contractor value on the base case."
+      var _bandCarries734 = _band734 && _band734.r2 != null && _band734.r2 < 0.60;
+      var _nClause734 = (d.n != null ? ' (n=' + Number(d.n).toLocaleString() + ' contracts)' : '');
+      var _defendInstr734 = _bandCarries734
+        ? '. <strong>' + _cpEsc(d.country) + ' carries ' + _rankWord734 + ' in its own take band ('
+          + cpNpvFmt(d.npv_75) + ' against a ' + cpNpvFmt(_band734.median)
+          + ' band median). Defend on the take and its evidence tier' + _nClause734
+          + ', and carry that NPV position separately \u2014 they are two findings, not one.</strong>'
+        : '. <strong>Defend on the take and its evidence tier' + _nClause734
+          + ', not on the NPV.</strong>';
       msg = '<strong>' + take.toFixed(1) + '% govt take @$75</strong> \u2014 ' + _tierLbl589
           + _cmpBasisNote552 + '. Clears the 10% WACC at $75 (' + cpNpvFmt(npv)
           + ') and at the $50/bbl downside (' + cpNpvFmt(npv50) + ')'
@@ -35040,8 +35215,7 @@ function loadCountryProfile(country) {
           // The contract count travels with the instruction, so "defend on the take" is
           // self-calibrating: Norway reads n=7,643, Vanuatu reads n=7. Same figure the
           // headline strip already prints as a chip; no new threshold, no new judgement.
-          + '. <strong>Defend on the take and its evidence tier' + (d.n != null ? ' (n=' + Number(d.n).toLocaleString() + ' contracts)' : '')
-          + ', not on the NPV.</strong>' + beStr
+          + _defendInstr734 + beStr
           // v715 (T2): the dispersion of the take this sentence just told the analyst to defend on.
           // Wrapper is always emitted so _cpApplyObsSpread() can fill it when the contract sample
           // lands after render; cpDefendDispersion() returns '' where the take really is one term.
@@ -35175,7 +35349,39 @@ function loadCountryProfile(country) {
   const _npv344Display = (!_isMonopoly && d.npv_75 != null) ? (function() {
     var npvCol = d.npv_75 >= 0 ? 'var(--green)' : 'var(--red)';
     var npvStr = fmtNpvShared ? fmtNpvShared(d.npv_75) : (d.npv_75 >= 0 ? '+' : '') + d.npv_75.toFixed(0) + 'M';
-    return '<span style="color:var(--muted);font-size:13px;margin-left:4px;cursor:help;" title="Contractor NPV at $75/bbl — net present value of all contractor cash flows under this fiscal regime. Discounted at 10% WACC, 100% working interest, pre-financing, pre-bonus, Deepwater standardized profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex). Positive = project earns above the 10% cost of capital at $75/bbl. For stake-level economics, scale by your WI%. For field-specific inputs, use Scenario Builder.">NPV: <strong style="color:' + npvCol + ';">' + npvStr + '</strong><span style="opacity:.65;font-size:10px;"> @$75</span></span>';
+    // v734 (T2): the take three lines above this carries a rank AND a vs-median pill; the NPV
+    // beside it carried neither, so the strip answered "how hard is the fiscal regime" and
+    // left "am I getting paid" to be eyeballed off a table three screens down. The one NPV
+    // rank the page did print -- "#17 of 21 producers" in the Key Metrics grid -- ranks across
+    // a 23%-to-85% take spread, so it largely restates the take: of course the high-take
+    // country ranks low. This pill ranks contractor NPV inside the country's OWN take band,
+    // which is the only comparison in which the NPV carries information the take does not.
+    // Indonesia: 59.5% take is mid-pack (+3.9pp vs producer median) and $745M is 2nd-lowest of
+    // the 33 regimes taking 53.5-65.5%, against a $1,148M band median. Same shape as the take
+    // pill, same +/-6pp window as the Similar Fiscal Profile table, so the analyst can scroll
+    // down and check it.
+    var _bn734 = (typeof cpTakeBandNpv === 'function') ? cpTakeBandNpv(d, 6) : null;
+    var _bandPill734 = '';
+    if (_bn734) {
+      var _delta734 = d.npv_75 - _bn734.median;
+      var _up734 = _delta734 >= 0;
+      // Above / below the measured band median. Not a threshold -- the comparison IS the median.
+      var _pc734 = _up734 ? 'var(--green)' : 'var(--orange)';
+      var _pb734 = _up734 ? 'rgba(21,128,61,.08)' : 'rgba(249,115,22,.10)';
+      var _pbd734 = _up734 ? 'rgba(21,128,61,.30)' : 'rgba(249,115,22,.35)';
+      _bandPill734 = '<span class="orca-npv-band-pill" style="display:inline-flex;align-items:center;font-size:11px;font-weight:600;'
+        + 'padding:2px 9px;margin-left:8px;border-radius:12px;white-space:nowrap;cursor:help;color:' + _pc734
+        + ';background:' + _pb734 + ';border:1px solid ' + _pbd734 + ';" title="'
+        + cpBandNpvNote(d, _bn734).replace(/"/g, '&quot;')
+        + ' This country is #' + _bn734.rank + ' of ' + _bn734.n + ' on contractor NPV inside that band, '
+        + 'HIGHEST FIRST (#1 = the most contractor value at this level of government take), against a band '
+        + 'median of ' + cpNpvFmt(_bn734.median) + '. Read it with the take rank on the left: the take says '
+        + 'how much the government takes across the life of the project, this says what the contractor is '
+        + 'left holding once the timing of that take is discounted.">NPV rank #'
+        + _bn734.rank + ' of ' + _bn734.n + ' at this take \u00b7 ' + (_up734 ? '+' : '\u2212')
+        + cpNpvFmt(Math.abs(_delta734)) + ' vs band median</span>';
+    }
+    return '<span style="color:var(--muted);font-size:13px;margin-left:4px;cursor:help;" title="Contractor NPV at $75/bbl — net present value of all contractor cash flows under this fiscal regime. Discounted at 10% WACC, 100% working interest, pre-financing, pre-bonus, Deepwater standardized profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex). Positive = project earns above the 10% cost of capital at $75/bbl. For stake-level economics, scale by your WI%. For field-specific inputs, use Scenario Builder.">NPV: <strong style="color:' + npvCol + ';">' + npvStr + '</strong><span style="opacity:.65;font-size:10px;"> @$75</span></span>' + _bandPill734;
   })() : '';
   const _dnside516Display = (!_isMonopoly && d.npv_50 != null) ? (function() {
     var dCol = d.npv_50 > 0 ? 'var(--green)' : 'var(--red)';
