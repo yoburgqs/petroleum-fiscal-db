@@ -41363,3 +41363,16 @@ eleven country names and a truncated "REGI…" header, and not one number.
   removed; `#reference-panel` untouched; no negative offsets added; no tooltip, FAQ or
   citation-string edit; no tab reordering; CP headline zones, tier colouring, rank and
   vs-median pill untouched; Govt NPV stays removed from Fiscal Compare.
+
+---
+## Cycle 653 Log — 2026-09-09 15:42
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cleanup of the two temp localhost servers was declined, so they're still running on ports 8099/8100 along with `/tmp/orca_base` (a copy of v746 plus symlinks) — harmless, but worth clearing manually if you want them gone.
+
+## Cycle 653 — T1, shipped as v747
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* Stalest by rotation (647 T1 · 648 T6 · 649 T3 · 650 T4 · 651 T5 · 652 T2).
+
+**Friction.** The desktop T1 path is genuinely in good shape — I walked it cold and found not
