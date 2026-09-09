@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v742</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v743</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1267,7 +1267,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   input[type="number"], .chip, .expl-mode-btn, .tab-dropdown-btn {
     min-height: 44px;
   }
-  /* v742 (T1): the two data-basis checkboxes in the Screener's Advanced panel. They answer
+  /* v743 (T1): the two data-basis checkboxes in the Screener's Advanced panel. They answer
      two different questions -- "has anyone drilled here" and "is this take a measurement" --
      and mis-hitting one for the other on a phone returns a different shortlist. Scoped to
      these two ids rather than to input[type=checkbox]: the mechanic and IOC grids in the same
@@ -2072,7 +2072,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v742</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v743</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2142,7 +2142,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v742</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v743</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3175,7 +3175,7 @@ window.copyPlatformCitation = function(btn) {
                filter, so the flagship IC screen could not express "only the countries anyone has
                actually drilled", which is exactly what T1 asks. -->
           <label title="163 of 185 countries have no verified field production: their fiscal terms are regional proxy estimates and the NPV and breakeven shown for them are indicative only &mdash; the Screener already says so in the divider row it draws at that boundary. CHECKED (default): all 185 stay in the list, ranked with the production-backed 22 first. UNCHECKED: keep only the 22 countries whose economics are backed by real field production."><input type="checkbox" id="sc-proxy-keep" checked> Include the <span style="font-weight:700;">163</span> countries with no verified field production <span style="color:var(--muted);font-size:10px;">(proxy economics &mdash; indicative only)</span></label>
-          <!-- v742 (T1): the escape hatch for the floor-take block. The default is unchanged --
+          <!-- v743 (T1): the escape hatch for the floor-take block. The default is unchanged --
                the rows stay in the list, partitioned last under their own divider with bounded
                cells -- because dropping 45 rows silently is the failure mode this platform keeps
                fixing, not a fix. What did not exist was any way to say "only the countries whose
@@ -3296,7 +3296,7 @@ window.copyPlatformCitation = function(btn) {
   <!-- v469: Profile assumption context strip — SbS always uses pre-computed Deepwater $1.2B 10%WACC values; analyst needs to know the basis before using in IC memo -->
   <div style="background:rgba(176,104,0,.04);border:1px solid rgba(176,104,0,.14);border-radius:5px;padding:5px 12px;margin-bottom:10px;font-size:11px;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
     <span style="color:var(--accent);font-weight:700;">Profile basis:</span>
-    <span><strong style="color:var(--text);">Deepwater</strong> · $1.2B capex · 50k bbl/d · $15/bbl opex · 25yr life · 10% WACC · 100% WI</span>
+    <span id="cmp-profile-terms"><strong style="color:var(--text);">Deepwater</strong> · $1.2B capex · 50k bbl/d · $15/bbl opex · 25yr life · 10% WACC · 100% WI</span>
     <span style="margin-left:auto;font-size:10px;color:var(--muted);font-style:italic;">Same basis as Fiscal Compare — values are directly comparable</span>
   </div>
   <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px;position:relative;">
@@ -29134,7 +29134,7 @@ let _screenerMinFacts = 0;   // v518: fact-depth floor, set only by the Primary-
 // It is a floor, not a replacement: the Primary-Source Evidence preset's 150 still wins.
 const SC_EVID_MIN_FACTS = 50;
 
-// ─── v742 (T1) — is this country's government take a MEASUREMENT or a FLOOR? ────────────────
+// ─── v743 (T1) — is this country's government take a MEASUREMENT or a FLOOR? ────────────────
 // The database take is the sum of the fiscal levers ORCA actually holds for a country. Where the
 // record holds no petroleum rent instrument AT ALL -- no state participation, no profit-oil or
 // revenue share, no resource-rent surtax, no cost-recovery limit, no first-tranche petroleum, no
@@ -29609,7 +29609,7 @@ var _SC_SIG_LABELS = {
   'sc-proxy-keep': { n: 'data basis',       f: function (v) { return v ? 'proxy countries included' : 'verified production only'; } },
   'sc-fee-cmp':    { n: 'take basis',       f: function (v) { return v ? 'comparable' : 'published blend'; } },
   'sc-evid-depth': { n: 'fact-depth leg',   f: function (v) { return v ? 'on' : 'off'; } },
-  // v742 (T1): so the exported IC criteria block and the active-filter badge both say which of
+  // v743 (T1): so the exported IC criteria block and the active-filter badge both say which of
   // the two data-basis questions was actually asked. They are different questions.
   'sc-floor-keep': { n: 'take basis',       f: function (v) { return v ? 'floor-take countries included' : 'measured take only'; } }
 };
@@ -29737,7 +29737,7 @@ function applyScreenerPreset(preset) {
   const keepProxy = document.getElementById('sc-proxy-keep');
   if (keepProxy) keepProxy.checked = true;
   const keepFloor = document.getElementById('sc-floor-keep');
-  if (keepFloor) keepFloor.checked = true;   // v742
+  if (keepFloor) keepFloor.checked = true;   // v743
   const scRgn = document.getElementById('sc-region');
   if (scRgn) scRgn.value = '';
   setReform('');   // v662
@@ -30566,7 +30566,7 @@ function _scProdCovTip(d) {
 }
 
 function runScreener() {
-  // v742 (T1): the floor-take population is read off the live data, not written into the label.
+  // v743 (T1): the floor-take population is read off the live data, not written into the label.
   (function(){ var el = document.getElementById('sc-floor-n'); if (el) el.textContent = _scFloorCount(); })();
   _scUpdateNeutralFlags();
   _scSyncNpvAxis();   // v617: re-scale the NPV axis to the active deck BEFORE its value is read
@@ -30590,7 +30590,7 @@ function runScreener() {
   // v517: the IRR axis is retired. What is left to disclose is data basis: 163 of the 185 countries
   // have no verified field production and their economics are regional proxies.
   const includeProxy = document.getElementById('sc-proxy-keep')?.checked !== false;
-  // v742 (T1): a SECOND data-basis leg, not a synonym for the one above. All 45 floor-take rows
+  // v743 (T1): a SECOND data-basis leg, not a synonym for the one above. All 45 floor-take rows
   // are proxy rows, but only 45 of the 163 proxy rows are floor-take: unticking the production
   // box to escape Vanuatu also threw away Guyana, Namibia, Mozambique, Senegal and Suriname.
   const includeFloor = document.getElementById('sc-floor-keep')?.checked !== false;
@@ -30691,7 +30691,7 @@ function runScreener() {
     // a divider at the boundary, but never let the analyst screen on it. "Only the countries anyone
     // has actually drilled" is the single most useful narrowing available for T1.
     if (!includeProxy && !_dqTier(d).hasProduction) return false;
-    // v742 (T1): floor-take basis filter. See _scTakeIsFloor().
+    // v743 (T1): floor-take basis filter. See _scTakeIsFloor().
     if (!includeFloor && _scTakeIsFloor(d)) return false;
 
     // mechanic: country passes if ANY of its mechanics is in the checked set
@@ -30816,7 +30816,7 @@ function runScreener() {
   //
   // Countries with verified production now sort first, proxies after, NPV DESC within each
   // group. Nothing is removed — all 185 stay in the table, the export and the count.
-  // v742 (T1): three registers, not two. 0 = verified field production. 1 = proxy economics but
+  // v743 (T1): three registers, not two. 0 = verified field production. 1 = proxy economics but
   // ORCA holds at least one petroleum rent instrument, so the take is a modelled figure. 2 = the
   // take is a floor (see _scTakeIsFloor). All 45 rank-2 rows sit inside the rank-1 set on the
   // shipped data, so this refines the v507 partition rather than cutting across it.
@@ -30864,7 +30864,7 @@ function runScreener() {
   }
   const _nVerified = data.filter(d => _dqTier(d).hasProduction).length;
   const _nProxy    = data.length - _nVerified;
-  // v742 (T1): rows in this result set whose take is a floor rather than a measurement.
+  // v743 (T1): rows in this result set whose take is a floor rather than a measurement.
   const _nFloor    = data.filter(_scTakeIsFloor).length;
   const _nModelled = _nProxy - _nFloor;
   // v609 — `!_scSortKey` removed. Grouping is now decided by the toggle the analyst controls,
@@ -30872,7 +30872,7 @@ function runScreener() {
   // the R-factor swing order, so it can group there too. With the toggle OFF and a sort active
   // the rows genuinely are interleaved, _grouped is false, and the v543 banner still fires.
   const _grouped   = _screenerEvidenceFirst && (!!_scSortKey || !_screenerRfactorOnly) && _nVerified > 0 && _nProxy > 0;
-  // v742: the floor block is partitioned on the same toggle and the same sort paths as the
+  // v743: the floor block is partitioned on the same toggle and the same sort paths as the
   // production block. It can be drawn when the result set holds both kinds of proxy row, and
   // does not require any production-backed row to exist -- the all-proxy screens (Deepwater,
   // PSC Africa, Frontier Markets) are exactly where the distinction carries most.
@@ -30995,7 +30995,7 @@ function runScreener() {
   // problem; "which of these has anyone actually drilled" is.
   // v609 — when a column sort is active the grouped note says the sort runs INSIDE each block,
   // so the analyst is not left thinking their click was ignored.
-  // v742 (T1): the basis sentence now names three registers when the third is present, because
+  // v743 (T1): the basis sentence now names three registers when the third is present, because
   // "163 regional proxies" put Vanuatu and Mozambique in one bucket and the analyst reads the
   // top of that bucket as the frontier shortlist.
   const _floorNote = _nFloor > 0
@@ -31340,7 +31340,7 @@ function runScreener() {
     // basis when the swap is live. Leaving it on the published figure is what put "NOC/Concession"
     // on row 6 of an ascending screen between two "Inv-Friendly" rows.
     const _rowFc  = _feeCmpOf(d);
-    // v742 (T1): the bound marker. A glyph is not the fix here -- the divider and the ranking
+    // v743 (T1): the bound marker. A glyph is not the fix here -- the divider and the ranking
     // are -- but a row lifted out of the block by a column sort, ticked into the shortlist, or
     // read on a phone where the divider has scrolled away still has to carry its own direction.
     const _rowFloor = _scTakeIsFloor(d);
@@ -31361,7 +31361,7 @@ function runScreener() {
         + `Ranked among themselves by ${_scSortKey ? _scSortLabelNow().toLowerCase() : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
         + `</td></tr>`
       : '';
-    // v742 (T1): second boundary, drawn where the ranking stops being a measurement at all.
+    // v743 (T1): second boundary, drawn where the ranking stops being a measurement at all.
     // The v507 divider above answers "has anyone drilled here". It does not answer "is this
     // number a number", and on an NPV-descending sort those two questions have opposite
     // consequences: the thinner the fiscal record, the lower the modelled take, the HIGHER the
@@ -31630,7 +31630,7 @@ function _scExportBasisLines() {
   }
   L.push('ASSUMPTIONS: standardized Deepwater profile, $1.2B capex, 50k bbl/d, $15/bbl opex, '
     + '10% WACC, 100% WI. Take and NPV at the screened price; breakeven always at $75/bbl.');
-  // v742 (T1): only stated when this shortlist actually contains such a row, and it names them,
+  // v743 (T1): only stated when this shortlist actually contains such a row, and it names them,
   // because a caveat about countries that are not in the export is noise in an IC memo.
   (function(){
     // Same two sources _scExportBasisLines() already uses for the data-basis split, so this
@@ -31834,7 +31834,7 @@ function _scExportRows() {
       Mechanics: d.mechanics,
       R_factor_Tiers: d.has_r_factor_tiers ? 'Yes' : 'No',
       Verified_Production: _dqTier(d).hasProduction ? 'Yes' : 'No',
-      // v742 (T1): the take/NPV basis flag. A shortlist that reaches an IC memo has to carry the
+      // v743 (T1): the take/NPV basis flag. A shortlist that reaches an IC memo has to carry the
       // direction of its own error, or the divider on screen stops at the browser window.
       Take_Is_Floor: _scTakeIsFloor(d) ? 'Yes' : 'No',
       Take_Basis: _scTakeIsFloor(d)
@@ -33534,7 +33534,7 @@ function renderReformTimeline(country) {
         + 'white-space:nowrap;vertical-align:bottom;">' + _esc(s) + '</span>';
     };
     const _fmtPct = function(v) { return (Math.round(v * 100) / 100) + '%'; };
-    // v742 (T6): row labels are HTML (v625 wraps NOT HELD labels in an opacity span). Any label
+    // v743 (T6): row labels are HTML (v625 wraps NOT HELD labels in an opacity span). Any label
     // that reaches a sentence rather than a cell is reduced to its text first.
     const _stripTag742 = function(x) { return String(x == null ? '' : x).replace(/<[^>]*>/g, ''); };
     const _mono = 'font-family:IBM Plex Mono,monospace;';
@@ -33627,7 +33627,7 @@ function renderReformTimeline(country) {
     // Quality chip at the top of this profile.
     const _termsCited = new Set();
 
-    // ── v742 (T6): WHICH ROWS THE NUMBER IS ACTUALLY BUILT FROM ──────────────────────────
+    // ── v743 (T6): WHICH ROWS THE NUMBER IS ACTUALLY BUILT FROM ──────────────────────────
     // v625 fixed the missing direction: a term the model runs and the fact base does not hold
     // now gets a NOT HELD row. The opposite direction was never handled. rowDefs is a fixed
     // eight-row list and every key the API happens to hold gets a row, whether or not this
@@ -33679,17 +33679,17 @@ function renderReformTimeline(country) {
       if (!mk) return true;
       return _liveTermSet.has(mk);
     };
-    let offRows = [];                 // v742: rows the live model does not read
-    let offUnsourcedLabels = [];      // v742: ...of which these carry no source at all
-    let offDivergentLabels = [];      // v742: ...and these disagree with their cited statute
-    let offSourcedCount = 0;          // v742: independently sourced, but not an input
+    let offRows = [];                 // v743: rows the live model does not read
+    let offUnsourcedLabels = [];      // v743: ...of which these carry no source at all
+    let offDivergentLabels = [];      // v743: ...and these disagree with their cited statute
+    let offSourcedCount = 0;          // v743: independently sourced, but not an input
 
     if (fk) {
       // API data available — build rows with source badges
       rowDefs.forEach(([label, key, fallbackKey]) => {
         let rawVal = fk[key] != null ? fk[key] : (fallbackKey ? fk[fallbackKey] : null);
         if (rawVal == null) return;
-        // v742 (T6): every counter and label list under this table is a statement about the terms
+        // v743 (T6): every counter and label list under this table is a statement about the terms
         // that produce the take. A row the live model does not read must not move any of them, so
         // the whole set is snapshotted here and rolled back at the push site if the row is
         // off-model. Rolling back is used rather than gating each increment because the increments
@@ -33955,7 +33955,7 @@ function renderReformTimeline(country) {
             // so the row is findable in a table scan rather than only on hover.
             ? '<span style="color:var(--red);font-weight:700;">' + val + '</span>'
             : val;
-        // v742 (T6): terms the live model does not read are held back for the partition below.
+        // v743 (T6): terms the live model does not read are held back for the partition below.
         if (_readsRow(label)) {
           rows.push([label, valHtml, statHtml, badgeHtml]);
         } else {
@@ -33982,7 +33982,7 @@ function renderReformTimeline(country) {
         }
       });
 
-      if (!rows.length && !offRows.length) {   // v742 (T6): off-model rows still make a table
+      if (!rows.length && !offRows.length) {   // v743 (T6): off-model rows still make a table
         el.innerHTML = '<div style="background:var(--surface2);border:1px solid var(--border);border-radius:5px;padding:10px 14px;font-size:12px;color:var(--muted);line-height:1.5;">No sourced fiscal parameters available for this country. Key parameters (royalty, CIT, profit oil split) have not yet been verified at A/B-tier confidence. The Take% and DCF metrics shown above are computed from contract averages — use the Evidence badge above for sourcing context. <strong style="color:var(--text);">Analyst note:</strong> verify fiscal terms via primary legislation or operator filings before IC memo use.</div>';
         _cpApplyPOReconcile(slug, poPrinted);   // v636 (T2)
         return;
@@ -34393,7 +34393,7 @@ function renderReformTimeline(country) {
         : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
-    // ── v742 (T6): what the rows below the divider are, and what they are not ────────────
+    // ── v743 (T6): what the rows below the divider are, and what they are not ────────────
     // Placed FIRST in the note stack, immediately under the partition it explains, because the
     // divider is the new thing on screen and an unexplained divider is worse than none. It states
     // the negative fact the analyst needs (these do not enter the number) and, where those rows
@@ -34450,7 +34450,7 @@ function renderReformTimeline(country) {
           + '<td>' + r[3] + '</td>'
           + '</tr>'
         ).join('')
-      // v742 (T6): the partition. A full-width divider row carrying the regime name, then the
+      // v743 (T6): the partition. A full-width divider row carrying the regime name, then the
       // rows the model does not read, at 60% opacity so the eye stops at the divider on a scan.
       // They stay in the same table -- moving them to a second table would make them look like a
       // different kind of record, and they are not; they are the same harvest, read by nothing.
@@ -34509,7 +34509,7 @@ function renderReformTimeline(country) {
           // engine never reads. On a ladder country there is no single number for that cell.
           ladder: (_cf && _cf.ladder) ? _cf.ladder : null,
           origin: _cf ? _cf.origin : null,
-          // v742 (T6): the partition travels with the workbook. The sheet exists to answer "where
+          // v743 (T6): the partition travels with the workbook. The sheet exists to answer "where
           // did this number come from"; a row that produced no number needs to say so before a
           // committee reads it as an input that did.
           readByModel: _readsRow(_lbl)
@@ -41627,6 +41627,128 @@ function _cmpPngName(slug) {
   return 'ORCA_' + slug + set + '.png';
 }
 
+/* v743 (T3) — THE EXPORTED CHART NOW CARRIES THE PROFILE IT WAS COMPUTED ON.
+   ─────────────────────────────────────────────────────────────────────────────
+   Walked "how do these three countries compare side by side?" cold and built
+   Guyana / Angola / Brazil, then took the exit this platform's own documentation
+   prescribes: "Export the Side-by-Side chart as PNG for direct insertion into your
+   IC presentation deck" (FAQ A37), and again at "IC committee -> XLSX export + PDF
+   Side-by-Side".
+
+   Every number on that chart is a function of ONE assumption set. Government take
+   is not a property of a country; it is the output of running a standardized
+   Deepwater project — $1.2B capex, 50k bbl/d, $15/bbl opex, 25yr life, 10% WACC,
+   100% WI — through that country's fiscal terms. Cost recovery, R-factor tiers and
+   every profit-oil split move with capex and opex, so a different profile produces
+   a different curve. The tab states this in a strip pinned above the search box
+   (#cmp-profile-terms), the clipboard export opens with it ("Standardized Deepwater
+   profile, $1.2B capex, 10% WACC, 100% WI..."), and the PDF prints it because the
+   strip is in the DOM and is not .no-print.
+
+   The PNG dropped it. Measured on the exported file: _canvasPng2x copies the
+   canvas bitmap and nothing else, and the canvas holds only the Chart.js title,
+   legend and axes. So the artifact read:
+
+       "Govt Take vs Oil Price  ◆ = R-factor PSC / hollow markers = statutory basis"
+       Guyana 54.1% · Angola 53.0% · Brazil 55.6%   at $75/bbl
+
+   — three sourced-looking percentages, no profile, no date, no platform, with the
+   x-axis carrying the price deck and nothing carrying anything else. That file is
+   the ONE artifact of this tab that gets seen by people who never open ORCA: it
+   lands in a deck, is read by an IC committee, and is argued over months later
+   with no path back to the run that produced it. v684 and v606 both reasoned
+   explicitly about "the legend is the only key that travels with the exported PNG"
+   and used it to carry the COMPARABILITY keys (hollow = statutory basis, (PSC/Conc)
+   = rebased). Both were right and both stay. Neither carried the BASIS.
+
+   This is the directive's fifth finalization test — "every export opens, parses,
+   and carries the assumptions behind its numbers" — and the chart PNG was the one
+   export on this tab still failing it.
+
+   The band is composed onto the exported bitmap only. The on-screen chart is
+   untouched: no layout, no Chart.js option and no element geometry changes, so
+   there is no pixel-gate surface and nothing for the v612 mobile layer to collide
+   with. Text is read from #cmp-profile-terms and #hdr-meta at export time rather
+   than hard-coded, so the caption cannot drift from what the page says. */
+function _cmpPngCaptionLines(key) {
+  var lines = [];
+  var terms = '';
+  var el = document.getElementById('cmp-profile-terms');
+  if (el) terms = (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim();
+  if (!terms) terms = 'Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 25yr life · 10% WACC · 100% WI';
+  lines.push({ bold: true, text: 'Basis — every column is run on one standardized profile: ' + terms
+    + '. These are not country properties; a different capex/opex profile gives different numbers.' });
+  if (key === 'npv') {
+    lines.push({ text: 'Contractor NPV is an unweighted mean of every contract result at each price, with production ignored. '
+      + 'It is NOT weighted the way the government-take chart is, and the two do not always rank countries in the same order.' });
+  } else {
+    lines.push({ text: 'Government take is weighted by verified field production where ORCA holds it, and is a simple average of '
+      + 'statutory terms where it does not — those columns are drawn with hollow markers and are not rankable against the filled lines.' });
+  }
+  var meta = document.getElementById('hdr-meta');
+  var metaTxt = meta ? (meta.innerText || '').replace(/\s+/g, ' ').trim() : '';
+  if (!metaTxt || /loading/i.test(metaTxt)) metaTxt = '71,576 contracts · 185 countries';
+  var vEl = document.getElementById('hdr-version');
+  var ver = vEl ? (vEl.innerText || '').trim() : '';
+  var d = new Date();
+  var stamp = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  lines.push({ muted: true, text: 'ORCA Petroleum Fiscal Intelligence · ' + metaTxt
+    + (ver ? ' · ' + ver : '') + ' · exported ' + stamp });
+  return lines;
+}
+
+/* Draws the chart at 2x with a caption band beneath it. Returns a PNG data URL.
+   Falls back to the plain 2x bitmap if anything in the composition throws, because
+   an export that fails is worse than an export without a footer. */
+function _cmpCanvasPngCaptioned(canvas, lines) {
+  try {
+    var S = 2;
+    var W = canvas.width * S;
+    var chartH = canvas.height * S;
+    var padX = 28, padTop = 22, padBot = 22, gap = 9;
+    var fs = 23, lh = 30;                       // caption font size / line height, in 2x space
+    var probe = document.createElement('canvas').getContext('2d');
+    var font = function (b) { return (b ? '700 ' : '400 ') + fs + 'px -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif'; };
+    // Wrap each caption line to the available width.
+    var wrapped = [];
+    lines.forEach(function (ln) {
+      probe.font = font(ln.bold);
+      var words = String(ln.text).split(' ');
+      var cur = '';
+      var pushed = 0;
+      for (var i = 0; i < words.length; i++) {
+        var trial = cur ? cur + ' ' + words[i] : words[i];
+        if (probe.measureText(trial).width > (W - padX * 2) && cur) {
+          wrapped.push({ text: cur, bold: ln.bold, muted: ln.muted, first: pushed === 0 });
+          pushed++; cur = words[i];
+        } else { cur = trial; }
+      }
+      if (cur) { wrapped.push({ text: cur, bold: ln.bold, muted: ln.muted, first: pushed === 0 }); }
+    });
+    var bandH = padTop + wrapped.length * lh + (lines.length - 1) * gap + padBot;
+    var out = document.createElement('canvas');
+    out.width = W; out.height = chartH + bandH;
+    var ctx = out.getContext('2d');
+    ctx.fillStyle = '#FFFFFF'; ctx.fillRect(0, 0, out.width, out.height);
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(canvas, 0, 0, W, chartH);
+    // Rule between the plot and its assumptions, in the ORCA accent.
+    ctx.fillStyle = '#B06800'; ctx.fillRect(padX, chartH + 6, W - padX * 2, 2);
+    var y = chartH + padTop + fs;
+    ctx.textBaseline = 'alphabetic';
+    for (var j = 0; j < wrapped.length; j++) {
+      if (j > 0 && wrapped[j].first) y += gap;
+      ctx.font = font(wrapped[j].bold);
+      ctx.fillStyle = wrapped[j].muted ? '#8A837C' : (wrapped[j].bold ? '#1C1A17' : '#4A443E');
+      ctx.fillText(wrapped[j].text, padX, y);
+      y += lh;
+    }
+    return out.toDataURL('image/png');
+  } catch (e) {
+    return _canvasPng2x(canvas);
+  }
+}
+
 // Returns the saved filename, or null if that chart is not on screen.
 function _cmpSavePng(key) {
   var t = _CMP_PNG_TARGETS[key];
@@ -41640,7 +41762,7 @@ function _cmpSavePng(key) {
   var name = _cmpPngName(t.slug);
   var a = document.createElement('a');
   a.download = name;
-  a.href = _canvasPng2x(canvas);
+  a.href = _cmpCanvasPngCaptioned(canvas, _cmpPngCaptionLines(key));
   a.click();
   return name;
 }
@@ -51242,7 +51364,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // v517: sc-proxy-keep (data-basis) replaces the retired sc-irr-nulls control
   var scProxyKeep = document.getElementById('sc-proxy-keep');
   if (scProxyKeep) scProxyKeep.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
-  // v742: floor-take data-basis toggle
+  // v743: floor-take data-basis toggle
   var scFloorKeep = document.getElementById('sc-floor-keep');
   if (scFloorKeep) scFloorKeep.addEventListener('change', function() { if (typeof runScreener === 'function') runScreener(); });
   // v554: take-comparability toggle

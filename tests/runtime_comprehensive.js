@@ -329,7 +329,14 @@ async function testCountryProfile(page) {
         found: i >= 0,
         marksUnsourced: /NO SOURCE|NOT RECORDED/.test(seg),
         namesConflict: /DCF USES 33\.4%/.test(seg),
-        hasDenominator: /3 of the 5 rows above are independently sourced; 2 are not sourced at all/.test(seg),
+        // v743: was pinned to the literal "3 of the 5 rows above are independently sourced;
+        // 2 are not sourced at all". v742 partitioned the Evidence Chain by what the country's
+        // mechanic actually reads, and Norway's Concession model does not read Cost Recovery
+        // Cap — so that row moved below the divider and the denominator became 4, correctly.
+        // The literal made a correct change look like a regression. This asserts the PROPERTY
+        // v601 existed to guarantee — the verdict carries a numerator AND a denominator — so
+        // it survives a legitimate repartition but still fails a bare count.
+        hasDenominator: /\b\d+\s+of\s+the\s+\d+\s+rows\b[^.]*\bindependently sourced\b/.test(seg),
         bareDbBadge: /Contract DB average/.test(seg),
         hasControl: !!document.querySelector('#dd-content button[onclick*="_cpScrollToLiveDcf"]')
       };
