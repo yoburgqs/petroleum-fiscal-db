@@ -40106,3 +40106,106 @@ block-span separators that read correctly on screen but concatenate oddly under 
 **Task.** T3 — *"How do these three countries compare side by side?"* Stalest by rotation (642 ran T6, 641 T1, 640 T2, 639 T5, 638 T4, 637 T3). Walked cold at 1440×900 and 390×844 with touch, storage cleared, over HTTP.
 
 **Friction.** Side-by-Side's take/NPV inversion notice (`index.html:28123`) was the last block on the tab with **no basis gate**. Every other block — the four Govt Take rows (v626), the four Cont
+
+---
+## Cycle 644 — T4, shipped as v738
+
+**Task.** T4 — *"What is my fiscal-stability and reform exposure here?"* Stalest by rotation
+(643 ran T3, 642 T6, 641 T1, 640 T2, 639 T5, 638 T4). Walked cold at 1440×900 and 390×844 with
+touch, storage cleared, over HTTP.
+
+**Friction.** The walk started on the Reform Risk tab, which is mature — optgrouped lookup, four
+verdict states, statute fallback for the 164 uncovered jurisdictions. The friction was one tab over
+and it left the building. Two on-screen columns are headed character-for-character `Stability ⓘ`
+and measure different things — Fiscal Compare renders the 0–5 reform diamonds, Explorer renders the
+0–100 Fiscal Predictability composite — and they rank the same pair in opposite orders (Guyana
+◆◆◆◆◆ = 5/5 but Predictability 62; Norway ◆◆◆◇◇ = 3/5 but 76). That collision is papered over with
+two ~300-word tooltips that each end by saying "distinct from the other one".
+
+The worse consequence sat in `exportExplorer()` (`index.html:38133`), which shipped a **third**
+meaning of the word: a column headed `Stability Score` computed as `100 − swing×3`. That formula is
+rendered on no screen in the product. It is the same local invention v558 deleted from the Fiscal
+Compare workbook for disagreeing with `getFiscalPredictabilityScore()`; it survived in this export.
+Measured against the score the Explorer and Country Profile actually show, it disagreed on **157 of
+160** scoreable countries, landed in a **different band on 151**, and inverted both ends:
+
+| | workbook | screen |
+|---|---|---|
+| Iraq | 80 · HIGH | 47 · LOW |
+| Cyprus | 89 · HIGH | 47 · LOW |
+| Guyana | 22 · VERY LOW | 62 · MODERATE |
+| Liberia | 25 · VERY LOW | 70 · MODERATE (widest, 45 points) |
+
+Being pure price swing, it ranked the regimes whose take barely moves with price as the most
+fiscally stable on file. It was the only stability number that left the platform as an IC
+attachment, where nothing on screen contradicts it — "stable but wrong" in its exact form: the file
+opens, parses and looks authoritative.
+
+**Change.** The invented column is deleted. The workbook now carries the two readings the analyst
+was actually asking for, both read from the functions the screens render from, so the file and the
+tab can no longer disagree:
+
+  `Fiscal Predictability (0–100)` · `Predictability Band` · `Predictability Basis`
+  `Reform Record (2010+)` · `Reform Record Basis`
+
+Band respects the v624 rule — a one-term score exports `UNGRADED`, not the band its number would
+fall in. Absent readings export as the words the screens print (`not scored`, `n/c`), never a blank
+that a spreadsheet sorts as zero; an absent reading is not a good one. Three notes added to the
+Filters & Assumptions sheet, including that the two columns are not one number (Norway:
+Predictability 76 with 2 sourced law changes; Guyana: 62 with 0) and that neither substitutes for
+the Reform Risk tab's IC action.
+
+**Result.** The analyst can attach the Explorer XLSX to an IC memo and have its stability figures
+agree with the tab they read them from — **0 mismatches across all 185 rows**, against 157 before —
+and can tell a measured spread from an uncharged one, and missing reform coverage from a clean
+record, without leaving the file.
+
+## Verification
+
+JS syntax gate PASS (11 script blocks, 0 errors). Runtime suite **RAN this cycle**: 294 PASS /
+0 FAIL / 0 WARN / 0 JS errors, read from the suite's own output.
+
+## Mobile (Step 5b)
+
+390×844 `hasTouch: true`. `scrollWidth` 390 = `clientWidth` 390 on Explorer, Fiscal Compare, Reform
+Risk and Country Profile. `#explorer-excel-btn` (the control touched) renders 44px tall. The export
+downloads on the phone. 0 page errors.
+
+## Still open (carried forward)
+
+**Not fixed this cycle, and now named with evidence:** the two on-screen columns both headed
+`Stability ⓘ` — Fiscal Compare's 0–5 reform diamonds and Explorer's 0–100 predictability composite.
+The export no longer inherits the ambiguity, but the headers still collide, and the platform's own
+guidance misdirects off it in two places: `index.html:7277` sends the analyst to "**Stability Score
+(0–5 dots)** in the **Explorer**", which is the 0–100 column, and `index.html:32079` says to "view
+the Predictability Score in **Fiscal Compare**", which carries the diamonds. The fix is to rename to
+the names the specialist tabs already use correctly — `Reform Freq.` on FC (matching Reform Risk's
+"Reform Frequency Score") and `Predictability` on Explorer (matching Country Profile's "FISCAL
+PREDICTABILITY") — and drop both "distinct from the other one" tooltip clauses. Deliberately left
+for its own cycle rather than bundled here.
+
+Also measured and not fixed: the FC Stability `!` marker ("the count is not the verdict here") fires
+on **19 of the 20** scored rows, so it no longer discriminates.
+
+Unchanged from v737 and not touched this cycle: the `IRR:` headline chip rendering a label with no
+value; the 7 countries with fewer than 8 comparable regimes reading the all-country r² clause; the
+Scenario Builder `.page-sub` promising an IRR the deck does not carry; `_exportScenariosXLSX()`
+requiring Save Scenario first; the 3 state monopolies rendering no Quick IC verdict; `sweetspot`
+returning 143 of 185 with 133 PROXY; the v729 production filter having no Screener preset
+equivalent; `Load Top 5 in Side-by-Side` taking `sorted.slice(0,5)`; the v601 evidence-chain 2200ms
+fixed-wait race; `.orca-fp-badge` at 21px across four tabs; the Home Screener card and
+`#tab-btn-tscreener` advertising `breakeven`/`IRR` filters deleted at v568/v517; the
+`#screener-count` run-on line; the service-worker absolute path (`index.html:49`, the standing
+1 WARN); `#cmp-clear-btn` at 23px on desktop; 19 sub-24px controls in `#explorer-screen-mode`;
+v710's `t7` clipped-text regression; `cp-price-select` absent from the DOM; Mozambique's
+"Commercially attractive" verdict; reform coverage 21 of 185; the Methodology/Home tier-definition
+conflict; `FC_PROFILES` / `DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+placeholder; Kuwait's evidence tier; 862 contracts with no fiscal terms; unweighted per-mechanic
+pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()` /
+`renderVintage()`; the Breakeven Map price-marker slider inert above $34; the FC/Screener shortlists
+being two independent selections; the CP headline printing `#13 of 21 producers` three lines above
+`12 / 20 producers take less`; the `getEvidenceBar()` chip missing from Explorer Browse and IOC
+Portfolio; the `# Contracts` row printing `7643` and `1193` without a thousands separator; the three
+state monopolies carrying `be_75 = 1.0` rather than null; no evidence badge anywhere being clickable
+while `STABILITY` beside it is; the `cp-terms-chip` and Evidence Chain counting different things in
+the same words; the IC-memo plain-text export rendering the Evidence tier cell with a stray `· of ·`.
