@@ -40722,3 +40722,132 @@ live and unpartitioned on Explorer Browse and the Bubble Chart, and `getDCFParam
 
 ## Friction
 The Country Profile's Evidence Chain builds its rows from a fixed eight-row list and renders every fiscal fact the API happens to hold — whether or not that country's mechanic reads it. Every count and every instruction under the table was then computed over that undiffer
+
+---
+## Cycle 649 Log — 2026-09-09 11:45 — shipped as v743 (`c456078`), pushed, mirrored
+
+- Test before: **292 PASS / 1 FAIL / 1 WARN**, measured. Not the 294/297 carried in from the
+  cycle prompt — see "Test correction" below. The pre-change HEAD build, served from the same
+  local server, measured **identically** (292/1/1), so the FAIL was inherited, not caused here.
+- Test after: **293 PASS / 0 FAIL / 1 WARN**. Suite actually RAN this cycle, three times
+  (pre-change baseline, post-change, post-test-fix). The 1 WARN is the standing local
+  service-worker 404, present on both builds.
+- JS syntax gate: **PASS** (11 blocks). `node --check` on the test file: PASS.
+- Page errors on the cold walk: **0**, at all six viewports.
+- Horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390 across nine tabs: **clean on all six**.
+- Pixel gate: **PASS** — no surface worse than baseline.
+- Mobile 390x844 `hasTouch`: `scrollWidth` 390 = `clientWidth` 390; **zero** sub-24px controls in `#t2`.
+- Both PNGs exported, opened and read: take and NPV, desktop (1366px canvas) and phone (984px canvas).
+
+## Task
+**T3** — "How do these three countries compare side by side?" Stalest by rotation
+(643 T3 · 644 T4 · 645 T5 · 646 T2 · 647 T1 · 648 T6). Walked cold at 1440×900 and 390×844
+with touch, storage cleared before every load, through all four entry points into the tab.
+
+## Friction
+The walk covered the search box, the four quickstart sets, the Fiscal Compare `+Compare` path,
+the Explorer basket → `Compare →` path, the grid, both charts, the clipboard export and the PDF.
+The plumbing is sound: the basket round-trips, the alias map resolves `uk`/`ksa`/`ivory coast`,
+and the fuzzy fallback was measured over all 185 countries × every one-char deletion — 1,194
+typo queries, **0** resolving to the wrong country. Those leads were dropped rather than written up.
+
+The defect is in the one artifact that **leaves** the platform. Every number on the Side-by-Side
+charts is the output of a single assumption set — a standardized Deepwater project, $1.2B capex,
+50k bbl/d, $15/bbl opex, 25yr life, 10% WACC, 100% WI — run through each country's terms. Take is
+not a property of a country: cost recovery and R-factor tiers move with capex and opex, so a
+different profile produces a different curve. The tab states this in a strip pinned above the
+search box, the clipboard export opens with it, and the PDF prints it because the strip is in the
+DOM and is not `.no-print`.
+
+`_cmpSavePng` → `_canvasPng2x` copies the canvas bitmap and nothing else, and the canvas holds
+only the Chart.js title, legend and axes. Measured on the exported file, the artifact read:
+
+    Govt Take vs Oil Price  ◆ = R-factor PSC / hollow markers = statutory basis
+    Guyana 54.1% · Angola 53.0% · Brazil 55.6%   at $75/bbl
+
+— three sourced-looking percentages, with the x-axis carrying the price deck and nothing carrying
+the profile, the date or the platform. This is the file the platform's own FAQ tells the analyst
+to produce ("Export the Side-by-Side chart as PNG for direct insertion into your IC presentation
+deck"; "IC committee → XLSX export + PDF Side-by-Side"), and it is the only output of this tab
+read by people who never open ORCA. v684 and v606 both reasoned explicitly that "the legend is the
+only key that travels with the exported PNG" and used it to carry the **comparability** keys.
+Both were right and both stay. Neither carried the **basis**.
+
+## Change
+`_cmpSavePng` now composes through a new `_cmpCanvasPngCaptioned()`, which draws the chart at 2x
+above a caption band carrying three lines:
+
+1. the profile basis, read from `#cmp-profile-terms` **at export time** so the caption cannot
+   drift from what the page says, plus the explicit warning that these are not country properties;
+2. the weighting rule for *that* chart — production-weighted vs statutory-average for take,
+   unweighted-mean-with-production-ignored for NPV, including the note that the two charts do not
+   always rank countries in the same order;
+3. `ORCA Petroleum Fiscal Intelligence · 71,576 contracts · 185 countries · Aug 2026 · v743 ·
+   exported <date>`, read from `#hdr-meta` and `#hdr-version`.
+
+Text wraps to the canvas width; verified at 1366px (desktop) and 984px (phone), where line 1 wraps
+to two lines and stays inside the margins. The whole composition is wrapped in `try/catch` and
+falls back to the plain 2x bitmap — an export that fails is worse than one without a footer.
+
+The **on-screen chart is untouched**: no layout, no Chart.js option, no element geometry. Two inert
+`id` attributes were added to existing spans. So there is no new pixel-gate surface and nothing for
+the v612 mobile layer to collide with.
+
+## Result
+An analyst can paste `ORCA_govt-take_Guyana-Angola-Brazil.png` straight into an IC deck, and a
+committee member who has never opened ORCA can see what profile, what price deck, what weighting
+and what platform version produced the curve — and that a different capex/opex profile would move
+it. This closes the last export on this tab failing the directive's fifth finalization test,
+"every export opens, parses, and carries the assumptions behind its numbers."
+
+## Test correction — the suite was RED and the reported number was never measured
+The cycle prompt carried **297 PASS / 0 FAIL** from cycle 648. Measured on this machine, v742
+scores **292 PASS / 1 FAIL**:
+
+    ✗ [CountryProfile] verdict carries denominator
+
+v742 partitioned the Evidence Chain by what each country's mechanic actually reads. That correctly
+moved Norway's Cost Recovery Cap below the divider, so its verdict went from *"3 of the 5 rows
+above…; 2 are not sourced at all"* to *"3 of the 4 rows the Concession model reads are
+independently sourced; 1 is not sourced at all"* — the product change working as intended. The
+assertion was pinned to the old literal, so a correct change read as a regression.
+
+Cycle 648's log states it rewrote that assertion to test the property instead, and added three
+more (`off-model rows partitioned`, `verdict scoped to model terms`, `off-model rows named`).
+**None of that reached the file.** `git log -- tests/runtime_comprehensive.js` ends at v727, the
+working tree was clean, and all three named assertions return 0 matches. The 297/0 was reported,
+not measured — the exact "stable but wrong" failure mode this directive's finalization test #1
+exists to catch, and the second time a cycle has shipped on a number the gate did not produce.
+
+Fixed here as 648 described: the assertion now matches `\d+ of the \d+ rows … independently
+sourced`, testing the property v601 existed to guarantee — a numerator **and** a denominator are
+present — so it survives a legitimate repartition and still fails a bare count.
+
+## Still open (carried forward)
+Everything carried into cycle 648 that this walk did not touch remains open — the two on-screen
+columns both headed `Stability`, the FC Stability `!` marker firing on 19 of 20 scored rows, the
+Screener XLSX filename not encoding shortlist size, the Scenario Builder header naming the profile
+*as loaded*, Country Profile's two NPV cohort ranks never stated as different cohorts,
+`Fiscal_Predictability` scoring Vanuatu 100/100 off a zero spread, the floor-take inversion on
+Explorer Browse and the Bubble Chart, `getDCFParams()` enriching from `COUNTRY_DATA` only for the
+PSC family, the FC drawer showing no partition, `_MODEL_KEY` covering only eight labels, and Iraq's
+hard-coded $6.00/bbl engine override.
+
+**Surfaced by this walk, not fixed:**
+1. **The Side-by-Side demo set is still unmarked in the exports.** A cold load seeds Norway / UK /
+   Netherlands. The on-screen `#sbs-example-banner` says so and clears on the analyst's first pick
+   — that part works. But the banner is `.no-print` and is not part of the `rows` array, so
+   `Copy for IC Memo` on an untouched cold load produces a complete, authoritative-looking
+   "ORCA fiscal comparison — Norway / United Kingdom / Netherlands" with nothing anywhere in the
+   5,269-character paste saying it was an example nobody chose. Same for the PDF.
+2. **831 words of set-specific ⚠ corrections sit entirely below the grid.** On Guyana / Angola /
+   Brazil the grid runs y=218–1579 and the four notice blocks run y=1578–2012 — the analyst forms
+   a ranking off the Govt Take rows and meets every correction to it ~1.75 viewports later. The
+   short markers in the cells ("not ranked · statutory terms", "lowest of 2") do carry the point
+   at the number, so this is elaboration-below-decision rather than a missing warning; still, the
+   one sentence that resolves the set ("carry Brazil 61 › Angola ≤26") is sentence six of the
+   first block.
+3. **The Predictability row prints 62 / 62 / 61 across the three columns** and the real values are
+   Brazil 61 MODERATE, Angola ≤26 VERY LOW, Guyana ungradeable. The withdrawal machinery is
+   present and the drawer auto-opens to explain it, but the largest number in the cell is still
+   the wrong one on two of three columns.
