@@ -39036,3 +39036,133 @@ ride along with the next structural change to that block.
 
 ## Friction
 Three of the four surfaces that print an evidence grade already carry v660's correction — the letter grades the country's **whole fact base** (primary-law share + fact depth, mostly cont
+
+---
+## Cycle 637 Log — 2026-09-08 23:52 — shipped as v731 (`abb4d1e`), pushed, mirror copied
+
+- Test before: 293 PASS / 0 FAIL / 1 WARN (measured on the pre-change file, served locally)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — identical. Playwright **RAN** this cycle.
+- JS errors: 0 page errors. The 1 WARN / 1 console error is the standing `sw.js`
+  absolute-path 404, present in the baseline run too and unrelated to this change.
+  (Local serving is also why this reads 293 and not the deployed 294.)
+
+## Task
+**T3 — "How do these three countries compare side by side?"** Stalest by rotation:
+636 ran T6, 635 T1, 634 T2, 633 T5, 632 T4, 631 T1 — T3 last walked at cycle 630.
+Walked cold at 1440x900 and 390x844 `hasTouch`, storage cleared, over http (not
+`file://` — the loading overlay never clears on `file://` because `country_data.json`
+is fetched, so a `file://` walk sees nothing at all).
+
+## Friction
+Side-by-Side does not open empty on a cold load — it pre-populates Norway / United
+Kingdom / Netherlands. Beneath that grid it writes a 1,179-character bold-orange
+notice (`_sbsObsNotice`) whose entire second half is an argument **about the
+Predictability Score row**:
+
+> "…which is what the Take spread and **Predictability** rows were built on… **Do not
+> rank the set on the printed scores** — rank it on the ceilings… On this platform's
+> own formula the withdrawn columns bound at Norway ≤52 · LOW (printed 76),
+> Netherlands ≤59 · LOW (printed 84)…"
+
+The Predictability Score row is inside the evidence drawer, and the drawer is
+collapsed on every cold load (`_sbsEvOpen`, `sessionStorage['orca_sbs_ev']`, written
+at v723). So the analyst reads a bold warning not to trust "the printed scores" on a
+screen that contains **no printed score, no ceiling, and no Predictability row at
+all**. The only visible row the notice cites is Take spread; the other half of its
+argument points at nothing.
+
+This is the tab's normal state, not an edge case. Measured: the withdrawal fires on
+the cold-load default set and on the Atlantic Frontier Quartet, USA vs Iraq and West
+Africa Trio quickstarts — every preset the tab ships.
+
+The correction itself was never missing. `_sbsPaintObsSpread()` (28585) had already
+painted it into the cell, and it paints fine through `display:none` because
+`querySelectorAll` does not care about visibility. Expanding the drawer by hand
+shows, fully formed: `76 · UNGRADED / ≥29.6pp obs / ▲ best case / → carry ≤52 · LOW`.
+It was one click away behind a 10px grey toggle whose own tooltip explains that it is
+collapsed *so the Govt Take rows are on screen*. Nothing on screen connected the two.
+
+Same defect class as v620 and v717 on this tab: the correction is computed, is
+correct, and does not reach the screen the decision is made on.
+
+## Change
+New `_sbsRevealEvidence()`, called from `_sbsObsNotice` at the point the notice is
+known to be non-empty (`hits.length`), so the row is on screen **before** the
+argument about it is written.
+
+- Opens the drawer when — and only when — a column in *this* set is actually
+  withdrawn. Data-driven, not a new default.
+- Does **not** write `sessionStorage`. The open state is a property of what is on
+  screen, not a remembered preference, so it cannot leak onto the next set the
+  analyst builds.
+- Respects an explicit collapse: if the analyst has shut the drawer this session
+  (`'0'`), it is not overridden.
+- The toggle's caption changes to say why it opened, rather than silently growing
+  five rows: *"Opened because a Predictability Score in this set is withdrawn — the
+  corrected ceiling is on that row."*
+- Fixed the notice's own pointer, which read "rank it on the ceilings **below**"
+  while the row is **above** it — the notice is inserted at `grid.nextSibling`. Now
+  names the row: "the ≤ ceilings now shown on the Predictability Score row above."
+
+Verified in the browser, all four cases:
+
+| case | result |
+|---|---|
+| cold default (Norway/UK/Netherlands) | drawer open; Predictability cell a real **399x57** box reading `→ carry ≤52 · LOW` |
+| control set, no withdrawal (Ascension Island/Bahrain/Belgium) | stays **collapsed**, no notice — Govt Take rows keep their position |
+| analyst explicitly collapsed (`'0'`) | stays collapsed, **not** overridden |
+| 390x844 `hasTouch` | `scrollWidth` 390 = `clientWidth` 390, no sideways scroll; toggle 26px (≥24) |
+
+Nothing on the STILL LOCKED list is touched: the v723 collapse remains the default,
+the print rule that forces the rows open for the IC-pack PDF is untouched, and the
+rows already rode the shared `rows` array into Copy for IC Memo regardless of the
+toggle.
+
+## Result
+An analyst told in bold "rank it on the ceilings" can now see the ceilings. On the
+cold-load default set the corrected Predictability row — Norway `→ carry ≤52 · LOW`,
+Netherlands `→ carry ≤59 · LOW`, United Kingdom `58 · LOW` measured — is on screen
+next to the notice that demands it, so the ranking the notice tells them to carry
+into the IC memo can be read off the grid instead of reconstructed from a paragraph.
+
+## Still open (unchanged, carried forward)
+`sweetspot` returning 143 of 185 with 133 PROXY; the v729 production filter having no
+Screener preset equivalent; `Load Top 5 in Side-by-Side` taking `sorted.slice(0,5)`
+with Somalia PROXY in the cold five; the v601 evidence-chain 2200ms fixed-wait race;
+`.orca-fp-badge` at 21px across four tabs; the Home Screener card and
+`#tab-btn-tscreener` advertising a `breakeven` and an `IRR` filter deleted at
+v568/v517; the `#screener-count` run-on line; the service-worker absolute path
+(`index.html:49`, the standing 1 WARN); Screener "Copy for IC Memo" firing against an
+empty `window._cpObsSpread` on a cold load; `#cmp-clear-btn` at 23px on desktop; 19
+sub-24px controls in `#explorer-screen-mode`; v710's `t7` clipped-text regression;
+`cp-price-select` absent from the DOM; Mozambique's "Commercially attractive"
+verdict; reform coverage 21 of 185; the Methodology/Home tier-definition conflict;
+the FAQ naming a non-existent "Stability Score filter at >=4"; `FC_PROFILES` /
+`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder; Kuwait's
+evidence tier; three monopolies carrying `be_75 = 1.0`; 862 contracts with no fiscal
+terms; the Screener Contractor NPV tooltip naming an absent profile selector; the
+Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic
+pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()` /
+`renderVintage()`; the Breakeven Map price-marker slider inert above $34; the
+FC/Screener shortlists being two independent selections; the CP headline printing
+`#13 of 21 producers` three lines above `12 / 20 producers take less`; the
+`getEvidenceBar()` chip missing from Explorer Browse and IOC Portfolio (v730); and
+the three Screener notes quoting three different term counts (v730).
+
+**New this cycle, not fixed.** The `# Contracts` row on this grid prints `7643` /
+`4211` / `135` with no thousands separator, directly above a Fiscal Mechanics row
+that prints `Concession (7,643)` for the same number. Cosmetic and text-only on its
+own, so not a cycle; it should ride along with the next structural change to the
+STRUCTURE block.
+
+**New this cycle, not fixed.** The two notices on the cold-load default set give
+opposite leads on the same column within 400px: the withdrawal notice ends "this set
+reads **Netherlands** ≤59 › United Kingdom 58 › Norway ≤52 — carry that order into
+the IC memo", and the next notice begins "**The column that wins this comparison is a
+proxy.** Netherlands…". Both are correct on their own axis (predictability ceiling vs
+data basis) and neither is wrong, but they are not sequenced, and the second does not
+acknowledge that the first just recommended the column it is about to withdraw.
+Worth a T3 or T5 cycle on notice ordering.
+
+**Version.** v730 → v731, three display strings, silently at the end. Not the
+deliverable.
