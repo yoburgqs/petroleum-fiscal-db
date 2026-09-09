@@ -41376,3 +41376,82 @@ eleven country names and a truncated "REGI…" header, and not one number.
 **Task:** T1 — *"Which countries should even be on my screening list?"* Stalest by rotation (647 T1 · 648 T6 · 649 T3 · 650 T4 · 651 T5 · 652 T2).
 
 **Friction.** The desktop T1 path is genuinely in good shape — I walked it cold and found not
+
+---
+## Cycle 654 — T6, shipped as v749
+
+**Task:** T6 — *"Where did this number come from and how solid is the evidence?"* Stalest by
+rotation (647 T1 · 648 T6 · 649 T3 · 650 T4 · 651 T5 · 652 T2 · 653 T1).
+
+**Friction.** Walked T6 cold into Fiscal Compare — no sessionStorage, no localStorage. 120 of
+189 rows are graded **G**: ORCA holds no country-specific terms for them in the compare engine.
+**116 of those print the identical model take (22.2%) and the identical model NPV ($4.3B)**,
+because all 116 fall back to the same Concession default.
+
+That constant was rendered through the tier-coloured `.take-val` pill at `renderFiscalCompare`
+(`index.html:47077`), and `takeClass(22.2)` returns `take-if` — **bold green, the investible
+tier**. So the screen read:
+
+| Country | Model take (shown green) | Citable db take | Gap |
+|---|---|---|---|
+| Venezuela | 22.2% | 74.9% | **52.7pp** |
+| UAE | 22.2% | 74.6% | 52.4pp |
+| Qatar | 22.2% | 74.5% | 52.3pp |
+| Brazil | 22.2% | 55.6% | 33.4pp |
+| Russia | 22.2% | 46.4% | 24.2pp |
+
+The only thing separating those rows was the v563 divider, and that divider is **conditional**:
+`_fcGenericLast = (sortField !== 'country')`. Click the Country header to look one country up —
+the single most likely T6 gesture — and the partition disappears entirely and the 116 constants
+interleave with real numbers in identical styling. Confirmed in the live DOM: Angola 61.3% (real),
+Argentina 22.2% (generic), Armenia 22.2% (generic), Australia 42.2% (real), Austria 22.2%
+(generic) — one column, no divider, no visual difference. The model cell carried no `title`, no
+marker, nothing; the only tell was a one-letter **G** badge six columns to the right, and the
+*worse* number was the *less* annotated one — the citable cell beside it already had a tooltip.
+
+**Change.** Generic-default rows now render their two MODEL cells as what they are: muted grey,
+**not tier-coloured**, with an inline dashed `DEFAULT` chip on the number and a plain-language
+title naming the mechanic default and pointing at the citable green column. The marking lives on
+the cell, so it holds in every sort mode instead of switching off with the divider. The 65
+own-terms rows are untouched and keep the tier-coloured pill.
+
+**Result.** An analyst who looks Venezuela up alphabetically no longer reads a green
+investible-tier 22.2% styled exactly like Norway's real 67.4%. The number that came from none of
+Venezuela's data now looks like it — in every sort — and points at the 74.9% that is citable.
+
+### Verification — measured, not assumed
+
+- **Runtime suite RAN this cycle, both sides**, each read from its own `ORCA_REPORT_FILE`, same
+  suite over `http://localhost:8xxx`, the "before" side served from a copy of the pre-change tree
+  on a second port. **Before (v748): 296 PASS / 0 FAIL / 1 WARN / 1 JS error. After (v749): 296
+  PASS / 0 FAIL / 1 WARN / 1 JS error.** No regression. The 1 JS error is the same `sw.js` 404 in
+  both runs — an artifact of serving from a localhost root rather than the
+  `/petroleum-fiscal-db/` scope the service worker registers against. The cycle prompt again
+  carried **297 PASS**, which is the deployed GitHub Pages figure; local scores 296. Recorded
+  rather than restated, per finalization test #1.
+- **JS syntax gate: PASS**, 11 inline blocks, re-checked after the version bump.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all 9 tabs.
+- **Console / page errors: 0** at all six viewports.
+- **Touch targets:** FC controls under 24px at `pointer: coarse` are **1 before and 1 after**,
+  measured against a served copy of the pre-change build. The `DEFAULT` chip is a
+  non-interactive `<span>`, not a control. None introduced.
+- **Desktop proven unchanged, not assumed:** at 1440 / 1280 / 768 the FC table measures **1805px
+  on both builds and all 13 column widths are byte-identical**. The chip fits inside the existing
+  133px take and 154px NPV columns; no reflow.
+- **STILL LOCKED respected:** v563 divider kept; v612 mobile layer untouched, no selector
+  narrowed or removed; `#reference-panel` untouched, no negative offsets; Govt NPV stays REMOVED
+  from FC; CP headline zones, tier colouring, global rank and vs-median pill untouched; no tab
+  reordering; no new tooltip *as the fix*, no new FAQ, no citation-string edit.
+
+### Housekeeping — a prior cycle's work was found uncommitted
+
+The working tree held a complete, suite-passing but **never-committed v748** change (IOC Portfolio
+`Mechanic basis` column: 95 of 1,772 IOC_DATA rows carry an instrument label — Contract Amendment,
+Service Contract, Memorandum of Understanding, Alaska State Lease, Environmental and Social — that
+is not one of the eight mechanics the DCF engine models, yet each printed a full take, NPV, IRR and
+breakeven; 9 of 16 seeded brand buttons land on one cold). It was committed **separately** as
+`1702979` so it is neither silently bundled into this cycle nor discarded. This cycle's own change
+is `ea2b271` alone.
+
+Also cleared: the two stale localhost servers on ports 8099/8100 and `/tmp/orca_base` left running
+by cycle 653.
