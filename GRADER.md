@@ -40222,3 +40222,113 @@ the same words; the IC-memo plain-text export rendering the Evidence tier cell w
 **Task.** T4 — *"What is my fiscal-stability and reform exposure here?"* Stalest by rotation (643 ran T3). Walked cold at 1440×900 and 390×844 with touch, storage cleared, over HTTP.
 
 **Friction.** The Reform Risk tab itself is mature — the walk found nothing worse there than cosmetics. The problem was one tab over, and it left the building. `exportExplorer()` (`index.html:38133`) shipped a column headed **`Stability Sco
+
+---
+## Cycle 645 — T5, shipped as v739
+
+**Task.** T5 — *"Give me something I can paste straight into an IC memo."* Stalest by rotation
+(641 T1 · 642 T6 · 643 T3 · 644 T4; T5 last ran at cycle 543). Walked cold at 1440x900 and at
+390x844 with `hasTouch`, sessionStorage and localStorage cleared, over HTTP.
+
+**What the walk covered before landing.** All six IC-copy surfaces were exercised and their real
+clipboard payloads captured, not inferred: Fiscal Compare (`copyFCForIC`), Screener
+(`copyScreenerTable`), Side-by-Side (`copyComparisonTable`), IOC Portfolio (`copyIOCPortfolio`),
+Country Profile (`copyICSummary`), and the drilldown `IC Citation`. All five XLSX exports were
+downloaded and parsed with openpyxl — every one opens, and every one carries a named assumptions
+sheet (FC 98 rows, CP 65, IOC 23, Explorer 18, Screener 10). The v632/v728 row-tick promise was
+tested rather than trusted: ticking 4 rows drops the Screener CSV from 31,248 to 2,587 bytes, the
+Screener XLSX to 5 rows, and rewrites the basis sheet from *"None — this is the full ORCA universe"*
+to *"Manual IC shortlist — 4 of the 185 … ticked by hand"*; the FC export even encodes
+`shortlist-4` in its filename. That path is finished. The friction was elsewhere.
+
+**Friction.** Home tells a first-time analyst that Country Profile *"auto-loads Indonesia on first
+visit"*, so that is where the cold walk lands. The `tfoot` of the 4-price sensitivity table states
+the platform's own IC rule — *"High swing — progressive regime; price range table required in IC
+memo."* The button directly beneath it is labelled **"Copy as IC table"**. Two defects, both
+measured on the live build:
+
+1. **It wrote `text/plain` only.** Clipboard flavours came back `["text/plain"]` on all four
+   countries tested. Every sibling IC-copy control emits `text/html` as well — Fiscal Compare
+   (v676), Screener (v728), Side-by-Side (v503), IOC Portfolio, and `copyICSummary()` 200px away
+   **on this same tab** (v690) — so Word, Docs, Outlook and PowerPoint render a real table. This one
+   called `writeText()` and pasted into Word as five run-on lines of tab characters. The control
+   whose label is the word *table*, producing the artifact the page had just told the analyst their
+   memo requires, was the one control on the platform that could not produce one. Same miss as v690,
+   on the sibling button.
+
+2. **The Breakeven cell read raw `d.be_75`** instead of `cpBeFor()` (v512) / `cpBeBound()` (v642) —
+   the two resolvers the BREAKEVEN COST CURVE ruler ~200px above and `copyICSummary()` both go
+   through. Swept all 185 countries: **120 rows disagreed with the page.** 119 pasted an em-dash
+   where the page showed a bounded `< $50/bbl` — Indonesia, Angola, Nigeria, Brazil, Canada and the
+   USA among them — and **Bahrain pasted `$1/bbl` beside $0 contractor NPV at all four prices**, the
+   floor artefact v564 had already suppressed on the ruler for exactly that reason. A $1/bbl
+   breakeven next to a zero NPV is a contradiction that would have left this tool inside an IC memo.
+
+**Change.** The render block resolves breakeven through `cpBeFor()` then `cpBeBound()`, in that
+order, so a solved value still wins. The payload is stashed on `window.__CP_IC_TBL` keyed by country
+slug and the button calls a new top-level `cpCopyICTable()` — necessary because the HTML flavour
+carries `style="…"` on every cell and cannot survive inside a double-quoted `onclick` attribute.
+That writer emits both flavours through `ClipboardItem` using the same table styling as the other
+five controls, degrading to `writeText(TSV)` where `ClipboardItem` is absent. A bound renders
+`(bounded)` in its cell and carries a numbered note stating it is bounded, not solved — a bound
+cannot pass for a solved price in the paste any more than it can on screen. Where breakeven is
+neither solved nor bracketed (the 3 state monopolies) the note says so rather than leaving a bare
+dash. The stray 6th title cell that emitted five trailing tabs into Excel is gone.
+`.cp-ic-tbl-btn` takes the directive's 24px floor under `pointer: coarse`.
+
+**Result.** The analyst clicks one button and pastes a formatted 4-price sensitivity table into a
+Word IC memo, instead of a block of tab stops they re-key by hand. 119 countries carry their bounded
+breakeven into that table instead of a blank; Bahrain stops shipping a $1/bbl breakeven beside a
+zero NPV; Australia still prints its solved $28/bbl.
+
+**Verification (all run this cycle, nothing assumed).**
+- JS syntax gate **PASS**, 11 blocks.
+- Runtime suite **RAN** against the local tree: **293 PASS / 0 FAIL / 1 WARN**. The WARN is the
+  standing service-worker item — `index.html:49` registers `/petroleum-fiscal-db/sw.js` on an
+  absolute path, which 404s when the tree is served locally at root and resolves on GitHub Pages.
+  293 + 1 = the 294 the deployed run reports. Not a regression.
+- Clipboard now returns `["text/plain","text/html"]` with a real 5-column `<table>` (5 `<th>`,
+  20 `<td>`) on Indonesia, Norway, Bahrain, Cote d'Ivoire and Australia — including the
+  apostrophe country, which the old inline-onclick escaping had to hand-escape.
+- 185-country sweep of the new cell: 65 solved · 117 bounded · 3 not claimed.
+- Mobile 390x844 `hasTouch`: **zero horizontal scroll on all 9 tabs**, button 36px under a thumb,
+  copy works on the phone. 0 page errors on any walk.
+
+## Still open (carried forward)
+
+**Named last cycle and still not fixed:** the two on-screen columns both headed `Stability ⓘ` —
+Fiscal Compare's 0–5 reform diamonds and Explorer's 0–100 predictability composite — with the
+platform's own guidance misdirecting off it at `index.html:7277` and `index.html:32079`. The fix is
+to rename to `Reform Freq.` on FC and `Predictability` on Explorer. Also the FC Stability `!` marker
+firing on 19 of 20 scored rows, so it no longer discriminates.
+
+**Surfaced by this walk, not fixed:** the Side-by-Side paste is not marked as the demo set — a cold
+load carries the "North Sea Trio" example (Norway / UK / Netherlands), labelled *"Example loaded"* on
+screen, but the clipboard caption reads only "ORCA fiscal comparison — Norway / United Kingdom /
+Netherlands" with nothing saying it was ORCA's example rather than the analyst's own selection. The
+Screener XLSX filename is also identical for a 4-row hand-picked shortlist and the full 185
+(`petroleum_screener_$75_<date>.xlsx`), where the FC export encodes `shortlist-4`.
+
+Unchanged from v738 and not touched this cycle: the SbS Evidence-tier cell rendering a stray
+`· of ·`; the `# Contracts` row printing `7643` and `4211` without a thousands separator; the `IRR:`
+headline chip rendering a label with no value; the 7 countries with fewer than 8 comparable regimes
+reading the all-country r² clause; the Scenario Builder `.page-sub` promising an IRR the deck does
+not carry; `_exportScenariosXLSX()` requiring Save Scenario first; the 3 state monopolies rendering
+no Quick IC verdict; `sweetspot` returning 143 of 185 with 133 PROXY; the v729 production filter
+having no Screener preset equivalent; `Load Top 5 in Side-by-Side` taking `sorted.slice(0,5)`; the
+v601 evidence-chain 2200ms fixed-wait race; `.orca-fp-badge` at 21px across four tabs; the Home
+Screener card and `#tab-btn-tscreener` advertising `breakeven`/`IRR` filters deleted at v568/v517;
+the `#screener-count` run-on line; the service-worker absolute path (`index.html:49`, the standing
+1 WARN); `#cmp-clear-btn` at 23px on desktop; 19 sub-24px controls in `#explorer-screen-mode`;
+v710's `t7` clipped-text regression; `cp-price-select` absent from the DOM; Mozambique's
+"Commercially attractive" verdict; reform coverage 21 of 185; the Methodology/Home tier-definition
+conflict; `FC_PROFILES` / `DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+placeholder; Kuwait's evidence tier; 862 contracts with no fiscal terms; unweighted per-mechanic
+pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()` /
+`renderVintage()`; the Breakeven Map price-marker slider inert above $34; the FC/Screener shortlists
+being two independent selections; the CP headline printing `#13 of 21 producers` three lines above
+`12 / 20 producers take less`; the `getEvidenceBar()` chip missing from Explorer Browse and IOC
+Portfolio; the three state monopolies carrying `be_75 = 1.0` rather than null (v739 stops that value
+reaching the IC paste, but the stored figure is still 1.0); no evidence badge anywhere being
+clickable while `STABILITY` beside it is; the `cp-terms-chip` and Evidence Chain counting different
+things in the same words.
