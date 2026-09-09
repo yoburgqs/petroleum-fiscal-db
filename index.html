@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v739</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v740</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2062,7 +2062,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v739</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v740</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2132,7 +2132,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v739</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v740</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -43884,7 +43884,7 @@ function runCustomScenario() {
 
   document.getElementById('sb-output').innerHTML = `
 ${takeClampWarning}<div class="sb-result-header">${mech} · ${DCF_PROFILES[profileKey].name} · $${price}/bbl</div>
-${_sbOriginNote(result)}
+${_sbOriginNote(result, price, profileKey)}
 <div class="sb-results-3">
   <div class="sb-result-card">
     <div class="sb-result-label">Govt Take</div>
@@ -44217,7 +44217,19 @@ function _sbFormFingerprint() {
 
 // The provenance strip rendered directly under the Scenario Builder result header whenever the
 // modal was opened from a country (Country Profile or the Fiscal Compare drilldown).
-function _sbOriginNote(result) {
+function _num740(v) { return (v == null || !isFinite(Number(v))) ? null : Number(v); }
+
+// v740 (T2): picks the published figure at the price the scenario is actually running, falling
+// back to the $75 anchor. Returns the price it used so the label can never misstate the basis.
+function _sbPubAt740(map, price) {
+  if (!map) return null;
+  var p = Number(price);
+  if (map[p] != null) return { v: map[p], price: p, exact: true };
+  if (map[75] != null) return { v: map[75], price: 75, exact: false };
+  return null;
+}
+
+function _sbOriginNote(result, sbPrice, sbProfileKey) {
   var o = window._sbOrigin;
   if (!o) return '';
   var sbTake = (result && result.take != null && isFinite(result.take)) ? Number(result.take) : null;
@@ -44250,21 +44262,110 @@ function _sbOriginNote(result) {
              : 'read from ORCA’s ' + cn + ' record')
          + ', run on a single synthetic ' + _esc594(o.profileName) + ' project. '
          + (o.cpTake != null
-             ? 'The <strong>' + o.cpTake.toFixed(1) + '%</strong> on ' + cn + '’s Country Profile is the average across '
+             ? 'The <strong>' + o.cpTake.toFixed(1) + '%</strong> at $75 on ' + cn + '’s Country Profile is the average across '
                + (o.n != null ? Number(o.n).toLocaleString() + ' actual ' + cn + ' contracts' : 'that country’s actual contracts') + '. '
              : '')
          + 'Both are true and they answer different questions — quote whichever you mean.';
   }
 
-  var cmpRow = '';
-  if (!o.monopoly && o.cpTake != null && sbTake != null) {
-    var diff    = sbTake - o.cpTake;
-    var diffCol = Math.abs(diff) >= 5 ? 'var(--red)' : 'var(--muted)';
-    cmpRow = '<div style="margin-top:8px;display:flex;flex-wrap:wrap;gap:18px;align-items:baseline;">'
-      + '<span style="font-size:11px;color:var(--muted);">This scenario <strong style="color:var(--text);font-size:15px;font-family:\'IBM Plex Mono\',monospace;">' + sbTake.toFixed(1) + '%</strong></span>'
-      + '<span style="font-size:11px;color:var(--muted);">' + cn + ' published @$75 <strong style="color:var(--text);font-size:15px;font-family:\'IBM Plex Mono\',monospace;">' + o.cpTake.toFixed(1) + '%</strong></span>'
-      + '<span style="font-size:12px;font-weight:800;color:' + diffCol + ';">' + (diff >= 0 ? '+' : '−') + Math.abs(diff).toFixed(1) + 'pp</span>'
+  // ── v740 (T2): reconcile BOTH headline numbers, not just the take ──────────────────────
+  // The strip printed "This scenario 66.2% / Indonesia published @$75 59.5% / +6.7pp" and stopped
+  // there. The contractor NPV — the figure that actually goes in the IC memo — was never set
+  // against the Country Profile's, and for Indonesia the two are $2.3B here against $745M there:
+  // 3.1x apart, on what both pages describe as the same standardized Deepwater project at the same
+  // 10% WACC. Worse, the scenario shows a HIGHER government take AND a HIGHER contractor NPV at
+  // the same time, which reads as broken arithmetic unless you already know the two figures are
+  // built from different populations. They are: the published NPV is the aggregate across the
+  // country's contracts, each priced on its own terms (Indonesia's 19 Gross Split contracts
+  // average -$215.5M and drag the mean down); the scenario is one project on one set of terms.
+  var _mono740   = !!o.monopoly;
+  var _sbNpv740  = (result && result.npv != null && isFinite(result.npv)) ? Number(result.npv) : null;
+  var _pubTake740 = _mono740 ? null : _sbPubAt740(o.cpTakes, sbPrice);
+  var _pubNpv740  = _mono740 ? null : _sbPubAt740(o.cpNpvs,  sbPrice);
+  // Legacy fallback: an origin record written before v740 carries cpTake only.
+  if (!_pubTake740 && !_mono740 && o.cpTake != null) {
+    _pubTake740 = { v: o.cpTake, price: 75, exact: (Number(sbPrice) === 75) };
+  }
+
+  var _row740 = function(label, sbTxt, pubTxt, pubPrice, exact, deltaTxt, deltaCol) {
+    return '<div style="display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-top:5px;">'
+      + '<span style="font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);min-width:104px;">' + label + '</span>'
+      + '<span style="font-size:11px;color:var(--muted);">This scenario <strong style="color:var(--text);font-size:15px;font-family:\'IBM Plex Mono\',monospace;">' + sbTxt + '</strong></span>'
+      + '<span style="font-size:11px;color:var(--muted);">' + cn + ' published @$' + pubPrice + ' <strong style="color:var(--text);font-size:15px;font-family:\'IBM Plex Mono\',monospace;">' + pubTxt + '</strong>'
+      + (exact ? '' : '<span style="opacity:.8;"> (no published figure at $' + sbPrice + ')</span>') + '</span>'
+      + '<span style="font-size:12px;font-weight:800;color:' + deltaCol + ';">' + deltaTxt + '</span>'
       + '</div>';
+  };
+
+  var cmpRow = '';
+  var _takeRow740 = '', _npvRow740 = '', _reconcile740 = '';
+
+  if (!_mono740 && _pubTake740 && sbTake != null) {
+    var diff    = sbTake - _pubTake740.v;
+    var diffCol = Math.abs(diff) >= 5 ? 'var(--red)' : 'var(--muted)';
+    _takeRow740 = _row740('Govt take', sbTake.toFixed(1) + '%', _pubTake740.v.toFixed(1) + '%',
+      _pubTake740.price, _pubTake740.exact,
+      (diff >= 0 ? '+' : '−') + Math.abs(diff).toFixed(1) + 'pp', diffCol);
+  }
+
+  if (!_mono740 && _pubNpv740 && _sbNpv740 != null) {
+    var _pv740 = _pubNpv740.v, _sv740 = _sbNpv740;
+    // A ratio only means something when both figures share a sign and the denominator is not noise.
+    var _ratioOk740 = (_pv740 > 0 && _sv740 > 0) || (_pv740 < 0 && _sv740 < 0);
+    var _mult740    = (_ratioOk740 && Math.abs(_pv740) >= 1) ? (_sv740 / _pv740) : null;
+    var _absD740    = _sv740 - _pv740;
+    var _rel740     = (Math.abs(_pv740) >= 1) ? Math.abs(_absD740) / Math.abs(_pv740) : null;
+    // Material means relatively material. A $686M gap on a $3.6B base is 19% and does not need a
+    // paragraph; a 3.2x gap does. Sign mismatch always does -- one of the two is a loss.
+    var _wide740    = (_mult740 != null && (_mult740 >= 1.5 || _mult740 <= 0.667))
+                   || !_ratioOk740
+                   || (Math.abs(_absD740) >= 500 && _rel740 != null && _rel740 >= 0.25);
+    var _npvCol740  = _wide740 ? 'var(--red)' : 'var(--muted)';
+    var _npvDelta740 = (_mult740 != null && (_mult740 >= 1.25 || _mult740 <= 0.8))
+      ? (_mult740 >= 1 ? _mult740.toFixed(1) + '× higher' : (1 / _mult740).toFixed(1) + '× lower')
+      : ((_absD740 >= 0 ? '+' : '−') + fmtNpvShared(Math.abs(_absD740)));
+    _npvRow740 = _row740('Contractor NPV', fmtNpvShared(_sv740), fmtNpvShared(_pv740),
+      _pubNpv740.price, _pubNpv740.exact, _npvDelta740, _npvCol740);
+
+    if (_wide740) {
+      // Name the mechanism. Vague is useless here — the analyst has to pick one of the two.
+      var _profOff740 = (sbProfileKey && sbProfileKey !== 'deepwater');
+      var _sameDir740 = (sbTake != null && _pubTake740
+        && ((sbTake > _pubTake740.v && _sv740 > _pv740) || (sbTake < _pubTake740.v && _sv740 < _pv740)));
+      var _gapTxt740 = (_mult740 != null && (_mult740 >= 1.25 || _mult740 <= 0.8))
+        ? (_mult740 >= 1 ? _mult740.toFixed(1) + '×' : (1 / _mult740).toFixed(1) + '×')
+        : fmtNpvShared(Math.abs(_absD740));
+      _reconcile740 = '<div style="margin-top:8px;padding:7px 10px;background:var(--surface);'
+        + 'border:1px solid var(--border);border-radius:5px;font-size:11px;color:var(--muted);line-height:1.6;">'
+        + '<strong style="color:var(--text);">These two NPVs are not the same measurement.</strong> '
+        + (o.basis === 'default'
+            // The form holds the generic mechanic fallback, so the gap is NOT the country's contract
+            // spread -- it is that these are not this country's terms. Do not name the wrong cause.
+            ? '<strong style="color:var(--text);">' + fmtNpvShared(_sv740) + '</strong> was not computed from '
+              + cn + '’s terms at all — the form holds the generic ' + _esc594(o.mech)
+              + ' fallback, as the banner above says. The ' + _gapTxt740 + ' gap against ORCA’s published '
+              + '<strong style="color:var(--text);">' + fmtNpvShared(_pv740) + '</strong> measures the distance between the fallback and '
+              + cn + '’s actual contracts, not a property of ' + cn + '. Enter real terms before reading anything into it. '
+            : ((_sameDir740
+                ? 'This scenario shows a <em>higher</em> government take and a <em>higher</em> contractor NPV at the same time. That is not an arithmetic error — it is what happens when two figures are built from different populations. '
+                : '')
+              + '<strong style="color:var(--text);">' + fmtNpvShared(_pv740) + '</strong> is ORCA’s published figure for ' + cn
+              + ' — the aggregate across '
+              + (o.n != null ? Number(o.n).toLocaleString() + ' contracts' : 'that country’s contracts')
+              + ', each priced on its own terms and then combined, so contracts carrying harsher terms — and any that price negative — pull it down. '
+              + '<strong style="color:var(--text);">' + fmtNpvShared(_sv740) + '</strong> is one project on the single set of terms in the form above. '
+              + 'The NPV at the average terms is not the average of the NPVs, and on ' + cn + ' that is worth ' + _gapTxt740 + '. '))
+        + (_profOff740
+            ? 'They are also not the same project: the published figure is computed on the standardized Deepwater profile, and this scenario is running the '
+              + _esc594((typeof DCF_PROFILES !== 'undefined' && DCF_PROFILES[sbProfileKey] && DCF_PROFILES[sbProfileKey].name) || String(sbProfileKey)) + ' profile. '
+            : '')
+        + '<strong style="color:var(--text);">Quote the published figure for a country screen; quote this one only with your own capex, opex and terms stated beside it.</strong>'
+        + '</div>';
+    }
+  }
+
+  if (_takeRow740 || _npvRow740) {
+    cmpRow = '<div style="margin-top:9px;">' + _takeRow740 + _npvRow740 + '</div>' + _reconcile740;
   }
 
   var editedNote = edited
@@ -44369,6 +44470,11 @@ function ddOpenScenarioBuilder(country) {
     overrideKeys: _probeParams._overrideKeys || [],
     monopoly:     _sbMono,
     cpTake:       _sbMono ? null : (d.take_75 != null ? Number(d.take_75) : null),
+    // v740 (T2): the published NPV at each ORCA price, so the strip can reconcile the number the
+    // analyst actually pastes into an IC memo — not just the take. Indonesia read 59.5% / $745M on
+    // Country Profile and 66.2% / $2.3B here, and only the 6.7pp take gap was ever explained.
+    cpTakes:      _sbMono ? null : { 50: _num740(d.take_50), 75: _num740(d.take_75), 100: _num740(d.take_100), 125: _num740(d.take_125) },
+    cpNpvs:       _sbMono ? null : { 50: _num740(d.npv_50),  75: _num740(d.npv_75),  100: _num740(d.npv_100),  125: _num740(d.npv_125) },
     n:            (d.n != null ? d.n : null),
     profileName:  (DCF_PROFILES[profile] && DCF_PROFILES[profile].name) || profile,
     fingerprint:  _sbFormFingerprint()
