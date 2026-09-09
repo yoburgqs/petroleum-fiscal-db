@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v729</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v730</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -217,6 +217,10 @@ table { width: 100%; border-collapse: collapse; }
   /* Directive step 5b: a control this cycle adds may not render under 24px under a thumb. */
   #tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all { width: 24px; height: 24px; }
   #tbl-screener th.sc-selcell, #tbl-screener td.sc-selcell { width: 40px; }
+  /* v730 (T6): the model-terms chip added to the Evidence column is a control, not a caption --
+     it opens that country's Evidence Chain -- so it takes the same 24px floor as everything
+     else on this table. On a mouse it stays on the 15px line so 185 rows do not grow. */
+  #tbl-screener .sc-terms-chip { min-height: 24px; }
 }
 #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
@@ -1844,6 +1848,12 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     min-height: 44px !important;
     min-width: 44px !important;
   }
+  /* v730 (T6): the rule above was written for standalone controls, of which a screen holds a
+     handful. The model-terms chip is IN A TABLE CELL, once per row, 185 times — at 44px it took
+     the Screener row from 49px to 74px and turned the whole ranking into a scroll. It takes the
+     directive's own floor for a control under a thumb (24px) instead of this rule's 44px, and
+     the exemption is scoped to that one chip on that one table. Nothing else is narrowed. */
+  #tbl-screener .sc-terms-chip { min-height: 24px !important; min-width: 0 !important; }
 }
 /* v101: Mobile mode toggle — prevent text wrap */
 .explorer-mode-toggle .expl-mode-btn { white-space: nowrap; flex-shrink: 0; touch-action: manipulation; }
@@ -2003,7 +2013,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v729</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v730</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2073,7 +2083,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v729</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v730</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -30994,7 +31004,7 @@ function runScreener() {
       <td style="color:var(--muted)">${d.region}</td>
       <td>${mechs}</td>
       <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
-      <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}</td>
+      <td class="num" title="${buildEvidenceTooltip(d)}">${getEvidenceBar(d)}<div class="sc-terms-slot" data-tc-country="${attrName}" style="margin-top:2px;"></div></td>
       <td class="num">${fmtNpvShared(d[npvKey])}</td>
       <td class="num" title="Contractor NPV at the $50/bbl downside on the standardized Deepwater profile. Compare against the Contractor NPV column to the left, which is computed at the active price deck: a regime that is positive there and negative here does not survive a price break. The second line is the share of THAT column&#39;s value retained, so the percentage can be checked against the two figures on this row — the axis the Downside Resilience preset screens on." style="color:${(d.npv_50!=null&&d.npv_50<0)?'var(--red)':'inherit'};font-weight:${(d.npv_50!=null&&d.npv_50<0)?'700':'400'}">${fmtNpvShared(d.npv_50)}${_retentionSub(d)}</td>
       <td class="num" title="${_scProdCovTip(d)}" style="color:${(d.prod_coverage_pct||0)>30?'#15803D':(d.prod_coverage_pct||0)>=10?'#A16207':'var(--muted)'}">${_scProdCovCell(d)}</td>
@@ -31058,7 +31068,117 @@ function runScreener() {
   } else {
     screenerTop4Btn.innerHTML = '';
   }
+
+  // v730 (T6): hydrate the model-terms leg on the rows the analyst can actually see. Debounced:
+  // entering this tab re-renders the body several times as the price deck and the grouping
+  // settle, and each pass would otherwise observe a different top-of-table and fetch it.
+  if (typeof _scHydrateTermChipsSoon === 'function') _scHydrateTermChipsSoon();
 }
+
+// ── v730 (T6): the Screener Evidence column graded the wrong thing for a T6 analyst ──
+// The Screener is the one tab that lets an analyst SCREEN on evidence: "Min primary-source
+// evidence (A)" is a slider, and the Methodology tab tells them to set it to 80% for "the
+// auditable set for formal due diligence". So this is the tab where the letter stops being a
+// caption and becomes an action.
+//
+// The letter cannot carry that action. Like the Country Profile badge (corrected at v660) and
+// the Fiscal Compare drawer's Src badge (corrected at v728), it grades the country's WHOLE fact
+// base -- primary-law share and fact depth, mostly contract metadata -- and never looks at the
+// four to six fiscal terms getDCFParams() actually runs to produce the take, NPV and breakeven
+// printed three columns to its left. Both of those tabs now say so on the same line as the
+// grade. The Screener, where the screening happens, said nothing.
+//
+// Measured live against the shipped build, slider at 80%, on the same rule _fcTermLeg() uses:
+//   * 22 countries survive. NOT ONE of the 22 has every model term independently cited.
+//   * 11 of the 22 cite HALF OR FEWER.
+//   * Netherlands and Namibia cite 1 of 4. Denmark 1 of 3. Canada -- rank 1, grade A, 92.7%
+//     primary law, 1,758 facts, the strongest-looking row in the table -- cites 2 of 4.
+// The analyst reads "A / 1,758 facts", takes the 22 as the auditable set, and stops.
+//
+// The chip is the same leg, in the same words, with the same click destination as the other two
+// tabs: it opens that country's Evidence Chain, which names each term, its ORCA value, the
+// statutory value and the source. It is hydrated per row against api/v1/country/<slug>.json,
+// which is ~11 KB, so it is fetched only for rows that scroll into view -- root is the .tbl-wrap
+// scroller, not the viewport, because this table scrolls inside it. _fcTermLegCache dedupes, so
+// a re-sort or a price-deck change re-reads memory rather than the network.
+//
+// No grade, letter, percentage, fact count, take, NPV, breakeven, tier, order or filter result
+// changes. How deep a fact base is and whether the terms in the model are cited are different
+// questions, and the column now answers both instead of one.
+var _scTermObs = null;
+function _scFillTermChip(slot) {
+  var country = slot.getAttribute('data-tc-country');
+  if (!country || typeof _fcTermLeg !== 'function') return;
+  _fcTermLeg(country).then(function(t) {
+    if (!t || !slot.isConnected) return;
+    var ratio = t.cited / t.total;
+    var col = ratio <= 0.5 ? 'var(--red)' : (ratio < 1 ? 'var(--orange)' : 'var(--green)');
+    var bg  = ratio <= 0.5 ? 'rgba(185,28,28,.12)' : (ratio < 1 ? 'rgba(194,65,12,.12)' : 'rgba(21,128,61,.12)');
+    var bd  = ratio <= 0.5 ? 'rgba(185,28,28,.45)' : (ratio < 1 ? 'rgba(194,65,12,.45)' : 'rgba(21,128,61,.45)');
+    var tip = 'This counts something different from the grade above it. The letter, the '
+      + 'primary-law share and the fact count all describe ' + country + '\u2019s WHOLE fact base. '
+      + 'This counts only the ' + t.total + ' fiscal terms the ' + (t.mech || 'DCF') + ' model runs '
+      + 'to produce the take, NPV and breakeven on this row, and asks of each one whether a '
+      + 'citation stands behind it. The bulk harvest, an instrument shared across jurisdictions '
+      + 'and an uncited contract average do not count, on the same rule the Country Profile '
+      + 'Evidence Chain uses. ' + t.cited + ' of ' + t.total + ' clear that bar'
+      + (t.uncited.length ? '; ' + t.uncited.join(', ') + ' '
+          + (t.uncited.length === 1 ? 'does' : 'do') + ' not.' : '.')
+      + ' No country on this platform cites every term, and 128 of 185 cite half or fewer \u2014 so '
+      + 'the Min primary-source evidence slider does not screen on this axis. Click to open '
+      + country + '\u2019s Evidence Chain, which names each term, its ORCA value, the statutory '
+      + 'value and the source.';
+    var safe = String(country).replace(/'/g, "\\'");
+    slot.innerHTML = '<span class="sc-terms-chip" role="button" tabindex="0"'
+      + ' onclick="event.stopPropagation();_fcOpenTermChain(\'' + safe + '\');"'
+      + ' onkeydown="event.stopPropagation();if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_fcOpenTermChain(\'' + safe + '\');}"'
+      + ' style="font-size:10px;font-weight:700;color:' + col + ';background:' + bg
+      + ';border:1px solid ' + bd + ';border-radius:3px;padding:0 5px;white-space:nowrap;'
+      + 'cursor:pointer;display:inline-flex;align-items:center;line-height:15px;"'
+      + ' title="' + tip.replace(/"/g, '&quot;') + '">'
+      + t.cited + ' of ' + t.total + ' terms cited &rarr;</span>';
+  });
+}
+function _scHydrateTermChips() {
+  var slots = document.querySelectorAll('#tbl-screener .sc-terms-slot:not([data-tc-done])');
+  if (!slots.length) return;
+  var wrap = document.getElementById('tbl-screener');
+  wrap = wrap ? wrap.closest('.tbl-wrap') : null;
+  function fill(slot) {
+    if (!slot || slot.getAttribute('data-tc-done')) return;
+    slot.setAttribute('data-tc-done', '1');
+    _scFillTermChip(slot);
+  }
+  if (typeof IntersectionObserver === 'undefined') {
+    // No observer: fill the first screenful only, so the fallback never costs 185 fetches.
+    Array.prototype.slice.call(slots, 0, 25).forEach(fill);
+    return;
+  }
+  // The observed element is the ROW, not the cell. .tbl-wrap scrolls in BOTH axes and
+  // intersection is two-dimensional: at 390px only ~360 of the table's 1,519px are inside the
+  // root, so the Evidence cell -- which sits well to the right of that -- never intersects and
+  // not one chip hydrated on a phone. A <tr> spans the full table width, so it is inside the
+  // root horizontally on every viewport and the test reduces to the vertical one intended.
+  if (_scTermObs) _scTermObs.disconnect();
+  _scTermObs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(en) {
+      if (!en.isIntersecting) return;
+      _scTermObs.unobserve(en.target);
+      fill(en.target.querySelector('.sc-terms-slot'));
+    });
+  }, { root: wrap || null, rootMargin: '120px 0px' });
+  Array.prototype.forEach.call(slots, function(el) {
+    var tr = el.closest('tr');
+    if (tr) _scTermObs.observe(tr); else fill(el);
+  });
+}
+var _scTermHydT = null;
+function _scHydrateTermChipsSoon() {
+  if (_scTermHydT) clearTimeout(_scTermHydT);
+  _scTermHydT = setTimeout(function() { _scTermHydT = null; _scHydrateTermChips(); }, 450);
+}
+window._scHydrateTermChips = _scHydrateTermChips;
+window._scHydrateTermChipsSoon = _scHydrateTermChipsSoon;
 
 // v558 (T5) — the basis block that travels INSIDE the exported shortlist.
 // Both export buttons emit the same lines, so the artifact is defensible whichever one was

@@ -38864,3 +38864,162 @@ Walked cold at 1440, no sessionStorage or localStorage: Home → **Fiscal Compar
 
 - **163 of 185** rows hold zero verified block-level field production
 - **6 of the top 10*
+
+---
+## Cycle 636 Log — 2026-09-08 22:5x — shipped as v730
+- Test before: 294 PASS / 0 FAIL (deployed baseline, from the cycle email)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local build, suite RUN this cycle against
+  `http://localhost:8899/index.html`; the 1 WARN is the standing service-worker 404 that only
+  exists off the GitHub Pages path)
+- JS errors: 0 (page errors and non-404 console errors, across 9 tabs at 6 viewports)
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** Stalest by rotation
+(636 ran T1, 635 T2, 634 T5, 633 T1, 632 T4, 631 T1, 630 T3 — T6 last walked at cycle 629).
+
+Walked cold at 1440x900 and again at 390x844 hasTouch, sessionStorage and localStorage cleared.
+Route: Home → Fiscal Compare (row click → drawer → Src badge → terms chip → Evidence Chain) →
+Country Profile (Evidence Quality panel, expanded, source list, Evidence Chain) → Explorer →
+**Screener** → Side-by-Side → IOC Portfolio → Breakeven Map → Reform Risk, checking on each tab
+what an analyst can click to get from a number to a document.
+
+## Friction
+
+Three of the four surfaces that print an evidence grade already carry the correction that v660
+established — the grade describes the country's WHOLE fact base (primary-law share and fact
+depth, mostly contract metadata) and never looks at the four to six fiscal terms `getDCFParams()`
+actually runs. The Country Profile got the `N of M model terms cited →` chip at v660; the Fiscal
+Compare drawer got it beside the Src badge at v728. Both are controls: clicking opens that
+country's Evidence Chain.
+
+**The Screener did not have it — and the Screener is the only tab where the grade is an ACTION
+rather than a caption.** It is the tab that carries the `Min primary-source evidence (A)` slider,
+and the Methodology tab tells the analyst in as many words: *"Set it to 80% for the 47 countries
+whose fiscal record is mostly primary law — that is the auditable set for formal due diligence."*
+That instruction points at the Screener, the Screener answers with a letter and a fact count, and
+the letter does not read the model.
+
+Measured live against the shipped build, `#sl-evid` set to 80, terms counted with the same
+`_fcTermLeg()` rule the other two tabs use (bulk harvest, shared regional instruments and
+D-confidence rows excluded):
+
+- **22 countries survive. NOT ONE of the 22 has every model term independently cited.**
+- **11 of the 22 cite HALF OR FEWER.**
+- Netherlands **1 of 4**. Namibia **1 of 4**. Denmark **1 of 3**.
+- Canada — rank 1, grade **A**, 92.7% primary law, **1,758 facts**, the strongest-looking row on
+  the platform — cites **2 of 4**.
+- On the cold default ranking the same holds at the top: USA `B / 125,336 facts` is **2 of 5**;
+  Argentina `B / 1,676 facts` is **2 of 4**; Kazakhstan `B / 8,142 facts` is **2 of 4**.
+
+The analyst reads `A · 1,758 facts`, treats the 22 as the auditable set, and stops. Nothing on
+the tab tells them the axis they screened on is not the axis their number rests on, and there is
+no click on the whole tab that reaches a source — the Evidence cell is `cursor:help`, a tooltip,
+and the row click goes to the top of the Country Profile, ~2,750px above the Evidence Chain.
+
+## Change
+
+The Screener Evidence column now carries the model-terms leg as a **second line under the grade**,
+and it is a control, not a caption.
+
+- `renderScreener()`'s Evidence cell emits `<div class="sc-terms-slot" data-tc-country="...">`
+  under `getEvidenceBar(d)`.
+- `_scHydrateTermChips()` fills it from `_fcTermLeg(country)` — the same function, cache and
+  sourcing rule the Fiscal Compare drawer chip uses, so the two tabs cannot disagree. The chip
+  renders `2 of 4 terms cited →`, coloured on the same thresholds (red ≤ half, orange below all,
+  green all), with a tooltip that names the terms that do not clear the bar and states plainly
+  that *the Min primary-source evidence slider does not screen on this axis*.
+- Clicking it calls `_fcOpenTermChain(country)` — the existing FC destination — which opens that
+  country's Country Profile and lands on the term-by-term Evidence Chain naming each term, its
+  ORCA value, the statutory value and the source. Verified end to end: clicking row 1's chip
+  lands on Country Profile / **Canada** with `#dd-facts-canada` visible.
+- Hydration is lazy. The country JSON is ~11 KB and the table is 185 rows; an
+  `IntersectionObserver` rooted on the `.tbl-wrap` scroller fills only rows that come into view
+  (18 fetches on entry, not 185), debounced 450ms so the several render passes that fire on tab
+  entry collapse into one. `_fcTermLegCache` dedupes, so a re-sort or a price-deck change costs
+  no network.
+
+Two implementation notes worth recording, because both were found by measuring rather than by
+reasoning:
+
+1. **The observed element is the `<tr>`, not the cell.** `.tbl-wrap` scrolls in BOTH axes and
+   intersection is two-dimensional. At 390px only ~360 of the table's 1,519px sit inside the
+   root, and the Evidence cell is well to the right of that — observing the cell hydrated
+   **zero** chips on a phone while working fine at 1440. A `<tr>` spans the full table width, so
+   it is always inside the root horizontally and the test reduces to the vertical one intended.
+2. **The global `[role="button"] { min-height: 44px !important }` rule (max-width 768px) was
+   written for standalone controls.** Applied 185 times in a table cell it took the Screener row
+   from 49px to **74px** and turned the ranking into a scroll. The chip is scoped out of it to
+   the directive's own floor for a control under a thumb — `#tbl-screener .sc-terms-chip
+   { min-height: 24px !important }`. Nothing else is narrowed; the 44px rule is untouched for
+   every other control on the platform.
+
+No grade, letter, primary-law percentage, fact count, take, NPV, breakeven, swing, tier, sort
+order or filter result changes. How deep a fact base is and whether the terms in the model are
+cited are different questions; the column now answers both instead of one.
+
+## Result
+
+An analyst who screens on evidence can now see, on the same row they are screening, whether the
+number they are about to cite is actually sourced — and reach the document in one click from the
+tab they are standing on. Concretely: setting the slider to 80% still returns 22 countries, but
+Canada now reads `A · 1,758 facts · 2 of 4 terms cited →` instead of `A · 1,758 facts`, and
+Netherlands reads `1 of 4`. The "auditable set for formal due diligence" is now visibly not
+auditable term-by-term, which is the true state of the data and was previously discoverable only
+by leaving the tab.
+
+## Verification
+
+- JS syntax gate: **PASS** (`node --check` over all 11 inline script blocks).
+- Runtime suite **RUN this cycle** against the local build: **293 PASS / 0 FAIL / 1 WARN**. The
+  WARN is the service-worker 404, which is local-server-only and is the standing WARN recorded
+  since v601.
+- Horizontal scroll at **1920 / 1440 / 1280 / 1024 / 768 / 390**, all 9 visible tabs:
+  `documentElement.scrollWidth === clientWidth` on every one. The Screener table's own
+  `.tbl-wrap` inner scroll is unchanged and the Evidence column did not widen (158.6px at 1440,
+  before and after).
+- Touch targets at 390x844 `hasTouch`: **0 chips under 24px** (measured 24px). Screener row
+  height 49px → 54px on a phone, 47.5px → 49.5px on desktop.
+- Cold-load chip click verified to land on the Evidence Chain, not the top of the profile.
+
+## Carried forward — unchanged
+
+Still open: `sweetspot` (Low Take · Positive NPV) returning 143 of 185 of which 133 are PROXY,
+and the one-click production filter shipped at v729 on Fiscal Compare having no Screener preset
+equivalent; `Load Top 5 in Side-by-Side` taking `sorted.slice(0,5)` with Somalia PROXY in the
+cold default five; the v601 evidence-chain 2200ms fixed-wait race; the `.orca-fp-badge` 21px
+touch target across four tabs; the Home Screener card and `#tab-btn-tscreener` title/aria-label
+both still advertising a `breakeven` and an `IRR` filter deleted at v568/v517; the
+`#screener-count` run-on line; the service-worker absolute path (`index.html:49`, the standing
+1 WARN); the Screener "Copy for IC Memo" firing against an empty `window._cpObsSpread` on a cold
+load; the active-preset badge `@$75` wording on other decks; `#cmp-clear-btn` at 23px on desktop;
+the CP "Copy for IC Memo" note 2 and `_fpCohortLine()` omitting the ≤26 predictability ceiling;
+19 sub-24px controls in `#explorer-screen-mode`; v710's `t7` clipped-text regression;
+`cp-price-select` absent from the DOM; Mozambique's "Commercially attractive" verdict;
+`renderTornadoPanel` unmarked on the generic-template path; reform coverage 21 of 185; the
+Methodology/Home tier-definition conflict; the FAQ naming a non-existent "Stability Score filter
+at >=4"; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates"
+placeholder; Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (35th cycle); 862
+contracts with no fiscal terms; the Screener Contractor NPV tooltip naming an absent profile
+selector (37th cycle); the Methodology tab naming a `display:none` API Explorer tab; unweighted
+per-mechanic pivot averages; the incomplete 2020s cohort; duplicated
+`renderVintageTrendChart()`/`renderVintage()`; the Breakeven Map's price-marker slider inert
+above $34; the Side-by-Side 3,425-character comparability notice block; the FC/Screener
+shortlists being two independent selections (`_fcSelected` / `_scSelected`); and the CP headline
+printing `#13 of 21 producers` three lines above `12 / 20 producers take less`.
+
+**New this cycle, not fixed.** The Explorer Browse table and the IOC Portfolio table both call
+the same `getEvidenceBar()` and both now lag the Screener by one leg. Explorer is a browse
+surface rather than a screening one and IOC's own header already says the grade is the country's
+and not the operator's, so neither is as sharp as the Screener case — but the same chip belongs
+on both, and the hydration function is written to be reusable (it keys on `#tbl-screener` only
+by selector, nothing else). Left for a later T6.
+
+**New this cycle, not fixed.** The three Screener notes that quote term counts do not all count
+the same thing. On Madagascar the chip reads `3 of 5 model terms cited`, one Evidence Chain note
+reads "ORCA has a sourced value for 4 of the 5 fiscal terms", and a third reads "3 of the 4 rows
+above are independently sourced". They are three different measures (citation-backed / value-held
+/ rows-rendered) and each is correct on its own definition, but stacked within 400px of each
+other they read as a contradiction. Text-only to fix, so it is not a cycle on its own; it should
+ride along with the next structural change to that block.
+
+**Version.** v729 → v730, three display strings, done silently at the end. Not the deliverable.
