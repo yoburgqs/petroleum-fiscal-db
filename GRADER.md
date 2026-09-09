@@ -39178,3 +39178,162 @@ deliverable.
 **T3 — "How do these three countries compare side by side?"** Stalest by rotation (T3 last walked at cycle 630). Walked cold at 1440×900 and 390×844 `hasTouch`, storage cleared.
 
 One process note worth recording: a `file://` walk of this page shows *nothing* — the loading overlay never clears because `country_data.json` is fetched. I served it over HTTP instead. Any cycle claiming a cold 
+
+---
+## Cycle 638 Log — 2026-09-09 00:50
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local baseline, pre-change build served from git HEAD)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local, this build)
+- JS errors: 0 page errors across 6 viewports x 9 tabs
+- Suite RAN this cycle against both builds. The 1 WARN is the documented
+  service-worker absolute-path 404, which only fires under a local server; it is
+  the same assertion that makes the deployed figure read 294/0.
+- Summary: shipped as **v732** (`ace405d`), pushed, mirror copied.
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest by
+rotation (v731 T3, v730 T6, v729 T1, v728 T2, v727 T5, v726 T1, v725 the last T4).
+Walked cold at 1440x900 and 390x844 `hasTouch`, storage cleared, over HTTP.
+
+## Friction
+
+The three reform surfaces are coherent and were checked as such: the Reform Risk
+lookup (all 185 in the dropdown, split into two optgroups — "Sourced reform
+history — scoreable (21)" / "No sourced reform history (164)"), the Fiscal
+Compare Stability column (`n/c` with the not-scored tooltip on every uncovered
+row), and the Country Profile FISCAL REFORM HISTORY block (an explicit "No
+sourced reform log ... Read this as missing coverage, not a clean record", then
+the sourcing statute to start the external check from). Spot-checked Norway,
+Russia, Guyana, Kuwait, Mozambique, Malaysia, Indonesia — no contradiction
+between surfaces. Mobile clean: `scrollWidth` 390 = `clientWidth` 390.
+
+The worst moment was one line above all of that, on the Country Profile **Quick
+IC verdict** — the line v500 added to answer "is this entry viable?" for an
+analyst opening a profile for the first time.
+
+Its reform control was gated (`index.html:35011`) on
+
+    ((favourable && !(_cpReformV && _cpReformV.icColor !== 'var(--green)')) ? '' : _cpReformCta(...))
+
+with `favourable = take <= 55` and `_cpReformV = _rrClassify(d.country)`.
+`_rrClassify()` returns **null** for the 164 jurisdictions with no sourced log
+(`if (!events.length) return null;`, index.html:32716). `!(null && ...)`
+evaluates to **true**. So a country ORCA holds *no reform data whatsoever* on
+satisfied the suppression test identically to a scored-and-clean one.
+
+Measured against the live `COUNTRY_DATA`:
+
+| profiles | outcome under the old gate |
+|---|---|
+| **130 of 185** | unscored, take <= 55 -> control **suppressed** |
+| 50 | control shown |
+| 3 | state monopolies — quick verdict does not render at all |
+| 2 | Malaysia, Yemen — "Price-dependent entry" branch, which never called the control |
+
+The legitimately-suppressed set — scored, green verdict, take <= 55 — is
+**empty**. The `favourable` short-circuit had no live purpose other than hiding
+the coverage gap.
+
+That inverts the rule the rest of the platform is built around and states
+explicitly on every other surface: *n/c means NOT SCORED — it is not a clean
+record and it is not a score of 5. Do not carry a zero reform-frequency premium
+into an IC memo on this basis.* An analyst who checked Indonesia and saw
+"Reform risk 70/100 · take was raised inside the scoring window ›" and then
+opened Mozambique saw **nothing in the same position** — and the reasonable read
+of a missing flag is that nothing is flagged.
+
+Same defect class v550 fixed once already on this exact line: v550 caught the
+*scored-but-non-green* case (the UK getting a green verdict at 49.2% take with 5
+law changes since 2010). It did not catch the *unscored* case, because a null
+classifier passes the same test a green one does.
+
+## Change
+
+1. **The gate now requires a verdict that exists.**
+   `(favourable && _cpReformV && _cpReformV.icColor === 'var(--green)')`.
+   Silence from a classifier with nothing to read is no longer a pass. Because
+   the scored-green-and-favourable set is empty, **no profile that shows a
+   control today loses one** — the change is purely additive.
+2. **The no-log arm says what it means.** `'Check reform risk'` — an errand, not
+   a reading — becomes **`Reform risk not scored · no sourced log — not a clean
+   record ›`**. It remains a control (`role="button"`, keyboard-operable,
+   `openReformRiskFor()`), coloured `var(--muted)`: not green, not red, no
+   reading. Same neutral treatment as the FC `n/c` cell.
+3. **Its tooltip carries the prohibition**, not just a description — the 21-of-185
+   scope, "NOT a Reform Frequency Score of 100", the zero-premium ban, and where
+   the click lands.
+4. **The price-dependent branch got the same control** (Malaysia, Yemen). Both
+   are unscored, and both were telling an analyst to "carry a low-price case"
+   with no word on the reform exposure they equally cannot price at zero.
+
+Verified in the browser: Mozambique, Cambodia, Malaysia, Yemen now render the
+not-scored control; Indonesia (`70/100 · take was raised inside the scoring
+window`) and the United Kingdom (`25/100 · Actively Reforming`) are unchanged;
+click-through from Mozambique lands on the Reform Risk tab with the lookup set
+to Mozambique and its verdict rendered.
+
+## Result
+
+On **132 country profiles** that previously said nothing at all about reform,
+the first line an analyst reads now states that ORCA holds no sourced reform log
+for the country, that this is not a score of 100, and that it will not support a
+zero reform-frequency premium — positioned immediately before the take figure
+they were about to carry into an IC memo — with one click through to the statute
+the external check starts from. The 130 profiles where a missing flag used to
+read as "nothing flagged" now read as "not measured."
+
+## Verification
+
+- JS syntax gate: **PASS** (16 script blocks, `node --check`).
+- Runtime suite **RAN** — 293 PASS / 0 FAIL / 1 WARN. Baseline established by
+  serving the pre-change `git show HEAD:index.html` on a second port: **identical
+  293 / 0 / 1**. No regression.
+- Horizontal scroll at 1920 / 1440 / 1280 / 1024 / 768 / 390 across all 9 visible
+  tabs, Country Profile loaded with an affected (unscored) country: **zero
+  violations**.
+- Page errors across that same sweep: **zero**.
+- Touch target: the control measures **28px** under `pointer: coarse` at 390x844
+  (v612 mobile layer already covers it); 13px with a mouse, consistent with every
+  other inline chip on the line.
+- Nothing on the STILL LOCKED list touched. The v449/v451/v452 CP *headline strip*
+  is untouched — this change is in the quick-verdict sentence above it, inside the
+  v550 mechanism.
+
+## Still open (carried forward, plus this cycle)
+
+**New this cycle, not fixed.** The 3 state monopolies (Kuwait among them) render
+no Quick IC verdict at all, so they carry no reform line in that position either.
+This is structurally different from the 130 — `_quickIcVerdict497` is gated on
+`!isStateMonopoly(...)` by design, and the Reform Risk lookup already handles
+Kuwait fully and well ("Fiscal stability is not the question here — access is").
+Noted rather than fixed; it needs a decision about whether monopolies should get a
+verdict line at all, which is a bigger question than this cycle.
+
+Unchanged from v731: `sweetspot` returning 143 of 185 with 133 PROXY; the v729
+production filter having no Screener preset equivalent; `Load Top 5 in
+Side-by-Side` taking `sorted.slice(0,5)` with Somalia PROXY in the cold five; the
+v601 evidence-chain 2200ms fixed-wait race; `.orca-fp-badge` at 21px across four
+tabs; the Home Screener card and `#tab-btn-tscreener` advertising a `breakeven`
+and an `IRR` filter deleted at v568/v517; the `#screener-count` run-on line; the
+service-worker absolute path (`index.html:49`, the standing 1 WARN); Screener
+"Copy for IC Memo" firing against an empty `window._cpObsSpread` on a cold load;
+`#cmp-clear-btn` at 23px on desktop; 19 sub-24px controls in
+`#explorer-screen-mode`; v710's `t7` clipped-text regression; `cp-price-select`
+absent from the DOM; Mozambique's "Commercially attractive" verdict; reform
+coverage 21 of 185; the Methodology/Home tier-definition conflict; the FAQ naming
+a non-existent "Stability Score filter at >=4"; `FC_PROFILES` / `DCF_PROFILES`
+divergence; the empty "Recent Platform Updates" placeholder; Kuwait's evidence
+tier; three monopolies carrying `be_75 = 1.0`; 862 contracts with no fiscal terms;
+the Screener Contractor NPV tooltip naming an absent profile selector; the
+Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic
+pivot averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`
+/ `renderVintage()`; the Breakeven Map price-marker slider inert above $34; the
+FC/Screener shortlists being two independent selections; the CP headline printing
+`#13 of 21 producers` three lines above `12 / 20 producers take less`; the
+`getEvidenceBar()` chip missing from Explorer Browse and IOC Portfolio; the three
+Screener notes quoting three different term counts; the `# Contracts` row printing
+`7643` without a thousands separator above a row printing `Concession (7,643)`;
+and the two unsequenced Side-by-Side notices giving opposite leads on the same
+column within 400px.
+
+**Version.** v731 -> v732, three display strings, silently at the end. Not the
+deliverable.
