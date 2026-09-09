@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v735</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v736</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2058,7 +2058,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v735</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v736</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2128,7 +2128,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v735</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v736</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2187,7 +2187,11 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 </script>
   <div style="text-align:center;padding:20px 0 12px;">
     <h1 style="font-size:26px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px;">ORCA &mdash; Petroleum Fiscal Intelligence</h1>
-    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;"><span class="orca-cite-n">71,576</span> contracts · <span class="orca-cite-k">185</span> countries · 8 fiscal mechanics.</span> Every number sourced. Current to August 2026 (<span class="orca-cite-ver">v603</span>).</div>
+    <div style="color:var(--muted);font-size:13px;">The global petroleum fiscal database. <span style="color:var(--text);font-weight:600;"><span class="orca-cite-n">71,576</span> contracts · <span class="orca-cite-k">185</span> countries · 8 fiscal mechanics.</span> Current to August 2026 (<span class="orca-cite-ver">v603</span>).</div>
+    <!-- v736 (T6): the measured sourcing headline. This slot used to read the flat claim "Every
+         number sourced." Populated from COUNTRY_DATA by _homeRenderSourcingClaim() so it can
+         never drift from the evidence letter printed on every other tab. -->
+    <div id="home-sourcing-claim" style="display:none;margin-top:8px;" aria-live="polite"></div>
     <!-- v465: Live investible universe stat — populated after country_data.json loads -->
     <div id="home-hurdle-stat" style="display:none;margin-top:8px;font-size:12px;color:var(--green);font-weight:600;" aria-live="polite"></div>
     <!-- v466: DB currency note — populated after country_data.json loads -->
@@ -3766,6 +3770,13 @@ Gross Split:    (1 - contractor_gross_split_pct) × gross_revenue + CIT + DMO_pe
     </div>
     <p style="font-size:12px;color:var(--muted);margin:14px 0 0;padding:10px 14px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;">
       <strong>Note:</strong> 43.4% of facts are bulk-linked — assigned at the country level rather than verified per individual contract. Per-contract verification is the active work frontier for high-coverage countries (Angola, Nigeria, Indonesia, Iraq-KRG).
+    </p>
+    <!-- v736 (T6): the destination of the Home sourcing chip. The table above grades FACTS; an
+         analyst arriving from Home was told their country grades C or D and needs to know what
+         that means for them. Counts are written by _homeRenderSourcingClaim() off the same
+         _evidenceGrade() the badges use. -->
+    <p style="font-size:12px;color:var(--muted);margin:10px 0 0;padding:10px 14px;background:var(--surface);border-left:3px solid var(--orange);border-radius:0 6px 6px 0;">
+      <strong>What the letter on a country means.</strong> The tiers above grade individual <em>facts</em>. The letter printed beside a country on Fiscal Compare, Explorer, Screener, Side-by-Side and the Country Profile grades that country&rsquo;s whole record, taking the <em>worse</em> of primary-law share (A&nbsp;&ge;60%&nbsp;/ B&nbsp;&ge;40%&nbsp;/ C&nbsp;&ge;20%) and fact depth (A&nbsp;&ge;150 facts&nbsp;/ B&nbsp;&ge;50&nbsp;/ C&nbsp;&ge;15). <strong style="color:var(--text);"><span id="meth-evidence-cd-count">78 of 185</span> countries grade C or D.</strong> Treat a <strong style="color:var(--yellow);">C</strong> as screening-only and do not put a <strong style="color:var(--orange);">D</strong> in a recommendation document without establishing the terms from the country&rsquo;s own petroleum act. And note the grade is a property of the <em>fact base</em>, not of the model: no country on this platform has every fiscal term its DCF runs independently cited, so check the Country Profile&rsquo;s <em>N of N model terms cited</em> chip as well as the letter.
     </p>
   </div>
 
@@ -29927,6 +29938,21 @@ window._homeOpenEvidence = _homeOpenEvidence;
 // what a C or a D licenses in an IC memo (C = screening only, D = not in a recommendation
 // document). The tile lives inside the Methodology pane, so the pane is already active -- this
 // is a scroll, not a tab switch, and it is guarded in case the section id is ever renamed.
+// v736 (T6): _methJumpEvidence() only scrolls. Methodology lives behind the Reference dropdown,
+// so from Home its target is inside an inactive .tab-pane and scrollIntoView() on it is a no-op
+// -- a dead click on the one control that answers "how solid is the evidence?". This activates
+// the tab first, on the same path the welcome FAQ button uses, then jumps.
+function _homeOpenEvidenceTiers() {
+  try {
+    if (window._activeTab !== 'tmethodology') {
+      var item = document.getElementById('ref-item-methodology');
+      if (typeof switchTabFromDropdown === 'function') switchTabFromDropdown('tmethodology', item);
+    }
+    setTimeout(_methJumpEvidence, 300);
+  } catch (e) { _methJumpEvidence(); }
+}
+window._homeOpenEvidenceTiers = _homeOpenEvidenceTiers;
+
 function _methJumpEvidence() {
   try {
     var el = document.getElementById('meth-evidence');
@@ -49976,6 +50002,86 @@ async function loadPlatformData() {
           }
         }
       } catch(e) { /* non-critical */ }
+    })();
+
+    // ── v736 (T6): the front door claimed something the platform spends ten screens denying ──
+    // The hero subtitle read "Every number sourced." It was the first sentence a first-time
+    // analyst read, and it is the exact sentence that stops them asking the T6 question at all.
+    //
+    // Measured 9 Sep 2026 by walking all 185 country profiles and reading each one's own
+    // cp-terms-chip -- the platform's own citation rule, the one the Evidence Chain applies,
+    // with the bulk harvest, shared-regional instruments and D-confidence rows excluded:
+    //   - NOT ONE of the 185 countries has every term its DCF model runs independently cited.
+    //     The best on the platform is 4 of 5. 19 countries have ZERO of their terms cited.
+    //   - Platform-wide, 393 of 802 model terms clear the citation bar. 49.0%. Under half.
+    //   - 78 of 185 countries grade C or D, which by this platform's own Methodology guidance
+    //     means screening-only (C) or "does not belong in a recommendation document" (D).
+    // The Country Profile has said all of this per country since v660 -- and v660's own comment
+    // records the same measurement. Nobody went back to the front door, so the landing page and
+    // the drilldown three clicks later have been asserting opposite things.
+    //
+    // The grade mix is computed HERE from COUNTRY_DATA through _evidenceGrade(), the identical
+    // function behind the letter on Fiscal Compare, Explorer, Screener, Side-by-Side, IOC
+    // Portfolio and the Country Profile, so this line cannot drift from the badges it describes.
+    // It is a control, not a caption: it lands on Methodology > Evidence Quality Tiers, which is
+    // where the letters are defined and where the C/D usage guidance lives.
+    (function() {
+      try {
+        var _sc = document.getElementById('home-sourcing-claim');
+        if (!_sc || !COUNTRY_DATA || !COUNTRY_DATA.length) return;
+        if (typeof _evidenceGrade !== 'function') return;
+        var _mix = { A: 0, B: 0, C: 0, D: 0 };
+        COUNTRY_DATA.forEach(function(c) {
+          var g = _evidenceGrade(c);
+          if (g && _mix[g.letter] != null) _mix[g.letter]++;
+        });
+        var _tot = COUNTRY_DATA.length;
+        var _cd  = _mix.C + _mix.D;
+        // Measured constants -- the per-country term citation lives in api/v1/country/<slug>.json,
+        // which Home does not fetch. Dated so it is auditable, and stated as a measurement rather
+        // than a claim. Reconfirmed 9 Sep 2026 against all 185 profiles.
+        var _TERMS_CITED = 393, _TERMS_TOTAL = 802, _FULLY_CITED = 0, _ZERO_CITED = 19;
+        var _MEASURED = '9 Sep 2026';
+        var _tip = 'Replaces the claim \u201cEvery number sourced.\u201d, which was true for '
+          + 'none of the ' + _tot + ' countries. Two different measurements, both from this '
+          + 'platform\u2019s own rules. (1) The grade mix left of the divider is computed live '
+          + 'from COUNTRY_DATA by _evidenceGrade() \u2014 the same function behind the evidence '
+          + 'letter on every other tab \u2014 taking the worse of primary-law share and fact '
+          + 'depth. (2) The model-terms figure counts, for each country, the four to six fiscal '
+          + 'terms its DCF actually runs, and asks whether a citation stands behind each one; the '
+          + 'bulk harvest, a regional instrument shared across jurisdictions and an uncited '
+          + 'contract average do not count, on the same rule the Evidence Chain uses. Measured '
+          + _MEASURED + ' across all ' + _tot + ' country profiles: ' + _TERMS_CITED + ' of '
+          + _TERMS_TOTAL + ' terms cited, ' + _FULLY_CITED + ' countries fully cited, '
+          + _ZERO_CITED + ' with none. A deep, heavily primary-sourced fact base can sit over a '
+          + 'thinly cited model. Click for what the letters mean and how to use a C or a D.';
+        _sc.innerHTML =
+          '<span role="button" tabindex="0" id="home-sourcing-btn"'
+          + ' onclick="_homeOpenEvidenceTiers()"'
+          + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_homeOpenEvidenceTiers();}"'
+          + ' title="' + _tip + '"'
+          + ' style="display:inline-flex;align-items:center;flex-wrap:wrap;justify-content:center;'
+          + 'gap:4px 8px;min-height:24px;padding:5px 12px;border:1px solid rgba(194,65,12,.45);'
+          + 'border-radius:14px;background:rgba(194,65,12,.07);cursor:pointer;font-size:12px;'
+          + 'line-height:1.5;color:var(--muted);max-width:100%;">'
+          + '<span style="font-weight:700;color:var(--text);">Sourcing</span>'
+          + '<span><span style="color:var(--green);font-weight:700;">A ' + _mix.A + '</span>'
+          + ' \u00b7 <span style="color:rgba(21,128,61,.85);font-weight:700;">B ' + _mix.B + '</span>'
+          + ' \u00b7 <span style="color:var(--yellow);font-weight:700;">C ' + _mix.C + '</span>'
+          + ' \u00b7 <span style="color:var(--orange);font-weight:700;">D ' + _mix.D + '</span>'
+          + ' <span style="opacity:.85;">of ' + _tot + '</span></span>'
+          + '<span style="opacity:.5;">|</span>'
+          + '<span><strong style="color:var(--orange);">' + _TERMS_CITED + ' of ' + _TERMS_TOTAL
+          + '</strong> model terms cited \u2014 <strong style="color:var(--orange);">no country '
+          + 'cites all of its own</strong></span>'
+          + '<span style="text-decoration:underline;white-space:nowrap;">what the grades mean \u2192</span>'
+          + '</span>';
+        _sc.style.display = 'block';
+        // The two headline counts also belong in the tier-guidance paragraph they qualify, so an
+        // analyst who arrives at Methodology from anywhere else reads the same figures.
+        var _cdEl = document.getElementById('meth-evidence-cd-count');
+        if (_cdEl) _cdEl.textContent = _cd + ' of ' + _tot;
+      } catch (e) { /* the line is additive; never let it take the Home page down */ }
     })();
     // v527 (T6): the tier-B composition, computed from the data rather than asserted in prose.
     // Uses _isBulkSource() -- the same two-name definition the Country Profile evidence panel
