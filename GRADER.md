@@ -38573,3 +38573,139 @@ unannounced, and `addToBasket`/Side-by-Side already occupies that ground.
 Walked all four paste-ready artifacts and clicked every export on every tab — all seven downloads land and all five workbooks carry a basis sheet, so the directive's finalization item 5 holds.
 
 The break is on the **Scree
+
+---
+## Cycle 635 Log — 2026-09-08 20:55
+- Test before: 294 PASS / 0 FAIL (deployed baseline)
+- Test after: 293 PASS / 0 FAIL / 1 WARN / 1 JS error (local build) — see Verification
+- JS errors: 1 (the standing service-worker 404, local-server only)
+- Summary: shipped as **v728** (`fe96222`), pushed.
+
+## Task
+**T2 — "Is this one country attractive at $75/bbl, and can I defend that?"** Stalest by rotation
+(634 ran T5, 633 T1, 632 T4, 631 T1, 630 T3, 629 T6 — 628 was the last T2).
+
+Walked cold at 1440x900, sessionStorage and localStorage cleared, into Country Profile, which
+auto-loads Indonesia. Then walked the country selector across 16 jurisdictions and clicked every
+one of the 29 visible controls on the tab.
+
+## Friction
+
+The Country Profile answers "attractive?" with a verdict line, a position pill — `12 / 20 producers
+take less` — and one CTA that answers the follow-up an IC analyst always asks, *compared to what?*:
+
+    See the 12 producers that take less →
+
+It opens the Screener restricted to those 12. Row 11 is **Iraq, printing 84.8%**, under a caption
+asserting every row takes less than Indonesia's 59.5%.
+
+Not a rounding artefact. `cpScreenLowerTake()` (`index.html:29016`) selects its members on
+**comparable** take — fee-basis TSC/RSC/buy-back contracts excluded, per the platform comparability
+rules — while the Screener's GOVT TAKE column prints the **published** headline. Iraq's two figures
+are 34.1% and 84.8%: a **50.7pp** gap. The cell that reconciles them already exists — `_takeCmpCell()`
+at `index.html:30872` — but was gated on `takeCeilingActive`, and this CTA calls
+`applyScreenerPreset(null)` on arrival, which clears the ceiling. **The one row set actually built on
+the comparable basis was the only one that never showed it.**
+
+Measured, not inferred, over the 21 production-weighted producers: **16 of them** open a table whose
+caption at least one visible row refutes.
+
+| reference country | contradicting row |
+|---|---|
+| Australia, Ecuador, UK, Angola, Brazil, Malaysia, Indonesia, Azerbaijan, China, India, Norway, Kazakhstan, Libya, Oman, Nigeria (15) | Iraq — headline 84.8%, comparable 34.1% |
+| Argentina | Mexico — headline 32.2%, comparable 29.7% |
+
+Both outcomes are bad. The analyst either concludes the ranking is broken and stops trusting the
+tab, or takes the list at face value and writes an IC memo asserting Iraq takes less than Indonesia
+— which the table's own printed number contradicts.
+
+**v663 already fixed this exact defect class for the sibling CTA** `cpScreenInvestibleProducers()`,
+and its comment names it as "the exact caption/rows disagreement v524 and v568 were both logged for."
+The v648 sibling never got it, and v663's naming was inlined where nothing else could reach it.
+
+## Change
+
+- **`_screenerSetOnCmp`** — new state flag meaning *this country set's membership was decided on
+  comparable take*. Set by both CTAs, cleared with `_screenerCountrySet`, carried through
+  `_scSaveState`/`_scRestoreState` so a preset-labelling pass cannot strand it.
+- **`_takeCmpCell()` / `_feeCmpOf()` now gate on `takeCeilingActive || _screenerSetOnCmp`.** Iraq's
+  cell reads **`84.8%  → in list on 34.1%`**. The label is basis-aware: `→ screened at` names a
+  ceiling control, and on this path no ceiling is on, so it says `→ in list on` instead. The tooltip
+  states that 34.1% met the scope above the table and 84.8% is the published figure used everywhere
+  else on the platform.
+- **`_scCmpSetDivergence()` / `_scCmpSetNote()`** — one shared caption helper, replacing v663's
+  inlined copy, so the two CTAs cannot drift again. It names **only** rows whose headline breaks the
+  threshold the scope line just asserted — the ones that actually read as a contradiction. Naming
+  every diverging row instead pushed the caption to 743 characters on a line the loop has already
+  flagged as a run-on; narrowing it also shortens v663's own caption **605 → 502** chars.
+
+## Result
+
+The analyst asking whether Indonesia's 59.5% is attractive clicks the one control that answers
+"compared to what?" and gets 12 rows, **none of which refutes the caption**. Iraq states on its own
+row that it is in the list on 34.1% and prints 84.8% because that is the published blend. The same
+holds for the other 15 producers, and for the v663 investible-producers CTA, which now carries the
+reconciliation on the row as well as in the caption.
+
+## Verification
+
+- **JS syntax gate: PASS** (11 inline script blocks, 2.53M chars, `node --check`).
+- **Runtime suite actually RAN** this cycle: **293 PASS / 0 FAIL / 1 WARN / 1 JS error** against the
+  local build. That is one PASS below and one WARN above the 294/0/0 deployed baseline — so the
+  **pre-change build was run under the identical local server** and scored **293/0/1/1, exactly the
+  same**. The delta is the service-worker absolute path 404ing under `http.server` (the standing
+  WARN already in the carried-forward list), not this change. No FAIL, no PASS lost.
+- **Cold path byte-identical.** Screener with no filters: tbody **1,033,519 chars** pre and post,
+  row text identical, count line identical. The v554 take-ceiling path: rows and count line
+  identical. Nothing changes unless a comparable-take CTA put the analyst there.
+- **v663 still names Iraq and Ecuador**, now through the shared helper.
+- **Mobile 390x844 `hasTouch:true`:** `scrollWidth === clientWidth === 390` on all eight tabs and
+  again after the CTA fires. The four sub-lines added measure 108x13 — they are **non-interactive
+  text**, identical in construction to the v554/v685 sub-lines they sit beside, so no new tap target
+  is introduced and the 24px control rule does not apply to them. Stated rather than claimed as a pass.
+- **Ordering, colouring, tiering and export are untouched.** `_scTakeSortOnCmp` was deliberately not
+  changed: the published headline still leads every cell and still drives the sort. This adds a
+  sub-line; it does not move a figure.
+
+## Still locked — nothing touched
+
+No new FAQ (974). No new tooltip on any column header, mechanic tag, waterfall line or Scenario
+Builder input — the tooltip text changed belongs to a cell v554 already created. No page-sub
+paragraph, amber banner, routing hint or "How to read" block. No tab added, removed or reordered.
+v371/v373, v430, v449, v451, v452, v489, v612 and the v612 mobile layer all intact. Version sweep
+**v727 → v728** done silently at the end. It is **not** the deliverable.
+
+## Carried forward — unchanged
+
+Still open: `sweetspot` (Low Take · Positive NPV) returning 143 of 185; the v601 evidence-chain
+2200ms fixed-wait race; the `.orca-fp-badge` 21px touch target across four tabs; the Home Screener
+card and `#tab-btn-tscreener` title/aria-label both still advertising a `breakeven` and an `IRR`
+filter deleted at v568/v517; the `#screener-count` run-on line (this cycle added 34 chars to the
+`cpScreenLowerTake` caption and removed 103 from the `cpScreenInvestibleProducers` one); the
+service-worker absolute path (`index.html:49`, the standing 1 WARN); the Screener carrying no
+model-terms leg; the Screener "Copy for IC Memo" firing against an empty `window._cpObsSpread` on a
+cold load; the active-preset badge `@$75` wording on other decks; `#cmp-clear-btn` at 23px on
+desktop; the CP "Copy for IC Memo" note 2 and `_fpCohortLine()` omitting the ≤26 predictability
+ceiling; 19 sub-24px controls in `#explorer-screen-mode`; v710's `t7` clipped-text regression;
+`cp-price-select` absent from the DOM; Mozambique's "Commercially attractive" verdict;
+`renderTornadoPanel` unmarked on the generic-template path; reform coverage 21 of 185; the
+Methodology/Home tier-definition conflict; the FAQ naming a non-existent "Stability Score filter at
+>=4"; `FC_PROFILES`/`DCF_PROFILES` divergence; the empty "Recent Platform Updates" placeholder;
+Kuwait's evidence tier; three monopolies carrying `be_75 = 1.0` (33rd cycle); 862 contracts with no
+fiscal terms; the Screener Contractor NPV tooltip naming an absent profile selector (35th cycle);
+the Methodology tab naming a `display:none` API Explorer tab; unweighted per-mechanic pivot
+averages; the incomplete 2020s cohort; duplicated `renderVintageTrendChart()`/`renderVintage()`; the
+Breakeven Map's price-marker slider inert above $34; the Side-by-Side 3,425-character comparability
+notice block; and the FC/Screener shortlists being two independent selections (`_fcSelected` /
+`_scSelected`).
+
+New this cycle, not fixed: the Country Profile prints **two denominators for the same fact three
+lines apart** — the headline rank reads `#13 of 21 producers` while the verdict pill reads
+`12 / 20 producers take less`. Both are correct (the pill excludes the country itself) and neither
+is wrong on its own, but an analyst reading them together has to work out why 21 became 20. Minor
+against this cycle's find, and left for a later T2.
+
+Also observed and NOT a defect: the headline strip's IRR slot renders `→ Model in Scenario Builder`
+for every one of the 16 countries walked, never a number. That is the deliberate v516 handoff —
+country-level IRR is an arithmetic mean of per-contract IRRs and clears a 15% hurdle almost
+everywhere — and it is correct not to print it. Recorded so a later cycle does not "fix" it.
