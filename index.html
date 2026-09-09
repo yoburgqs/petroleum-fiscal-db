@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v737</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v739</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -222,6 +222,10 @@ table { width: 100%; border-collapse: collapse; }
      else on this table. On a mouse it stays on the 15px line so 185 rows do not grow. */
   #tbl-screener .sc-terms-chip { min-height: 24px; }
 }
+/* v739 (T5): the Country Profile "Copy as IC table" button is a control this cycle touched, so it
+   takes the directive's 24px floor under a thumb. It measures 23px on a mouse and is left there —
+   the desktop row it sits in is unchanged. */
+@media (pointer: coarse) { .cp-ic-tbl-btn { min-height: 24px; } }
 #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-fc tr.fc-row-sel > td { background: rgba(176,104,0,0.09); }
@@ -2058,7 +2062,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v737</span>
+    <span class="badge" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v739</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2128,7 +2132,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v737</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v739</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -37067,20 +37071,72 @@ function loadCountryProfile(country) {
       // v458: Copy as IC table — tab-separated text ready to paste into Excel or IC memo
       // v486: prepend a title row with country + profile + version so IC analysts see context when pasting into Excel
       // v516: 'ORCA v500' was hard-coded and drifted 15 versions behind the build.
+      //
+      // ── v739 (T5) — this control could not produce a table, and its Breakeven column was
+      //    reading a field the rest of the page stopped trusting. ──────────────────────────
+      //
+      // Walked T5 cold. Home sends a first-time analyst here ("Indonesia auto-loads on first
+      // visit"). The page's own IC guidance, in the tfoot two rows above this button, says
+      // "High swing — progressive regime; price range table required in IC memo." The button
+      // directly under it is labelled "Copy as IC table". Two defects, both measured:
+      //
+      // 1. It wrote text/plain ONLY. Every other Copy-for-IC-Memo control on this platform --
+      //    Fiscal Compare (v676), Screener (v728), Side-by-Side (v503), IOC Portfolio, and
+      //    copyICSummary() 200px away on this same tab (v690) -- emits text/html so Word,
+      //    Google Docs, Outlook and PowerPoint render a real table, plus TSV so Excel splits
+      //    into columns. This one called writeText(). Measured on the live build: clipboard
+      //    flavours were ["text/plain"] on all four countries tested. Pasted into Word that is
+      //    five run-on lines of tab characters, not a table -- from the control whose own label
+      //    is the word "table" and whose output IS the price-range table the page just told the
+      //    analyst their memo requires. Same miss as v690, on the sibling button.
+      //
+      // 2. The Breakeven cell read raw d.be_75. cpBeFor() (v512) and cpBeBound() (v642) are what
+      //    the BREAKEVEN COST CURVE ruler ~200px above and copyICSummary() both resolve through.
+      //    Measured across all 185: 120 rows disagreed with the page. 119 pasted an em-dash where
+      //    the page showed a bounded "< $50/bbl" -- Indonesia, Angola, Nigeria, Brazil, Canada
+      //    and the USA among them -- and Bahrain pasted "$1/bbl" beside $0 contractor NPV at all
+      //    four prices, the floor artefact v564 already suppressed on the ruler for exactly that
+      //    reason. A $1/bbl breakeven next to a zero NPV is a contradiction that would leave this
+      //    tool inside an IC memo.
+      //
+      // Nothing is dropped: the bound carries a "bounded" marker and its own note, so a bound can
+      // never pass for a solved figure in the paste any more than it can on screen.
       const _cpIcTitle = country + ' — Fiscal Sensitivity (Deepwater profile, 10% WACC, 100% WI) — ORCA ' + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '') + ' (Aug 2026)';
-      const rows4 = [
-        [_cpIcTitle, '', '', '', '', ''],
-        ['Price', 'Govt Take %', 'Delta vs $50', 'Contractor NPV ($M)', 'Breakeven'],
-        ['$50',  d.take_50  != null ? d.take_50.toFixed(1)+'%'  : '—', '—',         d.npv_50  != null ? (d.npv_50 < 0 ? '-' : '') + '$' + (Math.abs(d.npv_50) >= 1000 ? (Math.abs(d.npv_50)/1000).toFixed(1)+'B' : Math.round(Math.abs(d.npv_50))+'M') : '—', '—'],
-        ['$75',  d.take_75  != null ? d.take_75.toFixed(1)+'%'  : '—', (d.take_75  != null && d.take_50 != null) ? (d.take_75  - d.take_50 === 0 ? '—' : (d.take_75  - d.take_50 > 0 ? '+' : '') + (d.take_75  - d.take_50).toFixed(1) + 'pp') : '—', d.npv_75  != null ? (d.npv_75  < 0 ? '-' : '') + '$' + (Math.abs(d.npv_75)  >= 1000 ? (Math.abs(d.npv_75)/1000).toFixed(1)+'B'  : Math.round(Math.abs(d.npv_75))+'M')  : '—', d.be_75   != null ? (d.be_75 < 1 ? '<$1/bbl' : d.be_75 >= 999 ? '>$300/bbl' : '$' + d.be_75.toFixed(0) + '/bbl') : '—'],
-        ['$100', d.take_100 != null ? d.take_100.toFixed(1)+'%' : '—', (d.take_100 != null && d.take_50 != null) ? (d.take_100 - d.take_50 === 0 ? '—' : (d.take_100 - d.take_50 > 0 ? '+' : '') + (d.take_100 - d.take_50).toFixed(1) + 'pp') : '—', d.npv_100 != null ? (d.npv_100 < 0 ? '-' : '') + '$' + (Math.abs(d.npv_100) >= 1000 ? (Math.abs(d.npv_100)/1000).toFixed(1)+'B' : Math.round(Math.abs(d.npv_100))+'M') : '—', '—'],
-        ['$125', d.take_125 != null ? d.take_125.toFixed(1)+'%' : '—', (d.take_125 != null && d.take_50 != null) ? (d.take_125 - d.take_50 === 0 ? '—' : (d.take_125 - d.take_50 > 0 ? '+' : '') + (d.take_125 - d.take_50).toFixed(1) + 'pp') : '—', d.npv_125 != null ? (d.npv_125 < 0 ? '-' : '') + '$' + (Math.abs(d.npv_125) >= 1000 ? (Math.abs(d.npv_125)/1000).toFixed(1)+'B' : Math.round(Math.abs(d.npv_125))+'M') : '—', '—'],
+      const _npvC = function(v){ return v != null ? (v < 0 ? '-' : '') + '$' + (Math.abs(v) >= 1000 ? (Math.abs(v)/1000).toFixed(1)+'B' : Math.round(Math.abs(v))+'M') : '—'; };
+      const _dlt  = function(v){ return (v != null && d.take_50 != null) ? (v - d.take_50 === 0 ? '—' : (v - d.take_50 > 0 ? '+' : '') + (v - d.take_50).toFixed(1) + 'pp') : '—'; };
+      // Same two resolvers the on-screen ruler uses, in the same order: a solved breakeven wins,
+      // otherwise the arithmetic bound, otherwise nothing is claimed.
+      const _beSolved = (typeof cpBeFor === 'function') ? cpBeFor(d) : null;
+      const _beBound  = (_beSolved == null && typeof cpBeBound === 'function') ? cpBeBound(d) : null;
+      const _beCell   = _beSolved != null ? '$' + _beSolved.toFixed(0) + '/bbl'
+                      : _beBound  != null ? _beBound.txt + ' (bounded)'
+                      : '—';
+      const _beNote   = _beSolved != null
+          ? ''
+          : _beBound != null
+            ? 'Breakeven ' + _beBound.txt + ' is BOUNDED, NOT SOLVED. ORCA carries no solved breakeven for '
+              + country + '. The range is arithmetic on the four contractor NPVs in this table, on the same '
+              + 'standardized Deepwater profile. Cite it as a bound, not as a price.'
+            : 'Breakeven is not reported for ' + country + ': ORCA carries no solved value, and the four '
+              + 'contractor NPVs in this table do not bracket one.';
+      const _hdr  = ['Price', 'Govt Take %', 'Delta vs $50', 'Contractor NPV ($M)', 'Breakeven'];
+      const _body = [
+        ['$50',  d.take_50  != null ? d.take_50.toFixed(1)+'%'  : '—', '—',                _npvC(d.npv_50),  ''],
+        ['$75',  d.take_75  != null ? d.take_75.toFixed(1)+'%'  : '—', _dlt(d.take_75),    _npvC(d.npv_75),  _beCell],
+        ['$100', d.take_100 != null ? d.take_100.toFixed(1)+'%' : '—', _dlt(d.take_100),   _npvC(d.npv_100), ''],
+        ['$125', d.take_125 != null ? d.take_125.toFixed(1)+'%' : '—', _dlt(d.take_125),   _npvC(d.npv_125), '']
       ];
+      const _notes = [];
+      if (_beNote) _notes.push(_beNote);
       // v516: the answer to "where is IRR?" travels inside the pasted artifact, not back on the page.
-      const tsv = rows4.map(r => r.join('\t')).join('\n') + '\n\n' + CP_IRR_NOTE;
-      const tsvEsc = tsv.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
+      _notes.push(typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '');
       const btnId = 'cp-ic-table-btn-' + safe;
-      return '<div style="margin-top:8px;text-align:right;"><button id="' + btnId + '" class="btn btn-sm btn-outline" style="font-size:11px;" onclick="(function(){var t=document.getElementById(\'' + btnId + '\');navigator.clipboard.writeText(\'' + tsvEsc + '\').then(function(){t.innerHTML=\'&#x2713; Copied!\';setTimeout(function(){t.innerHTML=\'Copy as IC table\';},2000);}).catch(function(){t.innerHTML=\'Clipboard unavailable\';setTimeout(function(){t.innerHTML=\'Copy as IC table\';},2000);});})()" title="Copy 4-price sensitivity table as tab-separated text — paste directly into Excel or IC memo">Copy as IC table</button></div>';
+      // Payload is stashed rather than serialised into the onclick attribute: the HTML flavour
+      // carries style="..." on every cell, which cannot survive inside a double-quoted attribute.
+      window.__CP_IC_TBL = window.__CP_IC_TBL || {};
+      window.__CP_IC_TBL[safe] = { title:_cpIcTitle, country:country, header:_hdr, body:_body,
+                                   notes:_notes.filter(function(t){ return !!t; }), btnId:btnId };
+      return '<div style="margin-top:8px;text-align:right;"><button id="' + btnId + '" class="btn btn-sm btn-outline cp-ic-tbl-btn" style="font-size:11px;" onclick="cpCopyICTable(\'' + safe + '\')" title="Copy the 4-price sensitivity table to the clipboard as a real table — pastes into Word, Google Docs, Outlook and PowerPoint as a formatted table, and into Excel as columns. Carries the breakeven the way this page resolves it (solved, or bounded and marked as a bound) and the IRR note.">Copy as IC table</button></div>';
     })()}
   </div>
   ${(function(){
@@ -41531,6 +41587,69 @@ function _icReformHead(txt) {
 }
 
 // v425: Copy IC Summary — builds a full IC memo paragraph with take at 4 prices, swing, IRR, breakeven, stability, mechanic, and source tier
+// ── v739 (T5): clipboard writer for the Country Profile 4-price sensitivity table. ──────────
+// Two flavours, matching every other Copy-for-IC-Memo control on the platform: text/html so
+// Word / Google Docs / Outlook / PowerPoint render a real table, and TSV so Excel splits into
+// columns. Before v739 this control wrote text/plain only, so the artifact the page's own IC
+// guidance asks for ("price range table required in IC memo") pasted into Word as tab stops.
+function cpCopyICTable(safe) {
+  var P = (window.__CP_IC_TBL || {})[safe];
+  if (!P) { if (typeof showCopyToast === 'function') showCopyToast('Table not ready — reopen this country and try again.'); return; }
+
+  var tsv = P.title + '\n\n'
+    + P.header.join('\t') + '\n'
+    + P.body.map(function(r){ return r.join('\t'); }).join('\n');
+  if (P.notes.length) {
+    tsv += '\n\nNotes — carried from the ORCA Country Profile for ' + P.country + ':\n'
+        + P.notes.map(function(t, i){ return (i + 1) + '. ' + t; }).join('\n');
+  }
+
+  function _e(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+  var _th = 'border:1px solid #999;padding:4px 8px;background:#f2ece2;font-family:Calibri,Arial,sans-serif;font-size:10pt;font-weight:bold;text-align:left;';
+  var _td = 'border:1px solid #999;padding:4px 8px;font-family:Calibri,Arial,sans-serif;font-size:10pt;';
+  var html = '<div style="font-family:Calibri,Arial,sans-serif;">'
+    + '<p style="font-size:11pt;font-weight:bold;margin:0 0 6px;">' + _e(P.title) + '</p>'
+    + '<table style="border-collapse:collapse;"><thead><tr>'
+    + P.header.map(function(h){ return '<th style="' + _th + '">' + _e(h) + '</th>'; }).join('')
+    + '</tr></thead><tbody>'
+    + P.body.map(function(r){
+        return '<tr>' + r.map(function(c, ci){
+          return '<td style="' + _td + (ci === 0 ? 'font-weight:bold;' : '') + '">' + _e(c) + '</td>';
+        }).join('') + '</tr>';
+      }).join('')
+    + '</tbody></table>';
+  if (P.notes.length) {
+    html += '<p style="font-size:9pt;font-weight:bold;margin:8px 0 2px;">'
+      + _e('Notes — carried from the ORCA Country Profile for ' + P.country + ':') + '</p>'
+      + '<ol style="font-size:9pt;color:#333;margin:0;padding-left:18px;">'
+      + P.notes.map(function(t){ return '<li style="margin-bottom:3px;">' + _e(t) + '</li>'; }).join('')
+      + '</ol>';
+  }
+  html += '</div>';
+
+  var okMsg = 'Copied as a table — 4 prices + ' + P.notes.length + ' note'
+    + (P.notes.length === 1 ? '' : 's') + '. Pastes as a formatted table into Word/Docs, as columns into Excel.';
+  function done(msg) {
+    var t = document.getElementById(P.btnId);
+    if (t) { t.innerHTML = '✓ Copied!'; setTimeout(function(){ t.innerHTML = 'Copy as IC table'; }, 2000); }
+    if (typeof showCopyToast === 'function') showCopyToast(msg);
+  }
+  function fail() {
+    var t = document.getElementById(P.btnId);
+    if (t) { t.innerHTML = 'Clipboard unavailable'; setTimeout(function(){ t.innerHTML = 'Copy as IC table'; }, 2000); }
+  }
+  if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
+    navigator.clipboard.write([new ClipboardItem({
+      'text/html':  new Blob([html], {type:'text/html'}),
+      'text/plain': new Blob([tsv],  {type:'text/plain'})
+    })]).then(function(){ done(okMsg); }).catch(function(){
+      navigator.clipboard.writeText(tsv).then(function(){ done(okMsg); }).catch(fail);
+    });
+  } else if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(tsv).then(function(){ done(okMsg); }).catch(fail);
+  } else { fail(); }
+}
+
 function copyICSummary() {
   var sel = document.getElementById('dd-country-select');
   var country = sel ? sel.value : '';
