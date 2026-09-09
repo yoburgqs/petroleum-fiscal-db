@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v747</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v748</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2177,7 +2177,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v747</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v748</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2247,7 +2247,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v747</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v748</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -32677,6 +32677,174 @@ function _iocEvCell(country) {
   return '<td class="num">' + getEvidenceBar(e) + '</td>';
 }
 
+// ── v748 (T6) — THE MECHANIC COLUMN NAMED A DOCUMENT TYPE, NOT A FISCAL MODEL ────────────
+// The Mechanic column is this platform's own answer to "what produced this number". On the
+// IOC Portfolio it is the only thing on the row that says what kind of fiscal regime the take,
+// NPV, IRR and breakeven were computed under — the country cell names a jurisdiction, the
+// Evidence cell (v653) grades the country's fact base, and neither names a model.
+//
+// IOC_DATA carries a `mechanic` string straight off the harvested contract record, and 95 of
+// its 1,772 rows (338 contracts) hold a value that is not one of the eight mechanics the DCF
+// engine models. Measured against the shipped IOC_DATA:
+//     Contract Amendment 45 · Service Contract 30 · Other 5 · Memorandum of Understanding 2 ·
+//     Exploration JV · Exploration / Production Right · Exploration Concession (Black Sea) ·
+//     Alaska State Lease · Working Area · Development Contract · Production Permit ·
+//     Model Contract · Official Registry · JV Refinery License · Gas Supply License ·
+//     Petroleum Agreement (PSA) · Environmental and Social
+// Every one of the 95 prints a full government take, contractor NPV, IRR and breakeven.
+// 94 operators hold at least one, and for 60 of them EVERY row is one — the whole table.
+// 9 of the 16 seeded "Quick:" brand buttons land on at least one, cold:
+//     Shell        Namibia / Contract Amendment 40.0%      · Philippines / Service Contract
+//                  · Nigeria / Other 57.6%
+//     Kosmos       Morocco / Memorandum of Understanding 27.5%
+//     Woodside     Senegal / Environmental and Social 53.0%
+//     ConocoPhillips  USA / Alaska State Lease 23.8% · Timor-Leste / Contract Amendment
+//     Repsol       Bolivia / Service Contract 100% · USA / Alaska State Lease
+//     Petronas     Malaysia + Thailand / Contract Amendment — 8 of its 28 contracts
+//     ExxonMobil   Tanzania / Contract Amendment 58.2%
+// A memorandum of understanding is not a contract and has no fiscal terms; "Environmental and
+// Social" is a document category. There is no MOU fiscal model and no Environmental-and-Social
+// fiscal model. The figures on those rows were resolved on the country's own mechanic —
+// Namibia's Concession, Senegal's PSC, Morocco's Concession — and the row never named it.
+// COUNTRY_DATA does not have this problem: its `mechanics` strings are combinations of the
+// eight modelled names only, so Fiscal Compare, Country Profile, Explorer, Screener and
+// Side-by-Side were all clean. This tab was the hole.
+//
+// The one signal that already existed was invisible by construction: getMechTagClass() returns
+// a bare "tag" for all 17 of these labels, with no colour and no tooltip, where every modelled
+// mechanic gets tag-concession / tag-psc / tag-tsc / tag-rsc / tag-buyback / tag-grosssplit.
+// Absence of a colour is indistinguishable from a styling gap.
+//
+// Nothing is recomputed, filtered, reordered or hidden. No take, NPV, IRR, breakeven, swing,
+// contract count, evidence grade or roll-up changes. Rows whose mechanic IS modelled render
+// byte-identically to v747, which is 1,677 of 1,772 rows and every row of 7 of the 16 brands.
+var _IOC_MODEL_MECH = ['Concession','PSC','TSC','PRRT','Revenue Share','RSC','Buy-back','Gross Split'];
+// A comma-joined list is what COUNTRY_DATA.mechanics holds ("Concession,PSC"), and the exposure
+// annex substitutes it on the rows where ORCA has no operator-level terms. Caught by the
+// verification sweep: without this, Kazakhstan and Trinidad and Tobago were reported as
+// instrument types on the Shell annex, which is a multi-mechanic jurisdiction, not a document.
+function _iocMechModelled(m) {
+  var x = String(m == null ? '' : m).trim();
+  if (!x) return false;
+  return x.split(',').every(function(part) { return _IOC_MODEL_MECH.indexOf(part.trim()) !== -1; });
+}
+// "Philippines’s" and "Netherlands’s" read as typos to the reader this tab is for.
+function _iocPoss(c) {
+  var x = String(c == null ? '' : c);
+  return /s$/i.test(x) ? x + '\u2019' : x + '\u2019s';
+}
+window._iocPoss = _iocPoss;
+// These four live inside initPlatform()'s closure, like every other helper on this tab. The
+// exposure annex and its two export controls sit OUTSIDE it, so they reach them through
+// window via the *Safe wrappers below, which fall back to "modelled" and render exactly as
+// v747 if the closure has not run yet.
+window._iocMechModelled = _iocMechModelled;
+// Which model the figures on the row were actually resolved on. resolveLiveDCFMechanic() is the
+// page's own resolver — the same one the Country Profile Evidence Chain partitions on (v742) —
+// and COUNTRY_DATA.mechanics is the fallback so this never returns a guess dressed as a fact.
+function _iocResolvedModel(country) {
+  var m = null;
+  try { if (typeof resolveLiveDCFMechanic === 'function') m = resolveLiveDCFMechanic(country); } catch (e) { m = null; }
+  if (_iocMechModelled(m)) return m;
+  var cd = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA)
+    ? COUNTRY_DATA.find(function(d) { return d.country === country; }) : null;
+  var first = cd && cd.mechanics ? String(cd.mechanics).split(',')[0].trim() : '';
+  return _iocMechModelled(first) ? first : null;
+}
+window._iocResolvedModel = _iocResolvedModel;
+// The Mechanic cell, used by both the group roll-up and the single-entity table so the two
+// cannot fork. Modelled mechanic in, current markup out.
+function _iocMechCell(r, hasR) {
+  var rTag = hasR ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">&#9670;</span>' : '';
+  if (_iocMechModelled(r.mechanic)) {
+    return '<td><span class="' + getMechTagClass(r.mechanic) + '">' + _iocEvEsc(r.mechanic) + '</span>' + rTag + '</td>';
+  }
+  var model = _iocResolvedModel(r.country);
+  var tip = '"' + r.mechanic + '" is the instrument type on the contract record, not a fiscal '
+    + 'mechanic. ORCA models eight — Concession, PSC, TSC, PRRT, Revenue Share, RSC, Buy-back, '
+    + 'Gross Split — and this is none of them, so no model of this name produced the take, NPV, '
+    + 'IRR or breakeven on this row. '
+    + (model
+        ? 'They were resolved on ' + _iocPoss(r.country) + ' ' + model + ' model, which is what the '
+          + 'Country Profile and Fiscal Compare run for ' + r.country + '.'
+        : 'ORCA cannot resolve which model ' + r.country + ' was run on, so treat the figures on '
+          + 'this row as unattributed.')
+    + ' Read the row as "' + r.n + ' contract' + (r.n === 1 ? '' : 's')
+    + ' filed under this instrument type in ' + r.country + '", not as a distinct fiscal regime, '
+    + 'and do not rank it against a Concession or PSC row as though it were one. Click the row '
+    + 'for ' + r.country + '’s profile and Evidence Chain.';
+  return '<td><span class="tag" style="border-color:rgba(194,65,12,.45);color:#C2410C;'
+    + 'background:rgba(194,65,12,.10);" title="' + _iocEvEsc(tip) + '">'
+    + _iocEvEsc(r.mechanic) + '</span>' + rTag
+    + '<div style="font-size:10px;line-height:1.4;color:#C2410C;margin-top:2px;font-weight:600;">'
+    + 'not a fiscal mechanic'
+    + (model ? ' &middot; <span style="color:var(--muted);font-weight:400;">figures on '
+        + _iocEvEsc(_iocPoss(r.country)) + ' ' + _iocEvEsc(model) + ' model</span>'
+             : ' &middot; <span style="color:var(--muted);font-weight:400;">model unresolved</span>')
+    + '</div></td>';
+}
+// The roll-up. An analyst reading a 55-row table should not have to scan it to find out that
+// some of the rows are not regimes.
+function _iocInstrumentMix(rows) {
+  var out = { rows: 0, contracts: 0, kinds: {}, countries: [] };
+  (rows || []).forEach(function(r) {
+    if (_iocMechModelled(r.mechanic)) return;
+    out.rows++; out.contracts += (r.n || 0);
+    out.kinds[r.mechanic] = (out.kinds[r.mechanic] || 0) + (r.n || 0);
+    out.countries.push(r.country + ' (' + r.mechanic + ')');
+  });
+  return out;
+}
+function _iocInstrumentStat(rows, totalContracts) {
+  var m = _iocInstrumentMix(rows);
+  if (!m.rows) return '';
+  var pct = totalContracts > 0 ? m.contracts / totalContracts * 100 : 0;
+  var val = pct >= 1 ? Math.round(pct) + '%' : m.rows + (m.rows === 1 ? ' row' : ' rows');
+  var tip = m.rows + ' of ' + (rows || []).length + ' rows in this table ('
+    + m.contracts.toLocaleString() + ' of ' + Number(totalContracts).toLocaleString()
+    + ' contracts) carry an instrument type where the Mechanic column should carry a fiscal '
+    + 'mechanic: ' + m.countries.join('; ') + '. ORCA models eight mechanics and none of these '
+    + 'is one of them, so the take, NPV, IRR and breakeven on those rows were resolved on the '
+    + 'country’s own model, named under each label. They are contracts ORCA holds, not '
+    + 'regimes it prices — do not rank them against the Concession and PSC rows as though the '
+    + 'label described the terms.';
+  return '<div class="ioc-stat" title="' + _iocEvEsc(tip) + '"><div class="sv" style="color:#C2410C;">'
+    + val + '</div><div class="sk">Instrument-type rows</div></div>';
+}
+// Mechanic Mix, computed over the rows that actually name a mechanic. Before this the mix
+// counted the instrument types as though they were mechanics, so a Petronas search read
+// "Contract Amendment 29%" beside "PSC 43%", and each of the 60 operators whose every row is
+// an instrument type got a mix built entirely out of document categories.
+function _iocMechMixHtml(rows, totalContracts) {
+  var per = {}, modelledN = 0;
+  (rows || []).forEach(function(r) {
+    if (!_iocMechModelled(r.mechanic)) return;
+    modelledN += (r.n || 0);
+    per[r.mechanic] = (per[r.mechanic] || 0) + (r.n || 0);
+  });
+  var m = _iocInstrumentMix(rows);
+  if (!modelledN) {
+    return '<span style="color:#C2410C;" title="' + _iocEvEsc('Every row in this table carries an '
+      + 'instrument type rather than a fiscal mechanic (' + Object.keys(m.kinds).join(', ')
+      + '), so there is no mechanic mix to report. The take and NPV figures were resolved on each '
+      + 'country’s own model — named under each label in the Mechanic column.')
+      + '">no fiscal mechanic on record</span>';
+  }
+  var mix = Object.keys(per).sort(function(a, b) { return per[b] - per[a]; })
+    .filter(function(k) { return Math.round(per[k] / modelledN * 100) >= 1; })
+    .map(function(k) { return k + ' ' + Math.round(per[k] / modelledN * 100) + '%'; })
+    .join(' &middot; ');
+  if (m.contracts) {
+    mix += ' <span style="color:#C2410C;" title="' + _iocEvEsc(m.contracts.toLocaleString()
+      + ' further contracts on ' + m.rows + ' row' + (m.rows === 1 ? '' : 's')
+      + ' carry an instrument type, not a mechanic (' + Object.keys(m.kinds).join(', ')
+      + '), and are excluded from the percentages beside this — a document category is not a share '
+      + 'of a mechanic mix. They are still in the contract count, the weighted take and the table.')
+      + '">+ ' + m.contracts.toLocaleString() + ' non-mechanic</span>';
+  }
+  return mix || '&mdash;';
+}
+
 window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
   // v615 (T2): "Example loaded: Shell" survived every later operator load — same defect as CP.
   if (!window._iocSeeding) {
@@ -32714,15 +32882,16 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
   const rfPctAgg = totalContracts > 0 ? Math.round(rfContractsAgg / totalContracts * 100) : 0;
   statsDiv.style.display='flex';
   // v231: mechanic mix breakdown for aggregate view
-  const mechContractsAgg = {};
-  rows.forEach(r => { mechContractsAgg[r.mechanic] = (mechContractsAgg[r.mechanic]||0) + r.n; });
-  const mechMixStrAgg = totalContracts > 0 ? Object.entries(mechContractsAgg).sort((a,b)=>b[1]-a[1]).filter(([m,n])=>Math.round(n/totalContracts*100)>=1).map(([m,n])=>`${m} ${Math.round(n/totalContracts*100)}%`).join(' &middot; ') : '—';
+  // v748 (T6): the mix is now computed over the rows that name a mechanic, and the
+  // instrument-type contracts are reported beside it instead of inside it.
+  const mechMixStrAgg = totalContracts > 0 ? _iocMechMixHtml(rows, totalContracts) : '—';
   statsDiv.innerHTML = `
     <div class="ioc-stat"><div class="sv">${totalContracts}</div><div class="sk">Contracts</div></div>
     <div class="ioc-stat"><div class="sv">${countries.length}</div><div class="sk">Countries</div></div>
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStrAgg}</div><div class="sk">Mechanic Mix</div></div>
     <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75</div></div>
     ${_iocEvidenceStat(rows, totalContracts)}
+    ${_iocInstrumentStat(rows, totalContracts)}
     ${rfPctAgg > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — higher govt take at high oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPctAgg}%</div><div class="sk">R-factor PSC</div></div>` : ''}
     <div class="ioc-stat" style="flex:1;min-width:200px;text-align:left;">
       <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">COUNTRIES</div>
@@ -32746,7 +32915,7 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
         : '';
       return `<tr style="cursor:pointer;" onclick="openCountryProfileFromFC('${cEsc}')" title="Click to open ${r.country} profile">
       <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTagAgg}</td>
-      <td><span class="${getMechTagClass(r.mechanic)}">${r.mechanic}</span>${_hasR?' <span style="font-size:10px;color:var(--purple);font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>':''}</td>
+      ${_iocMechCell(r, _hasR)}
       <td class="num">${r.n}</td>
       <td class="num">${fmtTake(r.take_75)}</td>
       ${_iocEvCell(r.country)}
@@ -32853,15 +33022,15 @@ window.loadIOC = function(operator) {
 
   statsDiv.style.display='flex';
   // v231: mechanic mix breakdown — % of contracts per mechanic type (replaces meaningless count)
-  const mechContracts = {};
-  rows.forEach(r => { mechContracts[r.mechanic] = (mechContracts[r.mechanic]||0) + r.n; });
-  const mechMixStr = Object.entries(mechContracts).sort((a,b)=>b[1]-a[1]).filter(([m,n])=>Math.round(n/totalContracts*100)>=1).map(([m,n])=>`${m} ${Math.round(n/totalContracts*100)}%`).join(' &middot; ');
+  // v748 (T6): see _iocMechMixHtml — a document category is not a share of a mechanic mix.
+  const mechMixStr = _iocMechMixHtml(rows, totalContracts);
   statsDiv.innerHTML = `
     <div class="ioc-stat"><div class="sv">${totalContracts}</div><div class="sk">Contracts</div></div>
     <div class="ioc-stat"><div class="sv">${countries.length}</div><div class="sk">Countries</div></div>
     <div class="ioc-stat" style="flex:1.5;" title="Share of contracts by fiscal mechanic type — high concentration in one mechanic (e.g. >60% PSC) signals correlated renegotiation risk. See FAQ A134."><div class="sv" style="font-size:12px;font-weight:700;">${mechMixStr}</div><div class="sk">Mechanic Mix</div></div>
     <div class="ioc-stat"><div class="sv">${wtAvgTake!==null?wtAvgTake.toFixed(1)+'%':'—'}</div><div class="sk">Wtd Avg Take @$75</div></div>
     ${_iocEvidenceStat(rows, totalContracts)}
+    ${_iocInstrumentStat(rows, totalContracts)}
     ${rfPct > 0 ? `<div class="ioc-stat" title="Percentage of contracts in R-factor PSC countries — these positions have higher govt take at higher oil prices"><div class="sv" style="color:var(--purple);">&#9670; ${rfPct}%</div><div class="sk">R-factor PSC</div></div>` : ''}
     <div class="ioc-stat" style="flex:1;min-width:200px;text-align:left;">
       <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">COUNTRIES</div>
@@ -32888,7 +33057,7 @@ window.loadIOC = function(operator) {
         : '';
       return `<tr style="cursor:pointer;" onclick="openCountryProfileFromFC('${cEsc}')" title="Click to open ${r.country} profile">
       <td><strong>${r.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${_iocReformTag}</td>
-      <td><span class="${getMechTagClass(r.mechanic)}">${r.mechanic}</span>${_hasR2?' <span style="font-size:10px;color:var(--purple);font-weight:700;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>':''}</td>
+      ${_iocMechCell(r, _hasR2)}
       <td class="num">${r.n}</td>
       <td class="num">${fmtTake(r.take_75)}</td>
       ${_iocEvCell(r.country)}
@@ -38918,6 +39087,14 @@ function initIOCExposureControls() {
   quick.innerHTML = topIOCs.map(op => `<button data-exposure-op="${op.replace(/"/g,'&quot;')}" onclick="(function(){document.getElementById('exposure-ioc-select').value='${op.replace(/'/g,"\\'")}';renderIOCExposure('${op.replace(/'/g,"\\'")}');document.querySelectorAll('[data-exposure-op]').forEach(function(b){b.style.background='transparent';b.style.color='var(--muted)';b.style.borderColor='var(--border)';});var self=document.querySelector('[data-exposure-op=\\'${op.replace(/'/g,"\\'").replace(/"/g,"&quot;")}\\']');if(self){self.style.background='rgba(176,104,0,.1)';self.style.color='var(--accent)';self.style.borderColor='rgba(176,104,0,.4)';}})();" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:4px 10px;font-size:11px;cursor:pointer;transition:.12s;">${op}</button>`).join('');
 }
 
+// v748 (T6): see the window exports in the IOC helper block. Additive by construction — if the
+// closure has not run, these report "modelled" and the annex renders exactly as v747 did.
+function _iocMechModelledSafe(m) {
+  return (typeof window._iocMechModelled === 'function') ? window._iocMechModelled(m) : true;
+}
+function _iocResolvedModelSafe(c) {
+  return (typeof window._iocResolvedModel === 'function') ? window._iocResolvedModel(c) : null;
+}
 function renderIOCExposure(operatorName) {
   const output = document.getElementById('ioc-exposure-output');
   if (!operatorName || !output) return;
@@ -39198,7 +39375,7 @@ function renderIOCExposure(operatorName) {
           return `<tr title="${why.replace(/"/g,'&quot;')}">
           <td style="padding:5px 8px;font-size:12px;"><button onclick="(function(){var ddSel=document.getElementById('dd-country-select');if(ddSel)ddSel.value='${d.country.replace(/'/g,"\\'")}';loadCountryProfile('${d.country.replace(/'/g,"\\'")}');var cpBtn=[].slice.call(document.querySelectorAll('.tab-btn')).find(function(b){return b.textContent.indexOf('Country Profile')>=0;});if(cpBtn)switchTab('t7',cpBtn);})()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${d.country}</button>${isCtry ? `<span class="ioc-basis-ctry" title="${why.replace(/"/g,'&quot;')}">country avg</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.region}</td>
-          <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}${(!isCtry && d.mechanicCount > 1) ? `<span class="ioc-mech-more" style="margin-left:4px;font-size:10px;color:var(--accent);" title="${operatorName} holds contracts under ${d.mechanicCount} different fiscal mechanics in ${d.country}. ${d.mechanic} carries the most contracts; the take and NPV on this row are weighted by contract count across all ${d.mechanicCount}, so they are not the ${d.mechanic} terms on their own.">+${d.mechanicCount-1}</span>` : ''}</td>
+          <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}${_iocMechModelledSafe(d.mechanic) ? '' : `<div style="font-size:10px;line-height:1.4;color:#C2410C;font-weight:600;" title="${(('"'+d.mechanic+'" is the instrument type on the contract record, not one of the eight fiscal mechanics ORCA models, so no model of that name produced the take or NPV on this row. ') + (_iocResolvedModelSafe(d.country) ? ('They were resolved on ' + window._iocPoss(d.country) + ' ' + _iocResolvedModelSafe(d.country) + ' model.') : ('ORCA cannot resolve which model ' + d.country + ' was run on.'))).replace(/"/g,'&quot;')}">not a fiscal mechanic${_iocResolvedModelSafe(d.country) ? ` \u00b7 <span style="color:var(--muted);font-weight:400;">on ${_iocResolvedModelSafe(d.country)}</span>` : ''}</div>`}${(!isCtry && d.mechanicCount > 1) ? `<span class="ioc-mech-more" style="margin-left:4px;font-size:10px;color:var(--accent);" title="${operatorName} holds contracts under ${d.mechanicCount} different fiscal mechanics in ${d.country}. ${d.mechanic} carries the most contracts; the take and NPV on this row are weighted by contract count across all ${d.mechanicCount}, so they are not the ${d.mechanic} terms on their own.">+${d.mechanicCount-1}</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;">${(function(){var _e=(COUNTRY_DATA||[]).find(function(c){return c.country===d.country;});return _e?getEvidenceBar(_e):'<span style="font-size:10px;color:var(--muted);" title="ORCA holds no country fiscal record for '+d.country+', so there is no evidence grade for this row.">no record</span>';})()}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};${isCtry?'opacity:.85;':''}">${_iocNpvFmt(d.npv75)}</td>
@@ -39261,6 +39438,21 @@ function _iocExpRows() {
       Country: d.country,
       Region: d.region,
       Mechanic: d.mechanic,
+      // v748 (T6): the on-screen marker, carried into the sheet and the clipboard. 95 of the
+      // 1,772 IOC rows name an instrument type rather than a fiscal mechanic, and an IC reader
+      // holding only the export cannot tell that "Memorandum of Understanding" is not a regime.
+      'Mechanic basis': _iocMechModelledSafe(d.mechanic)
+        ? 'fiscal mechanic modelled by ORCA'
+        : 'NOT A FISCAL MECHANIC — "' + d.mechanic + '" is the instrument type on the contract '
+          + 'record. ORCA models eight mechanics (Concession, PSC, TSC, PRRT, Revenue Share, RSC, '
+          + 'Buy-back, Gross Split) and this is none of them, so no model of that name produced '
+          + 'the take or NPV on this row. '
+          + (_iocResolvedModelSafe(d.country)
+              ? 'They were resolved on ' + window._iocPoss(d.country) + ' ' + _iocResolvedModelSafe(d.country)
+                + ' model. Do not rank this row against a Concession or PSC row as though the '
+                + 'label described its terms.'
+              : 'ORCA cannot resolve which model ' + d.country + ' was run on — treat the '
+                + 'figures on this row as unattributed.'),
       'Govt Take @$75 (%)': d.take75 != null ? +d.take75.toFixed(1) : null,
       'Contractor NPV @$75 ($M)': d.npv75 != null ? Math.round(d.npv75) : null,
       Contracts: d.n != null ? d.n : null,
@@ -39344,6 +39536,24 @@ function _iocExpBasisLines() {
     L.push('No row falls back to a country average.');
   }
   L.push('');
+  // v748 (T6): the Mechanic column is the sheet's only statement of what model produced each
+  // figure. 95 of the 1,772 IOC rows name a document type instead, so an IC reader holding only
+  // the workbook has to be told which of these rows is not a regime.
+  L.push('THE MECHANIC COLUMN');
+  (function() {
+    var inst = rows.filter(function(r) { return /^NOT A FISCAL MECHANIC/.test(r['Mechanic basis']); });
+    L.push('ORCA models eight fiscal mechanics: Concession, PSC, TSC, PRRT, Revenue Share, RSC, '
+      + 'Buy-back, Gross Split. The Mechanic column reproduces the instrument label on the contract '
+      + 'record, which is not always one of them.');
+    L.push(inst.length
+      ? inst.length + ' of ' + rows.length + ' rows carry an instrument type rather than a mechanic: '
+        + inst.map(function(r){ return r.Country + ' (' + r.Mechanic + ')'; }).join('; ')
+        + '. No model of those names exists, so the take and NPV on them were resolved on the '
+        + 'country\u2019s own mechanic \u2014 named per row in the "Mechanic basis" column. Do not rank '
+        + 'them against the Concession and PSC rows as though the label described their terms.'
+      : 'Every row in this annex names one of the eight. No row carries an instrument type.');
+  })();
+  L.push('');
   L.push('EVIDENCE');
   (function() {
     var weak = rows.filter(function(r) { return r['Evidence grade'] === 'C' || r['Evidence grade'] === 'D'; });
@@ -39421,6 +39631,16 @@ function copyIOCPortfolio() {
         : '. ')
     + 'Contractor NPV is on the standardized Deepwater profile ($1.2B capex, 50k bbl/d, $15/bbl opex, 10% WACC, 100% WI) — scale by your working interest. '
     + 'IRR and breakeven are not reported at this level: the underlying country figures are arithmetic means of per-contract values, not project returns.';
+  // v748 (T6): the instrument-type rows named in the artifact, not only on screen.
+  var _instRows = rows.filter(function(r){ return /^NOT A FISCAL MECHANIC/.test(r['Mechanic basis']); });
+  if (_instRows.length) {
+    assump += ' ' + _instRows.length + ' row(s) — '
+      + _instRows.map(function(r){ return r.Country + ' (' + r.Mechanic + ')'; }).join(', ')
+      + ' — carry an instrument type in the Mechanic column rather than a fiscal mechanic. ORCA '
+      + 'models eight mechanics and none of these is one of them, so the take and NPV on those '
+      + 'rows were resolved on the country\u2019s own model; the Mechanic basis column names it. '
+      + 'They are contracts ORCA holds, not regimes it prices.';
+  }
   var feeRows = rows.filter(function(r){ return /^NOT rankable/.test(r['Take comparability']); });
   if (feeRows.length) {
     assump += ' ' + feeRows.length + ' row(s) — ' + feeRows.map(function(r){ return r.Country; }).join(', ')
@@ -39430,7 +39650,7 @@ function copyIOCPortfolio() {
               + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '')
               + ' — yoburgqs.github.io/petroleum-fiscal-db/';
 
-  var cols = ['Country','Region','Mechanic','Govt Take @$75 (%)','Contractor NPV @$75 ($M)','Contracts','Evidence grade','Evidence basis','Take basis','Take comparability'];
+  var cols = ['Country','Region','Mechanic','Mechanic basis','Govt Take @$75 (%)','Contractor NPV @$75 ($M)','Contracts','Evidence grade','Evidence basis','Take basis','Take comparability'];
   var matrix = [cols].concat(rows.map(function(r){
     return cols.map(function(c){
       var v = r[c];
