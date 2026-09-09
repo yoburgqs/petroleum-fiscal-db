@@ -40580,3 +40580,132 @@ different cohorts.
 
 ## Friction
 The Screener ranks by contractor NPV descending. NPV is monotone *decreasing* in government take, so "ranked by NPV" is "ranked by lowest t
+
+---
+## Cycle 648 Log — 2026-09-09 10:34
+- Test before: 294 PASS / 0 FAIL / 0 WARN / 0 JS errors
+- Test after: **297 PASS / 0 FAIL / 0 WARN / 0 JS errors** — suite RUN this cycle against the
+  local tree, served under the deployed `/petroleum-fiscal-db/` path prefix so the service-worker
+  registration resolves. +3 is exactly the three assertions added below; no pre-existing test
+  changed its result. Report read back from the suite's own file.
+- Pixel gate: PASS — no surface worse than baseline.
+- Shipped as **v742**, committed `cb29e74`, mirrored, pushed.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?"
+Rotation: 641 T1 · 642 T6 · 643 T3 · 644 T4 · 645 T5 · 646 T2 · 647 T1 → T6 was stalest.
+Walked cold at 1440×900 and 390×844 with touch, storage cleared before every load: Home →
+Country Profile → country → headline take → Evidence Quality panel → term-by-term Evidence Chain.
+
+## Friction
+`renderSourcedFacts()` walks a fixed eight-row `rowDefs` list and renders every key
+`api/v1/country/{slug}.json` happens to hold — whether or not this country's resolved mechanic
+reads it. Every count and every imperative under the table is then computed over that
+undifferentiated set.
+
+Measured against the page's own `resolveLiveDCFMechanic()` and `getDCFParams()`, all 185 profiles:
+
+| | |
+|---|---|
+| countries rendering ≥1 row the live model never reads | **53 of 185** |
+| such rows in total | **79** |
+| of those, carrying NO SOURCE (drives the IC-memo imperative) | **32** |
+| of those, diverging from their cited statute (drives the orange headline) | **6** |
+
+**Iraq** is the sharpest. Resolved mechanic **TSC**; the model runs three terms — `fee_per_bbl`,
+`ept_rate`, `cit_rate`. The Evidence Chain rendered five held rows and **four of them are read by
+nothing**: Royalty Rate, Cost Recovery Cap, Profit Oil (Govt), State Participation. The page then
+told the analyst, in bold, *"Establish these from Iraq's own petroleum act before an IC memo"* —
+naming royalty, cost recovery and profit oil, three numbers that cannot move the take, NPV or IRR
+printed above them. The one correct instruction ("ORCA has a sourced value for 1 of the 3 fiscal
+terms its TSC model needs") was the *third* paragraph, under two louder ones about non-inputs.
+
+**Nigeria** (resolved Concession, headline 81.1%) printed FTP Rate, Cost Recovery Cap and Profit
+Oil (Govt) the same way; its loudest note named Profit Oil first, and the divergence headline read
+"3 of 4" where one of the three was Cost Recovery Cap — not an input.
+
+v625 fixed the *missing* direction: a term the model runs that the fact base does not hold now
+gets a NOT HELD row. The *surplus* direction had never been handled. An analyst who came here to
+ask where a number came from was reading a table in which up to four fifths of the rows are
+provenance for something else, with the alarms concentrated on exactly those rows.
+
+## Change
+- **The table is partitioned.** Terms the live model reads stay in the table proper. Terms it does
+  not read move below a full-width divider row reading `NOT READ BY THE <MECHANIC> MODEL · ON
+  RECORD FOR <COUNTRY>, NO EFFECT ON THE TAKE, NPV OR IRR ABOVE`, and render at 60% opacity in the
+  same table. Nothing is deleted — they are real contract records, just provenance for something
+  other than the figure on the page.
+- **Counters are scoped by snapshot-and-rollback.** Every counter and label list is snapshotted at
+  the top of each row and restored if the row turns out to be off-model: `sourcedCount`,
+  `divergentCount`, `unsourcedCount`, `bulkCount`, `sharedCount`, `citedLinkCount`,
+  `deadLinkCount`, their six label arrays, `modelConflicts` and `_termsCited`. Rollback rather
+  than per-branch gating, because the increments are spread across six branches and one missed
+  increment would silently corrupt a denominator.
+- **The verdict, the denominator and both IC-memo imperatives now say what they cover** — "3 of
+  the 4 rows the Concession model reads are independently sourced", "2 of 3 independently sourced
+  parameters the model reads differ from the statutory rate".
+- **A new note names the rows below the divider**, states that changing them moves nothing, names
+  which of them carry the absences that used to drive the imperative, and pointedly does *not*
+  repeat the imperative.
+- **The XLSX carries it too.** `Fiscal Terms & Sources` gains a `Read by model` column, a legend
+  paragraph, a per-row `NOT AN INPUT` note and a scoped SUMMARY line, so the distinction does not
+  un-scope the moment the workbook leaves the tool. (Directive "finished" criterion 5.)
+- Safe by construction: where the mechanic or params cannot be resolved, `_readsRow()` returns
+  true and the table is byte-identical to v741. 132 of 185 countries are unchanged.
+
+## Result
+An analyst asking where **Iraq's** take comes from now reads **three rows instead of seven**, and
+the three are the ones the number is built from — Income Tax Rate (cited, A-tier, link dead),
+Service Fee (NOT HELD, $6.00/bbl engine override) and Excess Petroleum Tax (NOT HELD, 0%). The
+work the page asks of them before an IC memo is now work that changes the figure. Royalty 10%,
+cost recovery 40% and profit oil 35% are still on screen, below the divider, correctly labelled as
+supporting nothing.
+
+On **Nigeria** the divergence headline moves from "3 of 4" to "2 of 3" and both remaining rows are
+real inputs; FTP, cost recovery and profit oil drop out of a verdict they were never part of. On
+**Norway** the denominator moves 5 → 4 and the unsourced imperative now names only State
+Participation, which the Concession model does read.
+
+## Verification
+- JS syntax gate **PASS**.
+- Runtime suite **RUN this cycle**: 297 PASS / 0 FAIL / 0 WARN / 0 JS errors.
+- Pixel gate **PASS** — no surface worse than baseline.
+- Cold sweep of all 185 profiles: 53 partitioned (matching the pre-change measurement exactly),
+  **zero** countries left with no on-model rows, zero divider mismatches, zero `undefined`/`NaN`
+  token leaks, zero page errors.
+- Mobile 390×844 `hasTouch` across Iraq, Nigeria, Brazil, Mexico, Austria, Guyana, Norway:
+  `scrollWidth` 390 = `clientWidth` 390 on all seven; **zero** touched elements under 24px.
+- Iraq XLSX exported, opened and parsed with openpyxl — 4 sheets, new column present and correct.
+
+## Test change, stated explicitly
+`runtime_comprehensive.js` pinned the `CountryProfile / verdict carries denominator` assertion to
+the literal string `3 of the 5 rows above are independently sourced; 2 are not sourced at all`.
+Norway's Concession model does not read Cost Recovery Cap, so that row now sits below the divider
+and the denominator is correctly **4, not 5** — the test failed on the change it was supposed to
+allow. The assertion now tests the *property* v601 existed to guarantee (a numerator **and** a
+denominator are present), and three new assertions were added covering the partition itself:
+`off-model rows partitioned`, `verdict scoped to model terms`, `off-model rows named`.
+
+## Still open (carried forward)
+Everything carried into cycle 647 that this walk did not touch remains open — the two on-screen
+columns both headed `Stability` (FC 0-5 diamonds vs Explorer 0-100 composite), the FC Stability `!`
+marker firing on 19 of 20 scored rows, the Side-by-Side paste not marked as the demo set, the
+Screener XLSX filename not encoding the shortlist size, the Scenario Builder header sentence naming
+the profile *as loaded*, Country Profile's two NPV cohort ranks never stated as different cohorts,
+`Fiscal_Predictability` scoring Vanuatu 100/100 off a zero spread, the floor-take inversion still
+live and unpartitioned on Explorer Browse and the Bubble Chart, and `getDCFParams()` enriching from
+`COUNTRY_DATA` only for the PSC family (which is why FC and Country Profile disagree about Canada).
+
+**Surfaced by this walk, not fixed:**
+1. The **Fiscal Compare drawer chip** (`_fcTermLeg`) counts model terms correctly — it was the
+   surface that proved the mismatch — but the FC drawer itself still shows no partition. It links
+   out to the Country Profile chain, which is now correct, so the defect is one click removed
+   rather than present; still, an analyst who works only the ranked table never sees the divider.
+2. `_MODEL_KEY` covers eight labels. `Service Fee`, `Excess Petroleum Tax`, `PRRT Rate`, `Windfall
+   Levy`, `Severance Tax` and `Capex Remuneration Rate` reach the table only through v625's NOT
+   HELD path, never as held rows, because `rowDefs` has no fiscal_facts key for them. If a harvest
+   ever lands `fee_per_bbl` as a fact, it will render with no row definition at all.
+3. Iraq's take rests materially on a **hard-coded $6.00/bbl engine override** with no value on
+   record. The chain now says so plainly and it is the first thing a T6 walk hits. Whether a
+   fee-basis TSC take built on an uncited override should be published alongside Group 1 regimes
+   at all is a domain question, not a UX one — flagged for Zach, not actioned.
