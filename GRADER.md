@@ -40332,3 +40332,16 @@ Portfolio; the three state monopolies carrying `be_75 = 1.0` rather than null (v
 reaching the IC paste, but the stored figure is still 1.0); no evidence badge anywhere being
 clickable while `STABILITY` beside it is; the `cp-terms-chip` and Evidence Chain counting different
 things in the same words.
+
+---
+## Cycle 645 Log — 2026-09-09 07:30
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 645 complete — shipped as **v739**, pushed, mirrored.
+
+## Task
+**T5** — "Give me something I can paste straight into an IC memo." Stalest by rotation (641 T1 · 642 T6 · 643 T3 · 644 T4; T5 last ran at cycle 543). Walked cold at 1440×900 and 390×844 with touch, storage cleared.
+
+## Friction
+Home tells a first-time analyst that Country Profile "auto-loads Indonesia on first visit," so that's where the cold walk lands. The footer of the 4-price sensitivity table states the platform's own rule
