@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v744</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v745</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -222,6 +222,11 @@ table { width: 100%; border-collapse: collapse; }
      else on this table. On a mouse it stays on the 15px line so 185 rows do not grow. */
   #tbl-screener .sc-terms-chip { min-height: 24px; }
 }
+/* v745 (T5): the "+N" mechanic marker added to the IOC exposure table carries its explanation in a
+   title, so under a thumb — where there is no hover — it is treated as a control and takes the
+   directive's 24px floor rather than staying a 12px caption. Same call v730 made for
+   .sc-terms-chip. On a mouse it stays on the 12px line so the 33 rows do not grow. */
+@media (pointer: coarse) { .ioc-mech-more { display: inline-block; min-height: 24px; line-height: 24px; } }
 /* v739 (T5): the Country Profile "Copy as IC table" button is a control this cycle touched, so it
    takes the directive's 24px floor under a thumb. It measures 23px on a mouse and is left there —
    the desktop row it sits in is unchanged. */
@@ -2072,7 +2077,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v744</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v745</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2142,7 +2147,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v744</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v745</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -38756,8 +38761,58 @@ function renderIOCExposure(operatorName) {
   if (!operatorName || !output) return;
   output.style.display = 'block';
 
-  // Get operator data from IOC_DATA
-  const opData = (IOC_DATA || []).filter(d => d.operator === operatorName);
+  // ── v745 (T5) — the exposure annex was built on ONE legal entity ────────────────────
+  // `opData` was an exact operator-string match. That is the defect the comment above
+  // _iocBrandEntities describes and that every OTHER brand entry point on this tab was
+  // routed through that function to fix — the cold seed, the empty-state benchmarks, the
+  // 16 "Quick:" buttons, Enter in the search box. This function was missed, and it is the
+  // one that feeds "Copy for IC Memo" and "XLSX": the artifact that actually reaches the
+  // memo. Measured against IOC_DATA on the deployed tree:
+  //     Chevron        12 contracts /  5 countries @ 57.2%   group: 740 / 16 @ 32.7%  (24.5pp)
+  //     ConocoPhillips 22 /  4 @ 28.9%                       group: 164 /  9 @ 56.7%  (27.8pp)
+  //     Equinor        22 /  7 @ 39.1%                       group: 956 / 11 @ 60.4%  (21.3pp)
+  //     Woodside        2 /  1 @ 55.2%                       group: 309 /  8 @ 36.2%  (19.0pp)
+  //     Shell         112 / 14 @ 39.0%                       group:1036 / 31 @ 40.0%
+  //     Kosmos Energy   0 /  0                               group:  60 /  8 @ 35.9%
+  //     Harbour Energy  0 /  0                               group: 105 /  2 @ 55.6%
+  // Two consequences, both of which travelled into the clipboard. The annex omitted up to
+  // 99% of the group's contracts; and the countries it could not match were refilled from
+  // COUNTRY_DATA and labelled "the country average, not X — ORCA holds no operator-level
+  // terms there", which is false wherever ORCA holds the group's terms under a subsidiary
+  // name (Shell Offshore Inc., SPDC, A/S Norske Shell, Statoil Petroleum AS ...). The v639
+  // heading read that fallback back as fact: "Kosmos Energy — none of them is Kosmos Energy"
+  // on an operator ORCA holds 60 contracts for.
+  // Resolution is now the tab's own: group when the brand resolves to more than one entity,
+  // exact when the dropdown names a single legal entity. Rows are deduplicated by
+  // country|mechanic keeping the highest n — loadIOCAggregated's convention, not a new one,
+  // because summing entities double-counts a rename (Statoil Petroleum AS / Equinor Energy
+  // AS are the same company either side of 2018). Mechanics within a country are then
+  // collapsed contract-weighted, so this section counts what the headline counts.
+  const _expGrp   = (typeof _iocBrandEntities === 'function') ? _iocBrandEntities(operatorName) : { entities: [] };
+  const _expEnts  = (_expGrp.entities && _expGrp.entities.length > 1) ? _expGrp.entities : [operatorName];
+  const _expGroup = _expEnts.length > 1;
+  const _expSeen = {}, _expDed = [];
+  (IOC_DATA || []).filter(d => _expEnts.indexOf(d.operator) !== -1)
+    .slice().sort((a,b) => b.n - a.n)
+    .forEach(r => { const k = r.country + '|' + r.mechanic; if (!_expSeen[k]) { _expSeen[k] = r; _expDed.push(r); } });
+  const _expByCtry = {};
+  _expDed.forEach(r => {
+    const e = _expByCtry[r.country] || (_expByCtry[r.country] = { n:0, tw:0, tn:0, vw:0, vn:0, mech:{}, ents:{} });
+    e.n += r.n;
+    if (r.take_75 != null) { e.tw += r.take_75 * r.n; e.tn += r.n; }
+    if (r.npv_75  != null) { e.vw += r.npv_75  * r.n; e.vn += r.n; }
+    e.mech[r.mechanic] = (e.mech[r.mechanic] || 0) + r.n;
+    e.ents[r.operator] = true;
+  });
+  const opData = Object.keys(_expByCtry).map(c => {
+    const e = _expByCtry[c];
+    const mechs = Object.keys(e.mech).sort((a,b) => e.mech[b] - e.mech[a]);
+    return { country: c,
+             take_75: e.tn ? e.tw / e.tn : null,
+             npv_75:  e.vn ? e.vw / e.vn : null,
+             n: e.n, mechanic: mechs[0] || '—',
+             mechanicCount: mechs.length, entityCount: Object.keys(e.ents).length };
+  });
 
   // Also try IOC_PRESENCE for country list
   const presenceCountries = (IOC_PRESENCE || {})[operatorName] || [];
@@ -38773,6 +38828,8 @@ function renderIOCExposure(operatorName) {
       npv75: iocEntry ? iocEntry.npv_75 : cdEntry ? cdEntry.npv_75 : null,
       n: iocEntry ? iocEntry.n : cdEntry ? cdEntry.n : null,
       mechanic: iocEntry ? iocEntry.mechanic : cdEntry ? cdEntry.mechanics : '\u2014',
+      mechanicCount: iocEntry ? iocEntry.mechanicCount : 1,
+      entityCount: iocEntry ? iocEntry.entityCount : 0,
       region: cdEntry ? cdEntry.region : '\u2014',
       source: iocEntry ? 'IOC_DATA' : 'COUNTRY_DATA'
     };
@@ -38833,6 +38890,14 @@ function renderIOCExposure(operatorName) {
   const total = portfolio.length;
 
   const avgTake = portfolio.reduce((s,d)=>s+d.take75,0)/total;
+  // v745 (T5): the contract-weighted take over the operator's OWN rows — the same quantity,
+  // over the same rows, as the "Wtd Avg Take @$75" tile at the top of this tab. Before the
+  // group fix above the two could not be reconciled at all because they were computed over
+  // different operator sets; printing it here lets the analyst see that the gap that remains
+  // is the weighting and nothing else.
+  const _expOwn   = portfolio.filter(d => d.source === 'IOC_DATA' && d.n);
+  const _expOwnN  = _expOwn.reduce((s,d)=>s+d.n,0);
+  const wtdTake   = _expOwnN ? _expOwn.reduce((s,d)=>s+d.take75*d.n,0)/_expOwnN : null;
   const avgNPV = portfolio.filter(d=>d.npv75!=null).reduce((s,d,_,a)=>s+d.npv75/a.length,0);
   const sorted = [...portfolio].sort((a,b)=>a.take75-b.take75);
   const medianTake = sorted[Math.floor(total/2)].take75;
@@ -38884,6 +38949,11 @@ function renderIOCExposure(operatorName) {
         <div style="font-size:22px;font-weight:700;color:${avgNPV>0?'#15803D':'#B91C1C'};">$${Math.round(avgNPV)}M</div>
         <div style="font-size:10px;color:var(--muted);text-transform:uppercase;">Avg NPV @$75</div>
       </div>
+      ${wtdTake!==null ? `<div style="grid-column:1/-1;background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:10px;text-align:center;" title="Weighted by contract count over the ${nFromOp} countries where ORCA holds ${operatorName}'s own terms (${_expOwnN.toLocaleString()} contracts). This is the same quantity as the 'Wtd Avg Take @$75' figure at the top of this tab and should read the same. The unweighted figure above differs from it only by the weighting${nFromCtry ? ' and by the ' + nFromCtry + ' country-average rows, which are excluded here' : ''} — not by a different set of contracts.">
+        <div style="font-size:22px;font-weight:700;color:${takeColor(wtdTake)};">${wtdTake.toFixed(1)}%</div>
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;">Contract-weighted take @$75 &mdash; ties to the tile at the top of this tab</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:3px;line-height:1.4;">${_expOwnN.toLocaleString()} contracts over ${nFromOp} ${nFromOp===1?'country':'countries'} of ${operatorName}&rsquo;s own terms${nFromCtry ? `; the ${nFromCtry} country-average ${nFromCtry===1?'row is':'rows are'} excluded` : ''}</div>
+      </div>` : ''}
     </div>
     <div style="margin-top:12px;font-size:11px;color:var(--muted);">
       ${tierCounts[0]} countries (${Math.round(tierCounts[0]/total*100)}%) are in state-heavy regimes (>70% take).
@@ -38959,11 +39029,14 @@ function renderIOCExposure(operatorName) {
           const isCtry = d.source !== 'IOC_DATA';
           const why = isCtry
             ? `Country average. ORCA holds no ${operatorName} contract terms for ${d.country}, so this row is the average across all ${d.n||'?'} contracts in the jurisdiction \u2014 the take, NPV and contract count describe ${d.country}, not ${operatorName}'s position in it.`
-            : `${operatorName}'s own contracts in ORCA \u2014 ${d.n||'?'} contract(s).`;
+            : `${operatorName}'s own contracts in ORCA \u2014 ${d.n||'?'} contract(s)`
+              + (d.entityCount > 1 ? ` across ${d.entityCount} group legal entities` : '')
+              + (d.mechanicCount > 1 ? `, spanning ${d.mechanicCount} fiscal mechanics; take and NPV are weighted by contract count across them` : '')
+              + '.';
           return `<tr title="${why.replace(/"/g,'&quot;')}">
           <td style="padding:5px 8px;font-size:12px;"><button onclick="(function(){var ddSel=document.getElementById('dd-country-select');if(ddSel)ddSel.value='${d.country.replace(/'/g,"\\'")}';loadCountryProfile('${d.country.replace(/'/g,"\\'")}');var cpBtn=[].slice.call(document.querySelectorAll('.tab-btn')).find(function(b){return b.textContent.indexOf('Country Profile')>=0;});if(cpBtn)switchTab('t7',cpBtn);})()" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:12px;padding:0;text-decoration:underline;">${d.country}</button>${isCtry ? `<span class="ioc-basis-ctry" title="${why.replace(/"/g,'&quot;')}">country avg</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.region}</td>
-          <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}</td>
+          <td style="padding:5px 8px;font-size:12px;color:var(--muted);">${d.mechanic}${(!isCtry && d.mechanicCount > 1) ? `<span class="ioc-mech-more" style="margin-left:4px;font-size:10px;color:var(--accent);" title="${operatorName} holds contracts under ${d.mechanicCount} different fiscal mechanics in ${d.country}. ${d.mechanic} carries the most contracts; the take and NPV on this row are weighted by contract count across all ${d.mechanicCount}, so they are not the ${d.mechanic} terms on their own.">+${d.mechanicCount-1}</span>` : ''}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${takeColor(d.take75)};font-weight:${isCtry?'500':'700'};${isCtry?'opacity:.85;':''}">${d.take75.toFixed(1)}%</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;">${(function(){var _e=(COUNTRY_DATA||[]).find(function(c){return c.country===d.country;});return _e?getEvidenceBar(_e):'<span style="font-size:10px;color:var(--muted);" title="ORCA holds no country fiscal record for '+d.country+', so there is no evidence grade for this row.">no record</span>';})()}</td>
           <td style="padding:5px 8px;font-size:12px;text-align:right;color:${d.npv75>0?'#15803D':'#B91C1C'};${isCtry?'opacity:.85;':''}">${_iocNpvFmt(d.npv75)}</td>
@@ -38983,7 +39056,16 @@ function renderIOCExposure(operatorName) {
     avgTake: avgTake,
     medianTake: medianTake,
     nFromOperator: portfolio.filter(function(d){ return d.source === 'IOC_DATA'; }).length,
-    nFromCountry:  portfolio.filter(function(d){ return d.source !== 'IOC_DATA'; }).length
+    nFromCountry:  portfolio.filter(function(d){ return d.source !== 'IOC_DATA'; }).length,
+    // v745 (T5): the group basis travels with the artifact. An annex headed "Chevron" that
+    // is built from 40 legal entities has to name that, and one built from a single entity
+    // has to say that too — those are different documents and the reader cannot tell them
+    // apart from the table alone.
+    isGroup: _expGroup,
+    entities: _expEnts.slice(),
+    excludedEntities: (_expGrp.excluded || []).slice(),
+    ownContracts: _expOwnN,
+    wtdTake: wtdTake
   };
 }
 window.renderIOCExposure = renderIOCExposure;
@@ -39063,6 +39145,30 @@ function _iocExpBasisLines() {
          + '%. Both are unweighted country averages: each country counts once regardless of how many '
          + 'contracts, barrels or working interest ' + st.operator + ' holds there. They are NOT a '
          + 'production-weighted portfolio take. Weight by your own WI and volumes before citing a single figure.');
+  if (st.wtdTake != null) {
+    L.push('Contract-weighted take @$75: ' + st.wtdTake.toFixed(1) + '% over '
+           + Number(st.ownContracts).toLocaleString() + ' contracts in the ' + st.nFromOperator
+           + ' countries held on ' + st.operator + "'s own terms. This is the figure the IOC Portfolio "
+           + 'headline reports and the one to quote if you quote a single number; the unweighted average '
+           + 'above differs from it by the weighting'
+           + (st.nFromCountry ? ' and by the ' + st.nFromCountry + ' country-average row(s), which it excludes' : '')
+           + ', not by a different set of contracts.');
+  }
+  L.push('');
+  L.push('WHOSE CONTRACTS');
+  L.push(st.isGroup
+    ? 'Group basis: ' + st.entities.length + ' legal entities are rolled up under the name "' + st.operator
+      + '" — ' + st.entities.slice(0, 12).join('; ')
+      + (st.entities.length > 12 ? '; and ' + (st.entities.length - 12) + ' more' : '')
+      + '. Entities are deduplicated by country and mechanic (highest contract count kept) rather than '
+      + 'summed, because a rename would otherwise be counted twice.'
+    : 'Single-entity basis: the name "' + st.operator + '" resolves to one legal entity in ORCA. This annex '
+      + 'covers that entity only and is NOT the group position — check the operator list for affiliates '
+      + 'filed under other names before presenting it as the group.');
+  if (st.excludedEntities && st.excludedEntities.length) {
+    L.push('Deliberately EXCLUDED from the roll-up: '
+           + st.excludedEntities.map(function(x){ return x.entity + ' — ' + x.why; }).join(' | '));
+  }
   L.push('');
   L.push('BASIS OF THE TAKE COLUMN — read before citing any row');
   L.push(st.nFromOperator + ' of ' + st.rows.length + ' rows are ' + st.operator
@@ -39139,6 +39245,14 @@ function copyIOCPortfolio() {
               + ' countries at $75/bbl, ranked by government take (highest first)';
   var assump = 'Portfolio average take ' + st.avgTake.toFixed(1) + '%, median ' + st.medianTake.toFixed(1)
     + '% — unweighted country averages, each country counted once regardless of contract count, volumes or working interest; not a production-weighted portfolio take. '
+    + (st.wtdTake != null
+        ? 'Contract-weighted over ' + Number(st.ownContracts).toLocaleString() + ' own-terms contracts the take is '
+          + st.wtdTake.toFixed(1) + '% — quote that one if you quote a single number. '
+        : '')
+    + (st.isGroup
+        ? '"' + st.operator + '" is a roll-up of ' + st.entities.length
+          + ' group legal entities, deduplicated by country and mechanic; see the Basis sheet for the entity list. '
+        : '"' + st.operator + '" is a single legal entity in ORCA, not the group — affiliates filed under other names are NOT in this table. ')
     + st.nFromOperator + ' of ' + rows.length + ' rows are ' + st.operator + "'s own contracts in ORCA"
     + (st.nFromCountry > 0
         ? '; the other ' + st.nFromCountry + ' are the COUNTRY average, substituted because ORCA holds no operator-level terms there — the Take basis column names them, and those rows describe the jurisdiction, not this operator\u2019s position in it. '
