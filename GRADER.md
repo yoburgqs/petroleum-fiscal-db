@@ -40851,3 +40851,16 @@ hard-coded $6.00/bbl engine override.
    Brazil 61 MODERATE, Angola ≤26 VERY LOW, Guyana ungradeable. The withdrawal machinery is
    present and the drawer auto-opens to explain it, but the largest number in the cell is still
    the wrong one on two of three columns.
+
+---
+## Cycle 649 Log — 2026-09-09 11:48
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete — shipped as **v743** (`c456078`), mirrored and pushed.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (stalest by rotation; 643 was the last T3).
+
+## Friction
+I walked the whole tab cold — search box, all four quickstart sets, the Fiscal Compare `+Compare` path, the Explorer basket → `Compare →` path, the grid, both charts, the clipboard and the PDF. The plumbing turned out sound, so I dropped two promising leads rather than write them up: the basket round
