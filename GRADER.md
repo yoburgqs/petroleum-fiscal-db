@@ -39337,3 +39337,16 @@ column within 400px.
 
 **Version.** v731 -> v732, three display strings, silently at the end. Not the
 deliverable.
+
+---
+## Cycle 638 Log — 2026-09-09 00:56
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Shipped as **v732** (`ace405d`), pushed, mirror identical, grader logged (`1eb36e1`).
+
+## Task
+**T4 — "What is my fiscal-stability and reform exposure here?"** Stalest by rotation (T4 last walked at v725). Walked cold at 1440×900 and 390×844 with touch, storage cleared, served over HTTP.
+
+## Friction
+The three reform surfaces are genuinely coherent — I checked the Reform Risk lookup, the Fiscal Compare Stability column, and the Country Profile reform block across Norway, Russia, 
