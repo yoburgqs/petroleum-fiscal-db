@@ -39023,3 +39023,16 @@ other they read as a contradiction. Text-only to fix, so it is not a cycle on it
 ride along with the next structural change to that block.
 
 **Version.** v729 → v730, three display strings, done silently at the end. Not the deliverable.
+
+---
+## Cycle 636 Log — 2026-09-08 22:55
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete — shipped as **v730** (`39c2dea`), pushed, mirror copied.
+
+## Task
+**T6 — "Where did this number come from and how solid is the evidence?"** (stalest by rotation; T6 last walked at cycle 629). Walked cold at 1440×900 and 390×844 hasTouch, storage cleared, across all nine visible tabs.
+
+## Friction
+Three of the four surfaces that print an evidence grade already carry v660's correction — the letter grades the country's **whole fact base** (primary-law share + fact depth, mostly cont
