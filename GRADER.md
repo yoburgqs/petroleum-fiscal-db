@@ -40345,3 +40345,91 @@ things in the same words.
 
 ## Friction
 Home tells a first-time analyst that Country Profile "auto-loads Indonesia on first visit," so that's where the cold walk lands. The footer of the 4-price sensitivity table states the platform's own rule
+
+---
+## Cycle 646 Log — 2026-09-09 13:30
+- Test before: 294 PASS / 0 FAIL (deployed baseline, as supplied to the cycle)
+- Test after: 293 PASS / 0 FAIL / 1 WARN — suite ACTUALLY RAN this cycle against the local
+  build (`TEST_URL=http://localhost:8899/index.html`). The same suite run against the
+  pre-change file scored identically (293/0/1), so the delta vs the deployed 294/0/0 is the
+  local environment, not this change. The 1 WARN is the standing service-worker 404.
+- JS errors: 0 page errors on the cold walk. JS syntax gate PASS (11 blocks).
+- Pixel gate: PASS — no surface worse than baseline.
+- Mobile 390x844 `hasTouch`: scrollWidth 390 = clientWidth 390, no horizontal scroll;
+  no sub-24px control added or touched.
+- Shipped as **v740**, committed, mirrored, pushed.
+
+## Task
+**T2** — "Is this one country attractive at $75/bbl, and can I defend that?" Stalest by
+rotation (641 T1 · 642 T6 · 643 T3 · 644 T4 · 645 T5). Walked cold at 1440x900 and
+390x844 with touch, `sessionStorage` and `localStorage` cleared before every load.
+
+## Friction
+Country Profile is where a cold load lands, and it routes the analyst to Scenario Builder
+**six times** — including the CTA sitting on the IRR chip itself, because CP deliberately
+refuses to print a country IRR. So Scenario Builder is not a side tool for T2; it is the
+platform's own designated path to a defensible IRR and breakeven.
+
+Following that CTA on Indonesia produced a second, unreconciled answer to the T2 question:
+
+| | Country Profile | Scenario Builder |
+|---|---|---|
+| Govt take @$75 | 59.5% | 66.2% |
+| Contractor NPV @$75 | **$745M** | **$2.3B** |
+
+Both pages describe their NPV as the standardized Deepwater project ($1.2B capex · 50k bbl/d ·
+$15/bbl opex · 25yr) at a 10% WACC. The provenance strip (`_sbOriginNote`, index.html:44220)
+reconciled the **6.7pp take gap** in a dedicated note and said **nothing whatsoever about the
+NPV** — the figure that actually goes in the IC memo — which is **3.2x apart**.
+
+And the pair is counterintuitive in a way that reads as a broken model: the scenario shows a
+*higher* government take **and** a *higher* contractor NPV at the same time. It is not broken.
+The published NPV is the aggregate across Indonesia's 667 contracts, each priced on its own
+terms — `mech_mix` shows its 19 Gross Split contracts averaging **-$215.5M**, dragging the mean
+down — while the scenario is one project on one set of terms. The NPV at the average terms is
+not the average of the NPVs. Nothing on screen said any of this.
+
+Second defect found in the same strip: `o.cpTake` was hardwired to `take_75` regardless of the
+scenario price. Run Indonesia at $125 and it compared a $125 scenario take (72.7%) against the
+**$75** published take (59.5%) and printed +13.2pp — reporting a price move as a terms gap.
+
+## Change
+The strip is now two labelled rows — **Govt take** and **Contractor NPV** — each showing the
+scenario figure against the published figure **at the scenario's own price**, with the delta.
+Indonesia at $125 now correctly reads 72.7% vs published @$125 70.3%, +2.4pp.
+
+When the NPV gap is materially wide (>=1.5x, or opposite signs, or >=$500M *and* >=25%) a
+reconciliation note fires naming the mechanism: which figure is the contract aggregate, which
+is the single project, and that the NPV at the average terms is not the average of the NPVs.
+It calls out the same-direction take/NPV case explicitly, names the profile when the scenario
+is not on the standardized Deepwater one (Indonesia on LNG reads 8.5x and says so), and on the
+**117 countries** loaded with a generic mechanic fallback it gives the *correct* cause instead —
+the form does not hold that country's terms — rather than blaming a contract spread that is not
+what moved the number. State monopolies (Bahrain, Kuwait, Saudi Arabia) stay suppressed.
+Afghanistan-scale gaps (19%) get the row but no longer draw a paragraph they do not warrant.
+
+Exercised live against Indonesia, Afghanistan, Norway, Iraq, Angola, Guyana, Kuwait, Bahrain;
+at $75 and $125; on the Deepwater and LNG profiles.
+
+## Result
+The analyst who follows the Country Profile's own CTA now sees ORCA's two Indonesia NPVs side
+by side, knows they differ 3.2x, knows why, and is told which to quote — the published figure
+for a country screen, the scenario only with their own capex and terms stated beside it.
+Before this they had two ORCA numbers for "Indonesia contractor NPV at $75/bbl" that differed
+by $1.5B, with the platform reconciling only the take, and no way to choose between them.
+
+## Still open (carried forward)
+Everything carried into cycle 645 that this walk did not touch remains open — including the two
+on-screen columns both headed `Stability` (FC 0-5 diamonds vs Explorer 0-100 composite,
+index.html:7277 and :32079), the FC Stability `!` marker firing on 19 of 20 scored rows, the
+Side-by-Side paste not marked as the demo set, and the Screener XLSX filename not encoding the
+shortlist size.
+
+**Surfaced by this walk, not fixed:** the strip's header sentence still names the profile *as
+loaded* ("run on a single synthetic Deepwater project") after the analyst switches the profile
+selector; the "Fields have been edited since load" line covers it and the new note names the
+profile actually running, but the header sentence itself is stale. Also, Country Profile prints
+three NPV cohort ranks for the same $745M — `#32 of 33 at this take` in the headline and
+`#17 of 21 producers` in Fiscal Mechanics — which are different denominators, correctly computed
+and directionally consistent (both `#1 = best`), but never stated as different cohorts at the
+second one.
