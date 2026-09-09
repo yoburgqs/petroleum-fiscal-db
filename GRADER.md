@@ -39845,3 +39845,16 @@ defensive and a fourth monopoly added later would arrive unguarded in any new co
 real fix is upstream, in whatever writes that field.
 
 **Version.** v734 → v735, 3 display strings, silently at the end. Not the deliverable.
+
+---
+## Cycle 641 Log — 2026-09-09 03:47
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete and pushed. Here is the summary in plain English.
+
+## Cycle 641 — T1
+
+**Task.** T1 — *"Which countries should even be on my screening list?"* (stalest by rotation; 640 ran T2, 639 T5, 638 T4, 637 T3, 636 T6). Walked cold at 1440×900 and 390×844 with touch, storage cleared on every load.
+
+**Friction.** The Screener held up well — presets, the four price decks and the sliders all behaved, including recomputing all 11 preset hit-counts when the deck moved. The problem was one mode ov
