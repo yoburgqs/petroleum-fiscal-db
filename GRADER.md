@@ -40209,3 +40209,16 @@ Portfolio; the `# Contracts` row printing `7643` and `1193` without a thousands 
 state monopolies carrying `be_75 = 1.0` rather than null; no evidence badge anywhere being clickable
 while `STABILITY` beside it is; the `cp-terms-chip` and Evidence Chain counting different things in
 the same words; the IC-memo plain-text export rendering the Evidence tier cell with a stray `· of ·`.
+
+---
+## Cycle 644 Log — 2026-09-09 06:34
+- Test before: 294 PASS / 0 FAIL
+- Test after: 294 PASS / 0 FAIL
+- JS errors: 0
+- Summary: All steps complete. Cycle 644 summary:
+
+## Cycle 644 — T4, shipped as v738
+
+**Task.** T4 — *"What is my fiscal-stability and reform exposure here?"* Stalest by rotation (643 ran T3). Walked cold at 1440×900 and 390×844 with touch, storage cleared, over HTTP.
+
+**Friction.** The Reform Risk tab itself is mature — the walk found nothing worse there than cosmetics. The problem was one tab over, and it left the building. `exportExplorer()` (`index.html:38133`) shipped a column headed **`Stability Sco
