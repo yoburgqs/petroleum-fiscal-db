@@ -41250,3 +41250,116 @@ and the same URL.
 **Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* Stalest by rotation (646 T2 · 647 T1 · 648 T6 · 649 T3 · 650 T4 · 651 T5). Walked cold at 1440×900 and 390×844 with touch, storage cleared. Indonesia auto-loads on Country Profile, so it's the profile a first-time analyst actually reads.
 
 **Friction:** A fiscal r
+
+---
+## Cycle 653 — T1, shipped as v747
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* Stalest by rotation
+(647 T1 · 648 T6 · 649 T3 · 650 T4 · 651 T5 · 652 T2). Walked cold with storage cleared, at
+1440x900 and at 390x844 with `hasTouch: true`.
+
+### Friction
+
+The desktop T1 path is in good shape and this cycle found nothing worse there than minor: the
+cold Screener partitions 22 production-backed countries above 163 proxy ones under a labelled
+divider, the four sliders narrow correctly, the zero-and-near-zero result states each carry
+their own honest divider ("This screen returned no production-backed regime. Widen the screen,
+or load the IOC Capital Screen preset"), all 11 presets return sane sets, and the three sort
+headers tested (take / npv50 / evidence) re-rank without losing the basis partition.
+
+**The phone is a different product.** Home hero → `open the screen →` → IOC Capital Screen,
+15 rows. Measured inside the 360px `.tbl-wrap`, exactly four cells per row were on screen:
+the shortlist checkbox, the rank, the country name, the region. `#tbl-screener` is **1435px**
+wide. **Govt Take starts at x=637 and Contractor NPV at x=923** — 277px and 563px past the
+right edge of the phone.
+
+So the tab whose entire job is answering T1 returned, on a phone, **a ranked list of country
+names with no numbers on it.**
+
+And the recovery was worse than the problem. `thead` is `position: sticky; top: 0`, which is
+**vertical only** — swiping right to reach the take carried the country name *and* its column
+header off the left edge together. The analyst arrived at `60.8%` attached to nothing. The
+only horizontal affordance on the page was `.tbl-wrap::after`, a 26px right-edge fade, which
+says "more exists", not "the decision columns are three screens that way".
+
+### Change — scoped to `max-width: 720px`, desktop byte-identical
+
+**1. Identity is pinned.** The checkbox / rank / country cells take `position: sticky` on the
+LEFT as well. Header cells keep their existing `top: 0`, so a `th` in this block is sticky in
+both axes and outranks the body cells (z-index 61 vs 50; `thead` is 60). Pinned cells get an
+opaque `--surface` base and the row tints are re-stated as gradients over it, because the
+`nth-child(even)` and `sc-row-sel` tints are semi-transparent overlays and the scrolled
+columns read straight through them otherwise.
+
+The country cell **wraps rather than clamps**, so the `PROD-WTD` / `PART-PROD` / `PROXY`
+data-basis badge is never clipped off the edge of its own cell — the one thing this platform
+is least willing to lose. It takes an explicit **150px**: left to auto-layout the column
+collapsed to 94px, narrower than the badge, so every cell broke into four lines
+(`+Compare` / name / arrow / badge) and one row stood **230px** tall — three and a half rows
+of a fifteen-row shortlist per screen. Rows are now **72px**.
+
+**2. Region and Mechanics step aside.** Columns 4 and 5, 113px and 185px, were holding 298px
+of a 360px screen between the country name and the first number. Neither is the answer to T1:
+region is legible from the country name and is a filter in this same tab's Advanced panel, and
+the mechanic mix is on the Country Profile that every row already opens on tap. Critically the
+mechanic's **one screening consequence** — a fee-basis headline that is not rankable across
+countries, per `MECHANIC_COMPARABILITY.md` — is not carried by that column anyway: it is
+rendered inline in the Govt Take cell as `84.8% → screened at 34.1%`, and that cell is now on
+screen at rest.
+
+Hidden, not deleted. Both stay in the DOM, the CSV, the XLSX and Copy for IC Memo, all of
+which build from `_scExportRows()` rather than from these cells — verified by reading
+`exportScreenerCSV()`. And it is **said out loud** in `#sc-mobile-cols-note` above the table,
+because dropping content silently is the failure mode this platform keeps having to fix, not
+a fix.
+
+### Result
+
+| | before (v746) | after (v747) |
+|---|---|---|
+| Cells readable per row at rest, 390px | 4 (checkbox, rank, name, region) | 5 — **incl. Govt Take** |
+| Numbers on screen without swiping | **none** | take, tier colour, fee-basis correction |
+| Table width | 1435px | 1023px |
+| Row height | 230px | 72px |
+| Rows visible per screen | ~3.5 | 9 |
+| Country name during horizontal swipe | scrolls away | **pinned** |
+| Distance to Contractor NPV | x=923 (563px off-screen) | x=512, one short swipe, name pinned |
+
+An analyst on a phone can now rank a screening shortlist by government take without touching
+the table horizontally, see which of those takes are fee-basis corrections, and swipe once to
+contractor NPV while still knowing which country they are reading. Before this cycle they read
+eleven country names and a truncated "REGI…" header, and not one number.
+
+### Verification — measured, not assumed
+
+- **Runtime suite RAN this cycle, both sides**, read from each run's own `ORCA_REPORT_FILE`,
+  against the same suite over `http://localhost:8xxx`. The "before" side was served from a
+  **pristine copy of v746 on a second port**, not from the working tree, because a first
+  attempt overlapped the edits and was discarded as untrustworthy.
+  **Before (v746): 293 PASS / 0 FAIL / 1 WARN. After (v747): 293 PASS / 0 FAIL / 1 WARN.**
+  No regression. The cycle prompt again carried **297 PASS**, which is the deployed GitHub
+  Pages figure; local scores 293. Recorded rather than restated, per finalization test #1.
+  The single console error is the same `sw.js` 404 in both runs — an artifact of serving the
+  tree from a localhost root rather than the `/petroleum-fiscal-db/` scope the service worker
+  registers against.
+  - A first `timeout 900 node …` invocation failed with `command not found: timeout` (not a
+    macOS builtin) and wrote nothing. Caught because the report file was deleted first — this
+    is precisely the blind-gate failure recorded in the repo's own post-cutover notes.
+- **JS syntax gate: PASS**, 11 inline blocks, re-checked after the version bump.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all ten tabs. An earlier
+  sweep of this used wrong tab-button ids and silently no-opped on five tabs; redone against
+  the ids read off the live `.tab-btn` list.
+- **Console / page errors: 0** at all six viewports, all ten tabs.
+- **Touch targets:** controls under 24px at `pointer: coarse` are **identical before and after**
+  — Home 1, Country Profile 3, Screener 17 — measured with the same probe against the pristine
+  v746 baseline. All pre-existing; the 17 on the Screener are the collapsed Advanced-Filters
+  mechanic/IOC grid checkboxes the v612 comment explicitly declined to widen. None introduced
+  by this cycle.
+- **Desktop proven unchanged, not assumed:** at 1440 the screener table measures 1419px on both
+  builds, all 12 header x/width pairs are identical, every cell is still `position: static`, and
+  `#sc-mobile-cols-note` is not rendered. At **768** the table is still 1419px with 12 columns
+  and a static country cell; the layer engages at **720** and below.
+- **STILL LOCKED respected:** the v612 mobile layer has no selector narrowed, weakened or
+  removed; `#reference-panel` untouched; no negative offsets added; no tooltip, FAQ or
+  citation-string edit; no tab reordering; CP headline zones, tier colouring, rank and
+  vs-median pill untouched; Govt NPV stays removed from Fiscal Compare.
