@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v770</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v771</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v770</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v771</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v770</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v771</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -38427,19 +38427,10 @@ function loadCountryProfile(country) {
       const _dlt  = function(v){ return (v != null && d.take_50 != null) ? (v - d.take_50 === 0 ? '—' : (v - d.take_50 > 0 ? '+' : '') + (v - d.take_50).toFixed(1) + 'pp') : '—'; };
       // Same two resolvers the on-screen ruler uses, in the same order: a solved breakeven wins,
       // otherwise the arithmetic bound, otherwise nothing is claimed.
-      const _beSolved = (typeof cpBeFor === 'function') ? cpBeFor(d) : null;
-      const _beBound  = (_beSolved == null && typeof cpBeBound === 'function') ? cpBeBound(d) : null;
-      const _beCell   = _beSolved != null ? '$' + _beSolved.toFixed(0) + '/bbl'
-                      : _beBound  != null ? _beBound.txt + ' (bounded)'
-                      : '—';
-      const _beNote   = _beSolved != null
-          ? ''
-          : _beBound != null
-            ? 'Breakeven ' + _beBound.txt + ' is BOUNDED, NOT SOLVED. ORCA carries no solved breakeven for '
-              + country + '. The range is arithmetic on the four contractor NPVs in this table, on the same '
-              + 'standardized Deepwater profile. Cite it as a bound, not as a price.'
-            : 'Breakeven is not reported for ' + country + ': ORCA carries no solved value, and the four '
-              + 'contractor NPVs in this table do not bracket one.';
+      // v771: resolved through _cpIcBe(), and re-resolved by cpCopyICTable() at click time -- see there.
+      const _beR      = _cpIcBe(d, country);
+      const _beCell   = _beR.cell;
+      const _beNote   = _beR.note;
       const _hdr  = ['Price', 'Govt Take %', 'Delta vs $50', 'Contractor NPV ($M)', 'Breakeven'];
       const _body = [
         ['$50',  d.take_50  != null ? d.take_50.toFixed(1)+'%'  : '—', '—',                _npvC(d.npv_50),  ''],
@@ -43282,9 +43273,51 @@ function _icReformHead(txt) {
 // Word / Google Docs / Outlook / PowerPoint render a real table, and TSV so Excel splits into
 // columns. Before v739 this control wrote text/plain only, so the artifact the page's own IC
 // guidance asks for ("price range table required in IC memo") pasted into Word as tab stops.
+// ── v771 (T5): the IC table pasted "ORCA carries no solved breakeven" for a country whose solved
+//    breakeven was printed 200px above the button. ─────────────────────────────────────────────
+//
+// Walked T5 cold: Country Profile -> Norway -> wait for the page to settle -> "Copy as IC table".
+// On screen the BREAKEVEN COST CURVE ruler, the footnote under the table, the headline strip and
+// the Breakeven Price card all read $29/bbl. The paste read:
+//
+//     $75   68.0%   +8.7pp   $826M   < $50/bbl (bounded)
+//     1. Breakeven < $50/bbl is BOUNDED, NOT SOLVED. ORCA carries no solved breakeven for Norway.
+//
+// and "Copy for IC Memo" on the same tab pasted "Breakeven $29/bbl". Two artifacts from one page,
+// one of them telling the committee the platform has no figure it had just displayed.
+//
+// Cause: the payload was frozen at render time. Norway's breakeven is not in the bundled table;
+// it arrives from api/v1/country/norway.json, and _cpApplyBe() repaints every breakeven slot on
+// the page when it lands -- except this payload, which had already resolved cpBeFor() to null and
+// fallen through to the bound. The breakeven cell and its note are now resolved again at click,
+// from the same cpBeFor() / cpBeBound() pair, so they read whatever the page is showing then.
+function _cpIcBe(d, country) {
+  var solved = (typeof cpBeFor === 'function') ? cpBeFor(d) : null;
+  var bound  = (solved == null && typeof cpBeBound === 'function') ? cpBeBound(d) : null;
+  return {
+    cell: solved != null ? '$' + solved.toFixed(0) + '/bbl'
+        : bound  != null ? bound.txt + ' (bounded)'
+        : '—',
+    note: solved != null
+        ? ''
+        : bound != null
+          ? 'Breakeven ' + bound.txt + ' is BOUNDED, NOT SOLVED. ORCA carries no solved breakeven for '
+            + country + '. The range is arithmetic on the four contractor NPVs in this table, on the same '
+            + 'standardized Deepwater profile. Cite it as a bound, not as a price.'
+          : 'Breakeven is not reported for ' + country + ': ORCA carries no solved value, and the four '
+            + 'contractor NPVs in this table do not bracket one.'
+  };
+}
 function cpCopyICTable(safe) {
   var P = (window.__CP_IC_TBL || {})[safe];
   if (!P) { if (typeof showCopyToast === 'function') showCopyToast('Table not ready — reopen this country and try again.'); return; }
+  var _d = (window.COUNTRY_DATA || []).filter(function(x){ return x.country === P.country; })[0];
+  if (_d) {
+    var _be = _cpIcBe(_d, P.country);
+    P.body[1][4] = _be.cell;   // the $75 row carries the breakeven cell
+    P.notes = [_be.note, typeof CP_IRR_NOTE === 'string' ? CP_IRR_NOTE : '']
+      .filter(function(t){ return !!t; });
+  }
 
   var tsv = P.title + '\n\n'
     + P.header.join('\t') + '\n'
@@ -43458,7 +43491,7 @@ function copyICSummary() {
   var beStr = (_beRes != null) ? '$' + _beRes.toFixed(0) + '/bbl'
     : _beBnd ? (_beBnd.txt + ' — bounded, not solved: ORCA carries no solved breakeven for this country, '
         + 'and this range is read off contractor NPV at $50/$75/$100/$125 on the same standardized '
-        + 'Deepwater profile. Cite it as a bound')
+        + 'Deepwater profile. Cite it as a bound, not as a price.')
     : '—';
   var stabScore = getFiscalPredictabilityScore(d);
   // v536 (T3): null means no contract-level take distribution is held, so no predictability claim
