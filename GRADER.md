@@ -42339,3 +42339,104 @@ analyst to infer it from em-dashes.
 Walked T3 cold — storage cleared, reloaded — on **Guyana / Angola / Brazil**, three of the four countries in this tab's own Atlantic Frontier quickstart.
 
 The grid hands the analyst an ordering they read straight off the eight Govt Take 
+
+---
+## Cycle 663 — T1, shipped as v757
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* (rotation: 662=T3, 661=T6,
+660=T2, 659=T4, 658=T5; T1 was stalest, last run at 657.)
+
+### Friction
+
+Walked T1 cold (storage cleared, reloaded) at 390x844 `hasTouch`, 768x1024, 1024x768, 1280x800,
+1440x900 and 1920x1080: Screener tab → **Load a screen… → IOC Capital Screen**, using the real
+`<select>`, not a direct function call.
+
+The page did not move. The chip above the menu and the slider handles changed; the 15 countries
+did not appear. `#screener-preset-select`'s `onchange` calls `applyScreenerPreset()` and stops,
+and the result table sits below the slider row, the Advanced summary and the count bar. First
+result row after the pick, measured on the shipped v756 build:
+
+| viewport | first result row | rows readable after the pick |
+|---|---|---|
+| 390x844 phone | y=1943 (2.3 screens below the menu) | **0** |
+| 768x1024 tablet | y=1381 | **0** |
+| 1024x768 | y=893 | **0** |
+| 1280x800 laptop | y=805 | **0** |
+| 1440x900 | y=787 | 2 |
+| 1920x1080 | y=696 | 7 |
+
+The control whose whole job is answering T1 answered it off-screen at every width below 1440. A
+first-time analyst sees an unchanged view and reads it as "the preset did nothing". The Home
+"open the screen" card (`_homeOpenICScreen()`) landed the same way: 0 rows at the same four widths.
+
+### Change
+
+- **New `_scRevealResults()`**, called from the menu's `onchange` and from `_homeOpenICScreen()`.
+  It is deliberately **not** inside `applyScreenerPreset()`, because `_labelScreenerPresets()` drives
+  every preset through that function to count hits and must never move the page.
+- **If three result rows are already readable, it does nothing** (1920 is left alone). Otherwise it
+  lands on the **count bar** when the bar, the header and three rows fit together, and on the
+  **table** when they don't (a phone).
+- **On narrow screens it clears the sticky `.site-header` / `.tab-nav-wrapper`**, measured from
+  computed style rather than a constant, and it scrolls instantly under `prefers-reduced-motion`.
+- No filter, preset, row, column or count changed. The dropdown stays a dropdown (v373 lock).
+
+### Result
+
+After the pick, the analyst is looking at the shortlist they asked for:
+
+| viewport | rows readable, v756 | rows readable, v757 | first row under sticky chrome |
+|---|---|---|---|
+| 390x844 | 0 | **9** | no |
+| 768x1024 | 0 | **10** | no |
+| 1024x768 | 0 | **9** | no |
+| 1280x800 | 0 | **10** | no |
+| 1440x900 | 2 | **12** | no |
+| 1920x1080 | 7 | 7 (not moved) | no |
+
+The Home IC-screen card now lands the same way. A second pick while already at the results
+(Atlantic Frontier, 7 rows) shows all 7.
+
+### Verification — run this cycle, not assumed
+
+- **Runtime suite RAN both sides**, same harness, local server, each reading its own
+  `ORCA_REPORT_FILE`: **before 293 PASS / 0 FAIL / 1 WARN / 1 JS error; after 293 PASS / 0 FAIL /
+  1 WARN / 1 JS error.** The reports are **identical** apart from the timestamp line. The 1 JS error
+  is the known `sw.js` 404 from serving outside the Pages scope. The prompt's 297 is the deployed
+  figure; local scores 293, as in cycle 662.
+- **JS syntax gate: PASS**, 11 inline blocks, re-run after the version bump.
+- **PIXEL GATE PASS** against `~/logs/pixel_audit/baseline.json` (captured 2026-09-08, not modified).
+  The first attempt pointed `PIXEL_OUT` at `/tmp`, which relocates the baseline, so it would have
+  gated against nothing. It was discarded (it wrote a throwaway baseline under `/tmp/walk663/pixel`
+  only), and the gate was re-run on the real baseline. That re-run is the one recorded here.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390** on the Screener after the pick.
+  Console / page errors: 0 at every width.
+- **Phone 390x844 `hasTouch` (step 5b):** overflow 0. No control was added. Screener controls
+  under 24px at `pointer: coarse`: **0** at 390 and 768. (19 at the mouse widths, identical on
+  v756.)
+- **Checked for no unwanted movement:** a price-deck change, which re-runs `_labelScreenerPresets()`
+  and so every preset, leaves the page at y=0 on both builds. Reduced motion at 390: instant landing,
+  table header at y=111 below the sticky header's bottom at 102.
+- **STILL LOCKED respected:** v612 mobile layer untouched; `#reference-panel` untouched; presets
+  remain a dropdown; Advanced filters stay collapsed; no tab reordering; no tooltip, FAQ or citation
+  edit. Version bumped v756 → v757 at the three display sites only.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+
+- **On a phone the landing skips the count sentence** ("IOC Capital Screen · 15 countries match…").
+  The bar is 547px tall at 390, so landing on it would put the first row at the bottom edge again.
+  The count is still in the mode button ("Screener (15)"). The real cause is that sentence's length:
+  ~700 characters of run-on caveats on the flagship preset. Restructuring it is a separate change.
+- **The IOC Capital Screen's own count line reports its $75 NPV leg as inert** ("removed 0 rows and
+  cannot remove any"). The preset still carries it in its chip. A preset-definition call, not
+  touched here.
+- **Home "open the screen →" measures 14px tall at 390 `pointer: coarse`.** It's already in the
+  pixel baseline, pre-existing, and not introduced here.
+
+---
+## Cycle 663 Log — 2026-09-10
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local)
+- JS errors: 1 both sides (sw.js 404, local-serving artifact)
+- Summary: shipped **v757**, pushed `c148b0a..56e4fc7`, mirrored to the office repo.
