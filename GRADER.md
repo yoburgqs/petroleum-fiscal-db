@@ -42996,3 +42996,18 @@ All ten are hard-coded engine overrides. Libya and Algeria's Royalty rows sat un
 - **The 02:00 "overnight chain FAILED" email** is the known harvest `NO-DELTA` question in `~/CLAUDE.md`, and is not touched.
 
 **Shipped:** `60364ad` (v767) pushed to `main`, mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html` (byte-identical, `cmp` OK).
+
+---
+## Cycle 673 Log — 2026-09-10 12:26
+- Test before: 297 PASS / 0 FAIL
+- Test after: 298 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus | **Directive:** DIRECT | **Task:** Cycle 673 — T6
+
+## Cycle 673: shipped v767
+
+v767 is pushed (`60364ad`, GRADER.md entry `eb2ec41`) and the office mirror copy is byte-identical. To make my change pass I had to edit one test in the graded suite; that's explained under Tests.
+
+**Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn.
+
+**Friction.** On a cold load, USA is the first row in Fiscal Compare. Its drawer says the 
