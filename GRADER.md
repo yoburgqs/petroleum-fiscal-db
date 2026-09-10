@@ -42029,3 +42029,150 @@ plus symlinks) for the before-suite; both localhost servers on 8211/8212 stopped
 
 ## Friction
 Walked T2 cold into Country Profile → **Nigeria** (834 contracts, a real producer). Most of the path is genuinely good — the verdict line tells you to defend on the take and *not* the NPV, and the missing breakeven, removed IRR column a
+
+---
+## Cycle 661 Log — 2026-09-09 23:42
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local build at localhost:8232, pre-change git HEAD)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local build at localhost:8231, shipping v755)
+- Pass-set diff: 0 lines. JS errors: 1 both sides (known `sw.js` 404 from serving at a
+  localhost root rather than the `/petroleum-fiscal-db/` scope the service worker registers
+  against). Local figure is **293** against the 297 the cycle prompt carried for the deployed
+  GitHub Pages build — recorded, not reconciled, same divergence cycle 660 noted at 296/297.
+- Summary: Cycle 661 complete — shipped as **v755**, committed, mirrored, pushed
+  (`ce96ad8..94b6cc8`).
+
+## Task
+**T6** — *"Where did this number come from and how solid is the evidence?"* (stalest in the
+rotation: 660 was T2, 659 T4, 658 T5, 657 T1, 656 T3, and T6 had not run since 654.)
+
+## Friction
+
+Walked T6 cold, no sessionStorage or localStorage: Home → Fiscal Compare → row drilldown →
+Country Profile → Evidence Quality → the per-parameter **Evidence Chain**, which is the
+deepest provenance surface the platform has and the end of every T6 path on it. Most of that
+walk is genuinely strong — the Quality column tooltip names both grading legs, the drilldown
+tells you which of two take numbers to cite and why, `LINK DEAD` chips mark unretrievable
+citations, and bulk-harvest rows are visibly demoted.
+
+The worst moment is the Evidence Chain's **verdict line**, the single most defensible-sounding
+sentence in the tool:
+
+> ✓ All 4 independently sourced parameters the model reads match the rate stated in the cited source.
+
+It is a count of **rows**, not of documents. Two of the three ways that count could overstate
+corroboration had already been closed:
+
+- **v569** excluded the EY / IHS bulk harvest — it populates the ORCA Value *and* the Statutory
+  column, so the two agreeing is self-agreement.
+- **v588** excluded regional instruments cited for several jurisdictions, on the same argument
+  one tier up.
+
+The third was never checked: **the same country-specific document backing several rows.**
+Measured against the 210 shipped `api/v1/country/*.json` files — of the **162** countries that
+reach this sentence with 2+ sourced rows, **149** have one document behind two or more of them,
+and **118 have every single sourced row resting on one document.** On **70** of those 118 that
+document is already in `_CITE_DEAD`.
+
+| country | sourced rows | documents behind them |
+|---|---|---|
+| Vietnam | 4 | 1 — Law on Petroleum 1993 (am. 2008) |
+| Libya | 4 | 1 — EPSA-IV model agreement |
+| Indonesia | 3 | 1 — Govt Regulation No. 53 of 2017, **LINK DEAD** |
+| Saudi Arabia | 2 | 1 — Royal Decree M/22 2017 |
+| United Kingdom | 2 | 1 — Finance Act 2011 s.7 |
+| Malaysia | 4 | 2 — PDA 1974 alone backs 3 |
+| Guyana | 4 | 2 — Stabroek 2016 agreement alone backs 3 |
+
+An analyst preparing to defend a take number reads that line as four checks that stand or fall
+separately. On 118 countries there is one. Kill the document — superseded, wrong licence
+vintage, mis-transcribed at harvest — and every sourced term moves together, while the match
+count stays exactly where it was.
+
+*Where:* `renderSourcedFacts()` inside `renderReformTimeline()`, index.html — `sourcedCount`
+increment at the `else if (srcVal != null)` branch, and the `_mainNote` verdict string.
+
+## Change
+
+`sourcedSrcs` collects the instrument name behind every row that increments `sourcedCount`,
+snapshotted into `_snap742` and rolled back with the other counters at the off-model push site
+so a row the live model does not read cannot move it. `_concScope755` then scopes the verdict
+sentence **in place** — the same technique `_scope625` and `_citeScope641` already use on that
+same line, rather than a new block below it that can be scrolled past.
+
+- **Total concentration** (124 of 185 countries): *"All 4 are the same document — Libya EPSA-IV
+  Exploration and Production Sharing Agreement Model… — so that is one citation checked 4 times,
+  not 4 independent ones."*
+- **Partial** (24 countries): *"Those 4 rest on 2 documents, not 4: Malaysia Petroleum
+  Development Act 1974 Petronas Production… alone is the citation behind 3 of them."*
+- Both close on the consequence: *"If it is superseded, or the wrong licence vintage for the
+  blocks you are screening, every sourced term above moves together — the match count will not
+  change."*
+- Silent on the 37 countries where the documents genuinely are distinct, or where fewer than two
+  rows are sourced. The full instrument name is on hover where the display truncates at 68 chars.
+
+**Nothing is recomputed and nothing is excluded from `sourcedCount`.** Each row's Statutory
+column genuinely is independent of its ORCA Value, so the match itself is real — the defect is
+that the matches are not independent *of each other*, and only the sentence claiming them can
+say so. No tier letter, percentage, grade, take, NPV, IRR, breakeven or export changed.
+
+## Result
+
+An analyst defending a take number can now see how many documents are actually underneath the
+tick. On Vietnam and Libya they know to chase **one** instrument rather than assume four
+corroborations; on Indonesia they see three parameters resting on a single 2017 regulation that
+ORCA has already measured as unretrievable; on Malaysia and Guyana they know which document
+carries three of the four rows. The concentration risk is stated where the claim is made
+instead of being reconstructable only by reading four Source cells and noticing they are the
+same string.
+
+## Verification — run this cycle, not assumed
+
+- **Runtime suite RAN both sides**, same harness, each reading its own `ORCA_REPORT_FILE`, both
+  cold against a local server: **before 293 PASS / 0 FAIL / 1 WARN / 1 JS error; after 293 PASS /
+  0 FAIL / 1 WARN / 1 JS error.** Pass sets diff clean — **0 lines differ**.
+- **JS syntax gate: PASS**, 11 inline blocks, re-checked after the copy polish and after the
+  version bump.
+- **PIXEL GATE PASS** — no surface got worse than baseline. Findings list unchanged from
+  baseline (10 pre-existing small-touch-target / clipped-text entries, none introduced here).
+- **185-country sweep** of the new path through `loadCountryProfile()`: **0 exceptions, 0 NaN /
+  undefined / Infinity / `[object`**. Fires on **124** total-concentration, **24** partial,
+  **37** silent — consistent with the offline count over the live hyphen-slug API files.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all ten tabs walked at
+  each. **Console / page errors: 0** at every viewport.
+- **Phone 390x844 `hasTouch` (step 5b):** the clause wraps to **301.7 x 61.5px**, right edge
+  342.7 of a 390 viewport, page overflow **0**. No control was added — the clause is text and
+  the truncation `<span title>` is a hover target 45px tall, above the 24px floor either way.
+  Screenshotted and read.
+- **STILL LOCKED respected:** v612 mobile layer untouched — no selector narrowed or removed;
+  `#reference-panel` untouched, no negative offsets; no tab reordering; no new tooltip *as the
+  fix*, no new FAQ, no citation-string micro-edit; v751–v754 work untouched.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+
+- **The word "independently" was left alone.** In this table it means independent *of the ORCA
+  Value* — the Statutory column is a separate record — and that reading is correct per row.
+  Rewriting it would relitigate v500/v569/v588 rather than add information. The new clause says
+  what the count does and does not establish, which is the part that was missing.
+- **The Evidence Quality panel's "Key sources" list has the same concentration** and does not
+  state it. It is a weaker case: that list already prints a per-source fact count, so an analyst
+  can see one document carrying most of the base. The Evidence Chain was the surface making an
+  explicit corroboration *claim*, which is why it was fixed first.
+- **29 orphan `api/v1/country/*.json` files use underscore slugs** (`united_kingdom.json`,
+  `saudi_arabia.json`, `viet_nam.json`, …) and ship `fiscal_facts_sourced` as a **list** rather
+  than a dict, which the Evidence Chain would index as `undefined` on every row. They are dead:
+  `renderReformTimeline()` builds hyphen slugs, so nothing fetches them. Investigated and
+  cleared this cycle — a data-repo cleanup, not a UX defect, and deleting API files was out of
+  scope for a UX cycle.
+- **The Nigeria profit-oil contradiction is still open** (three different government profit-oil
+  shares on one page, disclosed but unreconciled). Unchanged from cycle 660 — a domain call on
+  Nigeria's petroleum act.
+- **`p25_take === p75_take` on 135 of 163 countries**, leaving a 0.00px IQR band on ~94
+  profiles. Unchanged from cycle 660 — a chart design call.
+
+### Housekeeping
+
+Version bumped v754 → **v755** at the 3 display locations (`<title>`, `#hdr-version`,
+`#print-header-ver`). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+Pushed `ce96ad8..94b6cc8`. The pre-change build was served from `/tmp/t6before` (git HEAD's
+index.html plus symlinks to the data files) on port 8232 for the before-suite; both localhost
+servers stopped at cycle end.
