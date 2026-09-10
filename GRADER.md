@@ -41588,3 +41588,20 @@ it). The prose reference to "v749's Fiscal Compare fix" in the v750 comment is l
 
 Also cleared: four stale localhost servers left running on ports 8123/8124/8131/8132 by earlier
 cycles.
+
+---
+## Cycle 657 Log — 2026-09-09 19:36
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete. Everything pushed and verified.
+
+## Cycle 657 — T1, shipped as v751
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* (656 was T3, so not repeated.)
+
+**Friction.** Walked the Screener cold at 390×844 with touch. Four cycles ago, v747 hid the Region and Mechanics columns specifically so Govt Take — the one number this tab needs — would land on screen, and logged that it had. The *cell* had. The *number* had not:
+
+| | position on a 390px screen |
+|---|---|
+| 
