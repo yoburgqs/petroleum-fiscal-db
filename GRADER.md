@@ -43269,3 +43269,75 @@ reaches.
 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 679 — 2026-09-10 — T3, v772: Side-by-Side labels both of its orders, in one strip
+
+**First, cycle 678's work was never committed.** Its session ended while it waited on background checks
+(`cycle_log.txt`: "Claude cycle complete. Output length: 353 chars"), so v771 sat uncommitted in the tree and the
+loop pushed only the grader commit. Cycle 679 verified it in a cold Chromium: Norway's "Copy as IC table" now pastes
+`$29/bbl`, matching the page, instead of "< $50/bbl (bounded) ... ORCA carries no solved breakeven for Norway". Iraq
+and Indonesia still paste the bound and its note, with 0 page errors, and the JS gate passed. It was committed
+separately as `f84186e` (v771, T5), credited to cycle 678. Lesson for the loop: run the suite and pixel gate in the
+foreground, because a backgrounded check ends the session before the commit.
+
+**Task:** T3, "How do these three countries compare side by side?" T3 had gone longest without a turn (last run
+v762). The previous cycle was T5.
+
+**Friction:** walked cold. Side-by-Side, typed Iraq, Brazil and Angola, pressing Enter after each. The strip above the
+grid (`#cmp-verdict`) read **"RANKS AGAINST EACH OTHER: Iraq 34.1% › Angola 53.0% › Brazil 55.6% ... the ordering
+above is the whole set."** Under the grid is 330px of notices at 1440, and ~1,200px on a 390 phone. There, a bold
+line in larger type (`_sbsBoundOrder()`, the `line(body)` call) read **"The only order this set establishes: Brazil
+61 (measured) › Iraq 47 (measured) › Angola ≤26."** It showed the same three countries, with the same `›` glyph, in
+the reverse sequence, and neither line said what it ranked. The top line is govt take at $75, lowest first. The
+bottom line is the Predictability Score, most stable first. "The only order" read as overruling the strip, so an
+analyst who scrolled put Brazil first in the memo, and one who did not put Iraq first. The cold default has the same
+defect: United Kingdom › Norway by take, and "United Kingdom 58 › Norway ≤52" by score, with Netherlands handled
+differently in each. Nigeria / Indonesia / Malaysia shows it too.
+
+**Change:**
+- The strip's take line is now labelled **GOVT TAKE @$75, LOWEST FIRST**.
+- New row `#cmp-verdict-fp` in the same strip, **PREDICTABILITY, MOST STABLE FIRST**, e.g. `Brazil 61 › Iraq 47 ›
+  Angola ≤26`. It carries a `≤ = ceiling, not a score` pill (24px min height), and any "X ≤59 cannot be placed"
+  clause is shown muted. It is painted by the new `_sbsPaintVerdictFp()` as the per-country spread fetches land.
+  It stays hidden when nothing in the set is withdrawn (Iraq/Brazil).
+- `_sbsBoundOrder(hits, measured, sink)` returns its order through `sink`, so the strip and the notice use one
+  computation. The notice under the grid keeps its derivation and its "cannot be placed" clauses, but no longer
+  prints a bold order of its own. It now points to the strip.
+
+**Result:** the analyst sees both answers the tab computes, before the grid, one above the other, each named with
+its direction. They can write "lowest take: Iraq › Angola › Brazil; most predictable: Brazil › Iraq › Angola
+(Angola a ≤26 ceiling)" and know those are two findings, not one contradictory ranking. Nothing further down the
+page claims a different "only" order.
+
+| 3-country sets walked (1440 and 390 touch) | before (v771) | after (v772) |
+|---|---|---|
+| unlabelled `›` orders on screen | 2 (strip + bold notice line) | 0 — both labelled by metric and direction |
+| "The only order this set establishes" under the grid | Iraq/Brazil/Angola, NO/UK/NL, Guyana/Angola/Brazil, Nigeria/Indonesia/Malaysia | none |
+| predictability order visible without scrolling past the grid | no (below 1,231px grid at 1440) | yes, in the strip at y≈130 |
+
+**Verification — run this cycle on the v772 tree at 127.0.0.1:8481:**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8481/`,
+  `ORCA_REPORT_FILE=/tmp/rt_v772.txt`, read from its own report: **299 PASS / 0 FAIL / 1 WARN**. The WARN and the one
+  JS error are the known localhost `sw.js` 404 ("A bad HTTP response code (404) was received when fetching the
+  script"), which matches cycles 675-677 locally. The before figure is the loop's Step 2 on the deployed v770/v771
+  URL: 300 / 0 / 0.
+- Pixel gate `pixel_audit.js` against the local tree, baseline not updated: **PIXEL GATE PASS**.
+- Step 5b: 390x844 with `hasTouch`, `pointer: coarse` true, 5 sets walked by typing and Clear:
+  `scrollWidth == clientWidth` (390/390) on all 5, strip height 136-248px, no strip pill under 24px, 0 page errors.
+  At 1440, 1440/1440 on all 5 with 0 page errors. Stale-state check: after Clear and a switch to Iraq/Brazil, the
+  predictability row is hidden and no notice remains.
+- STILL LOCKED respected: v612 mobile layer and `#reference-panel` untouched; no new banner (the existing
+  `#cmp-verdict` strip gained a row); CP headline untouched; no tab reorder; no tooltip, FAQ or citation work.
+  Version v771 → v772 at the three display sites.
+
+**Deliberately NOT done:**
+- On phones the Predictability Score pill in the grid still clips ("61 · MODERATI", and "≥45.2pp obs" spills 3px
+  past its cell). This is minor next to the contradictory orders, and a layout-only fix for a later cycle.
+- The Contractor NPV chart remains on the blended basis while the take chart is on PSC/Conc. ORCA holds the Group-1
+  NPV at $75 only, so there is no honest re-base. The existing note already says so.
+
+**Shipped:** `f84186e` (v771, cycle 678's work) and `b4ad304` (v772) pushed to `main`. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK), office commit `c7a82d132`
+(not pushed by this session).
