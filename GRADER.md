@@ -42507,3 +42507,39 @@ Measured on this build against `api/v1/country/*.json` for all 185: **41** one-t
 The Country Profile's "Copy for IC Memo" was pasting a predictability score that the platform itself withdraws, for 41 countries. The pasted table now gives the number to use instead, and the badge on the page shows the same number. Pushed (`5dfd99d..2a0668f`) and copied to the office mirror.
 
 **Task:** T5, "Give me something I can paste straight into an IC memo." It hadn't been run since v752, the lo
+
+---
+## Cycle 665 — v759 (T4) — 2026-09-10 03:35
+
+**Task.** T4 — "What is my fiscal-stability and reform exposure here?" Chosen because it had gone longest unrun (v753); the last six cycles were T5, T1, T3, T6, T2, T4.
+
+**Walk.** Cold load, no storage → Reform Risk tab → "Check one country" → verdict card. Walked in Chromium at 1440×900 and 390×844 `hasTouch`, not from the changelog. Covered cases: Nigeria, Iraq, Brazil, Guyana, United Kingdom; no-log cases: Mozambique, Malaysia, Egypt.
+
+**Friction.** The Home card sells this lookup as the control "that returns one IC action", and every T4 route on the platform ends here. `renderReformCountryVerdict()` rendered that IC action **last**, below a five-tile strip. The strip's Fiscal Predictability tile, which the card itself labels "separate signal", runs to ~420px of 10px prose and grows again when `_rrApplyObsSpread()`'s fetch lands. An analyst who picked Nigeria read 70/100, "direction not measured", "73 MODERATE" and "Carry ≤46 LOW" before reaching the line that says what premium to carry. Measured by picking each of the 21 covered jurisdictions from a cold load:
+- **390×844 touch:** IC action fully on the first screen for **0 of 21**; median **811px** into the card (range 719–951).
+- **1440×900:** cut at the fold for 4 of 21: **Nigeria 50%, Mexico 50%, Kazakhstan 59%, Brazil 86%** visible.
+
+**Change.**
+1. The IC action block moves from below the tiles to directly under the card headline, and takes `id="rr-ic-action"`. Nothing is reworded or recomputed. `_rrClassify()` is untouched, so Fiscal Compare, the Country Profile sidebar and the IC paste are unaffected.
+2. The lookup's change handler now brings the answer into view on a user pick, via the existing `_rrScrollVerdictToTop()` (sticky-header aware). It does this **only** when `#rr-ic-action` is not already fully on screen, or the no-log lead, now `id="rr-verdict-lead"`. Programmatic picks through `openReformRiskFor()` already scrolled and are unchanged.
+
+**Result.** The analyst picks a country and the first thing inside the card is the action to take:
+- **1440×900:** the IC action is fully visible for **21 of 21**, 46px into the card, and the page does not move (post-pick `scrollY` 0 for all 21).
+- **390×844:** fully visible for **21 of 21**. The page scrolls for the 12 whose action would otherwise be cut and stays put for the other 9.
+- **No-log cards (Mozambique, Egypt, Saudi Arabia):** the "this is not a score of 100" lead is fully visible, with no scroll needed.
+
+### Verification — run this cycle
+- **Runtime suite RAN** (graded copy `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL` = edited local tree, own `ORCA_REPORT_FILE`): **296 PASS / 0 FAIL / 1 WARN / 1 JS error**. The WARN and the error are the same item, `[ConsoleErrors]` for `/petroleum-fiscal-db/sw.js` 404, a path that resolves only on Pages. This matches cycle 664's local runs (296/0/1/1 on both sides). **No before-run on the local tree this cycle.** The before figure is the loop's own step-2 run at 03:19 against the deployed build, 297/0/0.
+- **JS syntax gate: PASS**, 11 inline blocks, run after the version bump.
+- **PIXEL GATE PASS** against `~/logs/pixel_audit/baseline.json`, local tree, baseline not modified.
+- **Horizontal scroll: 0** with the verdict open at 1440 and 390, for all 21 covered countries plus 3 no-log. **1920 / 1280 / 1024 / 768 were not measured with a country selected this cycle.** The pixel gate covers those viewports with no country picked.
+- **Phone step 5b:** overflow 0. **No control was added or resized:** the moved block holds text only, and the select and Clear button are untouched. Their coarse-pointer heights were not re-measured.
+- **Page errors: 0** in every walk.
+- **STILL LOCKED respected:** v612 mobile layer and `#reference-panel` untouched; no tab reorder; no tooltip, FAQ or citation edit. Version v758 → v759 at the three display sites only.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+- **The Country Profile reform sidebar** renders the same `_rrClassify()` verdict (≈line 35321). Its ordering was not walked this cycle.
+- **No-log cards (164 of 185):** there is no labelled IC action. The "start the external check here" statute block is the actionable line, and it sits at the bottom (~560px into the card on desktop, ~1,240px on a phone).
+- **On a phone the Reform Risk intro strip is 335px of prose above the lookup**, which puts the select at y=575 on an 844px screen.
+- **The Fiscal Predictability tile inside the reform card is still ~420px** of 10px prose on Nigeria. It is now below the answer rather than above it, but it was not shortened.
+- The 02:00 "overnight chain FAILED" email was not re-examined this cycle. Cycle 664 diagnosed it as harvest `NO-DELTA`.
