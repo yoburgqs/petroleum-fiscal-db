@@ -42816,3 +42816,43 @@ byte-identical (`cmp` OK).
 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 671 — T5, shipped as v765 (and cycle 670's unshipped v764 committed)
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* (670 was T2; T5 last ran at 664, the longest gap of the six.)
+
+**First, cycle 670's work was lost in transit.** Its Claude session exited while waiting on its test runs. The loop then pushed only the GRADER commit (`bb63266`) and left the v764 `index.html` edit uncommitted, so it never deployed. It was verified before shipping: its own before/after sweep (`/tmp/c670sweep_*.out`) took Country Profile from 31 countries where the IC Memo strip contradicted the bold verdict above it to 0. The syntax gate passed. It is committed as `cf259f3`, the same recovery cycle 667 made for 666's v760.
+
+**Walk (cold, storage cleared, clipboard bytes captured by an init-script hook).** Every "Copy for IC Memo" control on Fiscal Compare, Country Profile (Indonesia) and Side-by-Side (both buttons, cold default set). The FC paste is 185 rows / 50,658 chars, by design (v632's row ticks are the escape hatch). The CP paste is a 15-row table with 7 notes. The worst moment was in the Side-by-Side paste.
+
+**Friction.** Side-by-Side → cold default set (Norway / United Kingdom / Netherlands) → Copy for IC Memo → paste. Comparability note 2 ended: *"Ranked on those ceilings alongside the measured column, this set reads **Netherlands ≤59 › United Kingdom 58 › Norway ≤52** — carry that order and those figures into the IC memo."* A ≤ figure is a CEILING: the platform's own tooltip says "the true figure is at or below it, never above". So Netherlands ≤59 is not established above United Kingdom 58, and two ceilings are never orderable. The only relation those figures support is United Kingdom 58 › Norway ≤52. The quickstart preset USA / Iraq pasted *"USA ≤82 › Iraq 47"*: USA's true score may sit anywhere at or below 82, including under 47. The analyst was being told, in bold orange on screen and again in the pasted artifact, to carry an order into committee that the data cannot support.
+Cause: `_sbsBoundOrder()` pushed ceilings and measured scores into one array and sorted it by value (v714). Its header comment stated the premise outright: "A ceiling and a measured score are both defensible upper reads, which is what makes them orderable together."
+Measured with a 64-set sweep (cold default, the 4 quickstart presets, 60 seeded random sets of 2–4), checking every `›` inside `#cmp-obs-notice`. On v764, 39 sets raise the notice and 28 print an order. **16 sets carry at least one unestablished order, 21 false `›` claims in total**, including 2 of the 4 presets.
+
+**Change.**
+1. `_sbsBoundOrder()` now prints only provable relations: measured vs measured (ties as `=`), and a measured score over a ceiling at or below it. Ceilings below every measured column are appended, marked "not ordered against each other" when there are several. A ceiling that cannot be placed is named: *"Netherlands ≤59 cannot be placed against United Kingdom 58 or the other ceiling — its true score may sit on either side."* Where nothing can be ordered, it says *"No predictability order is established in this set"*.
+2. That order sentence is now its own bold line inside the notice (`display:block`), instead of sitting mid-paragraph in a 1,100-character block.
+3. The notice clause "rank it on the ≤ ceilings" now reads "use the ≤ ceilings … and only the order stated below". The Predictability cell's carry tooltip no longer says "Rank this column on N". It now says that N places the column below a measured score at or above it, and against nothing else.
+
+**Result.** The analyst who pastes the Side-by-Side table gets a predictability order the numbers actually support. On the cold default that is United Kingdom 58 › Norway ≤52, with Netherlands explicitly unplaced. On USA / Iraq they are told no order exists, where before they got a false one. The line is readable on screen without parsing the paragraph.
+
+### Verification — run this cycle, not assumed
+- **64-set sweep: 21 false order claims in 16 sets → 0 in 0.** Before ran on a clean `cf259f3` worktree on :8472, after on the edited tree on :8471. Sets with a `›` order line went from 28 to 15; the other 13 now state that no order, or only a partial one, is established. The sweep ran before a final punctuation fix (a stray comma in the no-order sentence), which touches no `›`. The paste check below re-ran after it.
+- **Paste re-captured on the final tree:** both flavours carry the new sentence and neither carries "this set reads".
+- **Runtime suite RAN both sides** (`office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL` local, own `ORCA_REPORT_FILE` each): **v764 296 PASS / 0 FAIL / 1 WARN; v765 296 / 0 / 1.** The reports are identical apart from the timestamp. The one console error is the known localhost `sw.js` 404. The loop's deployed figure is 297.
+- **JS syntax gate: PASS**, 11 of 11 inline blocks, on the final tree.
+- **PIXEL GATE PASS** against `~/logs/pixel_audit/baseline.json` (baseline not modified), local tree.
+- **Page overflow 0** at 1920 / 1440 / 1280 / 1024 / 768 (touch) / 390 (touch), default set and USA / Iraq, on both builds. Page errors 0.
+- **Step 5b phone (390×844, `hasTouch`, `pointer: coarse` true):** overflow 0; the notice box is 14..376px with inner scrollWidth = clientWidth (362); no control was added, and the notice holds 0 controls.
+- **Cost, stated:** the notice is taller because it now names what cannot be placed. Default set: 117 → 141px at 1440, 195 → 258px at 768, 483 → 592px at 390. USA / Iraq: 78 → 102px at 1440.
+- **STILL LOCKED respected:** v612 mobile layer and `#reference-panel` untouched; no tab reorder; presets still a dropdown; no new tooltip as the fix (one existing tooltip corrected so it stops giving the wrong instruction); no FAQ; no citation-string edit. Version v764 → v765 at the three display sites.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+- **The Side-by-Side paste still flattens badges into fragments** (cycle 664's item, re-confirmed on v765): `66% primary law · of · 63,848 facts`, `68.0% · highest of 2 · of the producers`, and note 1 fused into `United Kingdom 49.2% › Norway 68.0% 18.8pp apart order holds $50–$125 Set aside — …`. Root cause is `cellText()`'s ` · ` separator plus `\s+` collapse in the notes sweep. This is the next T5 candidate.
+- **The Country Profile paste's breakeven note is cut off mid-sentence:** note 2 for Indonesia ends "Cite it as a bound" with no period and no completion.
+- **Ceiling vs ceiling across rows:** the Predictability row's cells still show each ceiling; nothing on the grid ranks them visually, so no grid change was needed.
+- **The 02:00 "overnight chain FAILED" email** is harvest `NO-DELTA` again (550 attempted, 0 new facts, 6 other steps OK). That is the known exhausted-skip-list question in `~/CLAUDE.md`; not touched.
+- **Loop defect that lost v764:** `autonomous_cycle.py` commits only `GRADER.md` (line 262). When the Claude session exits before committing, the tested `index.html` edit is left behind uncommitted, and the pixel gate and suite pass on a tree that is never shipped. This is the second time (666 → 667, 670 → 671). Not changed here: it is loop infrastructure, not a UX cycle.
+
+**Shipped:** pushed `bb63266..5e181c9` (v764 `cf259f3` + v765 `5e181c9`). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK).
