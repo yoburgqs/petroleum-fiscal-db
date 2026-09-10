@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v760</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v761</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1012,6 +1012,18 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 .source-badge.conf-c { background: rgba(194, 65, 12, 0.1); color: var(--orange); border: 1px solid rgba(194, 65, 12, 0.3); }
 .source-badge.conf-d { background: rgba(185, 28, 28, 0.1); color: var(--red); border: 1px solid rgba(185, 28, 28, 0.4); font-weight: 700; }
 .source-badge.conf-db { background: var(--surface2); color: var(--muted); border: 1px solid var(--border); }
+/* v761 (T6): the Evidence Chain's Source cell is where "where did this number come from" ends,
+   and v500's one-line ellipsis cut the answer off mid-name on 41 of 60 cells (all 15 LINK DEAD
+   rows among them). Scoped to .ec-chain only: the same pill in the ~250px reform sidebar keeps
+   v500/v576's single-line clamp. The name wraps inside the cell; the column is ~500px at 1440,
+   so the longest instrument names on record take two lines rather than losing their year. */
+.facts-table.ec-chain .source-badge { white-space: normal; max-width: 100%; overflow: visible; line-height: 1.45; overflow-wrap: anywhere; }
+.facts-table.ec-chain .ec-src-name { white-space: normal; }
+/* The global `thead th` / `tbody td` nowrap (lines ~276/289) let the "Not read by the model"
+   divider — one ~650px line in a colspan=4 cell — set the min-content of every column, which is
+   what pushed this table 27-117px past its wrapper at 1024. This table's own cells wrap. */
+.facts-table.ec-chain th, .facts-table.ec-chain td { white-space: normal; }
+.facts-table.ec-chain .cite-dead-chip, .facts-table.ec-chain .source-badge > span:not(.ec-src-name) { white-space: nowrap; }
 /* Feature 3 — tier-badge: colored quality dot for fiscal parameters */
 .tier-badge { display: inline-block; width: 14px; height: 14px; border-radius: 50%; font-size: 10px; text-align: center; line-height: 14px; font-weight: bold; margin-left: 3px; cursor: help; }
 .tier-badge.tier-a { background: var(--green); color: #fff; }
@@ -1423,6 +1435,25 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     align-items: flex-start;
     text-align: left;
   }
+
+  /* v761 (T6): the Evidence Chain on a phone. Parameter / ORCA / Statutory filled the 336px
+     wrapper and the Source column sat at x=422-778 -- off screen on 26 of 26 rows walked, behind a
+     sideways swipe nothing signals (this wrapper has no .tbl-wrap fade). The analyst read the
+     numbers and never saw which document, or that it was LINK DEAD. Each row is now a three-cell
+     line with its source on a full-width line beneath it, so nothing in the table scrolls. The
+     Source <th> is hidden because every source line labels itself. Scoped to .ec-chain; no v612
+     selector is narrowed or removed, and the desktop table is unchanged. */
+  .facts-table.ec-chain, .facts-table.ec-chain thead, .facts-table.ec-chain tbody { display: block; width: 100%; }
+  .facts-table.ec-chain tr { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr) minmax(0, 1fr); }
+  .facts-table.ec-chain thead th:nth-child(4) { display: none; }
+  .facts-table.ec-chain td { min-width: 0; overflow-wrap: anywhere; }
+  .facts-table.ec-chain tr:not(.ec-offmodel-div) > td:not(.ec-src) { border-bottom: none; padding-bottom: 3px; }
+  .facts-table.ec-chain td.ec-src { grid-column: 1 / -1; padding-top: 0; }
+  .facts-table.ec-chain tr.ec-offmodel-div { display: block; }
+  .facts-table.ec-chain tr.ec-offmodel-div > td { display: block; }
+  /* The "⚠ DCF USES TIERS 60–88%" conflict chip is inline-styled nowrap and 159px wide; in a
+     103px column it painted over the Statutory figure beside it. It wraps in its own cell here. */
+  .facts-table.ec-chain td.param-val span[style*="nowrap"] { white-space: normal !important; }
 
   /* Wide tables scroll inside themselves. The gradient on the right edge is
      the only honest signal that there is more table — without it an analyst
@@ -2240,7 +2271,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v760</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v761</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2310,7 +2341,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v760</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v761</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -34144,9 +34175,15 @@ function renderReformTimeline(country) {
     };
     // v500: source blobs run 80–120 chars (median 80). Ellipsise the NAME only, in an inner span,
     // so the tier letter and the ↗ link affordance are never the part that gets clipped.
+    // v761 (T6): this clamped every instrument name to 228px with an ellipsis, so "Nigeria
+    // Petroleum Industry Act 20…" lost its year and "Indonesia Government Regulation No. 53 of
+    // 2017 Gross Split P…" its subject -- on 41 of 60 Source cells across ten walked countries,
+    // including all 15 LINK DEAD rows, where the dead-link note below the table tells the analyst
+    // to "locate the instrument by name" and the name is the only lead left. The full string was
+    // only in a title="" -- which on a dead link is the dead-link explanation, and on a phone does
+    // not exist. The name now renders whole and wraps inside the cell (.ec-chain CSS).
     const _shortSrc = function(s) {
-      return '<span style="display:inline-block;max-width:228px;overflow:hidden;text-overflow:ellipsis;'
-        + 'white-space:nowrap;vertical-align:bottom;">' + _esc(s) + '</span>';
+      return '<span class="ec-src-name">' + _esc(s) + '</span>';
     };
     const _fmtPct = function(v) { return (Math.round(v * 100) / 100) + '%'; };
     // v743 (T6): row labels are HTML (v625 wraps NOT HELD labels in an opacity span). Any label
@@ -34474,12 +34511,12 @@ function renderReformTimeline(country) {
               const _deadChip = '<span class="cite-dead-chip" style="background:rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);'
                 + 'color:var(--red);font-size:10px;font-weight:700;padding:1px 4px;border-radius:3px;'
                 + 'letter-spacing:.04em;cursor:help;" title="' + _dTip + '">LINK DEAD</span> ';
-              badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="max-width:340px;opacity:.7;" title="${_dTip}">${_deadChip}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</a>`;
+              badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="opacity:.7;" title="${_dTip}">${_deadChip}${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</a>`;
             } else {
-              badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="max-width:340px;${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} ↗</a>`;
+              badgeHtml = `<a href="${_esc(srcMeta.url)}" target="_blank" rel="noopener" class="source-badge ${confClass}" style="${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel} ↗</a>`;
             }
           } else {
-            badgeHtml = `<span class="source-badge ${confClass}" style="max-width:340px;${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</span>`;
+            badgeHtml = `<span class="source-badge ${confClass}" style="${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</span>`;
           }
         } else {
           // v601 (T2): no source of any kind for this row. The old badge read "Contract DB
@@ -35099,7 +35136,7 @@ function renderReformTimeline(country) {
     // Previously the Source badge sat next to the contract average and read as though the primary
     // legislation backed that number. For 62 rows across 39 countries it does not (Angola royalty:
     // 2.58% modelled vs 20% in Lei 10/2004). Both numbers are now on screen, separately labelled.
-    el.innerHTML = '<table class="facts-table">'
+    el.innerHTML = '<table class="facts-table ec-chain">'
       + '<thead><tr><th>Parameter</th>'
       + '<th title="Contract-weighted average across this country\'s contracts in the ORCA database. This is the number the DCF engine uses for take%, NPV and IRR.">ORCA Value</th>'
       + '<th title="The rate stated in the cited source itself. This is what the Source badge backs — cite this figure, not the ORCA average, when you quote the legislation.">Statutory (cited source)</th>'
@@ -35110,7 +35147,7 @@ function renderReformTimeline(country) {
           + '<td class="param-name">' + r[0] + '</td>'
           + '<td class="param-val">' + r[1] + '</td>'
           + '<td class="param-val">' + r[2] + '</td>'
-          + '<td>' + r[3] + '</td>'
+          + '<td class="ec-src">' + r[3] + '</td>'
           + '</tr>'
         ).join('')
       // v743 (T6): the partition. A full-width divider row carrying the regime name, then the
@@ -35128,7 +35165,7 @@ function renderReformTimeline(country) {
                 + '<td class="param-name">' + r[0] + '</td>'
                 + '<td class="param-val">' + r[1] + '</td>'
                 + '<td class="param-val">' + r[2] + '</td>'
-                + '<td>' + r[3] + '</td>'
+                + '<td class="ec-src">' + r[3] + '</td>'
                 + '</tr>'
               ).join('')
           : '')
