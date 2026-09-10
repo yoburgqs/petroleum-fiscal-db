@@ -42494,3 +42494,16 @@ Measured on this build against `api/v1/country/*.json` for all 185: **41** one-t
 - **The Country Profile paste notes are long:** reform note 1,167–1,273 chars, predictability note ~960+. The table itself is clean, 15–16 rows.
 - **The Fiscal Compare cold copy is still 185 rows / 50,658 chars.** v632's row ticks are the designed escape hatch, and the toast states the row count.
 - **The 02:00 "overnight chain FAILED" email** is harvest `NO-DELTA`: 550 records attempted, 0 new facts, and the other 6 steps OK. This is the known exhausted-skip-list tension in ~/CLAUDE.md, not a UX defect, and was not touched here.
+
+---
+## Cycle 664 Log — 2026-09-10 02:45
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus | **Directive:** DIRECT | **Task:** Cycle 664 — T5
+
+## Cycle 664: shipped v758
+
+The Country Profile's "Copy for IC Memo" was pasting a predictability score that the platform itself withdraws, for 41 countries. The pasted table now gives the number to use instead, and the badge on the page shows the same number. Pushed (`5dfd99d..2a0668f`) and copied to the office mirror.
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." It hadn't been run since v752, the lo
