@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v751</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v752</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2237,7 +2237,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v751</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v752</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2307,7 +2307,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v751</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v752</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -42738,6 +42738,93 @@ function cpCopyICTable(safe) {
   } else { fail(); }
 }
 
+// ── v752 (T5): the one row in this paste that carried no note was the one the page shouts about ──
+//
+// Walked T5 cold: Country Profile -> "Copy for IC Memo" -> paste into a memo. The paste is a
+// Metric/Value table plus numbered notes, and every load-bearing row already drags its own
+// qualification along -- breakeven says "bounded, not solved", predictability says "UNGRADED,
+// do not cite as stability", evidence tier says "2 of 3 documents 404", data basis says "7.6%
+// production-weighted", fee-basis says "rank the COMPARABLE figure instead". One row had none:
+//
+//     Government take @ $75/bbl        59.5%
+//
+// which is the number the analyst came for. Meanwhile the Country Profile that produced the
+// paste was displaying, in orange, immediately under the verdict:
+//
+//     "Take is a range here, not a point. The contract table on this page runs 42.5-79.7%
+//      across its 50 largest producing contracts ... Quote 59.5% as a contract average and
+//      carry the range."
+//
+// v715 patched five surfaces with that reading -- the verdict line, the basis chip, the
+// distribution caption, the dashed band on the distribution bar, the predictability chip -- and
+// did not patch the artifact that LEAVES the tool. So the analyst read the warning on screen,
+// clicked the button whose whole promise is "paste straight into an IC memo", and the memo got
+// a bare point estimate. Measured on the shipped country_data.json + api/v1/country/*.json:
+// 58 of 185 countries hold a dispersion reading, 51 of them material (>=5pp) -- Uzbekistan
+// 26.6-82.4% (55.8pp), Angola 30.0-75.2%, Indonesia 42.5-79.7%. On those 51 the pasted table
+// stated a single take that the same page had already refuted.
+//
+// Both tests are cpDefendDispersion()'s, unchanged and not re-derived: cpSpreadConflict() (the
+// CP_OBS_REFUTE_PP = 1.0pp one-counterexample rule) first, the p25/p75 >= 5pp IQR read second,
+// and the same 5pp materiality cut deciding whether the wording is emphatic. The range is put
+// in the VALUE CELL, not only in the note, because an IC memo gets cut down and the table is
+// what survives.
+function _icTakeDispersion(d, hd) {
+  if (!d || typeof hd !== 'number' || !isFinite(hd)) return null;
+  if (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75)) return null;
+  var MATERIAL_PP = 5;
+  // "Quote X% as a contract average" is the wrong closing instruction when X is not inside the
+  // range the same note is printing. On 25 of 185 countries the headline sits outside its own
+  // contract evidence (Uzbekistan 85.6% against contracts running 26.6-82.4%), and on screen the
+  // basis chip says so in orange right beside the verdict. The paste has no chip, so the clause
+  // is swapped here rather than shipping an instruction the note itself refutes. Same
+  // CP_OBS_REFUTE_PP bar the chip uses; nothing new is asserted and no take is recomputed.
+  function _out(lo, hi) {
+    var bar = (typeof CP_OBS_REFUTE_PP === 'number') ? CP_OBS_REFUTE_PP : 1.0;
+    return hd < lo - bar || hd > hi + bar;
+  }
+  function _close(lo, hi, what) {
+    // In-range wording is cpDefendDispersion()'s own closing sentence, verbatim, so the paste and
+    // the screen cannot end up instructing the analyst differently.
+    if (!_out(lo, hi)) return 'Quote ' + hd.toFixed(1) + '% as a contract average and carry the range.';
+    var gap = (hd < lo) ? (lo - hd) : (hd - hi);
+    return 'The ' + hd.toFixed(1) + '% headline falls ' + gap.toFixed(1) + 'pp outside that range '
+         + '\u2014 ' + what + ' reaches it \u2014 so carry the range and resolve the headline '
+         + 'against the contract table before quoting it as a country average.';
+  }
+  var obs = (typeof cpObsSpread === 'function') ? cpObsSpread(d.country) : null;
+  if (typeof cpSpreadConflict === 'function' && cpSpreadConflict(d, obs)) {
+    var material = obs.spread >= MATERIAL_PP;
+    var rng = obs.min.toFixed(1) + '\u2013' + obs.max.toFixed(1) + '%';
+    return {
+      material: material,
+      cell: material ? ' \u2014 contract average; contracts run ' + rng : '',
+      note: 'Government take @ $75/bbl, ' + hd.toFixed(1) + '% \u2014 '
+          + (material ? 'take is a range here, not a point. ' : 'not a single term, but a narrow one. ')
+          + 'The contract table on the ORCA Country Profile runs ' + rng + ' across ' + d.country
+          + '\u2019s ' + obs.n + ' largest producing contracts \u2014 a floor of \u2265'
+          + obs.spread.toFixed(1) + 'pp measured, and the bundled quartiles that call this a single '
+          + 'term are not usable for ' + d.country + '. '
+          + (material || _out(obs.min, obs.max)
+              ? _close(obs.min, obs.max, 'no contract the profile lists')
+              : 'At that width ' + hd.toFixed(1) + '% is quotable as a contract average.')
+    };
+  }
+  if (d.p25_take != null && d.p75_take != null && (d.p75_take - d.p25_take) >= MATERIAL_PP) {
+    var pp = d.p75_take - d.p25_take;
+    var lo = Math.min(d.p25_take, d.p75_take), hi = Math.max(d.p25_take, d.p75_take);
+    var iqr = lo.toFixed(1) + '\u2013' + hi.toFixed(1) + '%';
+    return {
+      material: true,
+      cell: ' \u2014 contract average; half of contracts price ' + iqr,
+      note: 'Government take @ $75/bbl, ' + hd.toFixed(1) + '% \u2014 take is a range here, not a '
+          + 'point. Half of ' + d.country + '\u2019s contracts price between ' + iqr + ' ('
+          + pp.toFixed(1) + 'pp measured), so the block signed moves the take. '
+          + _close(lo, hi, 'the middle half of this country\u2019s contracts does not')
+    };
+  }
+  return null;
+}
 function copyICSummary() {
   var sel = document.getElementById('dd-country-select');
   var country = sel ? sel.value : '';
@@ -42811,9 +42898,14 @@ function copyICSummary() {
   var _stabHT = _icHeadTail(stabLabel);
   var _refTxt = _icReformLine(country).trim();
 
+  // v752 (T5): the headline take row carries its measured dispersion in the cell, so the range
+  // survives an editor who keeps the table and deletes the notes.
+  var _disp = (typeof _icTakeDispersion === 'function' && d.take_75 != null && d.take_75 > 0 && d.take_75 < 200)
+    ? _icTakeDispersion(d, d.take_75) : null;
+
   var _rows = [
     ['Government take @ $50/bbl',  t50Str],
-    ['Government take @ $75/bbl',  takeStr],
+    ['Government take @ $75/bbl',  takeStr + ((_disp && _disp.cell) ? _disp.cell : '')],
     ['Government take @ $100/bbl', t100Str],
     ['Government take @ $125/bbl', t125Str]
   ];
@@ -42843,6 +42935,8 @@ function copyICSummary() {
 
   // Notes, in table order. Each names the row it belongs to so the pairing survives an edit.
   var _notes = [];
+  // Table order: the $75 take row sits above breakeven, so its note leads.
+  if (_disp && _disp.note) _notes.push(_disp.note);
   // The head is repeated inside the note so the note still identifies its own row after an
   // editor moves it; a comma rather than a second em dash, because the tail already opens with one.
   if (_beHT.tail)   _notes.push('Breakeven, ' + _beHT.head + ' — ' + _beHT.tail);
