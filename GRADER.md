@@ -42440,3 +42440,14 @@ The Home IC-screen card now lands the same way. A second pick while already at t
 - Test after: 293 PASS / 0 FAIL / 1 WARN (local)
 - JS errors: 1 both sides (sw.js 404, local-serving artifact)
 - Summary: shipped **v757**, pushed `c148b0a..56e4fc7`, mirrored to the office repo.
+
+---
+## Cycle 663 Log — 2026-09-10 01:48
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: I shipped v757. Picking a screen from the Screener's "Load a screen…" menu used to leave every result off-screen below 1440px wide; now the page scrolls to the results. It's pushed (`c148b0a..56e4fc7`, log in `791ec12`) and mirrored to the office repo.
+
+**Task:** T1, "Which countries should even be on my screening list?" It hadn't been run since cycle 657.
+
+**Friction:** I cleared storage, opened the Screener and picked **IOC Capital Screen** from the menu. The page didn't move. The preset label
