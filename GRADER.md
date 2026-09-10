@@ -42176,3 +42176,16 @@ Version bumped v754 → **v755** at the 3 display locations (`<title>`, `#hdr-ve
 Pushed `ce96ad8..94b6cc8`. The pre-change build was served from `/tmp/t6before` (git HEAD's
 index.html plus symlinks to the data files) on port 8232 for the before-suite; both localhost
 servers stopped at cycle end.
+
+---
+## Cycle 661 Log — 2026-09-09 23:49
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 661 complete — shipped as **v755**, pushed `ce96ad8..fc29066`, mirrored to the office repo.
+
+## Task
+**T6** — "Where did this number come from and how solid is the evidence?" (stalest: 660 was T2, 659 T4, 658 T5, 657 T1, 656 T3; T6 hadn't run since 654.)
+
+## Friction
+Walked T6 from a cold load: Home → Fiscal Compare → row drilldown → Country Profile → Evidence Quality → the per-parameter **Evidence Chain**, which is where every T6 path on this platform ends. Its verdict line is the most de
