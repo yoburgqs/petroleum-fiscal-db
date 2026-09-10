@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v771</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v772</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v771</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v772</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v771</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v772</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -28233,7 +28233,7 @@ function renderCompare() {
       const _span = _vdRanked[_vdRanked.length - 1].v - _vdRanked[0].v;
       const _chain = _vdRanked.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong> '
         + x.v.toFixed(1) + '%').join(' <span style="color:var(--muted);opacity:.7;">›</span> ');
-      _lead = '<span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Ranks against each other:</span>'
+      _lead = '<span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Govt take @$75, lowest first:</span>'
         + '<span style="font-size:12px;">' + _chain + '</span>'
         + _pill(_span.toFixed(1) + 'pp apart',
                 _span < 5 ? 'var(--orange)' : 'var(--text)',
@@ -28270,7 +28270,10 @@ function renderCompare() {
           : '');
     _vdHtml = '<div id="cmp-verdict" class="cmp-notice" style="margin-bottom:10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.22);border-left:3px solid var(--accent);border-radius:5px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">'
       + '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">' + _lead + '</div>'
-      + _aside + '</div>';
+      + _aside
+      // v772 (T3): filled by _sbsPaintVerdictFp() once the per-country spread fetches land.
+      + '<div id="cmp-verdict-fp" style="display:none;flex-wrap:wrap;align-items:center;gap:8px;"></div>'
+      + '</div>';
   }
   let html = `<div id="cmp-scroll-hint" role="status"></div>`;
   html += _vdHtml;
@@ -29363,7 +29366,8 @@ function _sbsAttr(x) {
 // support is United Kingdom 58 > Norway <=52. Netherlands may sit on either side of both. Two
 // relations are provable and nothing else is printed with a ">": measured vs measured, and a
 // measured score over a ceiling at or below it. A ceiling that cannot be placed is named as such.
-function _sbsBoundOrder(hits, measured) {
+function _sbsBoundOrder(hits, measured, sink) {
+  sink = sink || {};
   var ceil = [];
   hits.forEach(function(k) {
     var h = window._sbsObsHits[k];
@@ -29387,26 +29391,39 @@ function _sbsBoundOrder(hits, measured) {
   var carry = ' Carry ' + (ceil.length > 1 ? 'each ceiling' : 'the ceiling')
     + ' into the IC memo with its observed range attached, not the printed score'
     + (ceil.length > 1 ? 's' : '') + '.';
-  var line = function(s) {
-    return '<span style="display:block;margin-top:4px;font-weight:700;">' + s + '</span>';
-  };
   var cn = function(r) { return r.c + ' \u2264' + r.b; };
   var pn = function(p) { return p.c + ' ' + p.v; };
+  // v772 (T3): the order is handed back through `sink` for the strip above the grid, in the same
+  // markup as the take chain there, instead of being printed in bold down here. See
+  // _sbsPaintVerdictFp() for why.
+  var sn = function(name, val) {
+    return '<strong style="color:var(--text);">' + _sbsAttr(name) + '</strong> ' + val;
+  };
+  var sep = function(t) { return ' <span style="color:var(--muted);opacity:.7;">' + t + '</span> '; };
+  var sc = function(r) { return sn(r.c, '\u2264' + r.b); };
+  sink.ceil = true;
   if (!pts.length) {
+    sink.chain = null;
+    sink.points = [];
+    sink.loose = ceil.map(sc);
     if (ceil.length === 1) return head + carry;
-    return head + line('No predictability order is established in this set: '
+    return head + ' No predictability order is established in this set: '
       + ceil.map(cn).join(', ') + ' are ceilings, and a ceiling caps a score without placing it. '
-      + 'Do not rank these columns against each other on predictability.') + carry;
+      + 'Do not rank these columns against each other on predictability.' + carry;
   }
   var minPt = pts[pts.length - 1].v;
   var below = ceil.filter(function(r) { return r.b <= minPt; });   // provably at or below every measured column
   var loose = ceil.filter(function(r) { return r.b > minPt; });
-  var chain = pts.map(function(p, i) {
-    return (i ? (p.v === pts[i - 1].v ? ' = ' : ' \u203a ') : '') + pn(p) + ' (measured)';
+  var sChain = pts.map(function(p, i) {
+    return (i ? sep(p.v === pts[i - 1].v ? '=' : '\u203a') : '') + sn(p.c, p.v);
   }).join('');
-  if (below.length === 1) chain += ' \u203a ' + cn(below[0]);
-  else if (below.length > 1) chain += ' \u203a ' + below.map(cn).join(' and ') + ' (not ordered against each other)';
+  if (below.length === 1) sChain += sep('\u203a') + sc(below[0]);
+  else if (below.length > 1) sChain += sep('\u203a') + below.map(sc).join(' and ')
+    + ' <span style="color:var(--muted);">(not ordered against each other)</span>';
   var hasOrder = pts.length > 1 || below.length > 0;
+  sink.chain = hasOrder ? sChain : null;
+  sink.points = pts.map(function(p) { return sn(p.c, p.v); });
+  sink.loose = loose.map(sc);
   var looseTxt = loose.map(function(r) {
     var over = pts.filter(function(p) { return p.v >= r.b; });
     var open = pts.filter(function(p) { return p.v < r.b; });
@@ -29416,10 +29433,10 @@ function _sbsBoundOrder(hits, measured) {
       + ' \u2014 its true score may sit on either side';
   });
   var body = hasOrder
-    ? 'The only order this set establishes: ' + chain + '.'
+    ? ' The predictability order this supports is on the strip above the grid, under the take order.'
       + (looseTxt.length ? ' ' + looseTxt.join('; ') + '.' : '')
-    : 'No predictability order is established in this set: ' + looseTxt.join('; ') + '.';
-  return head + line(body) + ' Carry ' + (hasOrder ? 'that order, and ' : '')
+    : ' No predictability order is established in this set: ' + looseTxt.join('; ') + '.';
+  return head + body + ' Carry ' + (hasOrder ? 'that order, and ' : '')
     + (ceil.length > 1 ? 'each ceiling' : 'the ceiling') + ' with its observed range attached'
     + (hasOrder ? ',' : '') + ' into the IC memo \u2014 not the printed scores, and no order between '
     + 'columns the figures cannot place.';
@@ -29474,6 +29491,50 @@ function _sbsRevealEvidence() {
   }
   if (typeof _sbsScrollHint === 'function') { try { _sbsScrollHint(); } catch (e) {} }
 }
+// ── v772 (T3): two "orders" for one set, neither saying what it was an order OF. ─────────────────
+//
+// Walked T3 cold: Side-by-Side -> typed Iraq, Brazil, Angola (Enter each). The strip above the grid
+// read "RANKS AGAINST EACH OTHER: Iraq 34.1% > Angola 53.0% > Brazil 55.6% ... the ordering above
+// is the whole set". Under the grid -- 330px of notices at 1440, ~1,200px on a 390 phone -- a bold
+// line in larger type read "The only order this set establishes: Brazil 61 (measured) > Iraq 47
+// (measured) > Angola <=26." Same three countries, same ">" glyph, the reverse sequence, and
+// neither line named its metric: the top one is govt take at $75 (lowest first), the bottom one
+// is the Predictability Score (most stable first). "The only order" read as overruling the strip,
+// so an analyst who scrolled wrote Brazil first; one who did not wrote Iraq first. Same on the
+// cold default (United Kingdom > Norway by take; United Kingdom 58 > Norway <=52 by score, with
+// Netherlands set aside on one and unplaceable on the other) and on Nigeria / Indonesia / Malaysia.
+//
+// Both orders now sit in the one strip, each labelled with what it ranks and which end is first.
+// The notice under the grid keeps its derivation and its "cannot be placed" clauses but no longer
+// prints an order of its own. The strip row is filled here, as each fetch lands, because that is
+// when the ceilings exist; before then, and on sets with nothing withdrawn, it stays hidden.
+function _sbsPaintVerdictFp(s) {
+  var row = document.getElementById('cmp-verdict-fp');
+  if (!row) return;
+  if (!s || !s.ceil) { row.style.display = 'none'; row.innerHTML = ''; return; }
+  var body;
+  if (s.chain) {
+    body = '<span style="font-size:12px;">' + s.chain + '</span>'
+      + (s.loose.length
+          ? '<span style="font-size:11px;color:var(--muted);">' + s.loose.join(', ') + ' cannot be placed</span>'
+          : '');
+  } else {
+    var all = (s.points || []).concat(s.loose || []);
+    body = '<span style="font-size:12px;color:var(--muted);">no order established — ' + all.join(', ')
+      + (all.length > 1 ? ' cannot be placed against each other' : ' is a ceiling only') + '</span>';
+  }
+  row.innerHTML = '<span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;'
+      + 'text-transform:uppercase;white-space:nowrap;">Predictability, most stable first:</span>'
+    + body
+    + '<span title="' + _sbsAttr('A ≤ figure is a CEILING, not a score. ORCA’s contract file shows '
+        + 'a wider take spread for that country than its printed Predictability Score was charged for, so '
+        + 'the true score sits at or below the ceiling. A measured score is placed above a ceiling only when '
+        + 'the ceiling is at or below it. The derivation is in the notice under the grid.')
+      + '" style="display:inline-flex;align-items:center;min-height:24px;font-size:10px;font-weight:700;'
+      + 'color:var(--orange);background:rgba(194,65,12,.10);border-radius:3px;padding:2px 8px;line-height:1.5;'
+      + 'white-space:nowrap;cursor:help;">≤ = ceiling, not a score</span>';
+  row.style.display = 'flex';
+}
 function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
   if (token !== window._sbsRenderToken) return;
   var out = document.getElementById('cmp-output');
@@ -29525,15 +29586,17 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
             + (measured.length > 1 ? 's' : '') + ' on this screen while sitting at a NARROWER dispersion '
             + 'than the withdrawn column' + (hits.length > 1 ? 's' : '') + '. Do not rank the set on the '
             + 'printed scores \u2014 use the \u2264 ceilings now shown on the Predictability '
-            + 'Score row above, and only the order stated below.'
+            + 'Score row above, and the predictability order on the strip above the grid.'
           : 'are shown on a measured basis and are directly readable.');
   }
+  var fpSink = {};
   el.innerHTML = '<strong style="color:var(--orange);">\u26a0 The &ldquo;single term&rdquo; claim is withdrawn for '
     + hits.length + ' column' + (hits.length > 1 ? 's' : '') + ' in this set.</strong> ORCA ships identical p25/p75 '
     + 'take for ' + parts.length + ' of these countries, which is what the Take spread and Predictability rows were '
     + 'built on. Its own contract file contradicts that: ' + parts.join('; ') + ' \u2014 measured government take at '
     + '$75/bbl, not simulated.' + cmp + ' The scores are NOT recomputed here, because a top-N-by-production sample '
-    + 'cannot establish a population spread; they are marked \u25b2 best case.' + _sbsBoundOrder(hits, measured);
+    + 'cannot establish a population spread; they are marked \u25b2 best case.' + _sbsBoundOrder(hits, measured, fpSink);
+  _sbsPaintVerdictFp(fpSink);
 }
 function _sbsApplyObsSpread() {
   window._sbsRenderToken = (window._sbsRenderToken || 0) + 1;
