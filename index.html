@@ -27372,12 +27372,56 @@ function renderCompare() {
         + (r.flips ? 'does change between $50 and $125.' : 'does not change between $50 and $125.'))
       + '">' + word + ' of ' + r.n + tag + '</span>';
   };
+  // v750 (T3): the four Govt Take figures were the last thing on this tab still presenting a
+  // statutory-basis column as a tier-graded, rankable result.
+  //
+  // Walked T3 cold at 1440x900 on the tab's own seeded default set -- Norway / United Kingdom /
+  // Netherlands -- sessionStorage and localStorage cleared. Every other surface on that screen
+  // already marks the Netherlands column: Data basis reads PROXY, Rank among producers reads
+  // "not ranked - no production data" (v542), the four Contractor NPV rows read "not comparable -
+  // statutory terms" (v705), the take LINE CHART draws it with hollow markers under a subtitle
+  // reading "hollow markers = statutory basis, no verified production - not rankable against the
+  // filled lines" (v684), and the NPV BAR CHART draws it as a faded dashed bar. The take NUMBER
+  // went through fmtTake(), which applies takeClass(23.4) -> .take-if -- BOLD GREEN. Measured with
+  // getComputedStyle on the shipped build, all four Netherlands figures render
+  //     17.6% / 23.4% / 26.2% / 28.0%   rgb(21,128,61)  font-weight 700
+  // which is byte-identical to the United Kingdom's genuinely production-weighted 37.1% two
+  // columns to its left, and the legend printed under the grid defines that green as "<=40%",
+  // the investible tier.
+  //
+  // Colour is the fastest read on this grid. Before any caption is parsed the analyst's eye
+  // resolves green < amber < orange and concludes the Netherlands wins the set. It does not: the
+  // notice 700px further down this same page is headed "The column that wins this comparison is a
+  // proxy". The 10px grey "not ranked - statutory terms" caption sits directly beneath the green
+  // figure and loses to it. This is the cold-load default set, so it is the tab's normal state.
+  //
+  // Not a repeat of v749's Fiscal Compare fix. That demoted rows whose MECHANIC terms were a
+  // generic fallback -- no country-specific terms at all. Here the terms are real and cited; it is
+  // the production WEIGHTING that is absent, which is a different gate (_cmpBasisGate) on a
+  // different tab and a different render path.
+  //
+  // The figure is not deleted, dimmed out of legibility, or moved: it keeps font-weight 700 and
+  // its place in the row. It loses the tier colour it has not earned and gains the hollow ring the
+  // chart immediately below already draws this column with, so the grid and its own charts now
+  // speak one grammar. Scope is exactly _cmpBasisNote()'s -- an all-producer set and an
+  // all-statutory set are both unchanged, because the gate fires only where a set MIXES the bases.
+  const _cmpStatTakeFigure = (d, v) => '<span class="take-val" style="color:var(--muted);cursor:help;" title="'
+    + _cmpEsc(d.country + ': ' + Number(v).toFixed(1) + '% is deliberately NOT tier-coloured. The '
+      + 'green / amber / orange / red tiers in the legend under this grid rank a country against the '
+      + 'others on screen, and this column is not on their basis \u2014 ORCA holds no verified field '
+      + 'production for it, so the figure is a simple average of statutory terms across its contracts '
+      + 'rather than output-weighted economics. The hollow ring is the same marker the Govt Take vs '
+      + 'Oil Price chart below draws this column with. Read the number; do not read its position in '
+      + 'the row.')
+    + '">\u25cb ' + Number(v).toFixed(1) + '%</span>';
   const _cmpTakeCell = (d, p) => {
     const v = d['take_' + p];
     const base = fmtTake(v);
     const st = _cmpMixStat(d);
     const gated = _cmpBasisNote(d, p);
-    if (gated) return base + gated;   // v626: no ordering marker on a column the basis gate dropped
+    // v626: no ordering marker on a column the basis gate dropped. v750: and no tier colour on it
+    // either -- the two statements have to agree, or the caption is arguing with the number.
+    if (gated) return _cmpStatTakeFigure(d, v) + gated;
     if (!st.blended || !st.g1 || st.g1['t' + p] == null || v == null || isStateMonopoly(v)) return base + _cmpOrderMark(d, p, false);
     const g1v = st.g1['t' + p];
     return base + '<span style="display:block;font-size:10px;font-weight:700;color:var(--green);cursor:help;" title="'
@@ -42858,7 +42902,10 @@ function copyComparisonTable(btn) {
   // separator is inserted only where the two pieces would otherwise run together as one word.
   function cellText(td) {
     function clean(x) {
-      return String(x || '').replace(/[\u24D8\u2139\u24BE\u25C6\u200A]/g, '').replace(/\s+/g, ' ');
+      // v750: \u25cb is the Side-by-Side statutory-basis ring. It is a screen marker that pairs
+      // with the chart legend; the pasted cell already carries "not ranked - statutory terms" in
+      // words, so the glyph is stripped and the clipboard output is unchanged by v750.
+      return String(x || '').replace(/[\u24D8\u2139\u24BE\u25C6\u25CB\u200A]/g, '').replace(/\s+/g, ' ');
     }
     function walk(node) {
       if (node.nodeType === 3) return clean(node.nodeValue);
