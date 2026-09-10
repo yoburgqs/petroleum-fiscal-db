@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v762</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v763</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -214,6 +214,17 @@ table { width: 100%; border-collapse: collapse; }
 #tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-screener tr.sc-row-sel > td { background: rgba(176,104,0,0.09); }
 #sc-mobile-cols-note { display: none; }
+/* v763 (T1) — the divider prose was setting the width of every column in the Screener.
+   tbody td is white-space:nowrap, and the data-basis dividers are colspan=12 cells carrying up
+   to 710 characters on one unbroken line. Auto table layout widened the spanned columns until
+   that line fit: on the COLD view (185 rows, both dividers drawn) #tbl-screener measured
+   3,330px, Country 762px and Mechanics 554px wide, and Govt Take began at x=1694 -- off the
+   right edge of every screen narrower than 1920. The analyst who opened the tab to ask "which
+   countries?" got names, regions and mechanic tags and no number; Low Take · Positive NPV and
+   Frontier Markets did the same. The prose now sits in .sc-div-body: contain:inline-size takes
+   it out of column sizing, it wraps, and it is held to the visible width and pinned left, so
+   it stays readable while a phone swipes the table sideways. Row, class and wording unchanged. */
+#tbl-screener tr.screener-basis-divider .sc-div-body { contain: inline-size; white-space: normal; position: sticky; left: 0; max-width: calc(100vw - 84px); }
 @media (pointer: coarse) {
   /* Directive step 5b: a control this cycle adds may not render under 24px under a thumb. */
   #tbl-screener input.sc-sel, #tbl-screener input.sc-sel-all { width: 24px; height: 24px; }
@@ -2271,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v762</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v763</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2341,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v762</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v763</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -31724,7 +31735,7 @@ function runScreener() {
   // same amber voice as the v507 divider. The count line above the table is easy to skip past; the
   // first row of the grid is not.
   const _topBanner = (_allProxy || _mixedUngrouped)
-    ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+    ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;"><div class="sc-div-body">`
       + (_allProxy
           ? `<strong style="color:var(--accent);letter-spacing:.04em;">EVERY ROW BELOW &mdash; ${data.length} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
             + `This screen returned no production-backed regime. Fiscal terms are regional proxy estimates and the NPV / breakeven shown are indicative only. `
@@ -31732,7 +31743,7 @@ function runScreener() {
           : `<strong style="color:var(--accent);letter-spacing:.04em;">MIXED DATA BASIS &mdash; ${_nVerified} PRODUCTION-BACKED, ${_nProxy} PROXY, INTERLEAVED BY THIS SORT</strong><br>`
             + `This ranking is by ${_scSortKey ? _scSortLabelNow() : 'price sensitivity'}, so the two bases are not separated into blocks. `
             + `Rows badged PROXY have no verified field production &mdash; their fiscal terms are regional estimates and their NPV / breakeven are indicative only.`)
-      + `</td></tr>`
+      + `</div></td></tr>`
     : '';
   // v554 — when the ceiling is live on a country whose headline is a fee-basis blend, the row
   // must say so. Otherwise an analyst reading "84.8%" inside a screen captioned "≤ 65%" sees a
@@ -31816,11 +31827,11 @@ function runScreener() {
     // the analyst reads row 23 with the same authority as row 1 — the PROXY badge alone did not
     // carry that, because every row above it was badged PROXY too and it read as decoration.
     const _divider = (_grouped && i > 0 && _dqTier(data[i-1]).hasProduction && !_dqTier(d).hasProduction)
-      ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+      ? `<tr class="screener-basis-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;"><div class="sc-div-body">`
         + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nProxy} COUNTRIES WITH NO VERIFIED FIELD PRODUCTION</strong><br>`
         + `Fiscal terms are regional proxy estimates and the NPV / IRR / breakeven shown are indicative only. `
         + `Ranked among themselves by ${_scSortKey ? _scSortLabelNow().toLowerCase() : 'NPV'}. Usable for fiscal comparison; not defensible as a screening shortlist on their own.`
-        + `</td></tr>`
+        + `</div></td></tr>`
       : '';
     // v743 (T1): second boundary, drawn where the ranking stops being a measurement at all.
     // The v507 divider above answers "has anyone drilled here". It does not answer "is this
@@ -31828,11 +31839,11 @@ function runScreener() {
     // consequences: the thinner the fiscal record, the lower the modelled take, the HIGHER the
     // NPV, the higher the row. Vanuatu led the block below the v507 line at $5.1B.
     const _floorDiv = (_floorGrouped && i > 0 && !_scTakeIsFloor(data[i-1]) && _scTakeIsFloor(d))
-      ? `<tr class="screener-basis-divider screener-floor-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;">`
+      ? `<tr class="screener-basis-divider screener-floor-divider"><td colspan="12" style="background:rgba(176,104,0,.07);border-top:2px solid rgba(176,104,0,.4);border-bottom:1px solid rgba(176,104,0,.2);padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.6;"><div class="sc-div-body">`
         + `<strong style="color:var(--accent);letter-spacing:.04em;">BELOW THIS LINE &mdash; ${_nFloor} ${_nFloor === 1 ? 'COUNTRY WHOSE TAKE IS A FLOOR' : 'COUNTRIES WHOSE TAKE IS A FLOOR'}, NOT A MEASUREMENT</strong><br>`
         + _scFloorWhy()
         + ` Their take cells read <strong style="color:var(--accent);">&ge;</strong> and their NPV cells <strong style="color:var(--accent);">&le;</strong> for that reason. A low take here is missing record, not favourable terms &mdash; do not carry this block into a shortlist.`
-        + `</td></tr>`
+        + `</div></td></tr>`
       : '';
     // Bug 3 fix: click row to navigate to country profile
     const safeName = d.country.replace(/'/g, "\\'");
