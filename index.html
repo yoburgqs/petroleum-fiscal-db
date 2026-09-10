@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v765</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v766</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v765</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v766</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v765</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v766</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -23015,7 +23015,9 @@ function _rrStatuteMaxYear(legs) {
 // The closing sentence of the uncovered-country card. Unchanged wording where ORCA holds
 // no statute citation either; where it does, it names the starting document instead of
 // handing back a generic reading list.
-function _rrStatuteTail(d) {
+// v766: `where` is 'above' on the Reform Risk lookup card, which now renders the statute block
+// ahead of this sentence; Country Profile still renders it after, so the default stays 'below'.
+function _rrStatuteTail(d, where) {
   var legs = _rrStatuteSources(d);
   if (!legs.length) {
     return 'For reform exposure specifically, an uncovered jurisdiction needs an external check '
@@ -23023,7 +23025,7 @@ function _rrStatuteTail(d) {
   }
   return 'For reform exposure specifically this jurisdiction needs an external check — but not from a standing start. '
        + 'ORCA read its fiscal terms out of a named statute, and that statute is the first document to check; '
-       + 'it is printed below, with IMF Article IV and operator annual reports after it.';
+       + 'it is printed ' + (where === 'above' ? 'above' : 'below') + ', with IMF Article IV and operator annual reports after it.';
 }
 // The block itself. Returns '' where there is no legislation citation to show.
 function _rrStatuteBlock(d) {
@@ -40953,7 +40955,7 @@ function _rrPopulateLookup() {
     sel.addEventListener('change', function () {
       renderReformCountryVerdict();
       if (!sel.value) return;
-      var lead = document.getElementById('rr-ic-action') || document.getElementById('rr-verdict-lead');
+      var lead = document.getElementById('rr-ic-action') || document.getElementById('rr-ext-check') || document.getElementById('rr-verdict-lead');
       if (!lead) return;
       var top = 0, hdr = document.querySelector('.site-header');
       if (hdr) {
@@ -41579,6 +41581,23 @@ function renderReformCountryVerdict() {
       + '<strong style="color:var(--text);">This is not a score of 100.</strong> No events on file means no coverage, not a clean record — '
       + 'do not read it as stability and do not carry a reform-frequency premium of zero into an IC memo on this basis.'
       + '</div>'
+      // ── v766 (T4): the one instruction this card gives, directly under the "not a score" lead ──
+      // v759 moved the IC action to the head of the covered-country card. This branch is the other
+      // 164 of 185 jurisdictions -- 89% of what the lookup offers -- and it was left in the old
+      // order: lead ("do not carry a zero premium"), a tile strip whose Predictability tile runs
+      // to 390-510px on a phone, the "what you can defend instead" paragraph, and only then the
+      // block that says what to DO -- the statute ORCA read the terms from, and whether its year
+      // falls inside or before the 2010 window. Measured from a cold load, picking each of the
+      // 160 that carry that citation:
+      //   390x844 touch  block fully on the first screen for 0 of 160; median 938px into the card
+      //   1440x900       cut at the fold for 38 of 160 (Albania, Azerbaijan, Equatorial Guinea...)
+      // So the analyst read "not 100", "don't carry zero" and "62 UNGRADED", and stopped with a
+      // prohibition and no next step. The block is not reworded; it moves here and takes an id.
+      // Iraq-Kurdistan, Paraguay, Somalia and UAE - Abu Dhabi hold no statute citation, so for
+      // them nothing moves and the paragraph's generic external-check sentence stays the action.
+      + (_rrStatuteSources(d).length
+          ? '<div id="rr-ext-check" style="margin-bottom:12px;">' + _rrStatuteBlock(d) + '</div>'
+          : '')
       + '<div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:12px;">'
       + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reform Frequency Score</div>'
       + '<div style="font-size:18px;font-weight:800;color:var(--muted);">n/a</div>'
@@ -41613,9 +41632,8 @@ function renderReformCountryVerdict() {
       // v536 (T3): this used to assert the Predictability Score "exists for all 185 countries".
       // It does not: 22 of the 185 carry no contract-level take distribution and are now not scored.
 
-      + _rrStatuteTail(d)
+      + _rrStatuteTail(d, 'above')
       + '</div>'
-      + _rrStatuteBlock(d)
       + '<div style="margin-top:12px;"></div>'
       + cpBtn
       + '</div>';
