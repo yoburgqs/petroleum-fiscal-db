@@ -42543,3 +42543,18 @@ The Country Profile's "Copy for IC Memo" was pasting a predictability score that
 - **On a phone the Reform Risk intro strip is 335px of prose above the lookup**, which puts the select at y=575 on an 844px screen.
 - **The Fiscal Predictability tile inside the reform card is still ~420px** of 10px prose on Nigeria. It is now below the answer rather than above it, but it was not shortened.
 - The 02:00 "overnight chain FAILED" email was not re-examined this cycle. Cycle 664 diagnosed it as harvest `NO-DELTA`.
+
+---
+## Cycle 665 Log — 2026-09-10 03:38
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus | **Directive:** DIRECT | **Task:** Cycle 665 — T4
+
+## Cycle 665: shipped v759
+
+On the Reform Risk tab, the one-country lookup put its "IC action" (what premium to carry) at the bottom of the result. It's now the first thing in the result, and on a phone the page scrolls to it. Pushed (`c4e5b9b..0931b7a`) and copied to the office mirror.
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn (last run v753).
+
+**Friction:** An ana
