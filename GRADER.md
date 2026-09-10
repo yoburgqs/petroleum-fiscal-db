@@ -42701,3 +42701,95 @@ The analyst who opens Side-by-Side reads the four Govt Take price rows as the fi
 **Task:** T3, "How do these three countries compare side by side?" It had gone longest without a turn (last run at v756).
 
 **Friction:** The analyst adds Guyana, Angola and Brazil, and at 1440×900 the grid's first screen is nine rows of background detail (evidence tier, facts held, reform record and so on). The $75 Govt Take row starts at y=899, the botto
+
+---
+## Cycle 669 — T1, shipped as v763
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* (rotation: 668=T3, 667=T6,
+666=T2, 665=T4, 664=T5; T1 was stalest, last run at 663.)
+
+### Friction
+Walked T1 cold (fresh context, no storage) at 1440x900 and 390x844 `hasTouch`: Home → Screener tab.
+Before any preset, the Screener lists all 185 countries, ranked. At 1440 the first screen of that
+table showed **Country, Region and Mechanics, and no number**. Govt Take and Contractor NPV were
+off the right edge of the table's scroll box.
+
+Cause, measured: `tbody td { white-space: nowrap }` also applies to the two data-basis divider rows.
+Those are `colspan=12` cells holding 280 and 710 characters on one unbroken line. Auto table layout
+widened the spanned columns until the line fit:
+
+| cold view | before |
+|---|---|
+| `#tbl-screener` width | **3,330px** (1,548px with the dividers hidden) |
+| Country / Mechanics column | 762px / 554px |
+| Govt Take header starts at | x=1694 (off-screen at every width below 1920) |
+| Divider text runs past the visible edge by | 158–2,957px (1024 → 390) |
+
+The Low Take · Positive NPV and Frontier Markets presets also draw both dividers and rendered at
+3,330px too. PSC Africa, Primary-Source Evidence, R-factor PSC and Downside Resilience (one divider
+each) rendered at 1,448–1,584px, which pushed the right-hand columns off at 1440.
+
+### Change
+- The divider prose sits in a new `.sc-div-body` wrapper (top banner, v507 proxy divider, v743 floor
+  divider). CSS: `contain: inline-size` takes it out of column sizing; `white-space: normal` lets it
+  wrap; `position: sticky; left: 0` with `max-width: calc(100vw - 84px)` keeps it inside the visible
+  width and pinned while a phone swipes the table sideways.
+- The row, its class (`screener-basis-divider`, which the suite uses to count rows) and its wording
+  are unchanged. No filter, sort, column or count changed.
+
+### Result
+The analyst who opens the Screener sees the take and NPV for the ranked list on the first screen.
+The 12 states measured are the cold view plus the 11 presets. Each cell counts the states where that
+column's header ends inside the table's visible width:
+
+| width | Govt Take on screen, before → after | Contractor NPV on screen, before → after |
+|---|---|---|
+| 1920 | 12 → 12 | 9 → **12** |
+| 1440 | 9 → **12** | 9 → **12** |
+| 1280 | 9 → **12** | 9 → **12** |
+| 1024 | 9 → **12** | 2 → 2 |
+| 768 touch | 4 → 4 | 0 → 0 |
+| 390 touch | 12 → 12 | 0 → 0 (phone design: swipe) |
+
+Cold table width at 1440: 3,330 → **1,548px**. Govt Take header right edge 1,846 → **864px**.
+The divider text now ends inside the visible width at all six widths. The floor divider grows taller
+for it: 55 → 90px at 1440, 55 → 266px at 390, where before it was a one-line strip nobody could read.
+
+### Verification — run this cycle
+- **Runtime suite RAN both sides**, graded copy `office/tools/petroleum/tests/runtime_comprehensive.js`,
+  each with its own `ORCA_REPORT_FILE`. Before: a clean HEAD worktree on :8472. After: the edited tree
+  on :8471, after the version bump. **Before 296 PASS / 0 FAIL / 1 WARN / 1 JS error; after
+  296 / 0 / 1 / 1.** The reports are identical apart from the timestamp. The error is the known
+  `sw.js` 404 from serving at a localhost root. The loop's deployed figure is 297.
+- **JS syntax gate: PASS**, 11 inline blocks, `node --check`. It **failed on my first edit**. The
+  anchor string already ended in a backtick, so `<div class="sc-div-body">` landed outside the
+  template literal. The gate caught it before any measurement was kept. The after-matrix and
+  screenshots taken on the broken tree were thrown away and re-run.
+- **PIXEL GATE PASS** against `~/logs/pixel_audit/baseline.json` (2026-09-08, not modified), local tree,
+  default `PIXEL_OUT`. Screener clean at all five viewports.
+- **Page overflow 0** at 1920 / 1440 / 1280 / 1024 / 768 / 390 across all 12 states. No page errors.
+  The only console error is the sw.js 404, on both builds.
+- **Step 5b phone (390x844, `hasTouch`, `pointer: coarse` true):** overflow 0. No control was added.
+  The Screener's visible controls under 24px number **17 on HEAD and 17 on v763**, out of 422
+  (all Advanced-panel checkboxes). That is a broader count than cycle 663's, so the two figures are
+  not comparable. After a 450px sideways swipe, both divider bodies start 1px from the wrapper's left
+  edge and end 55px inside its right edge.
+- **STILL LOCKED respected:** the v612 mobile layer is untouched, including line 1619's `position: static`
+  on the divider td; the sticky rule is on the new inner div. `#reference-panel` untouched. No tab
+  reorder. Presets are still a dropdown and Advanced stays collapsed. No tooltip, FAQ or citation edit.
+  Version bumped v762 → v763 at the three display sites.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+- **Explorer → Browse has the same defect.** `#tbl-explorer` measures **1,986px** at 1440 against a
+  1,398px wrapper, and its divider is a 299-character `nowrap` colspan cell. The same wrapper would fix
+  it. Left for a separate cycle so this one stays one moment.
+- **768 touch is unchanged: Govt Take is on screen in 4 of 12 states.** Past 720px the mobile layer's
+  hidden Region/Mechanics columns don't apply, and the rows alone need about 1,556px. That needs a
+  tablet column decision, not this fix.
+- **The zero-result row** (`colspan=12`, `nowrap` sentence plus hint list) was not touched. It shows
+  only when a screen returns nothing.
+- **Cycle 663's open items still stand:** the ~700-character count sentence on IOC Capital Screen,
+  and that preset's inert $75 NPV leg.
+
+**Shipped:** pushed `51f1929..b72c6c4` (v763). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`,
+byte-identical (`cmp` OK).
