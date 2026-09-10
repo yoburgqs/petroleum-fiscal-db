@@ -42929,3 +42929,70 @@ v766 is pushed (`16ea26e..e6fc67e`) and copied to the office mirror; the two fil
 **Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn (last run cycle 665); the last cycle was T5.
 
 **Fric
+
+---
+## Cycle 673 — T6, shipped as v767
+
+**Task:** T6, *"Where did this number come from and how solid is the evidence?"* It had gone longest without a turn: 667 T6, 668 T3, 669 T1, 670 T2, 671 T5, 672 T4.
+
+**Walk (cold, fresh browser, no storage), 1440×900 and 390×844 touch.** Home → Fiscal Compare → row #1, USA → drawer. The drawer states take 22.3% with a Fiscal Breakdown of Royalty 12.5% + CIT 9.8%, and offers "2 of 5 model terms cited →". One click lands on Country Profile → Key Fiscal Parameters — Evidence Chain (scrollY 2854 at 1440, 4910 at 390). The route works.
+
+**Friction.** The analyst came to trace a royalty the model ran at 12.5%. The chain's Royalty row reads **ORCA Value 17.62%, Statutory 18.75% (BOEM, LINK DEAD)**. The note under it says *"ORCA's take%, NPV and IRR are built from the contract terms in the ORCA Value column."* The ORCA Value header tooltip says the same. 12.5% appears on no row and in no note. An analyst writing the memo would cite BOEM's 18.75% as the basis of a take that was computed on neither figure.
+
+*Where:* `renderSourcedFacts()`. v601/v666's `_modelParam()` comparison, which puts "⚠ DCF USES x%" on a row, runs only in the **no-source** branch, so a cited row was never checked.
+
+*Measured over all 185 profiles:* on rows the live model reads with a non-D source, **10 rows on 6 countries** run an engine rate that is not the ORCA Value. On 9 of the 10 it is not the cited rate either.
+
+| Country | Term | ORCA Value | Cited | Engine |
+|---|---|---|---|---|
+| USA | Royalty | 17.62 | 18.75 | **12.5** |
+| Nigeria | Royalty | 10.03 | 20 | **5** |
+| Nigeria | CIT | 65.37 | 65.75 | **30** |
+| Nigeria | Special Tax (bulk) | 30 | 30 | **50** |
+| Libya | Royalty | 0 | 0 | **16** |
+| Libya | CIT | 64.78 | 65 | **55** |
+| Algeria | Royalty | 10 | 10 | **20** |
+| Algeria | CIT | 19.04 | 19 | **38** |
+| Iran | CIT | 24.98 | 25 | **35** |
+| Iraq | CIT | 29.39 | 35 | **35 (the cited rate)** |
+
+All ten are hard-coded engine overrides. Libya and Algeria's Royalty rows sat under a green "match" verdict. Azerbaijan and Malaysia (cost recovery) are deliberately **not** flagged: their engine rate is already printed on the separate contractual-ceiling row (v538/v666).
+
+**Change.**
+- **The flag:** each cited row the model reads, where the engine runs a different rate and no sibling row prints it, now shows **"⚠ DCF USES x%"** on its own line under the ORCA Value. It is red when the rate matches neither column and orange **"· CITED RATE"** when the engine runs the statute (Iraq).
+- **The red conflict note** now covers these rows and names all three figures and both gaps: *"runs USA on 12.5% — a hard-coded engine override that matches neither: 5.1pp from the contract average and 6.3pp from the cited rate."*
+  - **When the engine matches neither column:** *"the citation does not support the model output … state Royalty Rate at 12.5% as an engine assumption."*
+  - **When the engine runs the statute:** *"the model runs the cited rate, so the citation does support the take, NPV and IRR."*
+  - **Unsourced conflicts:** the "Neither figure is a source" sentence is now scoped to them. It is unchanged there, but was false on a cited row.
+  - **Several conflicts on one page** (Nigeria, Libya, Algeria): each sentence opens with the parameter name.
+- **Scoped in place, where the claim is made:** "built from the ORCA Value column" and the "All N match" tick now carry *"Not for Royalty Rate: the DCF runs 12.5%, which neither column above prints."* The ORCA Value header tooltip gets the same exception.
+- **Export:** the XLSX *Fiscal Terms & Sources* note for a cited row read "Two harvests of the same term; neither is cited." It now says whether the engine rate is the statute. The note is scoped to the platform's DCF (the Live DCF panel and Fiscal Compare's model take, NPV and IRR), because the Country Profile sheet's take and NPV are the contract-database figures and were not verified to use the engine rate.
+- **Unchanged:** no value, tier, grade, take, NPV, IRR, count or ranking.
+
+**Result.** An analyst who traces USA's take from Fiscal Compare now reads, in the royalty row, that the model ran 12.5%. They are told the BOEM 18.75% does not support the model figure and how to state it in a memo. Before, both on-page statements pointed at 17.62%. The same holds for Nigeria, Libya, Algeria and Iran. On Iraq they learn the model runs the statute, not the 29.39% contract average. The 175 other countries render as before: the sweep found no other qualifying row.
+
+### Verification (run this cycle, not assumed)
+- **185-country sweep, final tree:** 185 of 185 chains rendered; chips **0 → 10 rows on 6 countries** (9 red, 1 orange); 0 page errors; 0 NaN/undefined/`[object`; page overflow 0 at 1440. Every affected country shows both the note and the in-place scope.
+- **Phone, 390×844 `hasTouch`:** all 8 candidates (the 6, plus Azerbaijan and Malaysia, which correctly show no chip). Page overflow 0, chip right edge 252px, chip height 34–49px. The chip is text, not a control.
+- **Claims checked against the live page:**
+  - Country Profile's Live DCF panel: USA take 22.3%, Nigeria Royalty 5.0%.
+  - Fiscal Compare drawer breakdowns: Nigeria Royalty 5.0%, Libya Royalty 16.0%, Algeria Royalty 20.0%.
+  - Iran is a buy-back whose breakdown folds CIT into "Govt Direct", so no separate CIT line shows the 35% there.
+- **Workbook:** captured `exportCountryProfile()` for USA, Iraq, Nigeria and Libya. Each round-trips through `XLSX.read` (4 sheets) and carries the new notes.
+- **JS syntax gate: PASS**, 11 of 11 inline blocks, on the final tree.
+- **PIXEL GATE PASS** on the final tree against a *copy* of `~/logs/pixel_audit/baseline.json`. The real baseline was not modified (SHA `a093df4b…` before and after).
+- **Runtime suite RAN both sides**, graded copy, local servers, own `ORCA_REPORT_FILE` each.
+  - **Unmodified suite:** v766 **296 PASS / 0 FAIL / 1 WARN**, v767 **295 / 1 / 1**. The one FAIL was `[CountryProfile] fully sourced country unchanged`. That v601 control counted any "DCF USES" in USA's chain as noise, on the premise that a fully cited country cannot have an engine conflict — the premise this cycle measured false.
+  - **The test was edited, not the chip text.** Renaming the chip to slip past the regex would have been gaming the gate. The control keeps its property: NO SOURCE / NOT RECORDED / "no source at all" must be absent, and any DCF USES must be the cited-row marker. A new assertion requires USA's Royalty row to name 12.5%.
+  - **Edited suite:** v766 **296 PASS / 1 FAIL / 1 WARN** (the new assertion catches the defect), v767 **297 PASS / 0 FAIL / 1 WARN**. Pass-set diff: that one line.
+  - The WARN is the known localhost `sw.js` 404.
+  - Committed in office as `1d944da61`. The idle repo copy `tests/runtime_comprehensive.js` was already diverged and is not touched.
+- **STILL LOCKED respected:** v612 mobile layer and `#reference-panel` untouched; no tab reorder; no new FAQ; no citation-string edit; no declutter reversal. The only tooltip change is a one-clause exception on an existing header, not the fix. Version v766 → v767 at the three display sites.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+- **The "N of M model terms cited" counts** (FC drawer chip and CP chip) still count USA's Royalty as cited, although the rate the model runs is not the cited one (USA reads 2 of 5; strictly 1 of 5). Changing it moves hard-coded figures in both chips' tooltips ("128 of 185 cite half or fewer").
+- **An unverified pre-existing claim:** the XLSX *Fiscal Terms & Sources* header row (v666) says the take and NPV on the Country Profile sheet "were produced with" the DCF engine value. The Country Profile sheet exports `take_75` / `npv_75`, the contract-database figures. Not changed here; flagged for a T5 cycle.
+- **The overrides themselves.** Nigeria CIT 30% against a cited 65.75%, and Libya Royalty 16% against a cited 0%, are domain calls on `getDCFParams()`'s country override table, not UX. This cycle makes them visible; it does not adjudicate them.
+- **The 02:00 "overnight chain FAILED" email** is the known harvest `NO-DELTA` question in `~/CLAUDE.md`, and is not touched.
+
+**Shipped:** `60364ad` (v767) pushed to `main`, mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html` (byte-identical, `cmp` OK).
