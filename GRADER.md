@@ -41478,3 +41478,113 @@ by cycle 653.
 
 
 Pixel gate: 0 hard-rule failure(s), 1 regression(s): phone-390::4-texplorer: clipped-text 0 -> 86
+
+---
+## Cycle 657 — T1, shipped as v751
+
+**Task:** T1 — *"Which countries should even be on my screening list?"* (656 was T3; not repeated.)
+
+### Friction — the Screener's one number was rendered off the right edge of the phone
+
+Walked T1 cold at 390x844 with `hasTouch`, sessionStorage and localStorage cleared: Home →
+Screener, 187 rows, no filters.
+
+Cycle 653's **v747** hid the Region and Mechanics columns so that **Govt Take** — the only number
+this tab needs to answer T1 — would land on screen, and its log recorded that *"that cell is now
+on screen at rest"*. The **cell** was. The **number** never was. Measured on the shipped build,
+all 185 rows:
+
+| | position |
+|---|---|
+| pinned identity strip | x 14 → 225 (checkbox 34 + rank 26 + country 150) |
+| Govt Take **cell** | x 225, width 326 — left edge on screen, so the check passed |
+| Govt Take **glyphs** | **x 499 → 541 — 151px past the 390px right edge** |
+| `Govt Take` **th** label | x 482 → 541 — also entirely off screen |
+
+**0 of 185 take figures were readable, header included.** What the analyst saw at rest was the
+ranked list of country names v747 set out to fix, now followed by a 150px band of empty cell —
+which reads as *missing data*, not as a table that needs scrolling. That is worse than the state
+v747 started from.
+
+This is the **"stable but wrong"** shape the handover docs name: the check that ran (*is the
+cell's left edge < 390?*) passed, and the thing it stood in for (*can the analyst read the
+take?*) was false. Found by walking the flow and measuring painted glyph rects with a `Range`,
+not by reading the changelog — the changelog says this was fixed four cycles ago.
+
+**Cause.** Hiding two columns with `display: none` frees their 298px but does not shrink an
+auto-layout table (**3330px**, not the 1435px v747's own note recorded). The slack redistributed
+into the remaining columns; Govt Take absorbed 326px to hold content whose widest form across all
+185 rows measures **50px** (`≥10.0%`). `.num` is right-aligned, so the value parked against the
+far edge of a cell three-quarters of a screen wide.
+
+**Also cleared: the open pixel-gate regression from cycle 656** (`phone-390: clipped-text 0 → 86`).
+The rank column was 26px = 18px of content box, so ranks 1–99 fit and 100–185 did not: 86 of 187
+rows measured `scrollWidth 29 > clientWidth 26` and painted their third digit under the pinned
+country cell, which carries an opaque background and paints later. The bottom half of the list
+read **"10", "14", "18"** for 100, 149, 185.
+
+### Change
+
+Inside the existing `<=720px` layer only:
+
+- **Govt Take gets an explicit `112px` width** — the same treatment columns 1, 2 and 3 already
+  get six rules above — instead of inheriting the table's slack.
+- **Rank column 26px → 30px**, with the country column's sticky offset following `60px → 64px`.
+- The comparable sub-line (`→ screened at 34.1%`, live when a take ceiling or comparable-basis
+  preset is set) may **wrap** here rather than being held on one `nowrap` line it no longer fits.
+
+No column is dropped, moved or restyled; the value keeps its tier colour and its tooltip.
+
+### Result
+
+The analyst screening on a phone reads **each country's government take next to its name at
+rest** — 185 of 185 on screen, header included — and reads the **rank of every row in the bottom
+half of the list**. A ~35px sliver of the Evidence column stays visible under the
+`.tbl-wrap::after` fade, so the affordance that more columns exist to the right survives instead
+of being replaced by dead space.
+
+### Verification — measured this cycle, not assumed
+
+- **Before/after, same suite, same server, cold, 390x844 `hasTouch`:**
+
+  | | before | after |
+  |---|---|---|
+  | rank cells clipped | 86 | **0** |
+  | take values on screen | 0 / 185 | **185 / 185** |
+  | `Govt Take` header | x482–541 (off) | **x272–331 (on)** |
+
+- **Runtime suite RAN both sides**, each read from its own `ORCA_REPORT_FILE`:
+  **before 296 PASS / 0 FAIL / 1 WARN / 1 JS error; after 296 PASS / 0 FAIL / 1 WARN / 1 JS
+  error.** No regression. The 1 JS error is the same `sw.js` 404 on both sides — an artifact of
+  serving from a localhost root rather than the `/petroleum-fiscal-db/` scope the service worker
+  registers against. The cycle prompt carried **297 PASS**, which is the deployed GitHub Pages
+  figure; local scores 296. Recorded rather than restated, per finalization test #1.
+- **JS syntax gate: PASS**, 11 inline blocks, re-checked after the version bump.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all 10 tabs.
+- **Console / page errors: 0** at all six viewports.
+- **Screener controls under 24px at `pointer: coarse`: 0** at both 768 and 390. None introduced.
+- **PIXEL GATE PASS** — cycle 656's regression is cleared and no surface got worse than baseline.
+- **Desktop proven unchanged, not assumed:** at 1440 / 1280 / 1024 the Screener measures
+  **3330px and all 12 column widths are identical** to the pre-change build, served from the same
+  repo root so its assets resolve. (A first attempt served `index.html` alone from `/tmp` and
+  measured all-zero widths — the page had no assets. Recorded because the zero would have read
+  as a difference.)
+- **STILL LOCKED respected:** v612 mobile layer untouched, no selector narrowed or removed;
+  `#reference-panel` untouched, no negative offsets; v747's pinned identity strip and its
+  hidden-column note kept; no tab reordering; no new tooltip *as the fix*, no new FAQ, no
+  citation-string edit.
+
+### Housekeeping — cycle 656's work was found uncommitted
+
+The working tree held a complete, suite-passing but **never-committed v750** (T3 — Side-by-Side
+printed a statutory-basis take in the investible-tier green, byte-identical to a genuinely
+production-weighted figure, while every other surface on that screen already marked the column
+as PROXY). Cycle 656 finished the change and its verification, then died on an API 500 before
+committing. It was committed **separately** as `e11f191` so it is neither silently bundled into
+this cycle nor discarded; this cycle's own change is `d11303d` alone.
+
+Version display bumped v749 → **v751** at the 3 display locations (the v750 commit never bumped
+it). The prose reference to "v749's Fiscal Compare fix" in the v750 comment is left alone.
+
+Also cleared: four stale localhost servers left running on ports 8123/8124/8131/8132 by earlier
+cycles.
