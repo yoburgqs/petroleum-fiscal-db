@@ -42871,3 +42871,46 @@ The live site now serves v765. Tests on the edited build read 296 pass / 0 fail 
 **Task:** T5, "Give me something I can paste straight into an IC memo." It had gone longest without a turn; the last cycle was T2.
 
 **Friction:** I opened Side-by-Side on the default Norway / United Kingdom / Netherlands comparison and pressed Copy for IC Memo. O
+
+---
+## Cycle 672 — T4, shipped as v766
+
+**Task:** T4, *"What is my fiscal-stability and reform exposure here?"* Cycle 671 was T5. T4 last ran at 665 (v759), the longest gap of the six (after it: 666 T2, 667 T6, 668 T3, 669 T1, 670 T2, 671 T5).
+
+**Walk (cold, fresh browser context, no storage).** Opened the Reform Risk tab and used the "Check one country" lookup. Six picks were measured at 1440×900 and at 390×844 with touch: Nigeria, Brazil, Norway and Guyana have a reform log; Qatar and Kenya do not. The lookup's second group, "No sourced reform history — predictability only", holds **164 of the 185** countries, so it is the card most analysts land on. v759 had already moved the IC action to the head of the covered-country card. The uncovered card was never reordered.
+
+**Friction.** The analyst picks Kenya. The card reads, in order:
+1. "no Reform Frequency Score"
+2. "This is not a score of 100 … do not carry a reform-frequency premium of zero"
+3. a tile strip: n/a, then **62 UNGRADED** over a paragraph about the 132-regime cohort, then 56.9%
+4. the "What you can defend instead" paragraph
+5. only then, the one block that says what to do: *"Start the external check here: the statute ORCA sourced these terms from"*. That is Kenya Petroleum Act 2019, with a link. The block also says whether the act's year falls inside or before the 2010 window, which decides how stale the terms may be.
+
+So the first screen held a prohibition and a withheld grade, and no next step. It came from `renderReformCountryVerdict()`, case 1, which appended `_rrStatuteBlock(d)` after the tail paragraph.
+
+Measured from a cold load, picking each of the 160 uncovered countries that carry a statute citation:
+- **390×844 touch:** the block was fully on the first screen for **0 of 160**. It sat a median 938px into the card (615–1,261).
+- **1440×900:** it was cut at the fold for **38 of 160**, including Albania, Azerbaijan, Brunei, Equatorial Guinea, Georgia and Lebanon.
+
+**Change.** The statute block now renders directly under the "not a score of 100" lead, above the tile strip, inside `#rr-ext-check`.
+- **Wording:** the block is not reworded. The paragraph's pointer sentence now says the statute "is printed **above**" on this card. `_rrStatuteTail(d, where)` takes an opt-in `'above'`, and Country Profile's no-log panel still calls it with no argument and still says "below" (checked on Kenya).
+- **Scroll:** the lookup's change listener now also checks `#rr-ext-check`, so the phone scroll lands with the block in view.
+- **Not moved:** Iraq-Kurdistan, Paraguay, Somalia and UAE — Abu Dhabi carry no statute citation, so nothing moves for them.
+- **Covered countries:** their card is untouched.
+
+**Result.** An analyst who looks up any uncovered country sees, on the first screen at both sizes, the document to check and whether its year is before or inside the 2010 window. Before, that screen stopped at "don't carry zero" and "62 UNGRADED". That is 160 of the 164 countries this lookup cannot score.
+
+### Verification (run this cycle, not assumed)
+- **160-country sweep:** block fully on the first screen **0 → 160 of 160** at 390×844 touch and **122 → 160 of 160** at 1440×900. Median offset into the card went from 938px to 197px on the phone and from 442px to 95px on the desktop. Card height is unchanged (median 620px at 1440, 1,324px at 390), because this is a reorder and nothing was added. Before ran on the clean `16ea26e` tree on :8471 before the edit; after ran on the edited tree.
+- **Runtime suite RAN both sides** (`office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL` local, its own `ORCA_REPORT_FILE` each): **v765 296 PASS / 0 FAIL / 1 WARN** (clean `16ea26e` worktree on :8472); **v766 296 PASS / 0 FAIL / 1 WARN**. Every test line is identical between the two runs apart from timings. The one WARN is the known localhost `sw.js` 404. The loop's deployed figure is 297.
+- **JS syntax gate: PASS**, 11 of 11 inline blocks, on the final tree.
+- **PIXEL GATE PASS** against a copy of `~/logs/pixel_audit/baseline.json`, local tree. The real baseline was not modified: SHA `253bba92…` before and after. My first run pointed `PIXEL_OUT` at an empty directory, so it wrote a fresh baseline instead of gating. That run was discarded and the gate re-run against the copy.
+- **Page overflow 0** at 1920 / 1440 / 1280 / 1024 / 768 (touch) / 390 (touch), with Kenya, Qatar and Nigeria selected, on both builds. Page errors 0.
+- **Step 5b, phone (390×844, `hasTouch`, `pointer: coarse` true):** overflow 0. The moved block's statute link measures 44px. Controls under 24px in the card: 0 for Kenya and Qatar, on both builds.
+- **STILL LOCKED respected:** the v612 mobile layer and `#reference-panel` are untouched. No tab reorder, no new tooltip, no FAQ, no citation-string edit, no declutter reversal. Version v765 → v766 at the three display sites.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+- **Nigeria's covered card on a phone** has two statute-source links in its event log at 21px under `pointer: coarse` ("Petroleum Industry Act 2021 …", "Deep Offshore and Inland Basin …"). They are identical on v765 and are not touched here.
+- **The four uncovered countries with no statute citation** (Iraq-Kurdistan, Paraguay, Somalia, UAE — Abu Dhabi) still carry their only instruction, the generic external-check sentence, at the end of the paragraph under the tiles.
+- **The side-by-side paste flattening** and the **Country Profile paste's truncated breakeven note**, both from cycle 671's list, are still open. They are T5 work.
+- **The 02:00 "overnight chain FAILED" email** is the known harvest `NO-DELTA` / exhausted-skip-list question in `~/CLAUDE.md`, and is not touched.
