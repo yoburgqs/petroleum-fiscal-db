@@ -42856,3 +42856,18 @@ Measured with a 64-set sweep (cold default, the 4 quickstart presets, 60 seeded 
 - **Loop defect that lost v764:** `autonomous_cycle.py` commits only `GRADER.md` (line 262). When the Claude session exits before committing, the tested `index.html` edit is left behind uncommitted, and the pixel gate and suite pass on a tree that is never shipped. This is the second time (666 → 667, 670 → 671). Not changed here: it is loop infrastructure, not a UX cycle.
 
 **Shipped:** pushed `bb63266..5e181c9` (v764 `cf259f3` + v765 `5e181c9`). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK).
+
+---
+## Cycle 671 Log — 2026-09-10 10:38
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus | **Directive:** DIRECT | **Task:** Cycle 671 — T5
+
+## Cycle 671: shipped v765, plus cycle 670's lost v764
+
+The live site now serves v765. Tests on the edited build read 296 pass / 0 fail / 1 warning, identical to v764.
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." It had gone longest without a turn; the last cycle was T2.
+
+**Friction:** I opened Side-by-Side on the default Norway / United Kingdom / Netherlands comparison and pressed Copy for IC Memo. O
