@@ -43420,3 +43420,14 @@ Fiscal Compare screening column no longer shows Norway as a +12pp tightening. Th
 
 **Shipped:** petroleum-fiscal-db `main` (v773). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+---
+## Cycle 680 Log — 2026-09-10 18:18
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 680: Reform Risk now sizes the premium against the net take change (v773)
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn (last run cycle 672); the last cycle was T3.
+
+**Friction:** I opened Reform Risk cold and looked up Norway, the platform's default country. The instruction at the top of the card said Norway is "not a zero-premium jurisdiction" and to "size the premium against the +12pp already taken since 2010". The event log 
