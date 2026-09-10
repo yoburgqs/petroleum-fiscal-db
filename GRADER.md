@@ -43341,3 +43341,16 @@ page claims a different "only" order.
 **Shipped:** `f84186e` (v771, cycle 678's work) and `b4ad304` (v772) pushed to `main`. Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK), office commit `c7a82d132`
 (not pushed by this session).
+
+---
+## Cycle 679 Log — 2026-09-10 17:25
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 679
+
+# Cycle 679: Side-by-Side names what each of its two orders ranks (v772)
+
+**Task:** T3, "How do these three countries compare side by side?" It had gone longest without a turn; the last cycle was T5.
+
+**Friction:** I opened Side-by-Side cold and typed Iraq, Brazil and Angola. The strip above the grid said "Ranks against each other: Iraq 34.1% › Angola 53.0% › Brazil 55.6% … the ordering above is the whole set." Bel
