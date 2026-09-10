@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v757</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v758</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -232,6 +232,9 @@ table { width: 100%; border-collapse: collapse; }
    takes the directive's 24px floor under a thumb. It measures 23px on a mouse and is left there —
    the desktop row it sits in is unchanged. */
 @media (pointer: coarse) { .cp-ic-tbl-btn { min-height: 24px; } }
+/* v758 (T5): the Country Profile "→ carry ≤N" ceiling beside the predictability badge carries its
+   explanation in a title, so under a thumb it takes the 24px floor, as v745 ruled for .ioc-mech-more. */
+@media (pointer: coarse) { .cp-fp-carry { min-height: 24px; line-height: 24px !important; } }
 #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-fc tr.fc-row-sel > td { background: rgba(176,104,0,0.09); }
@@ -2237,7 +2240,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v757</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v758</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2307,7 +2310,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v757</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v758</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -25128,14 +25131,43 @@ function _fpCiteVerdict(score, d) {
   var nC = (d && d.n != null) ? Number(d.n).toLocaleString() : 'its';
   var k = _fpCnt();
   if (disp.state === 'single') {
-    return 'UNGRADED (score ' + score + '/100) \u2014 ORCA does not band this number and it is not a '
+    var _one = 'ORCA does not band this number and it is not a '
       + 'stability finding. All ' + nC + ' of this country\u2019s contracts price to one statutory term, so the '
       + 'interquartile-range penalty \u2014 the largest of the three components, worth up to \u221240 points \u2014 was never '
       + 'charged, and what is left is price swing and mechanic count. All ' + k.nHigh + ' scores on this platform that '
       + 'would fall in the HIGH band belong to one-term regimes like this one, and not one of the ' + k.nMeas
       + ' countries whose spread ORCA measured reaches HIGH (ceiling ' + k.ceil + '). A graded MODERATE outranks '
-      + 'this score however high its number. Do not cite it as evidence of fiscal stability'
-      + _fpCiteObsClause(d);
+      + 'this score however high its number. Do not cite it as evidence of fiscal stability';
+    // \u2500\u2500 v758 (T5): the one-term branch carries its ceiling in the CELL, as v720 did for graded \u2500\u2500
+    // Walked T5 cold: Country Profile -> Norway -> "Copy for IC Memo" -> paste. The memo table's
+    // Fiscal predictability row read "UNGRADED (score 76/100)". Build Side-by-Side on the same
+    // country and its pasted row reads "carry <=52 . LOW"; the Reform Risk card says the same.
+    // The refutation was in note 2 -- a 964-character paragraph -- and even there it named the
+    // 29.6pp range but never a figure to carry, so an editor who keeps the table and cuts the notes
+    // (the case v752 fixed for take) sent 76/100 to committee. 41 countries, 34 of them by five
+    // points or more: Uzbekistan pasted 89 against a ceiling of 49, Angola 62 against 26.
+    // Silent where no contract sample is loaded, exactly as before.
+    var _c1 = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+    if (!_c1 || !_c1.oneTerm) return 'UNGRADED (score ' + score + '/100) \u2014 ' + _one + _fpCiteObsClause(d);
+    var _r1 = _c1.obs.min.toFixed(1) + '\u2013' + _c1.obs.max.toFixed(1) + '%';
+    // The head becomes the table cell (_icHeadTail splits on the first spaced em dash), so it
+    // states the figure to carry on its own and holds no spaced em dash itself.
+    var _h1 = _c1.material
+      ? '\u2264' + _c1.bound + ' \u00b7 ' + _c1.band + ' ceiling (the printed ' + score
+        + ' UNGRADED is withdrawn; contracts run ' + _r1 + ')'
+      : 'UNGRADED (score ' + score + '/100) \u00b7 bounded at \u2264' + _c1.bound
+        + ' by this country\u2019s own contract table';
+    return _h1 + ' \u2014 ORCA\u2019s own contract file refutes the one-term basis this score was built on: '
+      + 'the bundled p25 and p75 take are identical, but the ' + _c1.obs.n + ' largest producing contracts it '
+      + 'holds for this country run ' + _r1 + ' government take at $75/bbl across ' + _c1.obs.distinct
+      + ' distinct values (' + _c1.obs.spread.toFixed(1) + 'pp). The interquartile-range term, the score\u2019s '
+      + 'largest at up to \u221240 points, was therefore charged nothing where the observed dispersion costs '
+      + _c1.cost.toFixed(0) + '. The score is NOT recomputed: a top-' + _c1.obs.n + '-by-production sample '
+      + 'cannot establish a population IQR across all ' + nC + ' contracts. But that dispersion is a FLOOR on '
+      + 'the real spread, so ' + _c1.bound + ' is a CEILING on the score \u2014 the true figure is at or below it, '
+      + 'never above. Carry \u2264' + _c1.bound + ' \u00b7 ' + _c1.band + ' with the observed range ' + _r1
+      + ' attached' + (_c1.material ? ', not ' + score : '') + '; Side-by-Side prints the same bound for this '
+      + 'country. For context on the printed figure: ' + _one + '.';
   }
   // ── v720 (T5): the GRADED branch now carries the withdrawal the screen already prints ────
   // Walked T5 cold: Country Profile -> Nigeria -> "Copy for IC Memo" -> paste. The Fiscal
@@ -41133,14 +41165,25 @@ function _fpObsCeilingFrom(d, obs, u) {
 }
 // Resolves the sample from the v559 cache. Returns null where no sample is loaded for this
 // country -- silent rather than guessing, exactly as _fpCiteObsClause() is on the one-term path.
+// v758 (T5): the ONE-TERM cohort now resolves too. _rrIqrUnderstated() deliberately returns null
+// where p25 === p75 ("cpSpreadConflict() owns that path"), and nothing else here picked that path
+// up, so this returned null for all 41 countries whose identical quartiles their own contract
+// table refutes -- Norway, Angola, Indonesia, Uzbekistan and 37 more. Side-by-Side and the Reform
+// Risk card each compute that bound inline (fp - min(40, spread x 0.8)) and print "carry <=52 . LOW";
+// every consumer of this object -- Country Profile's Copy for IC Memo and the XLSX -- got null and
+// pasted the printed score bare. A zero bundled IQR fed to the same formula is the same arithmetic
+// (charged 0, cost min(40, spread x 0.8)), so the three surfaces now read one number.
 function _fpObsCeiling(d) {
   if (!d || typeof cpObsSpread !== 'function' || typeof _rrIqrUnderstated !== 'function') return null;
   var obs = null;
   try { obs = cpObsSpread(d.country); } catch (e) { return null; }
   if (!obs) return null;
   var u = _rrIqrUnderstated(d, obs);
-  if (!u) return null;
-  return _fpObsCeilingFrom(d, obs, u);
+  if (u) return _fpObsCeilingFrom(d, obs, u);
+  if (typeof cpSpreadConflict !== 'function' || !cpSpreadConflict(d, obs)) return null;
+  var c = _fpObsCeilingFrom(d, obs, { iqr: 0, excess: obs.spread });
+  if (c) c.oneTerm = true;
+  return c;
 }
 window._fpObsCeiling = _fpObsCeiling;
 
@@ -49573,6 +49616,23 @@ function _cpApplyObsSpread(country) {
         + Math.min(40, obs.spread * 0.8).toFixed(0) + ' points. The score is not recomputed here — a '
         + 'top-' + obs.n + '-by-production sample is not a population IQR — but treat this number as '
         + 'the best case, not the finding.';
+      // v758 (T5): the badge the analyst copies from now shows the figure its Copy for IC Memo
+      // pastes. Before, this page said "≥29.6pp obs" and withheld the bound in a title, while
+      // Side-by-Side printed "→ carry ≤52 · LOW" for the same country. Same object as the paste.
+      var _c3 = (typeof _fpObsCeiling === 'function') ? _fpObsCeiling(d) : null;
+      if (_c3 && _c3.oneTerm && !wrap._obsBoundShown) {
+        wrap._obsBoundShown = true;
+        wrap.insertAdjacentHTML('afterend',
+          '<span class="cp-fp-carry" style="display:inline-block;margin-left:6px;font-size:10px;'
+          + 'font-weight:800;color:var(--orange);line-height:1.35;white-space:normal;" title="'
+          + _sbsAttr('Carry ≤' + _c3.bound + ' · ' + _c3.band + ' for ' + country + ', not the printed '
+            + _c3.printed + '. The bundled p25 and p75 take are identical, so the interquartile-range term '
+            + '— worth up to −40 points — was charged nothing; the ' + obs.n + ' largest producing contracts '
+            + 'run ' + obs.min.toFixed(1) + '–' + obs.max.toFixed(1) + '% (' + obs.spread.toFixed(1) + 'pp), '
+            + 'which costs ' + _c3.cost.toFixed(0) + ' points. A ceiling, not a recomputed score: the true '
+            + 'figure is at or below it. Copy for IC Memo carries this bound.')
+          + '">→ carry ≤' + _c3.bound + ' · ' + _c3.band + '</span>');
+      }
     }
   }
 
