@@ -43149,3 +43149,15 @@ re-finding their place or re-applying the screen.
 **Shipped:** `636f43c` (v769) pushed to `main`, confirmed `origin/main == 636f43c`. Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK), office commit
 `1dada89a6`.
+
+---
+## Cycle 676 Log — 2026-09-10 14:52
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 676: clicking a Screener country now opens its profile at the top (v769)
+
+**Task:** T1, "Which countries should even be on my screening list?" It had gone longest without a turn; the last cycle was T3.
+
+**Friction:** The worst moment is opening a country from a Screener shortlist. After loading the IOC Capital Screen (15 countries), clicking a country opened its Country Profile scrolled down as far as the Screener had been:
+- **At 1440:** 530px down. The country name, headline take and N
