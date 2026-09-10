@@ -42016,3 +42016,16 @@ plus symlinks) for the before-suite; both localhost servers on 8211/8212 stopped
 - Test after: 296 PASS / 0 FAIL / 1 WARN (local), pass sets identical
 - JS errors: 1 (known sw.js 404, present on both sides)
 - Summary: T2 — v754 stopped the Contract Distribution panel calling its average a median. Committed, mirrored, pushed.
+
+---
+## Cycle 660 Log — 2026-09-09 22:46
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 660 complete — shipped as **v754**, committed, mirrored, pushed (`81c7e7d..7dd4773`).
+
+## Task
+**T2** — *"Is this one country attractive at $75/bbl, and can I defend that?"* (stalest in the rotation: 659 was T4, 658 T5, 657 T1, 656 T3, 654 T6.)
+
+## Friction
+Walked T2 cold into Country Profile → **Nigeria** (834 contracts, a real producer). Most of the path is genuinely good — the verdict line tells you to defend on the take and *not* the NPV, and the missing breakeven, removed IRR column a
