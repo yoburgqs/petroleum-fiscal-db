@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v769</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v770</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v769</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v770</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v769</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v770</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -43386,8 +43386,9 @@ function _icTakeDispersion(d, hd) {
     return hd < lo - bar || hd > hi + bar;
   }
   function _close(lo, hi, what) {
-    // In-range wording is cpDefendDispersion()'s own closing sentence, verbatim, so the paste and
-    // the screen cannot end up instructing the analyst differently.
+    // v770: one builder, cpDefendClose(), now serves both the screen and this paste, so the two
+    // cannot end up instructing the analyst differently -- including out of range.
+    if (typeof cpDefendClose === 'function') return cpDefendClose(hd, lo, hi, what, 'headline');
     if (!_out(lo, hi)) return 'Quote ' + hd.toFixed(1) + '% as a contract average and carry the range.';
     var gap = (hd < lo) ? (lo - hd) : (hd - hi);
     return 'The ' + hd.toFixed(1) + '% headline falls ' + gap.toFixed(1) + 'pp outside that range '
@@ -49525,10 +49526,85 @@ function cpObsSpread(country) { return window._cpObsSpread[country] || null; }
 // Two readings, in order of strength. Neither is a new threshold: the conflict test is
 // cpSpreadConflict() (the existing CP_OBS_REFUTE_PP = 1.0pp rule) and the IQR cut is the 5pp
 // "consistent terms" line the basis-chip tooltip has used since v559.
+// v770 (T2): the closing instruction, shared with _icTakeDispersion() so the screen and the paste
+// cannot instruct the analyst differently. v752 gave the PASTE an out-of-range swap -- "Quote X% as
+// a contract average and carry the range" is wrong when X is not inside that range -- and left the
+// screen on the unconditional sentence, so the two had already drifted. `label` names which figure
+// is being quoted: the published headline, or the comparable take a fee-basis verdict reads on.
+function cpDefendClose(hd, lo, hi, what, label) {
+  var bar = (typeof CP_OBS_REFUTE_PP === 'number') ? CP_OBS_REFUTE_PP : 1.0;
+  if (!(hd < lo - bar || hd > hi + bar)) return 'Quote ' + hd.toFixed(1) + '% as a contract average and carry the range.';
+  var gap = (hd < lo) ? (lo - hd) : (hd - hi);
+  return 'The ' + hd.toFixed(1) + '% ' + (label || 'headline') + ' falls ' + gap.toFixed(1) + 'pp outside that range '
+       + '— ' + what + ' reaches it — so carry the range and resolve the ' + (label || 'headline')
+       + ' against the contract table before quoting it as a country average.';
+}
+// v770 (T2): the verdict on the 10 fee-basis countries reads on the COMPARABLE take (v552), but this
+// line measured its range on the BLENDED contract set -- quartiles and contract table both include
+// the fee-basis TSC / RSC / Buy-back rows. Walked cold on Iraq, the green verdict told the analyst:
+//     "34.1% govt take @$75 ... Take is a range here, not a point. Half of Iraq's contracts price
+//      between 65.0% and 98.5% ... Quote 34.1% as a contract average and carry the range."
+// The number it says to quote sits 30.9pp below the bottom of the range it says to carry. Put in
+// front of an IC, that is a sentence a reviewer takes apart in one question. The two figures are on
+// different bases: 65.0-98.5% is TSC-dominated (415 of 610 at 98.5%), 34.1% is over the 195
+// PSC/Concession contracts. The same-basis range already exists on this page -- the Group-1 regime
+// rows of cpRegimeRows(), which the "2 regimes here" card and the Fiscal Regime Breakdown print
+// (Concession 13.9% on 80, PSC 48.2% on 115). The line now carries THAT range when the verdict is on
+// the comparable take, points at the breakdown instead of the blended distribution, and says in one
+// clause why the blended spread further down does not describe the figure. No take is recomputed.
+function _cpDefendG1(d, hd) {
+  var fb = (typeof cpFeeBasis === 'function') ? cpFeeBasis(d) : null;
+  var rr = (typeof cpRegimeRows === 'function') ? cpRegimeRows(d) : null;
+  var rows = (rr && rr.rows) ? rr.rows.filter(function(r) { return r.g === 1 && r.take != null && r.nPriced > 0; }) : [];
+  if (rows.length < 2) return '';
+  rows.sort(function(a, b) { return a.take - b.take; });
+  var loR = rows[0], hiR = rows[rows.length - 1], pp = hiR.take - loR.take;
+  if (pp < 5) return '';
+  var nG1 = (fb && fb.g1 && fb.g1.n != null) ? Number(fb.g1.n).toLocaleString() : null;
+  var _cnt = function(r) { return Number(r.nPriced).toLocaleString() + (r.zr ? ' priced' : '') + (r.nPriced === 1 ? ' contract' : ' contracts'); };
+  var blendedNote = '';
+  // Named only where it would actually mislead: the quoted figure lies outside it (Iraq). On Mexico the
+  // blended quartiles are the Group-1 rows themselves and bracket the figure, so saying so is noise.
+  var _bar770 = (typeof CP_OBS_REFUTE_PP === 'number') ? CP_OBS_REFUTE_PP : 1.0;
+  var blo = (d.p25_take != null && d.p75_take != null) ? Math.min(d.p25_take, d.p75_take) : null;
+  var bhi = (blo != null) ? Math.max(d.p25_take, d.p75_take) : null;
+  if (blo != null && (bhi - blo) >= 5 && (hd < blo - _bar770 || hd > bhi + _bar770)) {
+    blendedNote =' The ' + blo.toFixed(1) + '–' + bhi.toFixed(1) + '% contract spread further down is across all '
+      + Number(d.n || 0).toLocaleString() + ' contracts' + (fb && fb.names ? ', fee-basis ' + fb.names + ' included' : '')
+      + ', so it does not describe this figure.';
+  }
+  return '<span style="display:block;margin-top:5px;padding-top:5px;border-top:1px solid rgba(194,65,12,.22);">'
+    + '<strong style="color:var(--orange);">Take is a range here, not a point.</strong> '
+    + 'On the ' + (nG1 ? nG1 + ' ' : '') + 'PSC/Concession contracts this take is read on, '
+    + '<strong style="color:var(--text);">' + loR.mechanic + ' prices at ' + loR.take.toFixed(1) + '%</strong> ('
+    + _cnt(loR) + ') and <strong style="color:var(--text);">' + hiR.mechanic + ' at ' + hiR.take.toFixed(1) + '%</strong> ('
+    + _cnt(hiR) + '), so the regime you sign moves the take by ' + pp.toFixed(1) + 'pp. '
+    + cpDefendClose(hd, loR.take, hiR.take, 'no PSC/Concession regime here', 'comparable take')
+      .replace('as a contract average', 'as the PSC/Concession average')
+    + blendedNote
+    + ' <button type="button" onclick="event.stopPropagation();_cpScrollToRegimes()" '
+    + 'title="Jump to the Fiscal Regime Breakdown — the per-regime takes this range is read from" '
+    + 'style="display:inline-block;min-height:24px;vertical-align:middle;background:rgba(194,65,12,.10);'
+    + 'border:1px solid rgba(194,65,12,.35);border-radius:4px;padding:2px 8px;margin-left:2px;'
+    + 'font-size:11px;font-weight:700;color:var(--orange);cursor:pointer;">See the regimes →</button>'
+    + '</span>';
+}
+function _cpScrollToRegimes() {
+  var el = document.getElementById('cp-regime-breakdown');
+  if (!el) return;
+  try { el.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) { el.scrollIntoView(); }
+  var prev = el.style.boxShadow;
+  el.style.transition = 'box-shadow .3s';
+  el.style.boxShadow = '0 0 0 3px rgba(194,65,12,.45)';
+  setTimeout(function() { el.style.boxShadow = prev || ''; }, 1800);
+}
+window._cpScrollToRegimes = _cpScrollToRegimes;
 function cpDefendDispersion(d, take) {
   if (!d || (typeof isStateMonopoly === 'function' && isStateMonopoly(d.take_75))) return '';
   var hd = (typeof take === 'number' && isFinite(take)) ? take : d.take_75;
   if (hd == null) return '';
+  // v770 (T2): a verdict read on the comparable take gets a range on the same basis, or none.
+  if (d.take_75 != null && hd.toFixed(1) !== d.take_75.toFixed(1)) return _cpDefendG1(d, hd);
   var obs = (typeof cpObsSpread === 'function') ? cpObsSpread(d.country) : null;
   // Materiality and refutation are different tests and are stated differently. cpSpreadConflict()
   // fires at 1.0pp because one counterexample is enough to withdraw "every contract prices the
@@ -49548,8 +49624,8 @@ function cpDefendDispersion(d, take) {
          + obs.n + ' largest producing contracts \u2014 a floor of \u2265' + obs.spread.toFixed(1)
          + 'pp, and the bundled quartiles that call this a single term are not usable for '
          + d.country + '.'
-         + (material
-            ? ' Quote ' + hd.toFixed(1) + '% as a contract average and carry the range.'
+         + ((material || hd < obs.min - CP_OBS_REFUTE_PP || hd > obs.max + CP_OBS_REFUTE_PP)
+            ? ' ' + cpDefendClose(hd, obs.min, obs.max, 'no contract the profile lists', 'headline')
             : ' At that width ' + hd.toFixed(1) + '% is quotable as a contract average.');
   } else if (d.p25_take != null && d.p75_take != null && (d.p75_take - d.p25_take) >= MATERIAL_PP) {
     var pp = d.p75_take - d.p25_take;
@@ -49557,7 +49633,9 @@ function cpDefendDispersion(d, take) {
          + 'Half of ' + d.country + '\u2019s contracts price between <strong style="color:var(--text);">'
          + d.p25_take.toFixed(1) + '%</strong> and <strong style="color:var(--text);">'
          + d.p75_take.toFixed(1) + '%</strong> (' + pp.toFixed(1) + 'pp measured), so the block you '
-         + 'sign moves the take. Quote ' + hd.toFixed(1) + '% as a contract average and carry the range.';
+         + 'sign moves the take. '
+         + cpDefendClose(hd, Math.min(d.p25_take, d.p75_take), Math.max(d.p25_take, d.p75_take),
+                         'the middle half of this country’s contracts does not', 'headline');
   }
   if (!body) return '';
   if (!material) {
