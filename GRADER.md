@@ -43081,3 +43081,71 @@ proposal for Zach, not done here.
 # Cycle 675: shipped the v768 fix that cycle 674 built but never committed
 
 This cycle made no new friction fix. Cycle 674 built a fix and tested it, but its session ended while its tests were still running in the background. The cycle runner only commits GRADER.md, so it pushed the log and emailed "298 PASS / 2 FAIL" while the fix sat uncommitted. Those 2 FAILs were the new tests catching the bug on the live site. I checked the 
+
+---
+## Cycle 676 Log — 2026-09-10 — T1 (v769)
+
+**Task:** T1, "Which countries should even be on my screening list?" It had gone longest without a turn
+(last run 669; since then 670 T2, 671 T5, 672 T4, 673 T6, 674/675 T3).
+
+**Walk:** cold Playwright context, no storage, 1440x900 and 390x844 `hasTouch`. Home → Screener card →
+IOC Capital Screen preset (15 rows) → click a country row → back. Every step was measured in a real browser
+on the local tree, not reasoned from the changelog.
+
+**Friction:** the shortlist → country drill-down, the one move T1 exists to make. `openCountryProfileFromFC()`
+calls `switchTab('t7')`, and `switchTab()` never touched scroll. Clicking a row therefore opened Country Profile
+at the Screener's offset: **scrollY 530 at 1440, 1,838 on the phone**. At 1440 the country name, the headline
+take, NPV rank and the IC memo line were all above the viewport, and the first thing on screen was the peer table.
+On the phone the view opened mid-way through the peer table, and nothing on screen said which country was loaded.
+The way back was broken too. The CP "← Explorer" button called `switchTab('texplorer')`, which forces
+`switchExplorerMode('browse')`, so clicking back from a shortlist dropped the analyst into the unfiltered
+185-row Browse table instead of their 15.
+
+**Change:**
+- `switchTab()`: on a real pane change it records the offset being left, per pane and with the Explorer's mode,
+  then starts the new pane at the top. Same-pane calls such as Explorer ↔ Screener are untouched. Callers that
+  scroll to a target after switching still win because the reset runs synchronously first: `runFiscalCompare`'s
+  results reveal, `_homeOpenEvidence`, search → mechanic card.
+- CP back button (`.cp-back-list` → `_cpBackToList()`): returns to the mode the Explorer was left in, at the
+  offset it was left at. Its label says where it goes (**← Screener** or **← Explorer**) and is refreshed on
+  every entry to the tab.
+
+**Result:** the analyst clicks a shortlisted country and reads its name, headline take and NPV on the first
+screen. At 1440, the country select sits at y=147 and the headline take and "← Screener" are in view. At 390,
+the name, fiscal-character verdict and "49.2% govt take @$75" line are above the fold. They click back and land
+on the same preset (IOC Capital Screen, 15 rows) with the row they clicked in the same place: UK row top
+752 → 752 at 1440, 411 → 411 at 390. They can now work through a shortlist country by country without
+re-finding their place or re-applying the screen.
+
+| measure, cold walk | before (v768) | after (v769) |
+|---|---|---|
+| CP scrollY on row click, 1440 | 530 | **0** |
+| CP scrollY on row click, 390 touch | 1,838 | **0** |
+| back button destination | Browse, unfiltered, 185 rows | **Screener, preset kept, 15 rows** |
+| clicked row position after back, 1440 / 390 | not in list | **752 / 411 (unchanged)** |
+
+**Verification — run this cycle, foreground, on the v769 tree at 127.0.0.1:8481:**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `ORCA_REPORT_FILE=/tmp/rt_v769.txt`,
+  read from its own report: **299 PASS / 0 FAIL / 1 WARN**. The report does not itemize the WARN. Its only
+  console error is the known localhost `sw.js` 404. A before-run on HEAD was **not** done this cycle; the
+  comparison figure is cycle 675's local 299/0/1 on v768.
+- Pixel gate `pixel_audit.js`, default baseline, not updated: **PIXEL GATE PASS**, all five viewports.
+- Step 5b (390x844 `hasTouch`): `scrollWidth == clientWidth` on CP arrival and after back. The one touched
+  control, the back button, is 44px tall under `pointer: coarse` and 24px at 1440. 0 page errors.
+- Regression walk: tab-bar switch to Fiscal Compare while scrolled lands on FC's own results reveal (523 at
+  1440), not a stale offset. `_homeOpenEvidence('Norway')` still opens the panel and scrolls to it. The
+  Browse → CP → "← Explorer" round trip restores Browse at the left offset.
+- STILL LOCKED respected: v612 mobile layer and `#reference-panel` untouched; no tab reorder; presets still a
+  dropdown; no tooltip, FAQ or citation edits. Version v768 → v769 at the three display sites.
+
+**Deliberately NOT done, so the next cycle does not re-find it:**
+- `openCountryProfileFromFC()` seeds CP's "#n of N" step bar from Fiscal Compare's results even when the
+  click came from the Screener. On a cold Screener-only path the bar is hidden (FC never ran). After FC has
+  run, it steps through FC's ranking, not the shortlist.
+- `switchTabFromDropdown()` (Reference menu panes) has its own activation path and still keeps scroll.
+- Explorer → Browse `#tbl-explorer` is still 1,986px in a 1,400px wrapper at 1440 (cycle 669's open item).
+
+**Shipped:** `636f43c` (v769) pushed to `main`, confirmed `origin/main == 636f43c`. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK), office commit
+`1dada89a6`.
