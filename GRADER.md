@@ -42793,3 +42793,16 @@ for it: 55 → 90px at 1440, 55 → 266px at 390, where before it was a one-line
 
 **Shipped:** pushed `51f1929..b72c6c4` (v763). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`,
 byte-identical (`cmp` OK).
+
+---
+## Cycle 669 Log — 2026-09-10 08:04
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus | **Directive:** DIRECT | **Task:** Cycle 669 — T1
+
+## Cycle 669: shipped v763 — the Screener's ranked list now shows its numbers on the first screen
+
+**Task:** T1, "Which countries should even be on my screening list?" It had gone longest without a turn (last run at cycle 663).
+
+**Friction:** On a cold load, the Screener lists all 185 countries ranked. At 1440 wide, the first screen of that table showed country names, regions and mechanic tags, but no government take and no NPV.
