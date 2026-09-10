@@ -42914,3 +42914,18 @@ Measured from a cold load, picking each of the 160 uncovered countries that carr
 - **The four uncovered countries with no statute citation** (Iraq-Kurdistan, Paraguay, Somalia, UAE — Abu Dhabi) still carry their only instruction, the generic external-check sentence, at the end of the paragraph under the tiles.
 - **The side-by-side paste flattening** and the **Country Profile paste's truncated breakeven note**, both from cycle 671's list, are still open. They are T5 work.
 - **The 02:00 "overnight chain FAILED" email** is the known harvest `NO-DELTA` / exhausted-skip-list question in `~/CLAUDE.md`, and is not touched.
+
+---
+## Cycle 672 Log — 2026-09-10 11:28
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus | **Directive:** DIRECT | **Task:** Cycle 672 — T4
+
+## Cycle 672: shipped v766
+
+v766 is pushed (`16ea26e..e6fc67e`) and copied to the office mirror; the two files are byte-identical. Tests read 296 pass / 0 fail / 1 warning on both v765 and v766, with every test line matching. The warning is the usual localhost `sw.js` 404.
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn (last run cycle 665); the last cycle was T5.
+
+**Fric
