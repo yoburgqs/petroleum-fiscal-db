@@ -42451,3 +42451,46 @@ The Home IC-screen card now lands the same way. A second pick while already at t
 **Task:** T1, "Which countries should even be on my screening list?" It hadn't been run since cycle 657.
 
 **Friction:** I cleared storage, opened the Screener and picked **IOC Capital Screen** from the menu. The page didn't move. The preset label
+
+
+---
+## Cycle 664 Log — 2026-09-10
+- Test before: 296 PASS / 0 FAIL / 1 WARN (local snapshot of v757)
+- Test after: 296 PASS / 0 FAIL / 1 WARN (local, v758)
+- JS errors: 1 both sides (sw.js 404, local-serving artifact)
+- Summary: shipped **v758**. Country Profile's "Copy for IC Memo" pasted a predictability score the platform itself withdraws on 41 countries; the pasted cell and the badge now carry the ceiling.
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." Last run at v752, the longest gap of the six.
+
+**Walk (cold, storage cleared, clipboard captured).** Fiscal Compare copy → Country Profile Copy for IC Memo and IC Citation → Side-by-Side (Norway / Brazil / Angola) copy. Every toast was accurate. The worst moment was on the single-country paste.
+
+**Friction.** Country Profile → Norway → Copy for IC Memo → paste. The memo table's *Fiscal predictability* row read **`UNGRADED (score 76/100)`**. Build Side-by-Side on the same country and its row reads **`→ carry ≤52 · LOW`**, and so does the Reform Risk card. The refutation was only in note 2, a 964-character paragraph. Even there it named the 29.6pp contract range but never a figure to carry. An editor who keeps the table and cuts the notes (the case v752 fixed for take) sends 76/100 to committee.
+Cause: `_fpObsCeiling()` (the object v720 made the single source for the paste, the XLSX and the CP badge) returned null for the **one-term** cohort. `_rrIqrUnderstated()` deliberately skips p25 === p75, and nothing picked that path up. Side-by-Side and Reform Risk compute the same bound inline, which is why only they showed it. The `_fpCiteVerdict()` one-term branch never asked for a ceiling at all.
+Measured on this build against `api/v1/country/*.json` for all 185: **41** one-term countries have a contract table that refutes their identical quartiles, and `_fpObsCeiling()` returned a ceiling for **0** of them. On **34** the score falls by 5+ points, and **16** land in VERY LOW. Worst: Uzbekistan pasted 89 against ≤49, Angola 62 against ≤26, Colombia 72 against ≤40, Netherlands 84 against ≤59.
+
+**Change.**
+1. `_fpObsCeiling()` now resolves the one-term conflict path with a zero bundled IQR through the same `_fpObsCeilingFrom()` arithmetic (charged 0, cost min(40, spread × 0.8)). That is exactly the formula `_sbsPaintObsSpread()` and `_rrPaintObsSpread()` use inline, and it is flagged `oneTerm`. The graded path is unchanged (Nigeria still pastes `LOW · upper bound 46/100`).
+2. `_fpCiteVerdict()` one-term branch: the table **cell** now states the figure to carry.
+   - Material cases: `≤52 · LOW ceiling (the printed 76 UNGRADED is withdrawn; contracts run 51.1–80.7%)`.
+   - Below the materiality bar (Mozambique 63 → 61): `UNGRADED (score 63/100) · bounded at ≤61 by this country's own contract table`.
+   - The note states the ceiling and its derivation, then keeps the original UNGRADED reasoning as context. With no sample loaded it stays silent, as before.
+3. Country Profile badge: a `→ carry ≤N · BAND` line now sits after each one-term refuted predictability badge (headline strip and parameter grid), matching Side-by-Side's wording. It takes the 24px floor under `pointer: coarse`, the same call v745 made for `.ioc-mech-more`.
+4. The XLSX Predictability Score cell reads the same object, so on these 41 it now takes the v720 `N — WITHDRAWN, carry ≤B (BAND)` form. Verified that the object resolves (Norway bound 52, material). **The XLSX file itself was not opened this cycle.**
+
+**Result.** The analyst who pastes a country's IC table gets the predictability figure the platform will actually defend, in the cell, and the same figure is now on the badge they copied from and in Side-by-Side. Country Profile, Side-by-Side and the paste no longer give three answers for one country.
+
+### Verification — run this cycle, not assumed
+- **Runtime suite RAN both sides**, same harness, each reading its own `ORCA_REPORT_FILE`. Before used an APFS snapshot of v757 served on :8165; after used the edited tree on :8164. **296 / 0 / 1 WARN / 1 JS error both sides**, and the reports are identical apart from the timestamp. The prompt's 297 is the deployed figure.
+- **JS syntax gate: PASS**, 11 inline blocks, re-run after the version bump.
+- **PIXEL GATE PASS** against `~/logs/pixel_audit/baseline.json` (2026-09-08T23:30, default `PIXEL_OUT`, not modified).
+- **Paste checked on 6 countries:** Norway, Uzbekistan and Angola (material), Mozambique (non-material), Nigeria (graded, unchanged), United Kingdom (graded measured, unchanged). The cell appears in both the text/plain and the text/html flavours.
+- **Horizontal scroll: 0** on Country Profile for all 6 at 1920 / 1440 / 1280 / 1024 / 768 / 390. Page errors: 0.
+- **Phone 390×844 `hasTouch` (step 5b):** overflow 0. The carry line measures **24px** at 390 and 768 under coarse, and 14px with a mouse.
+- **STILL LOCKED respected:** v612 mobile layer and `#reference-panel` untouched. No tab reorder, tooltip, FAQ or citation-string edit. Version v757 → v758 at the three display sites only.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+- **The Side-by-Side paste flattens badges into fragments.** `66% primary law · of · 63,848 facts` comes from the v541 separator in `copyComparisonTable().cellText()`, which fires between inline spans of one phrase. The predictability cell pastes `76 · UNGRADED ≥29.6pp obs ▲ best case → carry ≤52 · LOW`. Note 1 (the ranking) loses its line breaks: `…Norway 68.0% 15.0pp apart ⚠ order changes in $75–$100 All 3 columns…`. A real T5 defect, and the next candidate.
+- **The two pastes disagree on breakeven.** Side-by-Side's assumption line says breakeven "is not reported" (the stored values cannot separate countries), while the Country Profile paste prints `Breakeven $29/bbl` for Norway.
+- **The Country Profile paste notes are long:** reform note 1,167–1,273 chars, predictability note ~960+. The table itself is clean, 15–16 rows.
+- **The Fiscal Compare cold copy is still 185 rows / 50,658 chars.** v632's row ticks are the designed escape hatch, and the toast states the row count.
+- **The 02:00 "overnight chain FAILED" email** is harvest `NO-DELTA`: 550 records attempted, 0 new facts, and the other 6 steps OK. This is the known exhausted-skip-list tension in ~/CLAUDE.md, not a UX defect, and was not touched here.
