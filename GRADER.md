@@ -43011,3 +43011,14 @@ v767 is pushed (`60364ad`, GRADER.md entry `eb2ec41`) and the office mirror copy
 **Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn.
 
 **Friction.** On a cold load, USA is the first row in Fiscal Compare. Its drawer says the 
+
+---
+## Cycle 674 Log — 2026-09-10 13:14
+- Test before: 298 PASS / 0 FAIL
+- Test after: 298 PASS / 2 FAIL
+- JS errors: 0
+- Summary: Still running: the two runtime-suite runs (before and after) and the pixel gate, all in the background.
+
+Checked so far on the edited tree:
+- **Iraq / Kazakhstan / Oman:** the strip at the top ranks Iraq 34.1% › Kazakhstan 69.9% › Oman 75.6%. The notice that called this a take/NPV conflict is gone at both 1440 and 390.
+- **Afghanistan / Argentina / Iraq:** the strip ranks Argentina 31.0% › Iraq 34.1%. The notice now agrees with it: "Iraq takes more of the barrel than Argentina (34.1% on PSC/Conc
