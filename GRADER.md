@@ -43022,3 +43022,51 @@ v767 is pushed (`60364ad`, GRADER.md entry `eb2ec41`) and the office mirror copy
 Checked so far on the edited tree:
 - **Iraq / Kazakhstan / Oman:** the strip at the top ranks Iraq 34.1% › Kazakhstan 69.9% › Oman 75.6%. The notice that called this a take/NPV conflict is gone at both 1440 and 390.
 - **Afghanistan / Argentina / Iraq:** the strip ranks Argentina 31.0% › Iraq 34.1%. The notice now agrees with it: "Iraq takes more of the barrel than Argentina (34.1% on PSC/Conc
+
+---
+## Cycle 675 Log — 2026-09-10 — T3 (completing cycle 674's stranded v768)
+
+**Why this cycle did not pick a fresh task.** Cycle 674 walked T3, edited `index.html` to v768, and
+added two assertions to the graded suite. Then its session ended with the suite runs and pixel gate
+still in the background ("Still running: ..."). The runner commits only GRADER.md, so it pushed the
+log and emailed "298 PASS / 2 FAIL" while the fix sat uncommitted in the working tree. The deployed
+build stayed on v767, which is exactly what the two new assertions catch. Re-picking a new task on
+top of an unshipped, red fix would have left the analyst reading the wrong notice. This cycle verified
+that fix and shipped it instead. No new friction fix was attempted.
+
+- **Task:** T3, "How do these three countries compare side by side?"
+- **Friction:** `renderCompare()`, the orange take/NPV inversion notice under the Comparison grid
+  (`.cmp-notice`). It compared the fee-BLENDED headline take and NPV. On Iraq / Kazakhstan / Oman the
+  verdict strip and the $75 rows rank Iraq lowest on take (PSC/Conc 34.1%, $3.0B NPV) against Oman
+  75.6% / $866M, with no inversion. The notice under them said "Iraq takes more of the barrel than
+  Oman (84.8% vs 77.6%) and still shows more contractor NPV" and "Rank these countries on Govt Take".
+  That contradicts the grid the analyst just read, and the IC-memo clipboard carries the notice out.
+  Measured on deployed v767 by the graded suite at 13:47: FAIL, "paradox printed on the blended headline".
+- **Change:** on a fee-blended column the pair test and the printed figures now use the Group-1
+  `g1.t75` / `g1.v75`, the same numbers the $75 rows print, labelled "on PSC/Conc". PRRT and
+  unblended columns are unchanged. Iraq / Kazakhstan / Oman now shows no inversion notice.
+  Afghanistan / Argentina / Iraq still shows the real one: "Iraq takes more of the barrel than
+  Argentina (34.1% on PSC/Conc vs 31.0%) and still shows more contractor NPV ($3.0B on PSC/Conc vs
+  $2.9B)". The Brazil / Guyana / Norway cross-basis notice is unchanged.
+- **Result:** the analyst no longer gets told to rank Iraq on a take figure the grid above has
+  already corrected, and no longer pastes a false paradox into the memo. When the notice fires, it
+  quotes the same numbers the grid ranks on.
+
+**Verification (all on the v768 tree, run this cycle, foreground):**
+- JS syntax gate: 11 inline blocks, `node --check`, 0 failures.
+- Graded suite (`office/tools/petroleum/tests/runtime_comprehensive.js`) against a local server:
+  **299 PASS / 0 FAIL / 1 WARN**. The WARN and the one console error are the known localhost `sw.js` 404.
+  Deployed v767 by the same suite: 298 / 2 FAIL, and the two FAILs are exactly the new assertions.
+- 390×844 `hasTouch` and 1440×900, on four comparison sets: `scrollWidth == clientWidth` on every
+  one, 0 controls under 24px in the notices, 0 page errors.
+- Pixel gate: cycle 674's step 7b ran on this same tree, PASS. Not re-run this cycle.
+
+**Shipped:** `28618c9` (v768) pushed to `main`. The office mirror is byte-identical (`cmp` OK).
+Office commit `c789ee06e` holds the mirror plus cycle 674's two assertions, which had also been
+left uncommitted.
+
+**Defect in the loop itself, recorded rather than fixed:** `autonomous_cycle.py` does not notice
+a dirty `index.html` after the Claude step. It pushes GRADER.md, emails a cycle count, and leaves
+the product change stranded. A cycle that ends its turn with background jobs running will do this
+again. A guard (refuse to report COMPLETE while `git status` shows `index.html` modified) is a
+proposal for Zach, not done here.
