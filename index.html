@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v754</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v755</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2237,7 +2237,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v754</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v755</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2307,7 +2307,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v754</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v755</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -33924,6 +33924,20 @@ function renderReformTimeline(country) {
     let rows = [];            // v500: [label, valueHtml, statutoryHtml, sourceHtml]
     let divergentCount = 0;   // v500: rows where the modelled average and the cited statutory rate disagree
     let sourcedCount = 0;     // v500: rows that carry an INDEPENDENT statutory value (v569: bulk excluded)
+    // ── v755 (T6): WHICH document each of those sourced rows came from ────────────────────
+    // sourcedCount is a count of rows, and the tick sentence below reads it out as "All N
+    // independently sourced parameters match". Two of the three ways that sentence could
+    // overstate corroboration are already handled: v569 took the bulk harvest out (it populates
+    // both columns, so agreement is self-agreement) and v588 took multi-jurisdiction regional
+    // instruments out (same argument, one tier up). The third was never checked — the same
+    // country-specific document backing SEVERAL rows. Measured over the 210 shipped
+    // api/v1/country files: of the 162 countries with 2+ qualifying sourced rows, 149 have one
+    // document behind 2 or more of them and 118 have EVERY sourced row resting on a single
+    // document. On 70 of those 118 that one document is already in _CITE_DEAD. Vietnam ticks
+    // "All 4 independently sourced parameters match" off one 1993 statute; Libya's four come
+    // from one EPSA-IV model agreement. Names are collected here so the sentence can say how
+    // many documents are actually underneath it.
+    let sourcedSrcs = [];     // v755: {label, name} per row that increments sourcedCount
     let bulkCount = 0;        // v569: rows whose only "source" is the country-level bulk harvest
     let bulkLabels = [];      // v569: which parameters those are, named on screen
     let sharedCount = 0;      // v588: rows sourced to a document shared with other jurisdictions
@@ -34129,6 +34143,7 @@ function renderReformTimeline(country) {
         const _snap742 = {
           sourced: sourcedCount, divergent: divergentCount, unsourced: unsourcedCount,
           bulk: bulkCount, shared: sharedCount, cited: citedLinkCount, dead: deadLinkCount,
+          sS: sourcedSrcs.length,   // v755: rolled back with the rest when a row is off-model
           uL: unsourcedLabels.length, uZ: unsourcedZeroLabels.length, bL: bulkLabels.length,
           sL: sharedLabels.length, dL: deadLinkLabels.length, mC: modelConflicts.length,
           tC: Array.from(_termsCited)
@@ -34226,6 +34241,9 @@ function renderReformTimeline(country) {
               + _fmtPct(srcVal) + '</span> ' + _sharedChip(_shareOf.length, sTip);
           } else if (srcVal != null) {
             sourcedCount++;
+            // v755 (T6): the document, not just the tally. srcLabel is already the human-readable
+            // instrument name this row prints in its Source cell.
+            sourcedSrcs.push({ label: label, name: String(srcLabel || srcMeta.source || '') });
             if (_MODEL_KEY[label]) _termsCited.add(_MODEL_KEY[label]);   // v660 (T6)
             isDivergent = numVal != null &&
               Math.abs(numVal - srcVal) > Math.max(0.5, 0.02 * Math.max(Math.abs(srcVal), 1));
@@ -34404,6 +34422,7 @@ function renderReformTimeline(country) {
           sharedCount    = _snap742.shared;
           citedLinkCount = _snap742.cited;
           deadLinkCount  = _snap742.dead;
+          sourcedSrcs.length         = _snap742.sS;   // v755
           unsourcedLabels.length     = _snap742.uL;
           unsourcedZeroLabels.length = _snap742.uZ;
           bulkLabels.length          = _snap742.bL;
@@ -34800,6 +34819,48 @@ function renderReformTimeline(country) {
             : deadLinkCount + ' of those ' + citedLinkCount + ' citations cannot be opened from here.')
         + '</strong>'
       : '';
+    // ── v755 (T6): how many DOCUMENTS are under the count, stated where the count is made ────
+    // The tick sentence is the most defensible-sounding line on the platform's deepest
+    // provenance surface, and it is a row count. An analyst reads "All 4 independently sourced
+    // parameters match the rate stated in the cited source" as four checks that stand or fall
+    // separately. On 118 of the 162 countries that reach this sentence with 2+ sourced rows,
+    // they do not: one document is the sole citation behind every one of them, so a wrong
+    // statute, a superseded amendment or the wrong licence vintage moves all four together.
+    // Same argument v569 and v588 already accepted for the bulk harvest and for regional
+    // instruments — a count is not corroboration if the records behind it are one record.
+    // Nothing is excluded from sourcedCount here: each row's Statutory column genuinely is
+    // independent of its ORCA Value, so the match is real. What was missing is that the matches
+    // are not independent OF EACH OTHER, and only the sentence claiming them can say so.
+    const _concScope755 = (function() {
+      if (sourcedCount < 2 || sourcedSrcs.length < 2) return '';
+      const names = sourcedSrcs.map(function(s) { return s.name; }).filter(Boolean);
+      if (names.length < 2) return '';
+      const uniq = [];
+      names.forEach(function(n) { if (uniq.indexOf(n) === -1) uniq.push(n); });
+      if (uniq.length >= names.length) return '';   // genuinely N documents — say nothing
+      // Which document carries the most rows, and how many.
+      let top = uniq[0], topN = 0;
+      uniq.forEach(function(u) {
+        const c = names.filter(function(n) { return n === u; }).length;
+        if (c > topN) { topN = c; top = u; }
+      });
+      const _short = top.length > 68 ? top.slice(0, 66).replace(/\s+\S*$/, '') + '…' : top;
+      const _nameEl = '<span style="cursor:help;" title="' + _esc(top) + '">' + _esc(_short) + '</span>';
+      const _all = uniq.length === 1;
+      return ' <strong style="color:var(--orange);">'
+        + (_all
+            ? (names.length === 2 ? 'Both are the same document — ' : 'All ' + names.length + ' are the same document — ')
+              + _nameEl + ' — so that is one citation checked '
+              + (names.length === 2 ? 'twice, not two' : names.length + ' times, not ' + names.length)
+              + ' independent ones.'
+            : 'Those ' + names.length + ' rest on ' + uniq.length + ' documents, not ' + names.length
+              + ': ' + _nameEl + ' alone is the citation behind ' + topN + ' of them.')
+        + '</strong> <span style="color:var(--muted);font-weight:400;">If '
+        + (_all ? 'it' : 'that document')
+        + ' is superseded, or the wrong licence vintage for the blocks you are screening, '
+        + (_all ? 'every sourced term above moves together' : 'those ' + topN + ' rows move together')
+        + ' — the match count will not change.</span>';
+    })();
     const _mainNote = divergentCount > 0
       ? '<div style="margin-top:8px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
         + '<strong style="color:var(--text);">⚠ ' + divergentCount + ' of ' + sourcedCount
@@ -34811,6 +34872,7 @@ function renderReformTimeline(country) {
         + 'ORCA’s take%, NPV and IRR are built from the contract terms in the ORCA Value column, not from the statute. '
         + 'The gap is normally real — grandfathered licence rounds, block-specific terms and sliding scales. '
         + 'In an IC memo, cite the statutory figure against the linked source and the ORCA figure as a contract-weighted average.'
+        + _concScope755
         + _citeScope641
         + _scope625
         + '</div>'
@@ -34821,7 +34883,7 @@ function renderReformTimeline(country) {
               ? 'The 1 independently sourced parameter' + (offRows.length ? ' the model reads' : '') + ' matches'
               : 'All ' + sourcedCount + ' independently sourced parameters'
                 + (offRows.length ? ' the model reads' : '') + ' match')
-          + ' the rate stated in the cited source.' + _citeScope641 + _coverage601 + _scope625 + '</div>'
+          + ' the rate stated in the cited source.' + _concScope755 + _citeScope641 + _coverage601 + _scope625 + '</div>'
         : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
