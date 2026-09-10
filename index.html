@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v759</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v760</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2240,7 +2240,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v759</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v760</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2310,7 +2310,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v759</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v760</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -37160,7 +37160,14 @@ function loadCountryProfile(country) {
       : '';
     // Counted, not asserted, so the sentence that replaces the downside leg can say why it went.
     var _dsClear648 = 0, _dsTot648 = 0, _dsFrag648 = 0;
-    (COUNTRY_DATA || []).forEach(function(c) {
+    // v760 (T2): this counted the 3 state monopolies into the denominator ("180 of 185") while the
+    // defend paragraph, now rendered directly beneath this verdict, states the same test off
+    // cpFloorBase() ("180 of 182 non-monopoly regimes"). Same base now, so the two adjacent
+    // sentences print the same count. Local count kept only as the fallback.
+    var _fb760 = (typeof cpFloorBase === 'function') ? cpFloorBase() : null;
+    if (_fb760 && _fb760.n) {
+      _dsTot648 = _fb760.n; _dsClear648 = _fb760.nPass; _dsFrag648 = _fb760.nFail;
+    } else (COUNTRY_DATA || []).forEach(function(c) {
       if (c.npv_75 == null || c.npv_50 == null) return;
       _dsTot648++;
       if (c.npv_75 > 0 && c.npv_50 > 0) _dsClear648++;
@@ -37302,7 +37309,14 @@ function loadCountryProfile(country) {
       : '';
     return charLabel ? '<div style="font-size:11px;color:' + charColor + ';margin-bottom:14px;padding:6px 12px;background:rgba(0,0,0,.02);border-left:3px solid ' + charColor + ';border-radius:0 4px 4px 0;line-height:1.5;"><strong style="color:var(--text);">Fiscal character:</strong> ' + charLabel + _posPill648 + _verdictCTA + _charBasis + '</div>' : '';
   })() : '';
-  let html = _countryPageHeader + _quickIcVerdict497 + _headlineStrip344 + _cpFiscalVerdict470 + _sparseDataBanner + backToExplorerBtn + `<div id="dd-profile-head" class="dd-header">
+  // v760 (T2): the Fiscal character verdict is the page's one direct answer to "is this country
+  // attractive at $75?", and it rendered THIRD — under the ~170-word defend paragraph and the
+  // headline strip. Measured over all 182 non-monopoly profiles from a cold load: at 390x844 it was
+  // fully on the first screen for 0 of 182 (median 824px below the country name, after a median
+  // 283 words); at 1440x900 it was on screen but after 283 words. It now renders directly under the
+  // name. Nothing in either block is reworded or recomputed; the defend paragraph and the strip
+  // follow it in their existing order.
+  let html = _countryPageHeader + _cpFiscalVerdict470 + _quickIcVerdict497 + _headlineStrip344 + _sparseDataBanner + backToExplorerBtn + `<div id="dd-profile-head" class="dd-header">
     <span class="dd-region">${d.region}</span>
     <span class="tier ${tierClass(d.take_75)}" style="margin-left:8px">${tierLabel(d.take_75)}</span>
     <!-- v455: tooltip explains what "N contracts" means — a first-time IOC analyst may wonder "contracts with whom?" -->
