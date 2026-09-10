@@ -43354,3 +43354,69 @@ page claims a different "only" order.
 **Task:** T3, "How do these three countries compare side by side?" It had gone longest without a turn; the last cycle was T5.
 
 **Friction:** I opened Side-by-Side cold and typed Iraq, Brazil and Angola. The strip above the grid said "Ranks against each other: Iraq 34.1% › Angola 53.0% › Brazil 55.6% … the ordering above is the whole set." Bel
+
+---
+## Cycle 680 — 2026-09-10 — T4, v773: Reform Risk sizes the premium against the net take move, not the gross rise
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" T4 had gone longest without a turn (last run cycle
+672, v766). The previous cycle was T3.
+
+**Friction:** walked cold: Reform Risk tab, then **Check one country = Norway**, the platform's default Country Profile.
+The IC action at the head of the card (`#rr-ic-action`, from `_rrClassify()`'s in-window-rise branch) read: *"Below
+the Actively Reforming bar of 3 on frequency, but **not a zero-premium jurisdiction.** Size the premium against the
+**+12pp already taken since 2010**."* The event log further down the same card shows two entries in the window. 2022,
+"COVID relief package expired", +12pp. 2020, "COVID-19 Temporary Relief Package", −12pp. The +12pp is the scheduled
+end of a temporary cut. Norway's net take move since 2010 is 0pp. The card's own Direction tile says the two "cancel
+out", with a basis line reading "the 0 unmeasured could level or reverse it". An analyst would carry a premium
+against a tightening that never stuck, or trust neither line. `cumInWindow` summed rises and never subtracted cuts.
+The same figure left the product as Fiscal Compare's `TAKE +12pp` Reform-verdict token, in the Country Profile
+sidebar verdict, and in the pasted IC memo.
+
+Census over the 21 scoreable jurisdictions: 5 sit in that branch and 2 carry an in-window cut. Norway was told
++12pp (net 0pp). Indonesia was told +9pp (net +6pp, after its 2020 −3pp).
+
+**Change:**
+- The in-window-rise branch now lists each in-window cut (year, event, take change) and states the net measured move.
+  The sizing instruction reads against that net. Norway's label is *"take was raised inside the scoring window, net
+  0pp after in-window cuts"*. The rule says the rise was fully offset inside the window: *"Do not size a premium
+  against the gross +12pp; the net measured move since 2010 is 0pp."* Indonesia: *"Size the premium against the net
+  +6pp, not against the gross +9pp of rises and not against the count."*
+- Token `TAKE +12pp` → `TAKE NET 0pp` (Indonesia `TAKE NET +6pp`). All three places that define the tokens (the Home
+  guide, the FC IC Analyst Guide, and the column-header tooltip) now define the NET form.
+- `_rrTilt()`: where nothing is unmeasured, the basis reads "both fiscal changes carry a quantified take move — 1 up,
+  1 down, so the count sets no direction".
+- Russia, Australia and Ecuador (no in-window cut) render exactly as before.
+
+**Result:** an analyst checking Norway or Indonesia reads a premium basis that matches the event log under it. The
+Fiscal Compare screening column no longer shows Norway as a +12pp tightening. The IC memo paste carries the net.
+
+| scoreable jurisdictions in the in-window-rise branch | before (v772) | after (v773) |
+|---|---|---|
+| told to size against a figure that ignores an in-window cut | 2 (Norway +12 vs net 0; Indonesia +9 vs net +6) | 0 |
+| cards whose IC action contradicts their own Direction tile | 1 (Norway) | 0 |
+| FC Reform-verdict tokens overstating the net take move | 2 | 0 |
+
+**Verification (run this cycle on the v773 tree at 127.0.0.1:8481):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures** (run again after the legend edits).
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8481/`,
+  `ORCA_REPORT_FILE=/tmp/rt_v773.txt`, read from its own report: **299 PASS / 0 FAIL / 1 WARN**. The WARN and the one
+  console error are the known localhost `sw.js` 404, the same as cycles 675-679 locally. Run in the foreground.
+- Pixel gate `pixel_audit.js`, baseline not updated: **PIXEL GATE PASS**.
+- Step 5b: at 390x844 with `hasTouch` (`pointer: coarse` true), Fiscal Compare, Country Profile and Reform Risk all
+  measure `scrollWidth == clientWidth` (390/390), and so do the Norway, Indonesia, Russia, UK, Nigeria and Kenya cards.
+  The IC action is on the first screen for all six (top 160px, bottom ≤605px of 844). The FC token `TAKE NET 0pp`
+  is 86px wide in a 137px cell, with no overflow. 1440: all 1440/1440, and the FC token is 86px in a 138px cell.
+  0 page errors at both sizes. No control was added or resized.
+- STILL LOCKED respected: v612 mobile layer and `#reference-panel` untouched. No banner, tooltip, FAQ or citation
+  work. The token-key edits define the new token and add no new tooltip. CP headline, FC columns and tab order are
+  untouched. Version v772 → v773 at the three display sites.
+
+**Deliberately NOT done:**
+- The Actively Reforming branch (UK, Brazil) still states a frequency-based WACC premium and does not net the take
+  moves. UK in-window moves are +45pp / −57pp, net −12pp. That rule is a count rule by design, so netting it would
+  change a threshold, which is Zach's call, not a cycle's.
+- The global "Reformed Twice Since 2010" row for Norway still reads "raised take 2022 … +12pp · size not in the
+  score". That is factually true and gives no sizing instruction; left for a later cycle.
+
+**Shipped:** petroleum-fiscal-db `main` (v773). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`.
