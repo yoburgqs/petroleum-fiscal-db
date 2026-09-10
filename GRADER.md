@@ -41862,3 +41862,157 @@ server on 8199 was stopped. Mirrored to
 - Test after: 293 PASS / 0 FAIL / 1 WARN (local)
 - JS errors: 1 (known sw.js 404, present on both sides)
 - Summary: T4 — v753 split the Reform verdict column's two units. Committed, mirrored, pushed.
+
+---
+## Cycle 660 — T2, shipped as v754
+
+**Task:** T2 — *"Is this one country attractive at $75/bbl, and can I defend that?"* (659 was T4;
+658 T5, 657 T1, 656 T3, 654 T6 — T2 was the stalest in the rotation.)
+
+**Friction.** Walked T2 cold at 1440x900 and 390x844 with touch — no sessionStorage, no
+localStorage — into Country Profile, and selected Nigeria: 834 contracts, a real producer, the kind
+of row an IC analyst actually screens. Most of the T2 path is in good shape: the verdict line tells
+you what to defend on and what not to (*"Defend on the take and its evidence tier (n=834), not on
+the NPV"* — because NPV tracks take at r² 0.89 on the one fixed Deepwater profile), the missing
+breakeven and the removed IRR column both have honest absence notes, and the evidence chain
+volunteers that 3 of its 4 citation URLs 404.
+
+The defensibility leg then rests on the **Contract Distribution** panel (`#cp-dist-section`,
+`index.html` ~37999) — the only panel on the page that measures the spread behind the headline take.
+It named its own 3px marker three different things at once:
+
+| where | what it said |
+|---|---|
+| caption | "**Median** shown as vertical marker; IQR (P25–P75) shaded" |
+| legend, 3 lines below | "▲ **Avg**: 81.1%" |
+| marker `title` | "**Avg** @ $75: 81.1%" |
+
+The marker is `d.take_75` — the headline take, on whatever weighting basis the country resolved to.
+It is never the median. And on **57 of the 163** countries that carry quartiles it plots **outside**
+the shaded P25–P75 band (37 below P25, 20 above P75). Read against the caption's word *Median*, that
+is a median below the 25th percentile — arithmetically impossible. So the analyst had exactly two
+readings available, and both are bad: *this chart is broken*, or *the median take is 81.1%*, which
+is false.
+
+**41 of the 57** already carry the v559 conflict withdrawal, which accounts for the marker's
+position. **16 did not:**
+
+| country | P25 | Avg | P75 | n | gap |
+|---|---|---|---|---|---|
+| Cameroon | 58.1 | 53.5 | 58.1 | 104 | 4.6pp |
+| Peru | 23.1 | **27.0** | 23.1 | 391 | 3.9pp |
+| Bolivia | 69.1 | **72.1** | 69.1 | 168 | 3.0pp |
+| Guyana | 57.0 | 54.1 | 57.0 | 143 | 2.9pp |
+| Yemen | 55.9 | 53.4 | 55.9 | 62 | 2.5pp |
+| Bangladesh | 56.5 | 54.2 | 56.5 | 138 | 2.3pp |
+| **Nigeria** | **83.1** | **81.1** | **83.5** | **834** | **2.0pp** |
+| Rep. of the Congo | 61.9 | 60.2 | 62.3 | 220 | 1.7pp |
+| Uganda | 54.5 | 53.2 | 54.5 | 90 | 1.3pp |
+| + Oman, Russia, Ethiopia, Iraq-Kurdistan, Canada, Kenya, São Tomé | | | | | <1.0pp |
+
+**Nigeria is the worst case, not the smallest.** It is the only one of the sixteen whose band has
+real width (0.4pp), so it is the only one where the marker is *visibly* to the LEFT of the shaded
+box — and its note said nothing at all about that, because Nigeria is not one-term and so none of
+the v559 machinery reaches it. It printed the plain `Take ranges from 83.1% (P25) to 83.5% (P75)`
+and stopped.
+
+The legend made it worse. `#cp-dist-pcts` is `justify-content:space-between` with the three spans
+hard-coded **P25 | Avg | P75**, so the row's left-to-right order reads as an ordering of the values
+— and on Nigeria it printed **83.1 < 81.1 < 83.5** as a layout fact.
+
+**Change.**
+
+1. **The caption names the marker for what it is**, per country, from `d.weighting`, through one
+   shared `cpDistBasisName()`: *"The vertical marker is the headline take — this country's blended
+   average (production-weighted where data exists) — **not the median**. The shaded band is the
+   P25–P75 range of the individual contracts, so the marker can fall outside it."* The marker's own
+   tooltip now says the same thing instead of a bare "Avg".
+2. **New `cpDistSkew()`, appended by the existing shared `cpDistNote()`** — the same builder
+   `_cpApplyObsSpread()` re-runs on the async path, so screen and patch cannot fork. It fires only
+   when the marker sits outside its own band, and states the bracket the bundled quartiles
+   *already* give: the median of any set lies between its own P25 and P75, so where the marker is
+   outside them the median is on the far side of the nearer quartile. Nigeria now reads *"The
+   marker sits outside the band … it is 2.0pp below the P25 of Nigeria's own 834 contracts. The
+   median of any set lies between its own quartiles, so the median contract takes at least 83.1%.
+   The headline is pulled down by a low tail and is not a typical contract here. Which to use:
+   screening on 81.1% understates the government take a typical contract in Nigeria faces — cite
+   83.1% as the central contract, and 81.1% only where you are ranking Nigeria against other
+   countries, which is the basis every rank, median pill, screener filter and comparison on this
+   platform is built on."* Peru and Bolivia get the mirror image (**overstates**, high tail).
+   Where the quartiles are degenerate the statement is exact rather than a bound — Cameroon: *"Both
+   quartiles sit on 58.1%, so the median contract takes exactly that."*
+3. **The legend sorts its three labels ascending by value**, so the row can never again assert an
+   ordering the numbers contradict.
+
+**Nothing is recomputed.** No take, quartile, colour, tier, score or export changed. Emphasis reuses
+the existing `CP_OBS_REFUTE_PP = 1.0pp` cut rather than inventing a threshold — below it the
+mislabel is still corrected, in muted type, without the citation instruction (7 countries). Where
+v559 has withdrawn the quartiles as unusable (`cpSpreadConflict`), **no median claim is built on
+them at all**: Norway and Algeria are untouched and still show the dashed observed band, the
+observed-range label and the withdrawal.
+
+### Result
+
+The panel that backs the 81.1% headline no longer shows an impossible median. The analyst can read
+that the headline is a production-weighted average sitting 2.0pp *below* the quartiles of Nigeria's
+own 834 contracts, that the median contract takes at least 83.1%, and which of the two numbers goes
+in the memo versus which one the platform's ranks are built on.
+
+### Verification — run this cycle, not assumed
+
+- **Runtime suite RAN both sides**, same server, same cold conditions, each reading its own
+  `ORCA_REPORT_FILE`: **before 296 PASS / 0 FAIL / 1 WARN / 1 JS error; after 296 PASS / 0 FAIL /
+  1 WARN / 1 JS error.** Pass sets diff clean — 0 lines differ, and the two report files are
+  byte-identical apart from the timestamp. Re-run on the shipping build after a copy edit: **296
+  PASS**. Note the local figure is **296** this cycle, against the 297 the cycle prompt carried
+  (the deployed GitHub Pages number) and the 293 cycle 659 recorded locally — recorded, not
+  reconciled. The 1 JS error is the known `sw.js` 404 from serving at a localhost root rather than
+  the `/petroleum-fiscal-db/` scope the service worker registers against.
+- **JS syntax gate: PASS**, 11 inline blocks, re-checked after the version bump and after the copy
+  edit.
+- **PIXEL GATE PASS** — no surface got worse than baseline.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390**, every tab walked at each.
+- **Console / page errors: 0** at all six viewports.
+- **Phone 390x844 `hasTouch` (step 5b):** the legend fits on one line at 390px — no internal
+  scroll, no wrap, 0px page overflow — and the reordered spans measure 72.9 / 57.8 / 58.3px. No
+  control was added: the legend spans are text and the marker div is 28px tall. Screenshotted and
+  read.
+- **185-country sweep** of `cpDistSkew()` / `cpDistBasisName()`: **0 exceptions, 0 NaN /
+  undefined / Infinity.** Fires on **57**, matching the offline `country_data.json` count exactly —
+  33 emphatic, 24 muted, 128 silent.
+- **Contrast:** the skew line's `--orange` measured **4.75:1** in both `colorScheme: light` and
+  `dark` — AA pass. It is the token this same panel's conflict branch already uses, not a new colour.
+- **STILL LOCKED respected:** v612 mobile layer untouched — no selector narrowed or removed;
+  `#reference-panel` untouched, no negative offsets; no tab reordering; no new tooltip *as the fix*,
+  no new FAQ, no citation-string micro-edit; v751 / v752 / v753 work untouched.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+
+- **`p25_take === p75_take` on 135 of 163 countries**, so the "IQR (P25–P75) shaded" band renders
+  **0.00px wide** on 83% of profiles. v559 withdrew the *claim* on the 41 where the contract table
+  refutes it, and this cycle stops the marker's position from reading as an error — but on the
+  remaining ~94 the panel still draws an invisible band and prints two identical quartile numbers.
+  Whether a degenerate IQR should be drawn at all, or replaced by the exact-median statement it
+  actually supports, is a design call on the chart rather than a labelling defect.
+- **The transient on the 41 conflict countries.** The skew line renders on first paint and is
+  replaced by the stronger v559 withdrawal when the contract sample lands. Suppressing it
+  pre-fetch would permanently hide it on the ~94 countries that never get a sample re-render, so
+  it is left following the same async pattern v715 established for the verdict line.
+- **The Nigeria profit-oil contradiction is still open**, and it is bigger than anything above: the
+  page prints **three** different government profit-oil shares (60.0% in the summary and the XLSX,
+  40.0% in Key Fiscal Parameters, and a 60–80% R-factor ladder), and says so itself. It already
+  carries an explicit warning, so it is disclosed rather than hidden — but reconciling it is a
+  domain call on Nigeria's petroleum act, not a UX fix.
+
+### Housekeeping
+
+Version bumped v753 → **v754** at the 3 display locations (`<title>`, `#hdr-version`,
+`#print-header-ver`). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+Pushed `81c7e7d..01d053e`. The pre-change build served from `/tmp/t2walk/before` (a copy of v753
+plus symlinks) for the before-suite; both localhost servers on 8211/8212 stopped at cycle end.
+
+## Cycle 660 Log — 2026-09-09
+- Test before: 296 PASS / 0 FAIL / 1 WARN (local; 297 is the deployed figure)
+- Test after: 296 PASS / 0 FAIL / 1 WARN (local), pass sets identical
+- JS errors: 1 (known sw.js 404, present on both sides)
+- Summary: T2 — v754 stopped the Contract Distribution panel calling its average a median. Committed, mirrored, pushed.
