@@ -43259,3 +43259,13 @@ reaches.
 **Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn; the last cycle was T1.
 
 **Friction:** On a cold Country Profile load for Iraq, the green verdict leads with "34.1% govt take @$75 — investor-friendly". The sentence right under it said: "Half of Iraq's contracts price between 65.0% and 98.5%… Quote 34.1% as a contrac
+
+---
+## Cycle 678 Log — 2026-09-10 16:30
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Diff is limited to the paste fix, the version bump and the one-sentence completion. `CYCLE_STATE.json` and `cycle_log.txt` belong to the loop and I'll leave them. The mirror currently matches HEAD. Everything left depends on the three background checks (runtime suite, pixel gate, clipboard census), so I'm waiting for them to finish before committing.
+
+
+Pixel gate: pixel gate PASS
