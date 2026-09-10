@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v749</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v751</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1492,11 +1492,16 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     left: 0; width: 34px; min-width: 34px; max-width: 34px;
   }
   #tbl-screener thead th:nth-child(2), #tbl-screener tbody td:nth-child(2) {
-    left: 34px; width: 26px; min-width: 26px; max-width: 26px;
+    /* v751: was 26px, which is 18px of content box. The rank is 14px IBM Plex Mono and
+       right-aligned, so ranks 1-99 fit and ranks 100-185 did not: 86 of the 187 rows
+       measured scrollWidth 29 > clientWidth 26 and painted their third digit under the
+       pinned country cell, which carries an opaque background and paints later. On a phone
+       the bottom half of the list read "10", "14", "18" for 100, 149, 185. 30px. */
+    left: 34px; width: 30px; min-width: 30px; max-width: 30px;
     padding-left: 4px; padding-right: 4px;
   }
   #tbl-screener thead th:nth-child(3), #tbl-screener tbody td:nth-child(3) {
-    left: 60px;
+    left: 64px;   /* v751: follows the rank column 26px -> 30px */
     /* An explicit width, not a max-width. Left to auto-layout this column collapsed to 94px,
        which is narrower than the PROD-WTD / PART-PROD data-basis badge, so every cell broke
        into four lines (+Compare / name / arrow / badge) and one row stood 230px tall — three
@@ -1531,6 +1536,46 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   #tbl-screener tbody tr.sc-row-sel > td:nth-child(3) {
     background-image: linear-gradient(rgba(176,104,0,.09), rgba(176,104,0,.09));
   }
+  /* ══ v751 (T1) — the phone Screener's one number was rendered 151px off the right edge ══
+     v747 hid Region and Mechanics so that Govt Take — the only number this tab needs to
+     answer T1 — would land on screen, and its log recorded that "that cell is now on screen
+     at rest". The CELL was. The NUMBER never was, and this is the exact "stable but wrong"
+     shape: the check that was run (is the cell's left edge < 390?) passed, and the thing it
+     was standing in for (can the analyst read the take?) was false.
+
+     Measured on the shipped build, cold, 390x844 hasTouch, all 185 rows:
+       pinned identity strip  x 14 -> 225      (checkbox 34 + rank 26 + country 150)
+       Govt Take CELL         x 225, width 326   <- left edge on screen, so it "passed"
+       Govt Take GLYPHS       x 499 -> 541       <- 151px PAST the 390px right edge
+       "Govt Take" TH label   x 482 -> 541       <- also entirely off screen
+     Every value, every row, header included. The cell is `.num`, so it is right-aligned;
+     a 326px cell parks its content against its own right edge, which is three-quarters of
+     a screen away. What the analyst saw at rest was the ranked country list v747 set out to
+     fix, now followed by a 150px band of empty cell — which reads as MISSING DATA rather
+     than as a table that needs scrolling. That is worse than the problem v747 started from.
+
+     Why the cell is 326px: hiding two columns with `display: none` frees their 298px but
+     does not shrink the table, and this is an auto-layout table (now 3330px wide, not the
+     1435px v747's note recorded). The slack redistributes into whatever columns remain, and
+     Govt Take absorbed 326px to hold content whose widest form across all 185 rows measures
+     50px ("≥10.0%").
+
+     So the column is given a width instead of inheriting the slack — the same explicit-width
+     treatment columns 1, 2 and 3 already get six rules above, for the same reason. 112px
+     against 50px of content leaves the take value clear of the 26px `.tbl-wrap::after` fade
+     and still shows a ~36px sliver of the Evidence column beneath it, so the affordance that
+     more columns exist to the right survives rather than being replaced by dead space.
+
+     Nothing is hidden, moved or restyled: no column is dropped, the desktop table is
+     untouched (this is inside the <=720px layer), the value keeps its tier colour and its
+     tooltip, and the comparable sub-line — "→ screened at 34.1%", which appears when a take
+     ceiling or a comparable-basis preset is live — is allowed to wrap here instead of being
+     held on one nowrap line it no longer has room for. */
+  #tbl-screener thead th:nth-child(6), #tbl-screener tbody td:nth-child(6) {
+    width: 112px; min-width: 112px; max-width: 112px;
+  }
+  #tbl-screener tbody td:nth-child(6) div { white-space: normal !important; }
+
   /* Region (4) and Mechanics (5) — see note 2 above. */
   #tbl-screener thead th:nth-child(4), #tbl-screener tbody td:nth-child(4),
   #tbl-screener thead th:nth-child(5), #tbl-screener tbody td:nth-child(5) {
@@ -2192,7 +2237,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v749</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v751</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2262,7 +2307,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v749</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v751</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
