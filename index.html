@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v767</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v768</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v767</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v768</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v767</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v768</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -28563,7 +28563,23 @@ function renderCompare() {
   // quickstart presets is such a pair: "Atlantic Frontier Quartet" puts Brazil at 55.6% take and
   // $1.7B contractor NPV against Guyana at 54.1% and $1.1B. Detected and named on screen when it
   // occurs, instead of being discovered in the IC room.
-  const _cmpEcon = selected.filter(d => d.take_75 != null && d.npv_75 != null);
+  // v768 (T3): THE MECHANIC-BASIS CORRECTION REACHES THE INVERSION NOTICE. v737 taught this notice
+  // the data-basis gate; it still compared the fee-BLENDED headline take and NPV, which v549 (take)
+  // and the $75 NPV sub-line correct everywhere above it. Iraq / Kazakhstan / Oman: the verdict strip
+  // and the $75 rows rank Iraq LOWEST on take (PSC/Conc 34.1%) and print PSC/Conc $3.0B NPV against
+  // Oman's 75.6% / $866M -- no inversion. This box then said, in orange, "Iraq takes more of the
+  // barrel than Oman (84.8% vs 77.6%) and still shows more contractor NPV ($642M vs $566M)" and
+  // "Rank these countries on Govt Take" -- the ranking it had just contradicted -- and the IC-memo
+  // clipboard carries it out. On a fee-blended column the pair test now reads the same Group-1
+  // figures the $75 rows print (g1.t75 / g1.v75; ORCA holds the NPV split at $75 only, which is the
+  // only price this notice tests). PRRT columns keep their headline: at one equal price that take is
+  // comparable. Columns without a blend are unchanged.
+  const _invT = (d) => { const st = _cmpMixStat(d); return st.blended ? ((st.g1 && st.g1.t75 != null) ? st.g1.t75 : null) : d.take_75; };
+  const _invV = (d) => { const st = _cmpMixStat(d); return st.blended ? ((st.g1 && st.g1.v75 != null) ? st.g1.v75 : null) : d.npv_75; };
+  const _invG1 = (d) => _cmpMixStat(d).blended;
+  const _invTs = (d) => _invT(d).toFixed(1) + '%' + (_invG1(d) ? ' on PSC/Conc' : '');
+  const _invVs = (d) => fmtNpvShared(_invV(d)) + (_invG1(d) ? ' on PSC/Conc' : '');
+  const _cmpEcon = selected.filter(d => d.take_75 != null && d.npv_75 != null && _invT(d) != null && _invV(d) != null);
   // v737 (T3): THE BASIS GATE REACHES THE INVERSION NOTICE — the last block on this tab that
   // still compared a production-weighted column against a statutory-terms column at face value.
   //
@@ -28597,12 +28613,12 @@ function renderCompare() {
     for (let _j = 0; _j < _cmpEcon.length; _j++) {
       if (_i === _j) continue;
       const _a = _cmpEcon[_i], _b = _cmpEcon[_j];
-      if (_a.take_75 > _b.take_75 && _a.npv_75 > _b.npv_75) {
+      if (_invT(_a) > _invT(_b) && _invV(_a) > _invV(_b)) {   // v768: comparable figures, not the blend
         ((_cmpBasisGate && _cmpHasProd(_a) !== _cmpHasProd(_b)) ? _cmpInvX : _cmpInv).push([_a, _b]);
       }
     }
   }
-  const _invGap = (x, y) => (y[0].npv_75 - y[1].npv_75) - (x[0].npv_75 - x[1].npv_75);
+  const _invGap = (x, y) => (_invV(y[0]) - _invV(y[1])) - (_invV(x[0]) - _invV(x[1]));
   // The cross-basis line names the pair and both figures — the analyst must still be able to see
   // WHICH columns provoked it — but it never asserts that one takes more of the barrel than the
   // other, because on this set that ordering is not established.
@@ -28615,9 +28631,9 @@ function renderCompare() {
     _xHtml = '<strong style="color:var(--text);">⚠ '
       + _cmpEsc(_stat.country) + ' and ' + _cmpEsc(_pw.country)
       + ' cannot be ranked against each other on either row.</strong> '
-      + 'Their take and NPV figures do invert (' + _cmpEsc(_x[0].country) + ' ' + _x[0].take_75.toFixed(1) + '% / '
-      + fmtNpvShared(_x[0].npv_75) + ' against ' + _cmpEsc(_x[1].country) + ' ' + _x[1].take_75.toFixed(1) + '% / '
-      + fmtNpvShared(_x[1].npv_75) + ')'
+      + 'Their take and NPV figures do invert (' + _cmpEsc(_x[0].country) + ' ' + _invTs(_x[0]) + ' / '
+      + _invVs(_x[0]) + ' against ' + _cmpEsc(_x[1].country) + ' ' + _invTs(_x[1]) + ' / '
+      + _invVs(_x[1]) + ')'
       + (_cmpInvX.length > 1 ? ', as ' + (_cmpInvX.length === 2 ? 'does 1 further cross-basis pair'
           : 'do ' + (_cmpInvX.length - 1) + ' further cross-basis pairs') + ' in this set' : '')
       + ' — but ORCA holds no verified field production for <strong style="color:var(--text);">'
@@ -28635,9 +28651,9 @@ function renderCompare() {
   if (_cmpInv.length) {
     _cmpInv.sort(_invGap);
     const _pair = (pr) => '<strong style="color:var(--text);">' + _cmpEsc(pr[0].country) + '</strong> takes more of the barrel than '
-      + '<strong style="color:var(--text);">' + _cmpEsc(pr[1].country) + '</strong> (' + pr[0].take_75.toFixed(1) + '% vs '
-      + pr[1].take_75.toFixed(1) + '%) and still shows more contractor NPV (' + fmtNpvShared(pr[0].npv_75) + ' vs '
-      + fmtNpvShared(pr[1].npv_75) + ').';
+      + '<strong style="color:var(--text);">' + _cmpEsc(pr[1].country) + '</strong> (' + _invTs(pr[0]) + ' vs '
+      + _invTs(pr[1]) + ') and still shows more contractor NPV (' + _invVs(pr[0]) + ' vs '
+      + _invVs(pr[1]) + ').';
     const _shown = _cmpInv.slice(0, 2).map(_pair).join(' ');
     const _more = _cmpInv.length > 2 ? ' (' + (_cmpInv.length - 2) + ' further inverted pair' + (_cmpInv.length - 2 > 1 ? 's' : '') + ' in this set.)' : '';
     html += '<div class="cmp-notice" style="margin-top:10px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:9px 12px;font-size:11px;color:var(--muted);line-height:1.55;">'
