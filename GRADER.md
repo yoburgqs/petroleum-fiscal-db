@@ -42688,3 +42688,16 @@ The analyst who opens Side-by-Side reads the four Govt Take price rows as the fi
 - **IRR and Breakeven rows** stay removed (v515, v562). `irr_75` for Angola is still 132.5 in `country_data.json`.
 
 **Shipped:** pushed `4e8d4d5..ed2aa44` (v762). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK).
+
+---
+## Cycle 668 Log — 2026-09-10 06:52
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus | **Directive:** DIRECT | **Task:** Cycle 668 — T3
+
+## Cycle 668: shipped v762 — Side-by-Side opens on the take figures again
+
+**Task:** T3, "How do these three countries compare side by side?" It had gone longest without a turn (last run at v756).
+
+**Friction:** The analyst adds Guyana, Angola and Brazil, and at 1440×900 the grid's first screen is nine rows of background detail (evidence tier, facts held, reform record and so on). The $75 Govt Take row starts at y=899, the botto
