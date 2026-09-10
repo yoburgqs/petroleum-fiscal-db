@@ -43248,3 +43248,14 @@ reaches.
 `106ace78a` (not pushed by this session).
 
 ---
+
+---
+## Cycle 677 Log — 2026-09-10 15:45
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 677: Country Profile's "quote this take" line now uses one basis for both the number and its range (v770)
+
+**Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn; the last cycle was T1.
+
+**Friction:** On a cold Country Profile load for Iraq, the green verdict leads with "34.1% govt take @$75 — investor-friendly". The sentence right under it said: "Half of Iraq's contracts price between 65.0% and 98.5%… Quote 34.1% as a contrac
