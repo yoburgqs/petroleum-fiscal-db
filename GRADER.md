@@ -42638,3 +42638,53 @@ The analyst reads the full name and year of the instrument behind every number, 
 On the Country Profile's evidence table, the Source column cut off the name of the document behind each number, and on a phone it was off screen entirely. Both are fixed and pushed (`4d25d7d..7e79c80`), and the office mirror copy matches.
 
 **Cycle 666's work had never shipped.** That cycle ended its session while its tests were still running, so its v760 change (T2: the "Fi
+
+---
+## Cycle 668 — v762 (T3) — 2026-09-10
+
+### Task
+**T3** — *"How do these three countries compare side by side?"* It had gone longest without a turn: v756 T3, v757 T1, v758 T5, v759 T4, v760 T2, v761 T6.
+
+### Walk
+Cold load, storage cleared, then Side-by-Side. Typed `guy`, `ang`, `bra`, pressing Enter after each, at 1440×900 and 390×844 `hasTouch`. Adding worked: Enter picked the right country, the seeded North Sea example cleared itself, and the verdict strip gave the ranking.
+
+### Friction
+Then the grid opened on **nine rows of provenance**, and the first Govt Take figure sat at the bottom edge of the screen.
+
+- v723 had collapsed five "evidence depth" rows (Evidence tier, Model terms cited, Fiscal facts held, Predictability Score, Reform record) so the take rows would be on the first screen.
+- v731 then made `_sbsRevealEvidence()` open **all five** whenever any Predictability Score in the set is withdrawn.
+- A withdrawal turns out to be the normal state. Measured, settled after the async fetch: **40 of 65 randomised sets**, plus every preset: the cold default North Sea Trio, Atlantic Frontier, West Africa Trio, USA vs Iraq, and Guyana/Angola/Brazil.
+- On those sets the `Govt Take ($75/bbl)` label started at **y=899 on a 900px screen** (vs y=631 when shut). At 1440 the grid's first screen showed **no base-case take**; $75 was on screen for only **25 of 65** sets. On a phone the median was **1939px** (vs 1274).
+- The one row v731 needed open was Predictability Score, where the corrected "≤ carry" ceiling is. The other four came along for no reason.
+
+*Where:* `_sbsRevealEvidence()`, called from `_sbsObsNotice()`; the evidence rows are rendered in `renderCompare()`.
+
+### Change
+- A withdrawal now pins open **only the Predictability Score row** (`data-cmp-ev-id="fp"`). Evidence tier, Model terms cited, Fiscal facts held and Reform record stay shut.
+- The toggle stays collapsed and counts what's still behind it: **"▸ Show 4 more evidence rows"**. The orange reason now reads *"Predictability Score kept open — a score in this set is withdrawn and its corrected ceiling is on that row."*
+- Pressing Show opens all five ("Hide 5 evidence rows"). Hide shuts all five, including the pinned row, and resets the reason line. Before, the reason line kept saying "opened" after an explicit Hide. The session's `'0'` still blocks any auto-open on the next set.
+- Unchanged: the render still writes all 8 rows into `#cmp-data-table`, so Copy for IC Memo, Export PDF and the exports carry them all; `@media print` still forces all 5 open (measured 5/5 under print emulation).
+
+### Result
+The analyst who opens Side-by-Side reads the four Govt Take price rows as the first screen of the grid, with the corrected Predictability ceiling directly above them. They no longer have to scroll past Evidence tier, Model terms cited, Fiscal facts held and Reform record to reach the number the meeting is about.
+- 1440×900: `Govt Take ($75/bbl)` at **y=687** on withdrawn sets (was 899). On the first screen for **65 of 65** sets (was 25).
+- 390×844: median **1481px** (was 1939), 458px higher. **Still below the first phone screen**: the controls stack alone takes about 600px there, which is not addressed here.
+
+### Verification — run this cycle
+- **Runtime suite RAN both sides**, graded copy `office/tools/petroleum/tests/runtime_comprehensive.js`, each with its own `ORCA_REPORT_FILE`. Before: clean HEAD worktree served on :8469. After: the edited tree on :8468.
+  - **Before 296 PASS / 0 FAIL / 1 WARN / 1 JS error; after 296 / 0 / 1 / 1.**
+  - The two reports diff to 0 lines after removing timestamps and timings. The report carries only totals and failures, so that is all the 0 covers.
+  - The WARN and the error are the known `sw.js` 404 from serving at a localhost root. The loop's step-2 figure against deployed Pages is 297.
+- **JS syntax gate: PASS**, 11 inline blocks, `node --check`.
+- **PIXEL GATE PASS** against `~/logs/pixel_audit/baseline.json`, local tree, baseline not modified. No finding on Side-by-Side.
+- **Six viewports** (1920/1440/1280/1024 desktop; 768/390 touch), five sets each: page overflow **0** everywhere, **0 page errors**.
+- **Step 5b phone:** page overflow 0. The one control touched, `#cmp-ev-toggle`, is **26px** under `pointer: coarse`.
+- **Behaviour matrix at 1440 and 390, all as intended:** cold pin → Show (5 open, ss=1) → Hide (0 open, ss=0) → next set respects Hide → Clear + typed G/A/B pins again → print shows 5.
+- **STILL LOCKED respected:** v612 mobile layer and `#reference-panel` untouched; no tab reorder; no tooltip, FAQ or citation-string edit; v723 collapse and v731 reveal kept, v731 narrowed to the row it names. Version v761 → v762 at the three display sites.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+- **Phone controls stack before the answer.** At 390, the profile basis box, search, three 64px chip pills, a lone Clear row, the Order select and three export buttons fill about 600px above the verdict strip. $75 is still at about 1,480px. Fixing that means touching chip and button sizing inside the v612 mobile layer, which a cycle may not narrow or weaken. It needs a design, not a quick patch.
+- **The five notices under the grid** (715 words on G/A/B) are unchanged. Same reasoning as cycle 662.
+- **IRR and Breakeven rows** stay removed (v515, v562). `irr_75` for Angola is still 132.5 in `country_data.json`.
+
+**Shipped:** pushed `4e8d4d5..ed2aa44` (v762). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK).
