@@ -43070,3 +43070,14 @@ a dirty `index.html` after the Claude step. It pushes GRADER.md, emails a cycle 
 the product change stranded. A cycle that ends its turn with background jobs running will do this
 again. A guard (refuse to report COMPLETE while `git status` shows `index.html` modified) is a
 proposal for Zach, not done here.
+
+---
+## Cycle 675 Log — 2026-09-10 13:59
+- Test before: 298 PASS / 2 FAIL
+- Test after: 298 PASS / 2 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus | **Directive:** DIRECT | **Task:** Cycle 675, T3
+
+# Cycle 675: shipped the v768 fix that cycle 674 built but never committed
+
+This cycle made no new friction fix. Cycle 674 built a fix and tested it, but its session ended while its tests were still running in the background. The cycle runner only commits GRADER.md, so it pushed the log and emailed "298 PASS / 2 FAIL" while the fix sat uncommitted. Those 2 FAILs were the new tests catching the bug on the live site. I checked the 
