@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v761</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v762</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2271,7 +2271,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v761</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v762</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2341,7 +2341,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v761</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v762</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -27011,7 +27011,12 @@ function toggleSbsEvidence() {
   if (caret) caret.textContent = open ? '\u25be' : '\u25b8';
   if (word)  word.textContent  = open ? 'Hide' : 'Show';
   var rws = document.querySelectorAll('#cmp-output .compare-grid [data-cmp-grp="ev"]');
-  for (var i = 0; i < rws.length; i++) rws[i].style.display = open ? '' : 'none';
+  // v762: an explicit press settles every row, including one _sbsRevealEvidence() pinned open.
+  for (var i = 0; i < rws.length; i++) { rws[i].style.display = open ? '' : 'none'; rws[i].removeAttribute('data-sbs-pinned'); }
+  var n = document.getElementById('cmp-ev-n');
+  if (n) n.textContent = String(rws.length);
+  var what = document.getElementById('cmp-ev-what');   // the "kept open" reason no longer describes the rows
+  if (what) { what.textContent = 'tier · terms cited · facts held · predictability · reform'; delete what.dataset.sbsRevealed; }
   // The horizontal-overflow hint measures the grid; a row set appearing or vanishing can change
   // whether it needs to show, so re-run it on the same element the render path uses.
   if (typeof _sbsScrollHint === 'function') { try { _sbsScrollHint(); } catch (e) {} }
@@ -28292,7 +28297,7 @@ function renderCompare() {
           + `<button type="button" id="cmp-ev-toggle" onclick="toggleSbsEvidence()" aria-expanded="${_sbsEvOpen ? 'true' : 'false'}"`
           + ` title="Evidence depth for each column: the tier grade and its primary-law share, how many of the DCF&#39;s own fiscal terms carry a citation, the size of the fact base, the Fiscal Predictability Score and the post-2010 reform record. Collapsed by default so the Govt Take rows are on screen when the tab opens. The two rows that decide whether these columns may be compared at all — Data basis and Take basis — stay above it, and every row in here is still carried into Copy for IC Memo, Export PDF and the exports whether it is open or shut."`
           + ` style="background:transparent;border:1px solid var(--border);border-radius:5px;color:var(--muted);font:inherit;font-size:10px;font-weight:600;letter-spacing:.02em;text-transform:none;padding:4px 10px;min-height:26px;line-height:1.5;cursor:pointer;white-space:nowrap;">`
-          + `<span id="cmp-ev-caret">${_sbsEvOpen ? '▾' : '▸'}</span> <span id="cmp-ev-word">${_sbsEvOpen ? 'Hide' : 'Show'}</span> ${_sbsEvN} evidence rows</button>`
+          + `<span id="cmp-ev-caret">${_sbsEvOpen ? '▾' : '▸'}</span> <span id="cmp-ev-word">${_sbsEvOpen ? 'Hide' : 'Show'}</span> <span id="cmp-ev-n">${_sbsEvN}</span> evidence rows</button>`
           + `<span id="cmp-ev-what" style="font-weight:400;letter-spacing:0;text-transform:none;opacity:.8;">tier · terms cited · facts held · predictability · reform</span>`
           + `</div>`;
       } else {
@@ -28301,7 +28306,7 @@ function renderCompare() {
       }
     } else {
       const _evRow = r.grp === 'ev';
-      html += `<div class="cmp-row${_evRow ? ' cmp-ev-row' : ''}"${_evRow ? ` data-cmp-grp="ev"${_sbsEvOpen ? '' : ' style="display:none;"'}` : ''}>`;
+      html += `<div class="cmp-row${_evRow ? ' cmp-ev-row' : ''}"${_evRow ? ` data-cmp-grp="ev"${r.id ? ` data-cmp-ev-id="${r.id}"` : ''}${_sbsEvOpen ? '' : ' style="display:none;"'}` : ''}>`;
       html += `<div class="cmp-cell lbl">${r.label}</div>`;
       selected.forEach(d => html += `<div class="cmp-cell"${r.id ? ` data-sbs-row="${r.id}" data-sbs-c="${_cmpEsc(d.country)}"` : ''}>${r.key(d)}</div>`);
     }
@@ -29349,22 +29354,36 @@ function _sbsBoundOrder(hits, measured) {
 // analyst who has explicitly collapsed it this session ('0') is not overridden, and the auto-open
 // deliberately does NOT write sessionStorage: it is a property of the data on screen, not a
 // remembered preference, so it must not leak onto the next set the analyst builds.
+// v762 (T3): open the ONE row the withdrawal corrects, not all five. v731 opened the whole
+// drawer, and a withdrawal is the normal state, not the edge case: 40 of 65 randomised sets and
+// every preset, Norway / United Kingdom / Netherlands included. Opening Evidence tier, Model terms
+// cited, Fiscal facts held and Reform record as well pushed "Govt Take ($75/bbl)" from y=631 to
+// y=899 at 1440x900 -- the bottom edge of the screen -- so the default state of a tab built to
+// compare take showed no base-case take in the grid, which is what v723 collapsed the drawer to
+// prevent. The corrected ceiling v731 exists to show lives on the Predictability Score row alone
+// (id 'fp'), so only that row is pinned open. The toggle stays shut and now counts what is still
+// behind it ("Show 4 more evidence rows"); pressing it opens the rest, and an explicit Hide shuts
+// the pinned row too. Still not written to sessionStorage, for the reason given above.
 function _sbsRevealEvidence() {
   var btn = document.getElementById('cmp-ev-toggle');
   if (!btn || btn.getAttribute('aria-expanded') === 'true') return;
   try { if (sessionStorage.getItem('orca_sbs_ev') === '0') return; } catch (e) {}
-  btn.setAttribute('aria-expanded', 'true');
-  var caret = document.getElementById('cmp-ev-caret');
-  var word  = document.getElementById('cmp-ev-word');
-  if (caret) caret.textContent = '\u25be';
-  if (word)  word.textContent  = 'Hide';
   var rws = document.querySelectorAll('#cmp-output .compare-grid [data-cmp-grp="ev"]');
-  for (var i = 0; i < rws.length; i++) rws[i].style.display = '';
+  var pinned = 0;
+  for (var i = 0; i < rws.length; i++) {
+    if (rws[i].getAttribute('data-cmp-ev-id') !== 'fp') continue;
+    rws[i].style.display = '';
+    rws[i].setAttribute('data-sbs-pinned', '1');
+    pinned++;
+  }
+  if (!pinned) return;
+  var n = document.getElementById('cmp-ev-n');
+  if (n) n.textContent = (rws.length - pinned) + ' more';
   var what = document.getElementById('cmp-ev-what');
   if (what && what.dataset.sbsRevealed !== '1') {
     what.dataset.sbsRevealed = '1';
-    what.innerHTML = '<span style="color:var(--orange);font-weight:700;">Opened because a '
-      + 'Predictability Score in this set is withdrawn \u2014 the corrected ceiling is on that '
+    what.innerHTML = '<span style="color:var(--orange);font-weight:700;">Predictability Score '
+      + 'kept open \u2014 a score in this set is withdrawn and its corrected ceiling is on that '
       + 'row.</span>';
   }
   if (typeof _sbsScrollHint === 'function') { try { _sbsScrollHint(); } catch (e) {} }
