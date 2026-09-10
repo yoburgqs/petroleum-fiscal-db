@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v764</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v765</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v764</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v765</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v764</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v765</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -29300,8 +29300,9 @@ function _sbsPaintObsSpread(c, d, obs, token) {
           + '-by-production sample cannot establish a population IQR across all ' + nAll
           + ' contracts \u2014 but the observed spread is a floor on the real one, so '
           + cost.toFixed(0) + ' points is a floor on the penalty and ' + bound + ' is a CEILING on '
-          + 'the score: the true figure is at or below it, never above. Rank this column on '
-          + bound + ', with the observed range ' + range + ' attached.')
+          + 'the score: the true figure is at or below it, never above. Cite ' + bound
+          + ' as a ceiling, with the observed range ' + range + ' attached — it places this '
+          + 'column below a measured score at or above it, and against nothing else.')
         + '">\u2192 carry \u2264' + bound + ' \u00b7 ' + bLbl + '</span>');
     }
   }
@@ -29319,35 +29320,74 @@ function _sbsAttr(x) {
 // unusable without giving them anything to paste in its place, on the one screen whose job is
 // ranking. Each refuted column already has a CEILING computed from the platform's own formula
 // (score minus the spread penalty it was never charged); this states them, and re-ranks the set
-// on the ceilings together with any column ORCA does hold a measured spread for. A ceiling and a
-// measured score are both defensible upper reads, which is what makes them orderable together;
-// a ceiling is marked with "<=" everywhere it appears so it is never pasted as a point estimate.
+// on the ceilings together with any column ORCA does hold a measured spread for.
+// v765 (T5): v714 sorted ceilings and measured scores into ONE list as if both were points, and
+// told the analyst to "carry that order into the IC memo". A ceiling says how HIGH a score can
+// be, not where it is, so it is never established above anything: the cold default set pasted
+// "Netherlands <=59 > United Kingdom 58 > Norway <=52", and the only relation those figures
+// support is United Kingdom 58 > Norway <=52. Netherlands may sit on either side of both. Two
+// relations are provable and nothing else is printed with a ">": measured vs measured, and a
+// measured score over a ceiling at or below it. A ceiling that cannot be placed is named as such.
 function _sbsBoundOrder(hits, measured) {
-  var rows = [];
+  var ceil = [];
   hits.forEach(function(k) {
     var h = window._sbsObsHits[k];
     if (!h || h.bound == null) return;
-    rows.push({ c: k, v: h.bound, txt: k + ' \u2264' + h.bound + ' \u00b7 ' + h.bLbl
+    ceil.push({ c: k, b: h.bound, txt: k + ' \u2264' + h.bound + ' \u00b7 ' + h.bLbl
                                         + ' (printed ' + h.fp + ')' });
   });
-  if (!rows.length) return ' Carry the observed contract range into the IC memo, not the grade.';
-  var bounded = rows.map(function(r) { return r.txt; });
+  if (!ceil.length) return ' Carry the observed contract range into the IC memo, not the grade.';
+  ceil.sort(function(a, b) { return b.b - a.b; });
+  var pts = [];
   (measured || []).forEach(function(k) {
     var dd = (COUNTRY_DATA || []).filter(function(x) { return x.country === k; })[0];
     var sc = (dd && typeof getFiscalPredictabilityScore === 'function')
                ? getFiscalPredictabilityScore(dd) : null;
-    if (sc != null) rows.push({ c: k, v: sc, txt: k + ' ' + sc + ' (measured)' });
+    if (sc != null) pts.push({ c: k, v: sc });
   });
-  rows.sort(function(a, b) { return b.v - a.v; });
-  var order = rows.map(function(r) {
-    return r.c + ' ' + (r.txt.indexOf('\u2264') !== -1 ? '\u2264' : '') + r.v;
-  }).join(' \u203a ');
-  return ' On this platform\u2019s own formula the withdrawn column'
-    + (bounded.length > 1 ? 's bound at ' : ' bounds at ') + bounded.join(', ')
-    + '. Ranked on those ceilings' + ((measured && measured.length) ? ' alongside the measured column'
-        + (measured.length > 1 ? 's' : '') : '') + ', this set reads ' + order
-    + ' \u2014 carry that order and those figures into the IC memo, each with its observed range '
-    + 'attached, not the printed scores.';
+  pts.sort(function(a, b) { return b.v - a.v; });
+  var head = ' On this platform\u2019s own formula the withdrawn column'
+    + (ceil.length > 1 ? 's bound at ' : ' bounds at ')
+    + ceil.map(function(r) { return r.txt; }).join(', ') + '.';
+  var carry = ' Carry ' + (ceil.length > 1 ? 'each ceiling' : 'the ceiling')
+    + ' into the IC memo with its observed range attached, not the printed score'
+    + (ceil.length > 1 ? 's' : '') + '.';
+  var line = function(s) {
+    return '<span style="display:block;margin-top:4px;font-weight:700;">' + s + '</span>';
+  };
+  var cn = function(r) { return r.c + ' \u2264' + r.b; };
+  var pn = function(p) { return p.c + ' ' + p.v; };
+  if (!pts.length) {
+    if (ceil.length === 1) return head + carry;
+    return head + line('No predictability order is established in this set: '
+      + ceil.map(cn).join(', ') + ' are ceilings, and a ceiling caps a score without placing it. '
+      + 'Do not rank these columns against each other on predictability.') + carry;
+  }
+  var minPt = pts[pts.length - 1].v;
+  var below = ceil.filter(function(r) { return r.b <= minPt; });   // provably at or below every measured column
+  var loose = ceil.filter(function(r) { return r.b > minPt; });
+  var chain = pts.map(function(p, i) {
+    return (i ? (p.v === pts[i - 1].v ? ' = ' : ' \u203a ') : '') + pn(p) + ' (measured)';
+  }).join('');
+  if (below.length === 1) chain += ' \u203a ' + cn(below[0]);
+  else if (below.length > 1) chain += ' \u203a ' + below.map(cn).join(' and ') + ' (not ordered against each other)';
+  var hasOrder = pts.length > 1 || below.length > 0;
+  var looseTxt = loose.map(function(r) {
+    var over = pts.filter(function(p) { return p.v >= r.b; });
+    var open = pts.filter(function(p) { return p.v < r.b; });
+    return cn(r) + (over.length ? ' sits at or below ' + over.map(pn).join(', ') + ' but' : '')
+      + ' cannot be placed against ' + open.map(pn).join(', ')
+      + (ceil.length > 1 ? ' or the other ceiling' + (ceil.length > 2 ? 's' : '') : '')
+      + ' \u2014 its true score may sit on either side';
+  });
+  var body = hasOrder
+    ? 'The only order this set establishes: ' + chain + '.'
+      + (looseTxt.length ? ' ' + looseTxt.join('; ') + '.' : '')
+    : 'No predictability order is established in this set: ' + looseTxt.join('; ') + '.';
+  return head + line(body) + ' Carry ' + (hasOrder ? 'that order, and ' : '')
+    + (ceil.length > 1 ? 'each ceiling' : 'the ceiling') + ' with its observed range attached'
+    + (hasOrder ? ',' : '') + ' into the IC memo \u2014 not the printed scores, and no order between '
+    + 'columns the figures cannot place.';
 }
 // v731 (T3): the withdrawal notice under the grid is an argument ABOUT the Predictability Score
 // row -- "Do not rank the set on the printed scores -- rank it on the ceilings" -- and that row
@@ -29449,8 +29489,8 @@ function _sbsObsNotice(c, obs, bound, bLbl, fp, token) {
           ? 'therefore look' + (measured.length > 1 ? '' : 's') + ' like the LESS uniform regime'
             + (measured.length > 1 ? 's' : '') + ' on this screen while sitting at a NARROWER dispersion '
             + 'than the withdrawn column' + (hits.length > 1 ? 's' : '') + '. Do not rank the set on the '
-            + 'printed scores \u2014 rank it on the \u2264 ceilings now shown on the Predictability '
-            + 'Score row above.'
+            + 'printed scores \u2014 use the \u2264 ceilings now shown on the Predictability '
+            + 'Score row above, and only the order stated below.'
           : 'are shown on a measured basis and are directly readable.');
   }
   el.innerHTML = '<strong style="color:var(--orange);">\u26a0 The &ldquo;single term&rdquo; claim is withdrawn for '
