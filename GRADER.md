@@ -41605,3 +41605,130 @@ cycles.
 | | position on a 390px screen |
 |---|---|
 | 
+
+---
+## Cycle 658 — T5, shipped as v752
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* (657 was T1, so not repeated.)
+
+### Friction
+
+Walked T5 cold at 1440x900 and again at 390x844 `hasTouch`, no sessionStorage, no localStorage.
+Enumerated every copy/export control on all ten tabs, read the actual clipboard payload of all
+five *Copy for IC Memo* buttons in both flavours, and downloaded and parsed every export.
+
+Most of T5 is genuinely finished and I want that on the record before the finding: all five copy
+controls already write `text/html` **and** TSV, so Word/Docs/Outlook render a real table and Excel
+splits into columns; all three XLSX exports open in `openpyxl` and every one carries a
+Basis/Methodology sheet. That part of finalization test #5 holds.
+
+The defect is in the flagship single-country artifact. `copyICSummary()` builds a Metric/Value
+table plus numbered notes, and **every load-bearing row already drags its own qualification into
+the memo**:
+
+| row | note it carries |
+|---|---|
+| Breakeven | "bounded, not solved" |
+| Fiscal predictability | "UNGRADED — do not cite as evidence of fiscal stability" |
+| Reform exposure | full IC action, premium sizing |
+| Evidence tier | "2 of the 3 documents cited cannot be retrieved" |
+| Data basis | "7.6% of contracts production-weighted" |
+| Fee-basis take | "rank the COMPARABLE figure instead" |
+| **Government take @ $75/bbl** | **none** |
+
+The one row with no note is the number the analyst opened the tool for. Meanwhile the Country
+Profile that produced the paste was displaying, in orange, a few inches above the button:
+
+> **Take is a range here, not a point.** The contract table on this page runs **42.5–79.7%**
+> across its 50 largest producing contracts — a floor of ≥37.2pp — and the bundled quartiles that
+> call this a single term are not usable for Indonesia. Quote 59.5% as a contract average and
+> carry the range.
+
+v715 pushed that reading onto five surfaces — the verdict line, the basis chip, the distribution
+caption, the dashed band on the distribution bar, the predictability chip — and did not push it
+onto the artifact that **leaves the tool**. So the analyst read the warning on screen, clicked the
+control whose entire promise is "paste straight into an IC memo", and the memo got a bare point
+estimate. It is the *export* half of the exact defect v715 was written to close.
+
+Scope, measured over all 185 countries with the obs cache filled from `api/v1/country/*.json` the
+same way the page fills it: **61 of 185 hold a dispersion reading, 54 of them material (≥5pp)** —
+Uzbekistan 26.6–82.4% (55.8pp), Angola 30.0–75.2%, Guinea 24.1–65.9%, Georgia and Albania
+14.2–54.5%, Indonesia 42.5–79.7%. On each of those the pasted memo asserted a single take that the
+same page's own contract table refutes.
+
+### Change
+
+- **New `_icTakeDispersion(d, hd)`.** Both tests are `cpDefendDispersion()`'s, reused rather than
+  re-derived: `cpSpreadConflict()` (the existing `CP_OBS_REFUTE_PP = 1.0pp` one-counterexample
+  rule) first, the `p25/p75 ≥ 5pp` IQR read second, and the same 5pp materiality cut deciding
+  whether the wording is emphatic. **No new threshold, no take recomputed, no number overwritten.**
+- **The range goes in the VALUE CELL, not only in the note** — `59.5% — contract average;
+  contracts run 42.5–79.7%` — because an IC memo gets cut down and the table is what survives.
+- **Non-material spreads keep the cell clean.** 7 countries (Mozambique 2.2pp) get the muted
+  "not a single term, but a narrow one" note and no cell decoration, mirroring how the screen
+  grades them. 3 state monopolies are excluded, as on screen.
+- **The note leads the numbered list**, because notes are in table order and the $75 take row sits
+  above breakeven.
+- **Where the headline falls outside the range the note itself prints** — Uzbekistan 85.6% against
+  contracts running 26.6–82.4% — "Quote X% as a contract average" is *replaced* rather than
+  shipped, because the note would otherwise refute its own instruction. Same `CP_OBS_REFUTE_PP`
+  bar the basis chip already uses on screen for exactly this case. 2 countries.
+- Both clipboard flavours carry it, verified by reading `text/html` and `text/plain` back off the
+  clipboard, not by reading the code.
+
+### Result
+
+On the 61 countries where ORCA holds contract-level evidence that the take is a range, the memo
+the analyst pastes now carries that range **in the take row itself** and states what may be
+quoted — instead of a bare point estimate the platform's own contract table contradicts. An IC
+reader who receives only the table, with the notes cut, still sees the range.
+
+### Verification — run this cycle, not assumed
+
+- **Runtime suite RAN both sides**, same server, same cold conditions, each read from its own
+  `ORCA_REPORT_FILE`: **before 293 PASS / 0 FAIL / 1 WARN / 1 JS error; after 293 PASS / 0 FAIL /
+  1 WARN / 1 JS error.** Pass sets diff clean — zero lines differ. The 1 JS error is the same
+  `sw.js` 404 on both sides, an artifact of serving from a localhost root rather than the
+  `/petroleum-fiscal-db/` scope the service worker registers against.
+  **The cycle prompt carried 297 PASS, which is the deployed GitHub Pages figure; local scores
+  293 today on BOTH the pre-change and post-change builds.** Recorded rather than restated, per
+  finalization test #1. The before/after comparison is the load-bearing number, and it is flat.
+- **JS syntax gate: PASS**, 11 inline blocks, re-checked after the version bump.
+- **185-country sweep of the new helper** with the obs cache prefilled: 61 notes emitted, 54
+  material, 7 narrow, 2 outside-range, **0 NaN / undefined / Infinity, 0 exceptions**.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all 10 tabs.
+- **Console / page errors: 0** at all six viewports.
+- **PIXEL GATE PASS** — no surface got worse than baseline.
+- **Phone 390x844 `hasTouch` (step 5b):** the Copy button measures **44px tall**, was **tapped**
+  (not clicked), the note is present in the payload, and `scrollWidth - clientWidth` is **0px both
+  before and after the tap**.
+- **Exports re-checked** (finalization test #5): FC / IOC / Country Profile XLSX all open in
+  `openpyxl`; each carries a Methodology or Basis & Assumptions sheet. Breakeven CSV parses.
+- **STILL LOCKED respected:** v612 mobile layer untouched — no selector narrowed or removed;
+  `#reference-panel` untouched, no negative offsets; no tab reordering; no new tooltip *as the
+  fix*, no new FAQ, no citation-string micro-edit; v747's pinned identity strip and v751's
+  Screener column work untouched.
+
+### Deliberately NOT done, with the numbers, so the next cycle does not have to re-find it
+
+There is a **second and arguably worse** defect one step away in the same row, and it is a
+different defect, so it did not get folded in. `cpSpreadConflict()` requires `obs.spread > 1.0pp`;
+where the contract sample is *tight* but sits nowhere near the headline, neither branch fires and
+the paste still emits a bare number:
+
+| country | pasted take | what its 50 listed contracts actually price at |
+|---|---|---|
+| Peru | 27.0% | all 44.7% |
+| Guyana | 54.1% | all 57.0% |
+
+The badge already flags this on screen as `⚠ none listed at headline` (the `_mode654 ===
+'none-listed'` branch, ~25 of 185 countries). The paste does not. That is the strongest single
+T5 candidate remaining and it reuses the same constant.
+
+### Housekeeping
+
+Version display bumped v751 → **v752** at the 3 display locations (`<title>`, `#hdr-version`,
+`#print-header-ver`). A temporary `_before_probe.html` used to run the pre-change suite from the
+repo root — so its assets resolved, per cycle 657's finding — was moved out of the repo and is not
+in the commit; `git status` is clean apart from the loop's own `CYCLE_STATE.json` / `cycle_log.txt`.
+The localhost server on 8177 was stopped.
