@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v763</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v764</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v763</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v764</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v763</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v764</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -36801,10 +36801,29 @@ function loadCountryProfile(country) {
     // If the collinearity cannot be measured this cycle, the NPV instruction is left exactly as
     // it was rather than guessed away. Absence of a measurement is not evidence of independence.
     var _r2_670 = (_fb670 && _fb670.r2 != null) ? _fb670.r2 : null;
-    var _npvRestates670 = (_r2_670 != null && _r2_670 >= 0.7);
-    var _restateClause670 = _npvRestates670
-      ? ' Not the NPV pair — it tracks take at r² ' + _r2_670.toFixed(2)
-        + ' on ORCA’s one fixed Deepwater profile, so it restates the take rather than supporting it.'
+    // v764 (T2): this strip decided "Not the NPV pair" off the ALL-COUNTRY r² 0.89, and v734 moved
+    // the bold verdict four lines above it onto the country's own ±6pp take band without touching
+    // it. On 31 of 185 countries -- Norway, Brazil, Qatar, UAE, Kazakhstan, Algeria, Libya, Egypt
+    // among them -- the verdict said "carry that NPV position separately -- they are two findings,
+    // not one" and this strip, the line labelled IC MEMO, said "Not the NPV pair -- it restates the
+    // take". Two instructions for the same memo, opposite. The strip now reads the same band at the
+    // same 0.60 cut as _bandCarries734, and falls back to the all-country reading only where the
+    // verdict does (fewer than 8 comparable regimes in range, or no band r² measured).
+    var _band764 = (typeof cpTakeBandNpv === 'function') ? cpTakeBandNpv(d, 6) : null;
+    var _bandR2764 = (_band764 && _band764.r2 != null) ? _band764.r2 : null;
+    var _npvRestates670 = (_bandR2764 != null) ? (_bandR2764 >= 0.60)
+                                               : (_r2_670 != null && _r2_670 >= 0.7);
+    var _restateClause670 = !_npvRestates670 ? ''
+      : (_bandR2764 != null)
+        ? ' Not the NPV pair — inside its ±6pp take band contractor NPV tracks take at r² ' + _bandR2764.toFixed(2)
+          + ', so it restates the take rather than supporting it.'
+        : ' Not the NPV pair — it tracks take at r² ' + _r2_670.toFixed(2)
+          + ' on ORCA’s one fixed Deepwater profile, so it restates the take rather than supporting it.';
+    // Where the band shows NPV NOT moving with take, the NPV position is the second finding the
+    // verdict tells the analyst to carry. Same rank and window as the headline "NPV rank" pill.
+    var _carryClause764 = (_bandR2764 != null && _bandR2764 < 0.60 && d.npv_75 != null)
+      ? 'NPV ' + cpNpvFmt(d.npv_75) + ' @$75, #' + _band764.rank + ' of ' + _band764.n
+        + ' on contractor NPV in its ±6pp take band — carry it as a separate finding, not as support for the take.'
       : '';
     // The one branch where the NPV IS the finding: contractor NPV goes negative at $50/bbl.
     var _downFails670 = (d.npv_50 != null && d.npv_50 <= 0 && d.npv_75 != null);
@@ -36822,6 +36841,7 @@ function loadCountryProfile(country) {
     } else if (take > 75) {
       msg = 'IC: NOC-dominated take — cite take@$75 on the profile basis, with the evidence grade on this strip.'
           + (_npvRestates670 ? _restateClause670
+             : _carryClause764 ? ' ' + _carryClause764
              : ' Show NPV sensitivity at $100+.');
       col = 'var(--orange)'; bg = 'rgba(194,65,12,.06)'; border = 'rgba(194,65,12,.2)';
     } else if (swing != null && swing > 20) {
@@ -36836,6 +36856,7 @@ function loadCountryProfile(country) {
       msg = 'IC: standard citation — take@$75 ' + take.toFixed(1) + '%, profile, evidence tier, ORCA '
           + (typeof _orcaVerNow === 'function' ? _orcaVerNow() : '')
           + (_npvRestates670 ? '.' + _restateClause670
+             : _carryClause764 ? ' · ' + _carryClause764
              : (d.npv_75!=null?' · NPV '+cpNpvFmt(d.npv_75):'') + (d.npv_50!=null?' · '+cpNpvFmt(d.npv_50)+' @$50 downside':'') + '.');
       col = 'var(--muted)';
     }
@@ -36849,8 +36870,9 @@ function loadCountryProfile(country) {
         + '. ' + _ev670.aPct.toFixed(1) + '% of its ' + Number(_ev670.nFacts).toLocaleString()
         + ' facts come from primary legal instruments'
         + (d.n != null ? ', across ' + Number(d.n).toLocaleString() + ' contracts' : '')
-        + '. This is the figure the verdict line above tells you to defend the take on, because '
-        + 'unlike contractor NPV it is not derived from the take. Full breakdown in Evidence '
+        + '. This is the figure the verdict line above tells you to defend the take on'
+        + (_npvRestates670 ? ', because unlike contractor NPV it is not derived from the take' : '')
+        + '. Full breakdown in Evidence '
         + 'Quality and the Key Fiscal Parameters chain below.';
       _evSeg670 = '<span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;'
         + 'padding:2px 8px;border-radius:12px;white-space:nowrap;cursor:help;'
