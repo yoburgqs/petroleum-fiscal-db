@@ -42324,3 +42324,18 @@ analyst to infer it from em-dashes.
   profiles. Unchanged from cycles 660–661 — a chart design call.
 - **29 orphan `api/v1/country/*.json` files with underscore slugs** remain dead and
   unfetched. Cleared as a data-repo cleanup in cycle 661; still out of scope for a UX cycle.
+
+---
+## Cycle 662 Log — 2026-09-10 00:54
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete — shipped as **v756**, pushed `f6e9f12..39731ee`, mirrored to the office repo.
+
+## Task
+**T3** — "How do these three countries compare side by side?" (rotation: 661=T6, 660=T2, 659=T4, 658=T5, 657=T1; T3 was stalest, last run at 656.)
+
+## Friction
+Walked T3 cold — storage cleared, reloaded — on **Guyana / Angola / Brazil**, three of the four countries in this tab's own Atlantic Frontier quickstart.
+
+The grid hands the analyst an ordering they read straight off the eight Govt Take 
