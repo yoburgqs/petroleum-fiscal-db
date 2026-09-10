@@ -41745,3 +41745,120 @@ The localhost server on 8177 was stopped.
 **Task:** T5 — *"Give me something I can paste straight into an IC memo."* (657 was T1.)
 
 **Friction.** I walked T5 cold at 1440×900 and at 390×844 with touch — enumerated every copy/export control on all ten tabs, read the actual clipboard bytes of all five "Copy for IC Memo" buttons in *both* flavours, and downloaded and parsed every export. Most of T5 is genuinely finished: all five copy controls
+
+---
+## Cycle 659 — T4, shipped as v753
+
+**Task:** T4 — *"What is my fiscal-stability and reform exposure here?"* (658 was T5, 657 T1.)
+
+### Friction
+
+I walked T4 cold at 1440x900 and at 390x844 with touch, from a load with no sessionStorage or
+localStorage, across every surface that answers the question: the Reform Risk tab (global view and
+the per-country lookup, all 185 countries swept), Fiscal Compare's **Show Reform verdict** column
+and its deep link, Side-by-Side's *Reform record* row, the Country Profile reform line, the
+Screener's *Reform Record* filter and the **Stable Fiscal Record** preset, and the tab's own
+Reform Data CSV.
+
+Most of T4 is genuinely finished, and two things I initially took for defects were not:
+
+- `#sc-reform-note` reads empty via `innerText` — because it sits inside the Advanced Filters
+  `<details>`, which is collapsed by default and locked that way. `textContent` shows it fully
+  populated. Measurement artefact, not a bug.
+- The **Stable Fiscal Record** preset (the visible one-click path, presets locked as a dropdown)
+  does state its scope in the results banner: *"13 of the 21 jurisdictions ORCA holds a sourced
+  fiscal-reform log for … 11 cleared this screen's other thresholds, 2 did not: Libya, Venezuela."*
+
+The real defect is in the one column built for this question. `_rrClassify` emits `icToken`
+(index.html:33694 / 33713), rendered by the FC cell builder (~46652). On live data that column
+renders **exactly two colours**: orange on all 21 scoreable rows, muted on the 164 `n/c` rows.
+Both other branches are unreachable — `NO PREMIUM` (green) needs a measured in-window cut and no
+take rise ever; `PREMIUM 5–8pp` (red) needs `score <= 20`, i.e. 6+ in-window law changes, against a
+database maximum of 5 (the UK). So the colour channel partitioned nothing, and inside that single
+orange block, at identical 10px / weight-800 / right-aligned, sat **two numbers in different units,
+both suffixed `pp`**:
+
+| token | countries | what the pp actually is |
+|---|---|---|
+| `PREMIUM 3–5pp` | United Kingdom, Brazil | percentage points **added to the discount rate** |
+| `↑ +15pp` | Russia | percentage points of **government take already taken** |
+| `↑ +12pp` / `↑ +9pp` / `↑ +5pp` | Norway, Indonesia, Australia, Ecuador | same — a take fact |
+
+Russia's `+15pp` reads as five times more severe than the UK's `3–5pp`, in the wrong unit for the
+comparison. Adding 15pp to a 10% WACC gives 25% and kills every project; Russia's actual verdict is
+one in-window law change, *below* the frequency bar. The distinction lived only in the `title=`
+tooltip — and this analyst does not read a tooltip to understand a column.
+
+### Change
+
+Every token carrying a number now names its own unit, and the two classes separate before either
+number is read:
+
+- `PREMIUM 3–5pp` / `PREMIUM 5–8pp` → **`WACC +3–5pp`** / **`WACC +5–8pp`**, drawn as a **filled
+  pill** (white on the verdict colour, measured **5.18:1** in both light and dark), because these
+  are the only verdicts that change a model input.
+- `↑ +Npp` → **`TAKE +Npp`**, left as plain text: a fact about the fiscal terms, never a WACC add.
+- Unnumbered verdicts (`↑ PRE-2010`, `SIZE UNKNOWN`, `NO LAW CHANGE`) untouched.
+
+The column header tooltip and both on-screen legends were resynced so they name the tokens that
+actually render. **No threshold, score, classification or colour semantic changed** — only how the
+existing six-way verdict states its unit. `icToken` has no export consumer, so nothing downstream
+drifts.
+
+Live distribution after the change: `WACC +3–5pp` 2 (pilled) · `TAKE +Npp` 5 · `↑ PRE-2010` 7 ·
+`SIZE UNKNOWN` 5 · `NO LAW CHANGE` 2 · `n/c` 164.
+
+### Result
+
+Scanning the Reform verdict column, the analyst can see at a glance which rows carry a
+**discount-rate instruction** (2 — UK and Brazil, pilled) and which report a **take rise that
+already happened** (5 — Russia, Norway, Indonesia, Australia, Ecuador, plain), and can no longer
+carry +15pp of government take into a WACC.
+
+### Verification — run this cycle, not assumed
+
+- **Runtime suite RAN both sides**, same server, same cold conditions, each reading its own
+  `ORCA_REPORT_FILE`: **before 293 PASS / 0 FAIL / 1 WARN / 1 JS error; after 293 PASS / 0 FAIL /
+  1 WARN / 1 JS error.** Pass sets diff clean — zero lines differ. **The cycle prompt carried 297
+  PASS, which is the deployed GitHub Pages figure; local scores 293 on BOTH builds** — same finding
+  as cycle 658, recorded rather than restated. The 1 JS error is the known `sw.js` 404 from serving
+  at a localhost root rather than the `/petroleum-fiscal-db/` scope the service worker registers
+  against.
+- **JS syntax gate: PASS**, 11 inline blocks, re-checked after the version bump.
+- **PIXEL GATE PASS** — no surface got worse than baseline.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390.**
+- **Console / page errors: 0** at all six viewports.
+- **Phone 390x844 `hasTouch` (step 5b):** the pill is inline text; its tap target is the enclosing
+  button, which measures **36px** on touch (29.8px with a mouse). No new control under 24px.
+- **Contrast:** pill measured 5.18:1 in both `colorScheme: light` and `dark` — AA pass.
+- **185-country sweep** of the Reform Risk lookup: 0 NaN / undefined / Infinity, 0 exceptions.
+- **STILL LOCKED respected:** v612 mobile layer untouched — no selector narrowed or removed;
+  `#reference-panel` untouched, no negative offsets; no tab reordering; no new tooltip *as the fix*,
+  no new FAQ, no citation-string micro-edit; v751 Screener and v752 IC-paste work untouched.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+
+- **`PREMIUM 5–8pp` / `WACC +5–8pp` is unreachable on live data** and so is `NO PREMIUM`. The
+  ladder is documented in four places as a live six-way outcome; two of the six have never fired.
+  That is a defensible design (the branches exist for data that may arrive), but the docs read as
+  though an analyst will encounter them. Not folded in — it is a different defect from the unit
+  collision, and fixing it means deciding whether the bar of 3 / score ≤ 20 is still the right
+  ladder, which is a domain call.
+- **The Reform Risk country lookup card has no way to get its finding out of the product.** FC,
+  SbS, CP, the Screener and the Reform Risk *global* view all have an export or copy control; the
+  per-country card — the single richest T4 answer in the platform — has none. Strongest T5
+  candidate remaining.
+
+### Housekeeping
+
+Version bumped v752 → **v753** at the 3 display locations (`<title>`, `#hdr-version`,
+`#print-header-ver`). A temporary `_before_probe.html` in the repo root (needed so the pre-change
+suite's relative assets resolved, per cycle 657) was removed before the commit. The localhost
+server on 8199 was stopped. Mirrored to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; pushed `eb0944c..3377f0b`.
+
+## Cycle 659 Log — 2026-09-09
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local); 297 is the deployed figure
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local)
+- JS errors: 1 (known sw.js 404, present on both sides)
+- Summary: T4 — v753 split the Reform verdict column's two units. Committed, mirrored, pushed.
