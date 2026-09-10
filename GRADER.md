@@ -42189,3 +42189,138 @@ servers stopped at cycle end.
 
 ## Friction
 Walked T6 from a cold load: Home → Fiscal Compare → row drilldown → Country Profile → Evidence Quality → the per-parameter **Evidence Chain**, which is where every T6 path on this platform ends. Its verdict line is the most de
+
+---
+## Cycle 662 Log — 2026-09-10
+
+- Test before: 293 PASS / 0 FAIL / 1 WARN (local harness, pre-change build on :8232)
+- Test after: 293 PASS / 0 FAIL / 1 WARN (local harness, shipped artifact on :8231)
+- Reports diff to zero lines — no assertion changed. The 1 WARN / 1 JS error is the
+  sw.js 404 from the static file server, present on BOTH sides, not introduced.
+- JS errors: 0 introduced
+- Shipped as **v756**, pushed `f6e9f12..aa8d605`, mirrored to the office repo.
+
+## Task
+
+**T3** — "How do these three countries compare side by side?" (rotation: 661 was T6,
+660 T2, 659 T4, 658 T5, 657 T1 — T3 was stalest, last run at 656.)
+
+## Friction
+
+Walked T3 from a cold load (sessionStorage and localStorage cleared, then reloaded) on
+the standard screening set **Guyana / Angola / Brazil** — three of the four countries in
+this tab's own Atlantic Frontier quickstart.
+
+The grid hands the analyst an ordering they read straight off the eight Govt Take cells
+and their `highest of 2` / `lowest of 2` markers. Then, **starting at y=1578 — 678px
+below the fold on a 1440x900 screen** — five notices totalling **715 words** explain, in
+four separate ways, why that ordering is not the one to carry:
+
+| notice | what it forbids |
+|---|---|
+| single-term withdrawal | do not rank on the printed Predictability scores |
+| price-ordering | do not take a ranking off one price row |
+| proxy column | do not present Guyana's rows as like-for-like |
+| take-vs-NPV inversion | do not present the NPV ordering as the fiscal ranking |
+| Guyana vs Brazil | do not carry that pair as a take/NPV paradox |
+
+Measured on that set: **1,299 rendered words on the tab, 715 of them — 55% — are
+prohibitions**, and **not one line anywhere states the comparison that IS valid.** The
+analyst with 20 minutes reads the grid, never scrolls to the fine print, and writes the
+wrong order into the memo. Every notice is individually correct; collectively they tell
+the analyst what they may not conclude and never what they may.
+
+*Where:* `renderCompare()`, index.html — between the `_cmpFlip` computation (line ~28074)
+and the `let html = ...` that opens the grid (line ~28083).
+
+## Change
+
+A computed **verdict strip** (`#cmp-verdict`) directly **above** the grid — **y=218
+instead of y=1578**. Three parts, all recomputed every render:
+
+- **Ranks against each other:** the columns that genuinely rank, in order, at $75/bbl,
+  with the lowest-to-highest **pp span**. On Guyana/Angola/Brazil: *"Angola 53.0% ›
+  Brazil 55.6% · 2.6pp apart"*. The span pill turns orange under 5pp and says on hover
+  that the base-case row does not separate them on its own.
+- **Price-deck pill:** green *"order holds $50–$125"*, or orange *"⚠ order changes in
+  $75–$100"* naming the interval.
+- **Set aside:** every excluded column with its reason in its own clause — statutory
+  terms / state monopoly / PRRT cash-flow basis / fee-blended / no take — mirroring
+  `_cmpRankTake`'s null branches in the same order.
+
+**It adds no new analysis.** The ordering, the exclusions and the reversal were all
+already derived to build the notices below; they had simply never been assembled into an
+answer. It is computed from the **same `_cmpRankTake` gate** those notices use, so it
+cannot disagree with them — verified over 260 sets, 0 contradictions.
+
+It carries class `cmp-notice`, so it rides into **Copy for IC Memo as note 1**, ahead of
+the caveats — the paste now leads with the valid comparison.
+
+**One thing it catches that the page previously did not.** Its price-deck check compares
+the **full ordering** at all four prices; the existing `_cmpFlip` only tests whether the
+*lowest* column moves. On a 260-set randomised sweep that is **19 sets (7.3%)** with a
+mid-set reorder the page never mentioned anywhere. Verified by hand against
+`country_data.json`:
+
+| set | reorder | why `_cmpFlip` was silent |
+|---|---|---|
+| France / Mauritania / Yemen | Yemen 49.9 > Mauritania 47.0 at $50; Mauritania 59.0 > Yemen 53.4 at $75 | France lowest at every price |
+| Cote d'Ivoire / Tunisia / Bangladesh | Bangladesh 46.9 > CIV 44.0 at $50; CIV 56.6 > Bangladesh 54.2 at $75 | Tunisia lowest throughout |
+| Micronesia / CIV / Kenya / Montenegro | Kenya 56.9 > CIV 56.6 at $75; CIV 63.4 > Kenya 63.1 at $100 | Montenegro lowest throughout |
+
+## Result
+
+The analyst reads the **answer** to T3 before the grid instead of after it. On the cold
+default set they see *"United Kingdom 49.2% › Norway 68.0% · 18.8pp apart · order holds
+$50–$125 · Set aside: Netherlands — statutory terms"* above the fold. On
+Guyana/Angola/Brazil they see the ranking, its fragility across the price deck, and its
+one exclusion in a single line — instead of reconstructing all three from 715 words they
+will not scroll to. Where a set genuinely does not order (Iraq / Kuwait / UAE), it says
+**"Nothing ranks here"** and names why each column is out, rather than leaving the
+analyst to infer it from em-dashes.
+
+## Verification — run this cycle, not assumed
+
+- **Runtime suite RAN both sides**, same harness, each reading its own `ORCA_REPORT_FILE`,
+  both cold against a local server: **before 293 PASS / 0 FAIL / 1 WARN; after 293 PASS /
+  0 FAIL / 1 WARN**. The two reports **diff to zero lines** after the timestamp header.
+- **JS syntax gate: PASS**, 11 inline blocks, re-checked after every edit including the
+  version bump.
+- **PIXEL GATE PASS** — no surface worse than baseline. The 10 findings are the
+  pre-existing small-touch-target / clipped-text entries; **none on Side-by-Side**, none
+  introduced here.
+- **260 randomised 2–4 country sets:** 0 exceptions, 0 NaN / undefined / Infinity /
+  `[object`, 0 missing verdicts, **0 contradictions** with the notices below (never
+  claims "order holds" while the flip notice fires). 191 sets rank, 69 do not.
+- **Horizontal scroll: 0px at 1920 / 1440 / 1280 / 1024 / 768 / 390**, all 9 visible tabs
+  walked at each. **Console / page errors: 0** at every viewport.
+- **Phone 390x844 `hasTouch` (step 5b):** page overflow **0**, strip 362px wide inside a
+  390 viewport. Both pills measured **19px on the first build** — under the floor — and
+  were rebuilt as `inline-flex` with `min-height:24px`; re-measured at **exactly 24px**.
+  Grammar defects found by reading the rendered output ("1 of 3 column", "Their" for a
+  single column, "1 of 2 columns carry") were fixed and re-verified.
+- **STILL LOCKED respected:** v612 mobile layer untouched — no selector narrowed or
+  removed; `#reference-panel` untouched, no negative offsets; no tab reordering; no new
+  tooltip *as the fix*, no new FAQ, no citation-string micro-edit; v751–v755 untouched.
+  `grid.nextSibling` still resolves the same way, so `_sbsObsNotice()` placement is
+  unchanged.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+
+- **The five notices below the grid were left in place, not trimmed.** Each is correct and
+  set-specific. The defect was the missing answer, not the presence of the caveats —
+  deleting caveats to shorten the page would trade a real omission for a bigger one. If a
+  later cycle wants to shorten them, the verdict strip is now the thing they can be
+  shortened *toward*.
+- **The `highest of 2` / `lowest of 2` markers still fire on every take cell** and are
+  tautological when only two columns rank — every ranked column is one or the other. They
+  are now redundant with the verdict strip's ordering, but removing them is a separate
+  change to four rows and would relitigate v678, which fixed the half-labelled state
+  deliberately.
+- **The Nigeria profit-oil contradiction is still open** (three different government
+  profit-oil shares on one page, disclosed but unreconciled). Unchanged from cycles
+  660–661 — a domain call on Nigeria's petroleum act.
+- **`p25_take === p75_take` on 135 of 163 countries**, leaving a 0.00px IQR band on ~94
+  profiles. Unchanged from cycles 660–661 — a chart design call.
+- **29 orphan `api/v1/country/*.json` files with underscore slugs** remain dead and
+  unfetched. Cleared as a data-repo cleanup in cycle 661; still out of scope for a UX cycle.
