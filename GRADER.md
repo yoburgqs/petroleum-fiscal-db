@@ -43161,3 +43161,90 @@ re-finding their place or re-applying the screen.
 
 **Friction:** The worst moment is opening a country from a Screener shortlist. After loading the IOC Capital Screen (15 countries), clicking a country opened its Country Profile scrolled down as far as the Screener had been:
 - **At 1440:** 530px down. The country name, headline take and N
+
+## Cycle 677 Log — 2026-09-10 — T2 (v770)
+
+**Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn
+(last run 670; since then 671 T5, 672 T4, 673 T6, 674/675 T3, 676 T1).
+
+**Walk:** cold Playwright context, no storage, 1440x900 and 390x844 `hasTouch`. Country Profile tab → Indonesia
+auto-loads → pick a country from `#dd-country-select` → read the verdict and headline zone. Walked Brazil, Indonesia,
+Norway, Angola, Nigeria, Egypt, Malaysia and Iraq, then censused all 185 countries in a real browser.
+
+**Friction:** the "can I defend that" line. Cold on **Iraq** (a quick-load benchmark on the CP empty state), the
+green verdict reads "**34.1% govt take @$75** — investor-friendly tier ... Defend on the take and its evidence
+tier", and the orange sentence directly under it says:
+
+> "Take is a range here, not a point. Half of Iraq's contracts price between **65.0% and 98.5%** ... Quote
+> **34.1%** as a contract average and carry the range."
+
+The number it tells the analyst to quote is 30.9pp below the bottom of the range it tells them to carry. An IC
+reviewer asks one question and the defence falls apart. Cause: `cpDefendDispersion(d, take)` receives the
+**comparable** take (v552, 195 PSC/Concession contracts), but measured its range on the **blended** set:
+`d.p25_take`/`p75_take` and the contract-table sample both include the 415 fee-basis TSC contracts. The
+same-basis range was already on the page, 200px lower, in the "2 regimes here" card: PSC 48.2%, Concession 13.9%.
+
+A second, smaller form of the same defect: on **Uzbekistan** the screen said "Quote 85.6% ... carry the range" over
+a 26.6–82.4% contract range. v752 had already given the IC *paste* an out-of-range swap for exactly this case, but
+not the screen, so screen and paste were instructing the analyst differently.
+
+**Change:**
+- `cpDefendDispersion()`: when the verdict reads on the comparable take, the line now uses `_cpDefendG1()`, the
+  Group-1 priced regime rows from `cpRegimeRows()` (the same figures the "N regimes here" card and the Fiscal Regime
+  Breakdown print). Iraq now reads: "On the 195 PSC/Concession contracts this take is read on, **Concession prices
+  at 13.9%** (80 contracts) and **PSC at 48.2%** (115 contracts), so the regime you sign moves the take by 34.3pp.
+  Quote 34.1% as the PSC/Concession average and carry the range. The 65.0–98.5% contract spread further down is
+  across all 610 contracts, fee-basis TSC 415 included, so it does not describe this figure."
+  - The "does not describe this figure" clause appears only where the quoted take really lies outside the blended
+    spread (Iraq). On Mexico the blended quartiles *are* the Group-1 rows, so it is omitted.
+  - Where the Group-1 regimes agree within 5pp (Iran, Qatar, Oman, Malaysia), the line prints nothing, as it did
+    before. It no longer pairs a comparable take with a blended range.
+  - The CTA is now **See the regimes →**, which scrolls to `#cp-regime-breakdown` with the same flash as
+    `_cpScrollToDistribution`. It no longer points at the blended distribution.
+- `cpDefendClose()`: one closing-sentence builder shared by the screen and `_icTakeDispersion()`, so an out-of-range
+  headline now gets the same "falls Npp outside that range ... resolve the headline" instruction on screen that
+  the paste already carried. Paste output is unchanged (verified text-identical, below).
+
+**Result:** an analyst defending Iraq at $75 now reads a quote and a range on one basis, and the range contains the
+quote: 34.1% sits inside 13.9–48.2%. That range matches the regime card below it, and one click lands on the
+breakdown that sources it. They can put "34.1% (PSC/Concession average; 13.9% Concession to 48.2% PSC)" in a memo
+and answer the obvious follow-up. On Uzbekistan the screen no longer tells them to quote a figure no listed contract
+reaches.
+
+| census, all 185 countries, cold browser | before (v769) | after (v770) |
+|---|---|---|
+| countries printing the defend-dispersion line | 60 | 60 |
+| line tells analyst to quote a take outside the range it prints | **2** (Iraq 34.1 vs 65.0–98.5; Uzbekistan 85.6 vs 26.6–82.4) | **0** |
+| comparable-basis verdicts (quote on PSC/Conc) paired with a blended range | **6** (Azerbaijan, Ecuador, India, Iraq, Mexico, South Sudan) | **0**: all 6 on Group-1 regime rows, quote inside range on each |
+
+**Verification — run this cycle on the v770 tree at 127.0.0.1:8481:**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `ORCA_REPORT_FILE=/tmp/rt_v770.txt`,
+  read from its own report: **299 PASS / 0 FAIL / 1 WARN**; the WARN and the one captured JS error are the known localhost `sw.js` 404, and the local figure matches cycles 675/676 (299/0/1). The loop's 300/0/0 is its run against the deployed Pages URL, where `sw.js` exists****. Before figure is this cycle's loop Step 2 on v769: 300 PASS / 0 FAIL / 0 WARN.
+- Pixel gate `pixel_audit.js`, default baseline, not updated: **PIXEL GATE PASS — no surface got worse than baseline**.
+- Step 5b (390x844 `hasTouch`, `pointer: coarse` true): Iraq and Mexico `scrollWidth == clientWidth` (390/390) on
+  arrival and after the CTA click. The touched control, "See the regimes →", is 24px tall (≥24) at both widths,
+  the same as the button it replaces. The CTA lands `#cp-regime-breakdown` in view (top 212 of 844 at 390, 310 of
+  900 at 1440). 0 page errors; the only console error is the known localhost `sw.js` 404.
+- IC paste regression: `_icTakeDispersion(d, d.take_75)` for Iraq, Uzbekistan, Indonesia and Mozambique returns
+  the same note text as before. It still passes the published take against the blended range, which is on one
+  basis, so the paste did not carry the Iraq contradiction.
+- STILL LOCKED respected: v612 mobile layer and `#reference-panel` untouched; CP headline cells (v449/v451/v452)
+  untouched; no tab reorder; no tooltip, FAQ or citation edits. Version v769 → v770 at the three display sites.
+
+**Deliberately NOT done, so the next cycle does not re-find it:**
+- CP's **profit-oil reconcile banner** (`#cp-po-reconcile`) still tells the analyst that the page prints two or
+  three different government profit-oil shares (Indonesia 71.2% / 64.4% / 60–88% ladder; Nigeria 60% / 40% /
+  60–80%) and to reconcile them against the petroleum act. That is a fact-semantics question (see
+  PETROLEUM_DOMAIN_NOTES: `levy_profit_oil_rate` may hold the contractor share), not a layout fix.
+- **Brazil's Live DCF** says "ORCA holds no Brazil-specific fiscal parameters in this engine ... generic Concession
+  template", on a page whose Key Fiscal Parameters table cites Lei 9.478/1997 at 14.91% royalty and an R-factor
+  ladder. It sits ~6,000px down, but it contradicts the evidence chain the analyst would defend with.
+- Mozambique (non-material, 2.2pp) now also gets the out-of-range instruction in muted type (54.0% vs 55.6–57.8%),
+  matching the paste. It printed "quotable" before.
+
+**Shipped:** `6dee4b3` (v770) pushed to `main`, confirmed `origin/main == 6dee4b3`. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK), office commit
+`106ace78a` (not pushed by this session).
+
+---
