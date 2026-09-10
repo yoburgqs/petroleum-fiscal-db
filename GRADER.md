@@ -42568,3 +42568,60 @@ On the Reform Risk tab, the one-country lookup put its "IC action" (what premium
 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 667 — v761 (T6), and cycle 666's v760 committed — 2026-09-10 05:40
+
+### First: cycle 666 left its work uncommitted
+Cycle 666's `claude -p` run returned 102 characters: *"Both runtime suites and the pixel gate are still running. I'll commit and push once all three report."* The session ended there. Its v760 edit to `index.html` (T2: Country Profile's Fiscal character verdict moved directly under the country name, with its downside count on `cpFloorBase()`'s 182-regime base) was left in the working tree. The loop's push `c80a230..4d25d7d` carried only the grader update, so **v760 never reached Pages.**
+
+This cycle checked that edit before shipping it:
+- JS syntax gate PASS.
+- The loop's 04:42 pixel gate ran on that tree and passed.
+- The one semantic change, `_dsFrag648 = nFail`, re-measured: 2 on both definitions (Malaysia, Yemen). The "Marginal at $75" sentence prints the same number it did.
+
+It was committed on its own as `6f396a5` so it is attributed to T2/666, not folded into this cycle's commit. **Lesson for the loop:** a cycle must not end its session while its own gates are in flight. This cycle blocked in the foreground until all three reported.
+
+### Task
+**T6** — *"Where did this number come from and how solid is the evidence?"* Chosen because it had gone longest unrun: 661 was T6, then 662 T3, 663 T1, 664 T5, 665 T4, 666 T2.
+
+### Walk
+Cold load, no storage → Country Profile (cold default Indonesia) → pick a country → Evidence Quality strip → "N of M model terms cited →" chip → Key Fiscal Parameters — Evidence Chain. Walked in Chromium at 1440×900 and 390×844 `hasTouch`. Countries: Nigeria, Brazil, Netherlands, Indonesia, Guyana, Norway, Angola, Libya, Vietnam, United Kingdom.
+
+The route there works. The chip sits ~750px down, and one click lands on the chain heading at both widths (scrollY 3471 at 1440, 5864 at 390).
+
+### Friction
+The chain's **Source** column is the only place on the platform that names the document behind each number, and it did not show that name:
+- **Desktop:** `_shortSrc()` in `renderSourcedFacts()` clamped every instrument name to 228px with an ellipsis, and the three badge sites added an inline `max-width:340px`. Measured over ten countries: **41 of 60 Source cells clipped, including all 15 LINK DEAD rows.** Examples: Nigeria read *"Nigeria Petroleum Industry Act 20…"*; Indonesia *"…Regulation No. 53 of 2017 Gross Split P…"*.
+- **The worst of it is the dead-link rows.** The red note directly under the table tells the analyst to *"Locate the instrument by name before these figures go in an IC memo."* On a dead link the name is the only lead left, and it was cut. The full string was only in a `title` tooltip, which on dead links is the dead-link explanation and on a phone does not exist.
+- **Phone (390×844):** the table was 751px wide inside a 336px scroller that has no fade cue (`[id^="dd-facts-content-"]` is not a `.tbl-wrap`). The Source column sat at x=422–778. **26 of 26 rows** showed Parameter / ORCA / Statutory with no source on screen. The analyst read the numbers and never saw which document, or that it was dead.
+
+### Change
+- `_shortSrc()` now emits `<span class="ec-src-name">` with no clamp. The inline `max-width:340px` is removed at the three chain badge sites.
+- The chain table takes `class="facts-table ec-chain"`, and the Source cell `td.ec-src`, on model-read and off-model rows.
+- **Desktop CSS, scoped to `.ec-chain`:** the badge wraps (`white-space:normal; max-width:100%; overflow-wrap:anywhere`), while the LINK DEAD / BULK chips stay on one line. This table's own `th`/`td` wrap. The global `thead th` / `tbody td` nowrap (lines ~276/289) had let the ~650px "Not read by the model" divider, a `colspan=4` cell, set every column's min-content. That is what pushed the table 27–117px past its wrapper at 1024, before this cycle.
+- **Phone CSS (≤720px, section 2 of the v612 layer, added not narrowed):**
+  - Each row is a three-column grid (Parameter / ORCA / Statutory) with its source on a full-width line beneath.
+  - The Source `th` is hidden, since each source line labels itself.
+  - The inline-nowrap "⚠ DCF USES TIERS 60–88%" chip wraps inside its 103px cell instead of painting over the Statutory figure.
+- No count, tier letter, verdict, take, NPV, IRR, tooltip or export changed. The same `.source-badge` pill in the reform sidebar keeps its v500/v576 single-line clamp.
+
+### Result
+The analyst reads the full name and year of the instrument behind every number, next to the number, at every width. On a dead link they now have the one thing they need to go and find it: *"Nigeria Petroleum Industry Act 2021 (Federal Government of Nigeria Official Gazette)"*, *"Nigeria Deep Offshore and Inland Basin PSC Act 1993 (amended 2019)"*. On a phone, the source and its LINK DEAD / BULK status sit directly under each row. Nothing needs a sideways swipe.
+
+### Verification — run this cycle
+- **Runtime suite RAN both sides**, graded copy `office/tools/petroleum/tests/runtime_comprehensive.js`, own `ORCA_REPORT_FILE` each. Before: v760 tree served from `/tmp/c667before` on :8368. After: the final tree on :8367. **Before 296 PASS / 0 FAIL / 1 WARN / 1 JS error; after 296 / 0 / 1 / 1.** Pass-set diff **0 lines**. The WARN and the error are the known `sw.js` 404 from serving at a localhost root. The loop's own step-2 figure against deployed Pages is 297.
+- **JS syntax gate: PASS**, 11 inline blocks, run after the version bump and again after the final CSS edit.
+- **PIXEL GATE PASS** against `~/logs/pixel_audit/baseline.json`, local tree, baseline not modified.
+- **Six viewports** (1920 / 1440 / 1280 / 1024 desktop; 768 / 390 touch), Nigeria, Indonesia, Guyana, Brazil, Norway, 32 source rows each. **0 clipped names, 0 off-screen sources, 0 table overflow, 0 page overflow, 0 page errors** at every width. Before, 5 of 5 tables overflowed their wrapper at both 1024 and 390. Tallest row: 53px at 1440, 85px at 1024, 135px at 390.
+- **185-country sweep at 390×844 touch:** 185/185 chains rendered, 884 source rows; 0 off-screen, 0 clipped, 0 table overflow, 0 page overflow, 0 page errors, 0 NaN/undefined/`[object`.
+- **Step 5b phone:** page overflow 0. The smallest source badge or LINK DEAD chip under `pointer: coarse` is **24px** (768 and 390).
+- **STILL LOCKED respected:** v612 mobile layer untouched (rules added, no selector narrowed or removed); `#reference-panel` untouched; no tab reorder; no new tooltip, FAQ or citation edit. Version v760 → v761 at the three display sites.
+
+### Deliberately NOT done, so the next cycle does not re-find it
+- **Rows are taller.** Long instrument names take 2 lines at 1440 and up to 4 on a phone. That is the trade for the name being readable. Nothing was abbreviated, because the harvest strings are not safe to shorten mechanically.
+- **The harvest strings themselves are noisy.** "Guyana Petroleum Agreement Stabroek Block 2016 ExxonMobil Hess CNOOC PSA CIT 25 pct Royalty 2 pct" is a citation with the rates pasted in. Cleaning `srcLabel` is a data-repo task, not a UX cycle.
+- **The Evidence Quality "sources ▸" list** was not walked for the same clamp.
+- **The 02:00 "overnight chain FAILED" email** was not re-examined; cycle 664 diagnosed it as harvest `NO-DELTA`.
+
+**Shipped:** pushed `4d25d7d..e095c41` — `6f396a5` (v760, cycle 666 T2) and `e095c41` (v761, this cycle T6). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html` (byte-identical, `cmp` OK). Final-tree pass set vs before-tree pass set: 0 lines differ.
