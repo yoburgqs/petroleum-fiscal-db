@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v758</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v759</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2240,7 +2240,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v758</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v759</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2310,7 +2310,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v758</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v759</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -40802,7 +40802,24 @@ function _rrPopulateLookup() {
   if (g2) sel.appendChild(g2);
   sel.dataset.filled = '1';
   if (!sel.dataset.bound) {
-    sel.addEventListener('change', renderReformCountryVerdict);
+    // v759 (T4): on a phone the verdict card starts in the bottom third of the screen the
+    // native picker closes onto (card top 730px, viewport 175-1019px at 390x844), so even with
+    // the IC action at its head the analyst saw a headline and no answer. Bring the answer into
+    // view only when it is not already fully on screen -- at desktop widths it is, and the page
+    // must not jump away from the lookup. Programmatic picks (openReformRiskFor) scroll already.
+    sel.addEventListener('change', function () {
+      renderReformCountryVerdict();
+      if (!sel.value) return;
+      var lead = document.getElementById('rr-ic-action') || document.getElementById('rr-verdict-lead');
+      if (!lead) return;
+      var top = 0, hdr = document.querySelector('.site-header');
+      if (hdr) {
+        var pos = window.getComputedStyle(hdr).position;
+        if (pos === 'sticky' || pos === 'fixed') top = hdr.getBoundingClientRect().height;
+      }
+      var r = lead.getBoundingClientRect();
+      if (r.top < top || r.bottom > window.innerHeight) _rrScrollVerdictToTop();
+    });
     sel.dataset.bound = '1';
   }
   var clr = document.getElementById('rr-lookup-clear');
@@ -41413,7 +41430,7 @@ function renderReformCountryVerdict() {
     out.innerHTML =
       '<div style="border:1px solid var(--border);border-left:3px solid var(--muted);border-radius:8px;padding:14px 16px;background:var(--surface);">'
       + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:6px;">' + esc + ' — no Reform Frequency Score</div>'
-      + '<div style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;">'
+      + '<div id="rr-verdict-lead" style="font-size:12px;color:var(--muted);line-height:1.7;margin-bottom:12px;">'
       + 'ORCA carries a sourced fiscal-reform event log for <strong>' + coveredN + ' of ' + totalN + '</strong> jurisdictions. '
       + esc + ' is one of the <strong>' + (totalN - coveredN) + '</strong> without one. '
       + '<strong style="color:var(--text);">This is not a score of 100.</strong> No events on file means no coverage, not a clean record — '
@@ -41475,6 +41492,21 @@ function renderReformCountryVerdict() {
   out.innerHTML =
     '<div style="border:1px solid var(--border);border-left:3px solid ' + scoreColor + ';border-radius:8px;padding:14px 16px;background:var(--surface);">'
     + '<div style="font-size:14px;font-weight:700;color:var(--text);margin-bottom:10px;">' + esc + ' — reform exposure</div>'
+    // ── v759 (T4): the IC action is the answer, so it sits first ──────────────────────────
+    // The Home card sells this lookup as the control "that returns one IC action", and every
+    // T4 route on the platform ends on this card. The action rendered LAST in the verdict,
+    // below a five-tile strip whose Fiscal Predictability tile -- labelled "separate signal" --
+    // runs to ~420px of 10px prose and grows again when _rrApplyObsSpread's fetch lands.
+    // Measured from a cold load, picking each of the 21 covered jurisdictions in the lookup:
+    //   390x844 touch  IC action on the first screen for 0 of 21; median 811px into the card
+    //   1440x900       cut at the fold for 4 of 21 -- Nigeria and Mexico 50%, Kazakhstan 59%,
+    //                  Brazil 86% -- the four whose predictability tile paints the longest
+    // An analyst who picked Nigeria read 70/100, "direction not measured", "73 MODERATE" and
+    // "Carry <=46 LOW" before reaching the line telling them what premium to carry.
+    // Nothing is recomputed or reworded; the block moves above the tiles and takes an id.
+    + '<div id="rr-ic-action" style="font-size:12px;color:var(--text);line-height:1.7;padding:8px 12px;background:var(--surface2);border-left:3px solid ' + icColor + ';border-radius:4px;margin-bottom:12px;">'
+    + '<strong style="color:' + icColor + ';">' + icLabel + ':</strong> ' + icRule
+    + '</div>'
     + '<div style="display:flex;gap:22px;flex-wrap:wrap;align-items:flex-start;padding:10px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin-bottom:12px;">'
     + '<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:3px;">Reform Frequency Score</div>'
     + '<div style="font-size:18px;font-weight:800;color:' + scoreColor + ';">' + score + '<span style="font-size:11px;color:var(--muted);font-weight:700;">/100</span></div>'
@@ -41507,9 +41539,6 @@ function renderReformCountryVerdict() {
           + (latest.take_change ? ' <span style="font-family:IBM Plex Mono,monospace;font-weight:700;color:' + (String(latest.take_change).charAt(0) === '+' ? 'var(--red)' : 'var(--green)') + ';">' + _rrEsc(latest.take_change) + ' take</span>' : '')
           + '</div>'
         : '')
-    + '<div style="font-size:12px;color:var(--text);line-height:1.7;padding:8px 12px;background:var(--surface2);border-left:3px solid ' + icColor + ';border-radius:4px;margin-bottom:12px;">'
-    + '<strong style="color:' + icColor + ';">' + icLabel + ':</strong> ' + icRule
-    + '</div>'
     // v598 (T4): the events themselves, on the tab three other surfaces send the analyst to
     // for exactly this. Sits between the IC action and the profile route so the sentence
     // "size the premium against the rupture in the event log" now has the log under it.
