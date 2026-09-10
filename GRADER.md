@@ -41732,3 +41732,16 @@ Version display bumped v751 → **v752** at the 3 display locations (`<title>`, 
 repo root — so its assets resolved, per cycle 657's finding — was moved out of the repo and is not
 in the commit; `git status` is clean apart from the loop's own `CYCLE_STATE.json` / `cycle_log.txt`.
 The localhost server on 8177 was stopped.
+
+---
+## Cycle 658 Log — 2026-09-09 20:39
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle complete — everything committed, mirrored, and pushed.
+
+## Cycle 658 — T5, shipped as v752
+
+**Task:** T5 — *"Give me something I can paste straight into an IC memo."* (657 was T1.)
+
+**Friction.** I walked T5 cold at 1440×900 and at 390×844 with touch — enumerated every copy/export control on all ten tabs, read the actual clipboard bytes of all five "Copy for IC Memo" buttons in *both* flavours, and downloaded and parsed every export. Most of T5 is genuinely finished: all five copy controls
