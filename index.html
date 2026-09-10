@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v766</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v767</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v766</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v767</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v766</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v767</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -34343,6 +34343,29 @@ function renderReformTimeline(country) {
         return (typeof v === 'number' && isFinite(v)) ? { v: v * 100, origin: origin } : null;
       } catch (e) { return null; }
     };
+    // ── v767 (T6): the engine's rate was only ever compared against UNSOURCED rows ──────────
+    // v601/v666 put "⚠ DCF USES x%" on a row when the DCF runs a different rate from the one
+    // printed — but only inside the no-source branch. A row with a citation was never checked, on
+    // the reasoning that a cited row is the settled case. It is the opposite: it is the row an
+    // analyst trusts. Measured on the shipped build over all 185 profiles, rows the live model
+    // reads that carry a non-D source: 10 rows on 6 countries where the engine runs a rate that
+    // is NOT the ORCA Value printed, and on 9 of those 10 it is not the cited statutory rate
+    // either. USA — the #1 row on a cold Fiscal Compare — prints Royalty 17.62% against BOEM's
+    // 18.75%, while the take, NPV and IRR in the drawer that links here run a hard-coded 12.5%.
+    // Nigeria prints CIT 65.37% / 65.75% and the engine runs 30%; Libya Royalty 0% / 0%, engine
+    // 16%, under a green "All match" tick. Iraq prints CIT 29.39% and the engine runs the cited
+    // 35%. The number the model ran appeared in no row, and the note above said the take is
+    // built from the ORCA Value column. Azerbaijan and Malaysia are excluded on purpose: their
+    // engine rate is already printed on the separate contractual-ceiling row (v538/v666).
+    const _engShownElsewhere767 = function(label, mv) {
+      const mk = _MODEL_KEY[label];
+      if (!mk || !fk) return false;
+      return rowDefs.some(function(rd) {
+        if (rd[0] === label || _MODEL_KEY[rd[0]] !== mk) return false;
+        const v = fk[rd[1]] != null ? fk[rd[1]] : (rd[2] ? fk[rd[2]] : null);
+        return typeof v === 'number' && Math.abs(v - mv) <= Math.max(0.5, 0.02 * Math.max(Math.abs(mv), 1));
+      });
+    };
 
     // ── v660 (T6): which of the terms that PRODUCE the take carry a citation ──────────────
     // Filled in the sourced branch of the row loop below (the same branch that increments
@@ -34436,6 +34459,7 @@ function renderReformTimeline(country) {
         let statHtml = '<span style="color:var(--muted);" title="No statutory rate has been captured for this parameter — the modelled value is a contract-database average only.">—</span>';
         let isDivergent = false;
         let isUnsourcedConflict = false;   // v601 (T2)
+        let engConflict767 = null;         // v767 (T6): {v, matchesStat} on a SOURCED row the engine overrides
         if (srcMeta) {
           // Detect D-confidence: explicit 'd' confidence level OR self-referential petroleum-facts.db URL
           const rawConf = (srcMeta.confidence || 'c').toLowerCase();
@@ -34590,6 +34614,27 @@ function renderReformTimeline(country) {
           } else {
             badgeHtml = `<span class="source-badge ${confClass}" style="${bulkSty}" title="${badgeTip}">${bulkPre}${_shortSrc(srcLabel)} · ${confLabel}</span>`;
           }
+          // v767 (T6): same test v601 applies to unsourced rows, now applied to cited ones. A ladder
+          // is left to v700's machinery; a rate already printed on a sibling row is not a conflict.
+          if (conf !== 'd' && numVal != null) {
+            const _mp767 = _modelParam(label);
+            const _tol767 = function(a, b) { return Math.abs(a - b) > Math.max(0.5, 0.02 * Math.max(Math.abs(a), 1)); };
+            if (_mp767 && _mp767.origin !== 'tiers' && _mp767.v != null
+                && _tol767(_mp767.v, numVal) && !_engShownElsewhere767(label, _mp767.v)) {
+              const _mS767 = srcVal != null && !_tol767(_mp767.v, srcVal);
+              engConflict767 = { v: _mp767.v, matchesStat: _mS767 };
+              modelConflicts.push({ label: label, shown: val,
+                                    modelled: _fmtPct(_mp767.v),
+                                    modelledNum: Math.round(_mp767.v * 100) / 100,
+                                    ladder: null, origin: _mp767.origin,
+                                    gap: Math.abs(_mp767.v - numVal),
+                                    sourced: true,
+                                    stat: srcVal != null ? _fmtPct(srcVal) : null,
+                                    statGap: srcVal != null ? Math.abs(_mp767.v - srcVal) : null,
+                                    matchesStat: _mS767,
+                                    srcName: String(srcLabel || srcMeta.source || '') });
+            }
+          }
         } else {
           // v601 (T2): no source of any kind for this row. The old badge read "Contract DB
           // average", which names a method and reads like provenance; the Statutory cell was a
@@ -34683,9 +34728,20 @@ function renderReformTimeline(country) {
             // so the row is findable in a table scan rather than only on hover.
             ? '<span style="color:var(--red);font-weight:700;">' + val + '</span>'
             : val;
+        // v767 (T6): the rate the model ran, on its own line in the cell that claims to be it. Red
+        // where it matches neither column; orange where it is the cited rate and only the contract
+        // average is bypassed. The nowrap marker lets the v761 phone rule wrap it in a 103px cell.
+        const _engChip767 = engConflict767
+          ? '<br><span class="ec-eng767" style="display:inline-block;margin-top:3px;background:'
+            + (engConflict767.matchesStat ? 'rgba(194,65,12,.12);border:1px solid rgba(194,65,12,.45);color:var(--orange);'
+                                          : 'rgba(185,28,28,.12);border:1px solid rgba(185,28,28,.45);color:var(--red);')
+            + 'font-size:10px;font-weight:700;padding:1px 5px;border-radius:3px;letter-spacing:.04em;white-space:nowrap;">'
+            + '⚠ DCF USES ' + _fmtPct(engConflict767.v) + (engConflict767.matchesStat ? ' · CITED RATE' : '')
+            + '</span>'
+          : '';
         // v743 (T6): terms the live model does not read are held back for the partition below.
         if (_readsRow(label)) {
-          rows.push([label, valHtml, statHtml, badgeHtml]);
+          rows.push([label, valHtml + _engChip767, statHtml, badgeHtml]);
         } else {
           offRows.push([label, valHtml, statHtml, badgeHtml]);
           if (unsourcedCount > _snap742.unsourced) offUnsourcedLabels.push(label);
@@ -34979,9 +35035,29 @@ function renderReformTimeline(country) {
       ? '<div style="margin-top:8px;background:rgba(185,28,28,.06);border:1px solid rgba(185,28,28,.30);border-left:3px solid var(--red);border-radius:5px;padding:9px 11px;font-size:11px;color:var(--muted);line-height:1.55;">'
         + '<strong style="color:var(--text);">\u26a0 ' + (modelConflicts.every(function(c){ return !!c.ladder; })
             ? 'The model does not use the value this table prints for '
-            : 'This page carries two different values for ')
+            : modelConflicts.every(function(c){ return !!c.sourced; })
+              ? 'The DCF does not run the ORCA Value this table prints for '
+              : 'This page carries two different values for ')
         + modelConflicts.map(function(c){ return _esc(c.label); }).join(', ') + '.</strong> '
         + modelConflicts.map(function(c) {
+            // v767 (T6): a CITED row. There are up to three figures, and the analyst has to know
+            // which of them the take, NPV and IRR were actually produced with.
+            if (c.sourced) {
+              return (modelConflicts.length > 1 ? '<strong style="color:var(--text);">' + _esc(c.label) + ':</strong> t' : 'T')
+                + 'he table above shows <strong style="color:var(--text);">' + _esc(c.shown)
+                + '</strong> as the contract average'
+                + (c.stat != null ? ' and <strong style="color:var(--text);">' + _esc(c.stat)
+                    + '</strong> as the rate stated in ' + _esc(c.srcName) : '')
+                + '. The Live DCF panel further up this same page runs ' + _esc(country)
+                + ' on <strong style="color:var(--text);">' + _esc(c.modelled) + '</strong>'
+                + (c.matchesStat
+                    ? ' \u2014 the cited rate, not the contract average, ' + c.gap.toFixed(1) + 'pp apart'
+                    : ' \u2014 ' + (c.origin === 'override' ? 'a hard-coded engine override'
+                                    : 'a separately harvested country-level field')
+                      + ' that matches neither: ' + c.gap.toFixed(1) + 'pp from the contract average'
+                      + (c.statGap != null ? ' and ' + c.statGap.toFixed(1) + 'pp from the cited rate' : ''))
+                + ' \u2014 and carries that through to its Fiscal Breakdown and to Fiscal Compare.';
+            }
             // v700 (T6): a ladder country is not a two-figure disagreement, and describing it as
             // one sent the analyst to defend the wrong number. dcfPSC() reads tier_schedule and
             // ignores profit_oil_govt_pct entirely whenever a ladder is present.
@@ -35013,14 +35089,37 @@ function renderReformTimeline(country) {
             ? ' The figure in that row is not a source either \u2014 it is an uncited contract average. '
               + '<strong style="color:var(--text);">Cite the tier schedule, not this row, and read its own '
               + 'basis note before quoting the tiers.</strong> '
-            : ' Neither figure is a source \u2014 one is an unsourced contract average, the other '
-        + (modelConflicts.every(function(c) { return c.origin === 'override'; })
-            ? 'a hard-coded engine override'
-            : modelConflicts.every(function(c) { return c.origin === 'contract'; })
-              ? 'a separately harvested country-level field that carries no citation either'
-              : 'a hard-coded engine override or a second, equally uncited harvest of the same term')
-        + '. <strong style="color:var(--text);">Do not quote either until you have the rate from '
-        + _esc(country) + '\u2019s own petroleum act.</strong> ')
+            : (function() {
+                // v767 (T6): the "neither figure is a source" sentence is only true of UNSOURCED
+                // conflicts, so it is now scoped to them; cited rows get their own instruction.
+                const _un = modelConflicts.filter(function(c) { return !c.sourced; });
+                const _sn = modelConflicts.filter(function(c) { return c.sourced && !c.matchesStat; });
+                const _sm = modelConflicts.filter(function(c) { return c.sourced && c.matchesStat; });
+                let s = '';
+                if (_un.length) {
+                  s += ' Neither figure is a source \u2014 one is an unsourced contract average, the other '
+                    + (_un.every(function(c) { return c.origin === 'override'; })
+                        ? 'a hard-coded engine override'
+                        : _un.every(function(c) { return c.origin === 'contract'; })
+                          ? 'a separately harvested country-level field that carries no citation either'
+                          : 'a hard-coded engine override or a second, equally uncited harvest of the same term')
+                    + '. <strong style="color:var(--text);">Do not quote either until you have the rate from '
+                    + _esc(country) + '\u2019s own petroleum act.</strong> ';
+                }
+                if (_sn.length) {
+                  s += ' <strong style="color:var(--text);">For ' + _esc(_sn.map(function(c) { return c.label; }).join(', '))
+                    + ', the citation does not support the model output: the take, NPV and IRR the DCF produces rest on '
+                    + (_sn.length === 1 ? 'a rate' : 'rates') + ' no source on this page states. If you quote them, state '
+                    + _esc(_sn.map(function(c) { return c.label + ' at ' + c.modelled; }).join(', '))
+                    + ' as an engine assumption, and cite the statutory rate only as what the statute says.</strong> ';
+                }
+                if (_sm.length) {
+                  s += ' For ' + _esc(_sm.map(function(c) { return c.label; }).join(', '))
+                    + ', the model runs the cited rate, so the citation does support the take, NPV and IRR \u2014 it is the '
+                    + 'contract average in the ORCA Value column that is not the input. ';
+                }
+                return s;
+              })())
         + (modelConflicts.every(function(c) { return !!c.ladder; })
             ? '<button type="button" onclick="_cpScrollToTierSchedule()" style="margin-top:6px;background:rgba(185,28,28,.10);'
               + 'border:1px solid rgba(185,28,28,.40);border-radius:4px;color:var(--red);font-size:11px;font-weight:700;'
@@ -35139,6 +35238,19 @@ function renderReformTimeline(country) {
         + (_all ? 'every sourced term above moves together' : 'those ' + topN + ' rows move together')
         + ' — the match count will not change.</span>';
     })();
+    // v767 (T6): scopes the two verdict lines in place, where the false claim is made — "built from
+    // the ORCA Value column" and "All N match" — rather than only in the note further down.
+    const _engScope767 = (function() {
+      const s = modelConflicts.filter(function(c) { return c.sourced; });
+      if (!s.length) return '';
+      const allNeither = s.every(function(c) { return !c.matchesStat; });
+      return ' <strong style="color:var(--red);">Not for '
+        + _esc(s.map(function(c) { return c.label; }).join(', ')) + ': the DCF runs '
+        + _esc(s.map(function(c) { return c.modelled + (s.length > 1 ? ' for ' + c.label : '')
+                                      + (c.matchesStat ? ' (the cited rate)' : ''); }).join(', '))
+        + (allNeither ? ', which neither column above prints' : '')
+        + ' — see the red note below.</strong>';
+    })();
     const _mainNote = divergentCount > 0
       ? '<div style="margin-top:8px;background:rgba(194,65,12,.07);border:1px solid rgba(194,65,12,.28);border-left:3px solid var(--orange);border-radius:5px;padding:8px 11px;font-size:11px;color:var(--muted);line-height:1.5;">'
         + '<strong style="color:var(--text);">⚠ ' + divergentCount + ' of ' + sourcedCount
@@ -35147,7 +35259,8 @@ function renderReformTimeline(country) {
         + (divergentCount === 1 && sourcedCount === 1 ? ' differs' : ' differ')
         + ' from the statutory rate.</strong> '
         + _coverage601
-        + 'ORCA’s take%, NPV and IRR are built from the contract terms in the ORCA Value column, not from the statute. '
+        + 'ORCA’s take%, NPV and IRR are built from the contract terms in the ORCA Value column, not from the statute.'
+        + _engScope767 + ' '
         + 'The gap is normally real — grandfathered licence rounds, block-specific terms and sliding scales. '
         + 'In an IC memo, cite the statutory figure against the linked source and the ORCA figure as a contract-weighted average.'
         + _concScope755
@@ -35161,7 +35274,7 @@ function renderReformTimeline(country) {
               ? 'The 1 independently sourced parameter' + (offRows.length ? ' the model reads' : '') + ' matches'
               : 'All ' + sourcedCount + ' independently sourced parameters'
                 + (offRows.length ? ' the model reads' : '') + ' match')
-          + ' the rate stated in the cited source.' + _concScope755 + _citeScope641 + _coverage601 + _scope625 + '</div>'
+          + ' the rate stated in the cited source.' + _engScope767 + _concScope755 + _citeScope641 + _coverage601 + _scope625 + '</div>'
         : ((bulkCount > 0 || sharedCount > 0 || unsourcedCount > 0)
           ? '<div style="margin-top:8px;font-size:11px;color:var(--orange);font-weight:700;">⚠ No parameter on this table is independently sourced.</div>'
           : ''));
@@ -35210,7 +35323,7 @@ function renderReformTimeline(country) {
     // 2.58% modelled vs 20% in Lei 10/2004). Both numbers are now on screen, separately labelled.
     el.innerHTML = '<table class="facts-table ec-chain">'
       + '<thead><tr><th>Parameter</th>'
-      + '<th title="Contract-weighted average across this country\'s contracts in the ORCA database. This is the number the DCF engine uses for take%, NPV and IRR.">ORCA Value</th>'
+      + '<th title="Contract-weighted average across this country\'s contracts in the ORCA database. This is the number the DCF engine uses for take%, NPV and IRR, except on a row marked DCF USES, which names the rate the engine actually ran.">ORCA Value</th>'
       + '<th title="The rate stated in the cited source itself. This is what the Source badge backs — cite this figure, not the ORCA average, when you quote the legislation.">Statutory (cited source)</th>'
       + '<th>Source</th></tr></thead>'
       + '<tbody>'
@@ -35281,6 +35394,7 @@ function renderReformTimeline(country) {
           // engine never reads. On a ladder country there is no single number for that cell.
           ladder: (_cf && _cf.ladder) ? _cf.ladder : null,
           origin: _cf ? _cf.origin : null,
+          matchesStat: (_cf && _cf.sourced) ? !!_cf.matchesStat : null,   // v767 (T6)
           // v743 (T6): the partition travels with the workbook. The sheet exists to answer "where
           // did this number come from"; a row that produced no number needs to say so before a
           // committee reads it as an input that did.
@@ -39365,7 +39479,19 @@ function exportCountryProfile() {
           : (t.ladder
               ? 'The DCF does not use the ORCA value beside it. ' + country + ' carries an R-factor profit-oil ladder of ' + t.ladder.n + ' tiers and the engine resolves the government share off those tiers year by year as R moves (' + t.ladder.lo.toFixed(0) + '\u2013' + t.ladder.hi.toFixed(0) + '%). The figure in this row is an uncited contract average and is not an input to the take, NPV or IRR on the Country Profile sheet. Cite the ladder, not this row.'
               : (t.gap != null
-              ? 'The DCF engine ran ' + t.modelled + '% for this term, ' + t.gap + 'pp from the ORCA value beside it. Two harvests of the same term; neither is cited. Establish it from ' + country + '\u2019s own petroleum act.'
+              // v767 (T6): this branch is a CITED row (the no-source case is handled above), so
+              // "neither is cited" was false. It now says which figure produced the NPVs.
+              ? 'The DCF engine ran ' + t.modelled + '% for this term, ' + t.gap + 'pp from the ORCA value beside it. '
+                // Scoped to the platform's DCF (Live DCF panel, Fiscal Compare model columns), which is
+                // what was verified to run this rate. The take and NPV on the Country Profile sheet
+                // are the contract-database figures and are not claimed here.
+                + (t.matchesStat
+                    ? 'That is the rate the cited source states, so for this term the platform\u2019s DCF (the Live DCF panel and Fiscal Compare\u2019s model take, NPV and IRR) runs on the citation; the ORCA value is not its input.'
+                    : 'It is not the statutory rate either'
+                      + (t.statutory != null ? ' (' + t.statutory + '%)' : '')
+                      + ' \u2014 it is ' + (t.origin === 'override' ? 'a hard-coded engine override' : 'a separately harvested country-level field')
+                      + '. The platform\u2019s DCF (the Live DCF panel and Fiscal Compare\u2019s model take, NPV and IRR) runs on ' + t.modelled
+                      + '%, so the cited source does not support those figures for this term. State it as an engine assumption if you quote them.')
               : ''))))
       ]);
     });
