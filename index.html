@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v755</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v756</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2237,7 +2237,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v755</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v756</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2307,7 +2307,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v755</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v756</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -28080,7 +28080,102 @@ function renderCompare() {
   // v712 (T3): sits BEFORE the grid so `grid.nextSibling` — which _sbsObsNotice() uses to
   // place the comparability notices — still resolves the same way. Hidden until
   // _sbsScrollHint() measures a real overflow, so it costs nothing on a desktop.
+  // v756 (T3): the grid answers "how do these countries compare" with an ordering the analyst
+  // reads straight off the Govt Take rows -- and then, 678px BELOW THE FOLD on a 1440x900 screen,
+  // up to five notices totalling ~715 words explain, four separate ways, why that ordering is not
+  // the one to carry. Measured on the standard screening set (Guyana / Angola / Brazil, three of
+  // the four countries in this tab's own Atlantic Frontier quickstart): 1,299 rendered words, of
+  // which 715 -- 55% -- are prohibitions, and the first one starts at y=1578. Not one line anywhere
+  // on the tab states the comparison that IS valid. An analyst with 20 minutes reads the grid,
+  // never scrolls to the fine print, and writes the wrong order into the memo.
+  //
+  // This states the permitted comparison ONCE, above the grid, and it is computed from the very
+  // same `_cmpRankTake` gate every notice below already uses -- so it cannot disagree with them.
+  // It adds no new analysis: the ordering, the exclusions and the price-deck reversal were all
+  // already derived, they were just never assembled into an answer.
+  const _vdTake = (d) => (d ? _cmpRankTake(d, 75) : null);
+  const _vdRanked = selected.filter(d => _vdTake(d) != null)
+    .map(d => ({ c: d.country, v: _vdTake(d) })).sort((a, b) => a.v - b.v);
+  // Reasons mirror _cmpRankTake's null branches in the same order, so every set-aside column can
+  // say WHY in its own clause rather than being silently absent from the ordering.
+  const _vdWhy = (d) => {
+    const v = d['take_75'];
+    if (v == null) return 'no take at $75/bbl on file';
+    if (isStateMonopoly(v)) return 'state monopoly — no contractor position to rank';
+    if (_cmpBasisGate && !_cmpHasProd(d)) return 'statutory terms — ORCA holds no verified production behind it';
+    const st = _cmpMixStat(d);
+    if (st.prrt) return 'PRRT cash-flow basis — comparable at one price, not across the deck';
+    if (st.blended) return 'fee-blended — no PSC/Concession take underneath to rank on';
+    return 'not on a like-for-like basis with the rest of the set';
+  };
+  const _vdOut = selected.filter(d => d && _vdTake(d) == null).map(d => ({ c: d.country, why: _vdWhy(d) }));
+  // The full ordering at each published price, not just its low end -- an ordering can change in
+  // the middle of the set without the lowest column moving, which _cmpFlip alone would not catch.
+  const _vdSeq = (p) => selected.filter(d => d && _cmpRankTake(d, p) != null)
+    .map(d => ({ c: d.country, v: _cmpRankTake(d, p) })).sort((a, b) => a.v - b.v)
+    .map(x => x.c).join('›');
+  let _vdHold = null, _vdBreak = '';
+  if (_vdRanked.length >= 2) {
+    const _s75 = _vdSeq(75);
+    _vdHold = _CMP_PRICES.every(p => _vdSeq(p) === _s75);
+    if (!_vdHold) {
+      for (let _q = 1; _q < _CMP_PRICES.length; _q++) {
+        if (_vdSeq(_CMP_PRICES[_q]) !== _vdSeq(_CMP_PRICES[_q - 1])) {
+          _vdBreak = '$' + _CMP_PRICES[_q - 1] + '–$' + _CMP_PRICES[_q]; break;
+        }
+      }
+    }
+  }
+  let _vdHtml = '';
+  if (selected.filter(d => !!d).length >= 2) {
+    const _pill = (txt, col, bg, ttl) => '<span title="' + _cmpEsc(ttl) + '" style="display:inline-flex;align-items:center;min-height:24px;font-size:10px;font-weight:700;color:' + col
+      + ';background:' + bg + ';border-radius:3px;padding:2px 8px;line-height:1.5;white-space:nowrap;cursor:help;">' + txt + '</span>';
+    let _lead;
+    if (_vdRanked.length >= 2) {
+      const _span = _vdRanked[_vdRanked.length - 1].v - _vdRanked[0].v;
+      const _chain = _vdRanked.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong> '
+        + x.v.toFixed(1) + '%').join(' <span style="color:var(--muted);opacity:.7;">›</span> ');
+      _lead = '<span style="font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Ranks against each other:</span>'
+        + '<span style="font-size:12px;">' + _chain + '</span>'
+        + _pill(_span.toFixed(1) + 'pp apart',
+                _span < 5 ? 'var(--orange)' : 'var(--text)',
+                _span < 5 ? 'rgba(194,65,12,.10)' : 'var(--surface2)',
+                _span < 5
+                  ? 'Lowest to highest government take across the ranked columns at $75/bbl is only ' + _span.toFixed(1)
+                    + ' percentage points. That is inside the spread ORCA itself observes across contracts within a single one of these countries, so the base-case row does not separate them on its own.'
+                  : 'Lowest to highest government take across the ranked columns at $75/bbl, in percentage points.')
+        + (_vdHold
+            ? _pill('order holds $50–$125', 'var(--green)', 'rgba(21,128,61,.10)',
+                    'These columns rank in this same order at all four published prices ($50 / $75 / $100 / $125), so the $75 ordering is the ordering at every price ORCA publishes.')
+            : _pill('⚠ order changes in ' + _vdBreak, 'var(--orange)', 'rgba(194,65,12,.12)',
+                    'The columns do NOT rank in this order at every price. The ordering first changes in the ' + _vdBreak
+                    + '/bbl interval, so a ranking taken off the $75 row is not the ranking at the deck you may actually defend. The full reversal, with the figures at each end, is set out in the price-ordering notice under the grid.'));
+    } else if (_vdRanked.length === 1) {
+      _lead = '<span style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Nothing ranks here:</span>'
+        + '<span style="font-size:12px;">Only <strong style="color:var(--text);">' + _cmpEsc(_vdRanked[0].c)
+        + '</strong> carries a comparable take (' + _vdRanked[0].v.toFixed(1) + '% at $75/bbl). A single column is not a comparison.</span>';
+    } else {
+      _lead = '<span style="font-size:10px;font-weight:700;color:var(--orange);letter-spacing:.06em;text-transform:uppercase;white-space:nowrap;">Nothing ranks here:</span>'
+        + '<span style="font-size:12px;">No column in this set carries a take that is comparable with any other. The take rows are readable one at a time; the set does not order.</span>';
+    }
+    const _aside = _vdOut.length
+      ? '<div style="font-size:11px;color:var(--muted);line-height:1.55;">'
+        + '<strong style="color:var(--text);">Set aside — ' + _vdOut.length + ' of ' + selected.filter(d => !!d).length
+        + ' columns ' + (_vdRanked.length >= 2 ? 'cannot join that ordering' : (_vdOut.length === 1 ? 'carries' : 'carry') + ' no comparable take') + ':</strong> '
+        + _vdOut.map(x => '<strong style="color:var(--text);">' + _cmpEsc(x.c) + '</strong> — ' + x.why).join('; ')
+        + '. ' + (_vdOut.length === 1 ? 'Its take rows print, and are' : 'Their take rows print, and are')
+        + ' correct on their own basis — ' + (_vdOut.length === 1 ? 'it is not a rank position' : 'they are not rank positions')
+        + ' in this set.</div>'
+      : (_vdRanked.length >= 2
+          ? '<div style="font-size:11px;color:var(--muted);line-height:1.55;">All '
+            + _vdRanked.length + ' columns are on one basis — nothing is set aside, the ordering above is the whole set.</div>'
+          : '');
+    _vdHtml = '<div id="cmp-verdict" class="cmp-notice" style="margin-bottom:10px;background:rgba(176,104,0,.05);border:1px solid rgba(176,104,0,.22);border-left:3px solid var(--accent);border-radius:5px;padding:8px 12px;display:flex;flex-direction:column;gap:5px;">'
+      + '<div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">' + _lead + '</div>'
+      + _aside + '</div>';
+  }
   let html = `<div id="cmp-scroll-hint" role="status"></div>`;
+  html += _vdHtml;
   html += `<div class="compare-grid" style="--cmp-n:${compareList.length};grid-template-columns: 200px repeat(${compareList.length}, minmax(96px, 1fr));">`;
   // header row
   html += `<div class="cmp-hdr row-label">Metric</div>`;
