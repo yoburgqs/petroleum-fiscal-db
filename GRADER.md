@@ -42625,3 +42625,16 @@ The analyst reads the full name and year of the instrument behind every number, 
 - **The 02:00 "overnight chain FAILED" email** was not re-examined; cycle 664 diagnosed it as harvest `NO-DELTA`.
 
 **Shipped:** pushed `4d25d7d..e095c41` — `6f396a5` (v760, cycle 666 T2) and `e095c41` (v761, this cycle T6). Mirrored to `office/projects/oil-gas-expertise/fiscal_db_interface.html` (byte-identical, `cmp` OK). Final-tree pass set vs before-tree pass set: 0 lines differ.
+
+---
+## Cycle 667 Log — 2026-09-10 05:57
+- Test before: 297 PASS / 0 FAIL
+- Test after: 297 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus | **Directive:** DIRECT | **Task:** Cycle 667 — T6
+
+## Cycle 667: shipped v761, plus cycle 666's lost v760
+
+On the Country Profile's evidence table, the Source column cut off the name of the document behind each number, and on a phone it was off screen entirely. Both are fixed and pushed (`4d25d7d..7e79c80`), and the office mirror copy matches.
+
+**Cycle 666's work had never shipped.** That cycle ended its session while its tests were still running, so its v760 change (T2: the "Fi
