@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v753</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v754</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2237,7 +2237,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v753</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v754</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2307,7 +2307,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v753</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v754</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -37998,20 +37998,25 @@ function loadCountryProfile(country) {
     const iqrWidth = Math.max(0, Math.min(100, p75v) - Math.max(0, p25)).toFixed(2);
     return '<div class="dd-section" id="cp-dist-section">'
       + '<h3>Contract Distribution — ' + d.country + '</h3>'
-      + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Take distribution across ' + (d.n || 0) + ' contracts at $75/bbl. Median shown as vertical marker; IQR (P25–P75) shaded.</div>'
+      + '<div style="font-size:11px;color:var(--muted);margin-bottom:10px;line-height:1.5;">Take distribution across ' + (d.n || 0) + ' contracts at $75/bbl. The vertical marker is the headline take \u2014 this country\u2019s ' + cpDistBasisName(d) + ' \u2014 <strong>not the median</strong>. The shaded band is the P25\u2013P75 range of the individual contracts, so the marker can fall outside it.</div>'
       + '<div style="margin-bottom:14px;">'
       + '<div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:4px;"><span>0%</span><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>'
       + '<div id="cp-dist-bar" style="position:relative;height:28px;background:var(--surface);border-radius:6px;border:1px solid var(--border);overflow:hidden;">'
       + '<div style="position:absolute;left:' + iqrLeft + '%;width:' + iqrWidth + '%;top:0;height:100%;background:' + iqrColor + '22;border-left:2px solid ' + iqrColor + '88;border-right:2px solid ' + iqrColor + '88;"></div>'
-      + '<div style="position:absolute;left:' + toPos(med) + '%;top:0;height:100%;width:3px;background:' + iqrColor + ';border-radius:2px;" title="Avg @ $75: ' + med.toFixed(1) + '%"></div>'
+      + '<div style="position:absolute;left:' + toPos(med) + '%;top:0;height:100%;width:3px;background:' + iqrColor + ';border-radius:2px;" title="Headline take @ $75: ' + med.toFixed(1) + '% \u2014 this country\u0027s ' + cpDistBasisName(d) + '. It is NOT the median contract, and on a skewed distribution it can sit outside the P25\u2013P75 band."></div>'
       + '<div style="position:absolute;left:25%;top:0;height:100%;width:1px;background:var(--border);opacity:.5;"></div>'
       + '<div style="position:absolute;left:50%;top:0;height:100%;width:1px;background:var(--border);opacity:.5;"></div>'
       + '<div style="position:absolute;left:75%;top:0;height:100%;width:1px;background:var(--border);opacity:.5;"></div>'
       + '</div>'
       + '<div id="cp-dist-pcts" style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:5px;">'
-      + '<span>P25: <strong style="color:var(--text);">' + p25.toFixed(1) + '%</strong></span>'
-      + '<span style="color:' + iqrColor + ';font-weight:700;">&#9650; Avg: ' + med.toFixed(1) + '%</span>'
-      + '<span>P75: <strong style="color:var(--text);">' + p75v.toFixed(1) + '%</strong></span>'
+      // v754 (T2): sorted ascending. The row is justify-content:space-between, so its left-to-right
+      // order is read as an ordering of the values. Fixed at P25 | Avg | P75 it asserted
+      // 83.1 < 81.1 < 83.5 on Nigeria -- a false ordering printed as a layout fact.
+      + [{v: p25,  h: 'P25: <strong style="color:var(--text);">' + p25.toFixed(1) + '%</strong>'},
+         {v: med,  h: '<span style="color:' + iqrColor + ';font-weight:700;">&#9650; Avg: ' + med.toFixed(1) + '%</span>'},
+         {v: p75v, h: 'P75: <strong style="color:var(--text);">' + p75v.toFixed(1) + '%</strong>'}]
+          .sort(function(a, b){ return a.v - b.v; })
+          .map(function(e){ return '<span>' + e.h + '</span>'; }).join('')
       + '</div></div>'
       + '<p id="cp-dist-note" style="font-size:12px;color:var(--muted);line-height:1.6;">' + rangeLabel + weightNote + swingNote + '</p>'
       + '</div>';
@@ -49203,6 +49208,67 @@ function cpSpreadParts(d, obs) {
 
   return { txt: txt, col: col, tip: tip };
 }
+// ── v754 (T2): the Contract Distribution panel named its own marker three ways ───────────
+// The 3px vertical line on the distribution bar is `d.take_75` -- the headline take, on whatever
+// weighting basis this country resolved to. The panel called it:
+//   caption   "Median shown as vertical marker"      (wrong -- it is never the median)
+//   legend    "\u25B2 Avg: 81.1%"                      (right)
+//   tooltip   "Avg @ $75: 81.1%"                      (right)
+// The caption is the line an analyst reads first, and on 57 of the 163 countries that carry
+// quartiles the marker plots OUTSIDE the shaded P25-P75 band. Read against the word "Median" that
+// is a median below the 25th percentile, which is impossible -- so the only two readings available
+// were "this chart is broken" or "the median take is 81.1%", and the second is false.
+// 41 of the 57 already carry the v559 withdrawal, which accounts for the position. 16 did not,
+// Nigeria among them -- and Nigeria is the one case with a band of real width, so it is the one
+// where the marker is visibly to the LEFT of the shaded box: P25 83.1 | Avg 81.1 | P75 83.5.
+// Nothing below recomputes a take, a quartile or a score. The median of any set lies between its
+// own P25 and P75, so the bundled quartiles already BRACKET the median; where the marker falls
+// outside them, that bracket is stated as the bracket it is. Where v559 has withdrawn the
+// quartiles as unusable (cpSpreadConflict), no median claim is built on them at all.
+function cpDistBasisName(d) {
+  return (d && d.weighting === 'prod_weighted') ? 'production-weighted average'
+       : (d && d.weighting === 'prod_weighted_blended') ? 'blended average (production-weighted where data exists)'
+       : 'equal-weighted average';
+}
+// The skew reading. Fires only when the headline marker sits outside its own quartile band.
+function cpDistSkew(d, obs) {
+  if (!d) return '';
+  var p25 = d.p25_take, p75 = d.p75_take, avg = d.take_75;
+  if (p25 == null || p75 == null || avg == null) return '';
+  if (typeof cpSpreadConflict === 'function' && cpSpreadConflict(d, obs)) return '';
+  var lowTail = avg < p25 - 0.05, highTail = avg > p75 + 0.05;
+  if (!lowTail && !highTail) return '';
+  var edge = lowTail ? p25 : p75;
+  var gap  = Math.abs(edge - avg);
+  var nAll = (d.n || 0).toLocaleString();
+  var degenerate = Math.abs(p75 - p25) < 0.05;
+  // Materiality reuses the existing CP_OBS_REFUTE_PP = 1.0pp cut rather than introducing a new
+  // threshold. Below it the mislabel is still corrected -- the impossible-median reading must not
+  // survive anywhere -- but without the emphasis or the citation instruction.
+  var bar = (typeof CP_OBS_REFUTE_PP === 'number') ? CP_OBS_REFUTE_PP : 1.0;
+  if (gap < bar) {
+    return ' The marker sits <strong>' + gap.toFixed(1) + 'pp outside</strong> the band: the '
+         + avg.toFixed(1) + '% headline is the ' + cpDistBasisName(d) + ', not the median. At this '
+         + 'size the gap is rounding rather than a finding.';
+  }
+  var bracket = degenerate
+    ? 'Both quartiles sit on <strong>' + edge.toFixed(1) + '%</strong>, so the median contract takes '
+      + 'exactly that'
+    : 'The median of any set lies between its own quartiles, so the median contract takes '
+      + (lowTail ? 'at least <strong>' + edge.toFixed(1) + '%</strong>'
+                 : 'at most <strong>' + edge.toFixed(1) + '%</strong>');
+  return ' <strong style="color:var(--orange);">The marker sits outside the band.</strong> The '
+       + avg.toFixed(1) + '% headline is the ' + cpDistBasisName(d) + ' \u2014 not the median \u2014 and it is '
+       + '<strong>' + gap.toFixed(1) + 'pp ' + (lowTail ? 'below the P25' : 'above the P75')
+       + '</strong> of ' + d.country + '\u2019s own ' + nAll + ' contracts. ' + bracket
+       + '. The headline is pulled ' + (lowTail ? 'down by a low tail' : 'up by a high tail')
+       + ' and is not a typical contract here. Which to use: screening on ' + avg.toFixed(1) + '% '
+       + (lowTail ? 'understates' : 'overstates') + ' the government take a typical contract in '
+       + d.country + ' faces \u2014 cite ' + edge.toFixed(1) + '% as the central contract, and '
+       + avg.toFixed(1) + '% only where you are ranking ' + d.country + ' against other countries, '
+       + 'which is the basis every rank, median pill, screener filter and comparison on this '
+       + 'platform is built on.';
+}
 // The Contract Distribution caption, same conflict rule, same single builder.
 function cpDistNote(d, obs) {
   var p25 = d.p25_take, p75 = d.p75_take;
@@ -49218,10 +49284,11 @@ function cpDistNote(d, obs) {
   if (p25.toFixed(1) === p75.toFixed(1)) {
     return 'Contracts are tightly clustered (low dispersion).'
       + (obs ? ' Corroborated: the ' + obs.n + ' largest producing contracts below span only '
-               + obs.spread.toFixed(1) + 'pp.' : '');
+               + obs.spread.toFixed(1) + 'pp.' : '')
+      + cpDistSkew(d, obs);
   }
   return 'Take ranges from <strong>' + p25.toFixed(1) + '%</strong> (P25) to <strong>' + p75.toFixed(1)
-    + '%</strong> (P75) across ' + d.n + ' contracts.';
+    + '%</strong> (P75) across ' + d.n + ' contracts.' + cpDistSkew(d, obs);
 }
 // Patch the three claim sites once the contract sample lands. Guards the async race the same way
 // _cpApplyBe() does: the analyst may have switched country while the fetch was in flight.
