@@ -45375,3 +45375,18 @@ they were reading, to a toolbar that gave no indication it was there.
 
 **Shipped:** petroleum-fiscal-db `46cced9` (v800), pushed to origin/main. Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
+
+---
+## Cycle 707 Log — 2026-09-11 18:22
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 707, T5
+
+# Cycle 707 — T5, v800
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." Longest without a turn (last run cycle 701).
+
+**Friction.** Walked cold at 390×844 with `hasTouch`, and again at 768/1024/1280/1440/1920. Home → Fiscal Compare → 185 rows auto-load → scroll into the table and tick three countries around rank 20–35, which is what building an IC shortlist actually is.
+
+The toolbar rela
