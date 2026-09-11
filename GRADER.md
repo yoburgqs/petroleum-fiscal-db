@@ -44537,3 +44537,15 @@ The loop's own suite (300/0/0) and pixel gate at 08:25 had already run on that t
 
 **Shipped:** petroleum-fiscal-db `bf9229c` (v789, cycle 696 orphan) and `761a170` (v790). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
+
+---
+## Cycle 697 Log — 2026-09-11 09:18
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 697: T4, Reform Risk now has a way back to the row you came from (v790)
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn; the last cycle was T1.
+
+**Friction:** I walked it from a cold load in a real browser, through Fiscal Compare. Every one of its 185 rows has a Stability cell that opens Reform Risk. I scrolled down to Uganda and clicked its cell. Reform Risk opened on Uganda's verdict, but nothing got me back:
+- **The verdict car
