@@ -44658,3 +44658,14 @@ own suite (300/0/0) and pixel gate had already run on the v791 tree. Before comm
 
 **Shipped:** petroleum-fiscal-db `9887073` (v791, cycle 698 orphan) and `ae66fbf` (v792). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
+
+---
+## Cycle 699 Log — 2026-09-11 11:05
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 699: T2, the Country Profile reform line no longer reads backwards (v792)
+
+**Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn, and the last cycle was T3.
+
+**Friction:** I walked it from a cold load in a real browser, at desktop and phone sizes, opening Guyana, Tanzania and Norway in Country Profile. The verdict box above the headline figures is where an analyst decides whether a country can be defended. Its last line print
