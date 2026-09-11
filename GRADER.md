@@ -43813,3 +43813,69 @@ Further down the page, a bold
 
 
 Pixel gate: pixel gate PASS
+
+---
+## Cycle 687 Log — 2026-09-11 — T6 (v780), plus cycle 686's stranded v779
+
+**Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn; the
+last cycle (686) was T4.
+
+**First, cycle 686 did not ship.** It left `index.html` (v779 version strings) and `reform_history.json` modified
+and uncommitted. Its own suite report, `/tmp/rt_v779.txt`, reads 14 PASS / 24 FAIL, and every failure is
+"Target page, context or browser has been closed". The session ended while the suite was running; that was not a
+code failure. Its cycle email still read "300 PASS / 0 FAIL", the deployed figure. The change itself is a real data
+correction. The United Kingdom 2024 reform event read "EPL ended, -35pp, marginal rate returned to 40%". The Autumn
+Budget 2024 did the opposite: EPL went from 35% to 38% from 1 Nov 2024, the expiry was extended to 31 March 2030,
+and the investment allowance was removed. A structural diff confirmed only that one event's four fields changed. It
+is committed as its own commit, `96fadb2` (v779), and was verified by this cycle's suite run on the combined tree.
+The note's line about the Autumn Budget 2025 Oil and Gas Price Mechanism was not independently checked this cycle.
+
+**Friction:** walked cold with no storage, opening Country Profile for Norway, Iraq and Namibia at 1440. The number an
+analyst asks "where did this come from?" about is the headline take: Norway **68.0%**, Iraq **84.8%**, at y≈500.
+Clicking it did nothing: no onclick, no title, no affordance. The answer is the per-term Evidence Chain (Norway:
+Royalty 0% from Norwegian Petroleum Act s.4-2 · A; State Participation 0% with "DCF USES 33.4%" and no source). It
+renders at **y 3,250** (Norway) and **y 4,078** (Iraq), below eight other sections. The only control that reached
+it was the "N of M model terms cited →" chip inside the Evidence Quality summary. That chip names *model terms*, not
+the take, so an analyst clicking the number itself hit a dead end and had to scroll-hunt ~2,750px.
+
+**Change:** the headline take row (`#cp-take-source`, in the `_headlineStrip344` Zone A template) is now a
+`role="button"` control. It gets a dotted underline in the take's own tier colour, a `sources ↓` label beside
+"govt take @$75", and a pointer cursor. Click, tap, Enter or Space calls new `_cpTakeToEvidence(country)`, which
+scrolls to and flashes the Evidence Chain through the existing `_cpScrollToEvidenceChain()`. No tooltip was added.
+The take's colour, 26px size, the two-zone layout, global rank and vs-median pill are all unchanged
+(v449/v451/v452 locks).
+
+**Result:** an analyst who clicks or taps the headline take lands on the table that names each term behind it: its
+ORCA value, the statutory value, the document, its tier, and whether the link is dead. It is one action from the
+number instead of a 2,750-4,000px scroll through eight sections.
+
+| walk | before (v779) | after (v780) |
+|---|---|---|
+| click headline take, Norway 1440 | nothing happens; chain at y 3,250 | chain at viewport top (scrollY 3,237) |
+| tap headline take, Iraq 390x844 touch | nothing happens | chain at viewport top (scrollY 6,983) |
+| controls on the take row that reach its sources | 0 | 1 (41px desktop / 44px coarse) |
+
+**Verification (run this cycle, foreground probes, on the v780 tree at 127.0.0.1:8911):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+- v779 render check: `openReformRiskFor('United Kingdom')` shows "EPL raised to 38%", "EPL ended" no longer
+  appears anywhere on the page, 0 page errors.
+- Click probe at 1440 (click) and 390x844 `hasTouch`, `pointer: coarse` true (tap). Tested on Norway, Iraq,
+  United Kingdom, Cote d'Ivoire (apostrophe escaping), Saudi Arabia and Kuwait (monopoly, take "—"), and Tuvalu
+  (thin evidence). The Evidence Chain lands at viewport top 0 on all 7 at both sizes. The control is 41px / 44px,
+  scrollWidth is 1440/1440 and 390/390, and there were 0 page errors.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8911/`,
+  `ORCA_REPORT_FILE=/tmp/rt_v780.txt`, read from its own report: **299 PASS / 0 FAIL / 1 WARN**. The WARN and the single console error are the known localhost `sw.js` 404 ("A bad HTTP response code (404) was received when fetching the script"), as in cycles 675-685 locally.
+- Pixel gate `pixel_audit.js`, baseline not updated, report header url `http://127.0.0.1:8911/index.html`:
+  **PIXEL GATE PASS — no surface got worse than baseline**.
+- STILL LOCKED respected: the v612 mobile layer and `#reference-panel` untouched; CP headline stays two-zone, with
+  tier-coloured take, rank and vs-median pill; no FC column or tab-order change; no banner, tooltip, FAQ or
+  citation work. Version v779 → v780 at the three display sites.
+
+**Deliberately NOT done:**
+- Fiscal Compare, Explorer and Side-by-Side take cells still do not lead to a term-level source. Only the Country
+  Profile headline was changed.
+- The Norway State Participation contradiction the chain surfaces (0% on record vs 33.4% in the Live DCF) is a data
+  question, not touched here.
+
+**Shipped:** petroleum-fiscal-db `96fadb2` (v779, cycle 686's stranded fix) and `9ca873a` (v780). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
