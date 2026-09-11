@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v781</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v782</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2298,7 +2298,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v781</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v782</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2368,7 +2368,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v781</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v782</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -36752,8 +36752,13 @@ function loadCountryProfile(country) {
   const _cpSpread = (function() {
     var _parts = cpSpreadParts(d, cpObsSpread(country));
     if (!_parts) return '';
-    return '<span id="cp-spread-badge" class="cp-spread-badge" style="color:' + _parts.col
-      + ';border-color:' + _parts.col + ';cursor:help;" title="'
+    // v782 (T2): a regime-led chip opens the breakdown it quotes (see _cpSpreadBadgeAct).
+    var _act = _parts.regime
+      ? ' role="button" tabindex="0" onclick="event.stopPropagation();_cpScrollToRegimes()"'
+        + ' onkeydown="if(event.key===\'Enter\'||event.key===\' \'){event.preventDefault();_cpScrollToRegimes();}"'
+      : '';
+    return '<span id="cp-spread-badge" class="cp-spread-badge"' + _act + ' style="color:' + _parts.col
+      + ';border-color:' + _parts.col + ';cursor:' + (_parts.regime ? 'pointer' : 'help') + ';" title="'
       + _parts.tip.replace(/"/g, '&quot;') + '">' + _parts.txt + '</span>';
   })();
 
@@ -50017,7 +50022,11 @@ function cpDefendClose(hd, lo, hi, what, label) {
 // (Concession 13.9% on 80, PSC 48.2% on 115). The line now carries THAT range when the verdict is on
 // the comparable take, points at the breakdown instead of the blended distribution, and says in one
 // clause why the blended spread further down does not describe the figure. No take is recomputed.
-function _cpDefendG1(d, hd) {
+function _cpDefendG1(d, hd, basis) {
+  // v782 (T2): basis 'headline' -- the quote is the published take itself, read against its regime
+  // rows because the quartiles collapsed to one term (see _cpRegimeSplit). Default stays the v770
+  // comparable-take wording.
+  var _hl782 = basis === 'headline';
   var fb = (typeof cpFeeBasis === 'function') ? cpFeeBasis(d) : null;
   var rr = (typeof cpRegimeRows === 'function') ? cpRegimeRows(d) : null;
   var rows = (rr && rr.rows) ? rr.rows.filter(function(r) { return r.g === 1 && r.take != null && r.nPriced > 0; }) : [];
@@ -50040,12 +50049,23 @@ function _cpDefendG1(d, hd) {
   }
   return '<span style="display:block;margin-top:5px;padding-top:5px;border-top:1px solid rgba(194,65,12,.22);">'
     + '<strong style="color:var(--orange);">Take is a range here, not a point.</strong> '
-    + 'On the ' + (nG1 ? nG1 + ' ' : '') + 'PSC/Concession contracts this take is read on, '
+    + (_hl782 ? 'By regime, ' : 'On the ' + (nG1 ? nG1 + ' ' : '') + 'PSC/Concession contracts this take is read on, ')
     + '<strong style="color:var(--text);">' + loR.mechanic + ' prices at ' + loR.take.toFixed(1) + '%</strong> ('
     + _cnt(loR) + ') and <strong style="color:var(--text);">' + hiR.mechanic + ' at ' + hiR.take.toFixed(1) + '%</strong> ('
     + _cnt(hiR) + '), so the regime you sign moves the take by ' + pp.toFixed(1) + 'pp. '
-    + cpDefendClose(hd, loR.take, hiR.take, 'no PSC/Concession regime here', 'comparable take')
-      .replace('as a contract average', 'as the PSC/Concession average')
+    + (_hl782
+        // A headline inside the regime range is still only "a contract average" of them where the
+        // breakdown says it reconciles. Liberia's 55.5% sits inside 17.8-55.8% while 61 of its 75
+        // contracts price at 17.8%, so that instruction would be false; defer to rr.verdict, the
+        // same verdict the Fiscal Regime Breakdown prints.
+        ? ((hd >= loR.take - _bar770 && hd <= hiR.take + _bar770 && rr.verdict !== 'reconciles')
+            ? (rr.verdict === 'weighted'
+                ? 'Quote ' + hd.toFixed(1) + '% as the production-weighted country figure and carry the range.'
+                : 'The ' + hd.toFixed(1) + '% headline does not reconcile to these rows, so quote the row for '
+                  + 'the regime you would sign rather than the headline.')
+            : cpDefendClose(hd, loR.take, hiR.take, 'no regime here', 'headline'))
+        : cpDefendClose(hd, loR.take, hiR.take, 'no PSC/Concession regime here', 'comparable take')
+            .replace('as a contract average', 'as the PSC/Concession average'))
     + blendedNote
     + ' <button type="button" onclick="event.stopPropagation();_cpScrollToRegimes()" '
     + 'title="Jump to the Fiscal Regime Breakdown — the per-regime takes this range is read from" '
@@ -50102,6 +50122,13 @@ function cpDefendDispersion(d, take) {
          + cpDefendClose(hd, Math.min(d.p25_take, d.p75_take), Math.max(d.p25_take, d.p75_take),
                          'the middle half of this country’s contracts does not', 'headline');
   }
+  // v782 (T2): single-term quartiles, no contract-sample refutation, but the page's own regime rows
+  // split by 5pp or more. This line used to print nothing, so "Defend on the take" stood alone
+  // directly above a card reading "2 regimes here — take differs 38.4pp" (Guyana).
+  if (!body && d.p25_take != null && d.p75_take != null && Math.abs(d.p75_take - d.p25_take) < 0.05
+      && _cpRegimeSplit(d)) {
+    return _cpDefendG1(d, hd, 'headline');
+  }
   if (!body) return '';
   if (!material) {
     return '<span style="display:block;margin-top:5px;padding-top:5px;border-top:1px solid var(--border);color:var(--muted);">'
@@ -50139,6 +50166,37 @@ function cpSpreadConflict(d, obs) {
   if (p25 == null || p75 == null) return false;
   return (p75 - p25) < 0.05 && obs.spread > CP_OBS_REFUTE_PP;
 }
+// v782 (T2): the page's own regime split, on the rows the "N regimes here" card and the Fiscal
+// Regime Breakdown print. p25 === p75 only says the MIDDLE HALF of contracts price alike; where one
+// regime is 94% of the contracts (Guyana PSC 134 of 143) the quartiles never reach the other one.
+// Same Group-1 priced rows and the same 5pp cut _cpDefendG1() already uses. No new threshold.
+function _cpRegimeSplit(d) {
+  var rr = (typeof cpRegimeRows === 'function') ? cpRegimeRows(d) : null;
+  var rows = (rr && rr.rows) ? rr.rows.filter(function(r) { return r.g === 1 && r.take != null && r.nPriced > 0; }) : [];
+  if (rows.length < 2) return null;
+  rows = rows.slice().sort(function(a, b) { return a.take - b.take; });
+  var lo = rows[0], hi = rows[rows.length - 1];
+  if (hi.take - lo.take < 5) return null;
+  return { lo: lo, hi: hi, pp: hi.take - lo.take };
+}
+// The regime-led basis chip is a control: it opens the breakdown it quotes. Applied at render (inline
+// attributes) and again here when the contract sample lands and the chip may change branch.
+function _cpSpreadBadgeAct(el, on) {
+  if (!el) return;
+  if (on) {
+    el.setAttribute('role', 'button');
+    el.tabIndex = 0;
+    el.style.cursor = 'pointer';
+    el.onclick = function(e) { e.stopPropagation(); _cpScrollToRegimes(); };
+    el.onkeydown = function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); _cpScrollToRegimes(); } };
+  } else {
+    el.removeAttribute('role');
+    el.removeAttribute('tabindex');
+    el.style.cursor = 'help';
+    el.onclick = null;
+    el.onkeydown = null;
+  }
+}
 // Single builder for the headline dispersion badge, called at render time with whatever sample is
 // already cached and again by _cpApplyObsSpread() once the fetch lands, so both paths cannot drift.
 function cpSpreadParts(d, obs) {
@@ -50165,6 +50223,7 @@ function cpSpreadParts(d, obs) {
   // is recomputed: obs is a top-50-by-production sample, so its spread is a FLOOR on the real
   // dispersion and this badge says "observed", never "IQR".
   var _und = (typeof _rrIqrUnderstated === 'function') ? _rrIqrUnderstated(d, obs) : null;
+  var _split782 = (pp < 0.05) ? _cpRegimeSplit(d) : null, _regLed782 = false;
   if (cpSpreadConflict(d, obs)) {
     txt = 'Contract take: ' + obs.min.toFixed(1) + '–' + obs.max.toFixed(1) + '% observed (≥'
         + obs.spread.toFixed(1) + 'pp) ⚠';
@@ -50201,6 +50260,30 @@ function cpSpreadParts(d, obs) {
         + 'below. The sample is the top ' + obs.n + ' by production, not all ' + nAll
         + ' contracts, so ' + obs.spread.toFixed(1) + 'pp is a FLOOR on the real spread. '
         + 'Do not quote this country as a narrow-spread regime.';
+  } else if (_split782) {
+    // ── v782 (T2): "single term" beside a card that says the regimes differ by 38.4pp ──────
+    // Walked cold on Guyana at $75: the headline card reads "2 regimes here — take differs 38.4pp,
+    // PSC 56.5% / Concession 18.1%, screen on the regime you would sign", and 250px away on the
+    // same strip this chip read "Contract take: single term · 57.0%", titled "block selection does
+    // not change your fiscal outcome here". Two opposite instructions about the same number, and the
+    // verdict above them told the analyst to defend on the take with no range at all. The contract
+    // sample cannot catch it: it is the top 50 by production, and all 50 are the dominant regime.
+    // After the sample lands this held on 9 countries (Guyana, Russia, Peru, Bolivia, Liberia with a
+    // ✓, Cameroon, Bangladesh, Uganda, Yemen). The chip now prints the regime range it is contradicted
+    // by and opens the breakdown. Quartiles, score and headline are untouched.
+    _regLed782 = true;
+    var _lo782 = _split782.lo, _hi782 = _split782.hi;
+    txt = 'Contract take: ' + _lo782.take.toFixed(1) + '–' + _hi782.take.toFixed(1) + '% by regime ('
+        + _split782.pp.toFixed(1) + 'pp) ⚠';
+    col = _split782.pp > 15 ? 'var(--orange)' : 'var(--yellow)';
+    tip = 'THE REGIME YOU SIGN MOVES THE TAKE HERE. The bundled quartiles hold p25 = p75 = ' + p25.toFixed(1)
+        + '% for ' + country + ', which reads as one statutory term — but quartiles only describe the middle '
+        + 'half of the ' + nAll + ' contracts, and this country’s own regime rows split: '
+        + _lo782.mechanic + ' prices at ' + _lo782.take.toFixed(1) + '% (' + Number(_lo782.nPriced).toLocaleString()
+        + ' contracts) and ' + _hi782.mechanic + ' at ' + _hi782.take.toFixed(1) + '% ('
+        + Number(_hi782.nPriced).toLocaleString() + ' contracts), ' + _split782.pp.toFixed(1) + 'pp apart. '
+        + 'Screen and quote on the regime you would sign, not on one country term. '
+        + 'Click to open the Fiscal Regime Breakdown.';
   } else if (pp < 0.05) {
     txt = 'Contract take: single term · ' + p25.toFixed(1) + '%';
     col = 'var(--muted)';
@@ -50284,6 +50367,7 @@ function cpSpreadParts(d, obs) {
     // block was written to prevent.
     var _obsLed654 = cpSpreadConflict(d, obs) || !!_und;
     if (_obsLed654) { _shownLo = obs.min; _shownHi = obs.max; }
+    else if (_regLed782) { _shownLo = _split782.lo.take; _shownHi = _split782.hi.take; }
     else { _shownLo = Math.min(p25, p75); _shownHi = Math.max(p25, p75); }
 
     var _ev654 = null, _mode654 = '';
@@ -50313,7 +50397,7 @@ function cpSpreadParts(d, obs) {
       txt += (_mode654 === 'none-listed')
         ? ' ⚠ none listed at headline ' + hd.toFixed(1) + '%'
         : ' ⚠ vs headline ' + hd.toFixed(1) + '%';
-      col = _gap654 > 5 ? 'var(--orange)' : 'var(--yellow)';
+      col = (_gap654 > 5 || (_regLed782 && _split782.pp > 15)) ? 'var(--orange)' : 'var(--yellow)';
 
       var _basis654 = (d.weighting === 'prod_weighted_blended' && d.prod_coverage_pct)
         ? 'The headline is production-weighted across ' + nAll + ' contracts ('
@@ -50359,7 +50443,7 @@ function cpSpreadParts(d, obs) {
     }
   }
 
-  return { txt: txt, col: col, tip: tip };
+  return { txt: txt, col: col, tip: tip, regime: _regLed782 };
 }
 // ── v754 (T2): the Contract Distribution panel named its own marker three ways ───────────
 // The 3px vertical line on the distribution bar is `d.take_75` -- the headline take, on whatever
@@ -50461,6 +50545,7 @@ function _cpApplyObsSpread(country) {
     badge.style.borderColor = parts.col;
     badge.title = parts.tip;
     badge.textContent = parts.txt;
+    _cpSpreadBadgeAct(badge, !!parts.regime);
   }
   var note = document.getElementById('cp-dist-note');
   if (note && d.p25_take != null && d.p75_take != null) note.innerHTML = cpDistNote(d, obs);
