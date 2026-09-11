@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v792</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v793</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -938,6 +938,16 @@ tr.search-highlight { animation: row-flash 2s ease-out; }
 @keyframes drawerSlide { from { opacity: 0; } to { opacity: 1; } }
 @keyframes spin { to { transform: rotate(360deg); } }
 .fc-drawer-actions { margin-top: 12px; display: flex; gap: 8px; }
+/* v793 (T6): the drilldown sat in a nowrap table cell and widened #tbl-fc to its longest sentence,
+   putting its Src badge and "model terms cited →" chip past the visible edge. contain:inline-size
+   takes it out of column sizing (the v763 divider rule); sticky left holds it at the scroll
+   window's left edge while the table swipes; _fcFitDrawer() sets --fc-dr-w to that window's
+   width. Screen only — print sizes the table itself. */
+@media screen {
+  #fc-drawer-row > td > .fc-drawer { contain: inline-size; white-space: normal; position: sticky; left: 0;
+    box-sizing: border-box; width: var(--fc-dr-w, calc(100vw - 84px)); }
+  #fc-drawer-row .fc-drawer-actions { flex-wrap: wrap; }
+}
 .btn-run { background: var(--accent); color: #fff; font-weight: 700; padding: 6px 16px; font-size: 12px; border: none; border-radius: var(--radius); cursor: pointer; }
 .btn-run:hover { background: var(--accent-dim); }
 #fc-export-btn:disabled { opacity: 0.4; cursor: not-allowed; }
@@ -2314,7 +2324,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v792</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v793</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2384,7 +2394,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v792</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v793</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -49196,7 +49206,9 @@ function openFCDrilldown(country) {
   var _recGap = (_liveT != null && _citeSel != null && !_dbIsMonopoly) ? Math.abs(_liveT - _citeSel) : null;
   var _selCell = function(i) { return i === _selIdx ? 'background:rgba(176,104,0,.09);border-left:2px solid var(--accent);border-right:2px solid var(--accent);' : ''; };
   var _takeCol = function(v) { return v == null ? 'var(--muted)' : v <= 40 ? 'var(--green)' : v <= 60 ? 'var(--yellow)' : v <= 75 ? 'var(--orange)' : 'var(--negative)'; };
-  html += '<table style="width:100%;max-width:480px;border-collapse:collapse;margin-bottom:14px;">';
+  // v793 (T6): its own sideways scroller. The drawer is now held to the visible width, so on a
+  // phone this table's $100/$125 columns can no longer be reached by swiping the ranked table.
+  html += '<div class="fc-dd-price-scroll" style="overflow-x:auto;max-width:100%;margin-bottom:14px;"><table style="width:100%;max-width:480px;border-collapse:collapse;">';
   html += '<thead><tr><th style="'+_pmLblStyle+'"></th>';
   _pricePoints.forEach(function(p, _i){ html += '<th style="'+_pmHdrStyle+_selCell(_i)+(_i===_selIdx?'color:var(--accent);font-weight:800;':'')+'"'+(_i===_selIdx?' title="This is the price selected in the controls above \u2014 the column your header figures correspond to."':'')+'>'+p[0]+'/bbl'+(_i===_selIdx?'<div style="font-size:10px;font-weight:700;letter-spacing:.06em;opacity:.9;">SELECTED</div>':'')+'</th>'; });
   html += '</tr></thead><tbody>';
@@ -49251,7 +49263,7 @@ function openFCDrilldown(country) {
     _pricePoints.forEach(function(p){ var v=p[1]; var delta=(v!=null&&_take50base!=null)?(v-_take50base):null; var dStr=delta===null?'\u2014':delta===0?'=':(delta>0?'+':'')+delta.toFixed(1)+'pp'; var dCol=delta===null?'var(--muted)':Math.abs(delta)<2?'var(--muted)':delta>0?'var(--orange)':'var(--green)'; html += '<td style="'+_pmValStyle.replace('13px','11px')+';color:'+dCol+';">'+dStr+'</td>'; });
     html += '</tr>';
   }
-  html += '</tbody></table>';
+  html += '</tbody></table></div>';
   // v523 (T5): the platform still advertises IRR on the Fiscal Compare sort column, in Explorer
   // and on the Screener hurdle slider, so a silent absence from this table would be its own
   // confusion. Say where it went, once, and route to the tool that computes a real one.
@@ -49683,7 +49695,7 @@ function openFCDrilldown(country) {
   })();
   html += '<button class="btn btn-sm btn-outline" onclick="openFCDrilldown(\'' + cEsc + '\')" title="Collapse this drilldown row and return to the ranked table" style="margin-left:auto;">\u2715 Close</button>';
   // v474: keyboard nav hint — analysts don't discover ← → shortcut without a visible cue
-  html += '</div><div style="font-size:10px;color:var(--muted);padding:6px 12px 4px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,0,0,.06);margin-top:4px;"><span style="opacity:.7;">Keyboard: <kbd style="font-family:monospace;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);border-radius:2px;padding:0 3px;">&#8592;</kbd>&nbsp;prev &nbsp;&nbsp;<kbd style="font-family:monospace;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);border-radius:2px;padding:0 3px;">&#8594;</kbd>&nbsp;next — navigate ranked list without closing drawer</span><span style="opacity:.55;font-style:italic;">⎘ IC Citation = ready-to-paste memo string</span></div>';
+  html += '</div><div style="font-size:10px;color:var(--muted);padding:6px 12px 4px;display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:space-between;align-items:center;border-top:1px solid rgba(0,0,0,.06);margin-top:4px;"><span style="opacity:.7;">Keyboard: <kbd style="font-family:monospace;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);border-radius:2px;padding:0 3px;">&#8592;</kbd>&nbsp;prev &nbsp;&nbsp;<kbd style="font-family:monospace;background:rgba(0,0,0,.06);border:1px solid rgba(0,0,0,.12);border-radius:2px;padding:0 3px;">&#8594;</kbd>&nbsp;next — navigate ranked list without closing drawer</span><span style="opacity:.55;font-style:italic;">⎘ IC Citation = ready-to-paste memo string</span></div>';
   html += '</div>';
 
   const row = document.querySelector('#tbl-fc tr[data-country="' + country + '"]');
@@ -49700,6 +49712,7 @@ function openFCDrilldown(country) {
     const _drawerColspan = (_stabCheck && _stabCheck.checked) ? 13 : 12;   // v632 (T5): +1 for the shortlist select column
     newRow.innerHTML = '<td colspan="' + _drawerColspan + '" style="padding:0;border:none">' + html + '</td>';
     row.after(newRow);
+    _fcFitDrawer();   // v793 (T6): hold the drawer to the table's visible width
     if (r.waterfall) {
       setTimeout(function() { renderDrawerWaterfall(canvasId, r.waterfall); }, 0);
     }
@@ -49709,6 +49722,28 @@ function openFCDrilldown(country) {
     _fcRenderTermLeg(country);
   }
 }
+
+// ── v793 (T6) — the drilldown drew its source route off the right edge of the table ─────────
+// The drawer is a colspan cell in #tbl-fc, and `tbody td` is white-space:nowrap, so every
+// sentence in it ran on one line and auto table layout widened the table until the longest one
+// fit: opening Somalia took #tbl-fc from 1,805px to 2,244px inside a 1,318px window at 1440, and
+// inside a 280px window on a phone. The "Src D · 0% primary law" badge landed at x=1,433 and the
+// "0 of 5 model terms cited →" chip -- the drawer's one route to the Evidence Chain -- at
+// x=1,634, both past the visible edge; at 390 the chip sat at x=1,467, five screens right. The
+// "Cite the database figure (36.9%)" sentence was cut mid-word by the frame. Same defect v763
+// fixed for the Screener dividers. The CSS rule pins the drawer at the scroll window's left edge
+// and lets it wrap; this sets its width to that window exactly, and follows it on resize.
+function _fcFitDrawer() {
+  var dr = document.querySelector('#fc-drawer-row .fc-drawer');
+  var wrap = dr && dr.closest('.tbl-wrap');
+  if (!wrap) return;
+  dr.style.setProperty('--fc-dr-w', wrap.clientWidth + 'px');
+  if (window.ResizeObserver) {
+    if (!window._fcDrawerRO) window._fcDrawerRO = new ResizeObserver(function() { _fcFitDrawer(); });
+    window._fcDrawerRO.observe(wrap);
+  }
+}
+window._fcFitDrawer = _fcFitDrawer;
 
 // ── v679 (T6) — THE MODEL-TERM LEG ON THE FISCAL COMPARE DRILLDOWN ─────────────────────
 // The drilldown is where a Fiscal Compare analyst asks "where did this number come from?".
