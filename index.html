@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v788</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v789</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -1445,6 +1445,10 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   .fc-row-hint, .screener-row-hint { opacity: 1 !important; }
 }
 
+/* v789 (T1): the Screener's phone-only rank-basis line. Off at every width; the <=720px block
+   below turns it on, where the column it repeats is out of view. */
+.sc-rank-basis { display: none; }
+
 /* ── 2. Narrow layout. 720px so small tablets in portrait get it too. ── */
 @media (max-width: 720px) {
   body { font-size: 14px; }                    /* 13px is punishing on a phone */
@@ -1645,6 +1649,14 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
   /* The divider rows span all 12 columns and must keep spanning the visible ones. */
   #tbl-screener tbody tr.screener-basis-divider > td { position: static; }
   #sc-mobile-cols-note { display: block; }
+  /* v789 (T1): the figure the # column is ranked on, inside the pinned country cell — see the
+     v789 note in runScreener(). Block-level under the data-basis badge; wraps inside the 150px
+     cell rather than widening it. */
+  #tbl-screener .sc-rank-basis {
+    display: block; margin-top: 3px; font-size: 10px; line-height: 1.3; color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace; white-space: normal;
+  }
+  #tbl-screener .sc-rank-basis-v { color: var(--text); font-weight: 700; }
 
   /* Control rows wrap instead of squeezing — but they WRAP, they do not stack.
      The v38 rule put .fc-controls into a full-width column, so once every button got a
@@ -2298,7 +2310,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v788</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v789</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2368,7 +2380,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v788</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v789</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -32128,6 +32140,28 @@ function runScreener() {
     const t = `${d.country}: this column is ordered by comparable government take, so it leads with that figure — ${fc.cmp.toFixed(1)}% on its PSC/Concession contracts at $${price}/bbl. The published headline is ${fc.head.toFixed(1)}%, which blends ${fc.n2.toLocaleString()} fee-basis contracts (fixed $/bbl remuneration, no price upside) and measures contract structure rather than fiscal terms. Sort by any other column, or untick "screen on comparable take", to lead with the published figure again.`;
     return `<span class="take-val ${takeClass(fc.cmp)}" style="cursor:help;" title="${t.replace(/"/g,'&quot;')}">${fc.cmp.toFixed(1)}%</span>`;
   };
+  // v789 (T1) — on a phone the # column is ranked on a figure the analyst cannot see.
+  // Walked cold at 390x844 hasTouch: Home -> "open the screen ->" -> IOC Capital Screen. The pinned
+  // strip plus Govt Take is all that fits; Contractor NPV, which the default order is built on,
+  // starts at x 493 behind the 152px Evidence column. What reads at rest is ranks 1-9 against takes
+  // 32.7 / 23.4 / 60.8 / 32.2 / 31.0 / 33.5 / 61.0 / 38.5 / 46.5 — China's orange 61.0% at #7
+  // above Australia's green 38.5% — a ranking that looks broken until the analyst swipes two
+  // columns right. So the pinned country cell carries the number the row was placed on, for
+  // whichever order is live. Not rendered when that number is already on screen (take, or an A–Z
+  // order). Hidden above 720px, where the column itself is in view; the desktop table is unchanged.
+  const _rankBasisKey = _scSortKey || (_screenerRfactorOnly ? 'swing' : 'npv');
+  const _rankBasisCell = (d) => {
+    let lbl = '', val = '';
+    switch (_rankBasisKey) {
+      case 'npv':      lbl = `NPV @$${price}`; val = (_scTakeIsFloor(d) ? '≤' : '') + fmtNpvShared(d[npvKey]); break;
+      case 'npv50':    lbl = 'NPV @$50'; val = fmtNpvShared(d.npv_50); break;
+      case 'evidence': { const g = _evidenceGrade(d); lbl = 'Evidence'; val = g.letter + ' · ' + Number(g.nFacts || 0).toLocaleString() + ' facts'; break; }
+      case 'prodcov':  lbl = 'Prod cov'; val = _scProdCovCell(d); break;
+      case 'swing':    lbl = 'Swing'; val = d.swing != null ? '+' + fmt(d.swing) + 'pp' : '—'; break;
+      default:         return '';
+    }
+    return `<span class="sc-rank-basis" aria-hidden="true">${lbl} <span class="sc-rank-basis-v">${val}</span></span>`;
+  };
   tbody.innerHTML = _topBanner + data.map((d,i) => {
     const mechs = d.mechanics.split(',').map(m => `<span class="${getMechTagClass(m.trim())}">${m}</span>`).join('');
     // v685: the TIER cell is the take bucket, so it follows the take cell onto the comparable
@@ -32176,7 +32210,7 @@ function runScreener() {
     return _divider + _floorDiv + `<tr style="cursor:pointer" data-country="${attrName}" class="${_scSelHas(d.country) ? 'sc-row-sel' : ''}" onclick="openCountryProfileFromFC('${safeName}')" onkeydown="if(event.key==='Enter'||event.key===' '){this.click();event.preventDefault();}" tabindex="0" role="row" aria-label="${d.country} — click to open Country Profile" title="Click to view ${d.country} Country Profile">
       <td class="sc-selcell" onclick="event.stopPropagation();"><input type="checkbox" class="sc-sel"${_scSelHas(d.country) ? ' checked' : ''} onclick="event.stopPropagation();scToggleSel(this,'${safeName}')" onkeydown="event.stopPropagation();" aria-label="Add ${attrName} to the IC shortlist"></td>
       <td class="num" style="color:var(--muted)">${i+1}</td>
-      <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}</td>
+      <td><button onclick="addToBasket('${safeName}');event.stopPropagation();" title="Add ${d.country} to compare basket" aria-label="Add ${d.country} to compare basket" style="background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1;padding:0;display:inline-flex;align-items:center;justify-content:center;margin-right:4px;">+</button><strong>${d.country}</strong> <span style="font-size:10px;color:var(--muted);">↗</span>${d.has_r_factor_tiers ? ' <span style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:.02em;" title="R-factor profit oil tiers — govt take rises with project profitability">◆</span>' : ''} ${getDQBadge(d)}${_rankBasisCell(d)}</td>
       <td style="color:var(--muted)">${d.region}</td>
       <td>${mechs}</td>
       <td class="num" title="Government take on standardized $1.2B deepwater project. Production-weighted where coverage data available.">${_floorGe}${_takeLeadCell(d)}${_takeCmpCell(d)}</td>
