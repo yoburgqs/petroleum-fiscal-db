@@ -45074,3 +45074,87 @@ So far, run this cycle on the edited tree:
 - **Behaviour walk at 1440 and 390 with touch:** 33 of 35 checks passed. The 2 failures were a mistake in my test, not the page. A cold re-run of those two passed 2/2.
 - **Page errors:** 0.
 - **Horizontal scroll:** none (scrollWidth 390/3
+
+---
+## Cycle 705 Log — 2026-09-11 — T2 (v798)
+
+**Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone the longest without a turn.
+The last three cycles were T1 (702), T4 (703) and T3 (704).
+
+**First, cycle 704's unshipped work.** Cycle 704 (T3, v797: ticked Fiscal Compare rows open in Side-by-Side instead of
+being replaced by the top 5) edited `index.html` and ended with the change uncommitted. Its log says the commit was
+"waiting on the graded runtime suite", but that suite was killed with the session: the report stamp 20:38:34Z is the
+second the `claude -p` process exited, and 11 tests failed on "Target page, context or browser has been closed". The
+runner's own 300 PASS for cycle 704 was read against the LIVE site, which was still v796. I re-verified v797 on the
+local tree before building on it:
+- graded suite: **299 PASS / 0 FAIL / 1 WARN**, the localhost `sw.js` 404;
+- cycle 704's `verify.js`: 32 OK / 2 BAD. Both BADs are the test's `history.length` check. The push replaced a Forward
+  entry, so the length stayed at 4, and the Back-to-Fiscal-Compare check right after it passes;
+- JS gate: 0 failures.
+
+It is committed separately as `6b03fc4`, credited to cycle 704.
+
+**Friction:** Country Profile, cold load. On a phone, the analyst had to read the method to reach the answer.
+- **Where:** Home → Country Profile card → Indonesia auto-loads. The first thing under the country name is the verdict
+  box `_quickIcVerdict497`, titled "One-line IC read". It measured **215–304 words**, 11px.
+- **At 390x844 touch, v797:** the box was **397–520px** tall across Indonesia, Norway, Brazil, Iraq, Guyana and
+  Malaysia. It pushed the 26px headline take to **y=1,006–1,170** and contractor NPV to **y=1,208–1,505**.
+- **Why it was hard to read:** about 110 of those words were `cpBandNpvNote()`. That is the ±6pp band window, the r²,
+  and why an undiscounted take% and a discounted NPV diverge. It sat in the middle of the sentence, ahead of what the
+  analyst needs: "Indonesia carries 2nd-lowest contractor NPV of the 33 in its own take band ... Defend on the take and
+  its evidence tier (n=667), and carry that NPV position separately".
+
+**Change:**
+- The band reasoning is out of the sentence. It now sits behind a pill placed right after the instruction it justifies:
+  **"Why two findings ›"**, or **"Why not the NPV ›"** where the band shows NPV restating take (USA, r² 0.99).
+- A tap opens the full note inline and a second tap closes it. The pill uses `aria-expanded` and is 24px under
+  `pointer: coarse`.
+- Still in the sentence: the take and its tier, the $75 and $50 floor checks with their base rate ("so do 181 of 182"),
+  the in-band NPV rank, the defend instruction, the breakeven, the dispersion caveat, and the reform control.
+- Where no band resolves, the short all-country clause stays inline as before.
+- The NPV pill's hover tooltip still carries the same note.
+
+**Result:** the analyst reads take → tier → floor check → NPV rank → "defend on the take" as one continuous statement.
+The why is one tap away for when the IC asks. On a phone the answer and every headline number arrive about 100px
+sooner.
+
+| 390x844 touch, same tree, v797 → v798 | words | verdict h | headline take y | NPV y |
+|---|---|---|---|---|
+| Indonesia | 241 → 156 | 425 → 326 | 1,034 → 984 | 1,403 → 1,352 |
+| Norway | 238 → 157 | 425 → 326 | 1,067 → 968 | 1,208 → 1,109 |
+| Brazil | 215 → 130 | 397 → 298 | 1,006 → 907 | 1,301 → 1,202 |
+| Iraq | 304 → 223 | 520 → 421 | 1,170 → 1,071 | 1,505 → 1,406 |
+| Guyana | 234 → 149 | 412 → 313 | 1,030 → 931 | 1,287 → 1,188 |
+| Malaysia | 233 → 148 | 408 → 294 | 1,065 → 951 | 1,285 → 1,171 |
+
+At 1440 the verdict box is 97–128px, down from 106–157px.
+
+**Not fixed, stated plainly:** on a phone the 26px headline take is still below the 844px fold (y=885–1,071). This cycle
+removed the longest block in front of it, not the rest: six header buttons, the example line, and the Fiscal character
+box. At 1440 the strip's right column (NPV / Downside / BE) is still vertically centred against the taller left column,
+so on Indonesia NPV sits about 100px below the take. Neither was changed this cycle.
+
+**Verification (run this cycle, foreground, final tree, `http://127.0.0.1:8950/`):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+- `/tmp/c705/verify798.js` at 1440x900 and at 390x844 with `hasTouch`: **62 OK / 2 BAD**, 0 page errors.
+  - It covers cold Home → CP Indonesia and six more countries: toggle present and closed, method text hidden, the
+    instruction visible, open, close, still on CP after the tap, scrollWidth, and pill height under coarse.
+  - The 2 BAD are my test's error. I assumed Malaysia takes the price-dependent branch, but v786's PSC/Concession $50
+    figure (+$46M) puts it on the passing branch, where the toggle rendered and worked.
+- Step 5b: scrollWidth is **390/390** on all 7 countries, closed and open. `.cp-why-btn` is **24px** under
+  `pointer: coarse` on all 7.
+- Graded suite `runtime_comprehensive.js` on the local tree, read from its own report `/tmp/c705/rt_v798.txt`:
+  **299 PASS / 0 FAIL / 1 WARN (the localhost `sw.js` 404 recorded since cycle 684; the pixel gate overlapped the last ~120 tests and the suite still read clean)**.
+- Pixel gate `pixel_audit.js` on the local tree, baseline not updated: **PIXEL GATE PASS — no surface got worse than baseline**.
+- STILL LOCKED respected:
+  - no tooltip, FAQ, banner or citation change;
+  - CP headline take (tier colour, 26px, two-zone, rank and median pill) untouched;
+  - FC columns, the v612 mobile layer and `#reference-panel` untouched;
+  - tab order unchanged.
+- Version v797 → v798 at the three display sites.
+
+**Not investigated:** the 2026-09-11 "overnight chain FAILED" email (`petroleum_overnight` last exit 1). Out of scope for
+this UX cycle; it is now noted in three consecutive cycle logs.
+
+**Shipped:** petroleum-fiscal-db `9eb7f32` (v798), and `6b03fc4` (v797, cycle 704's work). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
