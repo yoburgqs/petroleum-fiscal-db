@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v798</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v799</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2329,7 +2329,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v798</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v799</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2399,7 +2399,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v798</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v799</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -49911,6 +49911,7 @@ function openFCDrilldown(country) {
     newRow.innerHTML = '<td colspan="' + _drawerColspan + '" style="padding:0;border:none">' + html + '</td>';
     row.after(newRow);
     _fcFitDrawer();   // v793 (T6): hold the drawer to the table's visible width
+    _fcRevealDrawer(row);   // v799 (T6): and open it where the analyst can actually read it
     if (r.waterfall) {
       setTimeout(function() { renderDrawerWaterfall(canvasId, r.waterfall); }, 0);
     }
@@ -49942,6 +49943,73 @@ function _fcFitDrawer() {
   }
 }
 window._fcFitDrawer = _fcFitDrawer;
+
+// ── v799 (T6) — the drawer opened where the analyst could not read it ──────────────────────
+// v793 stopped the drilldown drawing its source route off the right edge. It is still drawn
+// off the BOTTOM. The drawer is a row inside #tbl-fc, and #tbl-fc lives in a .tbl-wrap capped
+// at `calc(100vh - 150px)` with its own overflow-y — so the drawer opens wherever the tapped
+// row happens to sit inside that box, and nothing scrolls. Measured cold on the shipped v798,
+// at 390x844 `hasTouch` and at 1440x900:
+//
+//   390, rows 1 / 3 / 12: the readable slot -- the part of the box below the sticky chrome and
+//     the sticky thead that is still above the fold -- is 189px, for a drawer 1,865-2,375px
+//     tall. The "Src B · 41% primary law" badge and the "2 of 5 model terms cited ->" chip,
+//     which are the drawer's entire answer to T6 and its only route to the Evidence Chain,
+//     open BELOW THE FOLD on all three rows (badge y=958-1,163 of 844).
+//   1440, row 12 (United Kingdom, a row reached by scrolling the ranking): same defect, badge
+//     and chip at y=935-959 against a slot ending at 940 and a fold at 900. Rows 1 and 3 are
+//     fine at 1440, which is why this survived: it is invisible from the top of the table.
+//
+// The recovery was worse than the symptom. A real 300px touch swipe inside that 189px slot
+// (CDP Input.synthesizeScrollGesture, touch) moved the PAGE 0px and the box 300-323px: the
+// gesture latches onto .tbl-wrap, so the analyst cannot scroll the page to the drawer by
+// swiping the drawer. They read a 2,000px document through a 189px letterbox, or give up.
+//
+// Both scrollers are now aimed once, on open: the page so the table box sits directly under
+// the sticky chrome (only when that gains slot -- a box already fully on screen is left
+// alone), then the box so the opened row sits directly under the sticky thead. Instant, not
+// smooth: the arrow keys re-enter openFCDrilldown to step through the ranking, and a 300ms
+// animation per step would fight itself. No value, badge, chip, column, text or tab changes.
+function _fcTopChrome() {
+  var cover = 0;
+  ['.site-header', '.tab-nav-wrapper', '.fc-controls'].forEach(function (sel) {
+    document.querySelectorAll(sel).forEach(function (el) {
+      if (el.closest('.tbl-wrap')) return;
+      var cs = getComputedStyle(el);
+      if (cs.position !== 'sticky' && cs.position !== 'fixed') return;
+      if (cs.display === 'none' || cs.visibility === 'hidden') return;
+      // What it will cover once it is stuck, not where it happens to sit right now -- the page
+      // scroll below may be what sticks it. Same measure as _cpBackToList()'s `cover`.
+      cover = Math.max(cover, (parseFloat(cs.top) || 0) + el.offsetHeight);
+    });
+  });
+  return cover;
+}
+function _fcRevealDrawer(row) {
+  try {
+    var wrap = row && row.closest('.tbl-wrap');
+    if (!wrap) return;
+    var vh = window.innerHeight || document.documentElement.clientHeight;
+    var hdr = _fcTopChrome();
+    var wr = wrap.getBoundingClientRect();
+    // 1. The page. Only when there is slot to gain: the box is under the chrome, or it runs
+    //    past the fold while its top sits below the chrome. A box already wholly on screen
+    //    is left exactly where it is.
+    if (wr.top < hdr - 1 || (wr.bottom > vh + 1 && wr.top > hdr + 1)) {
+      var dy = wr.top - hdr;
+      // Never scroll so far that the box's own bottom comes above the fold.
+      if (wr.bottom - dy < vh) dy = Math.min(dy, wr.bottom - vh);
+      if (Math.abs(dy) > 1) window.scrollBy(0, dy);
+    }
+    // 2. The box, re-measured after the page moved: the opened row to the top, clear of the
+    //    sticky thead that would otherwise paint over it.
+    var th = wrap.querySelector('thead');
+    var thH = th ? th.getBoundingClientRect().height : 0;
+    var d2 = row.getBoundingClientRect().top - (wrap.getBoundingClientRect().top + thH);
+    if (Math.abs(d2) > 1) wrap.scrollTop += d2;
+  } catch (e) { /* a drawer that opened is better than a throw */ }
+}
+window._fcRevealDrawer = _fcRevealDrawer;
 
 // ── v679 (T6) — THE MODEL-TERM LEG ON THE FISCAL COMPARE DRILLDOWN ─────────────────────
 // The drilldown is where a Fiscal Compare analyst asks "where did this number come from?".
