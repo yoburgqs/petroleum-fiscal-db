@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v774</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v775</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v774</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v775</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v774</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v775</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -3427,6 +3427,9 @@ window.copyPlatformCitation = function(btn) {
         <button type="button" onclick="scClearSel()" title="Untick every country and go back to copying and exporting every row the screen returned" aria-label="Clear the IC shortlist selection" style="background:transparent;border:1px solid rgba(176,104,0,.35);border-radius:10px;color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;min-height:24px;cursor:pointer;font-family:inherit;">Clear</button>
       </span>
     </div>
+    <!-- v775 (T1): the verified-production countries the active screen removed, each named with the
+         threshold that removed it and each opening its Country Profile. Filled by runScreener(). -->
+    <div id="sc-prod-out" style="display:none;margin-top:8px;align-items:center;gap:6px;flex-wrap:wrap;font-size:11px;color:var(--muted);line-height:1.4;"></div>
   </div>
 
   <!-- v747 (T1): hidden at every width except the one where it is true. Two columns step
@@ -31745,6 +31748,60 @@ function runScreener() {
   const _universeLead = (activeCount === 0 && !_activePresetName)
     ? `All ${data.length} countries \u2014 no filters applied yet. Load a preset or move a slider to narrow.${sortNote}${_basisNote}${_grouped ? '' : _floorNote}`
     : `${presetPrefix}${data.length} countries match at ${priceLabel}${sortNote}${_basisNote}${_grouped ? '' : _floorNote}`;
+  // v775 (T1) — name the verified-production countries this screen removed, and why.
+  // Walked cold: Screener → IOC Capital Screen returns 15 countries. 7 of the 22 countries with
+  // verified field production are gone — Norway, Kazakhstan, Libya, Oman, Nigeria, Saudi Arabia on
+  // take, Malaysia on NPV @$50 (−$33M) — and nothing on screen named one of them. The count line
+  // names proxy exclusions and fee-basis admissions but not these, and with the proxy box off they
+  // are not in the table at all. The analyst's first question on a shortlist without Norway or
+  // Nigeria is "why isn't it on here?", and answering it meant dragging sliders until it came back.
+  // Reasons are read off the same thresholds _scPass() tests. Countries removed only by a scope the
+  // analyst chose (region, mechanic, named set, reform log, IOC, R-factor) are not listed.
+  (function () {
+    const host = document.getElementById('sc-prod-out');
+    if (!host) return;
+    if (!(activeCount > 0 || _activePresetName) || data.length === 0) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    const _regionV = (document.getElementById('sc-region') || {}).value || '';
+    const _outOfScope = d => (_screenerRfactorOnly && !d.has_r_factor_tiers)
+      || (_screenerCountrySet && _screenerCountrySet.indexOf(d.country) === -1)
+      || (reformSet && !reformSet.has(d.country))
+      || (checkedMechs.length > 0 && !d.mechanics.split(',').map(m => m.trim()).some(m => checkedMechs.includes(m)))
+      || (iocCountries !== null && !iocCountries.has(d.country))
+      || (_regionV && !_regionMatch(d.region, _regionV));
+    const _why = d => {
+      const r = [];
+      const fc = (takeCeilingActive && feeCmpOn) ? _scFeeCmpAt(d, price) : null;
+      const t = (fc && fc.diverges) ? fc.cmp : d[takeKey];
+      if (t == null) r.push('no take at ' + priceLabel);
+      else if (t > maxTake) r.push((fc && fc.diverges ? 'comparable take ' : 'take ') + t.toFixed(1) + '% > ' + maxTake + '%');
+      if (d[npvKey] != null && d[npvKey] < minNPV) r.push('NPV @$' + price + ' ' + fmtNpvShared(d[npvKey]) + ' < ' + fmtNpvShared(minNPV));
+      if (minNPV50 > -500 && (d.npv_50 == null || d.npv_50 < minNPV50)) r.push('NPV @$50 ' + fmtNpvShared(d.npv_50) + ' < ' + fmtNpvShared(minNPV50));
+      if (_screenerMinRetention !== null) {
+        const k = _npvRetentionAt(d, _scRetRefDeck());
+        if (k === null) r.push('no NPV retention ratio');
+        else if (k < _screenerMinRetention) r.push('keeps ' + Math.round(k * 100) + '% of NPV < ' + Math.round(_screenerMinRetention * 100) + '%');
+      }
+      if (minEvid > 0 && (d.a_pct || 0) < minEvid) r.push('tier-A ' + Math.round(d.a_pct || 0) + '% < ' + minEvid + '%');
+      const ff = Math.max((minEvid > 0 && evidDepthOn) ? SC_EVID_MIN_FACTS : 0, _screenerMinFacts || 0);
+      if (ff > 0 && (d.n_facts || 0) < ff) r.push((d.n_facts || 0) + ' facts < ' + ff);
+      // At the $50 deck the deck NPV leg and the $50 leg are the same test; say it once.
+      return r.filter((x, i) => r.indexOf(x) === i);
+    };
+    const _prodInScope = COUNTRY_DATA.filter(d => _dqTier(d).hasProduction && !_outOfScope(d));
+    const _out = _prodInScope.filter(d => !_curSet.has(d.country))
+      .map(d => ({ d: d, why: _why(d) })).filter(x => x.why.length)
+      .sort((a, b) => (b.d[npvKey] || 0) - (a.d[npvKey] || 0));
+    if (!_out.length) { host.style.display = 'none'; host.innerHTML = ''; return; }
+    host.innerHTML = '<span style="font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.05em;font-size:10px;">Not on this list</span>'
+      + '<span>' + _out.length + ' of ' + _prodInScope.length + ' verified-production countries removed:</span>'
+      + _out.map(x => {
+          const nm = x.d.country.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+          return '<button type="button" onclick="openCountryProfileFromFC(\'' + nm + '\')" title="Open ' + x.d.country + '’s Country Profile"'
+            + ' style="display:inline-flex;align-items:center;gap:5px;flex-wrap:wrap;max-width:100%;min-height:24px;padding:2px 9px;border:1px solid var(--border);border-radius:12px;background:var(--surface);color:var(--text);font-size:11px;font-weight:600;cursor:pointer;">'
+            + x.d.country + ' <span style="font-weight:400;color:var(--negative);font-family:\'IBM Plex Mono\',monospace;font-size:10px;">' + x.why.join(' · ') + '</span></button>';
+        }).join('');
+    host.style.display = 'flex';
+  })();
   document.getElementById('screener-count').innerHTML = `${_universeLead}${_setNote}${_reformNote}${_takeBasisNote}${_npv50Note}${_npvLegNote}${_retNote}${_proxyNote}${_evidNote}${_beNote}<span style="font-size:10px;color:var(--muted);margin-left:8px;" title="Take, NPV, IRR use this price. Breakeven is always at $75/bbl. Profile: Deepwater · $1.2B capex · 50k bbl/d · $15/bbl opex · 10% WACC.">· Deepwater @${priceLabel} · 10% WACC</span>`;
   // v558 (T5) — publish the screen, in plain text, for the exported artifact.
   // Friction this removes: an exported shortlist is the thing that reaches the investment
