@@ -45158,3 +45158,14 @@ this UX cycle; it is now noted in three consecutive cycle logs.
 
 **Shipped:** petroleum-fiscal-db `9eb7f32` (v798), and `6b03fc4` (v797, cycle 704's work). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
+
+---
+## Cycle 705 Log — 2026-09-11 16:34
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 705: the Country Profile verdict now gives the answer before the method (v798)
+
+This is v798, pushed as `9eb7f32`, with the GRADER.md entry as `ae6d84c`. The Office mirror copy matches `index.html` exactly. When I checked right after pushing, GitHub Pages was still serving v796, so the live site had not rebuilt yet.
+
+**Cycle 704's work was never committed.** Cycle 704 (T3, v797) left its Side-by-Side fix uncommitted. Its log said the commit was waiting on the test suite, but that suite w
