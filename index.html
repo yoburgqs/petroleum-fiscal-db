@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v799</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v800</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -265,6 +265,29 @@ table { width: 100%; border-collapse: collapse; }
 #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 30px; padding-left: 8px; padding-right: 2px; text-align: center; }
 #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; vertical-align: middle; margin: 0; }
 #tbl-fc tr.fc-row-sel > td { background: rgba(176,104,0,0.09); }
+/* ── v800 (T5) — Fiscal Compare IC shortlist dock ──────────────────────────────
+   The v781 dock, on the tab it was first needed on. .fc-controls is `position: sticky`
+   only down to 768px (the sticky is dropped in the narrow layout), and the Fiscal Compare
+   table is its own inner scroller — so once the analyst is down among the rows on a phone
+   or a narrow window, the toolbar holding "Copy for IC Memo", "Export XLSX" and the
+   "N selected" pill sits 1,161px above the viewport and never comes back while the table
+   is on screen. Ticking a row produced no visible reaction there at all. Same markup,
+   same state model, same escape hatch as #sc-sel-dock; class-styled, not inline
+   display:flex, so the v612 wrap rule does not apply to it. */
+#fc-sel-dock { position: fixed; left: 0; right: 0; bottom: 0; z-index: 999; display: flex; align-items: center; gap: 10px;
+  background: var(--surface); border-top: 2px solid var(--accent); box-shadow: 0 -2px 8px rgba(0,0,0,0.08); padding: 8px 20px; }
+#fc-sel-dock[hidden] { display: none; }
+#fc-sel-dock .fc-dock-list { flex: 1 1 auto; min-width: 0; display: flex; align-items: baseline; gap: 8px; font-size: 12px; color: var(--text); }
+#fc-sel-dock .fc-dock-list strong { flex: none; white-space: nowrap; }
+#fc-sel-dock .fc-dock-n { flex: none; white-space: nowrap; font-weight: 700; color: var(--accent); }
+#fc-sel-dock .fc-dock-names { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); }
+#fc-sel-dock .fc-dock-actions { flex: none; display: flex; align-items: center; gap: 6px; }
+#fc-sel-dock button:disabled { opacity: .45; cursor: not-allowed; }
+@media (max-width: 720px) {
+  #fc-sel-dock { flex-wrap: wrap; gap: 6px; padding: 8px 10px calc(8px + env(safe-area-inset-bottom)); }
+  #fc-sel-dock .fc-dock-list { flex-basis: 100%; }
+  #fc-sel-dock .fc-dock-actions { flex-wrap: wrap; }
+}
 @media (pointer: coarse) {
   #tbl-fc input.fc-sel, #tbl-fc input.fc-sel-all { width: 24px; height: 24px; }
   #tbl-fc th.fc-selcell, #tbl-fc td.fc-selcell { width: 40px; }
@@ -1812,7 +1835,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
 @media print {
   /* Hide everything except country profile content */
   .tab-nav, .site-header, .search-bar, .export-buttons, #loading-overlay,
-  #compare-basket, #sc-sel-dock, #data-vintage-footer,
+  #compare-basket, #sc-sel-dock, #fc-sel-dock, #data-vintage-footer,
   .scenario-modal, #reference-overlay, #reference-panel { display: none !important; }
 
   /* v535: print the tab the analyst is actually looking at. This was hard-coded to #t7, so
@@ -2329,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v799</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v800</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2399,7 +2422,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v799</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v800</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2959,6 +2982,27 @@ window.copyPlatformCitation = function(btn) {
     <div id="fc-quick-stats" style="display:none;"></div>
   </div>
   <div id="fiscal-waterfall-container" style="display:none;"></div>
+
+  <!-- v800 (T5): the IC shortlist stays reachable from wherever the tick happened.
+       The toolbar's "Copy N selected" / "Export XLSX (N)" / "N selected" pill is sticky only
+       at >=769px; below that .fc-controls goes static and the Fiscal Compare table scrolls
+       inside its own box, so the analyst ticking rows 20/28/35 on a phone saw a row highlight
+       and nothing else -- the only selection cue left in the viewport was the Side-by-Side
+       button, which is a different destination from "paste this into my memo". This dock shows
+       while anything is ticked, names the ticked countries in the order the table currently
+       ranks them, and carries the same Copy / XLSX / Side-by-Side / Clear the toolbar does --
+       the same functions, so copyFCForIC() and exportFCResults() stay the single choke points.
+       It lives inside #t0 so it disappears with the tab, and it stacks above the compare
+       basket rather than under it. -->
+  <div id="fc-sel-dock" role="region" aria-label="IC shortlist — ticked countries" hidden>
+    <div class="fc-dock-list"><strong>IC shortlist</strong><span id="fc-dock-n" class="fc-dock-n"></span><span id="fc-dock-names" class="fc-dock-names"></span></div>
+    <div class="fc-dock-actions">
+      <button type="button" id="fc-dock-copy" class="btn btn-sm btn-outline" aria-label="Copy the ticked countries for an IC memo">&#x2398; Copy</button>
+      <button type="button" id="fc-dock-xlsx" class="btn btn-sm" aria-label="Export the ticked countries as Excel">⬇ XLSX</button>
+      <button type="button" id="fc-dock-sbs" class="btn btn-sm btn-outline" aria-label="Open the ticked countries in Side-by-Side">&#8652; Side-by-Side</button>
+      <button type="button" id="fc-dock-clear" class="btn btn-sm btn-outline" aria-label="Clear the IC shortlist selection">Clear</button>
+    </div>
+  </div>
 </div>
 
 <!-- ===== TAB: REGIME EXPLORER (wraps Browse=t1 + Screen=t3) ===== -->
@@ -47793,7 +47837,62 @@ function _fcSyncSelUI() {
     all.checked = vis > 0 && on === vis;
     all.indeterminate = on > 0 && on < vis;
   }
+  _fcDockSync();
 }
+
+// ── v800 (T5) — "give me something I can paste straight into an IC memo." ──────────────
+// Walked cold at 390 x 844 (hasTouch) and again at 768: Fiscal Compare, scroll into the table,
+// tick three rows around rank 20-35. _fcSyncSelUI() relabels the toolbar correctly -- "Copy 3
+// selected", "Export XLSX (3)", the "3 selected" pill -- but .fc-controls is only
+// `position: sticky` at >= 769px, and the FC table is its own inner scroller, so all three of
+// those sat 1,161px above the viewport with no way back to them without leaving the table.
+// The one selection cue still on screen was the Side-by-Side button. So the analyst building an
+// IC shortlist on a phone got a row highlight, a count they could not see, and no route to the
+// paste. The Screener has had exactly this dock since v781; this is the same one.
+function _fcDockSync() {
+  var dock = document.getElementById('fc-sel-dock');
+  if (!dock) return;
+  var n = window._fcSelected.length;
+  dock.hidden = !n;
+  if (n) {
+    // _fcSelOrdered() carries every ticked country, including any a region filter is hiding --
+    // they are still on the shortlist and still exported, so say so rather than drop them.
+    var ordered = _fcSelOrdered() || [];
+    var shown = 0, trs = document.querySelectorAll('#tbl-fc tbody tr[data-country]');
+    for (var i = 0; i < trs.length; i++) if (_fcSelHas(trs[i].getAttribute('data-country'))) shown++;
+    var hidden = n - shown;
+    document.getElementById('fc-dock-n').textContent = hidden
+      ? n + ' ticked \u00b7 ' + hidden + ' hidden by the current filter, still carried'
+      : n + ' ticked';
+    document.getElementById('fc-dock-names').textContent = ordered.join(' \u00b7 ');
+    var sbs = document.getElementById('fc-dock-sbs');
+    if (sbs) {
+      sbs.innerHTML = n > CMP_MAX ? '\u21cc Side-by-Side (first ' + CMP_MAX + ')' : '\u21cc Side-by-Side';
+      sbs.title = 'Open the ' + (n > CMP_MAX ? 'first ' + CMP_MAX + ' of the ' + n : n)
+        + ' ticked countr' + (n === 1 ? 'y' : 'ies') + ' in Side-by-Side, in table order.';
+    }
+    var cp = document.getElementById('fc-dock-copy');
+    if (cp) cp.title = 'Copy the ' + n + ' ticked countr' + (n === 1 ? 'y' : 'ies')
+      + ' as a table you can paste straight into an IC memo (Word/Docs) or Excel. Same output as the toolbar button.';
+    var xl = document.getElementById('fc-dock-xlsx');
+    if (xl) xl.title = 'Export a workbook containing only the ' + n + ' ticked countr' + (n === 1 ? 'y' : 'ies') + '.';
+  }
+  _fcDockPlace();
+}
+// Stack above the compare basket when both are open, and pad the tab so the dock never covers
+// the last rows. Skipped while Fiscal Compare is hidden (offsetHeight 0).
+function _fcDockPlace() {
+  var dock = document.getElementById('fc-sel-dock');
+  var pane = document.getElementById('t0');
+  if (!dock || !pane) return;
+  var basket = document.getElementById('compare-basket');
+  var lift = (basket && basket.style.display !== 'none' && basket.offsetHeight) ? basket.offsetHeight : 0;
+  dock.style.bottom = lift + 'px';
+  if (dock.hidden) { pane.style.paddingBottom = ''; return; }
+  if (dock.offsetHeight) pane.style.paddingBottom = (dock.offsetHeight + lift + 12) + 'px';
+}
+window._fcDockSync = _fcDockSync; window._fcDockPlace = _fcDockPlace;
+window.addEventListener('resize', function () { _fcDockPlace(); });
 
 // ── v797 (T3) — "How do these three countries compare side by side?" ─────────────────
 // Walked cold at 1440 and 390: Fiscal Compare, tick Norway, Brazil and Guyana in the first column;
@@ -52827,6 +52926,7 @@ function renderBasket() {
   const items = [...window.compareBasket];
   // v781: the Screener's IC shortlist dock stacks on top of this bar, so re-place it on every change.
   setTimeout(function () { if (typeof _scDockPlace === 'function') _scDockPlace(); }, 0);
+  setTimeout(function () { if (typeof _fcDockPlace === 'function') _fcDockPlace(); }, 0);
   if (items.length === 0) {
     basket.style.display = 'none';
     return;
@@ -53998,6 +54098,15 @@ document.addEventListener('DOMContentLoaded', function() {
   // FC Copy for IC Memo button (v548)
   var fcCopyIC = document.getElementById('fc-copy-ic-btn');
   if (fcCopyIC) fcCopyIC.addEventListener('click', function() { copyFCForIC(fcCopyIC); });
+  // v800 (T5): the same four actions, from the dock that stays on screen among the rows.
+  var fcDockCopy = document.getElementById('fc-dock-copy');
+  if (fcDockCopy) fcDockCopy.addEventListener('click', function() { copyFCForIC(fcDockCopy); });
+  var fcDockXlsx = document.getElementById('fc-dock-xlsx');
+  if (fcDockXlsx) fcDockXlsx.addEventListener('click', function() { exportFCResults(); });
+  var fcDockSbs = document.getElementById('fc-dock-sbs');
+  if (fcDockSbs) fcDockSbs.addEventListener('click', function() { fcOpenSbs(); });
+  var fcDockClear = document.getElementById('fc-dock-clear');
+  if (fcDockClear) fcDockClear.addEventListener('click', function() { fcClearSel(); });
   // FC stability checkbox
   var fcStability = document.getElementById('fc-stability-check');
   if (fcStability) fcStability.addEventListener('change', function() {
