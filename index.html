@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v785</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v786</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2298,7 +2298,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v785</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v786</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2368,7 +2368,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v785</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v786</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -36253,6 +36253,49 @@ window.cpBeTieBadge = cpBeTieBadge;
 // Everything here is measured off COUNTRY_DATA at render time, never written into the
 // prose, so the sentence cannot go stale the way v575 found the Fiscal Compare mix line had.
 var _cpFloorBaseCache = null;
+// ── v786 (T2): the $50/bbl price-break test read the fee-basis blend ──────────────────────────
+// Walked cold: Country Profile -> Malaysia. The verdict box, the IC MEMO strip, the Downside chip
+// and the Fiscal Compare drilldown all said Malaysia does not survive $50 -- "Only 2 of 182
+// non-monopoly regimes in ORCA fail this (Malaysia, Yemen), so unlike the take reading it is
+// genuinely discriminating ... IC: cite the NPV here". The same sentence had already moved take
+// onto the 354 PSC/Concession contracts (58.3%, "basis: ... fee-basis (RSC 11), where take% is a
+// structural artefact"), but the -$33M it tested was d.npv_50: a blend over all 365 contracts, 11
+// of them RSCs that dcf_results prices at -$2,516M each at $50. On the 354 PSC/Concession
+// contracts alone contractor NPV at $50 is +$46M. The one finding the page calls discriminating
+// was manufactured by the contracts ~/MECHANIC_COMPARABILITY.md says may not be compared.
+//   add_mech_mix.py now carries g1.v50/v100/v125 beside v75 (same query, same vintage: all 11
+// g1 blocks still equal dcf_results). Where a country blends in fee-basis contracts and the
+// Group-1 $50 figure differs on screen, the test reads it and every surface names both figures.
+// The $75 NPV is NOT switched -- the headline NPV, the band pill and the band sentence all read
+// d.npv_75, and one paragraph quoting two $75 figures would be worse than the defect.
+function cpDownside50(d) {
+  var blend = d ? d.npv_50 : null;
+  var out = { v: blend, blend: blend, cmp: false, flips: false, n1: null, names: '' };
+  if (!d || blend == null || !d.g1 || d.g1.v50 == null) return out;
+  var mx = Array.isArray(d.mech_mix) ? d.mech_mix : [];
+  var fee = mx.filter(function(x) { return x.g === 2 && x.n; });
+  if (!fee.length) return out;
+  var fmt = (typeof cpNpvFmt === 'function') ? cpNpvFmt : function(v) { return String(Math.round(v)); };
+  // Same convention as cpFeeBasis().diverges: switch only where it changes the figure on screen.
+  if (fmt(d.g1.v50) === fmt(blend)) return out;
+  out.v = d.g1.v50;
+  out.cmp = true;
+  out.flips = (d.g1.v50 > 0) !== (blend > 0);
+  out.n1 = d.g1.n;
+  out.n2 = fee.reduce(function(a, x) { return a + x.n; }, 0);
+  out.names = fee.map(function(x) { return x.m + ' ' + Number(x.n).toLocaleString(); }).join(' · ');
+  return out;
+}
+window.cpDownside50 = cpDownside50;
+// Short basis clause for a $50 figure that cpDownside50() switched. '' where nothing switched.
+function cpDownside50Basis(dn) {
+  if (!dn || !dn.cmp) return '';
+  var fmt = (typeof cpNpvFmt === 'function') ? cpNpvFmt : function(v) { return String(Math.round(v)); };
+  return ' on its ' + Number(dn.n1).toLocaleString() + ' PSC/Concession contracts — the all-contract blend reads '
+    + fmt(dn.blend) + ' because it averages in ' + Number(dn.n2).toLocaleString() + ' fee-basis contracts (' + dn.names + ')'
+    + (dn.flips ? ', and that alone flips the sign' : '');
+}
+window.cpDownside50Basis = cpDownside50Basis;
 function cpFloorBase() {
   if (_cpFloorBaseCache) return _cpFloorBaseCache;
   if (typeof COUNTRY_DATA === 'undefined' || !COUNTRY_DATA || !COUNTRY_DATA.length) return null;
@@ -36261,8 +36304,10 @@ function cpFloorBase() {
         && d.npv_75 != null && d.npv_50 != null;
   });
   if (elig.length < 2) return null;
-  var pass = elig.filter(function(d) { return d.npv_75 > 0 && d.npv_50 > 0; });
-  var fail = elig.filter(function(d) { return !(d.npv_75 > 0 && d.npv_50 > 0); });
+  // v786 (T2): the $50 leg reads cpDownside50(), so a fee-basis blend cannot put a country in the
+  // fail set its PSC/Concession contracts are not in. r2/slope below are untouched.
+  var pass = elig.filter(function(d) { return d.npv_75 > 0 && cpDownside50(d).v > 0; });
+  var fail = elig.filter(function(d) { return !(d.npv_75 > 0 && cpDownside50(d).v > 0); });
   var n = elig.length, mx = 0, my = 0;
   elig.forEach(function(d) { mx += d.take_75; my += d.npv_75; });
   mx /= n; my /= n;
@@ -36921,7 +36966,10 @@ function loadCountryProfile(country) {
     var take = _verdictTake552;
     try { (window._cpVerdictTake = window._cpVerdictTake || {})[d.country] = take; } catch (e) {}
     var npv = d.npv_75;
-    var npv50 = d.npv_50;                                  // v516: the downside leg
+    // v786 (T2): the downside leg reads cpDownside50() -- the PSC/Concession $50 figure where a
+    // fee-basis blend changes it on screen (Malaysia -$33M blend -> +$46M on its 354 contracts).
+    var _dn786 = cpDownside50(d);
+    var npv50 = _dn786.v;                                  // v516: the downside leg
     var be = _cpBeR;   // v512: resolved breakeven, so the verdict cites the same number the page shows
     var hasNpv = npv != null;
     var hasDown = npv50 != null;
@@ -37015,7 +37063,7 @@ function loadCountryProfile(country) {
           + ', not on the NPV.</strong>';
       msg = '<strong>' + take.toFixed(1) + '% govt take @$75</strong> \u2014 ' + _tierLbl589
           + _cmpBasisNote552 + '. Clears the 10% WACC at $75 (' + cpNpvFmt(npv)
-          + ') and at the $50/bbl downside (' + cpNpvFmt(npv50) + ')'
+          + ') and at the $50/bbl downside (' + cpNpvFmt(npv50) + cpDownside50Basis(_dn786) + ')'
           + _baseClause589 + _dependClause589
           // The contract count travels with the instruction, so "defend on the take" is
           // self-calibrating: Norway reads n=7,643, Vanuatu reads n=7. Same figure the
@@ -37051,7 +37099,7 @@ function loadCountryProfile(country) {
           + _fbF589.failNames.join(', ') + '), so unlike the take reading it is genuinely discriminating.'
         : '';
       msg = 'Price-dependent entry \u2014 contractor NPV ' + cpNpvFmt(npv) + ' @$75 but ' + cpNpvFmt(npv50)
-          + ' at $50/bbl: this regime does not survive a price break on the standardized profile, at '
+          + ' at $50/bbl' + cpDownside50Basis(_dn786) + ': this regime does not survive a price break on the standardized profile, at '
           + take.toFixed(1) + '% govt take' + _cmpBasisNote552 + '.' + _rareF589 + beStr
           // v732 (T4): same control as the passing branch above. This arm carries no `favourable`
           // suppression of its own, so it was silent on reform for a different reason -- it simply
@@ -37189,9 +37237,15 @@ function loadCountryProfile(country) {
     return '<span style="color:var(--muted);font-size:13px;margin-left:4px;cursor:help;" title="Contractor NPV at $75/bbl — net present value of all contractor cash flows under this fiscal regime. Discounted at 10% WACC, 100% working interest, pre-financing, pre-bonus, Deepwater standardized profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex). Positive = project earns above the 10% cost of capital at $75/bbl. For stake-level economics, scale by your WI%. For field-specific inputs, use Scenario Builder.">NPV: <strong style="color:' + npvCol + ';">' + npvStr + '</strong><span style="opacity:.65;font-size:10px;"> @$75</span></span>' + _bandPill734;
   })() : '';
   const _dnside516Display = (!_isMonopoly && d.npv_50 != null) ? (function() {
-    var dCol = d.npv_50 > 0 ? 'var(--green)' : 'var(--red)';
-    var dLabel = d.npv_50 > 0 ? 'survives $50' : 'fails at $50';
-    return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="Contractor NPV at the $50/bbl downside case, same standardized Deepwater profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex), 10% WACC, 100% WI. Positive = the entry still clears the cost of capital through a price break; negative = viability depends on the price environment. This replaced the country-level IRR tile in v516: the bundled IRR is an arithmetic mean of per-contract IRRs (median 333% across the 165 countries that carry one) and is not a project return.">Downside: <strong style="color:' + dCol + ';">' + cpNpvFmt(d.npv_50) + '</strong><span style="opacity:.65;font-size:10px;"> @$50 (' + dLabel + ')</span></span>';
+    // v786 (T2): same $50 figure the verdict tests. Where it is the PSC/Concession figure, the blend
+    // is printed beside it rather than dropped, as the take headline keeps its published number.
+    var _dn = cpDownside50(d), dv = _dn.v;
+    var dCol = dv > 0 ? 'var(--green)' : 'var(--red)';
+    var dLabel = dv > 0 ? 'survives $50' : 'fails at $50';
+    var _dnBlend = _dn.cmp
+      ? '<span class="cp-dn-basis" style="opacity:.8;font-size:10px;cursor:help;" title="' + (d.country + ': ' + cpNpvFmt(dv) + ' is contractor NPV at $50/bbl' + cpDownside50Basis(_dn) + '. ~/MECHANIC_COMPARABILITY: fee-basis take and NPV are a property of the remuneration mechanic, not of the terms.').replace(/"/g, '&quot;') + '"> · PSC/Conc ' + Number(_dn.n1).toLocaleString() + ' · blend ' + cpNpvFmt(_dn.blend) + '</span>'
+      : '';
+    return '<span style="font-size:11px;color:var(--muted);cursor:help;" title="Contractor NPV at the $50/bbl downside case, same standardized Deepwater profile ($1.2B capex / 50k bbl/d peak / $15/bbl opex), 10% WACC, 100% WI. Positive = the entry still clears the cost of capital through a price break; negative = viability depends on the price environment. This replaced the country-level IRR tile in v516: the bundled IRR is an arithmetic mean of per-contract IRRs (median 333% across the 165 countries that carry one) and is not a project return.">Downside: <strong style="color:' + dCol + ';">' + cpNpvFmt(dv) + '</strong><span style="opacity:.65;font-size:10px;"> @$50 (' + dLabel + ')</span>' + _dnBlend + '</span>';
   })() : (!_isMonopoly ? '<span style="font-size:11px;color:var(--muted);opacity:.8;" title="Contractor NPV at the $50/bbl downside case is not computed for this country. Use Scenario Builder to run a low-price case with your own capex and opex.">Downside @$50: n/a</span>' : '');
   // v516: the route to a genuine, project-level IRR stays on the strip -- what was removed is the
   // country-level average that masqueraded as one. Scenario Builder computes an IRR from the
@@ -37353,11 +37407,12 @@ function loadCountryProfile(country) {
         + ' on contractor NPV in its ±6pp take band — carry it as a separate finding, not as support for the take.'
       : '';
     // The one branch where the NPV IS the finding: contractor NPV goes negative at $50/bbl.
-    var _downFails670 = (d.npv_50 != null && d.npv_50 <= 0 && d.npv_75 != null);
+    var _dn786m = cpDownside50(d);   // v786 (T2): same $50 basis as the verdict above
+    var _downFails670 = (_dn786m.v != null && _dn786m.v <= 0 && d.npv_75 != null);
     var msg = '', col = 'var(--muted)', bg = 'rgba(107,101,96,.07)', border = 'rgba(107,101,96,.2)';
     if (_downFails670) {
       msg = 'IC: cite the NPV here — contractor NPV goes negative at the $50/bbl downside ('
-          + cpNpvFmt(d.npv_50) + ' vs ' + cpNpvFmt(d.npv_75) + ' @$75)'
+          + cpNpvFmt(_dn786m.v) + ' vs ' + cpNpvFmt(d.npv_75) + ' @$75' + cpDownside50Basis(_dn786m) + ')'
           + ((_fb670 && _fb670.nFail) ? ', which ' + _fb670.nFail + ' of ' + _fb670.n
              + ' non-monopoly regimes reach. On the other ' + (_fb670.n - _fb670.nFail)
              + ' the NPV restates the take; here it does not.' : '.');
@@ -49088,7 +49143,8 @@ function openFCDrilldown(country) {
   // Yemen. Those two now get an amber flag naming the downside figure. The three countries with
   // no positive NPV at $75 are the state monopolies, already covered by the NOT COMPARABLE block.
   var _hurdleNote = '';
-  var _npv75 = d.npv_75, _npv50 = d.npv_50;
+  // v786 (T2): the $50 leg on the same basis as Country Profile (cpDownside50).
+  var _npv75 = d.npv_75, _npv50 = (typeof cpDownside50 === 'function') ? cpDownside50(d).v : d.npv_50;
   if (_npv75 != null && _npv75 > 0 && _npv50 != null && _npv50 <= 0) {
     _hurdleNote = ' \u00b7 <span style="color:var(--yellow);font-weight:700;" title="Contractor NPV is positive at $75/bbl but negative at the $50/bbl downside, on the standardized Deepwater profile at 10% WACC. This regime does not survive a price break. IC: carry an explicit low-price case rather than a single base-case NPV.">\u26a0 Price-dependent entry \u2014 contractor NPV ' + fmtNpvShared(_npv50) + ' at the $50/bbl downside</span>';
   }

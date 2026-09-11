@@ -68,8 +68,11 @@ def main():
             e['n'] = n
             if take is not None:
                 e['t%d' % p] = round(take, 1)
-            if p == 75 and npv is not None:
-                e['v75'] = round(npv, 1)
+            # v786: contractor NPV at every price, not $75 alone. The $50 leg is the one Country
+            # Profile's price-break test reads, and on the blend Malaysia's 11 RSC contracts
+            # turned a +$46M PSC/Concession downside into -$33M ("fails at $50").
+            if npv is not None:
+                e['v%d' % p] = round(npv, 1)
 
     rows = json.load(open(CD))
     patched = mixed = 0
