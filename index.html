@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v796</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v797</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2324,7 +2324,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v796</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v797</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2394,7 +2394,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v796</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v797</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -2685,6 +2685,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <!-- v632 (T5): shows only while a shortlist exists; the escape hatch back to "all rows on screen". -->
     <span id="fc-sel-note" style="display:none;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--accent);background:rgba(176,104,0,.10);border:1px solid rgba(176,104,0,.30);border-radius:12px;padding:2px 4px 2px 10px;white-space:nowrap;">
       <span id="fc-sel-count" title="Countries ticked for the IC shortlist. Copy and Export carry only these.">0 selected</span>
+      <button type="button" id="fc-sel-sbs" onclick="fcOpenSbs()" aria-label="Open the ticked countries in Side-by-Side" style="background:transparent;border:1px solid rgba(176,104,0,.35);border-radius:10px;color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;min-height:24px;cursor:pointer;font-family:inherit;">Side-by-Side &rarr;</button>
       <button type="button" onclick="fcClearSel()" title="Untick every country and go back to copying and exporting all rows on screen" aria-label="Clear the IC shortlist selection" style="background:transparent;border:1px solid rgba(176,104,0,.35);border-radius:10px;color:var(--accent);font-size:10px;font-weight:700;padding:2px 8px;min-height:24px;cursor:pointer;font-family:inherit;">Clear</button>
     </span>
     <span id="fc-status" role="status" aria-live="polite" aria-atomic="true" style="color:var(--text-muted);font-size:12px;font-family:'IBM Plex Mono',monospace">Auto-loading&hellip;</span>
@@ -27107,7 +27108,9 @@ function removeCompare(country) {
   _updateCompareHash();
 }
 function clearCompare() { _sbsDropExample(); compareList = []; cmpAddSeq = []; renderCompare(); _updateCompareHash(); }
+var _cmpHashHold = false;   // v797: fcOpenSbs() loads a whole set, then writes ONE history entry, not one per country
 function _updateCompareHash() {
+  if (_cmpHashHold) return;
   if (window._activeTab === 't0' || window._activeTab === 't2') {
     if (compareList.length > 0) {
       updateHash('compare', compareList.map(toSlug).join('+'));
@@ -47733,6 +47736,18 @@ function _fcSyncSelUI() {
       ? 'Export a workbook containing only the ' + n + ' ticked countr' + (n === 1 ? 'y' : 'ies') + '. Untick everything to export every row on screen.'
       : 'Export every row on screen as an XLSX workbook for IC attachment.';
   }
+  // v797 (T3): with rows ticked, the tab's Side-by-Side button says it will open THOSE rows (fcOpenSbs).
+  var sbsBtn = document.getElementById('fc-sbs-btn');
+  if (sbsBtn) {
+    sbsBtn.innerHTML = '&#x21cc; ' + (n === 0 ? 'Load Top 5 in Side-by-Side'
+      : n > CMP_MAX ? 'Compare first ' + CMP_MAX + ' of ' + n + ' selected in Side-by-Side'
+      : 'Compare ' + n + ' selected in Side-by-Side');
+    sbsBtn.title = n
+      ? 'Open the ' + (n > CMP_MAX ? 'first ' + CMP_MAX + ' of the ' + n : n) + ' ticked countr' + (n === 1 ? 'y' : 'ies') + ' in Side-by-Side, in table order. Replaces any existing comparison. Untick everything to load the top 5 of the current sort instead.'
+      : 'Load the top 5 ranked countries (current sort, own fiscal terms only) into Side-by-Side. Replaces any existing comparison. Tick rows first to compare your own choice.';
+  }
+  var selSbs = document.getElementById('fc-sel-sbs');
+  if (selSbs) selSbs.innerHTML = n > CMP_MAX ? 'Side-by-Side (first ' + CMP_MAX + ') &rarr;' : 'Side-by-Side &rarr;';
   var note = document.getElementById('fc-sel-note');
   if (note) {
     note.style.display = n ? 'inline-flex' : 'none';
@@ -47747,6 +47762,29 @@ function _fcSyncSelUI() {
     for (var i = 0; i < trs.length; i++) if (_fcSelHas(trs[i].getAttribute('data-country'))) on++;
     all.checked = vis > 0 && on === vis;
     all.indeterminate = on > 0 && on < vis;
+  }
+}
+
+// ── v797 (T3) — "How do these three countries compare side by side?" ─────────────────
+// Walked cold at 1440 and 390: Fiscal Compare, tick Norway, Brazil and Guyana in the first column;
+// the toolbar pill reads "3 selected". The one control on the tab naming Side-by-Side was "Load Top
+// 5 in Side-by-Side", and it ran clearCompare() + the top five of the sort: Side-by-Side opened on
+// USA, Iraq, Somalia, Australia and Ecuador with the three picks gone and nothing saying why. On a
+// phone that button sat 1,132px below the pill; the per-row +Compare is the table's last column
+// (x=1,795 in a 1,440 window). The ticked rows now go to Side-by-Side -- from that button, and from
+// a button inside the pill. With nothing ticked it still loads the top 5, as before.
+function fcOpenSbs() {
+  var sel = _fcSelOrdered();
+  var picks = (sel || window._fcTop5 || []).slice();
+  var left = picks.length > CMP_MAX ? picks.splice(CMP_MAX) : [];
+  if (!picks.length) return;
+  _cmpHashHold = true;   // clearCompare + N adds on this tab would push N+1 partial #/compare entries
+  try { clearCompare(); picks.forEach(function(c) { addCompare(c); }); }
+  finally { _cmpHashHold = false; }
+  switchTab('t2', document.getElementById('tab-btn-t2'));
+  _updateCompareHash();
+  if (left.length && typeof showCopyToast === 'function') {
+    showCopyToast('Side-by-Side holds ' + CMP_MAX + ' countries \u2014 opened the first ' + CMP_MAX + ' ticked. Not loaded: ' + left.join(', ') + '.');
   }
 }
 
@@ -48382,9 +48420,10 @@ function renderFCResults(results, price) {
   var top5safe = top5countries.map(function(c) { return c.replace(/'/g, "\\'"); });
   // v455: clearCompare() before adding top5 — otherwise the SbS auto-preset (Norway/UK/NL) occupies 3 of the 4 slots
   // and only 1 of the analyst's chosen countries would load, with no explanation. Now analyst always gets their shortlist.
-  var top5btn = '<button onclick="(function(){clearCompare();'
-    + top5safe.map(function(c) { return 'addCompare(\'' + c + '\');'; }).join('')
-    + 'var btn=[...document.querySelectorAll(\'.tab-btn\')].find(function(b){return b.textContent.includes(\'Side-by-Side\');});if(btn)switchTab(\'t2\',btn);})()" '
+  // v797 (T3): the click is resolved by fcOpenSbs() at press time, so ticked rows go to Side-by-Side
+  // instead of being silently replaced by these five. _fcSyncSelUI() relabels the button to match.
+  window._fcTop5 = top5countries;
+  var top5btn = '<button id="fc-sbs-btn" type="button" onclick="fcOpenSbs()" '
     + 'style="background:transparent;border:1px solid rgba(176,104,0,.4);border-radius:4px;color:var(--accent);font-size:10px;font-weight:600;padding:3px 10px;cursor:pointer;white-space:nowrap;transition:.15s;" '
     + 'onmouseover="this.style.background=\'rgba(176,104,0,.1)\'" onmouseout="this.style.background=\'transparent\'" '
     + 'title="Load the top 5 RANKED countries (by current sort) into Side-by-Side — replaces any existing comparison. Before v563 this took the first five rows of the table, which on the cold default view were Ireland, Tunisia, Venezuela, Brunei and UAE — Dubai: five generic-default rows carrying the identical 22.2%. It now takes the first five countries modelled on their own fiscal terms.">&#x21cc; Load Top 5 in Side-by-Side</button>';
