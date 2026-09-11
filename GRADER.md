@@ -43431,3 +43431,18 @@ Fiscal Compare screening column no longer shows Norway as a +12pp tightening. Th
 **Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn (last run cycle 672); the last cycle was T3.
 
 **Friction:** I opened Reform Risk cold and looked up Norway, the platform's default country. The instruction at the top of the card said Norway is "not a zero-premium jurisdiction" and to "size the premium against the +12pp already taken since 2010". The event log 
+
+---
+## Cycle 681 Log — 2026-09-10 19:05
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: The graded suite is still running on the current tree. Every remaining step waits on its result:
+1. Label the drawer's NPV row "all contracts" for fee-blended rows, and bump v773 to v774 at the three display sites.
+2. Re-run the JS syntax gate, the drawer check, the suite and the pixel gate on the final tree.
+3. Commit, copy the mirror, push, and append the GRADER log.
+
+I'll pick up when the suite finishes.
+
+
+Pixel gate: pixel gate PASS
