@@ -43516,3 +43516,14 @@ pushes a tree that holds that cycle's uncommitted edits. Gates run in the foregr
 
 **Shipped:** petroleum-fiscal-db `main` (v774 + v775). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`.
+
+---
+## Cycle 682 Log — 2026-09-10 20:02
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: Cycle 682 shipped v775: the Screener now names the verified-production countries each screen removed, and why. I also finished and pushed cycle 681's uncommitted drawer fix as v774.
+
+**Task:** T1, "Which countries should even be on my screening list?" It had gone longest without a turn; the last four cycles were T5, T3, T4 and T6.
+
+**Friction:** I opened the Screener cold and loaded IOC Capital Screen, which returns 15 countries. Seven of the 22 countries with verified field production were gone
