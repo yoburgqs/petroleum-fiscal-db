@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v793</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v794</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2324,7 +2324,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v793</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v794</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2394,7 +2394,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v793</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v794</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -25015,8 +25015,13 @@ function _icReformLine(country) {
       + 'external check (national petroleum law, IMF Article IV, operator annual reports) is '
       + 'required before this section is final.\n';
   }
-  return 'Reform exposure: ' + v.score + '/100 reform-frequency score (' + _icPlain(v.scoreNote) + '), '
-    + v.since2010 + ' sourced fiscal law change' + (v.since2010 === 1 ? '' : 's') + ' since 2010. '
+  // v794 (T5): this sentence opened "Reform exposure: 100/100 reform-frequency score" for Guyana
+  // and the USA (0 changes) and "70/100" for Norway (2). The score is 100 − 15 × changes, so under
+  // the word "exposure" it reads backwards — the inversion v792 removed from the profile's verdict
+  // line. It now leads with the same verdict token, and the score follows with its direction stated.
+  return 'Reform exposure: ' + _icPlain(v.icToken) + ' — ' + v.since2010 + ' sourced fiscal law change'
+    + (v.since2010 === 1 ? '' : 's') + ' since 2010 (reform-frequency score ' + v.score
+    + '/100, where 100 means no change since 2010, not the highest exposure; ' + _icPlain(v.scoreNote) + '). '
     // v725 (T4): this line is pasted into an IC memo, so it must name the window it describes.
     // It reported the WHOLE sourced record under a sentence whose previous clause says "since
     // 2010" -- so Venezuela pasted "Direction: net-tightening against the contractor" next to
@@ -43908,14 +43913,27 @@ function _icHeadTail(s) {
 // The reform paragraph's own first clause, compressed to a cell: score and the count it is
 // built from. Both absence registers (_icReformLine's NOT SCORED / NOT READ branches) are
 // carried through as themselves -- neither may be shown as a number, and neither is a zero.
-function _icReformHead(txt) {
+// ── v794 (T5): the IC table's "Reform exposure" cell printed the reform-frequency score ──────────
+// Walked T5 cold: Country Profile -> Copy for IC Memo -> read the clipboard. The row read
+//   Guyana  "100/100 · 0 sourced law changes since 2010"   (rank 1 of 21 — the least exposed)
+//   USA     "100/100 · 0 ..."      Norway / Indonesia "70/100 · 2 ..."      Iraq "85/100 · 1 ..."
+// The score is 100 − 15 × changes, so in a row labelled EXPOSURE the least-exposed countries paste
+// the maximum. v792 removed this inversion from the profile's verdict line on screen; the memo table
+// — the copy that reaches committee with no tooltip beside it — still carried it. The cell now reads
+// what that line reads: _rrClassify's verdict token (NO LAW CHANGE / WACC +3–5pp / SIZE UNKNOWN /
+// TAKE +Npp / ↑ PRE-2010 / NO PREMIUM), the change count, and the IC-action label. The score stays
+// in the note, with its direction written out. Nothing is recomputed.
+function _icReformHead(txt, country) {
   var t = String(txt == null ? '' : txt);
-  var m = /^Reform exposure:\s*(\d+)\/100[\s\S]*?,\s*(\d+) sourced fiscal law change/.exec(t);
-  if (m) return m[1] + '/100 · ' + m[2] + ' sourced law change'
-    + (m[2] === '1' ? '' : 's') + ' since 2010';
   var m2 = /^Reform exposure:\s*(NOT SCORED|NOT READ)/.exec(t);
   if (m2) return m2[1] + ' — see note below (this is not a zero premium)';
-  return 'see note below';
+  var v = (country && typeof _rrClassify === 'function') ? _rrClassify(country) : null;
+  if (!v || !v.icToken) return 'see note below';
+  var tail = v.icLabel === 'IC action' ? '' : _icPlain(String(v.icLabel || '')).replace(/^IC action\s*—\s*/, '');
+  // Same substitution as v792: this label refers to "score", which is not in the cell.
+  if (tail === 'score is a window artefact') tail = 'last take rise pre-dates the 2010 count';
+  return _icPlain(v.icToken) + ' · ' + v.since2010 + ' fiscal law change' + (v.since2010 === 1 ? '' : 's')
+    + ' since 2010' + (tail ? ' · ' + tail : '');
 }
 
 // v425: Copy IC Summary — builds a full IC memo paragraph with take at 4 prices, swing, IRR, breakeven, stability, mechanic, and source tier
@@ -44242,7 +44260,7 @@ function copyICSummary() {
     ['Contractor NPV @ $125/bbl (upside)',   npv125Str],
     ['Breakeven', _beHT.head],
     ['Fiscal predictability', _stabHT.head],
-    ['Reform exposure', _icReformHead(_refTxt)],
+    ['Reform exposure', _icReformHead(_refTxt, country)],
     ['Fiscal mechanic', mechStr],
     ['Contracts in sample', d.n ? Number(d.n).toLocaleString() : '—'],
     ['Evidence tier', tierStr],
