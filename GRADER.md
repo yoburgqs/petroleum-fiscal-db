@@ -43630,3 +43630,68 @@ countries can no longer be read as Brazil's.
 **Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn; the last cycle was T1.
 
 **Friction:** I opened Brazil cold on Country Profile. The headline doesn't show an IRR, because the stored per-country IRRs are unusable (Brazil's is 280%). Its IRR cell is a button, "→ Mo
+
+---
+## Cycle 684 Log — 2026-09-10 — T5 (v777)
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." It had gone longest without a turn
+(last run v771); the last six cycles were T5, T3, T4, T6, T1, T2.
+
+**Friction:** Walked cold at 127.0.0.1:8481 with no session or local storage: Fiscal Compare opens ranked at $75,
+Deepwater, 185 rows. Pressed **⎘ Copy for IC Memo** and read the clipboard captured in Chromium. The pasted
+table opens
+
+    #  Country    Govt Take % @$75 — ORCA database (CITABLE)   Comparable take % … (RANK AND CITE ON THIS)
+    1  USA        23.4
+    2  Iraq       84.8                                          34.1 ← cite this
+    3  Somalia    36.9
+
+under a preamble that says the rows are "ranked on the ORCA database take column — the CITABLE one — low → high"
+and that "the # column ranks on exactly that headline — so do not read their placing … as a fiscal finding".
+Neither is true since v675 moved the on-screen rank to the comparable take: Iraq is #2 on 34.1, not on 84.8.
+In the memo, the first take column the reader sees is out of order six times among the 65 ranked rows (Iraq,
+Ecuador, South Sudan, Malaysia, Azerbaijan, India). The note tells the IC reader to disregard Iraq's placing, which
+is the correct one. The figure to rank on arrived as text ("34.1 ← cite this"), so Excel could not sort it.
+Where: `copyFCForIC()`, the header / row / preamble / fee-basis note builders.
+
+**Change:** When the view holds a fee-basis-blended row, the first take column is now headed
+"Govt Take % @$75 — ORCA database, like-for-like (CITABLE)". It carries the comparable take on those rows and the
+database take everywhere else, as plain numbers. The next column is "Published all-contract take % — blends TSC /
+RSC / Buy-back fee contracts, NOT comparable across rows (reference only)". It is populated only on the fee rows
+and greyed in the HTML paste. The preamble's column sentence names the right columns. The fee-basis note now says
+the take column and the # placing are like-for-like, and that the blend is reference only. The placing clause is
+emitted only when the table is sorted on take. Views with no fee-basis row (e.g. a Norway + UK shortlist) paste the
+unchanged 12-column table.
+
+**Result:** The pasted table now reads in the order it says it is ranked. "2 Iraq 34.1 | 84.8" sits between USA 23.4
+and Somalia 36.9, with no inversions. The analyst can paste it into Word or Excel and sort or chart the ranked
+column without retyping ten cells. The memo no longer tells the committee to ignore a placing the screen got right.
+
+**Verification — all run this cycle, in the foreground or read back from the run's own report:**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures** (re-run after the version bump).
+- Clipboard verification in Chromium at 127.0.0.1:8481, 1440x900. Cold 185-row paste: ranked take column monotone
+  over 65 ranked rows (**0 inversions**, was 6); numeric on every row. Iraq rank 2, like-for-like 34.1, blend 84.8.
+  Blend populated on exactly the 10 fee rows (Iraq, Ecuador, South Sudan, Malaysia, Azerbaijan, India, Iran,
+  Mexico, Oman, Qatar). "ranks on exactly" and "← cite this" absent. HTML blend cell `color:#777`. Fee shortlist
+  (Iraq/Norway/Angola/Ecuador) pastes ranks 2/5/20/57 with Iraq 34.1. No-fee shortlist (Norway/UK): 12 columns,
+  original header and sentence. NPV sort: placing clause dropped, columns unchanged. scrollWidth 1440/1440.
+  0 page errors.
+- Step 5b, 390x844 `hasTouch` (`pointer: coarse` true): FC scrollWidth 390/390; Copy for IC Memo button visible,
+  44px tall; phone paste Iraq 34.1; 0 page errors. No control was added.
+- Graded suite `runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8481/`, `ORCA_REPORT_FILE=/tmp/rt_v777.txt`,
+  read from its own report: **299 PASS / 0 FAIL / 1 WARN; the WARN and the one console error are the known localhost `sw.js` 404, as in cycles 675-683**.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8481/`, baseline not updated: **PIXEL GATE PASS — no surface got worse than baseline (report header confirms url http://127.0.0.1:8481/)**.
+- STILL LOCKED respected: no FC table column change on screen (Govt NPV stays removed, NPV header unchanged, take
+  cell unchanged), v612 mobile layer and `#reference-panel` untouched, no tab reorder, no banner, tooltip, FAQ or
+  citation-string work. Version v776 → v777 at the three display sites.
+
+**Deliberately NOT done:**
+- **The FC XLSX export was not walked.** Its Methodology sheet says "Rank and row order are computed from
+  GovtTake_$75 (database), ascending". Whether its Rank column agrees with the v675 on-screen rank was not measured
+  this cycle.
+- The Screener paste keeps its "← cite this" marker. The two shortlist pastes no longer share the marker.
+- The cold default still pastes all 185 rows (~50K characters) unless rows are ticked. That is a separate friction
+  and was not changed.
+
+**Shipped:** petroleum-fiscal-db `d495026` (v777). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, `cmp` OK, byte-identical.
