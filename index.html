@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v786</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v787</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2298,7 +2298,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v786</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v787</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2368,7 +2368,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v786</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v787</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -33590,11 +33590,19 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
       <div style="font-size:12px;color:var(--muted);font-weight:700;margin-bottom:4px;">COUNTRIES</div>
       <div style="font-size:13px;">${countries.sort().map(c=>`<span style="cursor:pointer;color:var(--accent);" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'" onclick="openCountryProfileFromFC('${c.replace(/'/g,"\\'")}');event.stopPropagation();" title="Open ${c} Country Profile">${c}</span>`).join(' <span style="color:var(--border);">&middot;</span> ')}</div>
     </div>`;
+  // v787 (T6): the IRR (%) column is removed from both IOC tables (this group roll-up and the
+  // single-entity table in loadIOC). IOC_DATA.irr_75 is AVG(dcf_results.irr_pct) per operator |
+  // country | mechanic (build_pfdb_v13.py) -- an arithmetic mean of per-contract IRRs, the figure
+  // v516 withdrew from the Country Profile and v525 from Fiscal Compare because it is not a project
+  // return. This tab still printed it under a "Contractor IRR at reference project parameters"
+  // tooltip: Shell's top row read USA 425.9%, and across the 16 Quick brands 162 of 280 rows read
+  // >=100%, 45 "n/a*" and 8 -100.0%. An analyst tracing it clicked the row and landed on a profile
+  // that reports no IRR, while this tab's own exposure annex says IRR "is not reported at this level".
   const tbl = `<div class="tbl-wrap"><table>
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
       <th class="num">Govt Take</th>${_IOC_EV_TH}<th class="num">Swing</th><th class="num">NPV</th>
-      <th class="num">IRR (%)</th><th class="num">Breakeven</th>
+      <th class="num">Breakeven</th>
     </tr></thead>
     <tbody>${rows.sort((a,b)=>b.n-a.n).map(r => {
       const cEsc = r.country.replace(/'/g,"\\'");
@@ -33614,12 +33622,11 @@ window.loadIOCAggregated = function(brandName, operatorList, excludedList) {
       ${_iocEvCell(r.country)}
       <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'var(--red)':r.swing>=10?'var(--orange)':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
       <td class="num">${fmtNpvShared(r.npv_75)}</td>
-      <td class="num">${fmtIrr(r.irr_75)}</td>
       <td class="num">${formatBreakeven(r.be_75)}</td>
       </tr>`;}).join('')}</tbody>
   </table></div>`;
   const disclosureBanner = `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--muted);">
-  <strong style="color:var(--accent);">Note:</strong> NPV = contractor net present value, 100% WI gross, at $75/bbl. Shows all legal entities identified as part of ${brandName} group. Some subsidiary contracts may not be captured.
+  <strong style="color:var(--accent);">Note:</strong> NPV = contractor net present value, 100% WI gross, at $75/bbl. IRR is not shown: ORCA&rsquo;s contract IRR is an average of per-contract IRRs, not a project return &mdash; open a row, then <em>Model in Scenario Builder</em>. Shows all legal entities identified as part of ${brandName} group. Some subsidiary contracts may not be captured.
   </div>`;
 
   // ── v599 (T6): the provenance block. "Where did this number come from?" on this tab means
@@ -33736,7 +33743,7 @@ window.loadIOC = function(operator) {
     <thead><tr>
       <th>Country</th><th>Mechanic</th><th class="num">Contracts</th>
       <th class="num">Govt Take</th>${_IOC_EV_TH}<th class="num take-50-col" style="display:none">@$50</th><th class="num take-100-col" style="display:none">@$100</th><th class="num take-125-col" style="display:none">@$125</th><th class="num">Swing</th><th class="num">NPV</th>
-      <th class="num">IRR (%)</th><th class="num">Breakeven</th>
+      <th class="num">Breakeven</th>
     </tr></thead>
     <tbody>${rows.sort((a,b)=>(b.n-a.n)).map(r => {
       const cEsc = r.country.replace(/'/g,"\\'");
@@ -33759,7 +33766,6 @@ window.loadIOC = function(operator) {
       <td class="num take-125-col" style="display:none">${fmtTake(r.take_125)}</td>
       <td class="num">${r.swing!=null?`<span style="color:${r.swing>=20?'var(--red)':r.swing>=10?'var(--orange)':'var(--muted)'}">${r.swing.toFixed(1)}pp</span>`:'—'}</td>
       <td class="num">${fmtNpvShared(r.npv_75)}</td>
-      <td class="num">${fmtIrr(r.irr_75)}</td>
       <td class="num">${formatBreakeven(r.be_75)}</td>
     </tr>`;}).join('')}</tbody>
   </table></div>`;
@@ -33767,7 +33773,7 @@ window.loadIOC = function(operator) {
   const nocExcludedCount = IOC_DATA.filter(d => d.operator === operator).length - rows.length;
   const nocFootnote = `<div style="color:var(--muted);font-size:11px;margin-top:8px;">State-owned NOCs excluded. ${rows.length} operator entries shown.</div>`;
   const disclosureBanner = `<div style="background:var(--surface2);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:16px;font-size:12px;color:var(--muted);">
-  <strong style="color:var(--accent);">Note:</strong> NPV figures are 100% working interest (gross). IOC net share estimated using state participation proxy where available (~25% coverage). State-owned NOCs (Saudi Aramco, NIOC, ADNOC, QatarEnergy, etc.) are excluded from this view.
+  <strong style="color:var(--accent);">Note:</strong> NPV figures are 100% working interest (gross). IRR is not shown: ORCA&rsquo;s contract IRR is an average of per-contract IRRs, not a project return &mdash; open a row, then <em>Model in Scenario Builder</em>. IOC net share estimated using state participation proxy where available (~25% coverage). State-owned NOCs (Saudi Aramco, NIOC, ADNOC, QatarEnergy, etc.) are excluded from this view.
 </div>`;
   const iocCountryList = [...new Set(rows.map(r => r.country))];
   const compareBtnHtml = iocCountryList.length >= 2 && iocCountryList.length <= 4
