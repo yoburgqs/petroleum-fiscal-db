@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v775</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v776</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2282,7 +2282,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v775</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v776</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2352,7 +2352,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v775</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v776</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -34492,7 +34492,7 @@ function renderReformTimeline(country) {
         if (typeof getDCFParams !== 'function' || typeof resolveLiveDCFMechanic !== 'function') return null;
         const mk = _MODEL_KEY[label];
         if (!mk) return null;
-        const pr = getDCFParams(country, resolveLiveDCFMechanic(country));
+        const pr = getDCFParams(country, resolveLiveDCFMechanic(country), { record: true });  // v776: the basis the Live DCF runs
         if (!pr) return null;
         // ── v700 (T6): a live R-factor ladder makes the flat share a DEAD INPUT ─────────────
         // dcfPSC() resolves the government profit-oil share off params.tier_schedule year by
@@ -34528,6 +34528,9 @@ function renderReformTimeline(country) {
           const cdr = (typeof COUNTRY_DATA !== 'undefined')
             ? COUNTRY_DATA.find(function(x) { return x.country === country; }) : null;
           if (cdf && cdr && cdr[cdf] != null) origin = 'contract';
+        } else if (pr._basis === 'record') {
+          // v776 (T2): the Live DCF now runs this country's own royalty / CIT / special tax.
+          if (Array.isArray(pr._recordKeys) && pr._recordKeys.indexOf(mk) !== -1) origin = 'contract';
         }
         if (!origin) return null;
         const v = pr[mk];
@@ -35044,7 +35047,7 @@ function renderReformTimeline(country) {
                          profit_oil_govt_pct: 'profit_oil_govt', royalty_rate: 'royalty' };
       try {
         const _mech = (typeof resolveLiveDCFMechanic === 'function') ? resolveLiveDCFMechanic(country) : null;
-        const _pr   = (_mech && typeof getDCFParams === 'function') ? getDCFParams(country, _mech) : null;
+        const _pr   = (_mech && typeof getDCFParams === 'function') ? getDCFParams(country, _mech, { record: true }) : null;  // v776
         if (_pr) {
           const _ovk = Array.isArray(_pr._overrideKeys) ? _pr._overrideKeys : [];
           const _cdr = (typeof COUNTRY_DATA !== 'undefined')
@@ -35076,7 +35079,8 @@ function renderReformTimeline(country) {
               : null;
             const origin = _ladK ? 'tiers'
               : ((_ovk.indexOf(k) !== -1) ? 'override'
-              : ((cdf && _cdr && _cdr[cdf] != null) ? 'contract' : 'default'));
+              : (((cdf && _cdr && _cdr[cdf] != null)
+                  || (Array.isArray(_pr._recordKeys) && _pr._recordKeys.indexOf(k) !== -1)) ? 'contract' : 'default'));
             _missTerms.push({
               key: k, label: _TERM_LABEL[k], mech: _mech, origin: origin, ladder: _ladK,
               sub: _ladK ? (_ladK.lo.toFixed(0) + '\u2013' + _ladK.hi.toFixed(0) + '% R-factor ladder')
@@ -44464,6 +44468,12 @@ function _sbICBasisClause() {
          + ' (state monopoly, no contractor position); the terms above are the generic '
          + o.mech + ' default, not ' + o.country + "'s";
   }
+  if (o.basis === 'record' && o.recordTerms) {
+    // v776 (T2)
+    return '; terms: ' + o.recordTerms.held + ' from ORCA’s ' + o.country + ' record, ' + o.recordTerms.rest
+         + ' — one synthetic project, not ' + o.country + '’s published take'
+         + (o.cpTake != null ? ' (' + o.cpTake.toFixed(1) + '% @$75)' : '');
+  }
   if (o.basis === 'default') {
     return '; terms are the generic ' + o.mech + ' default, not ' + o.country + '-specific'
          + (o.cpTake != null ? ' (' + o.country + " published take @$75 is " + o.cpTake.toFixed(1) + '%)' : '');
@@ -44566,7 +44576,7 @@ function _sbCopyICLine(btn) {
 
 
 // Get fiscal params for a country from API JSON or fallback to COUNTRY_DATA
-function getDCFParams(country, mechanic) {
+function getDCFParams(country, mechanic, opts) {
   // Default params by mechanic
   const defaults = {
     Concession: { royalty_rate: 0.10, cit_rate: 0.25, spt_rate: 0, state_equity_pct: 0 },
@@ -44616,6 +44626,33 @@ function getDCFParams(country, mechanic) {
     }
   }
 
+  // ── v776 (T2): the Country Profile's project test ran a template, not the country ─────────────
+  // The CP headline's only route to an IRR is "IRR: → Model in Scenario Builder", whose tooltip
+  // promises the country's royalty and CIT. On 116 Concession countries it loaded 10% / 25%
+  // instead, because this function only ever read COUNTRY_DATA for the PSC family. Brazil's
+  // Key Fiscal Parameters table prints royalty 14.91% and CIT 34%, and says take, NPV and IRR are
+  // built from those; the Scenario Builder and the Live DCF on the same page ran 10% / 25% and
+  // printed 22.2% take and a 138.4% IRR, identical for all 116. Measured over those 116 at $75 on
+  // the Deepwater profile: reading the country's own royalty and CIT moves the modelled take
+  // toward the published take on 82, median gap 4.7pp -> 1.9pp.
+  // Opt-in ({record:true}) so the two Country Profile what-if surfaces read the record while
+  // Fiscal Compare's engine sweep, its Quality column and the census counts keep their basis.
+  // State equity is deliberately NOT read: COUNTRY_DATA.state_eq disagrees with the evidence
+  // table (Brazil 30% is the pre-salt PSC Petrobras carry, table NOT HELD; Oman 60% vs 10%), and
+  // a carried state share moves the take more than any other term. It runs at the template 0%,
+  // and every surface that uses this basis says so. State monopolies stay on the default.
+  if (opts && opts.record && _basis === 'default' && (mechanic === 'Concession' || !defaults[mechanic])) {
+    const cdR = (typeof COUNTRY_DATA !== 'undefined' && COUNTRY_DATA) ? COUNTRY_DATA.find(x => x.country === country) : null;
+    const monoR = cdR && typeof isStateMonopoly === 'function' && isStateMonopoly(cdR.take_75);
+    if (cdR && !monoR) {
+      const recKeys = [];
+      if (cdR.royalty != null && isFinite(cdR.royalty)) { params.royalty_rate = cdR.royalty / 100; recKeys.push('royalty_rate'); }
+      if (cdR.cit != null && isFinite(cdR.cit))         { params.cit_rate     = cdR.cit / 100;     recKeys.push('cit_rate'); }
+      if (cdR.spt != null && isFinite(cdR.spt))         { params.spt_rate     = cdR.spt / 100;     recKeys.push('spt_rate'); }
+      if (recKeys.length) { _basis = 'record'; params._recordKeys = recKeys; }
+    }
+  }
+
   params._basis = _basis;
   // v601 (T2): _basis describes the object, not the key. The Country Profile evidence table needs
   // to know whether a SPECIFIC parameter is this country's own override or a generic mechanic
@@ -44623,6 +44660,29 @@ function getDCFParams(country, mechanic) {
   // hard-coded override contradicting their own table. Metadata only; no term is changed.
   params._overrideKeys = Object.keys(countryOverrides[country] || {});
   return params;
+}
+
+// v776 (T2): one wording for a record-basis run, shared by the Scenario Builder banner, its origin
+// strip, its IC line and the Live DCF panel, so no two of them can describe the same form differently.
+//   held — "royalty 14.9% and CIT 34.0%" (read from the country's record)
+//   rest — "special tax and state equity run at 0%" (+ any royalty/CIT still on the template)
+function _dcfRecordTerms(params) {
+  var LBL = { royalty_rate: 'royalty', cit_rate: 'CIT', spt_rate: 'special tax' };
+  var keys = (params && Array.isArray(params._recordKeys)) ? params._recordKeys : [];
+  var fmt = function(v) { return (Math.round(Number(v || 0) * 1000) / 10).toFixed(1) + '%'; };
+  var held = keys.map(function(k) { return LBL[k] + ' ' + fmt(params[k]); });
+  var zero = [];
+  if (keys.indexOf('spt_rate') === -1) zero.push('special tax');
+  zero.push('state equity');
+  var tmpl = ['royalty_rate', 'cit_rate'].filter(function(k) { return keys.indexOf(k) === -1; })
+    .map(function(k) { return LBL[k] + ' is the ' + fmt(params[k]) + ' template'; });
+  var join = function(a) { return a.length > 1 ? a.slice(0, -1).join(', ') + ' and ' + a[a.length - 1] : (a[0] || ''); };
+  return {
+    held: join(held),
+    zeroNames: join(zero),
+    rest: join(zero) + (zero.length > 1 ? ' run' : ' runs') + ' at 0%' + (tmpl.length ? '; ' + tmpl.join('; ') : ''),
+    zeroCount: zero.length
+  };
 }
 
 // v505: human-readable description of the generic default terms a mechanic falls back to.
@@ -44660,7 +44720,7 @@ function runLiveDCF(country, profileKey, price) {
   // contract count. mechanics[0] is alphabetical and named 39 countries wrongly.
   let mechanic = fcResolveMechanic(d);
   const profile = { ...(DCF_PROFILES[profileKey] || DCF_PROFILES.deepwater) };
-  const params = getDCFParams(country, mechanic);
+  const params = getDCFParams(country, mechanic, { record: true });  // v776 (T2): this country's royalty/CIT, not the template
 
   // Country-level mechanic override (e.g. Australia → PRRT, Iran → Buy-back)
   if (params._mechanic) mechanic = params._mechanic;
@@ -44717,7 +44777,7 @@ function _ldcfProvenance(country) {
   if (!d) return null;
   const mech = resolveLiveDCFMechanic(country);
   let pr = null;
-  try { pr = getDCFParams(country, fcResolveMechanic(d)); } catch (e) {}
+  try { pr = getDCFParams(country, fcResolveMechanic(d), { record: true }); } catch (e) {}
   const basis = (pr && pr._basis) || 'default';
   // How many of the 185 run this identical generic template. Computed once, cached.
   if (_ldcfProvenance._shared === undefined) {
@@ -44725,7 +44785,7 @@ function _ldcfProvenance(country) {
     try {
       COUNTRY_DATA.forEach(function(x) {
         const m2 = fcResolveMechanic(x);
-        const p2 = getDCFParams(x.country, m2);
+        const p2 = getDCFParams(x.country, m2, { record: true });  // v776: same basis runLiveDCF runs on
         if (p2 && p2._basis === 'default' && resolveLiveDCFMechanic(x.country) === 'Concession') n++;
       });
     } catch (e) { n = 0; }
@@ -44736,6 +44796,8 @@ function _ldcfProvenance(country) {
     mechanic: mech,
     monopoly: isStateMonopoly(d.take_75),
     generic: basis === 'default',
+    record: basis === 'record',
+    recordTerms: (basis === 'record' && pr && typeof _dcfRecordTerms === 'function') ? _dcfRecordTerms(pr) : null,
     terms: (typeof describeDefaultTerms === 'function') ? describeDefaultTerms(mech) : '',
     shared: (mech === 'Concession' && basis === 'default') ? _ldcfProvenance._shared : 0
   };
@@ -44775,6 +44837,16 @@ function renderLiveDCFPanel(country, containerId) {
         + 'Move the price and profile to see how the template responds \u2014 but the result is a property of the '
         + 'template, not of ' + country + '. ' + country + '\u2019s own take, averaged over '
         + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts, is at the top of this page.'
+      : (_prov704.record && _prov704.recordTerms)
+      // v776 (T2): record basis — name the rates read and the terms still at 0%, in that order.
+      ? '<strong style="color:var(--text);">What-if tool — ' + _cpEsc704(_prov704.recordTerms.held) + ' from '
+        + country + '’s record.</strong> Runs <strong>one</strong> hypothetical project on those rates. '
+        + _cpEsc704(_prov704.recordTerms.rest.charAt(0).toUpperCase() + _prov704.recordTerms.rest.slice(1))
+        + ' — the record holds no rate for ' + (_prov704.recordTerms.zeroCount > 1 ? 'either of the first two' : 'the first')
+        + ', so if ' + country + ' levies ' + (_prov704.recordTerms.zeroCount > 1 ? 'either' : 'it') + ', the take below is understated. '
+        + 'The results are that project’s economics &mdash; <em>not</em> ' + country + '’s headline figures, '
+        + 'which are averaged over ' + (d.n ? d.n.toLocaleString() : 'all') + ' real contracts. '
+        + 'Reconciliation of the two is at the bottom of this panel.'
       : '<strong style="color:var(--text);">What-if tool.</strong> Runs <strong>one</strong> hypothetical project through '
         + country + '\u2019s ' + _runMech504 + ' terms at a price and profile you choose. '
         + 'The results below are that project\u2019s economics &mdash; <em>not</em> ' + country + '\u2019s headline figures, '
@@ -46224,6 +46296,20 @@ function _sbOriginNote(result, sbPrice, sbProfileKey) {
          + _esc594(o.mech) + ' default (' + _esc594(describeDefaultTerms(o.mech)) + '). '
          + 'Read the take, NPV, IRR, hurdle verdict and IC line below as a hypothetical regime you are building — '
          + 'not an entry into ' + cn + ' that ORCA can evidence.';
+  } else if (o.basis === 'record' && o.recordTerms) {
+    // v776 (T2): royalty / CIT read from the country's record; the terms it does not hold are named.
+    var _rt776 = o.recordTerms;
+    col  = 'var(--accent)';
+    head = 'Loaded from ' + cn + '’s record: ' + _esc594(_rt776.held) + ' — this is one project, not ' + cn + '’s published take';
+    body = _esc594(_rt776.rest.charAt(0).toUpperCase() + _rt776.rest.slice(1)) + ' — ORCA’s ' + cn
+         + ' record holds no rate for ' + (_rt776.zeroCount > 1 ? 'either of the first two' : 'the first') + ', so if ' + cn + '’s regime levies '
+         + (_rt776.zeroCount > 1 ? 'either' : 'it') + ', the take below is understated. '
+         + 'The run is a single synthetic ' + _esc594(o.profileName) + ' project. '
+         + (o.cpTake != null
+             ? 'The <strong>' + o.cpTake.toFixed(1) + '%</strong> at $75 on ' + cn + '’s Country Profile is the average across '
+               + (o.n != null ? Number(o.n).toLocaleString() + ' actual ' + cn + ' contracts' : 'that country’s actual contracts') + '. '
+             : '')
+         + 'Both are true and they answer different questions — quote whichever you mean.';
   } else if (o.basis === 'default') {
     col  = 'var(--yellow)';
     head = '⚠ No ' + cn + '-specific fiscal terms in ORCA — generic ' + _esc594(o.mech) + ' default loaded';
@@ -46370,7 +46456,7 @@ function ddOpenScenarioBuilder(country) {
   // nothing country-specific is loaded at all, and on Bahrain/Kuwait/Saudi Arabia the country
   // has no contractor regime for terms to come from. Resolve the basis FIRST, then say what is
   // actually true. `_probeParams` is the same object the pre-fill below writes into the form.
-  const _probeParams = getDCFParams(country, mechanic);
+  const _probeParams = getDCFParams(country, mechanic, { record: true });  // v776 (T2)
   const _sbBasis = _probeParams._basis || 'default';
   const _sbMono  = isStateMonopoly(d.take_75);
   var _sbBanner = document.getElementById('sb-prefill-banner');
@@ -46381,6 +46467,12 @@ function ddOpenScenarioBuilder(country) {
     _sbBannerText.textContent = _sbMono
       ? country + ' is a state monopoly — ORCA holds no contractor terms for it. Loaded the generic '
         + mechanic + ' default so you can build a hypothetical regime.'
+      : _sbBasis === 'record'
+      ? (function() {
+          var rt = _dcfRecordTerms(_probeParams);
+          return country + '’s ' + rt.held + ' pre-filled from ORCA’s record; ' + rt.rest
+            + '. Add any term ' + country + ' levies before quoting this as ' + country + '.';
+        })()
       : _sbBasis === 'default'
       ? 'No ' + country + '-specific terms in ORCA — loaded the generic ' + mechanic
         + ' default. Edit the fields before quoting this as ' + country + '.'
@@ -46405,7 +46497,7 @@ function ddOpenScenarioBuilder(country) {
   }
 
   // Load country-specific params
-  const params = getDCFParams(country, mechanic);
+  const params = getDCFParams(country, mechanic, { record: true });  // v776 (T2): royalty/CIT from this country's record
 
   // Set region-appropriate profile
   const region = d.region || '';
@@ -46420,9 +46512,13 @@ function ddOpenScenarioBuilder(country) {
   if (mechEl && mechEl.value === 'Concession') {
     const r = v => Math.round((v || 0) * 100);
     const el = id => document.getElementById(id);
-    if (el('sb-royalty')) el('sb-royalty').value = r(params.royalty_rate);
-    if (el('sb-cit')) el('sb-cit').value = r(params.cit_rate);
-    if (el('sb-spt')) el('sb-spt').value = r(params.spt_rate || 0);
+    // v776 (T2): a rate read from the record keeps one decimal (Brazil royalty 14.9, not 15), so the
+    // form, the strip above it and the Country Profile print the same figure.
+    const rk = Array.isArray(params._recordKeys) ? params._recordKeys : [];
+    const rv = (k, v) => rk.indexOf(k) !== -1 ? Math.round((v || 0) * 1000) / 10 : r(v);
+    if (el('sb-royalty')) el('sb-royalty').value = rv('royalty_rate', params.royalty_rate);
+    if (el('sb-cit')) el('sb-cit').value = rv('cit_rate', params.cit_rate);
+    if (el('sb-spt')) el('sb-spt').value = rv('spt_rate', params.spt_rate || 0);
     if (el('sb-state-eq')) el('sb-state-eq').value = r(params.state_equity_pct || 0);
     if (el('sb-windfall')) el('sb-windfall').value = r(params.windfall_rate || 0);
   } else if (mechEl && mechEl.value === 'PSC') {
@@ -46446,6 +46542,7 @@ function ddOpenScenarioBuilder(country) {
     country:      country,
     mech:         (mechEl ? mechEl.value : mechanic),
     basis:        _sbBasis,
+    recordTerms:  _sbBasis === 'record' ? _dcfRecordTerms(_probeParams) : null,  // v776 (T2)
     overrideKeys: _probeParams._overrideKeys || [],
     monopoly:     _sbMono,
     cpTake:       _sbMono ? null : (d.take_75 != null ? Number(d.take_75) : null),
