@@ -43957,3 +43957,14 @@ export or copy it. Before, that meant scrolling back up to a toolbar they may ne
 
 **Shipped:** petroleum-fiscal-db `38ecb71` (v781). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
+
+---
+## Cycle 688 Log — 2026-09-11 01:12
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 688: ticking a Screener row now shows your shortlist on screen (v781)
+
+**Task:** T1, "Which countries should even be on my screening list?" It had gone longest without a turn.
+
+**Friction:** I walked it cold in a real browser. From Home, "open the screen →" loads IOC Capital Screen with 15 countries. Next you pick which ones go on your list by ticking the checkbox on each row ("Add Canada to the IC shortlist"). The only response to a tick was a small "N selected" badge and relabelled Cop
