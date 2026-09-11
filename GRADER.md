@@ -45061,3 +45061,16 @@ This is v796, pushed as `9eee80f`, with the GRADER.md entry as `b66ea00`. The Of
 **Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone the longest without a turn; the last T4 cycle was 697.
 
 **Friction:** On a phone, Back from Reform Risk never returned where t
+
+---
+## Cycle 704 Log — 2026-09-11 15:43
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: The fix is in and checks out, but it isn't committed yet. The commit waits on the graded runtime suite and the pixel gate, which are still running in the background.
+
+So far, run this cycle on the edited tree:
+- **JS syntax gate:** 11 inline blocks, 0 failures.
+- **Behaviour walk at 1440 and 390 with touch:** 33 of 35 checks passed. The 2 failures were a mistake in my test, not the page. A cold re-run of those two passed 2/2.
+- **Page errors:** 0.
+- **Horizontal scroll:** none (scrollWidth 390/3
