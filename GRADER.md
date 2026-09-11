@@ -44349,3 +44349,87 @@ v787 is pushed to petroleum-fiscal-db as `7c08892`, and the GRADER.md entry as `
 **Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone longest without a turn; the last T6 was cycle 687.
 
 **Friction:** IOC Port
+
+---
+## Cycle 695 Log — 2026-09-11 — T5 (v788)
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." It had gone longest without a turn; the last T5
+was cycle 684. Since then, cycles 685 T3, 686 T4, 687 T6, 688 T1, 691 T4, 692 T3, 693 T2 and 694 T6 (689 and 690 left
+no task line in this file).
+
+**Friction:** Cycle 684 fixed the "⎘ Copy for IC Memo" paste and left the other IC artifact on the same toolbar,
+**⬇ Export XLSX** (`exportFCResults()`), explicitly unwalked. Walked it cold at 127.0.0.1:8923, 1440x900, no session
+or local storage: Fiscal Compare opens at $75 Deepwater, 185 rows, and the # column reads 1 USA, **2 Iraq**,
+3 Somalia, 4 Australia, 5 Ecuador. Pressed Export XLSX, saved the real download and parsed it with openpyxl:
+
+    Rank (database take @$75)   Country     Tier
+    1                           USA         IF
+    2                           Somalia     IF
+    3                           Australia   IF
+    ...
+    6                           Ecuador     MOD
+    20                          South Sudan MOD
+    63                          Iraq        NOC
+
+**61 of the 65 ranked rows carried a different Rank in the workbook than in the # column the analyst had just read**
+(ties normalised: screen "=9" vs sheet 9 + Tied_With counted as agreeing). v675 moved the screen's rank and tier
+dividers to the comparable take, and v777 moved the clipboard paste. The workbook still ordered, ranked and tiered on
+the published fee-basis blend: `_xlCmp` and `_xlVal` read `_xlDbTake`, and the Tier cell read
+`getTierInfo(_dbTake)`. Its Methodology sheet then told the IC reader that Rank "and the on-screen Fiscal Compare
+table agree row for row". So a memo body saying "Iraq, #2 of 65, investible" went out with an appendix saying
+Rank 63, Tier NOC. Nearly every other row in that appendix was also displaced, most by one or two places and South
+Sudan by nine (Rank 20 against #11), because the fee-basis rows sat in the wrong place above them. The like-for-like take column had 6 adjacent inversions in the ranked
+block.
+
+**Change:**
+- In `exportFCResults()`, one helper `_xlFeeSt()` (the same `_scFeeCmpAt()` call the screen uses) feeds the
+  comparator, the tie key and the Tier cell. On the 10 fee-basis rows the workbook now orders, ranks and tiers on the
+  comparable take. On the other 175 rows nothing changes, because there the comparable take is the database take.
+- The Rank header reads "Rank (database take @$75, like-for-like — same as on-screen #)" when a fee row is in the
+  export. Otherwise it is unchanged.
+- The per-row "Take comparability" cell and the Methodology sheet no longer say Rank and Tier are on the headline.
+  They say both are on the comparable take, as on screen. The worked Iraq figure is read from the export's own
+  price: 34.1% vs 84.8% at $75, 37.8% vs 86.9% at $100.
+
+**Result:** the attachment and the screen now agree. The Rank the analyst reads in the # column is the Rank in the
+workbook, at every price and in a ticked shortlist, so the IC appendix confirms the memo instead of contradicting it
+on 61 lines. Iraq exports as Rank 2 and Tier IF, Ecuador 5, South Sudan 11. An analyst can sort the file on Rank and
+get the screen's order.
+
+| cold $75 Deepwater, 185 rows | before (v787) | after (v788) |
+|---|---|---|
+| ranked rows whose XLSX Rank ≠ on-screen # | **61 of 65** | **0 of 65** |
+| Iraq Rank / Tier in XLSX (screen #2) | 63 / NOC | 2 / IF |
+| Ecuador / South Sudan Rank (screen 5 / 11) | 6 / 20 | 5 / 11 |
+| adjacent inversions on like-for-like take, ranked block | 6 | 0 |
+| Methodology says Rank matches the screen | yes (false) | yes (true) |
+
+**Verification (run this cycle, foreground unless noted, 127.0.0.1:8923):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**, re-run on the final tree after the version bump.
+- Real-download checks, `/tmp/walk_t5_xlsx.js` + openpyxl, each vs the # column captured in the same page:
+  - $75 cold: 0/65 disagreements.
+  - $100: 0/65, Iraq 2, Ecuador 4, Norway 57.
+  - Shortlist Iraq/Norway/Angola/Ecuador: 4 rows, ranks 2/57/20/5, all equal to screen.
+  - The 3 state monopolies read "n/c" in both places. 0 page errors on every run.
+- Step 5b, 390x844 `hasTouch` (`pointer: coarse` true): FC scrollWidth 390/390. Export XLSX button 44px tall. Phone
+  export 0/65 disagreements. 0 page errors. No control added or touched.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8923/`, read from
+  its own report `/tmp/rt_v788b.txt`, run on the final tree: **299 PASS / 0 FAIL / 1 WARN**. The one console error is the localhost `sw.js` 404, the same WARN cycles 684 and 694 recorded. An earlier run, before the last Methodology-sheet edit, read the same.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8923/index.html`, baseline not updated: **PIXEL GATE PASS — no surface got worse than baseline** (report header confirms url http://127.0.0.1:8923/index.html).
+- STILL LOCKED respected:
+  - No on-screen table, column, tooltip, FAQ, banner or citation-string change.
+  - The v612 mobile layer and `#reference-panel` are untouched, and tab order is unchanged.
+  - Version v787 → v788 at the three display sites.
+
+**Deliberately NOT done:**
+- The **Tier** column uses `getTierInfo()` bands (IF <45 / MOD <60 / HI <72 / NOC ≥72, `index.html` ~47306), while
+  the screen's tier dividers sit at 40 / 60 / 75. So Iran, ranked #62 on a comparable 74.4%, exports as NOC but sits in
+  the screen's High band, before the 75% divider. Both artifacts now read the same take. They still cut it at different
+  thresholds, which predates this cycle and was not changed.
+- Mexico, Oman and Qatar are fee-basis blends and also generic-default rows. They stay unranked, as on screen, and
+  their Tier is now graded off the comparable take like the other fee rows.
+- The Screener paste still carries "← cite this" (noted in cycle 684).
+- Explorer's bundled IRR column (noted in cycle 694) is untouched.
+
+**Shipped:** petroleum-fiscal-db `6382840` (v788). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, `cmp` OK, byte-identical.
