@@ -45271,3 +45271,107 @@ moves the wrong scroller.
 **Task:** T6, "Where did this number come from and how solid is the evidence?" — the task that had gone longest without a turn (last run cycle 700; since then T5, T1, T4, T3, T2).
 
 **Friction:** Walking cold from Home → Fiscal Compare → tap a row, the drilldown drawer is the tab's entire answer to "where did this come from" — it carries 
+
+---
+
+## Cycle 707 Log — 2026-09-11 — T5 (v800)
+
+**Task:** T5, "Give me something I can paste straight into an IC memo." — the task that had gone
+longest without a turn (last run cycle 701; since then T1, T4, T3, T2, T6).
+
+**Friction.** Walked cold — no sessionStorage, no localStorage — at 390 x 844 with `hasTouch`, and
+again at 768, 1024, 1280, 1440, 1920. Home → Fiscal Compare → the 185 rows auto-load → scroll into
+the table and tick three countries around rank 20–35, which is what building an IC shortlist
+actually looks like.
+
+`_fcSyncSelUI()` does its job: the toolbar relabels to `⎘ Copy 3 selected`, `Export XLSX (3)`, and
+the `#fc-sel-note` pill reads `3 selected`. The problem is where those live. `.fc-controls` is
+`position: sticky` only down to 769px — below that the sticky is dropped — and the Fiscal Compare
+table is its own inner scroller, so the page does not scroll once you are among the rows.
+
+| viewport | `.fc-controls` position | `#fc-copy-ic-btn` top | in viewport | selection cues still on screen |
+|---|---|---|---|---|
+| 1920 / 1440 / 1280 / 1024 | sticky | +24 | yes | Copy · Export · pill · Side-by-Side |
+| 768 | **static** | **−1161** | **no** | Side-by-Side only |
+| 390 touch | **static** | **−1161** | **no** | Side-by-Side only |
+
+Scrolling further down the table did not bring it back: `scrollY` stayed pinned at 1652 for rows 19,
+60 and 120, because the rows move inside `.tbl-wrap`, not the document. So on a phone the analyst
+ticked three rows, got a row highlight, and had no visible count and no route to the paste. The one
+cue left in the viewport was `⇌ Compare 3 selected in Side-by-Side` — a different destination from
+"paste this into my memo", and the wrong reaction to a tick, exactly as the v781 comment describes
+for the Screener.
+
+Which is the point: **the Screener has had the fix since v781** (`#sc-sel-dock`) and Fiscal Compare
+never got it, even though FC was tickable first (v632). The tab the analyst lands on from Home was
+the one that could not finish the job.
+
+**Change — `#fc-sel-dock`.** The v781 dock, same markup, same state model, same escape hatch:
+
+- Fixed to the bottom of the viewport, shown only while something is ticked. Cold load: `hidden`,
+  no padding applied, nothing on screen — no existing path changes.
+- Reads `3 ticked · Angola · Guyana · Gabon`, in the order the table currently ranks them. When a
+  region filter is hiding a ticked country it says `N hidden by the current filter, still carried`,
+  because FC's `_fcSelOrdered()` deliberately exports those too (unlike the Screener's, which drops
+  them) — the dock states the behaviour rather than contradicting it.
+- Four actions: `⎘ Copy`, `⬇ XLSX`, `⇌ Side-by-Side`, `Clear`. Each calls the function the toolbar
+  already calls — `copyFCForIC()`, `exportFCResults()`, `fcOpenSbs()`, `fcClearSel()` — so there is
+  still exactly one code path per artifact, and the Side-by-Side label picks up the same `CMP_MAX`
+  truncation the toolbar button uses.
+- Lives inside `#t0`, so it disappears with the tab (measured: rect height 0, `#t0` display none).
+  Stacks above `#compare-basket` via the same lift logic as `_scDockPlace()`, and pads `#t0` so it
+  never covers the last rows. Class-styled, not inline `display:flex`, so the v612 wrap rule does
+  not apply to it; its own `max-width:720px` rule wraps it. Added to the `@media print` hide list
+  beside `#sc-sel-dock` and `#compare-basket`.
+
+**Result:** an analyst building an IC shortlist on Fiscal Compare — on a phone, or in a window
+narrower than 769px — watches it build, and copies the memo table or pulls the XLSX from where they
+are standing. Previously the only way to reach either was to scroll 1,161px up, out of the table
+they were reading, to a toolbar that gave no indication it was there.
+
+| after (v800) | 1920 | 1440 | 1280 | 1024 | 768 | 390 touch |
+|---|---|---|---|---|---|---|
+| dock in viewport with 3 ticked | yes | yes | yes | yes | yes | yes |
+| dock button height | 25 | 25 | 25 | 25 | 36 | **44** |
+| scrollWidth / clientWidth | 1920/1920 | 1440/1440 | 1280/1280 | 1024/1024 | 768/768 | 390/390 |
+| page errors | 0 | 0 | 0 | 0 | 0 | 0 |
+| dock Copy → clipboard | 2,702 chars, IC shortlist header, 3 rows, v800 source line | | | | | |
+| dock XLSX | `ORCA_fiscal_compare_$75_deepwater_shortlist-3_2026-09-11.xlsx`, 30,107 bytes | | | | | |
+| dock Side-by-Side | loads 3/5 columns | | | | | |
+| Clear | dock hidden, `#t0` padding removed, `_fcSelected` empty | | | | | |
+
+**Verification (run this cycle, foreground, final bumped tree, `http://127.0.0.1:8941/`):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**. Run after the edit and again
+  after the version bump.
+- `/tmp/c707/verify.js` and `/tmp/c707/interact.js` — the tables above, plus tab-switch teardown.
+- Step 5b: `scrollWidth == clientWidth` at all six viewports with the dock open; all four dock
+  buttons 44px under `pointer: coarse`.
+- Graded suite `runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8941/`, read from its own
+  report `/tmp/c707/rt_v800.txt`: **299 PASS / 0 FAIL / 1 WARN**. The WARN and the single console
+  error are the localhost `sw.js` 404 standing since cycle 684.
+- Pixel gate `pixel_audit.js`, baseline **not** updated: **PIXEL GATE PASS — no surface got worse
+  than baseline.**
+- STILL LOCKED respected: no tooltip, FAQ, banner, citation or text-only edit; FC columns and the
+  removed Govt NPV column untouched; CP headline untouched; the v612 mobile layer, its
+  `min-width: max-content` marker and `#reference-panel` untouched; tab order unchanged.
+  Version v799 → v800 at the three display sites.
+
+**Also walked, found sound, not changed:**
+- FC `⎘ Copy for IC Memo` with 3 ticked at 1440: 2,660 chars, rank column carries the placing in the
+  full 185, PROXY / fee-basis / breakeven-coverage caveats all present. This is good output.
+- Country Profile `Copy for IC Memo` (Norway): 5,958 chars, Metric/Value table plus six numbered
+  notes keyed to the rows they qualify, including the ≤52 predictability ceiling. Good output.
+- All four file exports download and are non-trivial: FC XLSX 184,645 B, Screener XLSX 183,287 B,
+  Screener CSV 47,736 B, IOC XLSX 42,497 B.
+
+**Deliberately NOT done:**
+- FC `⎘ Copy for IC Memo` with **nothing** ticked still pastes all 185 rows / 50,731 characters
+  behind a ~4,000-character preamble. v632 judged this acceptable — the tooltip says so and the
+  ticks are the answer — and this cycle made the ticks usable rather than relitigating the default.
+- The 2026-09-11 "overnight chain FAILED" email (`petroleum_overnight` last exit 1) is still
+  uninvestigated. Out of scope for a UX cycle; fifth consecutive cycle log to note it.
+- ~13 `python -m http.server` processes from earlier cycles (ports 8211–8941) are still running.
+  This cycle started 8941 and stopped none.
+
+**Shipped:** petroleum-fiscal-db `46cced9` (v800), pushed to origin/main. Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
