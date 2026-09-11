@@ -43712,3 +43712,94 @@ column without retyping ten cells. The memo no longer tells the committee to ign
 1  USA       23.4
 2  Iraq      84.8      34.1 ← cite this
 3  Somalia   3
+
+---
+## Cycle 685 Log — 2026-09-10 — T3 (v778)
+
+**Task:** T3, "How do these three countries compare side by side?" It had gone longest without a turn (last run
+cycle 679, v772). The recent run was 680 T4, 681 T6, 682 T1, 683 T2, 684 T5.
+
+**Friction:** Walked cold in Chromium. Side-by-Side, typed Egypt, Algeria and Libya, pressing Enter after each. The
+strip above the grid (`#cmp-verdict`) read **"NOTHING RANKS HERE: Only Libya carries a comparable take (71.1% at
+$75/bbl) ... Set aside — Egypt — statutory terms — ORCA holds no verified production behind it ... they are not rank
+positions in this set."** Below the grid, in bold, the proxy notice (renderCompare, the v511 `_cmpProxies` block) read
+**"⚠ The column that wins this comparison is a proxy. Egypt shows the lowest government take (45.1%) of the 3 ranked
+columns and the highest contractor NPV."** The tab told the analyst Egypt is not a rank position, then told them Egypt
+wins. The cold-load default does the same: the strip ranks United Kingdom 49.2% › Norway 68.0% with Netherlands set
+aside, and the notice crowned Netherlands 23.4% "of the 3 ranked columns". The notice rides the IC-memo clipboard
+(v669), so "Egypt wins" went into the paste too.
+
+Cause: the notice's `_rank` was `take_75 != null && !isStateMonopoly`. The strip ranks through `_cmpRankTake()`, which
+drops statutory-only columns whenever the set mixes producers with proxies (the v626 basis gate). The two ranked
+different sets of columns.
+
+Census over 30 common screening sets (4 quickstarts, 4 sets from cycle 679, 22 regional trios): **14 crowned a column the
+strip had set aside.** They include North Sea Trio, West Africa Trio, Egypt/Algeria/Libya, UAE/Oman/Qatar,
+Kazakhstan/Azerbaijan/Russia (Russia crowned), Indonesia/Malaysia/Thailand (Thailand), Colombia/Peru/Ecuador (Peru),
+Denmark/Norway/UK (Denmark), China/India/Vietnam, Argentina/Chile/Bolivia, South Africa/Namibia/Angola,
+Brazil/Guyana/Suriname and Oman/Egypt/Algeria.
+
+**Change:**
+- The proxy notice ranks through `_cmpRankTake(d, 75)`, the gate the strip uses. The printed winner figure is the
+  rank take as well.
+- New branch. Where a set-aside proxy prints the lowest take in the grid, the notice reads **"⚠ The lowest take printed
+  in this grid is a proxy, and it is not a rank position."** It names the printed figure and the contract and fact
+  counts. It states the ordering the set does establish, e.g. "United Kingdom 49.2% › Norway 68.0%, lowest first",
+  or that only one column is comparable, or that nothing ranks. It names the strongest column. It closes "Do not
+  carry Netherlands into an IC memo as the lowest-take column; state it as a proxy beside the ordering."
+- All-proxy sets, where the strip ranks every column (Guyana/Suriname/Namibia → Namibia), keep "the column that wins
+  this comparison is a proxy". There it is true. Sets with no proxy in the lowest-take position get the generic
+  proxy notice as before.
+
+**Result:** the notice under the grid no longer names a different winner from the strip above it. An analyst who
+scrolls to the bottom before writing the memo reads the same ranking the top of the page gave them. The pasted IC
+table no longer tells the committee Egypt or Netherlands "wins" a comparison that did not rank them.
+
+| 30 common screening sets | before (v777) | after (v778) |
+|---|---|---|
+| notice crowns a column the strip set aside | 14 | 0 |
+| cold-load North Sea Trio: winner named under the grid | Netherlands 23.4% (set aside above) | none; states UK 49.2% › Norway 68.0% |
+| IC-memo paste carries a "wins" claim the strip contradicts | 14 | 0 |
+
+**Verification (all run this cycle, in the foreground, on the v778 tree at 127.0.0.1:8481, which `cmp`-matched the file on disk):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+- Census re-run over the same 30 sets: 0 crowned-but-set-aside, 0 page errors.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8481/`,
+  `ORCA_REPORT_FILE=/tmp/rt_v778.txt`, read from its own report: **299 PASS / 0 FAIL / 1 WARN**. The WARN and the
+  single console error are the known localhost `sw.js` 404 ("A bad HTTP response code (404) was received when
+  fetching the script"), as in cycles 675-684 locally.
+- Pixel gate `pixel_audit.js`, baseline not updated: **PIXEL GATE PASS — no surface got worse than baseline**. The
+  report header confirms url `http://127.0.0.1:8481/`.
+- Step 5b: 390x844 `hasTouch` (`pointer: coarse` true), North Sea Trio, Egypt/Algeria/Libya and
+  Guyana/Suriname/Namibia: scrollWidth 390/390 on all three. The notice is 362px wide with no internal overflow,
+  the Copy for IC Memo button is 44px, and there were 0 page errors. The clipboard read after pressing it carries the
+  corrected notice. At 1440: 1440/1440, 0 page errors. No control was added or resized.
+- STILL LOCKED respected: v612 mobile layer and `#reference-panel` untouched. No new banner (the existing notice
+  changed its claim). No tooltip, FAQ or citation work. CP headline, FC columns and tab order untouched. Version
+  v777 → v778 at the three display sites.
+
+**Deliberately NOT done:**
+- The notice still sits under the grid, ~1,300px down at 1440. It now agrees with the strip, but moving it up was not
+  measured and was not done.
+- `_cmpDqOf().hasProduction` (proxy tier) and `_cmpHasProd()` (producer set) are separate predicates. They agreed on
+  every set walked, but that was not proven across all 185.
+- The quickstart tooltips still quote headline takes (Netherlands "~48%") that do not match the grid (23.4%). This is
+  a tooltip, so it was left alone under the ban. Flagged for a data check.
+
+**Shipped:** petroleum-fiscal-db `9d22deb` (v778). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, `cmp` OK, byte-identical.
+
+---
+## Cycle 685 Log — 2026-09-10 22:46
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: # Cycle 685: Side-by-Side no longer names a different winner below the grid than the strip at the top (v778)
+
+**Task:** T3, "How do these three countries compare side by side?" It had gone longest without a turn; the last cycle was T5.
+
+**Friction:** I opened Side-by-Side cold and typed Egypt, Algeria and Libya. The strip at the top of the page said:
+
+> NOTHING RANKS HERE: Only Libya carries a comparable take… Set aside: Egypt — statutory terms… not a rank position
+
+Further down the page, a bold
