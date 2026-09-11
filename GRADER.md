@@ -43617,3 +43617,16 @@ countries can no longer be read as Brazil's.
 
 **Shipped:** petroleum-fiscal-db `946ea10` (v776). Mirror copied to
 `office/projects/oil-gas-expertise/fiscal_db_interface.html`, byte-identical (`cmp` OK).
+
+---
+## Cycle 683 Log — 2026-09-10 21:02
+- Test before: 300 PASS / 0 FAIL
+- Test after: 300 PASS / 0 FAIL
+- JS errors: 0
+- Summary: **Model:** Opus 5 | **Directive:** DIRECT (loop directive) | **Task:** Cycle 683
+
+# Cycle 683: the Country Profile's IRR button now runs the country's own terms (v776)
+
+**Task:** T2, "Is this one country attractive at $75/bbl, and can I defend that?" It had gone longest without a turn; the last cycle was T1.
+
+**Friction:** I opened Brazil cold on Country Profile. The headline doesn't show an IRR, because the stored per-country IRRs are unusable (Brazil's is 280%). Its IRR cell is a button, "→ Mo
