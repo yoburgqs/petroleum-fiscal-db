@@ -43992,3 +43992,85 @@ Everything left depends on the two background runs:
 3. **Commit v783**, with the suite and pixel numbers in the message. Waits on 1 and 2.
 4. **`git push origin main`** (v782 + v783). Waits on 3.
 5. **GRADER.md cycle 690 entry** (Task / Friction / Chan
+
+---
+## Cycle 691 — 2026-09-11 — T4, v784: the Reform Risk card's big predictability number is now the one it tells you to carry
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone longest without a turn; the last
+five cycles were T4 (686), T6, T1, T2 and T5.
+
+**Friction:** I walked it cold in a real browser: Reform Risk → "Check one country" → Nigeria. I also checked the
+Country Profile route (the headline chip "Reform risk 70/100 · …" calls `openReformRiskFor`), which lands on the
+same card. In the card's Fiscal Predictability slot (`#rr-fp-score`, built in `renderReformCountryVerdict()`), the
+18px band-coloured number read **73 MODERATE ▲ best case**. The number to carry sat beneath it in 10px type:
+"Carry ≤46 · LOW, not 73". Below that came a cohort paragraph, "3rd of 28 countries ORCA can measure … MODERATE here
+outranks any UNGRADED score", and then a second paragraph retracting it: "That rank and that comparison do not hold
+for Nigeria." The largest figure in that slot was the one the card had withdrawn. I measured all 185 lookups: **51**
+cards paint a ceiling, and on every one the big number was the refuted score. Examples: Uzbekistan 89 (carry ≤49),
+Netherlands 84 (≤59), Albania 81 (≤49), Thailand 80 (≤51), Georgia 62 (≤30). An analyst with twenty minutes copies
+the big number.
+
+**Change:** New `_rrFpHeadlineCeiling()`. It applies where `_fpObsCeilingFrom()` rates the correction material, by
+its existing rule: the band moves, or the correction is worth 5+ points. The slot then leads with **≤46 LOW ceiling**
+in the ceiling's band colour. Beneath it, "printed ~~73 · MODERATE~~ ▲ best case" is struck through. It is called
+from both paint paths, `_rrPaintObsSpread` (one-term cohort) and `_rrPaintIqrUnderstated` (measured cohort). Where
+the band moves, the withdrawn cohort paragraph is **replaced** by one line, "No cohort rank for Nigeria. …",
+instead of having its retraction stacked under it. Nothing is recomputed: the ceiling is the same object Country
+Profile's IC paste and XLSX already read. Below materiality the slot is unchanged.
+
+**Result:** the first number the analyst reads for predictability is now the one they can defend in committee. They
+no longer have to read three paragraphs to learn that the big number is withdrawn. On Nigeria the card is also
+131px shorter at 1440.
+
+| lookup | slot headline before (v783) | after (v784) |
+|---|---|---|
+| Nigeria | 73 MODERATE ▲ best case | ≤46 LOW ceiling · printed ~~73 · MODERATE~~ |
+| Uzbekistan | 89 UNGRADED ▲ best case | ≤49 LOW ceiling · printed ~~89 · UNGRADED~~ |
+| Georgia | 62 UNGRADED ▲ best case | ≤30 VERY LOW ceiling |
+| Kazakhstan | 73 MODERATE ▲ best case | ≤53 LOW ceiling |
+| Philippines (70 → 69, not material) | 70 UNGRADED ▲ best case | unchanged |
+| Ghana / Iraq (nothing refuted) | 52 LOW / 47 LOW | unchanged |
+
+**Verification (run this cycle on the final tree at 127.0.0.1:8913, all in the foreground):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+- Chromium probe over all 185 lookups at 1440x900 and at 390x844 `hasTouch` (`pointer: coarse` true):
+  - 45 of the 51 ceiling cards lead with the ceiling, and the headline equals the "Carry ≤N" bound on all 45.
+  - The 6 non-material cards are unchanged: Algeria, India, Venezuela, Mozambique, Niger, Philippines.
+  - The suite's four refuted countries (Uzbekistan, Thailand, Georgia, Norway) still carry "best case" inside
+    `#rr-fp-score`; its KEEP set (Ghana, Iraq, Guyana, Bahamas) is unmarked.
+  - The retraction stacked under a cohort paragraph appears on 0 cards (was 7).
+  - Re-arm works: Uzbekistan → Ghana → Uzbekistan repaints the ceiling.
+  - The Country Profile route (`openReformRiskFor('Uzbekistan')`) shows the ceiling.
+  - Nigeria's card is 1555 → 1424px at 1440 and 3339 → 3208px at 390. 0 page errors at both sizes.
+- Step 5b: scrollWidth 1440/1440 and 390/390. No controls were added; the new elements are text spans.
+- Graded suite `office/tools/petroleum/tests/runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8913/`,
+  `ORCA_REPORT_FILE=/tmp/rt_v784.txt`, run on the combined v783+v784 tree and read from its own report:
+  **299 PASS / 0 FAIL / 1 WARN**. The WARN is the localhost `sw.js` 404.
+- Pixel gate `pixel_audit.js`, `TEST_URL=http://127.0.0.1:8913/index.html`, baseline not updated: **PIXEL GATE PASS**.
+- STILL LOCKED respected. The v612 mobile layer and `#reference-panel` are untouched. There is no banner, tooltip,
+  FAQ or citation work, no FC column change and no tab-order change. Version v783 → v784 at the three display sites.
+
+**Also this cycle — cycle 690's stranded v783 (T5) verified and committed as `38b04f0`.** Cycle 690 left it
+uncommitted: its suite and pixel runs had been backgrounded and died with the browser ("Target page closed"), so
+they produced no code result. I probed it via the clipboard at 127.0.0.1:8913:
+- Guyana's paste now reads "54.1% — range by regime: Concession 18.1% · PSC 56.5% (38.4pp)".
+- Liberia's reads "(38.0pp)" with the quote-the-row verdict.
+- Neither pastes "price to one statutory term".
+
+The graded suite above covers v783 too.
+
+**Deliberately NOT done:**
+- Norway's IC paste (Country Profile → Copy for IC Memo) still says "All 7,643 of this country's contracts price to
+  one statutory term" in the predictability context sentence. That sits beside note 1, which says those quartiles
+  are not usable for Norway. `_fpCiteVerdict()`'s one-term branch is fixed only for the regime-split case (v783),
+  not for the contract-sample-refuted case. It is a T5 item.
+- The `#rr-fp-bound` line under the new headline still opens "Carry ≤46 · LOW, not 73 · MODERATE", which now
+  repeats the headline. It was left because its explanation of the ceiling's arithmetic is still needed.
+- On a phone, a native `select` change still scrolls to the IC action (v759), so the predictability slot starts
+  below the fold (Nigeria: top 921 of 844). That is by design; the IC action is the answer.
+- Overnight chain email "FAILED — 2026-09-11": this is harvest `NO-DELTA`, 550 records attempted and 0 new facts. The
+  other six steps passed, integrity is OK and results were pushed. It is the exhausted-contract-list case CLAUDE.md
+  already flags, not a UX defect.
+
+**Shipped:** petroleum-fiscal-db `38b04f0` (v783) and `2678412` (v784). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
