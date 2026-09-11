@@ -45169,3 +45169,92 @@ this UX cycle; it is now noted in three consecutive cycle logs.
 This is v798, pushed as `9eb7f32`, with the GRADER.md entry as `ae6d84c`. The Office mirror copy matches `index.html` exactly. When I checked right after pushing, GitHub Pages was still serving v796, so the live site had not rebuilt yet.
 
 **Cycle 704's work was never committed.** Cycle 704 (T3, v797) left its Side-by-Side fix uncommitted. Its log said the commit was waiting on the test suite, but that suite w
+
+---
+## Cycle 706 Log — 2026-09-11 — T6 (v799)
+
+**Task:** T6, "Where did this number come from and how solid is the evidence?" It had gone the longest without a
+turn; the last T6 was cycle 700, and since then 701 T5, 702 T1, 703 T4, 704 T3, 705 T2.
+
+**Walk:** cold, no storage, 1440x900 and 390x844 `hasTouch`, against the local tree at 127.0.0.1:8940. Home ->
+Fiscal Compare -> tap the row -> the drilldown drawer -> the `N of M model terms cited ->` chip -> the Country
+Profile Evidence Chain. The chain end of that route is in good shape: at 390 it lands at y=314-360 and renders
+whole for USA, Iraq and Somalia — LINK DEAD, NOT HELD, NO SOURCE, the off-model divider and the tier letters all
+fit in 336px, 0 page errors. The friction is one step earlier.
+
+**Friction:** the drawer opens where the analyst cannot read it. It is a row inside `#tbl-fc`, which lives in a
+`.tbl-wrap` capped at `calc(100vh - 150px)` with its own `overflow-y`, so it opens wherever the tapped row happens
+to sit inside that box and **nothing scrolls**. The drawer's Src grade badge and its `N of M model terms cited ->`
+chip — the tab's entire answer to T6 and its only route to the Evidence Chain — open below the fold.
+*Where:* `index.html` `openFCDrilldown` -> `row.after(newRow); _fcFitDrawer();` (no scroll of either scroller).
+*Measured on v798, cold:*
+
+| | readable slot | drawer height | Src badge / terms chip |
+|---|---|---|---|
+| 390 touch, row 1 (USA) | **189px** | 1,865px | y=958 / 989 — **below the 844 fold** |
+| 390 touch, row 3 (Somalia) | 189px | 2,375px | y=1,163 / 1,194 — **below the fold** |
+| 390 touch, row 12 (United Kingdom) | 189px | 1,869px | y=1,050 / 1,081 — **below the fold** |
+| 1440, row 12 (United Kingdom) | 679px | 836px | y=938 / 935 — **below the box (940) and the fold (900)** |
+| 1440, rows 1 and 3 | 679px | 934/956px | in view |
+
+The slot is the part of the box below the sticky chrome and the sticky `thead` that is still above the fold. Rows 1
+and 3 are fine at 1440, which is why this survived: it is invisible from the top of the table and appears as soon
+as the analyst scrolls the ranking.
+
+The recovery was worse than the symptom. A real 300px touch swipe inside that 189px slot (CDP
+`Input.synthesizeScrollGesture`, touch source) moved the **page 0px** and the **box 300-323px** on all three phone
+rows: the gesture latches onto `.tbl-wrap`, so swiping the drawer cannot scroll the page to the drawer. The analyst
+read a 2,000px document through a 189px letterbox.
+
+**Change:** new `_fcRevealDrawer(row)`, called from `openFCDrilldown` immediately after `_fcFitDrawer()`. It aims
+both scrollers once, on open:
+- the page, so the table box sits directly under the sticky chrome — and only when that gains slot; a box already
+  wholly on screen is left exactly where it is;
+- then the box, re-measured after the page moved, so the opened row sits directly under the sticky `thead`.
+- `_fcTopChrome()` measures `.site-header` / `.tab-nav-wrapper` / `.fc-controls` as `top + offsetHeight`, the same
+  measure `_cpBackToList()` already uses, so it is what the chrome will cover once stuck rather than where it sits
+  before the scroll. Max, not sum, so stacked chrome cannot double-count.
+- Instant, not smooth: the arrow keys re-enter `openFCDrilldown` to step through the ranking, and a 300ms animation
+  per step would fight itself. Wrapped in try/catch — a drawer that opened is better than a throw.
+- No value, badge, chip, column, text or tab changes. Closing is unaffected (the toggle returns before the insert).
+
+**Result:** an analyst who taps a Fiscal Compare row lands with the opened country at the top of the table box, and
+the drawer's evidence grade and its one link to the term-by-term Evidence Chain are on screen from the tap — on a
+phone, and on a desktop for rows below the first screenful. They no longer have to discover that swiping the drawer
+moves the wrong scroller.
+
+| after (v799) | 1440 | 390 touch |
+|---|---|---|
+| readable slot | 679 -> **719px** | 189 -> **655px** |
+| Src badge + terms chip in the slot, rows 1 / 3 / 12 | 2/3 -> **3/3** | 0/3 -> **3/3** |
+| scrollWidth / clientWidth | 1440/1440 | 390/390 |
+| page errors | 0 | 0 |
+
+**Verification (run this cycle, foreground, final bumped tree, `http://127.0.0.1:8940/`):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**. Run after the edit and again after the bump.
+- `/tmp/c706/measure.js`, before and after, 3 rows x 2 viewports: the tables above, 0 page errors.
+- Step 5b: scrollWidth 390/390 and 1440/1440 with the drawer open. No control was added or touched, so no new
+  `pointer: coarse` target; the terms chip stays 44px.
+- Graded suite `runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8940/`, read from its own report
+  `/tmp/c706/rt_v799.txt`: **299 PASS / 0 FAIL / 1 WARN**. The WARN and the single console error are the localhost
+  `sw.js` 404 recorded since cycle 684. The suite's own FC drawer tests (Src badge for Kazakhstan / Norway /
+  Nigeria, the IC-ready gate, the grade warning) pass — they call `openFCDrilldown` directly and read the DOM, so
+  the scroll does not touch them.
+- Pixel gate `pixel_audit.js`, baseline **not** updated: **PIXEL GATE PASS — no surface got worse than baseline**.
+- STILL LOCKED respected: no tooltip, FAQ, banner or citation change; no text-only edit; FC columns and the removed
+  Govt NPV column untouched; CP headline untouched; the v612 mobile layer, its `min-width: max-content` marker and
+  `#reference-panel` untouched; tab order unchanged. Version v798 -> v799 at the three display sites.
+
+**Deliberately NOT done:**
+- The phone drawer is still 1,865-2,375px tall inside a 694px box, so reading it end to end is still a long scroll
+  inside the box. This cycle made the box readable and put the evidence route in the first screen; it did not
+  shorten the drawer. That is its own cycle.
+- The `LINK DEAD` rows still carry a live `<a href>` to the dead address (USA Royalty -> boem.gov 404). It is
+  labelled, and prior cycles kept the href deliberately; not revisited.
+- The 2026-09-11 "overnight chain FAILED" email (`petroleum_overnight` last exit 1) is still uninvestigated. Out of
+  scope for a UX cycle; this is the fourth consecutive cycle log to note it.
+- About a dozen `python -m http.server` processes from earlier cycles (ports 8211-8940) are still running. This
+  cycle reused 8940 and started none.
+
+**Shipped:** petroleum-fiscal-db `0aa3273` (v799). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`; `cmp` confirms it is identical.
