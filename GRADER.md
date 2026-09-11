@@ -44963,3 +44963,86 @@ This is v795, pushed as `9d3942d`, with the GRADER.md entry as `b0411bf`. The Of
 **Task:** T1, "Which countries should even be on my screening list?" It had gone the longest without a turn; the last T1 cycle was 696.
 
 **Friction:** I started from a cold load at desktop width and on a phone. 
+
+---
+## Cycle 703 Log — 2026-09-11 — T4 (v796)
+
+**Task:** T4, "What is my fiscal-stability and reform exposure here?" It had gone the longest without a turn: the last
+T4 was cycle 697 (v790), and since then there has been T3, T2, T6, T5 and T1.
+
+**Friction:** I walked it cold at 390x844 with `hasTouch` and at 1440x900. The worst moment came after the verdict was
+read: **browser Back from Reform Risk never went back to where the analyst came from.** Reform Risk was not in
+`switchTab()`'s `tabHashMap`, so arriving there pushed no history entry and the address bar kept the previous tab's
+hash. Measured on the committed v795:
+- Home "Reform Risk" card → Reform Risk → Nigeria → Back: **left ORCA entirely** (`about:blank`).
+- Fiscal Compare → USA Stability cell → Back: stayed on Reform Risk and jumped to y=0. A second Back would leave the
+  site.
+- Country Profile, Nigeria → "Reform Risk →" → Back: opened **Indonesia's** Country Profile (the cold-load default).
+  The swipe skipped the Reform Risk visit and popped the entry before the Nigeria pick. Nothing on screen said the
+  country had changed.
+- Reload on a verdict: landed on Home with the lookup empty.
+
+On a phone, Back is the swipe, the one navigation an analyst makes without looking. v790 added the "← Fiscal Compare"
+button and deliberately left Back unfixed.
+
+**Change:**
+- Entering Reform Risk pushes `#/reform`, and the lookup keeps the URL on the country shown as `#/reform/<country>`. It
+  uses `replaceState`, so checking five countries still costs one Back.
+- Back to the entry the analyst came from restores that tab at the scroll offset it was left at: Home, Fiscal Compare
+  on the row, Country Profile on the same country, and the Explorer through `_cpBackToList()`. This is
+  `_rrLeaveByHistory()`, run ahead of `parseAndNavigate()` in the hashchange listener.
+- The "← origin" button is now `history.back()` while its own entry is current, so button and swipe cannot disagree,
+  and Back afterwards does not bounce into Reform Risk again.
+- Leaving by a tab button writes the destination's own URL. Country Profile waits for its country and Breakeven Map
+  gets a hash-less URL, so a reload there does not reopen Reform Risk.
+- A cold, reloaded or shared `#/reform/<country>` opens that verdict. This is a new `parseAndNavigate` branch that
+  polls until the lookup is filled.
+
+**Result:** the analyst checks a country's reform exposure, swipes back, and is on the row or profile they came from,
+still on the same country. They can also reload or send `#/reform/nigeria` and land on Nigeria's verdict rather than
+on Home.
+
+| measured on the final tree, 127.0.0.1:8931 | v795 | v796 |
+|---|---|---|
+| Home → RR → Back | about:blank | Home, y restored (200 → 200 at 390) |
+| FC Stability cell → RR → Back | Reform Risk, y=0 | Fiscal Compare, y=638 at 1440 / 1614 at 390 (exact) |
+| CP Nigeria → RR → Back | CP **Indonesia**, y=0 | CP **Nigeria**, `#/profile/nigeria`, y=299 at 390 (exact) |
+| Reload on a verdict | Home, lookup empty | Reform Risk, Norway verdict on screen |
+| Cold `#/reform/guyana` | (no route) | Reform Risk, Guyana verdict on screen |
+
+**Verification (run this cycle, foreground, final bumped tree):**
+- JS syntax gate: 11 inline blocks, `node --check`, **0 failures**.
+  - My first attempt did not run: zsh aborted on an empty glob. The result above is from the re-run under bash.
+- `/tmp/c703/verify.js` at 1440x900 and 390x844 `hasTouch`: **66 OK / 0 BAD**, 0 page errors. It covers:
+  - the three routes above, via Back and via the button;
+  - Forward;
+  - reload, and Back after a reload;
+  - tab-button exits to Breakeven Map, Country Profile and Fiscal Compare, and Back into Reform Risk from each;
+  - cold `#/reform/guyana`, `#/reform`, `#/profile/norway`, `#/compare/norway+iraq+indonesia`, `#/explorer` and
+    `#/ioc`.
+  - The first run was 62/64. First-visit Country Profile left a hash-less history entry before its Indonesia auto-load
+    wrote its hash, so Back hit a dead entry. That is fixed: the exit now waits for the profile's country.
+- Step 5b, 390x844 `hasTouch`, `pointer: coarse` true: `#rr-back-origin` is 44px and `#rr-country-lookup` is 44px.
+  scrollWidth is 390/390.
+- Graded suite `runtime_comprehensive.js`, `TEST_URL=http://127.0.0.1:8931/`, read from its own report
+  (`/tmp/runtime_test_report.txt`, copied to `/tmp/c703/rt_v796.txt`): **299 PASS / 0 FAIL / 1 WARN**. The WARN is the
+  localhost `sw.js` 404 recorded since cycle 684. I passed `REPORT_FILE`, but the suite reads `ORCA_REPORT_FILE`, so it
+  wrote to its default path. The number above was read from that file.
+- Pixel gate `pixel_audit.js`, baseline not updated: **PIXEL GATE PASS**.
+- Regression: cycle 702's `/tmp/c702/verify.js` re-pointed at this tree gives the same result 702 recorded. 9 exact.
+  3 are Mexico at 1440 within 6px (425 → 431), which that script's ≤4px test flags. R1–R4 are OK. R5, cold
+  `#/explorer?mech=PSC` → Home, is the bug noted in 702 that predates it.
+- STILL LOCKED respected: no tooltip, FAQ, banner or citation change. Tab order is unchanged. The v612 mobile layer,
+  `#reference-panel`, the CP headline and the FC columns are untouched. Version v795 → v796 at the three display
+  sites.
+
+**Deliberately NOT done:**
+- Back to a hash-less entry still does nothing on Fiscal Compare, Explorer or IOC Portfolio: `parseAndNavigate('')`
+  returns early. The Home fallback is scoped to Reform Risk only.
+- Breakeven Map, Side-by-Side and the Reference tabs still have no URL of their own. Same class of defect, not walked
+  this cycle.
+- `#/explorer?mech=PSC` cold still lands on Home (from cycle 702's list).
+- The 2026-09-11 "overnight chain FAILED" email was not investigated in this UX cycle.
+
+**Shipped:** petroleum-fiscal-db `9eee80f` (v796). Mirror copied to
+`office/projects/oil-gas-expertise/fiscal_db_interface.html`, and `cmp` confirms it is identical.
