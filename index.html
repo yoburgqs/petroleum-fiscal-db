@@ -39,7 +39,7 @@
 <meta name="color-scheme" content="light">
 <meta name="format-detection" content="telephone=no,date=no,address=no,email=no">
 <meta name="application-name" content="ORCA Petroleum Fiscal Intelligence Platform">
-<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v782</title>
+<title>ORCA — Petroleum Fiscal Intelligence Platform | 71,576 Contracts, 185 Countries | v783</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%23F7F5F0' stroke='%23D0CAC0' stroke-width='1'/><path d='M16 5c-1.2 0-7 8-7 14a7 7 0 0014 0c0-6-5.8-14-7-14z' fill='%23B06800'/><circle cx='14' cy='17' r='1.5' fill='%23F7F5F0' opacity='.6'/></svg>">
 
 <!-- v310: Service Worker registration — cache-first for static assets, network-first for JSON data. Enables offline access and faster repeat-visit loading. Scope: /petroleum-fiscal-db/ -->
@@ -2298,7 +2298,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
     <span class="brand-orca">ORCA</span>
     <span class="brand-sep">&middot;</span>
     <span class="brand-meta" id="hdr-meta">Loading&hellip;</span>
-    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v782</span>
+    <span class="badge" id="hdr-version" style="background:rgba(176,104,0,.15);color:var(--accent);border:1px solid rgba(176,104,0,.3);border-radius:4px;padding:2px 8px;font-size:11px;font-family:monospace;margin-left:8px;">v783</span>
   </div>
   <div class="header-actions">
     <button class="nav-search-btn" id="hdr-search-btn" title="Search (Ctrl+K)" aria-label="Search countries and mechanics (Ctrl+K)">Search <span style="font-size:10px;opacity:.6">Ctrl+K</span></button>
@@ -2368,7 +2368,7 @@ tbody tr:nth-child(even) { background: rgba(0,0,0,0.018); }
       <span style="font-size:18px;font-weight:900;letter-spacing:2px;">ORCA</span>
       <span style="font-size:13px;margin-left:10px;color:var(--muted);">Petroleum Fiscal Intelligence Platform</span>
     </div>
-    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v782</span> &middot; Exported <span id="print-export-date"></span></div>
+    <div style="font-size:11px;color:var(--muted);" id="print-header-meta">yoburgqs.github.io/petroleum-fiscal-db &middot; <span id="print-header-ver">v783</span> &middot; Exported <span id="print-export-date"></span></div>
   </div>
   <div style="font-size:12px;color:var(--muted);margin-top:5px;" id="print-header-view"></div>
 </div>
@@ -25239,11 +25239,23 @@ function _fpCiteVerdict(score, d) {
   var nC = (d && d.n != null) ? Number(d.n).toLocaleString() : 'its';
   var k = _fpCnt();
   if (disp.state === 'single') {
+    // v783 (T5): "All N contracts price to one statutory term" is false where the country's own regime
+    // rows split (Guyana: PSC 56.5% on 134, Concession 18.1% on 9). The IQR penalty was still never
+    // charged, which is what this sentence exists to say; only the stated reason changes.
+    var _sp783 = (typeof _cpRegimeSplit === 'function') ? _cpRegimeSplit(d) : null;
+    var _why783 = _sp783
+      ? 'The bundled quartiles put the middle half of this country\u2019s ' + nC + ' contracts at one take, but it is '
+        + 'not one statutory term: its regimes split, ' + _sp783.lo.mechanic + ' at ' + _sp783.lo.take.toFixed(1) + '% ('
+        + Number(_sp783.lo.nPriced).toLocaleString() + ' contracts) against ' + _sp783.hi.mechanic + ' at '
+        + _sp783.hi.take.toFixed(1) + '% (' + Number(_sp783.hi.nPriced).toLocaleString() + '), '
+        + _sp783.pp.toFixed(1) + 'pp apart. Because the quartiles collapsed, the '
+      : 'All ' + nC + ' of this country\u2019s contracts price to one statutory term, so the ';
     var _one = 'ORCA does not band this number and it is not a '
-      + 'stability finding. All ' + nC + ' of this country\u2019s contracts price to one statutory term, so the '
+      + 'stability finding. ' + _why783
       + 'interquartile-range penalty \u2014 the largest of the three components, worth up to \u221240 points \u2014 was never '
       + 'charged, and what is left is price swing and mechanic count. All ' + k.nHigh + ' scores on this platform that '
-      + 'would fall in the HIGH band belong to one-term regimes like this one, and not one of the ' + k.nMeas
+      + 'would fall in the HIGH band belong to ' + (_sp783 ? 'collapsed-quartile scores like this one' : 'one-term regimes like this one')
+      + ', and not one of the ' + k.nMeas
       + ' countries whose spread ORCA measured reaches HIGH (ceiling ' + k.ceil + '). A graded MODERATE outranks '
       + 'this score however high its number. Do not cite it as evidence of fiscal stability';
     // \u2500\u2500 v758 (T5): the one-term branch carries its ceiling in the CELL, as v720 did for graded \u2500\u2500
@@ -43744,6 +43756,35 @@ function _icTakeDispersion(d, hd) {
           + pp.toFixed(1) + 'pp measured), so the block signed moves the take. '
           + _close(lo, hi, 'the middle half of this country\u2019s contracts does not')
     };
+  }
+  // \u2500\u2500 v783 (T5): the paste still called a 38pp regime split "one statutory term" \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+  // Walked T5 cold: Country Profile -> Guyana -> "Copy for IC Memo" -> paste. v782 made the page
+  // read "Contract take: 18.1\u201356.5% by regime (38.4pp)" and "Take is a range here, not a point",
+  // but this function fell through to null whenever p25 = p75, so the memo table carried a bare
+  // 54.1% and note 2 told the committee "All 143 of this country's contracts price to one
+  // statutory term". The artifact that leaves the tool repeated the claim the page had withdrawn.
+  // 32 of 185 countries at cold load (Guyana, Liberia, Russia, Colombia, Peru, Thailand, Angola...).
+  // Same predicate as the chip (_cpRegimeSplit) and the same sentence as the screen (_cpDefendG1
+  // 'headline', tags and the jump button stripped), so the paste and the page cannot drift. The
+  // cell states the regime range without an instruction; the verdict-dependent instruction
+  // (carry the range / quote the regime row) lives in the note, exactly as on screen.
+  if (d.p25_take != null && d.p75_take != null && Math.abs(d.p75_take - d.p25_take) < 0.05
+      && typeof _cpRegimeSplit === 'function' && typeof _cpDefendG1 === 'function') {
+    var sp = _cpRegimeSplit(d);
+    var scr = sp ? _cpDefendG1(d, hd, 'headline') : '';
+    if (scr) {
+      var body = scr.replace(/<button[\s\S]*?<\/button>/g, '').replace(/<[^>]+>/g, '')
+        .replace(/&quot;/g, '"').replace(/&amp;/g, '&').replace(/\s+/g, ' ').trim()
+        .replace(/^Take is a range here, not a point\.\s*/, '');
+      return {
+        material: true,
+        cell: ' \u2014 range by regime: ' + sp.lo.mechanic + ' ' + sp.lo.take.toFixed(1) + '% \u00b7 '
+            + sp.hi.mechanic + ' ' + sp.hi.take.toFixed(1) + '% (' + sp.pp.toFixed(1) + 'pp)',
+        note: 'Government take @ $75/bbl, ' + hd.toFixed(1) + '% \u2014 take is a range here, not a point. '
+            + body + ' The bundled quartiles hold p25 = p75 because they describe only the middle half of '
+            + d.country + '\u2019s contracts; they are not one statutory term.'
+      };
+    }
   }
   return null;
 }
